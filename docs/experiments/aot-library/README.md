@@ -86,7 +86,7 @@ restriction and a deliberately small value profile. This does not claim general
 .NET-style library compatibility, performance gains or general trimming.
 
 The subsequent slice below now specializes generic values across this verified boundary.
-The actual System.Result runtime load-set and propagation-interface contracts remain next. The [library Result probe](../aot-values/README.md#real-library-result-dependency-boundary-2026-10-07)
+The subsequent runtime-context and verified interface-contract slices below admit direct calls for actual System.Result. The [library Result probe](../aot-values/README.md#real-library-result-dependency-boundary-2026-10-07)
 still needs generic runtime-library and interface support. UTF-8 console input/lifetimes,
 multiple generic instantiations and the HTTP driver remain later work.
 
@@ -153,10 +153,26 @@ This admits the complete runtime library without claiming its entire API can com
 [Context evidence](context-validation.json) uses the pinned runtime-owned seed/library
 with the existing generic Pair fixture and the real System.Result fixture. Both pass the
 interpreter. Pair also passes AOT admission and isolated native execution with only
-libSystem linkage. Result now passes context validation, specialization and direct-call
-selection, then fails **compilation** with `implemented interfaces require a later AOT
-profile`. Its `Propagatable<Result<T,E>,T,E>` relationship remains present in the private
-projection; this slice does not erase it or claim a native Result executable.
+libSystem linkage. That historical report records Result's earlier interface rejection.
+[Direct-call Result evidence](result-validation.json) now validates both native executables,
+including both success/error paths through `if let` and `let ... else`.
+
+Only explicit, fully verified load sets receive this treatment: the runtime validates all
+original interface relationships and contract implementations before specialization and
+selection. The private direct-call projection omits those relationships;
+`verifiedInterfaceRelationships` reports selected owners with original definition identities
+and specialized interface types. Original artifacts remain unchanged. This is not an exported
+metadata image or stable interface ABI. Interface storage, dispatch (including unreachable
+calls), explicit implementation mappings and generic methods remain unsupported. Missing or
+mismatched implementations fail original verification, even if their methods would be excluded.
+
+Like the existing .NET Native AOT comparison, required direct library bodies are compiled at
+build time. Unlike general Native AOT interface support, this bounded backend only uses
+conformance as a validation obligation. Omitting metadata-only relationships reduces the
+code-generation closure, at the cost of prohibiting interface execution/reflection and
+requiring the complete original load set during compilation. General trimming is not implemented.
+All 59 isolated AOT tests pass, including missing/signature-mismatched implementations,
+interface storage and unreachable virtual-call rejection.
 
 Reproduce without rebuilding producer fixtures:
 

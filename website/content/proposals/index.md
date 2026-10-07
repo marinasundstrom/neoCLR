@@ -223,21 +223,20 @@ now runs Raven constructors, fields, accessors and record-copy/branch samples na
 including nested reference-free payloads, ordinary output parameters, Byte tags and
 overloaded members. An [ordinary Raven Some/None app](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-union/README.md)
 now runs as a standalone ARM64 executable using explicit closed-world code selection;
-its unused generated formatting/boxing members are reported as excluded. Result and
-a console-input consumer remain next steps toward HTTP Server. Execution budgets and general managed
+its unused generated formatting/boxing members are reported as excluded. A console-input consumer remains the next step toward HTTP Server. Execution budgets and general managed
 services remain unsupported.
 A local generic Result app now runs with one closed instantiation per local value type;
 `let ... else` and `if let` patterns cover success and non-match branches. Plain positional
-`let` deconstruction remains a pinned Raven native-emitter gap. General library Result,
-multiple generic instantiations and native input/lifetimes are still pending. A real
-library Result consumer now passes the interpreter; read-only closed-world inspection
-reports its external-call AOT boundary. A subsequent nongeneric value-library slice now compiles separate Raven library and
+`let` deconstruction remains a pinned Raven native-emitter gap. Multiple generic instantiations and native input/lifetimes are still pending. The first
+real library Result probe passed the interpreter and recorded an external-call AOT boundary. A subsequent nongeneric value-library slice now compiles separate Raven library and
 application artifacts into one executable, checking original access scopes before
 selection. Generic value-library specialization now also passes a Pair<int, byte>
 consumer with copied values and default initialization, limited to one closed shape per
 type definition. Explicit runtime-owned System/Object validation contexts now pass;
-the real library Result reaches specialization/selection but still fails implemented-
-interface admission. Runtime-library Result execution remains open.
+the real library Result now executes both success/error paths in a standalone ARM64
+image. Original interface conformance is checked before relationships are omitted from
+the private direct-call projection; interface execution remains unsupported. Native
+UTF-8 input and lifetime contracts are the next consumer-driven step.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

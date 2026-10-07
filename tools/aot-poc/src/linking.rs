@@ -125,7 +125,24 @@ pub fn prepare(
     } else {
         None
     };
-    let input = specialized.as_ref().map_or(&joined, |(module, _)| module);
+    // Original conformance was verified above, before relocation or specialization.
+    // Direct code does not need interface relationships. Preserve them in the report,
+    // but do not pull unused contracts into the executable closure. Interface types,
+    // explicit implementations and interface operations still fail backend admission.
+    let mut direct = specialized
+        .as_ref()
+        .map_or(&joined, |(module, _)| module)
+        .clone();
+    let relationships: Vec<_> = direct
+        .types
+        .iter_mut()
+        .enumerate()
+        .map(|(i, ty)| {
+            let interfaces = std::mem::take(&mut ty.implements);
+            json!({"definition": types[i], "name": ty.name, "interfaces": interfaces})
+        })
+        .collect();
+    let input = &direct;
     let (selected, mut report) = super::selection::select_inventory(input, root, false)?;
     if let Some((_, mut specialization)) = specialized {
         for row in specialization["types"].as_array_mut().unwrap() {
@@ -143,6 +160,18 @@ pub fn prepare(
             row["definition"] = json!(types[row["sourceIndex"].as_u64().unwrap() as usize]);
         }
     }
+    report["verifiedInterfaceRelationships"] = json!(
+        report["types"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|row| &relationships[row["sourceIndex"].as_u64().unwrap() as usize])
+            .filter(|row| !row["interfaces"].as_array().unwrap().is_empty())
+            .collect::<Vec<_>>()
+    );
+    report["interfacePolicy"] = json!(
+        "original load-set conformance verified; relationships omitted only from private direct-call projection; interface operations, storage and explicit implementations unsupported"
+    );
     report["loadSet"] = json!({"modules": inputs.iter().map(|m| json!({"name": m.name, "revision": m.revision})).collect::<Vec<_>>(),
         "validation": "all original bodies verified with runtime binder before private canonical projection",
         "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "scope": "validation only; System seed bodies are not compilation inputs"},

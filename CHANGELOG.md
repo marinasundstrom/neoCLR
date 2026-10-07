@@ -102,8 +102,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   inspection, preserving the runtime's original identity, root-slot and access checks.
   Permit verified unselected generic methods while retaining selected-method rejection.
   Validate a standalone generic value app against the pinned runtime-owned context; the
-  real library Result now reaches specialization/selection and stops at an explicit
-  implemented-interface diagnostic. System seed bodies remain validation-only; no native
+  real library Result initially stops at an explicit implemented-interface diagnostic.
+  The next slice verifies original interface conformance, reports source identities and
+  specialized relationships, then omits metadata-only relationships from the private
+  direct-call projection. The actual System.Result<int, byte> consumer runs standalone
+  on ARM64, covering success/error `if let` and `let ... else` branches. Reject malformed
+  implementations, interface storage and dead dispatch. System seed bodies remain validation-only; no native
   reference services, interface execution or public ABI/runtime APIs are added.
   General unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,

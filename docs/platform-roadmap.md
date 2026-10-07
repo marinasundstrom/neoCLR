@@ -66,8 +66,9 @@ compiles separate Raven library/application artifacts into one standalone execut
 verifying original access scopes before projection. A follow-up now specializes one
 closed generic value shape across that boundary, validated by Pair<int, byte>. The
 runtime-owned System/Object validation context is now explicit and tested. The real
-Result probe passes specialization/selection and stops at its implemented propagation
-interface; that contract is the next bounded step. Multiple instantiations
+Result probe now runs as a standalone ARM64 executable: original interface conformance
+is verified before metadata-only relationships are omitted from the direct-call projection.
+Interface dispatch remains unsupported. Native UTF-8 input and lifetime contracts are next. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

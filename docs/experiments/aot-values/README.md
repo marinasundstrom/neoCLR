@@ -450,6 +450,6 @@ this does not change the recorded rejection of the System.Result probe.
 
 With the subsequent [explicit runtime context](../aot-library/README.md#explicit-runtime-validation-context-2026-10-07),
 the real library Result probe now passes loading, verification and specialization/selection.
-Its remaining observed boundary is implemented-interface admission, not an unresolved
-external call. The original dependency report remains historical evidence; no Result
-native executable is claimed yet.
+The subsequent verified interface-contract slice now runs this consumer as a standalone
+ARM64 executable, covering both success/error branches. See the [direct-call evidence](../aot-library/result-validation.json).
+The original dependency report remains historical evidence; interface execution is still unsupported.

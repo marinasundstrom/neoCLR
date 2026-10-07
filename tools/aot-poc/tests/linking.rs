@@ -491,3 +491,93 @@ fn unused_generic_methods_are_verified_but_selected_ones_still_fail() {
     assert!(!result.status.success());
     assert!(!dir.0.join("app.o").exists());
 }
+
+fn interface_modules() -> Vec<neoclr::Module> {
+    neoclr::assembler::assemble_modules(&[
+        ".module App\n.references (Models)\n.entry Main\n.function Main() -> Int32\n.local Cell c\nldc.i4 42\nnewobj Cell\nstloc c\nldloca c\ncall instance Cell::Get()\nret\n.end",
+        ".module Models\n.interface Read\n.method instance byref Get() -> Int32\n.end\n.end\n.type Cell\n.implements Read\n.field Value Int32\n.method instance byref Get() -> Int32\nldarg this\nldfld Cell::Value\nret\n.end\n.end"
+    ]).unwrap()
+}
+
+#[test]
+fn verified_interface_contracts_allow_direct_value_calls() {
+    let m = interface_modules();
+    let dir = Temp::new();
+    let result = invoke(&dir, &encode(&m[0]), &[encode(&m[1])], "@entry", false);
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    let relationships = report["verifiedInterfaceRelationships"].as_array().unwrap();
+    assert_eq!(relationships.len(), 1);
+    assert_eq!(relationships[0]["definition"]["module"], "Models");
+    assert_eq!(relationships[0]["name"], "Cell");
+    assert!(
+        !report["types"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|t| t["name"] == "Read")
+    );
+    let inspection = invoke(&dir, &encode(&m[0]), &[encode(&m[1])], "@entry", true);
+    let inspection: serde_json::Value = serde_json::from_slice(&inspection.stdout).unwrap();
+    assert_eq!(inspection["selection"], report);
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    native(&dir, 42);
+}
+
+#[test]
+fn invalid_original_interface_contracts_never_emit() {
+    for case in 0..3 {
+        let mut m = interface_modules();
+        let contract = m[1]
+            .functions
+            .iter_mut()
+            .find(|f| f.name == "Read.Get")
+            .unwrap();
+        match case {
+            0 => contract.name = "Read.Missing".into(),
+            1 => contract.returns = neoclr::metadata::Type::Byte,
+            2 => contract.parameters.push(neoclr::metadata::Type::Int32),
+            _ => unreachable!(),
+        }
+        let dir = Temp::new();
+        let result = invoke(&dir, &encode(&m[0]), &[encode(&m[1])], "@entry", false);
+        assert!(!result.status.success(), "case {case} accepted");
+        assert!(!dir.0.join("app.o").exists());
+    }
+}
+
+#[test]
+fn selected_interface_storage_and_dead_dispatch_stay_unsupported() {
+    for dispatch in [false, true] {
+        let mut m = interface_modules();
+        if dispatch {
+            m[0].functions[0].body.push(Op::CallVirtual(
+                neoclr::assembler::parse_function_ref("instance Read::Get()").unwrap(),
+            ));
+        } else {
+            m[0].functions[0].local_names.push(Some("view".into()));
+            m[0].functions[0]
+                .locals
+                .push(neoclr::metadata::Type::InterfaceRef(Box::new(
+                    neoclr::metadata::Type::Named("Read".into()),
+                )));
+        }
+        let dir = Temp::new();
+        let result = invoke(&dir, &encode(&m[0]), &[encode(&m[1])], "@entry", false);
+        assert!(!result.status.success());
+        assert!(!dir.0.join("app.o").exists());
+        let error = String::from_utf8_lossy(&result.stderr);
+        assert!(
+            error.contains(if dispatch {
+                "virtual calls"
+            } else {
+                "reference-free"
+            }),
+            "{error}"
+        );
+    }
+}

@@ -86,7 +86,8 @@ Implement it in bounded stages:
    now passes the interpreter and records the runtime-library AOT boundary. Separate
    [value libraries](../aot-library/README.md), including bounded generic values, now
    compile. Explicit runtime-owned validation contexts now pass too; the Result
-   interface contract remains open.
+   interface conformance is now verified before direct-call compilation; the actual library
+   Result success/error consumer runs standalone. Multiple instantiations remain open.
 2. Define the native UTF-8 line-input and lifetime contract, including empty line versus
    EOF and I/O failure. Link the service into the executable and retain interpreter parity.
 3. Compile parsing and output with valid, invalid, overflow and EOF tests. Use the ordinary
@@ -97,4 +98,4 @@ counting before selecting a mechanism; reference counting has not been chosen. A
 server remains the later motivating sample. Stable metadata/native ABI exploration and
 benchmarks remain separate work, driven by concrete consumers rather than prerequisites
 for this next console milestone. This is the assistant's recommendation after the union
-milestone, not a claim that the library Result, input or string lifetimes already work in native code.
+milestone, not a claim that input or string lifetimes already work in native code.

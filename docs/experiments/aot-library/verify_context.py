@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check an explicit runtime-owned Object context without adding native heap support."""
+"""Check standalone Pair and library Result with an explicit runtime-owned Object context."""
 import argparse
 import hashlib
 import json
@@ -53,14 +53,25 @@ with tempfile.TemporaryDirectory(prefix='neoclr-aot-context-') as directory:
     r = subprocess.run([installed], cwd=directory, env={}, capture_output=True, timeout=10)
     assert r.returncode == 0 and r.stdout == b'' and r.stderr == b''
 probe = json.loads(run([aot, '--inspect', result, '@entry', '--closed-world'] + context))
-assert probe['admission']['accepted'] is False and probe['admission']['phase'] == 'compilation'
-assert 'implemented interfaces' in probe['admission']['firstError']
-assert probe['selection']['specialization']['types']
-run([aot, '--closed-world', result, '@entry', output / 'result.o'] + context, success=False)
-assert not (output / 'result.o').exists()
-report['resultProbe'] = dict(admission=probe['admission'], selectedTypes=[t for t in probe['selection']['types']],
-                           specialization=probe['selection']['specialization'])
+assert probe['admission']['accepted'] is True
+result_obj, result_binary = output / 'result.o', output / 'result'
+result_selection = json.loads(run([aot, '--closed-world', result, '@entry', result_obj] + context))
+assert result_selection == probe['selection']
+assert result_selection['verifiedInterfaceRelationships']
+run(['clang', '-arch', 'arm64', '-Wall', '-Wextra', '-Werror', host, result_obj, '-o', result_binary])
+assert run(['nm', '-u', result_obj]) == ''
+result_dependencies = [line.split()[0] for line in run(['otool', '-L', result_binary]).splitlines()[1:]]
+assert result_dependencies == ['/usr/lib/libSystem.B.dylib']
+with tempfile.TemporaryDirectory(prefix='neoclr-aot-result-') as directory:
+    installed = Path(directory) / 'result'
+    shutil.copy2(result_binary, installed)
+    r = subprocess.run([installed], cwd=directory, env={}, capture_output=True, timeout=10)
+    assert r.returncode == 0 and r.stdout == b'' and r.stderr == b''
+report['resultProbe'] = dict(admission=probe['admission'],
+    selection={key: result_selection[key] for key in ('functions', 'types', 'specialization', 'verifiedInterfaceRelationships', 'interfacePolicy')},
+    executableOnlyDirectory=True, emptyEnvironment=True, exit=0, dynamicDependencies=result_dependencies,
+    artifacts={f.name: sha(f.read_bytes()) for f in (result_obj, result_binary)})
 report['native'] = dict(executableOnlyDirectory=True, emptyEnvironment=True, exit=0, dynamicDependencies=dependencies,
                        artifacts={f.name: sha(f.read_bytes()) for f in (obj, binary)})
 save()
-print('Passed: explicit runtime context, standalone value executable, and Result interface rejection')
+print('Passed: explicit runtime context, standalone value executable, and standalone library Result executable')
