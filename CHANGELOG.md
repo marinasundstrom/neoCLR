@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Update RavenDoc with explicit navigation section boundaries and sidebar titles.
+  This supports distinct Getting started and Language reference areas in Raven
+  while preserving neoCLR's existing navigation configuration.
+
 - Cross-check RavenDoc site-wide navigation support against neoCLR and explicitly
   retain section navigation here. Raven can share one documentation hierarchy
   without changing neoCLR's intentional API browser boundaries.

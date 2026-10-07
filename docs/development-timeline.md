@@ -11145,3 +11145,8 @@ existing section/API boundaries.
 The author emphasized that navigation should follow simple content conventions,
 with configuration for deliberate overrides; repository-specific organization
 belongs in content/TOCs rather than hard-coded RavenDoc behavior.
+
+The author refined the organization: Getting started (renamed from Docs) and
+Language reference should keep distinct hierarchies because they are separate
+navbar destinations. RavenDoc gained explicit directory/TOC boundaries and labels
+without changing neoCLR's existing navigation policy.

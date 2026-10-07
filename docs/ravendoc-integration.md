@@ -123,7 +123,7 @@ These are shared RavenDoc/compiler documentation changes: no Runtime Contract,
 native metadata, CLI bridge encoding or runtime execution behavior changes.
 
 Validation for this update: pinned Raven revision
-`143e763a32ca41f91e872586c5b967945dd1ff4e`, 1,803 generated pages with local
+`febe115e6ab4f90a8ca28caa41f1d1a8db049dbb`, 1,803 generated pages with local
 links/anchors/HTML checked, and all 18 Python website tests passing. Browser
 checks passed at 390px and 1280px in light/dark themes on the homepage, API
 landing, System namespace and ArrayList pages, including search retention and
@@ -145,3 +145,9 @@ toggling; generated API pages retain their symbol browser.
 `apiNavigationRoot`, while Raven uses `site` and a composed root hierarchy.
 Both modes are covered by upstream site-builder tests; the website regression
 suite cross-checks the unchanged neoCLR API and article behavior.
+
+Sites can further define explicit `navigationSections` by directory, each using
+its conventional `toc.yml` and optional sidebar title. The most specific boundary
+keeps one hierarchy throughout its descendants. Raven uses this for its separate
+Getting started and Language reference navbar areas; neoCLR needs no new boundary
+and retains its existing configuration.
