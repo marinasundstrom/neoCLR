@@ -21,8 +21,13 @@ coverage or a bootstrap-free/production-packaged release.
 The 174-input **System.Runtime candidate also builds independently** of Data,
 Networking and Web; unchanged orders imports it and executes with exact output/exit 0.
 [Runtime split evidence](experiments/extended-cli-metadata/runtime-split-2026-10-07.md).
-Next: compile Data and Networking separately against Runtime, then Web, and carry
-their owner/dependency catalog into project/LSP configuration. Keep the existing POC sample/editor gates as ownership moves.
+The first separate Data/Networking attempts expose two bounded gaps: Data's internal
+array-reflection helpers cross the new boundary; metadata override validation cannot
+select an imported native Object identity. The primitive flags-marker import blocker
+is fixed. [Commands and diagnostics](experiments/extended-cli-metadata/optional-library-frontier-2026-10-07.md).
+Next: support explicit imported Object contracts in metadata authoring (shared by
+optional-library overrides), then a supported array-reflection boundary for Data.
+Resume executable Data/Networking consumers, then Web and project/LSP catalogs. Keep the existing POC sample/editor gates as ownership moves.
 [Commands and evidence](experiments/extended-cli-metadata/source-owned-orders-2026-10-07.md).
 
 ### Earlier imported source-root frontier

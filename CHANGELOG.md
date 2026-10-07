@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Integrate Raven eab5b3e7d: native flags-enum marker lookup remains on the explicit
+  primitive bootstrap when Object belongs to an imported Runtime. Record separate
+  Data/Networking compilation: Data now reaches internal array-reflection dependencies;
+  Networking rejects imported-root overrides. Neither failed build publishes output.
+
 - Build the 174-input System.Runtime candidate without Data, Networking, Web or
   network adapters. Its source-free orders consumer verifies and executes with exact
   output/exit 0, retaining explicit primitive and service bootstrap dependencies.

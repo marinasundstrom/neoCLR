@@ -6509,3 +6509,11 @@ owners move together in the generated ownership manifest. The source build uses
 reference. No CLI projection or new compiler mapping participates. The finalized
 retained service seed references the emitted Runtime artifact by identity/revision.
 [Build, execution and remaining packaging gates](experiments/extended-cli-metadata/runtime-split-2026-10-07.md).
+
+### Optional-library flags import — 2026-10-07
+
+Raven `eab5b3e7d` keeps the flags-enum semantic marker on the configured primitive
+bootstrap even when System.Runtime owns Object. Its native C# probe reproduces the
+prior failure and passes with both ordinary/imported roots; .NET loading is unchanged.
+The marker remains a temporary CLI bootstrap fact, not an implicit projection of
+application/library metadata. [Optional-library frontier](experiments/extended-cli-metadata/optional-library-frontier-2026-10-07.md).
