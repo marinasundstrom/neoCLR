@@ -41,10 +41,52 @@ application/library references into .NET metadata.
 
 `scripts/verify-native-runtime-project.py` reproduces the project build, finalization
 and source-free execution of unchanged `application-order-collections`, with hashes
-and exact stdout/exit checks. Higher-level native projects, automatic bootstrap
-orchestration, Platform ownership and shipping layouts remain subsequent work.
+and exact stdout/exit checks. The higher-level projects and staged build below extend
+this foundation; Platform extraction and full SDK/editor packaging remain open.
 
 Compared with the existing .NET workflow, the native project uses the same evaluated
 project/source model but requires explicit primitive and retained-seed inputs. This
 makes ownership reviewable at the cost of an additional finalization stage. No .NET
 compiler defaults or native metadata encodings change in this slice.
+
+
+## Build the class-library bundle
+
+The checked-in graph is `System.Runtime ← System.Data`,
+`System.Runtime ← System.Networking`, and `System.Data + System.Networking ← System.Web`.
+Networking currently owns its two native service adapters. Those adapters are not yet
+separate Platform projects. Runtime does not reference the higher-level libraries.
+
+```sh
+python3 scripts/build-native-class-library.py \
+  --compiler /absolute/path/rvnc.dll \
+  --compiler-revision REVISION \
+  --core /absolute/path/Core.dll \
+  --bootstrap-directory /absolute/path/bootstrap \
+  --translator /absolute/path/NeoCLR.Metadata.Translate.dll \
+  --output /absolute/path/fresh-bundle
+```
+
+The bootstrap directory supplies `System.neox` and `System.retained.json` as described
+above. The build uses ordinary compiler project commands in these stages:
+
+1. Build Runtime with the compile-time seed (`RavenNeoClrBootstrapSeed`).
+2. Finalize `System.runtime.neox` against that exact Runtime artifact.
+3. Build Data, Networking and Web in order using `--no-build-references`, importing
+   existing native project artifacts and the finalized seed (`RavenNeoClrRuntimeSeed`).
+4. Confirm Runtime did not change; copy the four assemblies, primitive Core, finalized
+   seed and ownership manifest into the fresh bundle directory.
+5. Write `bundle.json` last with artifact hashes. A directory without this manifest is
+   incomplete and must not be treated as a published bundle.
+
+Prebuilt mode is explicit host orchestration, not freshness detection or a metadata
+fallback. The project loader still checks dependencies and identities. The initial
+approach of rebuilding Runtime through Web's dependency graph changed Runtime bytes
+and was rejected; do not assume byte-deterministic compiler output or reuse a stale
+finalized seed. The build tool fails rather than publishing such a bundle.
+
+`build-evidence.json` records commands, input/source hashes and revisions. No runtime
+binary, Raven toolchain, XML documentation or VS Code extension is bundled here. These
+are qualified class-library artifacts, not a complete installable SDK or release.
+The same staged artifacts pass `verify-separate-web.py` and the ordinary-project
+`verify-native-library-project.py` acceptance paths.

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Add native Data, Networking and Web projects referencing the Runtime foundation.
+  Build and stage the four libraries with explicit seed finalization and prebuilt
+  dependency imports (Raven 8fbacaa9f); publish a hashed bundle manifest only after
+  successful builds. Five source-free consumers and the project HTTP consumer execute.
+  Preserve rejection of stale/missing bootstrap inputs. Platform projects, API-doc
+  bundling and the complete editor/toolchain distribution remain separate release gates.
+
 - Add the checked-in native System.Runtime project and its explicit ownership manifest
   for the 175-source Runtime foundation. Qualify project compilation, retained-seed
   finalization and unchanged source-free orders execution. Higher-level project layouts

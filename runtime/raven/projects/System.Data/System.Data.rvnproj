@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../NativeLibrary.props" />
+  <PropertyGroup>
+    <AssemblyName>System.Data</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/System/Data/**/*.rvn" />
+    <ProjectReference Include="../System.Runtime/System.Runtime.rvnproj" />
+  </ItemGroup>
+</Project>

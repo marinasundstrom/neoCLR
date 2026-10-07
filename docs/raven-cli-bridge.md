@@ -6637,3 +6637,25 @@ requires a retained seed finalized against the new artifact. These are native se
 and emission contracts; no new CLI bridge representation is introduced. The legacy
 bridge project remains distinct. Public runtime APIs and website reference rendering
 are unchanged; see [evidence](experiments/extended-cli-metadata/native-runtime-project-2026-10-07.md).
+
+
+## Native class-library project bundle (2026-10-07)
+
+The checked-in Runtime/Data/Networking/Web projects now build through a staged host
+workflow. Raven `8fbacaa9f` provides `--no-build-references`: it compiles the selected
+project against existing native project artifacts without rebuilding dependencies.
+Graph/identity validation still applies; missing references reject without replacing
+consumer output. Default project builds remain dependency-first.
+
+The host builds Runtime, finalizes its retained seed, and builds higher-level libraries
+once in dependency order. It rejects any changed Runtime artifact and publishes the
+bundle manifest last. An earlier attempt that rebuilt Runtime after finalization changed
+its bytes and was rejected; deterministic output is not assumed. No importer/emitter
+coupling, new metadata encoding or CLI projection is involved. See the
+[project instructions](../runtime/raven/projects/README.md) and
+[executable evidence](experiments/extended-cli-metadata/native-class-library-bundle-2026-10-07.md).
+
+The staged artifacts pass five verify/run consumers and the ordinary-project HTTP
+consumer. Platform adapters remain in their current owning projects. Public signatures
+are unchanged; one unified API reference and live editor qualification of the split
+remain separate gates, as does an installable runtime/compiler distribution.

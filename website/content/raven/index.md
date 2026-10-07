@@ -149,6 +149,13 @@ bootstrap and a retained runtime seed are still required. This is a development 
 gate; production library packaging and editor configuration for this layout remain work
 in progress, and not every class-library API has execution coverage.
 
+The development class-library split now has native projects for System.Runtime,
+System.Data, System.Networking and System.Web. A staged build produces matching
+assemblies and a retained seed with artifact hashes; five HTTP/networking consumers
+and a separate project consumer execute against that bundle. Platform service extraction,
+API-documentation bundling and editor qualification for this split remain open. This
+class-library artifact bundle is not a complete SDK release.
+
 Native nongeneric async functions and class methods use the existing heap state-machine
 lowering. `Task<unit>` and `Task<int>` entries drain registered work before obtaining their
 result; cancellation and unresolved tasks fail explicitly. Generic async methods and

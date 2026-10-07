@@ -66,8 +66,12 @@ execution diamond, including generic object mutation and failure preservation.
 The checked-in native System.Runtime project now builds the 175-source foundation;
 unchanged orders executes against its output after explicit retained-seed finalization.
 [Runtime project evidence](experiments/extended-cli-metadata/native-runtime-project-2026-10-07.md).
-Next: higher-level class-library projects, live LSP qualification, Platform service
-ownership and collected shipping artifacts.
+Data, Networking and Web now have checked-in native projects. A staged build produces
+all four libraries, finalizes the retained seed against the exact Runtime output and
+records a hashed bundle manifest. Five native consumers and the project HTTP consumer
+pass against those artifacts. [Bundle evidence](experiments/extended-cli-metadata/native-class-library-bundle-2026-10-07.md).
+Next: Platform service ownership, documentation/editor qualification for this split and
+the complete shipping toolchain. The class-library bundle alone is not an SDK release.
 The API site remains one namespace/type reference across assemblies; declaring-assembly
 provenance belongs on pages. Native multi-input RavenDoc migration must preserve that
 shape, as recorded in [API maintenance](../api-docs/README.md#one-class-library-reference-across-assemblies).

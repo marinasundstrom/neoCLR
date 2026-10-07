@@ -7,6 +7,8 @@
     <RavenTargetPlatform>NeoCLR</RavenTargetPlatform>
     <RavenMetadataFormat>NeoCLR</RavenMetadataFormat>
     <!-- RavenNeoClrCoreReference and RavenNeoClrRuntimeSeed are explicit host inputs. -->
+    <!-- Higher-level builds use the finalized seed; this root always uses its compile-time seed. -->
+    <RavenNeoClrRuntimeSeed Condition="'$(RavenNeoClrBootstrapSeed)' != ''">$(RavenNeoClrBootstrapSeed)</RavenNeoClrRuntimeSeed>
     <RavenNeoClrBootstrapOwnership>ownership.json</RavenNeoClrBootstrapOwnership>
     <RavenNeoClrSourceObjectRoot>true</RavenNeoClrSourceObjectRoot>
     <RavenNeoClrBootstrapIntrinsics>true</RavenNeoClrBootstrapIntrinsics>

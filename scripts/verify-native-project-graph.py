@@ -68,8 +68,10 @@ func Main() -> int {
     report = dict(compilerRevision=args.compiler_revision, sourceRevision=subprocess.check_output(
         ['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(), commands=[])
 
-    def run():
+    def run(prebuilt=False):
         command = ['dotnet', str(args.compiler.resolve()), 'neoclr', '--project', str(projects['App']), '--run', str(args.runtime.resolve())]
+        if prebuilt:
+            command.append("--no-build-references")
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=180)
         report['commands'].append(dict(command=command, exitCode=result.returncode, stdout=result.stdout, stderr=result.stderr))
         (output / 'evidence.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -95,6 +97,16 @@ func Main() -> int {
     result = run()
     if result.returncode == 0 or before != [path.read_bytes() for path in artifacts]:
         raise RuntimeError('Dependency binding failure replaced outputs')
+    result = run(prebuilt=True)
+    if result.returncode != 0 or result.stdout != f'Native build output: {artifacts[-1]}\nNative project graph passed\n' or before[:-1] != [path.read_bytes() for path in artifacts[:-1]]:
+        raise RuntimeError('Prebuilt dependency mode rebuilt sources or failed execution')
+    saved = artifacts[0].read_bytes()
+    artifacts[0].unlink()
+    consumer_before = artifacts[-1].read_bytes()
+    result = run(prebuilt=True)
+    if result.returncode == 0 or artifacts[-1].read_bytes() != consumer_before:
+        raise RuntimeError('Missing prebuilt dependency did not preserve consumer output')
+    artifacts[0].write_bytes(saved)
     source_path.write_text(source)
     paths = [Path(__file__), args.compiler, args.runtime, args.core, *projects.values(), *artifacts]
     paths += list(output.glob('*/Main.rvn')) + [library / name for name in ('System.Runtime.dll', 'System.runtime.neox', 'ownership.json')]
