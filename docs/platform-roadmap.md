@@ -85,8 +85,13 @@ The native POC packager now accepts the split bundle and records its explicit Ob
 root, runtime seed and module list. Extracted verification uses those same selections;
 relative sample projects and SDK settings avoid development checkout paths.
 [Distribution qualification](experiments/extended-cli-metadata/native-split-distribution-2026-10-07.md).
-Next: Platform service ownership, API documentation coverage/unified RavenDoc generation
-and clean-checkout release reproduction.
+Standalone bootstrap preparation now generates Core and retained-seed inputs from
+checked-in sources without previous Numbers/Http or Runtime artifacts; the class-library
+builder validates its manifest before compilation.
+[Preparation evidence](experiments/extended-cli-metadata/native-bootstrap-preparation-2026-10-07.md).
+Next: clean-checkout release reproduction, Platform service ownership and native RavenDoc
+provider/coverage work. The author's requested provider boundary preserves real assembly
+owners rather than relabelling CoreProbe; [implementation direction](experiments/extended-cli-metadata/native-documentation-provider-2026-10-07.md).
 The bundle alone is not an SDK release.
 The API site remains one namespace/type reference across assemblies; declaring-assembly
 provenance belongs on pages. Native multi-input RavenDoc migration must preserve that

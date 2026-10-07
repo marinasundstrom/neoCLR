@@ -11419,3 +11419,19 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
   but does not identify the cause of the author's persistent delay.
 - **Open:** Reproduce the original persistent workload and isolate any scheduling,
   reload or client delay before claiming a fix. [Evidence and scope](experiments/extended-cli-metadata/native-split-editor-2026-10-07.md).
+
+
+## 2026-10-07: Native RavenDoc provenance and providers
+
+- **Author:** Pointed out the API reference's “Assembly: NeoCLR.CoreProbe.dll” label
+  and requested the actual Runtime/Data/Networking owners. Proposed native metadata
+  support through a provider structure and standardized member-presentation models,
+  allowing the compiler API as an intermediary.
+- **Assistant inspection:** RavenDoc currently loads CLI references and adjacent/framework
+  DLLs, while the renderer already accepts compiler symbols and multiple assemblies.
+- **Assistant proposal:** Add an explicit native input provider over the existing catalog
+  and symbol adapter first; retain actual declaration identities and extract a stable
+  documentation model incrementally. Do not relabel bridge ownership or add a resolver.
+- **Status:** Direction recorded; provider implementation and website migration remain
+  open. The active bootstrap-input validation continues independently.
+  [Plan and evidence](experiments/extended-cli-metadata/native-documentation-provider-2026-10-07.md).

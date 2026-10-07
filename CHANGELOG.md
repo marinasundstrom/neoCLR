@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Prepare primitive Core and source-owned retained-seed inputs from checked-in sources
+  without old Numbers/Http artifacts. Record generator commands/hashes and validate
+  prepared bootstrap inputs before class-library builds. This removes temporary input
+  prerequisites, not the permitted CLI primitive bootstrap or retained runtime seed.
+- Record the native RavenDoc provider direction: preserve actual declaring assembly
+  identities through the existing native compiler-symbol adapter, then extract a shared
+  documentation model incrementally. Provider implementation and website migration
+  remain planned; CoreProbe ownership has not been relabelled.
+
 - Teach native POC packaging to consume the split class-library bundle with its
   generated help, exact producer checks and relative SDK/project configuration.
   Read runtime modules from the archive manifest during extracted verification;

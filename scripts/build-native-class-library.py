@@ -24,9 +24,20 @@ def main():
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--compiler-revision', required=True)
     args = parser.parse_args()
+    bootstrap = args.bootstrap_directory.resolve()
+    bootstrap_manifest = bootstrap / 'bootstrap.json'
+    if bootstrap_manifest.is_file():
+        prepared = json.loads(bootstrap_manifest.read_text())
+        if prepared.get('kind') != 'explicit-source-runtime-bootstrap':
+            raise ValueError('Unsupported bootstrap preparation')
+        for relative, expected in prepared['files'].items():
+            path = (bootstrap / relative).resolve()
+            if bootstrap not in path.parents or sha(path) != expected:
+                raise ValueError('Prepared bootstrap hash mismatch: ' + relative)
+        if sha(args.core) != prepared['files'][prepared['core']]:
+            raise ValueError('Selected core differs from prepared bootstrap')
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    bootstrap = args.bootstrap_directory.resolve()
     seed = output / 'System.runtime.neox'
     environment = dict(os.environ, RavenNeoClrCoreReference=str(args.core.resolve()),
                        RavenNeoClrBootstrapSeed=str(bootstrap / 'System.neox'), RavenNeoClrRuntimeSeed=str(seed))
@@ -96,6 +107,8 @@ def main():
                     documentation=documentation,
                     files={path.relative_to(output).as_posix(): sha(path) for path in artifacts})
     inputs = [Path(__file__), args.compiler, args.core, args.translator, bootstrap / 'System.neox', bootstrap / 'System.retained.json']
+    if bootstrap_manifest.is_file():
+        inputs += [bootstrap_manifest, bootstrap / 'preparation-evidence.json']
     inputs += list(PROJECTS.glob('*/*.rvnproj')) + [PROJECTS / 'NativeLibrary.props', PROJECTS / 'System.Runtime/ownership.json']
     inputs += list((ROOT / 'runtime/raven/src/System').rglob('*.rvn')) + list((ROOT / 'runtime/raven/native').glob('*.rvn'))
     inputs += [args.translator.parent / 'NeoCLR.Metadata.Experimental.dll']

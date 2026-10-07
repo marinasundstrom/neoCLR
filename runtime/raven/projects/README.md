@@ -20,8 +20,24 @@ RavenNeoClrRuntimeSeed=/absolute/path/bootstrap/System.neox \
 These environment variables are evaluated MSBuild properties. They must refer to
 matching primitive-bootstrap and compile-time retained-seed artifacts; there is no
 implicit download, host-framework fallback or application metadata projection.
-The existing `scripts/audit-native-bootstrap.py --case runtime-owned` preparation
-produces the documented bootstrap inputs. They remain explicit dependencies, not a
+`scripts/prepare-native-bootstrap.py` produces these inputs directly from checked-in
+sources, without Numbers/Http or a previous Runtime artifact:
+
+```sh
+dotnet build docs/experiments/raven-target/Probe.csproj -p:RavenRoot="$RAVEN"
+dotnet build tools/metadata/NeoCLR.Metadata.Translate
+python3 scripts/prepare-native-bootstrap.py \
+  --probe docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll \
+  --runtime target/release/neoclr \
+  --translator tools/metadata/NeoCLR.Metadata.Translate/bin/Debug/net10.0/NeoCLR.Metadata.Translate.dll \
+  --output /absolute/path/fresh-bootstrap
+```
+
+Build the runtime with `cargo build --release` first. Select the matching Raven source
+revision explicitly. Use the generated `Core.dll` and bootstrap directory in the staged
+build command below. `bootstrap.json` is written last; when present, the library builder
+validates all preparation hashes and rejects a different selected core. The old audit
+workflow remains available for historical frontier experiments. They remain explicit dependencies, not a
 claim of bootstrap-free compilation.
 
 The output is `System.Runtime/bin/neoclr/System.Runtime.dll`. Before execution,
@@ -85,8 +101,8 @@ approach of rebuilding Runtime through Web's dependency graph changed Runtime by
 and was rejected; do not assume byte-deterministic compiler output or reuse a stale
 finalized seed. The build tool fails rather than publishing such a bundle.
 
-`build-evidence.json` records commands, input/source hashes and revisions. No runtime
-binary, Raven toolchain, XML documentation or VS Code extension is bundled here. These
+`build-evidence.json` records commands, input/source hashes and revisions. Generated XML and Markdown sidecars are bundled and hashed. No runtime
+binary, Raven toolchain or VS Code extension is bundled here. These
 are qualified class-library artifacts, not a complete installable SDK or release.
 The same staged artifacts pass `verify-separate-web.py` and the ordinary-project
 `verify-native-library-project.py` acceptance paths.

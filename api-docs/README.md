@@ -1201,3 +1201,14 @@ separate source; this slice does not partition/merge it into native outputs. Uni
 that content by canonical declaration identity and producing one RavenDoc model from
 the split inputs remains required. Do not advertise complete class-library IDE help.
 [Commands, artifacts and validation](../docs/experiments/extended-cli-metadata/native-bundle-documentation-2026-10-07.md).
+
+
+### Native provider direction (2026-10-07)
+
+The author explicitly reaffirmed that CoreProbe is not an acceptable production owner
+label. RavenDoc's current loader imports CLI references; its renderer already accepts
+compiler symbols from multiple assemblies. The next native provider should use the
+explicit NeoCLR catalog and current compiler-symbol adapter, preserving real declaring
+assembly identities. Extract a stable documentation model incrementally rather than
+build another resolver or merely replace the visible assembly name.
+[Inspected boundary and acceptance](../docs/experiments/extended-cli-metadata/native-documentation-provider-2026-10-07.md).
