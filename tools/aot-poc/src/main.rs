@@ -23,6 +23,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         .create_new(true)
         .open(&args[2])?;
     output.write_all(&object)?;
-    println!("Emitted aarch64-apple-darwin object; C export: int32_t neoclr_entry(int32_t)");
+    println!(
+        "Emitted aarch64-apple-darwin object; C export: int32_t neoclr_entry_v2(int32_t, int32_t *result)"
+    );
     Ok(())
 }

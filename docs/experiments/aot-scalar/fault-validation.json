@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-07",
+  "branch": "main",
+  "base_revision": "3b351e622618c7b14d2eb57dc7c2008d14f4d053",
+  "scope": "arithmetic Fault propagation and experimental scalar ABI v2",
+  "command": "cargo test --locked --manifest-path tools/aot-poc/Cargo.toml",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
+  "result": {
+    "passed": 9,
+    "failed": 0,
+    "native_interpreter_comparisons": 174,
+    "native_executables": 26,
+    "rejected_programs": 17,
+    "object_undefined_symbols": []
+  },
+  "sample": [
+    {
+      "input": "19",
+      "exit": 0,
+      "stdout": "5",
+      "stderr": ""
+    },
+    {
+      "input": "-1",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "DivideByZero"
+    },
+    {
+      "input": "2147483647",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "ArithmeticOverflow"
+    }
+  ],
+  "abi": {
+    "symbol": "neoclr_entry_v2",
+    "return": "Int32 status",
+    "output": "Int32 pointer; unchanged on fault",
+    "statuses": {
+      "0": "success",
+      "1": "DivideByZero",
+      "2": "ArithmeticOverflow"
+    }
+  },
+  "limitations": [
+    "no general Fault messages/stack snapshots",
+    "no execution budgets/cancellation",
+    "no managed allocation"
+  ],
+  "sha256": {
+    "tools/aot-poc/src/compiler.rs": "9a076727b25271c4c64023740a5cc6961d55686460070e203be417aa3942b8a0",
+    "tools/aot-poc/src/flow.rs": "2094e7aec571c99fecec76ae0680d6e65755ae4a9695c0a140986d71b85afc4b",
+    "tools/aot-poc/src/main.rs": "029332dcfad94845f2819fb7995dfbf0138ab0663725828d57977d259b6d3a9a",
+    "tools/aot-poc/tests/scalar.rs": "fad267acfb3804fcd24b86d930727f1c74f467626c15744a46618e19eff8f09a",
+    "tools/aot-poc/Cargo.lock": "5e01f8ba8f8874b863c1d038cdf26fec21108e00d52da551d7f0d456732a349d",
+    "docs/experiments/aot-scalar/faults.neoil": "71fffdc8cde0285dc4cde54a6a6c8d79d2aead01c78cf4988cf0ba431229d81e",
+    "docs/experiments/aot-scalar/host.c": "f32d17dedf1a3efe1651cf8e1edee5c084504c6c0e6902e6676929dcb1e00f8f",
+    "docs/experiments/aot-scalar/abi.h": "d3c9b6490d5ae1de215920198900c8fe4dd29ca58281c281bb66f5fd90d310a7",
+    "target/aot-scalar/faults-v2.o": "e0cd59ab0c986dcb3497e830fba77a6c70df8b1063da92b236311d1bf81bc36a",
+    "target/aot-scalar/faults-v2": "97fd76507d10ea09610fc90c36a0cc705672666f458cb54c26bb03bbca471345"
+  }
+}

@@ -1,7 +1,8 @@
 # First ARM64 scalar AOT probe
 
 **Development experiment, 2026-10-07.** A separate Rust tool lowers a deliberately
-small neoIL subset, now including branches and locals, through **Cranelift 0.121.2**, emits an ARM64 Mach-O object, and
+small neoIL subset, now including control flow and arithmetic Faults, through
+**Cranelift 0.121.2**, emits an ARM64 Mach-O object, and
 links it to a C executable. The generated functions execute native code; there is
 no interpreter, JIT or neoCLR runtime dependency in the scalar executable. The
 compiler itself uses neoCLR for assembly and validation. This is the first bounded
@@ -23,20 +24,22 @@ is hand-authored neoIL; Raven-produced native execution remains to validate.
 - Nongeneric free functions with Int32 parameters/results and up to 1,024 Int32
   locals; no native imports, special parameter contracts or managed runtime services.
 - `ldc.i4`, `ldarg`, `ldloc`, `stloc`, `dup`, `pop`, wrapping `add`/`sub`/`mul`,
-  direct unqualified local `call`, and `ret` with exactly one result. Early returns
+  signed/unsigned checked `add.ovf`/`sub.ovf`/`mul.ovf`, `div`/`rem` and their
+  unsigned forms, direct unqualified local `call`, and `ret` with exactly one result. Early returns
   are supported; reachable paths must return or remain within the function's CFG.
 - `br`, Int32 `brtrue`/`brfalse`, and `beq`, `bne.un`, `bgt`, `blt`, `bge`, `ble`
   with signed/unsigned forms. Loops and nonempty operand-stack joins are supported.
   Boolean-producing comparison instructions, switch and local reset remain outside
   this profile. The ordinary verifier enforces definite assignment of locals.
-- An explicitly named `(Int32) -> Int32` root exports the C symbol `neoclr_entry`.
-  Other functions are local object symbols. The module's ordinary entry-point
+- An explicitly named `(Int32) -> Int32` root exports the C symbol
+  `neoclr_entry_v2`, returning a status and writing the result through a pointer
+  only on success. Other functions are local object symbols. The module's ordinary entry-point
   spelling does not select the export; this is a C-hosted experiment.
 - All declared functions are checked and emitted, including unused functions; there
   is no function trimming. Unsupported opcodes are rejected even in unreachable
   instructions; supported unreachable instructions are omitted during lowering.
   Calls must match their local signature. Call-graph cycles are rejected
-  because native recursion budgets and Fault propagation are not implemented.
+  because native recursion budgets are not implemented.
 - Per-function body limit: 8,192 instructions. These are compiler acceptance bounds,
   not a native execution sandbox or the interpreter's instruction/stack quotas.
 - Unsupported instructions, malformed stacks, inconsistent stack joins,
@@ -56,9 +59,8 @@ The existing interpreter defines unchecked Int32 arithmetic by wrapping operatio
 ([implementation](../../../src/numeric.rs)); Cranelift I32 add/sub/mul preserves that
 behavior without C signed-overflow assumptions. The fixture computes `2*x + 2` via
 separate multiply and two-argument subtraction helpers. Values come from a C host
-at execution time, so native output is not just a precomputed constant. Checked
-arithmetic, division, recursion, pointers, allocation, GC, Strings, HTTP,
-JIT and hot reload remain unsupported. AOT does not yet run the web-app POC.
+at execution time, so native output is not just a precomputed constant. Recursion, guest pointers, allocation, GC, Strings, HTTP, JIT and hot reload
+remain unsupported. AOT does not yet run the web-app POC.
 
 ## Reproduce on macOS ARM64
 
@@ -103,11 +105,12 @@ ARM64; do not mistake a skipped consumer test elsewhere for native qualification
 [Tests](../../../tools/aot-poc/tests/scalar.rs) cover:
 
 - ARM64 Mach-O format, successful emission and refusal to overwrite existing output.
-- Eleven rejected programs: division, checked arithmetic, stack underflow, recursion,
+- Eleven rejected programs: unsupported XOR and shift, stack underflow, recursion,
   unknown target, mismatched call signature, excess return values, invalid argument
   index, empty return, non-Int32 result, and an unsupported operation in an unused
   function. The original scalar-only evidence rejected early return instead; it is
-  now a supported operation with explicit CFG validation.
+  now a supported operation with explicit CFG validation. The later Fault slice
+  also replaces rejected division/checked-add cases with unsupported XOR/shift.
 - A C consumer matching interpreter results for ten runtime inputs, including
   negatives and Int32 boundary wrapping; three invalid C command-line inputs fail.
   The object has no undefined symbols. C compilation enables warnings as errors.
@@ -135,12 +138,54 @@ nonterminating inputs can run indefinitely. This trusted-code probe is not suita
 for resource-limited hosting. The interpreter's quota behavior is not promised by
 this native profile. Fixtures deliberately bound their loops.
 
-Next proposed slice: establish an explicit Fault ABI before division or checked arithmetic, then
-UTF-8 console/runtime service boundaries, managed allocation/root reporting, and the
-minimal AOT HTTP consumer. Keep benchmarking as a later measured comparison.
+Next proposed slice: UTF-8 console/runtime service boundaries, followed by managed
+allocation/root reporting and the minimal AOT HTTP consumer. Keep benchmarking as a later measured comparison.
 
 The tool's [manifest](../../../tools/aot-poc/Cargo.toml) and separate lockfile keep
 experimental compiler dependencies out of the runtime manifest/lockfile. Its
 [dependency notices](../../../tools/aot-poc/THIRD_PARTY_NOTICES.md) record licenses.
 The pinned Cranelift version is a feasibility baseline, not a current-version or
 production-support recommendation.
+
+## Arithmetic Fault boundary — experimental ABI v2
+
+The [header](abi.h) declares:
+
+```c
+int32_t neoclr_entry_v2(int32_t value, int32_t *result);
+```
+
+Status 0 means success, 1 maps to `DivideByZero`, and 2 maps to
+`ArithmeticOverflow`. These are experiment-owned numbers, not Rust enum ordinals.
+The host must supply a valid aligned writable Int32 pointer. A failing invocation
+leaves that storage untouched. The symbol deliberately changes from the scalar
+probe's old `neoclr_entry`: rebuild the object and C host together. No stable public
+hosting API is being introduced.
+
+Every compiled function uses a status/out-result convention. Callers test status
+before reading their temporary result slot and return immediately on failure, so
+later guest instructions cannot replace the first fault. Success writes the result
+and returns zero. There is no native unwinding, guest exception or recoverable guest
+Result value. Rich Fault messages, stack snapshots, resource cleanup, cancellation
+and budgets remain outside this scalar boundary.
+
+Checked Int32 arithmetic widens signed or unsigned operands to 64 bits and checks
+that the result survives narrowing with the same signedness. Division/remainder
+check zero before executing the native instruction. Signed `MIN / -1` and
+`MIN % -1` both report `ArithmeticOverflow`, matching the current interpreter's
+checked division/remainder helpers; unsigned operations interpret operand bits as
+UInt32 and return the resulting Int32 bit pattern. Plain add/sub/mul still wrap.
+This preserves the existing semantic contract rather than treating ARM64's machine
+instruction behavior as the Fault policy.
+
+[Fault validation](fault-validation.json) records nine passing tests, 174 native/
+interpreter comparisons across 26 C executables and the 17 rejection cases. The C
+host checks that its sentinel output remains unchanged on every fault. Cases cover
+signed/unsigned overflow, zero divisors, signed MIN/-1, two compiled call boundaries,
+first-fault precedence and success after non-faulting operations. Export checks
+require the v2 symbol and absence of the old unversioned symbol.
+
+The [fault consumer](faults.neoil) computes `100 / checked(value + 1)`: input 19
+prints 5; -1 exits with DivideByZero; Int32.MaxValue exits with ArithmeticOverflow.
+Use the same compiler/host commands with a fresh output path. Historical scalar and
+control-flow evidence remains tied to its recorded source hashes and v1 ABI.

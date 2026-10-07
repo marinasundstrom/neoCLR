@@ -20,8 +20,10 @@ wrapping integer arithmetic/direct calls through Cranelift and a C consumer, wit
 focused validation. This selects a bounded AOT slice on main; the native bootstrap/release
 qualification priorities recorded below remain in place. The next committed slice
 adds branches, locals, loops and stack joins with seven focused tests and 79 native/
-interpreter comparisons on main. Native Fault propagation and execution budgets are
-still open; the web demo, JIT and hot reload remain future work.
+interpreter comparisons on main. A following arithmetic-Fault slice adds checked
+arithmetic, division/remainder and status propagation through compiled calls, with
+a versioned experimental C ABI and nine tests/174 native comparisons. Execution
+budgets, managed services, the web demo, JIT and hot reload remain future work.
 
 ## Existing native release gates
 

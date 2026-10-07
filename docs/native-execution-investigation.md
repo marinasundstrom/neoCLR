@@ -244,8 +244,10 @@ prerequisite for this first web demo.
 These are proposed tasks, not approved implementation dates. Step 1 now has a
 [partial scalar implementation](experiments/aot-scalar/README.md): wrapping arithmetic,
 direct acyclic calls, Int32 locals, branches, loops and stack joins. The author-directed
-cherry-pick and control-flow work are validated on main. Recursion, native Faults and
-execution budgets are not yet supported. Later steps remain future work.
+cherry-pick, control-flow and arithmetic-Fault slices are validated on main. Checked
+arithmetic and division/remainder now propagate two Fault categories through a
+versioned status/out-result ABI. Recursion, general Fault diagnostics and execution
+budgets are not yet supported. Later steps remain future work.
 
 1. **ARM64 scalar AOT:** lower a small verified arithmetic/branch/direct-call subset
    to an object and executable; export a scalar function to a C host. Test overflow,

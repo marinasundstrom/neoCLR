@@ -1,7 +1,7 @@
 //! Experimental scalar lowering, deliberately separate from the public runtime API.
 use cranelift_codegen::ir::condcodes::IntCC;
 use cranelift_codegen::{
-    ir::{self, AbiParam, InstBuilder, types},
+    ir::{self, AbiParam, InstBuilder, MemFlags, StackSlotData, StackSlotKind, types},
     isa, settings,
 };
 use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext, Variable};
@@ -109,9 +109,10 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
     for (index, function) in input.functions.iter().enumerate() {
         let mut sig = module.make_signature();
         sig.params = vec![AbiParam::new(types::I32); function.parameters.len()];
-        sig.returns.push(AbiParam::new(types::I32));
+        sig.params.push(AbiParam::new(types::I64)); // writable Int32 result pointer
+        sig.returns.push(AbiParam::new(types::I32)); // status: 0 success, 1 zero, 2 overflow
         let (name, linkage) = if index == root_index {
-            ("neoclr_entry".to_owned(), Linkage::Export)
+            ("neoclr_entry_v2".to_owned(), Linkage::Export)
         } else {
             (format!("neoclr_scalar_{index}"), Linkage::Local)
         };
@@ -131,6 +132,12 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
             builder.append_block_params_for_function_params(entry);
             builder.switch_to_block(entry);
             let args = builder.block_params(entry).to_vec();
+            let output = args[function.parameters.len()];
+            let call_result = builder.create_sized_stack_slot(StackSlotData::new(
+                StackSlotKind::ExplicitSlot,
+                4,
+                2,
+            ));
             let blocks: Vec<_> = function
                 .body
                 .iter()
@@ -183,16 +190,36 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
                         };
                         stack.push(value);
                     }
+                    Op::AddChecked
+                    | Op::SubChecked
+                    | Op::MulChecked
+                    | Op::AddCheckedUnsigned
+                    | Op::SubCheckedUnsigned
+                    | Op::MulCheckedUnsigned
+                    | Op::Divide
+                    | Op::DivideUnsigned
+                    | Op::Remainder
+                    | Op::RemainderUnsigned => {
+                        let right = stack.pop().expect("validated stack");
+                        let left = stack.pop().expect("validated stack");
+                        stack.push(checked_arithmetic(&mut builder, op, left, right));
+                    }
                     Op::Call(target) => {
                         let callee = names[target.name.as_str()];
                         let reference = module.declare_func_in_func(ids[callee], builder.func);
-                        let arguments = stack.split_off(stack.len() - target.parameters.len());
+                        let mut arguments = stack.split_off(stack.len() - target.parameters.len());
+                        arguments.push(builder.ins().stack_addr(types::I64, call_result, 0));
                         let call = builder.ins().call(reference, &arguments);
-                        stack.push(builder.inst_results(call)[0]);
+                        let status = builder.inst_results(call)[0];
+                        let failed = builder.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        return_if(&mut builder, failed, status);
+                        stack.push(builder.ins().stack_load(types::I32, call_result, 0));
                     }
                     Op::Return => {
                         let result = stack.pop().expect("validated stack");
-                        builder.ins().return_(&[result]);
+                        builder.ins().store(MemFlags::new(), result, output, 0);
+                        let success = builder.ins().iconst(types::I32, 0);
+                        builder.ins().return_(&[success]);
                         continue;
                     }
                     Op::Branch(target) => {
@@ -283,4 +310,76 @@ fn check_function(function: &Function) -> Result<Vec<Option<usize>>, Error> {
 
 fn block_args(stack: &[ir::Value]) -> Vec<ir::BlockArg> {
     stack.iter().copied().map(Into::into).collect()
+}
+
+// Faults use status returns, never a guest Result or unwinding through C/Rust.
+fn return_if(builder: &mut FunctionBuilder<'_>, failed: ir::Value, status: ir::Value) {
+    let fault = builder.create_block();
+    let next = builder.create_block();
+    builder.ins().brif(failed, fault, &[], next, &[]);
+    builder.switch_to_block(fault);
+    builder.ins().return_(&[status]);
+    builder.switch_to_block(next);
+}
+
+fn checked_arithmetic(
+    builder: &mut FunctionBuilder<'_>,
+    op: &Op,
+    left: ir::Value,
+    right: ir::Value,
+) -> ir::Value {
+    let overflow_status = builder.ins().iconst(types::I32, 2);
+    if matches!(
+        op,
+        Op::Divide | Op::DivideUnsigned | Op::Remainder | Op::RemainderUnsigned
+    ) {
+        let zero = builder.ins().icmp_imm(IntCC::Equal, right, 0);
+        let zero_status = builder.ins().iconst(types::I32, 1);
+        return_if(builder, zero, zero_status);
+        if matches!(op, Op::Divide | Op::Remainder) {
+            let min = builder
+                .ins()
+                .icmp_imm(IntCC::Equal, left, i64::from(i32::MIN));
+            let negative_one = builder.ins().icmp_imm(IntCC::Equal, right, -1);
+            let overflow = builder.ins().band(min, negative_one);
+            return_if(builder, overflow, overflow_status);
+        }
+        return match op {
+            Op::Divide => builder.ins().sdiv(left, right),
+            Op::DivideUnsigned => builder.ins().udiv(left, right),
+            Op::Remainder => builder.ins().srem(left, right),
+            Op::RemainderUnsigned => builder.ins().urem(left, right),
+            _ => unreachable!(),
+        };
+    }
+    let unsigned = matches!(
+        op,
+        Op::AddCheckedUnsigned | Op::SubCheckedUnsigned | Op::MulCheckedUnsigned
+    );
+    let (left, right) = if unsigned {
+        (
+            builder.ins().uextend(types::I64, left),
+            builder.ins().uextend(types::I64, right),
+        )
+    } else {
+        (
+            builder.ins().sextend(types::I64, left),
+            builder.ins().sextend(types::I64, right),
+        )
+    };
+    let wide = match op {
+        Op::AddChecked | Op::AddCheckedUnsigned => builder.ins().iadd(left, right),
+        Op::SubChecked | Op::SubCheckedUnsigned => builder.ins().isub(left, right),
+        Op::MulChecked | Op::MulCheckedUnsigned => builder.ins().imul(left, right),
+        _ => unreachable!(),
+    };
+    let result = builder.ins().ireduce(types::I32, wide);
+    let restored = if unsigned {
+        builder.ins().uextend(types::I64, result)
+    } else {
+        builder.ins().sextend(types::I64, result)
+    };
+    let overflow = builder.ins().icmp(IntCC::NotEqual, wide, restored);
+    return_if(builder, overflow, overflow_status);
+    result
 }

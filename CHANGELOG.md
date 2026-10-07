@@ -22,9 +22,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Extend the next slice with Int32 locals, loops, early returns, signed/unsigned
   branches and operand-stack joins. Seven focused tests on main cover 79 native/
   interpreter comparisons and 17 rejected programs, including uninitialized locals
-  and invalid control flow. Native Fault propagation, loop budgets/cancellation,
-  managed allocation and the web demo remain future work; runtime dependencies and
-  public APIs are unchanged. Cherry-pick this
+  and invalid control flow. Add a separate arithmetic-Fault slice: checked signed/
+  unsigned arithmetic and division/remainder return explicit status through compiled
+  calls, preserving first-fault behavior and leaving output untouched on failure.
+  The experimental C export becomes neoclr_entry_v2 (status plus result pointer);
+  rebuild probe objects and C hosts together. Nine tests cover 174 native/interpreter
+  comparisons. Loop budgets/cancellation, managed allocation and the web demo remain
+  future work; runtime dependencies and public APIs are unchanged. Cherry-pick this
   isolated slice to main at the author's correction, retaining main's newer native
   bootstrap work and refreshing the tool lockfile for the current runtime.
 

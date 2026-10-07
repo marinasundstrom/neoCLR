@@ -40,7 +40,19 @@ pub(super) fn analyze(function: &Function) -> Result<Vec<Option<usize>>, Error> 
             Op::Store(index) if *index < function.locals.len() => (1, 0),
             Op::Dup => (1, 2),
             Op::Pop => (1, 0),
-            Op::Add | Op::Sub | Op::Mul => (2, 1),
+            Op::Add
+            | Op::Sub
+            | Op::Mul
+            | Op::AddChecked
+            | Op::SubChecked
+            | Op::MulChecked
+            | Op::AddCheckedUnsigned
+            | Op::SubCheckedUnsigned
+            | Op::MulCheckedUnsigned
+            | Op::Divide
+            | Op::DivideUnsigned
+            | Op::Remainder
+            | Op::RemainderUnsigned => (2, 1),
             Op::Call(target) => (target.parameters.len(), 1),
             Op::Return => (1, 0),
             Op::Branch(_) => (0, 0),

@@ -39,11 +39,11 @@ const SOURCE: &str = include_str!("../../../docs/experiments/aot-scalar/scalar.n
 fn unsupported_or_invalid_programs_never_emit_an_object() {
     let cases = [
         (
-            SOURCE.replace("    mul", "    div"),
+            SOURCE.replace("    mul", "    xor"),
             "unsupported instruction",
         ),
         (
-            SOURCE.replace("    mul", "    add.ovf"),
+            SOURCE.replace("    mul", "    shl"),
             "unsupported instruction",
         ),
         (
@@ -82,7 +82,7 @@ fn unsupported_or_invalid_programs_never_emit_an_object() {
             "scalar profile",
         ),
         (
-            format!("{SOURCE}\n.function Unused() -> Int32\nldc.i4 1\nldc.i4 0\ndiv\nret\n.end\n"),
+            format!("{SOURCE}\n.function Unused() -> Int32\nldc.i4 1\nldc.i4 0\nxor\nret\n.end\n"),
             "unsupported instruction",
         ),
     ];
@@ -143,6 +143,11 @@ fn native_c_consumer_matches_interpreter_for_runtime_inputs() {
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn assert_native_parity(source: &str, inputs: &[i32], oracle: impl Fn(i32) -> i32) {
+    assert_native_outcomes(source, inputs, Some(&oracle));
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn assert_native_outcomes(source: &str, inputs: &[i32], oracle: Option<&dyn Fn(i32) -> i32>) {
     let temp = Temp::new();
     let object = temp.0.join("scalar.o");
     let result = compile(source, &object);
@@ -173,30 +178,67 @@ fn assert_native_parity(source: &str, inputs: &[i32], oracle: impl Fn(i32) -> i3
         symbols.stdout.is_empty(),
         "scalar object must not import interpreter/runtime helpers"
     );
+    let exported = Command::new("nm").arg("-g").arg(&object).output().unwrap();
+    assert!(exported.status.success());
+    let symbols = String::from_utf8(exported.stdout).unwrap();
+    assert!(
+        symbols
+            .lines()
+            .any(|line| line.ends_with(" _neoclr_entry_v2"))
+    );
+    assert!(!symbols.lines().any(|line| line.ends_with(" _neoclr_entry")));
     let program = neoclr::LoadedProgram::new(&neoclr::assemble(source).unwrap()).unwrap();
     let function = program
         .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
         .unwrap();
     for &input in inputs {
-        let interpreted = function
-            .invoke(vec![neoclr::Value::Int32(input)], neoclr::Limits::default())
-            .unwrap()
-            .value;
-        let neoclr::Value::Int32(expected) = interpreted else {
-            panic!("unexpected interpreter result")
-        };
-        assert_eq!(expected, oracle(input));
+        let interpreted =
+            function.invoke(vec![neoclr::Value::Int32(input)], neoclr::Limits::default());
         let result = Command::new(&binary)
             .arg(input.to_string())
             .output()
             .unwrap();
-        assert!(result.status.success());
-        let actual: i32 = String::from_utf8(result.stdout)
-            .unwrap()
-            .trim()
-            .parse()
-            .unwrap();
-        assert_eq!(actual, expected, "input {input}");
+        match interpreted {
+            Ok(execution) => {
+                let neoclr::Value::Int32(expected) = execution.value else {
+                    panic!("unexpected interpreter result")
+                };
+                if let Some(oracle) = oracle {
+                    assert_eq!(expected, oracle(input));
+                }
+                assert!(
+                    result.status.success(),
+                    "input {input}: {}",
+                    String::from_utf8_lossy(&result.stderr)
+                );
+                assert!(result.stderr.is_empty());
+                let actual: i32 = String::from_utf8(result.stdout)
+                    .unwrap()
+                    .trim()
+                    .parse()
+                    .unwrap();
+                assert_eq!(actual, expected, "input {input}");
+            }
+            Err(fault) => {
+                assert!(oracle.is_none(), "unexpected interpreter fault {fault}");
+                assert!(matches!(
+                    fault.code,
+                    neoclr::FaultCode::DivideByZero | neoclr::FaultCode::ArithmeticOverflow
+                ));
+                assert_eq!(
+                    result.status.code(),
+                    Some(1),
+                    "input {input}: {}",
+                    String::from_utf8_lossy(&result.stderr)
+                );
+                assert!(result.stdout.is_empty());
+                assert_eq!(
+                    String::from_utf8(result.stderr).unwrap().trim(),
+                    fault.code.as_str(),
+                    "input {input}"
+                );
+            }
+        }
     }
     for input in ["2147483648", "abc", ""] {
         assert_eq!(
@@ -289,7 +331,7 @@ fn invalid_control_flow_is_rejected_before_emission() {
             "incompatible stack heights",
         ),
         (
-            "ldc.i4 1\nret\nldc.i4 1\nldc.i4 0\ndiv\nret",
+            "ldc.i4 1\nret\nldc.i4 1\nldc.i4 0\nxor\nret",
             "unsupported instruction",
         ),
     ];
@@ -308,4 +350,53 @@ fn invalid_control_flow_is_rejected_before_emission() {
         );
         assert!(!path.exists());
     }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_arithmetic_faults_match_interpreter_and_preserve_output() {
+    let inputs = [
+        i32::MIN,
+        i32::MIN + 1,
+        -2,
+        -1,
+        0,
+        1,
+        2,
+        i32::MAX / 2,
+        i32::MAX,
+    ];
+    for (op, rhs) in [
+        ("add.ovf", 1),
+        ("sub.ovf", 1),
+        ("mul.ovf", 2),
+        ("add.ovf.un", 1),
+        ("sub.ovf.un", 1),
+        ("mul.ovf.un", 2),
+    ] {
+        // Two compiled call boundaries exercise status propagation to the C host.
+        let source = format!(
+            ".module Checked\n.function Operation(Int32 value) -> Int32\nldarg value\nldc.i4 {rhs}\n{op}\nret\n.end\n.function Forward(Int32 value) -> Int32\nldarg value\ncall Operation(Int32)\nret\n.end\n.function Calculate(Int32 value) -> Int32\nldarg value\ncall Forward(Int32)\nret\n.end\n"
+        );
+        assert_native_outcomes(&source, &inputs, None);
+    }
+    for op in ["div", "rem", "div.un", "rem.un"] {
+        let source = format!(
+            ".module Division\n.function Operation(Int32 value) -> Int32\nldc.i4 -2147483648\nldarg value\n{op}\nret\n.end\n.function Calculate(Int32 value) -> Int32\nldarg value\ncall Operation(Int32)\nret\n.end\n"
+        );
+        assert_native_outcomes(&source, &inputs, None);
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn first_fault_wins_across_compiled_calls() {
+    assert_native_outcomes(
+        include_str!("../../../docs/experiments/aot-scalar/faults.neoil"),
+        &[i32::MAX, -1, 19],
+        None,
+    );
+    let source = ".module FirstFault\n.function Overflow(Int32 value) -> Int32\nldarg value\nldc.i4 1\nadd.ovf\nret\n.end\n.function Calculate(Int32 value) -> Int32\nldarg value\ncall Overflow(Int32)\nldc.i4 0\ndiv\nret\n.end\n";
+    // MAX faults in the callee; 0 gets through and faults in the caller.
+    assert_native_outcomes(source, &[i32::MAX, 0], None);
 }

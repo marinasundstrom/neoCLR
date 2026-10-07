@@ -211,8 +211,9 @@ and code-lifetime rules. .NET runtime, ABI and compiler layers are comparison po
 extra execution paths bring verification, portability and testing obligations.
 **Development experiment:** an isolated ARM64 scalar tool now emits native objects
 for wrapping integer arithmetic, direct calls, locals and branches/loops, validated
-through C consumers against the interpreter. Native Faults and execution budgets
-remain unsupported.
+through C consumers against the interpreter. Checked arithmetic and division now
+propagate arithmetic Fault statuses through a versioned experimental C boundary.
+Execution budgets and managed services remain unsupported.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 [Scalar experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-scalar/README.md).
 

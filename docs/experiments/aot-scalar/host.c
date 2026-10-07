@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 /* Scalar experimental ABI only; no managed handles or runtime dependency. */
-extern int32_t neoclr_entry(int32_t value);
+#include "abi.h"
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -19,6 +19,17 @@ int main(int argc, char **argv) {
         fprintf(stderr, "invalid Int32 input\n");
         return 2;
     }
-    printf("%" PRId32 "\n", neoclr_entry((int32_t)value));
+    int32_t result = 123456789;
+    int32_t status = neoclr_entry_v2((int32_t)value, &result);
+    if (status != NEOCLR_AOT_OK) {
+        if (result != 123456789) {
+            fprintf(stderr, "AOT failure modified the output\n");
+            return 3;
+        }
+        fprintf(stderr, "%s\n", status == NEOCLR_AOT_DIVIDE_BY_ZERO ? "DivideByZero" :
+                status == NEOCLR_AOT_ARITHMETIC_OVERFLOW ? "ArithmeticOverflow" : "UnknownFault");
+        return 1;
+    }
+    printf("%" PRId32 "\n", result);
     return 0;
 }

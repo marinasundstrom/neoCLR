@@ -1,0 +1,16 @@
+.module AotFaults
+
+.function CheckedIncrement(Int32 value) -> Int32
+    ldarg value
+    ldc.i4 1
+    add.ovf
+    ret
+.end
+
+.function Calculate(Int32 value) -> Int32
+    ldc.i4 100
+    ldarg value
+    call CheckedIncrement(Int32)
+    div
+    ret
+.end
