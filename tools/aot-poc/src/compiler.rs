@@ -1,9 +1,13 @@
 //! Experimental scalar lowering, deliberately separate from the public runtime API.
+use cranelift_codegen::ir::condcodes::IntCC;
 use cranelift_codegen::{
     ir::{self, AbiParam, InstBuilder, types},
     isa, settings,
 };
-use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext};
+use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext, Variable};
+
+#[path = "flow.rs"]
+mod flow;
 use cranelift_module::{Linkage, Module};
 use cranelift_object::{ObjectBuilder, ObjectModule};
 use neoclr::metadata::{Function, Instruction as Op, Type};
@@ -19,11 +23,12 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
         );
     }
     let mut names = HashMap::new();
+    let mut flows = Vec::new();
     for (index, function) in input.functions.iter().enumerate() {
         if names.insert(function.name.as_str(), index).is_some() {
             return Err("scalar profile does not support overloaded names".into());
         }
-        check_function(function)?;
+        flows.push(check_function(function)?);
     }
     let root_index = *names.get(root).ok_or("root function not found")?;
     if input.functions[root_index].parameters != [Type::Int32] {
@@ -126,13 +131,43 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
             builder.append_block_params_for_function_params(entry);
             builder.switch_to_block(entry);
             let args = builder.block_params(entry).to_vec();
-            let mut stack: Vec<ir::Value> = Vec::new();
-            for op in &function.body {
+            let blocks: Vec<_> = function
+                .body
+                .iter()
+                .map(|_| builder.create_block())
+                .collect();
+            for (pc, depth) in flows[index].iter().enumerate() {
+                if let Some(depth) = depth {
+                    for _ in 0..*depth {
+                        builder.append_block_param(blocks[pc], types::I32);
+                    }
+                }
+            }
+            for local in 0..function.locals.len() {
+                builder.declare_var(Variable::from_u32(local as u32), types::I32);
+            }
+            builder.ins().jump(blocks[0], &[]);
+            for (pc, op) in function.body.iter().enumerate() {
+                if flows[index][pc].is_none() {
+                    continue;
+                }
+                builder.switch_to_block(blocks[pc]);
+                // SSA local parameters may be appended while translating predecessors;
+                // only the explicit first parameters represent the IL operand stack.
+                let mut stack: Vec<ir::Value> =
+                    builder.block_params(blocks[pc])[..flows[index][pc].unwrap()].to_vec();
                 match op {
                     Op::Int(value) => {
                         stack.push(builder.ins().iconst(types::I32, i64::from(*value)))
                     }
                     Op::Arg(index) => stack.push(args[*index]),
+                    Op::Load(index) => {
+                        stack.push(builder.use_var(Variable::from_u32(*index as u32)))
+                    }
+                    Op::Store(index) => {
+                        let value = stack.pop().expect("validated stack");
+                        builder.def_var(Variable::from_u32(*index as u32), value);
+                    }
                     Op::Dup => stack.push(*stack.last().expect("validated stack")),
                     Op::Pop => {
                         stack.pop().expect("validated stack");
@@ -158,9 +193,49 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
                     Op::Return => {
                         let result = stack.pop().expect("validated stack");
                         builder.ins().return_(&[result]);
+                        continue;
+                    }
+                    Op::Branch(target) => {
+                        builder.ins().jump(blocks[*target], &block_args(&stack));
+                        continue;
+                    }
+                    Op::BranchTrue(target) | Op::BranchFalse(target) => {
+                        let value = stack.pop().expect("validated stack");
+                        let condition = builder.ins().icmp_imm(
+                            if matches!(op, Op::BranchTrue(_)) {
+                                IntCC::NotEqual
+                            } else {
+                                IntCC::Equal
+                            },
+                            value,
+                            0,
+                        );
+                        builder.ins().brif(
+                            condition,
+                            blocks[*target],
+                            &block_args(&stack),
+                            blocks[pc + 1],
+                            &block_args(&stack),
+                        );
+                        continue;
+                    }
+                    _ if flow::comparison(op).is_some() => {
+                        let (target, comparison) = flow::comparison(op).unwrap();
+                        let right = stack.pop().expect("validated stack");
+                        let left = stack.pop().expect("validated stack");
+                        let condition = builder.ins().icmp(comparison, left, right);
+                        builder.ins().brif(
+                            condition,
+                            blocks[target],
+                            &block_args(&stack),
+                            blocks[pc + 1],
+                            &block_args(&stack),
+                        );
+                        continue;
                     }
                     _ => unreachable!("profile validation rejects unsupported instructions"),
                 }
+                builder.ins().jump(blocks[pc + 1], &block_args(&stack));
             }
             builder.seal_all_blocks();
             builder.finalize();
@@ -177,7 +252,7 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
     Ok(product.emit()?)
 }
 
-fn check_function(function: &Function) -> Result<(), Error> {
+fn check_function(function: &Function) -> Result<Vec<Option<usize>>, Error> {
     if function.owner.is_some()
         || function.instance
         || function.is_abstract
@@ -188,7 +263,8 @@ fn check_function(function: &Function) -> Result<(), Error> {
         || function.no_result
         || function.returns != Type::Int32
         || function.parameters.iter().any(|ty| *ty != Type::Int32)
-        || !function.locals.is_empty()
+        || function.locals.iter().any(|ty| *ty != Type::Int32)
+        || function.locals.len() > 1024
         || !function.generic_parameters.is_empty()
         || !function.generic_arguments.is_empty()
         || !function.generic_constraints.is_empty()
@@ -200,33 +276,11 @@ fn check_function(function: &Function) -> Result<(), Error> {
         || function.impl_flags != 0
         || function.body.len() > 8192
     {
-        return Err(format!("{}: scalar profile requires nongeneric free Int32 functions without locals or native imports", function.name).into());
+        return Err(format!("{}: scalar profile requires nongeneric free Int32 functions with Int32 locals and no native imports", function.name).into());
     }
-    let mut depth = 0usize;
-    for (pc, op) in function.body.iter().enumerate() {
-        let (pops, pushes) = match op {
-            Op::Int(_) => (0, 1),
-            Op::Arg(index) if *index < function.parameters.len() => (0, 1),
-            Op::Dup => (1, 2),
-            Op::Pop => (1, 0),
-            Op::Add | Op::Sub | Op::Mul => (2, 1),
-            Op::Call(target) => (target.parameters.len(), 1),
-            Op::Return if pc + 1 == function.body.len() && depth == 1 => (1, 0),
-            _ => {
-                return Err(format!(
-                    "{} instruction {pc}: unsupported instruction or invalid return: {op:?}",
-                    function.name
-                )
-                .into());
-            }
-        };
-        if depth < pops {
-            return Err(format!("{} instruction {pc}: stack underflow", function.name).into());
-        }
-        depth = depth - pops + pushes;
-    }
-    if !matches!(function.body.last(), Some(Op::Return)) {
-        return Err(format!("{}: missing final return", function.name).into());
-    }
-    Ok(())
+    flow::analyze(function)
+}
+
+fn block_args(stack: &[ir::Value]) -> Vec<ir::BlockArg> {
+    stack.iter().copied().map(Into::into).collect()
 }

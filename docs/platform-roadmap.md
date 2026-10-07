@@ -18,8 +18,10 @@ without making a broad benchmark suite a prerequisite for the first simple proof
 The [scalar ARM64 experiment](experiments/aot-scalar/README.md) implements native
 wrapping integer arithmetic/direct calls through Cranelift and a C consumer, with
 focused validation. This selects a bounded AOT slice on main; the native bootstrap/release
-qualification priorities recorded below remain in place. Branches/locals and a native
-Fault contract are the next proposed AOT boundaries; the web demo, JIT and hot reload remain future work.
+qualification priorities recorded below remain in place. The next committed slice
+adds branches, locals, loops and stack joins with seven focused tests and 79 native/
+interpreter comparisons on main. Native Fault propagation and execution budgets are
+still open; the web demo, JIT and hot reload remain future work.
 
 ## Existing native release gates
 

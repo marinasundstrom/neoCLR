@@ -19,8 +19,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   add an isolated Cranelift 0.121.2 scalar compiler emitting macOS ARM64 objects
   with a C-callable Int32 export. Validate wrapping arithmetic/direct calls against
   the interpreter, unsupported-input rejection, object format and no runtime imports.
-  Branches, native Fault propagation, managed allocation and the web demo remain
-  future work; runtime dependencies and public APIs are unchanged. Cherry-pick this
+  Extend the next slice with Int32 locals, loops, early returns, signed/unsigned
+  branches and operand-stack joins. Seven focused tests on main cover 79 native/
+  interpreter comparisons and 17 rejected programs, including uninitialized locals
+  and invalid control flow. Native Fault propagation, loop budgets/cancellation,
+  managed allocation and the web demo remain future work; runtime dependencies and
+  public APIs are unchanged. Cherry-pick this
   isolated slice to main at the author's correction, retaining main's newer native
   bootstrap work and refreshing the tool lockfile for the current runtime.
 

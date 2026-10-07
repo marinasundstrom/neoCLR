@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-07",
+  "branch": "main",
+  "base_revision": "3b4746bc386546fe58216566cda221ca18e7a6b6",
+  "scope": "Int32 control flow and locals",
+  "command": "cargo test --locked --manifest-path tools/aot-poc/Cargo.toml",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "result": {
+    "passed": 7,
+    "failed": 0,
+    "native_interpreter_comparisons": 79,
+    "native_executables": 14,
+    "rejected_programs": 17,
+    "consumer_input_20": 380,
+    "object_undefined_symbols": []
+  },
+  "limitations": [
+    "no native Fault propagation",
+    "no recursion",
+    "no instruction budgets or cancellation",
+    "no managed allocation"
+  ],
+  "sha256": {
+    "tools/aot-poc/src/compiler.rs": "720c09d9f249776b7f7de0da42153ac09fa87a61a4958bb88f82d4314dd1f5bb",
+    "tools/aot-poc/src/flow.rs": "a0de1d27e74f7e9ab2cd67f6d362ecb33eb63285e4f7154762e8f9fd4393ef8b",
+    "tools/aot-poc/tests/scalar.rs": "b7b6a658c76908c69e1c8f86fa8997823907768cfcdcd5dc89e429570c7c738c",
+    "tools/aot-poc/Cargo.lock": "5e01f8ba8f8874b863c1d038cdf26fec21108e00d52da551d7f0d456732a349d",
+    "docs/experiments/aot-scalar/control-flow.neoil": "ca325b2b5454a3d66486681b563a78fccd2a9da3fe3caf5b730882a9c674b330"
+  }
+}

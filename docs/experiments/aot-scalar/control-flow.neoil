@@ -1,0 +1,46 @@
+.module AotControlFlow
+
+.function Twice(Int32 value) -> Int32
+    ldarg value
+    ldc.i4 2
+    mul
+    ret
+.end
+
+.function Calculate(Int32 value) -> Int32
+    .local Int32 index
+    .local Int32 total
+    ldarg value
+    ldc.i4 0
+    blt Negative
+    ldarg value
+    ldc.i4 20
+    bgt TooLarge
+    ldc.i4 0
+    stloc index
+    ldc.i4 0
+    stloc total
+Loop:
+    ldloc index
+    ldarg value
+    bge Done
+    ldloc total
+    ldloc index
+    call Twice(Int32)
+    add
+    stloc total
+    ldloc index
+    ldc.i4 1
+    add
+    stloc index
+    br Loop
+Done:
+    ldloc total
+    ret
+Negative:
+    ldc.i4 -1
+    ret
+TooLarge:
+    ldc.i4 -2
+    ret
+.end

@@ -1,7 +1,7 @@
 # First ARM64 scalar AOT probe
 
 **Development experiment, 2026-10-07.** A separate Rust tool lowers a deliberately
-small neoIL subset through **Cranelift 0.121.2**, emits an ARM64 Mach-O object, and
+small neoIL subset, now including branches and locals, through **Cranelift 0.121.2**, emits an ARM64 Mach-O object, and
 links it to a C executable. The generated functions execute native code; there is
 no interpreter, JIT or neoCLR runtime dependency in the scalar executable. The
 compiler itself uses neoCLR for assembly and validation. This is the first bounded
@@ -20,20 +20,28 @@ is hand-authored neoIL; Raven-produced native execution remains to validate.
 ## Supported contract
 
 - One source module, no declared types; at most 128 uniquely named functions.
-- Nongeneric free functions with Int32 parameters/results and no locals, native
-  imports, special parameter contracts or managed runtime services.
-- `ldc.i4`, `ldarg`, `dup`, `pop`, wrapping `add`/`sub`/`mul`, direct unqualified local
-  `call`, and one final `ret` leaving exactly one result before return.
+- Nongeneric free functions with Int32 parameters/results and up to 1,024 Int32
+  locals; no native imports, special parameter contracts or managed runtime services.
+- `ldc.i4`, `ldarg`, `ldloc`, `stloc`, `dup`, `pop`, wrapping `add`/`sub`/`mul`,
+  direct unqualified local `call`, and `ret` with exactly one result. Early returns
+  are supported; reachable paths must return or remain within the function's CFG.
+- `br`, Int32 `brtrue`/`brfalse`, and `beq`, `bne.un`, `bgt`, `blt`, `bge`, `ble`
+  with signed/unsigned forms. Loops and nonempty operand-stack joins are supported.
+  Boolean-producing comparison instructions, switch and local reset remain outside
+  this profile. The ordinary verifier enforces definite assignment of locals.
 - An explicitly named `(Int32) -> Int32` root exports the C symbol `neoclr_entry`.
   Other functions are local object symbols. The module's ordinary entry-point
   spelling does not select the export; this is a C-hosted experiment.
-- All declared bodies are checked and emitted, including unused functions; there
-  is no trimming. Calls must match their local signature. Cycles are rejected
+- All declared functions are checked and emitted, including unused functions; there
+  is no function trimming. Unsupported opcodes are rejected even in unreachable
+  instructions; supported unreachable instructions are omitted during lowering.
+  Calls must match their local signature. Call-graph cycles are rejected
   because native recursion budgets and Fault propagation are not implemented.
 - Per-function body limit: 8,192 instructions. These are compiler acceptance bounds,
   not a native execution sandbox or the interpreter's instruction/stack quotas.
-- Unsupported instructions, early returns, malformed stacks and unsupported
-  metadata fail before an output file is created. A pre-existing output is never
+- Unsupported instructions, malformed stacks, inconsistent stack joins,
+  uninitialized-local reads and unsupported metadata fail before an output file is
+  created. A pre-existing output is never
   overwritten. The ordinary loader/verifier also runs before native code generation.
 
 The target is explicitly `aarch64-apple-darwin`, with baseline ARM64 code generation
@@ -49,7 +57,7 @@ The existing interpreter defines unchecked Int32 arithmetic by wrapping operatio
 behavior without C signed-overflow assumptions. The fixture computes `2*x + 2` via
 separate multiply and two-argument subtraction helpers. Values come from a C host
 at execution time, so native output is not just a precomputed constant. Checked
-arithmetic, division, branches, recursion, pointers, allocation, GC, Strings, HTTP,
+arithmetic, division, recursion, pointers, allocation, GC, Strings, HTTP,
 JIT and hot reload remain unsupported. AOT does not yet run the web-app POC.
 
 ## Reproduce on macOS ARM64
@@ -96,20 +104,38 @@ ARM64; do not mistake a skipped consumer test elsewhere for native qualification
 
 - ARM64 Mach-O format, successful emission and refusal to overwrite existing output.
 - Eleven rejected programs: division, checked arithmetic, stack underflow, recursion,
-  unknown target, mismatched call signature, early return, invalid argument index,
-  empty return, non-Int32 result, and an unsupported operation in an unused function.
+  unknown target, mismatched call signature, excess return values, invalid argument
+  index, empty return, non-Int32 result, and an unsupported operation in an unused
+  function. The original scalar-only evidence rejected early return instead; it is
+  now a supported operation with explicit CFG validation.
 - A C consumer matching interpreter results for ten runtime inputs, including
   negatives and Int32 boundary wrapping; three invalid C command-line inputs fail.
   The object has no undefined symbols. C compilation enables warnings as errors.
 
-Recorded results and artifact/source hashes are in [validation.json](validation.json).
+Original results and artifact/source hashes are in [validation.json](validation.json).
+[Control-flow evidence](control-flow-validation.json) records seven passing tests on
+main: 79 native/interpreter comparisons across 14 C executables, and 17 rejected
+programs. Additional negative cases cover inconsistent joins/backedges, a partially
+initialized local, unknown label, falling out of the function, and an unsupported
+opcode after an early return.
 The first linker attempt exposed a missing platform command in Cranelift's object;
 the tool now writes an explicit Mach-O build-version command. Final validation uses
 that corrected object. No website build or broad runtime suite is required for this
 isolated tool; the runtime and public library API are unchanged.
 
-Next proposed slice: verified branches and locals, with focused interpreter/native
-parity. Establish an explicit Fault ABI before division or checked arithmetic, then
+The [control-flow consumer](control-flow.neoil) sums doubled indices using locals,
+a loop and a helper call; negative and oversized inputs return early. Input 20
+returns 380. Run it with the same tool/C host above, using a fresh object path.
+The lowering uses one Cranelift block per reachable instruction and explicit stack
+block parameters, with Cranelift SSA variables for locals. This simple representation
+is a correctness baseline, not a compiler performance claim.
+
+Native loops have no instruction budget, cancellation polls or safepoints yet;
+nonterminating inputs can run indefinitely. This trusted-code probe is not suitable
+for resource-limited hosting. The interpreter's quota behavior is not promised by
+this native profile. Fixtures deliberately bound their loops.
+
+Next proposed slice: establish an explicit Fault ABI before division or checked arithmetic, then
 UTF-8 console/runtime service boundaries, managed allocation/root reporting, and the
 minimal AOT HTTP consumer. Keep benchmarking as a later measured comparison.
 
