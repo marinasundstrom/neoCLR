@@ -97,7 +97,8 @@ public sealed partial class MethodBuilder
                     return;
                 }
                 var constructedConformance = stack.Count > 0 && stack[^1].GenericInstance is { } instance &&
-                    (type.Class is { IsInterface: true } interfaceType && instance.ConformsTo(interfaceType) ||
+                    (type.Class is { IsNativeObjectRoot: true } root && instance.Definition.DerivesFrom(root) ||
+                     type.Class is { IsInterface: true } interfaceType && instance.ConformsTo(interfaceType) ||
                      type.GenericInstance is { Definition.IsInterface: true } interfaceInstance && instance.ConformsTo(interfaceInstance) ||
                      type.ImportedType is { } externalInterface && instance.ConformsTo(externalInterface));
                 var importedConformance = stack.Count > 0 && stack[^1].ImportedType is { } importedActual && type.ImportedType is { } importedTarget &&
@@ -362,7 +363,7 @@ public sealed partial class MethodBuilder
                     if (instruction.Target.IsConstructor)
                     {
                         if (baseInitialized || !IsConstructor || !ReferenceEquals(DeclaringType!.LocalBase, instruction.Target.DeclaringType) ||
-                            stack.Count != 1 || !stack[0].ConstructionReceiver || !ReferenceEquals(stack[0].Class, DeclaringType))
+                            stack.Count != 1 || !stack[0].ConstructionReceiver || !(stack[0] with { ConstructionReceiver = false }).Equals((BodyValueType)DeclaringType.OpenSignature))
                             throw new InvalidDataException("base constructor must initialize the current receiver exactly once");
                         stack.Clear(); baseInitialized = true;
                     }

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Allow top-level generic reference classes to inherit the explicitly authored native
+  Object root. Definition/builder validation, constructor flow and native reading retain
+  the existing CLI/native base encoding; general generic inheritance stays unsupported.
+  An API-authored case and a Raven source-root fixture execute generic storage and
+  inherited dispatch. The full-System audit passes Array<T> and next stops on enum
+  attribute ownership; full System and ordinary imported-root consumers remain pending.
+
 - Connect source NativeMemory to exact native allocation services through Raven's
   native pointer import/emission path. Separately compiled consumers execute both
   Alloc overloads, Free, typed pointer pass-through, double-free and overflow faults;

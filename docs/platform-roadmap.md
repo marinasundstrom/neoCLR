@@ -10,6 +10,16 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Generic reference classes can now inherit the source Object root through an explicit
+Raven target capability and the metadata builder/definition path. Generic storage,
+base construction and inherited dispatch execute in focused native tests. The System
+audit gets past Array<T> and next stops on enum attribute ownership. Next reconcile
+FlagsAttribute selection with source/core declaration ownership, then retry emission.
+No full System artifact is emitted; ordinary imported-root consumers are still unsupported.
+[Generic-root evidence](experiments/extended-cli-metadata/generic-object-root-2026-10-07.md).
+
+### Earlier NativeMemory frontier
+
 Source NativeMemory now compiles and is consumed through native metadata. Both Alloc
 forms and Free execute; double-free and checked-size overflow fault, and unsupported
 pointer signatures publish no output. The full-owned-handle audit clears **binding

@@ -53,6 +53,30 @@ signatures, and separately compiled source NativeMemory consumers execute. Point
 arithmetic and nominal pointer targets are still outside this bounded compiler gate;
 full System output remains pending. [Source acceptance](../docs/experiments/extended-cli-metadata/source-native-memory-2026-10-07.md).
 
+## Generic classes over the native Object root (development, 2026-10-07)
+
+`AssemblyBuilder.AddGenericClass(namespace, name, genericParameterNames, baseType,
+visibility)` accepts this output's explicitly designated native Object root. The matching
+manual `TypeDefinition` constructor accepts the same local base reference. The base must
+already be attached; foreign roots and ordinary class bases reject. This bounded overload
+does not admit constructed or generic bases, nested derived types or general generic
+class inheritance. Existing core-backed generic classes retain their behavior.
+
+Constructors must explicitly call the root constructor exactly once before ordinary
+receiver access. Signature validation retains the full open generic receiver identity.
+Constructed instances may be passed to inherited root methods; type argument storage
+is preserved. CLI projection keeps the ordinary TypeDef base token; native metadata keeps
+the existing named base edge. No encoding/version change is required, and executable
+CLI output of a native Object root remains rejected.
+
+The native reader preserves the base reference, and `NominalTypeInfo.BaseType` resolves
+the canonical root through the metadata context. The declaration fact applies to the
+generic definition; this does not add reflection or inherited member enumeration.
+
+Validation includes definition/builder parity, base round trips, canonical facade identity,
+missing initialization rejection and executed generic storage plus inherited virtual dispatch.
+[Source Raven regression and limits](../docs/experiments/extended-cli-metadata/generic-object-root-2026-10-07.md).
+
 ## Namespace and types
 
 - [Native-width integers](#native-width-integers-development-2026-10-06).

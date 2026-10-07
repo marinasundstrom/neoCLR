@@ -102,7 +102,7 @@ public sealed partial class AssemblyBuilder
                 if (type.Definition.IsNativeObjectRoot) type.Definition.ValidateNativeObjectRoot();
                 if (type.IsClosedHierarchy && (!(IsOrdinaryBase(type) || type.IsInterface && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null) || !type.IsAbstract))
                     throw new InvalidDataException("closed families require nongeneric top-level abstract class or interface owners");
-                if (type.LocalBase is { } parent && (!IsOrdinaryBase(type) || !IsOrdinaryBase(parent) || (parent.Definition.Attributes & 0x100) != 0))
+                if (type.LocalBase is { } parent && (!(IsOrdinaryBase(type) || parent.IsNativeObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType && type.Definition.DeclaringType is null) || !IsOrdinaryBase(parent) || (parent.Definition.Attributes & 0x100) != 0))
                     throw new InvalidDataException("derived classes require ordinary nongeneric reference owners");
             }
             ValidateValueLayouts();
@@ -281,6 +281,25 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentException">Invalid names, visibility, duplicate type or exceeded limits.</exception>
     public TypeBuilder AddGenericClass(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility = TypeVisibility.Public)
         => AddGenericTypeCore(@namespace, name, genericParameterNames, visibility, false);
+    /// <summary>Adds a generic reference class deriving from this output's explicit native Object root.</summary>
+    /// <param name="namespace">Metadata namespace.</param>
+    /// <param name="name">Simple name without CLI arity.</param>
+    /// <param name="genericParameterNames">One through 32 unique names.</param>
+    /// <param name="baseType">The attached native Object root in this output.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <returns>An attached generic class; constructors must explicitly initialize the base.</returns>
+    /// <exception cref="ArgumentException">Invalid owner, visibility, names or duplicate declaration.</exception>
+    /// <exception cref="ArgumentNullException">Base or parameter sequence is null.</exception>
+    public TypeBuilder AddGenericClass(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeBuilder baseType, TypeVisibility visibility = TypeVisibility.Public)
+    {
+        ArgumentNullException.ThrowIfNull(baseType);
+        if (!ReferenceEquals(baseType.Assembly, this) || !baseType.IsNativeObjectRoot || !Enum.IsDefined(visibility))
+            throw new ArgumentException("generic local bases require this output's native Object root");
+        var definition = new TypeDefinition(@namespace, name, visibility == TypeVisibility.Public ? 1u : 0u, baseType.Definition.ToReference(), genericParameterNames);
+        Definition.MainModule.Types.Add(definition);
+        return definition.Producer!;
+    }
+
     private TypeBuilder AddGenericTypeCore(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility, bool isStatic, bool isInterface = false, bool isValueType = false)
     {
         ArgumentNullException.ThrowIfNull(genericParameterNames);

@@ -6263,3 +6263,14 @@ source native-width numeric conversions remain separate work. Acceptance uses
 API-generated UIntPtr inputs explicitly, not application or library projections.
 The four binding errors are gone; full System next rejects Array<T>'s local Object
 base. [Commands and evidence](experiments/extended-cli-metadata/source-native-memory-2026-10-07.md).
+
+### Generic source-root base (2026-10-07)
+
+The native target opts into generic classes over the explicitly selected source Object
+root. Shared plans retain the semantic base; the adapter supplies a local base reference
+to the metadata API. The ordinary .NET target stays unchanged. No Runtime Contract
+option or new metadata encoding is introduced. General generic inheritance remains
+unsupported. A Raven-authored root fixture and Box<T> execute through an API-authored
+consumer; this does not remove the ordinary driver restriction on imported-root consumers.
+The System audit proceeds past Array<T> and next rejects enum attribute ownership.
+See [evidence and next boundary](experiments/extended-cli-metadata/generic-object-root-2026-10-07.md).

@@ -4,6 +4,14 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--generic-object-consumer", var rootLibrary, var rootCore, var rootConsumer])
+{
+    GenericObjectRootChecks.WriteConsumer(rootLibrary, rootCore, rootConsumer); return 0;
+}
+if (args is ["--generic-object-root", var rootOutput])
+{
+    GenericObjectRootChecks.WriteRuntime(rootOutput); return 0;
+}
 if (args is ["--pointer-allocation", var pointerOutput])
 {
     PointerSignatureChecks.WriteRuntime(pointerOutput); return 0;
@@ -455,6 +463,7 @@ var tests = new (string Name, Action Body)[]
     ("Integer widths and unsigned execution", IntegerWidthChecks.Run),
     ("Native integer signatures and conversions", NativeIntegerChecks.Run),
     ("Pointer signature round trips and introspection", PointerSignatureChecks.Run),
+    ("Generic class with source Object root", GenericObjectRootChecks.Run),
     ("Native primitive declaration representation", PrimitiveRepresentationChecks.Run),
     ("Native String reference representation", StringRepresentationChecks.Run),
     ("Native grapheme declaration representation", GraphemeRepresentationChecks.Run),

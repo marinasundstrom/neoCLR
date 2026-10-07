@@ -1,0 +1,16 @@
+public class Box<T> {
+    private var value: T
+
+    init(initial: T) {
+        value = initial
+    }
+
+    func Get() -> T => value
+
+    static func Run() -> int {
+        let box = Box<int>(42)
+        return box.Get() + box.GetHashCode()
+    }
+}
+
+public func RunGeneric() -> int => Box<int>.Run()
