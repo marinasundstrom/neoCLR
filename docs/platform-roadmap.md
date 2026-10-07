@@ -30,13 +30,17 @@ runs independently of a shared managed framework/runtime.
 
 **Author clarification:** build the CIL-to-native, self-contained executable foundation
 early, and extend it alongside platform evolution. **Hello World is the first executable
-milestone**, followed by increasingly complex samples until HTTP Server. Current
-Hello World input is handwritten neoIL; supported CIL input through the same pipeline
-is the next proposed proof. Required library/runtime support should be baked into
+milestone**, followed by increasingly complex samples until HTTP Server. The author clarifies that the input is **neoCLR CIL**, produced by Raven
+in its metadata format. The next slice now passes **Raven source → PE/#Neo metadata/IL
+→ native ARM64 Hello World**, with standalone NEOX also tested; the original neoIL
+consumer remains a backend test. The input is not ordinary .NET CIL. Required library/runtime support should be baked into
 the final image. Scalar and Fault tests support this progression; they do not replace
 the executable milestones. The author identifies trimming as a later step: establish
 code/metadata roots and dynamic-use rules before removing dependencies. No trimming
-is implemented or required for this first Hello World milestone.
+is implemented or required for this first Hello World milestone. The author selects
+types and members next, especially value types supporting union samples such as
+Result and Some, to exercise payload access and control flow/branches. Inspect Raven
+metadata/IL before selecting the first bounded representation and member slice.
 
 ## Existing native release gates
 

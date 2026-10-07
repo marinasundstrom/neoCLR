@@ -555,10 +555,20 @@ fn native_console_preserves_utf8_bytes_and_propagates_service_failure() {
 fn standalone_hello_world_has_no_managed_runtime_dependency() {
     let temp = Temp::new();
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    assert_standalone_hello(
+        &temp,
+        &root.join("docs/experiments/aot-hello/hello.neoil"),
+        "Main",
+    );
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn assert_standalone_hello(temp: &Temp, input: &Path, entry: &str) {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
     let object = temp.0.join("hello.o");
     let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
-        .arg(root.join("docs/experiments/aot-hello/hello.neoil"))
-        .arg("Main")
+        .arg(input)
+        .arg(entry)
         .arg(&object)
         .arg("--console")
         .output()
@@ -607,4 +617,180 @@ fn standalone_hello_world_has_no_managed_runtime_dependency() {
     assert_eq!(result.status.code(), Some(0));
     assert_eq!(result.stdout, b"Hello, world!\n");
     assert!(result.stderr.is_empty());
+}
+
+const RAVEN_HELLO: &[u8] = include_bytes!("../../../docs/experiments/aot-hello/RavenHello.pe");
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn raven_native_metadata_hello_runs_as_standalone_machine_code() {
+    let module = neoclr::metadata_container::decode(RAVEN_HELLO).unwrap();
+    assert_eq!(module.functions.len(), 1);
+    assert_eq!(module.functions[0].origin.as_ref().unwrap().name, "Main");
+    assert!(module.functions[0].parameters.is_empty());
+    let program = neoclr::LoadedProgram::new(&module).unwrap();
+    let interpreted = program.run(neoclr::ExecutionOptions::default()).unwrap();
+    assert_eq!(interpreted.output, ["Hello, world!"]);
+    for bytes in [
+        RAVEN_HELLO.to_vec(),
+        neoclr::metadata_container::write_module(&module).unwrap(),
+    ] {
+        let temp = Temp::new();
+        let input = temp.0.join("raven.bin"); // Recognition uses magic, not the extension.
+        fs::write(&input, bytes).unwrap();
+        assert_standalone_hello(&temp, &input, "@entry");
+    }
+}
+
+#[test]
+fn native_input_rejects_corruption_and_unsupported_il_before_emission() {
+    use neoclr::metadata::Instruction as Op;
+    let module = neoclr::metadata_container::decode(RAVEN_HELLO).unwrap();
+    let envelope = neoclr::metadata_container::write_module(&module).unwrap();
+    let mut wrong_marker = RAVEN_HELLO.to_vec();
+    let marker = wrong_marker
+        .windows(11)
+        .position(|w| w == b"neoCLR.NEOX")
+        .unwrap();
+    wrong_marker[marker] = b'x';
+    let mut corrupt_pe = RAVEN_HELLO.to_vec();
+    let payload = corrupt_pe.windows(4).position(|w| w == b"NEOX").unwrap();
+    corrupt_pe[payload + 40] ^= 1;
+    let mut unsupported = module.clone();
+    unsupported.functions[0].body.insert(0, Op::BitXor);
+    let mut invalid = module.clone();
+    invalid.functions[0].body.remove(0); // Console call without its String argument.
+    let mut wrong_owner = module.clone();
+    if let Op::Call(call) = &mut wrong_owner.functions[0].body[1] {
+        call.owner = None;
+    }
+    let mut no_entry = module.clone();
+    no_entry.entry.clear();
+    let mut cases = vec![
+        (wrong_marker, "recognition marker"),
+        (corrupt_pe, "binding mismatch"),
+        (
+            envelope[..envelope.len() - 1].to_vec(),
+            "native metadata container",
+        ),
+        (
+            neoclr::metadata_container::write_module(&unsupported).unwrap(),
+            "unsupported instruction",
+        ),
+        (
+            neoclr::metadata_container::write_module(&invalid).unwrap(),
+            "stack underflow",
+        ),
+        (
+            neoclr::metadata_container::write_module(&wrong_owner).unwrap(),
+            "unsupported operand type",
+        ),
+        (
+            neoclr::metadata_container::write_module(&no_entry).unwrap(),
+            "root function not found",
+        ),
+    ];
+    let mut trailing = envelope.clone();
+    trailing.push(0);
+    cases.push((trailing, "native metadata container"));
+    for (bytes, expected) in cases {
+        let temp = Temp::new();
+        let input = temp.0.join("input.neox");
+        let output = temp.0.join("rejected.o");
+        fs::write(&input, bytes).unwrap();
+        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+            .arg(&input)
+            .arg("@entry")
+            .arg(&output)
+            .arg("--console")
+            .output()
+            .unwrap();
+        assert!(!result.status.success());
+        assert!(
+            String::from_utf8_lossy(&result.stderr).contains(expected),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        assert!(!output.exists());
+    }
+    let temp = Temp::new();
+    let input = temp.0.join("input.neox");
+    let output = temp.0.join("preserved.o");
+    fs::write(&input, envelope).unwrap();
+    // Capability policy applies to binary inputs as well as text.
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        .arg(&input)
+        .arg("@entry")
+        .arg(&output)
+        .output()
+        .unwrap();
+    assert!(!result.status.success());
+    assert!(String::from_utf8_lossy(&result.stderr).contains("--console"));
+    assert!(!output.exists());
+    fs::write(&output, b"existing artifact").unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        .arg(&input)
+        .arg("@entry")
+        .arg(&output)
+        .arg("--console")
+        .output()
+        .unwrap();
+    assert!(!result.status.success());
+    assert_eq!(fs::read(output).unwrap(), b"existing artifact");
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn parameterless_entry_adapter_preserves_fault_and_result_pointer() {
+    let mut module = neoclr::metadata_container::decode(RAVEN_HELLO).unwrap();
+    use neoclr::metadata::Instruction as Op;
+    module.functions[0].body = vec![Op::Int(1), Op::Int(0), Op::Divide, Op::Return];
+    let temp = Temp::new();
+    let input = temp.0.join("fault.neox");
+    let object = temp.0.join("fault.o");
+    fs::write(
+        &input,
+        neoclr::metadata_container::write_module(&module).unwrap(),
+    )
+    .unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        .arg(&input)
+        .arg("@entry")
+        .arg(&object)
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let host = temp.0.join("host.c");
+    fs::write(
+        &host,
+        r#"
+#include <stdint.h>
+extern int32_t neoclr_entry_v2(int32_t, int32_t *);
+int main(void) {
+    int32_t result = 12345;
+    int32_t status = neoclr_entry_v2(99, &result);
+    return status == 1 && result == 12345 ? 0 : 1;
+}
+"#,
+    )
+    .unwrap();
+    let executable = temp.0.join("fault");
+    let result = Command::new("clang")
+        .args(["-arch", "arm64", "-Wall", "-Wextra", "-Werror"])
+        .arg(&host)
+        .arg(&object)
+        .arg("-o")
+        .arg(&executable)
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    assert!(Command::new(executable).output().unwrap().status.success());
 }

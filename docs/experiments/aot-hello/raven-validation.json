@@ -1,0 +1,114 @@
+{
+  "profile": "raven-neoclr-cil-hello-v1",
+  "compilerRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "neoClrBaseRevision": "d0da6036dcf95329e54fe42e5cca50c1b376e1b0",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-hello/raven-pipeline/RavenHello.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/hello.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "/Users/robert/Projects/neoclr/target/aot-hello/raven-pipeline/RavenHello.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-hello/raven-pipeline/hello.o",
+        "--console"
+      ],
+      "exit": 0,
+      "stdout": "Emitted aarch64-apple-darwin object; C export: int32_t neoclr_entry_v2(int32_t, int32_t *result)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/target/aot-hello/raven-pipeline/hello.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-hello/raven-pipeline/hello"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-hello/raven-pipeline/hello"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-hello/raven-pipeline/hello:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/hello.rvn": "052fbbe9d5579a8e4d2de55ab979683e0d4126c11ae80f753164d5c3f5b6ad26",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "3385faac991d494589bad07f579b9b6577f930f81f12fcd7c7d60384e6376678",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d"
+  },
+  "artifacts": {
+    "RavenHello.dll": "0425185e394cc36594cc868c264ef0f081e7ffe4bff11ca7a0a2b9256a489447",
+    "hello.o": "0d601f29428bda29c8814b838cc7acf88b59b948b0261e0339aa971a4ccfe01c",
+    "hello": "638cc2f7e4c2a3df2c5496839db81e63192bb049a3009ebafb54be1101f27ebb"
+  },
+  "execution": {
+    "stdout": "Hello, world!\n",
+    "stderr": "",
+    "exit": 0,
+    "emptyEnvironment": true,
+    "executableOnlyDirectory": true,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "limits": [
+    "explicit compiler primitive/console bootstrap",
+    "literal console intrinsic",
+    "no general library dependency compilation",
+    "no trimming",
+    "no HTTP Server"
+  ],
+  "date": "2026-10-07",
+  "tests": {
+    "command": "cargo test --locked --manifest-path tools/aot-poc/Cargo.toml",
+    "passed": 15,
+    "failed": 0,
+    "new_cases": [
+      "Raven PE/#Neo and NEOX standalone execution and interpreter parity",
+      "8 malformed/unsupported binary cases, missing capability and output preservation",
+      "parameterless entry Fault status and untouched output"
+    ]
+  },
+  "sourceSha256": {
+    "tools/aot-poc/src/main.rs": "2e8589aaf7f353b36b22ab10f64edd6fe7dac274471cef941156e950cf8c4a41",
+    "tools/aot-poc/src/compiler.rs": "3590619132ec0b56a1a7869f4cd07c18043509720471b8ea74c1c724e4e26e46",
+    "tools/aot-poc/tests/scalar.rs": "c88ab17dc48b4115b73099106842bcc2166e2ff4de91648cc188fc9b2141070a",
+    "docs/experiments/aot-hello/hello.rvn": "052fbbe9d5579a8e4d2de55ab979683e0d4126c11ae80f753164d5c3f5b6ad26",
+    "docs/experiments/aot-hello/RavenHello.pe": "7b3dc09c6979dd3fde39e4e2d541e847b0b2a7d8570a83f28b38da54bb70dbd2",
+    "docs/experiments/aot-hello/verify_raven.py": "d289928c6f0368c945497817613d753fd889aca716ca0f726306c14d616e492b"
+  },
+  "fixture": "RavenHello.pe was emitted from hello.rvn in a separate invocation of the same pinned compiler; byte-identical rebuilds are not claimed."
+}

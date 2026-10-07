@@ -16,18 +16,22 @@ correction, commit `3571ab79` is cherry-picked onto main with fresh main validat
 the old validation.json remains historical evidence, not a claim about the new base.
 [Main revalidation](main-validation.json) passes the same three tests, including
 native C/interpreter parity and eleven rejection cases, against Preview 12 main. The source input
-is hand-authored neoIL; Raven-produced native execution remains to validate.
+in that historical validation is hand-authored neoIL; the later Raven pipeline is
+recorded separately below.
 
 The first user-facing executable milestone is now
 [Hello World](../aot-hello/README.md). These scalar cases remain supporting compiler
-conformance tests. CIL input is the target; the current tool accepts neoIL only.
+conformance tests. The tool now also reads neoCLR CIL from native PE/#Neo and
+standalone NEOX assemblies; Raven Hello World exercises that pipeline. This does
+not import ordinary .NET CIL.
 
 ## Supported contract
 
-- One source module, no declared types; at most 128 uniquely named functions.
+- One source or decoded native module, no declared types; at most 128 uniquely named functions.
 - Nongeneric free functions with Int32 parameters/results and up to 1,024 Int32
   locals; no general native imports or special parameter contracts. `--console`
-  enables only the existing `neoCLR.Runtime.WriteLine(String)` service.
+  enables the existing `neoCLR.Runtime.WriteLine(String)` service and checked
+  bundled `System.Console.WriteLine(String)` wrapper.
 - `ldc.i4`, `ldarg`, `ldloc`, `stloc`, `dup`, `pop`, wrapping `add`/`sub`/`mul`,
   literal `ldstr` values and explicit console service calls,
   signed/unsigned checked `add.ovf`/`sub.ovf`/`mul.ovf`, `div`/`rem` and their
@@ -37,10 +41,11 @@ conformance tests. CIL input is the target; the current tool accepts neoIL only.
   with signed/unsigned forms. Loops and nonempty operand-stack joins are supported.
   Boolean-producing comparison instructions, switch and local reset remain outside
   this profile. The ordinary verifier enforces definite assignment of locals.
-- An explicitly named `(Int32) -> Int32` root exports the C symbol
+- An explicitly named `() -> Int32` or `(Int32) -> Int32` root exports the C symbol
   `neoclr_entry_v2`, returning a status and writing the result through a pointer
   only on success. Other functions are local object symbols. The module's ordinary entry-point
-  spelling does not select the export; this is a C-hosted experiment.
+  spelling selects the export when the CLI root argument is `@entry`. Parameterless
+  roots use a generated adapter to preserve the v2 host ABI.
 - All declared functions are checked and emitted, including unused functions; there
   is no function trimming. Unsupported opcodes are rejected even in unreachable
   instructions; supported unreachable instructions are omitted during lowering.

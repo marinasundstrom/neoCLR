@@ -33,8 +33,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   bytes, OS-only dynamic dependencies, execution without companion files and service
   failures. Record the author's early self-contained CIL-to-native foundation and
   Hello World-to-HTTP Server sequence, with trimming recorded as a later step.
-  Input is still neoIL; CIL AOT ingestion, loop
-  budgets/cancellation, managed allocation and HTTP remain future work. Runtime
+  Clarify the input as neoCLR CIL: compile Raven Hello World to native PE/#Neo
+  metadata/IL, decode it directly, select its declared entry, and compile/link it
+  into the standalone ARM64 executable. Support standalone NEOX too, retaining
+  neoIL conformance inputs. Add a parameterless Int32 entry adapter and checked
+  bundled Console.WriteLine(String) lowering. Record the pinned compiler bootstrap,
+  fixture and reproducible pipeline; fifteen focused tests pass, rejecting corrupt
+  containers and unsupported IL before emission. Record types/members and value-type
+  union consumers as the author-selected next milestone. General library dependency compilation, loop budgets/cancellation,
+  managed allocation and HTTP remain future work. Runtime
   dependencies and public library APIs are unchanged. Cherry-pick this
   isolated slice to main at the author's correction, retaining main's newer native
   bootstrap work and refreshing the tool lockfile for the current runtime.

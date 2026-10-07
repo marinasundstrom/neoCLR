@@ -1,6 +1,10 @@
 mod compiler;
 
-use std::{env, fs, io::Write};
+use std::{
+    env, fs,
+    io::{Read, Write},
+    path::Path,
+};
 
 fn main() {
     if let Err(error) = run() {
@@ -13,12 +17,34 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = env::args_os().skip(1).collect();
     if !(args.len() == 3 || (args.len() == 4 && args[3] == "--console")) {
         return Err(
-            "usage: neoclr-aot-poc <source.neoil> <root-name> <output.o> [--console]".into(),
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]"
+                .into(),
         );
     }
-    let source = fs::read_to_string(&args[0])?;
+    // Reuse the runtime's native CIL decoder; never translate binary metadata back
+    // through text or interpret CLI projection bodies as neoCLR instructions.
+    let mut bytes = Vec::new();
+    fs::File::open(&args[0])?
+        .take(16 * 1024 * 1024 + 1)
+        .read_to_end(&mut bytes)?;
+    if bytes.len() > 16 * 1024 * 1024 {
+        return Err("input exceeds 16 MiB AOT profile limit".into());
+    }
+    let input = if bytes.starts_with(b"NEOX") {
+        neoclr::metadata_container::decode_envelope(&bytes).map_err(|error| error.to_string())?
+    } else if bytes.starts_with(b"MZ") {
+        neoclr::metadata_container::decode(&bytes).map_err(|error| error.to_string())?
+    } else if Path::new(&args[0])
+        .extension()
+        .is_some_and(|extension| extension == "neoil")
+    {
+        neoclr::assemble(std::str::from_utf8(&bytes)?).map_err(|error| error.to_string())?
+    } else {
+        return Err("expected neoCLR CIL in NEOX, PE/#Neo or .neoil source".into());
+    };
     let root = args[1].to_str().ok_or("root name must be UTF-8")?;
-    let object = compiler::compile(&source, root, args.len() == 4)?;
+    let root = if root == "@entry" { &input.entry } else { root };
+    let object = compiler::compile(&input, root, args.len() == 4)?;
     // Do not clobber an existing artifact, including on failed compilation.
     let mut output = fs::OpenOptions::new()
         .write(true)

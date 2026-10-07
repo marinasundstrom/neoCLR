@@ -215,8 +215,9 @@ through C consumers against the interpreter. Checked arithmetic and division now
 propagate arithmetic Fault statuses through a versioned experimental C boundary.
 The first standalone executable milestone is now
 [Hello World](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-hello/README.md),
-with UTF-8 console support linked into the image. The target is self-contained CIL-to-
-native compilation established early; this first probe still accepts neoIL. More
+with UTF-8 console support linked into the image. The bounded pipeline now compiles
+Raven source to neoCLR metadata containing its IL, then compiles that artifact to
+native ARM64 code. Standalone NEOX and neoIL inputs also remain supported. More
 complex samples follow toward HTTP Server. Execution budgets and general managed
 services remain unsupported.
 General AOT applications, the web demo, JIT and hot reload remain future work.

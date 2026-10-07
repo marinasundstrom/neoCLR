@@ -25,9 +25,12 @@ that every executable contain all execution engines.
 The foundation should be exercised early as the platform evolves. The author selects
 **Hello World first**, then increasingly complex executable samples until **HTTP
 Server**. The [native Hello World probe](experiments/aot-hello/README.md) implements
-literal UTF-8 output and self-contained native service linking, with neoIL input.
-A supported CIL consumer through the same pipeline is still pending and is the next
-proposed input proof. The broader experimental list below is research context; this
+literal UTF-8 output and self-contained native service linking. After the initial
+neoIL proof, the author clarifies **neoCLR CIL** and the exact pipeline: compile Hello
+World in Raven to its metadata format with IL, then compile that artifact to native
+code. This now passes for Raven PE/#Neo output and its standalone NEOX encoding; the
+backend reuses native metadata decoding and verification. The bounded compiler/console
+bootstrap and class-library limits are recorded with the sample. The broader experimental list below is research context; this
 later author-directed sample progression controls the immediate work. The author
 also identifies trimming as a future step; establish explicit code/metadata retention
 and dynamic-use roots, without making trimming a prerequisite for Hello World.

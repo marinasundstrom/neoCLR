@@ -25,7 +25,7 @@ experiment above; hot reload remains design work.
 
 ### Self-contained CIL AOT foundation
 
-The author clarifies that the target is **compiling CIL to native code**, producing
+The author clarifies that the target is **compiling neoCLR CIL to native code**, producing
 an executable with required dependencies baked in and no dependency on an installed
 shared framework or managed runtime. Required runtime services still exist; their
 selected implementation code is linked into the executable. OS libraries and explicit
@@ -35,13 +35,15 @@ itself require a freestanding binary or static linking of every system library.
 Establish this foundation early and exercise it as the platform evolves. Keep the
 input reader/importer, shared resolution/verification, native lowering, runtime ABI
 and final linker as distinct boundaries. Handwritten neoIL is useful for conformance,
-but must not become the only exercised input path. The next input proof should compile
-a supported CIL consumer through this pipeline, with explicit diagnostics for unsupported
+but must not become the only exercised input path. The author specifies Raven source
+compiled to neoCLR metadata containing IL, then native compilation of that artifact.
+The Hello World probe now exercises this path with explicit diagnostics for unsupported
 metadata/instructions; it is not a promise to run arbitrary existing .NET applications.
 
 The author selects **Hello World first**, then increasingly complex samples until
 **HTTP Server**. The [first executable probe](experiments/aot-hello/README.md) uses
-neoIL and statically linked native startup/console code. CIL AOT input remains pending.
+Raven-produced PE/#Neo metadata/IL and statically linked native startup/console code;
+standalone NEOX and handwritten neoIL remain supported inputs to the bounded backend.
 For each subsequent platform feature, identify native representation, lowering,
 reachable dependencies and service/GC requirements; extend the small native conformance
 path when supported or record the exact gap. Full JIT/AOT coverage is not a prerequisite

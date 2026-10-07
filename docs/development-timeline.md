@@ -84,6 +84,24 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Assistant response/action:** records trimming as later work, with code/metadata
   roots, reflection/dynamic use, initialization and runtime-helper dependencies to
   establish. Keeps the current non-trimming Hello World proof bounded.
+- **Author input correction:** “We will compile neoCLR CIL into native code.” Then
+  specifies: “So we will have to compile Hello World in Raven into it's metadata
+  format with its IL, and then compile into native code”.
+- **Assistant correction/action:** had started an isolated ordinary .NET assembly
+  importer after interpreting CIL too broadly; removes that uncommitted experiment.
+  Uses the existing native-enabled Raven compiler to emit Hello World in PE/#Neo,
+  feeds its actual metadata/IL directly to the AOT backend, and adds a parameterless
+  entry adapter plus checked bundled-console lowering. Tests PE/#Neo and standalone
+  NEOX execution, interpreter parity, container rejection and standalone deployment.
+  [Raven pipeline evidence](experiments/aot-hello/raven-validation.json) records the
+  pinned compiler and build-time bootstrap limitations. General dependency compilation,
+  richer samples, HTTP Server and trimming remain open; no Raven compiler change occurs.
+- **Author next milestone:** asks for compiling types and members, especially value
+  types so a sample can use unions such as Result and Some and exercise control flow
+  or branching instructions.
+- **Assistant response:** finish the Raven Hello World commit, then inspect actual
+  emitted type/member metadata and select a bounded value-type slice. This direction
+  does not imply that union or general member AOT is already implemented.
 - **Open:** backend choice, OS qualification order, native ABI/GC/metadata contracts,
   edit compatibility, measurements and implementation scheduling. These details are
   assistant proposals, not subsequent author decisions. The active Raven work and

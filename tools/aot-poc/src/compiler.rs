@@ -16,18 +16,18 @@ use std::collections::{HashMap, HashSet};
 
 type Error = Box<dyn std::error::Error>;
 
-pub(super) fn compile(source: &str, root: &str, console: bool) -> Result<Vec<u8>, Error> {
-    let input = neoclr::assemble(source).map_err(|error| error.to_string())?;
+pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool) -> Result<Vec<u8>, Error> {
     if input.name == "System" || !input.types.is_empty() || input.functions.len() > 128 {
         return Err(
             "scalar profile requires an application with no types and at most 128 functions".into(),
         );
     }
-    if input
-        .functions
-        .iter()
-        .any(|f| f.name == "neoCLR.Runtime.WriteLine")
-    {
+    if input.functions.iter().any(|f| {
+        matches!(
+            f.name.as_str(),
+            "neoCLR.Runtime.WriteLine" | "System.Console.WriteLine"
+        )
+    }) {
         return Err("application cannot replace the reserved console service".into());
     }
     let mut uses_console = false;
@@ -40,8 +40,9 @@ pub(super) fn compile(source: &str, root: &str, console: bool) -> Result<Vec<u8>
         flows.push(check_function(function)?);
     }
     let root_index = *names.get(root).ok_or("root function not found")?;
-    if input.functions[root_index].parameters != [Type::Int32] {
-        return Err("root must have signature (Int32) -> Int32".into());
+    let parameterless_root = input.functions[root_index].parameters.is_empty();
+    if !parameterless_root && input.functions[root_index].parameters != [Type::Int32] {
+        return Err("root must have signature () -> Int32 or (Int32) -> Int32".into());
     }
     // Validate every declared body, including unreachable functions/instructions.
     // Resolve only unqualified local calls; no ad-hoc cross-module name lookup.
@@ -108,7 +109,15 @@ pub(super) fn compile(source: &str, root: &str, console: bool) -> Result<Vec<u8>
     for node in 0..edges.len() {
         visit(node, &edges, &mut HashSet::new(), &mut done)?;
     }
-    neoclr::LoadedProgram::new(&input)
+    if input
+        .functions
+        .iter()
+        .flat_map(|f| &f.body)
+        .any(|op| matches!(op, Op::Call(target) if public_console_call(target)))
+    {
+        check_console_wrapper()?;
+    }
+    neoclr::LoadedProgram::new(input)
         .and_then(|program| program.verify())
         .map_err(|error| error.to_string())?;
 
@@ -163,7 +172,7 @@ pub(super) fn compile(source: &str, root: &str, console: bool) -> Result<Vec<u8>
         sig.params = vec![AbiParam::new(types::I32); function.parameters.len()];
         sig.params.push(AbiParam::new(types::I64)); // writable Int32 result pointer
         sig.returns.push(AbiParam::new(types::I32)); // status: 0 success, 1 zero, 2 overflow
-        let (name, linkage) = if index == root_index {
+        let (name, linkage) = if index == root_index && !parameterless_root {
             ("neoclr_entry_v2".to_owned(), Linkage::Export)
         } else {
             (format!("neoclr_scalar_{index}"), Linkage::Local)
@@ -349,6 +358,34 @@ pub(super) fn compile(source: &str, root: &str, console: bool) -> Result<Vec<u8>
         }
         module.define_function(ids[index], &mut context)?;
     }
+    if parameterless_root {
+        // Preserve the v2 host ABI while calling the actual parameterless Raven entry.
+        // Internal calls keep the function's declared signature and target its local symbol.
+        let mut context = module.make_context();
+        context.func.signature.params = vec![AbiParam::new(types::I32), AbiParam::new(types::I64)];
+        context
+            .func
+            .signature
+            .returns
+            .push(AbiParam::new(types::I32));
+        let export =
+            module.declare_function("neoclr_entry_v2", Linkage::Export, &context.func.signature)?;
+        let mut builder_context = FunctionBuilderContext::new();
+        {
+            let callee = module.declare_func_in_func(ids[root_index], &mut context.func);
+            let mut builder = FunctionBuilder::new(&mut context.func, &mut builder_context);
+            let entry = builder.create_block();
+            builder.append_block_params_for_function_params(entry);
+            builder.switch_to_block(entry);
+            let output = builder.block_params(entry)[1];
+            let call = builder.ins().call(callee, &[output]);
+            let status = builder.inst_results(call)[0];
+            builder.ins().return_(&[status]);
+            builder.seal_all_blocks();
+            builder.finalize();
+        }
+        module.define_function(export, &mut context)?;
+    }
     let mut product = module.finish();
     // Baseline macOS ARM64 object, not a claim of testing every macOS version.
     // No SDK was used to compile these scalar functions (sdk = 0).
@@ -464,11 +501,51 @@ fn checked_arithmetic(
     result
 }
 
-fn console_call(target: &FunctionRef) -> bool {
+fn runtime_console_call(target: &FunctionRef) -> bool {
     target.name == "neoCLR.Runtime.WriteLine"
         && target.parameters == [Type::String]
         && target.owner.is_none()
         && target.definition.is_none()
         && !target.instance
         && target.generic_arguments.is_empty()
+}
+
+// This is a backend intrinsic for the exact bundled wrapper, not a name-only
+// replacement for arbitrary library code or a .NET System.Console implementation.
+fn public_console_call(target: &FunctionRef) -> bool {
+    target.name == "System.Console.WriteLine"
+        && target.owner == Some(Type::Named("System.Console".into()))
+        && target.parameters == [Type::String]
+        && target.definition.is_none()
+        && !target.instance
+        && target.generic_arguments.is_empty()
+}
+
+fn console_call(target: &FunctionRef) -> bool {
+    runtime_console_call(target) || public_console_call(target)
+}
+
+fn check_console_wrapper() -> Result<(), Error> {
+    let library = neoclr::library::system().map_err(|error| error.to_string())?;
+    let candidates: Vec<_> = library
+        .functions
+        .iter()
+        .filter(|f| f.name == "System.Console.WriteLine" && f.parameters == [Type::String])
+        .collect();
+    let [wrapper] = candidates.as_slice() else {
+        return Err("bundled console wrapper is missing or ambiguous".into());
+    };
+    if wrapper.owner != Some(Type::Named("System.Console".into()))
+        || wrapper.instance
+        || wrapper.returns != Type::Void
+        || wrapper.no_result
+        || wrapper.impl_flags != 0
+        || wrapper.pinvoke.is_some()
+        || !wrapper.locals.is_empty()
+        || !wrapper.generic_parameters.is_empty()
+        || !matches!(wrapper.body.as_slice(), [Op::Arg(0), Op::Call(call), Op::Return] if runtime_console_call(call))
+    {
+        return Err("bundled console wrapper changed; review native console lowering".into());
+    }
+    Ok(())
 }
