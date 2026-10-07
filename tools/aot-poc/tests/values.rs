@@ -392,8 +392,8 @@ ret
 
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-fn empty_and_eight_lane_records_cross_private_call_boundary() {
-    for count in [0, 8] {
+fn empty_and_sixteen_lane_records_cross_private_call_boundary() {
+    for count in [0, 8, 16] {
         let fields = (0..count)
             .map(|i| format!(".field F{i} Int32\n"))
             .collect::<String>();
@@ -591,8 +591,8 @@ fn cyclic_unknown_and_oversized_inline_layouts_never_emit() {
         ),
         (".type A\n.field Child Int32\n.end", "local named record"),
         (
-            ".type A\n.field X Int32\n.field Y Int32\n.field Z Int32\n.end\n.type B\n.field X A\n.field Y A\n.field Z A\n.end",
-            "eight flattened lanes",
+            ".type A\n.field X Int32\n.field Y Int32\n.field Z Int32\n.end\n.type B\n.field X A\n.field Y A\n.field Z A\n.field U A\n.field V A\n.field W A\n.end",
+            "sixteen flattened lanes",
         ),
     ] {
         let source = format!(
@@ -1874,13 +1874,13 @@ ret
 #[test]
 fn multiple_value_shape_discovery_stays_bounded() {
     let mut source = String::from(".module ManyShapes\n.type Box<T>\n.field Value T\n.end\n");
-    for n in 0..33 { source.push_str(&format!(".type Leaf{n}\n.end\n")); }
+    for n in 0..65 { source.push_str(&format!(".type Leaf{n}\n.end\n")); }
     source.push_str(".function Main() -> Int32\n");
-    for n in 0..33 { source.push_str(&format!(".local Box<Leaf{n}> item{n}\n")); }
+    for n in 0..65 { source.push_str(&format!(".local Box<Leaf{n}> item{n}\n")); }
     source.push_str("ldc.i4 0\nret\n.end\n");
     let m = neoclr::assemble(&source).unwrap();
     let temp = Temp::new();
     let r = compile_mode(&neoclr::metadata_container::write_module(&m).unwrap(),&temp,"Main",true);
     assert!(!r.status.success() && !temp.0.join("value.o").exists());
-    assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 32"));
+    assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 64"));
 }

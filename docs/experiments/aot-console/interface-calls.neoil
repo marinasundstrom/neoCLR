@@ -1,0 +1,72 @@
+.module InterfaceCalls
+.interface Reader
+.method instance Read(Int32 mode) -> Int32
+.end
+.end
+.type class First
+.implements Reader
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance Read(Int32 mode) -> Int32
+ldarg mode
+ldc.i4 2
+beq Fail
+ldc.i4 42
+ret
+Fail:
+fault "reader failed"
+.end
+.end
+.type class Second
+.implements Reader
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance Read(Int32 mode) -> Int32
+ldc.i4 99
+ret
+.end
+.end
+; A conforming implementation without a reachable construction must not be selected.
+.type class Unused
+.implements Reader
+.method instance Read(Int32 mode) -> Int32
+ldc.i4 1
+ldc.i4 2
+xor
+ret
+.end
+.end
+.function Forward(Reader reader, Int32 mode) -> Int32
+ldarg reader
+ldarg mode
+callvirt instance Reader::Read(Int32)
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Reader reader
+ldarg mode
+ldc.i4 3
+beq Null
+ldarg mode
+ldc.i4 1
+beq Second
+newobj.ctor instance First::.ctor()
+castclass Reader
+stloc reader
+br Invoke
+Second:
+newobj.ctor instance Second::.ctor()
+castclass Reader
+stloc reader
+br Invoke
+Null:
+ldloca reader
+initobj Reader
+Invoke:
+ldloc reader
+ldarg mode
+call Forward(Reader, Int32)
+ret
+.end

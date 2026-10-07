@@ -84,7 +84,7 @@ impl Specializer<'_> {
         if let Some(existing) = self.shapes.iter().find(|v| v.source == i && v.arguments == arguments) {
             return Ok(Type::Named(existing.name.clone()));
         }
-        if self.shapes.len() >= 32 { return Err("specialized type count exceeds 32".into()); }
+        if self.shapes.len() >= 64 { return Err("specialized type count exceeds 64".into()); }
         let row = if self.shapes.iter().any(|v| v.source == i) {
             let row = self.source.types.len() + self.type_clones;
             self.type_clones += 1;
@@ -122,8 +122,8 @@ impl Specializer<'_> {
                 // Keep lexical identity only. The value profile separately validates
                 // empty static companions and rejects every executable use.
                 let owner_index = self.type_index(&owner.name)?;
-                if !self.shapes.iter().any(|v| v.source == owner_index) && self.shapes.len() >= 32 {
-                    return Err("specialized type count exceeds 32".into());
+                if !self.shapes.iter().any(|v| v.source == owner_index) && self.shapes.len() >= 64 {
+                    return Err("specialized type count exceeds 64".into());
                 }
                 if !self.shapes.iter().any(|v| v.source == owner_index) {
                     self.shapes.push(Shape { source: owner_index, arguments: vec![], row: owner_index, name: owner.name.clone() });
@@ -139,8 +139,8 @@ impl Specializer<'_> {
             if let Type::Named(name) = ty {
                 let i = self.type_index(name)?;
                 if super::selection::static_owner(&self.source.types[i]) {
-                    if !self.shapes.iter().any(|v| v.source == i) && self.shapes.len() >= 32 {
-                        return Err("specialized type count exceeds 32".into());
+                    if !self.shapes.iter().any(|v| v.source == i) && self.shapes.len() >= 64 {
+                        return Err("specialized type count exceeds 64".into());
                     }
                     if !self.shapes.iter().any(|v| v.source == i) {
                         self.shapes.push(Shape { source: i, arguments: vec![], row: i, name: name.clone() });
@@ -294,7 +294,7 @@ impl Specializer<'_> {
                         .map_err(|e| e.to_string())?;
                     let instance = self.resolve(&closed)?;
                     let callee = &self.source.functions[instance.source];
-                    if virtual_call && (callee.is_virtual || callee.is_abstract || callee.is_override || callee.owner.as_ref().and_then(|t| self.source.type_definition(t)).is_some_and(|t| t.representation == neoclr::metadata::Representation::Interface)) {
+                    if virtual_call && !super::selection::interface_contract(self.source, callee) && (callee.is_virtual || callee.is_abstract || callee.is_override) {
                         return Err("virtual calls requiring dispatch need a later specialization profile".into());
                     }
                     target.definition = Some(neoclr::metadata::MemberId {
@@ -398,47 +398,59 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
     let mut pending = vec![root_instance];
     let mut visited = std::collections::HashSet::new();
     let mut expanded = input.clone();
-    while let Some(instance) = pending.pop() {
-        if !visited.insert(instance.row) {
-            continue;
-        }
-        let mut function = context.function(
-            &input.functions[instance.source],
-            &instance.types,
-            &instance.methods,
-            &mut pending,
-        )?;
-        if !instance.methods.is_empty() { function.name = clone_name(&function, instance.row); }
-        if instance.row != instance.source {
-            if let Some(origin) = &mut function.origin {
-                // Source tokens identify templates, not each private native body. Keep
-                // access/owner facts, assign an unused private token, omit parameter
-                // descriptors (custom attributes are removed during selection).
-                let last = input
-                    .functions
-                    .iter()
-                    .filter_map(|f| f.origin.as_ref())
-                    .map(|o| o.token & 0x00ff_ffff)
-                    .max()
-                    .unwrap_or(0);
-                let rid = last + (instance.row - input.functions.len()) as u32 + 1;
-                if rid > 0x00ff_ffff {
-                    return Err("private method token range exhausted".into());
+    loop {
+        while let Some(instance) = pending.pop() {
+            if !visited.insert(instance.row) {
+                continue;
+            }
+            let mut function = context.function(
+                &input.functions[instance.source],
+                &instance.types,
+                &instance.methods,
+                &mut pending,
+            )?;
+            if !instance.methods.is_empty() { function.name = clone_name(&function, instance.row); }
+            if instance.row != instance.source {
+                if let Some(origin) = &mut function.origin {
+                    // Source tokens identify templates, not each private native body. Keep
+                    // access/owner facts, assign an unused private token, omit parameter
+                    // descriptors (custom attributes are removed during selection).
+                    let last = input
+                        .functions
+                        .iter()
+                        .filter_map(|f| f.origin.as_ref())
+                        .map(|o| o.token & 0x00ff_ffff)
+                        .max()
+                        .unwrap_or(0);
+                    let rid = last + (instance.row - input.functions.len()) as u32 + 1;
+                    if rid > 0x00ff_ffff {
+                        return Err("private method token range exhausted".into());
+                    }
+                    origin.token = 0x0600_0000 | rid;
+                    origin.parameter_tokens.fill(0);
                 }
-                origin.token = 0x0600_0000 | rid;
-                origin.parameter_tokens.fill(0);
+            }
+            function.definition = Some(neoclr::metadata::MemberId {
+                module: input.name.clone(),
+                revision: input.revision.clone(),
+                index: instance.row as u32,
+            });
+            // Reserve rows in discovery order even when the worklist is processed in reverse.
+            while expanded.functions.len() < input.functions.len() + context.clones {
+                expanded.functions.push(input.functions[*root].clone());
+            }
+            expanded.functions[instance.row] = function;
+        }
+        let reached = context.instances.iter().map(|v| v.source).collect();
+        for &contract in &reached {
+            for (_, target) in super::selection::dispatch_targets(input, contract, &reached)? {
+                let f = &input.functions[target];
+                let reference = FunctionRef { definition: f.definition.clone(), name: f.name.clone(), owner: f.owner.clone(), instance: f.instance, generic_arguments: vec![], parameters: f.parameters.clone() };
+                let instance = context.resolve(&reference)?;
+                if !visited.contains(&instance.row) { pending.push(instance); }
             }
         }
-        function.definition = Some(neoclr::metadata::MemberId {
-            module: input.name.clone(),
-            revision: input.revision.clone(),
-            index: instance.row as u32,
-        });
-        // Reserve rows in discovery order even when the worklist is processed in reverse.
-        while expanded.functions.len() < input.functions.len() + context.clones {
-            expanded.functions.push(input.functions[*root].clone());
-        }
-        expanded.functions[instance.row] = function;
+        if pending.is_empty() { break; }
     }
     // Materialize each private shape after discovery. Original metadata is verified
     // before this pass; copied access/readonly facts remain active in the projection.
@@ -478,7 +490,7 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
         }
         expanded.types[shape.row] = t;
     }
-    let report = json!({"policy":"up to 32 closed value shapes; primitive static generic methods and closed owner methods, at most 32 function clones and 128 selected functions; no constraints",
+    let report = json!({"policy":"up to 64 closed value shapes; primitive static generic methods and closed owner methods, at most 32 function clones and 128 selected functions; no constraints",
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
     Ok((expanded, report))

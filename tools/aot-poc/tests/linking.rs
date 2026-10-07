@@ -583,7 +583,7 @@ fn selected_interface_storage_and_dead_dispatch_stay_unsupported() {
         let error = String::from_utf8_lossy(&result.stderr);
         assert!(
             error.contains(if dispatch {
-                "virtual calls"
+                "interface dispatch requires"
             } else {
                 "reference-free"
             }),

@@ -443,3 +443,44 @@ broken-pipe fault parity, standalone execution and libSystem-only dependencies.
 The pinned Raven compiler intermittently rejected unchanged standard-stream members
 before the successful retry; this slice does not fix that producer issue. Next:
 compile calls through these stream interfaces, beginning with standard input.
+
+
+## Standard input dispatch (2026-10-08)
+
+The reference-arena profile now dispatches bodyless nongeneric interface contracts
+to exact public implicit implementations on classes constructed by the selected
+program. Selection and specialization discover implementations to a fixed point,
+including calls and constructions in their bodies. Unconstructed implementations
+stay excluded; original load-set conformance/access verification still precedes
+projection. `interfaceDispatch` reports the private contract, type and method rows.
+Explicit implementations, interface inheritance/default bodies, generic reference
+classes and class virtual/override dispatch remain unsupported.
+
+Native dispatch compares private object tags and forwards the receiver, arguments,
+result storage and fault context. Null receivers fail at the caller's callvirt;
+implementation faults retain their ordinary managed frames without a synthetic
+interface frame. This follows the CLR interface-call behavior at the language level.
+Compared with general runtime dispatch machinery, the bounded linear tag table is
+simple and statically linkable, but scales with selected implementations and supports
+neither dynamic loading nor a stable external object ABI.
+
+`input-stream.rvn` uses ordinary Console.OpenStandardInput, InputStream.Read and
+Close, with byte-array mutation, zero-count reads, invalid-range and closed-stream
+Result errors, successful bytes and EOF. Its selected graph needs 60 functions and
+33 types, including the twelve-field StreamError carrier. The private profile now
+allows 64 types and sixteen flattened lanes/fields, with 128-byte internal call
+result storage; 128 functions, 32 extra function clones and the 64-KiB frame bound
+remain. Rebuild private objects and hosts together; no stable aggregate ABI is promised.
+
+The focused interface test covers two implementations, an excluded unused
+implementation, null receivers and exact implementation-fault traces. The value
+suite checks sixteen-lane calls and oversized-layout/type rejection. All 78 focused
+Console, linking and value tests pass. Fresh standalone
+sample evidence is recorded by `verify_interactive.py --input-stream` and
+`input-stream-validation.json`. After the first successful fresh compilation, the
+pinned producer rejected unchanged standard-input members on two retries. Validation
+therefore reused that successful metadata artifact with `--reuse-compilation`,
+checking source/compiler/dependency hashes and retaining the original successful
+command and assembly hash. This does not claim the producer issue is fixed. Standard
+output/error Write/Flush bindings are the next Console slice; text readers/writers
+and Console.ReadLine still need further library dependencies.

@@ -949,3 +949,59 @@ int main(int argc, char **argv) {
         }
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn interface_calls_dispatch_two_implementations_and_preserve_fault_frames() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/interface-calls.neoil");
+    let denied = compile_source(&dir,&seed,source,&["--compile-system"],false);
+    assert!(!denied.status.success() && !dir.0.join("app.o").exists());
+    let r = compile_source(&dir,&seed,source,&["--compile-system","--reference-arena"],false);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["interfaceDispatch"].as_array().unwrap().len(), 1);
+    assert_eq!(report["interfaceDispatch"][0]["targets"].as_array().unwrap().len(), 2);
+    assert!(!report["functions"].as_array().unwrap().iter().any(|f| f["name"] == "Unused.Read"));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc, char **argv) {
+    uint64_t storage[32];
+    neoclr_aot_context ctx={ .text={(unsigned char*)storage,sizeof(storage),0} };
+    int32_t result=-99;
+    int status=neoclr_entry_v4(argc>1 ? atoi(argv[1]) : 0,&result,&ctx);
+    if (status) {
+        if ((status!=4 && status!=6) || result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
+        neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
+    }
+    printf("%d\n",result);return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in 0..4 {
+        let reference = method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default());
+        let r = Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        match reference {
+            Ok(result) => {
+                assert_eq!(r.status.code(),Some(0),"{mode}: {r:?}");
+                let neoclr::Value::Int32(value) = result.value else { panic!("expected Int32") };
+                assert_eq!(r.stdout,format!("{value}\n").as_bytes());
+                assert!(r.stderr.is_empty());
+            }
+            Err(fault) => {
+                assert_eq!(r.status.code(),Some(1),"{mode}: {r:?}");
+                assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(),"{mode}");
+            }
+        }
+    }
+}

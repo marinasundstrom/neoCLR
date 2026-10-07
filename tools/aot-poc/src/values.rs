@@ -205,6 +205,34 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             let parameters = b.block_params(entry).to_vec();
             let output = parameters[parameters.len() - 1 - usize::from(details.is_some())];
             let fault_context = details.map(|_| *parameters.last().unwrap());
+            if let Some(targets) = p.dispatch.get(&i) {
+                // Caller checks null. Forward the original receiver, result slot and
+                // context; no synthetic interface frame enters the managed trace.
+                let tag = b.ins().load(types::I64, MemFlags::new(), parameters[0], 0);
+                for &(type_index, target) in targets {
+                    let matched = b.create_block();
+                    let next = b.create_block();
+                    let equal = b.ins().icmp_imm(IntCC::Equal, tag, type_index as i64);
+                    b.ins().brif(equal, matched, &[], next, &[]);
+                    b.switch_to_block(matched);
+                    let target = module.declare_func_in_func(ids[target], b.func);
+                    let call = b.ins().call(target, &parameters);
+                    let status = b.inst_results(call)[0];
+                    b.ins().return_(&[status]);
+                    b.switch_to_block(next);
+                }
+                let status = b.ins().iconst(types::I32, 3);
+                if let Some(d) = &diagnostic_data {
+                    let mut site = d.site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                    site.capture_frame = false;
+                    site.record(&mut b, status);
+                }
+                b.ins().return_(&[status]);
+                b.seal_all_blocks();
+                b.finalize();
+                module.define_function(ids[i], &mut context)?;
+                continue;
+            }
             if details.is_some_and(|d| d.console_read_byte.contains(&i)) {
                 let service = module.declare_func_in_func(input_service.unwrap(), b.func);
                 let call = b.ins().call(service, &[]);
@@ -309,7 +337,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
-            let mut frame_bytes = 64usize;
+            let mut frame_bytes = 128usize;
             let mut arguments = vec![];
             let mut at = 0;
             for t in &p.args[i] {
@@ -327,9 +355,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     slot(&mut b, p.bytes(t))
                 })
                 .collect();
-            // All profile return values fit in eight padded scalar lanes; snapshots are read
+            // All profile return values fit in sixteen padded scalar lanes; snapshots are read
             // immediately after each successful call, before this storage can be reused.
-            let call_result = slot(&mut b, 64);
+            let call_result = slot(&mut b, 128);
             let mut constructors = std::collections::HashMap::new();
             for (pc, op) in f.body.iter().enumerate() {
                 if let Op::Construct(target) = op {

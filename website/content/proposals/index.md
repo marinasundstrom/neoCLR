@@ -262,8 +262,9 @@ using the same bounded text arena. Multiple closed value shapes now compile with
 distinct layouts/methods, demonstrated by several Option/Result instantiations in
 one Console input/output app. Nongeneric interface views and the verified empty
 Object base now support the three standard-stream factories in a standalone sample.
-General collection, interface dispatch, ReadLine
-and the broader Console stream surface remain future work. An explicit failure binding now preserves
+Bounded implicit interface dispatch now supports standard-input Read/Close, byte
+buffers and stream-result unions. General collection, ReadLine and output-stream
+services remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked
 renderer and standalone exit-1 failure app are validated. Interpreter CLI execution

@@ -38,6 +38,7 @@ pub(super) struct Profile<'a> {
     pub args: Vec<Vec<Ty>>,
     pub locals: Vec<Vec<Ty>>,
     pub results: Vec<Option<Ty>>,
+    pub dispatch: HashMap<usize, Vec<(usize, usize)>>,
 }
 pub(super) type Stacks = Vec<Option<Vec<Ty>>>;
 
@@ -60,9 +61,9 @@ fn object_base_shape(t: &neoclr::metadata::TypeDef) -> bool {
 
 impl<'a> Profile<'a> {
     pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>) -> Result<Self, Error> {
-        if input.name == "System" || input.types.len() > 32 || input.functions.len() > 128 {
+        if input.name == "System" || input.types.len() > 64 || input.functions.len() > 128 {
             return Err(
-                "value profile requires an application with at most 32 types and 128 functions"
+                "value profile requires an application with at most 64 types and 128 functions"
                     .into(),
             );
         }
@@ -97,14 +98,14 @@ impl<'a> Profile<'a> {
                 || !t.generic_constraints.is_empty()
                 || t.packing.is_some()
                 || t.minimum_size.is_some()
-                || t.fields.len() > 8
+                || t.fields.len() > 16
                 || t.fields.iter().any(|f| {
                     f.deferred
                         || !(matches!(f.ty, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::String | Type::Named(_))
                             || (references && matches!(&f.ty, Type::ArrayRef(t) if **t == Type::Byte)))
                 })
             {
-                return Err(format!("{}: value profile requires nongeneric records with at most eight Int32/small-integer/Boolean/String/local-record fields", t.name).into());
+                return Err(format!("{}: value profile requires nongeneric records with at most sixteen Int32/small-integer/Boolean/String/local-record fields", t.name).into());
             }
         }
         let mut p = Self {
@@ -117,6 +118,7 @@ impl<'a> Profile<'a> {
             args: vec![],
             locals: vec![],
             results: vec![],
+            dispatch: HashMap::new(),
         };
         // Compute bounded inline layouts before using any storage or call signatures.
         // A visiting node is an illegal inline cycle, including otherwise unused types.
@@ -137,8 +139,8 @@ impl<'a> Profile<'a> {
                 }
                 p.layouts[i].push(width);
                 width += p.lanes(&ty);
-                if width > 8 {
-                    return Err("value layout exceeds eight flattened lanes".into());
+                if width > 16 {
+                    return Err("value layout exceeds sixteen flattened lanes".into());
                 }
             }
             p.widths[i] = width.max(1);
@@ -151,9 +153,13 @@ impl<'a> Profile<'a> {
         }
         for (i, f) in input.functions.iter().enumerate() {
             p.names.entry(&f.name).or_default().push(i);
-            if f.is_virtual
+            let interface = references && crate::selection::interface_contract(input, f);
+            if interface {
+                let reached = (0..input.functions.len()).collect();
+                p.dispatch.insert(i, crate::selection::dispatch_targets(input, i, &reached)?);
+            }
+            if ((f.is_virtual || f.is_abstract) && !interface)
                 || f.is_override
-                || f.is_abstract
                 || f.impl_flags != 0
                 || f.pinvoke.is_some()
                 || !f.generic_parameters.is_empty()
@@ -184,12 +190,12 @@ impl<'a> Profile<'a> {
                     // Static owner contributes identity/access only, with no receiver.
                 } else {
                     let ty = p.ty(owner)?;
-                    if !matches!(ty, Ty::Record(_) | Ty::Reference(_)) {
+                    if !matches!(ty, Ty::Record(_) | Ty::Reference(_) | Ty::Interface(_)) {
                         return Err("value member requires a local record owner".into());
                     }
                     if f.instance {
                         match ty {
-                            Ty::Reference(_) if !f.receiver_byref => args.push(ty),
+                            Ty::Reference(_) | Ty::Interface(_) if !f.receiver_byref => args.push(ty),
                             Ty::Record(_) if f.receiver_byref => args.push(ty.address()),
                             _ => return Err("receiver representation does not match value/reference owner".into()),
                         }
@@ -234,9 +240,12 @@ impl<'a> Profile<'a> {
             for op in &f.body {
                 if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
                     let callee = p.callee(target)?;
+                    if p.dispatch.contains_key(&callee) && !matches!(op, Op::CallVirtual(_)) {
+                        return Err("interface contracts require callvirt".into());
+                    }
                     if matches!(op, Op::CallVirtual(_)) &&
                         (!references || !input.functions[callee].instance ||
-                         !matches!(p.args[callee].first(), Some(Ty::Reference(_)))) {
+                         !matches!(p.args[callee].first(), Some(Ty::Reference(_) | Ty::Interface(_)))) {
                         return Err("callvirt requires an admitted nonvirtual reference member".into());
                     }
                     if matches!(op, Op::Construct(_)) {
@@ -248,6 +257,9 @@ impl<'a> Profile<'a> {
                     edges[i].push(callee);
                 }
             }
+        }
+        for (&contract, targets) in &p.dispatch {
+            edges[contract].extend(targets.iter().map(|(_, target)| *target));
         }
         fn visit(i: usize, edges: &[Vec<usize>], states: &mut [u8]) -> Result<(), Error> {
             if states[i] == 1 {
@@ -619,6 +631,7 @@ impl<'a> Profile<'a> {
         let f = &self.input.functions[i];
         let fail =
             |pc, message| -> Error { format!("{} instruction {pc}: {message}", f.name).into() };
+        if self.dispatch.contains_key(&i) { return Ok(vec![]); }
         if f.body.is_empty() {
             return Err(fail(0, "empty body"));
         }

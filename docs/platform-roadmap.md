@@ -113,8 +113,10 @@ compile with separate layouts/methods and retained source identities: a fresh Ra
 app combines Option<int/string/byte> and Result<int/string/input-outcome> with
 Console.ReadByte. Bounds and original-scope validation remain enforced. Nongeneric
 interface views/casts and the verified empty Object base now let all three standard
-stream factories compile, with standalone Raven evidence. Interface
-dispatch and broader stream/text capabilities remain open. The author adds a console-input sample after unions, exercising input and
+stream factories compile, with standalone Raven evidence. Constructed-class implicit
+interface dispatch now compiles standard-input Read/Close and StreamError outcomes;
+its measured graph extends private bounds to 64 types/sixteen value lanes. Output
+stream services and broader text reader/writer capabilities remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

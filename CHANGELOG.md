@@ -75,7 +75,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   null/mismatch behavior and fault locations. Privately project the verified empty
   Object base while compiling its ordinary constructor; validate fresh standalone
   Console.OpenStandardInput/Output/Error factories. General inheritance, Object
-  virtual slots and interface method dispatch remain pending.
+  virtual slots and interface method dispatch initially remained pending. Add bounded
+  implicit interface dispatch for reachable constructed classes, forwarding results
+  and faults without synthetic managed frames. Keep unused implementations excluded
+  and preserve original conformance/access checks. Extend the private budget to
+  64 types and sixteen value lanes for StreamError, with matching call-result storage
+  and boundary tests. Compile ordinary standard-input Read/Close methods and validate
+  byte, EOF, zero-count, invalid-range and closed-stream outcomes.
 
 ### 2026-10-07
 

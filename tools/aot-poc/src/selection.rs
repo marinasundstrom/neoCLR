@@ -70,6 +70,48 @@ fn resolve(input: &neoclr::Module, target: &FunctionRef) -> Result<usize, Error>
     Ok(index)
 }
 
+pub(super) fn interface_contract(input: &neoclr::Module, f: &neoclr::metadata::Function) -> bool {
+    f.owner.as_ref().and_then(|t| input.type_definition(t))
+        .is_some_and(|t| t.representation == neoclr::metadata::Representation::Interface)
+}
+
+/// Exact implicit implementations for classes constructed by the reachable program.
+/// Original conformance is verified before private projection; this is not a binder.
+pub(super) fn dispatch_targets(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>) -> Result<Vec<(usize, usize)>, Error> {
+    let f = &input.functions[contract];
+    if !interface_contract(input, f) { return Ok(vec![]); }
+    if !f.instance || f.receiver_byref || !f.body.is_empty() || !f.generic_parameters.is_empty() {
+        return Err("interface dispatch requires a bodyless nongeneric instance contract".into());
+    }
+    let mut constructed = BTreeSet::new();
+    for &i in reached {
+        for op in &input.functions[i].body {
+            if let Op::Construct(target) = op {
+                if let Some(Type::Named(name)) = &target.owner { constructed.insert(name.as_str()); }
+            }
+        }
+    }
+    let member_name = |m: &neoclr::metadata::Function| m.origin.as_ref().map(|o| o.name.clone())
+        .unwrap_or_else(|| m.name.rsplit('.').next().unwrap().to_owned());
+    let name = member_name(f);
+    let mut targets = vec![];
+    for (ti, t) in input.types.iter().enumerate() {
+        if !constructed.contains(t.name.as_str()) || !t.implements.iter().any(|v| Some(v) == f.owner.as_ref()) { continue; }
+        if !t.is_reference_type || !t.generic_parameters.is_empty() || t.representation != neoclr::metadata::Representation::Record {
+            return Err("interface dispatch requires nongeneric constructed classes".into());
+        }
+        let candidates: Vec<_> = input.functions.iter().enumerate().filter(|(_, m)|
+            m.owner == Some(Type::Named(t.name.clone())) && member_name(m) == name
+            && m.instance == f.instance && m.parameters == f.parameters && m.returns == f.returns
+            && m.no_result == f.no_result && m.out_parameters == f.out_parameters
+            && m.visibility == neoclr::metadata::Visibility::Public && m.interface_implementations.is_empty()
+        ).map(|(i, _)| i).collect();
+        let [target] = candidates.as_slice() else { return Err(format!("interface implementation is missing or ambiguous: {} on {}", f.name, t.name).into()); };
+        targets.push((ti, *target));
+    }
+    Ok(targets)
+}
+
 pub(super) fn validate_source(input: &neoclr::Module, single_assembly: bool) -> Result<(), Error> {
     if input.functions.len() > 4096 || input.types.len() > 1024 {
         return Err("closed-world input inventory exceeds bounds".into());
@@ -137,26 +179,34 @@ pub(super) fn select_inventory(
     };
     let mut functions = BTreeSet::new();
     let mut pending = vec![*root_index];
-    while let Some(i) = pending.pop() {
-        if !functions.insert(i) {
-            continue;
-        }
-        if functions.len() > 128 {
-            return Err("selected functions exceed the value profile limit".into());
-        }
-        for op in &input.functions[i].body {
-            match op {
-                Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
-                    let callee = resolve(input, target)?;
-                    let f = &input.functions[callee];
-                    if matches!(op, Op::CallVirtual(_)) && (f.is_virtual || f.is_abstract || f.is_override || f.owner.as_ref().and_then(|t| input.type_definition(t)).is_some_and(|t| t.representation == neoclr::metadata::Representation::Interface)) {
-                        return Err("virtual calls requiring dispatch need a later selection profile".into());
+    loop {
+        while let Some(i) = pending.pop() {
+            if !functions.insert(i) {
+                continue;
+            }
+            if functions.len() > 128 {
+                return Err("selected functions exceed the value profile limit".into());
+            }
+            for op in &input.functions[i].body {
+                match op {
+                    Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
+                        let callee = resolve(input, target)?;
+                        let f = &input.functions[callee];
+                        if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && (f.is_virtual || f.is_abstract || f.is_override) {
+                            return Err("virtual calls requiring dispatch need a later selection profile".into());
+                        }
+                        pending.push(callee);
                     }
-                    pending.push(callee);
+                    _ => (), // Unsupported selected opcodes still fail ordinary AOT admission.
                 }
-                _ => (), // Unsupported selected opcodes still fail ordinary AOT admission.
             }
         }
+        for &contract in &functions {
+            for (_, target) in dispatch_targets(input, contract, &functions)? {
+                if !functions.contains(&target) { pending.push(target); }
+            }
+        }
+        if pending.is_empty() { break; }
     }
     let mut types = BTreeSet::new();
     let mut pending_types = vec![];
@@ -197,7 +247,7 @@ pub(super) fn select_inventory(
                 if !types.insert(*i) {
                     continue;
                 }
-                if types.len() > 32 {
+                if types.len() > 64 {
                     return Err("selected types exceed the value profile limit".into());
                 }
                 let t = &input.types[*i];
@@ -285,8 +335,17 @@ pub(super) fn select_inventory(
                 .expect("selected lexical owner") as u32;
         }
     }
+    let mut dispatch = vec![];
+    for (compiled, source) in rows.iter().enumerate() {
+        if interface_contract(input, &input.functions[*source]) {
+            let targets = dispatch_targets(input, *source, &functions)?;
+            dispatch.push(json!({"contractCompiledIndex":compiled,"contractSourceIndex":source,
+                "targets":targets.iter().map(|(ty, method)| json!({"typeCompiledIndex":type_rows.binary_search(ty).unwrap(),"functionCompiledIndex":rows.binary_search(method).unwrap()})).collect::<Vec<_>>() }));
+        }
+    }
     let report = json!({"schema":"neoclr-aot-selection-v1", "module":input.name, "root":root,
-        "policy":"explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch",
+        "policy":"explicit closed world with constructed-class implicit interface dispatch; every opcode of selected bodies retained; no reflection, dynamic loading or class virtual dispatch",
+        "interfaceDispatch":dispatch,
         "metadataPolicy":"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
         "functions": rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.functions[*old].definition,"name":input.functions[*old].name})).collect::<Vec<_>>(),
         "types": type_rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.types[*old].definition,"name":input.types[*old].name})).collect::<Vec<_>>(),
