@@ -22,6 +22,17 @@ and extension containers omit inheritance and inherited-member controls. Nested
 types appear on their owner's page, with separate namespace and containing-type
 metadata, rather than expanding the sidebar.
 
+## Shared API navigation
+
+neoCLR opts into `sharedApiNavigation: true`: API pages load one shared navigation
+fragment using plain JavaScript. The generator defaults to inline navigation.
+Static page URLs and content remain intact, and API overview/namespace links
+remain usable without JavaScript or if the fragment cannot load. No SPA
+framework is required. The shared tree is cached per browser tab with a content
+hash for invalidation. Reserved sidebar space and a hidden loading fallback
+avoid switching visibly between two menus. Failed requests reveal fallback
+links; failed page scripts reveal them after four seconds.
+
 ## Shared behavior
 
 Type pages show inherited instance members and implemented interface contracts

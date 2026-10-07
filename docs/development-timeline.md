@@ -11169,3 +11169,13 @@ and nested types on their owner's page. Loader/model/renderer extensibility is
 documented as future direction; no plugin API is introduced in this release.
 Validation and the pinned generator revision are recorded in the changelog and
 `tools/ravendoc/version.json`. These local changes do not publish the neoCLR site.
+
+
+### Follow-up: opt-in dynamic navigation
+
+After the Raven compiler API reference exposed substantial repeated sidebar
+markup, the author requested dynamic loading without a SPA framework, then
+specified that it must be opt-in for large sites. The assistant implemented
+`sharedApiNavigation`, defaulting to false, and enabled it in both Raven and
+neoCLR site configurations. Normal page navigation and namespace fallback links
+remain static. This is a site-generator capability rather than a neoCLR overlay.

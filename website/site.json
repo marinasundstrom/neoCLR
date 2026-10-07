@@ -11,6 +11,7 @@
   "memberListStyle": "compact",
   "apiNavigationRoot": "docs",
   "namespaceNavigation": "flat",
+  "sharedApiNavigation": true,
   "googleAnalyticsId": "G-SVXYRRCEEK",
   "name": "neoCLR",
   "links": [

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Opt into RavenDoc's shared API navigation to avoid repeating the full tree on
+  every reference page. Normal static pages and no-JavaScript namespace links
+  remain available; the shared generator keeps inline navigation as its default.
+  Pin Raven main `d1fe391b9`, including versioned session caching and stable
+  sidebar space to avoid loading flicker. All 18 contract tests and the full
+  1,804-page build pass; browser review confirms active selection after loading.
+
 - Configure RavenDoc assembly inputs as a list sharing one API namespace tree.
   Keep the current CoreProbe snapshot's real identity; future split snapshots
   can join the same tree. Refresh shared source links, static-type presentation,
