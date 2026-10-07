@@ -1,0 +1,44 @@
+import System.*
+import System.Option.*
+import System.Result.*
+
+func Main() -> int {
+    let number: Option<int> = Some(42)
+    let word: Option<string> = Some("ready")
+    let absent: Option<string> = None()
+    let Ok(value) = Result<int, byte>.Ok(42) else {
+        return 1
+    }
+    let Ok(text) = Result<string, byte>.Ok("multiple shapes") else {
+        return 2
+    }
+    let Some(n) = number else {
+        return 3
+    }
+    let Some(label) = word else {
+        return 4
+    }
+    if let Some(unexpected) = absent {
+        Console.WriteLine(unexpected)
+        return 5
+    }
+    let failure: Result<string, byte> = Error((byte)7)
+    let Error(code) = failure else {
+        return 7
+    }
+    Console.WriteLine(code)
+    Console.WriteLine(value)
+    Console.WriteLine(text)
+    Console.WriteLine(n)
+    Console.WriteLine(label)
+    let Ok(input) = Console.ReadByte() else {
+        Console.WriteLine("Input failed")
+        return 6
+    }
+    if let Some(b) = input {
+        Console.WriteLine(b)
+    } else {
+        Console.WriteLine("End of input")
+    }
+    return 0
+}

@@ -246,7 +246,7 @@ fn generic_library_specialization_preserves_library_identity_and_value_copies() 
 }
 
 #[test]
-fn generic_library_rejects_multiple_shapes_references_and_cross_module_access() {
+fn generic_library_specializes_multiple_shapes_without_weakening_access() {
     use neoclr::metadata::Type;
     for case in 0..4 {
         let mut app = neoclr::metadata_container::decode(include_bytes!(
@@ -310,12 +310,15 @@ fn generic_library_rejects_multiple_shapes_references_and_cross_module_access() 
         let dir = Temp::new();
         let result = invoke(&dir, &encode(&app), &[encode(&library)], "@entry", false);
         let error = String::from_utf8_lossy(&result.stderr);
+        if case < 2 {
+            assert!(result.status.success(), "{error}");
+            let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+            assert!(report["specialization"]["types"].as_array().unwrap().len() >= 2);
+            continue;
+        }
         assert!(!result.status.success(), "case {case} accepted");
         assert!(!error.contains("panicked"));
         assert!(!dir.0.join("app.o").exists());
-        if case == 0 {
-            assert!(error.contains("multiple closed instantiations"), "{error}");
-        }
         if case >= 2 {
             assert!(error.contains("access denied"), "{error}");
         }

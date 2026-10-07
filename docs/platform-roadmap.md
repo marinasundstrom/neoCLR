@@ -108,8 +108,11 @@ boundary and fresh Raven evidence. Explicit 64-bit formatting/native-width bindi
 now cover the remaining integer Console output paths, including signed/unsigned
 endpoints, with full-width storage and conversion parity. Interface
 views/dispatch and broader stream support behind Write/ReadLine remain next; this region is
-not a replacement for general native collection. Multiple instantiations
-and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
+not a replacement for general native collection. Multiple closed value shapes now
+compile with separate layouts/methods and retained source identities: a fresh Raven
+app combines Option<int/string/byte> and Result<int/string/input-outcome> with
+Console.ReadByte. Bounds and original-scope validation remain enforced. Interface
+dispatch and broader stream/text capabilities remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

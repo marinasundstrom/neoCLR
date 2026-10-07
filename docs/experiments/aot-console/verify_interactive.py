@@ -13,16 +13,17 @@ mode.add_argument('--arrays',action='store_true',help='Validate packed byte arra
 mode.add_argument('--characters',action='store_true',help='Validate UTF-8 character output with statically linked segmentation')
 mode.add_argument('--small-integers',action='store_true',help='Validate signed and unsigned narrow integer Console output')
 mode.add_argument('--wide-integers',action='store_true',help='Validate 64-bit and native-width integer Console output')
+mode.add_argument('--multi-values',action='store_true',help='Validate several Option/Result shapes alongside Console input')
 a=p.parse_args()
 compiler,runtime,aot,bundle,output=(getattr(a,k).resolve() for k in ('compiler','runtime','aot','bundle','output'))
 output.mkdir(parents=True,exist_ok=False)
 base=ROOT/'docs/experiments/aot-console';faults=base.parent/'aot-fault-details'
-source=base/('wide-integers.rvn' if a.wide_integers else 'small-integers.rvn' if a.small_integers else 'characters.rvn' if a.characters else 'bytes.rvn' if a.arrays else 'reference-cell.rvn' if a.references else 'numbers.rvn' if a.numeric else 'text-values.rvn' if a.text_values else 'interactive.rvn')
-uses_arena=a.numeric or a.references or a.arrays or a.small_integers or a.wide_integers
+source=base/('multiple-values.rvn' if a.multi_values else 'wide-integers.rvn' if a.wide_integers else 'small-integers.rvn' if a.small_integers else 'characters.rvn' if a.characters else 'bytes.rvn' if a.arrays else 'reference-cell.rvn' if a.references else 'numbers.rvn' if a.numeric else 'text-values.rvn' if a.text_values else 'interactive.rvn')
+uses_arena=a.numeric or a.multi_values or a.references or a.arrays or a.small_integers or a.wide_integers
 host=base/'text-host.c' if uses_arena else faults/'host.c'
 core,seed,library,ownership=(bundle/'lib'/n for n in ('Core.dll','System.runtime.neox','System.Runtime.dll','ownership.json'))
 sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
-report=dict(profile='aot-console-wide-integers-v1' if a.wide_integers else 'aot-console-small-integers-v1' if a.small_integers else 'aot-console-characters-v1' if a.characters else 'aot-console-byte-arrays-v1' if a.arrays else 'aot-console-references-v1' if a.references else 'aot-console-numeric-v1' if a.numeric else 'aot-console-text-values-v1' if a.text_values else 'aot-console-interactive-v1',baseRevision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),SDKROOT=os.environ.get('SDKROOT'),inputs={str(p):sha(p) for p in (compiler,runtime,aot,core,seed,library,ownership,source,base/'console.c',base.parent/'aot-scalar/console.c',host,faults/'render.c',base/'text-arena.h',base/'text-arena.c')},commands=[])
+report=dict(profile='aot-console-multiple-values-v1' if a.multi_values else 'aot-console-wide-integers-v1' if a.wide_integers else 'aot-console-small-integers-v1' if a.small_integers else 'aot-console-characters-v1' if a.characters else 'aot-console-byte-arrays-v1' if a.arrays else 'aot-console-references-v1' if a.references else 'aot-console-numeric-v1' if a.numeric else 'aot-console-text-values-v1' if a.text_values else 'aot-console-interactive-v1',baseRevision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),SDKROOT=os.environ.get('SDKROOT'),inputs={str(p):sha(p) for p in (compiler,runtime,aot,core,seed,library,ownership,source,base/'console.c',base.parent/'aot-scalar/console.c',host,faults/'render.c',base/'text-arena.h',base/'text-arena.c')},commands=[])
 def save(): (output/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 def run(args,expected=0,**kwargs):
     r=subprocess.run(list(map(str,args)),cwd=ROOT,capture_output=True,timeout=120,**kwargs)
@@ -32,7 +33,7 @@ def run(args,expected=0,**kwargs):
 assembly,obj,binary=(output/n for n in ('Interactive.dll','interactive.o','interactive'))
 run(['dotnet',compiler,'neoclr','--core-reference',core,'--runtime-seed',seed,'--reference',library,'--bootstrap-intrinsics','--bootstrap-ownership',ownership,'--object-library','System.Runtime','-o',assembly,source])
 context=['--system',seed,'--module',library,'--object-root',library]
-cases=[(b'*',0),(b'A',0 if a.numeric else 2),(b'',0)]
+cases=[(b'*',0),(b'A',0 if a.numeric or a.multi_values else 2),(b'',0)]
 if a.text_values or a.references or a.arrays or a.characters or a.small_integers or a.wide_integers: cases=[(b'',0)]
 if a.numeric: cases += [(b'\x00',0),(b'\xff',0)]
 interpreted=[run([runtime,'run',assembly]+context,expected=code,input=data) for data,code in cases]
@@ -48,7 +49,7 @@ inspection=json.loads(run([aot,'--inspect',assembly,'@entry','--closed-world']+f
 assert inspection['admission']['accepted'] is True,inspection['admission']
 selection=json.loads(run([aot,'--closed-world',assembly,'@entry',obj]+flags).stdout)
 assert inspection['selection']==selection
-report['selection']={k:selection[k] for k in ('loadSet','functions','nativeBindings')}
+report['selection']={k:selection[k] for k in ('loadSet','functions','nativeBindings','types','specialization','verifiedInterfaceRelationships','staticPrimitiveOwners') if k in selection}
 native_text=[]
 if a.characters:
     manifest=ROOT/'tools/aot-native-text/Cargo.toml'

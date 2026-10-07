@@ -203,7 +203,7 @@ pub fn prepare(
         }
         let arguments: Vec<neoclr::metadata::Type> = report["specialization"]["types"]
             .as_array()
-            .and_then(|rows| rows.iter().find(|r| r["sourceIndex"] == row["sourceIndex"]))
+            .and_then(|rows| rows.iter().find(|r| r["expandedIndex"] == row["expandedIndex"]))
             .map(|r| serde_json::from_value(r["arguments"].clone()))
             .transpose()?
             .unwrap_or_default();

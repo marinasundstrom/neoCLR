@@ -64,7 +64,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Preserve full-width bits, typed copies and shared arena lifetime/exhaustion rules.
   Validate numeric endpoints, wrapping, signed versus unsigned widening and a fresh
   Raven Console app, including native-width defaults. Wide checked arithmetic,
-  division and general native-pointer operations remain unsupported.
+  division and general native-pointer operations remain unsupported. Specialize
+  multiple closed value shapes with distinct layouts, member bodies and private
+  metadata tokens, retaining original identities/type arguments in diagnostics and
+  reports. Preserve access/readonly verification and enforce 32 selected shapes,
+  32 function clones and 128 selected functions. Validate cloned members/faults,
+  discovery bounds and a standalone Raven app combining several Option/Result
+  shapes, Error/None patterns and Console.ReadByte.
 
 ### 2026-10-07
 

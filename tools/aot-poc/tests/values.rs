@@ -1407,15 +1407,17 @@ fn specialization_rejects_unsupported_shapes_and_preserves_verification() {
             true,
         );
         let error = String::from_utf8_lossy(&result.stderr);
+        if case < 2 {
+            // Multi-shape token cloning requires original-scope verification. This
+            // old single-artifact fixture omits its declared Raven dependency.
+            assert!(error.contains("missing referenced module"), "case {case}: {error}");
+        }
         assert!(
             !result.status.success(),
             "case {case} unexpectedly accepted"
         );
         assert!(!temp.0.join("value.o").exists());
         assert!(!error.contains("panicked"), "case {case}: {error}");
-        if case == 0 {
-            assert!(error.contains("multiple closed instantiations"), "{error}");
-        }
         if case == 9 {
             assert!(error.contains("source assembly"), "{error}");
         }
@@ -1784,4 +1786,101 @@ fn text_profile_rejects_erasure_and_uninitialized_copies() {
         assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
     }
 
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn multiple_closed_value_shapes_keep_layouts_members_and_faults_distinct() {
+    let source = r#"
+.module MultipleShapes
+.type Box<T>
+.field Value T
+.method instance byref Get() -> T
+ldarg 0
+ldfld Box<T>::Value
+ret
+.end
+.method instance byref Fail() -> Void
+fault "shape failure"
+.end
+.end
+.function Main(Int32 input) -> Int32
+.local Box<Int32> number
+.local Box<Boolean> flag
+ldc.i4 42
+newobj Box<Int32>
+stloc number
+ldc.bool true
+newobj Box<Boolean>
+stloc flag
+ldarg input
+ldc.i4 1
+beq IntFault
+ldarg input
+ldc.i4 2
+beq BoolFault
+ldloca flag
+call instance Box<Boolean>::Get()
+brfalse Wrong
+ldloca number
+call instance Box<Int32>::Get()
+ret
+IntFault:
+ldloca number
+call instance Box<Int32>::Fail()
+pop
+br Wrong
+BoolFault:
+ldloca flag
+call instance Box<Boolean>::Fail()
+pop
+Wrong:
+ldc.i4 -1
+ret
+.end
+"#;
+    let m = neoclr::assemble(source).unwrap();
+    let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+    let program = neoclr::LoadedProgram::new(&m).unwrap();
+    let main = program.resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap()).unwrap();
+    for input in [0,1,2] {
+        let reference = main.invoke(vec![neoclr::Value::Int32(input)],neoclr::Limits::default());
+        if input == 0 {
+            assert_eq!(reference.unwrap().value,neoclr::Value::Int32(42));
+            native_mode(&bytes,input,0,42,"Main",true);
+        } else {
+            assert_eq!(reference.unwrap_err().code,neoclr::FaultCode::UserFault);
+            native_mode(&bytes,input,4,12345,"Main",true);
+        }
+    }
+    let temp = Temp::new();
+    let r = compile_mode(&bytes,&temp,"Main",true);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    let shapes = report["types"].as_array().unwrap();
+    assert_eq!(shapes.len(),2);
+    assert_eq!(shapes[0]["definition"],shapes[1]["definition"]);
+    assert_ne!(shapes[0]["compiledName"],shapes[1]["compiledName"]);
+    assert_ne!(shapes[0]["typeArguments"],shapes[1]["typeArguments"]);
+    for name in ["Box.Get","Box.Fail"] {
+        let rows: Vec<_> = report["functions"].as_array().unwrap().iter().filter(|r| r["name"] == name).collect();
+        assert_eq!(rows.len(),2);
+        assert_eq!(rows[0]["definition"],rows[1]["definition"]);
+        assert_ne!(rows[0]["compiledIndex"],rows[1]["compiledIndex"]);
+        assert_ne!(rows[0]["typeArguments"],rows[1]["typeArguments"]);
+    }
+}
+
+#[test]
+fn multiple_value_shape_discovery_stays_bounded() {
+    let mut source = String::from(".module ManyShapes\n.type Box<T>\n.field Value T\n.end\n");
+    for n in 0..33 { source.push_str(&format!(".type Leaf{n}\n.end\n")); }
+    source.push_str(".function Main() -> Int32\n");
+    for n in 0..33 { source.push_str(&format!(".local Box<Leaf{n}> item{n}\n")); }
+    source.push_str("ldc.i4 0\nret\n.end\n");
+    let m = neoclr::assemble(&source).unwrap();
+    let temp = Temp::new();
+    let r = compile_mode(&neoclr::metadata_container::write_module(&m).unwrap(),&temp,"Main",true);
+    assert!(!r.status.success() && !temp.0.join("value.o").exists());
+    assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 32"));
 }

@@ -258,7 +258,9 @@ WriteLine now preserves combining marks and emoji graphemes, with the interprete
 pinned Unicode validation baked into the executable. Signed-byte and 16-bit integer
 Console output also compile with interpreter storage-boundary parity. Explicit
 64-bit/native-width integer formatting now preserves signed and unsigned endpoints
-using the same bounded text arena. General collection, interface dispatch, ReadLine
+using the same bounded text arena. Multiple closed value shapes now compile with
+distinct layouts/methods, demonstrated by several Option/Result instantiations in
+one Console input/output app. General collection, interface dispatch, ReadLine
 and the broader Console stream surface remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked

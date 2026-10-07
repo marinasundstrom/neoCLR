@@ -1,8 +1,7 @@
 //! Bounded type-generic specialization before explicit closed-world selection.
-//! One shape per value definition; bounded primitive static method instantiations.
+//! Multiple bounded value shapes; primitive static method instantiations.
 use neoclr::metadata::{Function, FunctionRef, Instruction as Op, Type};
 use serde_json::{Value, json};
-use std::collections::BTreeMap;
 type Error = Box<dyn std::error::Error>;
 #[derive(Clone, PartialEq, Eq)]
 struct Instance {
@@ -11,9 +10,17 @@ struct Instance {
     methods: Vec<Type>,
     row: usize,
 }
+#[derive(Clone)]
+struct Shape {
+    source: usize,
+    arguments: Vec<Type>,
+    row: usize,
+    name: String,
+}
 struct Specializer<'a> {
     source: &'a neoclr::Module,
-    shapes: BTreeMap<usize, Vec<Type>>,
+    shapes: Vec<Shape>,
+    type_clones: usize,
     instances: Vec<Instance>,
     clones: usize,
 }
@@ -71,18 +78,21 @@ impl Specializer<'_> {
         for arg in &arguments {
             validate_argument(arg, 0)?;
         }
-        if let Some(existing) = self.shapes.get(&i) {
-            if existing != &arguments {
-                return Err(
-                    "multiple closed instantiations of one type require a later profile".into(),
-                );
-            }
-            return Ok(Type::Named(name.clone()));
+        if let Some(existing) = self.shapes.iter().find(|v| v.source == i && v.arguments == arguments) {
+            return Ok(Type::Named(existing.name.clone()));
         }
-        if self.shapes.len() >= 32 {
-            return Err("specialized type count exceeds 32".into());
+        if self.shapes.len() >= 32 { return Err("specialized type count exceeds 32".into()); }
+        let row = if self.shapes.iter().any(|v| v.source == i) {
+            let row = self.source.types.len() + self.type_clones;
+            self.type_clones += 1;
+            row
+        } else { i };
+        let mut private_name = if row == i { name.clone() } else { format!("{name}$aot_shape_{row}") };
+        if row != i {
+            while self.source.types.iter().any(|t| t.name == private_name)
+                || self.shapes.iter().any(|t| t.name == private_name) { private_name.push('_'); }
         }
-        self.shapes.insert(i, arguments.clone());
+        self.shapes.push(Shape { source: i, arguments: arguments.clone(), row, name: private_name.clone() });
         for arg in &arguments {
             self.lower(arg)?;
         }
@@ -109,25 +119,29 @@ impl Specializer<'_> {
                 // Keep lexical identity only. The value profile separately validates
                 // empty static companions and rejects every executable use.
                 let owner_index = self.type_index(&owner.name)?;
-                if !self.shapes.contains_key(&owner_index) && self.shapes.len() >= 32 {
+                if !self.shapes.iter().any(|v| v.source == owner_index) && self.shapes.len() >= 32 {
                     return Err("specialized type count exceeds 32".into());
                 }
-                self.shapes.insert(owner_index, vec![]);
+                if !self.shapes.iter().any(|v| v.source == owner_index) {
+                    self.shapes.push(Shape { source: owner_index, arguments: vec![], row: owner_index, name: owner.name.clone() });
+                }
             } else {
                 self.lower(&Type::Named(owner.name.clone()))?;
             }
         }
-        Ok(Type::Named(name.clone()))
+        Ok(Type::Named(private_name))
     }
     fn owner(&mut self, ty: &Type, instance: bool) -> Result<Type, Error> {
         if !instance {
             if let Type::Named(name) = ty {
                 let i = self.type_index(name)?;
                 if super::selection::static_owner(&self.source.types[i]) {
-                    if !self.shapes.contains_key(&i) && self.shapes.len() >= 32 {
+                    if !self.shapes.iter().any(|v| v.source == i) && self.shapes.len() >= 32 {
                         return Err("specialized type count exceeds 32".into());
                     }
-                    self.shapes.insert(i, vec![]);
+                    if !self.shapes.iter().any(|v| v.source == i) {
+                        self.shapes.push(Shape { source: i, arguments: vec![], row: i, name: name.clone() });
+                    }
                     return Ok(ty.clone());
                 }
             }
@@ -197,11 +211,11 @@ impl Specializer<'_> {
             return Ok(instance.clone());
         }
         if self.instances.len() >= 128
-            || (!target.generic_arguments.is_empty() && self.clones >= 32)
+            || (self.clones >= 32 && (!target.generic_arguments.is_empty() || self.instances.iter().any(|v| v.source == i)))
         {
             return Err("method specialization exceeds 128 selected functions or 32 clones".into());
         }
-        let row = if target.generic_arguments.is_empty() {
+        let row = if target.generic_arguments.is_empty() && !self.instances.iter().any(|v| v.source == i) {
             i
         } else {
             let row = self.source.functions.len() + self.clones;
@@ -243,6 +257,7 @@ impl Specializer<'_> {
                 self.owner(&closed, f.instance)
             })
             .transpose()?;
+        result.name = lowered_member_name(f, result.owner.as_ref());
         for t in result
             .parameters
             .iter_mut()
@@ -284,10 +299,9 @@ impl Specializer<'_> {
                         revision: self.source.revision.clone(),
                         index: instance.row as u32,
                     });
-                    if !instance.methods.is_empty() {
-                        target.name =
-                            clone_name(&self.source.functions[instance.source], instance.row);
-                    }
+                    let method_clone = !instance.methods.is_empty();
+                    let instance_row = instance.row;
+                    let source_function = self.source.functions[instance.source].clone();
                     target.generic_arguments.clear();
                     pending.push(instance);
                     target.owner = closed
@@ -295,6 +309,8 @@ impl Specializer<'_> {
                         .as_ref()
                         .map(|t| self.owner(t, closed.instance))
                         .transpose()?;
+                    target.name = if method_clone { clone_name(&source_function, instance_row) }
+                        else { lowered_member_name(&source_function, target.owner.as_ref()) };
                     target.parameters = closed
                         .parameters
                         .iter()
@@ -321,6 +337,13 @@ impl Specializer<'_> {
 fn substitute(t: &Type, types: &[Type], methods: &[Type]) -> Result<Type, neoclr::Fault> {
     t.substitute_method_parameters(methods)?
         .substitute_type_parameters(types)
+}
+fn lowered_member_name(f: &Function, owner: Option<&Type>) -> String {
+    let name = |t: &Type| match t { Type::Named(n) | Type::Constructed { definition: n, .. } => Some(n.clone()), _ => None };
+    if let (Some(old), Some(new)) = (f.owner.as_ref().and_then(name), owner.and_then(name)) {
+        if let Some(member) = f.name.strip_prefix(&format!("{old}.")) { return format!("{new}.{member}"); }
+    }
+    f.name.clone()
 }
 fn clone_name(f: &Function, row: usize) -> String {
     format!("{}$aot_method_{row}", f.name)
@@ -364,7 +387,8 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
     };
     let mut context = Specializer {
         source: input,
-        shapes: BTreeMap::new(),
+        shapes: vec![],
+        type_clones: 0,
         instances: vec![root_instance.clone()],
         clones: 0,
     };
@@ -381,8 +405,8 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
             &instance.methods,
             &mut pending,
         )?;
-        if !instance.methods.is_empty() {
-            function.name = clone_name(&function, instance.row);
+        if !instance.methods.is_empty() { function.name = clone_name(&function, instance.row); }
+        if instance.row != instance.source {
             if let Some(origin) = &mut function.origin {
                 // Source tokens identify templates, not each private native body. Keep
                 // access/owner facts, assign an unused private token, omit parameter
@@ -413,33 +437,47 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
         }
         expanded.functions[instance.row] = function;
     }
-    let shapes = context.shapes.clone();
-    for (&i, arguments) in &shapes {
-        let t = &mut expanded.types[i];
+    // Materialize each private shape after discovery. Original metadata is verified
+    // before this pass; copied access/readonly facts remain active in the projection.
+    let mut at = 0;
+    let mut field_rid = input.types.iter().filter_map(|t| t.origin.as_ref())
+        .flat_map(|o| &o.field_tokens).map(|t| t & 0x00ff_ffff).max().unwrap_or(0);
+    let type_rid = input.types.iter().filter_map(|t| t.origin.as_ref())
+        .map(|o| o.token & 0x00ff_ffff).max().unwrap_or(0);
+    while at < context.shapes.len() {
+        let shape = context.shapes[at].clone();
+        at += 1;
+        let mut t = input.types[shape.source].clone();
+        t.name = shape.name.clone();
         t.generic_parameters.clear();
-        for field in &mut t.fields {
-            field.ty = context.close(&field.ty, arguments)?;
-        }
-        t.base = t
-            .base
-            .as_ref()
-            .map(|t| context.close(t, arguments))
-            .transpose()?;
-        t.implements = t
-            .implements
-            .iter()
-            .map(|t| context.close(t, arguments))
-            .collect::<Result<_, _>>()?;
-        // Descriptive property types are removed by closed-world selection; no property
-        // access can bypass selection of its accessor body.
+        for field in &mut t.fields { field.ty = context.close(&field.ty, &shape.arguments)?; }
+        t.base = t.base.as_ref().map(|t| context.close(t, &shape.arguments)).transpose()?;
+        t.implements = t.implements.iter().map(|t| context.close(t, &shape.arguments)).collect::<Result<_, _>>()?;
         t.properties.clear();
+        t.definition = Some(neoclr::metadata::TypeDefId {
+            module: input.name.clone(), revision: input.revision.clone(), index: shape.row as u32,
+        });
         if let Some(origin) = &mut t.origin {
             origin.property_tokens.clear();
+            if shape.row != shape.source {
+                let rid = type_rid + (shape.row - input.types.len()) as u32 + 1;
+                if rid > 0x00ff_ffff { return Err("private type token range exhausted".into()); }
+                origin.token = 0x0200_0000 | rid;
+                for token in &mut origin.field_tokens {
+                    field_rid += 1;
+                    if field_rid > 0x00ff_ffff { return Err("private field token range exhausted".into()); }
+                    *token = 0x0400_0000 | field_rid;
+                }
+            }
         }
+        while expanded.types.len() < input.types.len() + context.type_clones {
+            expanded.types.push(input.types[shape.source].clone());
+        }
+        expanded.types[shape.row] = t;
     }
-    let report = json!({"policy":"one shape per value definition; primitive static generic methods, at most 32 clones and 128 selected functions; no constraints",
-        "methods": context.instances.iter().filter(|v| !v.methods.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods})).collect::<Vec<_>>(),
-        "types": shapes.iter().filter(|(_,args)| !args.is_empty()).map(|(i,args)| json!({"sourceIndex":i,"definition":input.types[*i].definition,"name":input.types[*i].name,"arguments":args})).collect::<Vec<_>>()});
+    let report = json!({"policy":"up to 32 closed value shapes; primitive static generic methods and closed owner methods, at most 32 function clones and 128 selected functions; no constraints",
+        "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
+        "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
     Ok((expanded, report))
 }
 
@@ -459,7 +497,22 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
                 row["compiledName"] = row["name"].clone();
                 row["name"] = method["name"].clone();
                 row["methodArguments"] = method["arguments"].clone();
+                row["typeArguments"] = method["typeArguments"].clone();
             }
         }
     }
+    for key in ["types", "excludedTypes"] {
+        for row in report[key].as_array_mut().unwrap() {
+            if let Some(shape) = specialization["types"].as_array().unwrap().iter()
+                .find(|t| t["expandedIndex"] == row["sourceIndex"]) {
+                row["expandedIndex"] = row["sourceIndex"].clone();
+                row["sourceIndex"] = shape["sourceIndex"].clone();
+                row["definition"] = shape["definition"].clone();
+                row["compiledName"] = row["name"].clone();
+                row["name"] = shape["name"].clone();
+                row["typeArguments"] = shape["arguments"].clone();
+            }
+        }
+    }
+
 }

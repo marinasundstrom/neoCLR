@@ -377,3 +377,38 @@ conversions are consequently validated at CIL level. Invalid `UL`/minimum-litera
 spellings in that probe were replaced with tested Raven casts/expressions, not new
 compiler syntax support. Stream/interface calls and multiple closed carrier shapes
 remain the next Write/ReadLine dependencies.
+
+## Multiple closed value shapes (2026-10-08)
+
+Closed-world selection now specializes several instantiations of the same value
+carrier, replacing the earlier one-shape restriction. Each shape retains separate
+storage and method identities even if its native lane widths equal another shape's.
+Constructors retain their constructor names under private owners; calls bind exact
+closed signatures. Repeated references reuse the same shape/body. Nongeneric static
+companions still contribute metadata identity only.
+
+Private cloned types, fields and methods receive distinct metadata tokens. Original
+access/readonly facts remain active and original definitions are retained in reports,
+with `typeArguments`, `compiledName`, `expandedIndex` and `compiledIndex` where
+applicable. Runtime fault frames use original function names. The original explicit
+load set is verified before cloning; single-artifact inputs requiring new type/method
+tokens must also supply their declared verification dependencies. The older bounded
+single-shape projection remains compatible. Generic reference classes, generic
+lexical owners, constraints and interface dispatch remain unsupported.
+
+Bounds remain 32 selected shapes (including nongeneric dependencies), 32 additional
+function bodies and 128 selected functions. Discovery counts closed shapes, rather
+than just source definitions. This is bounded monomorphization, not a stable generic
+ABI or general trimming policy. It follows the existing .NET generic-specialization
+comparison in the [value experiment](../aot-values/README.md): concrete layouts simplify
+native calls but duplicate code/metadata. No code-size or performance advantage is
+claimed, and there is no representation-based merging of distinct nominal shapes.
+
+`multiple-values.rvn` combines Option<int>, Option<string>, input Option<byte> and
+several Result payloads, including Error/None and both pattern forms. The fresh run
+selects 24 types/55 functions, with 14 generic shapes and 23 additional function bodies.
+`verify_interactive.py --multi-values` and `multiple-values-validation.json` retain
+source/shape provenance and interpreter/native output, EOF and broken-pipe parity.
+Focused CIL tests exercise two same-width generic layouts, cloned member returns and
+faults, and excessive-shape rejection. This removes one of the ordinary stream
+library's prerequisites; the next boundary is interface views and calls.

@@ -30,7 +30,8 @@ pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Va
             .any(|f| !f.generic_parameters.is_empty())
     {
         let (expanded, specialization) = super::specialization::expand(input, root)?;
-        if !specialization["methods"].as_array().unwrap().is_empty() {
+        if specialization["methods"].as_array().unwrap().iter().any(|m| !m["arguments"].as_array().unwrap().is_empty())
+            || specialization["types"].as_array().unwrap().iter().any(|t| t["expandedIndex"].as_u64().unwrap() as usize >= input.types.len()) {
             // Cloning assigns private origin tokens. Verify originals first so this
             // cannot repair invalid source metadata or bypass generic contracts.
             neoclr::LoadedProgram::new(input)
