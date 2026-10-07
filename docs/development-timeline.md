@@ -102,6 +102,20 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Assistant response:** finish the Raven Hello World commit, then inspect actual
   emitted type/member metadata and select a bounded value-type slice. This direction
   does not imply that union or general member AOT is already implemented.
+- **Assistant investigation:** compiles Counter and Some/None Choice probes with the
+  pinned native-enabled Raven compiler, inspects their metadata/IL and executes them
+  under the interpreter. Records constructor/field/byref/member and nested-payload/out
+  requirements; AOT correctly rejects these still-unsupported declarations. The union
+  needs explicit native Runtime references; an earlier host-bootstrap attempt rejects
+  generated ToString. See the [inventory](experiments/aot-values/inventory.json).
+- **Author reference-type question:** wonders whether reference counting should be
+  the first implementation step, “Before we consider JIT for AOT”.
+- **Assistant response/proposal:** treats counting as an experiment to compare with
+  a simple native tracer, not an approved replacement. Notes the existing interpreter
+  already collects cycles; plain counting requires a cycle policy, reference-bearing
+  value handling and return/Fault cleanup. AOT/JIT and memory-management choices are
+  independent. Records [sources, costs and validation needs](native-execution-investigation.md#reference-counting-as-an-early-native-experiment-2026-10-07).
+  No reference-counting implementation or benchmark is performed.
 - **Open:** backend choice, OS qualification order, native ABI/GC/metadata contracts,
   edit compatibility, measurements and implementation scheduling. These details are
   assistant proposals, not subsequent author decisions. The active Raven work and

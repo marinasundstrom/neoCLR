@@ -1,0 +1,14 @@
+union Choice {
+    case Some(int)
+    case None
+}
+
+func Main() -> int {
+    let item = Choice.Some(42)
+    if item is .Some(let value) {
+        if value == 42 {
+            return 0
+        }
+    }
+    return 1
+}

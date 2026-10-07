@@ -7,6 +7,7 @@ does not imply a shipped runtime capability. Read each experiment's status and
 reproduction instructions before using its output.
 
 - [ARM64 AOT Hello World: first standalone executable](aot-hello/README.md)
+- [AOT value types/members: Raven producer inventory and next-slice plan](aot-values/README.md)
 - [ARM64 scalar AOT: native object and C consumer](aot-scalar/README.md)
 - [JSON document: a sensor report and acknowledgement](json-document/README.md)
 - [JSON message: a bounded string round trip](json-message/README.md)

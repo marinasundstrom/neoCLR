@@ -35,6 +35,56 @@ later author-directed sample progression controls the immediate work. The author
 also identifies trimming as a future step; establish explicit code/metadata retention
 and dynamic-use roots, without making trimming a prerequisite for Hello World.
 
+## Reference counting as an early native experiment (2026-10-07)
+
+The author asks whether reference types should initially use reference counting,
+“Before we consider JIT for AOT”. This is recorded as an open question, not a chosen
+replacement for tracing. Memory management is independent of code-generation timing:
+AOT requires no JIT, and either native execution mode can call a statically linked
+memory manager. The next value/member inventory is [recorded separately](experiments/aot-values/README.md).
+
+The existing interpreter has a nonmoving tracing heap and reclaims unreachable cycles
+([implementation](../src/gc.rs), [contract](garbage-collection.md)). .NET's baseline
+also identifies live objects from roots and traces the reachable graph, though its
+production collector has generations and compaction
+([Microsoft GC fundamentals](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/fundamentals),
+reviewed 2026-10-07). Adopting native reference counting would be a new backend strategy,
+not merely filling in an absent managed lifetime policy.
+
+Reference counting can provide an incremental experiment with explicit allocation,
+retain/release and destruction of owned reference fields. Its costs include updates
+on ownership changes, cleanup on every return/Fault path, cascading reclamation, and
+additional coordination for shared objects. Plain counts cannot reclaim strong cycles.
+[Rust Rc](https://doc.rust-lang.org/std/rc/index.html) documents both cycle leakage and
+the single-threaded/non-atomic restriction; Weak breaks selected ownership cycles,
+but adding weak edges manually is not equivalent to automatically collecting arbitrary
+managed cycles (reviewed 2026-10-07). No performance advantage is established here.
+
+**Provisional assistant recommendation:** keep the value/member slice first. Compare
+an isolated, explicitly single-threaded reference-counting experiment with a simple
+nonmoving native tracer using registered roots. The tracer preserves existing cycle
+semantics but requires native roots and collection boundaries; reference counting
+requires ownership lowering and a cycle strategy before general managed compatibility.
+Neither is automatically the cheaper complete implementation. Do not select a
+production policy or promise deterministic destruction based on this discussion.
+
+For either approach, define per-type reference descriptors and copying/overwriting
+rules first. Inline value types containing references still need reference management;
+borrowed byrefs must preserve their owning allocation and cannot be treated as owning
+object references indiscriminately. Keep layout/lifetime operations internal to the
+native backend/runtime boundary, with no new retain/release obligations in Raven
+source or portable neoCLR CIL. Replacing a strategy later can require recompilation;
+it is not necessarily an ABI-compatible runtime swap.
+
+A reference-counting trial must test aliases, self-assignment, reference-bearing
+value copies, field replacement, returns, early branches, Fault cleanup, interior
+references and a cycle that exposes its limit. An unrestricted cycle must either be
+collected by an added mechanism or excluded by a clearly enforced experimental profile;
+leaking it cannot be reported as parity with the interpreter. Weak references,
+concurrent ownership, finalizers and resource cleanup are separate contracts. Timely
+external cleanup remains Dispose/Close, not an implicit promise from counting.
+No reference-counting implementation or benchmark is added in this planning slice.
+
 ## Findings and proposed direction
 
 JIT and AOT are plausible extensions of the existing architecture, but adding a code

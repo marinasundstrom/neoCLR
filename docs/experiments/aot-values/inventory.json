@@ -1,0 +1,220 @@
+{
+  "date": "2026-10-07",
+  "scope": "producer/interpreter inventory for the next AOT value/member slice; native compilation not implemented",
+  "compilerRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "runtimeRevision": "ca34025a2e0af6f167a9063ef1a1e6a981ac6ff9",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/counter.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-values/counter.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/counter.dll",
+        "/Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/counter.txt"
+      ],
+      "exit": 0,
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/counter.dll -> /Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/counter.txt\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/counter.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "/Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/counter.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/counter.o"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "aot-poc: scalar profile requires an application with no types and at most 128 functions\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/choice.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-values/choice.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/choice.dll",
+        "/Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/choice.txt"
+      ],
+      "exit": 0,
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/choice.dll -> /Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/choice.txt\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/choice.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "/Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/choice.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-types-investigation/recorded/choice.o"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "aot-poc: scalar profile requires an application with no types and at most 128 functions\n"
+    }
+  ],
+  "cases": {
+    "counter": {
+      "sourceSha256": "eaccf3272d96b3c6e4e434dd29346cb2ed22e565a4fab061b57dd229f96959c6",
+      "artifactSha256": "63a59cc239312f7bf06023744dd9a99d44b3e5c342ac3b9c35ea4d2be502e453",
+      "types": [
+        {
+          "name": "NeoMetadata_27D5AF0CF72C835BBC8BC99A55964DC43B1707B05CFE2F87024F553DBD2AA73A.T__436F756E746572",
+          "representation": "Record"
+        }
+      ],
+      "methodCount": 5,
+      "opcodes": [
+        "add",
+        "brfalse",
+        "call",
+        "ceq",
+        "initobj",
+        "ldarg",
+        "ldc.i4",
+        "ldfld",
+        "ldloc",
+        "ldloca",
+        "newobj.ctor",
+        "pop",
+        "ret",
+        "stfld",
+        "stloc"
+      ],
+      "interpreterExit": 0,
+      "nativeCompilation": "rejected as unsupported, without output"
+    },
+    "choice": {
+      "sourceSha256": "6c7a25aae5be0aa2484512a5356b540648f9b2d35fe5c223d3b1a62d9c94bfad",
+      "artifactSha256": "02a968502683f871d492194135b97748125884a61f81ef54279eaa7a25fae26c",
+      "types": [
+        {
+          "name": "NeoMetadata_23651735CB2D7E81AE6B14419BED07A00F872FFB244E224791844E8A9AD4B753.T__43686F696365",
+          "representation": "Record"
+        },
+        {
+          "name": "NeoMetadata_23651735CB2D7E81AE6B14419BED07A00F872FFB244E224791844E8A9AD4B753.T__43686F696365.N_536F6D65",
+          "representation": "Record"
+        },
+        {
+          "name": "NeoMetadata_23651735CB2D7E81AE6B14419BED07A00F872FFB244E224791844E8A9AD4B753.T__43686F696365.N_4E6F6E65",
+          "representation": "Record"
+        },
+        {
+          "name": "NeoMetadata_23651735CB2D7E81AE6B14419BED07A00F872FFB244E224791844E8A9AD4B753.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_556E696F6E417474726962757465",
+          "representation": "Record",
+          "is_reference_type": true
+        },
+        {
+          "name": "NeoMetadata_23651735CB2D7E81AE6B14419BED07A00F872FFB244E224791844E8A9AD4B753.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E43617365417474726962757465",
+          "representation": "Record",
+          "is_reference_type": true
+        },
+        {
+          "name": "NeoMetadata_23651735CB2D7E81AE6B14419BED07A00F872FFB244E224791844E8A9AD4B753.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E436F6D70616E696F6E417474726962757465",
+          "representation": "Record",
+          "is_reference_type": true
+        }
+      ],
+      "methodCount": 20,
+      "opcodes": [
+        "box",
+        "brfalse",
+        "call",
+        "callvirt",
+        "castclass",
+        "ceq",
+        "conv.i4",
+        "initobj",
+        "isinst",
+        "ldarg",
+        "ldc.bool",
+        "ldc.i4",
+        "ldfld",
+        "ldflda",
+        "ldloc",
+        "ldloca",
+        "ldstr",
+        "newobj.ctor",
+        "pop",
+        "ref.isnull",
+        "ret",
+        "stfld",
+        "stloc",
+        "stobj"
+      ],
+      "interpreterExit": 0,
+      "nativeCompilation": "rejected as unsupported, without output"
+    }
+  },
+  "inputSha256": {
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d"
+  }
+}

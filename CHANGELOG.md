@@ -40,7 +40,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   bundled Console.WriteLine(String) lowering. Record the pinned compiler bootstrap,
   fixture and reproducible pipeline; fifteen focused tests pass, rejecting corrupt
   containers and unsupported IL before emission. Record types/members and value-type
-  union consumers as the author-selected next milestone. General library dependency compilation, loop budgets/cancellation,
+  union consumers as the author-selected next milestone. Inventory emitted Counter
+  and Some/None types/members with interpreter validation and explicit AOT rejection;
+  record a reference-counting versus tracing experiment proposal without changing
+  managed lifetime policy. General library dependency compilation, loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime
   dependencies and public library APIs are unchanged. Cherry-pick this
   isolated slice to main at the author's correction, retaining main's newer native

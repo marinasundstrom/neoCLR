@@ -1,0 +1,17 @@
+struct Counter {
+    var Value: int = 0
+
+    func Bump() -> int {
+        Value += 1
+        return Value
+    }
+}
+
+func Main() -> int {
+    var counter = Counter()
+    let result = counter.Bump()
+    if result == 1 {
+        return 0
+    }
+    return 1
+}
