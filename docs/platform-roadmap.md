@@ -60,9 +60,11 @@ task; its integrated compiler revision is af47cb0a5, with native async qualifica
 separate. Native project import/run now carries the exact source-built Object root via
 RavenNeoClrObjectLibrary (Raven 0f85f53b8); the unchanged HTTP headers project executes
 and invalid ownership preserves the prior output. [Evidence](experiments/extended-cli-metadata/native-project-root-2026-10-07.md).
-Next: native project-reference/build and LSP catalogs, Platform service ownership and
-collected shipping artifacts. Existing native workspace tests explicitly reject project
-references; accepting a real project graph needs implementation and validation.
+Native project-reference builds and prebuilt workspace imports now pass a four-project
+execution diamond, including generic object mutation and failure preservation.
+[Graph evidence](experiments/extended-cli-metadata/native-project-graph-2026-10-07.md).
+Next: checked-in class-library project layouts, live LSP qualification, Platform service
+ownership and collected shipping artifacts.
 The API site remains one namespace/type reference across assemblies; declaring-assembly
 provenance belongs on pages. Native multi-input RavenDoc migration must preserve that
 shape, as recorded in [API maintenance](../api-docs/README.md#one-class-library-reference-across-assemblies).

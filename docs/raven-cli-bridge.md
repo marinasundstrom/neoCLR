@@ -6604,3 +6604,19 @@ names. Reference artifacts remain watched by the editor metadata loader. This ad
 CLI projection or importer/emitter coupling. [Executable project gate](experiments/extended-cli-metadata/native-project-root-2026-10-07.md)
 passes against separate libraries. ProjectReference build orchestration remains next;
 this change does not claim full VS Code or packaged-release acceptance.
+
+
+## Native project dependency graphs (2026-10-07)
+
+Raven 3892b113a now builds ProjectReference libraries before their consumers. Workspace
+loading reads those prebuilt outputs through the native catalog, flattens explicit
+transitive dependencies and watches project/artifact/configuration inputs. No dependency
+sources or CLI projections enter the consumer. The provider owns bin/neoclr artifact
+placement and checks expected assembly names; catalog identity/digest checks remain.
+Cycles and incompatible targets reject, and a failing assembly retains its prior output.
+Successful earlier dependency builds are not rolled back if a later assembly fails.
+
+The executable diamond and C# loader contracts are recorded in the
+[project graph gate](experiments/extended-cli-metadata/native-project-graph-2026-10-07.md).
+Ordinary .NET project behavior is unchanged. This does not yet define Platform projects,
+a shipping layout or live VS Code acceptance; API/website rendering is unchanged.

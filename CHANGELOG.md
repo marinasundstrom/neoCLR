@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Qualify Raven 3892b113a dependency-first native ProjectReference builds with a four-project diamond,
+  transitive native imports, generic object mutation/identity, exact execution output,
+  cycle rejection and failed-output preservation. Record the prebuilt workspace boundary
+  and remaining class-library project/editor packaging gates.
+
 - Qualify native project import/run against separate source-built libraries using Raven
   0f85f53b8's explicit Object-owner selection. Add a reproducible unchanged HTTP project
   consumer and invalid-owner output-preservation check. Native ProjectReference build
