@@ -94,8 +94,12 @@ and assembly-label correction. A possible RavenDoc rewrite in Raven is future ex
 not a current implementation commitment. These changes are not gates for this release.
 Keep the existing reference's bridge provenance explicit; do not relabel CoreProbe as
 production ownership. Preserve the [future provider direction](experiments/extended-cli-metadata/native-documentation-provider-2026-10-07.md).
-Next: clean-checkout release reproduction, installation and packaged sample/editor
-qualification. Prioritize demonstrated release failures and useful shipped behavior;
+Independent source checkouts now rebuild the runtime, SDK, bootstrap inputs and four
+libraries; the extracted collection/Tasks/JSON/HTTP gates pass after explicit Apple SDK
+selection and serial build recovery. All 26 installed-package editor checks also pass.
+[Clean-source evidence](experiments/extended-cli-metadata/clean-bootstrap-reproduction-2026-10-07.md).
+Next: exact release-candidate/platform qualification and remaining installation/editor
+issues. Prioritize demonstrated release failures and useful shipped behavior;
 assess Platform boundary work against that scope rather than expanding documentation
 architecture. Existing API-help coverage limitations remain visible.
 The bundle alone is not an SDK release.

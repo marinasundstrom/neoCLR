@@ -193,3 +193,9 @@ assemblies with a shared project configuration, explicit runtime Object ownershi
 relative SDK selection. Extracted sample verification covers native compilation and
 execution; this candidate is not a new published download. Platform boundaries and
 complete API documentation remain release work.
+
+
+The development bootstrap workflow has also been exercised from isolated source
+checkouts on macOS arm64, regenerating the primitive bootstrap and retained seed before
+building the four libraries. This is local qualification of the documented dependency
+chain, not compiler self-hosting or a new release announcement.

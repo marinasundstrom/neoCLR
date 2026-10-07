@@ -1,0 +1,1205 @@
+{
+  "date": "2026-10-07",
+  "platform": "macOS arm64",
+  "neoClrRevision": "ca34025a2e0af6f167a9063ef1a1e6a981ac6ff9",
+  "ravenRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "sourceStatus": {
+    "/private/tmp/neoclr-clean1007": "",
+    "/private/tmp/raven-clean1007": ""
+  },
+  "checkoutMethod": "Independent git clone --no-hardlinks --no-checkout, then detached checkout at exact revisions. No developer bin/obj/target outputs copied.",
+  "toolchain": {
+    "rustc": "1.95.0 (59807616e 2026-04-14)",
+    "cargo": "1.95.0 (f2d3ce0bd 2026-03-21)",
+    "dotnet": "11.0.100-rc.1.26425.128",
+    "node": "v22.21.0",
+    "python": "3.9.6",
+    "clang": "Apple clang 17.0.0 (clang-1700.6.3.2)"
+  },
+  "runtimeEnvironment": {
+    "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
+    "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk"
+  },
+  "recoveredFailures": [
+    "Default Apple SDK selection caused libffi configure failure: linker could not read macOS 27 libSystem stub. Command-local Xcode SDK selection passed.",
+    "Overlapping SDK/probe/translator builds reported missing reference assemblies. Standalone metadata build plus serial SDK retry and canonical paths passed; no manual binary copies. Exact race/path mechanism unproven."
+  ],
+  "bootstrap": {
+    "kind": "explicit-source-runtime-bootstrap",
+    "sourceRevision": "ca34025a2e0af6f167a9063ef1a1e6a981ac6ff9",
+    "commands": [
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll",
+          "--reference-source-failure-core",
+          "/private/tmp/clean-bootstrap1007/Core.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/private/tmp/neoclr-clean1007/target/release/neoclr",
+          "assemble",
+          "/private/tmp/clean-bootstrap1007/System.neoil",
+          "/private/tmp/clean-bootstrap1007/System.bootstrap.json",
+          "--format",
+          "json"
+        ],
+        "exitCode": 0,
+        "stdout": "Assembled System -> /private/tmp/clean-bootstrap1007/System.bootstrap.json\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/neoclr-clean1007/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll",
+          "/private/tmp/clean-bootstrap1007/System.retained.json",
+          "/private/tmp/clean-bootstrap1007/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Wrote 51399 bytes. Runtime semantic validation is required.\n",
+        "stderr": ""
+      }
+    ],
+    "hashes": {
+      "/private/tmp/neoclr-clean1007/scripts/prepare-native-bootstrap.py": "d4afa5364a6da3aa8474955c9ba11f00dc5f4a2e8e6f4594f9bf97b3760f3b90",
+      "/private/tmp/neoclr-clean1007/runtime/raven/native/poc-seed.neoil": "42f5655f72e918ff274e70c435e4e9ecf8e943225cce5351cec77ed48f1684ee",
+      "/private/tmp/neoclr-clean1007/runtime/raven/projects/System.Runtime/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll": "2c56c036bc907cd2bac7e6887e20032d160b6eb1ec24ae3cf2684924dac7d22b",
+      "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+      "/private/tmp/neoclr-clean1007/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll": "7a06db09dad177167e86e23bf82f4f402db6c64ab792472a24ca3f81a477e747",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/JsonBindings.cs": "8681b479565e6a0c975c361da29611d3e02e49ed4932a8dcbf6581fb00663dce",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/AsyncBindings.cs": "8dcc0f8b91f19acf97b73b8cc3b395f95708db6cee00eb28a1f661988031a87f",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/StringBindings.cs": "98ac3fd91129af4769d3d758e51aacd299f1f497aaa6196f663911e191b1f27b",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ProjectBuild.cs": "8e18e7e66e3c7e20bdd81257583e7b69698302c4d46e06cefc9378b9149404d9",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/HttpJsonBindings.cs": "52515cadf6ad04ece1995e7a698118ca136451630212aa2f695a40a5d49698eb",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ErrorBindings.cs": "eda838bd6a3dc0a5667bbc5f6c770e0613c7a326bca0f395dca7e59164e1f686",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ResultBindings.cs": "563d665e816293fccfe54ffa35e436585431f24b2d409fdc251c06a7a43a60c1",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/CollectionDeclarations.cs": "763a34a7c0fc9f194162ed09a70fdbe7ba98147e21c84d66c484dcee06c22e10",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/EnumHelpersBindings.cs": "f23d6a2a8903b606e3878587ed07d2ce61cab5dfa2f0a484ee311293a34c078b",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/StandardUnionLibraryChecks.cs": "2e2433f322cfaf4c0eb1beb3ecc086da99c7aade4d9cfda3eeeeae851679fbce",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/OutcomeOperatorBindings.cs": "1e7d62b6f82d6507a70820e48354634ccd077e6ab3e2a1f345d44c00a5b24976",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ReflectionMemberChecks.cs": "f873d2cdac0139b25d24cbf61806414aac71165736b65e0c4de6f9bff713468a",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/NativeAllocationBindings.cs": "ee61a64c62f0b6e0eb4706f6cc3fc65ce774df08a31d276c9681acfbde4e88ed",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ParseProbe.cs": "2b3a2b564d52dfdfc0b8cde0f27c5b0d9e3f04464f03a77f11a349aad7cc4ef9",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/StorageHierarchyProbe.cs": "c585f971c941cde3c0cd10f332d3c8e1d9d5ca757c50b50ec9b7794496891f5b",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/FileProbe.cs": "787dafd1fbf8dcaa0663fb7eee1905ac17f6bdfd38e5b7e852321cbfa1dd00bd",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ConditionalOutputChecks.cs": "e6fc8f4369348cb9bf1c7980350aa0ddf653a8a1e7f88229b93cbac772144959",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/MapBindings.cs": "6827889b17be339b89b4a0d705b1c840f7bb79a593dcbc1a2016f4ac6a5dfbad",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/FaultBindings.cs": "52444680c9d0a0b74ab97ab13c07e881bd4628aaf382bf237547fc366bb73e54",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/IntrospectionHierarchy.cs": "479e6c50a68c13d89391ed16ee0e77a24f528179fc5ee63394fa3fd93a8d5e7a",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ArrayApiProbe.cs": "d222179a4736c127d160eee0282ee6d7eca7b2fbade571c491b0b2bb02d8731c",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/VoidStorageValidation.cs": "8b3974ee9ae58a43361f8e03911f227b24d32a5b3b48bddb0916c41524a86137",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/DescriptorLibrary.cs": "325ebedb5e8345c3f460fc83a29df7d947b5eab92e3147919a2f7c86f68bd21c",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/NumberChecks.cs": "909845536a190c1cdb14813cc26cd12df99f632af20fd65551429917fede0de0",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/NetworkBudgetChecks.cs": "2d63acb82d380b441c142045a20c0dcf01fc5f2a5e0cc4dee283ed25d0b8d311",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/UnicodeScalarBindings.cs": "6deb093de9f6df9b4ebd6eb844373b41d00c76e8012e1d03040cfc0d5c5ad19e",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/VoidChecks.cs": "7ec1c1f30441c2355e8c535d739466620b8c7d83443dfe178d2b6abc32d53cf1",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/StorageItemBindings.cs": "255935ff513a89c4903a8a466f0b2ecfba445e86e74071c592ecb8cbda0dc90c",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/RuntimeServiceBindings.cs": "8ab19e2c215977fb46e58cb6ae3fd8a2749015ec37bc4e237586b8f904ce57fd",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/StorageProviderBindings.cs": "54a8cdef0d0e35787d79debf0e25b44e9c09c3e1eacd32c58b13b0851c7d9d40",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/NumberBindings.cs": "041b98cb3565ff475e5aad2317a6586bee7027c3179f76e99051649e2bfb6a2d",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/PayloadUnionBindings.cs": "65c48e1e5467aed45a49c9f9220e66dc3f022b4411f504dbc4fc6845fe8f7bc6",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/StaticImport.cs": "1dbd766765ba5e93e1d5a157212c0b5020cc2cb7367d2228cb18523d78864168",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/RuntimeSignatures.cs": "f8ab635c1416b6cd24e06419f82464b4f1185caebc9decd67830401b3e807a45",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/SourceMetadata.cs": "dc4514440061fa8be55510c349b3484f1ddbf4ef6ba332f1cbf4186953e92e93",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/EmptyLibrary.cs": "94063d95f47320072221ad3f2564018544e20f063b6849e31f0003dd68757fc0",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/MetadataIdentityChecks.cs": "8164ca61ea731eb34bdbd2368e8695c4ce11cb9708056b9ae8da37f08afab28c",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ParameterSnapshotBindings.cs": "39eb0870d53ef5bda64024ea31f142a5113b0b513c31d09233e200269afc6074",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/QueryBindings.cs": "62180fe2ba2fc5f0fd96ddf8af9931c8d5e79ce261867971f2de9b57b0b9212a",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/GlobalizationBindings.cs": "12eee4c493470fdad9f1f68d61776d6bb5a7e9f25a6d6ea5df4e9819f18ca8ae",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/NamespaceFunctions.cs": "1369b4a00b7d63c94d3523b2b5453e6f29f94683b86fed8b2d7b5dea48aee644",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/StorageHierarchy.cs": "128770292f1a7625c4e767a283e94aa029c1025903d25739abde77044170ee31",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/Utf8Bindings.cs": "125c5859627821a6c2b44da9850d42be2f84f372a64205f6d1440b10b998c50c",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ErrorCarrierLibrary.cs": "1ce40411b87e70ce90d5f03c97c9ae16b205c25c44825398485370954da46171",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/HashCodeBindings.cs": "f5f42c4cb5402f3df6d99f6f6f5734106538a417a223fa72fdddd92f4bdc8e6b",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ArrayLibrary.cs": "4218fd2256864cf1bc5bc07539ec3264a670fba0143938808c59c28ca46baab4",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/HttpBindings.cs": "7d12929007c35d8c8feaa96f7a0fc6e9d2c3d1b1ee46419d1a7d844e60149a0c",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/NativeMemoryBindings.cs": "0120ccfd72d88470c25990c44385dc25d1663a40e3f2405644433faf05dca7b6",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/CasingIntegerChecks.cs": "013497f971a0c9c22955f202444d7a96f2eee346f7b805ef361dd07324fd9fa2",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/PrimitiveLibrary.cs": "a231122f5f4e8f24c033ed4523ab8c024dd078a9893e4f0e9ff892899bcb45e6",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ReaderBindings.cs": "b535fcb33e6f9c3c8c62981815adbb443da45f76da607c3c97b6e80220b20d6c",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/SliceProbe.cs": "fc1df693058e6a699299fafe92788bb2ef132007b0baa129292a85ecfef38870",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/EntryPointBindings.cs": "5a5a414625d1ea1b44dce6078ce3591848ec4bf3a94dd99e803571c5e346b2c8",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/PropagationLibrary.cs": "f487dc6028308a9798a0132899ea6dd28adff9c75e9fdc224f1ec984fc5b13cb",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/GlobalizationChecks.cs": "df26ea1a3c3f78fe51087936290a9f02ecb0707107bd5bc3f42fb15b0ad65572",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/GenericUnionBindings.cs": "34598508b294665a741925de36be4bf53fbb15809009fa9883a3630e7a430f8c",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/InterfaceProbe.cs": "0b34f95158a95abf3e1928cd80012c929f32d25d3aea3bc7d29babb876dfaa4d",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/StreamBindings.cs": "14483af2c6b0462706208b4c2bcf0660bc568f1e2870b0b953b41b5f04ff4662",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/FunctionBindings.cs": "bee01e87f7534826a64295be4910d89b7e20f04e9d1b63f1486185821a773db1",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/MetadataIdentity.cs": "e52f913d93983888730481d7022ac3f10ae109b7b1492985613881bf75f46a30",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ApplicationImport.cs": "66855a52e0d43532222cdbae0530de57ce13f25a00cd7e7d0cd791da7bf2607a",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/UriBindings.cs": "c38e7ffc77b19d7a76eeb6840eb7a4d794bf5a9ed11384cd0345f0b549adadfe",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/PrimitiveBindings.cs": "c412ae3e910f1cfe747afe391edc43423c925156c170e87bf0143b6d626179e6",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ReflectionBindings.cs": "174e57c505a1a319395c65d074eaabb4a873b5d7b3fea61773ad3b6d935b3c93",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/CollectionBindings.cs": "fd86c8fa3408b13bbf8207808854344aa1d965b0b05cfea5ae73bf146c59a6e8",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ClosureAudit.cs": "2955102d4966f3cc7c76256e58db87dc61bf9f1bf7faff75b51d1923ca8822c8",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/GenericApplicationChecks.cs": "72ce8d809b680b8f839060791744708de5ff954b10301b299965fd299a763885",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/IPAddressBindings.cs": "fbb8f46466c5464ab54c3188fa826f47ff15f0dfb73f486a947a78eb46aee976",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/NativeServiceCatalog.cs": "7264d38cc0e9c0ca683869b8557b7a1f095136ae015e592144c18c73b4b0c8ce",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/WorkerBindings.cs": "af58f0f39807c4f7bee9832f13767b1369df8c05f1bd32614ceac9dfafdb05f5",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/OptionImportChecks.cs": "2b5df98643d421459c1105ce271b319109f879636343577c7eb88e58df391fb9",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/GenericUnionLibrary.cs": "77b5d92f591dc1306b37b869725ded4e5c5884af129279766016047ee9f94e81",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/MarkerLibrary.cs": "784b3ab2518d3b23d4155d8992c23aaea70b6af0236a0fe41996f9d81b706bbd",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/UnitContractChecks.cs": "904669024d8474bfc0e925f37008e5c43eab3a50392875643ef3779ae404973b",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/CollectionImportChecks.cs": "fbcb8c767309f4fca155b3f492bc6188ff176945eb42f0bfb9adf04aafc71247",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/FileSystemBindings.cs": "ba62230cd9b4fcdfa1be8f17d1b50849505e43bf5450ee3cc346176b476a8e61",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/NamespaceMemberProbe.cs": "75375f2b54b6aff15d97e5bd5744d7e191b6f7336dafd995aa070aaa3acbdbae",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ValueStorageBindings.cs": "ba3205201777d7ff59eff8a15e3af3aaa018da2ed7911eb005d563d6ad8f246f",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/TupleChecks.cs": "448a2cd69f892e3b7f5352cab84a923501a5d3afdd4f89492892125a902a3acc",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/InterfaceBindings.cs": "5549f67335f618e0e16ffb3949e9e15e22ba51c9e609131b2705b58154d55fa3",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ScalarUnionChecks.cs": "4298ba3784ab71f47618a3c15c37c8af21bdba19a9de7a1dff9f5f75b93d6e81",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/TaskBindings.cs": "e5bdcdc517da418b8dd097a9606707e0d1e300f4c2cfb40a15ebcc080d9701f8",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ComparerChecks.cs": "a3717753f277a5ec4a11b7593a49d425ddfa86a00c98e74a943ee1ea2e1a8cda",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/Int32Bindings.cs": "19340082d2b70c72d950d032cf6aa574596d70d0429668e3e01fb2556a0c6112",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/PathBindings.cs": "ede622dccd58bb711be18eaf7a0142c285798bfa8308c8028d9dca387a8fe59c",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/TupleBindings.cs": "1a667eeb9acb23174f4ad0a859b2ddd3139b760efb8ae437328befaa21a9a2ca",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/AttributeMetadata.cs": "634a4319bf3d9266cc54c35de994208ba0c61c5e1c7b6fcbe499d51f9a6a464d",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/LibrarySignatureChecks.cs": "8f2efb17ad25b15b2ca67a91fcb3e298a7d06a0a32414cb0bec569bbfa5582b1",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/AsyncRefChecks.cs": "6190575f0d1606f540f69ef333fb932611f77d60eafadcc902340e4a263f80d9",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ApplicationSpecialization.cs": "6eb6ccee20ef81594f1746607524a045064e8390ab3db4ee96e34020ab8fb313",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ApplicationTypes.cs": "0c5ffeb162e54eda53e847e174663cad62d13a0be0ba22d3864061bf70a852cc",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ArrayProbe.cs": "24fbb68838b8636e12e45f874631eb8ef547109198d1618653e8ddedcca74dd3",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/RecordMetadataChecks.cs": "7935a1effdc1939a0c7d4e4bd3ac4234be602011389ec3c7242f648a0601ba81",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/EnumBindings.cs": "a97b9888dba2e367b2a3c9de1dc60e12422841e36818f8ed7b26ec9b635f3239",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/RuntimeFailureBindings.cs": "119133892f5c2024a8b869d3b0446511207dded1aba1afff66f147a3c65bce7f",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/CoreDeclarations.cs": "0d2da4a3bd77c398f3ae760c6ea54c201ed622848dd6ff215f5a47d7617627a0",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ProcessBindings.cs": "241737bb6d812314a34e6936ef12cb89d074ce8e885c927b760bc8c6a1957357",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ComparerBindings.cs": "70ba15b58295bdd3d91578d32e0c6d6f080d54580ef6d9f02e7f4d57181f02f2",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/CalendarBindings.cs": "20bb72699731d37cc156e290b1093317377b3aef640cf5dc5f8fa3cca2d93cd6",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ResultImportChecks.cs": "7450bb06c66f7343fc4150e3dfa46632e9a93b30d4e09a802ebb98da5c85d7f3",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ManagedArrayBindings.cs": "179b090642d87e096da1e04c95eeac89bc205c7b315ef3ad28f723cd07e91a1a",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/DoubleBindings.cs": "ca3ac375b5ad59ef3eac75a11f5592691333c95b79c10c46e3dd0e2059010240",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/UnionImport.cs": "20cb628df88564b9b438819cc457c62e3dda830dea18c6f351ba0252eab342bd",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/VoidProjection.cs": "75f84c24cd5ffb47150a8a6db429d79a8becee246f317a4b4388075d5de8f542",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/FieldAccessChecks.cs": "77a6a0992859e2981bdcd54abef81e980a411f79d924c8f5f29d80eb95ec1f0c",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ConstructionBindingChecks.cs": "785616703f5226f6de6fa4cdab43475af536cbf56e95d5d4c2fcd2f088464f82",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/SignatureProbe.cs": "db92229af0e9115dd4b86031288a8bd8ce154b130857585c199cc13aaa9237d6",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ReflectionGenericBindings.cs": "54045f63968b7b5b7c2dae2939bb260931e0d189e647fcb2c11c4ed267da0130",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/GCBindings.cs": "fc4d13aac5a0db84772a50cd2eb561a2d9e80084a692f12d836ef766b69c3c31",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/TargetSurface.cs": "45154fa74c4dcb66dfa89043a1856b5e4e9a584fc113f2c433ca22b1a3775f7f",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/SourceUnionReferences.cs": "c25bfe7320ff17e249fd32a98d749c932abdc447bd058667ef481dddf4eec4f1",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/MatchProbe.cs": "1bfc988838f47cceb202d3a1272ed524742b7ff803e9bff9bbe8d1a2fc6c0271",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/BooleanBindings.cs": "08fec72e49b6499e5a9a8b0cfaedb97c0ad3679ecc17c58ebf83f30958d24c86",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/SocketBindings.cs": "5ca2825ca2f405984c0c9cbda14cd49dbb0c4a7f40451212707c0f2d0ee93361",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/FlagsLibrary.cs": "9f81408a5be58e184567a528288b3ecf915c68803ced4ea3088e154885b5fbb8",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/UnionDeclarations.cs": "3f862ac30602041f065db91397a74c80b49b9db6861c161383215ceefd0bcd6c",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/CheckedStorageBindings.cs": "efa6916abaca9d68a84a901be5d46ea90a5d7d63269213f30a3f4e6b07e9966f",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/OpaqueLibrary.cs": "daa33270da772c064b66eeaab8ac9c41b00d539f09b00a71b64a5e7cd0a067f8",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/GenericLibraryChecks.cs": "6156c1df8d2e9d6aeb1e286f423df16b1aeaa0a8e9ad35d4bff480c4af200a05",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/RavenUnionMetadata.cs": "639a88f476bd96159c4dd5eb6203a9fa871bed5cf4eb8e0bafca4c9c44f8345a",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/FileBindings.cs": "2a80ded24f7433f0c388a2a59d567e83d37807de56edb461d56ec384bcb7fe9d",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/TaskRunChecks.cs": "49b62db43152783d8664dc9577199974362071511d119980d6fdd89f9667d4a4",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/InstanceLibraryChecks.cs": "172a54a1ac036d4b5c9433100a4e035a8678d661cfc8aa39d0b6f759ca7cdfb6",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/CancellationBindings.cs": "85768b657a55d99dda5408412da303031d145b52f5b8980c8a3b0649e1324115",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/LibraryImplementation.cs": "ff63b00ae2172b745aaeb907838e894e44790d8fe5d28e174b62f38008aabe82",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/PropagationImportChecks.cs": "35c63ea2f58c0beddcb7ff3917e512c23c728b6f29800c79ef204de7b8a024ff",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/StandardUnionLibrary.cs": "4028e1c0f711f45214b5804645fbaff604bee7dddf0dce23f9b794ee2a619342",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ArrayCallbackBindings.cs": "bd2f4a6960bd42676d27a3626a0d7de472389681f49bfb82a315b4e80c75fee1",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ApplicationSpecializationChecks.cs": "6eaa98124410d913c9420df575ae7db920c38343234178377717f3e86682cc72",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/StandardUnionReference.cs": "5bbc82e1768b7656ef3d45ef043cf6e7faad1346e0379fa6b70535c733e03131",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/GCChecks.cs": "734a6efe3a2d8b497915d7ef116c86e977ce88b4535cd7c629bff453924b0911",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/ArrayImportChecks.cs": "e686fff0469e465d2b4fca85a908fd7a62db207a92a282178285343b08263763",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/Program.cs": "3870260eadaa1293f93bd32637c1f4e4751c1653134ea43112999c6f58743de9",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/bin/Debug/net11.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/bin/Debug/net11.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/bin/Debug/net11.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/bin/Debug/net11.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/bin/Debug/net11.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "388b199d99a5183bc0ebeef5cf2b2a67aeb2b42b8416fc83e497a679461010af",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/bin/Debug/net11.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/bin/Debug/net11.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+      "/private/tmp/neoclr-clean1007/docs/experiments/raven-target/bin/Debug/net11.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+      "/private/tmp/neoclr-clean1007/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Experimental.dll": "54534925445ddff1d19e4238eb9382942c36e68f1984f50d55017e034df0da7e",
+      "/private/tmp/clean-bootstrap1007/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+      "/private/tmp/clean-bootstrap1007/System.neoil": "9fea1d695165de86f4c2f5c79d3752d978388b465d3f71cd8ae96a4056d46fca",
+      "/private/tmp/clean-bootstrap1007/System.bootstrap.json": "27a2c0fadd13c3adc2ab370ed02f7abb79facb5a744ad0d8e402b7e062d2e42c",
+      "/private/tmp/clean-bootstrap1007/System.retained.json": "b7109d22f3da3906825bf00bc4f696c8aa759d8e88cd9cb029450a5897b0243a",
+      "/private/tmp/clean-bootstrap1007/System.neox": "75e0411fcf2b98bffa4511d80bdfb34b76657e033a6c313390688d124cdd70d1"
+    }
+  },
+  "libraryBuildCommands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/tmp/neoclr-clean1007/runtime/raven/projects/System.Runtime/System.Runtime.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /private/tmp/neoclr-clean1007/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll\n",
+      "stderr": "warning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0331: Member 'char.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\ninfo RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'double' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'double' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'double' to 'double' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'double' to 'double' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'double' to 'double' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'double' to 'double' is unnecessary because an implicit conversion exists.\nwarning RAV0162: Unreachable code\nwarning RAV0331: Member 'EnvironmentError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0331: Member 'int.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\ninfo RAV1508: Explicit cast from 'int' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV0162: Unreachable code\nwarning RAV0331: Member 'long.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\ninfo RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'long' to 'long' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'long' to 'long' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'long' to 'long' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'long' to 'long' is unnecessary because an implicit conversion exists.\nwarning RAV2103: This catch-all never matches.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0331: Member 'InvalidDateError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0331: Member 'InvalidRangeError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0331: Member 'InvalidTimeError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\ninfo RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\nwarning RAV2103: This catch-all never matches.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\nwarning RAV0403: The '!' operator treats the operand as non-null\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0331: Member 'OverflowError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\nwarning RAV0162: Unreachable code\ninfo RAV1508: Explicit cast from 'int' to 'float' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'float' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'float' to 'float' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'float' to 'float' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'float' to 'float' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'float' to 'float' is unnecessary because an implicit conversion exists.\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\nwarning RAV0331: Member 'InvalidPathError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\nwarning RAV2103: This catch-all never matches.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0331: Member 'InvalidUtf8Error.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\nwarning RAV2103: This catch-all never matches.\nwarning RAV2103: This catch-all never matches.\nwarning RAV0162: Unreachable code\ninfo RAV1508: Explicit cast from 'uint' to 'uint' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'uint' to 'uint' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'uint' to 'uint' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'uint' to 'uint' is unnecessary because an implicit conversion exists.\nwarning RAV0162: Unreachable code\ninfo RAV1508: Explicit cast from 'ulong' to 'ulong' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'ulong' to 'ulong' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'ulong' to 'ulong' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'ulong' to 'ulong' is unnecessary because an implicit conversion exists.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\nwarning RAV0168: 'offset' shadows a previous declaration.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/neoclr-clean1007/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll",
+        "/private/tmp/clean-bootstrap1007/System.retained.json",
+        "/private/tmp/clean-libraries1007/System.runtime.neox",
+        "--reference",
+        "/private/tmp/neoclr-clean1007/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Wrote 51500 bytes. Runtime semantic validation is required.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/tmp/neoclr-clean1007/runtime/raven/projects/System.Data/System.Data.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /private/tmp/neoclr-clean1007/runtime/raven/projects/System.Data/bin/neoclr/System.Data.dll\n",
+      "stderr": "warning RAV2103: This catch-all never matches.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/tmp/neoclr-clean1007/runtime/raven/projects/System.Networking/System.Networking.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /private/tmp/neoclr-clean1007/runtime/raven/projects/System.Networking/bin/neoclr/System.Networking.dll\n",
+      "stderr": "warning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV2103: This catch-all never matches.\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/tmp/neoclr-clean1007/runtime/raven/projects/System.Web/System.Web.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /private/tmp/neoclr-clean1007/runtime/raven/projects/System.Web/bin/neoclr/System.Web.dll\n",
+      "stderr": "info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV0162: Unreachable code\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0168: 'reason' shadows a previous declaration.\nwarning RAV2103: This catch-all never matches.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV0168: 'active' shadows a previous declaration.\nwarning RAV0168: 'active' shadows a previous declaration.\nwarning RAV0168: 'active' shadows a previous declaration.\nwarning RAV0162: Unreachable code\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n"
+    }
+  ],
+  "extracted": {
+    "passed": true,
+    "root": "/private/tmp/clean release extracted1007/neoclr-native-poc",
+    "commands": [
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/collections/App.rvnproj"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /private/tmp/clean release extracted1007/neoclr-native-poc/samples/collections/bin/neoclr/App.dll\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/bin/neoclr",
+          "run",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/collections/bin/neoclr/App.dll",
+          "--system",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+          "--object-root",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+          "--instructions",
+          "100000000"
+        ],
+        "exitCode": 0,
+        "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/tasks/App.rvnproj"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /private/tmp/clean release extracted1007/neoclr-native-poc/samples/tasks/bin/neoclr/App.dll\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/bin/neoclr",
+          "run",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/tasks/bin/neoclr/App.dll",
+          "--system",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+          "--object-root",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+          "--instructions",
+          "100000000"
+        ],
+        "exitCode": 0,
+        "stdout": "Suspended\n42\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/json/App.rvnproj"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /private/tmp/clean release extracted1007/neoclr-native-poc/samples/json/bin/neoclr/App.dll\n",
+        "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n"
+      },
+      {
+        "command": [
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/bin/neoclr",
+          "run",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/json/bin/neoclr/App.dll",
+          "--system",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+          "--object-root",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+          "--instructions",
+          "100000000"
+        ],
+        "exitCode": 0,
+        "stdout": "JSON object mapping checks passed\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/http-json-server/App.rvnproj"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /private/tmp/clean release extracted1007/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll\n",
+        "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/http-json-client/App.rvnproj"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /private/tmp/clean release extracted1007/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll\n",
+        "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\nwarning RAV0162: Unreachable code\n"
+      },
+      {
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/tools/verify-native-http-json.py",
+          "--runtime",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/bin/neoclr",
+          "--server",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll",
+          "--client",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll",
+          "--seed",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+          "--module",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+          "--object-root",
+          "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+          "--output",
+          "/tmp/clean-release-acceptance1007-http.json"
+        ],
+        "exitCode": 0,
+        "stdout": "Native HTTP/JSON server requests passed\nNative HTTP/JSON client/server pair passed\n",
+        "stderr": ""
+      }
+    ],
+    "verifiedFiles": 1028,
+    "http": {
+      "inputs": {
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/bin/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll": "cd5990cc692e2be764a84cdf22ab83c5b1e19ec21f17459c97c9b3e749f55da5",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll": "23755ea9b74e35a7b7fa1151c89ca8390a9e37a3a7add52dd3d645a6c5855bdf",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll": "fdf3c7866a8cae147578bc315a2c6b72eea4edb08d2a496a6134c662c8aa12df",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll": "7c33d97e0e65a23876e300fdddc069b03fad6bc87ffb7c1bea4333f21f0e9ea2",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll": "2ceee479056bca82e9752f81d84881db118dc106af5efa8cf121c345ea94ce7b"
+      },
+      "runs": [
+        {
+          "serverCommand": [
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/bin/neoclr",
+            "run",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll",
+            "--system",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+            "--instructions",
+            "100000000",
+            "--module",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+            "--module",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+            "--module",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+            "--module",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+            "--object-root",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+            "--",
+            "4"
+          ],
+          "requests": [
+            {
+              "method": "GET",
+              "path": "/report",
+              "status": 200,
+              "body": {
+                "station": "Caf\u00e9"
+              }
+            },
+            {
+              "method": "POST",
+              "path": "/reports",
+              "status": 201,
+              "body": {
+                "accepted": true
+              }
+            },
+            {
+              "method": "POST",
+              "path": "/reports",
+              "status": 400,
+              "body": {
+                "error": "Invalid report"
+              }
+            },
+            {
+              "method": "GET",
+              "path": "/missing",
+              "status": 404,
+              "body": {
+                "error": "Not found"
+              }
+            }
+          ],
+          "port": "57315",
+          "server": {
+            "exitCode": 0,
+            "stdout": "Reports served\n",
+            "stderr": ""
+          }
+        },
+        {
+          "serverCommand": [
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/bin/neoclr",
+            "run",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll",
+            "--system",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+            "--instructions",
+            "100000000",
+            "--module",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+            "--module",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+            "--module",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+            "--module",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+            "--object-root",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+            "--",
+            "2"
+          ],
+          "requests": [],
+          "port": "57325",
+          "clientCommand": [
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/bin/neoclr",
+            "run",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll",
+            "--system",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+            "--instructions",
+            "100000000",
+            "--module",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+            "--module",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+            "--module",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+            "--module",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+            "--object-root",
+            "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+            "--",
+            "http://127.0.0.1:57325/"
+          ],
+          "client": {
+            "exitCode": 0,
+            "stdout": "{\"accepted\":true}\n",
+            "stderr": ""
+          },
+          "server": {
+            "exitCode": 0,
+            "stdout": "Reports served\n",
+            "stderr": ""
+          }
+        }
+      ],
+      "passed": true
+    }
+  },
+  "editor": {
+    "vscode": "1.140.0",
+    "checks": [
+      "native imported hover",
+      "native imported Markdown documentation hover",
+      "native Markdown sidecar edit refreshes hover",
+      "native XML fallback after Markdown member deletion",
+      "read-only metadata declaration navigation",
+      "native imported completion",
+      "native imported completion documentation",
+      "actual file watcher invalidates replaced native library",
+      "unsaved buffer survives native workspace reload",
+      "missing native reference produces a project diagnostic",
+      "native dependency recovery clears the project diagnostic",
+      "System.Data.Json.JsonValue native hover and metadata navigation",
+      "shipped native Networking documentation appears in hover",
+      "System.Networking.IPAddress native hover and metadata navigation",
+      "System.Web.Http.HttpClient native hover and metadata navigation",
+      "imported bundle configuration edit produces project diagnostic",
+      "restored bundle configuration recovers the workspace",
+      "unchanged broad sample imports source-built class library",
+      "native Option and Result type hovers retain union kind and constructed arguments",
+      "repeated broad-sample type and query hovers return symbols",
+      "broad-sample hovers return after unsaved edits",
+      "configured VS Code native build task",
+      "VS Code task executes exact broad-sample output on native runtime",
+      "failed build preserves last successful artifact",
+      "ordinary .NET editor hover and diagnostics",
+      "unchanged Tasks/await sample builds and executes from VS Code"
+    ],
+    "passed": true,
+    "hoverTimings": [
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:02.250Z",
+        "elapsedMs": 37,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:02.790Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:03.292Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:03.795Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:04.296Z",
+        "elapsedMs": 0,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:04.799Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:05.302Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:05.805Z",
+        "elapsedMs": 0,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:06.308Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:06.810Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:07.313Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:07.816Z",
+        "elapsedMs": 1709,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:09.527Z",
+        "elapsedMs": 26,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:10.054Z",
+        "elapsedMs": 2987,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:13.041Z",
+        "elapsedMs": 1123,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:14.667Z",
+        "elapsedMs": 1601,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:20.294Z",
+        "elapsedMs": 412,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T17:30:21.209Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 43,
+        "startedAt": "2026-10-07T17:30:27.257Z",
+        "elapsedMs": 645,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 44,
+        "startedAt": "2026-10-07T17:30:27.916Z",
+        "elapsedMs": 50,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Probe.rvn",
+        "line": 0,
+        "character": 42,
+        "startedAt": "2026-10-07T17:30:27.980Z",
+        "elapsedMs": 66,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:33.629Z",
+        "elapsedMs": 826,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T17:30:34.456Z",
+        "elapsedMs": 17,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T17:30:34.473Z",
+        "elapsedMs": 8,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:34.481Z",
+        "elapsedMs": 6,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T17:30:34.487Z",
+        "elapsedMs": 2,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T17:30:34.489Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 90,
+        "character": 26,
+        "startedAt": "2026-10-07T17:30:34.492Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 91,
+        "character": 10,
+        "startedAt": "2026-10-07T17:30:34.496Z",
+        "elapsedMs": 5,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:34.501Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T17:30:34.503Z",
+        "elapsedMs": 2,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T17:30:34.506Z",
+        "elapsedMs": 5,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 90,
+        "character": 26,
+        "startedAt": "2026-10-07T17:30:34.511Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 91,
+        "character": 10,
+        "startedAt": "2026-10-07T17:30:34.513Z",
+        "elapsedMs": 2,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:34.515Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T17:30:34.519Z",
+        "elapsedMs": 2,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T17:30:34.521Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 90,
+        "character": 26,
+        "startedAt": "2026-10-07T17:30:34.524Z",
+        "elapsedMs": 8,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 91,
+        "character": 10,
+        "startedAt": "2026-10-07T17:30:34.532Z",
+        "elapsedMs": 10,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:34.546Z",
+        "elapsedMs": 57,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:34.605Z",
+        "elapsedMs": 62,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:34.669Z",
+        "elapsedMs": 56,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/clean-editor1007-dotnet/Main.rvn",
+        "line": 0,
+        "character": 35,
+        "startedAt": "2026-10-07T17:30:51.071Z",
+        "elapsedMs": 727,
+        "hasResult": true
+      }
+    ],
+    "lastHover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+    "diagnostics": [],
+    "hover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+    "completion": [
+      {
+        "label": "VersionOne",
+        "description": "EditorApi"
+      }
+    ],
+    "bundleHovers": {
+      "System.Data.Json.JsonValue": "```raven\nsealed class JsonValue\n```\n\nType in `Json`",
+      "System.Networking.IPAddress": "```raven\nsealed class IPAddress: EquatableTo<IPAddress>\n```\n\nType in `Networking`\n\n---\n\nAn immutable IP address in the closed IPv4 and IPv6 family.",
+      "System.Web.Http.HttpClient": "```raven\nclass HttpClient\n```\n\nType in `Http`"
+    },
+    "unionHovers": {
+      "Option<Order>": "```raven\nunion struct Option<Order>: Propagatable<Option<Order>, Order, void>\n```\n\nType in `System`",
+      "Result<Order, SingleError>": "```raven\nunion struct Result<Order, SingleError>: Propagatable<Result<Order, SingleError>, Order, SingleError>\n```\n\nType in `System`"
+    },
+    "repeatedMainHovers": [
+      {
+        "round": 0,
+        "term": "ArrayList",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:34.481Z",
+        "elapsedMs": 6,
+        "hasResult": true
+      },
+      {
+        "round": 0,
+        "term": "Option<Order>",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T17:30:34.487Z",
+        "elapsedMs": 2,
+        "hasResult": true
+      },
+      {
+        "round": 0,
+        "term": "Result<Order, SingleError>",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T17:30:34.489Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "round": 0,
+        "term": "Filter(",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 90,
+        "character": 26,
+        "startedAt": "2026-10-07T17:30:34.492Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "round": 0,
+        "term": ".Map(",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 91,
+        "character": 10,
+        "startedAt": "2026-10-07T17:30:34.496Z",
+        "elapsedMs": 5,
+        "hasResult": true
+      },
+      {
+        "round": 1,
+        "term": "ArrayList",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:34.501Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "round": 1,
+        "term": "Option<Order>",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T17:30:34.503Z",
+        "elapsedMs": 2,
+        "hasResult": true
+      },
+      {
+        "round": 1,
+        "term": "Result<Order, SingleError>",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T17:30:34.506Z",
+        "elapsedMs": 5,
+        "hasResult": true
+      },
+      {
+        "round": 1,
+        "term": "Filter(",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 90,
+        "character": 26,
+        "startedAt": "2026-10-07T17:30:34.511Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "round": 1,
+        "term": ".Map(",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 91,
+        "character": 10,
+        "startedAt": "2026-10-07T17:30:34.513Z",
+        "elapsedMs": 2,
+        "hasResult": true
+      },
+      {
+        "round": 2,
+        "term": "ArrayList",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:34.515Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "round": 2,
+        "term": "Option<Order>",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T17:30:34.519Z",
+        "elapsedMs": 2,
+        "hasResult": true
+      },
+      {
+        "round": 2,
+        "term": "Result<Order, SingleError>",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T17:30:34.521Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "round": 2,
+        "term": "Filter(",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 90,
+        "character": 26,
+        "startedAt": "2026-10-07T17:30:34.524Z",
+        "elapsedMs": 8,
+        "hasResult": true
+      },
+      {
+        "round": 2,
+        "term": ".Map(",
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 91,
+        "character": 10,
+        "startedAt": "2026-10-07T17:30:34.532Z",
+        "elapsedMs": 10,
+        "hasResult": true
+      }
+    ],
+    "postEditMainHovers": [
+      {
+        "round": 0,
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:34.546Z",
+        "elapsedMs": 57,
+        "hasResult": true
+      },
+      {
+        "round": 1,
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:34.605Z",
+        "elapsedMs": 62,
+        "hasResult": true
+      },
+      {
+        "round": 2,
+        "uri": "file:///private/tmp/clean-editor1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T17:30:34.669Z",
+        "elapsedMs": 56,
+        "hasResult": true
+      }
+    ],
+    "stdout": "Native build output: /private/tmp/clean-editor1007/bin/neoclr/App.dll\nDuplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n"
+  },
+  "hashes": {
+    "/tmp/clean-distribution1007/neoclr-native-poc.tar.gz": "2e72c031f31e90f81c4712739408781c54b339e0bfe5512754d09cce2ce51a48",
+    "/tmp/clean release extracted1007/neoclr-native-poc/manifest.json": "ce3869e1ce30b616d60a577978a858a10a2b60e35d1f7943db2c1076ff561909",
+    "/tmp/clean release extracted1007/neoclr-native-poc/provenance.json": "51dcae859fc3994525395a90d6be0624838111e0b5eaeb2caf70f08485ba897a",
+    "/tmp/clean release extracted1007/neoclr-native-poc/bin/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/tmp/clean release extracted1007/neoclr-native-poc/editor/raven-vscode.vsix": "0e547556bdabb45cf71044b4f5b2c4b901133850c7a8c754ad3ecd784e5612f8",
+    "/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d",
+    "/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/language-server/Raven.LanguageServer.dll": "4899034a4f80d0b0a8060c1377dbeb9e021b225bf68f63e292bd287e97fa39d7",
+    "/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/language-server/Raven.Macros.dll": "fb65a3d7cefa04509c7720540d4892b3ec2517daab0b699be26ac7d024aa4ade",
+    "/private/tmp/neoclr-clean1007/Cargo.lock": "155d398eeeab5f2ede5c1cc5260de3978af54ba80e9196359919704123bdd51c",
+    "/private/tmp/raven-clean1007/scripts/package-sdk.sh": "b4c8e4e53cf921670eda28b03b426db425ef74484059ba6b0cf5e6e3bd1166ae",
+    "/private/tmp/raven-clean1007/src/Raven.VSCode/package-lock.json": "1aa32d5def5c58d02e8185670f57094ccf3f5a2d8221a62cff6ac92b3b4e8563",
+    "/tmp/neoclr-clean-runtime1007.log": "f879a74b4bfb7e1293dac8b1f75d9e86e4341f0e09d730c10601b87513dbe8b9",
+    "/tmp/neoclr-clean-runtime-retry1007.log": "ded015341aeffe159ebb9c119778fad5a2c9910ee53ad2558c7c2af1b04235f7",
+    "/tmp/clean-sdk-build1007.log": "452aba5521348c5d95c92073c549e022df4be2f5075c3f58f2599cc3fa496027",
+    "/tmp/clean-sdk-retry1007.log": "08d93b8cab251f3d5b2afa3c7a413630623e1322e057db4521f7e889377f0c88",
+    "/tmp/clean-metadata-retry1007.log": "02906a2467af9229aa9274a8a43c060555f63498fb95f5274c9abe8c1b556ce0",
+    "/tmp/clean-probe1007.log": "51ca5a4bc9d805e6d51dc2f9830ed15fe46401899a197570b0b6f77408858526",
+    "/tmp/clean-probe-retry1007.log": "78bffd745ddab5a880ac68c1551e2a3c9daf06aed33677f7ff317170e251f320",
+    "/tmp/clean-translator1007.log": "f975e60d183012244b914560971de4b19e07e3d2448dd30b41405797833de187",
+    "/tmp/clean-extension-install1007.log": "075b90ee6e3b8b316a689594a92353f17ecbe9713ec4768ff0e0ad0b361ba5da",
+    "/tmp/clean-extension-build1007.log": "9efa60ac00a576e9be479b7c9a30fff68d8bfd2180c780b841f9346150dd57c9",
+    "/tmp/clean-vsix1007.log": "0045af68aff3124ca0465907c986b3360c365fe9cc75b5bd69c5be6cdbef87fd",
+    "/tmp/clean-editor-install1007.log": "2affc647152acff438c091ca1f79877a8ab9c45de99cb3e66ef309e90204c40a"
+  },
+  "limits": [
+    "Installed tools/package caches retained; no offline or cache-free restore claim",
+    "macOS arm64 only; no Linux/Windows qualification",
+    "VS Code test harness uses installed package directory as extensionDevelopmentPath",
+    "Existing persistent-hover report not reproduced or fixed",
+    "No publication, final version selection or main merge"
+  ]
+}

@@ -33,7 +33,11 @@ python3 scripts/prepare-native-bootstrap.py \
   --output /absolute/path/fresh-bootstrap
 ```
 
-Build the runtime with `cargo build --release` first. Select the matching Raven source
+Build the runtime with `cargo build --release` first. When producing a matching SDK,
+finish SDK packaging before building the probe/translator against the same project
+outputs. Use canonical absolute paths. See the
+[clean-source reproduction](../../../docs/experiments/extended-cli-metadata/clean-bootstrap-reproduction-2026-10-07.md)
+for the pinned revisions, toolchain prerequisites and validation limits. Select the matching Raven source
 revision explicitly. Use the generated `Core.dll` and bootstrap directory in the staged
 build command below. `bootstrap.json` is written last; when present, the library builder
 validates all preparation hashes and rejects a different selected core. The old audit

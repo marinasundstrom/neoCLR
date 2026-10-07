@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Record independent-checkout macOS arm64 bootstrap/distribution qualification from
+  pinned NeoCLR/Raven sources. Document explicit compatible Apple SDK selection and
+  sequential shared-project builds after preserving initial toolchain/reference-output
+  failures. No runtime/compiler semantics changed; other platforms and final release
+  publication are not implied by this local evidence. Nine extracted compile/run
+  commands and all 26 installed-package editor checks pass.
+
 - Prepare primitive Core and source-owned retained-seed inputs from checked-in sources
   without old Numbers/Http artifacts. Record generator commands/hashes and validate
   prepared bootstrap inputs before class-library builds. This removes temporary input
