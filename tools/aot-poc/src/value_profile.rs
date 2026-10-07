@@ -72,11 +72,11 @@ impl<'a> Profile<'a> {
                     f.deferred
                         || !matches!(
                             f.ty,
-                            Type::Int32 | Type::Byte | Type::Boolean | Type::Named(_)
+                            Type::Int32 | Type::Byte | Type::Boolean | Type::String | Type::Named(_)
                         )
                 })
             {
-                return Err(format!("{}: value profile requires nongeneric records with at most eight Int32/Byte/Boolean/local-record fields", t.name).into());
+                return Err(format!("{}: value profile requires nongeneric records with at most eight Int32/Byte/Boolean/String/local-record fields", t.name).into());
             }
         }
         let mut p = Self {
@@ -283,6 +283,14 @@ impl<'a> Profile<'a> {
             _ => vec![false; self.lanes(t)],
         }
     }
+    pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
+        match t {
+            Ty::Literal | Ty::Address(_) => vec![true],
+            Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
+                .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
+            _ => vec![false; self.lanes(t)],
+        }
+    }
     pub fn lanes(&self, t: &Ty) -> usize {
         match t {
             Ty::Record(i) => self.widths[*i],
@@ -291,11 +299,9 @@ impl<'a> Profile<'a> {
         }
     }
     pub fn bytes(&self, t: &Ty) -> u32 {
-        if matches!(t, Ty::Address(_) | Ty::Literal) {
-            8
-        } else {
-            self.lanes(t) as u32 * 4
-        }
+        // Private slots use eight bytes per scalar lane so mixed pointer/Int32
+        // records remain aligned. This is not an external aggregate ABI.
+        self.lanes(t) as u32 * 8
     }
     pub fn field_offset(&self, t: &Ty, index: usize) -> usize {
         let t = if let Ty::Address(t) = t {
@@ -585,11 +591,9 @@ impl<'a> Profile<'a> {
                 | Op::DivideUnsigned
                 | Op::Remainder
                 | Op::RemainderUnsigned => (),
+                Op::IsInstance(Type::String) | Op::CastClass(Type::String) | Op::ReferenceIsNull => (),
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
-                }
-                Op::InitializeObject(Type::String) => {
-                    return Err(fail(pc, "String default requires a later ownership profile"));
                 }
                 Op::InitializeObject(Type::Value) => {
                     return Err(fail(pc, "Value has no default initialization"));
@@ -668,6 +672,14 @@ impl<'a> Profile<'a> {
                         take(&mut stack, &self.ty(&f.ty)?)?;
                     }
                     stack.push(t);
+                }
+                Op::IsInstance(Type::String) | Op::CastClass(Type::String) => {
+                    take(&mut stack, &Ty::Literal)?;
+                    stack.push(Ty::Literal);
+                }
+                Op::ReferenceIsNull => {
+                    take(&mut stack, &Ty::Literal)?;
+                    stack.push(Ty::Bool);
                 }
                 Op::Field(n) | Op::FieldAddress(n) => {
                     let owner = pop(&mut stack)?;

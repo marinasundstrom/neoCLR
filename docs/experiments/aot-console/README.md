@@ -127,8 +127,9 @@ headers, preserves old strings across later conversions, and publishes a pointer
 on success. Pointer copies across locals, calls and output slots remain valid until
 this invocation's storage is reused/released. **Render dynamic fault messages before
 the next entry call or releasing the buffer.** The Int32 root signature prevents guest
-String results escaping the invocation. Reference fields, String erasure, arbitrary
-host String inputs, persistent guest state and default/null strings remain rejected.
+String results escaping the invocation. At this slice, String fields and defaults were still rejected. The subsequent
+text-bearing-value slice below admits copied String fields and null defaults; String
+erasure, arbitrary host inputs and persistent guest state remain rejected.
 The POC does not use reference counting, finalizers, a tracing collector, TLS or a
 process-global allocation list. The host example chooses a 64 KiB stack buffer;
 that size is sample policy, not a platform default.
@@ -148,3 +149,37 @@ unchanged result/cursor/output and surrounding canaries, reject malformed arena 
 and reuse a context after failure. Versions 2/3 remain unchanged when no dynamic text
 producer is selected. The next Console dependencies are wider numeric/text primitives
 and the ordinary stream/reference path used by Write and ReadLine.
+
+## Text-bearing values and patterns (2026-10-08)
+
+Copied records can now contain String fields, including nested values and closed
+String-valued generic carriers. Text pointers still refer only to the image or the
+current invocation arena; copying/replacing a field does not free or mutate its text.
+Private aggregate slots are eight-byte padded lanes with individual I32/I64 types,
+so a pointer between byte/integer fields is never truncated or misaligned. Up to eight
+flattened lanes (64 private bytes) remain admitted; these slots are not a public
+aggregate ABI. Public scalar entry and context layouts are unchanged.
+
+String defaults use the interpreter's null representation, including inactive union
+payloads. Exact String-to-String `isinst`/`castclass` and String `ref.isnull` support
+Raven's generated payload pattern checks. General object casts/dispatch are still
+rejected. Native WriteLine and failure services check null String arguments before
+reading the pointer and preserve the interpreter's RuntimeError code/message/trace.
+This deliberately retains existing neoCLR behavior rather than adopting .NET's null
+Console string formatting behavior as an unrelated change. No new source/compiler
+bridge encoding is introduced.
+
+`text-values.rvn` exercises nested record copies, mutation, control-flow joins,
+Some<string>, None and both `let ... else` and `if let`; run
+`verify_interactive.py --text-values` for fresh Raven/interpreter/native evidence.
+`text-records.neoil` additionally tests invocation-produced text in mixed records,
+output copies and interior field borrows, compared with interpreter output at Int32
+endpoints. Erased String payloads, arbitrary host String inputs, persistent storage,
+reference objects, arrays and virtual dispatch remain outside this profile. The
+bounded text-region ownership contract still applies to every copied pointer.
+
+This is the representation layer needed by .NET-like reference-bearing structs and
+neoCLR's String-valued Option/Result APIs; it does not claim a general GC-compatible
+layout or collection policy. It trades larger padded private storage for a simple
+mixed-width implementation. No performance advantage is asserted. ReadLine remains
+an ordinary stream-library consumer and is not replaced with a special Console body.

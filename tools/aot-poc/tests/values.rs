@@ -1759,9 +1759,8 @@ fn raven_literal_transport_compiles_from_pe_and_neox() {
 }
 
 #[test]
-fn literal_profile_rejects_defaults_erasure_fields_and_uninitialized_copies() {
+fn text_profile_rejects_erasure_and_uninitialized_copies() {
     for (declarations, body) in [
-        (".local String text", "ldloca text\ninitobj String\nldc.i4 0\nret"),
         (".local String text", "ldloc text\npop\nldc.i4 0\nret"),
         ("", "ldstr \"no erasure\"\nvalue.pack String\npop\nldc.i4 0\nret"),
         (".local String text", "ldc.i4 0\nstloc text\nldc.i4 0\nret"),
@@ -1774,9 +1773,5 @@ fn literal_profile_rejects_defaults_erasure_fields_and_uninitialized_copies() {
         assert!(!temp.0.join("value.o").exists());
         assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
     }
-    let m = neoclr::assemble(".module LiteralField\n.type Box\n.field text String\n.end\n.function Main() -> Int32\nldstr \"field\"\nnewobj Box\npop\nldc.i4 0\nret\n.end").unwrap();
-    let temp = Temp::new();
-    let result = compile_mode(&neoclr::metadata_container::write_module(&m).unwrap(), &temp, "Main", true);
-    assert!(!result.status.success());
-    assert!(!temp.0.join("value.o").exists());
+
 }

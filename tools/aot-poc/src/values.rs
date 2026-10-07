@@ -14,12 +14,8 @@ use cranelift_object::{ObjectBuilder, ObjectModule};
 use neoclr::metadata::Instruction as Op;
 use profile::{Profile, Ty};
 
-fn lane(t: &Ty) -> ir::Type {
-    if matches!(t, Ty::Address(_) | Ty::Literal) {
-        types::I64
-    } else {
-        types::I32
-    }
+fn lanes(p: &Profile<'_>, t: &Ty) -> Vec<ir::Type> {
+    p.pointer_lanes(t).into_iter().map(|pointer| if pointer { types::I64 } else { types::I32 }).collect()
 }
 fn read(
     b: &mut FunctionBuilder<'_>,
@@ -27,17 +23,17 @@ fn read(
     t: &Ty,
     pointer: ir::Value,
 ) -> Vec<ir::Value> {
-    (0..p.lanes(t))
-        .map(|i| {
+    lanes(p, t).into_iter().enumerate()
+        .map(|(i, ty)| {
             b.ins()
-                .load(lane(t), MemFlags::new(), pointer, i as i32 * 4)
+                .load(ty, MemFlags::new(), pointer, i as i32 * 8)
         })
         .collect()
 }
 fn write(b: &mut FunctionBuilder<'_>, pointer: ir::Value, values: &[ir::Value]) {
     for (i, value) in values.iter().enumerate() {
         b.ins()
-            .store(MemFlags::new(), *value, pointer, i as i32 * 4);
+            .store(MemFlags::new(), *value, pointer, i as i32 * 8);
     }
 }
 fn normalize(
@@ -135,7 +131,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         let mut sig = module.make_signature();
         for t in &p.args[i] {
             sig.params
-                .extend((0..p.lanes(t)).map(|_| AbiParam::new(lane(t))));
+                .extend(lanes(&p, t).into_iter().map(AbiParam::new));
         }
         sig.params.push(AbiParam::new(types::I64)); // caller-owned result storage
         if details.is_some() { sig.params.push(AbiParam::new(types::I64)); }
@@ -183,6 +179,13 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             }
             if details.is_some_and(|d| d.console_write_line.contains(&i)) {
                 let service = module.declare_func_in_func(output_service.unwrap(), b.func);
+                // Preserve the interpreter's invalid-native-argument RuntimeError
+                // for default/null String instead of dereferencing address zero.
+                let null = b.ins().icmp_imm(IntCC::Equal, parameters[0], 0);
+                let null_status = b.ins().iconst(types::I32, 3);
+                let mut null_site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                null_site.capture_frame = false;
+                return_if_detailed(&mut b, null, null_status, Some(&null_site));
                 let length = b.ins().load(types::I64, MemFlags::new(), parameters[0], 0);
                 let bytes = b.ins().iadd_imm(parameters[0], 8);
                 let call = b.ins().call(service, &[bytes, length]);
@@ -222,7 +225,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
-            let mut frame_bytes = 32usize;
+            let mut frame_bytes = 64usize;
             let mut arguments = vec![];
             let mut at = 0;
             for t in &p.args[i] {
@@ -240,9 +243,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     slot(&mut b, p.bytes(t))
                 })
                 .collect();
-            // All profile return values fit in eight 32-bit lanes; snapshots are read
+            // All profile return values fit in eight padded scalar lanes; snapshots are read
             // immediately after each successful call, before this storage can be reused.
-            let call_result = slot(&mut b, 32);
+            let call_result = slot(&mut b, 64);
             let mut constructors = std::collections::HashMap::new();
             for (pc, op) in f.body.iter().enumerate() {
                 if let Op::Construct(target) = op {
@@ -258,8 +261,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             for (pc, stack) in flows[i].iter().enumerate() {
                 if let Some(stack) = stack {
                     for t in stack {
-                        for _ in 0..p.lanes(t) {
-                            b.append_block_param(blocks[pc], lane(t));
+                        for lane in lanes(&p, t) {
+                            b.append_block_param(blocks[pc], lane);
                         }
                     }
                 }
@@ -279,6 +282,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     Op::String(_) => {
                         let data = module.declare_data_in_func(literals[&(i, pc)], b.func);
                         stack.push(b.ins().global_value(types::I64, data));
+                    }
+                    Op::IsInstance(neoclr::metadata::Type::String) | Op::CastClass(neoclr::metadata::Type::String) => (),
+                    Op::ReferenceIsNull => {
+                        let value = pop(&mut stack);
+                        let is_null = b.ins().icmp_imm(IntCC::Equal, value, 0);
+                        stack.push(b.ins().uextend(types::I32, is_null));
                     }
                     Op::ConvertInt32 => (),
                     Op::ConvertUInt8 => {
@@ -348,8 +357,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     Op::InitializeObject(t) => {
                         let address = pop(&mut stack);
                         let ty = p.ty(t)?;
-                        let zero = b.ins().iconst(types::I32, 0);
-                        write(&mut b, address, &vec![zero; p.lanes(&ty)]);
+                        let zeros: Vec<_> = lanes(&p, &ty).into_iter().map(|t| b.ins().iconst(t, 0)).collect();
+                        write(&mut b, address, &zeros);
                     }
                     Op::LoadObject(t) => {
                         let address = pop(&mut stack);
@@ -377,7 +386,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let offset = p.field_offset(top(), *n);
                         if matches!(top(), Ty::Address(_)) {
                             let owner = pop(&mut stack);
-                            let address = b.ins().iadd_imm(owner, (offset * 4) as i64);
+                            let address = b.ins().iadd_imm(owner, (offset * 8) as i64);
                             if matches!(op, Op::FieldAddress(_)) {
                                 stack.push(address);
                             } else {
@@ -395,7 +404,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let value = normalize(&mut b, &p, &p.field(owner, *n)?, &value);
                         if matches!(owner, Ty::Address(_)) {
                             let owner = pop(&mut stack);
-                            let address = b.ins().iadd_imm(owner, (offset * 4) as i64);
+                            let address = b.ins().iadd_imm(owner, (offset * 8) as i64);
                             write(&mut b, address, &value);
                             stack.push(b.ins().iconst(types::I32, 0)); // inhabited Void
                         } else {
@@ -415,8 +424,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let constructed = if construct {
                             let t = p.ty(target.owner.as_ref().unwrap())?;
                             let address = b.ins().stack_addr(types::I64, constructors[&pc], 0);
-                            let zero = b.ins().iconst(types::I32, 0);
-                            write(&mut b, address, &vec![zero; p.lanes(&t)]);
+                            let zeros: Vec<_> = lanes(&p, &t).into_iter().map(|t| b.ins().iconst(t, 0)).collect();
+                            write(&mut b, address, &zeros);
                             call_args.insert(0, address);
                             Some((t, address))
                         } else {
@@ -439,7 +448,13 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     Op::Fault(_) => {
                         if details.is_some_and(|d| d.user_faults.contains(&i)) {
                             let pointer = b.ins().stack_load(types::I64, arguments[0], 0);
-                            site.as_mut().unwrap().message = Some(pointer);
+                            let diagnostic = site.as_mut().unwrap();
+                            diagnostic.message = None;
+                            diagnostic.capture_frame = false;
+                            let null = b.ins().icmp_imm(IntCC::Equal, pointer, 0);
+                            let invalid = b.ins().iconst(types::I32, 3);
+                            return_if_detailed(&mut b, null, invalid, Some(diagnostic));
+                            diagnostic.message = Some(pointer);
                             // The interpreter reports the managed call site, not an
                             // artificial frame for an InternalCall implementation.
                             site.as_mut().unwrap().capture_frame = false;

@@ -485,3 +485,105 @@ fn text_producer_requires_explicit_capability_and_exact_contract() {
     assert!(!r.status.success() && !dir.0.join("app.o").exists());
     assert!(String::from_utf8_lossy(&r.stderr).contains("exact neoCLR.Runtime.Int32ToString"));
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn mixed_text_records_preserve_snapshots_nested_borrows_and_output_neighbors() {
+    let dir = Temp::new();
+    let source = include_str!("../../../docs/experiments/aot-console/text-records.neoil");
+    let seed = neoclr::assemble(TEXT_SEED).unwrap();
+    let flags = [
+        "--compile-system",
+        "--bind-console-write-line",
+        "--bind-int32-to-string",
+    ];
+    let r = compile_source(&dir, &seed, source, &flags, false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror"])
+        .arg(base.join("aot-console/text-host.c"))
+        .arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-scalar/console.c"))
+        .arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o"))
+        .arg("-o")
+        .arg(dir.0.join("app"))
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let function = program
+        .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
+        .unwrap();
+    for value in [i32::MIN, 0, i32::MAX] {
+        let reference = function
+            .invoke(vec![neoclr::Value::Int32(value)], neoclr::Limits::default())
+            .unwrap();
+        let r = Command::new(dir.0.join("app"))
+            .arg(value.to_string())
+            .env_clear()
+            .output()
+            .unwrap();
+        assert_eq!(r.status.code(), Some(42));
+        assert_eq!(r.stdout, format!("{value}\nchanged\nneighbor\n").as_bytes());
+        assert_eq!(
+            r.stdout,
+            format!("{}\n", reference.output.join("\n")).as_bytes()
+        );
+        assert!(r.stderr.is_empty());
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn default_text_and_null_native_arguments_match_interpreter() {
+    for consumer in [
+        "call neoCLR.Runtime.WriteLine(String)\npop",
+        "call System.Fail(String)",
+    ] {
+        let dir = Temp::new();
+        let source = format!(
+            ".module NullText\n.function Calculate() -> Int32\n.local String text\nldloca text\ninitobj String\nldloc text\n{consumer}\nldc.i4 42\nret\n.end"
+        );
+        let seed = neoclr::assemble(TEXT_SEED).unwrap();
+        let flags = [
+            "--compile-system",
+            "--bind-user-fault",
+            "--bind-console-write-line",
+        ];
+        let r = compile_source(&dir, &seed, &source, &flags, false);
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+        let r = Command::new("clang")
+            .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror"])
+            .arg(base.join("aot-fault-details/host.c"))
+            .arg(base.join("aot-fault-details/render.c"))
+            .arg(base.join("aot-scalar/console.c"))
+            .arg(dir.0.join("app.o"))
+            .arg("-o")
+            .arg(dir.0.join("app"))
+            .output()
+            .unwrap();
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let app = neoclr::assemble(&source).unwrap();
+        let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+        let function = program
+            .resolve_function(&neoclr::assembler::parse_function_ref("Calculate()").unwrap())
+            .unwrap();
+        let fault = function
+            .invoke(vec![], neoclr::Limits::default())
+            .unwrap_err();
+        let r = Command::new(dir.0.join("app"))
+            .env_clear()
+            .output()
+            .unwrap();
+        assert_eq!(r.status.code(), Some(1));
+        assert_eq!(
+            String::from_utf8_lossy(&r.stderr),
+            fault.diagnostic().to_string()
+        );
+        assert!(r.stdout.is_empty());
+    }
+}

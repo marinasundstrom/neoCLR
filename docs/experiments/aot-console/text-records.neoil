@@ -1,0 +1,78 @@
+.module TextRecords
+.type Label
+.field tag Byte
+.field text String
+.field suffix Int32
+.end
+.type Envelope
+.field label Label
+.field note String
+.end
+.function Copy(out Envelope& target, Envelope value) -> Void
+ldarg target
+ldarg value
+stobj Envelope
+ldvoid
+ret
+.end
+.function Fill(out String& target, String text) -> Void
+ldarg target
+ldarg text
+stobj String
+ldvoid
+ret
+.end
+.function Echo(Envelope value) -> Envelope
+ldarg value
+ret
+.end
+.function Calculate(Int32 input) -> Int32
+.local Envelope original
+.local Envelope changed
+ldc.i4 263
+conv.u1
+ldarg input
+call neoCLR.Runtime.Int32ToString(Int32)
+ldc.i4 42
+newobj Label
+ldstr "neighbor"
+newobj Envelope
+call Echo(Envelope)
+stloc original
+ldloca changed
+ldloc original
+call Copy(Envelope&, Envelope)
+pop
+ldloca changed
+ldflda 0
+ldflda 1
+ldstr "changed"
+call Fill(String&, String)
+pop
+ldloc original
+ldfld 0
+ldfld 1
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldloc changed
+ldfld 0
+ldfld 1
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldloc changed
+ldfld 1
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldloc changed
+ldfld 0
+ldfld 0
+ldc.i4 7
+bne.un Bad
+ldloc changed
+ldfld 0
+ldfld 2
+ret
+Bad:
+ldc.i4 1
+ret
+.end

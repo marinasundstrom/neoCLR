@@ -1,0 +1,48 @@
+import System.*
+import System.Option.*
+
+struct Label {
+    var Prefix: byte = (byte)7
+    var Text: string = "världen 🌍"
+    var Suffix: int = 42
+}
+
+struct Envelope {
+    var Data: Label = Label()
+    var Note: string = "copied text"
+}
+
+func Select(first: bool, left: Envelope, right: Envelope) -> Envelope {
+    return if first { left } else { right }
+}
+
+func Print(item: Option<string>) -> int {
+    if let Some(text) = item {
+        Console.WriteLine(text)
+        return 1
+    }
+    return 0
+}
+
+func Main() -> int {
+    let original = Envelope()
+    var changed = original
+    changed.Data.Text = "changed"
+    let selected = Select(false, original, changed)
+    Console.WriteLine(original.Data.Text)
+    Console.WriteLine(selected.Data.Text)
+    Console.WriteLine(selected.Note)
+    if selected.Data.Prefix != 7 || selected.Data.Suffix != 42 {
+        return 1
+    }
+    let item: Option<string> = Some(original.Data.Text)
+    let Some(text) = item else {
+        return 2
+    }
+    Console.WriteLine(text)
+    let absent: Option<string> = None()
+    if Print(absent) != 0 || Print(item) != 1 {
+        return 3
+    }
+    return 0
+}

@@ -327,7 +327,7 @@ fn validate_argument(ty: &Type, depth: usize) -> Result<(), Error> {
         return Err("generic argument nesting exceeds 16".into());
     }
     match ty {
-        Type::Int32 | Type::Byte | Type::Boolean | Type::Named(_) => Ok(()),
+        Type::Int32 | Type::Byte | Type::Boolean | Type::String | Type::Named(_) => Ok(()),
         Type::Constructed { arguments, .. } => {
             for arg in arguments {
                 validate_argument(arg, depth + 1)?;

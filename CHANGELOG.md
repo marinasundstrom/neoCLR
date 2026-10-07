@@ -28,7 +28,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   messages; bounded exhaustion reports NativeMemoryLimitExceeded. Arena text expires
   on the next invocation or buffer release; render faults first. This is not general
   managed memory/GC support. Validate endpoint formatting, allocation bounds, context
-  reuse and a standalone numeric Raven input/output app.
+  reuse and a standalone numeric Raven input/output app. Extend copied value records
+  and closed type-generic payloads to carry String pointers with mixed I32/I64 lanes,
+  aligned private storage, null defaults and exact String pattern tests. Guard null
+  native text arguments with interpreter-compatible fault diagnostics. Validate nested
+  copies/interior output borrows and fresh Raven Some/None<string> patterns. General
+  reference objects, array storage and stream dispatch remain unsupported.
 
 ### 2026-10-07
 
