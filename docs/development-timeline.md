@@ -25,6 +25,30 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-07: Continue native bootstrap development on main
+
+- **Author:** Directed merging the native bootstrap branch into main and cleaning up
+  branches so development can continue there.
+- **Assistant action:** Combined native bootstrap with main's newer shared RavenDoc
+  publisher and navigation, preserving both histories. This changes the development
+  branch; it does not declare Windows qualification complete or publish a release.
+  Cleanup is limited to branches whose tips are included in the merged history.
+
+## 2026-10-07: Windows native release and simpler website instructions
+
+- **Author:** Required Windows support for a native metadata release and asked to remove
+  historical details and change notes from the website, using the changelog for history.
+  Asked for simple installation instructions and prominent Raven navigation, with links
+  to the language website and playground.
+- **Assistant action:** Reduced setup to prerequisites, one matched download and running
+  a sample; removed superseded bridge setup and accumulated integration reports. Added
+  Raven navigation and external language links, retaining concrete target limits.
+  Added a Windows native toolchain qualification workflow and replaced Unix-specific
+  HTTP pipe readiness with a bounded portable reader.
+- **Open:** Windows runner execution, installed editor acceptance and a qualified Windows
+  download remain required. Local changes and CI configuration alone do not establish
+  Windows support or publish the website. RavenDoc provider redesign remains deferred.
+
 ## 2026-10-02: Separate compiler semantics from metadata authoring
 
 - **Author:** Asked for abstract Raven loader/emitter interfaces and an ILGenerator
@@ -11188,3 +11212,340 @@ mobile viewport and directed that it be fixed after the Raven release through
 an incremental site publish. The shared RavenDoc fix excludes modal drawers
 from the desktop height reservation. neoCLR adopts the same upstream generator;
 no target-specific stylesheet workaround or neoCLR deployment is introduced.
+
+## 2026-10-06 — Full bootstrap inventory and first source-core fix
+
+**Author:** Asked what full bootstrap requires, then directed continuation.
+
+**Assistant proposal/action:** Distinguished source-built System from later compiler
+self-hosting; prioritized a fresh inventory and source core ownership. The audit found
+that existing Storage adapters and six omitted contract files already compile. The
+all-source mode exposed a PE-only reflection-loader cast; isolated Raven fix
+`6b31997a9` removes it and unifies imported Object signatures with the selected source
+root. All 41 focused tests pass; released library compilation controls remain green.
+
+**Remaining:** Union ToString synthesis currently requests source Object members too
+early and aborts the full build. Declaration ordering is the next priority before
+interpreting wider core/service diagnostics. No full-bootstrap completion or new
+execution support is claimed. See [frontier](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).
+
+
+**Union follow-up outcome:** Raven `d29179810` completes the source Object.ToString
+signature through the existing lazy declaration path. Four ordering regressions pass,
+206 existing tests remain green, and both full-library layouts now reject normally
+without output. Keeping bootstrap RuntimeTypeHandle removes the typeof configuration
+error and seven conversion errors; both layouts expose 45 missing service-member
+diagnostics. The next bounded work is canonical handle ownership and coherent runtime
+service inputs, followed by reduced residual failures. No full-bootstrap success or
+change to published Preview 12 is claimed.
+
+
+**Ownership follow-up correction:** The source-handle support had already been implemented
+in the October 5 gate. The new audit omitted its explicit primitive ownership selection.
+Reusing that contract and removing the competing seed handle reaches 74 diagnostics with
+all 178 inputs, matching the retained-handle control. This is an audit correction, not a
+new compiler fix. Missing service families now have priority.
+
+**Author question on main:** Asked whether general fixes are committed to Raven main.
+The assistant confirmed that independently validated general fixes belong there and
+clarified that the two latest source-Object fixes remain isolated because their regression
+contract is absent on main. Inspection confirms main has the earlier RavenDoc, union-doc,
+lexical-union and reference-assignment fixes; no new main integration is claimed here.
+
+
+**GC continuation:** On the author's continuation, the assistant added source adapters
+for the existing GC services. Executing a separate consumer exposed the no-result
+service mismatch, now fixed with nine GC tests and a focused admission test. The native
+retention consumer executes, but the valid null-call consumer still rejects because
+nullable parameter facts are lost on import. The assistant proposes making nullable
+metadata preservation the next shared blocker rather than expanding isolated API
+facades. The null fixture remains recorded; this is not full GC API or bootstrap
+completion. See [partial gate](experiments/extended-cli-metadata/source-heap-2026-10-06.md).
+
+## 2026-10-06 — Raven use cleanup without exception regions
+
+The author proposed `use` support on Raven `codex/metadata-consumer`, requiring
+cleanup on block exit, return and error/None propagation because neoCLR has no
+exception unwinding. The assistant proposed shared scope-exit lowering with explicit
+target contract selection and an initial synchronous slice. The author directed
+implementation, then clarified that general improvements may be added to main.
+
+Implementation stays on the requested Raven branch with general lowering/tests
+separate from neoCLR's protocol selection; no main merge is claimed. Six native
+protocol fixtures verify and execute, while async/iterator use remains diagnosed.
+See [the integration record](raven-cli-bridge.md#raven-synchronous-use-cleanup-2026-10-06-development)
+for contracts, limitations and validation. This entry records the scoped compiler
+work and does not reprioritize the remaining platform roadmap.
+
+
+**Nullability direction (2026-10-06):** The author asked, “Can we add nullability another
+way? Or should we defer?” The assistant proposed preserving declaration annotations
+using the existing .NET nullable-attribute convention while deferring new native runtime
+semantics. On continuation, the first slice implements explicit callable annotations in
+the host metadata API and CLI PE path, with .NET interpretation and execution tests.
+Native transport and Raven reconstruction remain open; KeepAlive(null) is not fixed by
+this first slice. See [scope, alternatives and next gate](design/callable-nullability.md).
+
+
+**Raven branch consolidation (2026-10-06):** The author requested inclusion of the
+latest `codex/metadata-consumer` work to enable synchronous use cleanup, suggested
+retiring that branch, and explicitly selected `codex/source-object-metadata-resolution`
+for future work. The assistant merged the cleanup commit there as `7bfc6ad27`, retaining
+both source-root fixes. Only documentation conflicts needed resolution. Validation:
+54 baseline checks, 92 post-merge checks, and six native consumers verifying and exiting
+42. The old clean checkout remains available; it is superseded for new work, not deleted.
+Native async cleanup and nullable metadata integration remain open.
+
+
+**Nullable API issue resolved (2026-10-06):** The author directed continued work until
+resolution. The assistant extended native callable declaration metadata and then Raven
+import/emission, preserving explicit nullable facts without new runtime null semantics.
+The original KeepAlive(null) fixture now compiles from emitted GC references alone and
+executes successfully. Array/generic symbol checks, 17 .NET checks and seven native
+consumers pass. A shared nullable-generic storage correction is isolated (`7ac1fec4a`);
+its owning portable layer is absent on main, so no main backport is claimed. A stale
+sealed-class expectation was corrected separately (`d1efc68f6`). Context/field metadata
+and full bootstrap remain open. See [design and gate](design/callable-nullability.md).
+
+
+**Managed array direction (2026-10-06):** During source Environment integration, the
+assistant found that the old runtime service returned a temporary value-array buffer
+where Raven emits a managed reference. The author clarified that managed arrays are the
+supported model and inline value arrays have no current story, apart from possible
+future interop. The assistant retains Array<T> backing and materializes fresh managed
+argument arrays at the native boundary; legacy transport compatibility is an internal
+detail, not a public feature direction. The Environment artifact-only consumer passes,
+including snapshot mutation, and four runtime boundary tests pass. Full-System compilation
+still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/source-environment-2026-10-06.md).
+
+## 2026-10-06: Prefer specific temporal types
+
+- **Author:** Clarified that DateTime should not lead the documentation; it is an
+  option when representing either a local or a zoned date. “Specific date types are preferred”.
+- **Assistant:** Agreed and moved the optional union explanation below the primary
+  time-zone workflow, updating feature navigation and its manual API supplement.
+- **Implementation context:** The calendar bootstrap exposed constructor-union import
+  support as a compiler gap. Testing that representation does not change the public
+  recommendation to use specific temporal types.
+
+## 2026-10-07 — Aggregate bootstrap coverage versus library packaging
+
+- **Author:** “We might split the System.Runtime because not everything is part of
+  core. System.Data. System.Networking. System.Web.”
+- **Assistant response:** Agreed to treat the all-source build as coverage rather
+  than a shipped layout and to map dependencies before choosing assembly boundaries.
+- **Performed work:** The larger-envelope prototype lets all 197 diagnostic inputs
+  emit; runtime admission still rejects the source Array backing contract. A separate
+  API-authored large-library consumer executes. These are distinct gates.
+- **Open:** Exact core membership, optional-library dependency edges and native service
+  ownership; separate-library execution is not yet established. The proposal does
+  not imply a final assembly naming/ownership decision.
+- [Implementation evidence and tradeoffs](experiments/extended-cli-metadata/expanded-library-2026-10-07.md).
+
+### Follow-up evidence for the 2026-10-07 packaging discussion
+
+- **Assistant investigation:** Counted emitted local references with nested union
+  cases assigned to their declaring owners. Observed Data → Runtime, Networking →
+  Runtime, and Web → Runtime/Data/Networking; no local reverse edge from the Runtime
+  remainder. Seed dependencies and native adapter ownership still need review.
+- **Performed action:** Removed the duplicate retained Object in the diagnostic
+  audit; the full-source artifact still emits. Runtime admission now identifies a
+  retained/source WriteLine result-contract mismatch. No assembly split is implemented.
+- [Inventory and ordered proposed gates](experiments/extended-cli-metadata/library-boundaries-2026-10-07.md).
+
+## 2026-10-07 — Void is the NeoCLR unit type
+
+- **Author clarification:** Raven's separate .NET unit representation exists because
+  CLR void cannot occupy value/generic-argument positions. NeoCLR does not have to
+  inherit that restriction: “we only needed the void type, because we have given it
+  the meaning of the unit type.”
+- **Assistant response:** Treat NeoCLR void as the canonical inhabited unit, including
+  generic arguments and callbacks. Preserve .NET carrier lowering inside the .NET
+  target. A callable's no-result stack convention remains an encoding distinction,
+  not a second language type.
+- **Performed work:** Explicitly designated the selected System.Void declaration as
+  native unit storage, including output-owned external references. Metadata and native
+  callback/generic checks pass; a separately compiled Raven NativeMemory consumer
+  executes with unit parameters and generic interfaces. .NET unit regressions pass.
+- **Open:** Full-System admission reaches retained-seed dependency ownership. This is
+  not full bootstrap or a completed optional-library split.
+- [Evidence](experiments/extended-cli-metadata/canonical-unit-2026-10-07.md).
+
+## 2026-10-07 — Source-owned broad application acceptance
+
+- **Author's earlier objective:** Compile the runtime-library sources, consume their
+  emitted metadata without including those sources in the application, and execute
+  unchanged application-order-collections. Keep bootstrap dependencies explicit and
+  preserve ordinary .NET behavior. Later suggested separating optional Data,
+  Networking and Web libraries from core.
+- **Assistant implementation follow-up:** Added an explicitly selected imported Object
+  owner to Raven's semantic import contract and compiler driver. This resolved the
+  competing bootstrap/source Object identities without relaxing inheritance checks.
+- **Observed outcome:** The native consumer compiles, verifies and runs with exact
+  expected stdout, no stderr and exit 0 against the separately emitted 197-input
+  aggregate. The C# root probe and 47 focused compiler regressions pass. Reproducible
+  commands and hashes are checked in; the website labels this as development work.
+- **Still open:** Production assembly boundaries, project/editor ownership catalogs,
+  wider API execution coverage and removal of permitted bootstrap inputs. This outcome
+  does not establish a new release or imply every API has been executed.
+- [Acceptance evidence](experiments/extended-cli-metadata/source-owned-orders-2026-10-07.md).
+
+## 2026-10-07: Platform distribution packages versus assembly ownership
+
+- **Author:** “Platform packages perhaps need to be their own package and potentially
+  more pacakages”.
+- **Assistant proposal:** Separate managed foundation/optional libraries, OS/architecture
+  runtime payloads and developer tools; packages may contain multiple assemblies and
+  native assets. Keep further splits evidence-driven.
+- **Author follow-up:** Asked to continue. This is not recorded as approval of specific
+  package IDs, formats, versioning or a native plugin architecture.
+- **Action:** Recorded the [candidate package boundaries](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md),
+  their compatibility/qualification gates and .NET asset-selection comparison. Inspected
+  imported Object override validation across metadata authoring, method references and
+  reader reconstruction; documented the coordinated change needed rather than weakening
+  one check.
+- **Outcome/open:** Documentation only in this slice. Runtime/orders acceptance remains
+  the prior passing evidence; optional-library execution, package implementation and
+  CLI/LSP catalog propagation remain open.
+
+## 2026-10-07: Runtime as the dependency foundation
+
+- **Author:** Directed that the system.runtime package be well defined around core
+  runtime functionality, with all other packages depending on those fundamentals,
+  “and not the other way around.” Said this direction need not copy .NET exactly.
+- **Assistant response:** Agreed to enforce dependency direction and distinguish
+  fundamental mechanisms from optional policy. Proposed Runtime-owned managed array
+  reflection consumed by Data-owned JSON mapping as the current concrete boundary.
+- **Action/outcome:** Added ArrayReflection and migrated ObjectMapper off internal
+  cross-assembly services. Separate Runtime/Data consumers now execute nested JSON,
+  setters, arrays, mutation and identity checks. Corrected imported Object call names
+  and native root type-syntax ownership exposed by that execution.
+- **Open:** Exact minimal Runtime membership, separate Web acceptance and distribution/
+  editor catalogs. No package IDs, registry or version scheme was selected here.
+- [Dependency rule](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md),
+  [execution evidence](experiments/extended-cli-metadata/separate-data-2026-10-07.md).
+
+## 2026-10-07: A unified class-library API reference
+
+- **Author:** Asked to continue and proposed presenting the split class library “as one”
+  in the RavenDoc-generated site, without separate sections, while retaining where each
+  type/function is declared (assembly/file provenance).
+- **Assistant response:** Proposed one namespace/type navigation tree with assembly
+  provenance on declaration pages. Distinguished logical assembly identity from a PE
+  container, package and namespace.
+- **Action:** Reviewed RavenDoc's existing per-API grouping and the aggregate docs bridge.
+  Recorded a unified native-input migration gate; did not claim that multi-assembly
+  rendering is already implemented or change the existing site into per-DLL sections.
+  Continued the Web split audit against independently compiled dependencies.
+- **Observed outcome:** Web is blocked by private shared-deadline operations crossing
+  Networking's boundary. No Web artifact is published; Runtime's dependency direction
+  remains unchanged. A typed supported deadline contract is the next design/implementation
+  slice; raw runtime-service integers are not promoted to public APIs by this audit.
+- [Reference direction](../api-docs/README.md#one-class-library-reference-across-assemblies),
+  [Web boundary evidence](experiments/extended-cli-metadata/web-boundary-2026-10-07.md).
+
+## 2026-10-07: Project artifacts, documentation bundles and precise source links
+
+- **Author:** Directed that Networking and other libraries be their own projects,
+  referencing Runtime and Platform integration projects, with their outputs shipped.
+  Clarified that RavenDoc should define a bundle of assemblies shown as one structure.
+  Asked for universal GitHub source links to the specific type/member file and location,
+  comparable to .NET support; described the present solution as incomplete.
+- **Assistant proposal:** Preserve declaration origins independently of documentation
+  grouping, target representation and where inherited/extension members are displayed.
+  Use repository revision, source path and declaration span, not namespace guesses.
+- **Action:** Recorded the project gate and bundle/source-link requirements, compared
+  Source Link and Portable PDB inputs, and proposed investigating a declaration map
+  where standard debug information lacks exact declaration spans.
+- **Outcome/open:** Requirements documented; no project graph, bundle implementation,
+  new metadata encoding or complete source-link support is claimed. The ongoing Web
+  deadline slice remains unverified: separate Web compilation succeeded after an import
+  correction, but the new async consumer currently rejects its Task<()> entry signature.
+- [API requirements](../api-docs/README.md#planned-bundles-and-declaration-source-links),
+  [project direction](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md#real-project-graph-author-direction-2026-10-07).
+
+## 2026-10-07: Bootstrap and release scope reaffirmed
+
+- **Author:** Reaffirmed bootstrapping, full NeoCLR support and an acceptable developer
+  experience for the next release, explicitly including the website.
+- **Assistant response:** Kept executable library and project blockers first, with
+  documentation bundles/source links tied to release usability rather than a separate
+  reprioritization. No declaration that the release is ready.
+- **Action/outcome:** Typed shared network deadlines remove Web's private dependency on
+  Networking internals. Five consumers compile against emitted libraries only and execute;
+  header-phase loopback cancellation closes cancelled sockets while independent work
+  completes. API reference and website development content are updated in this slice.
+- **Open:** Real native project references (currently explicitly rejected by workspace
+  tests), Platform integration projects, build/LSP ownership catalogs, final artifacts
+  and release qualification. A new async fixture exposed a Task<()> return-conversion
+  gap; its explicit Task<int> form passes. This gap remains recorded, not fixed here.
+
+## 2026-10-07: Bootstrap branch merge gate
+
+- **Author:** Directed that codex/native-system-bootstrap be merged into neoCLR main
+  when bootstrap is ready, with continued development from there.
+- **Assistant response/action:** Recorded this as authorization conditional on bootstrap
+  qualification. Both HTTP cancellation cases now pass, but a fresh Web build exposed
+  intermittent System.Void metadata encoding failure; an identical retry succeeds.
+  Preserve both outcomes and investigate before claiming a reliable build.
+- **Open:** No merge performed. Reliable build, project/editor and artifact qualification
+  remain necessary; successful selected consumers alone do not close that gate.
+
+## 2026-10-07: Release-task ownership of general Raven fixes
+
+- **Author:** Directed that the general Raven issue be handled by task
+  01a11579-77d7-7500-8561-950c20b1f6bc, which is working on a release.
+- **Assistant action:** Sent that task the main-based codex/fix-async-unit-return branch,
+  complete patch, baseline failures and focused test results. Left its remaining main
+  validation, changelog/commit and release integration with that task; did not merge main.
+- **Separate bootstrap outcome:** Raven e141006f3 fixes exact bootstrap Void namespace
+  lookup. Both forced-lookup regressions failed before and all 29 focused tests pass
+  after; six fresh Web compilations succeed. Native consumer evidence is recorded in
+  the [bootstrap unit report](experiments/extended-cli-metadata/unit-bootstrap-2026-10-07.md).
+- **Open:** The handoff does not establish general-fix completion or a release. NeoCLR
+  continues native execution qualification and project/editor/artifact bootstrapping.
+
+
+## 2026-10-07: Investigate repeated editor hover delays
+
+- **Author:** Reported VS Code hovers repeatedly remaining on “Loading...” and
+  identified one of the Main.rvn files opened in the previous session.
+- **Assistant:** Extended the real extension-host acceptance to record provider
+  request latency, repeated broad-sample hovers and requests after unsaved edits.
+  Kept this investigation alongside split class-library editor qualification.
+- **Observed:** The initial split run passed 24 checks. Warm Main.rvn requests took
+  3–13 ms, while some startup/reload requests took up to 2.749 seconds; the server
+  hover handler's maximum was 86.2 ms. This suggests waiting outside that handler,
+  but does not identify the cause of the author's persistent delay.
+- **Open:** Reproduce the original persistent workload and isolate any scheduling,
+  reload or client delay before claiming a fix. [Evidence and scope](experiments/extended-cli-metadata/native-split-editor-2026-10-07.md).
+
+
+## 2026-10-07: Native RavenDoc provenance and providers
+
+- **Author:** Pointed out the API reference's “Assembly: NeoCLR.CoreProbe.dll” label
+  and requested the actual Runtime/Data/Networking owners. Proposed native metadata
+  support through a provider structure and standardized member-presentation models,
+  allowing the compiler API as an intermediary.
+- **Assistant inspection:** RavenDoc currently loads CLI references and adjacent/framework
+  DLLs, while the renderer already accepts compiler symbols and multiple assemblies.
+- **Assistant proposal:** Add an explicit native input provider over the existing catalog
+  and symbol adapter first; retain actual declaration identities and extract a stable
+  documentation model incrementally. Do not relabel bridge ownership or add a resolver.
+- **Status:** Direction recorded; provider implementation and website migration remain
+  open. The active bootstrap-input validation continues independently.
+  [Plan and evidence](experiments/extended-cli-metadata/native-documentation-provider-2026-10-07.md).
+
+
+## 2026-10-07: Defer RavenDoc architecture for release focus
+
+- **Author:** Asked to delay fixing RavenDoc's bridge assembly display, considering
+  rewriting RavenDoc in Raven in the future. Directed attention to the actual release
+  and changes that add value to it.
+- **Assistant:** Deferred native documentation providers and standardized-model work,
+  keeping the previous proposal as future context. Proposed focusing on reproducible
+  builds, working samples, installation and editor usability while leaving bridge
+  provenance explicit.
+- **Action:** Updated the authoritative roadmap and API maintenance direction. The
+  possible rewrite is recorded as exploration, not an approved implementation project.
+  No runtime/compiler behavior or release qualification result changes in this update.

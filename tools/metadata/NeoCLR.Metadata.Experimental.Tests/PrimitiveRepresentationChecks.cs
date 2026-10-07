@@ -5,8 +5,55 @@ using NeoCLR.Metadata.Experimental.Introspection;
 
 internal static class PrimitiveRepresentationChecks
 {
+    private static void CheckErasedValue()
+    {
+        foreach (var manual in new[] { false, true })
+        {
+            var graph = new AssemblyBuilder(new("ValueOwner", new(1, 0, 0, 0)), new("Core", new(1, 0, 0, 0)));
+            TypeBuilder value;
+            if (manual)
+            {
+                var definition = new TypeDefinition("System", "Value", 0x109,
+                    graph.Definition.MainModule.ImportReference(graph.CoreLibrary, "System", "ValueType"));
+                definition.SetNativePrimitive(PrimitiveType.Value);
+                graph.Definition.MainModule.Types.Add(definition);
+                value = graph.Types.Single();
+            }
+            else
+            {
+                value = graph.AddValueType("System", "Value");
+                value.SetNativePrimitive(PrimitiveType.Value);
+            }
+            var identity = graph.AddFunction("Identity", new(value, new SignatureType[] { value }));
+            identity.GetILGenerator().LoadArgument(0); identity.GetILGenerator().Return();
+            var snapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(graph));
+            var view = new MetadataLoadContext([snapshot]).Resolve(snapshot.Identity).GetTypes().Single();
+            if (view.NativePrimitive != PrimitiveType.Value || snapshot.MainModule.Functions.Single().TryGetSignature(out var signature) == false || signature is null ||
+                signature.ReturnType.ReferencedType?.Resolve().NativePrimitive != PrimitiveType.Value ||
+                signature.ParameterTypes.Single() != signature.ReturnType)
+                throw new Exception("source Value representation or signature lost");
+            var consumer = new AssemblyBuilder(new("ImportedValueOwner", new(1, 0, 0, 0)), graph.CoreLibrary);
+            var external = consumer.CreateValueTypeReference(graph.Identity, graph.CoreLibrary, new string('A', 64), "System", "Value");
+            consumer.SetNativePrimitive(external, PrimitiveType.Value);
+            var echo = consumer.AddFunction("Echo", new(external, [external]));
+            echo.GetILGenerator().LoadArgument(0); echo.GetILGenerator().Return();
+            var importedSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(consumer));
+            var context = new MetadataLoadContext([snapshot, importedSnapshot]);
+            var importedEcho = context.Resolve(importedSnapshot.Identity).GetModules().Single().GetFunctions().Single();
+            if (!ReferenceEquals(importedEcho.ReturnType, context.Resolve(snapshot.Identity).GetTypes().Single()) ||
+                !ReferenceEquals(importedEcho.ReturnType, importedEcho.GetParameters().Single().ParameterType))
+                throw new Exception("external erased Value lost its selected owner");
+            var competing = consumer.CreateValueTypeReference(new("Other", new(1, 0, 0, 0)), graph.CoreLibrary, new string('B', 64), "System", "Value");
+            Reject<InvalidDataException>(() => consumer.SetNativePrimitive(competing, PrimitiveType.Value));
+            Reject<ArgumentOutOfRangeException>(() => { SignatureType bare = PrimitiveType.Value; });
+            value.AddField("Invalid", PrimitiveType.Int32);
+            Reject<InvalidDataException>(() => RuntimeAssemblyContainer.WriteBinary(graph));
+        }
+    }
+
     internal static void Run()
     {
+        CheckErasedValue();
         var detachedGraph = new AssemblyBuilder(new("HandleDefinitions", new Version(1, 0, 0, 0)), new("System.Runtime", new Version(10, 0, 0, 0)));
         var detachedHandle = new TypeDefinition("System", "RuntimeTypeHandle", 0x109,
             detachedGraph.Definition.MainModule.ImportReference(detachedGraph.CoreLibrary, "System", "ValueType"));

@@ -2,33 +2,22 @@
 
 Task describes whether an operation produced a value. It does not imply a thread. Write async code around the operation you need, with expected errors as values and cancellation as a distinct outcome.
 
-**Preview 11 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
-
 [See a working example ↓](#await) · [Download the complete example](../../samples/library-async-default-queue.rvn)
 
 <a id="await"></a>
 
-## Native compiler integration (development)
+<a id="native-compiler-integration-development"></a>
 
-The development metadata/compiler branch now compiles the six Tasks/Concurrency source
-files as a separate native library. Artifact-only consumers execute continuations,
-cancellation, worker results and queue draining. This is a bounded integration gate;
-full async compiler integration remains in progress. Explicit native Task/builder selection
-now supports top-level nongeneric async functions, including completed/pending awaits,
-hoisted locals and cancellation. A synchronous entry drives the queue in the tested case.
-The unchanged cancellation sample also compiles and runs. Immutable callbacks preserve
-hoisted Promise identity. Nongeneric class async methods preserve receiver identity and
-private access. Async Result propagation now executes, and the unchanged HTTP JSON
-client/server samples compile to native assemblies and pass a localhost round trip.
-Native `Task<unit>` and `Task<int>` entry points now complete registered work before reading
-the result. Both async Main samples execute; arguments and integer exit status are
-preserved, while cancellation and unresolved tasks fault. Generic async methods and
-`Task<Result<...>>` entry adaptation remain outside this bounded development gate.
-The current POC prioritizes working samples; complete System coverage is later work.
+## Native async support
+
+Nongeneric functions and class methods can await completed or pending Tasks. Locals and
+receiver identity survive suspension. Native `Task<unit>` and `Task<int>` entry points
+complete registered work before reading the result; cancellation and unresolved tasks
+fail explicitly. Generic async methods and `Task<Result<...>>` entry points are not supported.
 
 ## Starting and awaiting a worker
 
-Direct async Main uses the matching compiler, bridge and runtime. See [supported entry points](../../raven/#entry-points)
+Direct async Main uses the matching compiler and runtime. See [supported entry points](../../raven/#entry-points)
 for return types and process exit behavior.
 
 ```raven
@@ -43,7 +32,9 @@ This preview uses System.Concurrency.Thread: construct a Thread and call its ins
 
 <a id="task-run"></a>
 
-## Submitting work with shared captures (development)
+<a id="submitting-work-with-shared-captures-development"></a>
+
+## Submitting work with shared captures
 
 `Task.Run` is the canonical API for new work with captured variables and shared
 objects. The runtime chooses execution; the first backend uses bounded native
@@ -179,12 +170,10 @@ This dispatcher is small and serialized. Worker joins can block it. An unresolve
 
 <a id="try"></a>
 
-## Use matching Preview 11 artifacts
-With the matching Preview 11 SDK, open a prepared `.rvnproj` in VS Code, replace `Main.rvn` with one of the complete downloads above, and run the neoCLR build/run task. Refresh the compiler, reference core and runtime library together. Use the runtime, SDK and editor tools from a matching build.
+## Run the examples
 
-neoCLR and the programs it runs do not require .NET. The Raven compiler, build tools and Raven Language Server run on .NET.
-
-[Setup and version compatibility →](../../try/#development)
+Open the bundled Tasks project in VS Code and use the neoCLR run task.
+[Installation instructions →](../../try/)
 
 <a id="release-checkpoint"></a>
 <a id="pending-read"></a>

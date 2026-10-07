@@ -22,7 +22,7 @@ public sealed partial class NativeAssemblyDefinition
         internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -130,7 +130,9 @@ public sealed partial class NativeAssemblyDefinition
                 var backingFields = Array(backing, "fields", 256);
                 Require(backing.TryGetProperty("is_reference_type", out var referenceBacking) && referenceBacking.GetBoolean() &&
                     (!backing.TryGetProperty("is_abstract", out var abstractBacking) || !abstractBacking.GetBoolean()) &&
-                    !backing.TryGetProperty("base", out _) && !backing.TryGetProperty("declaring_type", out _) &&
+                    (!backing.TryGetProperty("base", out var backingBase) ||
+                        ReadBaseName(backingBase) == "System.Object" && typeElements.Any(t => Text(t, "name") == "System.Object")) &&
+                    !backing.TryGetProperty("declaring_type", out _) &&
                     Array(backing, "generic_parameters", 32).Length == 1 &&
                     (!backing.TryGetProperty("generic_constraints", out var bounds) || bounds.GetArrayLength() == 0) &&
                     backingFields.Length == 1 && Text(backingFields[0], "visibility") == "private" &&
@@ -264,7 +266,7 @@ public sealed partial class NativeAssemblyDefinition
                 else if (isPrimitive)
                 {
                     Require(nativeName.StartsWith("System.", StringComparison.Ordinal), "primitive requires canonical identity");
-                    primitive = nativeName == "System.Char" ? null : ReadPrimitive(nativeName[7..], false);
+                    primitive = nativeName == "System.Char" ? null : ReadPrimitive(nativeName[7..], nativeName == "System.Void");
                     Require((nativeName == "System.Char" || primitive is { } scalar && TypeDefinition.IsSupportedNativePrimitive(scalar)) && isValueType == (primitive != PrimitiveType.String) && !isStatic &&
                         declaringType < 0 && typeNames.Length == 0 && fieldRows.Count == 0 && enumMembers is null,
                         "invalid runtime primitive declaration");
@@ -327,7 +329,7 @@ public sealed partial class NativeAssemblyDefinition
                 type.BaseIndex = types.FindIndex(candidate => candidate.NativeName == type.BaseName);
                 Require(type.BaseIndex >= 0, "base class must be a local declaration");
                 var parent = types[type.BaseIndex];
-                Require(IsOrdinaryClass(type) && IsOrdinaryClass(parent) && !parent.IsSealedClass, "unsupported base class category");
+                Require((IsOrdinaryClass(type) || parent.IsObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType && type.DeclaringType < 0 && type.NativePrimitive is null or PrimitiveType.String && !type.NativeGrapheme) && IsOrdinaryClass(parent) && !parent.IsSealedClass, $"unsupported base class category: {type.Namespace}.{type.Name} -> {parent.Namespace}.{parent.Name}");
                 var seen = new HashSet<int>();
                 for (var current = i; current >= 0; current = types[current].BaseName is { } name ? types.FindIndex(candidate => candidate.NativeName == name) : -1)
                     Require(seen.Add(current), "cyclic class inheritance");
@@ -393,10 +395,14 @@ public sealed partial class NativeAssemblyDefinition
             {
                 if (element.ValueKind == JsonValueKind.String)
                 {
+                    if (!allowVoid && element.GetString() == "Void" && signatureOwners.SingleOrDefault(t => t.NativePrimitive == PrimitiveType.Void) is { } localUnit)
+                        return localUnit;
                     if (!allowVoid && element.GetString() == "Void" && nativeTypeAliases.TryGetValue(("System.Void", 0), out var unit) && unit.ValueType && unit.Namespace == "System" && unit.Name == "Void")
                         return ImportExternalType(signatureGraph, "System.Void", 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
                     if (element.GetString() == "Value")
                     {
+                        var localValue = signatureOwners.SingleOrDefault(t => t.NativePrimitive == PrimitiveType.Value);
+                        if (localValue is not null) return localValue;
                         Require(nativeTypeAliases.TryGetValue(("System.Value", 0), out var erased) && erased.ValueType && erased.Namespace == "System" && erased.Name == "Value" && erased.Declaring is null, "Value requires an explicit core value alias");
                         return ImportExternalType(signatureGraph, "System.Value", 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
                     }
@@ -421,6 +427,11 @@ public sealed partial class NativeAssemblyDefinition
                     var returns = ReadType(function.GetProperty("returns"), noResult);
                     Require(noResult == (returns.Primitive == PrimitiveType.Void), "function result convention mismatch");
                     return SignatureType.Function(new MethodSignature(returns, Array(function, "parameters", 16).Select(p => ReadType(p, false))));
+                }
+                if (element.TryGetProperty("Ptr", out var pointer))
+                {
+                    Shape(element, "Ptr");
+                    return SignatureType.PointerTo(ReadType(pointer, true));
                 }
                 if (element.TryGetProperty("ByRef", out var target))
                 {
@@ -556,7 +567,10 @@ public sealed partial class NativeAssemblyDefinition
                     Require(implementationAttributes is 0 or 0x1000, "unsupported method implementation flags");
                 }
                 Shape(method, fields.ToArray());
-                var origin = method.GetProperty("origin"); Shape(origin, "assembly", "module", "name", "token", "member_access", "parameter_tokens");
+                var origin = method.GetProperty("origin");
+                var originFields = new List<string> { "assembly", "module", "name", "token", "member_access", "parameter_tokens" };
+                if (origin.TryGetProperty("nullable_annotations", out _)) originFields.Add("nullable_annotations");
+                Shape(origin, originFields.ToArray());
                 var name = Text(origin, "name"); Require(name.Length is > 0 and <= 1024, "invalid native method name"); CheckName(name);
                 var owner = method.GetProperty("owner"); int ownerIndex = -1;
                 if (owner.ValueKind != JsonValueKind.Null)
@@ -630,6 +644,17 @@ public sealed partial class NativeAssemblyDefinition
                 var tokens = Array(origin, "parameter_tokens", 256);
                 Require(tokens.Length == parameters.Length && tokens.All(t => t.GetInt32() == 0 ||
                     (t.GetInt32() >> 24 == 8 && (t.GetInt32() & 0xffffff) > 0 && parameterTokens.Add(t.GetInt32()))), "invalid or duplicate native parameter token");
+                var nullableAnnotations = new Dictionary<int, NullableAnnotation>();
+                if (origin.TryGetProperty("nullable_annotations", out _))
+                    foreach (var annotation in Array(origin, "nullable_annotations", 257))
+                    {
+                        Shape(annotation, "position", "flags", "uniform");
+                        int position = annotation.GetProperty("position").GetInt32();
+                        var flags = Array(annotation, "flags", 4096).Select(f => f.GetInt32()).ToArray();
+                        bool uniform = annotation.GetProperty("uniform").GetBoolean();
+                        Require(position >= -1 && position < parameters.Length && flags.Length > 0 && flags.All(f => f is >= 0 and <= 2) && (!uniform || flags.Length == 1), "invalid native nullable annotation");
+                        Require(nullableAnnotations.TryAdd(position, new NullableAnnotation(flags.Select(f => (byte)f), uniform)), "duplicate native nullable annotation");
+                    }
                 int? parameterArray = null;
                 if (method.TryGetProperty("custom_attributes", out _))
                 {
@@ -692,8 +717,13 @@ public sealed partial class NativeAssemblyDefinition
                     Require(ownerIndex < 0 && !instance && !isAbstract && !isVirtual && !isOverride && genericNames.Length == 0 &&
                         method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var internalLocals) || internalLocals.GetArrayLength() == 0),
                         "internal calls require bodyless nongeneric assembly functions");
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, ParameterArrayIndex = parameterArray, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
+            nativeTypeAliases.TryGetValue(("System.Object", 0), out var externalRootAlias);
+            if (externalRootAlias is not null)
+                Require(externalRootAlias.Namespace == "System" && externalRootAlias.Name == "Object" &&
+                    !externalRootAlias.ValueType && externalRootAlias.Declaring is null && signatureGraph.NativeObjectRoot is null,
+                    "invalid external Object root alias");
             foreach (var method in methods.Where(m => m.Override))
             {
                 MethodRow? inherited = null;
@@ -704,8 +734,8 @@ public sealed partial class NativeAssemblyDefinition
                     if (inherited is not null) break;
                 }
                 Require(inherited is not null ? inherited.Virtual && inherited.Signature.Matches(method.Signature) :
-                    MethodDefinition.IsObjectOverride(method.Name, method.Signature, signatureGraph.NativeObjectRoot is null ? null : identity, signatureGraph.NativeObjectRoot) &&
-                    (signatureGraph.NativeObjectRoot is not null || nativeModuleAliases.Values.Count(m => m.Module == "System") == 1), "unsupported or incompatible native override");
+                    MethodDefinition.IsObjectOverride(method.Name, method.Signature, signatureGraph.NativeObjectRoot is null ? externalRootAlias?.Assembly : identity, signatureGraph.NativeObjectRoot) &&
+                    (signatureGraph.NativeObjectRoot is not null || externalRootAlias is not null || nativeModuleAliases.Values.Count(m => m.Module == "System") == 1), "unsupported or incompatible native override");
             }
             genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();
@@ -795,16 +825,19 @@ public sealed partial class NativeAssemblyDefinition
             throw new InvalidDataException("Value projection requires the explicit core scope");
         if (methods.Any(m => m.ExplicitInterfaces.Length != 0)) throw new NotSupportedException("explicit mappings require direct native import");
         var graph = new AssemblyBuilder(Identity, coreLibrary);
+        if (nativeTypeAliases.TryGetValue(("System.Object", 0), out _))
+            graph.SetNativeObjectRoot(ImportExternalType(graph, "System.Object", 0, References, valueTypeReferences, nativeTypeAliases));
         var owners = DefineTypes(graph, types);
         for (int i = 0; i < types.Length; i++)
             foreach (var constraint in types[i].Constraints)
                 owners[i].AddBaseTypeConstraint(constraint.Parameter, owners[System.Array.FindIndex(types, t => t.NativeName == constraint.Bound)]);
         for (int i = 0; i < types.Length; i++)
             foreach (var (parameter, flags) in types[i].SpecialConstraints) owners[i].SetSpecialConstraints(parameter, flags);
-        SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? type.GetString() == "Value" ? ProjectNamed("System.Value") : type.GetString() == "Char" ? ProjectNamed("System.Char") : type.GetString() == "Void" && nativeTypeAliases.ContainsKey(("System.Void", 0)) ? ProjectNamed("System.Void") : (SignatureType)ReadPrimitive(type.GetString(), false)
+        SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? type.GetString() == "Value" ? ProjectNamed("System.Value") : type.GetString() == "Char" ? ProjectNamed("System.Char") : type.GetString() == "Void" && (nativeTypeAliases.ContainsKey(("System.Void", 0)) || types.Any(t => t.NativePrimitive == PrimitiveType.Void)) ? ProjectNamed("System.Void") : (SignatureType)ReadPrimitive(type.GetString(), false)
             : type.TryGetProperty("Function", out var function) ? SignatureType.Function(new MethodSignature(function.GetProperty("no_result").GetBoolean() ? PrimitiveType.Void : ProjectType(function.GetProperty("returns")), Array(function, "parameters", 16).Select(ProjectType)))
             : type.TryGetProperty("TypeParameter", out var parameter) ? SignatureType.TypeParameter(parameter.GetInt32())
             : type.TryGetProperty("Constructed", out var instance) ? ProjectConstruction(Text(instance, "definition"), Array(instance, "arguments", 32).Select(ProjectType).ToArray())
+            : type.TryGetProperty("Ptr", out var pointer) ? SignatureType.PointerTo(ProjectType(pointer))
             : type.TryGetProperty("ArrayRef", out var element) ? SignatureType.ArrayOf(ProjectType(element))
             : ProjectNamed(Text(type, "Named"));
         SignatureType ProjectNamed(string name)
@@ -835,7 +868,7 @@ public sealed partial class NativeAssemblyDefinition
                 foreach (var (owner, index) in original.Assembly.Types.Select((owner, index) => (owner, index))) mappedOwners.Add(owner, owners[index]);
             return mappedOwners[original];
         }
-        SignatureType Remap(SignatureType type) => type.FunctionSignature is { } function ? function.Substitute(Remap) : type.ByReferenceElement is { } target ? SignatureType.ByReference(Remap(target)) : type.ImportedType is { } imported ? RemapImported(imported) : type.GenericInstance is { } instance ? RemapOwner(instance.Definition).MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
+        SignatureType Remap(SignatureType type) => type.PointerElement is not null ? type : type.FunctionSignature is { } function ? function.Substitute(Remap) : type.ByReferenceElement is { } target ? SignatureType.ByReference(Remap(target)) : type.ImportedType is { } imported ? RemapImported(imported) : type.GenericInstance is { } instance ? RemapOwner(instance.Definition).MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
             : type.ClassType is { } c ? RemapOwner(c) : type;
         SignatureType RemapImported(ImportedTypeReference type)
         {
@@ -856,6 +889,7 @@ public sealed partial class NativeAssemblyDefinition
                 : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(signature, method.Visibility)
                 : owners[method.Owner].AddInstanceMethod(method.Name, signature, method.Visibility);
             if (method.ImplementationAttributes == 0x1000) output.SetInternalCall();
+            foreach (var pair in method.NullableAnnotations) output.SetNullableAnnotation(pair.Key, pair.Value);
             foreach (var pair in method.ParameterNames) output.SetParameterName(pair.Key, pair.Value);
             // Reference emission supplies throwing bodies; do not invent executable native behavior.
             foreach (var bound in method.InterfaceConstraints)
@@ -970,7 +1004,10 @@ public sealed partial class NativeAssemblyDefinition
         "UInt16" => PrimitiveType.UInt16,
         "UInt32" => PrimitiveType.UInt32,
         "UInt64" => PrimitiveType.UInt64,
+        "IntPtr" => PrimitiveType.IntPtr,
+        "UIntPtr" => PrimitiveType.UIntPtr,
         "RuntimeTypeHandle" => PrimitiveType.RuntimeTypeHandle,
+        "Value" => PrimitiveType.Value,
 
         "Single" => PrimitiveType.Single,
         "Double" => PrimitiveType.Double,

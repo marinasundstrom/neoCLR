@@ -120,7 +120,7 @@ public sealed partial class TypeDefinition
         ? throw new NotSupportedException("CLI closed-family attributes are not materialized") : closedHierarchy;
     private TypeReference? authoredBaseType;
     /// <summary>Gets the authored or materialized nominal base reference without resolving dependencies.</summary>
-    /// <remarks>Native snapshots currently support local nongeneric class bases. Null means no recorded base.</remarks>
+    /// <remarks>Native snapshots support local nongeneric class bases, including the native Object base of a generic class. Null means no recorded base.</remarks>
     public TypeReference? BaseType => authoredBaseType ?? (loadedBaseTypeToken == 0 ? null :
         Module!.GetTypeDefinition(loadedBaseTypeToken)?.ToReference()
             ?? throw new InvalidDataException("missing base class definition"));
@@ -165,7 +165,11 @@ public sealed partial class AssemblyBuilder
     private static bool IsOrdinaryBase(TypeBuilder type) => !type.IsStatic && !type.IsInterface && !type.IsValueType && type.NativePrimitive is null && !type.NativeGrapheme && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null;
     internal TypeDefinition AttachType(TypeDefinition definition)
     {
-        if (definition.IsNativeObjectRoot) definition.ValidateNativeObjectRoot();
+        if (definition.IsNativeObjectRoot)
+        {
+            if (ExternalObjectRoot is not null) throw new InvalidOperationException("conflicting native Object ownership");
+            definition.ValidateNativeObjectRoot();
+        }
         if (types.Count >= DefinitionLimits.AuthoredTypes || types.Any(t => t.Namespace == definition.Namespace && t.Name == definition.Name && ReferenceEquals(t.Definition.DeclaringType, definition.DeclaringType)) ||
             definition.MetadataToken != 0 || definition.Producer is { } existing && !ReferenceEquals(existing.Assembly, this))
             throw new ArgumentException("foreign, duplicate or excessive type definition");
@@ -182,7 +186,7 @@ public sealed partial class AssemblyBuilder
             {
                 if (definition.BaseType is not null) throw new ArgumentException("interfaces have no class base");
             }
-            else if (!definition.IsNativeObjectRoot && !(category is 0 or 0x80 or 0x100 && definition.GenericArity == 0 && definition.DeclaringType is null && definition.BaseType is { ExplicitScope: null } localBase && ReferenceEquals(localBase.Module, Definition.MainModule) && localBase.Resolve().Producer is { } parent && IsOrdinaryBase(parent)) && (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
+            else if (!definition.IsNativeObjectRoot && !(category is 0 or 0x80 or 0x100 && definition.DeclaringType is null && definition.BaseType is { ExplicitScope: null } localBase && ReferenceEquals(localBase.Module, Definition.MainModule) && localBase.Resolve().Producer is { } parent && IsOrdinaryBase(parent) && (definition.GenericArity == 0 || parent.IsNativeObjectRoot)) && (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
                 baseType.Name != (definition.IsEnum ? "Enum" : definition.IsValueType ? "ValueType" : "Object") || definition.IsValueType != (category == 0x108 || category == 0x100 && definition.IsEnum)))
                 throw new ArgumentException("type base/category does not match the explicit core contract");
             // Validate pending fields before attaching any ownership or writer handles.

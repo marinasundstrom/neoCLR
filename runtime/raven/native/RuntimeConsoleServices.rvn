@@ -1,0 +1,25 @@
+namespace System
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+internal extension ConsoleRuntimeServices for RuntimeServices {
+    static func ConsoleReadByte() -> System.Value {
+        return neoCLR.Runtime.ConsoleReadByte()
+    }
+
+    static func ConsoleWriteBytes(error: bool, buffer: byte[], offset: int, count: int) -> System.Value {
+        return neoCLR.Runtime.ConsoleWriteBytes(error, buffer, offset, count)
+    }
+
+    static func ConsoleFlush(error: bool) -> System.Value {
+        return neoCLR.Runtime.ConsoleFlush(error)
+    }
+
+    static func WriteLine(value: string) -> System.Void {
+        return neoCLR.Runtime.WriteLine(value)
+    }
+
+    static func UInt64ToString(value: ulong) -> string {
+        return neoCLR.Runtime.UInt64ToString(value)
+    }
+}

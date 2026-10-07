@@ -102,7 +102,7 @@ public sealed partial class AssemblyBuilder
                 if (type.Definition.IsNativeObjectRoot) type.Definition.ValidateNativeObjectRoot();
                 if (type.IsClosedHierarchy && (!(IsOrdinaryBase(type) || type.IsInterface && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null) || !type.IsAbstract))
                     throw new InvalidDataException("closed families require nongeneric top-level abstract class or interface owners");
-                if (type.LocalBase is { } parent && (!IsOrdinaryBase(type) || !IsOrdinaryBase(parent) || (parent.Definition.Attributes & 0x100) != 0))
+                if (type.LocalBase is { } parent && (!(IsOrdinaryBase(type) || parent.IsNativeObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType && type.Definition.DeclaringType is null) || !IsOrdinaryBase(parent) || (parent.Definition.Attributes & 0x100) != 0))
                     throw new InvalidDataException("derived classes require ordinary nongeneric reference owners");
             }
             ValidateValueLayouts();
@@ -125,7 +125,7 @@ public sealed partial class AssemblyBuilder
             foreach (var method in methods)
             {
                 int arity = method.DeclaringType?.GenericParameterNames.Count ?? 0;
-                if (method.IsImplicitObjectOverride && !MethodDefinition.IsObjectOverride(method.Name, method.Signature, CoreLibrary, NativeObjectRoot))
+                if (method.IsImplicitObjectOverride && !MethodDefinition.IsObjectOverride(method.Name, method.Signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot))
                     throw new InvalidDataException("Object override does not match the selected root signature");
                 method.Signature.ValidateOwner(this, arity, complete: true, allowSelf: method.DeclaringType?.IsInterface == true);
                 foreach (var bound in method.InterfaceConstraints)
@@ -229,6 +229,24 @@ public sealed partial class AssemblyBuilder
         Definition.MainModule.Types.Add(definition);
         return definition.Producer!;
     }
+    /// <summary>Adds an abstract closed family derived from an owned ordinary class.</summary>
+    /// <param name="namespace">Metadata namespace.</param>
+    /// <param name="name">Nonempty unique metadata name.</param>
+    /// <param name="baseType">Already attached nongeneric reference base, including the native Object root.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <returns>The attached closed-family definition.</returns>
+    /// <exception cref="ArgumentNullException">The base is null.</exception>
+    /// <exception cref="ArgumentException">Invalid base, visibility, name or duplicate type.</exception>
+    /// <remarks>Uses the same validation as manually attached definitions. Constructors must initialize the direct base; closure constrains this family's direct children, not its base.</remarks>
+    public TypeBuilder AddClosedClass(string @namespace, string name, TypeBuilder baseType, TypeVisibility visibility = TypeVisibility.Public)
+    {
+        ArgumentNullException.ThrowIfNull(baseType);
+        if (!Enum.IsDefined(visibility)) throw new ArgumentException("invalid visibility", nameof(visibility));
+        var definition = new TypeDefinition(@namespace, name, (visibility == TypeVisibility.Public ? 1u : 0u) | 0x80,
+            baseType.Definition.ToReference(), true);
+        Definition.MainModule.Types.Add(definition);
+        return definition.Producer!;
+    }
     /// <summary>Adds a nongeneric interface whose direct implementations and derived interfaces belong to this output.</summary>
     /// <param name="namespace">Metadata namespace.</param>
     /// <param name="name">Nonempty unique metadata name.</param>
@@ -281,6 +299,25 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentException">Invalid names, visibility, duplicate type or exceeded limits.</exception>
     public TypeBuilder AddGenericClass(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility = TypeVisibility.Public)
         => AddGenericTypeCore(@namespace, name, genericParameterNames, visibility, false);
+    /// <summary>Adds a generic reference class deriving from this output's explicit native Object root.</summary>
+    /// <param name="namespace">Metadata namespace.</param>
+    /// <param name="name">Simple name without CLI arity.</param>
+    /// <param name="genericParameterNames">One through 32 unique names.</param>
+    /// <param name="baseType">The attached native Object root in this output.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <returns>An attached generic class; constructors must explicitly initialize the base.</returns>
+    /// <exception cref="ArgumentException">Invalid owner, visibility, names or duplicate declaration.</exception>
+    /// <exception cref="ArgumentNullException">Base or parameter sequence is null.</exception>
+    public TypeBuilder AddGenericClass(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeBuilder baseType, TypeVisibility visibility = TypeVisibility.Public)
+    {
+        ArgumentNullException.ThrowIfNull(baseType);
+        if (!ReferenceEquals(baseType.Assembly, this) || !baseType.IsNativeObjectRoot || !Enum.IsDefined(visibility))
+            throw new ArgumentException("generic local bases require this output's native Object root");
+        var definition = new TypeDefinition(@namespace, name, visibility == TypeVisibility.Public ? 1u : 0u, baseType.Definition.ToReference(), genericParameterNames);
+        Definition.MainModule.Types.Add(definition);
+        return definition.Producer!;
+    }
+
     private TypeBuilder AddGenericTypeCore(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility, bool isStatic, bool isInterface = false, bool isValueType = false)
     {
         ArgumentNullException.ThrowIfNull(genericParameterNames);
@@ -306,7 +343,7 @@ public sealed partial class AssemblyBuilder
     private byte[] WriteImage(bool referenceOnly)
     {
         var methods = ValidateGraph(validateBodies: !referenceOnly);
-        if (!referenceOnly && types.Any(t => t.Definition.IsNativeObjectRoot))
+        if (!referenceOnly && (ExternalObjectRoot is not null || types.Any(t => t.Definition.IsNativeObjectRoot)))
             throw new InvalidDataException("native Object root requires native emission; CLI projection is reference-only");
         if (!referenceOnly && types.Any(t => t.IsClosedHierarchy))
             throw new InvalidDataException("closed class families require native emission; CLI closed-family attributes are not authored");
@@ -405,6 +442,12 @@ public sealed partial class AssemblyBuilder
         TypeReferenceHandle selfMarker = default;
         void EncodeType(SignatureTypeEncoder encoder, SignatureType type)
         {
+            if (type.PointerElement is { } pointer)
+            {
+                if (pointer.Primitive == PrimitiveType.Void) encoder.VoidPointer();
+                else EncodeType(encoder.Pointer(), pointer);
+                return;
+            }
             if (type.IsSelf)
             {
                 if (!referenceOnly) throw new InvalidDataException("Self requires native emission; CLI projection is reference-only");
@@ -429,7 +472,7 @@ public sealed partial class AssemblyBuilder
                 {
                     encoder.Char(); return;
                 }
-                if (imported.AssemblyIdentity.Equals(CoreLibrary) && imported is { Namespace: "System", Name: "Object", IsValueType: false, GenericArity: 0, DeclaringType: null })
+                if (Equals(imported, ExternalObjectRoot) || imported.AssemblyIdentity.Equals(CoreLibrary) && imported is { Namespace: "System", Name: "Object", IsValueType: false, GenericArity: 0, DeclaringType: null })
                 {
                     encoder.Object(); return;
                 }
@@ -467,6 +510,8 @@ public sealed partial class AssemblyBuilder
                 case PrimitiveType.UInt16: encoder.UInt16(); break;
                 case PrimitiveType.UInt32: encoder.UInt32(); break;
                 case PrimitiveType.UInt64: encoder.UInt64(); break;
+                case PrimitiveType.IntPtr: encoder.IntPtr(); break;
+                case PrimitiveType.UIntPtr: encoder.UIntPtr(); break;
                 case PrimitiveType.RuntimeTypeHandle: encoder.Type(MetadataTokens.EntityHandle(ElementToken(type)), isValueType: true); break;
 
                 case PrimitiveType.Single: encoder.Single(); break;
@@ -617,10 +662,26 @@ public sealed partial class AssemblyBuilder
         void EmitMethod(MethodBuilder method)
         {
             var firstParameter = MetadataTokens.ParameterHandle(nextParameter);
-            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null)
+            void AnnotateNullable(ParameterHandle parameter, NullableAnnotation annotation)
+            {
+                var marker = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System.Runtime.CompilerServices"), metadata.GetOrAddString("NullableAttribute"));
+                var constructor = metadata.AddMemberReference(marker, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(annotation.IsUniform ? new byte[] { 0x20, 1, 1, 5 } : new byte[] { 0x20, 1, 1, 0x1d, 5 }));
+                var blob = new BlobBuilder(); blob.WriteUInt16(1);
+                if (!annotation.IsUniform) blob.WriteInt32(annotation.Flags.Count);
+                foreach (var flag in annotation.Flags) blob.WriteByte(flag);
+                blob.WriteUInt16(0);
+                metadata.AddCustomAttribute(parameter, constructor, metadata.GetOrAddBlob(blob));
+            }
+            if (method.Definition.NullableAnnotations.TryGetValue(-1, out var returnFlags))
+            {
+                AnnotateNullable(metadata.AddParameter(ParameterAttributes.None, default, 0), returnFlags);
+                nextParameter++;
+            }
+            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.NullableAnnotations.Keys.Any(i => i >= 0))
                 for (int i = 0; i < method.ParameterCount; i++)
                 {
                     var parameter = metadata.AddParameter(method.Signature.OutParameters.Contains(i) ? ParameterAttributes.Out : ParameterAttributes.None, method.Definition.ParameterNames.TryGetValue(i, out var parameterName) ? metadata.GetOrAddString(parameterName) : default, i + 1);
+                    if (method.Definition.NullableAnnotations.TryGetValue(i, out var flags)) AnnotateNullable(parameter, flags);
                     if (method.Definition.ParameterArrayIndex == i)
                     {
                         var marker = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("ParamArrayAttribute"));
@@ -715,6 +776,8 @@ public sealed partial class AssemblyBuilder
                     case "convertUInt16": code.WriteByte(0xd1); break;
                     case "convertUInt32": code.WriteByte(0x6d); break;
                     case "convertUInt64": code.WriteByte(0x6e); break;
+                    case "convertIntPtr": code.WriteByte(0xd3); break;
+                    case "convertUIntPtr": code.WriteByte(0xe0); break;
                     case "divide.unsigned": code.WriteByte(0x5c); break;
                     case "remainder.unsigned": code.WriteByte(0x5e); break;
                     case "shift.right.unsigned": code.WriteByte(0x64); break;

@@ -60,13 +60,13 @@ internal class ObjectMapper {
             let Some(element) = type.GetElementType() else {
                 return Error(JsonError.UnsupportedMapping("Missing array element type"))
             }
-            let count = RuntimeServices.ReflectionArrayLength(present)
+            let count = ArrayReflection.GetLength(present)
             if count > 31 {
                 return Error(JsonError.LimitExceeded("Array exceeds 31 items"))
             }
             let array = JsonArray()
             for index in 0..<count {
-                let child = RuntimeServices.ReflectionArrayGet(present, index)
+                let child = ArrayReflection.GetValue(present, index)
                 let node = WriteValue(child, element, depth + 1)?
                 _ = array.Add(node)?
             }
@@ -133,7 +133,7 @@ internal class ObjectMapper {
                 if construct == 0 {
                     return Ok(array)
                 }
-                return Ok(RuntimeServices.ReflectionArrayCreate(type, items))
+                return Ok(ArrayReflection.Create(type, items))
             }
             return Error(JsonError.TypeMismatch("array"))
         }

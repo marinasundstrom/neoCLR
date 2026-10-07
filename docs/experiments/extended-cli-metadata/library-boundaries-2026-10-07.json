@@ -1,0 +1,302 @@
+{
+  "scope": "Candidate namespace partition; nested types follow their declaring owner. Local metadata/signature/body references only. Imported seed/bootstrap dependencies and final native-adapter ownership require separate review. Not a proven build DAG.",
+  "types": {
+    "System.Runtime candidate": 334,
+    "System.Data": 26,
+    "System.Networking": 33,
+    "System.Web": 37
+  },
+  "functions": {
+    "System.Runtime candidate": 1999,
+    "System.Data": 142,
+    "System.Networking": 189,
+    "System.Web": 313
+  },
+  "declarationCborBytes": {
+    "System.Runtime candidate": 4896542,
+    "System.Data": 812782,
+    "System.Networking": 711626,
+    "System.Web": 2348997
+  },
+  "edges": [
+    {
+      "source": "System.Data",
+      "target": "System.Runtime candidate",
+      "relationships": 548,
+      "examples": [
+        [
+          "System.Data.Json.DocumentReader",
+          "System.Collections.Sequence`1"
+        ],
+        [
+          "System.Data.Json.DocumentReader",
+          "System.Object"
+        ],
+        [
+          "System.Data.Json.DocumentReader..ctor",
+          "System.Collections.Sequence`1"
+        ],
+        [
+          "System.Data.Json.DocumentReader..ctor",
+          "System.Object"
+        ],
+        [
+          "System.Data.Json.DocumentReader..ctor",
+          "System.Object..ctor"
+        ],
+        [
+          "System.Data.Json.DocumentReader..ctor",
+          "System.Text.Utf8"
+        ],
+        [
+          "System.Data.Json.DocumentReader..ctor",
+          "System.Text.Utf8.Encode"
+        ],
+        [
+          "System.Data.Json.DocumentReader.Read",
+          "System.Collections.Collection`1"
+        ],
+        [
+          "System.Data.Json.DocumentReader.Read",
+          "System.Collections.Collection`1.get_Count"
+        ],
+        [
+          "System.Data.Json.DocumentReader.Read",
+          "System.Result+Error`1"
+        ],
+        [
+          "System.Data.Json.DocumentReader.Read",
+          "System.Result+Error`1..ctor"
+        ],
+        [
+          "System.Data.Json.DocumentReader.Read",
+          "System.Result+Ok`1"
+        ]
+      ]
+    },
+    {
+      "source": "System.Networking",
+      "target": "System.Runtime candidate",
+      "relationships": 480,
+      "examples": [
+        [
+          "System.Networking.Dns",
+          "System.Object"
+        ],
+        [
+          "System.Networking.Dns..ctor",
+          "System.Object"
+        ],
+        [
+          "System.Networking.Dns..ctor",
+          "System.Object..ctor"
+        ],
+        [
+          "System.Networking.Dns.DecodeError",
+          "System.Fail"
+        ],
+        [
+          "System.Networking.Dns.GetHostAddresses",
+          "System.Collections.Sequence`1"
+        ],
+        [
+          "System.Networking.Dns.GetHostAddresses",
+          "System.Concurrency.CancellationToken"
+        ],
+        [
+          "System.Networking.Dns.GetHostAddresses",
+          "System.Concurrency.CancellationToken.get_None"
+        ],
+        [
+          "System.Networking.Dns.GetHostAddresses",
+          "System.Result`2"
+        ],
+        [
+          "System.Networking.Dns.GetHostAddresses",
+          "System.Tasks.Task`1"
+        ],
+        [
+          "System.Networking.Dns.GetHostAddressesUntil",
+          "System.Collections.Sequence`1"
+        ],
+        [
+          "System.Networking.Dns.GetHostAddressesUntil",
+          "System.Concurrency.CancellationToken"
+        ],
+        [
+          "System.Networking.Dns.GetHostAddressesUntil",
+          "System.Concurrency.CancellationToken.get_None"
+        ]
+      ]
+    },
+    {
+      "source": "System.Web",
+      "target": "System.Data",
+      "relationships": 29,
+      "examples": [
+        [
+          "System.Web.Http.Json.HttpJsonError+Json",
+          "System.Data.Json.JsonError"
+        ],
+        [
+          "System.Web.Http.Json.HttpJsonError+Json..ctor",
+          "System.Data.Json.JsonError"
+        ],
+        [
+          "System.Web.Http.Json.HttpJsonError+Json.Deconstruct",
+          "System.Data.Json.JsonError"
+        ],
+        [
+          "System.Web.Http.Json.HttpJsonError+Json.ToString",
+          "System.Data.Json.JsonError"
+        ],
+        [
+          "System.Web.Http.Json.HttpJsonError+Json.get_Reason",
+          "System.Data.Json.JsonError"
+        ],
+        [
+          "System.Web.Http.Json.HttpJsonError.ToString",
+          "System.Data.Json.JsonError"
+        ],
+        [
+          "System.Web.Http.Json.HttpJsonError.ToString",
+          "System.Data.Json.JsonError.ToString"
+        ],
+        [
+          "System.Web.Http.Json.JsonClientOperations.Post",
+          "System.Data.Json.JsonError"
+        ],
+        [
+          "System.Web.Http.Json.JsonClientRead.Decode",
+          "System.Data.Json.JsonError"
+        ],
+        [
+          "System.Web.Http.Json.JsonContent.Create",
+          "System.Data.Json.JsonError"
+        ],
+        [
+          "System.Web.Http.Json.JsonContent.Create",
+          "System.Data.Json.JsonSerializer"
+        ],
+        [
+          "System.Web.Http.Json.JsonContent.Create",
+          "System.Data.Json.JsonSerializer.Serialize"
+        ]
+      ]
+    },
+    {
+      "source": "System.Web",
+      "target": "System.Networking",
+      "relationships": 85,
+      "examples": [
+        [
+          "System.Web.Http.HttpContext",
+          "System.Networking.Sockets.Socket"
+        ],
+        [
+          "System.Web.Http.HttpContext",
+          "System.Networking.Sockets.SocketError"
+        ],
+        [
+          "System.Web.Http.HttpContext..ctor",
+          "System.Networking.Sockets.Socket"
+        ],
+        [
+          "System.Web.Http.HttpContext..ctor",
+          "System.Networking.Sockets.SocketError"
+        ],
+        [
+          "System.Web.Http.HttpContext.Close",
+          "System.Networking.Sockets.Socket"
+        ],
+        [
+          "System.Web.Http.HttpContext.Close",
+          "System.Networking.Sockets.Socket.Close"
+        ],
+        [
+          "System.Web.Http.HttpContext.OnSent",
+          "System.Networking.Sockets.SocketError"
+        ],
+        [
+          "System.Web.Http.HttpContext.SendNext",
+          "System.Networking.Sockets.Socket"
+        ],
+        [
+          "System.Web.Http.HttpContext.SendNext",
+          "System.Networking.Sockets.Socket.SendUntil"
+        ],
+        [
+          "System.Web.Http.HttpContext.SendNext",
+          "System.Networking.Sockets.SocketError"
+        ],
+        [
+          "System.Web.Http.HttpError+NameResolution",
+          "System.Networking.DnsError"
+        ],
+        [
+          "System.Web.Http.HttpError+NameResolution..ctor",
+          "System.Networking.DnsError"
+        ]
+      ]
+    },
+    {
+      "source": "System.Web",
+      "target": "System.Runtime candidate",
+      "relationships": 1873,
+      "examples": [
+        [
+          "System.Web.Http.HttpClient",
+          "System.Collections.Sequence`1"
+        ],
+        [
+          "System.Web.Http.HttpClient",
+          "System.Object"
+        ],
+        [
+          "System.Web.Http.HttpClient",
+          "System.Option`1"
+        ],
+        [
+          "System.Web.Http.HttpClient..ctor",
+          "System.Collections.ArrayList`1"
+        ],
+        [
+          "System.Web.Http.HttpClient..ctor",
+          "System.Collections.ArrayList`1..ctor"
+        ],
+        [
+          "System.Web.Http.HttpClient..ctor",
+          "System.Collections.Sequence`1"
+        ],
+        [
+          "System.Web.Http.HttpClient..ctor",
+          "System.Object"
+        ],
+        [
+          "System.Web.Http.HttpClient..ctor",
+          "System.Object..ctor"
+        ],
+        [
+          "System.Web.Http.HttpClient..ctor",
+          "System.Option+None"
+        ],
+        [
+          "System.Web.Http.HttpClient..ctor",
+          "System.Option+None..ctor"
+        ],
+        [
+          "System.Web.Http.HttpClient..ctor",
+          "System.Option`1"
+        ],
+        [
+          "System.Web.Http.HttpClient..ctor",
+          "System.Option`1..ctor"
+        ]
+      ]
+    }
+  ],
+  "input": "/private/tmp/full-system-payload1007.json",
+  "sha256": "0bce2c5574c8c5219034fc04d22b0604e91e937babee0acd9dd55e4d75bcc8e2",
+  "nativeJsonBytes": 10080354,
+  "nativeCborBytes": 8770829
+}

@@ -1,0 +1,119 @@
+{
+  "runtimeRevision": "7bfca8206dab7944cbe21f7cfdfdfe258cdfb2b9",
+  "compilerRevision": "d19c6e4a3",
+  "instructionBudget": 100000000,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/nullable-compiler-final1006/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/source-env1006-final/Environment.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Environment/Functions.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/EnvironmentError.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeEnvironmentCalls.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeEnvironmentServices.rvn"
+      ],
+      "cwd": "/private/tmp/source-env1006-final",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV0331: Member 'EnvironmentError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/nullable-compiler-final1006/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/source-env1006-final/Environment.dll",
+        "-o",
+        "/private/tmp/source-env1006-final/EnvironmentConsumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/environment-consumer.rvn"
+      ],
+      "cwd": "/private/tmp/source-env1006-final",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-env1006-final/EnvironmentConsumer.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-env1006-final/Environment.dll"
+      ],
+      "cwd": "/private/tmp/source-env1006-final",
+      "exitCode": 0,
+      "stdout": "NeoMetadata_35F228FD8E65DC616D8BE0FBBC3EA3D7D4DD10D2B2F8F69DA6EF77A0B73CE918: typed-stack/control-flow verification passed (1465 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-env1006-final/EnvironmentConsumer.dll",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-env1006-final/Environment.dll",
+        "--",
+        "first",
+        "r\u00e4ven"
+      ],
+      "cwd": "/private/tmp/source-env1006-final",
+      "exitCode": 0,
+      "stdout": "Native source environment passed\n",
+      "stderr": ""
+    }
+  ],
+  "hashes": {
+    "/private/tmp/native-poc-libraries1005/Numbers.dll": "3b41a75d3e16ac1f0750e22eb1f3ff7297691e9de8d5e6a47815596031afc1dd",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/private/tmp/preview12-bootstrap/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/preview12-bootstrap/Core.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/nullable-compiler-final1006/rvnc.dll": "a72b50df77cd2d778f42d3fe780353a97fb0b8b1a2ecba3d7424761adfdeb964",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "80521b2831bcce1bd37eee082c79462461969eddc683c14086e35c01b1b5976f",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_source_environment.py": "0a640792922635ff596f92b1d26b78ffeba0248d21f7fea9c79a4fab9e13e1bd",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/environment-consumer.rvn": "5c8f03b6af4086e51797af2c7f4bd0cf4c66eddee21ea3932a45825986c23b2b",
+    "/private/tmp/source-env1006-final/Environment.dll": "7b6ab3f5e1a07071614a81b2fb63e91bbeafb5cc65e6ce424e5c000144ef43a6",
+    "/private/tmp/source-env1006-final/EnvironmentConsumer.dll": "8751b3123b66f26c694c8b67fbd09fb650c77b9d33530f2e00597b61d10c9d1c",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Environment/Functions.rvn": "39d1fa62dcdbed3275d991716fc784ff07d617e1531a4e94becf73ba6c16157d",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/EnvironmentError.rvn": "08d7ca88cd6395e47a000c413b910c7c61b501417c9827dda7ef40b63b5c11f4",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeEnvironmentCalls.rvn": "31c3cc02aa576ac1ea0bd98bed30e001025f7e5f04d3ed27d8b9082b844f060b",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeEnvironmentServices.rvn": "fd077d9a6d41a2e5480b7c29b3980f8bd4fab3696e7b2d24b80c20b98a450c77",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/native.rs": "3bc975211b1c06150fd8e4bb9d4509ac525d9156fce10f41db37b9d45d3c73a7",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/vm.rs": "f50fb0d9b3162108218653f3e181b10fbc11666f7d925d32177a1092f85d7faf",
+    "/private/tmp/nullable-compiler-final1006/Raven.CodeAnalysis.dll": "365044b249c3a96561bb7525e10ac38ba5f4c101a2516e8c39686361ebc08e5a",
+    "/private/tmp/nullable-compiler-final1006/Raven.CodeAnalysis.NeoClr.dll": "1e567696fa5047af999d7a0fe1aedcc50fc5a4856088b4a969e02f276d6aef4c",
+    "/private/tmp/nullable-compiler-final1006/NeoCLR.Metadata.Experimental.dll": "c99b86bdc3e8472dff10373783edd92782ec59c9100c6a518e86aefd68d2158b"
+  }
+}

@@ -571,11 +571,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         ) {
             // Separate assemblies may declare the same runtime service. Keep their
             // definition identities; do not merge declarations or relax overloads.
+            // Registered Void services may explicitly admit both a unit value and
+            // a no-result call ABI. Each scoped call keeps its declaring contract.
             if previous.is_internal_call()
                 && function.is_internal_call()
                 && previous.parameters == function.parameters
                 && previous.returns == function.returns
-                && previous.no_result == function.no_result
+                && (previous.no_result == function.no_result
+                    || (previous.returns == Type::Void
+                        && crate::native::bind_in(module, previous).is_ok()
+                        && crate::native::bind_in(module, function).is_ok()))
                 && previous
                     .definition
                     .as_ref()
@@ -584,9 +589,17 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             {
                 continue;
             }
-            return Err(Fault::new(
-                "duplicate function signature differing only by reference access",
-            ));
+            return Err(Fault::new(format!(
+                "conflicting function signature: {} ({:?}) [{:?} versus {:?}]; returns {:?}/{:?}, no-result {}/{}",
+                function.name,
+                function.parameters,
+                previous.definition,
+                function.definition,
+                previous.returns,
+                function.returns,
+                previous.no_result,
+                function.no_result
+            )));
         }
         if function.name.is_empty()
             || (function.owner.is_some()
@@ -610,10 +623,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
     }
     for definition in &module.types {
-        if definition
-            .base
-            .as_ref()
-            .is_some_and(|base| module.is_reference_type(base) != definition.is_reference_type)
+        let intrinsic_string_root =
+            crate::inheritance::has_intrinsic_string_root(module, definition);
+        if !intrinsic_string_root
+            && definition
+                .base
+                .as_ref()
+                .is_some_and(|base| module.is_reference_type(base) != definition.is_reference_type)
         {
             return Err(Fault::new(
                 "base and derived types must have the same storage category",
@@ -3636,6 +3652,47 @@ fn interpret_instructions_with_dispatch(
                         frames.push(child);
                         return Ok(None);
                     }
+                    // Intrinsic String keeps text storage; its fieldless Object base
+                    // still executes with the ordinary Object receiver ABI.
+                    let string_base_chain = callee.instance
+                        && callee.name == "System.Object..ctor"
+                        && crate::object_root::owns_slot(module, &callee)
+                        && function.name == "System.String..ctor"
+                        && function
+                            .owner
+                            .as_ref()
+                            .and_then(|owner| module.type_definition(owner))
+                            .is_some_and(|owner| {
+                                crate::inheritance::has_intrinsic_string_root(module, owner)
+                            });
+                    if string_base_chain {
+                        let receiver_index = frame
+                            .stack
+                            .len()
+                            .checked_sub(callee.parameters.len() + 1)
+                            .ok_or_else(|| Fault::new("missing String constructor receiver"))?;
+                        let own = frame.args[0].borrow().get()?.clone();
+                        if frame.constructor_chained
+                            || !matches!((&own, &frame.stack[receiver_index]),
+                            (Value::String(a), Value::String(b)) if a.same_owner(b))
+                        {
+                            return Err(Fault::new(
+                                "String constructor must chain once using its own receiver",
+                            ));
+                        }
+                        if heap.len() >= limits.heap_objects {
+                            return Err(Fault::coded(
+                                crate::FaultCode::HeapLimitExceeded,
+                                "heap object limit exceeded",
+                            ));
+                        }
+                        let index = heap.allocate(frame.stack[receiver_index].clone())?;
+                        frame.stack[receiver_index] =
+                            Value::ObjectReference(crate::value::ObjectReference {
+                                reference: heap.address(index)?,
+                                view: callee.owner.clone(),
+                            });
+                    }
                     let mut args = frame.args(module, &callee.argument_types())?;
                     if callee.instance
                         && callee.name.ends_with("..ctor")
@@ -3652,8 +3709,9 @@ fn interpret_instructions_with_dispatch(
                             .get()?
                             .clone();
                         if frame.constructor_chained
-                            || !matches!((&own, args.first()),
-                            (Value::ObjectReference(a), Some(Value::ObjectReference(b))) if a == b)
+                            || (!string_base_chain
+                                && !matches!((&own, args.first()),
+                            (Value::ObjectReference(a), Some(Value::ObjectReference(b))) if a == b))
                         {
                             return Err(Fault::new(
                                 "class constructor must chain once using its own receiver",
@@ -3702,6 +3760,33 @@ fn interpret_instructions_with_dispatch(
                             )?);
                             return Ok(None);
                         }
+                        if matches!(binding, crate::native::Binding::NativeAllocate) {
+                            let [Value::UIntPtr(count)] = args.as_slice() else {
+                                return Err(Fault::new("native allocation requires a byte count"));
+                            };
+                            let layout = crate::memory::layout(module, &Type::Byte)?;
+                            let mut pointer = memory.allocate(
+                                Type::Byte,
+                                &layout,
+                                *count,
+                                limits.pointer_bytes,
+                                limits.pointer_allocations,
+                            )?;
+                            pointer.target = Type::Void;
+                            frames
+                                .last_mut()
+                                .unwrap()
+                                .stack
+                                .push(Value::Pointer(pointer));
+                            return Ok(None);
+                        }
+                        if matches!(binding, crate::native::Binding::NativeFree) {
+                            let [Value::Pointer(pointer)] = args.as_slice() else {
+                                return Err(Fault::new("native release requires a pointer"));
+                            };
+                            memory.free(pointer)?;
+                            return Ok(None);
+                        }
                         if matches!(binding, crate::native::Binding::GcCollect) {
                             // The private service consumes no arguments; all roots remain in frames.
                             let roots = execution_roots(
@@ -3716,7 +3801,9 @@ fn interpret_instructions_with_dispatch(
                                 .saturating_mul(2)
                                 .max(64)
                                 .min(limits.heap_objects);
-                            frames.last_mut().unwrap().stack.push(Value::Void);
+                            if !callee.no_result {
+                                frames.last_mut().unwrap().stack.push(Value::Void);
+                            }
                             return Ok(None);
                         }
 
@@ -3760,6 +3847,7 @@ fn interpret_instructions_with_dispatch(
                                 | crate::native::Binding::ExecutingAssembly
                                 | crate::native::Binding::UnixTimeToLocal
                                 | crate::native::Binding::EnvironmentArguments
+                                | crate::native::Binding::TimeZoneMapLocal
                                 | crate::native::Binding::StringSnapshot
                         ) {
                             *arrays_used = true;
@@ -3978,6 +4066,34 @@ fn interpret_instructions_with_dispatch(
                                 console_bytes,
                                 options,
                             )?
+                        };
+                        let value = if matches!(
+                            binding,
+                            crate::native::Binding::EnvironmentArguments
+                                | crate::native::Binding::TimeZoneMapLocal
+                        ) && matches!(callee.returns, Type::ArrayRef(_))
+                        {
+                            let Value::Array { elements, .. } = &value else {
+                                return Err(Fault::new(
+                                    "native array service returned a non-array value",
+                                ));
+                            };
+                            if elements.len() > limits.array_elements {
+                                return Err(Fault::new("array element limit exceeded"));
+                            }
+                            if heap.len() >= limits.heap_objects {
+                                return Err(Fault::coded(
+                                    crate::FaultCode::HeapLimitExceeded,
+                                    "heap object limit exceeded",
+                                ));
+                            }
+                            let index = heap.allocate(value)?;
+                            Value::ObjectReference(crate::value::ObjectReference {
+                                reference: heap.address(index)?,
+                                view: Some(callee.returns.clone()),
+                            })
+                        } else {
+                            value
                         };
                         let value = if matches!(
                             binding,

@@ -1,0 +1,25 @@
+namespace System
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+internal extension TimeZoneRuntimeServices for RuntimeServices {
+    static func TimeZoneDatabaseVersion() -> string {
+        return neoCLR.Runtime.TimeZoneDatabaseVersion()
+    }
+
+    static func SystemTimeZoneName() -> string {
+        return neoCLR.Runtime.SystemTimeZoneName()
+    }
+
+    static func TimeZoneExists(id: string) -> bool {
+        return neoCLR.Runtime.TimeZoneExists(id)
+    }
+
+    static func TimeZoneOffset(id: string, ticks: long) -> int {
+        return neoCLR.Runtime.TimeZoneOffset(id, ticks)
+    }
+
+    static func TimeZoneMapLocal(id: string, ticks: long) -> long[] {
+        return neoCLR.Runtime.TimeZoneMapLocal(id, ticks)
+    }
+}

@@ -1,0 +1,176 @@
+{
+  "runtimeRevision": "119d2daf543c5cc73287a88cfb9cefdc5a0afd4c",
+  "compilerRevision": "d19c6e4a3",
+  "instructionBudget": 100000000,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/nullable-compiler-final1006/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/source-heap-nullable1006-final/Heap.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Runtime/GC.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeHeapCalls.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeHeapServices.rvn"
+      ],
+      "cwd": "/private/tmp/source-heap-nullable1006-final",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/nullable-compiler-final1006/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/source-heap-nullable1006-final/Heap.dll",
+        "-o",
+        "/private/tmp/source-heap-nullable1006-final/HeapConsumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/heap-retention-consumer.rvn"
+      ],
+      "cwd": "/private/tmp/source-heap-nullable1006-final",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-heap-nullable1006-final/HeapConsumer.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-heap-nullable1006-final/Heap.dll"
+      ],
+      "cwd": "/private/tmp/source-heap-nullable1006-final",
+      "exitCode": 0,
+      "stdout": "NeoMetadata_A926138B166F82B73FB3A3CA23AA324A27801DFA8D9EC5D664F8F8581017E791: typed-stack/control-flow verification passed (1476 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-heap-nullable1006-final/HeapConsumer.dll",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-heap-nullable1006-final/Heap.dll"
+      ],
+      "cwd": "/private/tmp/source-heap-nullable1006-final",
+      "exitCode": 0,
+      "stdout": "Native source heap passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/nullable-compiler-final1006/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/source-heap-nullable1006-final/Heap.dll",
+        "-o",
+        "/private/tmp/source-heap-nullable1006-final/HeapNullableConsumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/heap-consumer.rvn"
+      ],
+      "cwd": "/private/tmp/source-heap-nullable1006-final",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-heap-nullable1006-final/HeapNullableConsumer.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-heap-nullable1006-final/Heap.dll"
+      ],
+      "cwd": "/private/tmp/source-heap-nullable1006-final",
+      "exitCode": 0,
+      "stdout": "NeoMetadata_C6563451002ADBD5FB7F96B514F819FEE869FC066E1917C94818EAE0875F6520: typed-stack/control-flow verification passed (1476 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-heap-nullable1006-final/HeapNullableConsumer.dll",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-heap-nullable1006-final/Heap.dll"
+      ],
+      "cwd": "/private/tmp/source-heap-nullable1006-final",
+      "exitCode": 0,
+      "stdout": "Native source heap passed\n",
+      "stderr": ""
+    }
+  ],
+  "limitation": "Explicit callable annotations only; nullable context and fields remain pending",
+  "hashes": {
+    "/private/tmp/native-poc-libraries1005/Numbers.dll": "3b41a75d3e16ac1f0750e22eb1f3ff7297691e9de8d5e6a47815596031afc1dd",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/private/tmp/preview12-bootstrap/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/preview12-bootstrap/Core.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/nullable-compiler-final1006/rvnc.dll": "a72b50df77cd2d778f42d3fe780353a97fb0b8b1a2ecba3d7424761adfdeb964",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "34f0d6ae1021c33cd7c42974ac080831e3667f108927d70b2057c98e87cc23f1",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_source_heap.py": "b84a2f18ad6260de5430eddb6c681e571f9c249a8c74863eca5477eb25dd66ee",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/heap-retention-consumer.rvn": "347fbfa36bb8cb2857c4ff3749fa360160b14bec11cacc0609b669489e2341ee",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/heap-consumer.rvn": "d64314668fba8ac796ba0aadd955f0525978720b7a53a52d85d0de004bef38c2",
+    "/private/tmp/source-heap-nullable1006-final/Heap.dll": "8801a65b841503a3effa4b6fc4d3b7e50ead7ff67593563162ef4654276f429a",
+    "/private/tmp/source-heap-nullable1006-final/HeapConsumer.dll": "9c77d0ba40251f69866da5650e294e0e3946ccb1519cb4f8235f3a4dd29661b3",
+    "/private/tmp/source-heap-nullable1006-final/HeapNullableConsumer.dll": "0dcbe9e3d07e7ca71e78a28aab261d1a957d36657b506fb354b860a3ea251967",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Runtime/GC.rvn": "1c672a79b8eb146f353d73ec5d075235976dbc68397843d2e1b7ce669dd915d0",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeHeapCalls.rvn": "5d6713ef3c5c24c5122301a728732066931ef77be90fcc24891cf8774ef68ba1",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeHeapServices.rvn": "c39d3ba0850ce0d4878b5d198a7e475129f9a4590b8d5bf11e4ddd0a7ea5f0b4",
+    "/private/tmp/nullable-compiler-final1006/Raven.CodeAnalysis.dll": "365044b249c3a96561bb7525e10ac38ba5f4c101a2516e8c39686361ebc08e5a",
+    "/private/tmp/nullable-compiler-final1006/Raven.CodeAnalysis.NeoClr.dll": "1e567696fa5047af999d7a0fe1aedcc50fc5a4856088b4a969e02f276d6aef4c",
+    "/private/tmp/nullable-compiler-final1006/NeoCLR.Metadata.Experimental.dll": "c99b86bdc3e8472dff10373783edd92782ec59c9100c6a518e86aefd68d2158b"
+  }
+}

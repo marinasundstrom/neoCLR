@@ -31,7 +31,7 @@ public sealed partial class NativeAssemblyDefinition
     {
         static bool SupportedArgument(SignatureType type) => type.MethodParameterIndex is not null ||
             (type.ArrayElement is { } element ? SupportedArgument(element) : SupportedScalar(type));
-        static bool SupportedScalar(SignatureType type) => type.FunctionSignature is { } function && SupportedArgument(function.ReturnType) && function.ParameterTypes.All(SupportedArgument) || type.IsSelf || type.GenericInstance is { } instance && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
+        static bool SupportedScalar(SignatureType type) => type.PointerElement is not null || type.FunctionSignature is { } function && SupportedArgument(function.ReturnType) && function.ParameterTypes.All(SupportedArgument) || type.IsSelf || type.GenericInstance is { } instance && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
             type.ClassType is { IsStatic: false } ||
             type.ImportedType is { } imported &&
             imported.GenericArity == imported.TypeArguments.Count && imported.TypeArguments.All(SupportedArgument);
@@ -54,6 +54,7 @@ public sealed partial class NativeAssemblyDefinition
         AssemblyDefinition.NativeSignatureTypeRow Copy(SignatureType type)
         {
             if (type.FunctionSignature is { } function) return new(null, 0, Function: new(Copy(function.ReturnType), function.ParameterTypes.Select(Copy).ToArray()));
+            if (type.PointerElement is { } pointer) return new(null, 0, Copy(pointer), IsPointer: true);
             if (type.ByReferenceElement is { } target) return new(null, 0, Copy(target), IsByReference: true);
             if (type.IsSelf) return new(null, 0, IsSelf: true);
             if (type.GenericInstance is { } instance) return new(null, LocalToken(instance.Definition), Arguments: instance.TypeArguments.Select(Copy).ToArray());
@@ -95,7 +96,7 @@ public sealed partial class NativeAssemblyDefinition
         var rows = methods.Select((method, index) => new AssemblyDefinition.MethodRow(
             0x06000001u + (uint)index, method.Owner < 0 ? 0 : 0x02000002u + (uint)method.Owner, method.Name,
             (ushort)((method.ExplicitInterfaces.Length != 0 ? 0x160 : 0) | (method.Override ? 0xc0 : method.Abstract ? 0x5c0 : method.Virtual ? 0x1c0 : 0) | (method.Owner >= 0 && types[method.Owner].IsInterface ? 0x5c0 : 0) | (accessors.Contains(index) ? 0x800 : 0) | (method.Instance ? 0 : 0x10) | (method.Instance && method.Name == ".ctor" ? 0x1800 : 0) | (method.Visibility == MethodVisibility.Public ? 6 : method.Visibility == MethodVisibility.Internal ? 3 : method.Visibility == MethodVisibility.Protected ? 4 : 1)), method.ImplementationAttributes, method.Signature.GenericParameterNames.Count, [], false, [],
-            new AssemblyDefinition.NativeMethodSignatureRow(Copy(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Copy).ToArray(), method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.ToArray()), method.Namespace, ParameterNames: method.ParameterNames, ParameterArrayIndex: method.ParameterArrayIndex, InterfaceConstraints: method.InterfaceConstraints.Select(c => new AssemblyDefinition.MethodConstraintRow(c.Parameter, Copy(c.Type).TypeToken)).ToArray())).ToArray();
+            new AssemblyDefinition.NativeMethodSignatureRow(Copy(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Copy).ToArray(), method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.ToArray()), method.Namespace, ParameterNames: method.ParameterNames, NullableAnnotations: method.NullableAnnotations, ParameterArrayIndex: method.ParameterArrayIndex, InterfaceConstraints: method.InterfaceConstraints.Select(c => new AssemblyDefinition.MethodConstraintRow(c.Parameter, Copy(c.Type).TypeToken)).ToArray())).ToArray();
         var propertyRows = properties.Select((property, index) => new AssemblyDefinition.PropertyRow(
             0x17000001u + (uint)index, 0x02000002u + (uint)property.Owner, property.Name, 0, [],
             property.Getter < 0 ? 0 : 0x06000001u + (uint)property.Getter,

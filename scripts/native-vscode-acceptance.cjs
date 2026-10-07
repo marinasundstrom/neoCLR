@@ -33,6 +33,20 @@ exports.run = async function () {
   const config = JSON.parse(fs.readFileSync(path.join(root, 'acceptance.json')));
   const report = { vscode: vscode.version, checks: [], passed: false };
   const record = label => { report.checks.push(label); console.log('PASS ' + label); };
+  report.hoverTimings = [];
+  async function measuredHover(uri, position) {
+    const startedAt = new Date().toISOString();
+    const started = performance.now();
+    let result;
+    try {
+      result = await vscode.commands.executeCommand('vscode.executeHoverProvider', uri, position);
+      return result;
+    } finally {
+      report.hoverTimings.push({ uri: uri.toString(), line: position.line, character: position.character,
+        startedAt, elapsedMs: Math.round(performance.now() - started), hasResult: Boolean(result?.length) });
+    }
+  }
+
   let probe;
   try {
     await vscode.extensions.getExtension('raven.raven-vscode').activate();
@@ -41,7 +55,7 @@ exports.run = async function () {
     await vscode.window.showTextDocument(probe);
     const position = probe.positionAt(probe.getText().indexOf('VersionOne') + 2);
     const hover = await until(async () => {
-      const result = await vscode.commands.executeCommand('vscode.executeHoverProvider', uri, position);
+      const result = await measuredHover(uri, position);
       report.lastHover = hoverText(result);
       fs.writeFileSync(path.join(root, 'vscode-progress.json'), JSON.stringify(report));
       report.diagnostics = vscode.languages.getDiagnostics(uri).map(d => ({message:d.message, severity:d.severity}));
@@ -56,10 +70,10 @@ exports.run = async function () {
     const memberDoc = walk(docsRoot).find(f => f.endsWith('.md') && fs.readFileSync(f, 'utf8').includes('documented answer'));
     assert(memberDoc);
     fs.writeFileSync(memberDoc, fs.readFileSync(memberDoc, 'utf8').replace('documented answer', 'refreshed answer'));
-    await until(async () => hoverText(await vscode.commands.executeCommand('vscode.executeHoverProvider', uri, position)).includes('refreshed answer'), 'documentation-only refresh');
+    await until(async () => hoverText(await measuredHover(uri, position)).includes('refreshed answer'), 'documentation-only refresh');
     record('native Markdown sidecar edit refreshes hover');
     fs.unlinkSync(memberDoc);
-    await until(async () => hoverText(await vscode.commands.executeCommand('vscode.executeHoverProvider', uri, position)).includes('documented answer'), 'XML fallback after Markdown deletion');
+    await until(async () => hoverText(await measuredHover(uri, position)).includes('documented answer'), 'XML fallback after Markdown deletion');
     record('native XML fallback after Markdown member deletion');
     const definitions = await until(async () => {
       const result = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', uri, position);
@@ -91,7 +105,7 @@ exports.run = async function () {
     record('actual file watcher invalidates replaced native library');
     await edit('func EditorProbe() -> int => EditorApi.VersionTwo()\n');
     await until(async () => {
-      const result = await vscode.commands.executeCommand('vscode.executeHoverProvider', uri, probe.positionAt(probe.getText().indexOf('VersionTwo') + 2));
+      const result = await measuredHover(uri, probe.positionAt(probe.getText().indexOf('VersionTwo') + 2));
       return hoverText(result).includes('VersionTwo') && !vscode.languages.getDiagnostics(uri).some(d => d.severity === 0);
     }, 'replacement symbol with unsaved buffer');
     record('unsaved buffer survives native workspace reload');
@@ -106,17 +120,57 @@ exports.run = async function () {
     } finally { fs.writeFileSync(dependency, dependencyImage); }
     await until(() => !vscode.languages.getDiagnostics(projectUri).some(d => d.source === 'raven-project'), 'dependency recovery');
     record('native dependency recovery clears the project diagnostic');
+    if (config.classLibraryBundle) {
+      report.bundleHovers = {};
+      for (const type of ['System.Data.Json.JsonValue', 'System.Networking.IPAddress', 'System.Web.Http.HttpClient']) {
+        await edit(`func EditorProbe(value: ${type}) { }\n`);
+        const name = type.split('.').pop();
+        const typePosition = probe.positionAt(probe.getText().indexOf(name) + 2);
+        const hover = await until(async () => {
+          const result = await measuredHover(uri, typePosition);
+          return hoverText(result).includes(name) && result;
+        }, `${type} hover`);
+        const locations = await until(async () => {
+          const result = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', uri, typePosition);
+          return result?.length && result;
+        }, `${type} metadata navigation`);
+        assert.strictEqual((locations[0].targetUri || locations[0].uri).scheme, 'raven-metadata');
+        report.bundleHovers[type] = hoverText(hover);
+        if (config.bundleDocumentation && type === 'System.Networking.IPAddress') {
+          assert(hoverText(hover).includes('An immutable IP address in the closed IPv4 and IPv6 family.'));
+          record('shipped native Networking documentation appears in hover');
+        }
+        record(`${type} native hover and metadata navigation`);
+      }
+      await edit('func EditorProbe() -> int => EditorApi.VersionTwo()\n');
+      await probe.save();
+      const configurationPath = path.join(root, 'references/NeoCLR.ClassLibrary.props');
+      const originalConfiguration = fs.readFileSync(configurationPath, 'utf8');
+      const invalidConfiguration = originalConfiguration.replace(
+        '<RavenNeoClrObjectLibrary>System.Runtime</RavenNeoClrObjectLibrary>',
+        '<RavenNeoClrObjectLibrary>Missing.Owner</RavenNeoClrObjectLibrary>');
+      assert.notStrictEqual(originalConfiguration, invalidConfiguration);
+      try {
+        fs.writeFileSync(configurationPath, invalidConfiguration);
+        await until(() => vscode.languages.getDiagnostics(projectUri).some(d =>
+          d.source === 'raven-project' && d.message.includes('Missing.Owner')), 'bundle configuration diagnostic');
+        record('imported bundle configuration edit produces project diagnostic');
+      } finally { fs.writeFileSync(configurationPath, originalConfiguration); }
+      await until(() => !vscode.languages.getDiagnostics(projectUri).some(d => d.source === 'raven-project'),
+        'bundle configuration recovery');
+      record('restored bundle configuration recovers the workspace');
+    }
     const main = await vscode.workspace.openTextDocument(vscode.Uri.file(path.join(root, 'Main.rvn')));
     await vscode.window.showTextDocument(main);
     await until(async () => {
-      const result = await vscode.commands.executeCommand('vscode.executeHoverProvider', main.uri, main.positionAt(main.getText().indexOf('ArrayList') + 2));
+      const result = await measuredHover(main.uri, main.positionAt(main.getText().indexOf('ArrayList') + 2));
       return hoverText(result).includes('ArrayList');
     }, 'source-built class-library symbols');
     assert(!vscode.languages.getDiagnostics(main.uri).some(d => d.severity === 0));
     record('unchanged broad sample imports source-built class library');
     report.unionHovers = {};
     for (const term of ['Option<Order>', 'Result<Order, SingleError>']) {
-      const result = await vscode.commands.executeCommand('vscode.executeHoverProvider', main.uri, main.positionAt(main.getText().indexOf(term) + 2));
+      const result = await measuredHover(main.uri, main.positionAt(main.getText().indexOf(term) + 2));
       const signature = hoverText(result);
       assert(signature.includes('union struct ' + term), signature);
       report.unionHovers[term] = signature;
@@ -128,6 +182,35 @@ exports.run = async function () {
       assert(!Object.values(report.unionHovers).some(text => text.includes('generated IUnion contract')));
       record('source-built Option and Result display shared authored API documentation');
     }
+    report.repeatedMainHovers = [];
+    for (let round = 0; round < 3; round++) {
+      for (const term of ['ArrayList', 'Option<Order>', 'Result<Order, SingleError>', 'Filter(', '.Map(']) {
+        const offset = main.getText().indexOf(term);
+        assert(offset >= 0, term);
+        const position = main.positionAt(offset + 2);
+        const result = await measuredHover(main.uri, position);
+        assert(hoverText(result), `Missing repeated hover: ${term}`);
+        report.repeatedMainHovers.push({ round, term, ...report.hoverTimings.at(-1) });
+      }
+    }
+    record('repeated broad-sample type and query hovers return symbols');
+    report.postEditMainHovers = [];
+    const originalMain = main.getText();
+    try {
+      for (let round = 0; round < 3; round++) {
+        const change = new vscode.WorkspaceEdit();
+        change.insert(main.uri, main.positionAt(main.getText().length), '\n// Hover timing edit\n');
+        assert(await vscode.workspace.applyEdit(change));
+        const result = await measuredHover(main.uri, main.positionAt(main.getText().indexOf('ArrayList') + 2));
+        assert(hoverText(result).includes('ArrayList'));
+        report.postEditMainHovers.push({ round, ...report.hoverTimings.at(-1) });
+      }
+    } finally {
+      const restore = new vscode.WorkspaceEdit();
+      restore.replace(main.uri, new vscode.Range(main.positionAt(0), main.positionAt(main.getText().length)), originalMain);
+      assert(await vscode.workspace.applyEdit(restore));
+    }
+    record('broad-sample hovers return after unsaved edits');
     const tasks = await vscode.tasks.fetchTasks();
     const build = tasks.find(t => t.name === 'neoCLR: Build');
     assert(build, 'configured native build task');
@@ -152,7 +235,7 @@ exports.run = async function () {
     if (dotnetFolder) {
       const doc = await vscode.workspace.openTextDocument(vscode.Uri.joinPath(dotnetFolder.uri, 'Main.rvn'));
       await vscode.window.showTextDocument(doc);
-      await until(async () => hoverText(await vscode.commands.executeCommand('vscode.executeHoverProvider', doc.uri,
+      await until(async () => hoverText(await measuredHover(doc.uri,
         doc.positionAt(doc.getText().indexOf('Abs') + 1))).includes('Abs'), '.NET hover');
       assert(!vscode.languages.getDiagnostics(doc.uri).some(d => d.severity === 0));
       record('ordinary .NET editor hover and diagnostics');

@@ -11,3 +11,6 @@ bounds. Floating-point functions return Double values.
 
 This page preserves the public container's reference entry while the function
 signatures and descriptions remain on their generated member pages.
+
+Native metadata represents these namespace functions as module functions without this
+CLI container. The function signatures and result contracts are the same.

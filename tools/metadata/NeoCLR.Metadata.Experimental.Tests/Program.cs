@@ -4,6 +4,40 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--external-object-consumer", var externalLibrary, var externalCore, var externalOutput])
+{
+    ObjectRootChecks.WriteExternalConsumer(externalLibrary, externalCore, externalOutput); return 0;
+}
+if (args is ["--object-roots"])
+{
+    ObjectRootChecks.Run(); GenericObjectRootChecks.Run();
+    Console.WriteLine("PASS native Object root contracts"); return 0;
+}
+if (args is ["--check-source-attributes", var attributeLibrary])
+{
+    SourceAttributeChecks.Check(attributeLibrary); return 0;
+}
+if (args is ["--generic-object-consumer", var rootLibrary, var rootCore, var rootConsumer])
+{
+    GenericObjectRootChecks.WriteConsumer(rootLibrary, rootCore, rootConsumer); return 0;
+}
+if (args is ["--generic-object-root", var rootOutput])
+{
+    GenericObjectRootChecks.WriteRuntime(rootOutput); return 0;
+}
+if (args is ["--pointer-allocation", var pointerOutput])
+{
+    PointerSignatureChecks.WriteRuntime(pointerOutput); return 0;
+}
+if (args.Length == 3 && args[0] == "--native-integer-inputs")
+{
+    NativeIntegerChecks.WriteInputs(args[1], args[2]); return 0;
+}
+if (args.Length == 1 && args[0] == "--nullable-annotations")
+{
+    NullableAnnotationChecks.Run();
+    Console.WriteLine("PASS nullable annotation definitions, CLI round trip and CLR interpretation"); return 0;
+}
 if (args.Length == 3 && args[0] == "--class-virtual-runtime")
 {
     await ClassVirtualChecks.RunRuntime(args[1], args[2]); return 0;
@@ -68,6 +102,10 @@ if (args.Length == 3 && args[0] == "--argument-address-runtime")
 if (args.Length == 5 && args[0] == "--native-comparer-binding")
 {
     await NativeComparerBindingChecks.Run(args[1], args[2], args[3], args[4]); return 0;
+}
+if (args.Length == 3 && args[0] == "--string-root-runtime")
+{
+    await StringRepresentationChecks.RunRuntime(args[1], args[2]); return 0;
 }
 if (args.Length == 3 && args[0] == "--array-backing-runtime")
 {
@@ -440,6 +478,9 @@ var tests = new (string Name, Action Body)[]
     ("Method interface bounds, snapshots and introspection", GenericMethodConstraintChecks.Run),
     ("Floating point signatures and execution", FloatingPointChecks.Run),
     ("Integer widths and unsigned execution", IntegerWidthChecks.Run),
+    ("Native integer signatures and conversions", NativeIntegerChecks.Run),
+    ("Pointer signature round trips and introspection", PointerSignatureChecks.Run),
+    ("Generic class with source Object root", GenericObjectRootChecks.Run),
     ("Native primitive declaration representation", PrimitiveRepresentationChecks.Run),
     ("Native String reference representation", StringRepresentationChecks.Run),
     ("Native grapheme declaration representation", GraphemeRepresentationChecks.Run),
@@ -482,6 +523,8 @@ var tests = new (string Name, Action Body)[]
     ("No-result entry points across CLI and native containers", EntryPointChecks.Run),
     ("Native library inventory and explicit static callable projections", NativeLibrarySymbolChecks.Run),
     ("Library binary profile and UInt64 bounds", LibraryBinaryChecks.Run),
+    ("Expanded library byte budget", ExpandedLibraryChecks.Run),
+    ("Explicit native unit value representation", UnitRepresentationChecks.Run),
     ("Existing native module transport", NativeModuleChecks.Run),
     ("Binary CBOR profile and container roundtrips", BinaryEncodingChecks.Run),
     ("Native console literal emission and bounds", ConsoleWriterChecks.Run),
@@ -493,6 +536,7 @@ var tests = new (string Name, Action Body)[]
     ("Consistent authored and reader type-row limits", DefinitionLimitChecks.Run),
     ("Inherited public interface implementation dispatch", InheritedInterfaceChecks.Run),
     ("Parameter array definitions, builders and CLI execution", ParameterArrayChecks.Run),
+    ("Nullable annotation definitions and CLI execution", NullableAnnotationChecks.Run),
     ("Reference Object override authoring and CLI execution", ReferenceOverrideChecks.Run),
     ("Source-owned module descriptor contract", SourceModuleInfoChecks.Run),
     ("Opaque runtime type handles and type-token authoring", TypeHandleChecks.Run),

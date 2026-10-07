@@ -202,6 +202,7 @@ public sealed partial class AssemblyDefinition
                     throw new InvalidDataException("missing or excessive method signature data");
                 signatureBytes += length;
                 int? parameterArray = null;
+                var nullableAnnotations = new Dictionary<int, NullableAnnotation>();
                 foreach (var parameter in method.GetParameters().Select(reader.GetParameter))
                 foreach (var attributeHandle in parameter.GetCustomAttributes())
                 {
@@ -226,6 +227,29 @@ public sealed partial class AssemblyDefinition
                         HandleKind.TypeDefinition => reader.GetString(reader.GetTypeDefinition((TypeDefinitionHandle)markerOwner).Namespace) + "." + reader.GetString(reader.GetTypeDefinition((TypeDefinitionHandle)markerOwner).Name),
                         _ => ""
                     };
+                    if (markerName == "System.Runtime.CompilerServices.NullableAttribute")
+                    {
+                        var constructorSignature = reader.GetBlobBytes(markerSignature);
+                        var blob = reader.GetBlobReader(attribute.Value);
+                        if (reader.GetString(markerConstructorName) != ".ctor" || blob.RemainingBytes < 5 || blob.ReadUInt16() != 1)
+                            throw new InvalidDataException("invalid nullable annotation attribute");
+                        byte[] flags;
+                        bool uniform = constructorSignature.AsSpan().SequenceEqual(new byte[] { 0x20, 1, 1, 5 });
+                        if (uniform)
+                            flags = [blob.ReadByte()];
+                        else if (constructorSignature.AsSpan().SequenceEqual(new byte[] { 0x20, 1, 1, 0x1d, 5 }))
+                        {
+                            if (blob.RemainingBytes < 6) throw new InvalidDataException("truncated nullable annotation");
+                            int count = blob.ReadInt32();
+                            if (count is < 1 or > 4096 || count > blob.RemainingBytes - 2) throw new InvalidDataException("invalid nullable annotation length");
+                            flags = blob.ReadBytes(count);
+                        }
+                        else throw new InvalidDataException("unsupported nullable annotation constructor");
+                        if (flags.Any(f => f > 2) || blob.ReadUInt16() != 0 || blob.RemainingBytes != 0 ||
+                            !nullableAnnotations.TryAdd(parameter.SequenceNumber - 1, new NullableAnnotation(flags, uniform)))
+                            throw new InvalidDataException("invalid or duplicate nullable annotation");
+                        continue;
+                    }
                     if (markerName != "System.ParamArrayAttribute") continue;
                     var signatureReader = reader.GetBlobReader(method.Signature);
                     if (signatureReader.ReadSignatureHeader().IsGeneric) _ = signatureReader.ReadCompressedInteger();
@@ -244,14 +268,14 @@ public sealed partial class AssemblyDefinition
                     if (parameter.SequenceNumber > 256 || parameterName.Length == 0 || !names.TryAdd(parameter.SequenceNumber - 1, parameterName))
                         throw new InvalidDataException("invalid parameter name row");
                 }
-                if (names.Count != 0)
+                if (names.Count != 0 || nullableAnnotations.Count != 0)
                 {
                     var signatureReader = reader.GetBlobReader(method.Signature);
                     var header = signatureReader.ReadSignatureHeader();
                     if (header.IsGeneric) _ = signatureReader.ReadCompressedInteger();
                     int parameterCount = signatureReader.ReadCompressedInteger();
-                    if (parameterCount < 0 || names.Keys.Any(index => index >= parameterCount))
-                        throw new InvalidDataException("parameter name outside method signature");
+                    if (parameterCount < 0 || names.Keys.Concat(nullableAnnotations.Keys).Any(index => index >= parameterCount))
+                        throw new InvalidDataException("parameter metadata outside method signature");
                 }
                 var methodBounds = new List<MethodConstraintRow>();
                 bool unsupportedMethodBounds = false;
@@ -278,7 +302,7 @@ public sealed partial class AssemblyDefinition
                     reader.GetBlobBytes(method.Signature),
                     unsupportedMethodBounds || method.GetGenericParameters().Select(reader.GetGenericParameter).Where((p, i) => p.Index != i || p.Attributes != 0).Any(),
                     method.GetParameters().Select(reader.GetParameter).Where(p => p.SequenceNumber > 0 && (p.Attributes & System.Reflection.ParameterAttributes.Out) != 0).Select(p => p.SequenceNumber - 1).ToArray(),
-                    UnsupportedParameterModes: method.GetParameters().Select(reader.GetParameter).Any(p => (p.Attributes & System.Reflection.ParameterAttributes.In) != 0), ParameterNames: names, InterfaceConstraints: methodBounds.ToArray(), ParameterArrayIndex: parameterArray));
+                    UnsupportedParameterModes: method.GetParameters().Select(reader.GetParameter).Any(p => (p.Attributes & System.Reflection.ParameterAttributes.In) != 0), ParameterNames: names, InterfaceConstraints: methodBounds.ToArray(), ParameterArrayIndex: parameterArray, NullableAnnotations: nullableAnnotations));
             }
             var properties = new List<PropertyRow>();
             var methodRows = methods.ToDictionary(m => m.Token);
@@ -355,9 +379,9 @@ public sealed partial class AssemblyDefinition
     internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
     internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others, NativeSignatureTypeRow? NativeType = null, NativeSignatureTypeRow[]? NativeParameters = null);
     internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, NativeSignatureTypeRow? NativeType = null, int? Constant = null);
-    internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null, int? MethodParameter = null, int? TypeParameter = null, NativeSignatureTypeRow[]? Arguments = null, bool IsSelf = false, bool IsByReference = false, NativeMethodSignatureRow? Function = null)
+    internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null, int? MethodParameter = null, int? TypeParameter = null, NativeSignatureTypeRow[]? Arguments = null, bool IsSelf = false, bool IsByReference = false, NativeMethodSignatureRow? Function = null, bool IsPointer = false)
     {
-        internal SignatureType Materialize(ModuleDefinition module) => Function is { } function ? SignatureType.Function(function.Materialize(module)) : IsByReference ? SignatureType.ByReference(Element!.Materialize(module)) : IsSelf ? SignatureType.Self : Arguments is { } arguments ? SignatureType.FromConstruction(module.GetNativeSignatureType(TypeToken).ReferencedType!, arguments.Select(a => a.Materialize(module)))
+        internal SignatureType Materialize(ModuleDefinition module) => IsPointer ? SignatureType.PointerTo(Element!.Materialize(module)) : Function is { } function ? SignatureType.Function(function.Materialize(module)) : IsByReference ? SignatureType.ByReference(Element!.Materialize(module)) : IsSelf ? SignatureType.Self : Arguments is { } arguments ? SignatureType.FromConstruction(module.GetNativeSignatureType(TypeToken).ReferencedType!, arguments.Select(a => a.Materialize(module)))
             : Element is { } element ? SignatureType.ArrayOf(element.Materialize(module))
             : TypeParameter is { } typeParameter ? SignatureType.TypeParameter(typeParameter)
             : MethodParameter is { } parameter ? SignatureType.MethodParameter(parameter)
@@ -369,7 +393,7 @@ public sealed partial class AssemblyDefinition
         internal MethodSignature Materialize(ModuleDefinition module) => new(Result.Materialize(module), Parameters.Select(p => p.Materialize(module)), GenericNames, OutParameters);
     }
     internal sealed record MethodConstraintRow(int Parameter, uint Interface);
-    internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null, bool UnsupportedParameterModes = false, IReadOnlyDictionary<int, string>? ParameterNames = null, MethodConstraintRow[]? InterfaceConstraints = null, int? ParameterArrayIndex = null);
+    internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null, bool UnsupportedParameterModes = false, IReadOnlyDictionary<int, string>? ParameterNames = null, MethodConstraintRow[]? InterfaceConstraints = null, int? ParameterArrayIndex = null, IReadOnlyDictionary<int, NullableAnnotation>? NullableAnnotations = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
     internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null, bool IsEnum = false, PrimitiveType? NativePrimitive = null, bool NativeGrapheme = false, uint BaseTypeToken = 0, bool IsClosedHierarchy = false, bool IsFlagsEnum = false);

@@ -1,0 +1,49 @@
+import System.*
+import System.Result.*
+import System.Option.*
+
+func Main() -> int {
+    Console.WriteLine("Native source console")
+    Console.WriteLine(42)
+    Console.WriteLine(true)
+    Console.WriteLine((ulong)42)
+    Console.WriteLine(default(nint))
+    Console.WriteLine(default(nuint))
+    Console.Write("räven")
+    Console.WriteLine()
+    match Console.ReadLine() {
+        Ok(Some(let text)) => {
+            if text != "héllo" { return 1 }
+        }
+        _ => { return 2 }
+    }
+    match Console.ReadByte() {
+        Ok(None) => { }
+        _ => { return 3 }
+    }
+    let first = Console.OpenStandardOutput()
+    first.Close()
+    match first.Flush() {
+        Error(_) => { }
+        _ => { return 4 }
+    }
+    let writer = Console.Out
+    match writer.WriteLine("still open") {
+        Ok(_) => { }
+        _ => { return 5 }
+    }
+    match writer.Flush() {
+        Ok(_) => { }
+        _ => { return 6 }
+    }
+    let errors = Console.Error
+    match errors.WriteLine("native stderr") {
+        Ok(_) => { }
+        _ => { return 7 }
+    }
+    match errors.Flush() {
+        Ok(_) => { }
+        _ => { return 8 }
+    }
+    return 42
+}

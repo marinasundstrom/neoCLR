@@ -2,8 +2,6 @@
 
 Option represents absence; Result represents recoverable failure. Raven patterns extract case values, and ? propagates an outcome to the caller.
 
-**Preview 11 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
-
 <a id="handling"></a>
 
 ## Error and optional-result handling in Raven

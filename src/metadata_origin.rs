@@ -85,6 +85,18 @@ pub struct MetadataOrigin {
     pub property_tokens: Vec<u32>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub parameter_tokens: Vec<u32>,
+    /// Explicit .NET nullable transform facts; -1 denotes the return value.
+    /// These annotations do not affect physical signatures or runtime checks.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub nullable_annotations: Vec<NullableAnnotation>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NullableAnnotation {
+    pub position: i32,
+    pub flags: Vec<u8>,
+    pub uniform: bool,
 }
 
 fn text(value: &str) -> bool {
@@ -108,7 +120,14 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             .ok_or_else(|| Fault::new("nominal array backing definition is missing"))?;
         if !shape.is_reference_type
             || shape.is_abstract
-            || shape.base.is_some()
+            || shape.base.as_ref().is_some_and(|base| {
+                base != &crate::metadata::Type::from_name("System.Object")
+                    || module.type_definition(base).is_none_or(|parent| {
+                        module.object_root.is_none()
+                            || parent.definition.as_ref() != module.object_root.as_ref()
+                            || !parent.fields.is_empty()
+                    })
+            })
             || shape.declaring_type.is_some()
             || !matches!(
                 shape.representation,
@@ -246,6 +265,21 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             return Err(Fault::new(
                 "declaring type origin applies only to type definitions",
             ));
+        }
+        let mut nullable_positions = HashSet::new();
+        if origin.nullable_annotations.len() > 257
+            || origin.nullable_annotations.iter().any(|annotation| {
+                table != 0x06
+                    || annotation.position < -1
+                    || annotation.position >= parameters as i32
+                    || annotation.flags.is_empty()
+                    || annotation.flags.len() > 4096
+                    || annotation.flags.iter().any(|flag| *flag > 2)
+                    || annotation.uniform && annotation.flags.len() != 1
+                    || !nullable_positions.insert(annotation.position)
+            })
+        {
+            return Err(Fault::new("invalid callable nullable annotation metadata"));
         }
         check(origin, origin.token, table)?;
         for &token in &origin.field_tokens {

@@ -1,23 +1,15 @@
-# DateTime, time offsets and time zones
+# Dates, times and time zones
 
 Date and Time describe civil fields. Instant identifies a point on the timeline,
-Duration an elapsed amount, and Clock supplies Now. **The time-zone and DateTime union
-APIs below are provisional Preview 11 APIs.**
+Duration an elapsed amount, and Clock supplies Now. **The named-zone APIs below are provisional Preview 11 APIs.**
 
-## Local or zoned
+## Choose a specific type
 
-DateTime is a nominal parenthesized union: `DateTime(LocalDateTime | ZonedDateTime)`.
-An existing local or zoned value converts directly into it. Match the type to decide
-what information is available; there are no extra wrapper cases or .NET-style Kind flag.
-An uninitialized union is inactive, rather than an implicitly local date.
-
-```raven
-{{DATETIME_UNION_SAMPLE}}
-```
-
-LocalDateTime has no zone. ZonedDateTime retains Instant, Zone, LocalDateTime and
-Offset. TimeOffset is a fixed whole-second displacement from UTC; TimeZone contains
-rules that can change that displacement over time. No OffsetDateTime type is included.
+Prefer Date for a calendar date, Time for a time of day, LocalDateTime for civil
+fields without a zone, and Instant for a point on the timeline. Use ZonedDateTime
+when a value must retain its Instant, Zone, LocalDateTime and Offset.
+TimeOffset is a fixed whole-second displacement from UTC; TimeZone contains rules
+that can change that displacement over time. No OffsetDateTime type is included.
 
 ## Mapping a local time
 
@@ -47,6 +39,18 @@ Time.ToString uses the current culture; an explicit culture gives repeatable out
 rendering. Format a zoned value's LocalDateTime through those same formatters.
 The DateTime union's generated ToString is diagnostic, not a serialization format.
 
+## When an API accepts either local or zoned values
+
+DateTime is an optional nominal union: `DateTime(LocalDateTime | ZonedDateTime)`.
+Use it only when the contract intentionally accepts either form; prefer the specific
+civil or zoned type otherwise. Existing values convert directly, and type patterns
+extract them without wrapper cases or a .NET-style Kind flag. An uninitialized union
+is inactive, rather than an implicitly local date.
+
+```raven
+{{DATETIME_UNION_SAMPLE}}
+```
+
 ## Data and limits
 
 Named conversions bundle IANA **2025b** and support UTC/local years **1900–2099**.
@@ -67,13 +71,3 @@ and scheduling remain future work. Resource localization remains separate from c
 
 [API reference →](../../docs/namespaces.html)
 · [Detailed contracts and evidence →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/time-zones.md)
-
-
-## Native compiler integration (development)
-
-The metadata integration branch builds Instant, Clock, SystemClock and TimeOffset from
-Raven sources into a separate native library. The unchanged clock example and independent
-consumers execute interface dispatch, local-time conversion and checked Instant
-arithmetic, fixed-offset round trips and civil-range boundaries. An explicit primitive bootstrap supplies the existing wall-clock service;
-the library owns local-time construction. This development result does not establish
-full .NET library parity or native time-zone support.

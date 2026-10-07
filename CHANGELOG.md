@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Merge native System bootstrap into main while retaining the newer shared RavenDoc
+  publisher/navigation. Continue development on main; Windows native toolchain and
+  installed-editor qualification remain open release gates. The merged tree passes
+  165 metadata contracts, 21 website/readiness tests and the 1,815-page site build.
+
 - Refresh RavenDoc to Raven main `a00fa5ee6` so shared API navigation fills the
   full mobile viewport when opened as a drawer. This follows the Raven 0.1.14
   release as a site-only fix; desktop navigation keeps its reserved height.
@@ -87,6 +92,361 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   neoCLR reference snapshot, Runtime Contract and native/CLI encoding are unchanged.
   Validate 1,803 pages and local links/anchors, 18 website tests, and mobile/desktop
   browser behavior in both themes.
+
+- Require Windows qualification for the next native metadata release. Add a manual
+  Windows x64 compiler/bootstrap/library/package execution workflow; qualification and
+  installed-editor acceptance remain pending. Make HTTP pipe readiness portable and
+  decode runtime verification output as UTF-8 rather than the host code page.
+- Simplify installation to one matched native workflow, add Raven to the main navigation
+  with website/playground links, and remove superseded setup and integration chronology.
+  Preserve actual download availability and concrete limitations. Cover the protected
+  Attribute constructor with a manual reference because the pinned renderer omits it,
+  and repair stale API-guide and maintainer-evidence links.
+
+- Record independent-checkout macOS arm64 bootstrap/distribution qualification from
+  pinned NeoCLR/Raven sources. Document explicit compatible Apple SDK selection and
+  sequential shared-project builds after preserving initial toolchain/reference-output
+  failures. No runtime/compiler semantics changed; other platforms and final release
+  publication are not implied by this local evidence. Nine extracted compile/run
+  commands and all 26 installed-package editor checks pass.
+
+- Prepare primitive Core and source-owned retained-seed inputs from checked-in sources
+  without old Numbers/Http artifacts. Record generator commands/hashes and validate
+  prepared bootstrap inputs before class-library builds. This removes temporary input
+  prerequisites, not the permitted CLI primitive bootstrap or retained runtime seed.
+- Record the native RavenDoc provider direction: preserve actual declaring assembly
+  identities through the existing native compiler-symbol adapter, then extract a shared
+  documentation model incrementally. Provider implementation and website migration
+  were subsequently deferred by the author for release focus, with a possible Raven
+  rewrite left as future exploration. CoreProbe ownership has not been relabelled;
+  the provider/model migration is not an upcoming release gate.
+
+- Teach native POC packaging to consume the split class-library bundle with its
+  generated help, exact producer checks and relative SDK/project configuration.
+  Read runtime modules from the archive manifest during extracted verification;
+  retain explicit legacy aggregate-bundle support. This is development packaging,
+  not a release publication or completion of Platform/API-documentation work.
+
+- Ship generated XML and Markdown help with each source-built native class-library
+  assembly, validate documentation identity before publishing the bundle, and hash
+  nested sidecar files. Extend relocation/editor checks to verify native IPAddress
+  help. This transports existing comments; missing API help and unified RavenDoc
+  generation remain open, including the current empty Data documentation output.
+
+- Extend installed VS Code acceptance to the split native class-library bundle,
+  including optional-library navigation and imported configuration recovery. Record
+  client-side hover timings and repeated/unsaved-edit Main.rvn checks; persistent
+  hover latency reported by the author remains under investigation. No compiler
+  performance fix or complete SDK qualification is claimed.
+
+- Emit a relocatable NeoCLR.ClassLibrary.props in staged bundles, with native references
+  and matching Core/seed/ownership selections shared by compiler and editor project
+  loading (Raven e93fcfdc1). Test symbol owners, missing/conflicting dependencies and HTTP execution from
+  a relocated bundle with spaces in its path. Record the still-internal networking
+  service boundary; no new public Platform API is introduced.
+
+- Add native Data, Networking and Web projects referencing the Runtime foundation.
+  Build and stage the four libraries with explicit seed finalization and prebuilt
+  dependency imports (Raven 8fbacaa9f); publish a hashed bundle manifest only after
+  successful builds. Five source-free consumers and the project HTTP consumer execute.
+  Preserve rejection of stale/missing bootstrap inputs. Platform projects, API-doc
+  bundling and the complete editor/toolchain distribution remain separate release gates.
+
+- Add the checked-in native System.Runtime project and its explicit ownership manifest
+  for the 175-source Runtime foundation. Qualify project compilation, retained-seed
+  finalization and unchanged source-free orders execution. Higher-level project layouts
+  and Platform extraction remain open; the legacy bridge project is retained separately.
+
+- Qualify Raven 3892b113a dependency-first native ProjectReference builds with a four-project diamond,
+  transitive native imports, generic object mutation/identity, exact execution output,
+  cycle rejection and failed-output preservation. Record the prebuilt workspace boundary
+  and remaining class-library project/editor packaging gates.
+
+- Qualify native project import/run against separate source-built libraries using Raven
+  0f85f53b8's explicit Object-owner selection. Add a reproducible unchanged HTTP project
+  consumer and invalid-owner output-preservation check. Native ProjectReference build
+  orchestration remains the next slice; no release or VS Code gate is claimed complete.
+
+- Record Raven e141006f3's canonical bootstrap Void binding correction: two deterministic
+  lookup regressions, six fresh Web compilations and five source-free executable consumers
+  pass without metadata fallbacks. Preserve commands, artifact hashes and prior failures.
+  Hand the separate general async unit-return fix to the author-designated Raven release
+  task; retain native project/editor/artifact qualification as bootstrap work ahead.
+
+- Add development NetworkDeadline and five typed DNS/socket deadline overloads, keeping
+  raw stamps internal and the default expired. Separate Web consumes these native APIs
+  with its existing exchange budget. Add source-free executable acceptance, C# visibility
+  checks, API reference and website documentation. New bridge declarations support docs
+  only; legacy CLI-to-neoIL translation does not support the typed deadline contract.
+  Record passing consumers and loopback cancellation alongside an unresolved intermittent
+  System.Void clean-build failure; bootstrap/main merge remains gated on qualification.
+
+- Record planned real library/Platform project outputs and RavenDoc assembly bundles.
+  Specify shared declaration provenance and exact revision-pinned source links for
+  .NET/NeoCLR API documentation, with Source Link/PDB comparison and validation gates.
+  These are requirements, not implemented project or documentation capabilities.
+
+- Extend optional-library auditing with a separate Web build against emitted Runtime,
+  Data and Networking references. Record private deadline API failures and absence of
+  output. Document the author-directed unified RavenDoc class-library reference with
+  declaring-assembly provenance; native multi-assembly documentation migration remains
+  planned, not implemented. Keep separate package ownership and one-way dependencies.
+
+- Add development ArrayReflection.GetLength/GetValue/Create for supported managed
+  vectors, with terminal checked faults and preserved reference identity. JSON mapping
+  consumes this public boundary across separate Runtime/Data assemblies. Align API
+  declarations, XML reference, snapshot and website limits. Preserve canonical external
+  Object ownership for ordinary GetType references; add C# and source-free execution
+  regressions. Default runtime instruction limits remain unchanged.
+
+- Validate external-root boxing against the complete authored Object slot contract;
+  reject incomplete contracts before encoding. Separate System.Networking now compiles
+  and runs the unchanged cancellation consumer against System.Runtime (exit 0).
+  Correct optional-library auditing to enable explicit bootstrap intrinsics: the earlier
+  CheckedStorage failure was missing build configuration, not a required new mapping.
+  Add reproducible compiler/verify/run acceptance and C# incomplete-contract coverage.
+
+- Add explicit selected-root Object slot references with exact signature and virtual
+  dispatch validation. Source-free Raven dispatch through an object receiver reaches
+  derived ToString/GetHashCode/Equals overrides (42); the API fixture also executes
+  imported Equals dispatch. All 165 metadata groups pass. Networking now reaches a
+  CheckedStorage ownership mapping gap rather than unsupported Object calls.
+
+- Preserve selected imported System.Value ownership when mapping bootstrap helper
+  signatures, writing native storage aliases and matching retained runtime services.
+  C# introspection round trips retain exact external identity; a Raven parse/type-test/
+  unpack consumer verifies and returns 42. Networking now reaches imported virtual
+  Object.ToString support; optional-library execution remains open.
+
+- Add explicit external native Object authoring selection, shared by manual definitions,
+  builders and method references. Preserve scoped identity through existing native aliases
+  and CLI Object reference signatures; conflicting owners reject. API-authored and Raven
+  Equals consumers verify/run against source-built Runtime with exit 42. All 165 metadata
+  groups pass; Networking now reaches a separate System.Value encoding blocker.
+
+- Record the proposed distinction between managed assembly ownership, optional library
+  packages, platform runtime payloads and developer tooling. Keep package IDs/layouts
+  provisional and bootstrap inputs explicit; no package resolver or release split is
+  implemented. Detail imported-root authoring as the next end-to-end dependency.
+
+- Integrate Raven eab5b3e7d: native flags-enum marker lookup remains on the explicit
+  primitive bootstrap when Object belongs to an imported Runtime. Record separate
+  Data/Networking compilation: Data now reaches internal array-reflection dependencies;
+  Networking rejects imported-root overrides. Neither failed build publishes output.
+
+- Build the 174-input System.Runtime candidate without Data, Networking, Web or
+  network adapters. Its source-free orders consumer verifies and executes with exact
+  output/exit 0, retaining explicit primitive and service bootstrap dependencies.
+  Record reproducible packaging evidence; optional assembly builds remain next.
+
+- Establish the native source-owned orders gate: all 197 aggregate library inputs
+  emit, and unchanged application-order-collections imports that artifact, compiles,
+  verifies and executes with exact output/exit 0. Raven explicitly selects the imported
+  Object owner; primitive bootstrap and finalized retained seed remain required.
+  Add reproducible acceptance tooling and update the development website status.
+
+- Integrate Raven's native erased Value import fix: preserve nominal semantic identity
+  instead of parsing a nonexistent CLR special type. The unchanged orders consumer
+  now reaches ArrayList emission validation; reconcile imported source-root ownership
+  next. Record focused symbol/ownership tests and compiler/artifact hashes.
+
+- Finalize the full-source audit's runtime seed with an explicit revisioned dependency
+  read from the emitted native artifact. The combined load set verifies 2,433 IL
+  functions and executes a control application. Invalid/missing/duplicate inputs
+  publish no translated seed; wrong runtime revisions reject. Ordinary application
+  import next exposes Raven's native System.Value classification gap.
+
+- Encode the explicitly selected source/imported System.Void as canonical native unit
+  storage, including callbacks and generic arguments. Keep no-result calling conventions
+  distinct without introducing another language type. Metadata round trips and separate
+  Raven NativeMemory consumers execute; ordinary .NET unit tests remain green.
+
+- Preserve separately scoped unit-value and no-result declarations of runtime
+  services when the registry explicitly admits both. Native WriteLine consumers
+  execute with their own stack contracts; ordinary and same-module conflicts still
+  reject. Full-System loading next reaches source-unit callback signature admission.
+
+- Remove the competing bootstrap Object from the full-source audit's retained native
+  seed. All 197 inputs still emit; admission advances to the retained/source WriteLine
+  result-contract conflict, now identified with declaration and return details.
+  Add a read-only emitted-dependency inventory and staged Data/Networking/Web split
+  plan; no production assembly split is claimed.
+
+- Add required native library schema 4 with a 16 MiB envelope; smaller libraries
+  retain schema 3 and its 8 MiB limit. JSON/node/depth and total PE bounds stay
+  unchanged. All 197 System inputs now emit; runtime admission next rejects the
+  source Array backing contract. Full bootstrap is not yet complete.
+
+- Preserve intrinsic String inheritance from the selected source Object root in
+  native metadata and runtime constructor execution, retaining UTF-8 text storage.
+  Linked PE execution passes; full-System encoding next reaches the payload limit.
+
+- Align array backing validation across authoring, reading and runtime linking:
+  allow the explicitly selected fieldless source Object base, while rejecting
+  other/unselected bases. Managed-array allocation and alias mutation execute in
+  linked PE assemblies. Full-System emission next reaches String/Object inheritance.
+
+- Support explicitly owned System.Value runtime storage in metadata definitions,
+  native signatures and introspection while retaining nominal CLI signatures.
+  Source Environment payload type tests/unpacking execute through retained helpers;
+  malformed carrier storage rejects. Raven's full-System audit advances to native
+  array backing-storage validation. Generic helpers remain an explicit seed dependency.
+
+- Route parameterless reflection construction through source-owned native service
+  declarations, retaining constructor execution and access checks. Preserve the
+  temporary CLI bridge with validated facade bindings. The full-source audit omits
+  the seed-only GetType extension and advances to System.Value ownership validation.
+
+- Route source Object.GetType through an explicit native handle facade instead of
+  the bootstrap RuntimeServices signature. Source-owned Object/RuntimeTypeHandle
+  verification and identity/hash checks execute; the full-System audit advances
+  to ReflectionConstruct dependency resolution. Public API signatures are unchanged.
+
+- Add closed-class builder authoring over an owned local base, including source
+  Object, with existing definition validation and native encoding. Raven preserves
+  that base; protected constructor chaining and virtual dispatch execute successfully.
+  The full-System audit advances to ObjectTypeHandle dependency-contract resolution.
+
+- Verify early source-unit ownership through generic interface dispatch in a separately
+  compiled native consumer, alongside NativeMemory success/fault checks and the legacy
+  bootstrap control. Raven no longer caches a bootstrap Void before source declarations
+  exist. The full System audit advances to direct-base constructor validation.
+
+- Verify source/native unit ownership with production Void and NativeMemory sources:
+  a separate native consumer executes allocation/free and an inhabited unit parameter;
+  expected overflow/double-free faults and unsupported-pointer rejection pass. Retain
+  the ordinary-bootstrap control. The full audit now selects source Void explicitly
+  and omits the seed copy; encoding still exposes a residual bootstrap Void reference.
+
+- Add the source-built abstract System.Attribute base with a protected constructor;
+  retain UnionAttribute inheritance and reuse its constructor for union metadata.
+  Source and embedded marker gates execute, metadata identity checks pass, and invalid
+  markers publish no output. The full System frontier advances to NativeMemory's
+  pointer-to-source-Void signature. API reference shape and summaries are refreshed.
+
+- Verify bootstrap FlagsAttribute and MethodImpl(InternalCall) with a source-owned
+  Object root after Raven's exact-core identity fix. Production BindingFlags and an
+  attributed runtime call execute; same-named source attributes reject before output.
+  Ordinary-bootstrap NativeMemory execution/fault checks still pass. Full System now
+  stops at UnionAttribute's unsupported external System.Attribute base.
+
+- Allow top-level generic reference classes to inherit the explicitly authored native
+  Object root. Definition/builder validation, constructor flow and native reading retain
+  the existing CLI/native base encoding; general generic inheritance stays unsupported.
+  An API-authored case and a Raven source-root fixture execute generic storage and
+  inherited dispatch. The full-System audit passes Array<T> and next stops on enum
+  attribute ownership; full System and ordinary imported-root consumers remain pending.
+
+- Connect source NativeMemory to exact native allocation services through Raven's
+  native pointer import/emission path. Separately compiled consumers execute both
+  Alloc overloads, Free, typed pointer pass-through, double-free and overflow faults;
+  unsupported string pointers reject before output. Extend metadata module-function
+  reference authoring to pointer signatures. Full System now clears binding across
+  194 inputs, then stops at generic classes inheriting the source Object root.
+
+- Add bounded unmanaged pointer signatures to the .NET metadata API, using ordinary
+  CLI PTR encoding and the existing native Ptr category. Callable readers, import,
+  canonical introspection and argument/local/call/return validation preserve pointer
+  targets. Reject unsupported pointer targets, generic arguments and Function shapes.
+  All 162 C# groups pass; an API-authored allocation/free consumer executes with exit
+  42. Raven mapping and source NativeMemory compilation remain pending.
+
+- Add exact native allocation InternalCalls for the pending source NativeAllocation
+  adapter: UIntPtr byte allocation, checked size multiplication and no-result void-pointer
+  release. They share the existing pointer heap, initialization tracking and limits;
+  legacy heap instructions remain unchanged. Five native-container service tests and
+  17 pointer regressions pass. C# pointer metadata/Raven authoring remains to be connected;
+  this slice does not reduce the four remaining full-System binding errors.
+
+- Select source/native System.Fail ownership through Raven's explicit failure contract.
+  Local and separately imported let-else calls now compile and execute on both present
+  and absent paths; wrong owners reject without publishing an assembly. The full-System
+  audit drops from 12 to four binding errors, all NativeAllocation. No runtime or
+  metadata format change; complete System emission has not yet been reached.
+
+### 2026-10-06
+
+- Compile unchanged System.Fail with a native RuntimeFailure adapter and execute it
+  from a separate metadata consumer. The exact no-result neoCLR.Runtime.Fail service
+  raises UserFault; legacy inhabited-unit Fault remains available for existing seeds.
+  An explicit primitive profile omits the competing Fail declaration. Five fault tests,
+  signature controls and the source gate pass. Full-System binding now has 12 errors;
+  source-owned terminal-flow recognition and NativeAllocation remain open.
+
+- Execute unchanged source-built Console from a separate native metadata consumer,
+  using an explicit primitive core and seed without competing Console declarations.
+  Preserve both legacy unit and source no-result WriteLine conventions; blocking host
+  call completion now respects the callee's result convention. Verify UTF-8 input/output,
+  EOF, numeric overloads, stderr and independent wrapper closure. Full-System binding
+  diagnostics drop from 30 to 14; this is not a complete System bootstrap.
+
+- Build unchanged IntPtr/UIntPtr sources with explicit native primitive ownership and
+  execute their comparison methods from an artifact-only consumer. Add exact-signature
+  signed/unsigned widening services without changing Raven cast rules. Raven a6ee91610
+  connects import/emission; its general default-receiver correction is isolated in
+  24c2c4d40. Nine runtime, 161 metadata and eight focused .NET/portable tests pass.
+  Full-System diagnostics drop from 35 to 30; Console service integration remains open.
+
+- Add host metadata IntPtr/UIntPtr signature categories and ILGenerator Conv_I/Conv_U
+  using standard CLI encodings and existing native runtime types. Method/field/property
+  readers and introspection retain them. All 161 C# groups pass; the generated native
+  consumer verifies and exits 42. Raven mappings and source ownership remain pending;
+  this prerequisite does not yet unblock Console or change the full-System baseline.
+
+- Compile unchanged calendar/time-zone sources through five native service adapters.
+  A separately compiled consumer executes DST mappings, offsets, errors and optional
+  local/zoned union conversions with Raven befb8c1e1. TimeZoneMapLocal returns managed
+  Int64 arrays with allocation limits; legacy transport remains compatible. Full-System
+  diagnostics drop from 48 to 35. Prefer specific temporal types in feature/navigation
+  and API guidance; DateTime is an optional local-or-zoned contract, not the main model.
+
+- Compile unchanged Environment sources with three native adapters and execute an
+  artifact-only consumer covering argument snapshots, Unicode, cwd and variable states.
+  EnvironmentArguments now admits managed string-array results with array/heap limits;
+  the old internal transport remains compatible. Four runtime tests pass. Full-System
+  diagnostics drop from 51 to 48; Console/native-width and other bootstrap work remains.
+
+- Record Raven merge `7bfc6ad27` bringing synchronous use cleanup onto the continuing
+  `codex/source-object-metadata-resolution` branch. The merged line passes 92 focused
+  .NET checks and six native cleanup executions; native async cleanup stays deferred.
+
+- Preserve explicit callable nullable annotations in the host metadata definitions,
+  builders, CLI writer/reader and introspection facade. C# tests check .NET interpretation,
+  execution identity and malformed payloads. Native encoding rejects these annotations
+  until its matching support exists; this first step did not fix native KeepAlive(null).
+  Follow-up: native callable origins now preserve and validate the same explicit facts,
+  including binary/introspection round trips and CLI projection. Older readers reject
+  annotated artifacts; matching development tools are required. Raven `d19c6e4a3` now
+  preserves these facts through symbols and emission. Both artifact-only GC consumers
+  compile, verify and execute, including KeepAlive(null); 17 .NET checks and seven native
+  consumers pass. Nullable context/field support remains out of scope.
+
+- Document companion Raven synchronous `use` support through a shared disposal
+  contract: reverse-order cleanup on block completion, return, propagation and loop
+  exits, with no exception regions. Six authored-protocol native consumers verify
+  and execute; async/iterator cleanup and bare bootstrap-interface implementation
+  remain outside this slice. Runtime instructions and implementation are unchanged.
+
+- Add native source GC adapters and admit no-result Collect/KeepAlive service calls
+  without pushing a unit value. Existing unit callers remain supported. Nine GC
+  tests and an artifact-only retention consumer pass. Preserve KeepAlive(null) as
+  an explicit failing native-import regression: nullable parameter metadata remains
+  unsupported, so the complete GC API gate is still open.
+
+- Compile unchanged Math sources through native adapters for the existing 15 floating
+  services. An artifact-only consumer executes all 20 public functions, including
+  rounding and Result failures. Record the explicit namespace alias needed with the
+  retained bootstrap Math type; full-System diagnostics drop from 74 to 59.
+
+- Add a reproducible post-release System bootstrap inventory, distinguishing omitted
+  build inputs from compiler failures. Existing Storage adapters and six omitted
+  contract files compile. Isolate and fix Raven's PE-only metadata assumption for a
+  source Object root (41 focused tests). Fix union source-Object signature completion
+  with four declaration-order regressions; 206 existing tests remain green. Full-source
+  compilation now reports diagnostics instead of crashing. Prioritize handle ownership
+  and missing runtime-service declarations; no full System assembly is published.
+  A follow-up reuses the already implemented source-handle contract in the audit,
+  removing its configuration and conversion cascades without a new compiler fix.
 
 ### 2026-10-05
 

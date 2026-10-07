@@ -3,7 +3,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<ImportedTypeReference, PrimitiveType> authoredPrimitiveOwners = [];
-    /// <summary>Declares the scalar representation of an output-owned external numeric value type or String reference type from host semantic facts.</summary>
+    /// <summary>Declares the scalar representation of an output-owned external canonical scalar (including unit Void) or String reference type from host semantic facts.</summary>
     /// <exception cref="ArgumentException">The reference is foreign or does not name the matching nongeneric System primitive category.</exception>
     /// <exception cref="InvalidDataException">Another dependency already owns the scalar representation.</exception>
     public void SetNativePrimitive(ImportedTypeReference type, PrimitiveType primitive)
@@ -35,6 +35,24 @@ public sealed partial class AssemblyBuilder
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
     public ImportedMethodReference CreateMethodReference(ImportedTypeReference declaringType, string name,
         MethodSignature signature, bool isStatic = false, bool isOverride = false, PrimitiveType? nativePrimitive = null)
+        => CreateMethodReferenceCore(declaringType, name, signature, isStatic, isOverride, nativePrimitive, false);
+
+    /// <summary>Authors a virtual ToString, GetHashCode or Equals reference on the explicitly selected external Object root.</summary>
+    /// <remarks>No dependency is loaded. The host supplies the selected root; runtime linking validates its actual slot. Use Callvirt, not Call.</remarks>
+    /// <exception cref="InvalidOperationException">No external native root is selected.</exception>
+    /// <exception cref="ArgumentException">The name or signature is not an exact supported Object slot.</exception>
+    /// <exception cref="InvalidDataException">The reference conflicts with an existing contract.</exception>
+    public ImportedMethodReference CreateObjectSlotReference(string name, MethodSignature signature)
+    {
+        var root = ExternalObjectRoot ?? throw new InvalidOperationException("select an external Object root before authoring slots");
+        ArgumentNullException.ThrowIfNull(signature);
+        if (!MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, null, root) || signature.OutParameters.Count != 0)
+            throw new ArgumentException("Object slot reference requires an exact root signature");
+        return CreateMethodReferenceCore(root, name, signature, false, false, null, true);
+    }
+
+    private ImportedMethodReference CreateMethodReferenceCore(ImportedTypeReference declaringType, string name,
+        MethodSignature signature, bool isStatic, bool isOverride, PrimitiveType? nativePrimitive, bool isObjectSlot)
     {
         ArgumentNullException.ThrowIfNull(declaringType);
         ArgumentNullException.ThrowIfNull(name);
@@ -46,7 +64,7 @@ public sealed partial class AssemblyBuilder
             declaringType.IsValueType != (primitive != PrimitiveType.String) || declaringType.Namespace != "System" || declaringType.Name != primitive.ToString() ||
             declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name == ".cctor" || name == ".ctor" && primitive != PrimitiveType.String || isOverride))
             throw new ArgumentException("invalid native primitive member owner", nameof(nativePrimitive));
-        if (isOverride && (isStatic || !declaringType.IsValueType && declaringType.GenericArity != 0 || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary)))
+        if (isOverride && (isStatic || !declaringType.IsValueType && declaringType.GenericArity != 0 || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot)))
             throw new ArgumentException("override reference requires an exact instance Object slot signature");
         if (IsNativeGrapheme(declaringType) && (name is ".ctor" or ".cctor" || isOverride || nativePrimitive is not null))
             throw new ArgumentException("grapheme members require ordinary methods without primitive reinterpretation");
@@ -68,7 +86,7 @@ public sealed partial class AssemblyBuilder
             if (!Equals(existing.DeclaringReference, declaringType) || existing.Name != name ||
                 existing.Signature.GenericParameterNames.Count != signature.GenericParameterNames.Count ||
                 !existing.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)) continue;
-            if (existing.Target.DeclaringType?.NativePrimitive != nativePrimitive || existing.Target.NativeValueOverride != isOverride || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
+            if (existing.Target.NativeImportObjectSlot != isObjectSlot || existing.Target.DeclaringType?.NativePrimitive != nativePrimitive || existing.Target.NativeValueOverride != isOverride || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
                 throw new InvalidDataException("conflicting method contract");
             return existing;
         }
@@ -87,14 +105,17 @@ public sealed partial class AssemblyBuilder
         if (nativePrimitive is { } scalar) owner.SetNativePrimitive(scalar);
         if (IsNativeGrapheme(declaringType)) owner.SetNativeGrapheme();
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, owner, name, signature, isStatic: isStatic))
-        { DeclaringReference = declaringType, RequiresVirtualDispatch = (isInterface || isOverride && !declaringType.IsValueType) && !isStatic };
+        { DeclaringReference = declaringType, RequiresVirtualDispatch = (isObjectSlot || isInterface || isOverride && !declaringType.IsValueType) && !isStatic };
         reference.Target.NativeValueOverride = isOverride;
+        reference.Target.NativeImportObjectSlot = isObjectSlot;
+        reference.Target.NativeImportObjectOwner = Equals(ExternalObjectRoot, declaringType);
+        if (reference.Target.NativeImportObjectOwner) reference.Target.NativeImportName = "System.Object." + (constructor ? ".ctor" : name);
         reference.Target.NativeImportPrimitiveOwner = nativePrimitive;
         reference.Target.NativeImportCharOwner = IsNativeGrapheme(declaringType);
         authoredCallableReferences.Add(reference);
         return reference;
 
-        bool Supported(SignatureType type, bool result) =>
+        bool Supported(SignatureType type, bool result) => type.PointerElement is not null ? true :
             type.IsSelf ? isInterface :
             type.FunctionSignature is { } function ? Supported(function.ReturnType, true) && function.ParameterTypes.All(p => Supported(p, false)) :
             type.Primitive is { } primitive ? primitive != PrimitiveType.Void || result :

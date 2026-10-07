@@ -13,10 +13,13 @@ parser.add_argument('--toolchain-root', type=Path)
 for name in ('compiler', 'core', 'seed', 'ownership'):
     parser.add_argument('--' + name, type=Path)
 parser.add_argument('--native-library', type=Path, action='append', default=[])
+parser.add_argument('--object-library')
+parser.add_argument('--object-root', type=Path)
 parser.add_argument('--runner', type=Path, required=True)
 parser.add_argument('--case', action='append', choices=['headers', 'body'])
 args = parser.parse_args()
 native = args.compiler is not None
+assert bool(args.object_library) == bool(args.object_root), 'Specify both object ownership options'
 if native:
     assert args.core and args.seed and args.ownership and args.native_library
 else:
@@ -43,6 +46,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-cancellation-') as folder, 
                    '--bootstrap-ownership', str(args.ownership.resolve())]
         for library in args.native_library:
             command += ['--reference', str(library.resolve())]
+        if args.object_library:
+            command += ['--object-library', args.object_library]
         command += ['-o', str(root / 'App.dll'), str(root / 'Main.rvn')]
     build = subprocess.run(command,
                            env=env, capture_output=True, text=True, timeout=240)
@@ -100,6 +105,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-cancellation-') as folder, 
                        '--gc-stats', '--instructions', '100000000']
             for library in args.native_library:
                 command += ['--module', str(library.resolve())]
+            if args.object_root:
+                command += ['--object-root', str(args.object_root.resolve())]
         run = subprocess.run(command,
                              capture_output=True, text=True, timeout=180)
         assert run.returncode == 0, run.stdout + run.stderr

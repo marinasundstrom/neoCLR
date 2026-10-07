@@ -342,3 +342,22 @@ fn migrated_library_has_one_canonical_api_and_no_union_instructions_at_these_bou
         );
     }
 }
+
+#[test]
+fn write_line_preserves_unit_and_no_result_calling_conventions() {
+    for (result, discard) in [("Void", "pop"), ("noresult", "")] {
+        let module = assemble(&format!(
+            ".module System\n.function neoCLR.Runtime.WriteLine(String text) -> {result}\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldstr \"räven\"\ncall neoCLR.Runtime.WriteLine(String)\n{discard}\nldc.i4 42\nret\n.end"
+        )).unwrap();
+        let program = LoadedProgram::new(&module).unwrap();
+        program.verify().unwrap();
+        let console = TestConsole::input(b"");
+        let execution = program
+            .resolve_function(&parse_function_ref("Main()").unwrap())
+            .unwrap()
+            .invoke(vec![], options(console.clone()))
+            .unwrap();
+        assert_eq!(execution.value, Value::Int32(42));
+        assert_eq!(console.state.lock().unwrap().lines, ["räven"]);
+    }
+}

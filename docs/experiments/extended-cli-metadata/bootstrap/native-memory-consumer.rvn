@@ -1,0 +1,15 @@
+import System.Runtime.InteropServices.NativeMemory.*
+
+unsafe func Identity(pointer: *System.Void) -> *System.Void {
+    return pointer
+}
+
+unsafe func Main() -> int {
+    let count = NativeWidthInputs.Six()
+    let size = NativeWidthInputs.Seven()
+    let pointer = Alloc(count, size)
+    Free(Identity(pointer))
+    let second = Alloc(count)
+    Free(second)
+    return 42
+}

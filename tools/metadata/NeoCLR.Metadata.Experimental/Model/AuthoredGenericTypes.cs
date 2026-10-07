@@ -20,7 +20,7 @@ public sealed partial class TypeDefinition
     /// <param name="namespace">Metadata namespace.</param>
     /// <param name="name">Simple name without CLI arity suffix.</param>
     /// <param name="attributes">Supported root-class, value-type or interface CLI flags.</param>
-    /// <param name="baseType">Explicit core base reference, or null for an interface.</param>
+    /// <param name="baseType">Explicit core base reference, local native Object root for a reference class, or null for an interface.</param>
     /// <param name="genericParameterNames">One through 32 unique names; copied.</param>
     /// <exception cref="ArgumentNullException">Parameter sequence is null.</exception>
     /// <exception cref="ArgumentException">Invalid simple name or parameter names.</exception>

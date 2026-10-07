@@ -23,6 +23,6 @@ public abstract class Object {
     }
 
     func GetType() -> TypeInfo {
-        return RuntimeContext.Current.GetTypeInfoFromHandle(RuntimeServices.ObjectTypeHandle(self))
+        return RuntimeContext.Current.GetTypeInfoFromHandle(NativeObject.GetTypeHandle(self))
     }
 }

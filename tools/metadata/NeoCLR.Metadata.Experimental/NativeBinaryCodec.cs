@@ -3,21 +3,22 @@ using System.Text.Json;
 
 namespace NeoCLR.Metadata.Experimental;
 
-// NEOX execution schemas 2/3: bounded CBOR, definite containers, text keys, Int64;
+// NEOX execution schemas 2/3/4: bounded CBOR, definite containers, text keys, Int64;
 // library schema 3 additionally admits UInt64 and larger explicit budgets.
+// Schema 4 doubles only the library envelope byte budget; all other bounds remain.
 // booleans/null; no tags, byte strings, floating point or indefinite lengths.
 internal static class NativeBinaryCodec
 {
     private static readonly UTF8Encoding Utf8 = new(false, true);
-    internal static byte[] Encode(ReadOnlySpan<byte> json, bool library = false)
+    internal static byte[] Encode(ReadOnlySpan<byte> json, bool library = false, bool expandedLibrary = false)
     {
         if (json.Length > (library ? 32 * 1024 * 1024 : 4 * 1024 * 1024)) throw Invalid("native JSON exceeds limit");
-        try { return EncodeCore(json, library); }
+        try { return EncodeCore(json, library, expandedLibrary); }
         catch (Exception error) when (error is JsonException or InvalidOperationException or EncoderFallbackException)
         { throw new InvalidDataException("invalid native binary input", error); }
     }
 
-    private static byte[] EncodeCore(ReadOnlySpan<byte> json, bool library)
+    private static byte[] EncodeCore(ReadOnlySpan<byte> json, bool library, bool expandedLibrary)
     {
         using var document = JsonDocument.Parse(json.ToArray(), new JsonDocumentOptions { MaxDepth = 64 });
         using var stream = new MemoryStream();
@@ -56,18 +57,18 @@ internal static class NativeBinaryCodec
                 case JsonValueKind.Null: stream.WriteByte(0xf6); break;
                 default: throw Invalid("unsupported value");
             }
-            if (stream.Length > (library ? 8 * 1024 * 1024 : MetadataEnvelope.MaxImageSize) - 32) throw Invalid("binary payload exceeds envelope limit");
+            if (stream.Length > (expandedLibrary ? 16 * 1024 * 1024 : library ? 8 * 1024 * 1024 : MetadataEnvelope.MaxImageSize) - 32) throw Invalid("binary payload exceeds envelope limit");
         }
         Value(document.RootElement);
         var result = stream.ToArray();
         // Apply the same node/depth limits as consumers before publishing bytes.
-        _ = Decode(result, library);
+        _ = Decode(result, library, expandedLibrary);
         return result;
     }
 
-    internal static byte[] Decode(ReadOnlySpan<byte> input, bool library = false)
+    internal static byte[] Decode(ReadOnlySpan<byte> input, bool library = false, bool expandedLibrary = false)
     {
-        if (input.Length > (library ? 8 * 1024 * 1024 : MetadataEnvelope.MaxImageSize) - 32) throw Invalid("binary payload exceeds envelope limit");
+        if (input.Length > (expandedLibrary ? 16 * 1024 * 1024 : library ? 8 * 1024 * 1024 : MetadataEnvelope.MaxImageSize) - 32) throw Invalid("binary payload exceeds envelope limit");
         var data = input.ToArray(); int position = 0, nodes = 0;
         using var stream = new MemoryStream();
         using var json = new Utf8JsonWriter(stream);

@@ -7,6 +7,7 @@ import System.Collections.*
 import System.Tasks.*
 import System.Concurrency.*
 import System.Text.*
+import System.Networking.*
 import System.Networking.Sockets.*
 import System.Runtime.CompilerServices.*
 
@@ -393,7 +394,7 @@ public class HttpContext : Disposable {
     private var outgoing: Sequence<byte> = ArrayList<byte>()
     private var sent: int = 0
     private var token: CancellationToken = CancellationToken.None
-    private var deadline: long = 0
+    private var deadline = NetworkDeadline.Expired
 
     internal init(owner: HttpServer, connection: Socket, request: HttpRequest) {
         self.owner = owner
@@ -455,7 +456,7 @@ public class HttpContext : Disposable {
         let encoded = HttpServer.EncodeResponse(response, if request.Method == "HEAD" { 1 } else { 0 })
         if let Ok(bytes) = encoded {
             outgoing = bytes
-            deadline = RuntimeServices.SocketDeadlineAfter(15000)
+            deadline = NetworkDeadline.AfterMilliseconds(15000)
             SendNext()
         } else if let Error(reason) = encoded {
             Finish(Error(reason))
@@ -496,7 +497,7 @@ public class HttpContext : Disposable {
             _ = source.Cancel()
             return
         }
-        if RuntimeServices.SocketDeadlineExpired(deadline) {
+        if deadline.IsExpired {
             Finish(Error(HttpError.TimedOut))
             return
         }
@@ -523,7 +524,7 @@ public class HttpContext : Disposable {
                 _ = source.Cancel()
                 return
             }
-            if RuntimeServices.SocketDeadlineExpired(deadline) {
+            if deadline.IsExpired {
                 Finish(Error(HttpError.TimedOut))
                 return
             }
@@ -553,7 +554,7 @@ internal class HttpServerExchange {
     private var transfer: Option<Task<Result<int, SocketError>>> = None()
     private var decoder: HttpRequestDecoder = HttpRequestDecoder()
     private var buffer: byte[] = CheckedStorage.Reserve<byte>(256)
-    private var deadline: long = 0
+    private var deadline = NetworkDeadline.Expired
 
     internal init(owner: HttpServer, listener: Socket, token: CancellationToken) {
         self.owner = owner
@@ -613,7 +614,7 @@ internal class HttpServerExchange {
             }
             if let Ok(connection) = pending.GetResult() {
                 socket = Some(connection)
-                deadline = RuntimeServices.SocketDeadlineAfter(15000)
+                deadline = NetworkDeadline.AfterMilliseconds(15000)
                 ReceiveNext()
             } else if let Error(reason) = pending.GetResult() {
                 Fail(HttpError.Transport(reason))
@@ -640,7 +641,7 @@ internal class HttpServerExchange {
                 Fail(HttpError.InvalidRequest("Request cancelled"))
                 return
             }
-            if RuntimeServices.SocketDeadlineExpired(deadline) {
+            if deadline.IsExpired {
                 Fail(HttpError.TimedOut)
                 return
             }

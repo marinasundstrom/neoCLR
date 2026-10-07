@@ -1,0 +1,27 @@
+import System.Runtime.CompilerServices.*
+
+namespace neoCLR.Runtime
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func GCCollectionCount() -> long;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func GCAllocatedObjectCount() -> long;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func GCHeapObjectCount() -> long;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func GCPeakHeapObjectCount() -> long;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func GCReclaimedObjectCount() -> long;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func GCHeapObjectLimit() -> long;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func GCCollect() -> System.Void;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func GCKeepAlive(value: object?) -> System.Void;

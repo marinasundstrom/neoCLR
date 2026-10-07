@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../NativeLibrary.props" />
+  <PropertyGroup>
+    <AssemblyName>System.Web</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/System/Web/**/*.rvn" />
+    <ProjectReference Include="../System.Data/System.Data.rvnproj" />
+    <ProjectReference Include="../System.Networking/System.Networking.rvnproj" />
+  </ItemGroup>
+</Project>

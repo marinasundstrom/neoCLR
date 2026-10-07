@@ -70,3 +70,13 @@ this slice and remains deferred.
 Tests cover argument isolation and limits, Neo/artifact execution, CLI option
 separation, current directory and missing/empty/present/invalid-text values. Unix
 non-Unicode tests use isolated child processes, without mutating test-process globals.
+
+
+## Native source bootstrap (development, 2026-10-06)
+
+The Environment facade now builds directly from its unchanged Raven sources and is
+consumed through native metadata. GetCommandLineArgs returns a fresh managed string
+array, including independent mutation across repeated calls. Its host buffer is an
+implementation detail; inline value arrays are not an exposed platform feature.
+A separate consumer exercises all three functions, Unicode and absence/error distinctions.
+See the [source gate and limitations](experiments/extended-cli-metadata/source-environment-2026-10-06.md).

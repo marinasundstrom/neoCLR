@@ -89,12 +89,12 @@ fn explicit_collection_cannot_evade_heap_limit() {
 #[test]
 fn service_signatures_are_exact() {
     for (name, args, result) in [
-        ("GCCollect", "", "noresult"),
+        ("GCCollect", "", "Int32"),
         ("GCCollect", "Int32", "noresult"),
         ("GCCollectionCount", "", "Int32"),
         ("GCHeapObjectLimit", "Int32", "Int64"),
         ("GCKeepAlive", "Int32", "noresult"),
-        ("GCKeepAlive", "System.Object", "noresult"),
+        ("GCKeepAlive", "System.Object", "Int64"),
     ] {
         let module = assemble(&format!(
             ".module Bad\n.function neoCLR.Runtime.{name}({args}) -> {result}\n.methodimpl InternalCall\n.end"
@@ -179,5 +179,46 @@ fn gc_control_reports_heap_requirement_and_consumes_instruction_budget() {
         .unwrap_err()
         .code,
         neoclr::FaultCode::InstructionLimitExceeded
+    );
+}
+
+#[test]
+fn no_result_gc_controls_preserve_live_stack_roots_without_pushing_unit() {
+    let module = assemble(
+        r#"
+.module App
+.entry Main
+.type class System.Object
+.end
+.function neoCLR.Runtime.GCCollect() -> noresult
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.GCKeepAlive(System.Object value) -> noresult
+.methodimpl InternalCall
+.end
+.function Main() -> Int32
+.local System.Object empty
+ldloca empty
+initobj System.Object
+ldc.i4 42
+heap.new
+call neoCLR.Runtime.GCCollect()
+ldloc empty
+call neoCLR.Runtime.GCKeepAlive(System.Object)
+ldobj Int32
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    let result = program.run(Limits::default()).unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert!(
+        result
+            .heap
+            .collection_events()
+            .any(|event| event.reason == CollectionReason::ExplicitRequest && event.after == 1)
     );
 }

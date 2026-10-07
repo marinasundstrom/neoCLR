@@ -130,7 +130,7 @@ fn payload(image: &[u8]) -> Result<(u16, &[u8]), Fault> {
         .get(b"#Neo".as_slice())
         .ok_or_else(|| invalid("required #Neo stream missing"))?;
     let length = u32_at(envelope, 12)?;
-    if !(16..=8 * 1024 * 1024).contains(&length)
+    if !(16..=16 * 1024 * 1024).contains(&length)
         || length > envelope.len()
         || envelope.len() - length > 3
         || envelope[length..].iter().any(|v| *v != 0)
@@ -138,7 +138,7 @@ fn payload(image: &[u8]) -> Result<(u16, &[u8]), Fault> {
         return Err(invalid("invalid envelope size/padding"));
     }
     let payload = execution_payload_profile(&envelope[..length], true)?;
-    if payload.0 != 3 && image.len() > 4 * 1024 * 1024 {
+    if payload.0 < 3 && image.len() > 4 * 1024 * 1024 {
         return Err(invalid("legacy image exceeds 4 MiB limit"));
     }
     Ok(payload)
@@ -220,11 +220,13 @@ fn execution_payload_profile(envelope: &[u8], library: bool) -> Result<(u16, &[u
         }
         let payload = bytes(envelope, offset, length)?;
         end += length;
-        if flags == 1 && (kind != 256 || !(matches!(version, 1 | 2) || library && version == 3)) {
+        if flags == 1
+            && (kind != 256 || !(matches!(version, 1 | 2) || library && matches!(version, 3 | 4)))
+        {
             return Err(invalid("unsupported required section"));
         }
         if kind == 256 {
-            if flags != 1 || !(matches!(version, 1 | 2) || library && version == 3) {
+            if flags != 1 || !(matches!(version, 1 | 2) || library && matches!(version, 3 | 4)) {
                 return Err(invalid("unsupported or optional native execution schema"));
             }
             execution = Some((version, payload));
@@ -234,7 +236,10 @@ fn execution_payload_profile(envelope: &[u8], library: bool) -> Result<(u16, &[u
         return Err(invalid("trailing envelope bytes"));
     }
     let (version, bytes) = execution.ok_or_else(|| invalid("native execution section missing"))?;
-    if version != 3 && envelope.len() > 1024 * 1024 {
+    if version == 3 && envelope.len() > 8 * 1024 * 1024 {
+        return Err(invalid("schema-3 envelope exceeds 8 MiB limit"));
+    }
+    if version < 3 && envelope.len() > 1024 * 1024 {
         return Err(invalid("legacy envelope exceeds 1 MiB limit"));
     }
     if version == 1 {
@@ -258,9 +263,9 @@ pub fn decode(image: &[u8]) -> Result<Module, Fault> {
     decode_payload(payload(image)?)
 }
 
-/// Encode a format-5 module as an owned standalone schema-3 NEOX assembly.
+/// Encode a format-5 module as an owned standalone schema-3/4 NEOX assembly.
 /// Uses direct binary serialization, preserves definition/reference identities and
-/// enforces the library profile's budgets. Does not link or verify method bodies.
+/// selects schema 4 above 8 MiB and enforces the library profile's budgets. Does not link or verify method bodies.
 pub fn write_module(module: &Module) -> Result<Vec<u8>, Fault> {
     let payload = crate::native_binary::encode_library(module)?;
     let mut image = vec![0u8; 32];
@@ -269,7 +274,12 @@ pub fn write_module(module: &Module) -> Result<Vec<u8>, Fault> {
     image[8..12].copy_from_slice(&1u32.to_le_bytes());
     image[12..16].copy_from_slice(&((32 + payload.len()) as u32).to_le_bytes());
     image[16..18].copy_from_slice(&256u16.to_le_bytes());
-    image[18..20].copy_from_slice(&3u16.to_le_bytes());
+    let schema: u16 = if payload.len() <= 8 * 1024 * 1024 - 32 {
+        3
+    } else {
+        4
+    };
+    image[18..20].copy_from_slice(&schema.to_le_bytes());
     image[20..24].copy_from_slice(&1u32.to_le_bytes());
     image[24..28].copy_from_slice(&32u32.to_le_bytes());
     image[28..32].copy_from_slice(&(payload.len() as u32).to_le_bytes());
@@ -280,8 +290,8 @@ pub fn write_module(module: &Module) -> Result<Vec<u8>, Fault> {
 /// Decode a standalone NEOX native module without a CLI projection or PE binding.
 /// The same runtime validation and dependency rules apply after decoding.
 pub fn decode_envelope(image: &[u8]) -> Result<Module, Fault> {
-    if image.len() > 8 * 1024 * 1024 {
-        return Err(invalid("envelope exceeds 8 MiB limit"));
+    if image.len() > 16 * 1024 * 1024 {
+        return Err(invalid("envelope exceeds 16 MiB limit"));
     }
     decode_payload(execution_payload_profile(image, true)?)
 }
@@ -294,8 +304,8 @@ pub fn load_envelope(image: &[u8]) -> Result<Module, Fault> {
 }
 
 fn decode_payload((version, bytes): (u16, &[u8])) -> Result<Module, Fault> {
-    if matches!(version, 2 | 3) {
-        crate::native_binary::decode(bytes, version == 3)
+    if matches!(version, 2 | 3 | 4) {
+        crate::native_binary::decode(bytes, version >= 3, version == 4)
     } else {
         crate::decode_module(std::str::from_utf8(bytes).map_err(|_| invalid("invalid UTF-8"))?)
     }
@@ -318,6 +328,28 @@ mod tests {
         data[32..].copy_from_slice(b"{}");
         data
     }
+    #[test]
+    fn expanded_library_round_trip_and_downgrade_rejection() {
+        let mut module: Module =
+            serde_json::from_str(r#"{"format":5,"name":"Small","functions":[]}"#).unwrap();
+        assert_eq!(write_module(&module).unwrap()[18], 3);
+        module.name = "x".repeat(8 * 1024 * 1024);
+        let encoded = write_module(&module).unwrap();
+        assert_eq!(encoded[18], 4);
+        assert_eq!(decode_envelope(&encoded).unwrap().name, module.name);
+        let mut downgraded = encoded.clone();
+        downgraded[18] = 3;
+        assert!(
+            decode_envelope(&downgraded)
+                .unwrap_err()
+                .to_string()
+                .contains("8 MiB")
+        );
+        downgraded[18] = 5;
+        assert!(decode_envelope(&downgraded).is_err());
+        assert!(decode_envelope(&vec![0; 16 * 1024 * 1024 + 1]).is_err());
+    }
+
     #[test]
     fn required_execution_schema_and_bounds() {
         let valid = envelope();

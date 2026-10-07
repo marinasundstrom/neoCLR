@@ -1,0 +1,18 @@
+; Executable String dependency for generated union display; Object is source-owned.
+.module System
+.references ()
+.type System.String
+.sealed
+.method static Concat(String left,String right) -> String
+ldarg 0
+ldarg 1
+call neoCLR.Runtime.StringConcat(String,String)
+ret
+.end
+.end
+.function neoCLR.Runtime.StringConcat(String left,String right) -> String
+.methodimpl InternalCall
+.end
+.type System.Char
+.sealed
+.end

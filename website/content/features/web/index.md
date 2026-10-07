@@ -3,18 +3,9 @@ title: Web and HTTP
 ---
 # Web and HTTP
 
-**Preview 11.** Raven client and server applications can exchange a small UTF-8
-response through neoCLR TCP sockets, with DNS on the client. HttpClient, HttpServer, request/response types,
-content and handlers are experimental APIs in System.Web.Http. Use the matching
-Preview 11 toolchain.
-
-## Native metadata integration in development
-
-The development compiler can build the HTTP library and consume its emitted native
-assembly in separate applications. Verified callback-based cases cover headers, JSON,
-routing, cancellation, client/server status handling and stream uploads. This is separate
-from the published Preview 11 toolchain above; native `async` state-machine compilation
-and full-System bootstrapping are still pending. Existing protocol limits remain.
+Raven client and server applications exchange UTF-8 content through neoCLR TCP sockets,
+with DNS on the client. HttpClient, HttpServer, request/response types, content and
+handlers live in System.Web.Http. Applications can use callbacks or async functions.
 
 ## HttpClient: call an HTTP service
 

@@ -1,0 +1,48 @@
+import System.Runtime.CompilerServices.*
+
+namespace neoCLR.Runtime
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathAbs(value: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathSqrt(value: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathFloor(value: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathCeiling(value: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathTruncate(value: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathRound(value: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathExp(value: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathLog(value: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathLog10(value: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathSin(value: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathCos(value: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathTan(value: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathPow(left: double, right: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathMin(left: double, right: double) -> double;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MathMax(left: double, right: double) -> double;

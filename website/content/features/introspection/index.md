@@ -2,8 +2,6 @@
 
 From an object’s type to an assembly’s members, one descriptive model gives you a way to explore what a neoCLR program contains.
 
-**Preview 11 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
-
 [Follow the walkthrough ↓](#walkthrough) · [Download the complete sample](../../samples/library-introspection-tour.rvn)
 
 <a id="walkthrough"></a>
@@ -244,7 +242,9 @@ See [Enum API reference](/docs/api/System/Enum/) for both overload families.
 EquatableTo&lt;T&gt; and ComparableTo&lt;T&gt; describe equality and comparison.
 ConvertibleInto&lt;T&gt; supplies an explicit Convert() contract with an implementation-defined policy.
 
-## Development case: inspecting route declarations at startup
+<a id="development-case-inspecting-route-declarations-at-startup"></a>
+
+## Case: inspecting route declarations at startup
 
 A server can describe routes with attributes on union cases, then inspect those
 declarations once during startup. This example reads the catalog routes:
@@ -285,41 +285,5 @@ constructs ordinary union values through checked Reflection extensions.
 See [Function types and objects](../functions/) for signature identity, value bindings
 and the transitional bound-target Function property.
 
-The development .NET host metadata facade also preserves interface-scoped native Self
-signatures in declared member views. This is separate from guest introspection and does
-not yet provide Raven native Self dispatch. See the
-[experimental metadata API](/docs/experimental-metadata.html#native-self-signatures-development-2026-10-03)
-for supported signatures and remaining limits.
-
-The development host facade preserves writable `ref`/`out` parameter modes separately
-from their element types, including constructed generic owners. Readonly modes remain
-unsupported; this does not add runtime invocation to introspection.
-
-Development metadata work now retains top-level native value declarations and generic
-inline payload signatures in the C# host facade. Raven source-union emission remains
-in progress; see the [development API reference](/docs/experimental-metadata.html).
-
-The development host reader also preserves nested native case ownership and scoped
-external references below nongeneric owners. Same-named cases remain distinct in the
-metadata facade and Raven symbols; this does not yet complete source-union emission.
-
-
-## Compiler metadata integration (development)
-
-The separate C# metadata facade retains native Self as an interface-scoped type,
-without adding a generic parameter. The development compiler can now import and emit
-these contracts: separately compiled Clonable, implementation and consumer assemblies
-execute concrete clone calls with independent mutation. Constrained generic Self calls
-and complete System-library compilation remain in progress. This development gate does
-not change the published guest introspection API.
-
-## Native source-library integration (development)
-
-The development Raven/NeoCLR integration now compiles the production JSON mapper and
-introspection sources into a native library and executes separately compiled consumers.
-The checked gate covers nested object construction, real property setters, Boolean, text and
-integer values, arrays, shared-object mutation and validation before model side effects.
-Source-owned descriptors resolve within their selected assembly/module; bootstrap and
-runtime-service dependencies remain explicit. This is development integration evidence,
-not full-System, .NET library parity or HTTP-stack completion. The existing public API
-contracts above remain unchanged.
+The separate [C# metadata API](/docs/experimental-metadata.html) reads and authors native
+assemblies on the host. It is distinct from the guest introspection APIs described here.

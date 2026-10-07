@@ -1,0 +1,658 @@
+{
+  "date": "2026-10-07",
+  "platform": "macOS arm64",
+  "ravenRevision": "e93fcfdc19dad0c9be46bd6a41b26b2b3796e649",
+  "neoClrBaseRevision": "9f0946c9dd0fafed177734155bab08a1e3dc0ffb",
+  "runtimeProvenance": "Reused runtime from native-bundle-configuration-2026-10-07.json; binary hash recorded here. No runtime rebuild in this slice.",
+  "toolchainQualification": "Local native-enabled build; reused Raven.Macros.dll; not clean SDK distribution acceptance.",
+  "bundleProvenance": "native-bundle-configuration-2026-10-07.json",
+  "bundle": {
+    "version": 1,
+    "kind": "explicit-bootstrap-native-class-library",
+    "assemblyNames": [
+      "System.Runtime",
+      "System.Data",
+      "System.Networking",
+      "System.Web"
+    ],
+    "objectAssembly": "System.Runtime",
+    "runtimeSeed": "System.runtime.neox",
+    "projectConfiguration": "NeoCLR.ClassLibrary.props",
+    "files": {
+      "System.Runtime.dll": "af77d3d7bf06dab7e71491affdf9d145881ba9d4ed589b8b0338550296db2bc6",
+      "System.Data.dll": "973131683c2b9658c69aee5b417b33eeae0571b454fe9e7b9b56f7afc0747894",
+      "System.Networking.dll": "cd7b83ac85ec1504ad60cc6644485d5802818c828b338bc863824afceeec9227",
+      "System.Web.dll": "f7f47da7bd5550b0208417a9386b7edf15d8966fc0b6030e5d85b56fb43c55b1",
+      "System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+      "Core.dll": "7e5cee8e255704bbf44595173609c1c4834b7e7b512dba8704987fd05420dd88",
+      "ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+      "NeoCLR.ClassLibrary.props": "772a570a1ef9193e69fa646fe57a3ee90f220f23395892f4ba5c619c7db02112"
+    }
+  },
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/scripts/prepare-native-editor.py": "51ef74f36df6bfcda3c434931118cf3af1d9fad5baae5a68e14b8aff186a235d",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/scripts/native-vscode-acceptance.cjs": "354d19798def032131fe5d92c2c186b3edf3b8398576eaa771c1852ef5c8b023",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/tmp/native-config-editor-sdk1007/tools/rvnc/rvnc.dll": "f11af398bd70b2b627e2960bb204a50b7bf7fd573fd786e0c05f8fe4df4b4b7c",
+    "/tmp/native-config-editor-sdk1007/tools/rvnc/Raven.CodeAnalysis.dll": "2580ca71d841b964677830139f0c17aae6b2401c8caf05aa7362b7fefc083d1f",
+    "/tmp/native-config-editor-sdk1007/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "a286075ebf98a59fe25bf3f20b008de58818516b61ad1a82d3858a045d890dfd",
+    "/tmp/native-config-editor-sdk1007/tools/language-server/Raven.LanguageServer.dll": "6c262042cdcbd271ebc54b9dca4a5b9ec01f4281fb881d9dc0c188727b9899d8",
+    "/tmp/native-config-editor-sdk1007/tools/language-server/Raven.CodeAnalysis.dll": "8a8ad031b5225b400a388176454d6edc1ff81cb83d2eec97edd1835239130fbf",
+    "/tmp/native-config-editor-sdk1007/tools/language-server/Raven.Macros.dll": "9f32e80ab7c69677f8d03b3eed72c7c6f1f4fad4c31608714382481093d2093e",
+    "/tmp/native-config-editor-sdk1007/tools/language-server/NeoCLR.Metadata.Experimental.dll": "528a3d3dad0ffcc5d974c771228dad90f24fdf82e31d1a41e333c4f3b68d70ba",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.VSCode/package.json": "2493f11a8f765280bce1bee4d3eea7d8b8571ad817fb09b1263328ee82c45b57",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.VSCode/dist/extension.js": "176666ce16ef90a84c0bf03706f843ce7c39128d7bfd65e8d9c9b255578efc82",
+    "/tmp/native-split-vscode-latency1007/Main.rvn": "d775c2c648591482cf53a0a735603ca51aea48c2f2bb33633c95830e57b6550b",
+    "/tmp/native-split-vscode-latency1007/App.rvnproj": "da6b962f0c229eebe44a77cd3c4925e7cc357e2bc8ac4ec4804c97c7df23b036",
+    "/tmp/native-split-vscode-latency1007/.vscode/settings.json": "82dd8747cd22a43fedb6ea296665798a49a51bbbcf9d14c497c523c84bf3cbc9",
+    "/tmp/native-split-vscode-latency1007/.vscode/tasks.json": "f1a7de460ded1f6aa25ad38eea30d73edc128a950c9d7ccdce5892fee8e5b8c2",
+    "/tmp/native-split-vscode-latency1007/bin/neoclr/App.dll": "6d8a48474f20cf5b26fa73cbb2ee4aecc01f6dc9438435e429cedf6f36e8a970",
+    "/tmp/native-split-vscode-latency1007-async/Main.rvn": "8e225b601fd18c86f5c3b2ec30b47064c4cb37b87bd156e331097eb075cd226c",
+    "/tmp/native-split-vscode-latency1007-async/Async.rvnproj": "ecbafb853939273df370f1692b1c10a8228c3b7ea2a66b84b5d742d41fa38680",
+    "/tmp/native-split-vscode-latency-profile1007/User/globalStorage/raven.raven-vscode/language-server/ec31a47f907c/logs/raven-lsp-performance.txt": "cee85ff767f02cb9f7fa06b19d69f89fe768c5ae7bc98097edbd17de81b9cbd3",
+    "/tmp/native-split-vscode-latency-profile1007/User/globalStorage/raven.raven-vscode/language-server/ec31a47f907c/logs/raven-lsp.log": "cc619df9ccefc77762b7abaa72976b7cdac4efaebd4035a14b46d113aaab96e8",
+    "/tmp/native-split-vscode-latency1007/references/System.Runtime.dll": "af77d3d7bf06dab7e71491affdf9d145881ba9d4ed589b8b0338550296db2bc6",
+    "/tmp/native-split-vscode-latency1007/references/System.Data.dll": "973131683c2b9658c69aee5b417b33eeae0571b454fe9e7b9b56f7afc0747894",
+    "/tmp/native-split-vscode-latency1007/references/System.Networking.dll": "cd7b83ac85ec1504ad60cc6644485d5802818c828b338bc863824afceeec9227",
+    "/tmp/native-split-vscode-latency1007/references/System.Web.dll": "f7f47da7bd5550b0208417a9386b7edf15d8966fc0b6030e5d85b56fb43c55b1",
+    "/tmp/native-split-vscode-latency1007/references/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/tmp/native-split-vscode-latency1007/references/Core.dll": "7e5cee8e255704bbf44595173609c1c4834b7e7b512dba8704987fd05420dd88",
+    "/tmp/native-split-vscode-latency1007/references/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/tmp/native-split-vscode-latency1007/references/NeoCLR.ClassLibrary.props": "772a570a1ef9193e69fa646fe57a3ee90f220f23395892f4ba5c619c7db02112"
+  },
+  "acceptance": {
+    "vscode": "1.140.0",
+    "checks": [
+      "native imported hover",
+      "native imported Markdown documentation hover",
+      "native Markdown sidecar edit refreshes hover",
+      "native XML fallback after Markdown member deletion",
+      "read-only metadata declaration navigation",
+      "native imported completion",
+      "native imported completion documentation",
+      "actual file watcher invalidates replaced native library",
+      "unsaved buffer survives native workspace reload",
+      "missing native reference produces a project diagnostic",
+      "native dependency recovery clears the project diagnostic",
+      "System.Data.Json.JsonValue native hover and metadata navigation",
+      "System.Networking.IPAddress native hover and metadata navigation",
+      "System.Web.Http.HttpClient native hover and metadata navigation",
+      "imported bundle configuration edit produces project diagnostic",
+      "restored bundle configuration recovers the workspace",
+      "unchanged broad sample imports source-built class library",
+      "native Option and Result type hovers retain union kind and constructed arguments",
+      "repeated broad-sample type and query hovers return symbols",
+      "broad-sample hovers return after unsaved edits",
+      "configured VS Code native build task",
+      "VS Code task executes exact broad-sample output on native runtime",
+      "failed build preserves last successful artifact",
+      "ordinary .NET editor hover and diagnostics",
+      "unchanged Tasks/await sample builds and executes from VS Code"
+    ],
+    "passed": true,
+    "hoverTimings": [
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:14:57.726Z",
+        "elapsedMs": 47,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:14:58.276Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:14:58.777Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:14:59.280Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:14:59.782Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:00.284Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:00.786Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:01.288Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:01.790Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:02.292Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:02.794Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:03.296Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:03.798Z",
+        "elapsedMs": 1,
+        "hasResult": false
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:04.298Z",
+        "elapsedMs": 1184,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:05.483Z",
+        "elapsedMs": 22,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:06.006Z",
+        "elapsedMs": 2588,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:08.594Z",
+        "elapsedMs": 931,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:10.026Z",
+        "elapsedMs": 1749,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:15.704Z",
+        "elapsedMs": 511,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 41,
+        "startedAt": "2026-10-07T15:15:16.715Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 43,
+        "startedAt": "2026-10-07T15:15:22.756Z",
+        "elapsedMs": 752,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 44,
+        "startedAt": "2026-10-07T15:15:23.526Z",
+        "elapsedMs": 68,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Probe.rvn",
+        "line": 0,
+        "character": 42,
+        "startedAt": "2026-10-07T15:15:23.604Z",
+        "elapsedMs": 61,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:30.241Z",
+        "elapsedMs": 833,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T15:15:31.074Z",
+        "elapsedMs": 28,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T15:15:31.102Z",
+        "elapsedMs": 5,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:31.107Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T15:15:31.112Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T15:15:31.116Z",
+        "elapsedMs": 12,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 90,
+        "character": 26,
+        "startedAt": "2026-10-07T15:15:31.128Z",
+        "elapsedMs": 6,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 91,
+        "character": 10,
+        "startedAt": "2026-10-07T15:15:31.134Z",
+        "elapsedMs": 5,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:31.138Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T15:15:31.142Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T15:15:31.145Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 90,
+        "character": 26,
+        "startedAt": "2026-10-07T15:15:31.149Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 91,
+        "character": 10,
+        "startedAt": "2026-10-07T15:15:31.153Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:31.156Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T15:15:31.160Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T15:15:31.164Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 90,
+        "character": 26,
+        "startedAt": "2026-10-07T15:15:31.168Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 91,
+        "character": 10,
+        "startedAt": "2026-10-07T15:15:31.172Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:31.180Z",
+        "elapsedMs": 76,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:31.258Z",
+        "elapsedMs": 65,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:31.325Z",
+        "elapsedMs": 66,
+        "hasResult": true
+      },
+      {
+        "uri": "file:///private/tmp/native-split-vscode-latency1007-dotnet/Main.rvn",
+        "line": 0,
+        "character": 35,
+        "startedAt": "2026-10-07T15:15:46.897Z",
+        "elapsedMs": 629,
+        "hasResult": true
+      }
+    ],
+    "lastHover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+    "diagnostics": [],
+    "hover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+    "completion": [
+      {
+        "label": "VersionOne",
+        "description": "EditorApi"
+      }
+    ],
+    "bundleHovers": {
+      "System.Data.Json.JsonValue": "```raven\nsealed class JsonValue\n```\n\nType in `Json`",
+      "System.Networking.IPAddress": "```raven\nsealed class IPAddress: EquatableTo<IPAddress>\n```\n\nType in `Networking`",
+      "System.Web.Http.HttpClient": "```raven\nclass HttpClient\n```\n\nType in `Http`"
+    },
+    "unionHovers": {
+      "Option<Order>": "```raven\nunion struct Option<Order>: Propagatable<Option<Order>, Order, void>\n```\n\nType in `System`",
+      "Result<Order, SingleError>": "```raven\nunion struct Result<Order, SingleError>: Propagatable<Result<Order, SingleError>, Order, SingleError>\n```\n\nType in `System`"
+    },
+    "repeatedMainHovers": [
+      {
+        "round": 0,
+        "term": "ArrayList",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:31.107Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "round": 0,
+        "term": "Option<Order>",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T15:15:31.112Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "round": 0,
+        "term": "Result<Order, SingleError>",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T15:15:31.116Z",
+        "elapsedMs": 12,
+        "hasResult": true
+      },
+      {
+        "round": 0,
+        "term": "Filter(",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 90,
+        "character": 26,
+        "startedAt": "2026-10-07T15:15:31.128Z",
+        "elapsedMs": 6,
+        "hasResult": true
+      },
+      {
+        "round": 0,
+        "term": ".Map(",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 91,
+        "character": 10,
+        "startedAt": "2026-10-07T15:15:31.134Z",
+        "elapsedMs": 5,
+        "hasResult": true
+      },
+      {
+        "round": 1,
+        "term": "ArrayList",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:31.138Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "round": 1,
+        "term": "Option<Order>",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T15:15:31.142Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "round": 1,
+        "term": "Result<Order, SingleError>",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T15:15:31.145Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "round": 1,
+        "term": "Filter(",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 90,
+        "character": 26,
+        "startedAt": "2026-10-07T15:15:31.149Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "round": 1,
+        "term": ".Map(",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 91,
+        "character": 10,
+        "startedAt": "2026-10-07T15:15:31.153Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "round": 2,
+        "term": "ArrayList",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:31.156Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "round": 2,
+        "term": "Option<Order>",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 33,
+        "character": 60,
+        "startedAt": "2026-10-07T15:15:31.160Z",
+        "elapsedMs": 3,
+        "hasResult": true
+      },
+      {
+        "round": 2,
+        "term": "Result<Order, SingleError>",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 41,
+        "character": 47,
+        "startedAt": "2026-10-07T15:15:31.164Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "round": 2,
+        "term": "Filter(",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 90,
+        "character": 26,
+        "startedAt": "2026-10-07T15:15:31.168Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      },
+      {
+        "round": 2,
+        "term": ".Map(",
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 91,
+        "character": 10,
+        "startedAt": "2026-10-07T15:15:31.172Z",
+        "elapsedMs": 4,
+        "hasResult": true
+      }
+    ],
+    "postEditMainHovers": [
+      {
+        "round": 0,
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:31.180Z",
+        "elapsedMs": 76,
+        "hasResult": true
+      },
+      {
+        "round": 1,
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:31.258Z",
+        "elapsedMs": 65,
+        "hasResult": true
+      },
+      {
+        "round": 2,
+        "uri": "file:///private/tmp/native-split-vscode-latency1007/Main.rvn",
+        "line": 25,
+        "character": 55,
+        "startedAt": "2026-10-07T15:15:31.325Z",
+        "elapsedMs": 66,
+        "hasResult": true
+      }
+    ],
+    "stdout": "Native build output: /private/tmp/native-split-vscode-latency1007/bin/neoclr/App.dll\nDuplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n"
+  },
+  "hoverHandlerPerformance": "Operation: hover\n  Count: 32\n  TotalMs: 437,5\n  AvgMs: 13,7\n  MaxMs: 111,2\n  FirstLookupAfterEditCount: 7\n  FirstLookupAfterEditAvgMs: 66,9\n  FirstLookupAfterEditMaxMs: 86,7\n  FirstLookupAfterEditSources:\n    didChange: 7\n  Stages:\n    resolution: count=32 total=259,8ms avg=8,1ms max=55,4ms\n    genericSymbolResolution: count=32 total=246,7ms avg=7,7ms max=55,0ms\n    documentation: count=32 total=114,0ms avg=3,6ms max=109,5ms\n    directInvocationResolution: count=32 total=11,0ms avg=0,3ms max=6,8ms\n    hoverText: count=32 total=6,7ms avg=0,2ms max=4,9ms\n    signature: count=32 total=6,3ms avg=0,2ms max=2,7ms\n    declaredSymbolResolution: count=32 total=0,8ms avg=0,0ms max=0,4ms\n    containing: count=32 total=0,8ms avg=0,0ms max=0,6ms\n    directAttributeResolution: count=32 total=0,6ms avg=0,0ms max=0,2ms\n    analysisContext: count=32 total=0,5ms avg=0,0ms max=0,1ms\n    range: count=32 total=0,5ms avg=0,0ms max=0,0ms\n    gateWait: count=32 total=0,4ms avg=0,0ms max=0,1ms\n    invocationOverride: count=32 total=0,2ms avg=0,0ms max=0,2ms\n    captures: count=32 total=0,1ms avg=0,0ms max=0,1ms\n    semanticModel: count=32 total=0,1ms avg=0,0ms max=0,0ms\n  SlowestSamples:\n    111,2ms file:///private/tmp/native-split-vscode-latency1007-dotnet/Main.rvn 0:35 semantic=[symbolInfo=0, symbolCacheHits=1, symbolBoundHits=0, symbolBinderFallbacks=0, symbolOperationFallbacks=0, typeInfo=0, typeSymbolHits=0, typeBoundFallbacks=0, typeDiagnosticFallbacks=0, boundNode=0, boundCacheHits=0, boundContextHits=0, boundBindFallbacks=0, loweredCacheHits=0, loweredFallbacks=0]\n    56,0ms file:///private/tmp/native-split-vscode-latency1007/Probe.rvn 0:43 semantic=[symbolInfo=1, symbolCacheHits=2, symbolBoundHits=0, symbolBinderFallbacks=0, symbolOperationFallbacks=0, typeInfo=0, typeSymbolHits=0, typeBoundFallbacks=0, typeDiagnosticFallbacks=0, boundNode=0, boundCacheHits=0, boundContextHits=0, boundBindFallbacks=0, loweredCacheHits=0, loweredFallbacks=0]\n    42,8ms file:///private/tmp/native-split-vscode-latency1007/Probe.rvn 0:44 semantic=[symbolInfo=1, symbolCacheHits=2, symbolBoundHits=0, symbolBinderFallbacks=0, symbolOperationFallbacks=0, typeInfo=0, typeSymbolHits=0, typeBoundFallbacks=0, typeDiagnosticFallbacks=0, boundNode=0, boundCacheHits=0, boundContextHits=0, boundBindFallbacks=0, loweredCacheHits=0, loweredFallbacks=0]\n    41,3ms file:///private/tmp/native-split-vscode-latency1007/Main.rvn 25:55 semantic=[symbolInfo=0, symbolCacheHits=0, symbolBoundHits=0, symbolBinderFallbacks=0, symbolOperationFallbacks=0, typeInfo=0, typeSymbolHits=0, typeBoundFallbacks=0, typeDiagnosticFallbacks=0, boundNode=0, boundCacheHits=0, boundContextHits=0, boundBindFallbacks=0, loweredCacheHits=0, loweredFallbacks=0]\n    39,1ms file:///private/tmp/native-split-vscode-latency1007/Main.rvn 25:55 semantic=[symbolInfo=0, symbolCacheHits=0, symbolBoundHits=0, symbolBinderFallbacks=0, symbolOperationFallbacks=0, typeInfo=0, typeSymbolHits=0, typeBoundFallbacks=0, typeDiagnosticFallbacks=0, boundNode=0, boundCacheHits=0, boundContextHits=0, boundBindFallbacks=0, loweredCacheHits=0, loweredFallbacks=0]",
+  "scope": "Provider command latency excludes mouse debounce/rendering. Persistent delay from prior user session not reproduced; unresolved. Class-library help sidecars absent; help tested with EditorLibrary."
+}

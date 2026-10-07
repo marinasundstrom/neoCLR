@@ -30,7 +30,13 @@ public enum PrimitiveType
     /// <summary>An unsigned 64-bit storage type; evaluation uses Int64 bits.</summary>
     UInt64,
     /// <summary>An opaque runtime type identity; CLI uses System.RuntimeTypeHandle, native metadata uses RuntimeTypeHandle.</summary>
-    RuntimeTypeHandle
+    RuntimeTypeHandle,
+    /// <summary>A signed native-width integer; CLI ELEMENT_TYPE_I.</summary>
+    IntPtr,
+    /// <summary>An unsigned native-width integer; CLI ELEMENT_TYPE_U.</summary>
+    UIntPtr,
+    /// <summary>Native erased-value storage designation. Signatures use an explicitly owned System.Value declaration.</summary>
+    Value
 }
 
 /// <summary>An immutable nongeneric primitive signature whose declared parameters exclude any instance receiver.</summary>

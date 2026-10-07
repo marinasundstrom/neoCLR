@@ -1,0 +1,30 @@
+{
+  "baseRevision": "cd475f87",
+  "compilerRevision": "ca4aeccfb",
+  "command": [
+    "dotnet",
+    "run",
+    "--project",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+    "--",
+    "--array-backing-runtime",
+    "target/debug/neoclr",
+    "/tmp/array-root-runtime1007b"
+  ],
+  "exitCode": 0,
+  "stdout": "PASS source Object array backing: PE verify/run, alias mutation returns 42\nPASS nominal backing validation: valid, missing, storage, duplicate, unselected base\n",
+  "scope": "Metadata-API authored source Object and generic array backing, linked PE consumer. Not Raven full-library execution.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/metadata_origin.rs": "fa9d2ea2ec7d5fcfed30ee5fa81679e3ac954a2a2a940c70f47d8b36ee1756d4",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/ArrayBackingChecks.cs": "a711a325209c01e1184852f8bb963e930b83c0e43febddbaf582423c9209f2d4",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "1dc1569f50bb5ea333ce3206c13978ee459f547ed3b2dcaca5661073dafa7f1c",
+    "/private/tmp/array-root-runtime1007b/valid.json": "82b5aa468f3abbc938bebb6d8c7fa37d9edd728cbf7fd48b0cd23710ab59abb0",
+    "/private/tmp/array-root-runtime1007b/SourceArrays.dll": "9b2ccb0be9c4f83c98b78ecd261956920cf634a4da2148b071f47c3e10c039bf",
+    "/private/tmp/array-root-runtime1007b/missing.json": "84061e8094f6b0113fd4154652b91c01b40a05e8e252534e33360fe0dc2f7684",
+    "/private/tmp/array-root-runtime1007b/System.neoil": "b3de629ea4ba552863c8df2a94a8787ae1505a49da4e890dacc23e49c75dbbbd",
+    "/private/tmp/array-root-runtime1007b/base.json": "cc004b573126e57715bc99030b447c38aa7510a003815978cfd54a252e1703fc",
+    "/private/tmp/array-root-runtime1007b/storage.json": "e2c81c2f1ae8faed351a739d6d6db13fd5bae4497d3d59c15c5138e11be1c17d",
+    "/private/tmp/array-root-runtime1007b/Consumer.dll": "0cf962918d80b9f53a67253b75dabbb62cffdfd3c814f7e0ed8a1218dfaed9bf",
+    "/private/tmp/array-root-runtime1007b/duplicate.json": "8429dfaa4c523a686ea1262e7db73852a3506f253f56ea709de6fa1968780790"
+  }
+}

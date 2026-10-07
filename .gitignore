@@ -8,3 +8,7 @@
 # RavenDoc copies the authored sidecar beside the pinned reference at build time.
 /api-docs/reference/*.xml
 /scripts/__pycache__/
+
+# Native class-library project outputs.
+/runtime/raven/projects/**/bin/
+/runtime/raven/projects/**/obj/

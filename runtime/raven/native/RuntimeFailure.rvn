@@ -1,0 +1,7 @@
+namespace System.Runtime.CompilerServices
+
+internal static class RuntimeFailure {
+    static func Terminate(message: string) {
+        neoCLR.Runtime.Fail(message)
+    }
+}

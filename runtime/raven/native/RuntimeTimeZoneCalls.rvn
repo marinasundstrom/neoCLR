@@ -1,0 +1,18 @@
+import System.Runtime.CompilerServices.*
+
+namespace neoCLR.Runtime
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TimeZoneDatabaseVersion() -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SystemTimeZoneName() -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TimeZoneExists(id: string) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TimeZoneOffset(id: string, ticks: long) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TimeZoneMapLocal(id: string, ticks: long) -> long[];

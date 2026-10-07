@@ -4,12 +4,15 @@ using System.Text.Json.Nodes;
 using NeoCLR.Metadata.Experimental;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
+using MethodDefinition = NeoCLR.Metadata.Experimental.Model.MethodDefinition;
 using TypeDefinition = NeoCLR.Metadata.Experimental.Model.TypeDefinition;
 
 internal static class ObjectRootChecks
 {
     internal static void Run()
     {
+        ExternalRoot();
+        ExternalBoxing();
         foreach (bool manual in new[] { false, true })
         {
             var graph = Create();
@@ -63,6 +66,114 @@ internal static class ObjectRootChecks
         var types = json["types"]!.AsArray();
         types[0]!["is_sealed"] = true;
         Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(System.Text.Encoding.UTF8.GetBytes(json.ToJsonString())));
+    }
+
+    internal static void WriteExternalConsumer(string libraryPath, string corePath, string output)
+    {
+        var image = File.ReadAllBytes(libraryPath);
+        var library = AssemblyDefinition.ReadNativeAssembly(image);
+        var core = AssemblyDefinition.ReadAssembly(File.ReadAllBytes(corePath), false);
+        var graph = new AssemblyBuilder(new("ExternalObjectConsumer", new Version(1, 0, 0, 0)), core.Identity);
+        var root = graph.CreateTypeReference(library.Identity, core.Identity,
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), "System", "Object", 0);
+        graph.SetNativeObjectRoot(root);
+        var owner = graph.AddClass("Example", "Item");
+        var ctor = owner.AddConstructor([]); ctor.GetILGenerator().Return();
+        var equals = owner.AddOverride("Equals", new(PrimitiveType.Boolean, [root]));
+        equals.GetILGenerator().Emit(OpCode.Ldc_Bool, true); equals.GetILGenerator().Return();
+        var main = graph.AddFunction("Main"); graph.EntryPoint = main;
+        var il = main.GetILGenerator(); var failed = il.DefineLabel();
+        _ = graph.CreateObjectSlotReference("ToString", new(PrimitiveType.String, []));
+        _ = graph.CreateObjectSlotReference("GetHashCode", new(PrimitiveType.Int32, []));
+        il.LoadConstant(42); il.Box(PrimitiveType.Int32); il.IsInstance(PrimitiveType.Int32);
+        il.IsNull(); il.Emit(OpCode.Brtrue, failed);
+        var typeInfo = graph.CreateTypeReference(library.Identity, core.Identity,
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), "System.Introspection", "TypeInfo", 0);
+        var getType = graph.CreateMethodReference(root, "GetType", new(typeInfo, []));
+        if (getType.RequiresVirtualDispatch) throw new Exception("GetType must retain ordinary instance dispatch");
+        il.NewObject(ctor); il.Call(getType); il.Emit(OpCode.Pop);
+        il.NewObject(ctor); il.LoadDefault(root); il.Emit(OpCode.Callvirt, graph.CreateObjectSlotReference("Equals", new(PrimitiveType.Boolean, [root])));
+        il.Emit(OpCode.Brfalse, failed); il.LoadConstant(42); il.Return();
+        il.MarkLabel(failed); il.LoadConstant(1); il.Return();
+        File.WriteAllBytes(output, RuntimeAssemblyContainer.WriteBinary(graph));
+    }
+
+    private static void ExternalBoxing()
+    {
+        var graph = Create();
+        var root = graph.CreateTypeReference(new("ExternalRoot", new Version(1, 0, 0, 0)),
+            graph.CoreLibrary, new string('A', 64), "System", "Object", 0);
+        graph.SetNativeObjectRoot(root);
+        var box = graph.AddFunction("Box", new MethodSignature(root, []));
+        box.GetILGenerator().LoadConstant(42);
+        box.GetILGenerator().Box(PrimitiveType.Int32);
+        box.GetILGenerator().Return();
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+        _ = graph.CreateObjectSlotReference("ToString", new(PrimitiveType.String, []));
+        _ = graph.CreateObjectSlotReference("Equals", new(PrimitiveType.Boolean, [root]));
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+        _ = graph.CreateObjectSlotReference("GetHashCode", new(PrimitiveType.Int32, []));
+        var loaded = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph));
+        if (loaded.MainModule.Functions.Single().Name != "Box")
+            throw new Exception("external-root boxing lost on roundtrip");
+    }
+
+    private static void ExternalRoot()
+    {
+        foreach (bool manual in new[] { false, true })
+        {
+            var graph = Create();
+            var identity = new AssemblyIdentity("ExternalRoot", new Version(1, 0, 0, 0));
+            var root = graph.CreateTypeReference(identity, graph.CoreLibrary, new string('A', 64), "System", "Object", 0);
+            var owner = graph.AddClass("Example", "Item");
+            var signature = new MethodSignature(PrimitiveType.Boolean, [root]);
+            Reject<InvalidOperationException>(() => owner.AddOverride("Equals", signature));
+            graph.SetNativeObjectRoot(root);
+            graph.SetNativeObjectRoot(root);
+            var externalClass = graph.CreateTypeReference(identity, graph.CoreLibrary, new string('A', 64), "Example", "External", 0);
+            _ = graph.CreateMethodReference(externalClass, "Equals", signature, isOverride: true);
+            Reject<ArgumentException>(() => graph.CreateMethodReference(externalClass, "Equals",
+                new(PrimitiveType.Boolean, [graph.CoreObjectType]), isOverride: true));
+            var slot = graph.CreateObjectSlotReference("ToString", new(PrimitiveType.String, []));
+            if (!slot.RequiresVirtualDispatch || slot.IsStatic || slot.IsInterfaceMethod)
+                throw new Exception("Object slot category lost");
+            if (!ReferenceEquals(slot, graph.CreateObjectSlotReference("ToString", new(PrimitiveType.String, []))))
+                throw new Exception("Object slot references must intern");
+            Reject<ArgumentException>(() => graph.CreateObjectSlotReference("Equals", new(PrimitiveType.Boolean, [graph.CoreObjectType])));
+            Reject<ArgumentException>(() => graph.CreateObjectSlotReference("Other", new(PrimitiveType.Int32, [])));
+            Reject<InvalidDataException>(() => graph.CreateMethodReference(root, "ToString", new(PrimitiveType.String, [])));
+            if (!Equals(graph.ObjectType.ImportedType, root)) throw new Exception("external Object selection lost");
+            MethodBuilder method;
+            if (manual)
+            {
+                owner.Definition.Methods.Add(new MethodDefinition("Equals", 0x46, signature));
+                method = owner.Methods.Single();
+            }
+            else method = owner.AddOverride("Equals", signature);
+            method.GetILGenerator().Emit(OpCode.Ldc_Bool, true);
+            method.GetILGenerator().Return();
+            var ordinaryMember = graph.CreateMethodReference(root, "GetType", new(root, []));
+            if (ordinaryMember.RequiresVirtualDispatch) throw new Exception("ordinary root method became virtual");
+            var caller = graph.AddFunction("RootMember", new(root, [root]));
+            caller.GetILGenerator().LoadArgument(0);
+            caller.GetILGenerator().Call(ordinaryMember);
+            caller.GetILGenerator().Return();
+            var nativeImage = graph.WriteNativeAssembly();
+            var text = System.Text.Encoding.UTF8.GetString(nativeImage);
+            if (!text.Contains("System.Object.GetType") || text.Contains("T_53797374656D_4F626A656374"))
+                throw new Exception("ordinary external Object method lost canonical owner/name");
+            var native = NativeAssemblyDefinition.ReadAssembly(nativeImage);
+            _ = native.CreateReferenceAssembly(graph.CoreLibrary);
+            var loaded = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph));
+            if (loaded.MainModule.Types.Single().Methods.Single().Name != "Equals")
+                throw new Exception("external Object override lost on roundtrip");
+            Reject<ArgumentException>(() => method.GetILGenerator().Emit(OpCode.Call, slot));
+            Reject<InvalidDataException>(() => graph.Write());
+            Reject<InvalidOperationException>(() => graph.AddNativeObjectRoot());
+            Reject<InvalidOperationException>(() => graph.SetNativeObjectRoot(graph.CoreObjectType));
+            Reject<InvalidOperationException>(() => owner.AddOverride("Equals", new(PrimitiveType.Boolean, [graph.CoreObjectType])));
+            Reject<ArgumentException>(() => graph.SetNativeObjectRoot(Create().CoreObjectType));
+        }
     }
 
     private static AssemblyBuilder Create() => new(new("OwnedRoot", new Version(1, 0, 0, 0)), new("System.Runtime", new Version(10, 0, 0, 0)));

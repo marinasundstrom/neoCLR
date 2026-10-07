@@ -34,11 +34,11 @@ public sealed partial class MethodBuilder
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);
 
-    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null, bool ConstructionReceiver = false, FunctionSignature? Function = null)
+    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null, bool ConstructionReceiver = false, FunctionSignature? Function = null, SignatureType? PointerElement = null)
     {
         internal static BodyValueType Receiver(TypeBuilder owner) => owner.IsValueType ? SignatureType.ByReference(owner.OpenSignature) : owner.OpenSignature;
         public static implicit operator BodyValueType(PrimitiveType type) => new(type switch { PrimitiveType.SByte or PrimitiveType.Byte or PrimitiveType.Int16 or PrimitiveType.UInt16 or PrimitiveType.UInt32 => PrimitiveType.Int32, PrimitiveType.UInt64 => PrimitiveType.Int64, _ => type });
-        public static implicit operator BodyValueType(SignatureType type) => type.FunctionSignature is { } function ? new(PrimitiveType.Void, Function: function) : type.ByReferenceElement is { } target ? new(PrimitiveType.Void, ByReferenceElement: target) : type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : (BodyValueType)type.Primitive!.Value;
+        public static implicit operator BodyValueType(SignatureType type) => type.ClassType?.NativePrimitive == PrimitiveType.Void ? new(PrimitiveType.Void) : type.ClassType?.NativePrimitive == PrimitiveType.Value || type.ImportedType is { } erased && NativeImportBinding.IsErasedValue(erased) ? new(PrimitiveType.Value) : type.PointerElement is { } pointer ? new(PrimitiveType.Void, PointerElement: pointer) : type.FunctionSignature is { } function ? new(PrimitiveType.Void, Function: function) : type.ByReferenceElement is { } target ? new(PrimitiveType.Void, ByReferenceElement: target) : type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : (BodyValueType)type.Primitive!.Value;
     }
     private BodyValueType ArgumentType(int index)
     {
@@ -97,17 +97,23 @@ public sealed partial class MethodBuilder
                     return;
                 }
                 var constructedConformance = stack.Count > 0 && stack[^1].GenericInstance is { } instance &&
-                    (type.Class is { IsInterface: true } interfaceType && instance.ConformsTo(interfaceType) ||
+                    (type.Class is { IsNativeObjectRoot: true } root && instance.Definition.DerivesFrom(root) ||
+                     type.Class is { IsInterface: true } interfaceType && instance.ConformsTo(interfaceType) ||
                      type.GenericInstance is { Definition.IsInterface: true } interfaceInstance && instance.ConformsTo(interfaceInstance) ||
                      type.ImportedType is { } externalInterface && instance.ConformsTo(externalInterface));
                 var importedConformance = stack.Count > 0 && stack[^1].ImportedType is { } importedActual && type.ImportedType is { } importedTarget &&
                     (Assembly.HasNativeInterfaceConversion(importedActual, importedTarget) || Assembly.HasDeclaredClassBase(importedActual, importedTarget));
+                var externalRootConformance = stack.Count > 0 && Assembly.ExternalObjectRoot is { } selectedRoot &&
+                    Equals(type.ImportedType, selectedRoot) &&
+                    (stack[^1].Class is { IsValueType: false, IsStatic: false } ||
+                     stack[^1].GenericInstance is { Definition.IsValueType: false, Definition.IsStatic: false } ||
+                     stack[^1].ImportedType is { IsValueType: false });
                 var localExternalConformance = stack.Count > 0 && stack[^1].Class is { } localClass && type.ImportedType is { } externalTarget &&
                     localClass.InheritedContracts().Any(c => Equals(c.ImportedType, externalTarget));
                 if (stack.Count > 0 && (stack[^1].Class?.IsValueType == true || stack[^1].GenericInstance?.Definition.IsValueType == true || stack[^1].ImportedType?.IsValueType == true) &&
                     (type.Class?.IsInterface == true || type.GenericInstance?.Definition.IsInterface == true || type.ImportedType is { IsValueType: false }))
                     throw new InvalidDataException("value-to-interface conversion requires explicit boxing or constrained dispatch");
-                if (stack.Count == 0 || stack[^1] != type && !(stack[^1].Class is { } derived && type.Class is { } ancestor && derived.DerivesFrom(ancestor)) && !importedConformance && !constructedConformance && !localExternalConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException($"evaluation stack type mismatch or underflow at {index} ({instruction.Op}): expected {type}, actual {(stack.Count == 0 ? "<empty>" : stack[^1].ToString())}");
+                if (stack.Count == 0 || stack[^1] != type && !(stack[^1].Class is { } derived && type.Class is { } ancestor && derived.DerivesFrom(ancestor)) && !externalRootConformance && !importedConformance && !constructedConformance && !localExternalConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException($"evaluation stack type mismatch or underflow at {index} ({instruction.Op}): expected {type}, actual {(stack.Count == 0 ? "<empty>" : stack[^1].ToString())}");
                 stack.RemoveAt(stack.Count - 1);
             }
             switch (instruction.Op)
@@ -211,12 +217,14 @@ public sealed partial class MethodBuilder
                 case "convertUInt16":
                 case "convertUInt32":
                 case "convertUInt64":
+                case "convertIntPtr":
+                case "convertUIntPtr":
                 case "convertByte":
                 case "convert32":
                 case "convert64":
-                    if (stack.Count == 0 || (stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Single or PrimitiveType.Double) && !(instruction.Op == "convert32" && stack[^1].NativeLength)))
-                        throw new InvalidDataException("numeric conversion requires Int32, Int64, Single or Double; array length is supported only by conv.i4");
-                    stack[^1] = instruction.Op switch { "convertSingle" => PrimitiveType.Single, "convertDouble" => PrimitiveType.Double, "convert64" or "convertUInt64" => PrimitiveType.Int64, _ => PrimitiveType.Int32 }; break;
+                    if (stack.Count == 0 || (stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.IntPtr or PrimitiveType.UIntPtr or PrimitiveType.Single or PrimitiveType.Double) && !(instruction.Op == "convert32" && stack[^1].NativeLength)))
+                        throw new InvalidDataException("numeric conversion requires an integer or floating value; array length is supported only by conv.i4");
+                    stack[^1] = instruction.Op switch { "convertIntPtr" => PrimitiveType.IntPtr, "convertUIntPtr" => PrimitiveType.UIntPtr, "convertSingle" => PrimitiveType.Single, "convertDouble" => PrimitiveType.Double, "convert64" or "convertUInt64" => PrimitiveType.Int64, _ => PrimitiveType.Int32 }; break;
                 case "convertUnsignedDouble":
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("conv.r.un requires integer operands");
@@ -360,7 +368,7 @@ public sealed partial class MethodBuilder
                     if (instruction.Target.IsConstructor)
                     {
                         if (baseInitialized || !IsConstructor || !ReferenceEquals(DeclaringType!.LocalBase, instruction.Target.DeclaringType) ||
-                            stack.Count != 1 || !stack[0].ConstructionReceiver || !ReferenceEquals(stack[0].Class, DeclaringType))
+                            stack.Count != 1 || !stack[0].ConstructionReceiver || !(stack[0] with { ConstructionReceiver = false }).Equals((BodyValueType)DeclaringType.OpenSignature))
                             throw new InvalidDataException("base constructor must initialize the current receiver exactly once");
                         stack.Clear(); baseInitialized = true;
                     }

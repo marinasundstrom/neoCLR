@@ -1,0 +1,259 @@
+{
+  "sourceRevision": "a705beda2f829803c3e87037a5caf03b587fb5e9",
+  "compilerRevision": "e492490dc+source-unit",
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "assemble",
+        "/private/tmp/source-unit-memory1007g/System.neoil",
+        "/private/tmp/source-unit-memory1007g/System.neox",
+        "--format",
+        "neox"
+      ],
+      "exitCode": 0,
+      "stdout": "Assembled System -> /private/tmp/source-unit-memory1007g/System.neox\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/source-unit-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/source-unit-memory1007g/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-unit-memory1007g/ownership.json",
+        "--library",
+        "-o",
+        "/private/tmp/source-unit-memory1007g/NativeMemory.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/NativeAllocation.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeNativeAllocationCalls.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Void.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/source-unit-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/source-unit-memory1007g/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-unit-memory1007g/ownership.json",
+        "--reference",
+        "/private/tmp/source-unit-memory1007g/NativeMemory.dll",
+        "--reference",
+        "/private/tmp/source-native-memory1007/NativeWidthInputs.dll",
+        "-o",
+        "/private/tmp/source-unit-memory1007g/Consumer.dll",
+        "/private/tmp/source-unit-memory1007g/Consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-unit-memory1007g/Consumer.dll",
+        "--system",
+        "/private/tmp/source-unit-memory1007g/System.neox",
+        "--module",
+        "/private/tmp/source-native-memory1007/NativeWidthInputs.dll",
+        "--module",
+        "/private/tmp/source-unit-memory1007g/NativeMemory.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (14 IL functions; maximum stack 2; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-unit-memory1007g/Consumer.dll",
+        "--system",
+        "/private/tmp/source-unit-memory1007g/System.neox",
+        "--module",
+        "/private/tmp/source-native-memory1007/NativeWidthInputs.dll",
+        "--module",
+        "/private/tmp/source-unit-memory1007g/NativeMemory.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/source-unit-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/source-unit-memory1007g/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-unit-memory1007g/ownership.json",
+        "--reference",
+        "/private/tmp/source-unit-memory1007g/NativeMemory.dll",
+        "--reference",
+        "/private/tmp/source-native-memory1007/NativeWidthInputs.dll",
+        "-o",
+        "/private/tmp/source-unit-memory1007g/DoubleFree.dll",
+        "/private/tmp/source-unit-memory1007g/DoubleFree.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-unit-memory1007g/DoubleFree.dll",
+        "--system",
+        "/private/tmp/source-unit-memory1007g/System.neox",
+        "--module",
+        "/private/tmp/source-native-memory1007/NativeWidthInputs.dll",
+        "--module",
+        "/private/tmp/source-unit-memory1007g/NativeMemory.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_4315AECBCDB34014665E8EE849F5859BEA8D11A20993B8D7EFE635CF3684370B: typed-stack/control-flow verification passed (14 IL functions; maximum stack 2; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-unit-memory1007g/DoubleFree.dll",
+        "--system",
+        "/private/tmp/source-unit-memory1007g/System.neox",
+        "--module",
+        "/private/tmp/source-native-memory1007/NativeWidthInputs.dll",
+        "--module",
+        "/private/tmp/source-unit-memory1007g/NativeMemory.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Fault: double free [code=RuntimeError] at NeoMetadata_4C7980F2D3E8582987DF3603C93F538508279556E26618A9AF252BC2A22A904D.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_4E6174697665416C6C6F636174696F6E.M_52656C65617365:1\n  at NeoMetadata_4C7980F2D3E8582987DF3603C93F538508279556E26618A9AF252BC2A22A904D.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_4E6174697665416C6C6F636174696F6E.M_52656C65617365(Ptr(Void)) owner=Named(\"NeoMetadata_4C7980F2D3E8582987DF3603C93F538508279556E26618A9AF252BC2A22A904D.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_4E6174697665416C6C6F636174696F6E\") [NeoMetadata_4C7980F2D3E8582987DF3603C93F538508279556E26618A9AF252BC2A22A904D#1.0.0.0:8] IL instruction 1\n  at NeoMetadata_4C7980F2D3E8582987DF3603C93F538508279556E26618A9AF252BC2A22A904D.F_3C4E656F46756E6374696F6E3E35333739373337343635364432453532373536453734363936443635324534393645373436353732364637303533363537323736363936333635373332453445363137343639373636353444363536443646373237395F3436373236353635(Ptr(Void)) [NeoMetadata_4C7980F2D3E8582987DF3603C93F538508279556E26618A9AF252BC2A22A904D#1.0.0.0:2] IL instruction 1\n  at NeoMetadata_4315AECBCDB34014665E8EE849F5859BEA8D11A20993B8D7EFE635CF3684370B.F_4D61696E() [NeoMetadata_4315AECBCDB34014665E8EE849F5859BEA8D11A20993B8D7EFE635CF3684370B#1.0.0.0:1] IL instruction 15\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/source-unit-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/source-unit-memory1007g/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-unit-memory1007g/ownership.json",
+        "--reference",
+        "/private/tmp/source-unit-memory1007g/NativeMemory.dll",
+        "--reference",
+        "/private/tmp/source-native-memory1007/NativeWidthInputs.dll",
+        "-o",
+        "/private/tmp/source-unit-memory1007g/Overflow.dll",
+        "/private/tmp/source-unit-memory1007g/Overflow.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-unit-memory1007g/Overflow.dll",
+        "--system",
+        "/private/tmp/source-unit-memory1007g/System.neox",
+        "--module",
+        "/private/tmp/source-native-memory1007/NativeWidthInputs.dll",
+        "--module",
+        "/private/tmp/source-unit-memory1007g/NativeMemory.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_73BE67E1F63AE9821C99CDB914654AA55CE76B5D87A6AF6EC39D7C5E9BD506A0: typed-stack/control-flow verification passed (14 IL functions; maximum stack 2; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-unit-memory1007g/Overflow.dll",
+        "--system",
+        "/private/tmp/source-unit-memory1007g/System.neox",
+        "--module",
+        "/private/tmp/source-native-memory1007/NativeWidthInputs.dll",
+        "--module",
+        "/private/tmp/source-unit-memory1007g/NativeMemory.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Fault: native allocation size overflow [code=ArithmeticOverflow] at NeoMetadata_4C7980F2D3E8582987DF3603C93F538508279556E26618A9AF252BC2A22A904D.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_4E6174697665416C6C6F636174696F6E.M_4D756C7469706C79436865636B6564:2\n  at NeoMetadata_4C7980F2D3E8582987DF3603C93F538508279556E26618A9AF252BC2A22A904D.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_4E6174697665416C6C6F636174696F6E.M_4D756C7469706C79436865636B6564(UIntPtr, UIntPtr) owner=Named(\"NeoMetadata_4C7980F2D3E8582987DF3603C93F538508279556E26618A9AF252BC2A22A904D.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_4E6174697665416C6C6F636174696F6E\") [NeoMetadata_4C7980F2D3E8582987DF3603C93F538508279556E26618A9AF252BC2A22A904D#1.0.0.0:7] IL instruction 2\n  at NeoMetadata_4C7980F2D3E8582987DF3603C93F538508279556E26618A9AF252BC2A22A904D.F_3C4E656F46756E6374696F6E3E35333739373337343635364432453532373536453734363936443635324534393645373436353732364637303533363537323736363936333635373332453445363137343639373636353444363536443646373237395F34313643364336463633(UIntPtr, UIntPtr) [NeoMetadata_4C7980F2D3E8582987DF3603C93F538508279556E26618A9AF252BC2A22A904D#1.0.0.0:1] IL instruction 2\n  at NeoMetadata_73BE67E1F63AE9821C99CDB914654AA55CE76B5D87A6AF6EC39D7C5E9BD506A0.F_4D61696E() [NeoMetadata_73BE67E1F63AE9821C99CDB914654AA55CE76B5D87A6AF6EC39D7C5E9BD506A0#1.0.0.0:1] IL instruction 10\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/source-unit-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/source-unit-memory1007g/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-unit-memory1007g/ownership.json",
+        "--reference",
+        "/private/tmp/source-unit-memory1007g/NativeMemory.dll",
+        "--library",
+        "-o",
+        "/private/tmp/source-unit-memory1007g/Unsupported.dll",
+        "/private/tmp/source-unit-memory1007g/unsupported.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support callable declaration: static func Echo(pointer: *string) -> *string.\n"
+    }
+  ],
+  "hashes": {
+    "/private/tmp/source-unit-memory1007g/System.neoil": "b3de629ea4ba552863c8df2a94a8787ae1505a49da4e890dacc23e49c75dbbbd",
+    "/private/tmp/source-unit-memory1007g/System.neox": "ffeb28eefd8e74baeede19208a692cacb7780deff7086cbe978a46c603db606a",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn": "ef66171b634c2e59249dd875a8d13b275c0c8243c8a8e7f575238683a91ced7d",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/NativeAllocation.rvn": "d369a490e54a665449ef2ea5e447b0a1750bcfca7aad7fb453f3bfe2291f6614",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeNativeAllocationCalls.rvn": "c5b74a5dd0d799ca3eaf6d3aa98d019c8738d18900c9b2cadeeb349723c992f4",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Void.rvn": "cec6e383555235c0144b80860e7e384061f3a74d26e8b74178f1547d2bd12e75",
+    "/private/tmp/source-unit-memory1007g/Consumer.rvn": "fc3b5e79ec72181deab11cf1d89ee396d2ea1442cad8d0d5144015178c14f06d",
+    "/private/tmp/source-unit-memory1007g/Consumer.dll": "af4a3d8a1975a08aecdf8388aed2021e1508c44f6c57724ec9e5254d88ef3695",
+    "/private/tmp/source-unit-memory1007g/DoubleFree.rvn": "89a81327d08d79d9c36bd674e5c6190fd03a74fffb61d4342ed7bd3bfa9d81ef",
+    "/private/tmp/source-unit-memory1007g/DoubleFree.dll": "10ef8a75fc707796482dc07c457bd5ba79dd1fc691e413420a4cde685a5ea2ab",
+    "/private/tmp/source-unit-memory1007g/Overflow.rvn": "cc4ab654d3c4ed69f1da69e5d363c3a2e61599f845851c4d777a7c8a6d2579ec",
+    "/private/tmp/source-unit-memory1007g/Overflow.dll": "ab372256548e13adff5e7c4242797abf0fa1aac804702e2c0ab047a84952d722",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_source_native_memory.py": "9a9d49a108da876362faaa046ab2660667ae9f58d96d8fc3251134a80b13925b",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/native-memory-consumer.rvn": "146b005358b4e1daa6eed01ef3bbff9118ed37cca0114fbc83859486c2166fd5",
+    "/private/tmp/source-unit-memory1007g/unsupported.rvn": "6d742b4c883adde7d97e42f280d7086d58407394defa9874d490c2413e3ae6ef",
+    "/private/tmp/source-unit-memory1007g/ownership.json": "4a833385cf7c860120ea1f5acdc12c7a85f08b09cedeeeabd1c875a980d44583",
+    "/private/tmp/source-unit-memory1007g/NativeMemory.dll": "39771a721b3f5dfd9a68ea82e9b8b11f7fa1540abce3e286bd0d5039bc87d0ac",
+    "/private/tmp/source-unit-compiler1007/rvnc.dll": "444a6854747071a03416a0a15a6396ae90773473dd9174c287bf4cbe2ae998a8",
+    "/private/tmp/preview12-bootstrap/Core.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/preview12-bootstrap/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/native-poc-libraries1005/Numbers.dll": "3b41a75d3e16ac1f0750e22eb1f3ff7297691e9de8d5e6a47815596031afc1dd",
+    "/private/tmp/source-width1006-recorded/NativeIntegers.dll": "0d89265acac831d3ec4dc4f3cb3df079223d442cdd2fe60a94653923c5cd8ce8",
+    "/private/tmp/source-native-memory1007/NativeWidthInputs.dll": "5c9c453f96ebb90c5d258e8263afe2d200dee1eead87017fd1f534588428eee4",
+    "/private/tmp/source-width1006-recorded/ownership.json": "cecb02b9a7b47f461dedaac4e9b60e17154af0bb483bf1e1efff49964689c6f3",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "a2d79f933a7ccfe95fb0f4be86c8e00c496cc6f28c21d84dd74ada335a0acb49",
+    "/private/tmp/source-unit-compiler1007/Raven.CodeAnalysis.dll": "bf661490556422005c1e4e2bae3f8303ff8be83650b5842180c47c233b0fa0c8",
+    "/private/tmp/source-unit-compiler1007/Raven.CodeAnalysis.NeoClr.dll": "29f89be91d2e2d289897494e684f24d3c78894946945dca11f4d9ec181a69680",
+    "/private/tmp/source-unit-compiler1007/NeoCLR.Metadata.Experimental.dll": "142a7f31bcc21fdae1a97d1e216c5aba82dda815c9b601e895d9a9d9cad5e4d8"
+  }
+}

@@ -23,9 +23,10 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
 
     private SignatureType Type(bool allowVoid, int depth, bool allowByReference = false)
     {
-        if (depth >= 16) throw new InvalidDataException("imported signature nesting limit");
+        if (depth > 16) throw new InvalidDataException("imported signature nesting limit");
         switch (Byte())
         {
+            case 0x0f: return SignatureType.PointerTo(Type(true, depth + 1));
             case 0x10 when allowByReference: return SignatureType.ByReference(Type(false, depth + 1));
             case 0x01 when allowVoid: return PrimitiveType.Void;
             case 0x02: return PrimitiveType.Boolean;
@@ -37,12 +38,14 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
             case 0x07: return PrimitiveType.UInt16;
             case 0x09: return PrimitiveType.UInt32;
             case 0x0b: return PrimitiveType.UInt64;
+            case 0x18: return PrimitiveType.IntPtr;
+            case 0x19: return PrimitiveType.UIntPtr;
 
             case 0x0c: return PrimitiveType.Single;
             case 0x0d: return PrimitiveType.Double;
             case 0x0a: return PrimitiveType.Int64;
             case 0x0e: return PrimitiveType.String;
-            case 0x1c: return consumer.CoreObjectType;
+            case 0x1c: return consumer.ObjectType;
             case 0x13:
                 var ownerOrdinal = Number();
                 if (ownerOrdinal >= ownerArity) throw new InvalidDataException("unscoped imported owner parameter");

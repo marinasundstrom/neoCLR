@@ -6,6 +6,12 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.Syntax;
 using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 
+if (args.Length == 2 && args[0] == "--construction-binding-checks")
+{
+    ConstructionBindingChecks.Verify(args[1]);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--tuple-image-checks")
 {
     TupleChecks.VerifyImage(args[1]);
@@ -245,6 +251,18 @@ if (args.Length == 1 && args[0] == "--native-service-catalog-checks")
 if (args.Length == 2 && args[0] == "--native-service-catalog")
 {
     RuntimeServiceBindings.WriteNativeCatalog(args[1]);
+    return;
+}
+
+if (args.Length == 2 && args[0] == "--reference-source-failure-core")
+{
+    CoreDeclarations.Write(args[1], comparerStorage: true, includeFail: false);
+    return;
+}
+
+if (args.Length == 2 && args[0] == "--reference-source-console-core")
+{
+    CoreDeclarations.Write(args[1], includeConsole: false, comparerStorage: true);
     return;
 }
 

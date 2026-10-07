@@ -26,6 +26,17 @@ socket backend and DNS lookup remain IPv4-only. Socket overloads accept IPAddres
 values; IPv6 produces `SocketError.UnsupportedAddressFamily` before starting I/O.
 String socket overloads also accept numeric addresses.
 
+<a id="shared-budgets-development"></a>
+
+## Shared budgets
+
+Native source-built Networking and Web now share an opaque
+[NetworkDeadline](xref:System.Networking.NetworkDeadline). DNS, connection attempts and
+partial transfers can use the same deadline without restarting it. HTTP retains its
+15-second exchange budget; existing shorter phase limits and cancellation behavior remain.
+The default deadline is expired. See the [API contract](/docs/sockets.html) for limits.
+This is development support, not a new published release or a performance claim.
+
 ## Resolve, connect, exchange
 
 [Dns.GetHostAddresses](xref:System.Networking.Dns) returns a

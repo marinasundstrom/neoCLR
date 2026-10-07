@@ -15,9 +15,16 @@ static class NetworkBudgetChecks
                 using var assembly = AssemblyDefinition.ReadAssembly(path);
                 var module = assembly.MainModule;
                 var methods = module.Types.Where(t => t.FullName is "System.Networking.Dns" or "System.Networking.Sockets.Socket")
-                    .SelectMany(t => t.Methods).Where(m => m.Name.EndsWith("Until", StringComparison.Ordinal)).ToArray();
+                    .SelectMany(t => t.Methods).Where(m => m.Name.EndsWith("Until", StringComparison.Ordinal) && m.Parameters.Any(p => p.ParameterType.MetadataType == MetadataType.Int64)).ToArray();
                 if (methods.Length != 10 || methods.Any(m => bootstrap ? !m.IsPublic : !m.IsAssembly))
                     throw new InvalidDataException("Network budget visibility differs from the selected reference profile.");
+                var deadline = module.GetType("System.Networking.NetworkDeadline");
+                if (!deadline.IsValueType || !deadline.IsPublic || deadline.Fields.Any(f => f.IsPublic))
+                    throw new InvalidDataException("Deadline must be opaque public value metadata.");
+                var typed = module.Types.SelectMany(t => t.Methods).Where(m => m.Name.EndsWith("Until", StringComparison.Ordinal)
+                    && m.Parameters.Any(p => p.ParameterType.FullName == deadline.FullName)).ToArray();
+                if (typed.Length != 5 || typed.Any(m => !m.IsPublic || m.Parameters[^1].ParameterType.FullName != CancellationBindings.Token))
+                    throw new InvalidDataException("Missing typed public deadline/cancellation contracts.");
                 var tokenOverloads = module.Types.Where(t => t.FullName is "System.Networking.Dns" or "System.Networking.Sockets.Socket")
                     .SelectMany(t => t.Methods).Where(m => !m.Name.EndsWith("Until", StringComparison.Ordinal)
                         && m.Parameters.LastOrDefault()?.ParameterType.FullName == CancellationBindings.Token).ToArray();

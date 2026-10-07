@@ -143,6 +143,11 @@ without an intermediate JSON file. JSON remains the default (`--format json`).
 Both outputs refuse overwrites. See [module-set assembly](docs/cli-module-sets.md).
 
 Use `cargo build --locked --release` for an optimized build in `target/release`.
+On macOS, the selected SDK must match the installed compiler/linker. If libffi's
+configure step reports an unsupported architecture in `libSystem.B.tbd`, select a
+compatible installed SDK through command-local `SDKROOT`/`DEVELOPER_DIR`; see the
+[recorded clean-source build](docs/experiments/extended-cli-metadata/clean-bootstrap-reproduction-2026-10-07.md)
+for the tested host and build order. This does not require changing global Xcode settings.
 Run `cargo test --locked` to execute the Rust test suite.
 
 On Windows the executable is `target\debug\neoclr.exe`. `hello.neo.json` contains

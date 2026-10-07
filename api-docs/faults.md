@@ -20,6 +20,11 @@ Use Result for expected errors that callers can handle. A stream's Closed result
 or a Task's cancelled state is not a terminal Fault. These codes do not introduce
 exceptions, catch/finally behavior or a new guest error hierarchy.
 
+Development bootstrap (2026-10-06): independently emitted source System.Fail now raises
+this same UserFault through native metadata import. Its primitive profile removes the
+competing bridge declaration. Source-owned terminal-flow recognition in Raven remains
+open, so this execution gate does not yet qualify let-else uses of that source library.
+
 ## Reading faults in an embedding host
 
 Rust hosts receive `Result<Execution, neoclr::Fault>`. The `Fault` fields are:
@@ -122,3 +127,10 @@ metadata, temporary input Strings or total process memory. Setting the entry quo
 to zero prevents all insertions. Limits are terminal runtime budgets, not recoverable
 Storage errors or guest-selected Fault codes. Hosts constructing Limits exhaustively
 must supply the two new fields; using `..Limits::default()` picks up the defaults.
+
+
+Development update (2026-10-07): the source-owned terminal-flow limitation described
+above is resolved with Raven's explicit RuntimeFailureContract. The selected native
+owner now works in let-else, including separate compilation. Ordinary .NET methods
+remain unchanged; missing or incompatible owners reject before output. This changes
+compiler configuration, not the public Fail signature or runtime fault behavior.

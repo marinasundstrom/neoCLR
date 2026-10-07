@@ -57,7 +57,7 @@ public sealed partial class AssemblyBuilder
             }
         if (methods.Any(m => m.Instructions.Any(i => i.Op == "object.box" || i.Op == "reference.test" && !MethodBuilder.IsReferenceSignature(i.Type!))))
         {
-            if (NativeObjectRoot is not null) ValidateNativeObjectSlots();
+            if (NativeObjectRoot is not null || ExternalObjectRoot is not null) ValidateNativeObjectSlots();
             else (NativeBindingFor(CoreLibrary) ?? throw new InvalidDataException("native boxing/value type tests require an explicit System core binding")).ValidateBoxingCore();
         }
 
@@ -81,7 +81,7 @@ public sealed partial class AssemblyBuilder
         if (methods.Any(method => method.IsImplicitObjectOverride))
         {
             if (NativeObjectRoot is not null) ValidateNativeObjectSlots();
-            else
+            else if (ExternalObjectRoot is null)
             {
                 var bindings = nativeBindings.Where(pair => pair.Value.Library.ModuleName == "System").ToArray();
                 if (bindings.Length != 1) throw new InvalidDataException("native Object overrides require one explicit runtime slot binding for System");
@@ -116,15 +116,25 @@ public sealed partial class AssemblyBuilder
         static string Encoded(string value) => Convert.ToHexString(Encoding.UTF8.GetBytes(value));
         static string TypeName(TypeBuilder type) => type.Definition.IsNativeObjectRoot ? "System.Object" : type.NativeGrapheme ? "System.Char" : type.NativePrimitive is { } primitive ? "System." + primitive : type.Assembly.NativeBinding is { } binding ? binding.TypeName(type.Definition) : type.Definition.DeclaringType is { } parent ? TypeName(parent.Producer!) + ".N_" + Encoded(type.Name) : ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
         static string FunctionName(MethodBuilder method) => method.NativeImportName ?? (method.Definition.ImplementationAttributes == 0x1000 ? (method.Namespace.Length == 0 ? method.Name : method.Namespace + "." + method.Name) : ((method.IsVirtual && method.DeclaringType?.IsInterface == false || method.NativeValueOverride || method.DeclaringType?.NativePrimitive is not null || method.DeclaringType?.NativeGrapheme == true || method.DeclaringType?.Definition.IsNativeObjectRoot == true) ? TypeName(method.DeclaringType!) + "." + method.Name : method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName)));
-        static object? Owner(MethodBuilder method) => method.NativeImportCharOwner ? "Char" : method.NativeImportPrimitiveOwner is { } primitive ? primitive.ToString() : method.NativeImportIsNamespaceFunction ? null : method.DeclaringType is { } type ? TypeOwner(type, type.GenericParameterNames.Select((_, i) => SignatureType.TypeParameter(i)).ToArray()) : null;
+        static object? Owner(MethodBuilder method) => method.NativeImportObjectOwner ? new { Named = "System.Object" } : method.NativeImportCharOwner ? "Char" : method.NativeImportPrimitiveOwner is { } primitive ? primitive.ToString() : method.NativeImportIsNamespaceFunction ? null : method.DeclaringType is { } type ? TypeOwner(type, type.GenericParameterNames.Select((_, i) => SignatureType.TypeParameter(i)).ToArray()) : null;
         static object TypeOwner(TypeBuilder type, IReadOnlyList<SignatureType> arguments) => type.NativeGrapheme ? "Char" : type.NativePrimitive is { } primitive ? primitive.ToString() : arguments.Count == 0 ? new { Named = TypeName(type) } : new { Constructed = new { definition = TypeName(type), arguments = arguments.Select(SignatureValue).ToArray() } };
-        static string ExternalName(ImportedTypeReference type) => type.Owner.IsNativeGrapheme(type) ? "System.Char" : type.Owner.NativeBindingFor(type.AssemblyIdentity) is { } binding ? binding.TypeName(type) : type.DeclaringType is { } parent ? ExternalName(parent) + ".N_" + Encoded(type.Name) : ModuleIdentity(type.AssemblyIdentity) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
+        static string ExternalName(ImportedTypeReference type) => Equals(type.Owner.ExternalObjectRoot, type) ? "System.Object" : type.Owner.AuthoredPrimitiveOwner(type) is PrimitiveType.Void or PrimitiveType.Value ? "System." + type.Owner.AuthoredPrimitiveOwner(type) : type.Owner.IsNativeGrapheme(type) ? "System.Char" : type.Owner.NativeBindingFor(type.AssemblyIdentity) is { } binding ? binding.TypeName(type) : type.DeclaringType is { } parent ? ExternalName(parent) + ".N_" + Encoded(type.Name) : ModuleIdentity(type.AssemblyIdentity) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
         static object ExternalValue(ImportedTypeReference type) => type.Owner.AuthoredPrimitiveOwner(type) is { } primitive ? primitive.ToString() : NativeImportBinding.IsInhabitedVoid(type) ? "Void" : NativeImportBinding.IsIntrinsicChar(type) ? "Char" : NativeImportBinding.IsErasedValue(type) ? "Value" : type.TypeArguments.Count == 0 ? new { Named = ExternalName(type) } : new { Constructed = new { definition = ExternalName(type), arguments = type.TypeArguments.Select(SignatureValue).ToArray() } };
-        static object SignatureValue(SignatureType type) => type.IsSelf ? "SelfType" : type.FunctionSignature is { } function ? new { Function = new { parameters = function.ParameterTypes.Select(SignatureValue).ToArray(), returns = SignatureValue(function.ReturnType), no_result = function.NoResult } } : type.ByReferenceElement is { } target ? new { ByRef = SignatureValue(target) } : type.ImportedType is { } imported ? ExternalValue(imported) : type.GenericInstance is { } instance ? TypeOwner(instance.Definition, instance.TypeArguments) : type.TypeParameterIndex is { } ordinal ? new { TypeParameter = ordinal } : type.MethodParameterIndex is { } index ? new { MethodTypeParameter = index } : type.ArrayElement is { } element ? new { ArrayRef = SignatureValue(element) } : type.ClassType is { NativeGrapheme: true } ? (object)"Char" : type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
+        static object SignatureValue(SignatureType type) => type.PointerElement is { } pointer ? new { Ptr = SignatureValue(pointer) } : type.IsSelf ? "SelfType" : type.FunctionSignature is { } function ? new { Function = new { parameters = function.ParameterTypes.Select(SignatureValue).ToArray(), returns = SignatureValue(function.ReturnType), no_result = function.NoResult } } : type.ByReferenceElement is { } target ? new { ByRef = SignatureValue(target) } : type.ImportedType is { } imported ? ExternalValue(imported) : type.GenericInstance is { } instance ? TypeOwner(instance.Definition, instance.TypeArguments) : type.TypeParameterIndex is { } ordinal ? new { TypeParameter = ordinal } : type.MethodParameterIndex is { } index ? new { MethodTypeParameter = index } : type.ArrayElement is { } element ? new { ArrayRef = SignatureValue(element) } : type.ClassType is { NativePrimitive: PrimitiveType.Void or PrimitiveType.Value } scalar ? (object)scalar.NativePrimitive.Value.ToString() : type.ClassType is { NativeGrapheme: true } ? (object)"Char" : type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
         static object[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(SignatureValue).ToArray();
-        object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
-            ? new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, publicly_visible = publiclyVisible }
-            : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility == MethodVisibility.Protected ? "Family" : method.Visibility.ToString(), parameter_tokens = parameterTokens[method] };
+        object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true)
+        {
+            var origin = new Dictionary<string, object> { ["assembly"] = IdentityText(Identity), ["module"] = Identity.Name + ".dll", ["name"] = name, ["token"] = token };
+            if (method is null) origin["publicly_visible"] = publiclyVisible;
+            else
+            {
+                origin["member_access"] = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility == MethodVisibility.Protected ? "Family" : method.Visibility.ToString();
+                origin["parameter_tokens"] = parameterTokens[method];
+                if (method.Definition.NullableAnnotations.Count != 0)
+                    origin["nullable_annotations"] = method.Definition.NullableAnnotations.OrderBy(p => p.Key).Select(p => new { position = p.Key, flags = p.Value.Flags.Select(f => (int)f).ToArray(), uniform = p.Value.IsUniform }).ToArray();
+            }
+            return origin;
+        }
         object Instruction(MethodBuilder.Operation instruction) => instruction.Op switch
         {
             "function.bind" => new { op = "function.bind", arg = new { function_type = SignatureValue(instruction.Type!), target = new { name = FunctionName(instruction.Target!), owner = instruction.ConstructedTarget is { } binding ? TypeOwner(binding.Definition.DeclaringType!, binding.DeclaringTypeArguments) : Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, generic_arguments = (instruction.ConstructedTarget?.MethodArguments ?? instruction.GenericTarget?.TypeArguments ?? []).Select(SignatureValue).ToArray(), parameters = (instruction.ConstructedTarget?.Signature ?? instruction.GenericTarget?.Signature ?? instruction.Target!.Signature).ParameterTypes.Select(SignatureValue).ToArray() } } },
@@ -150,6 +160,8 @@ public sealed partial class AssemblyBuilder
             "convertUInt16" => new { op = "conv.u2" },
             "convertUInt32" => new { op = "conv.u4" },
             "convertUInt64" => new { op = "conv.u8" },
+            "convertIntPtr" => new { op = "conv.i" },
+            "convertUIntPtr" => new { op = "conv.u" },
             "divide.unsigned" => new { op = "div.un" },
             "remainder.unsigned" => new { op = "rem.un" },
             "shift.right.unsigned" => new { op = "shr.un" },
@@ -323,14 +335,14 @@ public sealed partial class AssemblyBuilder
             ValidateArrayBacking(arrayBacking);
             manifest["array_backing"] = new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(arrayBacking) };
         }
-        var moduleBindings = dependencies.Values.Where(d => d.NativeBinding is not null || externalGrapheme?.AssemblyIdentity.Equals(d.Identity) == true).Select(d => new
+        var moduleBindings = dependencies.Values.Where(d => ExternalObjectRoot?.AssemblyIdentity.Equals(d.Identity) == true || d.NativeBinding is not null || externalGrapheme?.AssemblyIdentity.Equals(d.Identity) == true || ExternalPrimitive(PrimitiveType.Void)?.AssemblyIdentity.Equals(d.Identity) == true || ExternalPrimitive(PrimitiveType.Value)?.AssemblyIdentity.Equals(d.Identity) == true).Select(d => new
         {
             assembly = IdentityText(d.Identity),
             module = ModuleName(d),
             revision = d.NativeBinding is null ? d.Identity.Version.ToString() : d.NativeBinding.Revision
         }).ToArray();
         if (moduleBindings.Length != 0) manifest["native_module_bindings"] = moduleBindings;
-        var typeBindings = importedNominalTypes.Values.Where(t => NativeBindingFor(t.AssemblyIdentity) is not null || IsNativeGrapheme(t)).Select(t => new
+        var typeBindings = importedNominalTypes.Values.Where(t => Equals(ExternalObjectRoot, t) || NativeBindingFor(t.AssemblyIdentity) is not null || IsNativeGrapheme(t) || AuthoredPrimitiveOwner(t) is PrimitiveType.Void or PrimitiveType.Value).Select(t => new
         {
             native_name = ExternalName(t),
             assembly = IdentityText(t.AssemblyIdentity),
@@ -341,7 +353,7 @@ public sealed partial class AssemblyBuilder
             declaring = t.DeclaringType is null ? null : ExternalName(t.DeclaringType)
         }).ToArray();
         if (typeBindings.Length != 0) manifest["native_type_bindings"] = typeBindings;
-        var importedValues = importedNominalTypes.Values.Where(t => t.IsValueType && AuthoredPrimitiveOwner(t) is null).Select(ExternalName).Order().ToArray();
+        var importedValues = importedNominalTypes.Values.Where(t => t.IsValueType && AuthoredPrimitiveOwner(t) is null or PrimitiveType.Void or PrimitiveType.Value).Select(ExternalName).Order().ToArray();
         if (importedValues.Length != 0) manifest["value_type_references"] = importedValues;
         var artifact = new
         {

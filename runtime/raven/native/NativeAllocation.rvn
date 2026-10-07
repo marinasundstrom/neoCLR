@@ -1,0 +1,15 @@
+namespace System.Runtime.CompilerServices
+
+internal static class NativeAllocation {
+    static unsafe func Allocate(byteCount: nuint) -> *System.Void {
+        return neoCLR.Runtime.NativeAllocate(byteCount)
+    }
+
+    static func MultiplyChecked(elementCount: nuint, elementSize: nuint) -> nuint {
+        return neoCLR.Runtime.NativeMultiplyChecked(elementCount, elementSize)
+    }
+
+    static unsafe func Release(pointer: *System.Void) {
+        neoCLR.Runtime.NativeFree(pointer)
+    }
+}

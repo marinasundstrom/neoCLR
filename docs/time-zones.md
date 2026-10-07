@@ -1,20 +1,8 @@
-# Time, offsets, named zones and DateTime
+# Time, offsets and named zones
 
-Provisional development slice, 2026-09-27, beyond Preview 10. The author selected Time
-and time-zone handling after calendars/globalization, renamed the proposed Offset to
-**TimeOffset**, and requested a nominal **parenthesized** DateTime union. After clarifying
-that the second alternative should retain a zone ID, the selected terms are:
-
-```raven
-public union DateTime(LocalDateTime | ZonedDateTime)
-```
-
-This supersedes the earlier proposal's decision not to introduce DateTime. It does
-not recreate .NET DateTime.Kind. Existing values convert directly into the nominal
-union; type patterns extract LocalDateTime or ZonedDateTime without wrapper cases.
-The standard union default is inactive (HasValue=false, Value=null); it is not midnight
-or an implicitly zoned value. Compiler-generated ToString is diagnostic, not a date
-formatter. Match an active alternative and use the culture formatter on its civil value.
+Prefer specific types: Date, Time, LocalDateTime, Instant and ZonedDateTime express
+the information an API needs. DateTime is an optional union for contracts that
+intentionally accept either a local or a zoned value.
 
 ## Contracts
 
@@ -50,6 +38,19 @@ OutOfRange is distinct from Skipped. Error cases are UnknownZone, OutOfRange and
 SystemZoneUnavailable. Unknown/absent system zones do not silently become UTC.
 TimeZone.GetSystem reads the OS IANA name; each returned zone is a snapshot selection.
 Culture and region do not determine a timezone.
+
+## Optional local-or-zoned contract
+
+```raven
+public union DateTime(LocalDateTime | ZonedDateTime)
+```
+
+This supersedes the earlier proposal's decision not to introduce DateTime. It does
+not recreate .NET DateTime.Kind. Existing values convert directly into the nominal
+union; type patterns extract LocalDateTime or ZonedDateTime without wrapper cases.
+The standard union default is inactive (HasValue=false, Value=null); it is not midnight
+or an implicitly zoned value. Compiler-generated ToString is diagnostic, not a date
+formatter. Match an active alternative and use the culture formatter on its civil value.
 
 ## Rules, precision and distribution
 
@@ -141,3 +142,10 @@ A focused RavenDoc render covers the six new types. The DateTime heading omits i
 parenthesized variants; the API reference links an exact declaration supplement.
 LocalTimeMapping payload pages use the existing manual-member mechanism. Website
 sample extraction was checked without running the full site build.
+
+## Native source bootstrap (development, 2026-10-06)
+
+The calendar group now compiles into a separate native library, and an artifact-only
+consumer executes named-zone offsets, gaps/overlaps and the optional local-or-zoned
+union. The internal mapping service returns managed Int64 arrays. See the
+[gate and remaining full-System blockers](experiments/extended-cli-metadata/source-calendar-2026-10-06.md).

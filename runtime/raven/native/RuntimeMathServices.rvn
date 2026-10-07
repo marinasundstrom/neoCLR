@@ -1,0 +1,66 @@
+namespace System.Math
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+// Native adapters for the existing floating-point math runtime services.
+internal extension MathRuntimeServices for RuntimeServices {
+    static func MathAbs(value: double) -> double {
+        return neoCLR.Runtime.MathAbs(value)
+    }
+
+    static func MathSqrt(value: double) -> double {
+        return neoCLR.Runtime.MathSqrt(value)
+    }
+
+    static func MathFloor(value: double) -> double {
+        return neoCLR.Runtime.MathFloor(value)
+    }
+
+    static func MathCeiling(value: double) -> double {
+        return neoCLR.Runtime.MathCeiling(value)
+    }
+
+    static func MathTruncate(value: double) -> double {
+        return neoCLR.Runtime.MathTruncate(value)
+    }
+
+    static func MathRound(value: double) -> double {
+        return neoCLR.Runtime.MathRound(value)
+    }
+
+    static func MathExp(value: double) -> double {
+        return neoCLR.Runtime.MathExp(value)
+    }
+
+    static func MathLog(value: double) -> double {
+        return neoCLR.Runtime.MathLog(value)
+    }
+
+    static func MathLog10(value: double) -> double {
+        return neoCLR.Runtime.MathLog10(value)
+    }
+
+    static func MathSin(value: double) -> double {
+        return neoCLR.Runtime.MathSin(value)
+    }
+
+    static func MathCos(value: double) -> double {
+        return neoCLR.Runtime.MathCos(value)
+    }
+
+    static func MathTan(value: double) -> double {
+        return neoCLR.Runtime.MathTan(value)
+    }
+
+    static func MathPow(left: double, right: double) -> double {
+        return neoCLR.Runtime.MathPow(left, right)
+    }
+
+    static func MathMin(left: double, right: double) -> double {
+        return neoCLR.Runtime.MathMin(left, right)
+    }
+
+    static func MathMax(left: double, right: double) -> double {
+        return neoCLR.Runtime.MathMax(left, right)
+    }
+}

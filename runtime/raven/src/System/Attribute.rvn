@@ -1,0 +1,7 @@
+namespace System
+
+/// Base class for nominal metadata attributes.
+public abstract class Attribute {
+    /// Initializes a derived attribute.
+    protected init() { }
+}

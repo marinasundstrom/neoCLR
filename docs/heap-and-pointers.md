@@ -305,3 +305,46 @@ zero-sized Void semantics and the remaining native-layout limitations.
 The same initobj opcode also accepts managed T& destinations under the
 [typed default-initialization contract](managed-initialization.md). That path uses
 managed slot writes and does not require native layout or raw memory allocation.
+
+
+## Source NativeAllocation services (2026-10-07)
+
+Development InternalCalls provide the runtime operations needed by the source
+`System.Runtime.InteropServices.NativeMemory` functions:
+
+| Runtime service | Exact signature | Operation |
+| --- | --- | --- |
+| `neoCLR.Runtime.NativeAllocate` | `(UIntPtr) -> Void*` | Allocate the requested uninitialized byte count |
+| `neoCLR.Runtime.NativeMultiplyChecked` | `(UIntPtr, UIntPtr) -> UIntPtr` | Multiply count and element size with unsigned native-width overflow checking |
+| `neoCLR.Runtime.NativeFree` | `(Void*) -> noresult` | Release a tracked base pointer; null is accepted |
+
+Allocation/free use the same execution-owned heap as `heap.alloc`/`heap.free`. Pointers
+can cross these service/instruction boundaries without losing allocation identity.
+Initialization tracking, null/zero-size rules, double-free checks and byte/allocation
+limits are unchanged. A successful no-result free leaves no stack value. The older
+heap.free instruction still produces its inhabited Void value. Multiplication overflow
+raises ArithmeticOverflow; exhausted native budgets raise NativeMemoryLimitExceeded.
+Reachability reports NativeAllocation and PointerMemory for allocation/free, while the
+pure multiplication service needs neither resource. Incorrect service signatures reject.
+
+This preserves the existing comparison with .NET NativeMemory: count multiplication is
+checked, storage is uninitialized, and release is explicit. neoCLR additionally retains
+its tracked pointer validity and execution budgets; these checks have runtime costs and
+are not a performance claim. No new memory model, instruction or metadata format is added.
+
+`tests/native_allocation_services.rs` round-trips the program through native metadata
+before execution. Five tests cover values, aliasing, release, limits, overflow, invalid
+signatures and service discovery. All 17 existing pointer tests also pass. These are
+runtime tests, not yet Raven source acceptance: the C# metadata writer/introspection and
+Raven emitter still need unmanaged pointer signatures before the NativeMemory sources
+can use these services. Managed arrays remain separate from this unsafe allocation API.
+
+### Source NativeMemory acceptance (2026-10-07)
+
+The native Raven target now compiles the unchanged NativeMemory functions against
+`NativeAllocation` adapters backed by the three services above. A separate consumer
+imports the emitted library without its sources, runs both allocation overloads and
+Free, and verifies double-free and multiplication overflow faults. The adapters remain
+internal implementation details. Metadata uses existing Ptr signatures; ordinary CLI
+representation remains PTR. This does not add nominal pointer targets or native Raven
+pointer arithmetic. See [acceptance evidence](experiments/extended-cli-metadata/source-native-memory-2026-10-07.md).

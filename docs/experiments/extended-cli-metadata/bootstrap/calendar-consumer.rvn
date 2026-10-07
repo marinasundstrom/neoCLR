@@ -1,0 +1,66 @@
+import System.*
+import System.Result.*
+
+func Main() -> int {
+    let Ok(zone) = TimeZone.Find("Europe/Stockholm") else {
+        return 1
+    }
+    if zone.Id != "Europe/Stockholm" {
+        return 2
+    }
+    if TimeZone.DatabaseVersion.Length == 0 {
+        return 3
+    }
+    let Ok(date) = Date.Create(2024, 3, 31) else {
+        return 4
+    }
+    let Ok(time) = Time.Create(2, 30, 0) else {
+        return 5
+    }
+    let Ok(LocalTimeMapping.Skipped) = zone.MapLocal(LocalDateTime.Create(date, time)) else {
+        return 6
+    }
+    let Ok(overlap) = Date.Create(2024, 10, 27) else {
+        return 7
+    }
+    let Ok(LocalTimeMapping.Ambiguous(earlier, later)) = zone.MapLocal(LocalDateTime.Create(overlap, time)) else {
+        return 8
+    }
+    if later.Instant.UnixTimeTicks - earlier.Instant.UnixTimeTicks != 36000000000L {
+        return 9
+    }
+    if earlier.Offset.Seconds != 7200 {
+        return 10
+    }
+    if later.Offset.Seconds != 3600 {
+        return 11
+    }
+    let Ok(LocalTimeMapping.Unique(unique)) = TimeZone.Utc.MapLocal(LocalDateTime.Create(date, time)) else {
+        return 12
+    }
+    if unique.LocalDateTime.Date.Day != 31 {
+        return 13
+    }
+    let Error(TimeZoneError.UnknownZone) = TimeZone.Find("Invented/Zone") else {
+        return 14
+    }
+    if Kind(unique) != 2 {
+        return 15
+    }
+    if Kind(LocalDateTime.Create(date, time)) != 1 {
+        return 16
+    }
+    let Error(TimeZoneError.OutOfRange) = zone.GetUtcOffset(Instant.FromUnixTimeTicks(-9223372036854775807L)) else {
+        return 17
+    }
+    System.Console.WriteLine("Native source calendar passed")
+    return 0
+}
+
+func Kind(value: DateTime) -> int {
+    return match value {
+        LocalDateTime local => 1
+        ZonedDateTime zoned => 2
+        _ => 0
+    }
+}

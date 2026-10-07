@@ -1,0 +1,103 @@
+name: Native toolchain qualification
+on:
+  push:
+    paths:
+      - .github/workflows/native-toolchain.yml
+  workflow_dispatch:
+    inputs:
+      raven_revision:
+        description: Exact Raven commit to qualify with this neoCLR revision
+        required: true
+        default: 70aea9a7e9e424159a48b0227869245a95bf2ec2
+permissions:
+  contents: read
+jobs:
+  windows-native:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      PYTHONUTF8: '1'
+      PACKAGE_VERSION: 0.1.13-neoclr.qualification
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: neoclr
+      - uses: actions/checkout@v4
+        with:
+          repository: marinasundstrom/raven
+          ref: ${{ inputs.raven_revision || '70aea9a7e9e424159a48b0227869245a95bf2ec2' }}
+          path: raven
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            11.0.100-rc.1.26425.128
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: choco install zip --no-progress -y
+      - name: Build runtime and test portable HTTP readiness
+        working-directory: neoclr
+        run: |
+          python -m unittest discover -s scripts -p test_native_http_readiness.py
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cargo build --locked --release --bin neoclr
+      - name: Build native compiler SDK
+        shell: bash
+        working-directory: raven
+        run: |
+          export RAVEN_NEOCLR_METADATA_PROJECT="$(cygpath -m "$GITHUB_WORKSPACE/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj")"
+          export RAVEN_PACKAGE_OUTPUT="$(cygpath -m "$GITHUB_WORKSPACE/packages")"
+          scripts/package-sdk.sh win-x64 "$PACKAGE_VERSION"
+      - name: Build bootstrap tools sequentially
+        shell: pwsh
+        run: |
+          dotnet build neoclr/tools/metadata/NeoCLR.Metadata.Translate/NeoCLR.Metadata.Translate.csproj -c Release
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          dotnet build neoclr/docs/experiments/raven-target/Probe.csproj "-p:RavenRoot=$env:GITHUB_WORKSPACE/raven"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Build editor package with matching server
+        shell: pwsh
+        working-directory: raven/src/Raven.VSCode
+        run: |
+          npm ci
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run package:extension
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          if (Test-Path server) { Remove-Item server -Recurse -Force }
+          Copy-Item "$env:GITHUB_WORKSPACE/packages/raven-sdk-$env:PACKAGE_VERSION-win-x64/tools/language-server" server -Recurse -Force
+          npx --no-install vsce package --no-dependencies --out "$env:GITHUB_WORKSPACE/packages/raven-vscode.vsix"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Compile libraries, package and run extracted samples
+        shell: pwsh
+        working-directory: neoclr
+        run: |
+          $runtime = "$PWD/target/release/neoclr.exe"
+          $translator = "$PWD/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll"
+          $sdk = "$env:GITHUB_WORKSPACE/packages/raven-sdk-$env:PACKAGE_VERSION-win-x64"
+          $ravenRevision = git -C ../raven rev-parse HEAD
+          $runtimeRevision = git rev-parse HEAD
+          python scripts/prepare-native-bootstrap.py --probe docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll --runtime $runtime --translator $translator --output target/bootstrap
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python scripts/build-native-class-library.py --compiler "$sdk/tools/rvnc/rvnc.dll" --compiler-revision $ravenRevision --core target/bootstrap/Core.dll --bootstrap-directory target/bootstrap --translator $translator --output target/libraries
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python scripts/package-native-poc.py --sdk $sdk --vsix ../packages/raven-vscode.vsix --libraries target/libraries --runtime $runtime --runtime-revision $runtimeRevision --output target/distribution
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          New-Item -ItemType Directory 'target/extracted bundle'
+          tar -xzf target/distribution/neoclr-native-poc.tar.gz -C 'target/extracted bundle'
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python 'target/extracted bundle/neoclr-native-poc/tools/verify-native-bundle.py' --report target/windows-native-acceptance.json
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-native-qualification
+          path: |
+            neoclr/target/windows-native-acceptance*.json
+            neoclr/target/bootstrap/*.json
+            neoclr/target/libraries/*evidence.json
+            neoclr/target/distribution/*.tar.gz

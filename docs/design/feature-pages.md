@@ -38,6 +38,16 @@ directions are welcome, clearly distinguished from implementation. Setup/downloa
 pages retain accurate package availability. Preserve changelog, published release
 notes and development history outside the feature narrative.
 
+## Installation and language navigation — author direction, 2026-10-07
+
+Give installation one short path: prerequisites, download, install the editor extension,
+open a sample and run it. Put optional verification and troubleshooting after those steps;
+keep source-build qualification and bootstrap internals in linked maintainer docs.
+Keep Raven in the main navigation. Its page links directly to the Raven language website
+and playground, explaining that the playground is for the language rather than neoCLR's
+runtime libraries. The site's experimental identity supplies general context; repeat only
+concrete limitations or availability differences that affect the reader's next action.
+
 ## Case-based samples — author direction, 2026-09-27
 
 This is a general website convention, especially for feature pages: explain a

@@ -2,12 +2,21 @@
 
 Create objects, invoke methods, and read or write members discovered at runtime.
 
-**Preview 11 API.** Use matching compiler, library and runtime artifacts.
-
 [Introspection](../introspection/) describes a program's types and members.
 Import `System.Runtime.Reflection.*` to add execution extensions to those descriptions.
 Expected validation failures are `Result` values, so callers can inspect an error or
 propagate it with `?`.
+
+<a id="development-dynamic-arrays"></a>
+
+## dynamic arrays
+
+Separately compiled JSON mapping can use `ArrayReflection` to read managed vector
+lengths and boxed elements, or construct a vector from a runtime-backed array descriptor.
+Reference elements retain identity. These bounded operations use terminal Faults for
+invalid inputs and do not support custom value elements or multidimensional arrays.
+See the [API contract](/docs/reflection.html#dynamic-managed-arrays-development-2026-10-07).
+This is development work after Preview 12; use matching rebuilt libraries.
 
 ## Construct and invoke
 
@@ -63,7 +72,9 @@ MemberInfo and ParameterInfo expose constructor data without executing attribute
 constructors. Read it once during startup and cache the validated mapping.
 
 
-## Development case: preparing union constructors for routes
+<a id="development-case-preparing-union-constructors-for-routes"></a>
+
+## Case: preparing union constructors for routes
 
 Read route attributes and select constructors at startup, then keep those descriptors
 for the server lifetime. The tested `ItemRouteFactory` finds the `/items/{id}` case,
@@ -84,14 +95,3 @@ with preparation, repeated construction and rejection checks. The [attributed HT
 combines this execution support with startup schema validation and cached route bindings.
 See [constructor execution](xref:System.Runtime.Reflection.ConstructorReflectionExtensions)
 for signatures and limitations.
-
-## Native source-library integration (development)
-
-The development Raven/NeoCLR integration now compiles the production JSON mapper and
-introspection sources into a native library and executes separately compiled consumers.
-The checked gate covers nested object construction, real property setters, Boolean, text and
-integer values, arrays, shared-object mutation and validation before model side effects.
-Source-owned descriptors resolve within their selected assembly/module; bootstrap and
-runtime-service dependencies remain explicit. This is development integration evidence,
-not full-System, .NET library parity or HTTP-stack completion. The existing public API
-contracts above remain unchanged.

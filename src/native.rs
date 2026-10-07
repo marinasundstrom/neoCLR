@@ -65,6 +65,10 @@ pub(crate) enum Binding {
     StringCasing(bool),
     Int32ToString,
     IntegerToString,
+    NativeIntegerTo64,
+    NativeAllocate,
+    NativeFree,
+    NativeMultiplyChecked,
     WriteLine,
     Fault,
     CharCategory,
@@ -200,7 +204,17 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Binding::GenericCurrentTaskQueue
         });
     }
-    if function.no_result && function.name != "neoCLR.Runtime.ReflectionPropertySet" {
+    if function.no_result
+        && !matches!(
+            function.name.as_str(),
+            "neoCLR.Runtime.ReflectionPropertySet"
+                | "neoCLR.Runtime.GCCollect"
+                | "neoCLR.Runtime.GCKeepAlive"
+                | "neoCLR.Runtime.WriteLine"
+                | "neoCLR.Runtime.Fail"
+                | "neoCLR.Runtime.NativeFree"
+        )
+    {
         return Err(Fault::new(
             "native service does not support no-result execution",
         ));
@@ -359,7 +373,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         } else {
             vec![]
         };
-        if function.parameters != expected || function.no_result || function.returns != Type::Void {
+        if function.parameters != expected || function.returns != Type::Void {
             return Err(Fault::new("GC control service signature mismatch"));
         }
         return Ok(if keep_alive {
@@ -402,7 +416,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.TimeZoneMapLocal", [Type::String, Type::Int64]) => (
             Binding::TimeZoneMapLocal,
-            Type::Array(Box::new(Type::Int64)),
+            if function.returns == Type::ArrayRef(Box::new(Type::Int64)) {
+                function.returns.clone()
+            } else {
+                Type::Array(Box::new(Type::Int64))
+            },
         ),
         ("neoCLR.Runtime.TimeZoneDatabaseVersion", []) => {
             (Binding::TimeZoneDatabaseVersion, Type::String)
@@ -411,7 +429,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.SystemCultureName", []) => (Binding::SystemCultureName, Type::String),
         ("neoCLR.Runtime.EnvironmentArguments", []) => (
             Binding::EnvironmentArguments,
-            Type::Array(Box::new(Type::String)),
+            if function.returns == Type::ArrayRef(Box::new(Type::String)) {
+                function.returns.clone()
+            } else {
+                Type::Array(Box::new(Type::String))
+            },
         ),
         ("neoCLR.Runtime.EnvironmentCurrentDirectory", []) => {
             (Binding::EnvironmentCurrentDirectory, Type::Value)
@@ -473,12 +495,32 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Type::Value,
         ),
         ("neoCLR.Runtime.ParseInt32", [Type::String]) => (Binding::ParseInt32, Type::Value),
+        ("neoCLR.Runtime.IntPtrToInt64", [Type::IntPtr]) => {
+            (Binding::NativeIntegerTo64, Type::Int64)
+        }
+        ("neoCLR.Runtime.UIntPtrToUInt64", [Type::UIntPtr]) => {
+            (Binding::NativeIntegerTo64, Type::UInt64)
+        }
         ("neoCLR.Runtime.Int32ToString", [Type::Int32]) => (Binding::Int32ToString, Type::String),
         ("neoCLR.Runtime.Int64ToString", [Type::Int64])
         | ("neoCLR.Runtime.UInt64ToString", [Type::UInt64]) => {
             (Binding::IntegerToString, Type::String)
         }
+        ("neoCLR.Runtime.NativeAllocate", [Type::UIntPtr]) => {
+            (Binding::NativeAllocate, Type::Ptr(Box::new(Type::Void)))
+        }
+        ("neoCLR.Runtime.NativeFree", [Type::Ptr(element)])
+            if **element == Type::Void && function.no_result =>
+        {
+            (Binding::NativeFree, Type::Void)
+        }
+        ("neoCLR.Runtime.NativeMultiplyChecked", [Type::UIntPtr, Type::UIntPtr]) => {
+            (Binding::NativeMultiplyChecked, Type::UIntPtr)
+        }
         ("neoCLR.Runtime.Fault", [Type::String]) => (Binding::Fault, Type::Void),
+        ("neoCLR.Runtime.Fail", [Type::String]) if function.no_result => {
+            (Binding::Fault, Type::Void)
+        }
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
         ("neoCLR.Runtime.CharCategory", [Type::UInt32]) => (Binding::CharCategory, Type::Int32),
         ("neoCLR.Runtime.Utf8Encode", [Type::String]) => {
@@ -1143,6 +1185,18 @@ impl Binding {
             (Self::StringCasing(uppercase), [Value::String(text)]) => Ok(Value::String(
                 crate::string_casing::convert(text, *uppercase).into(),
             )),
+            (Self::NativeMultiplyChecked, [Value::UIntPtr(left), Value::UIntPtr(right)]) => {
+                left.checked_mul(*right).map(Value::UIntPtr).ok_or_else(|| {
+                    Fault::coded(
+                        crate::FaultCode::ArithmeticOverflow,
+                        "native allocation size overflow",
+                    )
+                })
+            }
+            (Self::NativeIntegerTo64, [Value::IntPtr(number)]) => Ok(Value::Int64(*number as i64)),
+            (Self::NativeIntegerTo64, [Value::UIntPtr(number)]) => {
+                Ok(Value::UInt64(*number as u64))
+            }
             (Self::Int32ToString, [Value::Int32(number)]) => {
                 Ok(Value::String(number.to_string().into()))
             }
@@ -1405,7 +1459,7 @@ mod task_callback_tests {
 #[cfg(test)]
 mod reflection_signature_tests {
     #[test]
-    fn only_property_setter_admits_no_result_service_execution() {
+    fn no_result_service_execution_requires_an_admitted_control_signature() {
         for (signature, accepted) in [
             (
                 "ReflectionPropertySet(RuntimeTypeHandle owner, Int32 token, System.Object receiver, System.Object value) -> noresult",
@@ -1419,10 +1473,15 @@ mod reflection_signature_tests {
                 "ReflectionPropertyGet(RuntimeTypeHandle owner, Int32 token, System.Object receiver) -> noresult",
                 false,
             ),
-            ("WriteLine(String text) -> noresult", false),
+            ("WriteLine(String text) -> noresult", true),
+            ("Fail(String message) -> noresult", true),
+            ("Fail(String message) -> Void", false),
+            ("Fail(Int32 message) -> noresult", false),
+            ("GCCollect() -> noresult", true),
+            ("GCKeepAlive(System.Object value) -> noresult", true),
         ] {
             let result = crate::assemble(&format!(
-                ".module Test\n.type class System.Object\n.end\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
+                ".module System\n.type class System.Object\n.end\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
             ));
             assert_eq!(result.is_ok(), accepted, "{signature}: {result:?}");
         }

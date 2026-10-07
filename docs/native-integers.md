@@ -69,3 +69,12 @@ See the [executable sample](../examples/native-integers.neoil) and
 [heap/pointer contract](heap-and-pointers.md). No ownership policy is introduced.
 
 Fixed-width storage types and normalization are described in [integer types](integer-types.md).
+
+## Source-library integration (development, 2026-10-06)
+
+The unchanged System.IntPtr/UIntPtr Raven sources can now be compiled as an explicitly
+owned native library and imported into a separate consumer. CompareTo widens native
+storage through internal IntPtrToInt64/UIntPtrToUInt64 services without losing signed
+or unsigned bits. This is a metadata/compiler integration step, not new Raven cast
+syntax or unsafe pointer access. The [execution gate](experiments/extended-cli-metadata/source-native-integers-2026-10-06.md)
+records limits, dependencies and remaining Console work.

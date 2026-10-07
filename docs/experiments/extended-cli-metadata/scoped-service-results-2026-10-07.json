@@ -1,0 +1,29 @@
+{
+  "baseRevision": "96c55f89",
+  "compilerRevision": "ca4aeccfb",
+  "command": [
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+    "verify",
+    "/tmp/expanded-library1007.dll.app",
+    "--system",
+    "/tmp/retained-root-audit1007b/full-owned-handle/System.neox",
+    "--module",
+    "/tmp/expanded-library1007.dll",
+    "--module",
+    "/tmp/retained-root-audit1007b/full-owned-handle/Numbers.dll",
+    "--object-root",
+    "/tmp/retained-root-audit1007b/full-owned-handle/Numbers.dll"
+  ],
+  "exitCode": 1,
+  "stdout": "",
+  "stderr": "Fault: no runtime binding for neoCLR.Runtime.DnsLookup([String, Function(FunctionType { parameters: [], returns: Named(\"NeoMetadata_79C5D7429CAE2158FCD0DE05E0A1DE959B01A78720392AE49806BC8ADAD82380.T_53797374656D_566F6964\"), no_result: false, out_parameters: [], out_when_true: [] })]) [code=RuntimeError]\n",
+  "focusedTests": "   Compiling neoclr v0.1.0-preview.12 (/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.78s\n     Running unittests src/lib.rs (target/debug/deps/neoclr-85a2c0491473e155)\n\nrunning 2 tests\ntest library::scoped_service_result_tests::result_abi_allowance_does_not_admit_ordinary_or_wrong_result_declarations ... ok\ntest library::scoped_service_result_tests::separate_service_declarations_preserve_value_and_no_result_stacks ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 234 filtered out; finished in 0.01s\n\n",
+  "registryTests": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running unittests src/lib.rs (target/debug/deps/neoclr-85a2c0491473e155)\n\nrunning 1 test\ntest native::reflection_signature_tests::no_result_service_execution_requires_an_admitted_control_signature ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 235 filtered out; finished in 0.00s\n\n",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/vm.rs": "ab4f9c7e10fb2e277d4443a53f1db964c5a6ea75013fc2180d104e97ddbd2d3f",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/library.rs": "c31a9129c966e374f7b097ebc02332481d5d369b2673ed43a8469ec8b180338e",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "180608db04f98d2834e0d520f7997adc54d9e86623fbd4ebcf2a62940599b750",
+    "/tmp/retained-root-audit1007b/full-owned-handle/Numbers.dll": "0a2f112c4c0034e00ee39a5fe1cafc8387149ac5d743d056bc267ac60e9ae3d6",
+    "/tmp/retained-root-audit1007b/full-owned-handle/System.neox": "75e0411fcf2b98bffa4511d80bdfb34b76657e033a6c313390688d124cdd70d1"
+  }
+}

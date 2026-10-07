@@ -13,7 +13,75 @@ format-5 assemblies, including native top-level functions. Direct PE/#Neo runtim
 with a reference-only CLI projection. A bounded binary native payload now avoids JSON parsing at runtime. General rewriting
 and guest Introspection assembly loading remain pending.
 
+## Unmanaged pointer signatures (development, 2026-10-07)
+
+`SignatureType.PointerTo(elementType)` creates an immutable unmanaged pointer signature.
+`PointerElement` exposes its target. Supported targets are scalar primitives (including
+Void), and nested pointers, up to sixteen pointer levels. String, RuntimeTypeHandle,
+nominal types, generic parameters, managed references and structural targets reject with
+`ArgumentException`; a null target throws `ArgumentNullException`. Pointer vectors,
+pointer generic arguments and pointer-bearing Function shapes are currently rejected.
+These bounds are library limitations, not changes to the CLI type system.
+
+Use pointer signatures for callable parameters/results and local slots. Definition
+attachment and builder convenience methods share validation. `GetILGenerator()` preserves
+exact pointer target identity through arguments, locals, calls and returns; returning a
+different pointer target rejects during writing. This does not provide allocation,
+ownership, pointer arithmetic or dereference operations in the C# instruction API.
+
+CLI output uses standard `ELEMENT_TYPE_PTR` (including `PTR VOID`), and native output
+uses the existing `Ptr` category without a format-version change. Both readers preserve
+callable signatures and import them into new builders. `MetadataLoadContext` projects a
+canonical `PointerTypeInfo`, exposing `ElementType`, `DisplayName` and
+`IsNominalType == false`. No dependency loading or runtime reflection is required.
+
+```csharp
+var pointer = SignatureType.PointerTo(PrimitiveType.Void);
+var identity = owner.AddMethod("Identity", new MethodSignature(pointer, [pointer]));
+var il = identity.GetILGenerator();
+il.LoadArgument(0);
+il.Return();
+```
+
+Validation: 162 C# metadata groups pass, including CLI/native round trips, manual
+method definitions, import, canonical introspection, depth/shape rejection and pointer
+target mismatch. An API-authored native assembly calls NativeMultiplyChecked,
+NativeAllocate and NativeFree and exits 42. Follow-up native module-function references
+also accept these pointer signatures via `CreateFunctionReference`; its explicit
+identity/digest contract remains unchanged. Raven now maps and consumes these callable
+signatures, and separately compiled source NativeMemory consumers execute. Pointer
+arithmetic and nominal pointer targets are still outside this bounded compiler gate;
+full System output remains pending. [Source acceptance](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/source-native-memory-2026-10-07.md).
+
+## Generic classes over the native Object root (development, 2026-10-07)
+
+`AssemblyBuilder.AddGenericClass(namespace, name, genericParameterNames, baseType,
+visibility)` accepts this output's explicitly designated native Object root. The matching
+manual `TypeDefinition` constructor accepts the same local base reference. The base must
+already be attached; foreign roots and ordinary class bases reject. This bounded overload
+does not admit constructed or generic bases, nested derived types or general generic
+class inheritance. Existing core-backed generic classes retain their behavior.
+
+Constructors must explicitly call the root constructor exactly once before ordinary
+receiver access. Signature validation retains the full open generic receiver identity.
+Constructed instances may be passed to inherited root methods; type argument storage
+is preserved. CLI projection keeps the ordinary TypeDef base token; native metadata keeps
+the existing named base edge. No encoding/version change is required, and executable
+CLI output of a native Object root remains rejected.
+
+The native reader preserves the base reference, and `NominalTypeInfo.BaseType` resolves
+the canonical root through the metadata context. The declaration fact applies to the
+generic definition; this does not add reflection or inherited member enumeration.
+
+Validation includes definition/builder parity, base round trips, canonical facade identity,
+missing initialization rejection and executed generic storage plus inherited virtual dispatch.
+[Source Raven regression and limits](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/generic-object-root-2026-10-07.md).
+
 ## Namespace and types
+
+- [Native-width integers](#native-width-integers-development-2026-10-06).
+
+- [Explicit callable nullable annotations](#explicit-callable-nullable-annotations-development-2026-10-06).
 
 - [Native Object root authoring](#native-object-root-authoring-development-2026-10-05).
 
@@ -6056,7 +6124,10 @@ and reference payloads; see the bootstrap query acceptance workflow.
 
 Development API: selects the output-owned nominal class backing native vectors. `type`
 must be a nonabstract, nonstatic, nonnested generic class with one unconstrained parameter
-and exactly one private field of type `T[]`. Repeating the same selection is idempotent;
+and exactly one private field of type `T[]`. Its local base may be absent or the
+output-owned native Object root (development, 2026-10-07). Reading preserves that
+relationship; runtime linking requires the exact host-selected, fieldless root.
+Other bases remain unsupported. Repeating the same selection is idempotent;
 a different selection throws InvalidOperationException. Null throws ArgumentNullException;
 foreign/incompatible descriptors throw ArgumentException. Native writing revalidates the
 selection after subsequent definition edits.
@@ -6999,6 +7070,8 @@ checks do not add closed-interface or general sealed-leaf enforcement. See the
 ```csharp
 TypeBuilder AssemblyBuilder.AddClosedClass(string @namespace, string name,
     TypeVisibility visibility = TypeVisibility.Public);
+TypeBuilder AssemblyBuilder.AddClosedClass(string @namespace, string name,
+    TypeBuilder baseType, TypeVisibility visibility = TypeVisibility.Public);
 TypeDefinition(string @namespace, string name, uint attributes,
     TypeReference? baseType, bool isClosedHierarchy);
 bool TypeDefinition.IsClosedHierarchy { get; }
@@ -7013,7 +7086,14 @@ void AssemblyBuilder.DeclareClassBase(ImportedTypeReference type,
 The original four-argument TypeDefinition constructor is preserved. Closed declarations
 require Abstract without Sealed and a nongeneric top-level reference class; invalid
 manual definitions throw ArgumentException on attachment before modifying the module.
-AddClosedClass creates a root using the explicitly selected core Object reference.
+The overload without a base creates a root using the explicitly selected core Object
+reference. The base-taking overload (development, 2026-10-07) uses an already attached
+ordinary nongeneric reference class, including the native Object root. It shares
+manual-definition validation: null throws ArgumentNullException; foreign, generic,
+interface, static and value bases throw ArgumentException. Invalid visibility/name
+or duplicate types also reject. Constructors must initialize their direct base;
+missing initialization or a sealed base rejects during writer validation. Native
+reader and introspection retain the canonical base independently of family closure.
 Its constructors may be Protected. Ordinary local children use AddClass(baseType);
 abstract allocation fails writer validation with InvalidDataException.
 
@@ -7348,7 +7428,7 @@ source Object/compiler integration is still pending.
 ### Selected Object signatures and boxing
 
 `AssemblyBuilder.ObjectType : SignatureType` returns the explicitly authored native
-root when present, otherwise the existing imported bootstrap Object signature.
+root when present, otherwise the explicitly selected external root or existing bootstrap Object signature.
 `CoreObjectType : ImportedTypeReference` keeps its original bootstrap meaning.
 Declare the root before creating signatures; existing signatures are not rewritten.
 No dependency is loaded and this property does not select runtime host ownership.
@@ -7356,10 +7436,11 @@ No dependency is loaded and this property does not select runtime host ownership
 `Box` and value-type `Isinst` stack results use `ObjectType`. Native emission with an
 authored root validates all three concrete root slots instead of demanding a separate
 legacy System binding. An incomplete root or a body expecting the unrelated bootstrap
-Object fails with `InvalidDataException` before bytes are returned. Without an authored
-root, the existing explicit System binding requirement is unchanged. Root signature
-selection does not yet implement imported root selection. Local overrides are supported
-as described below.
+Object fails with `InvalidDataException` before bytes are returned. With an external root, author all three exact slot references through
+`CreateObjectSlotReference` before native writing: ToString, Equals and GetHashCode.
+Missing slots reject with `InvalidDataException`; a selected name alone is insufficient.
+The host supplies the contract and the runtime checks the actual linked definitions.
+Without either selected root, the existing explicit System binding requirement is unchanged.
 
 The API-produced fixture's `BoxedDisplay()` now emits boxing and virtual dispatch and
 executes with result `"42"` under explicit runtime root selection. This tests executable
@@ -7484,3 +7565,248 @@ Markdown member help takes precedence over XML; absent/malformed optional sideca
 do not invalidate an assembly. Image-only references have no implicit sidecar search.
 See [host options, output rules and editor lifetime](https://github.com/marinasundstrom/raven/blob/codex/metadata-consumer/docs/compiler/neoclr-cli-bridge.md#native-ide-documentation-2026-10-05).
 The guest RavenDoc snapshot is unchanged. Website guides are separate content.
+
+
+### Explicit callable nullable annotations (development, 2026-10-06)
+
+`Model.NullableAnnotation(IEnumerable<byte> flags, bool isUniform = false)` copies
+1–4096 flags into immutable `Flags`. Values are 0 (oblivious), 1 (non-null) and
+2 (nullable), in .NET nullable transform order. `IsUniform` distinguishes the
+scalar-byte `NullableAttribute` constructor, which repeats its flag, from a
+positional byte-array payload. Uniform annotations require exactly one flag.
+Null input throws `ArgumentNullException`; invalid values or lengths throw
+`ArgumentException`.
+
+`MethodDefinition.SetNullableAnnotation(int position, NullableAnnotation? annotation)`
+and the matching `MethodBuilder` convenience method share one implementation.
+Position -1 identifies the return; nonnegative positions identify parameters.
+Passing null removes the annotation. Invalid positions throw
+`ArgumentOutOfRangeException`; detached or loaded definitions cannot be mutated
+and throw `InvalidOperationException`. `NullableAnnotations` exposes the explicit
+annotations as a read-only dictionary. Attach manually created definitions before
+setting annotations, just as for parameter metadata.
+
+```csharp
+method.GetILGenerator().LoadArgument(0);
+method.GetILGenerator().Return();
+method.SetNullableAnnotation(0, new NullableAnnotation([1, 2]));
+method.Definition.SetNullableAnnotation(-1, new NullableAnnotation([1, 2]));
+// For a string[] signature: a non-null array with nullable string elements.
+```
+
+CLI writing emits ordinary parameter/return custom attributes referencing
+`System.Runtime.CompilerServices.NullableAttribute` in the configured core assembly.
+That core must supply the appropriate byte/byte[] constructors. The CLI reader
+preserves these explicit payloads; malformed, duplicate or oversized payloads
+reject. `Introspection.MethodInfo.ReturnNullableAnnotation` and
+`ParameterInfo.NullableAnnotation` expose them without changing physical type views.
+Absent metadata is not a non-null assertion.
+
+This is raw explicit annotation preservation, not a completed nullable type system.
+`NullableContextAttribute`, field/property annotations and general signature-shape
+validation remain pending. Raven's native adapter now reconstructs supported callable
+nullable reference, array and generic positions from the facade. Native writing preserves these facts in
+`origin.nullable_annotations`; native readers and the compatibility CLI projection
+retain both scalar and vector forms. Runtime metadata validation checks position,
+uniqueness and payload bounds without executing an attribute constructor. Loaded-assembly rewriting remains subject to the library's existing
+limits. There is no new runtime check, layout change or GC policy.
+
+Validation: `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests
+-- --nullable-annotations` checks authored-definition/builder parity, defensive copying,
+CLI round trips, facade exposure, malformed input and .NET `NullabilityInfoContext`
+interpretation. The generated identity methods execute without changing object identity.
+See the [design and integration boundary](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/design/callable-nullability.md).
+
+## Native-width integers (development, 2026-10-06)
+
+`PrimitiveType.IntPtr` and `PrimitiveType.UIntPtr` represent signed and unsigned
+native-width integers in method, field, property and local signatures. Use them in
+`MethodSignature`, `SignatureType` and definition/builder APIs just like the fixed-width
+integer categories. CLI writers emit standard ELEMENT_TYPE_I (0x18) and ELEMENT_TYPE_U
+(0x19); readers and introspection preserve the categories. Native metadata uses the
+existing runtime IntPtr/UIntPtr types. These are integer values, not unmanaged pointer
+signatures or new inline-array representations.
+
+`method.GetILGenerator().Emit(OpCode.Conv_I)` and `Emit(OpCode.Conv_U)` emit `conv.i`
+and `conv.u`. Existing numeric conversions accept native-width integer inputs.
+The writer rejects nonnumeric operands before publishing bytes. Target width is
+chosen by the executing runtime; no fixed 64-bit signature is substituted. This support does not add unchecked pointer access or native integer arithmetic
+validation. The source-provider follow-up also admits SetNativePrimitive(IntPtr/UIntPtr)
+for their exact canonical System value declarations, with the same no-record-storage
+validation as other primitive providers.
+
+```csharp
+var identity = owner.AddMethod("Identity", new(PrimitiveType.IntPtr, [PrimitiveType.IntPtr]));
+var il = identity.GetILGenerator();
+il.LoadArgument(0);
+il.Emit(OpCode.Conv_I8);
+il.Emit(OpCode.Conv_I);
+il.Return();
+```
+
+C# tests compile and execute signed/unsigned conversions, locals and signatures on
+.NET; the same native artifact verifies and exits 42 under neoCLR. Definition-authored
+fields, builder-authored methods/properties and introspection retain both categories.
+No metadata format version changes; older host readers may reject these newly admitted
+signatures even though the runtime already implements their native categories.
+
+### Source-owned erased Value storage (development, 2026-10-07)
+
+`PrimitiveType.Value` designates the existing native erased carrier with
+`TypeDefinition.SetNativePrimitive` or `TypeBuilder.SetNativePrimitive`. Create an
+owned public System.Value value definition, then mark it; generic/nested definitions,
+record fields and constructors reject as for RuntimeTypeHandle. Use that definition
+or builder as a signature operand. Converting the bare enum to SignatureType throws
+ArgumentOutOfRangeException because erased signatures require an explicit owner.
+
+```csharp
+var value = assembly.AddValueType("System", "Value");
+value.SetNativePrimitive(PrimitiveType.Value);
+var identity = assembly.AddFunction("Identity", new MethodSignature(value, new SignatureType[] { value }));
+identity.GetILGenerator().LoadArgument(0);
+identity.GetILGenerator().Return();
+```
+
+Native signatures encode Value and the declaration uses existing Runtime storage;
+CLI signatures retain the owned value-type token. Executable CLI emission rejects
+native primitive designations. Native reading preserves NativePrimitive and resolves
+local Value signatures to the canonical local definition. The exact configured
+core/System bootstrap alias can share evaluation storage with this selected carrier;
+arbitrary foreign or unmarked local types do not acquire erased storage. No format
+version change or runtime instruction was added. See the
+[source bootstrap gate and remaining limits](https://github.com/marinasundstrom/neoCLR/blob/codex/native-system-bootstrap/docs/experiments/extended-cli-metadata/source-value-2026-10-07.md).
+
+### Intrinsic String over an explicit Object root (development, 2026-10-07)
+
+`AddClass("System", "String", objectRoot)` followed by
+`SetNativePrimitive(PrimitiveType.String)` retains its canonical Object base when
+read through `AssemblyDefinition.ReadNativeAssembly`. Runtime loading requires
+explicit selection of that fieldless Object root. String retains intrinsic UTF-8
+storage, not record fields; unrelated primitive bases remain unsupported. Use
+`GetILGenerator()` for constructor bodies, including the direct base call.
+[Runtime evidence](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/string-root-2026-10-07.md).
+
+### Expanded library envelope (development, 2026-10-07)
+
+`NativeModuleContainer.WriteLibraryBinary`,
+`RuntimeAssemblyContainer.WriteLibraryBinary` and runtime `write_module` select
+required schema 4 when the encoded library exceeds schema 3's 8 MiB envelope.
+Schema 4 allows a 16 MiB envelope. `Read`, `ReadNativeAssembly` and native runtime
+loading accept it; older readers reject the required version. Small libraries keep
+schema 3. Schema-1/2 bounds remain unchanged. The native CBOR/semantic model is unchanged.
+
+All other library limits remain: 32 MiB JSON, 2,097,152 nodes, depth 64, and 16 MiB
+**total PE** (`MaxLibraryImageSize`). Container/CLI overhead counts toward that PE
+limit. Exceeding any applicable bound throws `InvalidDataException`; no partial
+compiler artifact is published. No execution or complete bootstrap is implied by a
+successful write. [Contracts and executable evidence](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/expanded-library-2026-10-07.md).
+
+### Canonical native unit (development, 2026-10-07)
+
+`TypeDefinition.SetNativePrimitive`, `TypeBuilder.SetNativePrimitive` and
+`AssemblyBuilder.SetNativePrimitive(ImportedTypeReference, PrimitiveType)` accept
+`PrimitiveType.Void` for the explicitly selected canonical `System.Void` declaration.
+It represents NeoCLR's inhabited unit, usable in parameters, generic arguments and
+function results. There is no additional native Unit type.
+
+Local declarations must be empty, nongeneric, top-level value types without
+constructors; wrong identities and storage reject through the existing validation.
+The external-reference API records host-supplied ownership without loading a
+consumer's dependencies. Native encoding records the scoped canonical unit alias;
+loading still requires its actual dependency. Manual definitions and builders share
+validation. Existing CLI executable primitive-provider rejection remains unchanged.
+
+A signature using the designated declaration denotes a unit **value**; a bare
+`PrimitiveType.Void` return retains the API's CLI-compatible **no-result** convention.
+`FunctionSignature.NoResult` preserves that stack distinction across encoding and
+introspection. This is a low-level calling convention, not two Raven language types.
+Nominal CLI signature transport is retained where CLI void is illegal. The compiler
+owns target-specific lowering and supplies RuntimeUnitContract ownership; an arbitrary
+empty struct is never inferred to be unit.
+
+### External native Object authoring (development, 2026-10-07)
+
+`AssemblyBuilder.SetNativeObjectRoot(ImportedTypeReference root) : void` selects an
+output-owned nongeneric, nonnested reference named System.Object. Construct the reference
+with `CreateTypeReference` from the exact dependency identity/core/artifact digest, then
+select it before authoring signatures. Use `AssemblyBuilder.ForDefinition(definition)`
+for the same selection when manually constructing definitions. `ObjectType` returns
+that signature; `CoreObjectType` retains its explicit bootstrap identity.
+
+The method rejects null/foreign/malformed references with argument exceptions and
+conflicting local/external selections with InvalidOperationException. Repeating the
+same selection is allowed. A caller supplies the host-validated root identity; this
+API does not load or inspect the dependency and does not substitute runtime admission.
+Unselected same-named identities do not satisfy Equals override validation.
+
+Manual method definitions and builders share the exact Boolean Equals(selected Object)
+validation; ToString/GetHashCode retain their existing signatures. Authored/imported
+method references apply the same selected identity. Primitive-bootstrap Object type
+references and ELEMENT_TYPE_OBJECT signatures map to the selected root during import.
+Already-created signatures are not rewritten.
+
+Native writing uses existing scoped module/type aliases for canonical System.Object,
+with no new format version. Reading checks the alias and exact Equals owner. The CLI
+reference image uses ELEMENT_TYPE_OBJECT; executable CLI output rejects a selected
+native root. Bootstrap-only behavior remains unchanged.
+
+[Validation and executable examples](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/imported-object-authoring-2026-10-07.md)
+cover manual/builder parity, wrong owners, conflicts, native round trips and a Raven
+consumer against the source-built Runtime. These are host metadata APIs, documented
+here rather than in the guest RavenDoc reference assembly.
+
+### Imported erased Value representation (development, 2026-10-07)
+
+The existing `AssemblyBuilder.SetNativePrimitive(reference, PrimitiveType.Value)`
+selection now preserves the external carrier through native writing, reading and
+introspection. It writes the Value storage tag with a scoped System.Value alias and
+value-type reference, using the existing format. Competing explicit primitive owners
+reject. A same-named unselected type does not acquire this representation.
+
+When importing the primitive bootstrap's empty nongeneric System.Value definition,
+an explicitly selected external carrier replaces that bootstrap reference. Retained
+service signature matching recognizes the same explicit Value designation without
+requiring a second seed-owned type. This does not replace System.Object or assign a
+.NET SpecialType to the carrier. Existing seed-owned and local-source cases remain
+supported; this adds no new public API or native instruction.
+
+[Executable evidence](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/imported-value-2026-10-07.md)
+covers successful/error payloads through actual runtime services and canonical
+introspection parameter/return identity.
+
+### Imported Object slot references (development, 2026-10-07)
+
+`AssemblyBuilder.CreateObjectSlotReference(string name, MethodSignature signature)`
+returns an interned `ImportedMethodReference` for the explicitly selected external
+Object root. Supported contracts are `String ToString()`, `Int32 GetHashCode()` and
+`Boolean Equals(ObjectType)`, without generic or out parameters. Call
+`SetNativeObjectRoot(reference)` first. No dependency is opened; the host provides
+identity and runtime linking validates the actual root and slot.
+
+The returned contract has `RequiresVirtualDispatch == true`; use
+`generator.Emit(OpCode.Callvirt, reference)`. Ordinary Call rejects with ArgumentException.
+This is an inherited slot declaration reference, not an override or interface method.
+Missing selection throws InvalidOperationException, invalid signatures throw
+ArgumentException, and conflicting ordinary/virtual references throw InvalidDataException.
+The reference retains its external assembly scope in CLI metadata and canonical native
+Object owner/name for runtime linking. No encoding category or version changes.
+
+Body validation accepts reference-class receivers for the explicitly selected external
+root; values still require explicit boxing or constrained dispatch. Selection does not
+make arbitrary same-named types universal receivers.
+
+[C# and executable Raven validation](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/imported-object-slots-2026-10-07.md)
+covers slot interning/category, wrong signatures, incompatible contracts, wrong dispatch
+opcode and execution through a base-typed receiver. General imported virtual class
+methods remain outside this bounded API. Host API documentation lives here; it is not
+a new guest class-library API for the RavenDoc assembly snapshot.
+
+### Ordinary selected-root method references (development, 2026-10-07)
+
+`CreateMethodReference` on the explicitly selected external Object root now uses the
+same canonical native owner/member names as authored root definitions. This includes
+nonvirtual `GetType`; it remains an ordinary instance call. Only
+`CreateObjectSlotReference` claims virtual-slot dispatch. Exact artifact identity and
+CLI member scopes are retained; no dependency is opened by authoring. A C# regression
+checks canonical names and ordinary-call classification, and the API fixture executes
+GetType against the actual source-built Runtime. This closes a JSON mapping link failure.

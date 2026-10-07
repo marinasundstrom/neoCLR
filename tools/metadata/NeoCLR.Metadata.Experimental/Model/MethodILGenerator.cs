@@ -327,6 +327,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
             OpCode.Conv_U2 => "convertUInt16",
             OpCode.Conv_U4 => "convertUInt32",
             OpCode.Conv_U8 => "convertUInt64",
+            OpCode.Conv_I => "convertIntPtr",
+            OpCode.Conv_U => "convertUIntPtr",
             OpCode.Div_Un => "divide.unsigned",
             OpCode.Rem_Un => "remainder.unsigned",
             OpCode.Shr_Un => "shift.right.unsigned",

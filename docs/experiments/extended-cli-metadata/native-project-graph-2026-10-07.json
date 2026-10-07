@@ -1,0 +1,94 @@
+{
+  "compilerRevision": "0f85f53b8+project-graph",
+  "sourceRevision": "1025737f156b28cbbb339ac5f37b090bcd1ccb4e",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/native-graph-final-compiler1007/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/tmp/native-graph-final-acceptance1007/App/App.rvnproj",
+        "--run",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /private/tmp/native-graph-final-acceptance1007/Base/bin/neoclr/Base.dll\nNative build output: /private/tmp/native-graph-final-acceptance1007/Left/bin/neoclr/Left.dll\nNative build output: /private/tmp/native-graph-final-acceptance1007/Right/bin/neoclr/Right.dll\nNative build output: /private/tmp/native-graph-final-acceptance1007/App/bin/neoclr/App.dll\nNative project graph passed\n",
+      "stderr": "warning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/native-graph-final-compiler1007/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/tmp/native-graph-final-acceptance1007/App/App.rvnproj",
+        "--run",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR project: Cyclic project reference: /private/tmp/native-graph-final-acceptance1007/Left/Left.rvnproj\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/native-graph-final-compiler1007/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/tmp/native-graph-final-acceptance1007/App/App.rvnproj",
+        "--run",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error RAV0103: 'MissingName' is not in scope.\n"
+    }
+  ],
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/scripts/verify-native-project-graph.py": "1222cc62f14fc6ac51fee16f0b2090d4910456ff23b9dd18aed648e137b711f3",
+    "/private/tmp/native-graph-final-compiler1007/rvnc.dll": "cced04976793f906542a5e8c6d62c281da27bca9592748c8da05e578dc47abe7",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/private/tmp/failure1006b/Core.dll": "7e5cee8e255704bbf44595173609c1c4834b7e7b512dba8704987fd05420dd88",
+    "/private/tmp/native-graph-final-acceptance1007/Base/Base.rvnproj": "173820a0a683a4d7c60318bcc157283329b254e1a940b7b457946161a92006b1",
+    "/private/tmp/native-graph-final-acceptance1007/Left/Left.rvnproj": "c0247df71f3ee7e6a68aa8e9e4aa69014927c408fc8811737fde74a4809b174c",
+    "/private/tmp/native-graph-final-acceptance1007/Right/Right.rvnproj": "3ea23bed0d705710691f6fa1c9415d5080604635d0296d8e74b19434a5387d53",
+    "/private/tmp/native-graph-final-acceptance1007/App/App.rvnproj": "3c986a32d5d2c8bff6a94fcbad9354e5420bce6903e7c3ee19e1fb2a654ecec1",
+    "/private/tmp/native-graph-final-acceptance1007/Base/bin/neoclr/Base.dll": "a53fe2deb24a07048f41416f914827cd3c796ccb4bf2ac27f98f7e3b0ad47f90",
+    "/private/tmp/native-graph-final-acceptance1007/Left/bin/neoclr/Left.dll": "0561f87a819faee0bb507a2627077f7eb96eb7532fa34027c93764ff5264ef44",
+    "/private/tmp/native-graph-final-acceptance1007/Right/bin/neoclr/Right.dll": "74579611f6c2cc88453e5ae4e36ec49ef471b11113ff274e60e5313faf4a8066",
+    "/private/tmp/native-graph-final-acceptance1007/App/bin/neoclr/App.dll": "24bd378733f70e69ae922b54f6b7b2595be044bc3745d4cab06495fcd4ef1862",
+    "/private/tmp/native-graph-final-acceptance1007/Right/Main.rvn": "27290c6c15e36de844d0f19b41825fc9bdfd67c56ae4f6628978887bcc34582d",
+    "/private/tmp/native-graph-final-acceptance1007/App/Main.rvn": "48a8ea641a685e81bf352d8f743ea2075fcb388283defdbca65a27eb3c37d660",
+    "/private/tmp/native-graph-final-acceptance1007/Left/Main.rvn": "0f131882a7edf2ddabd911f92ca765f7ae679ecc0ca53c2961555030a2eb132f",
+    "/private/tmp/native-graph-final-acceptance1007/Base/Main.rvn": "ad37e39d406c50d983f9de2a1853ff696126730ccced0141956ca6f9ee14134c",
+    "/private/tmp/array-runtime1007/runtime-owned/System.Runtime.dll": "37f23ef91178c91d42164f8018adbec6206076dbe037daf0be25ed1b5da758b8",
+    "/private/tmp/array-runtime1007/runtime-owned/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/array-runtime1007/runtime-owned/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/private/tmp/native-graph-final-compiler1007/Raven.CodeAnalysis.dll": "5b460854dbf32026516e4971beb21760ca436bf5881ee41d9609ee4d4e946bd2",
+    "/private/tmp/native-graph-final-compiler1007/Raven.CodeAnalysis.NeoClr.dll": "49f6054c544ca74046f8b602819734dfccb2f3ae5aa96201e3ed884e59280c5c",
+    "/private/tmp/native-graph-final-compiler1007/NeoCLR.Metadata.Experimental.dll": "3f30902c2936a85adbafc7d3d78011d59939b952472558f424463fc267c2081a"
+  },
+  "workspaceChecks": {
+    "result": "pass",
+    "log": "/tmp/project-graph-final1007.log",
+    "coverage": [
+      "native prebuilt binding",
+      "missing artifact and project",
+      "wrong assembly name",
+      "cycle",
+      "incompatible metadata format",
+      "duplicate explicit reference",
+      "watched artifact",
+      "transactional workspace failure"
+    ]
+  },
+  "committedCompilerRevision": "3892b113a",
+  "dotnetProjectRegression": {
+    "passed": 67,
+    "failed": 0,
+    "log": "/tmp/native-graph-dotnet-focused1007.log",
+    "command": "dotnet test test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj --no-restore -p:BuildProjectReferences=false --filter FullyQualifiedName~MsBuildProjectSystemServiceTests /property:WarningLevel=0",
+    "note": "Initial ordinary build was stopped during unrelated Raven.Macros compilation; focused test run completed."
+  }
+}

@@ -1,0 +1,9 @@
+public struct UnitBox<T> { }
+
+public interface UnitConsumer {
+    func Accept(box: UnitBox<System.Void>) -> int
+}
+
+public class UnitSink : UnitConsumer {
+    func Accept(box: UnitBox<System.Void>) -> int => 42
+}

@@ -103,3 +103,27 @@ FileSystem helper also reflects the current compiler's local layout; a native co
 verifies two-entry enumeration and the bounded-error path (42). The direct Raven
 FileSystem-local consumer remains rejected by the existing CLI importer and was not
 claimed as an end-to-end success. See [recorded evidence](experiments/extended-cli-metadata/system-fail-rename-validation-2026-10-02.json).
+
+
+## Native source bootstrap — 2026-10-06
+
+Unchanged System.Fail now compiles with an internal source RuntimeFailure adapter.
+The new exact `neoCLR.Runtime.Fail(String) -> noresult` service raises the same UserFault;
+wrong argument or inhabited-result declarations reject. Legacy `neoCLR.Runtime.Fault`
+keeps its inhabited Void convention so the existing Numbers library and seed continue
+to link. This separate service spelling avoids mixing incompatible return conventions
+under one runtime identity. No new opcode or exception behavior is introduced.
+
+The source-failure primitive profile omits the bridge Fail declaration. A separate
+native consumer imports Failure.dll without its sources and checks unsuccessful exit,
+empty stdout and the supplied fault message. Raven still recognizes terminal flow only
+for the legacy core declaration: source/imported native Fail in let-else needs the next
+compiler contract slice. The runtime guarantee already holds, but do not treat that as
+proof of source-library flow analysis. [Evidence](experiments/extended-cli-metadata/source-failure-2026-10-06.md).
+
+
+Development update (2026-10-07): the source-owned terminal-flow limitation described
+above is resolved with Raven's explicit RuntimeFailureContract. The selected native
+owner now works in let-else, including separate compilation. Ordinary .NET methods
+remain unchanged; missing or incompatible owners reject before output. This changes
+compiler configuration, not the public Fail signature or runtime fault behavior.

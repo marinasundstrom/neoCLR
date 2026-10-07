@@ -1,0 +1,18 @@
+import System.Runtime.CompilerServices.*
+
+namespace neoCLR.Runtime
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ConsoleReadByte() -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ConsoleWriteBytes(error: bool, buffer: byte[], offset: int, count: int) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ConsoleFlush(error: bool) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func WriteLine(value: string) -> System.Void;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func UInt64ToString(value: ulong) -> string;

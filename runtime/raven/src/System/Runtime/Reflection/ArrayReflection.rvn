@@ -1,0 +1,31 @@
+namespace System.Runtime.Reflection
+
+import System.*
+import System.Introspection.*
+import System.Runtime.CompilerServices.*
+
+/// <summary>Dynamic access to supported managed vector arrays.</summary>
+/// <remarks>Development API. Invalid inputs and unsupported element types cause terminal runtime faults.</remarks>
+public static class ArrayReflection {
+    /// <summary>Returns the number of elements in a supported managed vector.</summary>
+    /// <param name="array">A non-null managed vector.</param>
+    static func GetLength(array: Object) -> int {
+        return RuntimeServices.ReflectionArrayLength(array)
+    }
+
+    /// <summary>Reads an element, boxing scalar values and preserving reference identity.</summary>
+    /// <param name="array">A non-null managed vector.</param>
+    /// <param name="index">A zero-based index within the array.</param>
+    /// <returns>The boxed value, original reference or null.</returns>
+    static func GetValue(array: Object, index: int) -> Object? {
+        return RuntimeServices.ReflectionArrayGet(array, index)
+    }
+
+    /// <summary>Creates a managed vector of the runtime-backed array type and copies the supplied elements.</summary>
+    /// <param name="arrayType">A runtime-backed vector type, such as typeof(int[]), not its element type.</param>
+    /// <param name="values">Elements with exact boxed scalar types or compatible references.</param>
+    /// <returns>A new array; reference elements retain their identity.</returns>
+    static func Create(arrayType: TypeInfo, values: Object?[]) -> Object {
+        return RuntimeServices.ReflectionArrayCreate(arrayType, values)
+    }
+}

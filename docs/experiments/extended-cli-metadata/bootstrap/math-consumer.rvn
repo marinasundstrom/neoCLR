@@ -1,0 +1,53 @@
+import System.*
+import System.Result.*
+
+alias NativeMath = System.Math
+
+func Check(actual: double, expected: double) {
+    if actual != expected {
+        System.Fail("Unexpected math result")
+    }
+}
+
+func Main() {
+    Check(NativeMath.Abs(-3.5), 3.5)
+    Check(NativeMath.Sqrt(9.0), 3.0)
+    Check(NativeMath.Floor(-1.25), -2.0)
+    Check(NativeMath.Ceiling(-1.25), -1.0)
+    Check(NativeMath.Truncate(-1.25), -1.0)
+    Check(NativeMath.Round(2.5), 2.0)
+    Check(NativeMath.Round(3.5), 4.0)
+    Check(NativeMath.Exp(0.0), 1.0)
+    Check(NativeMath.Log(1.0), 0.0)
+    Check(NativeMath.Log10(100.0), 2.0)
+    Check(NativeMath.Sin(0.0), 0.0)
+    Check(NativeMath.Cos(0.0), 1.0)
+    Check(NativeMath.Tan(0.0), 0.0)
+    Check(NativeMath.Pow(2.0, 3.0), 8.0)
+    Check(NativeMath.Min(-2.0, 3.0), -2.0)
+    Check(NativeMath.Max(-2.0, 3.0), 3.0)
+    let nan = NativeMath.Sqrt(-1.0)
+    if nan == nan || NativeMath.Min(nan, 1.0) == NativeMath.Min(nan, 1.0) {
+        System.Fail("NaN behavior changed")
+    }
+    match NativeMath.Abs(-42) {
+        Ok(42) => { }
+        _ => System.Fail("Integer Abs failed")
+    }
+    match NativeMath.Abs(-2147483648) {
+        Error(_) => { }
+        _ => System.Fail("Integer overflow was lost")
+    }
+    match NativeMath.Clamp(9, 0, 4) {
+        Ok(4) => { }
+        _ => System.Fail("Clamp failed")
+    }
+    match NativeMath.Clamp(9, 4, 0) {
+        Error(_) => { }
+        _ => System.Fail("Invalid range was accepted")
+    }
+    if NativeMath.Min(2, 3) != 2 || NativeMath.Max(2, 3) != 3 || NativeMath.Sign(-3) != -1 {
+        System.Fail("Integer helpers failed")
+    }
+    Console.WriteLine("Native source math passed")
+}

@@ -1,0 +1,142 @@
+{
+  "sourceBase": "45d76411 + Object slot reference changes",
+  "ravenRevision": "1c2ccd638",
+  "networking": {
+    "command": [
+      "dotnet",
+      "/tmp/object-slot-compiler1007/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/failure1006b/Core.dll",
+      "--runtime-seed",
+      "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+      "--bootstrap-ownership",
+      "/tmp/runtime-split1007/runtime-owned/ownership.json",
+      "--reference",
+      "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+      "--object-library",
+      "System.Runtime",
+      "--library",
+      "-o",
+      "/tmp/object-slot1007/System.Networking.dll",
+      "runtime/raven/src/System/Networking/Dns.rvn",
+      "runtime/raven/src/System/Networking/DnsError.rvn",
+      "runtime/raven/src/System/Networking/IPAddress.rvn",
+      "runtime/raven/src/System/Networking/IPAddressError.rvn",
+      "runtime/raven/src/System/Networking/Sockets/Socket.rvn",
+      "runtime/raven/src/System/Networking/Sockets/SocketError.rvn",
+      "runtime/raven/native/RuntimeNetworkCalls.rvn",
+      "runtime/raven/native/RuntimeNetworkServices.rvn"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "warning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV2103: This catch-all never matches.\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support dependency method contract unavailable or ambiguous: static func Reserve<T>(length: int) -> T[] (native type missing or ambiguous: System.Runtime.CompilerServices.CheckedStorage).\n"
+  },
+  "consumer": {
+    "command": [
+      "dotnet",
+      "/tmp/object-slot-compiler1007/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/failure1006b/Core.dll",
+      "--runtime-seed",
+      "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+      "--bootstrap-ownership",
+      "/tmp/runtime-split1007/runtime-owned/ownership.json",
+      "--reference",
+      "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+      "--object-library",
+      "System.Runtime",
+      "-o",
+      "/tmp/object-slot1007/Slots.dll",
+      "docs/experiments/extended-cli-metadata/bootstrap/imported-object-slots.rvn"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "execution": [
+    {
+      "command": [
+        "target/debug/neoclr",
+        "verify",
+        "/tmp/object-slot1007/Slots.dll",
+        "--system",
+        "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+        "--module",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+        "--object-root",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_99409282138A4170B170FC8E974487D89617EF4BFDE27C7F932752397402E177: typed-stack/control-flow verification passed (1755 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "/tmp/object-slot1007/Slots.dll",
+        "--system",
+        "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+        "--module",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+        "--object-root",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "apiExecution": [
+    {
+      "command": [
+        "target/debug/neoclr",
+        "verify",
+        "/tmp/object-slot-api1007.dll",
+        "--system",
+        "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+        "--module",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+        "--object-root",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_20CEE8BA4813FBD5F9CADADAD7F9EEAA84277BDB9E6B01E8EAF5909813D9DE30: typed-stack/control-flow verification passed (1753 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "/tmp/object-slot-api1007.dll",
+        "--system",
+        "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+        "--module",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+        "--object-root",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "metadataTests": "165/165 C# metadata contract tests passed",
+  "apiSnapshot": "Checked RavenDoc reference assembly and source fingerprints",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "180608db04f98d2834e0d520f7997adc54d9e86623fbd4ebcf2a62940599b750",
+    "/private/tmp/failure1006b/Core.dll": "7e5cee8e255704bbf44595173609c1c4834b7e7b512dba8704987fd05420dd88",
+    "/private/tmp/object-slot1007/Slots.dll": "b3ad4ab902d6089a56a8d9432c7f7ab4ea0d988bca93c8c390e5ff4bdd82f089",
+    "/private/tmp/object-slot-api1007.dll": "0f995d80b68c473491131e8dafa91bb4ec8d1e642ec929d22d056bc8ef4904d0",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/imported-object-slots.rvn": "941db1e9bfdde05778ca8a573cb58a0f1646c3e8234c152ce9b0100fcd877ca0",
+    "/private/tmp/object-slot-compiler1007/rvnc.dll": "520b100adac2bda22e84630b5cbc3ffaf45b3644faef5055e2e235b538d1d51e",
+    "/private/tmp/object-slot-compiler1007/Raven.CodeAnalysis.dll": "c16b2d6c5a739428a990957e756a7f4c39cbe2240bd22470fba8f5e326a94edf",
+    "/private/tmp/object-slot-compiler1007/Raven.CodeAnalysis.NeoClr.dll": "9c107b6a037f9fbc9944c8fefa2c6f4ee856b724e63712a65ced3d823f328f4d",
+    "/private/tmp/object-slot-compiler1007/NeoCLR.Metadata.Experimental.dll": "a55d6ccbe9c6ae6fef5dabc52db30c5902874763cf134880e828d59aed28157f",
+    "/private/tmp/runtime-split1007/runtime-owned/System.Runtime.dll": "a71beb14cae765cf85d45925cd28aa5ce9738ab5e12ff75f28c9c62ba5702c00",
+    "/private/tmp/runtime-split1007/runtime-owned/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/runtime-split1007/runtime-owned/ownership.json": "e74446ad9e70ac4fe9283f090cbc482acf154125c8bc2a9a760a34427dd95679"
+  }
+}

@@ -50,6 +50,88 @@ The selected namespace container and XML member entry include the new name; host
 and FaultCode retain their manual reference. Source callers must migrate from
 `System.Fault` and use the matching reference/compiler/runtime bundle.
 
+## One class-library reference across assemblies
+
+Author direction (2026-10-07): present the class library as one reference, organized by
+namespace and type. Splitting Runtime/Data/Networking/Web into assemblies or distribution
+packages must not create separate API sections, duplicate namespace trees or per-DLL
+landing pages. Keep `/docs/` navigation, cross-references and search unified.
+
+A type/member page should identify its actual declaring assembly, and may additionally
+show package and file provenance when known. An assembly is the logical metadata and
+identity unit; a PE file is its container, often named `.dll`. Package, namespace,
+assembly and filename are different facts and should not be conflated. Inherited and
+extension members should retain their declaration provenance rather than acquire the
+viewed type's assembly. Never guess ownership from a namespace.
+
+Current rendering still uses the aggregate `NeoCLR.CoreProbe.dll` documentation bridge.
+That displayed assembly is a bridge identity, not evidence of a Runtime/Data production
+owner. The native multi-assembly reference migration remains work ahead. RavenDoc's
+current `apis` configuration generates per-API groups; do not configure one such group
+per split class-library DLL. The migration needs one combined documentation model over
+explicit native inputs, retaining actual declaration identities, one canonical page
+per type, merged namespaces, cross-assembly links and conflict diagnostics. Keep
+source links and documentation associated with their original declarations.
+
+Acceptance for that migration: Runtime/Data/Networking/Web share one namespace tree;
+a cross-assembly member type links to its unique type page; declaration ownership is
+correct on type, ordinary member, inherited member and extension-member pages; duplicate
+identities reject rather than silently overwrite; existing URLs remain stable where
+possible. This is a presentation direction, not a requirement to merge runtime binaries.
+
+## Planned bundles and declaration source links
+
+Author clarification (2026-10-07): RavenDoc needs an explicit **assembly bundle**:
+a list of assemblies presented as one API structure. This is a documentation grouping,
+not a merged assembly. Resolve symbols using assembly-qualified identities before
+combining navigation, search and cross-references. Retain each input's documentation
+and source provenance, including inputs from different repositories or revisions.
+Configuration syntax and implementation remain future RavenDoc work.
+
+Source links must identify the actual file and declaration location for a type or
+member on GitHub, for both .NET and NeoCLR inputs. Repository links or namespace-based
+file guesses do not satisfy this requirement. Proposed shared declaration facts are:
+
+- Declaring assembly/artifact identity and unambiguous declaration identity, including
+  overloads, generic arity and module-level functions.
+- Repository URL, immutable commit, repository-relative document path and source checksum.
+- Declaration start/end line and column, with multiple locations retained for partial
+  declarations and an explicit generated-source origin when applicable.
+
+The renderer consumes these facts independently of the metadata target; a repository
+provider converts them to a browser URL (GitHub file and line anchors first). Inherited
+and extension-member entries link to their original declaration, even when displayed
+under another type or assembly. Documentation text and source location are separate:
+external Markdown can document an API without becoming its declaration source.
+
+Comparison: [.NET Source Link](https://learn.microsoft.com/dotnet/standard/library-guidance/sourcelink)
+provides repository provenance alongside symbols. The
+[Portable PDB specification](https://github.com/dotnet/runtime/blob/main/docs/design/specs/PortablePdb-Metadata.md)
+defines documents/checksums, method sequence points, Source Link mappings and
+TypeDefinitionDocument information. These are useful inputs, but method sequence points
+are not a universal declaration-span index for types, fields, properties and abstract
+members. Reuse available standard information; investigate a compiler-produced declaration
+map for missing locations rather than infer a declaration from its first executable line.
+The map's encoding, distribution and compatibility remain open decisions, not a new
+NeoCLR metadata extension approved by this note.
+
+Implementation order: audit both target readers and RavenDoc source lookup; define one
+origin contract; populate it from compiler source declarations and matching artifact
+symbols/maps; render links; then integrate bundle inputs. Carry matching provenance
+artifacts through project builds and packaging. Validate artifact/symbol identity and
+checksums before accepting locations. Missing provenance should omit the precise link
+with an actionable diagnostic; stale/conflicting provenance must not silently link to
+another version. Local uncommitted sources must not be represented as published commits.
+
+Acceptance includes exact links for types, constructors, overloads, properties, fields,
+interface members and module functions; cross-assembly inherited/extension members;
+partial and generated declarations; path escaping; multiple repositories; missing and
+mismatched symbols. Run equivalent .NET/NeoCLR fixtures. Neither source availability nor
+network access should be required to load native metadata or execute an assembly.
+The benefit is accurate, portable navigation; the cost is producing and shipping reliable
+declaration provenance beyond execution metadata. No new source-link support is claimed
+as implemented here.
+
 ## Build and refresh
 
 Author direction (2026-09-27): run only validation needed for the change; do not
@@ -1074,3 +1156,73 @@ The reference-producer compatibility regression above is resolved by Raven integ
 projects unchanged Option source and generates a reference byte-for-byte identical to
 the snapshot. No snapshot refresh or new public API is needed. See the
 [dual-target execution evidence](../docs/experiments/extended-cli-metadata/union-lexical-cases-2026-10-05.md).
+
+Host native-width integer signatures and Conv_I/Conv_U are documented in the
+[manual metadata reference](experimental-metadata.md#native-width-integers-development-2026-10-06).
+They are host-only API additions; the guest reference snapshot is unchanged.
+
+### Source Attribute base (2026-10-07)
+
+The existing System.Attribute API page now describes its source-built abstract base
+and protected constructor. The matching reference projection and XML sidecar preserve
+that shape; the [reference-support guide](reference-support.md#source-attribute-base-development)
+distinguishes it from bootstrap-only attribute scaffolds and unimplemented .NET helpers.
+
+The source-unit bootstrap gate (2026-10-07) adds no guest API signatures. Existing
+System.Void and NativeMemory sources compile with explicit native unit ownership;
+inhabited unit parameters and no-result calls remain distinct. The integration guide
+records the source/native owner configuration and current full-bootstrap limitation.
+
+The 2026-10-07 `NativeReflection` facade is internal native build infrastructure,
+not a new public reflection API. The public parameterless CreateInstance signature
+is unchanged. Its two public declarations in the temporary bootstrap are translation
+scaffolding, like RuntimeServices, and are intentionally outside RavenDoc selection.
+Source constructor execution and access checks are documented in the
+[construction gate](../docs/experiments/extended-cli-metadata/reflection-construction-2026-10-07.md).
+
+Development 2026-10-07: ArrayReflection is included in the generated reference and XML
+member documentation, with source-backed GetLength/GetValue/Create and vector/Fault
+limits in [the reflection guide](reflection.md). The reference bridge supplies only
+matching declarations; native acceptance compiles the actual Raven implementations.
+
+
+### Split native bundle IDE documentation (2026-10-07)
+
+The source-built Runtime/Data/Networking/Web bundle now carries each build's XML and
+Markdown sidecars next to its native assembly. The manifest hashes every nested file
+and associates the sidecars with the declaring assembly. Relocation and editor tests
+check imported Networking IPAddress help. This uses native symbols, not the aggregate
+CLI documentation projection, and changes no public API signatures.
+
+Coverage is incomplete: the current generated XML contains 136 Runtime, zero Data,
+41 Networking and 136 Web member entries (including synthesized declarations; these
+are not counts of fully documented public APIs). Authored website XML remains a
+separate source; this slice does not partition/merge it into native outputs. Unifying
+that content by canonical declaration identity and producing one RavenDoc model from
+the split inputs remains required. Do not advertise complete class-library IDE help.
+[Commands, artifacts and validation](../docs/experiments/extended-cli-metadata/native-bundle-documentation-2026-10-07.md).
+
+
+### Native provider direction (2026-10-07)
+
+The author explicitly reaffirmed that CoreProbe is not an acceptable production owner
+label. RavenDoc's current loader imports CLI references; its renderer already accepts
+compiler symbols from multiple assemblies. The next native provider should use the
+explicit NeoCLR catalog and current compiler-symbol adapter, preserving real declaring
+assembly identities. Extract a stable documentation model incrementally rather than
+build another resolver or merely replace the visible assembly name.
+[Inspected boundary and acceptance](../docs/experiments/extended-cli-metadata/native-documentation-provider-2026-10-07.md).
+
+
+### Release scope correction (2026-10-07)
+
+The author subsequently deferred the native RavenDoc provider/model migration and
+CoreProbe assembly-label correction, while considering a future Raven rewrite of
+RavenDoc. The earlier provider plan remains recorded for future use, not as an active
+release gate. Keep the existing bridge identity and limitations explicit; do not invent
+production assembly ownership in the current reference. Normal accuracy/coverage upkeep
+and the already shipped IDE sidecars remain useful; renderer redesign is deferred.
+
+The protected `System.Attribute()` constructor is documented in the
+[manual introspection reference](introspection.md#attribute-constructor), with a route in
+`manual-members.json`: the pinned RavenDoc renderer omits protected constructors.

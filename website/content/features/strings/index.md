@@ -2,8 +2,6 @@
 
 String represents Unicode text. Char represents one grapheme cluster: a practical approximation of a character as a reader perceives it. UTF-8 is the canonical internal encoding; scalar and byte access are explicit.
 
-**Preview 11 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
-
 [See a working example ↓](#characters) · [Download the complete sample](../../samples/library-utf8.rvn)
 
 <a id="characters"></a>
@@ -47,7 +45,7 @@ Use patterns to extract a successful value or its error. For example, `RoundTrip
 
 <a id="try"></a>
 
-## Use the matching Preview 11 toolchain
+## Run the example
 Open the prepared Raven project in VS Code, replace Main.rvn with the complete sample, save it, then run the neoCLR build/run task. Use matching reference and runtime libraries.
 
 [Download Raven source](../../samples/library-utf8.rvn) · [Download expected output](../../samples/library-utf8.expected.txt) · [Toolchain setup →](../../try/#development)
@@ -196,7 +194,9 @@ overhead and temporary inputs are not included in those payload counts. See the
 [String API reference](xref:System.String) and [Fault/limit reference](../../docs/faults.html).
 
 
-## Explicit comparison policies (development)
+<a id="explicit-comparison-policies-development"></a>
+
+## Explicit comparison policies
 
 `StringComparer.Ordinal` combines exact equality, String's Object content hash and
 native UTF-8 ordering in one reusable policy. It accepts non-null strings and does
@@ -225,7 +225,9 @@ and encoding views. The immediate direction is encoding/decoding foundations and
 possibly a small builder for later APIs, not System.Text parity. Boundary types
 remain experimental; these plans do not change current equality or indexing.
 
-## Encoding foundations (development)
+<a id="encoding-foundations-development"></a>
+
+## Encoding foundations
 
 [Encoding](xref:System.Text.Encoding) converts valid text into bytes and creates
 independent [Decoder](xref:System.Text.Decoder) instances. [Encodings](xref:System.Text.Encodings)
@@ -236,7 +238,9 @@ for ownership, bounds and errors. [Encoder](xref:System.Text.Encoder) now accept
 output, with explicit progress and finalization. A public builder and broader codecs
 remain possible next steps.
 
-## Unicode casing and decimal reports (development)
+<a id="unicode-casing-and-decimal-reports-development"></a>
+
+## Unicode casing and decimal reports
 
 `String.ToUpperInvariant()` and `ToLowerInvariant()` use Unicode 17 full default
 casing. `"Straße ﬃ".ToUpperInvariant()` produces `"STRASSE FFI"`, and
@@ -261,23 +265,3 @@ culture dependency. Number provides a separate arithmetic contract; parsing is n
 part of it. See [numeric API contracts](/docs/text-numbers.html) for exact rules and the
 current generic-import limits. A shared numeric parsing interface remains a possible
 future direction.
-
-
-The development native compiler gate now builds Boolean and BooleanParseError from Raven
-source into a separate library and executes an artifact-only consumer. The checked service
-catalog includes all existing numeric parsers. A further development gate builds the
-unchanged Single/Double Number implementations and NumberParseError with explicit
-native scalar ownership, then imports and executes parsing and ordering from a separate
-consumer. The cumulative source subset now also builds and executes all ten numeric
-implementations without seed numeric declarations. Generic Number-constrained code now
-also compiles into a separate algorithms library. A consumer using only emitted native
-references executes arithmetic, Zero/One, inherited ordering and generic forwarding for
-all ten numeric types. This is a development integration gate; full class-library
-compilation and broader generic constraints remain ongoing.
-
-
-Development integration: the Raven-to-NeoCLR native bootstrap now executes the existing
-text-service family through separately compiled libraries, including grapheme vectors,
-Unicode scalar classification and UTF-8 slice errors. The compiler's source-owned
-String/Char implementation is still in progress; this gate uses explicit bootstrap
-ownership and does not establish .NET text parity.

@@ -35,6 +35,8 @@ public sealed partial class MethodBuilder
     internal bool IsCoreObjectEquals { get; set; }
     internal bool NativeValueOverride { get; set; }
     internal string? NativeImportName { get; set; }
+    internal bool NativeImportObjectSlot { get; set; }
+    internal bool NativeImportObjectOwner { get; set; }
     internal bool NativeImportCharOwner { get; set; }
     internal PrimitiveType? NativeImportPrimitiveOwner { get; set; }
     internal bool NativeImportIsNamespaceFunction { get; set; }
@@ -173,13 +175,14 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
     internal static bool IsIntrinsicChar(ImportedTypeReference type) => type.Owner.IsNativeGrapheme(type) ||
         type.AssemblyIdentity.Equals(type.Owner.CoreLibrary) && type.Owner.NativeBindingFor(type.AssemblyIdentity)?.Library.ModuleName == "System" &&
         type.DeclaringType is null && type.Namespace == "System" && type.Name == "Char" && type.IsValueType && type.GenericArity == 0;
-    internal static bool IsErasedValue(ImportedTypeReference type) =>
+    internal static bool IsErasedValue(ImportedTypeReference type) => type.Owner.AuthoredPrimitiveOwner(type) == PrimitiveType.Value ||
         type.AssemblyIdentity.Equals(type.Owner.CoreLibrary) && type.Owner.NativeBindingFor(type.AssemblyIdentity)?.Library.ModuleName == "System" &&
         type.DeclaringType is null && type.Namespace == "System" && type.Name == "Value" && type.IsValueType && type.GenericArity == 0;
     private string TypeKey(SignatureType type)
     {
         if (type.ClassType is { NativeGrapheme: true }) return "Char";
         if (type.Primitive is { } primitive) return primitive.ToString();
+        if (type.PointerElement is { } pointer) return "Ptr(" + TypeKey(pointer) + ")";
         if (type.ByReferenceElement is { } byref) return "ByRef(" + TypeKey(byref) + ")";
         if (type.ArrayElement is { } element) return "ArrayRef(" + TypeKey(element) + ")";
         if (type.MethodParameterIndex is { } method) return "MethodTypeParameter(" + method + ")";

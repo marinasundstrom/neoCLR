@@ -8,6 +8,388 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+Author reaffirmation (2026-10-07): bootstrapping remains the objective, with full native
+NeoCLR support and an acceptable developer experience for the next release, including
+the website. Documentation improvements support this gate; they do not replace native
+library, build, execution and editor qualification. Current evidence below is partial.
+
+Author release direction (2026-10-07): Windows is required for the next native metadata
+release, alongside macOS. Runtime-only Windows CI does not qualify the compiler,
+source-built libraries or editor. The manual `native-toolchain.yml` workflow builds a
+matched Windows x64 candidate and runs extracted native samples; its execution and
+installed VS Code acceptance are still pending. See [Windows qualification](windows-native-qualification.md).
+Installation pages should give one short current path, with detailed troubleshooting
+linked separately. Feature pages explain behavior and limits; history belongs in the
+changelog. Raven must be accessible from the main navigation, including links to its
+language website and playground.
+
+## Source-built System bootstrap frontier (2026-10-07)
+
+**The native source-owned orders gate passes.** The 197-input aggregate library is
+compiled separately; unchanged application-order-collections imports its native metadata,
+emits and executes with exact checked-in output and exit 0. Explicit imported Object
+selection unifies semantic roots without weakening inheritance checks. The runtime uses
+the finalized retained seed and explicit source-root artifact. This meets the broad
+native application gate under the permitted bootstrap dependencies, not complete API
+coverage or a bootstrap-free/production-packaged release.
+
+The 174-input **System.Runtime candidate also builds independently** of Data,
+Networking and Web; unchanged orders imports it and executes with exact output/exit 0.
+[Runtime split evidence](experiments/extended-cli-metadata/runtime-split-2026-10-07.md).
+The first separate Data/Networking attempts expose two bounded gaps: Data's internal
+array-reflection helpers cross the new boundary; metadata override validation cannot
+select an imported native Object identity. The primitive flags-marker import blocker
+is fixed. [Commands and diagnostics](experiments/extended-cli-metadata/optional-library-frontier-2026-10-07.md).
+Explicit imported Object authoring now passes C# contracts and API/Raven consumer
+execution (42). Networking advances to a System.Value encoding dependency.
+[Imported-root evidence](experiments/extended-cli-metadata/imported-object-authoring-2026-10-07.md).
+Imported Value ownership now passes source-free parse/type-test/unpack execution
+(42), with 165 metadata groups passing. Networking reaches imported virtual Object
+method calls. [Value evidence](experiments/extended-cli-metadata/imported-value-2026-10-07.md).
+Imported Object slot references now execute ToString/GetHashCode/Equals overrides
+through an object receiver (42), with 165 metadata groups passing.
+[Slot evidence](experiments/extended-cli-metadata/imported-object-slots-2026-10-07.md).
+Separate **System.Networking now compiles and executes** the unchanged cancellation
+consumer against System.Runtime (exact stdout, exit 0). The CheckedStorage failure was
+an omitted explicit `--bootstrap-intrinsics` audit option; the subsequent boxing gap
+now validates the complete selected external Object contract.
+[Networking gate](experiments/extended-cli-metadata/separate-networking-2026-10-07.md).
+Separate **System.Data now executes JSON object mapping** using the public Runtime
+ArrayReflection boundary. Nested models, setters, managed/jagged arrays, mutation,
+reference identity and invalid-input checks pass against emitted references only.
+[Data gate](experiments/extended-cli-metadata/separate-data-2026-10-07.md).
+Separate Web now compiles and executes through a supported NetworkDeadline contract
+owned by Networking. Source-free deadline, headers, base-address, JSON-client and route
+consumers pass, along with the loopback header-cancellation check. HTTP retains one
+15-second exchange budget. [Evidence](experiments/extended-cli-metadata/separate-web-2026-10-07.md).
+Raven e141006f3 fixes the intermittent `System.Void` encoding failure at type binding:
+exact bootstrap Void lookup now honors the selected native unit owner. Two deterministic
+regressions and six fresh builds pass. [Evidence](experiments/extended-cli-metadata/unit-bootstrap-2026-10-07.md).
+The general async unit-return correction is handed to the author-designated Raven release
+task; its integrated compiler revision is af47cb0a5, with native async qualification still
+separate. Native project import/run now carries the exact source-built Object root via
+RavenNeoClrObjectLibrary (Raven 0f85f53b8); the unchanged HTTP headers project executes
+and invalid ownership preserves the prior output. [Evidence](experiments/extended-cli-metadata/native-project-root-2026-10-07.md).
+Native project-reference builds and prebuilt workspace imports now pass a four-project
+execution diamond, including generic object mutation and failure preservation.
+[Graph evidence](experiments/extended-cli-metadata/native-project-graph-2026-10-07.md).
+The checked-in native System.Runtime project now builds the 175-source foundation;
+unchanged orders executes against its output after explicit retained-seed finalization.
+[Runtime project evidence](experiments/extended-cli-metadata/native-runtime-project-2026-10-07.md).
+Data, Networking and Web now have checked-in native projects. A staged build produces
+all four libraries, finalizes the retained seed against the exact Runtime output and
+records a hashed bundle manifest. Five native consumers and the project HTTP consumer
+pass against those artifacts. [Bundle evidence](experiments/extended-cli-metadata/native-class-library-bundle-2026-10-07.md).
+The staged bundle also supplies relocatable project configuration. Workspace symbol
+loading and ordinary HTTP project execution pass after relocation, with native owners
+and missing/conflicting-input rejection checked. [Configuration evidence](experiments/extended-cli-metadata/native-bundle-configuration-2026-10-07.md).
+Installed-editor acceptance now covers this split, including native optional-library
+navigation, configuration recovery and orders/Tasks execution. Hover latency is
+measured separately; the reported persistent delay remains open.
+[Editor evidence](experiments/extended-cli-metadata/native-split-editor-2026-10-07.md).
+The bundle now also stages and hashes each assembly's generated XML/Markdown help;
+relocation verifies native IPAddress documentation. This transports existing comments,
+not complete API coverage: Data's generated XML currently contains no member entries.
+[Documentation packaging](experiments/extended-cli-metadata/native-bundle-documentation-2026-10-07.md).
+The native POC packager now accepts the split bundle and records its explicit Object
+root, runtime seed and module list. Extracted verification uses those same selections;
+relative sample projects and SDK settings avoid development checkout paths.
+[Distribution qualification](experiments/extended-cli-metadata/native-split-distribution-2026-10-07.md).
+Standalone bootstrap preparation now generates Core and retained-seed inputs from
+checked-in sources without previous Numbers/Http or Runtime artifacts; the class-library
+builder validates its manifest before compilation.
+[Preparation evidence](experiments/extended-cli-metadata/native-bootstrap-preparation-2026-10-07.md).
+Author reprioritization (2026-10-07): defer the native RavenDoc provider/model migration
+and assembly-label correction. A possible RavenDoc rewrite in Raven is future exploration,
+not a current implementation commitment. These changes are not gates for this release.
+Keep the existing reference's bridge provenance explicit; do not relabel CoreProbe as
+production ownership. Preserve the [future provider direction](experiments/extended-cli-metadata/native-documentation-provider-2026-10-07.md).
+Independent source checkouts now rebuild the runtime, SDK, bootstrap inputs and four
+libraries; the extracted collection/Tasks/JSON/HTTP gates pass after explicit Apple SDK
+selection and serial build recovery. All 26 installed-package editor checks also pass.
+[Clean-source evidence](experiments/extended-cli-metadata/clean-bootstrap-reproduction-2026-10-07.md).
+Next: exact release-candidate/platform qualification and remaining installation/editor
+issues. Prioritize demonstrated release failures and useful shipped behavior;
+assess Platform boundary work against that scope rather than expanding documentation
+architecture. Existing API-help coverage limitations remain visible.
+The bundle alone is not an SDK release.
+The API site remains one namespace/type reference across assemblies; declaring-assembly
+provenance belongs on pages. Native multi-input RavenDoc migration must preserve that
+shape, as recorded in [API maintenance](../api-docs/README.md#one-class-library-reference-across-assemblies).
+
+Author clarification (2026-10-07): follow the executable split with real library and
+Platform integration projects whose outputs form the shipped artifacts, rather than
+leaving the graph in audit source lists. Future RavenDoc work needs an explicit assembly
+bundle and target-independent, commit-pinned declaration source links, including exact
+GitHub file/line locations. See [project gate](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md#real-project-graph-author-direction-2026-10-07)
+and [documentation acceptance](../api-docs/README.md#planned-bundles-and-declaration-source-links).
+These are recorded requirements; project/bundle/source-link implementation remains open.
+Author merge direction (2026-10-07): once bootstrap is ready, merge
+`codex/native-system-bootstrap` into neoCLR `main` and continue development there.
+Unqualified project-graph/editor/shipping artifacts keep this
+merge gate open; the instruction authorizes merging when qualified, not prematurely.
+
+Author-directed foundation rule (2026-10-07): System.Runtime owns well-defined
+fundamentals; higher-level packages depend on it, never the reverse. Exact Runtime
+membership remains subject to dependency review. .NET is a comparison point, not a
+required package layout; document benefits and costs of different boundaries.
+The author's platform-package direction is recorded separately from assembly ownership:
+[candidate distribution boundaries](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md).
+No new package resolver or native plugin mechanism is a prerequisite for these gates. Keep the existing POC sample/editor gates as ownership moves.
+[Commands and evidence](experiments/extended-cli-metadata/source-owned-orders-2026-10-07.md).
+
+### Earlier imported source-root frontier
+
+Native System.Value now imports with its declared semantic identity. The unchanged
+orders consumer gets through binding and reaches **System.Collections.ArrayList<T>
+emission validation**. Investigate imported source Object ownership for generic classes
+before relaxing any capability checks. Full-artifact verification/control execution
+from the retained-catalog slice remains valid; broad application execution is still open.
+[Value import evidence](experiments/extended-cli-metadata/value-import-2026-10-07.md).
+
+### Earlier erased-value importer frontier
+
+All 197 aggregate inputs emit, and the finalized retained seed now names the source
+owner explicitly. The combined load set verifies 2,433 IL functions and runs an
+API-authored control (42). The next gate is **ordinary Raven native consumption**:
+unchanged `application-order-collections` fails on native System.Value's classification
+as a nonexistent Raven SpecialType. Fix that importer fact before expanding execution
+or splitting core/Data/Networking/Web. Full class-library API coverage is not claimed.
+[Catalog evidence](experiments/extended-cli-metadata/retained-catalog-2026-10-07.md).
+
+### Earlier retained dependency frontier
+
+The selected source/imported System.Void now uses native unit storage, including
+callback results and generic arguments. API-authored execution and separately compiled
+Raven NativeMemory consumers pass. All 197 aggregate inputs emit; full admission now
+reaches a **retained seed dependency edge to the source owner**, after the DNS signature
+contract. Resolve the seed/source dependency catalog before splitting and consuming core.
+[Canonical unit evidence](experiments/extended-cli-metadata/canonical-unit-2026-10-07.md).
+
+### Earlier source-unit callback frontier
+
+Separately scoped WriteLine value/no-result declarations now execute under their
+own admitted registry contracts. Full-System admission advances to **source-owned
+unit in native callback signatures** (DnsLookup), with no new compiler or format
+change. Resolve that selected-unit representation next, then resume core admission
+and the candidate optional-library split.
+[Evidence](experiments/extended-cli-metadata/scoped-service-results-2026-10-07.md).
+
+### Earlier retained-service frontier
+
+The full-source audit now removes the competing seed Object; all 197 inputs emit.
+Runtime admission advances past Array backing to **retained/source WriteLine result
+ABI** (Void value versus no-result). Reconcile service ownership/contracts next.
+The candidate Runtime/Data/Networking/Web inventory has no local core-to-optional
+edges; build and consume those assemblies in dependency order after core admission.
+[Prioritized gates and evidence](experiments/extended-cli-metadata/library-boundaries-2026-10-07.md).
+
+### Earlier aggregate-emission frontier
+
+All 197 diagnostic System inputs now emit a native PE. Required schema 4 admits
+larger library envelopes while retaining earlier-profile bounds. Full-artifact runtime
+admission next rejects **nominal array backing storage**; resolve that actual source
+shape before claiming bootstrap. The author also suggested optional System.Data,
+System.Networking and System.Web assemblies: map dependency/service ownership and
+keep the aggregate compile as coverage, not a proposed monolithic distribution.
+[Evidence and packaging direction](experiments/extended-cli-metadata/expanded-library-2026-10-07.md).
+
+### Earlier String frontier
+
+Intrinsic String now retains and executes its selected source Object relationship.
+The linked PE constructor gate returns 42; the 197-input audit advances to the
+**binary library payload limit**, with no published output. Next inspect payload
+size and coordinated writer/reader budgets before expanding them.
+[Evidence](experiments/extended-cli-metadata/string-root-2026-10-07.md).
+
+### Earlier array frontier
+
+Array backing validation now admits the explicitly selected fieldless source Object
+root. Linked PE execution verifies allocation and mutation through an alias, returning
+42. The 197-input audit advances to **System.String -> System.Object base-category
+validation**. Next align intrinsic String reference storage with that source-root
+relationship. Full System still publishes no artifact.
+[Evidence](experiments/extended-cli-metadata/array-root-2026-10-07.md).
+
+### Earlier erased-value frontier
+
+Source-owned System.Value now has the runtime erased-carrier representation; the
+real environment payload type-test/unpack gate executes successfully. The 197-input
+System audit advances to **native array backing-storage validation**. Next trace
+that contract while preserving managed arrays and canonical source ownership.
+Full System still publishes no artifact; erased helpers remain explicit seed inputs.
+[Evidence](experiments/extended-cli-metadata/source-value-2026-10-07.md).
+
+### Earlier construction frontier
+
+Native reflection construction now works with source Object/RuntimeTypeHandle;
+constructor execution, distinct identity and access/missing-constructor checks pass.
+The 197-input audit excludes the seed-only GetType extension and reaches
+**System.Value ownership at Environment.GetCurrentDirectory's generic call**.
+Next reconcile the source/imported Value intrinsic contract without relaxing stack
+validation. Full System still publishes no artifact.
+[Evidence](experiments/extended-cli-metadata/reflection-construction-2026-10-07.md).
+
+### Earlier Object handle frontier
+
+Source Object now uses an explicit native handle service facade. A source-owned
+Object/RuntimeTypeHandle consumer verifies and executes identity/hash checks. The
+196-input audit advances to **ReflectionConstruct dependency-contract resolution**.
+Next resolve that remaining bootstrap signature through the native adapter boundary;
+full System still publishes no artifact.
+[Evidence](experiments/extended-cli-metadata/object-handles-2026-10-07.md).
+
+### Earlier closed-family frontier
+
+Closed families now preserve source Object as their base. Protected initialization
+and virtual dispatch execute through the resulting three-level hierarchy. The
+195-input audit advances to **ObjectTypeHandle dependency-contract resolution**;
+next align this intrinsic with source Object/RuntimeTypeHandle ownership through
+explicit bootstrap contracts. No full System artifact is published.
+[Evidence](experiments/extended-cli-metadata/closed-object-root-2026-10-07.md).
+
+### Earlier unit ownership frontier
+
+Early unit resolution now rejects wrong-assembly lookup fallbacks. Source-owned Void
+remains canonical through generic interface signatures, including when unit is needed
+before source declarations exist. The native unit-interface consumer and NativeMemory
+success/fault gates pass, with the ordinary-bootstrap control preserved. The 195-input
+System audit now reaches **direct-base constructor call validation**. Next identify
+the caller/target relationship and repair it at the owning layer; no full System
+artifact is published. [Evidence](experiments/extended-cli-metadata/unit-owner-2026-10-07.md).
+
+### Earlier unit-reference frontier
+
+
+Explicit source/native System.Void ownership now preserves inhabited unit parameters,
+no-result calls and PTR VOID signatures. The separately compiled NativeMemory consumer
+runs with source-owned Void; double-free, overflow and rejection gates pass, as does
+the ordinary-bootstrap control. The 195-input full-System audit clears binding and
+pointer admission but stops during encoding on a remaining **bootstrap System.Void
+reference**. Next trace and migrate that reference through semantic unit ownership;
+do not reintroduce a competing seed copy. No full System artifact is published.
+[Source-unit evidence](experiments/extended-cli-metadata/source-unit-2026-10-07.md).
+
+### Earlier source attribute frontier
+
+
+Source Attribute and UnionAttribute now preserve local inheritance, and native unions
+reuse the source marker constructor. Canonical metadata inspection, separate consumer
+execution (exit 42), embedded-marker control and invalid-marker rejection pass.
+The 195-input System audit next rejects **NativeMemory.Alloc's pointer to source Void**;
+binding is clean and no full-System artifact is published. Next reconcile that signature
+with the existing pointer-to-CLI-void encoding and configured unit ownership.
+[Source-attribute evidence](experiments/extended-cli-metadata/source-attributes-2026-10-07.md).
+
+### Earlier bootstrap attribute frontier
+
+
+Native FlagsAttribute and MethodImpl(InternalCall) validation now uses the explicit
+primitive-bootstrap identity, independently of source Object ownership. The source-root
+regression and wrong-owner rejection pass; ordinary-bootstrap NativeMemory still runs.
+The 194-input System audit next rejects **UnionAttribute**, whose System.Attribute base
+is external bootstrap metadata. Next establish explicit Attribute ownership/inheritance
+for the source library and its metadata representation. Full System still emits no output.
+[Core-attribute evidence](experiments/extended-cli-metadata/core-attributes-source-root-2026-10-07.md).
+
+### Earlier generic-root frontier
+
+Generic reference classes can now inherit the source Object root through an explicit
+Raven target capability and the metadata builder/definition path. Generic storage,
+base construction and inherited dispatch execute in focused native tests. The System
+audit gets past Array<T> and next stops on enum attribute ownership. Next reconcile
+FlagsAttribute selection with source/core declaration ownership, then retry emission.
+No full System artifact is emitted; ordinary imported-root consumers are still unsupported.
+[Generic-root evidence](experiments/extended-cli-metadata/generic-object-root-2026-10-07.md).
+
+### Earlier NativeMemory frontier
+
+Source NativeMemory now compiles and is consumed through native metadata. Both Alloc
+forms and Free execute; double-free and checked-size overflow fault, and unsupported
+pointer signatures publish no output. The full-owned-handle audit clears **binding
+across 194 inputs**, then rejects **Array<T>**, the first generic reference type with a
+source-defined Object base. Next extend that shared ownership/metadata relationship
+rather than patch individual Array APIs. Full System still emits no assembly.
+[NativeMemory evidence and limits](experiments/extended-cli-metadata/source-native-memory-2026-10-07.md).
+
+### Earlier prerequisites
+
+NativeAllocation runtime prerequisites now execute through native containers: exact
+allocation/free/checked-size services share the established pointer heap and limits.
+Five focused service tests and 17 pointer regressions pass. Bounded unmanaged pointer
+signature authoring, reading/import and introspection now pass 162 C# groups; an
+API-authored allocation/free assembly executes with exit 42. Next add Raven pointer
+mapping, then connect the unchanged NativeMemory sources. The four source binding errors remain; no full-System progress
+is claimed from runtime-only support. [Runtime contract](heap-and-pointers.md#source-nativeallocation-services-2026-10-07).
+
+Explicit source/native terminal-function ownership now clears the six let-else and two
+HTTP Task return errors. The audit has **four binding errors across 192 inputs**, all
+NativeAllocation imports/member uses. Local and separately compiled Fail control-flow
+consumers execute both branches correctly; invalid owners publish no output. Next resolve
+NativeAllocation at its owning native instruction/service layer, then re-run the full
+compile to expose any encoding/linking frontier. Full System still emits no assembly.
+[Terminal-flow evidence](experiments/extended-cli-metadata/source-failure-flow-2026-10-07.md).
+
+### Earlier frontier — 2026-10-06
+
+The source System.Fail helper now compiles and its native consumer reports the expected
+UserFault without returning. Full-owned-handle binding is down to **12 diagnostics across
+192 inputs**. Next make terminal-call recognition use an explicit source/native owner
+contract instead of the legacy core identity; then resolve NativeAllocation. Six let-else
+and two HTTP Task return errors still need isolation. No full System assembly is emitted.
+[Failure gate and remaining boundary](experiments/extended-cli-metadata/source-failure-2026-10-06.md).
+
+Source Console now compiles and executes through native metadata with its own explicit
+bootstrap profile: no Console declaration in the primitive core or retained seed.
+UTF-8 input/output, EOF, overloads and non-owning wrappers pass an artifact-only consumer.
+The full-owned-handle binding audit is down to **14 diagnostics across 190 inputs**.
+Next address RuntimeFailure/NativeAllocation ownership, let-else termination and HTTP
+Task return binding. Full System still fails binding; its later encoding/linking gate
+has not been reached. [Console evidence](experiments/extended-cli-metadata/source-console-2026-10-06.md).
+
+The source native integer declarations now compile separately with explicit ownership,
+and an artifact-only consumer executes signed/unsigned CompareTo calls. The corresponding
+metadata categories, Raven mappings and runtime widening services are connected. The
+full-owned-handle audit is now **30 diagnostics across 188 inputs**, down from 35.
+Next complete Console service adapters and their seed compatibility, then re-assess
+remaining binding errors. [Native integer gate](experiments/extended-cli-metadata/source-native-integers-2026-10-06.md).
+
+The calendar/time-zone group now compiles separately and its native consumer executes
+DST gaps/overlaps, offsets and optional local/zoned union conversions. Native constructor
+union import and managed mapping-array results close the exposed integration gaps.
+The latest full-System audit has **35 diagnostics across 186 inputs**, down from 48;
+Console/native-width service inputs and remaining binding failures are next.
+[Calendar evidence](experiments/extended-cli-metadata/source-calendar-2026-10-06.md).
+
+The author requested continuation toward full bootstrap after Preview 12. A fresh
+inventory confirms that Storage's existing adapters and six omitted contracts compile;
+release omission does not mean missing compiler support. The first full-source crash
+was a PE-only reflection-loader assumption, now fixed on an isolated Raven integration
+branch with 41 focused tests and unchanged released library compilation controls.
+Union ToString now completes the real source Object signature on demand; declaration
+order regressions pass and the full build reaches diagnostics instead of crashing.
+The existing source RuntimeTypeHandle contract also works once explicitly selected in
+the audit. Next complete missing runtime-service inputs, reduce residual binding failures,
+and finish the ownership catalog before replacing the CLI primitive reference.
+The Math family now compiles and executes all 20 functions through a separate native
+consumer; its 15 missing services are resolved and full-source diagnostics drop to 59.
+[Gate and bootstrap import limitation](experiments/extended-cli-metadata/source-math-2026-10-06.md).
+Callable nullable metadata now survives native encoding, introspection and Raven import.
+The independently compiled GC null-call consumer executes, including KeepAlive(null),
+with unchanged runtime semantics. Reference/array/generic symbol controls, 17 focused
+.NET checks and seven existing native consumers pass. Continue reducing the remaining
+full-System service/binding failures and completing ownership; context/field nullable
+annotations remain a bounded follow-up rather than reopening this GC gate.
+[Annotation direction](design/callable-nullability.md).
+[GC gate](experiments/extended-cli-metadata/source-heap-2026-10-06.md).
+The Environment family now compiles and executes all three APIs through a native
+artifact-only consumer. Managed argument arrays preserve independent snapshots and obey
+allocation limits. The full-owned-handle inventory is now 48 diagnostics (184 inputs).
+Next address Console/native-width service ownership and remaining Calendar services;
+retain public overloads while closing their underlying contracts.
+[Environment gate](experiments/extended-cli-metadata/source-environment-2026-10-06.md).
+Full System still does not compile. [Frontier and evidence](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).
+
 ## Native source release direction (2026-10-05)
 
 The author explicitly reaffirmed that native metadata replaces the CLI translation

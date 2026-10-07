@@ -66,5 +66,9 @@
   "M:System.LocalTimeMapping.Ambiguous.Deconstruct": {
     "output": "docs/time-zone-mappings.html#ambiguous-deconstruct",
     "reason": "RavenDoc renders union cases inline but omits their Deconstruct member pages; the manual entry records the public out-parameter signature."
+  },
+  "M:System.Attribute.#ctor": {
+    "output": "docs/introspection.html#attribute-constructor",
+    "reason": "The pinned RavenDoc renderer omits protected constructors from generated member pages."
   }
 }

@@ -20,7 +20,7 @@ static class ReflectionMemberChecks
         var constructor = module.GetType("System.Introspection.ConstructorInfo");
         Check(constructor.IsInterface && constructor.Interfaces.Single().InterfaceType.FullName == "System.Introspection.MemberInfo");
         Check(constructor.Properties.All(p => p.Name != "ReturnType"));
-        foreach (var name in new[] {"System.Introspection.ConstructorInfo", "System.Runtime.Reflection.ConstructorReflectionExtensions", "System.Runtime.Reflection.MethodReflectionExtensions", "System.Runtime.Reflection.FieldReflectionExtensions"})
+        foreach (var name in new[] {"System.Runtime.Reflection.ArrayReflection", "System.Introspection.ConstructorInfo", "System.Runtime.Reflection.ConstructorReflectionExtensions", "System.Runtime.Reflection.MethodReflectionExtensions", "System.Runtime.Reflection.FieldReflectionExtensions"})
             foreach (var method in module.GetType(name).Methods.Where(m => m.IsPublic)) {
                 Check(ReflectionBindings.Bind(method,method) is not null);
                 var wrong = new MethodReference(method.Name,module.TypeSystem.Int32,method.DeclaringType) {HasThis=method.HasThis};

@@ -1,0 +1,28 @@
+{
+  "baseRevision": "55da083f",
+  "scope": "Diagnostic source-root ownership correction; aggregate emission succeeds, admission intentionally reports remaining service ABI conflict.",
+  "command": [
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+    "verify",
+    "/tmp/expanded-library1007.dll.app",
+    "--system",
+    "/tmp/retained-root-audit1007b/full-owned-handle/System.neox",
+    "--module",
+    "/tmp/expanded-library1007.dll",
+    "--module",
+    "/tmp/retained-root-audit1007b/full-owned-handle/Numbers.dll",
+    "--object-root",
+    "/tmp/retained-root-audit1007b/full-owned-handle/Numbers.dll"
+  ],
+  "exitCode": 1,
+  "stdout": "",
+  "stderr": "Fault: conflicting function signature: neoCLR.Runtime.WriteLine ([String]) [Some(MemberId { module: \"System\", revision: None, index: 5 }) versus Some(MemberId { module: \"NeoMetadata_79C5D7429CAE2158FCD0DE05E0A1DE959B01A78720392AE49806BC8ADAD82380\", revision: Some(\"1.0.0.0\"), index: 33 })]; returns Void/Void, no-result false/true [code=RuntimeError]\n",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "aa997e28629aea03dd05024f21cddde55425b37e40ffc02051a925e9d5bb09c1",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/scripts/audit-native-bootstrap.py": "614fafc6a271ed9e805806dc5af2d7b5436cd0f18eef9bee15a45491285be8a3",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/vm.rs": "e7e608a9d70986a4566a83540a8dbadde9a694d230f24e87ae0e96d37e4d2048",
+    "/tmp/retained-root-audit1007b/full-owned-handle/System.neox": "75e0411fcf2b98bffa4511d80bdfb34b76657e033a6c313390688d124cdd70d1",
+    "/tmp/retained-root-audit1007b/full-owned-handle/System.retained.json": "b7109d22f3da3906825bf00bc4f696c8aa759d8e88cd9cb029450a5897b0243a",
+    "/tmp/retained-root-audit1007b/full-owned-handle/Numbers.dll": "0a2f112c4c0034e00ee39a5fe1cafc8387149ac5d743d056bc267ac60e9ae3d6"
+  }
+}

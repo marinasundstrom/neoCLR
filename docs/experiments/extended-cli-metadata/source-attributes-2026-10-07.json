@@ -1,0 +1,218 @@
+{
+  "sourceRevision": "67b09d90e689cb7524c7e0458a5a56d7a3c0c4d1",
+  "compilerRevision": "622041224+source-attributes",
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "assemble",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/attribute-seed.neoil",
+        "/private/tmp/source-attribute-gate1007i/AttributeSeed.neox",
+        "--format",
+        "neox"
+      ],
+      "exitCode": 0,
+      "stdout": "Assembled System -> /private/tmp/source-attribute-gate1007i/AttributeSeed.neox\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/source-attribute-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/source-attribute-gate1007i/AttributeSeed.neox",
+        "--source-object-root",
+        "--library",
+        "-o",
+        "/private/tmp/source-attribute-gate1007i/Root.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Attribute.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-union-marker.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+        "--",
+        "--generic-object-consumer",
+        "/private/tmp/source-attribute-gate1007i/Root.dll",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "/private/tmp/source-attribute-gate1007i/App.pe"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+        "--",
+        "--check-source-attributes",
+        "/private/tmp/source-attribute-gate1007i/Root.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-attribute-gate1007i/App.pe",
+        "--system",
+        "/private/tmp/source-attribute-gate1007i/AttributeSeed.neox",
+        "--module",
+        "/private/tmp/source-attribute-gate1007i/Root.dll",
+        "--object-root",
+        "/private/tmp/source-attribute-gate1007i/Root.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_F1536B34A7AC440DA89D557B92716FD7490242F49F82A1FA236F632A2A61AC81: typed-stack/control-flow verification passed (26 IL functions; maximum stack 2; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-attribute-gate1007i/App.pe",
+        "--system",
+        "/private/tmp/source-attribute-gate1007i/AttributeSeed.neox",
+        "--module",
+        "/private/tmp/source-attribute-gate1007i/Root.dll",
+        "--object-root",
+        "/private/tmp/source-attribute-gate1007i/Root.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/source-attribute-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/source-attribute-gate1007i/AttributeSeed.neox",
+        "--source-object-root",
+        "--library",
+        "-o",
+        "/private/tmp/source-attribute-gate1007i/Rejected-marker.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Attribute.rvn",
+        "/private/tmp/source-attribute-gate1007i/invalid-marker.rvn",
+        "/private/tmp/source-attribute-gate1007i/marker-union.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support source UnionAttribute requires a public parameterless constructor.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/source-attribute-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/source-attribute-gate1007i/AttributeSeed.neox",
+        "--source-object-root",
+        "--library",
+        "-o",
+        "/private/tmp/source-attribute-gate1007i/Embedded.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn",
+        "/private/tmp/source-attribute-gate1007i/embedded-marker.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+        "--",
+        "--generic-object-consumer",
+        "/private/tmp/source-attribute-gate1007i/Embedded.dll",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "/private/tmp/source-attribute-gate1007i/Embedded.pe"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-attribute-gate1007i/Embedded.pe",
+        "--system",
+        "/private/tmp/source-attribute-gate1007i/AttributeSeed.neox",
+        "--module",
+        "/private/tmp/source-attribute-gate1007i/Embedded.dll",
+        "--object-root",
+        "/private/tmp/source-attribute-gate1007i/Embedded.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_F1536B34A7AC440DA89D557B92716FD7490242F49F82A1FA236F632A2A61AC81: typed-stack/control-flow verification passed (25 IL functions; maximum stack 2; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-attribute-gate1007i/Embedded.pe",
+        "--system",
+        "/private/tmp/source-attribute-gate1007i/AttributeSeed.neox",
+        "--module",
+        "/private/tmp/source-attribute-gate1007i/Embedded.dll",
+        "--object-root",
+        "/private/tmp/source-attribute-gate1007i/Embedded.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "scope": "Source Attribute hierarchy and union marker; consumer generated by metadata API, not Raven imported-root acceptance.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn": "9d4ac383f59d0bf29aa8926c8dc402b905e17393c9f65c903bc15f0ab950d4f6",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Attribute.rvn": "89211bdc6852fa7d85dc38bec55c3a643113636049eaf6cd17d384db3c317f94",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn": "2b5dc7aca6883217188df40ce57c31025703caa869bcdcf775309eda34c804d9",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-union-marker.rvn": "31f0b842563c136c63ed547b8d3ed1eb144050964a6a6d74f4c1af2aea5cde51",
+    "/private/tmp/source-attribute-gate1007i/invalid-marker.rvn": "5e5ad7646e209bb042af8d61e4c1bff7441c96864fdafd7513952f5de86d804f",
+    "/private/tmp/source-attribute-gate1007i/marker-union.rvn": "b92d9f222711f9889b0e7a1994220154911fccba25e014ea22225d984c0ce124",
+    "/private/tmp/source-attribute-gate1007i/embedded-marker.rvn": "41f86f98e293436bcd0eb409260c0721403d560d4b9394ac77f77e013eae71e5",
+    "/private/tmp/source-attribute-gate1007i/Embedded.dll": "3552db98eec3ca89c7c4eb67dade6f8fd74fbed3e121ea7440b6c73b511703d2",
+    "/private/tmp/source-attribute-gate1007i/Embedded.pe": "f8f5c063ded21834b01c151013b91906a2e991c4612440d17d89b8f2b7a17bff",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_generic_object_root.py": "c754f100d4f2e801943d0aee86924abdaf8fb9ef06a9a35eb17bf5ee6c3ac8f0",
+    "/private/tmp/source-attribute-compiler1007/rvnc.dll": "b65e54c947d8b2c806763dae7611d1b1f0ca69a2e5f79ef0f36fefb2c5c57524",
+    "/private/tmp/preview12-bootstrap/Core.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/preview12-bootstrap/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "a2d79f933a7ccfe95fb0f4be86c8e00c496cc6f28c21d84dd74ada335a0acb49",
+    "/private/tmp/source-attribute-gate1007i/System.neoil": "b3de629ea4ba552863c8df2a94a8787ae1505a49da4e890dacc23e49c75dbbbd",
+    "/private/tmp/source-attribute-gate1007i/Root.dll": "c83f484a7d52d867439100e4cee87dbc453af58999d5050ce90298572b24b0e7",
+    "/private/tmp/source-attribute-gate1007i/App.pe": "c35ef1f92e3e7e0500e5f2f6c7e9fb9e20503f2758d089ac063dd7dfd4ff43f4",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/attribute-seed.neoil": "922764f429e8d69211d6ddaed2a8c8035cc4682e49c7e70cca4586ff8a5fd984",
+    "/private/tmp/source-attribute-gate1007i/AttributeSeed.neox": "b1807235e4e42c8e8b51aebb20dd4ebefc8a021689e241b097098c68900d9edf",
+    "/private/tmp/source-attribute-compiler1007/Raven.CodeAnalysis.dll": "e3a741bd3a8abc449ba3c50bab941772f635f68243a8d9f8394f6718035273fb",
+    "/private/tmp/source-attribute-compiler1007/Raven.CodeAnalysis.NeoClr.dll": "709317f9864a219efeb57798cb8872f315f86481e09ff5c61b599496cb58555f",
+    "/private/tmp/source-attribute-compiler1007/NeoCLR.Metadata.Experimental.dll": "346031d1b4c27a194c3c447a5b28e786318465e2cb1d851c26667fa440189fd5"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "sourceRevision": "dd184f95fc3225389b3dc3e0e882ecf3cb26a82d",
+  "compilerRevision": "801f131ba",
+  "baseline": "Unhandled exception. System.ArgumentException: Requested value 'System_Value' was not found.\n   at System.Enum.TryParseByName[TStorage](RuntimeType enumType, ReadOnlySpan`1 value, Boolean ignoreCase, Boolean throwOnFailure, TStorage& result)\n   at System.Enum.Parse[TEnum](String value, Boolean ignoreCase)\n   at System.Enum.Parse[TEnum](String value)\n   at Raven.CodeAnalysis.NeoClr.NativeNamedTypeSymbol..ctor(Compilation compilation, NominalTypeInfo view, NativeNamespaceSymbol owner, NativeNamedTypeSymbol declaringType) in /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis.NeoClr/NativeNamedTypeSymbol.cs:line 26\n   at Raven.CodeAnalysis.NeoClr.NativeModuleSymbol.<>c__DisplayClass4_0.<.ctor>g__AddType|1(NominalTypeInfo type, <>c__DisplayClass4_1&) in /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis.NeoClr/NativeAssemblySymbol.cs:line 58\n   at Raven.CodeAnalysis.NeoClr.NativeModuleSymbol..ctor(Compilation compilation, NativeAssemblySymbol assembly) in /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis.NeoClr/NativeAssemblySymbol.cs:line 51\n   at Raven.CodeAnalysis.NeoClr.NativeAssemblySymbol..ctor(Compilation compilation, NeoClrMetadataReference reference) in /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis.NeoClr/NativeAssemblySymbol.cs:line 18\n   at Raven.CodeAnalysis.NeoClr.NeoClrMetadataReference.Raven.CodeAnalysis.Metadata.ISemanticMetadataReference.CreateAssemblySymbol(Compilation compilation) in /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis.NeoClr/NeoClrMetadataReference.cs:line 75\n   at Raven.CodeAnalysis.Metadata.CompositeSemanticDataLoader.LoadReference(MetadataReference reference) in /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis/Metadata/ISemanticMetadataReference.cs:line 14\n   at Raven.CodeAnalysis.Compilation.GetAssemblyOrModuleSymbol(MetadataReference metadataReference) in /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis/Compilation.cs:line 2505\n   at Raven.CodeAnalysis.Compilation.Setup() in /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis/Compilation.cs:line 948\n   at Raven.CodeAnalysis.Compilation.EnsureSetup() in /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis/Compilation.cs:line 929\n   at Raven.CodeAnalysis.Compilation.GetTypeByMetadataName(String metadataName) in /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis/Compilation.cs:line 2592\n   at NeoClrMetadataProbe.NativeValueSymbolChecks.Run(String corePath) in /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/tools/NeoClrMetadataProbe/NativeValueSymbolChecks.cs:line 26\n   at Program.<Main>$(String[] args) in /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/tools/NeoClrMetadataProbe/Program.cs:line 21\n   at Program.<Main>(String[] args)\n",
+  "symbolRegression": "PASS native erased Value is not a CLI special type; numeric classification retained\n",
+  "ownershipTests": "/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj]\n  Raven.CodeAnalysis.Tests -> /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll\n  Tool 'dotnet-ilverify' (version '9.0.9') was restored. Available commands: ilverify\n  Tool 'ilspycmd' (version '9.1.0.7988') was restored. Available commands: ilspycmd\n  \n  Restore was successful.\nTest run for /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll (.NETCoreApp,Version=v11.0)\nA total of 1 test files matched the specified pattern.\n\nPassed!  - Failed:     0, Passed:     2, Skipped:     0, Total:     2, Duration: 23 ms - Raven.CodeAnalysis.Tests.dll (net11.0)\n",
+  "consumer": {
+    "command": [
+      "dotnet",
+      "/tmp/value-import-compiler1007/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/failure1006b/Core.dll",
+      "--runtime-seed",
+      "/tmp/retained-catalog-audit1007/full-owned-handle/System.runtime.neox",
+      "--bootstrap-ownership",
+      "/tmp/retained-catalog-audit1007/full-owned-handle/ownership.json",
+      "--reference",
+      "/tmp/retained-catalog-audit1007/full-owned-handle/Numbers.dll",
+      "-o",
+      "/tmp/value-import-orders1007.dll",
+      "docs/experiments/raven-target/samples/application-order-collections.rvn"
+    ],
+    "exitCode": 1,
+    "diagnostics": "error NEOMETA001: Native emission does not support native type requires a supported symbol-only emission contract: System.Collections.ArrayList`1.\n",
+    "outputPublished": false
+  },
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn": "d775c2c648591482cf53a0a735603ca51aea48c2f2bb33633c95830e57b6550b",
+    "/private/tmp/retained-catalog-audit1007/full-owned-handle/Numbers.dll": "edd069bc424c27196549fd98061184cef87d41be6192466c2b70e7dce4abe37f",
+    "/private/tmp/retained-catalog-audit1007/full-owned-handle/System.runtime.neox": "689c667a5872bf58fea50ef6773f131d035ad8856c505b19d74e1400eaf7d15f",
+    "/private/tmp/retained-catalog-audit1007/full-owned-handle/ownership.json": "2afe2e6fcb77171c597b2beb79064882e8e4c63bfe9cb8d3ba4d054d973d9cc6",
+    "/private/tmp/failure1006b/Core.dll": "7e5cee8e255704bbf44595173609c1c4834b7e7b512dba8704987fd05420dd88",
+    "/private/tmp/value-import-compiler1007/rvnc.dll": "91b6e53cacc7a81bc4fef7ff450f8b1ceb74dc60de6f965c154e037b93f3986d",
+    "/private/tmp/value-import-compiler1007/Raven.CodeAnalysis.dll": "65f583f187e5812357177c4d8c17bce82d827be58ae09d49ae77a0978406808c",
+    "/private/tmp/value-import-compiler1007/Raven.CodeAnalysis.NeoClr.dll": "868ca08f7110a7a3d51e95893638a64400e184295fc4d4ec82c6eac46f2a6413",
+    "/private/tmp/value-import-compiler1007/NeoCLR.Metadata.Experimental.dll": "c3006704bbcc934409f86d25ccfcb5d410e5e3e31c2535e328d3fdeb0e523954"
+  }
+}

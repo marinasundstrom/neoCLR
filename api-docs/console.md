@@ -5,6 +5,11 @@ methods are `Write(string/int)`, `WriteLine()`, `WriteLine(string/int/object?)` 
 and `ReadLine()`/`ReadLine(maxUtf8Bytes)`. Terminal key handling, colors, cursor
 movement, character-at-a-time text input and asynchronous calls are not implemented.
 
+Development bootstrap validation (2026-10-06): these source declarations also compile
+into a separate native metadata assembly and execute with an artifact-only consumer.
+This requires the explicit source-Console core/seed profile; the older primitive
+bootstrap contains only limited Console declarations. Public API signatures are unchanged.
+
 | Member | Type or result | Purpose |
 | --- | --- | --- |
 | `Console.In` | `TextReader` | Read UTF-8 standard input |

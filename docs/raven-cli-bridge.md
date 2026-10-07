@@ -6117,3 +6117,564 @@ ownership are target configuration, not reflection-based metadata projection.
 include broad collections, actual Tasks/await execution and an ordinary .NET editor
 control. The new development path is qualified on macOS arm64 only. Packaging and
 publication remain separate; no Preview 11 artifact has been replaced.
+
+### Raven synchronous use cleanup (2026-10-06 development)
+
+The companion Raven `codex/metadata-consumer` change introduces a shared
+`RuntimeDisposalContract` and scope-exit lowering. The neoCLR profile selects
+`System.Disposable.Dispose` from `NeoCLR.CoreProbe` without exception regions.
+A bootstrap ownership manifest can select an authored interface using its `Disposal`
+entry (`AssemblyName`, `InterfaceTypeName`, `UseExceptionHandling: false`); that
+interface must be listed under its declared library owner. General lowering and
+regressions are suitable for Raven main; neoCLR protocol names remain target policy.
+
+Resources become active only after initialization and are disposed in reverse order
+on block completion, returns, failed error/None propagation and loop exits. Result
+values are evaluated before cleanup. The temporary CLI bridge encodes ordinary calls
+and branches rather than try/finally. Native emission consumes the same bound plan;
+existing native calls, locals and branch metadata already express the behavior. Raven
+owns lifetime semantics; the profile owns protocol selection and the runtime executes
+ordinary calls. No runtime implementation change or new metadata opcode is required.
+
+Async and iterator use remain diagnosed (RAVT006); terminal faults do not unwind.
+Outward/backward gotos clean up; jumps past a use initializer are rejected (RAVT007).
+Ordinary .NET goto restrictions are unchanged. Bare bootstrap interface implementation still
+hits the native adapter's pre-existing authored-interface requirement; source-built
+libraries should configure their actual protocol owner. This is a packaging/admission
+boundary, not a permanent language restriction. Disposal failure has no Result channel;
+Closable is not selected implicitly. Suspension and cancellation cleanup remain work.
+
+Validation: Raven's `ScopeExitCleanupTests` and existing default .NET resource tests,
+and `NeoClrMetadataProbe --scope-exit-cleanup-runtime` with this checkout's runtime.
+Six authored-protocol consumers (return, goto, loop exits, value block, None and error
+propagation) verify and return 42. The probe deliberately uses isolated authored
+protocol/carrier fixtures, not the bootstrap facade implementation path. Raven records
+runtime/core SHA-256 identities in `scope-exit-cleanup-validation.json`. The runtime
+checkout was `codex/native-system-bootstrap`, base `c23a2585`. No .NET Framework or
+NanoFramework execution is claimed, and this is development compiler support, not a
+published runtime release.
+
+
+### Continuing Raven integration branch (2026-10-06)
+
+At the author's direction, Raven now continues on
+`codex/source-object-metadata-resolution`. Merge `7bfc6ad27` includes
+`codex/metadata-consumer` cleanup commit `13b52ca56` and preserves the source-owned
+Object fixes. The old branch is superseded for new work; its clean checkout is retained.
+The runtime stays on `codex/native-system-bootstrap`.
+
+Post-merge evidence: 92 focused .NET checks pass, including source-root, disposal and
+default async lifetime controls. Six native consumers verify and execute with exit 42:
+return, goto, loop exits, value block, None propagation and error propagation. This
+updates the earlier five-consumer record above with the final goto case. Raven's
+`tools/NeoClrMetadataProbe/scope-exit-cleanup-integration-validation.json` records the
+runtime/core hashes and merge parents. The runtime was built from the GC-support code
+on this line; no new runtime instructions or nullable native encoding are introduced.
+The authored-protocol ownership restriction remains; native async/iterator cleanup
+is still diagnosed and deferred. General .NET/main integration is a separate gate.
+
+
+### Source Console bootstrap (2026-10-06)
+
+The `--reference-source-console-core` probe profile retains comparer-storage primitive
+facts while omitting `System.Console`. The acceptance script removes the exact legacy
+Console type and WriteLine service from the retained seed, assigns Console to its native
+library, and compiles the consumer without library sources. It does not change default
+compiler precedence or add a CLI fallback. Raven a6ee91610 is unchanged.
+
+Source adapters declare WriteLine with CLI-style no-result execution; the legacy
+inhabited Void service remains supported in older seeds. Runtime blocking-call completion
+now observes the selected callee convention. Only the explicit source profile removes
+legacy declarations; mixing both owners is not supported. The primitive core remains a
+temporary binding input, while application and library references use native metadata.
+[Reproduction and executed coverage](experiments/extended-cli-metadata/source-console-2026-10-06.md).
+
+
+### Source terminal failure service (2026-10-06)
+
+The `--reference-source-failure-core` profile omits the projected Fail declaration.
+Unchanged System/Functions.rvn plus internal RuntimeFailure adapters emit Failure.dll;
+an artifact-only consumer resolves its namespace function through native metadata.
+`neoCLR.Runtime.Fail(String) -> noresult` is the new exact runtime service, while the
+legacy seed's inhabited `Fault` service remains intact for existing Numbers bodies.
+Both raise UserFault and never return. Wrong new-service signatures reject.
+
+Raven a6ee91610 remains unchanged: the native runtime path works, but its legacy-core
+terminal-flow test still excludes source/native Fail ownership. Replacing that check
+with an explicit target contract is the next compiler slice, not a new language rule.
+[Commands, hashes and scope](experiments/extended-cli-metadata/source-failure-2026-10-06.md).
+
+
+### Native terminal-flow ownership (2026-10-07)
+
+The optional bootstrap `failure` object selects `{ "assemblyName": "Failure",
+"namespaceName": "System", "functionName": "Fail" }`. Use the source System library's
+actual assembly name in a full bootstrap (the audit uses Numbers). The catalog must
+contain that owner. Raven validates one public static non-generic namespace function
+with a by-value string parameter and unit/void result. This is a runtime behavior
+assertion supplied by the host, not a name-based inference. Invalid selection fails
+before output publication.
+
+Source/native symbols provide this fact to existing binding and lowering. Local and
+imported let-else both compile; a Some path returns 42 and a None path produces UserFault.
+The existing CLI bootstrap remains available, but no native consumer falls back to it.
+Raven's ordinary .NET path is unchanged. No new metadata encoding is needed for this
+bounded contract. [Evidence and remaining work](experiments/extended-cli-metadata/source-failure-flow-2026-10-07.md).
+
+The matching compiler contract is Raven `296ca0f36`; 18 focused compiler tests and the
+source/imported executable gate pass. The runtime remains `b933c32b`.
+
+
+### NativeAllocation runtime prerequisites (2026-10-07)
+
+NativeAllocate(UIntPtr)->Void*, NativeMultiplyChecked(UIntPtr,UIntPtr)->UIntPtr and
+NativeFree(Void*)->noresult now execute as exact neoCLR.Runtime InternalCalls. They
+reuse the existing pointer heap and checked native-width operations; the previous bridge
+mapping to heap.alloc Byte / ptr.cast Void, mul.ovf.un and heap.free remains valid.
+The service path is the intended replacement for the source NativeAllocation helper.
+No source helper or bridge fallback is introduced in this runtime-only slice.
+
+The native container regression and 17 pointer controls pass. C# SignatureType pointer
+support, CLI PTR encoding/decoding, native Ptr mapping, introspection and Raven semantic
+operands are the remaining boundary. No compiler behavior changes yet; the full-System
+binding count remains four. [Exact service contract](heap-and-pointers.md#source-nativeallocation-services-2026-10-07).
+
+### Native pointer metadata prerequisite (2026-10-07)
+
+The C# metadata API now preserves scalar/Void pointer signatures through standard CLI
+PTR encoding and existing native Ptr encoding, including import and metadata-only views.
+An API-authored consumer executes the three native allocation services with exit 42.
+This is a metadata/runtime prerequisite; Raven's pointer symbol/emission mapping is
+still pending. No CLI projection fallback was added and the four full-System binding
+errors remain. See the [bounded public contract](../api-docs/experimental-metadata.md#unmanaged-pointer-signatures-development-2026-10-07).
+
+### Source NativeMemory now executes (2026-10-07)
+
+Raven's native target maps metadata pointer views to semantic pointer symbols and
+uses an explicit shared pointer capability for emission. External namespace functions
+are authored from those symbols and host identities; no importer object is reused.
+Both Alloc overloads and Free in the unchanged source NativeMemory implementation
+execute through the real NativeAllocation adapter and existing tracked runtime heap.
+The ordinary .NET backend is unchanged. No new Runtime Contract setting is required.
+
+The bounded surface is scalar/Void pointer parameters/results, locals and pass-through;
+nominal pointer targets, pointer arithmetic/dereference in the native compiler, and
+source native-width numeric conversions remain separate work. Acceptance uses
+API-generated UIntPtr inputs explicitly, not application or library projections.
+The four binding errors are gone; full System next rejects Array<T>'s local Object
+base. [Commands and evidence](experiments/extended-cli-metadata/source-native-memory-2026-10-07.md).
+
+### Generic source-root base (2026-10-07)
+
+The native target opts into generic classes over the explicitly selected source Object
+root. Shared plans retain the semantic base; the adapter supplies a local base reference
+to the metadata API. The ordinary .NET target stays unchanged. No Runtime Contract
+option or new metadata encoding is introduced. General generic inheritance remains
+unsupported. A Raven-authored root fixture and Box<T> execute through an API-authored
+consumer; this does not remove the ordinary driver restriction on imported-root consumers.
+The System audit proceeds past Array<T> and next rejects enum attribute ownership.
+See [evidence and next boundary](experiments/extended-cli-metadata/generic-object-root-2026-10-07.md).
+
+### Bootstrap attribute ownership independent of Object (2026-10-07)
+
+Raven `622041224` validates FlagsAttribute and MethodImplAttribute against the exact
+host-provided core identity instead of System.Object's containing assembly. Source-owned
+Object therefore does not change the owner of these bootstrap declarations. Their names,
+constructor arguments and permitted target shapes remain checked; lookalike source
+attributes reject before publication. No Runtime Contract option or wire-format change
+is introduced. Ordinary .NET code is unchanged.
+
+Production BindingFlags plus an InternalCall execute with the source Object fixture;
+ordinary-bootstrap NativeMemory passes again. These are focused regressions, not full
+imported-root acceptance. The full-System audit proceeds to UnionAttribute's unsupported
+external System.Attribute base. [Reproduction and evidence](experiments/extended-cli-metadata/core-attributes-source-root-2026-10-07.md).
+
+### Source attribute ownership (2026-10-07)
+
+Raven `e492490dc` reuses the output-owned UnionAttribute constructor instead of
+embedding a duplicate marker. Source System.Attribute is abstract with a protected
+constructor; the existing UnionAttribute retains its base relationship. The CLI
+reference exposes the same declaration shape. Other bootstrap attribute ownership
+remains explicit and unchanged. The fallback embedded native marker remains a
+nominal metadata record, without Attribute inheritance, for outputs without a source
+marker. No format or Runtime Contract configuration change.
+
+[The focused gate](experiments/extended-cli-metadata/source-attributes-2026-10-07.md)
+checks canonical custom-attribute identity, constructor-chain execution, fallback and
+failure-before-publication. The full audit now reaches NativeMemory's pointer to source
+Void; this is not yet a completed System bootstrap or Raven imported-root consumer.
+
+### Source/native unit ownership (2026-10-07)
+
+Raven `7abe0adf7` allows the NeoCLR System.Void unit contract to name the current
+source assembly or an explicit native artifact. The chosen public empty value type
+backs unit values; callable unit results and pointers retain CLI no-result/PTR VOID
+encoding. Same-named unselected declarations do not receive that pointer treatment.
+Ownership manifests may omit unused iteration contracts. The primitive bootstrap
+remains explicit and does not become a native dependency fallback.
+
+The [source-unit gate](experiments/extended-cli-metadata/source-unit-2026-10-07.md)
+executes production NativeMemory and an inhabited unit argument from a separately
+compiled consumer. Its empty runtime seed contains no competing Void; native runtime
+services are authored in the library. Released libraries still referring to seed-owned
+Void are not interchangeable with this new owner. The full audit now selects source
+Void and stops at a remaining bootstrap Void reference during encoding, after passing
+binding and pointer validation. No full-System output is published.
+
+The independently useful diagnostic assertion correction is integrated into local
+Raven main as `8c53fa55b` (17 focused tests), with its temporary fix branch retired.
+Target-specific ownership changes remain on the native integration line.
+
+### Early unit lookup identity (2026-10-07)
+
+Raven `3390f151b` rejects a wrong-assembly result from source metadata-name lookup
+when unit is initialized before source declarations are available. The explicit unit
+contract remains authoritative; the later source declaration supplies the storage
+identity. No runtime contract option, CLI encoding or runtime representation changes.
+[The evidence](experiments/extended-cli-metadata/unit-owner-2026-10-07.md) includes
+C# declaration-order regressions, native generic unit-interface dispatch, NativeMemory
+fault/success cases and an ordinary-bootstrap control. The complete System audit now
+reaches direct-base constructor validation rather than importing bootstrap Void.
+
+## Closed families over source Object (2026-10-07)
+
+Raven `793220f33` forwards the declared local base to the new metadata
+`AddClosedClass` overload. This fixes the source-root JsonValue constructor frontier
+without changing lowering, Runtime Contract configuration, CLI projection or native
+format. Definition authoring and builders share validation; the reader/introspection
+already retain local base identity. Protected chaining and virtual dispatch execute;
+32 ordinary .NET regressions and 163 metadata groups pass. The next full-System
+blocker is ObjectTypeHandle dependency-contract resolution. Source-built System is
+not complete. See [evidence and scope](experiments/extended-cli-metadata/closed-object-root-2026-10-07.md).
+
+## Source Object handle boundary (2026-10-07)
+
+Source Object.GetType now calls the native `NativeObject.GetTypeHandle` facade,
+backed by the existing internal-call declaration. Bootstrap RuntimeServices retains
+its older signature; no compiler fallback, signature relaxation or CLI projection is
+introduced. Source-owned Object and RuntimeTypeHandle use their explicit source
+configuration. The API-authored executable consumer verifies identity/hash behavior;
+full System advances to ReflectionConstruct. [Scope and evidence](experiments/extended-cli-metadata/object-handles-2026-10-07.md).
+
+## Source-owned reflection construction (2026-10-07)
+
+Parameterless TypeInfo.CreateInstance uses the internal NativeReflection facade and
+source InternalCall declarations. The native emitter uses ordinary symbol contracts;
+no dependency signature relaxation or importer reuse is introduced. Existing source
+Object and handle ownership configuration is unchanged. Runtime construction still
+checks access and executes the selected constructor.
+
+The temporary CLI bootstrap also declares the facade's two static methods; its
+translator checks their exact owner and signatures before targeting the existing
+native services. Bootstrap declarations are reference-only scaffolding and do not
+implement .NET reflection execution. The native source facade replaces this path
+for source-built libraries. [Evidence, compatibility and remaining frontier](experiments/extended-cli-metadata/reflection-construction-2026-10-07.md).
+
+## Source erased Value storage (2026-10-07)
+
+Raven ca4aeccfb accepts an explicit nativePrimitives System.Value source owner but
+keeps it outside CLI special-type resolution. Its empty definition is marked as
+runtime storage; native metadata uses Value while CLI signatures retain nominal
+ownership. The selected core/System seed facade and marked local carrier share
+physical evaluation storage. The seed omits the competing declaration and retains
+only the explicitly required generic helpers. The native environment payload gate
+executes; separate Raven import of a source Value API remains unqualified. No .NET
+compiler semantics or runtime behavior changes. [Evidence and next frontier](experiments/extended-cli-metadata/source-value-2026-10-07.md).
+
+## Managed array backing over source Object (2026-10-07)
+
+The metadata reader and runtime now accept an array backing class whose base is the
+explicitly selected fieldless Object root. Authoring validation matches that rule;
+foreign or unselected bases remain unsupported. Raven configuration and compiler
+emission are unchanged. This preserves managed T[] and nominal Array<T>, with no
+inline/value-array feature or altered CLI array signature. The runtime PE gate
+verifies alias mutation; full-System emission next stops at intrinsic String's Object
+base. [Validation and scope](experiments/extended-cli-metadata/array-root-2026-10-07.md).
+
+## Intrinsic String and source Object (2026-10-07)
+
+Native reading and runtime execution now preserve String's selected Object base
+without changing its intrinsic UTF-8 receiver ABI. Protected constructor chaining
+checks identity and executes the real base body through an Object handle view.
+No new Runtime Contract option, compiler mapping or temporary CLI bridge encoding.
+The 197-source audit next reaches the binary library payload limit; output remains
+unpublished. [Evidence](experiments/extended-cli-metadata/string-root-2026-10-07.md).
+
+## Full-source emission and schema 4 (2026-10-07)
+
+The 197-input diagnostic build now emits using the metadata library's required
+schema 4 (16 MiB envelope; other library bounds unchanged). Small libraries retain
+schema 3; older runtimes reject schema 4. No compiler or Runtime Contract option
+changes. Native metadata remains authoritative; CLI reference projection semantics
+and ordinary .NET codegen are unchanged. The aggregate owner Numbers is diagnostic,
+not production packaging. Runtime admission now reaches the source Array backing
+contract. [Evidence and candidate assembly split](experiments/extended-cli-metadata/expanded-library-2026-10-07.md).
+
+## Retained root ownership and candidate assembly split (2026-10-07)
+
+The aggregate audit now removes seed Object before native linking to the selected
+source root, retaining explicit bootstrap/encoding inputs and hashes. Compiler
+emission still passes; runtime next rejects retained/source WriteLine contracts
+(Void value versus no-result). No compiler or .NET behavior is changed. Diagnostic
+metadata import during emission remains native; host seed preparation may use JSON
+before encoding NEOX and is not a runtime input fallback.
+
+The author-suggested Runtime/Data/Networking/Web split has an emitted local-dependency
+inventory and ordered separate-compilation gates, not final assembly ownership.
+[Details and remaining ABI work](experiments/extended-cli-metadata/library-boundaries-2026-10-07.md).
+
+## Scoped service result ABI (2026-10-07)
+
+Runtime linking now admits separate-module unit-value/no-result Void service
+contracts only where the registry validates both. Each call keeps its own scoped
+member and stack behavior. Retained and source WriteLine execute together; ordinary
+and same-module conflicts still reject. No Runtime Contract option, compiler code,
+CLI bridge mapping or metadata format changes. Full-System admission advances to
+DnsLookup's source-owned unit callback result.
+[Validation and next gate](experiments/extended-cli-metadata/scoped-service-results-2026-10-07.md).
+
+## Canonical native Void values (2026-10-07)
+
+NeoCLR void is the inhabited unit type. RuntimeUnitContract selects its System.Void
+owner; the native emitter marks that source declaration and output-owned imported
+references with native unit storage. It uses symbol facts and artifact identities,
+without reopening importer objects. Callbacks, parameters and generic arguments encode
+Void values. No-result methods remain a separate stack convention, not another type.
+
+CLI transport retains a nominal value signature wherever CLI void is illegal; the .NET
+backend's existing unit carrier and no-result lowering are unchanged. Empty lookalike
+structs do not acquire unit semantics. The metadata library owns canonical alias/scoped
+reference encoding and introspection, while Raven owns target selection/lowering.
+[Executable evidence and remaining bootstrap work](experiments/extended-cli-metadata/canonical-unit-2026-10-07.md).
+
+## Explicit retained-seed dependency catalog (2026-10-07)
+
+The diagnostic all-source audit now finalizes `System.runtime.neox` after emitting the
+source owner. Its module/revision reference is read from the native artifact, not inferred
+from a CLI projection or a hardcoded identity hash. `System.neox` remains the explicitly
+recorded compile-time seed, necessary before the source owner exists. These are distinct
+bootstrap stages; runtime loading uses the finalized catalog and validates dependencies.
+There is no implicit reference fallback or relaxed runtime check.
+
+The combined load set verifies 2,433 IL functions and executes an API-authored control
+returning 42. This is full artifact admission, not full class-library API execution or
+ordinary Raven consumer success. The unchanged orders consumer now fails native import
+when System.Value is parsed as a nonexistent Raven SpecialType. No compiler code or
+.NET behavior changes in this catalog slice. Runtime Contract ownership settings remain
+unchanged. [Evidence and next gate](experiments/extended-cli-metadata/retained-catalog-2026-10-07.md).
+
+## Native erased Value import (2026-10-07)
+
+Raven 801f131ba preserves native System.Value as a nominal value symbol with no CLR
+SpecialType. Its declaring assembly and parameter/return identity survive import;
+existing Runtime Contract ownership still selects its target meaning. No native format,
+reader, reflection surrogate, .NET default or bridge representation changes.
+
+A C# metadata-to-symbol regression reproduces the former Enum.Parse failure and now
+passes, alongside both erased-value ownership tests. The unchanged orders application
+against the full source-built native artifact reaches ArrayList<T> emission validation.
+The diagnostic now names the rejected type. The imported generic class uses the library's
+source Object root; reconcile consumer root selection next, without weakening checks.
+No consumer artifact was published and broad execution is not claimed.
+[Evidence](experiments/extended-cli-metadata/value-import-2026-10-07.md).
+
+## Source-owned orders acceptance (2026-10-07)
+
+Raven 3e5406d8f adds an explicit imported Object contract and --object-library selection.
+It validates a native public abstract fieldless baseless root, uses it for object lookup,
+source/imported generic bases and primitive-bootstrap base facts, and retains the explicit
+CLI primitive core for other bootstrap declarations. Missing, wrong, non-native, conflicting
+and .NET selections reject; ordinary .NET defaults are unchanged. Emission consumes
+semantic facts and host artifact identities, without reopening importer objects.
+
+The unchanged orders sample compiles through ordinary driver commands using only the
+full 197-input native library artifact, ownership manifest, primitive bootstrap and
+finalized retained seed. It verifies and runs with exact expected stdout, no stderr,
+and exit 0. Mutations, callbacks, query operations and shared identity are observable in
+the checked-in sample output. The source library is reused from the recorded aggregate
+audit; no source/consumer rewriting or CLI projection fallback participates.
+
+47 focused compiler regressions and native root semantic checks pass. Root catalog
+propagation to project/LSP configuration and separate production assembly packaging are
+next; this is not execution of every class-library API or removal of bootstrap inputs.
+[Acceptance and hashes](experiments/extended-cli-metadata/source-owned-orders-2026-10-07.md).
+
+### Runtime candidate packaging — 2026-10-07
+
+The existing native compiler/importer/emitter contracts also support the selected
+source library under `System.Runtime`, without Data, Networking or Web sources.
+All selected primitive, iteration, propagation, introspection, unit and failure
+owners move together in the generated ownership manifest. The source build uses
+`--source-object-root`; consumers use `--object-library System.Runtime` and a native
+reference. No CLI projection or new compiler mapping participates. The finalized
+retained service seed references the emitted Runtime artifact by identity/revision.
+[Build, execution and remaining packaging gates](experiments/extended-cli-metadata/runtime-split-2026-10-07.md).
+
+### Optional-library flags import — 2026-10-07
+
+Raven `eab5b3e7d` keeps the flags-enum semantic marker on the configured primitive
+bootstrap even when System.Runtime owns Object. Its native C# probe reproduces the
+prior failure and passes with both ordinary/imported roots; .NET loading is unchanged.
+The marker remains a temporary CLI bootstrap fact, not an implicit projection of
+application/library metadata. [Optional-library frontier](experiments/extended-cli-metadata/optional-library-frontier-2026-10-07.md).
+
+### Imported native Object override authoring — 2026-10-07
+
+Raven `d920e57c0` selects the output-owned external root before signatures are imported.
+The matching metadata API uses existing native aliases and preserves the primitive
+bootstrap separately. Manual/API and ordinary Raven consumers verify/run against
+System.Runtime with exit 42. No emitter access to importer objects or CLI fallback is
+added. [Contracts, commands and limits](experiments/extended-cli-metadata/imported-object-authoring-2026-10-07.md).
+
+### Imported erased carrier mapping — 2026-10-07
+
+Raven `74c50ad2f` registers System.Value from the selected root-owner assembly before
+bootstrap helper import. Metadata retains the explicit external owner and canonical
+Value encoding. Actual retained parsing/type-test/unpack services execute with success
+and error payload checks (42); no service stubs or new CLI projection participate.
+[Evidence and next blocker](experiments/extended-cli-metadata/imported-value-2026-10-07.md).
+
+### Imported Object virtual dispatch — 2026-10-07
+
+Raven `1c2ccd638` authors exact selected-root virtual slot references from symbols.
+The metadata API requires Callvirt and retains external identity while encoding native
+Object owner/name. Ordinary Raven calls through an object receiver execute all three
+derived overrides (42), without library sources or importer access during emission.
+[Validation and remaining Networking gap](experiments/extended-cli-metadata/imported-object-slots-2026-10-07.md).
+
+### Separate Networking and imported-root boxing — 2026-10-07
+
+Raven now supplies all three selected external Object slot contracts from symbols,
+regardless of called methods. Metadata validates completeness for boxing without
+requiring a competing seed Object. Runtime linking still validates the dependency.
+The optional class-library compiler invocation explicitly enables bootstrap intrinsics;
+ordinary consumer invocation does not. Unchanged network cancellation executes against
+independently built Runtime and Networking. Native import remains direct; the primitive
+bootstrap and finalized retained runtime services remain explicit dependencies.
+[Commands, evidence and remaining scope](experiments/extended-cli-metadata/separate-networking-2026-10-07.md).
+
+### Separate Data and array reflection — 2026-10-07
+
+Runtime exports the bounded ArrayReflection facade; ObjectMapper no longer calls
+internal array services across an assembly boundary. The native driver uses separate
+Runtime and Data references, with explicit selected Object ownership. Raven normalizes
+bootstrap Object type syntax to the selected native root, including parent-namespace
+lookup, while ordinary .NET behavior stays unchanged. Metadata authoring preserves
+canonical Object ownership for nonvirtual GetType as well as virtual slots.
+
+The CLI reference bridge adds matching ArrayReflection declarations/signature admission
+and source-library export selection solely to keep the existing reference/docs workflow
+aligned. The native gate executes Raven source implementations through native metadata,
+not those placeholder bodies. Array elements remain managed vectors; boxed scalars,
+reference identity and null retain existing storage semantics. Terminal array Faults
+are explicit development limits. See [the split Data gate](experiments/extended-cli-metadata/separate-data-2026-10-07.md).
+
+## Shared network deadlines across native libraries (2026-10-07)
+
+Networking owns the opaque NetworkDeadline value and public typed Until overloads.
+Web consumes these through ordinary native references, without reading internal clock
+stamps or RuntimeServices. The compiler remains at Raven 65f554a49; consumers explicitly
+select System.Runtime for Object and, when using async, its Task/builder symbols.
+The importer and emitter boundaries are unchanged.
+
+SocketBindings includes declaration-only CLI equivalents for the API reference and
+visibility checks. There is no new legacy CLI-to-neoIL translation mapping for this
+value or its overloads. Migrated HTTP sources require the native compilation path;
+these documentation declarations must not be treated as executable bridge support.
+Raw long overloads stay internal to applications. See the
+[separate Web evidence](experiments/extended-cli-metadata/separate-web-2026-10-07.md).
+
+## Canonical bootstrap unit syntax (2026-10-07)
+
+Raven e141006f3 normalizes namespace lookup of primitive-bootstrap System.Void to the
+explicit native RuntimeUnitContract owner. Qualified and unqualified spellings no longer
+make generic fields depend on lookup order or require a retained-seed Void declaration.
+Default .NET policy, unit/no-result distinction and native metadata validation are
+unchanged. Two forced-lookup regressions, 29 focused tests and six fresh separate Web
+compilations pass. See [evidence](experiments/extended-cli-metadata/unit-bootstrap-2026-10-07.md).
+General async unit-return corrections are owned by the Raven release task following the
+author's handoff instruction, and remain separate from this target-specific fix.
+
+## Native project Object owner (2026-10-07)
+
+Raven 0f85f53b8 supports RavenNeoClrObjectLibrary=System.Runtime in projects consuming
+the source-built runtime. Semantic loading and --run select the same registered native
+artifact; the project provider exposes ObjectRootPath and rejects missing/ambiguous
+names. Reference artifacts remain watched by the editor metadata loader. This adds no
+CLI projection or importer/emitter coupling. [Executable project gate](experiments/extended-cli-metadata/native-project-root-2026-10-07.md)
+passes against separate libraries. ProjectReference build orchestration remains next;
+this change does not claim full VS Code or packaged-release acceptance.
+
+
+## Native project dependency graphs (2026-10-07)
+
+Raven 3892b113a now builds ProjectReference libraries before their consumers. Workspace
+loading reads those prebuilt outputs through the native catalog, flattens explicit
+transitive dependencies and watches project/artifact/configuration inputs. No dependency
+sources or CLI projections enter the consumer. The provider owns bin/neoclr artifact
+placement and checks expected assembly names; catalog identity/digest checks remain.
+Cycles and incompatible targets reject, and a failing assembly retains its prior output.
+Successful earlier dependency builds are not rolled back if a later assembly fails.
+
+The executable diamond and C# loader contracts are recorded in the
+[project graph gate](experiments/extended-cli-metadata/native-project-graph-2026-10-07.md).
+Ordinary .NET project behavior is unchanged. This does not yet define Platform projects,
+a shipping layout or live VS Code acceptance; API/website rendering is unchanged.
+
+
+## Source-owned Runtime project (2026-10-07)
+
+Raven `eb5744ba4` adds `RavenNeoClrSourceObjectRoot=true`, the project equivalent of the native command's
+`--source-object-root`. It requires library output, excludes imported Object selection,
+and retains primitive/async ownership. Introspection follows the ownership manifest;
+there is no implicit seed introspection facade for a source-root bootstrap. Invalid
+boolean values, executable selection and conflicting imported roots reject.
+
+The [native Runtime project](../runtime/raven/projects/README.md) now builds the
+175 audited sources and executes unchanged orders through a separate native consumer.
+The primitive Core and compile-time retained seed are explicit inputs. Runtime execution
+requires a retained seed finalized against the new artifact. These are native semantic
+and emission contracts; no new CLI bridge representation is introduced. The legacy
+bridge project remains distinct. Public runtime APIs and website reference rendering
+are unchanged; see [evidence](experiments/extended-cli-metadata/native-runtime-project-2026-10-07.md).
+
+
+## Native class-library project bundle (2026-10-07)
+
+The checked-in Runtime/Data/Networking/Web projects now build through a staged host
+workflow. Raven `8fbacaa9f` provides `--no-build-references`: it compiles the selected
+project against existing native project artifacts without rebuilding dependencies.
+Graph/identity validation still applies; missing references reject without replacing
+consumer output. Default project builds remain dependency-first.
+
+The host builds Runtime, finalizes its retained seed, and builds higher-level libraries
+once in dependency order. It rejects any changed Runtime artifact and publishes the
+bundle manifest last. An earlier attempt that rebuilt Runtime after finalization changed
+its bytes and was rejected; deterministic output is not assumed. No importer/emitter
+coupling, new metadata encoding or CLI projection is involved. See the
+[project instructions](../runtime/raven/projects/README.md) and
+[executable evidence](experiments/extended-cli-metadata/native-class-library-bundle-2026-10-07.md).
+
+The staged artifacts pass five verify/run consumers and the ordinary-project HTTP
+consumer. Platform adapters remain in their current owning projects. Public signatures
+are unchanged; one unified API reference and live editor qualification of the split
+remain separate gates, as does an installable runtime/compiler distribution.
+
+
+## Relocatable bundle project configuration (2026-10-07)
+
+Class-library staging emits `NeoCLR.ClassLibrary.props` with relative native References,
+Core/seed/ownership paths and Runtime Object/async selection. Applications import this
+file into ordinary projects; it explicitly disables source-root and bootstrap-intrinsic
+authoring. It contains no absolute build-machine paths or source-library inclusion.
+The bundle manifest records its hash. This is explicit MSBuild configuration, not a
+new package resolver or implicit metadata projection.
+
+Raven `e93fcfdc1` includes native project .props/.targets imports in metadata input
+tracking. The native-enabled workspace loader and compiler consume the same evaluated
+configuration. C# checks verify owners across all four libraries, one primitive bootstrap,
+no dependency sources and transactional rejection. A relocated HTTP project with spaces
+in its SDK path executes successfully. See the
+[configuration gate](experiments/extended-cli-metadata/native-bundle-configuration-2026-10-07.md).
+Installed VS Code event/hover acceptance remains separate; this is headless workspace
+and ordinary compiler evidence. No public Runtime API or metadata encoding changes.
