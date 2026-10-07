@@ -161,3 +161,18 @@ The 390px, 768px and 1280px previews passed menu/Escape, theme/search visibility
 code-scroll alignment and overflow checks in both themes; all 18 website tests
 and the complete site build passed. These changes are staged locally for neoCLR;
 publication remains a separate action.
+
+## GitHub API source links
+
+The publisher at Raven revision `75cf59e24` supports site/per-API
+`sourceRepository` configuration. neoCLR indexes `runtime/raven/src` using Raven's
+parser and matches declarations to metadata types by namespace, nesting and
+generic arity. Type and member pages link the actual declaring files, preserving
+`NeoCLR.CoreProbe.dll` as assembly identity. Metadata links omit line numbers;
+partial types may show multiple files. Unmatched/generated types have no guessed
+source link. This does not change the reference assembly or native runtime.
+
+Validation: 55 focused RavenDoc tests, 18 website tests and a full site build;
+361 generated API pages contain source links. Browser checks followed Console
+from its type page to a member and verified the source link, assembly name and
+390px layout. Console, Int32 and ArrayList source URLs were checked on GitHub.

@@ -1,7 +1,7 @@
 {
   "repository": "https://github.com/marinasundstrom/raven.git",
-  "revision": "816b5d8a63e71891e364d98a470aa506debc1609",
+  "revision": "75cf59e24a3ba4654bd0a8ea2629455b6666c55c",
   "framework": "net10.0",
   "archive": "ravendoc-net10.0.zip",
-  "sha256": "b3a0b89e5dd40ca69a693a41732655d2e449867b26fd6799a315904b9e73c631"
+  "sha256": "0f817e645eeed31c1572465469e82a5c6a23f95bde06fb222abd81626c70e32f"
 }

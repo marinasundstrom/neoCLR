@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Add GitHub source-file links to API type/member pages through configurable shared
+  RavenDoc repository settings and Raven declaration indexing. Preserve assembly
+  names and omit links where no matching source declaration exists. Validate the
+  full site, 18 website tests and mobile type/member navigation.
+
 - Update RavenDoc with a mobile three-dot navbar menu beside theme/search controls
   and stationary copy buttons during horizontal code scrolling. Validate all 18
   website tests, generated pages and both themes at mobile/tablet/desktop widths.

@@ -452,6 +452,8 @@ def main():
     config = json.loads((SOURCE / 'site.json').read_text())
     if not config.get('notice') or not config.get('releaseUrl'):
         raise ValueError('The site must explain development/release availability and link the published release')
+    if config.get('sourceRepository'):
+        config['sourceRepository']['root'] = str((SOURCE / config['sourceRepository'].get('root', '.')).resolve())
     publisher_output = ROOT / 'target/website-rendered'
     config.update(output=str(publisher_output), api=str(ROOT / 'api-docs/reference/NeoCLR.CoreProbe.dll'),
                   apiContent=str(SOURCE / 'api-content'),

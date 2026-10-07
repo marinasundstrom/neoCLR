@@ -49,5 +49,13 @@
   ],
   "search": true,
   "copyCode": true,
-  "navigationScope": "section"
+  "navigationScope": "section",
+  "sourceRepository": {
+    "url": "https://github.com/marinasundstrom/neoCLR",
+    "revision": "main",
+    "root": "..",
+    "paths": [
+      "runtime/raven/src"
+    ]
+  }
 }
