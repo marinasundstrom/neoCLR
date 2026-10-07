@@ -698,3 +698,64 @@ fn reference_arena_is_explicit_and_does_not_admit_virtual_calls() {
     );
     assert!(!r.status.success() && !dir.0.join("app.o").exists());
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn packed_byte_arrays_bounds_borrows_and_faults_match_interpreter() {
+    let dir=Temp::new();
+    let source=include_str!("../../../docs/experiments/aot-console/byte-array.neoil");
+    let seed=neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let denied=compile_source(&dir,&seed,source,&["--compile-system"],false);
+    assert!(!denied.status.success() && !dir.0.join("app.o").exists());
+    let r=compile_source(&dir,&seed,source,&["--compile-system","--reference-arena"],false);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+#include <string.h>
+int main(int argc, char **argv) {
+    uint64_t storage[16]; memset(storage,0xa5,sizeof(storage));
+    neoclr_aot_context ctx={ .text={(unsigned char*)storage,17,0} };
+    int32_t result=-99;
+    if (neoclr_entry_v4(42,&result,&ctx) || result!=255 || ctx.text.used!=17) return 90;
+    for (unsigned i=17;i<sizeof(storage);i++) if (((unsigned char*)storage)[i]!=0xa5) return 91;
+    ctx.text.capacity=sizeof(storage);result=-99;
+    int input=argc>1 ? atoi(argv[1]) : 0;
+    int status=neoclr_entry_v4(input,&result,&ctx);
+    if (status) {
+        if (result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
+        neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
+    }
+    printf("%d\n",result);return 0;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"]).arg(base.join("aot-console"))
+        .arg(dir.0.join("host.c")).arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let app=neoclr::assemble(source).unwrap();
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for value in [-4,-3,-2,-1,0,1,2,3,4,42] {
+        let reference=method.invoke(vec![neoclr::Value::Int32(value)],neoclr::Limits::default());
+        let r=Command::new(dir.0.join("app")).arg(value.to_string()).env_clear().output().unwrap();
+        match reference {
+            Ok(result) => {
+                assert_eq!(r.status.code(),Some(0),"{value}: {r:?}");
+                let neoclr::Value::Int32(result)=result.value else { panic!("expected Int32") };
+                assert_eq!(r.stdout,format!("{result}\n").as_bytes());
+                assert!(r.stderr.is_empty());
+            }
+            Err(fault) => {
+                assert_eq!(r.status.code(),Some(1),"{value}: {r:?}");
+                assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string());
+            }
+        }
+    }
+    for (value,message) in [(65536,"NativeMemoryLimitExceeded: Native memory limit exceeded"),(65537,"ArrayLimitExceeded: Array limit exceeded")] {
+        let r=Command::new(dir.0.join("app")).arg(value.to_string()).env_clear().output().unwrap();
+        assert_eq!(r.status.code(),Some(1));
+        assert!(String::from_utf8_lossy(&r.stderr).starts_with(message));
+    }
+}

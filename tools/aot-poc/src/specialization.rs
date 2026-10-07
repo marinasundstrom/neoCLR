@@ -41,10 +41,11 @@ impl Specializer<'_> {
     }
     fn lower(&mut self, ty: &Type) -> Result<Type, Error> {
         let (name, arguments) = match ty {
-            Type::Int32 | Type::Byte | Type::Boolean | Type::Void | Type::Value | Type::String => {
+            Type::Int32 | Type::Byte | Type::Boolean | Type::Void | Type::Value | Type::String | Type::UIntPtr => {
                 return Ok(ty.clone());
             }
             Type::ByRef(t) => return Ok(Type::ByRef(Box::new(self.lower(t)?))),
+            Type::ArrayRef(t) if **t == Type::Byte => return Ok(ty.clone()),
             Type::Named(name) => (name, vec![]),
             Type::Constructed {
                 definition,
@@ -306,7 +307,8 @@ impl Specializer<'_> {
                 | Op::StoreObject(t)
                 | Op::PackValue(t)
                 | Op::IsValue(t)
-                | Op::UnpackValue(t) => {
+                | Op::UnpackValue(t)
+                | Op::NewArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t) | Op::ArrayAddress(t) => {
                     *t =
                         self.lower(&substitute(t, arguments, methods).map_err(|e| e.to_string())?)?
                 }

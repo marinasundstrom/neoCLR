@@ -62,7 +62,7 @@ impl Options {
 pub struct Data {
     frames: Vec<DataId>,
     messages: HashMap<(usize, usize), DataId>,
-    defaults: [DataId; 5],
+    defaults: [DataId; 7],
 }
 fn literal(module: &mut ObjectModule, name: &str, text: &str) -> Result<DataId, Error> {
     let id = module.declare_data(name, Linkage::Local, false, false)?;
@@ -118,6 +118,8 @@ impl Data {
             literal(module, "fault_native_memory",
                 neoclr::FaultCode::NativeMemoryLimitExceeded.standard_message().unwrap())?,
             literal(module, "fault_null_reference", neoclr::FaultCode::NullReference.standard_message().unwrap())?,
+            literal(module, "fault_array_limit", neoclr::FaultCode::ArrayLimitExceeded.standard_message().unwrap())?,
+            literal(module, "fault_index", neoclr::FaultCode::IndexOutOfRange.standard_message().unwrap())?,
         ];
         Ok(Self {
             frames,
@@ -154,7 +156,7 @@ pub struct Site {
     context: ir::Value,
     frame: ir::Value,
     pc: usize,
-    defaults: [ir::Value; 5],
+    defaults: [ir::Value; 7],
     pub message: Option<ir::Value>,
     pub capture_frame: bool,
 }
@@ -177,7 +179,11 @@ impl Site {
             let memory = b.ins().icmp_imm(IntCC::Equal, status, 5);
             let message = b.ins().select(memory, self.defaults[3], message);
             let null = b.ins().icmp_imm(IntCC::Equal, status, 6);
-            b.ins().select(null, self.defaults[4], message)
+            let message = b.ins().select(null, self.defaults[4], message);
+            let array = b.ins().icmp_imm(IntCC::Equal, status, 7);
+            let message = b.ins().select(array, self.defaults[5], message);
+            let index = b.ins().icmp_imm(IntCC::Equal, status, 8);
+            b.ins().select(index, self.defaults[6], message)
         };
         b.ins().store(MemFlags::new(), status, self.context, 0);
         b.ins().store(MemFlags::new(), message, self.context, 8);

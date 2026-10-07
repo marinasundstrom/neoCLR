@@ -13,6 +13,8 @@ pub(super) enum Ty {
     Literal, // Immutable image/explicit invocation-arena UTF-8; not a general managed String.
     Record(usize),
     Reference(usize),
+    ByteArray,
+    Size,
     Address(Box<Ty>),
 }
 impl Ty {
@@ -22,6 +24,7 @@ impl Ty {
 }
 pub(super) struct Profile<'a> {
     pub input: &'a neoclr::Module,
+    references: bool,
     layouts: Vec<Vec<usize>>,
     widths: Vec<usize>,
     names: HashMap<&'a str, Vec<usize>>,
@@ -71,10 +74,8 @@ impl<'a> Profile<'a> {
                 || t.fields.len() > 8
                 || t.fields.iter().any(|f| {
                     f.deferred
-                        || !matches!(
-                            f.ty,
-                            Type::Int32 | Type::Byte | Type::Boolean | Type::String | Type::Named(_)
-                        )
+                        || !(matches!(f.ty, Type::Int32 | Type::Byte | Type::Boolean | Type::String | Type::Named(_))
+                            || (references && matches!(&f.ty, Type::ArrayRef(t) if **t == Type::Byte)))
                 })
             {
                 return Err(format!("{}: value profile requires nongeneric records with at most eight Int32/Byte/Boolean/String/local-record fields", t.name).into());
@@ -82,6 +83,7 @@ impl<'a> Profile<'a> {
         }
         let mut p = Self {
             input,
+            references,
             layouts: vec![vec![]; input.types.len()],
             widths: vec![0; input.types.len()],
             names: HashMap::new(),
@@ -248,6 +250,8 @@ impl<'a> Profile<'a> {
             Type::Void => Ty::Unit,
             Type::Value => Ty::Erased,
             Type::String => Ty::Literal,
+            Type::UIntPtr => Ty::Size,
+            Type::ArrayRef(t) if **t == Type::Byte && self.references => Ty::ByteArray,
             Type::Named(name) => {
                 let i = self
                     .input
@@ -290,7 +294,7 @@ impl<'a> Profile<'a> {
     }
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
-            Ty::Literal | Ty::Address(_) | Ty::Reference(_) => vec![true],
+            Ty::Literal | Ty::Address(_) | Ty::Reference(_) | Ty::ByteArray | Ty::Size => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
             _ => vec![false; self.lanes(t)],
@@ -421,7 +425,8 @@ impl<'a> Profile<'a> {
                         .filter(|n| f.out_parameters.contains(n)),
                 ),
                 Op::ConvertInt32 | Op::ConvertUInt8 => (),
-                Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_) => {
+                Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_)
+                | Op::IsInstance(_) | Op::CastClass(_) | Op::ReferenceIsNull | Op::NewArray(_) | Op::ArrayLength => {
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
                     state.stack.push(None);
                 }
@@ -445,7 +450,14 @@ impl<'a> Profile<'a> {
                     state.stack.pop();
                     // Partial construction is deliberately outside this proof.
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
-                    state.stack.push(None);
+                    let shape = shapes[pc].as_ref().unwrap();
+                    if !matches!(shape[shape.len() - 2], Ty::Reference(_)) { state.stack.push(None); }
+                }
+                Op::ArrayElement(_) | Op::ArrayAddress(_) | Op::StoreArrayElement(_) => {
+                    if matches!(op, Op::StoreArrayElement(_)) { state.stack.pop(); }
+                    state.stack.pop();
+                    readable(state.stack.pop().unwrap(), &state.assigned)?;
+                    if !matches!(op, Op::StoreArrayElement(_)) { state.stack.push(None); }
                 }
                 Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                     let c = self.callee(target)?;
@@ -602,6 +614,7 @@ impl<'a> Profile<'a> {
                 | Op::Remainder
                 | Op::RemainderUnsigned => (),
                 Op::IsInstance(Type::String) | Op::CastClass(Type::String) | Op::ReferenceIsNull | Op::ReferenceEqual => (),
+                Op::NewArray(Type::Byte) | Op::ArrayElement(Type::Byte) | Op::StoreArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) | Op::ArrayLength if self.references => (),
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
                 }
@@ -632,7 +645,7 @@ impl<'a> Profile<'a> {
                 Op::Int(_) => stack.push(Ty::Int),
                 Op::String(_) => stack.push(Ty::Literal),
                 Op::ConvertInt32 | Op::ConvertUInt8 => {
-                    take(&mut stack, &Ty::Int)?;
+                    if !matches!(pop(&mut stack)?, Ty::Int | Ty::Size) { return Err(fail(pc, "conversion requires Int32 or array length")); }
                     stack.push(Ty::Int);
                 }
                 Op::Bool(_) => stack.push(Ty::Bool),
@@ -688,16 +701,34 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::Literal);
                 }
                 Op::ReferenceIsNull => {
-                    if !matches!(pop(&mut stack)?, Ty::Literal | Ty::Reference(_)) {
+                    if !matches!(pop(&mut stack)?, Ty::Literal | Ty::Reference(_) | Ty::ByteArray) {
                         return Err(fail(pc, "null test requires text or reference"));
                     }
                     stack.push(Ty::Bool);
                 }
                 Op::ReferenceEqual => {
                     let ty = pop(&mut stack)?;
-                    if !matches!(ty, Ty::Reference(_)) { return Err(fail(pc, "identity requires same reference type")); }
+                    if !matches!(ty, Ty::Reference(_) | Ty::ByteArray) { return Err(fail(pc, "identity requires same reference type")); }
                     take(&mut stack, &ty)?;
                     stack.push(Ty::Bool);
+                }
+                Op::NewArray(Type::Byte) => {
+                    take(&mut stack, &Ty::Int)?;
+                    stack.push(Ty::ByteArray);
+                }
+                Op::ArrayLength => {
+                    take(&mut stack, &Ty::ByteArray)?;
+                    stack.push(Ty::Size);
+                }
+                Op::ArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) => {
+                    take(&mut stack, &Ty::Int)?;
+                    take(&mut stack, &Ty::ByteArray)?;
+                    stack.push(if matches!(op, Op::ArrayAddress(_)) { Ty::Byte.address() } else { Ty::Int });
+                }
+                Op::StoreArrayElement(Type::Byte) => {
+                    take(&mut stack, &Ty::Int)?;
+                    take(&mut stack, &Ty::Int)?;
+                    take(&mut stack, &Ty::ByteArray)?;
                 }
                 Op::Field(n) | Op::FieldAddress(n) => {
                     let owner = pop(&mut stack)?;

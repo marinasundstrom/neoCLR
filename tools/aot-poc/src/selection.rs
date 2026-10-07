@@ -171,7 +171,8 @@ pub(super) fn select_inventory(
             | Op::StoreObject(t)
             | Op::PackValue(t)
             | Op::IsValue(t)
-            | Op::UnpackValue(t) = op
+            | Op::UnpackValue(t)
+            | Op::NewArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t) | Op::ArrayAddress(t) = op
             {
                 pending_types.push(t.clone());
             }
@@ -216,7 +217,8 @@ pub(super) fn select_inventory(
                 }
             }
             Type::ByRef(t) => pending_types.push(*t),
-            Type::Int32 | Type::Byte | Type::Boolean | Type::Void | Type::Value | Type::String => (),
+            Type::ArrayRef(t) if *t == Type::Byte => (),
+            Type::Int32 | Type::Byte | Type::Boolean | Type::Void | Type::Value | Type::String | Type::UIntPtr => (),
             _ => {
                 return Err(
                     "closed-world selection requires reference-free nongeneric value signatures"

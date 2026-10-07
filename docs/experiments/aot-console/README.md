@@ -238,3 +238,33 @@ and distinct stack location for each opcode. Negative interface and virtual test
 remain in place. This follows the existing neoCLR CIL/CLR call distinction and is
 a prerequisite for ordinary class consumers, not implementation of stream interface
 dispatch.
+
+## Packed byte arrays (2026-10-08)
+
+The reference-arena profile now supports managed `byte[]` (`arrayref<Byte>` in
+neoIL), with zero-initialized allocation, reference copies, length, checked indexed
+loads/stores and interior `Byte&` borrows. Array payloads are tightly packed; borrowed
+byte stores write exactly one byte even though ordinary private record slots remain
+eight-byte padded. Length uses the target UIntPtr lane and explicit Int32 conversion.
+The original verifier still governs typed indexing, initialization and borrows.
+
+The private allocation layout has a 16-byte header and a byte payload. It is not
+a stable ABI or a general CLR array layout. Arrays share the invocation lifetime
+and aliasing contract with objects. Negative lengths produce RuntimeError; null
+access produces NullReference; unsigned bounds checks catch negative and oversized
+indices as IndexOutOfRange. The experimental maximum is 65,536 payload bytes per
+array (ArrayLimitExceeded/status 7), separately from the host's total arena capacity
+(NativeMemoryLimitExceeded/status 5). IndexOutOfRange is status 8. Zero-length arrays
+are valid and still consume a header. Other element types/value arrays remain rejected.
+
+`byte-array.neoil` compares interpreter/native returns and exact fault diagnostics,
+including zero length, zeroed elements, negative lengths/indices, null, upper bounds
+and a borrowed byte at the allocation's last byte with surrounding canaries.
+`bytes.rvn` exercises shared indexed mutation and ordinary numeric Console output.
+`verify_interactive.py --arrays` and `arrays-validation.json` record fresh compilation,
+standalone deployment and broken-pipe fault parity. This supplies byte buffers needed
+by Console streams; Write/ReadLine still need interface dispatch and more library
+capabilities. As with .NET arrays, typed indexing is checked and reference assignment
+preserves shared storage; the invocation arena is a deliberately bounded alternative
+to the CLR managed heap, retaining unreachable arrays until reset. No performance
+or collection equivalence is claimed.

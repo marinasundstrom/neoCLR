@@ -185,3 +185,10 @@ storage. Status 6 denotes NullReference with the shared standard message; native
 field faults retain interpreter frame/instruction locations. Its objects and cycles
 expire on reset and cannot be exported through the Int32-only entry contract. It does
 not establish a stable object ABI or a general collection policy.
+
+The same experimental arena also admits packed byte arrays. Status 7 denotes
+ArrayLimitExceeded (the POC limits one array to 65,536 bytes); status 8 denotes
+IndexOutOfRange. Negative lengths retain RuntimeError, null array access retains
+NullReference, and insufficient invocation storage retains NativeMemoryLimitExceeded.
+All use shared standard messages and managed instruction locations. These bounds
+are experimental admission/resource policy, not a new platform-wide array limit.

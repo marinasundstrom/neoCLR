@@ -42,6 +42,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   to exact nonvirtual class members under the reference-arena opt-in, including its
   call-site null check. Preserve the distinct direct-call fault location and reject
   genuine virtual/interface dispatch, including bodyless interface declarations.
+  Add zero-initialized packed byte arrays to the explicit invocation-arena profile,
+  with aliasing, length, indexed loads/stores and one-byte interior borrows. Match
+  interpreter null/index/negative-length faults; report bounded array/native-memory
+  exhaustion without publishing a result. Validate empty arrays, byte-store canaries
+  and a fresh standalone Raven array/Console consumer. Other array element types
+  and stream/interface dispatch remain pending.
 
 ### 2026-10-07
 

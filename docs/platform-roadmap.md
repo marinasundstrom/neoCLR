@@ -98,8 +98,10 @@ payloads now use aligned mixed-width lanes, with String defaults/pattern tests a
 null-native-argument fault parity. An explicit bounded reference-arena profile now
 compiles nongeneric classes and preserves aliasing/cycles until invocation reset,
 with Raven class/Console evidence and interpreter null-fault parity. Exact nonvirtual
-class callvirt now preserves its separate call-site null check. Interface views/
-dispatch and array/stream support behind Write/ReadLine remain next; this region is
+class callvirt now preserves its separate call-site null check. Packed byte arrays
+now support zero initialization, aliasing, indexing, length and interior byte borrows,
+with interpreter fault parity and a standalone Raven Console consumer. Interface
+views/dispatch and broader stream support behind Write/ReadLine remain next; this region is
 not a replacement for general native collection. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later

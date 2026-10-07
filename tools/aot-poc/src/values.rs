@@ -23,10 +23,10 @@ fn read(
     t: &Ty,
     pointer: ir::Value,
 ) -> Vec<ir::Value> {
-    lanes(p, t).into_iter().enumerate()
-        .map(|(i, ty)| {
-            b.ins()
-                .load(ty, MemFlags::new(), pointer, i as i32 * 8)
+    lanes(p, t).into_iter().zip(p.byte_lanes(t)).enumerate()
+        .map(|(i, (ty, byte))| {
+            let value = b.ins().load(if byte { types::I8 } else { ty }, MemFlags::new(), pointer, i as i32 * 8);
+            if byte { b.ins().uextend(types::I32, value) } else { value }
         })
         .collect()
 }
@@ -59,7 +59,8 @@ fn write_typed(
     pointer: ir::Value,
     values: &[ir::Value],
 ) {
-    let values = normalize(b, p, t, values);
+    let values: Vec<_> = normalize(b, p, t, values).into_iter().zip(p.byte_lanes(t))
+        .map(|(value, byte)| if byte { b.ins().ireduce(types::I8, value) } else { value }).collect();
     write(b, pointer, &values);
 }
 fn slot(b: &mut FunctionBuilder<'_>, bytes: u32) -> ir::StackSlot {
@@ -138,6 +139,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.params.extend([AbiParam::new(types::I64), AbiParam::new(types::I32), AbiParam::new(types::I32), AbiParam::new(types::I64)]);
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_allocate_object_v1", Linkage::Import, &sig)?)
+    } else { None };
+    let array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::NewArray(_)))) {
+        let mut sig = module.make_signature();
+        sig.params.extend([AbiParam::new(types::I64), AbiParam::new(types::I32), AbiParam::new(types::I64)]);
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_allocate_bytes_v1", Linkage::Import, &sig)?)
     } else { None };
     let mut ids = vec![];
     for (i, _) in input.functions.iter().enumerate() {
@@ -308,9 +315,15 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let equal = b.ins().icmp(IntCC::Equal, left, right);
                         stack.push(b.ins().uextend(types::I32, equal));
                     }
-                    Op::ConvertInt32 => (),
+                    Op::ConvertInt32 => {
+                        if matches!(top(), Ty::Size) {
+                            let value = pop(&mut stack);
+                            stack.push(b.ins().ireduce(types::I32, value));
+                        }
+                    }
                     Op::ConvertUInt8 => {
                         let value = pop(&mut stack);
+                        let value = if matches!(top(), Ty::Size) { b.ins().ireduce(types::I32, value) } else { value };
                         stack.push(b.ins().band_imm(value, 255));
                     }
                     Op::Bool(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
@@ -400,6 +413,44 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let value = stack.split_off(stack.len() - p.lanes(&ty));
                         stack.extend(normalize(&mut b, &p, &ty, &value));
                     }
+                    Op::NewArray(neoclr::metadata::Type::Byte) => {
+                        let count = pop(&mut stack);
+                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        let output = b.ins().stack_addr(types::I64, call_result, 0);
+                        let service = module.declare_func_in_func(array_service.unwrap(), b.func);
+                        let call = b.ins().call(service, &[arena, count, output]);
+                        let status = b.inst_results(call)[0];
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        return_if_detailed(&mut b, failed, status, site.as_ref());
+                        stack.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
+                    }
+                    Op::ArrayLength => {
+                        let array = pop(&mut stack);
+                        null_reference(&mut b, array, site.as_ref());
+                        stack.push(b.ins().load(types::I64, MemFlags::new(), array, 8));
+                    }
+                    Op::ArrayElement(neoclr::metadata::Type::Byte) | Op::ArrayAddress(neoclr::metadata::Type::Byte) | Op::StoreArrayElement(neoclr::metadata::Type::Byte) => {
+                        let value = if matches!(op, Op::StoreArrayElement(_)) { Some(pop(&mut stack)) } else { None };
+                        let index = pop(&mut stack);
+                        let array = pop(&mut stack);
+                        null_reference(&mut b, array, site.as_ref());
+                        let length = b.ins().load(types::I32, MemFlags::new(), array, 8);
+                        let outside = b.ins().icmp(IntCC::UnsignedGreaterThanOrEqual, index, length);
+                        let status = b.ins().iconst(types::I32, 8);
+                        return_if_detailed(&mut b, outside, status, site.as_ref());
+                        let offset = b.ins().uextend(types::I64, index);
+                        let data = b.ins().iadd_imm(array, 16);
+                        let address = b.ins().iadd(data, offset);
+                        if let Some(value) = value {
+                            let byte = b.ins().ireduce(types::I8, value);
+                            b.ins().store(MemFlags::new(), byte, address, 0);
+                        } else if matches!(op, Op::ArrayAddress(_)) {
+                            stack.push(address);
+                        } else {
+                            let byte = b.ins().load(types::I8, MemFlags::new(), address, 0);
+                            stack.push(b.ins().uextend(types::I32, byte));
+                        }
+                    }
                     Op::Field(n) | Op::FieldAddress(n) => {
                         let field = p.field(top(), *n)?;
                         let offset = p.field_offset(top(), *n);
@@ -433,7 +484,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                                 8
                             } else { 0 };
                             let address = b.ins().iadd_imm(owner, (header + offset * 8) as i64);
-                            write(&mut b, address, &value);
+                            write_typed(&mut b, &p, &p.field(&shape[shape.len() - 2], *n)?, address, &value);
                             if !is_reference { stack.push(b.ins().iconst(types::I32, 0)); } // borrowed value store returns Void
                         } else {
                             let start = stack.len() - p.lanes(owner) + offset;

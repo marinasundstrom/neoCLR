@@ -3,6 +3,8 @@
 #include "../aot-fault-details/fault-details.h"
 #define NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT 5
 #define NEOCLR_AOT_FAULT_NULL_REFERENCE 6
+#define NEOCLR_AOT_FAULT_ARRAY_LIMIT 7
+#define NEOCLR_AOT_FAULT_INDEX_OUT_OF_RANGE 8
 /* Experimental ABI v4. Host owns an aligned writable buffer for this invocation.
  * The buffer must not overlap context/result and must cover capacity bytes.
  * All arena text is immutable after creation and expires at the next entry call
@@ -33,4 +35,7 @@ int32_t neoclr_int32_to_string_v1(int32_t value, neoclr_aot_text_arena *arena,
  */
 int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
                                 uint32_t bytes, void **output);
+/* Packed byte arrays, zero-initialized, length 0..65536. Negative length is
+ * RuntimeError (matching the interpreter); excessive length is ArrayLimitExceeded. */
+int32_t neoclr_allocate_bytes_v1(neoclr_aot_text_arena *arena, int32_t length, void **output);
 #endif

@@ -1,0 +1,78 @@
+.module ByteArrays
+.function Fill(out Byte& target, Int32 value) -> Void
+ldarg target
+ldarg value
+conv.u1
+stobj Byte
+ldvoid
+ret
+.end
+.function Calculate(Int32 input) -> Int32
+.local arrayref<Byte> bytes
+ldarg input
+ldc.i4 -4
+beq Empty
+ldarg input
+ldc.i4 -3
+beq Null
+ldarg input
+ldc.i4 42
+beq Single
+ldarg input
+ldc.i4 -2
+beq Allocate
+ldarg input
+ldc.i4 4
+bge Allocate
+ldc.i4 3
+newarr Byte
+stloc bytes
+ldloc bytes
+ldc.i4 0
+ldc.i4 298
+conv.u1
+stelem Byte
+ldloc bytes
+ldc.i4 1
+ldelema Byte
+ldc.i4 255
+call Fill(Byte&, Int32)
+pop
+ldloc bytes
+ldarg input
+ldelem Byte
+ret
+Single:
+ldc.i4 1
+newarr Byte
+stloc bytes
+ldloc bytes
+ldc.i4 0
+ldelema Byte
+ldc.i4 511
+call Fill(Byte&, Int32)
+pop
+ldloc bytes
+ldc.i4 0
+ldelem Byte
+ret
+Allocate:
+ldarg input
+newarr Byte
+ldlen
+conv.i4
+ret
+Empty:
+ldc.i4 0
+newarr Byte
+ldlen
+conv.i4
+ret
+Null:
+ldloca bytes
+initobj arrayref<Byte>
+ldloc bytes
+ldlen
+conv.i4
+ret
+.end

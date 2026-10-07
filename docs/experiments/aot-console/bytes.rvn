@@ -1,0 +1,12 @@
+import System.*
+
+func Main() -> int {
+    let bytes: byte[] = [(byte)42, (byte)0, (byte)255]
+    let alias = bytes
+    alias[1] = (byte)7
+    Console.WriteLine(bytes[0])
+    Console.WriteLine(bytes[1])
+    Console.WriteLine(bytes[2])
+    Console.WriteLine(bytes.Length)
+    return 0
+}

@@ -251,8 +251,10 @@ uses a bounded invocation-owned text arena with explicit lifetime and exhaustion
 behavior. Copied String-bearing records and String-valued Some/None patterns now
 compile with null-default and fault checks. An explicit invocation-arena experiment
 now supports nongeneric reference classes and aliasing, reclaiming the whole graph
-at reset, with distinct direct-call and nonvirtual callvirt null behavior. General
-collection, interface dispatch, arrays, wider numeric text, ReadLine
+at reset, with distinct direct-call and nonvirtual callvirt null behavior. Packed byte
+arrays now support bounded allocation, shared mutation, length and checked indexing,
+including one-byte interior borrows; other array kinds remain unsupported. General
+collection, interface dispatch, wider numeric text, ReadLine
 and the broader Console stream surface remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked

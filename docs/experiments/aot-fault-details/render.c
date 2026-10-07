@@ -10,7 +10,9 @@ int neoclr_aot_render_fault(FILE *stream, const neoclr_aot_fault *fault) {
                            fault->code == 3 ? "RuntimeError" :
                            fault->code == 4 ? "UserFault" :
                            fault->code == 5 ? "NativeMemoryLimitExceeded" :
-                           fault->code == 6 ? "NullReference" : "UnknownFault";
+                           fault->code == 6 ? "NullReference" :
+                           fault->code == 7 ? "ArrayLimitExceeded" :
+                           fault->code == 8 ? "IndexOutOfRange" : "UnknownFault";
     fprintf(stream, "%s: ", category);
     text(stream, fault->message);
     fputc('\n', stream);
