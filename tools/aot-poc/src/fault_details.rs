@@ -13,11 +13,13 @@ pub struct Options {
     pub console_read_byte: Vec<usize>,
     pub console_write_line: Vec<usize>,
     pub int32_to_string: Vec<usize>,
+    pub reference_arena: bool,
     pub frame_names: HashMap<usize, String>,
 }
 impl Options {
     pub fn from_report(report: Option<&serde_json::Value>) -> Self {
         Self {
+            reference_arena: report.is_some_and(|r| r["referenceArena"] == true),
             frame_names: report
                 .and_then(|r| r["functions"].as_array())
                 .into_iter()
@@ -60,7 +62,7 @@ impl Options {
 pub struct Data {
     frames: Vec<DataId>,
     messages: HashMap<(usize, usize), DataId>,
-    defaults: [DataId; 4],
+    defaults: [DataId; 5],
 }
 fn literal(module: &mut ObjectModule, name: &str, text: &str) -> Result<DataId, Error> {
     let id = module.declare_data(name, Linkage::Local, false, false)?;
@@ -115,6 +117,7 @@ impl Data {
             )?,
             literal(module, "fault_native_memory",
                 neoclr::FaultCode::NativeMemoryLimitExceeded.standard_message().unwrap())?,
+            literal(module, "fault_null_reference", neoclr::FaultCode::NullReference.standard_message().unwrap())?,
         ];
         Ok(Self {
             frames,
@@ -151,7 +154,7 @@ pub struct Site {
     context: ir::Value,
     frame: ir::Value,
     pc: usize,
-    defaults: [ir::Value; 4],
+    defaults: [ir::Value; 5],
     pub message: Option<ir::Value>,
     pub capture_frame: bool,
 }
@@ -172,7 +175,9 @@ impl Site {
             let divide = b.ins().icmp_imm(IntCC::Equal, status, 1);
             let message = b.ins().select(divide, self.defaults[0], other);
             let memory = b.ins().icmp_imm(IntCC::Equal, status, 5);
-            b.ins().select(memory, self.defaults[3], message)
+            let message = b.ins().select(memory, self.defaults[3], message);
+            let null = b.ins().icmp_imm(IntCC::Equal, status, 6);
+            b.ins().select(null, self.defaults[4], message)
         };
         b.ins().store(MemFlags::new(), status, self.context, 0);
         b.ins().store(MemFlags::new(), message, self.context, 8);

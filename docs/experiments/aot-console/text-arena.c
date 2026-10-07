@@ -19,3 +19,20 @@ int32_t neoclr_int32_to_string_v1(int32_t value, neoclr_aot_text_arena *arena,
     *output = text;
     return NEOCLR_AOT_FAULT_NONE;
 }
+
+int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
+                                uint32_t bytes, void **output) {
+    if (arena->used > arena->capacity || (arena->capacity && !arena->data) ||
+        ((uintptr_t)arena->data & 7) || bytes < 8 || bytes > 72 || (bytes & 7))
+        return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t padding = (8 - (arena->used & 7)) & 7;
+    uint64_t needed = padding + bytes;
+    if (needed > arena->capacity - arena->used) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    unsigned char *object = arena->data + arena->used + padding;
+    uint64_t identity = type;
+    memcpy(object, &identity, sizeof(identity));
+    memset(object + 8, 0, bytes - 8);
+    arena->used += needed;
+    *output = object;
+    return NEOCLR_AOT_FAULT_NONE;
+}

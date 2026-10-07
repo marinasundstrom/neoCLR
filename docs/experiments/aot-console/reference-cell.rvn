@@ -1,0 +1,21 @@
+import System.*
+
+class Cell {
+    var Value: int = 40
+    var Text: string = "original"
+
+    func Bump() -> int {
+        Value += 1
+        return Value
+    }
+}
+
+func Main() -> int {
+    let original = Cell()
+    let alias = original
+    alias.Bump()
+    alias.Text = "shared change"
+    Console.WriteLine(original.Text)
+    Console.WriteLine(original.Bump())
+    return 0
+}

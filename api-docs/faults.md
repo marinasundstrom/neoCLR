@@ -179,3 +179,9 @@ next entry call or releasing that buffer. Frame names and runtime messages remai
 image-owned. Each concurrent invocation needs distinct context and buffer storage.
 This is an experimental C hosting contract, not a Raven guest API or stable native ABI.
 See the [full contract and header](../docs/experiments/aot-console/README.md#numeric-output-and-text-lifetime-2026-10-08).
+
+The optional reference-arena profile uses the same ABI v4 context for bounded object
+storage. Status 6 denotes NullReference with the shared standard message; native
+field faults retain interpreter frame/instruction locations. Its objects and cycles
+expire on reset and cannot be exported through the Int32-only entry contract. It does
+not establish a stable object ABI or a general collection policy.

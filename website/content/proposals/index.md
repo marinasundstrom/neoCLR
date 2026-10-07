@@ -249,8 +249,10 @@ input/output app now compiles ordinary string, Boolean and empty-line WriteLine
 wrappers, with interpreter/native broken-pipe fault parity. Int32/byte formatting now
 uses a bounded invocation-owned text arena with explicit lifetime and exhaustion
 behavior. Copied String-bearing records and String-valued Some/None patterns now
-compile with null-default and fault checks. General managed memory, wider numeric
-text, ReadLine and the broader Console stream surface remain future work. An explicit failure binding now preserves
+compile with null-default and fault checks. An explicit invocation-arena experiment
+now supports nongeneric reference classes and aliasing, reclaiming the whole graph
+at reset. General collection, interface dispatch, arrays, wider numeric text, ReadLine
+and the broader Console stream surface remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked
 renderer and standalone exit-1 failure app are validated. Interpreter CLI execution

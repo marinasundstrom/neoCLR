@@ -33,7 +33,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   aligned private storage, null defaults and exact String pattern tests. Guard null
   native text arguments with interpreter-compatible fault diagnostics. Validate nested
   copies/interior output borrows and fresh Raven Some/None<string> patterns. General
-  reference objects, array storage and stream dispatch remain unsupported.
+  reference objects initially remained unsupported; a following explicit
+  `--reference-arena` slice admits bounded nongeneric classes, constructors, shared
+  fields, output copies and identity in ABI v4. Preserve aliases/self-cycles until
+  region reset and match interpreter null-field fault traces; validate exhaustion,
+  repeated reuse and a fresh Raven class/Console consumer. There is no per-object GC,
+  inheritance, virtual/interface dispatch or array support yet.
 
 ### 2026-10-07
 

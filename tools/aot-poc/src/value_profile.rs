@@ -12,6 +12,7 @@ pub(super) enum Ty {
     Erased,
     Literal, // Immutable image/explicit invocation-arena UTF-8; not a general managed String.
     Record(usize),
+    Reference(usize),
     Address(Box<Ty>),
 }
 impl Ty {
@@ -42,7 +43,7 @@ pub(super) fn erased_tag(ty: &Type) -> Result<i64, Error> {
 }
 
 impl<'a> Profile<'a> {
-    pub fn new(input: &'a neoclr::Module) -> Result<Self, Error> {
+    pub fn new(input: &'a neoclr::Module, references: bool) -> Result<Self, Error> {
         if input.name == "System" || input.types.len() > 32 || input.functions.len() > 128 {
             return Err(
                 "value profile requires an application with at most 32 types and 128 functions"
@@ -58,7 +59,7 @@ impl<'a> Profile<'a> {
                 .into());
             }
             let static_owner = crate::selection::static_owner(t);
-            if (t.is_reference_type && !static_owner)
+            if (t.is_reference_type && !static_owner && !references)
                 || t.representation != Representation::Record
                 || t.enum_info.is_some()
                 || t.base.is_some()
@@ -154,14 +155,15 @@ impl<'a> Profile<'a> {
                     // Static owner contributes identity/access only, with no receiver.
                 } else {
                     let ty = p.ty(owner)?;
-                    if !matches!(ty, Ty::Record(_)) {
+                    if !matches!(ty, Ty::Record(_) | Ty::Reference(_)) {
                         return Err("value member requires a local record owner".into());
                     }
                     if f.instance {
-                        if !f.receiver_byref {
-                            return Err("value member requires a by-reference receiver".into());
+                        match ty {
+                            Ty::Reference(_) if !f.receiver_byref => args.push(ty),
+                            Ty::Record(_) if f.receiver_byref => args.push(ty.address()),
+                            _ => return Err("receiver representation does not match value/reference owner".into()),
                         }
-                        args.push(ty.address());
                     } else if f.receiver_byref {
                         return Err("static member cannot have a by-reference receiver".into());
                     }
@@ -248,12 +250,10 @@ impl<'a> Profile<'a> {
                     .iter()
                     .position(|t| &t.name == name)
                     .ok_or("value profile requires a local named record")?;
-                if self.input.types[i].is_reference_type {
-                    return Err(
-                        "static owners cannot be used as values or instance receivers".into(),
-                    );
+                if crate::selection::static_owner(&self.input.types[i]) {
+                    return Err("static owners cannot be used as values or instance receivers".into());
                 }
-                Ty::Record(i)
+                if self.input.types[i].is_reference_type { Ty::Reference(i) } else { Ty::Record(i) }
             }
             _ => {
                 return Err(
@@ -285,7 +285,7 @@ impl<'a> Profile<'a> {
     }
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
-            Ty::Literal | Ty::Address(_) => vec![true],
+            Ty::Literal | Ty::Address(_) | Ty::Reference(_) => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
             _ => vec![false; self.lanes(t)],
@@ -303,24 +303,28 @@ impl<'a> Profile<'a> {
         // records remain aligned. This is not an external aggregate ABI.
         self.lanes(t) as u32 * 8
     }
+    pub fn object_bytes(&self, index: usize) -> u32 { 8 + self.widths[index] as u32 * 8 }
     pub fn field_offset(&self, t: &Ty, index: usize) -> usize {
         let t = if let Ty::Address(t) = t {
             t.as_ref()
         } else {
             t
         };
-        let Ty::Record(owner) = t else {
+        let (Ty::Record(owner) | Ty::Reference(owner)) = t else {
             unreachable!("checked field owner")
         };
         self.layouts[*owner][index]
     }
     pub fn field(&self, t: &Ty, index: usize) -> Result<Ty, Error> {
+        if matches!(t, Ty::Address(inner) if matches!(**inner, Ty::Reference(_))) {
+            return Err("load a borrowed reference slot before accessing object fields".into());
+        }
         let t = if let Ty::Address(t) = t {
             t.as_ref()
         } else {
             t
         };
-        let Ty::Record(owner) = t else {
+        let (Ty::Record(owner) | Ty::Reference(owner)) = t else {
             return Err("field access requires a value record".into());
         };
         self.ty(&self.input.types[*owner]
@@ -591,7 +595,7 @@ impl<'a> Profile<'a> {
                 | Op::DivideUnsigned
                 | Op::Remainder
                 | Op::RemainderUnsigned => (),
-                Op::IsInstance(Type::String) | Op::CastClass(Type::String) | Op::ReferenceIsNull => (),
+                Op::IsInstance(Type::String) | Op::CastClass(Type::String) | Op::ReferenceIsNull | Op::ReferenceEqual => (),
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
                 }
@@ -666,7 +670,7 @@ impl<'a> Profile<'a> {
                 Op::New(t) => {
                     let t = self.ty(t)?;
                     let Ty::Record(owner) = t else {
-                        return Err(fail(pc, "newobj requires a record"));
+                        return Err(fail(pc, "reference allocation requires a constructor"));
                     };
                     for f in self.input.types[owner].fields.iter().rev() {
                         take(&mut stack, &self.ty(&f.ty)?)?;
@@ -678,14 +682,22 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::Literal);
                 }
                 Op::ReferenceIsNull => {
-                    take(&mut stack, &Ty::Literal)?;
+                    if !matches!(pop(&mut stack)?, Ty::Literal | Ty::Reference(_)) {
+                        return Err(fail(pc, "null test requires text or reference"));
+                    }
+                    stack.push(Ty::Bool);
+                }
+                Op::ReferenceEqual => {
+                    let ty = pop(&mut stack)?;
+                    if !matches!(ty, Ty::Reference(_)) { return Err(fail(pc, "identity requires same reference type")); }
+                    take(&mut stack, &ty)?;
                     stack.push(Ty::Bool);
                 }
                 Op::Field(n) | Op::FieldAddress(n) => {
                     let owner = pop(&mut stack)?;
                     let t = self.field(&owner, *n)?;
                     if matches!(op, Op::FieldAddress(_)) {
-                        if !matches!(owner, Ty::Address(_)) {
+                        if !matches!(owner, Ty::Address(_) | Ty::Reference(_)) {
                             return Err(fail(pc, "field address requires a borrowed record"));
                         }
                         stack.push(t.address());
@@ -699,11 +711,9 @@ impl<'a> Profile<'a> {
                     if Self::stack_type(&self.field(&owner, *n)?) != value {
                         return Err(fail(pc, "field store type mismatch"));
                     }
-                    stack.push(if matches!(owner, Ty::Address(_)) {
-                        Ty::Unit
-                    } else {
-                        owner
-                    });
+                    if !matches!(owner, Ty::Reference(_)) {
+                        stack.push(if matches!(owner, Ty::Address(_)) { Ty::Unit } else { owner });
+                    }
                 }
                 Op::Call(target) | Op::Construct(target) => {
                     let c = self.callee(target)?;

@@ -69,8 +69,15 @@ fn args(values: &[ir::Value]) -> Vec<ir::BlockArg> {
     values.iter().copied().map(Into::into).collect()
 }
 
+fn null_reference(b: &mut FunctionBuilder<'_>, pointer: ir::Value, site: Option<&crate::fault_details::Site>) {
+    let null = b.ins().icmp_imm(IntCC::Equal, pointer, 0);
+    let status = b.ins().iconst(types::I32, 6);
+    return_if_detailed(b, null, status, site);
+}
+
 pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
-    let p = Profile::new(input)?;
+    let references = details.is_some_and(|d| d.reference_arena);
+    let p = Profile::new(input, references)?;
     let root = p.root(root)?;
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))
@@ -119,12 +126,18 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_console_write_line_utf8_v1", Linkage::Import, &sig)?)
     } else { None };
-    let text_arena = details.is_some_and(|d| !d.int32_to_string.is_empty());
-    let format_service = if text_arena {
+    let text_arena = references || details.is_some_and(|d| !d.int32_to_string.is_empty());
+    let format_service = if details.is_some_and(|d| !d.int32_to_string.is_empty()) {
         let mut sig = module.make_signature();
         sig.params.extend([AbiParam::new(types::I32), AbiParam::new(types::I64), AbiParam::new(types::I64)]);
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_int32_to_string_v1", Linkage::Import, &sig)?)
+    } else { None };
+    let object_service = if references && input.types.iter().any(|t| t.is_reference_type && !crate::selection::static_owner(t)) {
+        let mut sig = module.make_signature();
+        sig.params.extend([AbiParam::new(types::I64), AbiParam::new(types::I32), AbiParam::new(types::I32), AbiParam::new(types::I64)]);
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_allocate_object_v1", Linkage::Import, &sig)?)
     } else { None };
     let mut ids = vec![];
     for (i, _) in input.functions.iter().enumerate() {
@@ -289,6 +302,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let is_null = b.ins().icmp_imm(IntCC::Equal, value, 0);
                         stack.push(b.ins().uextend(types::I32, is_null));
                     }
+                    Op::ReferenceEqual => {
+                        let right = pop(&mut stack);
+                        let left = pop(&mut stack);
+                        let equal = b.ins().icmp(IntCC::Equal, left, right);
+                        stack.push(b.ins().uextend(types::I32, equal));
+                    }
                     Op::ConvertInt32 => (),
                     Op::ConvertUInt8 => {
                         let value = pop(&mut stack);
@@ -384,9 +403,13 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     Op::Field(n) | Op::FieldAddress(n) => {
                         let field = p.field(top(), *n)?;
                         let offset = p.field_offset(top(), *n);
-                        if matches!(top(), Ty::Address(_)) {
+                        if matches!(top(), Ty::Address(_) | Ty::Reference(_)) {
                             let owner = pop(&mut stack);
-                            let address = b.ins().iadd_imm(owner, (offset * 8) as i64);
+                            let header = if matches!(top(), Ty::Reference(_)) {
+                                null_reference(&mut b, owner, site.as_ref());
+                                8
+                            } else { 0 };
+                            let address = b.ins().iadd_imm(owner, (header + offset * 8) as i64);
                             if matches!(op, Op::FieldAddress(_)) {
                                 stack.push(address);
                             } else {
@@ -402,11 +425,16 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let owner = &shape[shape.len() - 2];
                         let offset = p.field_offset(owner, *n);
                         let value = normalize(&mut b, &p, &p.field(owner, *n)?, &value);
-                        if matches!(owner, Ty::Address(_)) {
+                        if matches!(owner, Ty::Address(_) | Ty::Reference(_)) {
+                            let is_reference = matches!(owner, Ty::Reference(_));
                             let owner = pop(&mut stack);
-                            let address = b.ins().iadd_imm(owner, (offset * 8) as i64);
+                            let header = if is_reference {
+                                null_reference(&mut b, owner, site.as_ref());
+                                8
+                            } else { 0 };
+                            let address = b.ins().iadd_imm(owner, (header + offset * 8) as i64);
                             write(&mut b, address, &value);
-                            stack.push(b.ins().iconst(types::I32, 0)); // inhabited Void
+                            if !is_reference { stack.push(b.ins().iconst(types::I32, 0)); } // borrowed value store returns Void
                         } else {
                             let start = stack.len() - p.lanes(owner) + offset;
                             stack[start..start + value.len()].copy_from_slice(&value);
@@ -424,9 +452,26 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let constructed = if construct {
                             let t = p.ty(target.owner.as_ref().unwrap())?;
                             let address = b.ins().stack_addr(types::I64, constructors[&pc], 0);
-                            let zeros: Vec<_> = lanes(&p, &t).into_iter().map(|t| b.ins().iconst(t, 0)).collect();
-                            write(&mut b, address, &zeros);
-                            call_args.insert(0, address);
+                            let receiver = if let Ty::Reference(index) = t {
+                                let service = module.declare_func_in_func(object_service.unwrap(), b.func);
+                                let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                                let type_id = b.ins().iconst(types::I32, index as i64);
+                                let bytes = b.ins().iconst(types::I32, p.object_bytes(index) as i64);
+                                let call = b.ins().call(service, &[arena, type_id, bytes, address]);
+                                let raw = b.inst_results(call)[0];
+                                let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                                let memory = b.ins().iconst(types::I32, 5);
+                                let runtime = b.ins().iconst(types::I32, 3);
+                                let status = b.ins().select(exhausted, memory, runtime);
+                                let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                                return_if_detailed(&mut b, failed, status, site.as_ref());
+                                b.ins().load(types::I64, MemFlags::new(), address, 0)
+                            } else {
+                                let zeros: Vec<_> = lanes(&p, &t).into_iter().map(|t| b.ins().iconst(t, 0)).collect();
+                                write(&mut b, address, &zeros);
+                                address
+                            };
+                            call_args.insert(0, receiver);
                             Some((t, address))
                         } else {
                             None

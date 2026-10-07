@@ -183,3 +183,41 @@ neoCLR's String-valued Option/Result APIs; it does not claim a general GC-compat
 layout or collection policy. It trades larger padded private storage for a simple
 mixed-width implementation. No performance advantage is asserted. ReadLine remains
 an ordinary stream-library consumer and is not replaced with a special Console body.
+
+## Bounded reference storage (2026-10-08)
+
+`--reference-arena` explicitly admits nongeneric, nonabstract reference classes with
+no inheritance or virtual dispatch, using ABI v4's existing caller-owned storage.
+Each allocation contains a private type index and up to eight padded field lanes.
+Ordinary constructors, direct instance calls, fields, interior field borrows, output
+reference copies, null defaults and same-type reference identity compile natively.
+String and reference fields retain pointers; copying an object reference preserves
+aliasing rather than copying its payload. Original verifier access/initialization and
+borrow checks still run before projection. Unopted reference code remains rejected.
+
+All objects, including cycles, live until the next entry resets the invocation region
+or the host releases it. There is no per-object reclamation, external-resource cleanup,
+reference counting or native tracing collector. A long-running stream program will
+need reclamation beyond this bounded experiment. The Int32 root and absence of static
+storage/host object exports prevent guest graphs from escaping this profile. The
+region may hold both objects and formatted text; each concurrent invocation still
+needs separate storage. Exhaustion preserves output storage and reports status 5.
+Null field access reports status 6, NullReference, with the shared message and frames.
+Direct `call` retains interpreter semantics: a null receiver faults when its body
+dereferences it; `callvirt` null checks/dispatch are not silently substituted.
+
+`reference-cell.neoil` tests shared mutations, output copies, self-cycles, null field
+trace parity, exhaustion and repeated region reuse with canaries. The fresh Raven
+`reference-cell.rvn` adds class accessors, a shared String field and numeric Console
+output. `verify_interactive.py --references` and `references-validation.json` record
+standalone output/fault parity against the pinned bundle. This is a storage foundation
+for Console's ordinary stream objects, not completion of Write/ReadLine. Interface
+views/dispatch, inheritance, arrays, generic reference classes and general managed
+collection remain rejected.
+
+The .NET/tracing comparison and cycle requirements remain those in the
+[native ownership investigation](../../native-execution-investigation.md#reference-counting-as-an-early-native-experiment-2026-10-07).
+An invocation region is useful here because no object can outlive the call; it avoids
+adding incomplete retain/release behavior and reclaims cycles together. The cost is
+retaining unreachable objects until reset. That bound must not be presented as normal
+GC behavior or a production strategy. No speed or memory-efficiency claim is made.

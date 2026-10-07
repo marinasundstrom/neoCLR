@@ -587,3 +587,102 @@ fn default_text_and_null_native_arguments_match_interpreter() {
         assert!(r.stdout.is_empty());
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn bounded_reference_aliases_cycles_null_faults_and_reuse_match_interpreter() {
+    let dir = Temp::new();
+    let source = include_str!("../../../docs/experiments/aot-console/reference-cell.neoil");
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let denied = compile_source(&dir, &seed, source, &["--compile-system"], false);
+    assert!(!denied.status.success() && !dir.0.join("app.o").exists());
+    let r = compile_source(
+        &dir,
+        &seed,
+        source,
+        &["--compile-system", "--reference-arena"],
+        false,
+    );
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+int main(void) {
+    struct { uint64_t before; uint64_t bytes[8]; uint64_t after; } storage={ .before=123, .after=456 };
+    neoclr_aot_context ctx={ .text={(unsigned char*)storage.bytes,sizeof(storage.bytes),0} };
+    for (int i=0;i<10;i++) {
+        int32_t result=-99;
+        if (neoclr_entry_v4(1,&result,&ctx) || result!=42 || ctx.text.used!=24) return 1;
+    }
+    int32_t result=-99;
+    if (neoclr_entry_v4(0,&result,&ctx)!=6 || result!=-99 || ctx.text.used!=0) return 2;
+    if (neoclr_aot_render_fault(stderr,&ctx.fault)) return 3;
+    ctx.text.capacity=16;
+    if (neoclr_entry_v4(1,&result,&ctx)!=5 || result!=-99 || ctx.text.used!=0) return 4;
+    if (storage.before!=123 || storage.after!=456) return 5;
+    return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args([
+            "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
+        ])
+        .arg(base.join("aot-console"))
+        .arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o"))
+        .arg("-o")
+        .arg(dir.0.join("app"))
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("app"))
+        .env_clear()
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{r:?}");
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let function = program
+        .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
+        .unwrap();
+    let result = function
+        .invoke(vec![neoclr::Value::Int32(1)], neoclr::Limits::default())
+        .unwrap();
+    assert_eq!(result.value, neoclr::Value::Int32(42));
+    let fault = function
+        .invoke(vec![neoclr::Value::Int32(0)], neoclr::Limits::default())
+        .unwrap_err();
+    assert_eq!(
+        String::from_utf8_lossy(&r.stderr),
+        fault.diagnostic().to_string()
+    );
+}
+
+#[test]
+fn reference_arena_is_explicit_and_does_not_admit_virtual_calls() {
+    let source = include_str!("../../../docs/experiments/aot-console/reference-cell.neoil");
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    for flags in [
+        vec!["--reference-arena"],
+        vec!["--compile-system", "--reference-arena", "--reference-arena"],
+    ] {
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, source, &flags, false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    }
+    let dir = Temp::new();
+    let virtual_source = source.replace(
+        "call instance Cell::Bump()",
+        "callvirt instance Cell::Bump()",
+    );
+    let r = compile_source(
+        &dir,
+        &seed,
+        &virtual_source,
+        &["--compile-system", "--reference-arena"],
+        false,
+    );
+    assert!(!r.status.success() && !dir.0.join("app.o").exists());
+}

@@ -11750,6 +11750,8 @@ and an interactive input/output consumer. The assistant then selected a bounded,
 host-owned invocation text region for Int32 formatting: preserve strings across calls
 and faults, reclaim together at the next invocation, and reject escaping reference
 storage. This is an experimental lifetime foundation, not an author decision to replace
-tracing with regions or reference counting. General memory and stream/reference
-support remain open. This Console direction does
+tracing with regions or reference counting. A subsequent explicit reference-arena slice uses the same bounded lifetime for
+nongeneric class objects, preserving aliases and reclaiming cycles at reset. The
+assistant tested reference copies, null faults and a Raven class/Console consumer.
+General collection, interface dispatch, arrays and stream support remain open. This Console direction does
 not establish a new permanent roadmap priority outside the author-directed AOT work.

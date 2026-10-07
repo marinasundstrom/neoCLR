@@ -59,7 +59,7 @@ impl Specializer<'_> {
         };
         let i = self.type_index(name)?;
         let definition = &self.source.types[i];
-        if definition.is_reference_type
+        if (definition.is_reference_type && !definition.generic_parameters.is_empty())
             || !definition.generic_constraints.is_empty()
             || definition.generic_parameters.len() != arguments.len()
         {

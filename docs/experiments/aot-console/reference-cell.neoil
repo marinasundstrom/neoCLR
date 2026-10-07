@@ -1,0 +1,65 @@
+.module ReferenceCell
+.type class Cell
+.field value Int32
+.field next Cell
+.method instance .ctor(Int32 value) -> noresult
+ldarg 0
+ldarg value
+stfld 0
+ldarg 0
+ldarg 0
+stfld 1
+ret
+.end
+.method instance Bump() -> Int32
+ldarg 0
+ldarg 0
+ldfld 0
+ldc.i4 1
+add
+stfld 0
+ldarg 0
+ldfld 0
+ret
+.end
+.end
+.function Copy(out Cell& output, Cell input) -> Void
+ldarg output
+ldarg input
+stobj Cell
+ldvoid
+ret
+.end
+.function Calculate(Int32 kind) -> Int32
+.local Cell first
+.local Cell alias
+ldarg kind
+brfalse Null
+ldc.i4 40
+newobj.ctor instance Cell::.ctor(Int32)
+stloc first
+ldloca alias
+ldloc first
+call Copy(Cell&, Cell)
+pop
+ldloc first
+ldloc alias
+ref.eq
+brfalse Bad
+ldloc alias
+call instance Cell::Bump()
+pop
+ldloc first
+ldfld 1
+call instance Cell::Bump()
+ret
+Null:
+ldloca first
+initobj Cell
+ldloc first
+call instance Cell::Bump()
+ret
+Bad:
+ldc.i4 1
+ret
+.end

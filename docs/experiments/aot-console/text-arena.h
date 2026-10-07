@@ -2,6 +2,7 @@
 #define NEOCLR_AOT_TEXT_ARENA_H
 #include "../aot-fault-details/fault-details.h"
 #define NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT 5
+#define NEOCLR_AOT_FAULT_NULL_REFERENCE 6
 /* Experimental ABI v4. Host owns an aligned writable buffer for this invocation.
  * The buffer must not overlap context/result and must cover capacity bytes.
  * All arena text is immutable after creation and expires at the next entry call
@@ -26,4 +27,10 @@ int32_t neoclr_entry_v4(int32_t value, int32_t *result, neoclr_aot_context *cont
  */
 int32_t neoclr_int32_to_string_v1(int32_t value, neoclr_aot_text_arena *arena,
                                 const neoclr_aot_text **output);
+/* Internal object allocation for the explicit reference-arena profile. Header is
+ * a private type index; bytes includes header and padded payload (8..72 bytes).
+ * The arena owns objects and cycles until the next entry/reset, just like text.
+ */
+int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
+                                uint32_t bytes, void **output);
 #endif
