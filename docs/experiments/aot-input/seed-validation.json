@@ -1,0 +1,389 @@
+{
+  "profile": "aot-explicit-system-code-v1",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "baseRevision": "86153833e98317eafc1b707ef241e7b15b101867",
+  "inputs": {
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "798d78a0b595db008e5975f2d51eb5358c65fcd1fdc8868d51ad20d7d9f79efb",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-input/seed-helpers.neoil": "953d3c8ed661b1ac0284ffd938a6ca1edcde735ff658b60957bc02215d04a40f",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe": "745c5cdd9ac8ec34c53603c09f134eafa46c3f91622dfd5060fdc788222143c0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea"
+  },
+  "commands": [
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "assemble",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/seed-helpers.neoil",
+        "/Users/robert/Projects/neoclr/target/aot-explicit-system-code/SeedHelpers.neox",
+        "--format",
+        "neox",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Assembled SeedHelpers -> /Users/robert/Projects/neoclr/target/aot-explicit-system-code/SeedHelpers.neox\n"
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-explicit-system-code/SeedHelpers.neox",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-explicit-system-code/SeedHelpers.neox",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 3403,
+        "sha256": "78bde49e9808d349391e1b62f37d58b5da53d149d30b66a815daa22dd5e4aa88"
+      }
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-explicit-system-code/SeedHelpers.neox",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 956072,
+        "sha256": "6fa9d0a38a20a3c0eaed810b6abd01d1435de7c841748edea5b6fae462d3f4e9"
+      }
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-explicit-system-code/SeedHelpers.neox",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-explicit-system-code/transport.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 909067,
+        "sha256": "dd9f60a6562f97bdc61d61d64754d2657b0279638c2355dfdf34730ef97eb5de"
+      }
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-explicit-system-code/transport.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-explicit-system-code/transport"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-explicit-system-code/transport.o"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-explicit-system-code/transport"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-explicit-system-code/transport:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 8372,
+        "sha256": "d666c636cdf5beb8260582150bd078c6a1b6e6a84239260aee04f6c5eb9fbcf4"
+      }
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-explicit-system-code/read-byte.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system"
+      ],
+      "exit": 1,
+      "stderr": "aot-poc: specialization requires closed reference-free local value types: String\n",
+      "stdout": ""
+    }
+  ],
+  "withoutOptIn": {
+    "accepted": false,
+    "firstError": "generic call identity/signature is missing or ambiguous: FunctionRef { definition: None, name: \"System.Runtime.CompilerServices.RuntimeServices.IsValue\", owner: Some(Named(\"System.Runtime.CompilerServices.RuntimeServices\")), instance: false, generic_arguments: [Byte], parameters: [Value] }",
+    "phase": "selection"
+  },
+  "selection": {
+    "loadSet": {
+      "limits": "one closed instantiation per local value definition; primitive static generic methods; one to eight explicit dependencies; no dynamic loading",
+      "modules": [
+        {
+          "name": "SeedHelpers",
+          "revision": null
+        },
+        {
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        {
+          "name": "System",
+          "revision": null
+        }
+      ],
+      "runtimeContext": {
+        "compileSystem": true,
+        "explicit": true,
+        "objectRoot": {
+          "index": 8,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "revision": null,
+        "scope": "explicit managed System body selection; native services still require bindings",
+        "system": "System"
+      },
+      "validation": "all original bodies verified with runtime binder before private canonical projection"
+    },
+    "functions": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 0,
+          "module": "SeedHelpers"
+        },
+        "name": "Main",
+        "sourceIndex": 0
+      },
+      {
+        "compiledIndex": 1,
+        "compiledName": "System.Runtime.CompilerServices.RuntimeServices.IsValue$aot_method_2103",
+        "definition": {
+          "index": 27,
+          "module": "System"
+        },
+        "expandedIndex": 2103,
+        "methodArguments": [
+          "Byte"
+        ],
+        "name": "System.Runtime.CompilerServices.RuntimeServices.IsValue",
+        "sourceIndex": 1987
+      },
+      {
+        "compiledIndex": 2,
+        "compiledName": "System.Runtime.CompilerServices.RuntimeServices.IsValue$aot_method_2104",
+        "definition": {
+          "index": 27,
+          "module": "System"
+        },
+        "expandedIndex": 2104,
+        "methodArguments": [
+          "Int32"
+        ],
+        "name": "System.Runtime.CompilerServices.RuntimeServices.IsValue",
+        "sourceIndex": 1987
+      },
+      {
+        "compiledIndex": 3,
+        "compiledName": "System.Runtime.CompilerServices.RuntimeServices.IsValue$aot_method_2105",
+        "definition": {
+          "index": 27,
+          "module": "System"
+        },
+        "expandedIndex": 2105,
+        "methodArguments": [
+          "Void"
+        ],
+        "name": "System.Runtime.CompilerServices.RuntimeServices.IsValue",
+        "sourceIndex": 1987
+      },
+      {
+        "compiledIndex": 4,
+        "compiledName": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue$aot_method_2106",
+        "definition": {
+          "index": 28,
+          "module": "System"
+        },
+        "expandedIndex": 2106,
+        "methodArguments": [
+          "Byte"
+        ],
+        "name": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue",
+        "sourceIndex": 1988
+      }
+    ],
+    "types": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 1,
+          "module": "System"
+        },
+        "name": "System.Runtime.CompilerServices.RuntimeServices",
+        "sourceIndex": 335
+      }
+    ],
+    "specialization": {
+      "methods": [
+        {
+          "arguments": [
+            "Byte"
+          ],
+          "definition": {
+            "index": 27,
+            "module": "System"
+          },
+          "expandedIndex": 2103,
+          "name": "System.Runtime.CompilerServices.RuntimeServices.IsValue",
+          "sourceIndex": 1987,
+          "sourceOrigin": null
+        },
+        {
+          "arguments": [
+            "Int32"
+          ],
+          "definition": {
+            "index": 27,
+            "module": "System"
+          },
+          "expandedIndex": 2104,
+          "name": "System.Runtime.CompilerServices.RuntimeServices.IsValue",
+          "sourceIndex": 1987,
+          "sourceOrigin": null
+        },
+        {
+          "arguments": [
+            "Void"
+          ],
+          "definition": {
+            "index": 27,
+            "module": "System"
+          },
+          "expandedIndex": 2105,
+          "name": "System.Runtime.CompilerServices.RuntimeServices.IsValue",
+          "sourceIndex": 1987,
+          "sourceOrigin": null
+        },
+        {
+          "arguments": [
+            "Byte"
+          ],
+          "definition": {
+            "index": 28,
+            "module": "System"
+          },
+          "expandedIndex": 2106,
+          "name": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue",
+          "sourceIndex": 1988,
+          "sourceOrigin": null
+        }
+      ],
+      "policy": "one shape per value definition; primitive static generic methods, at most 32 clones and 128 selected functions; no constraints",
+      "types": []
+    }
+  },
+  "excludedCounts": {
+    "excludedFunctions": 2102,
+    "excludedTypes": 336
+  },
+  "native": {
+    "executableOnlyDirectory": true,
+    "emptyEnvironment": true,
+    "exit": 0,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "readByteBoundary": {
+    "accepted": false,
+    "firstError": "specialization requires closed reference-free local value types: String",
+    "phase": "selection"
+  },
+  "artifacts": {
+    "SeedHelpers.neox": "33f751f8f5619b3dadf9c9893cd16244aff1060dc467f3af168f309b365d17fe",
+    "transport.o": "ca9517ab77be700ddf59f8b5b6f49d088d920f94e0675e08781f0d195776fdc0",
+    "transport": "5d1311d1fbe7125d76f70c4b9c872072a0dd27edce760b25cd898fcef128007d"
+  }
+}

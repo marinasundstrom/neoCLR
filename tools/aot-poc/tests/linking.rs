@@ -391,7 +391,7 @@ fn invoke_context(
             .arg(dir.0.join("app.o"));
     }
     c.arg("--module").arg(&lib);
-    if case != 1 {
+    if case != 1 && case != 11 {
         c.arg("--system").arg(&system);
     }
     c.arg("--object-root")
@@ -402,6 +402,8 @@ fn invoke_context(
     if case == 4 {
         c.arg("--system").arg(&system);
     }
+    if case >= 9 { c.arg("--compile-system"); }
+    if case == 10 { c.arg("--compile-system"); }
     c.output().unwrap()
 }
 #[test]
@@ -806,5 +808,61 @@ fn generic_method_specialization_rejects_bad_identity_access_and_shapes() {
         assert!(!result.status.success(), "accepted case {case}");
         assert!(!dir.0.join("app.o").exists());
         assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
+    }
+}
+
+#[test]
+fn explicit_system_code_compiles_managed_seed_helpers_and_reports_source_identity() {
+    let (_, mut m) = runtime_context_fixture();
+    let seed = neoclr::assemble(".module System\n.references ()\n.function SeedEcho<T>(T value) -> T\nldarg value\nret\n.end").unwrap();
+    m[0].functions[0].body = vec![Op::Int(42), Op::Call(neoclr::assembler::parse_function_ref("SeedEcho<Int32>(Int32)").unwrap()), Op::Return];
+    let root = neoclr::metadata::TypeDefId { module: "Core".into(), revision: Some("r1".into()), index: 0 };
+    let program = neoclr::LoadedProgram::with_modules_and_object_root(&m[0], &seed, &m[1..], &root).unwrap();
+    assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    let dir = Temp::new();
+    let missing = invoke_context(&dir, &seed, &m, 0, false);
+    assert!(!missing.status.success());
+    assert!(!dir.0.join("app.o").exists());
+    let inspected = invoke_context(&dir, &seed, &m, 9, true);
+    let inspection: serde_json::Value = serde_json::from_slice(&inspected.stdout).unwrap();
+    assert_eq!(inspection["admission"]["accepted"], true, "{inspection}");
+    let emitted = invoke_context(&dir, &seed, &m, 9, false);
+    assert!(emitted.status.success(), "{}", String::from_utf8_lossy(&emitted.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&emitted.stdout).unwrap();
+    assert_eq!(report, inspection["selection"]);
+    assert_eq!(report["loadSet"]["runtimeContext"]["compileSystem"], true);
+    assert_eq!(report["specialization"]["methods"][0]["definition"]["module"], "System");
+    assert!(report["loadSet"]["modules"].as_array().unwrap().iter().any(|m| m["name"] == "System"));
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    native(&dir, 42);
+    for case in [10, 11] {
+        let dir = Temp::new();
+        let rejected = invoke_context(&dir, &seed, &m, case, false);
+        assert!(!rejected.status.success());
+        assert!(String::from_utf8_lossy(&rejected.stderr).contains("--compile-system"));
+        assert!(!dir.0.join("app.o").exists());
+    }
+}
+
+#[test]
+fn system_code_opt_in_does_not_enable_internal_calls_or_nonpublic_access() {
+    for native_service in [false, true] {
+        let (_, mut m) = runtime_context_fixture();
+        let seed = neoclr::assemble(if native_service {
+            ".module System\n.references ()\n.function neoCLR.Runtime.ConsoleReadByte() -> Value\n.methodimpl InternalCall\n.end"
+        } else {
+            ".module System\n.references ()\n.function internal Hidden() -> Int32\nldc.i4 42\nret\n.end"
+        }).unwrap();
+        m[0].functions[0].body = if native_service {
+            vec![Op::Call(neoclr::assembler::parse_function_ref("neoCLR.Runtime.ConsoleReadByte()").unwrap()), Op::UnpackValue(neoclr::metadata::Type::Byte), Op::Return]
+        } else {
+            vec![Op::Call(neoclr::assembler::parse_function_ref("Hidden()").unwrap()), Op::Return]
+        };
+        let dir = Temp::new();
+        let rejected = invoke_context(&dir, &seed, &m, 9, false);
+        let error = String::from_utf8_lossy(&rejected.stderr);
+        assert!(!rejected.status.success());
+        assert!(error.contains(if native_service { "unsupported value member contract" } else { "access denied" }), "{error}");
+        assert!(!dir.0.join("app.o").exists());
     }
 }

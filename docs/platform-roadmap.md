@@ -76,8 +76,9 @@ factory returning the nested result. Bounded primitive erased-value transport no
 pack/test/unpack, copied calls and output slots; mismatched unpack propagates RuntimeError.
 Primitive static generic methods now specialize into bounded private bodies, with original
 identities/origins reported and a Raven forwarding consumer validated. ReadByte's generic
-helpers live in the validation-only System seed; explicit selective seed-body compilation
-is next, followed by native byte-input services and UTF-8 text/lifetime contracts. Multiple instantiations
+helpers now compile from an explicitly supplied System seed with `--compile-system`;
+the default remains validation only. The unchanged ReadByte probe now reaches its String-based
+failure path. That path and native byte-input services precede UTF-8 text/lifetime contracts. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

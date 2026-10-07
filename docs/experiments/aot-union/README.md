@@ -91,8 +91,8 @@ Implement it in bounded stages:
 2. The [nested input-outcome sample](../aot-input/README.md) now validates the actual
    Result<Option<byte>, ConsoleReadError> shape. Metadata-only static member owners now
    compile, primitive erased-value transport passes, and primitive static generic methods
-   now specialize. Explicit seed-body compilation and native byte-input services remain
-   before extending to text.
+   now specialize. Explicit `--compile-system` selects managed seed helpers; the
+   ReadByte String-based failure path and native byte-input service remain before extending to text.
 3. Define the native UTF-8 line-input and lifetime contract, including empty line versus
    EOF and I/O failure. Link the service into the executable and retain interpreter parity.
 4. Compile parsing and output with valid, invalid, overflow and EOF tests. Use the ordinary

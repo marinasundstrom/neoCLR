@@ -145,8 +145,11 @@ neoclr-aot-poc --inspect LibraryResultApp.pe @entry --closed-world \
 
 The selection report records `loadSet.runtimeContext`: the chosen System module/revision,
 Object type definition identity and whether the context was explicit. The seed is used
-for **validation only**; its bodies are not compilation inputs. A selected call requiring
-an unsupplied System implementation still fails. Native reference allocation, virtual
+for **validation only by default**. Explicit `--compile-system` with `--system` adds
+the seed to compilation inputs, selecting managed bodies through the same exact binding,
+verification and admission rules as libraries. Reports record `compileSystem` and original
+System identities. InternalCall/native services still require a separate binding; the flag
+does not enable them. See [seed helper evidence](../aot-input/README.md#explicit-managed-system-bodies-2026-10-07). Native reference allocation, virtual
 calls and interface execution remain unsupported. Unselected generic methods in a supplied
 library are permitted after ordinary verification; the subsequent primitive static
 method-specialization slice now admits bounded selected generic methods.

@@ -241,8 +241,9 @@ Empty static member owners now compile without object allocation; actual Console
 now passes bounded primitive erased-value storage and reaches generic helper calls.
 Primitive pack/test/unpack preserves exact types and propagates incorrect-unpack faults;
 primitive static generic helpers now specialize with source identities retained in build
-reports. Explicit compilation of selected System seed bodies, native input services and
-UTF-8 text lifetimes remain future work.
+reports. Explicit `--compile-system` now compiles selected managed System seed helpers.
+The actual ReadByte wrapper reaches its String-based failure path; that path, native input
+services and UTF-8 text lifetimes remain future work.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

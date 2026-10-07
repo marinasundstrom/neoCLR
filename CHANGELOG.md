@@ -126,9 +126,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   bounded primitive static generic-method specialization, exact call binding and distinct
   private bodies with original identities/origins reported. Validate Raven forwarding in
   PE/NEOX, cross-library method shapes and clone/identity/access rejection. ReadByte now
-  exposes managed helper bodies in the validation-only System seed; no implicit seed
-  compilation or native service binding is added.
-  System seed bodies remain validation-only; no native
+  exposes managed helper bodies in the System seed. Add explicit `--compile-system`
+  selection of managed seed bodies, preserving original verification and identity reports;
+  the default remains validation only. Validate actual primitive seed helpers in an isolated
+  native executable and reject duplicate/missing context, nonpublic access and native
+  InternalCall services. ReadByte now reaches its String-based failure path. No native
   reference services, interface execution or public ABI/runtime APIs are added.
   General unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,

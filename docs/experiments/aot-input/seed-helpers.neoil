@@ -1,0 +1,29 @@
+.module SeedHelpers
+.entry Main
+
+.function Main() -> Int32
+.local Value item
+ldc.i4 511
+value.pack Byte
+stloc item
+ldloc item
+call System.Runtime.CompilerServices.RuntimeServices::IsValue<Byte>(Value)
+brfalse fail
+ldloc item
+call System.Runtime.CompilerServices.RuntimeServices::IsValue<Int32>(Value)
+brtrue fail
+ldvoid
+value.pack Void
+call System.Runtime.CompilerServices.RuntimeServices::IsValue<Void>(Value)
+brfalse fail
+ldloc item
+call System.Runtime.CompilerServices.RuntimeServices::UnpackValue<Byte>(Value)
+ldc.i4 255
+ceq
+brfalse fail
+ldc.i4 0
+ret
+fail:
+ldc.i4 1
+ret
+.end

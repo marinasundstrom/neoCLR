@@ -19,6 +19,12 @@ fn main() {
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut args: Vec<_> = env::args_os().skip(1).collect();
+    let compile_system_count = args.iter().filter(|a| *a == "--compile-system").count();
+    if compile_system_count > 1 {
+        return Err("duplicate --compile-system option".into());
+    }
+    let compile_system = compile_system_count == 1;
+    args.retain(|a| a != "--compile-system");
     let dependency_args = args
         .iter()
         .position(|a| a == "--module" || a == "--system" || a == "--object-root")
@@ -38,6 +44,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             _ => return Err("invalid, duplicate or excessive load-context option".into()),
         }
     }
+    if compile_system && system_path.is_none() {
+        return Err("--compile-system requires explicit --system".into());
+    }
     if object_path.is_some() && system_path.is_none() {
         return Err("--object-root requires explicit --system".into());
     }
@@ -51,7 +60,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
     {
         return Err(
-            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs"
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection"
                 .into(),
         );
     }
@@ -113,6 +122,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             read_module(Path::new(path)).map(|system| linking::RuntimeContext {
                 system,
                 object_root,
+                compile_system,
             })
         })
         .transpose()?;

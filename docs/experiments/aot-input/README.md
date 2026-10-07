@@ -245,3 +245,40 @@ python3 docs/experiments/aot-input/verify_methods.py \
 Tests cover multi-shape erased type tests/unpack, forwarded generic arguments, original
 library revisions, bad signatures/arity/identities, private access, constraints, recursive
 calls, 32-versus-33 clone bounds and malformed original source tokens.
+
+## Explicit managed System bodies (2026-10-07)
+
+Closed-world inspection/emission now accept `--compile-system` together with an explicit
+`--system`. This adds the verified seed to the input inventory and selects reachable
+managed bodies under the existing admission rules. The default remains validation only.
+Reports include `loadSet.runtimeContext.compileSystem`, the seed inventory and original
+System member identities, including specialized methods. Duplicate flags and a missing
+explicit seed fail before emission. InternalCall/native services remain unsupported.
+
+[The backend consumer](seed-helpers.neoil) calls the pinned seed's actual generic
+`RuntimeServices.IsValue<T>` and `UnpackValue<T>` bodies. It checks Byte truncation,
+exact Byte/Int32 tests and Void tagging, then exits successfully. Assemble it against the
+explicit runtime context first: the AOT tool's standalone text assembler does not resolve
+seed types. This is a CIL backend consumer, not an additional Raven producer claim.
+[Recorded evidence](seed-validation.json) checks interpreter parity, matching inspection
+and emission, preserved System source identities, no unresolved object imports, and an
+isolated executable with only the platform libSystem dependency. The 23 focused linking
+and inspection tests pass, including nonpublic access and InternalCall rejection.
+
+```sh
+python3 docs/experiments/aot-input/verify_seed.py \
+  --runtime /absolute/path/to/neoclr \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --bundle /absolute/path/to/neoclr-native-poc \
+  --output target/aot-explicit-system-code
+```
+
+The unchanged Raven `ReadByte.pe` now passes seed helper selection and stops at
+`specialization requires closed reference-free local value types: String`: the ordinary
+wrapper includes an invalid-status failure path. It still emits no object. Supporting
+that path and explicitly binding the native byte-input service are subsequent tasks.
+Existing reproduction scripts without the opt-in retain the earlier missing-body boundary.
+
+This extends the .NET Native AOT build-time dependency comparison above: managed seed
+helpers can be baked into the image, with explicit input selection and bounded native
+coverage. This does not make arbitrary runtime services compilable or change the public ABI.

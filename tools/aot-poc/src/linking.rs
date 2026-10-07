@@ -7,6 +7,7 @@ type Error = Box<dyn std::error::Error>;
 pub struct RuntimeContext {
     pub system: neoclr::Module,
     pub object_root: Option<TypeDefId>,
+    pub compile_system: bool,
 }
 
 pub fn prepare(
@@ -21,7 +22,7 @@ pub fn prepare(
     if app.functions.iter().filter(|f| f.name == root).count() != 1 {
         return Err("load-set root must resolve uniquely inside the application".into());
     }
-    let inputs: Vec<_> = std::iter::once(app).chain(dependencies).collect();
+    let mut inputs: Vec<_> = std::iter::once(app).chain(dependencies).collect();
     if inputs.iter().map(|m| m.functions.len()).sum::<usize>() > 4096
         || inputs.iter().map(|m| m.types.len()).sum::<usize>() > 1024
     {
@@ -38,6 +39,15 @@ pub fn prepare(
     } else {
         neoclr::library::system().map_err(|e| e.to_string())?
     };
+    let compile_system = context.is_some_and(|c| c.compile_system);
+    if compile_system {
+        inputs.push(system);
+        if inputs.iter().map(|m| m.functions.len()).sum::<usize>() > 4096
+            || inputs.iter().map(|m| m.types.len()).sum::<usize>() > 1024
+        {
+            return Err("load-set inventory including System exceeds AOT bounds".into());
+        }
+    }
     let program = if let Some(object_root) = context.and_then(|c| c.object_root.as_ref()) {
         neoclr::LoadedProgram::with_modules_and_object_root(app, system, dependencies, object_root)
     } else {
@@ -188,7 +198,7 @@ pub fn prepare(
     );
     report["loadSet"] = json!({"modules": inputs.iter().map(|m| json!({"name": m.name, "revision": m.revision})).collect::<Vec<_>>(),
         "validation": "all original bodies verified with runtime binder before private canonical projection",
-        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "scope": "validation only; System seed bodies are not compilation inputs"},
+        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
         "limits": "one closed instantiation per local value definition; primitive static generic methods; one to eight explicit dependencies; no dynamic loading"});
     Ok((selected, report))
 }
