@@ -1,0 +1,21 @@
+import System.Runtime.CompilerServices.*
+
+public func RunGeneric() -> int {
+    let payload = neoCLR.Runtime.EnvironmentCurrentDirectory()
+    if RuntimeServices.IsValue<int>(payload) {
+        return 1
+    }
+    if !RuntimeServices.IsValue<string>(payload) {
+        return 2
+    }
+    let text = RuntimeServices.UnpackValue<string>(payload)
+    if neoCLR.Runtime.StringGraphemeCount(text) == 0 {
+        return 3
+    }
+    return 42
+}
+
+namespace neoCLR.Runtime {
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func StringGraphemeCount(text: string) -> int;
+}

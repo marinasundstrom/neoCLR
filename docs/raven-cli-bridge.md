@@ -6369,3 +6369,14 @@ translator checks their exact owner and signatures before targeting the existing
 native services. Bootstrap declarations are reference-only scaffolding and do not
 implement .NET reflection execution. The native source facade replaces this path
 for source-built libraries. [Evidence, compatibility and remaining frontier](experiments/extended-cli-metadata/reflection-construction-2026-10-07.md).
+
+## Source erased Value storage (2026-10-07)
+
+Raven ca4aeccfb accepts an explicit nativePrimitives System.Value source owner but
+keeps it outside CLI special-type resolution. Its empty definition is marked as
+runtime storage; native metadata uses Value while CLI signatures retain nominal
+ownership. The selected core/System seed facade and marked local carrier share
+physical evaluation storage. The seed omits the competing declaration and retains
+only the explicitly required generic helpers. The native environment payload gate
+executes; separate Raven import of a source Value API remains unqualified. No .NET
+compiler semantics or runtime behavior changes. [Evidence and next frontier](experiments/extended-cli-metadata/source-value-2026-10-07.md).

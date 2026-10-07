@@ -34,7 +34,9 @@ public enum PrimitiveType
     /// <summary>A signed native-width integer; CLI ELEMENT_TYPE_I.</summary>
     IntPtr,
     /// <summary>An unsigned native-width integer; CLI ELEMENT_TYPE_U.</summary>
-    UIntPtr
+    UIntPtr,
+    /// <summary>Native erased-value storage designation. Signatures use an explicitly owned System.Value declaration.</summary>
+    Value
 }
 
 /// <summary>An immutable nongeneric primitive signature whose declared parameters exclude any instance receiver.</summary>

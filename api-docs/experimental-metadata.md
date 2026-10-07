@@ -7645,3 +7645,29 @@ C# tests compile and execute signed/unsigned conversions, locals and signatures 
 fields, builder-authored methods/properties and introspection retain both categories.
 No metadata format version changes; older host readers may reject these newly admitted
 signatures even though the runtime already implements their native categories.
+
+### Source-owned erased Value storage (development, 2026-10-07)
+
+`PrimitiveType.Value` designates the existing native erased carrier with
+`TypeDefinition.SetNativePrimitive` or `TypeBuilder.SetNativePrimitive`. Create an
+owned public System.Value value definition, then mark it; generic/nested definitions,
+record fields and constructors reject as for RuntimeTypeHandle. Use that definition
+or builder as a signature operand. Converting the bare enum to SignatureType throws
+ArgumentOutOfRangeException because erased signatures require an explicit owner.
+
+```csharp
+var value = assembly.AddValueType("System", "Value");
+value.SetNativePrimitive(PrimitiveType.Value);
+var identity = assembly.AddFunction("Identity", new MethodSignature(value, new SignatureType[] { value }));
+identity.GetILGenerator().LoadArgument(0);
+identity.GetILGenerator().Return();
+```
+
+Native signatures encode Value and the declaration uses existing Runtime storage;
+CLI signatures retain the owned value-type token. Executable CLI emission rejects
+native primitive designations. Native reading preserves NativePrimitive and resolves
+local Value signatures to the canonical local definition. The exact configured
+core/System bootstrap alias can share evaluation storage with this selected carrier;
+arbitrary foreign or unmarked local types do not acquire erased storage. No format
+version change or runtime instruction was added. See the
+[source bootstrap gate and remaining limits](https://github.com/marinasundstrom/neoCLR/blob/codex/native-system-bootstrap/docs/experiments/extended-cli-metadata/source-value-2026-10-07.md).

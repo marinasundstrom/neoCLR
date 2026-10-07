@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Support explicitly owned System.Value runtime storage in metadata definitions,
+  native signatures and introspection while retaining nominal CLI signatures.
+  Source Environment payload type tests/unpacking execute through retained helpers;
+  malformed carrier storage rejects. Raven's full-System audit advances to native
+  array backing-storage validation. Generic helpers remain an explicit seed dependency.
+
 - Route parameterless reflection construction through source-owned native service
   declarations, retaining constructor execution and access checks. Preserve the
   temporary CLI bridge with validated facade bindings. The full-source audit omits

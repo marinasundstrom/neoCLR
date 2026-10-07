@@ -109,7 +109,14 @@ public sealed partial class AssemblyBuilder
         if (!CoreLibrary.Equals(dependencyCoreLibrary) || !definition.CanImportReference || definition.IsValueType && !definition.Module.Assembly.IsNative && !Equals(definition.ValueTypeCore, dependencyCoreLibrary) || (definition.Attributes & 7) != (definition.DeclaringType is null ? 1u : 2u))
             throw new InvalidDataException("unsupported imported type or core contract: " + definition.Namespace + "." + definition.Name + " (value core " + definition.ValueTypeCore?.Name + ", expected " + dependencyCoreLibrary.Name + ")");
         var identity = definition.Module.Assembly.Identity;
-        NativeBindingFor(identity)?.ValidateType(definition);
+        // A selected source Value owns the runtime carrier. The explicit core
+        // facade may still describe generic helpers using its CLI Value token;
+        // it must not require a competing retained-seed declaration.
+        bool sourceValueAlias = identity.Equals(CoreLibrary) && NativeBindingFor(identity)?.Library.ModuleName == "System" &&
+            definition.Namespace == "System" && definition.Name == "Value" && definition.IsValueType &&
+            definition.GenericArity == 0 && definition.DeclaringType is null && definition.Fields.Count == 0 &&
+            types.Any(t => t.NativePrimitive == PrimitiveType.Value);
+        if (!sourceValueAlias) NativeBindingFor(identity)?.ValidateType(definition);
         if (importedGraphs.TryGetValue(identity, out var prior) && prior.Snapshot != definition.Module.Assembly.ImportSnapshotIdentity) throw new InvalidDataException("conflicting dependency module snapshots");
         var result = ImportTypeIdentity(identity, definition.Namespace, definition.Name, definition.GenericArity, definition.IsValueType, ImportDeclaringScope(definition.DeclaringType, dependencyCoreLibrary));
         if (!importedGraphs.ContainsKey(identity)) importedGraphs.Add(identity, (definition.Module.Assembly.ImportSnapshotIdentity, new AssemblyBuilder(identity, dependencyCoreLibrary)));

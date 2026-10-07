@@ -72,9 +72,10 @@ def main():
         if name == 'full-owned-handle':
             library = manifest['libraries'][0]
             manifest['failure'] = dict(assemblyName=library['assemblyName'], namespaceName='System', functionName='Fail')
-            library['types'] = sorted(set(library['types']) | {'System.RuntimeTypeHandle', 'System.Void'})
+            library['types'] = sorted(set(library['types']) | {'System.RuntimeTypeHandle', 'System.Void', 'System.Value'})
             manifest['unit'] = dict(assemblyName=library['assemblyName'], typeName='System.Void')
             manifest['nativePrimitives']['System.RuntimeTypeHandle'] = library['assemblyName']
+            manifest['nativePrimitives']['System.Value'] = library['assemblyName']
             # Reuse the already implemented source-handle ownership contract. The
             # exact empty seed declaration must disappear when this owner is selected.
             seed_text = (ROOT / 'runtime/raven/native/poc-seed.neoil').read_text()
@@ -85,7 +86,10 @@ def main():
             void_declaration = '.type System.Void\n.sealed\n.end\n'
             if seed_text.count(void_declaration) != 1:
                 raise ValueError('Expected exactly one retained Void declaration')
-            seed_source.write_text(seed_text.replace(declaration, '').replace(void_declaration, ''))
+            value_declaration = '.type System.Value\n.sealed\n.end\n'
+            if seed_text.count(value_declaration) != 1:
+                raise ValueError('Expected exactly one retained Value declaration')
+            seed_source.write_text(seed_text.replace(declaration, '').replace(void_declaration, '').replace(value_declaration, ''))
             seed = directory / 'System.neox'
             assembled = subprocess.run([str(args.runtime.resolve()), 'assemble', str(seed_source), str(seed), '--format', 'neox'],
                                        cwd=ROOT, capture_output=True, text=True, timeout=60)

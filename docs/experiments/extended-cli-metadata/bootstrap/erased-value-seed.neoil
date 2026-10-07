@@ -1,0 +1,14 @@
+.module System
+.references ()
+.type System.Runtime.CompilerServices.RuntimeServices
+.method static IsValue<T>(Value value) -> Boolean
+ldarg value
+value.is T
+ret
+.end
+.method static UnpackValue<T>(Value value) -> T
+ldarg value
+value.unpack T
+ret
+.end
+.end

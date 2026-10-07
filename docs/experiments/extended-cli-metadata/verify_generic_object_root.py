@@ -18,8 +18,9 @@ def main():
     parser.add_argument('--closed-root', action='store_true', help='Exercise a closed family over source Object')
     parser.add_argument('--object-handles', action='store_true', help='Exercise native ObjectTypeHandle with source Object and handle owners')
     parser.add_argument('--reflection-construction', action='store_true', help='Execute native construction with source Object and handle owners')
+    parser.add_argument('--erased-value', action='store_true', help='Exercise source-owned erased Value through retained generic helpers')
     args = parser.parse_args()
-    if sum((args.core_attributes, args.source_attributes, args.closed_root, args.object_handles, args.reflection_construction)) > 1:
+    if sum((args.core_attributes, args.source_attributes, args.closed_root, args.object_handles, args.reflection_construction, args.erased_value)) > 1:
         parser.error('Select one root scenario')
     for name in ('compiler', 'core', 'seed', 'runtime', 'output'):
         setattr(args, name, getattr(args, name).resolve())
@@ -46,6 +47,10 @@ def main():
         sources = sources[:-1] + [ROOT / 'runtime/raven/native/NativeReflection.rvn',
                    ROOT / 'runtime/raven/native/RuntimeConstructionCalls.rvn',
                    sources[0].parent / 'reflection-construction.rvn']
+    if args.erased_value:
+        sources = [sources[0], ROOT / 'runtime/raven/src/System/Value.rvn',
+                   ROOT / 'runtime/raven/native/RuntimeEnvironmentCalls.rvn',
+                   sources[0].parent / 'erased-value.rvn']
     library, app = args.output / 'Root.dll', args.output / 'App.pe'
     runtime_seed = args.output / 'System.neoil'
     runtime_seed.write_text('.module System\n.references ()\n')
@@ -74,6 +79,16 @@ def main():
         run([args.runtime, 'assemble', runtime_seed, compile_seed, '--format', 'neox'])
         compile_options = ['--bootstrap-ownership', ownership]
         ownership_inputs = [ownership, compile_seed]
+    if args.erased_value:
+        ownership = args.output / 'ownership.json'
+        ownership.write_text(json.dumps(dict(version=1, libraries=[dict(assemblyName='Root', sources=[str(p) for p in sources], types=['System.Value'])],
+                                            nativePrimitives={'System.Value': 'Root'}), indent=2) + '\n')
+        seed_source = sources[0].parent / 'erased-value-seed.neoil'
+        runtime_seed = args.output / 'ValueSeed.neox'
+        run([args.runtime, 'assemble', seed_source, runtime_seed, '--format', 'neox'])
+        compile_seed = runtime_seed
+        compile_options = ['--bootstrap-ownership', ownership]
+        ownership_inputs = [ownership, seed_source]
     run(['dotnet', args.compiler, 'neoclr', '--core-reference', args.core, '--runtime-seed', compile_seed,
          '--source-object-root', '--library', '-o', library] + compile_options + sources)
     run(['dotnet', 'run', '--project', ROOT / 'tools/metadata/NeoCLR.Metadata.Experimental.Tests', '--',
@@ -89,6 +104,17 @@ def main():
     if result.stdout != ('source root attributes\n' if args.core_attributes else '') or result.stderr:
         raise RuntimeError('Unexpected runtime output')
     negative_inputs = []
+    if args.erased_value:
+        invalid = args.output / 'invalid-value.rvn'
+        invalid.write_text('namespace System\npublic struct Value { public var Payload: int = 0 }\n')
+        rejected = args.output / 'invalid' / 'Root.dll'
+        rejected.parent.mkdir()
+        invalid_sources = [invalid if p.name == 'Value.rvn' else p for p in sources]
+        result = run(['dotnet', args.compiler, 'neoclr', '--core-reference', args.core, '--runtime-seed', compile_seed,
+                      '--source-object-root', '--library', '-o', rejected] + compile_options + invalid_sources, 1)
+        if rejected.exists() or 'empty value declaration without constructors' not in result.stdout + result.stderr:
+            raise RuntimeError('Fielded erased carrier must reject before publication')
+        negative_inputs.append(invalid)
     if args.core_attributes:
         for name, source, diagnostic in [
             ('flags', 'namespace System\npublic class FlagsAttribute : Attribute { init() { } }\n', 'configured core FlagsAttribute'),
@@ -130,7 +156,7 @@ def main():
     files += [args.compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     evidence = dict(sourceRevision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                     compilerRevision=args.compiler_revision, commands=commands,
-                    scope=('Native reflection construction with source owners' if args.reflection_construction else 'Native Object handle adapters with source owners' if args.object_handles else 'Closed family over source Object' if args.closed_root else 'Source Attribute hierarchy and union marker' if args.source_attributes else 'Source Object fixture with bootstrap attributes' if args.core_attributes else 'Source Object fixture and generic class') + '; consumer generated by metadata API, not Raven imported-root acceptance.',
+                    scope=('Source erased Value and retained generic helpers' if args.erased_value else 'Native reflection construction with source owners' if args.reflection_construction else 'Native Object handle adapters with source owners' if args.object_handles else 'Closed family over source Object' if args.closed_root else 'Source Attribute hierarchy and union marker' if args.source_attributes else 'Source Object fixture with bootstrap attributes' if args.core_attributes else 'Source Object fixture and generic class') + '; consumer generated by metadata API, not Raven imported-root acceptance.',
                     hashes={str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in files})
     (args.output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
     print(args.output / 'validation.json')

@@ -10,6 +10,15 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Source-owned System.Value now has the runtime erased-carrier representation; the
+real environment payload type-test/unpack gate executes successfully. The 197-input
+System audit advances to **native array backing-storage validation**. Next trace
+that contract while preserving managed arrays and canonical source ownership.
+Full System still publishes no artifact; erased helpers remain explicit seed inputs.
+[Evidence](experiments/extended-cli-metadata/source-value-2026-10-07.md).
+
+### Earlier construction frontier
+
 Native reflection construction now works with source Object/RuntimeTypeHandle;
 constructor execution, distinct identity and access/missing-constructor checks pass.
 The 197-input audit excludes the seed-only GetType extension and reaches

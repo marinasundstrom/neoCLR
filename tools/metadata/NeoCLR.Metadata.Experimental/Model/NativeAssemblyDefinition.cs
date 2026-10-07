@@ -397,6 +397,8 @@ public sealed partial class NativeAssemblyDefinition
                         return ImportExternalType(signatureGraph, "System.Void", 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
                     if (element.GetString() == "Value")
                     {
+                        var localValue = signatureOwners.SingleOrDefault(t => t.NativePrimitive == PrimitiveType.Value);
+                        if (localValue is not null) return localValue;
                         Require(nativeTypeAliases.TryGetValue(("System.Value", 0), out var erased) && erased.ValueType && erased.Namespace == "System" && erased.Name == "Value" && erased.Declaring is null, "Value requires an explicit core value alias");
                         return ImportExternalType(signatureGraph, "System.Value", 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
                     }
@@ -994,6 +996,7 @@ public sealed partial class NativeAssemblyDefinition
         "IntPtr" => PrimitiveType.IntPtr,
         "UIntPtr" => PrimitiveType.UIntPtr,
         "RuntimeTypeHandle" => PrimitiveType.RuntimeTypeHandle,
+        "Value" => PrimitiveType.Value,
 
         "Single" => PrimitiveType.Single,
         "Double" => PrimitiveType.Double,
