@@ -1212,3 +1212,13 @@ explicit NeoCLR catalog and current compiler-symbol adapter, preserving real dec
 assembly identities. Extract a stable documentation model incrementally rather than
 build another resolver or merely replace the visible assembly name.
 [Inspected boundary and acceptance](../docs/experiments/extended-cli-metadata/native-documentation-provider-2026-10-07.md).
+
+
+### Release scope correction (2026-10-07)
+
+The author subsequently deferred the native RavenDoc provider/model migration and
+CoreProbe assembly-label correction, while considering a future Raven rewrite of
+RavenDoc. The earlier provider plan remains recorded for future use, not as an active
+release gate. Keep the existing bridge identity and limitations explicit; do not invent
+production assembly ownership in the current reference. Normal accuracy/coverage upkeep
+and the already shipped IDE sidecars remain useful; renderer redesign is deferred.

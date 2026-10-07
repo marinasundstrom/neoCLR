@@ -1,5 +1,10 @@
 # Native documentation provider boundary — 2026-10-07
 
+**Deferred by the author later on 2026-10-07.** The native provider/model migration
+and bridge assembly-label correction are not requirements for the upcoming release.
+A possible rewrite of RavenDoc in Raven is exploratory future work. Retain the design
+below as context; prioritize release reproduction, working samples and developer usability.
+
 Author direction: stop presenting NeoCLR.CoreProbe.dll as production assembly ownership.
 RavenDoc should consume NeoCLR metadata natively, directly or through the compiler API,
 and use providers and standardized presentation models. This is a planned implementation

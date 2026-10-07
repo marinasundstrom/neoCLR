@@ -15,7 +15,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Record the native RavenDoc provider direction: preserve actual declaring assembly
   identities through the existing native compiler-symbol adapter, then extract a shared
   documentation model incrementally. Provider implementation and website migration
-  remain planned; CoreProbe ownership has not been relabelled.
+  were subsequently deferred by the author for release focus, with a possible Raven
+  rewrite left as future exploration. CoreProbe ownership has not been relabelled;
+  the provider/model migration is not an upcoming release gate.
 
 - Teach native POC packaging to consume the split class-library bundle with its
   generated help, exact producer checks and relative SDK/project configuration.

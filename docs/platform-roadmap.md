@@ -89,9 +89,15 @@ Standalone bootstrap preparation now generates Core and retained-seed inputs fro
 checked-in sources without previous Numbers/Http or Runtime artifacts; the class-library
 builder validates its manifest before compilation.
 [Preparation evidence](experiments/extended-cli-metadata/native-bootstrap-preparation-2026-10-07.md).
-Next: clean-checkout release reproduction, Platform service ownership and native RavenDoc
-provider/coverage work. The author's requested provider boundary preserves real assembly
-owners rather than relabelling CoreProbe; [implementation direction](experiments/extended-cli-metadata/native-documentation-provider-2026-10-07.md).
+Author reprioritization (2026-10-07): defer the native RavenDoc provider/model migration
+and assembly-label correction. A possible RavenDoc rewrite in Raven is future exploration,
+not a current implementation commitment. These changes are not gates for this release.
+Keep the existing reference's bridge provenance explicit; do not relabel CoreProbe as
+production ownership. Preserve the [future provider direction](experiments/extended-cli-metadata/native-documentation-provider-2026-10-07.md).
+Next: clean-checkout release reproduction, installation and packaged sample/editor
+qualification. Prioritize demonstrated release failures and useful shipped behavior;
+assess Platform boundary work against that scope rather than expanding documentation
+architecture. Existing API-help coverage limitations remain visible.
 The bundle alone is not an SDK release.
 The API site remains one namespace/type reference across assemblies; declaring-assembly
 provenance belongs on pages. Native multi-input RavenDoc migration must preserve that

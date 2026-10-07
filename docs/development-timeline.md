@@ -11435,3 +11435,17 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
 - **Status:** Direction recorded; provider implementation and website migration remain
   open. The active bootstrap-input validation continues independently.
   [Plan and evidence](experiments/extended-cli-metadata/native-documentation-provider-2026-10-07.md).
+
+
+## 2026-10-07: Defer RavenDoc architecture for release focus
+
+- **Author:** Asked to delay fixing RavenDoc's bridge assembly display, considering
+  rewriting RavenDoc in Raven in the future. Directed attention to the actual release
+  and changes that add value to it.
+- **Assistant:** Deferred native documentation providers and standardized-model work,
+  keeping the previous proposal as future context. Proposed focusing on reproducible
+  builds, working samples, installation and editor usability while leaving bridge
+  provenance explicit.
+- **Action:** Updated the authoritative roadmap and API maintenance direction. The
+  possible rewrite is recorded as exploration, not an approved implementation project.
+  No runtime/compiler behavior or release qualification result changes in this update.
