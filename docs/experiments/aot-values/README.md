@@ -31,14 +31,14 @@ python3 docs/experiments/aot-values/verify_native.py \
   --output target/aot-values-run
 ```
 
-The output directory must be new. This runs all three samples in the interpreter, compiles
+The output directory must be new. This runs all four samples in the interpreter, compiles
 their PE/#Neo bodies to native objects, links the C startup adapter, checks for no
 object imports and only macOS `libSystem` executable linkage, then runs each copied
 executable alone with an empty environment. Select a compatible Apple SDK as in the
 [Hello World instructions](../aot-hello/README.md). Raven's existing primitive bootstrap
 is a build-time dependency; native code never executes CLI projection bodies.
 
-The checked-in [Counter](Counter.pe), [Copies](Copies.pe) and [Nested](Nested.pe) artifacts
+The checked-in [Counter](Counter.pe), [Copies](Copies.pe) [Nested](Nested.pe) and [Outputs](Outputs.pe) artifacts
 come from the same pinned producer and corresponding sources. Rust tests use them without invoking
 Raven on each run. Fixture hashes and fresh run hashes are recorded separately;
 byte-identical producer rebuilds are not asserted.
@@ -60,7 +60,9 @@ Constructors use the same member call machinery and publish a value only after s
 The source module's ordinary metadata, member-access, initialization and lifetime
 verification still runs before native emission. References cannot be stored in fields,
 locals, ordinary parameters or results in this profile, so they cannot escape a frame.
-Readonly receivers, out parameters, virtual dispatch, overloaded names and external
+Explicit `out` parameters may borrow Int32, Boolean or local-record storage.
+Readonly receivers, conditional `out(true)` parameters, general `ref` parameters,
+virtual dispatch, overloaded names and external
 library/service calls remain unsupported here, including console calls in value-bearing
 modules. The original scalar/literal-console profile remains available for Hello World.
 
@@ -108,7 +110,7 @@ call-identity mismatches and uninitialized locals. Three additional rejection ca
 cover mutual inline cycles, unresolved fields and oversized flattened storage. Native
 tests cover the nested Raven fixture in both containers and three-level field addresses,
 whole-payload replacement, deep alias preservation, empty nested records and clearing
-a payload without overwriting adjacent fields. Ten value-profile tests pass; the earlier
+a payload without overwriting adjacent fields. Fourteen value-profile tests pass; the earlier
 fifteen scalar/Hello test results remain applicable.
 
 The [.NET struct baseline](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct)
@@ -128,6 +130,49 @@ a strict size bound. Pointer-backed payloads would require lifetime and aliasing
 that this slice deliberately does not introduce. Layout is still private: no foreign ABI,
 layout-query, GC, reflection or performance guarantee is inferred from these tests.
 
+## Ordinary output parameters (2026-10-07)
+
+[Outputs](outputs.rvn) exercises Raven output parameters through a borrowed instance
+receiver, a forwarding function and both success/miss branches. Its ordinary `out`
+contract writes the payload on either result, matching the inventoried Raven union
+extractor. [Evidence](outputs-validation.json) records the fresh producer/interpreter/native
+pipeline and executable-only deployment. Tests also use PE/#Neo and standalone NEOX.
+This is an output-member probe, not a handwritten substitute for a Raven union.
+
+The backend passes output addresses through the private native ABI. Every admitted
+output callee must prove a whole-slot assignment (`stobj`, `initobj` or forwarding to
+another admitted output) on every normal return path. Reads, field borrows and member
+calls on that output require prior assignment. Branch joins intersect assignment facts;
+ambiguous output-address identities at joins and partial construction before a whole-slot
+write are conservatively rejected. Borrowed parameters cannot be rebound or escape.
+The ordinary verifier still checks caller initialization, types and member contracts.
+Its callee-output enforcement is dynamic in the interpreter, so AOT adds this explicit
+proof instead of assuming that metadata flags validate a body. No native runtime check
+or managed allocation is introduced. Faults propagate the existing status; output writes
+performed before a Fault are not rolled back, while the exported result stays untouched.
+
+This reuses the [.NET/CLI output-contract comparison](../../design/extended-cli-metadata.md#output-parameter-contracts-2026-10-02):
+BYREF identifies storage, Out declares a parameter mode, and body assignment must be
+established separately. The native proof is stricter than the interpreter for some valid
+programs (partial initialization and ambiguous borrow joins). That bounded acceptance
+cost avoids introducing native initialization tracking and its runtime overhead. No
+performance improvement is claimed. Conditional `out(true)` remains unsupported because
+its return-sensitive assignment proof is different from ordinary `out`.
+
+The pinned Raven producer reports `RAV0269` for the sample's uninitialized direct
+forwarding form. The checked-in Raven probe explicitly initializes before forwarding;
+the IL test forwards uninitialized output storage without that workaround. This is a
+producer limitation in this exact bundle, not a neoCLR output rule; related general Raven
+forwarding work is recorded in [library validation](../../raven-library-port-validation.md).
+No compiler or bridge encoding changes are included here.
+
+Eight new native comparisons cover the Raven fixture, uninitialized/initialized outputs
+on both branches, two outputs aliasing the same nested payload, and an output callee
+Fault. Six rejection cases cover missing writes, premature reads, conditional/general
+reference contracts, invalid output indices and escaping output references. General
+Some/None execution still needs the emitted Byte tag/conversions, overloaded members,
+attribute classes, generated boxing/string/virtual methods and library dependencies.
+
 ## Next steps toward union-based console input
 
 The author proposes console input once unions work: represent available input,
@@ -144,8 +189,8 @@ references. Its initial host-bootstrap attempt rejected generated ToString with
 The explicit native dependency configuration succeeds in the interpreter; no Raven fix
 or native union execution is claimed by this slice.
 
-Nested value storage is now implemented; next add the required out-parameter semantics, retaining
-nominal identities and actual field contracts rather than recognizing union source names.
+Nested value storage and ordinary output parameters are now implemented. Next admit
+the union tag and remaining generated-member/dependency contracts, retaining nominal identities and actual field contracts rather than recognizing union source names.
 Exercise both Some/None branches, then Result success/error. Resolve generated-member
 and library dependencies explicitly. Reference-bearing payloads and console input follow
 with defined native lifetime and service contracts. Trimming and general heap management

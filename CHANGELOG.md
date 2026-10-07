@@ -52,8 +52,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   aggregate field copies and deep interior borrows, rejecting inline cycles and oversized
   payloads. Validate a Raven Envelope consumer as an independent ARM64 executable and
   nested copy/alias operations against the interpreter. Union-based console input is
-  the next sample direction;
-  nested unions, reference fields and general library dependency compilation remain
+  the next sample direction. Add ordinary output-parameter calls with conservative
+  whole-slot definite-assignment checks, preserving forwarding, nested aliases and
+  Fault propagation. Validate Raven output members and record the pinned producer
+  forwarding workaround; conditional output contracts remain deferred. Full
+  unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime
   dependencies and public library APIs are unchanged. Cherry-pick this

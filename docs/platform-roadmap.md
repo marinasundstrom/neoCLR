@@ -45,8 +45,10 @@ The [first native value/member slice](experiments/aot-values/README.md) now comp
 Raven Counter and copied Int32/Boolean records, including constructors, fields,
 accessors, borrowed receivers and branches. A follow-up slice adds nested
 reference-free records with copied payloads and interior field borrows, validated by
-the Raven Envelope sample. Some/None and Result unions remain next: out-parameter
-matching and generated/library members are not yet supported. The author adds a console-input sample after unions, exercising input and
+the Raven Envelope sample. Ordinary output parameters now support a Raven member/
+forwarding probe, with a native definite-assignment check and alias/Fault tests.
+Some/None and Result execution remains next: tag/conversion support and generated/
+library members are not yet supported; conditional output contracts remain deferred. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

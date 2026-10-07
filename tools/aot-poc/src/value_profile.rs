@@ -106,7 +106,6 @@ impl<'a> Profile<'a> {
                 || !f.generic_parameters.is_empty()
                 || !f.generic_arguments.is_empty()
                 || !f.generic_constraints.is_empty()
-                || !f.out_parameters.is_empty()
                 || !f.out_when_true.is_empty()
                 || !f.readonly_parameters.is_empty()
                 || f.receiver_readonly
@@ -116,6 +115,13 @@ impl<'a> Profile<'a> {
                 || f.parameters.len() > 32
             {
                 return Err(format!("{}: unsupported value member contract", f.name).into());
+            }
+            if f.out_parameters
+                .iter()
+                .any(|n| !matches!(f.parameters.get(*n), Some(Type::ByRef(_))))
+                || f.out_parameters.windows(2).any(|pair| pair[0] >= pair[1])
+            {
+                return Err("output indices must be sorted, unique borrowed parameters".into());
             }
             let mut args = vec![];
             if let Some(owner) = &f.owner {
@@ -134,8 +140,17 @@ impl<'a> Profile<'a> {
             } else if f.instance || f.receiver_byref {
                 return Err("instance member requires a record owner".into());
             }
-            for t in &f.parameters {
-                args.push(p.stored(t)?);
+            for (index, t) in f.parameters.iter().enumerate() {
+                if let Type::ByRef(target) = t {
+                    if !f.out_parameters.contains(&index) {
+                        return Err(
+                            "explicit borrowed parameters require an output contract".into()
+                        );
+                    }
+                    args.push(p.stored(target)?.address());
+                } else {
+                    args.push(p.stored(t)?);
+                }
             }
             p.args.push(args);
             p.locals.push(
@@ -284,6 +299,164 @@ impl<'a> Profile<'a> {
         }
         Ok(i)
     }
+    // The interpreter checks callee output assignment dynamically. Native code has
+    // no such runtime, so require a whole-slot write on every normal return path.
+    fn verify_outputs(&self, i: usize, shapes: &Stacks) -> Result<(), Error> {
+        let f = &self.input.functions[i];
+        if f.out_parameters.is_empty() {
+            return Ok(());
+        }
+        #[derive(Clone, PartialEq, Eq)]
+        struct State {
+            stack: Vec<Option<usize>>,
+            assigned: Vec<bool>,
+        }
+        let mut states = vec![None; f.body.len()];
+        states[0] = Some(State {
+            stack: vec![],
+            assigned: vec![false; f.parameters.len()],
+        });
+        let mut work = VecDeque::from([0]);
+        let offset = usize::from(f.instance);
+        while let Some(pc) = work.pop_front() {
+            let mut state = states[pc].clone().unwrap();
+            let op = &f.body[pc];
+            let fail = || -> Error {
+                format!(
+                    "{} instruction {pc}: output requires a definite whole-slot assignment",
+                    f.name
+                )
+                .into()
+            };
+            let readable = |origin: Option<usize>, assigned: &[bool]| -> Result<(), Error> {
+                if origin.is_some_and(|n| !assigned[n]) {
+                    Err(fail())
+                } else {
+                    Ok(())
+                }
+            };
+            match op {
+                Op::Arg(n) => state.stack.push(
+                    n.checked_sub(offset)
+                        .filter(|n| f.out_parameters.contains(n)),
+                ),
+                Op::Dup => state.stack.push(*state.stack.last().unwrap()),
+                Op::StoreObject(_) => {
+                    state.stack.pop();
+                    if let Some(n) = state.stack.pop().unwrap() {
+                        state.assigned[n] = true;
+                    }
+                }
+                Op::InitializeObject(_) => {
+                    if let Some(n) = state.stack.pop().unwrap() {
+                        state.assigned[n] = true;
+                    }
+                }
+                Op::Field(_) | Op::FieldAddress(_) | Op::LoadObject(_) => {
+                    readable(state.stack.pop().unwrap(), &state.assigned)?;
+                    state.stack.push(None);
+                }
+                Op::SetField(_) => {
+                    state.stack.pop();
+                    // Partial construction is deliberately outside this proof.
+                    readable(state.stack.pop().unwrap(), &state.assigned)?;
+                    state.stack.push(None);
+                }
+                Op::Call(target) | Op::Construct(target) => {
+                    let c = self.callee(target)?;
+                    let callee = &self.input.functions[c];
+                    let construct = matches!(op, Op::Construct(_));
+                    let count = self.args[c].len() - usize::from(construct);
+                    let passed = state.stack.split_off(state.stack.len() - count);
+                    let receiver = usize::from(callee.instance && !construct);
+                    // Check all input borrows before marking any output assigned.
+                    for (n, origin) in passed.iter().enumerate() {
+                        if n.checked_sub(receiver)
+                            .is_none_or(|n| !callee.out_parameters.contains(&n))
+                        {
+                            readable(*origin, &state.assigned)?;
+                        }
+                    }
+                    for &n in &callee.out_parameters {
+                        if let Some(origin) = passed[n + receiver] {
+                            state.assigned[origin] = true;
+                        }
+                    }
+                    if construct || self.results[c].is_some() {
+                        state.stack.push(None);
+                    }
+                }
+                Op::Return => {
+                    if f.out_parameters.iter().any(|n| !state.assigned[*n]) {
+                        return Err(fail());
+                    }
+                    continue;
+                }
+                Op::New(t) => {
+                    let Ty::Record(owner) = self.ty(t)? else {
+                        unreachable!()
+                    };
+                    state
+                        .stack
+                        .truncate(state.stack.len() - self.input.types[owner].fields.len());
+                    state.stack.push(None);
+                }
+                Op::Pop
+                | Op::Store(_)
+                | Op::StoreArg(_)
+                | Op::BranchTrue(_)
+                | Op::BranchFalse(_) => {
+                    state.stack.pop();
+                }
+                Op::Branch(_) => (),
+                Op::Int(_)
+                | Op::Bool(_)
+                | Op::Void
+                | Op::Load(_)
+                | Op::LocalAddress(_)
+                | Op::ArgumentAddress(_) => state.stack.push(None),
+                _ => {
+                    // All remaining admitted instructions are binary scalar operations.
+                    state.stack.pop();
+                    state.stack.pop();
+                    if flow::comparison(op).is_none() {
+                        state.stack.push(None);
+                    }
+                }
+            }
+            let successors = match op {
+                Op::Branch(n) => vec![*n],
+                Op::BranchTrue(n) | Op::BranchFalse(n) => vec![*n, pc + 1],
+                _ if flow::comparison(op).is_some() => {
+                    vec![flow::comparison(op).unwrap().0, pc + 1]
+                }
+                _ => vec![pc + 1],
+            };
+            for next in successors {
+                debug_assert_eq!(state.stack.len(), shapes[next].as_ref().unwrap().len());
+                if let Some(old) = &mut states[next] {
+                    // Do not erase the identity of an output borrow at a CFG join.
+                    if old.stack != state.stack {
+                        return Err(fail());
+                    }
+                    let joined: Vec<_> = old
+                        .assigned
+                        .iter()
+                        .zip(&state.assigned)
+                        .map(|(a, b)| *a && *b)
+                        .collect();
+                    if joined != old.assigned {
+                        old.assigned = joined;
+                        work.push_back(next);
+                    }
+                } else {
+                    states[next] = Some(state.clone());
+                    work.push_back(next);
+                }
+            }
+        }
+        Ok(())
+    }
     pub fn analyze(&self, i: usize) -> Result<Stacks, Error> {
         let f = &self.input.functions[i];
         let fail =
@@ -300,7 +473,7 @@ impl<'a> Profile<'a> {
                     if matches!(op, Op::ArgumentAddress(_) | Op::StoreArg(_))
                         && matches!(self.args[i][*n], Ty::Address(_))
                     {
-                        return Err(fail(pc, "cannot address or replace a borrowed receiver"));
+                        return Err(fail(pc, "cannot address or replace a borrowed parameter"));
                     }
                 }
                 Op::Load(n) | Op::Store(n) | Op::LocalAddress(n) if *n < self.locals[i].len() => (),
@@ -492,6 +665,7 @@ impl<'a> Profile<'a> {
                 }
             }
         }
+        self.verify_outputs(i, &stacks)?;
         Ok(stacks)
     }
 }

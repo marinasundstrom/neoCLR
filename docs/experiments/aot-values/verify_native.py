@@ -18,7 +18,7 @@ def main():
     for name in ('compiler', 'runtime', 'aot', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--compiler-revision', required=True)
-    parser.add_argument('--samples', nargs='+', choices=('counter', 'copies', 'nested'), default=['counter', 'copies', 'nested'])
+    parser.add_argument('--samples', nargs='+', choices=('counter', 'copies', 'nested', 'outputs'), default=['counter', 'copies', 'nested', 'outputs'])
     args = parser.parse_args()
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':
         parser.error('Native execution requires macOS ARM64')
@@ -28,7 +28,7 @@ def main():
             parser.error('Missing built tool: ' + str(path))
     output.mkdir(parents=True, exist_ok=False)
     sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
-    report = dict(profile='raven-inline-values-v2', declaredCompilerRevision=args.compiler_revision,
+    report = dict(profile='raven-output-values-v3', declaredCompilerRevision=args.compiler_revision,
                   neoClrBaseRevision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   host=platform.platform(), SDKROOT=os.environ.get('SDKROOT'), commands=[], samples={})
 

@@ -597,3 +597,179 @@ fn cyclic_unknown_and_oversized_inline_layouts_never_emit() {
         assert!(!temp.0.join("value.o").exists());
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn raven_output_members_forward_record_storage() {
+    let bytes = include_bytes!("../../../docs/experiments/aot-values/Outputs.pe");
+    let m = module(bytes);
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(0)
+    );
+    native(bytes, 0, 0);
+    native(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 0);
+}
+
+const OUTPUTS: &str = r#"
+.module Outputs
+.entry Main
+.type Payload
+.field Value Int32
+.field Ready Boolean
+.end
+.type Envelope
+.field Before Int32
+.field Data Payload
+.field After Int32
+.end
+.function Try(out Payload& value, Boolean success) -> Boolean
+ldarg value
+initobj Payload
+ldarg success
+brfalse Miss
+ldarg value
+ldc.i4 42
+ldc.bool true
+newobj Payload
+stobj Payload
+ldc.bool true
+ret
+Miss:
+ldc.bool false
+ret
+.end
+.function Forward(out Payload& value, Boolean success) -> Boolean
+ldarg value
+ldarg success
+call Try(Payload&,Boolean)
+ret
+.end
+"#;
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn ordinary_outputs_initialize_on_both_success_and_miss() {
+    for initialized in [false, true] {
+        for success in [false, true] {
+            let init = if initialized {
+                "ldc.i4 7\nldc.bool false\nnewobj Payload\nstloc value"
+            } else {
+                ""
+            };
+            let miss = if initialized {
+                "ldloc value\nldfld Payload::Value"
+            } else {
+                "ldc.i4 -1"
+            };
+            let source = format!(
+                "{OUTPUTS}\n.function Main() -> Int32\n.local Payload value\n{init}\nldloca value\nldc.bool {success}\ncall Forward(Payload&,Boolean)\nbrfalse Miss\nldloc value\nldfld Payload::Value\nret\nMiss:\n{miss}\nret\n.end"
+            );
+            let m = neoclr::assemble(&source).unwrap();
+            let expected = if success {
+                42
+            } else if initialized {
+                0
+            } else {
+                -1
+            };
+            assert_eq!(
+                neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+                neoclr::Value::Int32(expected)
+            );
+            native(
+                &neoclr::metadata_container::write_module(&m).unwrap(),
+                0,
+                expected,
+            );
+        }
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn output_aliases_can_target_nested_storage_and_faults_preserve_export_result() {
+    let body = r#"
+.function Alias(out Payload& first, out Payload& second) -> Void
+ldarg first
+ldc.i4 3
+ldc.bool false
+newobj Payload
+stobj Payload
+ldarg second
+ldc.i4 9
+ldc.bool true
+newobj Payload
+stobj Payload
+ldvoid
+ret
+.end
+.function Main() -> Int32
+.local Envelope item
+ldloca item
+initobj Envelope
+ldloca item
+ldflda Envelope::Data
+ldloca item
+ldflda Envelope::Data
+call Alias(Payload&,Payload&)
+pop
+ldloc item
+ldfld Envelope::Data
+ldfld Payload::Value
+ret
+.end
+"#;
+    let source = format!("{OUTPUTS}{body}");
+    let m = neoclr::assemble(&source).unwrap();
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(9)
+    );
+    native(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 9);
+    let faulty = source.replace("ldvoid\nret", "ldc.i4 1\nldc.i4 0\ndiv\npop\nldvoid\nret");
+    let m = neoclr::assemble(&faulty).unwrap();
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap_err().code,
+        neoclr::FaultCode::DivideByZero
+    );
+    native(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        1,
+        12345,
+    );
+}
+
+#[test]
+fn invalid_output_initialization_and_borrow_contracts_never_emit() {
+    let caller = "\n.function Main() -> Int32\n.local Payload value\nldloca value\nldc.bool true\ncall Forward(Payload&,Boolean)\nbrfalse Miss\nldloc value\nldfld Payload::Value\nret\nMiss:\nldc.i4 -1\nret\n.end";
+    let valid = format!("{OUTPUTS}{caller}");
+    let cases = [
+        // Returning normally without assigning output is rejected.
+        valid.replace("ldarg value\ninitobj Payload\n", ""),
+        // Reading output before its first write is rejected.
+        valid.replace(
+            "ldarg value\ninitobj Payload",
+            "ldarg value\nldobj Payload\npop\nldarg value\ninitobj Payload",
+        ),
+        // Conditional contracts and general ref remain outside this slice.
+        valid.replace("out ", "out(true) "),
+        valid.replace("out ", ""),
+        valid.clone(),
+        valid.replace("ldc.bool true\nret", "ldarg value\nret"),
+    ];
+    for (i, source) in cases.iter().enumerate() {
+        let mut m = neoclr::assemble(source).unwrap();
+        if i == 4 {
+            m.functions[0].out_parameters = vec![99];
+        }
+        let temp = Temp::new();
+        let result = compile(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp,
+        );
+        assert!(!result.status.success(), "case {i}");
+        assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
+        assert!(!temp.0.join("value.o").exists());
+    }
+}

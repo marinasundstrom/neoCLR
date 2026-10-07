@@ -1,0 +1,40 @@
+struct Payload {
+    var Value: int = 42
+    var Enabled: bool = true
+}
+
+struct Reader {
+    func TryRead(success: bool, out value: Payload) -> bool {
+        value = default(Payload)
+        if success {
+            value = Payload()
+            return true
+        }
+        return false
+    }
+}
+
+func Forward(success: bool, out value: Payload) -> bool {
+    value = default(Payload)
+    var reader = Reader()
+    let matched = reader.TryRead(success, out value)
+    return matched
+}
+
+func Main() -> int {
+    var value = default(Payload)
+    if Forward(true, out value) {
+        if value.Value != 42 || value.Enabled != true {
+            return 1
+        }
+    } else {
+        return 2
+    }
+    if Forward(false, out value) {
+        return 3
+    }
+    if value.Value != 0 || value.Enabled != false {
+        return 4
+    }
+    return 0
+}
