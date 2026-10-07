@@ -143,13 +143,24 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_console_write_line_utf8_v1", Linkage::Import, &sig)?)
     } else { None };
-    let text_arena = references || details.is_some_and(|d| !d.int32_to_string.is_empty());
+    let text_arena = references || details.is_some_and(|d| !d.int32_to_string.is_empty() || !d.int64_to_string.is_empty() || !d.uint64_to_string.is_empty());
     let format_service = if details.is_some_and(|d| !d.int32_to_string.is_empty()) {
         let mut sig = module.make_signature();
         sig.params.extend([AbiParam::new(types::I32), AbiParam::new(types::I64), AbiParam::new(types::I64)]);
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_int32_to_string_v1", Linkage::Import, &sig)?)
     } else { None };
+    let mut wide_format_services = std::collections::HashMap::new();
+    if let Some(d) = details {
+        for (indices, symbol) in [(&d.int64_to_string, "neoclr_int64_to_string_v1"), (&d.uint64_to_string, "neoclr_uint64_to_string_v1")] {
+            if indices.is_empty() { continue; }
+            let mut sig = module.make_signature();
+            sig.params.extend([types::I64, types::I64, types::I64].map(AbiParam::new));
+            sig.returns.push(AbiParam::new(types::I32));
+            let service = module.declare_function(symbol, Linkage::Import, &sig)?;
+            for index in indices { wide_format_services.insert(*index, service); }
+        }
+    }
     let character_service = if details.is_some_and(|d| !d.char_from_string.is_empty()) {
         let mut sig = module.make_signature();
         sig.params.extend([types::I64, types::I64].map(AbiParam::new));
@@ -269,8 +280,17 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
-            if details.is_some_and(|d| d.int32_to_string.contains(&i)) {
-                let service = module.declare_func_in_func(format_service.unwrap(), b.func);
+            if details.is_some_and(|d| d.native_integer_to64.contains(&i)) {
+                write(&mut b, output, &[parameters[0]]);
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks();
+                b.finalize();
+                module.define_function(ids[i], &mut context)?;
+                continue;
+            }
+            if details.is_some_and(|d| d.int32_to_string.contains(&i)) || wide_format_services.contains_key(&i) {
+                let service = module.declare_func_in_func(wide_format_services.get(&i).copied().or(format_service).unwrap(), b.func);
                 let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                 let call = b.ins().call(service, &[parameters[0], arena, output]);
                 let raw = b.inst_results(call)[0];
@@ -345,6 +365,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let mut site = diagnostic_data.as_ref().map(|d| d.site(&mut module, &mut b, fault_context.unwrap(), i, pc));
                 match op {
                     Op::Int(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
+                    Op::Int64(v) => stack.push(b.ins().iconst(types::I64, *v)),
                     Op::String(_) => {
                         let data = module.declare_data_in_func(literals[&(i, pc)], b.func);
                         stack.push(b.ins().global_value(types::I64, data));
@@ -361,15 +382,23 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let equal = b.ins().icmp(IntCC::Equal, left, right);
                         stack.push(b.ins().uextend(types::I32, equal));
                     }
-                    Op::ConvertInt32 => {
-                        if matches!(top(), Ty::Size) {
+                    Op::ConvertInt32 | Op::ConvertUInt32 => {
+                        if matches!(top(), Ty::Size | Ty::Wide) {
                             let value = pop(&mut stack);
                             stack.push(b.ins().ireduce(types::I32, value));
                         }
                     }
+                    Op::ConvertInt64 | Op::ConvertUInt64 | Op::ConvertNativeInt | Op::ConvertNativeUInt => {
+                        if matches!(top(), Ty::Int) {
+                            let value = pop(&mut stack);
+                            stack.push(if matches!(op, Op::ConvertUInt64 | Op::ConvertNativeUInt) {
+                                b.ins().uextend(types::I64, value)
+                            } else { b.ins().sextend(types::I64, value) });
+                        }
+                    }
                     Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 => {
                         let value = pop(&mut stack);
-                        let value = if matches!(top(), Ty::Size) { b.ins().ireduce(types::I32, value) } else { value };
+                        let value = if matches!(top(), Ty::Size | Ty::Wide) { b.ins().ireduce(types::I32, value) } else { value };
                         let narrow = b.ins().ireduce(if matches!(op, Op::ConvertUInt8 | Op::ConvertInt8) { types::I8 } else { types::I16 }, value);
                         stack.push(if matches!(op, Op::ConvertInt8 | Op::ConvertInt16) { b.ins().sextend(types::I32, narrow) } else { b.ins().uextend(types::I32, narrow) });
                     }

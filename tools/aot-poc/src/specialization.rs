@@ -41,7 +41,7 @@ impl Specializer<'_> {
     }
     fn lower(&mut self, ty: &Type) -> Result<Type, Error> {
         let (name, arguments) = match ty {
-            Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UIntPtr => {
+            Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr => {
                 return Ok(ty.clone());
             }
             Type::ByRef(t) => return Ok(Type::ByRef(Box::new(self.lower(t)?))),

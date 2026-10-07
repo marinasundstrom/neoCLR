@@ -19,6 +19,7 @@ pub(super) enum Ty {
     Reference(usize),
     ByteArray,
     Size,
+    Wide,
     Address(Box<Ty>),
 }
 impl Ty {
@@ -78,7 +79,7 @@ impl<'a> Profile<'a> {
                 || t.fields.len() > 8
                 || t.fields.iter().any(|f| {
                     f.deferred
-                        || !(matches!(f.ty, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::String | Type::Named(_))
+                        || !(matches!(f.ty, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::String | Type::Named(_))
                             || (references && matches!(&f.ty, Type::ArrayRef(t) if **t == Type::Byte)))
                 })
             {
@@ -248,7 +249,7 @@ impl<'a> Profile<'a> {
     }
     pub fn ty(&self, t: &Type) -> Result<Ty, Error> {
         Ok(match t {
-            Type::Int32 => Ty::Int,
+            Type::Int32 | Type::UInt32 => Ty::Int,
             Type::Byte => Ty::Byte,
             Type::SByte => Ty::SByte,
             Type::Int16 => Ty::Short,
@@ -258,7 +259,8 @@ impl<'a> Profile<'a> {
             Type::Value => Ty::Erased,
             Type::String => Ty::Literal,
             Type::Char => Ty::Character,
-            Type::UIntPtr => Ty::Size,
+            Type::IntPtr | Type::UIntPtr => Ty::Size,
+            Type::Int64 | Type::UInt64 => Ty::Wide,
             Type::ArrayRef(t) if **t == Type::Byte && self.references => Ty::ByteArray,
             Type::Named(name) => {
                 let i = self
@@ -305,7 +307,7 @@ impl<'a> Profile<'a> {
     }
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
-            Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::ByteArray | Ty::Size => vec![true],
+            Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::ByteArray | Ty::Size | Ty::Wide => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
             _ => vec![false; self.lanes(t)],
@@ -435,7 +437,7 @@ impl<'a> Profile<'a> {
                     n.checked_sub(offset)
                         .filter(|n| f.out_parameters.contains(n)),
                 ),
-                Op::ConvertInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 => (),
+                Op::ConvertInt32 | Op::ConvertUInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 | Op::ConvertInt64 | Op::ConvertUInt64 | Op::ConvertNativeInt | Op::ConvertNativeUInt => (),
                 Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_)
                 | Op::IsInstance(_) | Op::CastClass(_) | Op::ReferenceIsNull | Op::NewArray(_) | Op::ArrayLength => {
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
@@ -519,6 +521,7 @@ impl<'a> Profile<'a> {
                 }
                 Op::Branch(_) => (),
                 Op::Int(_)
+                | Op::Int64(_)
                 | Op::String(_)
                 | Op::Bool(_)
                 | Op::Void
@@ -588,8 +591,14 @@ impl<'a> Profile<'a> {
                 }
                 Op::Load(n) | Op::Store(n) | Op::LocalAddress(n) if *n < self.locals[i].len() => (),
                 Op::Int(_)
+                | Op::Int64(_)
                 | Op::String(_)
                 | Op::ConvertInt32
+                | Op::ConvertUInt32
+                | Op::ConvertInt64
+                | Op::ConvertUInt64
+                | Op::ConvertNativeInt
+                | Op::ConvertNativeUInt
                 | Op::ConvertUInt8
                 | Op::ConvertInt8
                 | Op::ConvertInt16
@@ -657,10 +666,15 @@ impl<'a> Profile<'a> {
             };
             match op {
                 Op::Int(_) => stack.push(Ty::Int),
+                Op::Int64(_) => stack.push(Ty::Wide),
                 Op::String(_) => stack.push(Ty::Literal),
-                Op::ConvertInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 => {
-                    if !matches!(pop(&mut stack)?, Ty::Int | Ty::Size) { return Err(fail(pc, "conversion requires Int32 or array length")); }
-                    stack.push(Ty::Int);
+                Op::ConvertInt32 | Op::ConvertUInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 | Op::ConvertInt64 | Op::ConvertUInt64 | Op::ConvertNativeInt | Op::ConvertNativeUInt => {
+                    if !matches!(pop(&mut stack)?, Ty::Int | Ty::Size | Ty::Wide) { return Err(fail(pc, "conversion requires an integer stack category")); }
+                    stack.push(match op {
+                        Op::ConvertInt64 | Op::ConvertUInt64 => Ty::Wide,
+                        Op::ConvertNativeInt | Op::ConvertNativeUInt => Ty::Size,
+                        _ => Ty::Int,
+                    });
                 }
                 Op::Bool(_) => stack.push(Ty::Bool),
                 Op::Void => stack.push(Ty::Unit),
@@ -791,6 +805,12 @@ impl<'a> Profile<'a> {
                     if !matches!(pop(&mut stack)?, Ty::Int | Ty::Bool) {
                         return Err(fail(pc, "branch requires Int32 or Boolean"));
                     }
+                }
+                Op::Add | Op::Sub | Op::Mul => {
+                    let t = pop(&mut stack)?;
+                    if !matches!(t, Ty::Int | Ty::Wide) { return Err(fail(pc, "wrapping arithmetic requires Int32 or Int64")); }
+                    take(&mut stack, &t)?;
+                    stack.push(t);
                 }
                 Op::Equal => {
                     let t = pop(&mut stack)?;

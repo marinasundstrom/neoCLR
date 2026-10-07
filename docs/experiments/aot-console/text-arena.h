@@ -29,6 +29,10 @@ int32_t neoclr_entry_v4(int32_t value, int32_t *result, neoclr_aot_context *cont
  */
 int32_t neoclr_int32_to_string_v1(int32_t value, neoclr_aot_text_arena *arena,
                                 const neoclr_aot_text **output);
+int32_t neoclr_int64_to_string_v1(int64_t value, neoclr_aot_text_arena *arena,
+                                const neoclr_aot_text **output);
+int32_t neoclr_uint64_to_string_v1(uint64_t value, neoclr_aot_text_arena *arena,
+                                 const neoclr_aot_text **output);
 /* Internal object allocation for the explicit reference-arena profile. Header is
  * a private type index; bytes includes header and padded payload (8..72 bytes).
  * The arena owns objects and cycles until the next entry/reset, just like text.

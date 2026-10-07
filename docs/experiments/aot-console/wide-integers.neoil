@@ -1,0 +1,129 @@
+.module WideIntegers
+.type Packet
+.field Signed Int64
+.field Tag Byte
+.field Unsigned UInt64
+.end
+.function Fill(out Packet& target) -> Void
+ldarg target
+ldc.i8 -9223372036854775808
+ldc.i4 255
+ldc.i8 -1
+newobj Packet
+stobj Packet
+ldvoid
+ret
+.end
+.function Calculate(Int32 input) -> Int32
+.local Packet packet
+ldarg input
+ldc.i4 0
+beq Minimum
+ldarg input
+ldc.i4 1
+beq Maximum
+ldarg input
+ldc.i4 2
+beq UnsignedMaximum
+ldarg input
+ldc.i4 3
+beq WidenUnsigned
+ldarg input
+ldc.i4 4
+beq NativeSigned
+ldarg input
+ldc.i4 5
+beq NativeUnsigned
+ldarg input
+ldc.i4 6
+beq NativeAllBits
+ldarg input
+ldc.i4 7
+beq Narrow
+ldarg input
+ldc.i4 8
+beq Record
+ldarg input
+ldc.i4 9
+beq WrapAdd
+ldarg input
+ldc.i4 10
+beq WrapSub
+ldarg input
+ldc.i4 11
+beq WrapMul
+ldarg input
+conv.i8
+br UnsignedText
+Minimum:
+ldc.i8 -9223372036854775808
+br SignedText
+Maximum:
+ldc.i8 9223372036854775807
+br SignedText
+UnsignedMaximum:
+ldc.i8 -1
+br UnsignedText
+WidenUnsigned:
+ldc.i4 -1
+conv.u8
+br UnsignedText
+NativeSigned:
+ldc.i4 -1
+conv.i
+call neoCLR.Runtime.IntPtrToInt64(IntPtr)
+br SignedText
+NativeUnsigned:
+ldc.i4 -1
+conv.u
+call neoCLR.Runtime.UIntPtrToUInt64(UIntPtr)
+br UnsignedText
+NativeAllBits:
+ldc.i8 -1
+conv.u
+call neoCLR.Runtime.UIntPtrToUInt64(UIntPtr)
+br UnsignedText
+Narrow:
+ldc.i8 -1
+conv.i4
+conv.i8
+br SignedText
+Record:
+ldloca packet
+call Fill(Packet&)
+pop
+ldloc packet
+ldfld Packet::Unsigned
+br UnsignedText
+WrapAdd:
+ldc.i8 9223372036854775807
+ldc.i8 1
+add
+br SignedText
+WrapSub:
+ldc.i8 -9223372036854775808
+ldc.i8 1
+sub
+br SignedText
+WrapMul:
+ldc.i8 9223372036854775807
+ldc.i8 2
+mul
+br SignedText
+SignedText:
+call neoCLR.Runtime.Int64ToString(Int64)
+br Fault
+UnsignedText:
+call neoCLR.Runtime.UInt64ToString(UInt64)
+Fault:
+call neoCLR.Runtime.Fault(String)
+pop
+ldc.i4 42
+ret
+.end
+.function neoCLR.Runtime.IntPtrToInt64(IntPtr value) -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.UIntPtrToUInt64(UIntPtr value) -> UInt64
+.methodimpl InternalCall
+.end

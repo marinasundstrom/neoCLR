@@ -241,3 +241,41 @@ pub fn character_text(input: &mut neoclr::Module, selection: &Value) -> Result<V
     }
     Ok(bindings)
 }
+
+/// Explicit wide integer formatting and ARM64 native-width conversion.
+pub fn integer_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        let (parameter, result, implementation) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.Int64ToString") => (Type::Int64, Type::String, "int64-to-string-v1"),
+            Some("neoCLR.Runtime.UInt64ToString") => (Type::UInt64, Type::String, "uint64-to-string-v1"),
+            Some("neoCLR.Runtime.IntPtrToInt64") => (Type::IntPtr, Type::Int64, "native-integer-to64-v1"),
+            Some("neoCLR.Runtime.UIntPtrToUInt64") => (Type::UIntPtr, Type::UInt64, "native-integer-to64-v1"),
+            _ => continue,
+        };
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != row["name"].as_str().unwrap()
+            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != [parameter] || f.returns != result || f.no_result
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
+            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
+        { return Err("native integer text binding requires exact reserved Int64/UInt64 formatting or native-integer conversion InternalCall contract".into()); }
+        f.impl_flags = 0;
+        f.body = if result == Type::String {
+            vec![Op::String(String::new()), Op::Return]
+        } else {
+            vec![Op::Int64(0), Op::Return]
+        };
+        bindings.push(json!({"definition": row["definition"], "name": row["name"],
+            "compiledIndex": row["compiledIndex"], "implementation": implementation,
+            "symbol": match implementation {
+                "int64-to-string-v1" => Some("neoclr_int64_to_string_v1"),
+                "uint64-to-string-v1" => Some("neoclr_uint64_to_string_v1"),
+                _ => None,
+            }, "storage": if result == Type::String { "caller-owned-text-arena-v4" } else { "64-bit target bit-preserving conversion" }}));
+    }
+    Ok(bindings)
+}

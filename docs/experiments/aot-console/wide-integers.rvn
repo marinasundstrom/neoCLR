@@ -1,0 +1,15 @@
+import System.*
+
+func Signed(value: long) -> long => value
+func Unsigned(value: ulong) -> ulong => value
+
+func Main() -> int {
+    Console.WriteLine(Signed(-9223372036854775807L - 1L))
+    Console.WriteLine(Signed(9223372036854775807L))
+    Console.WriteLine(Unsigned((ulong)-1L))
+    let unsignedInt: uint = 4294967295
+    Console.WriteLine(unsignedInt)
+    Console.WriteLine(default(nint))
+    Console.WriteLine(default(nuint))
+    return 0
+}

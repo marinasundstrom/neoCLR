@@ -826,3 +826,74 @@ int main(int argc, char **argv) {
         assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(), "{value}");
     }
 }
+
+const INTEGER_SEED: &str = ".function neoCLR.Runtime.Int64ToString(Int64 value) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.UInt64ToString(UInt64 value) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.IntPtrToInt64(IntPtr value) -> Int64\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.UIntPtrToUInt64(UIntPtr value) -> UInt64\n.methodimpl InternalCall\n.end";
+
+#[test]
+fn wide_integer_services_require_exact_opt_in() {
+    let seed = neoclr::assemble(&format!("{TEXT_SEED}\n{INTEGER_SEED}")).unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/wide-integers.neoil");
+    for flags in [
+        vec!["--compile-system", "--bind-user-fault"],
+        vec!["--bind-integer-text"],
+        vec!["--compile-system", "--bind-integer-text", "--bind-integer-text"],
+    ] {
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, source, &flags, false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    }
+    for service in ["neoCLR.Runtime.Int64ToString", "neoCLR.Runtime.UInt64ToString"] {
+        let mut impostor = seed.clone();
+        let f = impostor.functions.iter_mut().find(|f| f.name == service).unwrap();
+        f.impl_flags = 0;
+        f.body = vec![neoclr::metadata::Instruction::String("fake".into()), neoclr::metadata::Instruction::Return];
+        let dir = Temp::new();
+        let r = compile_source(&dir, &impostor, source, &["--compile-system", "--bind-user-fault", "--bind-integer-text"], false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+        assert!(String::from_utf8_lossy(&r.stderr).contains("exact reserved"));
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn wide_integer_text_conversions_records_and_lifetime_match_interpreter() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(&format!("{TEXT_SEED}\n{INTEGER_SEED}")).unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/wide-integers.neoil");
+    let r = compile_source(&dir, &seed, source, &["--compile-system", "--bind-user-fault", "--bind-integer-text"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"), r#"
+#include "text-arena.h"
+#include <stdlib.h>
+#include <string.h>
+int main(int argc, char **argv) {
+    uint64_t storage[5]; memset(storage,0xa5,sizeof(storage));
+    neoclr_aot_context ctx={ .text={(unsigned char*)storage,27,0} };
+    int32_t result=-99;
+    if (neoclr_entry_v4(0,&result,&ctx)!=5 || result!=-99 || ctx.text.used) return 90;
+    for (unsigned i=0;i<sizeof(storage);i++) if (((unsigned char*)storage)[i]!=0xa5) return 91;
+    ctx.text.capacity=28;
+    for (int iteration=0;iteration<2;iteration++) {
+        int status=neoclr_entry_v4(argc>1 ? atoi(argv[1]) : 0,&result,&ctx);
+        if (status!=4 || result!=-99 || ctx.fault.code!=4 || ctx.text.used>28) return 92;
+    }
+    for (unsigned i=28;i<sizeof(storage);i++) if (((unsigned char*)storage)[i]!=0xa5) return 93;
+    return neoclr_aot_render_fault(stderr,&ctx.fault);
+}
+"#).unwrap();
+    let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for value in [0,1,2,3,4,5,6,7,8,9,10,11,-1,i32::MIN,i32::MAX] {
+        let fault = method.invoke(vec![neoclr::Value::Int32(value)],neoclr::Limits::default()).unwrap_err();
+        let r = Command::new(dir.0.join("app")).arg(value.to_string()).env_clear().output().unwrap();
+        assert!(r.status.success(), "{value}: {r:?}");
+        assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(), "{value}");
+    }
+}

@@ -171,7 +171,7 @@ own recovery/exit policy. No stable native ABI or new guest exception API is int
 
 ### Experimental native text lifetime
 
-The AOT Console experiment's optional Int32 formatting binding exports ABI v4 with
+The AOT Console experiment's optional integer formatting bindings export ABI v4 with
 a caller-owned context and text buffer. Its fault prefix remains the ABI v3 layout;
 status 5 denotes NativeMemoryLimitExceeded and uses the shared standard message.
 UserFault messages may point into the invocation buffer: render/read them before the

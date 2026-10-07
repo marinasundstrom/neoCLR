@@ -336,3 +336,44 @@ width/sign categories, including overflow truncation and sign boundaries.
 and `small-integers-validation.json` record fresh compilation, exact output/fault
 parity and standalone deployment. The existing Int32 text binding provides formatting;
 no new Console native service or public managed API is added.
+
+## Wide and native-width integer output (2026-10-08)
+
+`--bind-integer-text` (requiring `--compile-system`) admits exact InternalCall
+`Int64ToString(Int64) -> String`, `UInt64ToString(UInt64) -> String`,
+`IntPtrToInt64(IntPtr) -> Int64` and `UIntPtrToUInt64(UIntPtr) -> UInt64` contracts.
+Ordinary Console/runtime-service wrappers still compile as managed bodies. Formatting
+calls the linked `neoclr_int64_to_string_v1`/`neoclr_uint64_to_string_v1` functions,
+with `(int64_t|uint64_t value, neoclr_aot_text_arena*, const neoclr_aot_text**)`
+signatures and the same success/runtime-error/exhaustion statuses as Int32 formatting.
+Native-width conversion preserves bits on the ARM64 target and imports no helper.
+The existing `--bind-int32-to-string` capability remains separate.
+
+UInt32 uses the Int32 evaluation category. Int64/UInt64 and native-width storage use
+64-bit lanes through locals, fields, calls, return slots and borrows. Unchecked integer
+conversions truncate or extend according to the opcode: signed Int32 widening sign
+extends; `conv.u8`/`conv.u` zero extend its 32-bit bit pattern. Native integers are
+64-bit for this target, not a portable assumption for future 32-bit targets. Int64
+wrapping add/subtract/multiply also compile. Checked wide arithmetic, wide division/
+remainder, general pointer operations, wide generic payloads and wide comparisons
+remain unsupported; root exports remain Int32-only.
+
+Decimal formatting uses bounded 21-byte local buffers, preserves signed/unsigned
+endpoints and copies text to invocation-owned immutable storage. There is no shared
+managed framework dependency or change to ABI v4's layout/lifetime. As with ordinary
+.NET integer formatting, the value's signedness controls its decimal representation;
+this experiment follows neoCLR's existing culture-independent service contract,
+without adding CLR format providers or claiming equivalent culture APIs/performance.
+
+`wide-integers.neoil` compares exact interpreter/native diagnostics for endpoints,
+signed/unsigned widening, native-width conversions, narrowing, mixed record output
+copies and wrapping arithmetic. A one-byte-short arena fails without changing result,
+cursor or bytes; an exact-size arena succeeds across repeated calls with canaries.
+`wide-integers.rvn`, `verify_interactive.py --wide-integers` and
+`wide-integers-validation.json` exercise fresh Raven Console output and broken-pipe
+parity in a standalone executable. The pinned Raven bridge accepts native-width
+defaults but rejected explicit int-to-nint casts in the initial probe; nonzero native
+conversions are consequently validated at CIL level. Invalid `UL`/minimum-literal
+spellings in that probe were replaced with tested Raven casts/expressions, not new
+compiler syntax support. Stream/interface calls and multiple closed carrier shapes
+remain the next Write/ReadLine dependencies.

@@ -1150,7 +1150,7 @@ fn closed_world_compiles_original_raven_choice_without_runtime_imports() {
 #[test]
 fn closed_world_is_explicit_and_never_omits_called_unsupported_code() {
     use neoclr::metadata::Instruction as Op;
-    let source = ".module Selection\n.entry Main\n.type Cell\n.field Value Int32\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n.function Unused() -> Int32\nldc.i8 1\npop\nldc.i4 0\nret\n.end";
+    let source = ".module Selection\n.entry Main\n.type Cell\n.field Value Int32\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n.function Unused() -> Int32\nldc.r8 1\npop\nldc.i4 0\nret\n.end";
     let m = neoclr::assemble(source).unwrap();
     let bytes = neoclr::metadata_container::write_module(&m).unwrap();
     let temp = Temp::new();

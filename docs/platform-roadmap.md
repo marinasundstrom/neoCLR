@@ -104,7 +104,9 @@ with interpreter fault parity and a standalone Raven Console consumer. Character
 WriteLine now preserves UTF-8 graphemes through statically linked Unicode validation,
 with NUL defaults, invalid-input parity and a fresh Raven consumer. Signed-byte and
 16-bit integer storage/conversions now feed ordinary numeric Console output, with
-boundary and fresh Raven evidence. Interface
+boundary and fresh Raven evidence. Explicit 64-bit formatting/native-width bindings
+now cover the remaining integer Console output paths, including signed/unsigned
+endpoints, with full-width storage and conversion parity. Interface
 views/dispatch and broader stream support behind Write/ReadLine remain next; this region is
 not a replacement for general native collection. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and

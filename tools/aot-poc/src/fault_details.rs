@@ -15,6 +15,9 @@ pub struct Options {
     pub int32_to_string: Vec<usize>,
     pub char_from_string: Vec<usize>,
     pub char_text: Vec<usize>,
+    pub int64_to_string: Vec<usize>,
+    pub uint64_to_string: Vec<usize>,
+    pub native_integer_to64: Vec<usize>,
     pub reference_arena: bool,
     pub frame_names: HashMap<usize, String>,
 }
@@ -55,6 +58,24 @@ impl Options {
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter().flatten()
                 .filter(|r| r["implementation"] == "char-text-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            int64_to_string: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "int64-to-string-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            uint64_to_string: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "uint64-to-string-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            native_integer_to64: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "native-integer-to64-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             console_read_byte: report

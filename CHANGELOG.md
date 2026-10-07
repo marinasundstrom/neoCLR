@@ -58,7 +58,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   retaining Int32 stack arithmetic and existing numeric text formatting. Validate
   48 boundary cases across fields, borrows, parameters and returns, plus a fresh
   standalone Raven small-integer Console sample. Checked narrowing and wider
-  integer formatting remain outside this slice.
+  integer formatting initially remained outside that slice. Add explicit signed and
+  unsigned 64-bit formatting/native-width conversion bindings, UInt32/64-bit/native
+  storage, unchecked integer conversions and wrapping Int64 add/subtract/multiply.
+  Preserve full-width bits, typed copies and shared arena lifetime/exhaustion rules.
+  Validate numeric endpoints, wrapping, signed versus unsigned widening and a fresh
+  Raven Console app, including native-width defaults. Wide checked arithmetic,
+  division and general native-pointer operations remain unsupported.
 
 ### 2026-10-07
 
