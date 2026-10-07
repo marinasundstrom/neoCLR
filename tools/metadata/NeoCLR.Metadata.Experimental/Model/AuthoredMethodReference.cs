@@ -35,6 +35,24 @@ public sealed partial class AssemblyBuilder
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
     public ImportedMethodReference CreateMethodReference(ImportedTypeReference declaringType, string name,
         MethodSignature signature, bool isStatic = false, bool isOverride = false, PrimitiveType? nativePrimitive = null)
+        => CreateMethodReferenceCore(declaringType, name, signature, isStatic, isOverride, nativePrimitive, false);
+
+    /// <summary>Authors a virtual ToString, GetHashCode or Equals reference on the explicitly selected external Object root.</summary>
+    /// <remarks>No dependency is loaded. The host supplies the selected root; runtime linking validates its actual slot. Use Callvirt, not Call.</remarks>
+    /// <exception cref="InvalidOperationException">No external native root is selected.</exception>
+    /// <exception cref="ArgumentException">The name or signature is not an exact supported Object slot.</exception>
+    /// <exception cref="InvalidDataException">The reference conflicts with an existing contract.</exception>
+    public ImportedMethodReference CreateObjectSlotReference(string name, MethodSignature signature)
+    {
+        var root = ExternalObjectRoot ?? throw new InvalidOperationException("select an external Object root before authoring slots");
+        ArgumentNullException.ThrowIfNull(signature);
+        if (!MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, null, root) || signature.OutParameters.Count != 0)
+            throw new ArgumentException("Object slot reference requires an exact root signature");
+        return CreateMethodReferenceCore(root, name, signature, false, false, null, true);
+    }
+
+    private ImportedMethodReference CreateMethodReferenceCore(ImportedTypeReference declaringType, string name,
+        MethodSignature signature, bool isStatic, bool isOverride, PrimitiveType? nativePrimitive, bool isObjectSlot)
     {
         ArgumentNullException.ThrowIfNull(declaringType);
         ArgumentNullException.ThrowIfNull(name);
@@ -68,7 +86,7 @@ public sealed partial class AssemblyBuilder
             if (!Equals(existing.DeclaringReference, declaringType) || existing.Name != name ||
                 existing.Signature.GenericParameterNames.Count != signature.GenericParameterNames.Count ||
                 !existing.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)) continue;
-            if (existing.Target.DeclaringType?.NativePrimitive != nativePrimitive || existing.Target.NativeValueOverride != isOverride || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
+            if (existing.Target.NativeImportObjectSlot != isObjectSlot || existing.Target.DeclaringType?.NativePrimitive != nativePrimitive || existing.Target.NativeValueOverride != isOverride || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
                 throw new InvalidDataException("conflicting method contract");
             return existing;
         }
@@ -87,8 +105,10 @@ public sealed partial class AssemblyBuilder
         if (nativePrimitive is { } scalar) owner.SetNativePrimitive(scalar);
         if (IsNativeGrapheme(declaringType)) owner.SetNativeGrapheme();
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, owner, name, signature, isStatic: isStatic))
-        { DeclaringReference = declaringType, RequiresVirtualDispatch = (isInterface || isOverride && !declaringType.IsValueType) && !isStatic };
+        { DeclaringReference = declaringType, RequiresVirtualDispatch = (isObjectSlot || isInterface || isOverride && !declaringType.IsValueType) && !isStatic };
         reference.Target.NativeValueOverride = isOverride;
+        reference.Target.NativeImportObjectSlot = isObjectSlot;
+        if (isObjectSlot) reference.Target.NativeImportName = "System.Object." + name;
         reference.Target.NativeImportPrimitiveOwner = nativePrimitive;
         reference.Target.NativeImportCharOwner = IsNativeGrapheme(declaringType);
         authoredCallableReferences.Add(reference);

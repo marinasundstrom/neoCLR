@@ -1,0 +1,22 @@
+import System.*
+
+public class Item {
+    init() { }
+    override func ToString() -> string => "derived"
+    override func GetHashCode() -> int => 42
+    override func Equals(other: Object?) -> bool => true
+}
+
+func Main() -> int {
+    let value: object = Item()
+    if value.ToString() != "derived" {
+        return 1
+    }
+    if value.GetHashCode() != 42 {
+        return 2
+    }
+    if !value.Equals(null) {
+        return 3
+    }
+    return 42
+}

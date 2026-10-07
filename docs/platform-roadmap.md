@@ -31,8 +31,11 @@ execution (42). Networking advances to a System.Value encoding dependency.
 Imported Value ownership now passes source-free parse/type-test/unpack execution
 (42), with 165 metadata groups passing. Networking reaches imported virtual Object
 method calls. [Value evidence](experiments/extended-cli-metadata/imported-value-2026-10-07.md).
-Next: support symbol-authored imported Object slots, then the supported array-reflection
-boundary for Data.
+Imported Object slot references now execute ToString/GetHashCode/Equals overrides
+through an object receiver (42), with 165 metadata groups passing.
+[Slot evidence](experiments/extended-cli-metadata/imported-object-slots-2026-10-07.md).
+Next: resolve the source/retained CheckedStorage dependency mapping exposed by separate
+Networking compilation, then the supported array-reflection boundary for Data.
 Resume executable Data/Networking consumers, then Web and project/LSP catalogs.
 The author's platform-package direction is recorded separately from assembly ownership:
 [candidate distribution boundaries](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md).

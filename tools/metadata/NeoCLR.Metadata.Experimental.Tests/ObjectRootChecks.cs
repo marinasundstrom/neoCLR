@@ -82,7 +82,7 @@ internal static class ObjectRootChecks
         equals.GetILGenerator().Emit(OpCode.Ldc_Bool, true); equals.GetILGenerator().Return();
         var main = graph.AddFunction("Main"); graph.EntryPoint = main;
         var il = main.GetILGenerator(); var failed = il.DefineLabel();
-        il.NewObject(ctor); il.LoadDefault(root); il.CallVirtual(equals);
+        il.NewObject(ctor); il.LoadDefault(root); il.Emit(OpCode.Callvirt, graph.CreateObjectSlotReference("Equals", new(PrimitiveType.Boolean, [root])));
         il.Emit(OpCode.Brfalse, failed); il.LoadConstant(42); il.Return();
         il.MarkLabel(failed); il.LoadConstant(1); il.Return();
         File.WriteAllBytes(output, RuntimeAssemblyContainer.WriteBinary(graph));
@@ -104,6 +104,14 @@ internal static class ObjectRootChecks
             _ = graph.CreateMethodReference(externalClass, "Equals", signature, isOverride: true);
             Reject<ArgumentException>(() => graph.CreateMethodReference(externalClass, "Equals",
                 new(PrimitiveType.Boolean, [graph.CoreObjectType]), isOverride: true));
+            var slot = graph.CreateObjectSlotReference("ToString", new(PrimitiveType.String, []));
+            if (!slot.RequiresVirtualDispatch || slot.IsStatic || slot.IsInterfaceMethod)
+                throw new Exception("Object slot category lost");
+            if (!ReferenceEquals(slot, graph.CreateObjectSlotReference("ToString", new(PrimitiveType.String, []))))
+                throw new Exception("Object slot references must intern");
+            Reject<ArgumentException>(() => graph.CreateObjectSlotReference("Equals", new(PrimitiveType.Boolean, [graph.CoreObjectType])));
+            Reject<ArgumentException>(() => graph.CreateObjectSlotReference("Other", new(PrimitiveType.Int32, [])));
+            Reject<InvalidDataException>(() => graph.CreateMethodReference(root, "ToString", new(PrimitiveType.String, [])));
             if (!Equals(graph.ObjectType.ImportedType, root)) throw new Exception("external Object selection lost");
             MethodBuilder method;
             if (manual)
@@ -119,6 +127,7 @@ internal static class ObjectRootChecks
             var loaded = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph));
             if (loaded.MainModule.Types.Single().Methods.Single().Name != "Equals")
                 throw new Exception("external Object override lost on roundtrip");
+            Reject<ArgumentException>(() => method.GetILGenerator().Emit(OpCode.Call, slot));
             Reject<InvalidDataException>(() => graph.Write());
             Reject<InvalidOperationException>(() => graph.AddNativeObjectRoot());
             Reject<InvalidOperationException>(() => graph.SetNativeObjectRoot(graph.CoreObjectType));

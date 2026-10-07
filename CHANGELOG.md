@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Add explicit selected-root Object slot references with exact signature and virtual
+  dispatch validation. Source-free Raven dispatch through an object receiver reaches
+  derived ToString/GetHashCode/Equals overrides (42); the API fixture also executes
+  imported Equals dispatch. All 165 metadata groups pass. Networking now reaches a
+  CheckedStorage ownership mapping gap rather than unsupported Object calls.
+
 - Preserve selected imported System.Value ownership when mapping bootstrap helper
   signatures, writing native storage aliases and matching retained runtime services.
   C# introspection round trips retain exact external identity; a Raven parse/type-test/

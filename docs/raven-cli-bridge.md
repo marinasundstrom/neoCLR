@@ -6533,3 +6533,11 @@ bootstrap helper import. Metadata retains the explicit external owner and canoni
 Value encoding. Actual retained parsing/type-test/unpack services execute with success
 and error payload checks (42); no service stubs or new CLI projection participate.
 [Evidence and next blocker](experiments/extended-cli-metadata/imported-value-2026-10-07.md).
+
+### Imported Object virtual dispatch — 2026-10-07
+
+Raven `1c2ccd638` authors exact selected-root virtual slot references from symbols.
+The metadata API requires Callvirt and retains external identity while encoding native
+Object owner/name. Ordinary Raven calls through an object receiver execute all three
+derived overrides (42), without library sources or importer access during emission.
+[Validation and remaining Networking gap](experiments/extended-cli-metadata/imported-object-slots-2026-10-07.md).

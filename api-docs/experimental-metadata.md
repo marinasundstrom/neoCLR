@@ -7772,3 +7772,30 @@ supported; this adds no new public API or native instruction.
 [Executable evidence](../docs/experiments/extended-cli-metadata/imported-value-2026-10-07.md)
 covers successful/error payloads through actual runtime services and canonical
 introspection parameter/return identity.
+
+### Imported Object slot references (development, 2026-10-07)
+
+`AssemblyBuilder.CreateObjectSlotReference(string name, MethodSignature signature)`
+returns an interned `ImportedMethodReference` for the explicitly selected external
+Object root. Supported contracts are `String ToString()`, `Int32 GetHashCode()` and
+`Boolean Equals(ObjectType)`, without generic or out parameters. Call
+`SetNativeObjectRoot(reference)` first. No dependency is opened; the host provides
+identity and runtime linking validates the actual root and slot.
+
+The returned contract has `RequiresVirtualDispatch == true`; use
+`generator.Emit(OpCode.Callvirt, reference)`. Ordinary Call rejects with ArgumentException.
+This is an inherited slot declaration reference, not an override or interface method.
+Missing selection throws InvalidOperationException, invalid signatures throw
+ArgumentException, and conflicting ordinary/virtual references throw InvalidDataException.
+The reference retains its external assembly scope in CLI metadata and canonical native
+Object owner/name for runtime linking. No encoding category or version changes.
+
+Body validation accepts reference-class receivers for the explicitly selected external
+root; values still require explicit boxing or constrained dispatch. Selection does not
+make arbitrary same-named types universal receivers.
+
+[C# and executable Raven validation](../docs/experiments/extended-cli-metadata/imported-object-slots-2026-10-07.md)
+covers slot interning/category, wrong signatures, incompatible contracts, wrong dispatch
+opcode and execution through a base-typed receiver. General imported virtual class
+methods remain outside this bounded API. Host API documentation lives here; it is not
+a new guest class-library API for the RavenDoc assembly snapshot.
