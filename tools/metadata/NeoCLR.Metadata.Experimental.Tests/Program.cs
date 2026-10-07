@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--check-source-attributes", var attributeLibrary])
+{
+    SourceAttributeChecks.Check(attributeLibrary); return 0;
+}
 if (args is ["--generic-object-consumer", var rootLibrary, var rootCore, var rootConsumer])
 {
     GenericObjectRootChecks.WriteConsumer(rootLibrary, rootCore, rootConsumer); return 0;

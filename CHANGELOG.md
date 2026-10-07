@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Add the source-built abstract System.Attribute base with a protected constructor;
+  retain UnionAttribute inheritance and reuse its constructor for union metadata.
+  Source and embedded marker gates execute, metadata identity checks pass, and invalid
+  markers publish no output. The full System frontier advances to NativeMemory's
+  pointer-to-source-Void signature. API reference shape and summaries are refreshed.
+
 - Verify bootstrap FlagsAttribute and MethodImpl(InternalCall) with a source-owned
   Object root after Raven's exact-core identity fix. Production BindingFlags and an
   attributed runtime call execute; same-named source attributes reject before output.

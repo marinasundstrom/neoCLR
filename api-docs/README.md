@@ -1078,3 +1078,10 @@ the snapshot. No snapshot refresh or new public API is needed. See the
 Host native-width integer signatures and Conv_I/Conv_U are documented in the
 [manual metadata reference](experimental-metadata.md#native-width-integers-development-2026-10-06).
 They are host-only API additions; the guest reference snapshot is unchanged.
+
+### Source Attribute base (2026-10-07)
+
+The existing System.Attribute API page now describes its source-built abstract base
+and protected constructor. The matching reference projection and XML sidecar preserve
+that shape; the [reference-support guide](reference-support.md#source-attribute-base-development)
+distinguishes it from bootstrap-only attribute scaffolds and unimplemented .NET helpers.

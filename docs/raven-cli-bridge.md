@@ -6288,3 +6288,18 @@ Production BindingFlags plus an InternalCall execute with the source Object fixt
 ordinary-bootstrap NativeMemory passes again. These are focused regressions, not full
 imported-root acceptance. The full-System audit proceeds to UnionAttribute's unsupported
 external System.Attribute base. [Reproduction and evidence](experiments/extended-cli-metadata/core-attributes-source-root-2026-10-07.md).
+
+### Source attribute ownership (2026-10-07)
+
+Raven `e492490dc` reuses the output-owned UnionAttribute constructor instead of
+embedding a duplicate marker. Source System.Attribute is abstract with a protected
+constructor; the existing UnionAttribute retains its base relationship. The CLI
+reference exposes the same declaration shape. Other bootstrap attribute ownership
+remains explicit and unchanged. The fallback embedded native marker remains a
+nominal metadata record, without Attribute inheritance, for outputs without a source
+marker. No format or Runtime Contract configuration change.
+
+[The focused gate](experiments/extended-cli-metadata/source-attributes-2026-10-07.md)
+checks canonical custom-attribute identity, constructor-chain execution, fallback and
+failure-before-publication. The full audit now reaches NativeMemory's pointer to source
+Void; this is not yet a completed System bootstrap or Raven imported-root consumer.

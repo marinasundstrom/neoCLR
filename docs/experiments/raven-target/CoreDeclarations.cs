@@ -178,7 +178,7 @@ static class CoreDeclarations
             public sealed class String { }
             public abstract class Array { public int Length => 0; }
             public class Type { }
-            public class Attribute { }
+            public abstract class Attribute { protected Attribute() { } }
             // Metadata-only dependency of Raven's extension marker stub. Throwing
             // or constructing it in executable code remains unsupported.
             public class NotImplementedException { }

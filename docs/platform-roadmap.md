@@ -10,6 +10,17 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Source Attribute and UnionAttribute now preserve local inheritance, and native unions
+reuse the source marker constructor. Canonical metadata inspection, separate consumer
+execution (exit 42), embedded-marker control and invalid-marker rejection pass.
+The 195-input System audit next rejects **NativeMemory.Alloc's pointer to source Void**;
+binding is clean and no full-System artifact is published. Next reconcile that signature
+with the existing pointer-to-CLI-void encoding and configured unit ownership.
+[Source-attribute evidence](experiments/extended-cli-metadata/source-attributes-2026-10-07.md).
+
+### Earlier bootstrap attribute frontier
+
+
 Native FlagsAttribute and MethodImpl(InternalCall) validation now uses the explicit
 primitive-bootstrap identity, independently of source Object ownership. The source-root
 regression and wrong-owner rejection pass; ordinary-bootstrap NativeMemory still runs.

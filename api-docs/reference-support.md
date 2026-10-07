@@ -20,7 +20,7 @@ non-constructible; its presence does not imply every .NET Enum method is support
 
 Public visibility in a compiler reference does not mean that every CLR support type
 is an executable neoCLR service. ValueType, Delegate, MulticastDelegate,
-Attribute, attribute metadata and NotImplementedException support compilation or
+attribute metadata and NotImplementedException support compilation or
 reference-body scaffolding. Delegate and MulticastDelegate are excluded transport
 scaffolds; the Function family page documents the runtime contract. Other scaffold
 pages identify their role. In particular,
@@ -57,3 +57,14 @@ carriers. Its IUnion contract exposes the boxed active case; default carriers ar
 inactive. These are details of the documentation/CLI representation, not an additional
 interface requirement for native NeoCLR unions. Ordinary source should use named cases,
 patterns and propagation, including explicit None construction for absence.
+
+## Source attribute base (development)
+
+`System.Attribute` now has a source-built abstract declaration with a protected
+constructor, following the basic .NET nominal attribute inheritance shape.
+`System.Runtime.CompilerServices.UnionAttribute` derives from it; source-owned union
+markers retain that base relationship in native metadata. The reference assembly
+exposes the same abstract/protected shape. This adds no .NET attribute discovery,
+usage-policy enforcement or runtime instantiation service. Bootstrap compiler markers
+remain explicitly bootstrap-owned while source Attribute/UnionAttribute belong to
+the rebuilt library.

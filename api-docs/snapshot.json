@@ -1,7 +1,7 @@
 {
-  "assemblySha256": "300ec80dedfe40ca416fdea2bf195d26e4bd628e8876c701628448ad35eda7d4",
+  "assemblySha256": "094d184cb4bc6e5ed35015094e8c640417b8cc0ee1fc3cc83eae3dd7d394edf6",
   "inputs": {
-    "api-docs/NeoCLR.CoreProbe.xml": "61ce759a2c40a61ee0bd72b949ea43da42b8a429cabe64ac7fe17c1fd917c417",
+    "api-docs/NeoCLR.CoreProbe.xml": "5f503710ea09ceedbf949ca416c3ad71a3b96a03b5c96c8af92e2d2bfbb2993d",
     "api-docs/exclusions.json": "dfbbab53935ec02fec642d8b5281a5bb01f12ff30d27d2fe47900430c26e642a",
     "api-docs/manual-members.json": "0095803d78be03e5dfd16ca19bb95a6295c96db48f7c0db190cdd049da2120f4",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
@@ -30,7 +30,7 @@
     "docs/experiments/raven-target/ComparerBindings.cs": "70ba15b58295bdd3d91578d32e0c6d6f080d54580ef6d9f02e7f4d57181f02f2",
     "docs/experiments/raven-target/ComparerChecks.cs": "a3717753f277a5ec4a11b7593a49d425ddfa86a00c98e74a943ee1ea2e1a8cda",
     "docs/experiments/raven-target/ConditionalOutputChecks.cs": "e6fc8f4369348cb9bf1c7980350aa0ddf653a8a1e7f88229b93cbac772144959",
-    "docs/experiments/raven-target/CoreDeclarations.cs": "ff5f7bf550325d68294f93dd5036f050113ea96d668ec22ce847b46607909a03",
+    "docs/experiments/raven-target/CoreDeclarations.cs": "0d2da4a3bd77c398f3ae760c6ea54c201ed622848dd6ff215f5a47d7617627a0",
     "docs/experiments/raven-target/DescriptorLibrary.cs": "8ddb75bd47ced50ef08777d366455d1b05db704fadf9a63bda52d666dfabd310",
     "docs/experiments/raven-target/DoubleBindings.cs": "ca3ac375b5ad59ef3eac75a11f5592691333c95b79c10c46e3dd0e2059010240",
     "docs/experiments/raven-target/EmptyLibrary.cs": "94063d95f47320072221ad3f2564018544e20f063b6849e31f0003dd68757fc0",
@@ -139,6 +139,7 @@
     "docs/experiments/raven-target/VoidStorageValidation.cs": "8b3974ee9ae58a43361f8e03911f227b24d32a5b3b48bddb0916c41524a86137",
     "docs/experiments/raven-target/WorkerBindings.cs": "af58f0f39807c4f7bee9832f13767b1369df8c05f1bd32614ceac9dfafdb05f5",
     "runtime/raven/src/System/Array.rvn": "6e421b09a2909d31ca48781106f8b9a82d9af59d9d0c9e6a30855c7284590c3f",
+    "runtime/raven/src/System/Attribute.rvn": "89211bdc6852fa7d85dc38bec55c3a643113636049eaf6cd17d384db3c317f94",
     "runtime/raven/src/System/Boolean.rvn": "022d4bb1f588c65e35c69bb5f3ac350aa8cc1cb4d2e443a97a899b65a696796f",
     "runtime/raven/src/System/BooleanParseError.rvn": "77bbe4d2b205dd8668bdb99539c3e4b1229b79cc3b251e86acf3dcab25a2b555",
     "runtime/raven/src/System/Byte.rvn": "27d832fb3ffb787ebbbc79659915e987bce9bdca8f5b0bf074bbb18de2ec37c9",

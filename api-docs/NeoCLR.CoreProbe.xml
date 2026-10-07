@@ -1263,8 +1263,8 @@
 
     <member name="T:System.Array"><summary>Compiler-facing base shape for managed arrays; Length reports the allocated element count.</summary></member>
     <member name="P:System.Array.Length"><summary>Gets the allocated element count.</summary></member>
-    <member name="T:System.Attribute"><summary>Compiler-reference base for custom-attribute metadata.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
-    <member name="M:System.Attribute.#ctor"><summary>Creates Attribute.</summary></member>
+    <member name="T:System.Attribute"><summary>Base class for nominal metadata attributes.</summary><remarks>Development: source-built attributes retain their Object inheritance and base constructor calls. This abstract base does not provide the .NET attribute discovery, equality or instantiation APIs; inspect metadata through the introspection APIs.</remarks></member>
+    <member name="M:System.Attribute.#ctor"><summary>Initializes a derived attribute.</summary><remarks>Protected; only derived attribute constructors may invoke it.</remarks></member>
 
     <member name="T:System.NotImplementedException"><summary>Compiler-reference placeholder used in non-executable reference method bodies.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
     <member name="M:System.NotImplementedException.#ctor"><summary>Creates NotImplementedException.</summary></member>

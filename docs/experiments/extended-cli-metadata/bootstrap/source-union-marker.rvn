@@ -1,0 +1,8 @@
+import System.*
+union Choice {
+    case None
+}
+public func RunGeneric() -> int {
+    let marker = System.Runtime.CompilerServices.UnionAttribute()
+    return marker.GetHashCode() + 42
+}
