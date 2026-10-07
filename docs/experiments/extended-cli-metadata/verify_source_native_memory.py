@@ -23,6 +23,7 @@ def main():
         'runtime/raven/native/NativeAllocation.rvn', 'runtime/raven/native/RuntimeNativeAllocationCalls.rvn')]
     if args.source_unit:
         sources.append(ROOT / 'runtime/raven/src/System/Void.rvn')
+        sources.append(Path(__file__).resolve().parent / 'bootstrap/unit-interface.rvn')
     manifest = json.loads(args.ownership.read_text())
     if args.source_unit:
         # No released library with references to the old seed-owned Void participates.
@@ -68,6 +69,7 @@ def main():
     if args.source_unit:
         consumer_source += '\nfunc Ignore(value: System.Void) { }\n'
         consumer_source = consumer_source.replace('    let count =', '    Ignore(())\n    let count =')
+        consumer_source = consumer_source.replace('    return 42', '    let sink: UnitConsumer = UnitSink()\n    return sink.Accept(UnitBox<System.Void>())')
     cases = [('Consumer', consumer_source, 42, None),
              ('DoubleFree', consumer_source.replace('Free(Identity(pointer))', 'Free(pointer)\n    Free(pointer)'), 1, 'double free'),
              ('Overflow', consumer_source.replace('NativeWidthInputs.Six()', 'NativeWidthInputs.Maximum()'), 1, 'code=ArithmeticOverflow')]

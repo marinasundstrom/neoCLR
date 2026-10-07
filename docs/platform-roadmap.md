@@ -10,6 +10,17 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Early unit resolution now rejects wrong-assembly lookup fallbacks. Source-owned Void
+remains canonical through generic interface signatures, including when unit is needed
+before source declarations exist. The native unit-interface consumer and NativeMemory
+success/fault gates pass, with the ordinary-bootstrap control preserved. The 195-input
+System audit now reaches **direct-base constructor call validation**. Next identify
+the caller/target relationship and repair it at the owning layer; no full System
+artifact is published. [Evidence](experiments/extended-cli-metadata/unit-owner-2026-10-07.md).
+
+### Earlier unit-reference frontier
+
+
 Explicit source/native System.Void ownership now preserves inhabited unit parameters,
 no-result calls and PTR VOID signatures. The separately compiled NativeMemory consumer
 runs with source-owned Void; double-free, overflow and rejection gates pass, as does

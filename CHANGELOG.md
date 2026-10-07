@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Verify early source-unit ownership through generic interface dispatch in a separately
+  compiled native consumer, alongside NativeMemory success/fault checks and the legacy
+  bootstrap control. Raven no longer caches a bootstrap Void before source declarations
+  exist. The full System audit advances to direct-base constructor validation.
+
 - Verify source/native unit ownership with production Void and NativeMemory sources:
   a separate native consumer executes allocation/free and an inhabited unit parameter;
   expected overflow/double-free faults and unsupported-pointer rejection pass. Retain

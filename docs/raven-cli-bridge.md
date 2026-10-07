@@ -6324,3 +6324,14 @@ binding and pointer validation. No full-System output is published.
 The independently useful diagnostic assertion correction is integrated into local
 Raven main as `8c53fa55b` (17 focused tests), with its temporary fix branch retired.
 Target-specific ownership changes remain on the native integration line.
+
+### Early unit lookup identity (2026-10-07)
+
+Raven `3390f151b` rejects a wrong-assembly result from source metadata-name lookup
+when unit is initialized before source declarations are available. The explicit unit
+contract remains authoritative; the later source declaration supplies the storage
+identity. No runtime contract option, CLI encoding or runtime representation changes.
+[The evidence](experiments/extended-cli-metadata/unit-owner-2026-10-07.md) includes
+C# declaration-order regressions, native generic unit-interface dispatch, NativeMemory
+fault/success cases and an ordinary-bootstrap control. The complete System audit now
+reaches direct-base constructor validation rather than importing bootstrap Void.
