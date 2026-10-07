@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Refresh RavenDoc so wide tables scroll inside mobile articles without widening
+  the page. Rebuild the site and validate all 18 website tests.
+
 - Update RavenDoc with explicit navigation section boundaries and sidebar titles.
   This supports distinct Getting started and Language reference areas in Raven
   while preserving neoCLR's existing navigation configuration.

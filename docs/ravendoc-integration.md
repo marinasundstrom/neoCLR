@@ -123,7 +123,7 @@ These are shared RavenDoc/compiler documentation changes: no Runtime Contract,
 native metadata, CLI bridge encoding or runtime execution behavior changes.
 
 Validation for this update: pinned Raven revision
-`febe115e6ab4f90a8ca28caa41f1d1a8db049dbb`, 1,803 generated pages with local
+`e88ea43cf16185734d01f6c50e620fdb40fd3b36`, 1,803 generated pages with local
 links/anchors/HTML checked, and all 18 Python website tests passing. Browser
 checks passed at 390px and 1280px in light/dark themes on the homepage, API
 landing, System namespace and ArrayList pages, including search retention and
@@ -151,3 +151,6 @@ its conventional `toc.yml` and optional sidebar title. The most specific boundar
 keeps one hierarchy throughout its descendants. Raven uses this for its separate
 Getting started and Language reference navbar areas; neoCLR needs no new boundary
 and retains its existing configuration.
+
+Wide tables scroll inside articles on mobile screens, including when platform
+font metrics make a comparison table wider than the available content column.
