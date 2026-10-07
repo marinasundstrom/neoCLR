@@ -121,3 +121,21 @@ inventory is a better basis for additional splits.
 This refines delivery work without replacing the roadmap's immediate end-to-end
 priority. See the [optional-library frontier](optional-library-frontier-2026-10-07.md)
 and [assembly inventory](library-boundaries-2026-10-07.md).
+
+
+## Networking extraction inspection (2026-10-07)
+
+The native project graph and staged four-library bundle now execute. Inspection of the
+next Platform boundary found that RuntimeNetworkCalls and RuntimeNetworkServices expose
+internal raw operation/socket handles, deadline stamps, callbacks and System.Value
+payloads. They currently compile inside Networking and are not a supported cross-assembly
+service API. Moving the files alone fails accessibility; making them public would create
+an unreviewed API contract rather than complete packaging.
+
+No visibility or runtime binding change was made. A follow-up extraction must choose a
+bounded service contract and ownership of its result/error/handle types without making
+Runtime depend on Networking or creating a Platform↔Networking cycle. Friend-assembly
+semantics are a different compiler/metadata feature, not an assumed shortcut. This remains
+open; the next delivered developer-experience slice provides relocatable bundle project
+configuration using existing native import contracts. It does not replace or cancel the
+author's Platform-project direction.

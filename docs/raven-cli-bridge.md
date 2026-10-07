@@ -6659,3 +6659,22 @@ The staged artifacts pass five verify/run consumers and the ordinary-project HTT
 consumer. Platform adapters remain in their current owning projects. Public signatures
 are unchanged; one unified API reference and live editor qualification of the split
 remain separate gates, as does an installable runtime/compiler distribution.
+
+
+## Relocatable bundle project configuration (2026-10-07)
+
+Class-library staging emits `NeoCLR.ClassLibrary.props` with relative native References,
+Core/seed/ownership paths and Runtime Object/async selection. Applications import this
+file into ordinary projects; it explicitly disables source-root and bootstrap-intrinsic
+authoring. It contains no absolute build-machine paths or source-library inclusion.
+The bundle manifest records its hash. This is explicit MSBuild configuration, not a
+new package resolver or implicit metadata projection.
+
+Raven `e93fcfdc1` includes native project .props/.targets imports in metadata input
+tracking. The native-enabled workspace loader and compiler consume the same evaluated
+configuration. C# checks verify owners across all four libraries, one primitive bootstrap,
+no dependency sources and transactional rejection. A relocated HTTP project with spaces
+in its SDK path executes successfully. See the
+[configuration gate](experiments/extended-cli-metadata/native-bundle-configuration-2026-10-07.md).
+Installed VS Code event/hover acceptance remains separate; this is headless workspace
+and ordinary compiler evidence. No public Runtime API or metadata encoding changes.

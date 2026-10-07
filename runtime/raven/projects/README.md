@@ -90,3 +90,32 @@ binary, Raven toolchain, XML documentation or VS Code extension is bundled here.
 are qualified class-library artifacts, not a complete installable SDK or release.
 The same staged artifacts pass `verify-separate-web.py` and the ordinary-project
 `verify-native-library-project.py` acceptance paths.
+
+
+## Consume a relocated bundle
+
+The bundle includes `NeoCLR.ClassLibrary.props`, using paths relative to that file.
+An application can use this project (the example directory name is tested):
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="SDK with spaces/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Headers</AssemblyName>
+  </PropertyGroup>
+</Project>
+```
+
+The imported configuration selects native metadata, all four native libraries and the
+matching Core/seed/ownership artifacts. It selects Runtime for Object and async symbols,
+and disables source-root and bootstrap-intrinsic authoring for applications. No library
+sources, environment variables or absolute build-machine paths are needed for this
+consumer. Compile with `rvnc neoclr --project Headers.rvnproj --run /path/to/neoclr`.
+A native-enabled Raven language server uses the same project metadata provider.
+
+`verify-native-bundle-project.py` checks relocated workspace symbols, missing/conflicting
+inputs, manifest hashes and ordinary project execution. The manifest records integrity;
+the project loader consumes the explicit reference catalog, not a package resolver.
+Headless workspace validation does not replace installed VS Code acceptance.

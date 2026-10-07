@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Emit a relocatable NeoCLR.ClassLibrary.props in staged bundles, with native references
+  and matching Core/seed/ownership selections shared by compiler and editor project
+  loading (Raven e93fcfdc1). Test symbol owners, missing/conflicting dependencies and HTTP execution from
+  a relocated bundle with spaces in its path. Record the still-internal networking
+  service boundary; no new public Platform API is introduced.
+
 - Add native Data, Networking and Web projects referencing the Runtime foundation.
   Build and stage the four libraries with explicit seed finalization and prebuilt
   dependency imports (Raven 8fbacaa9f); publish a hashed bundle manifest only after

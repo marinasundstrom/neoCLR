@@ -70,8 +70,11 @@ Data, Networking and Web now have checked-in native projects. A staged build pro
 all four libraries, finalizes the retained seed against the exact Runtime output and
 records a hashed bundle manifest. Five native consumers and the project HTTP consumer
 pass against those artifacts. [Bundle evidence](experiments/extended-cli-metadata/native-class-library-bundle-2026-10-07.md).
-Next: Platform service ownership, documentation/editor qualification for this split and
-the complete shipping toolchain. The class-library bundle alone is not an SDK release.
+The staged bundle also supplies relocatable project configuration. Workspace symbol
+loading and ordinary HTTP project execution pass after relocation, with native owners
+and missing/conflicting-input rejection checked. [Configuration evidence](experiments/extended-cli-metadata/native-bundle-configuration-2026-10-07.md).
+Next: Platform service ownership, API documentation and installed-editor qualification
+for this split, then the complete shipping toolchain. The bundle alone is not an SDK release.
 The API site remains one namespace/type reference across assemblies; declaring-assembly
 provenance belongs on pages. Native multi-input RavenDoc migration must preserve that
 shape, as recorded in [API maintenance](../api-docs/README.md#one-class-library-reference-across-assemblies).

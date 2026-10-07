@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parent.parent
 PROJECTS = ROOT / 'runtime/raven/projects'
@@ -57,10 +58,26 @@ def main():
         shutil.copyfile(artifact(name), output / (name + '.dll'))
     shutil.copyfile(args.core.resolve(), output / 'Core.dll')
     shutil.copyfile(PROJECTS / 'System.Runtime/ownership.json', output / 'ownership.json')
-    artifacts = [output / (name + '.dll') for name in NAMES] + [seed, output / 'Core.dll', output / 'ownership.json']
+    configuration = ET.Element('Project')
+    properties = ET.SubElement(configuration, 'PropertyGroup')
+    for name, value in dict(RavenTargetPlatform='NeoCLR', RavenMetadataFormat='NeoCLR',
+                           RavenNeoClrCoreReference='$(MSBuildThisFileDirectory)Core.dll',
+                           RavenNeoClrRuntimeSeed='$(MSBuildThisFileDirectory)System.runtime.neox',
+                           RavenNeoClrBootstrapOwnership='$(MSBuildThisFileDirectory)ownership.json',
+                           RavenNeoClrObjectLibrary='System.Runtime', RavenNeoClrAsyncLibrary='System.Runtime',
+                           RavenNeoClrSourceObjectRoot='false', RavenNeoClrBootstrapIntrinsics='false').items():
+        ET.SubElement(properties, name).text = value
+    references = ET.SubElement(configuration, 'ItemGroup')
+    for name in NAMES:
+        reference = ET.SubElement(references, 'Reference', Include=name)
+        ET.SubElement(reference, 'HintPath').text = '$(MSBuildThisFileDirectory)' + name + '.dll'
+    configuration_path = output / 'NeoCLR.ClassLibrary.props'
+    ET.indent(configuration)
+    ET.ElementTree(configuration).write(configuration_path, encoding='unicode')
+    artifacts = [output / (name + '.dll') for name in NAMES] + [seed, output / 'Core.dll', output / 'ownership.json', configuration_path]
     # Publish the manifest last. An interrupted/failed build directory is not a completed bundle.
     manifest = dict(version=1, kind='explicit-bootstrap-native-class-library', assemblyNames=list(NAMES),
-                    objectAssembly='System.Runtime', runtimeSeed=seed.name,
+                    objectAssembly='System.Runtime', runtimeSeed=seed.name, projectConfiguration=configuration_path.name,
                     files={path.name: sha(path) for path in artifacts})
     inputs = [Path(__file__), args.compiler, args.core, args.translator, bootstrap / 'System.neox', bootstrap / 'System.retained.json']
     inputs += list(PROJECTS.glob('*/*.rvnproj')) + [PROJECTS / 'NativeLibrary.props', PROJECTS / 'System.Runtime/ownership.json']

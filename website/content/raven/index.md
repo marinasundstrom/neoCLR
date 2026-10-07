@@ -154,7 +154,9 @@ System.Data, System.Networking and System.Web. A staged build produces matching
 assemblies and a retained seed with artifact hashes; five HTTP/networking consumers
 and a separate project consumer execute against that bundle. Platform service extraction,
 API-documentation bundling and editor qualification for this split remain open. This
-class-library artifact bundle is not a complete SDK release.
+class-library artifact bundle is not a complete SDK release. It now includes a relocatable
+project configuration; headless workspace symbol loading and an unchanged HTTP project
+pass after relocation. Installed-editor acceptance of this split remains separate.
 
 Native nongeneric async functions and class methods use the existing heap state-machine
 lowering. `Task<unit>` and `Task<int>` entries drain registered work before obtaining their
