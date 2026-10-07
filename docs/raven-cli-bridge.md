@@ -6355,3 +6355,17 @@ its older signature; no compiler fallback, signature relaxation or CLI projectio
 introduced. Source-owned Object and RuntimeTypeHandle use their explicit source
 configuration. The API-authored executable consumer verifies identity/hash behavior;
 full System advances to ReflectionConstruct. [Scope and evidence](experiments/extended-cli-metadata/object-handles-2026-10-07.md).
+
+## Source-owned reflection construction (2026-10-07)
+
+Parameterless TypeInfo.CreateInstance uses the internal NativeReflection facade and
+source InternalCall declarations. The native emitter uses ordinary symbol contracts;
+no dependency signature relaxation or importer reuse is introduced. Existing source
+Object and handle ownership configuration is unchanged. Runtime construction still
+checks access and executes the selected constructor.
+
+The temporary CLI bootstrap also declares the facade's two static methods; its
+translator checks their exact owner and signatures before targeting the existing
+native services. Bootstrap declarations are reference-only scaffolding and do not
+implement .NET reflection execution. The native source facade replaces this path
+for source-built libraries. [Evidence, compatibility and remaining frontier](experiments/extended-cli-metadata/reflection-construction-2026-10-07.md).

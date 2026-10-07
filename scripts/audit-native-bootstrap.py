@@ -40,10 +40,12 @@ def main():
     adapters = sorted(str(p.relative_to(ROOT)) for p in (ROOT / 'runtime/raven/native').glob('*.rvn'))
     storage_adapters = ['runtime/raven/native/' + n + '.rvn' for n in ('RuntimeStorageCalls', 'RuntimeStorageServices', 'RuntimeFileTextServices')]
     cases += [('storage-with-adapters', groups['storage'] + storage_adapters, True)]
-    cases += [('full-source', production + adapters, False),
-              ('full-bootstrap-handle', [s for s in production + adapters if not s.endswith('/RuntimeTypeHandle.rvn')], False)]
+    # The source Object supplies GetType; the seed-only extension is not a second owner.
+    full_sources = production + [s for s in adapters if not s.endswith('/ObjectIntrospection.rvn')]
+    cases += [('full-source', full_sources, False),
+              ('full-bootstrap-handle', [s for s in full_sources if not s.endswith('/RuntimeTypeHandle.rvn')], False)]
     if args.runtime or 'full-owned-handle' in (args.case or []):
-        cases.append(('full-owned-handle', production + adapters, False))
+        cases.append(('full-owned-handle', full_sources, False))
     if args.case:
         unknown = set(args.case) - {name for name, _, _ in cases}
         if unknown:

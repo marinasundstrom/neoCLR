@@ -57,9 +57,9 @@ public extension TypeReflectionExtensions for TypeInfo {
     func CreateInstance() -> Result<Object, ReflectionError> {
         if self is RuntimeNominalTypeInfo implementation {
             let handle = implementation.ExecutionHandle
-            let status = RuntimeServices.ReflectionConstructionCheck(handle)
+            let status = NativeReflection.ReflectionConstructionCheck(handle)
             if status == 0 {
-                return Ok(RuntimeServices.ReflectionConstruct(handle))
+                return Ok(NativeReflection.ReflectionConstruct(handle))
             }
             if status == 1 {
                 return Error(ReflectionError.UnboundMetadata)

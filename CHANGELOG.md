@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Route parameterless reflection construction through source-owned native service
+  declarations, retaining constructor execution and access checks. Preserve the
+  temporary CLI bridge with validated facade bindings. The full-source audit omits
+  the seed-only GetType extension and advances to System.Value ownership validation.
+
 - Route source Object.GetType through an explicit native handle facade instead of
   the bootstrap RuntimeServices signature. Source-owned Object/RuntimeTypeHandle
   verification and identity/hash checks execute; the full-System audit advances

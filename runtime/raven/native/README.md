@@ -38,3 +38,10 @@ StorageNames. Callbacks retain existing native function signatures, with no nomi
 delegate ABI or structural Function experiment dependency. The unchanged network
 cancellation fixture runs over localhost and an ephemeral loopback listener through
 [the source network gate](../../../docs/experiments/extended-cli-metadata/source-network-2026-10-05.md).
+
+`NativeReflection.rvn` and `RuntimeConstructionCalls.rvn` provide parameterless
+construction and its preflight check for source-owned Object/RuntimeTypeHandle.
+The runtime executes the actual constructor and retains access/missing-constructor
+errors. Full-source builds omit the seed-only ObjectIntrospection extension because
+source Object owns GetType. The older POC manifest remains unchanged.
+See the [source construction gate](../../../docs/experiments/extended-cli-metadata/reflection-construction-2026-10-07.md).

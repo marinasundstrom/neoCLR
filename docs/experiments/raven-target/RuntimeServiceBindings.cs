@@ -4,6 +4,7 @@ using Mono.Cecil;
 // boundary, not a public API or a way to select arbitrary native entry points.
 static partial class RuntimeServiceBindings
 {
+    const string ConstructionOwner = "System.Runtime.CompilerServices.NativeReflection";
     const string Owner = "System.Runtime.CompilerServices.RuntimeServices";
     static readonly string[] UnaryMath = ["Abs", "Sqrt", "Floor", "Ceiling", "Truncate", "Round", "Exp", "Log", "Log10", "Sin", "Cos", "Tan"];
     static readonly string[] BinaryMath = ["Pow", "Min", "Max"];
@@ -200,11 +201,16 @@ static partial class RuntimeServiceBindings
     };
     static bool IsProperty(string name) => name is "CurrentTaskQueue" or "DefaultTaskQueue";
     public static string Declarations => "\n#nullable enable annotations\nnamespace Runtime.CompilerServices { public static class RuntimeServices { "
-        + string.Join(" ", Members.Select(m => IsProperty(m.Name) ? $"public static {CSharp(m.Result)} {m.Name} => default;" : $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => (m.Name.StartsWith("Reflection") && t == "arrayref<System.Object>" ? "object?[]" : CSharp(t)) + ((m.Name == "GCKeepAlive" || m.Name == "ObjectReferenceEquals" || m.Name == "ObjectEquals" && i == 1 || m.Name.StartsWith("Reflection") && t == "System.Object" && i >= 2) ? "?" : "") + " arg" + i))}) {(m.Result == "noresult" ? "{ }" : "=> default;")}")) + " public static System.RuntimeTypeHandle TypeHandle<T>() => default; public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; " + QueueDeclarations + " } }\n#nullable restore annotations\n";
+        + string.Join(" ", Members.Select(m => IsProperty(m.Name) ? $"public static {CSharp(m.Result)} {m.Name} => default;" : $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => (m.Name.StartsWith("Reflection") && t == "arrayref<System.Object>" ? "object?[]" : CSharp(t)) + ((m.Name == "GCKeepAlive" || m.Name == "ObjectReferenceEquals" || m.Name == "ObjectEquals" && i == 1 || m.Name.StartsWith("Reflection") && t == "System.Object" && i >= 2) ? "?" : "") + " arg" + i))}) {(m.Result == "noresult" ? "{ }" : "=> default;")}")) + " public static System.RuntimeTypeHandle TypeHandle<T>() => default; public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; " + QueueDeclarations + " } public static class NativeReflection { public static int ReflectionConstructionCheck(System.RuntimeTypeHandle handle) => default; public static object ReflectionConstruct(System.RuntimeTypeHandle handle) => default; } }\n#nullable restore annotations\n";
 
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
-        if (reference.DeclaringType.FullName != Owner) return null;
+        if (reference.DeclaringType.FullName == ConstructionOwner)
+        {
+            if (reference.Name is not ("ReflectionConstruct" or "ReflectionConstructionCheck"))
+                throw new InvalidDataException("Unsupported native construction facade operation.");
+        }
+        else if (reference.DeclaringType.FullName != Owner) return null;
         if (reference.Name == "TypeHandle")
         {
             if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || reference.HasThis || !definition.IsPublic || !definition.IsStatic || definition.IsVirtual || definition.ExplicitThis

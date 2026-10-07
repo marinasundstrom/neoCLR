@@ -1,0 +1,43 @@
+import System.*
+import System.Runtime.CompilerServices.*
+
+public class Constructed {
+    public var Value: int = 0
+
+    init() {
+        Value = 42
+    }
+}
+
+public class PrivateConstruction {
+    private init() { }
+
+    static func Create() -> PrivateConstruction => PrivateConstruction()
+}
+
+public class RequiredArgument {
+    init(value: int) { }
+}
+
+public func RunGeneric() -> int {
+    let original = Constructed()
+    original.Value = 7
+    if NativeReflection.ReflectionConstructionCheck(NativeObject.GetTypeHandle(PrivateConstruction.Create())) != 3 {
+        return 4
+    }
+    if NativeReflection.ReflectionConstructionCheck(NativeObject.GetTypeHandle(RequiredArgument(1))) != 4 {
+        return 5
+    }
+    let handle = NativeObject.GetTypeHandle(original)
+    if NativeReflection.ReflectionConstructionCheck(handle) != 0 {
+        return 1
+    }
+    let created = NativeReflection.ReflectionConstruct(handle)
+    if RuntimeServices.ObjectReferenceEquals(original, created) {
+        return 2
+    }
+    if created is Constructed value {
+        return value.Value
+    }
+    return 3
+}

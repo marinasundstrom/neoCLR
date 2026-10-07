@@ -1,0 +1,13 @@
+namespace System.Runtime.CompilerServices
+
+// Distinct facade preserves source Object ownership instead of selecting the
+// bootstrap RuntimeServices construction signature.
+internal static class NativeReflection {
+    static func ReflectionConstructionCheck(handle: System.RuntimeTypeHandle) -> int {
+        return neoCLR.Runtime.ReflectionConstructionCheck(handle)
+    }
+
+    static func ReflectionConstruct(handle: System.RuntimeTypeHandle) -> object {
+        return neoCLR.Runtime.ReflectionConstruct(handle)
+    }
+}

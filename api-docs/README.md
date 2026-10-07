@@ -1090,3 +1090,10 @@ The source-unit bootstrap gate (2026-10-07) adds no guest API signatures. Existi
 System.Void and NativeMemory sources compile with explicit native unit ownership;
 inhabited unit parameters and no-result calls remain distinct. The integration guide
 records the source/native owner configuration and current full-bootstrap limitation.
+
+The 2026-10-07 `NativeReflection` facade is internal native build infrastructure,
+not a new public reflection API. The public parameterless CreateInstance signature
+is unchanged. Its two public declarations in the temporary bootstrap are translation
+scaffolding, like RuntimeServices, and are intentionally outside RavenDoc selection.
+Source constructor execution and access checks are documented in the
+[construction gate](../docs/experiments/extended-cli-metadata/reflection-construction-2026-10-07.md).

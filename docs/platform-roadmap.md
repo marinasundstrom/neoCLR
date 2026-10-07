@@ -10,6 +10,16 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Native reflection construction now works with source Object/RuntimeTypeHandle;
+constructor execution, distinct identity and access/missing-constructor checks pass.
+The 197-input audit excludes the seed-only GetType extension and reaches
+**System.Value ownership at Environment.GetCurrentDirectory's generic call**.
+Next reconcile the source/imported Value intrinsic contract without relaxing stack
+validation. Full System still publishes no artifact.
+[Evidence](experiments/extended-cli-metadata/reflection-construction-2026-10-07.md).
+
+### Earlier Object handle frontier
+
 Source Object now uses an explicit native handle service facade. A source-owned
 Object/RuntimeTypeHandle consumer verifies and executes identity/hash checks. The
 196-input audit advances to **ReflectionConstruct dependency-contract resolution**.
