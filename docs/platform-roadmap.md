@@ -77,7 +77,12 @@ Installed-editor acceptance now covers this split, including native optional-lib
 navigation, configuration recovery and orders/Tasks execution. Hover latency is
 measured separately; the reported persistent delay remains open.
 [Editor evidence](experiments/extended-cli-metadata/native-split-editor-2026-10-07.md).
-Next: Platform service ownership, API documentation and clean toolchain distribution.
+The bundle now also stages and hashes each assembly's generated XML/Markdown help;
+relocation verifies native IPAddress documentation. This transports existing comments,
+not complete API coverage: Data's generated XML currently contains no member entries.
+[Documentation packaging](experiments/extended-cli-metadata/native-bundle-documentation-2026-10-07.md).
+Next: Platform service ownership, API documentation coverage/unified RavenDoc generation
+and clean toolchain distribution.
 The bundle alone is not an SDK release.
 The API site remains one namespace/type reference across assemblies; declaring-assembly
 provenance belongs on pages. Native multi-input RavenDoc migration must preserve that

@@ -54,8 +54,19 @@ def main():
         run(['dotnet', args.compiler.resolve(), 'neoclr', '--project', PROJECTS / name / (name + '.rvnproj'), '--no-build-references'])
     if sha(artifact('System.Runtime')) != runtime_hash:
         raise RuntimeError('Runtime changed during dependent project builds; finalized seed cannot be published')
+    documentation = {}
     for name in NAMES:
         shutil.copyfile(artifact(name), output / (name + '.dll'))
+        xml = artifact(name).with_suffix('.xml')
+        markdown = artifact(name).with_suffix('.docs')
+        if ET.parse(xml).findtext('./assembly/name') != name:
+            raise RuntimeError('Documentation assembly mismatch: ' + str(xml))
+        if not (markdown / 'manifest.json').is_file():
+            raise RuntimeError('Missing generated Markdown documentation: ' + str(markdown))
+        shutil.copyfile(xml, output / xml.name)
+        shutil.copytree(markdown, output / markdown.name)
+        documentation[name] = dict(xml=xml.name, markdown=markdown.name)
+
     shutil.copyfile(args.core.resolve(), output / 'Core.dll')
     shutil.copyfile(PROJECTS / 'System.Runtime/ownership.json', output / 'ownership.json')
     configuration = ET.Element('Project')
@@ -75,10 +86,15 @@ def main():
     ET.indent(configuration)
     ET.ElementTree(configuration).write(configuration_path, encoding='unicode')
     artifacts = [output / (name + '.dll') for name in NAMES] + [seed, output / 'Core.dll', output / 'ownership.json', configuration_path]
+    for name in NAMES:
+        artifacts.append(output / documentation[name]['xml'])
+        artifacts.extend(sorted((output / documentation[name]['markdown']).rglob('*')))
+    artifacts = [path for path in artifacts if path.is_file()]
     # Publish the manifest last. An interrupted/failed build directory is not a completed bundle.
     manifest = dict(version=1, kind='explicit-bootstrap-native-class-library', assemblyNames=list(NAMES),
                     objectAssembly='System.Runtime', runtimeSeed=seed.name, projectConfiguration=configuration_path.name,
-                    files={path.name: sha(path) for path in artifacts})
+                    documentation=documentation,
+                    files={path.relative_to(output).as_posix(): sha(path) for path in artifacts})
     inputs = [Path(__file__), args.compiler, args.core, args.translator, bootstrap / 'System.neox', bootstrap / 'System.retained.json']
     inputs += list(PROJECTS.glob('*/*.rvnproj')) + [PROJECTS / 'NativeLibrary.props', PROJECTS / 'System.Runtime/ownership.json']
     inputs += list((ROOT / 'runtime/raven/src/System').rglob('*.rvn')) + list((ROOT / 'runtime/raven/native').glob('*.rvn'))

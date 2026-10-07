@@ -136,6 +136,10 @@ exports.run = async function () {
         }, `${type} metadata navigation`);
         assert.strictEqual((locations[0].targetUri || locations[0].uri).scheme, 'raven-metadata');
         report.bundleHovers[type] = hoverText(hover);
+        if (config.bundleDocumentation && type === 'System.Networking.IPAddress') {
+          assert(hoverText(hover).includes('An immutable IP address in the closed IPv4 and IPv6 family.'));
+          record('shipped native Networking documentation appears in hover');
+        }
         record(`${type} native hover and metadata navigation`);
       }
       await edit('func EditorProbe() -> int => EditorApi.VersionTwo()\n');

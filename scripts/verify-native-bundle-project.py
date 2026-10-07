@@ -34,7 +34,7 @@ def main():
     relocated = consumer / 'SDK with spaces'
     manifest = json.loads((relocated / 'bundle.json').read_text())
     for name, expected in manifest['files'].items():
-        if Path(name).name != name or hashlib.sha256((relocated / name).read_bytes()).hexdigest() != expected:
+        if Path(name).is_absolute() or '..' in Path(name).parts or hashlib.sha256((relocated / name).read_bytes()).hexdigest() != expected:
             raise RuntimeError('Relocated manifest mismatch: ' + name)
     project = consumer / 'Headers.rvnproj'
     result = run(['dotnet', args.compiler.resolve(), 'neoclr', '--project', project, '--run', args.runtime.resolve()])

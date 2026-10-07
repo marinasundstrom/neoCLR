@@ -1184,3 +1184,20 @@ Development 2026-10-07: ArrayReflection is included in the generated reference a
 member documentation, with source-backed GetLength/GetValue/Create and vector/Fault
 limits in [the reflection guide](reflection.md). The reference bridge supplies only
 matching declarations; native acceptance compiles the actual Raven implementations.
+
+
+### Split native bundle IDE documentation (2026-10-07)
+
+The source-built Runtime/Data/Networking/Web bundle now carries each build's XML and
+Markdown sidecars next to its native assembly. The manifest hashes every nested file
+and associates the sidecars with the declaring assembly. Relocation and editor tests
+check imported Networking IPAddress help. This uses native symbols, not the aggregate
+CLI documentation projection, and changes no public API signatures.
+
+Coverage is incomplete: the current generated XML contains 136 Runtime, zero Data,
+41 Networking and 136 Web member entries (including synthesized declarations; these
+are not counts of fully documented public APIs). Authored website XML remains a
+separate source; this slice does not partition/merge it into native outputs. Unifying
+that content by canonical declaration identity and producing one RavenDoc model from
+the split inputs remains required. Do not advertise complete class-library IDE help.
+[Commands, artifacts and validation](../docs/experiments/extended-cli-metadata/native-bundle-documentation-2026-10-07.md).

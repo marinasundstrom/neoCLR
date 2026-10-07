@@ -76,7 +76,7 @@ for name, tail in [('Build', []), ('Run', ['--run', str(a.runtime.resolve())])]:
         args=[str(compiler), 'neoclr', '--project', '${workspaceFolder}/App.rvnproj'] + tail,
         group='build' if name == 'Build' else 'test', problemMatcher=[]))
 (vscode / 'tasks.json').write_text(json.dumps({'version': '2.0.0', 'tasks': tasks}, indent=2))
-(out / 'acceptance.json').write_text(json.dumps({'compiler': str(compiler), 'runtime': str(a.runtime.resolve()), 'classLibraryBundle': bool(a.bundle)}, indent=2))
+(out / 'acceptance.json').write_text(json.dumps({'compiler': str(compiler), 'runtime': str(a.runtime.resolve()), 'classLibraryBundle': bool(a.bundle), 'bundleDocumentation': bool(a.bundle and json.loads((refs / 'bundle.json').read_text()).get('documentation'))}, indent=2))
 print(out)
 
 # Compile two versions of an ordinary library outside the application source root.

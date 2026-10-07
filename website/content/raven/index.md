@@ -175,7 +175,8 @@ API help and native reference refresh. Primitive bootstrap and retained runtime 
 remain explicit dependencies. The matched download includes bootstrap dependencies with recorded source provenance.
 A subsequent development check also runs orders and Tasks/await from VS Code against
 separate Runtime, Data, Networking and Web assemblies using shared bundle project
-configuration. Documentation packaging for that split is still pending. Reported
+configuration. The development bundle now carries generated XML/Markdown API help; coverage is
+incomplete and the unified RavenDoc migration remains pending. Reported
 persistent hover delays remain under investigation; this is not a performance claim.
 
 The development `neoclr disassemble` command inspects native metadata and instructions

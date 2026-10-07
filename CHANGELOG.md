@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Ship generated XML and Markdown help with each source-built native class-library
+  assembly, validate documentation identity before publishing the bundle, and hash
+  nested sidecar files. Extend relocation/editor checks to verify native IPAddress
+  help. This transports existing comments; missing API help and unified RavenDoc
+  generation remain open, including the current empty Data documentation output.
+
 - Extend installed VS Code acceptance to the split native class-library bundle,
   including optional-library navigation and imported configuration recovery. Record
   client-side hover timings and repeated/unsaved-edit Main.rvn checks; persistent
