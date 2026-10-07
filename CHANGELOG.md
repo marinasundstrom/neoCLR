@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Add required native library schema 4 with a 16 MiB envelope; smaller libraries
+  retain schema 3 and its 8 MiB limit. JSON/node/depth and total PE bounds stay
+  unchanged. All 197 System inputs now emit; runtime admission next rejects the
+  source Array backing contract. Full bootstrap is not yet complete.
+
 - Preserve intrinsic String inheritance from the selected source Object root in
   native metadata and runtime constructor execution, retaining UTF-8 text storage.
   Linked PE execution passes; full-System encoding next reaches the payload limit.

@@ -35,7 +35,7 @@ internal static class RuntimeContainerChecks
     internal static IEnumerable<(string Name, byte[] Image)> MalformedEnvelopes(byte[] image)
     {
         foreach (var change in new (string Name, int Offset, byte Value)[] {
-            ("UnknownRequired", 16, 1), ("WrongSchema", 18, 4), ("OptionalExecution", 20, 0),
+            ("UnknownRequired", 16, 1), ("WrongSchema", 18, 5), ("OptionalExecution", 20, 0),
             ("BadRange", 24, 31), ("BadVersion", 6, 2) })
         {
             var mutated = image.ToArray();

@@ -6399,3 +6399,13 @@ checks identity and executes the real base body through an Object handle view.
 No new Runtime Contract option, compiler mapping or temporary CLI bridge encoding.
 The 197-source audit next reaches the binary library payload limit; output remains
 unpublished. [Evidence](experiments/extended-cli-metadata/string-root-2026-10-07.md).
+
+## Full-source emission and schema 4 (2026-10-07)
+
+The 197-input diagnostic build now emits using the metadata library's required
+schema 4 (16 MiB envelope; other library bounds unchanged). Small libraries retain
+schema 3; older runtimes reject schema 4. No compiler or Runtime Contract option
+changes. Native metadata remains authoritative; CLI reference projection semantics
+and ordinary .NET codegen are unchanged. The aggregate owner Numbers is diagnostic,
+not production packaging. Runtime admission now reaches the source Array backing
+contract. [Evidence and candidate assembly split](experiments/extended-cli-metadata/expanded-library-2026-10-07.md).

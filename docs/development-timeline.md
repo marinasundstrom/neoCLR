@@ -11227,3 +11227,17 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
 - **Implementation context:** The calendar bootstrap exposed constructor-union import
   support as a compiler gap. Testing that representation does not change the public
   recommendation to use specific temporal types.
+
+## 2026-10-07 — Aggregate bootstrap coverage versus library packaging
+
+- **Author:** “We might split the System.Runtime because not everything is part of
+  core. System.Data. System.Networking. System.Web.”
+- **Assistant response:** Agreed to treat the all-source build as coverage rather
+  than a shipped layout and to map dependencies before choosing assembly boundaries.
+- **Performed work:** The larger-envelope prototype lets all 197 diagnostic inputs
+  emit; runtime admission still rejects the source Array backing contract. A separate
+  API-authored large-library consumer executes. These are distinct gates.
+- **Open:** Exact core membership, optional-library dependency edges and native service
+  ownership; separate-library execution is not yet established. The proposal does
+  not imply a final assembly naming/ownership decision.
+- [Implementation evidence and tradeoffs](experiments/extended-cli-metadata/expanded-library-2026-10-07.md).

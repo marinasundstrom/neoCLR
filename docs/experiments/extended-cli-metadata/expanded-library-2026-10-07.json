@@ -1,0 +1,169 @@
+{
+  "baseRevision": "c101b542",
+  "compilerRevision": "ca4aeccfb",
+  "scope": "Bounded library transport and linked API-authored PE execution. Full-source System emission succeeds; runtime admission remains blocked.",
+  "measurement": {
+    "jsonBytes": 10080354,
+    "binaryBytes": 8770829,
+    "components": {
+      "format": 1,
+      "name": 78,
+      "revision": 8,
+      "references": 8,
+      "entry": 1,
+      "assemblies": 714,
+      "types": 630449,
+      "functions": 8139504
+    },
+    "keyBytes": [
+      [
+        "arg",
+        209672
+      ],
+      [
+        "op",
+        191427
+      ],
+      [
+        "parameters",
+        152273
+      ],
+      [
+        "Named",
+        141138
+      ],
+      [
+        "instance",
+        113130
+      ],
+      [
+        "Constructed",
+        109476
+      ],
+      [
+        "definition",
+        100353
+      ],
+      [
+        "arguments",
+        93220
+      ],
+      [
+        "name",
+        87755
+      ],
+      [
+        "owner",
+        77442
+      ],
+      [
+        "generic_arguments",
+        71298
+      ],
+      [
+        "parameter_tokens",
+        44931
+      ],
+      [
+        "member_access",
+        37002
+      ],
+      [
+        "no_result",
+        31150
+      ],
+      [
+        "assembly",
+        27684
+      ],
+      [
+        "returns",
+        24920
+      ],
+      [
+        "parameter_names",
+        24800
+      ],
+      [
+        "TypeParameter",
+        24122
+      ]
+    ]
+  },
+  "checks": [
+    {
+      "name": "verify",
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/tmp/expanded-library1007.dll.app",
+        "--system",
+        "/tmp/expanded-library1007.dll.neoil",
+        "--module",
+        "/tmp/expanded-library1007.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_2DB34085E1BC64EF0837233DA3077215CADE6256C8AEA80400CE20FAE874C26A: typed-stack/control-flow verification passed (19 IL functions; maximum stack 1; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "name": "run",
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/tmp/expanded-library1007.dll.app",
+        "--system",
+        "/tmp/expanded-library1007.dll.neoil",
+        "--module",
+        "/tmp/expanded-library1007.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "downgraded",
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/tmp/expanded-library1007.dll.downgraded.neox"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Fault: native metadata container: schema-3 envelope exceeds 8 MiB limit [code=RuntimeError]\n"
+    },
+    {
+      "name": "full-source-admission",
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/tmp/expanded-library1007.dll.app",
+        "--system",
+        "/tmp/expanded-audit1007/full-owned-handle/System.neox",
+        "--module",
+        "/tmp/expanded-library1007.dll",
+        "--module",
+        "/tmp/expanded-audit1007/full-owned-handle/Numbers.dll",
+        "--object-root",
+        "/tmp/expanded-audit1007/full-owned-handle/Numbers.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Fault: invalid nominal array backing storage contract [code=RuntimeError]\n"
+    }
+  ],
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/native_binary.rs": "4a18c2fd5e3358ac5fbf4609f365b6126dd867e85df04d17549e51ee2b3bbcab",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/metadata_container.rs": "df91fc99f900c99f791a9fb7ffbc993ad472dd01ad3ae365b36f7378e0de4209",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/ExpandedLibraryChecks.cs": "307b39de500ca3f8e5dfe36409421dce912b8562cd3caa08b714fe81a47df7b7",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "e2bc3d4393c25500f9f68b34d85693a6eb8827c2da9cc40b26ba9fe49bf3634a",
+    "/tmp/expanded-library1007.dll.neox": "1ca50393a04dad903b2c82b05cc62734263c6313a50a16b2905c632bc3edfe1c",
+    "/tmp/expanded-library1007.dll.app": "42db60da890e94f1199ec4a4cd1c458d9152bd91072d63414e70cadbf30be74a",
+    "/tmp/expanded-library1007.dll.neoil": "b3de629ea4ba552863c8df2a94a8787ae1505a49da4e890dacc23e49c75dbbbd",
+    "/tmp/expanded-library1007.dll.downgraded.neox": "ca84fb82059569aaab3cfe7aa806772116bcb6b3a043de3232044e92a6b875f3",
+    "/tmp/expanded-library1007.dll": "95bc48209c6f805cb64b6196a301223687d2371eea8650caf0813f402bac3e93",
+    "/tmp/expanded-audit1007/full-owned-handle/Numbers.dll": "359cb715a8c1805613bd994795104617eebf2c184d1d74bafe9d54000c171fa5",
+    "/tmp/value-compiler1007/rvnc.dll": "6d6675e7ebd2afbbc8529db70812891f6f7b16afd465334de5c6a9fcf69f09e7",
+    "/tmp/value-compiler1007/NeoCLR.Metadata.Experimental.dll": "a83d3647370e43fac4f77d762af0e6c78c562dd40f551729c21a049d0a01144d"
+  }
+}

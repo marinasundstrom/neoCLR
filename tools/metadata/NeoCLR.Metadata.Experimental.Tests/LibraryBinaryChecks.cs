@@ -36,12 +36,13 @@ internal static class LibraryBinaryChecks
         Reject(() => NativeBinaryCodec.Decode(deep, true));
         byte[] json = Encoding.UTF8.GetBytes("{\"format\":5,\"name\":\"Library\",\"functions\":[],\"padding\":\"" + new string('x', 1024 * 1024) + "\"}");
         var image = NativeModuleContainer.WriteLibraryBinary(json);
+        Check(image[18] == 3, "small libraries retain schema 3");
         Check(JsonNode.DeepEquals(JsonNode.Parse(json), JsonNode.Parse(NativeModuleContainer.Read(image))), "large container values");
         Reject(() => MetadataEnvelope.Read(image, new Dictionary<ushort, ushort> { [256] = 3 }));
         Reject(() => NativeModuleContainer.WriteBinary(json));
         var downgraded = image.ToArray(); downgraded[18] = 2;
         Reject(() => NativeModuleContainer.Read(downgraded));
-        var unknown = image.ToArray(); unknown[18] = 4;
+        var unknown = image.ToArray(); unknown[18] = 5;
         Reject(() => NativeModuleContainer.Read(unknown));
     }
     internal static void RoundTripFile(string path)

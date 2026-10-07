@@ -20,21 +20,23 @@ public static class NativeModuleContainer
         return MetadataEnvelope.Write([new MetadataSection(256, 2, true, payload)], Schemas);
     }
 
-    /// <summary>Encodes a standalone library using execution schema 3, including UInt64 operands.</summary>
+    /// <summary>Encodes a standalone library using schema 3 or, above 8 MiB, schema 4; includes UInt64 operands.</summary>
     /// <param name="nativeImage">Format-5 JSON up to 32 MiB; Int64 negatives and UInt64 nonnegative numbers.</param>
-    /// <returns>Owned NEOX bytes up to 8 MiB, without CLI metadata.</returns>
+    /// <returns>Owned NEOX bytes up to 16 MiB, without CLI metadata.</returns>
     /// <exception cref="InvalidDataException">Invalid header, unsupported values or exceeded bounds.</exception>
-    /// <remarks>Depth remains 64; the item budget is 2,097,152. Older readers reject required schema 3.</remarks>
+    /// <remarks>Depth remains 64; the item budget is 2,097,152. Schema 3 retains its 8 MiB budget; older readers reject required schema 4.</remarks>
     public static byte[] WriteLibraryBinary(ReadOnlySpan<byte> nativeImage)
     {
-        var payload = NativeBinaryCodec.Encode(nativeImage, library: true);
-        ValidateHeader(NativeBinaryCodec.Decode(payload, library: true));
-        return MetadataEnvelope.WriteCore([new MetadataSection(256, 3, true, payload, 8 * 1024 * 1024)],
-            new Dictionary<ushort, ushort> { [256] = 3 }, 8 * 1024 * 1024);
+        var payload = NativeBinaryCodec.Encode(nativeImage, library: true, expandedLibrary: true);
+        ValidateHeader(NativeBinaryCodec.Decode(payload, library: true, expandedLibrary: true));
+        ushort schema = payload.Length <= 8 * 1024 * 1024 - 32 ? (ushort)3 : (ushort)4;
+        int limit = schema == 3 ? 8 * 1024 * 1024 : 16 * 1024 * 1024;
+        return MetadataEnvelope.WriteCore([new MetadataSection(256, schema, true, payload, limit)],
+            new Dictionary<ushort, ushort> { [256] = schema }, limit);
     }
 
     /// <summary>Validates transport and the module header, then reconstructs owned native JSON values.</summary>
-    /// <param name="image">Complete standalone NEOX image: schema 2 up to 1 MiB or schema 3 up to 8 MiB.</param>
+    /// <param name="image">Complete standalone NEOX image: schema 2 up to 1 MiB, schema 3 up to 8 MiB, or schema 4 up to 16 MiB.</param>
     /// <returns>Equivalent JSON values; original whitespace and lexical spellings are not retained.</returns>
     /// <exception cref="InvalidDataException">Malformed framing, required schema, binary values or module header.</exception>
     /// <remarks>Unknown optional sections are admitted but are not returned in the JSON view.
@@ -44,11 +46,15 @@ public static class NativeModuleContainer
         IReadOnlyList<MetadataSection> sections;
         try { sections = MetadataEnvelope.Read(image, Schemas); }
         catch (InvalidDataException)
-        { sections = MetadataEnvelope.ReadCore(image, new Dictionary<ushort, ushort> { [256] = 3 }, 8 * 1024 * 1024); }
+        {
+            try { sections = MetadataEnvelope.ReadCore(image, new Dictionary<ushort, ushort> { [256] = 3 }, 8 * 1024 * 1024); }
+            catch (InvalidDataException)
+            { sections = MetadataEnvelope.ReadCore(image, new Dictionary<ushort, ushort> { [256] = 4 }, 16 * 1024 * 1024); }
+        }
         var execution = sections.SingleOrDefault(s => s.Kind == 256);
-        if (execution is null || !execution.Required || execution.Version is not (2 or 3))
+        if (execution is null || !execution.Required || execution.Version is not (2 or 3 or 4))
             throw new InvalidDataException("required binary native execution section missing");
-        var json = NativeBinaryCodec.Decode(execution.Payload, library: execution.Version == 3);
+        var json = NativeBinaryCodec.Decode(execution.Payload, library: execution.Version >= 3, expandedLibrary: execution.Version == 4);
         ValidateHeader(json);
         return json;
     }

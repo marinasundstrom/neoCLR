@@ -7684,3 +7684,18 @@ explicit selection of that fieldless Object root. String retains intrinsic UTF-8
 storage, not record fields; unrelated primitive bases remain unsupported. Use
 `GetILGenerator()` for constructor bodies, including the direct base call.
 [Runtime evidence](../docs/experiments/extended-cli-metadata/string-root-2026-10-07.md).
+
+### Expanded library envelope (development, 2026-10-07)
+
+`NativeModuleContainer.WriteLibraryBinary`,
+`RuntimeAssemblyContainer.WriteLibraryBinary` and runtime `write_module` select
+required schema 4 when the encoded library exceeds schema 3's 8 MiB envelope.
+Schema 4 allows a 16 MiB envelope. `Read`, `ReadNativeAssembly` and native runtime
+loading accept it; older readers reject the required version. Small libraries keep
+schema 3. Schema-1/2 bounds remain unchanged. The native CBOR/semantic model is unchanged.
+
+All other library limits remain: 32 MiB JSON, 2,097,152 nodes, depth 64, and 16 MiB
+**total PE** (`MaxLibraryImageSize`). Container/CLI overhead counts toward that PE
+limit. Exceeding any applicable bound throws `InvalidDataException`; no partial
+compiler artifact is published. No execution or complete bootstrap is implied by a
+successful write. [Contracts and executable evidence](../docs/experiments/extended-cli-metadata/expanded-library-2026-10-07.md).

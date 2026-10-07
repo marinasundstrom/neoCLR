@@ -1,4 +1,4 @@
-//! NEOX native execution schemas 2/3: bounded definite-length CBOR object data.
+//! NEOX native execution schemas 2/3/4: bounded definite-length CBOR object data.
 use crate::{Fault, Module};
 use std::collections::HashSet;
 
@@ -11,7 +11,7 @@ pub(crate) fn encode_library(module: &Module) -> Result<Vec<u8>, Fault> {
     struct Bounded(Vec<u8>);
     impl std::io::Write for Bounded {
         fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
-            if bytes.len() > (8 * 1024 * 1024 - 32) - self.0.len() {
+            if bytes.len() > (16 * 1024 * 1024 - 32) - self.0.len() {
                 return Err(std::io::Error::other(
                     "native payload exceeds library envelope limit",
                 ));
@@ -31,12 +31,12 @@ pub(crate) fn encode_library(module: &Module) -> Result<Vec<u8>, Fault> {
     }
     let mut output = Bounded(Vec::new());
     ciborium::into_writer(module, &mut output).map_err(invalid)?;
-    validate_profile(&output.0, true)?;
+    validate_expanded_profile(&output.0, true, true)?;
     Ok(output.0)
 }
 
-pub(crate) fn decode(data: &[u8], library: bool) -> Result<Module, Fault> {
-    validate_profile(data, library)?;
+pub(crate) fn decode(data: &[u8], library: bool, expanded: bool) -> Result<Module, Fault> {
+    validate_expanded_profile(data, library, expanded)?;
     // Deserialize into the runtime model, without a JSON string or serde_json::Value tree.
     let module: Module = ciborium::from_reader(data).map_err(invalid)?;
     if module.format != 5 {
@@ -50,9 +50,16 @@ fn validate(data: &[u8]) -> Result<(), Fault> {
     validate_profile(data, false)
 }
 
+#[cfg(test)]
 fn validate_profile(data: &[u8], library: bool) -> Result<(), Fault> {
+    validate_expanded_profile(data, library, false)
+}
+
+fn validate_expanded_profile(data: &[u8], library: bool, expanded: bool) -> Result<(), Fault> {
     if data.len()
-        > (if library {
+        > (if expanded {
+            16 * 1024 * 1024
+        } else if library {
             8 * 1024 * 1024
         } else {
             1024 * 1024
@@ -176,6 +183,31 @@ impl<'a> Reader<'a> {
 mod tests {
     use super::*;
     #[test]
+    fn expanded_profile_keeps_node_depth_and_encoding_limits() {
+        let mut largest = vec![b'x'; 16 * 1024 * 1024 - 32];
+        largest[0] = 0x7a;
+        let length = (largest.len() - 5) as u32;
+        largest[1..5].copy_from_slice(&length.to_be_bytes());
+        validate_expanded_profile(&largest, true, true).unwrap();
+        assert!(validate_profile(&largest, true).is_err());
+        largest.push(b'x');
+        assert!(validate_expanded_profile(&largest, true, true).is_err());
+        let mut excess = vec![0; 2097157];
+        excess[..5].copy_from_slice(&[0x9a, 0, 0x20, 0, 0]);
+        assert!(validate_expanded_profile(&excess, true, true).is_err());
+        assert!(
+            validate_expanded_profile(&[vec![0x81; 65], vec![0]].concat(), true, true).is_err()
+        );
+        for invalid in [
+            vec![0xbf, 0xff],
+            vec![0x18, 0],
+            vec![0xa2, 0x61, b'x', 0, 0x61, b'x', 1],
+        ] {
+            assert!(validate_expanded_profile(&invalid, true, true).is_err());
+        }
+    }
+
+    #[test]
     fn direct_writer_rejects_unsupported_format_and_payload_overflow() {
         let mut module: Module =
             serde_json::from_str(r#"{"format":5,"name":"Large","functions":[]}"#).unwrap();
@@ -184,7 +216,7 @@ mod tests {
         module.format = 5;
         module.name.clear();
         assert!(encode_library(&module).is_err());
-        module.name = "x".repeat(8 * 1024 * 1024);
+        module.name = "x".repeat(16 * 1024 * 1024);
         assert!(encode_library(&module).is_err());
     }
 
@@ -225,12 +257,12 @@ mod tests {
             let module: Module = serde_json::from_str(&json).unwrap();
             let mut binary = Vec::new();
             ciborium::into_writer(&module, &mut binary).unwrap();
-            let decoded = decode(&binary, true).unwrap();
+            let decoded = decode(&binary, true, false).unwrap();
             assert_eq!(
                 serde_json::to_value(module).unwrap(),
                 serde_json::to_value(decoded).unwrap()
             );
-            assert!(decode(&binary, false).is_err());
+            assert!(decode(&binary, false, false).is_err());
         }
     }
 

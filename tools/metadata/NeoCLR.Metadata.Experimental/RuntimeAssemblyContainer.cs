@@ -11,7 +11,7 @@ namespace NeoCLR.Metadata.Experimental;
 /// its throwing bodies are never used by neoCLR. Binding detects modification, not authenticity.</remarks>
 public static class RuntimeAssemblyContainer
 {
-    /// <summary>Maximum schema-3 library PE size, 16 MiB; its native envelope is limited to 8 MiB.</summary>
+    /// <summary>Maximum library PE size, 16 MiB. Schema-3/4 envelopes are limited to 8/16 MiB.</summary>
     public const int MaxLibraryImageSize = 16 * 1024 * 1024;
     private static readonly IReadOnlyDictionary<ushort, ushort> Schemas = new Dictionary<ushort, ushort> { [256] = 1 };
 
@@ -51,13 +51,13 @@ public static class RuntimeAssemblyContainer
         return WriteCore(native, assembly.CoreLibrary, binary: true, projection, library: assembly.RequiresWideNumericPayload);
     }
 
-    /// <summary>Builds a schema-3 library PE with explicit larger bounded binary metadata budgets.</summary>
+    /// <summary>Builds a schema-3 library PE, selecting schema 4 when its payload exceeds 8 MiB.</summary>
     /// <param name="assembly">The authored graph and complete external contracts; no dependency reader is consulted.</param>
-    /// <returns>Owned PE bytes, at most 16 MiB, containing an 8 MiB native envelope.</returns>
+    /// <returns>Owned PE bytes, at most 16 MiB; schema-3/4 envelopes allow 8/16 MiB.</returns>
     /// <exception cref="ArgumentNullException">The graph is null.</exception>
     /// <exception cref="InvalidDataException">Invalid graph, unsupported declarations or exceeded profile bounds.</exception>
     /// <remarks>Host JSON is bounded to 32 MiB, binary nodes to 2,097,152 and depth to 64.
-    /// Declaration row/signature bounds remain unchanged. Older schema-1/2 readers reject this required schema.</remarks>
+    /// Declaration row/signature bounds remain unchanged. Schema 4 changes only the envelope byte budget; older readers reject it.</remarks>
     public static byte[] WriteLibraryBinary(AssemblyBuilder assembly)
     {
         ArgumentNullException.ThrowIfNull(assembly);
@@ -72,8 +72,9 @@ public static class RuntimeAssemblyContainer
             throw new InvalidDataException("native payload exceeds execution envelope limit");
         var definition = library ? NativeAssemblyDefinition.ReadLibraryAssembly(nativeImage) : NativeAssemblyDefinition.ReadAssembly(nativeImage);
         ushort schema = library ? (ushort)3 : binary ? (ushort)2 : (ushort)1;
-        byte[] payloadBytes = binary ? NativeBinaryCodec.Encode(nativeImage, library) : nativeImage.ToArray();
-        int envelopeLimit = library ? 8 * 1024 * 1024 : MetadataEnvelope.MaxImageSize;
+        byte[] payloadBytes = binary ? NativeBinaryCodec.Encode(nativeImage, library, expandedLibrary: library) : nativeImage.ToArray();
+        if (library && payloadBytes.Length > 8 * 1024 * 1024 - 32) schema = 4;
+        int envelopeLimit = schema == 4 ? 16 * 1024 * 1024 : library ? 8 * 1024 * 1024 : MetadataEnvelope.MaxImageSize;
         var envelope = MetadataEnvelope.WriteCore([new MetadataSection(256, schema, true, payloadBytes, envelopeLimit)],
             new Dictionary<ushort, ushort> { [256] = schema }, envelopeLimit);
         var image = projection ?? definition.CreateReferenceAssembly(coreLibrary);
@@ -139,10 +140,10 @@ public static class RuntimeAssemblyContainer
     }
 
     /// <summary>Validates the PE, recognition digest, envelope and supported native declarations.</summary>
-    /// <param name="image">Complete unsigned PE32 image, at most 4 MiB for schema 1/2 or 16 MiB for schema 3.</param>
-    /// <returns>Owned native format-5 JSON: original schema-1 bytes or reconstructed schema-2/3 values.</returns>
+    /// <param name="image">Complete unsigned PE32 image, at most 4 MiB for schema 1/2 or 16 MiB for schema 3/4.</param>
+    /// <returns>Owned native format-5 JSON: original schema-1 bytes or reconstructed schema-2/3/4 values.</returns>
     /// <exception cref="InvalidDataException">Missing/changed binding, malformed container or unsupported required schema/declarations.</exception>
-    /// <remarks>Accepts schema-1 JSON, schema-2 CBOR and schema-3 library CBOR. Does not execute, resolve dependencies, compare CLI declarations or verify native bodies.</remarks>
+    /// <remarks>Accepts schema-1 JSON, schema-2 CBOR and schema-3/4 library CBOR. Does not execute, resolve dependencies, compare CLI declarations or verify native bodies.</remarks>
     public static byte[] Read(ReadOnlySpan<byte> image)
     {
         var envelope = MetadataArtifactReader.ReadEnvelope(image, maxImageSize: MaxLibraryImageSize)!;
@@ -152,15 +153,19 @@ public static class RuntimeAssemblyContainer
         {
             try { sections = MetadataEnvelope.Read(envelope, new Dictionary<ushort, ushort> { [256] = 2 }); }
             catch (InvalidDataException)
-            { sections = MetadataEnvelope.ReadCore(envelope, new Dictionary<ushort, ushort> { [256] = 3 }, 8 * 1024 * 1024); }
+            {
+                try { sections = MetadataEnvelope.ReadCore(envelope, new Dictionary<ushort, ushort> { [256] = 3 }, 8 * 1024 * 1024); }
+                catch (InvalidDataException)
+                { sections = MetadataEnvelope.ReadCore(envelope, new Dictionary<ushort, ushort> { [256] = 4 }, 16 * 1024 * 1024); }
+            }
         }
         var execution = sections.SingleOrDefault(s => s.Kind == 256);
-        if (execution is null || !execution.Required || execution.Version is not (1 or 2 or 3))
+        if (execution is null || !execution.Required || execution.Version is not (1 or 2 or 3 or 4))
             throw new InvalidDataException("required native execution section missing or unsupported");
-        if (execution.Version != 3 && image.Length > MetadataArtifactReader.MaxImageSize)
+        if (execution.Version < 3 && image.Length > MetadataArtifactReader.MaxImageSize)
             throw new InvalidDataException("legacy native PE exceeds 4 MiB");
-        var native = execution.Version == 1 ? execution.GetPayload() : NativeBinaryCodec.Decode(execution.Payload, library: execution.Version == 3);
-        _ = execution.Version == 3 ? NativeAssemblyDefinition.ReadLibraryAssembly(native) : NativeAssemblyDefinition.ReadAssembly(native);
+        var native = execution.Version == 1 ? execution.GetPayload() : NativeBinaryCodec.Decode(execution.Payload, library: execution.Version >= 3, expandedLibrary: execution.Version == 4);
+        _ = execution.Version >= 3 ? NativeAssemblyDefinition.ReadLibraryAssembly(native) : NativeAssemblyDefinition.ReadAssembly(native);
         return native;
     }
 

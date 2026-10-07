@@ -10,6 +10,16 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+All 197 diagnostic System inputs now emit a native PE. Required schema 4 admits
+larger library envelopes while retaining earlier-profile bounds. Full-artifact runtime
+admission next rejects **nominal array backing storage**; resolve that actual source
+shape before claiming bootstrap. The author also suggested optional System.Data,
+System.Networking and System.Web assemblies: map dependency/service ownership and
+keep the aggregate compile as coverage, not a proposed monolithic distribution.
+[Evidence and packaging direction](experiments/extended-cli-metadata/expanded-library-2026-10-07.md).
+
+### Earlier String frontier
+
 Intrinsic String now retains and executes its selected source Object relationship.
 The linked PE constructor gate returns 42; the 197-input audit advances to the
 **binary library payload limit**, with no published output. Next inspect payload
