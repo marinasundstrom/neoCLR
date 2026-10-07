@@ -235,7 +235,9 @@ reports its external-call AOT boundary. A subsequent nongeneric value-library sl
 application artifacts into one executable, checking original access scopes before
 selection. Generic value-library specialization now also passes a Pair<int, byte>
 consumer with copied values and default initialization, limited to one closed shape per
-type definition. Runtime-library Result and interface support remain open.
+type definition. Explicit runtime-owned System/Object validation contexts now pass;
+the real library Result reaches specialization/selection but still fails implemented-
+interface admission. Runtime-library Result execution remains open.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

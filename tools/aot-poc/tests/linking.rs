@@ -321,3 +321,173 @@ fn generic_library_rejects_multiple_shapes_references_and_cross_module_access() 
         }
     }
 }
+
+fn runtime_context_fixture() -> (neoclr::Module, Vec<neoclr::Module>) {
+    use neoclr::assembler::{ModuleInput, read_modules_with_object_root};
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let root = r#"
+.module Core
+.revision r1
+.references ()
+.type class abstract System.Object
+.method instance virtual ToString() -> String
+ldstr "root"
+ret
+.end
+.method instance virtual Equals(System.Object other) -> Boolean
+ldc.bool false
+ret
+.end
+.method instance virtual GetHashCode() -> Int32
+ldc.i4 -1
+ret
+.end
+.end
+.type Cell
+.field Value Int32
+.end
+.function Create() -> Cell
+ldc.i4 42
+newobj Cell
+ret
+.end
+"#;
+    let app = ".module App\n.references (Core#r1)\n.entry Main\n.function Main() -> Int32\ncall Create()\nldfld 0\nret\n.end";
+    let id = neoclr::metadata::TypeDefId {
+        module: "Core".into(),
+        revision: Some("r1".into()),
+        index: 0,
+    };
+    let modules = read_modules_with_object_root(
+        &[ModuleInput::Source(app), ModuleInput::Source(root)],
+        &seed,
+        &id,
+    )
+    .unwrap();
+    (seed, modules)
+}
+fn invoke_context(
+    dir: &Temp,
+    seed: &neoclr::Module,
+    m: &[neoclr::Module],
+    case: usize,
+    inspect: bool,
+) -> Output {
+    let app = dir.0.join("app.neox");
+    let lib = dir.0.join("core.neox");
+    let system = dir.0.join("system.neox");
+    fs::write(&app, encode(&m[0])).unwrap();
+    fs::write(&lib, encode(&m[1])).unwrap();
+    fs::write(&system, encode(seed)).unwrap();
+    let mut c = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
+    if inspect {
+        c.arg("--inspect")
+            .arg(&app)
+            .args(["@entry", "--closed-world"]);
+    } else {
+        c.arg("--closed-world")
+            .arg(&app)
+            .arg("@entry")
+            .arg(dir.0.join("app.o"));
+    }
+    c.arg("--module").arg(&lib);
+    if case != 1 {
+        c.arg("--system").arg(&system);
+    }
+    c.arg("--object-root")
+        .arg(if case == 2 { &app } else { &lib });
+    if case == 3 {
+        c.arg("--module").arg(&lib);
+    }
+    if case == 4 {
+        c.arg("--system").arg(&system);
+    }
+    c.output().unwrap()
+}
+#[test]
+fn explicit_runtime_object_context_preserves_validation_and_standalone_values() {
+    let (seed, m) = runtime_context_fixture();
+    let dir = Temp::new();
+    let inspect = invoke_context(&dir, &seed, &m, 0, true);
+    assert!(inspect.status.success());
+    let inspection: serde_json::Value = serde_json::from_slice(&inspect.stdout).unwrap();
+    assert_eq!(inspection["admission"]["accepted"], true, "{inspection}");
+    assert!(!dir.0.join("app.o").exists());
+    let result = invoke_context(&dir, &seed, &m, 0, false);
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert_eq!(report, inspection["selection"]);
+    assert_eq!(
+        report["loadSet"]["runtimeContext"]["objectRoot"]["module"],
+        "Core"
+    );
+    assert_eq!(report["loadSet"]["runtimeContext"]["explicit"], true);
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    native(&dir, 42);
+}
+#[test]
+fn invalid_runtime_contexts_never_emit() {
+    for case in 1..9 {
+        let (mut seed, mut m) = runtime_context_fixture();
+        match case {
+            5 => seed.name = "NotSystem".into(),
+            6 => m[1].types[0].is_abstract = false,
+            7 => m[1].types[0].name = "OtherObject".into(),
+            8 => {
+                let method = m[1]
+                    .functions
+                    .iter_mut()
+                    .find(|f| f.name.ends_with("GetHashCode"))
+                    .unwrap();
+                method.is_virtual = false;
+            }
+            _ => (),
+        }
+        let dir = Temp::new();
+        let result = invoke_context(&dir, &seed, &m, case, false);
+        let error = String::from_utf8_lossy(&result.stderr);
+        assert!(!result.status.success(), "case {case} accepted");
+        assert!(!error.contains("panicked"), "{error}");
+        assert!(!dir.0.join("app.o").exists());
+    }
+}
+
+#[test]
+fn unused_generic_methods_are_verified_but_selected_ones_still_fail() {
+    let (seed, mut m) = runtime_context_fixture();
+    let template = neoclr::assemble(
+        ".module Template\n.function Unused<T>(T value) -> T\nldarg value\nret\n.end",
+    )
+    .unwrap();
+    let mut method = template.functions[0].clone();
+    method.definition = None;
+    m[1].functions.push(method);
+    let dir = Temp::new();
+    let result = invoke_context(&dir, &seed, &m, 0, false);
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert!(
+        report["excludedFunctions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|f| f["name"] == "Unused")
+    );
+    m[0].functions[0].body = vec![
+        Op::Int(42),
+        Op::Call(neoclr::assembler::parse_function_ref("Unused<Int32>(Int32)").unwrap()),
+        Op::Return,
+    ];
+    let dir = Temp::new();
+    let result = invoke_context(&dir, &seed, &m, 0, false);
+    assert!(!result.status.success());
+    assert!(!dir.0.join("app.o").exists());
+}

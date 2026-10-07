@@ -446,3 +446,10 @@ The [subsequent explicit value-library slice](../aot-library/README.md) now impl
 application-plus-library compilation with original-scope verification and standalone
 Raven evidence, including a follow-up with one closed generic value shape per definition. Generic runtime-library/interface support remains open;
 this does not change the recorded rejection of the System.Result probe.
+
+
+With the subsequent [explicit runtime context](../aot-library/README.md#explicit-runtime-validation-context-2026-10-07),
+the real library Result probe now passes loading, verification and specialization/selection.
+Its remaining observed boundary is implemented-interface admission, not an unresolved
+external call. The original dependency report remains historical evidence; no Result
+native executable is claimed yet.

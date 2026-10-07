@@ -98,7 +98,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   specialization reports. Compile a separate Pair<int, byte> library consumer with
   copied values, accessors and default initialization; validate both native containers
   and reject additional shapes, reference payloads and cross-module generic access.
-  No public ABI or runtime APIs change.
+  Add explicit --system/--object-root validation contexts for closed-world emission and
+  inspection, preserving the runtime's original identity, root-slot and access checks.
+  Permit verified unselected generic methods while retaining selected-method rejection.
+  Validate a standalone generic value app against the pinned runtime-owned context; the
+  real library Result now reaches specialization/selection and stops at an explicit
+  implemented-interface diagnostic. System seed bodies remain validation-only; no native
+  reference services, interface execution or public ABI/runtime APIs are added.
   General unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime

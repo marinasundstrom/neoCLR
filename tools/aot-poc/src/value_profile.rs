@@ -37,6 +37,13 @@ impl<'a> Profile<'a> {
             );
         }
         for t in &input.types {
+            if !t.implements.is_empty() {
+                return Err(format!(
+                    "{}: implemented interfaces require a later AOT profile",
+                    t.name
+                )
+                .into());
+            }
             let lexical_companion = t.is_reference_type
                 && t.is_abstract
                 && t.is_sealed
@@ -53,7 +60,6 @@ impl<'a> Profile<'a> {
                 || t.representation != Representation::Record
                 || t.enum_info.is_some()
                 || t.base.is_some()
-                || !t.implements.is_empty()
                 || (t.is_abstract && !lexical_companion)
                 || !t.generic_parameters.is_empty()
                 || !t.generic_constraints.is_empty()

@@ -59,14 +59,15 @@ as local `ParseResult<int, byte>` with one closed shape per generic definition, 
 specializations and standalone evidence. `let ... else` and `if let` execute both paths;
 plain positional `let` deconstruction is a recorded Raven native-emitter gap.
 The [real library Result probe](experiments/aot-values/README.md#real-library-result-dependency-boundary-2026-10-07)
-now passes Raven/interpreter execution and records AOT's external-call rejection.
+passes Raven/interpreter execution; its initial report recorded AOT's external-call rejection.
 Closed-world inspection shares emission preparation and exposes this boundary.
 An [explicit nongeneric value-library load set](experiments/aot-library/README.md) now
 compiles separate Raven library/application artifacts into one standalone executable,
 verifying original access scopes before projection. A follow-up now specializes one
-closed generic value shape across that boundary, validated by Pair<int, byte>. The next
-Result step needs the explicit runtime-owned System/Object load context and propagation-
-interface contract. Multiple instantiations
+closed generic value shape across that boundary, validated by Pair<int, byte>. The
+runtime-owned System/Object validation context is now explicit and tested. The real
+Result probe passes specialization/selection and stops at its implemented propagation
+interface; that contract is the next bounded step. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

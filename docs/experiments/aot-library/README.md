@@ -46,12 +46,13 @@ neoclr-aot-poc --inspect App.pe @entry --closed-world --module Values.pe
 - Each input is limited to 16 MiB; the combined inventory is limited to 4,096 functions
   and 1,024 types. Selected code keeps the existing 128-function/32-type/inline-layout
   limits. Source modules and source assemblies must be distinct. No dependency discovery,
-  dynamic loading, custom System/Object root, generic methods or interface dispatch
-  is supported. The follow-up generic profile admits one closed instantiation per value
+  dynamic loading, selected generic methods or interface dispatch is supported.
+  Explicit System/Object validation contexts are available as described below. The
+  follow-up generic profile admits one closed instantiation per value
   definition, as described below; constraints and reference payloads remain unsupported.
   Single-module generic specialization is unchanged. Unknown external calls are rejected, never replaced with name-based intrinsics.
 - Before relocation, the ordinary runtime loader and verifier check the **entire original
-  load set**, using bundled System. This enforces reference lists/revisions, identities,
+  load set**, using bundled System by default or an explicit validated context. This enforces reference lists/revisions, identities,
   signatures, initialization, borrows and private/internal/type/field accessibility in
   their original scopes. This is deliberately stricter than verifying only selected code:
   invalid unused bodies/dependencies also fail. Supplied source definition identities
@@ -80,7 +81,7 @@ and [metadata identity baseline](../../design/extended-cli-metadata.md). Like a 
 native publish, required library code is compiled at build time. The experiment uses the
 existing neoCLR runtime binder/verifier before projection instead of inventing parallel
 access rules or concatenating unchecked declarations. The benefit is reuse of executable
-identity/access semantics; the cost is whole-load-set verification, a bundled-System
+identity/access semantics; the cost is whole-load-set verification, a validation-only System context
 restriction and a deliberately small value profile. This does not claim general
 .NET-style library compatibility, performance gains or general trimming.
 
@@ -109,7 +110,7 @@ This preserves nominal distinctions and the original dependency/access proof whi
 keeping the same private native layout and C entry ABI.
 
 One closed shape per type definition is permitted across the entire explicit load set.
-Multiple shapes, reference arguments and generic methods remain rejected; selected types
+Multiple shapes, reference arguments and selected generic methods remain rejected; selected types
 with constraints or interface dependencies need later profiles. Negative tests cover a
 second instantiation, a reference payload, an internal generic accessor called from the
 application, and direct access to the library's private generic field. All fail before
@@ -118,6 +119,64 @@ object emission. Source and native metadata formats are unchanged.
 This reuses the [type-specialization comparison](../aot-values/README.md#generic-result-and-pattern-bindings-2026-10-07):
 .NET Native AOT supports more generic instantiations with a code-size cost. The current
 single-shape restriction avoids inventing multi-instantiation metadata/symbol identities;
-it is an experimental bound, not a permanent platform rule. The next Result step must
-handle the explicit runtime-owned System/Object load context and propagation-interface
-metadata; this sample does not claim that the real System.Runtime Result already compiles.
+it is an experimental bound, not a permanent platform rule. The runtime-owned System/Object context is now supported below. The next Result step
+must handle propagation-interface metadata; this sample does not claim that the real System.Runtime Result already compiles.
+
+
+## Explicit runtime validation context (2026-10-07)
+
+Closed-world emission and inspection now accept `--system <seed>` and
+`--object-root <dependency>` alongside `--module`. Both modes use the ordinary runtime
+loader and whole-load-set verifier with that exact context before projection. The
+Object root is a host choice, not a serialized metadata instruction. It must identify
+exactly one supplied compiled dependency, requires an explicit System seed, and must
+pass the runtime's public/abstract/fieldless/nongeneric root and virtual-slot checks.
+Duplicate options, ambiguous/missing root inputs and invalid roots fail before emission.
+An explicit runtime context currently requires at least one dependency. Existing bounded
+System/source inventory and input-size checks remain in effect; the seed is separately
+bounded to 16 MiB, 1,024 types and 4,096 functions.
+
+```sh
+neoclr-aot-poc --inspect LibraryResultApp.pe @entry --closed-world \
+  --system System.runtime.neox --module System.Runtime.dll \
+  --object-root System.Runtime.dll
+```
+
+The selection report records `loadSet.runtimeContext`: the chosen System module/revision,
+Object type definition identity and whether the context was explicit. The seed is used
+for **validation only**; its bodies are not compilation inputs. A selected call requiring
+an unsupplied System implementation still fails. Native reference allocation, virtual
+calls and interface execution remain unsupported. Unselected generic methods in a supplied
+library are now permitted after ordinary verification; selected generic methods still fail.
+This admits the complete runtime library without claiming its entire API can compile.
+
+[Context evidence](context-validation.json) uses the pinned runtime-owned seed/library
+with the existing generic Pair fixture and the real System.Result fixture. Both pass the
+interpreter. Pair also passes AOT admission and isolated native execution with only
+libSystem linkage. Result now passes context validation, specialization and direct-call
+selection, then fails **compilation** with `implemented interfaces require a later AOT
+profile`. Its `Propagatable<Result<T,E>,T,E>` relationship remains present in the private
+projection; this slice does not erase it or claim a native Result executable.
+
+Reproduce without rebuilding producer fixtures:
+
+```sh
+python3 docs/experiments/aot-library/verify_context.py \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --runtime /absolute/path/to/neoclr \
+  --bundle /absolute/path/to/pinned/neoclr-native-poc \
+  --output target/aot-runtime-context
+```
+
+The report records hashes of all inputs, selected rows/context, counts of excluded rows,
+commands and native deployment checks. Large diagnostic outputs are represented by their
+byte count/hash rather than duplicating the full runtime inventory. Focused tests also
+cover a small independently authored root, invalid slot/root shapes, wrong seed identity,
+missing/duplicate context arguments and unused versus selected generic methods.
+
+This reuses the existing .NET Native AOT and metadata-identity comparisons above. Explicit
+build-time dependency contexts remove dependence on the compiler host's bundled type root,
+while retaining neoCLR's existing root validation. The cost is another bounded input contract
+and full-source verification. This is not a native GC, a stable hosting ABI or support for
+calling arbitrary runtime services. The next bounded step is preserving verified interface
+contracts for reference-free direct-call code without enabling interface dispatch implicitly.

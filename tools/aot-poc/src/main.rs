@@ -21,14 +21,28 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut args: Vec<_> = env::args_os().skip(1).collect();
     let dependency_args = args
         .iter()
-        .position(|a| a == "--module")
+        .position(|a| a == "--module" || a == "--system" || a == "--object-root")
         .map(|i| args.split_off(i))
         .unwrap_or_default();
-    if dependency_args.len() > 16
-        || dependency_args.len() % 2 != 0
-        || dependency_args.chunks(2).any(|pair| pair[0] != "--module")
-    {
-        return Err("expected up to eight trailing --module <input> pairs".into());
+    if dependency_args.len() > 20 || dependency_args.len() % 2 != 0 {
+        return Err("expected trailing --module, --system or --object-root input pairs".into());
+    }
+    let mut module_paths = vec![];
+    let mut system_path = None;
+    let mut object_path = None;
+    for pair in dependency_args.chunks(2) {
+        match pair[0].to_str() {
+            Some("--module") if module_paths.len() < 8 => module_paths.push(&pair[1]),
+            Some("--system") if system_path.is_none() => system_path = Some(&pair[1]),
+            Some("--object-root") if object_path.is_none() => object_path = Some(&pair[1]),
+            _ => return Err("invalid, duplicate or excessive load-context option".into()),
+        }
+    }
+    if object_path.is_some() && system_path.is_none() {
+        return Err("--object-root requires explicit --system".into());
+    }
+    if system_path.is_some() && module_paths.is_empty() {
+        return Err("explicit runtime context requires at least one --module dependency".into());
     }
     let inspect = args.first().is_some_and(|a| a == "--inspect");
     let inspect_closed = inspect && args.get(3).is_some_and(|a| a == "--closed-world");
@@ -37,7 +51,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
     {
         return Err(
-            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library> pairs"
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs"
                 .into(),
         );
     }
@@ -57,10 +71,51 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         return Err("--module requires explicit closed-world emission or inspection".into());
     }
     let input = read_module(Path::new(input_path))?;
-    let dependencies = dependency_args
-        .chunks(2)
-        .map(|pair| read_module(Path::new(&pair[1])))
+    let dependencies = module_paths
+        .iter()
+        .map(|path| read_module(Path::new(path)))
         .collect::<Result<Vec<_>, _>>()?;
+    let object_root = if let Some(path) = object_path {
+        if Path::new(path).extension().is_some_and(|e| e == "neoil") {
+            return Err("--object-root requires compiled metadata".into());
+        }
+        let selected = fs::canonicalize(path)?;
+        let matches: Vec<_> = module_paths
+            .iter()
+            .enumerate()
+            .filter(|(_, p)| fs::canonicalize(p).is_ok_and(|p| p == selected))
+            .map(|(i, _)| i)
+            .collect();
+        let [index] = matches.as_slice() else {
+            return Err("--object-root must identify exactly one explicit --module input".into());
+        };
+        let module = &dependencies[*index];
+        let roots: Vec<_> = module
+            .types
+            .iter()
+            .enumerate()
+            .filter(|(_, t)| t.name == "System.Object")
+            .map(|(i, _)| i)
+            .collect();
+        let [index] = roots.as_slice() else {
+            return Err("Object root artifact must contain exactly one System.Object".into());
+        };
+        Some(neoclr::metadata::TypeDefId {
+            module: module.name.clone(),
+            revision: module.revision.clone(),
+            index: *index as u32,
+        })
+    } else {
+        None
+    };
+    let context = system_path
+        .map(|path| {
+            read_module(Path::new(path)).map(|system| linking::RuntimeContext {
+                system,
+                object_root,
+            })
+        })
+        .transpose()?;
     let root = args[1 + usize::from(shifted)]
         .to_str()
         .ok_or("root name must be UTF-8")?;
@@ -72,7 +127,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 &input,
                 root,
                 inspect_closed,
-                &dependencies
+                &dependencies,
+                context.as_ref()
             ))?
         );
         return Ok(());
@@ -81,7 +137,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         Some(if dependencies.is_empty() {
             selection::prepare(&input, root)?
         } else {
-            linking::prepare(&input, &dependencies, root)?
+            linking::prepare(&input, &dependencies, root, context.as_ref())?
         })
     } else {
         None

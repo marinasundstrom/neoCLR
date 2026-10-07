@@ -8,6 +8,7 @@ pub fn report(
     root: &str,
     closed: bool,
     dependencies: &[neoclr::Module],
+    context: Option<&super::linking::RuntimeContext>,
 ) -> Value {
     let mut histogram = BTreeMap::<String, usize>::new();
     let functions: Vec<_> = input
@@ -43,7 +44,7 @@ pub fn report(
         if dependencies.is_empty() {
             super::selection::prepare(input, root).map(Some)
         } else {
-            super::linking::prepare(input, dependencies, root).map(Some)
+            super::linking::prepare(input, dependencies, root, context).map(Some)
         }
     } else {
         Ok(None)

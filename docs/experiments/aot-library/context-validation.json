@@ -1,0 +1,425 @@
+{
+  "profile": "aot-runtime-context-v1",
+  "inputs": {
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "d3f80f3015fdf60b5dbc0a25d2daf56c124f1e3f8a4e1a952ae969e940bfc4f6",
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-library/GenericApp.pe": "534ed668db5c6928c79966e28ed88c585248d84ef932d98cafbf968bfc817039",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-library/GenericValues.pe": "f8eb07f45c8156a8890ba36bd15c18b2796bd3c320ab5d578875b49e520f4e4a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-values/LibraryResultApp.pe": "2d7da923aea2e7d25e1c4b21c8577feacc27851738fcc3dead1b4b343f44cf73",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca"
+  },
+  "baseRevision": "040f01457d64d1ebcfe69db0608005a6725506fb",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "commands": [
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-library/GenericApp.pe",
+        "--module",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-library/GenericValues.pe",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-values/LibraryResultApp.pe",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-library/GenericApp.pe",
+        "@entry",
+        "--closed-world",
+        "--module",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-library/GenericValues.pe",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 930793,
+        "sha256": "94d82b06723012fc4e72ca95a25006327a07857c81a0a8d2800d971eca917b15"
+      }
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-library/GenericApp.pe",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-runtime-context-final2/pair.o",
+        "--module",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-library/GenericValues.pe",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 882173,
+        "sha256": "30e22602df99b822f9ee9e8108fbef08a206e89f2f4392f56f32b43ebbf26915"
+      }
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-runtime-context-final2/pair.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-runtime-context-final2/pair"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-runtime-context-final2/pair.o"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-runtime-context-final2/pair"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-runtime-context-final2/pair:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-values/LibraryResultApp.pe",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 937418,
+        "sha256": "894a521906b4c3d8d64d81b162ff520af586ae3cb905f4b32933025026c6a96c"
+      }
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-values/LibraryResultApp.pe",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-runtime-context-final2/result.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 1,
+      "stderr": "aot-poc: NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032: implemented interfaces require a later AOT profile\n",
+      "stdout": ""
+    }
+  ],
+  "selected": {
+    "loadSet": {
+      "limits": "one closed instantiation per local value definition; no selected generic methods; one to eight explicit dependencies; no dynamic loading",
+      "modules": [
+        {
+          "name": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5",
+          "revision": "1.0.0.0"
+        },
+        {
+          "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        },
+        {
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        }
+      ],
+      "runtimeContext": {
+        "explicit": true,
+        "objectRoot": {
+          "index": 8,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "revision": null,
+        "scope": "validation only; System seed bodies are not compilation inputs",
+        "system": "System"
+      },
+      "validation": "all original bodies verified with runtime binder before private canonical projection"
+    },
+    "functions": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_436F7079",
+        "sourceIndex": 0
+      },
+      {
+        "compiledIndex": 1,
+        "definition": {
+          "index": 1,
+          "module": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E",
+        "sourceIndex": 1
+      },
+      {
+        "compiledIndex": 2,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032..ctor",
+        "sourceIndex": 2
+      },
+      {
+        "compiledIndex": 3,
+        "definition": {
+          "index": 1,
+          "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F4669727374",
+        "sourceIndex": 3
+      },
+      {
+        "compiledIndex": 4,
+        "definition": {
+          "index": 2,
+          "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F5365636F6E64",
+        "sourceIndex": 4
+      }
+    ],
+    "types": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032",
+        "sourceIndex": 0
+      }
+    ],
+    "specialization": {
+      "policy": "one closed instantiation per local type definition; no generic methods or constraints",
+      "types": [
+        {
+          "arguments": [
+            "Int32",
+            "Byte"
+          ],
+          "definition": {
+            "index": 0,
+            "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+            "revision": "1.0.0.0"
+          },
+          "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032",
+          "sourceIndex": 0
+        }
+      ]
+    }
+  },
+  "excludedCounts": {
+    "excludedFunctions": 1959,
+    "excludedTypes": 334
+  },
+  "resultProbe": {
+    "admission": {
+      "accepted": false,
+      "firstError": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032: implemented interfaces require a later AOT profile",
+      "phase": "compilation"
+    },
+    "selectedTypes": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 229,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032",
+        "sourceIndex": 229
+      },
+      {
+        "compiledIndex": 1,
+        "definition": {
+          "index": 230,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74",
+        "sourceIndex": 230
+      },
+      {
+        "compiledIndex": 2,
+        "definition": {
+          "index": 231,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031",
+        "sourceIndex": 231
+      },
+      {
+        "compiledIndex": 3,
+        "definition": {
+          "index": 232,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031",
+        "sourceIndex": 232
+      },
+      {
+        "compiledIndex": 4,
+        "definition": {
+          "index": 294,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_50726F706167617461626C656033",
+        "sourceIndex": 294
+      }
+    ],
+    "specialization": {
+      "policy": "one closed instantiation per local type definition; no generic methods or constraints",
+      "types": [
+        {
+          "arguments": [
+            "Int32",
+            "Byte"
+          ],
+          "definition": {
+            "index": 229,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032",
+          "sourceIndex": 229
+        },
+        {
+          "arguments": [
+            "Int32"
+          ],
+          "definition": {
+            "index": 231,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031",
+          "sourceIndex": 231
+        },
+        {
+          "arguments": [
+            "Byte"
+          ],
+          "definition": {
+            "index": 232,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031",
+          "sourceIndex": 232
+        },
+        {
+          "arguments": [
+            {
+              "Constructed": {
+                "arguments": [
+                  "Int32",
+                  "Byte"
+                ],
+                "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+              }
+            },
+            "Int32",
+            "Byte"
+          ],
+          "definition": {
+            "index": 294,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_50726F706167617461626C656033",
+          "sourceIndex": 294
+        }
+      ]
+    }
+  },
+  "native": {
+    "executableOnlyDirectory": true,
+    "emptyEnvironment": true,
+    "exit": 0,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ],
+    "artifacts": {
+      "pair.o": "8ed329fd50e0550ff97ee788ebaf17a4c6ec8e0d4e03656b752fd4eb5e8651ad",
+      "pair": "e455459674428173e8bf9fd5bafcf8764d47ae983dc5ecb76f50cf5dee6e1a03"
+    }
+  }
+}
