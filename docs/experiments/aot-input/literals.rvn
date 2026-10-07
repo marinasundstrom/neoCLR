@@ -1,0 +1,9 @@
+func Echo(value: string) -> string {
+    return value
+}
+
+func Main() -> int {
+    let greeting = Echo("Hej, världen 🌍")
+    let empty = Echo("")
+    return 42
+}

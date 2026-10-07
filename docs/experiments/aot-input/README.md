@@ -285,3 +285,50 @@ Existing reproduction scripts without the opt-in retain the earlier missing-body
 This extends the .NET Native AOT build-time dependency comparison above: managed seed
 helpers can be baked into the image, with explicit input selection and bounded native
 coverage. This does not make arbitrary runtime services compilable or change the public ABI.
+
+## Immutable literal transport (2026-10-07)
+
+The [Raven literal consumer](literals.rvn) now compiles to native metadata/IL and a
+standalone ARM64 executable. It forwards Unicode and empty String literals through an
+ordinary managed function and returns 42. [The CIL consumer](literals.neoil) additionally
+exercises output slots, indirect loads, copies, branch joins and embedded NUL. This
+validates transport and preserved payload bytes, not text operations or console output.
+
+Literal values use one private 64-bit pointer to immutable image data containing a
+64-bit UTF-8 byte count followed by the exact bytes. This extends the existing scalar
+Hello World representation to value-profile arguments/results, locals and output slots.
+All admitted String values originate from literals; the Int32 export cannot import a
+String pointer. Original verification still checks initialization and borrowed output
+contracts. No allocation, ownership count or general managed String layout is introduced.
+Fields, erased String payloads, generic String arguments, defaults, dynamic producers
+and String operations remain rejected. The representation is not a public native ABI.
+
+[Recorded evidence](literal-validation.json) includes a fresh producer with the pinned
+compiler revision, interpreter/native exit 42, matching inspection/emission, no unresolved
+object imports and execution from an otherwise empty directory/environment with only
+libSystem. PE and NEOX fixtures pass native tests; object checks preserve UTF-8 lengths
+and bytes. The 80-test isolated AOT suite passes, including rejection of unsupported
+dead IL (the old String rejection cases now use an unsupported bitwise instruction).
+
+```sh
+python3 docs/experiments/aot-input/verify_literals.py \
+  --compiler /absolute/path/to/rvnc.dll \
+  --compiler-revision 70aea9a7e9e424159a48b0227869245a95bf2ec2 \
+  --runtime /absolute/path/to/neoclr \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --bundle /absolute/path/to/neoclr-native-poc \
+  --output target/aot-literal-transport
+```
+
+With `--compile-system`, unchanged ReadByte now passes String signature selection and
+fails native admission at `neoCLR.Runtime.ConsoleReadByte: unsupported value member
+contract`. Its ordinary System.Fail path is retained and also needs a native failure
+service binding. No object is emitted. `verify_seed.py` now asserts this newer boundary;
+its earlier recorded evidence remains historical.
+
+This reuses the [.NET String baseline](../../string-storage-design.md#net-baseline-and-layers):
+.NET's immutable reference semantics and general managed UTF-16 storage are broader
+than this literal-only representation. Static UTF-8 data avoids runtime allocation for
+this bounded consumer; the cost is no dynamic text, identity/interning contract or general
+String operations. No performance comparison is claimed. Native service bindings are
+the next slice; reference counting versus GC for dynamically produced text remains open.

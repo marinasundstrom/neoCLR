@@ -92,7 +92,9 @@ Implement it in bounded stages:
    Result<Option<byte>, ConsoleReadError> shape. Metadata-only static member owners now
    compile, primitive erased-value transport passes, and primitive static generic methods
    now specialize. Explicit `--compile-system` selects managed seed helpers; the
-   ReadByte String-based failure path and native byte-input service remain before extending to text.
+   String literals now cross locals/calls/output slots and explicit fault instructions
+   terminate natively. ReadByte still needs native failure and byte-input service bindings
+   before extending to dynamic text.
 3. Define the native UTF-8 line-input and lifetime contract, including empty line versus
    EOF and I/O failure. Link the service into the executable and retain interpreter parity.
 4. Compile parsing and output with valid, invalid, overflow and EOF tests. Use the ordinary

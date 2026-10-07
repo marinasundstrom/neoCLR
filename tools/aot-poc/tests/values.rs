@@ -311,7 +311,7 @@ fn unsupported_value_shapes_and_invalid_borrows_never_emit() {
     m.functions[1].body = vec![Op::Arg(0), Op::Field(99), Op::Return];
     cases.push(m);
     let mut m = original.clone();
-    m.functions[1].body = vec![Op::Int(0), Op::Return, Op::String("unused".into())];
+    m.functions[1].body = vec![Op::Int(0), Op::Return, Op::BitNot];
     cases.push(m);
     let mut m = original.clone();
     m.functions[1].body = vec![Op::Arg(0), Op::Return];
@@ -1712,5 +1712,71 @@ fn user_fault_does_not_hide_unsupported_value_il() {
     let result = compile_mode(&bytes, &temp, "Main", true);
     assert!(!result.status.success());
     assert!(String::from_utf8_lossy(&result.stderr).contains("unsupported value instruction"));
+    assert!(!temp.0.join("value.o").exists());
+}
+
+#[test]
+fn immutable_utf8_literals_cross_locals_outputs_calls_and_joins() {
+    let source = include_str!("../../../docs/experiments/aot-input/literals.neoil");
+    let m = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::new(&m).unwrap();
+    program.verify().unwrap();
+    let main = program.resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap()).unwrap();
+    for input in [0, 1] {
+        assert_eq!(main.invoke(vec![neoclr::Value::Int32(input)], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    }
+    let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+    for closed in [false, true] {
+        let temp = Temp::new();
+        let result = compile_mode(&bytes, &temp, "Main", closed);
+        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        let object = fs::read(temp.0.join("value.o")).unwrap();
+        for text in ["Hej, världen 🌍", "embedded\0null", ""] {
+            let mut payload = (text.len() as u64).to_le_bytes().to_vec();
+            payload.extend_from_slice(text.as_bytes());
+            assert!(object.windows(payload.len()).any(|w| w == payload));
+        }
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        for input in [0, 1] {
+            native_mode(&bytes, input, 0, 42, "Main", closed);
+        }
+    }
+}
+
+#[test]
+fn raven_literal_transport_compiles_from_pe_and_neox() {
+    let pe = include_bytes!("../../../docs/experiments/aot-input/Literals.pe");
+    let m = module(pe);
+    assert_eq!(neoclr::run(&m, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    let neox = neoclr::metadata_container::write_module(&m).unwrap();
+    for bytes in [pe.as_slice(), neox.as_slice()] {
+        let temp = Temp::new();
+        let result = compile_mode(bytes, &temp, "@entry", true);
+        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        native_mode(bytes, 0, 0, 42, "@entry", true);
+    }
+}
+
+#[test]
+fn literal_profile_rejects_defaults_erasure_fields_and_uninitialized_copies() {
+    for (declarations, body) in [
+        (".local String text", "ldloca text\ninitobj String\nldc.i4 0\nret"),
+        (".local String text", "ldloc text\npop\nldc.i4 0\nret"),
+        ("", "ldstr \"no erasure\"\nvalue.pack String\npop\nldc.i4 0\nret"),
+        (".local String text", "ldc.i4 0\nstloc text\nldc.i4 0\nret"),
+    ] {
+        let m = neoclr::assemble(&format!(".module InvalidLiteral\n.function Main() -> Int32\n{declarations}\n{body}\n.end")).unwrap();
+        let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+        let temp = Temp::new();
+        let result = compile_mode(&bytes, &temp, "Main", true);
+        assert!(!result.status.success(), "accepted {body}");
+        assert!(!temp.0.join("value.o").exists());
+        assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
+    }
+    let m = neoclr::assemble(".module LiteralField\n.type Box\n.field text String\n.end\n.function Main() -> Int32\nldstr \"field\"\nnewobj Box\npop\nldc.i4 0\nret\n.end").unwrap();
+    let temp = Temp::new();
+    let result = compile_mode(&neoclr::metadata_container::write_module(&m).unwrap(), &temp, "Main", true);
+    assert!(!result.status.success());
     assert!(!temp.0.join("value.o").exists());
 }

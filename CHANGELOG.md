@@ -135,7 +135,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   preserving first-fault propagation and untouched export results. Fault paths may end
   before output assignment; normal returns retain assignment checks. Validate interpreter
   parity and an isolated native consumer. Hosts naming statuses should recognize 4;
-  fault messages/stack traces and String-based System.Fail remain unsupported in AOT. No native
+  fault messages/stack traces and String-based System.Fail remain unsupported in AOT.
+  Carry immutable UTF-8 literals through value-profile arguments, results, locals, output
+  slots and control-flow joins using private read-only image data. Validate a fresh Raven
+  producer in PE/NEOX and CIL transport including empty/embedded-NUL text; defaults,
+  fields, erasure, generic String arguments and dynamic text remain rejected. ReadByte
+  now passes String signature selection and stops at its native ConsoleReadByte service. No native
   reference services, interface execution or public ABI/runtime APIs are added.
   General unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,

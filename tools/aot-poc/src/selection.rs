@@ -212,7 +212,7 @@ pub(super) fn select_inventory(
                 }
             }
             Type::ByRef(t) => pending_types.push(*t),
-            Type::Int32 | Type::Byte | Type::Boolean | Type::Void | Type::Value => (),
+            Type::Int32 | Type::Byte | Type::Boolean | Type::Void | Type::Value | Type::String => (),
             _ => {
                 return Err(
                     "closed-world selection requires reference-free nongeneric value signatures"

@@ -1,0 +1,39 @@
+.module LiteralTransport
+.function Echo(String value) -> String
+    ldarg value
+    ret
+.end
+.function Fill(out String& result, String value) -> Void
+    ldarg result
+    ldarg value
+    stobj String
+    ldvoid
+    ret
+.end
+.function Main(Int32 input) -> Int32
+    .local String message
+    .local Int32 sentinel
+    ldc.i4 42
+    stloc sentinel
+    ldarg input
+    brfalse Empty
+    ldstr "Hej, världen 🌍"
+    br Join
+Empty:
+    ldstr ""
+Join:
+    call Echo(String)
+    stloc message
+    ldloca message
+    ldstr "embedded\u0000null"
+    call Fill(String&, String)
+    pop
+    ldloca message
+    ldobj String
+    dup
+    call Echo(String)
+    pop
+    pop
+    ldloc sentinel
+    ret
+.end

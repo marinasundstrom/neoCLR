@@ -9,13 +9,13 @@ use cranelift_codegen::{
     isa, settings,
 };
 use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext};
-use cranelift_module::{Linkage, Module};
+use cranelift_module::{DataDescription, Linkage, Module};
 use cranelift_object::{ObjectBuilder, ObjectModule};
 use neoclr::metadata::Instruction as Op;
 use profile::{Profile, Ty};
 
 fn lane(t: &Ty) -> ir::Type {
-    if matches!(t, Ty::Address(_)) {
+    if matches!(t, Ty::Address(_) | Ty::Literal) {
         types::I64
     } else {
         types::I32
@@ -93,6 +93,24 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
         "neoclr_values",
         cranelift_module::default_libcall_names(),
     )?);
+    // Same private read-only payload as the scalar literal profile. Every String
+    // value originates here; no null/default, allocation, erasure or native producer
+    // is admitted. Internal calls/fields cannot introduce arbitrary pointers.
+    let mut literals = std::collections::HashMap::new();
+    for (i, f) in input.functions.iter().enumerate() {
+        for (pc, op) in f.body.iter().enumerate() {
+            if let Op::String(text) = op {
+                let id = module.declare_data(&format!("neoclr_literal_{i}_{pc}"), Linkage::Local, false, false)?;
+                let mut data = DataDescription::new();
+                let mut bytes = (text.len() as u64).to_le_bytes().to_vec();
+                bytes.extend_from_slice(text.as_bytes());
+                data.define(bytes.into_boxed_slice());
+                data.set_align(8);
+                module.define_data(id, &data)?;
+                literals.insert((i, pc), id);
+            }
+        }
+    }
     let mut ids = vec![];
     for (i, _) in input.functions.iter().enumerate() {
         let mut sig = module.make_signature();
@@ -172,6 +190,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                 let pop = |s: &mut Vec<ir::Value>| s.pop().expect("checked stack");
                 match op {
                     Op::Int(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
+                    Op::String(_) => {
+                        let data = module.declare_data_in_func(literals[&(i, pc)], b.func);
+                        stack.push(b.ins().global_value(types::I64, data));
+                    }
                     Op::ConvertInt32 => (),
                     Op::ConvertUInt8 => {
                         let value = pop(&mut stack);

@@ -79,8 +79,10 @@ identities/origins reported and a Raven forwarding consumer validated. ReadByte'
 helpers now compile from an explicitly supplied System seed with `--compile-system`;
 the default remains validation only. The unchanged ReadByte probe now reaches its String-based
 failure path. Explicit `fault` now lowers to terminal UserFault status in scalar/value
-code, with first-fault propagation and no result publication. String-based System.Fail
-and native byte-input services still precede UTF-8 text/lifetime contracts. Multiple instantiations
+code, with first-fault propagation and no result publication. Immutable UTF-8 literals
+now pass through value-profile locals, calls and output slots, with a Raven producer
+validated in PE/NEOX. ReadByte reaches native service admission; the failure and byte-input
+service bindings remain next, before dynamic UTF-8 text/lifetime contracts. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

@@ -10,6 +10,7 @@ pub(super) enum Ty {
     Bool,
     Unit,
     Erased,
+    Literal, // Immutable module-owned UTF-8; not a general managed String.
     Record(usize),
     Address(Box<Ty>),
 }
@@ -239,6 +240,7 @@ impl<'a> Profile<'a> {
             Type::Boolean => Ty::Bool,
             Type::Void => Ty::Unit,
             Type::Value => Ty::Erased,
+            Type::String => Ty::Literal,
             Type::Named(name) => {
                 let i = self
                     .input
@@ -289,7 +291,7 @@ impl<'a> Profile<'a> {
         }
     }
     pub fn bytes(&self, t: &Ty) -> u32 {
-        if matches!(t, Ty::Address(_)) {
+        if matches!(t, Ty::Address(_) | Ty::Literal) {
             8
         } else {
             self.lanes(t) as u32 * 4
@@ -479,6 +481,7 @@ impl<'a> Profile<'a> {
                 }
                 Op::Branch(_) => (),
                 Op::Int(_)
+                | Op::String(_)
                 | Op::Bool(_)
                 | Op::Void
                 | Op::Load(_)
@@ -547,6 +550,7 @@ impl<'a> Profile<'a> {
                 }
                 Op::Load(n) | Op::Store(n) | Op::LocalAddress(n) if *n < self.locals[i].len() => (),
                 Op::Int(_)
+                | Op::String(_)
                 | Op::ConvertInt32
                 | Op::ConvertUInt8
                 | Op::Bool(_)
@@ -584,6 +588,9 @@ impl<'a> Profile<'a> {
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
                 }
+                Op::InitializeObject(Type::String) => {
+                    return Err(fail(pc, "String default requires a later ownership profile"));
+                }
                 Op::InitializeObject(Type::Value) => {
                     return Err(fail(pc, "Value has no default initialization"));
                 }
@@ -609,6 +616,7 @@ impl<'a> Profile<'a> {
             };
             match op {
                 Op::Int(_) => stack.push(Ty::Int),
+                Op::String(_) => stack.push(Ty::Literal),
                 Op::ConvertInt32 | Op::ConvertUInt8 => {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(Ty::Int);

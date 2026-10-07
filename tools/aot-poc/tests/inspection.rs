@@ -186,9 +186,7 @@ fn closed_world_inspection_distinguishes_selection_and_body_failures() {
         .find(|f| f.name == module.entry)
         .unwrap()
         .body
-        .push(neoclr::metadata::Instruction::String(
-            "unsupported dead instruction".into(),
-        ));
+        .push(neoclr::metadata::Instruction::BitNot);
     let report = inspect_mode(
         &neoclr::metadata_container::write_module(&module).unwrap(),
         true,

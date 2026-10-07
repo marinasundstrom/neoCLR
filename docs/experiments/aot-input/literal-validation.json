@@ -1,0 +1,191 @@
+{
+  "profile": "aot-literal-transport-v1",
+  "declaredCompilerRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "baseRevision": "e5028cef4a8baf55135fc22004e68a2245357afe",
+  "inputs": {
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "4becdbf93d7d1b60676e3e5782fbfd434d60014996baee303e075a5edb819972",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-input/literals.rvn": "09759683039e2978165b3a4089b679f959ad204973db46deb9fac4037f24d95a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe": "745c5cdd9ac8ec34c53603c09f134eafa46c3f91622dfd5060fdc788222143c0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-literal-transport/Literals.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/literals.rvn"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-literal-transport/Literals.dll"
+      ],
+      "exit": 42,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-literal-transport/Literals.dll",
+        "@entry",
+        "--closed-world"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 3462,
+        "sha256": "c0a5a0158b21e3f0d5baf205e3e29aaea477515b3084b92304886e2342d0b584"
+      }
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-literal-transport/Literals.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-literal-transport/transport.o"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": "{\n  \"excludedFunctions\": [],\n  \"excludedTypes\": [],\n  \"functions\": [\n    {\n      \"compiledIndex\": 0,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_EE40D12C722C2BF0FFBF550CF2D088C41D63DF0EAFC1AF15C38A08DC62F20681.F_4563686F\",\n      \"sourceIndex\": 0\n    },\n    {\n      \"compiledIndex\": 1,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_EE40D12C722C2BF0FFBF550CF2D088C41D63DF0EAFC1AF15C38A08DC62F20681.F_4D61696E\",\n      \"sourceIndex\": 1\n    }\n  ],\n  \"metadataPolicy\": \"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted\",\n  \"module\": \"NeoMetadata_EE40D12C722C2BF0FFBF550CF2D088C41D63DF0EAFC1AF15C38A08DC62F20681\",\n  \"policy\": \"explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch\",\n  \"root\": \"NeoMetadata_EE40D12C722C2BF0FFBF550CF2D088C41D63DF0EAFC1AF15C38A08DC62F20681.F_4D61696E\",\n  \"schema\": \"neoclr-aot-selection-v1\",\n  \"types\": []\n}\n"
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-literal-transport/transport.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-literal-transport/transport"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-literal-transport/transport.o"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-literal-transport/transport"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-literal-transport/transport:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 968964,
+        "sha256": "5f0b506b6cd7fae5527fe4854eead0b087a21182c3377b60fa2fb51c95bdfcc5"
+      }
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-literal-transport/read-byte.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system"
+      ],
+      "exit": 1,
+      "stderr": "aot-poc: neoCLR.Runtime.ConsoleReadByte: unsupported value member contract\n",
+      "stdout": ""
+    }
+  ],
+  "selection": {
+    "excludedFunctions": [],
+    "excludedTypes": [],
+    "functions": [
+      {
+        "compiledIndex": 0,
+        "definition": null,
+        "name": "NeoMetadata_EE40D12C722C2BF0FFBF550CF2D088C41D63DF0EAFC1AF15C38A08DC62F20681.F_4563686F",
+        "sourceIndex": 0
+      },
+      {
+        "compiledIndex": 1,
+        "definition": null,
+        "name": "NeoMetadata_EE40D12C722C2BF0FFBF550CF2D088C41D63DF0EAFC1AF15C38A08DC62F20681.F_4D61696E",
+        "sourceIndex": 1
+      }
+    ],
+    "metadataPolicy": "original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
+    "module": "NeoMetadata_EE40D12C722C2BF0FFBF550CF2D088C41D63DF0EAFC1AF15C38A08DC62F20681",
+    "policy": "explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch",
+    "root": "NeoMetadata_EE40D12C722C2BF0FFBF550CF2D088C41D63DF0EAFC1AF15C38A08DC62F20681.F_4D61696E",
+    "schema": "neoclr-aot-selection-v1",
+    "types": []
+  },
+  "native": {
+    "executableOnlyDirectory": true,
+    "emptyEnvironment": true,
+    "exit": 42,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "readByteBoundary": {
+    "accepted": false,
+    "firstError": "neoCLR.Runtime.ConsoleReadByte: unsupported value member contract",
+    "phase": "compilation"
+  },
+  "artifacts": {
+    "Literals.dll": "c9f024d18e6f1feaf655a7d50ed88bb3b2c86e4c8a5279315d7e01b6ec346432",
+    "transport.o": "8ebd0df06a426524cfb7a70898180295db6dc350a7a58ffeb145db8e4b3bbba4",
+    "transport": "05962d0990bd100e34b11f2f6026a53b5e1533b3acdedb9119b9d0da8efaae75"
+  }
+}

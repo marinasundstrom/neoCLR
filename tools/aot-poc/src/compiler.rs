@@ -26,8 +26,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool) -> Resu
                 .chain(&f.locals)
                 .chain([&f.returns])
                 .any(|t| {
-                    matches!(t, Type::Value)
-                        || matches!(t, Type::ByRef(inner) if **inner == Type::Value)
+                    matches!(t, Type::Value | Type::String)
+                        || matches!(t, Type::ByRef(inner) if matches!(**inner, Type::Value | Type::String))
                 })
                 || f.body.iter().any(|op| {
                     matches!(op, Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
