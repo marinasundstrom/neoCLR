@@ -1,0 +1,84 @@
+.module Characters
+.function Copy(Char value, out Char& target) -> Void
+ldarg target
+ldarg value
+stobj Char
+ldvoid
+ret
+.end
+.function Calculate(Int32 input) -> Int32
+.local Char character
+.local String text
+ldarg input
+ldc.i4 -3
+beq Null
+ldarg input
+ldc.i4 -2
+beq Empty
+ldarg input
+ldc.i4 -1
+beq Multiple
+ldarg input
+ldc.i4 0
+beq Default
+ldarg input
+ldc.i4 1
+beq Ascii
+ldarg input
+ldc.i4 2
+beq Combining
+ldarg input
+ldc.i4 3
+beq Family
+ldarg input
+ldc.i4 4
+beq Flag
+ldarg input
+ldc.i4 5
+beq CrLf
+ldarg input
+call neoCLR.Runtime.Int32ToString(Int32)
+br Convert
+Null:
+ldloca text
+initobj String
+ldloc text
+br Convert
+Empty:
+ldstr ""
+br Convert
+Multiple:
+ldstr "ab"
+br Convert
+Ascii:
+ldstr "A"
+br Convert
+Combining:
+ldstr "é"
+br Convert
+Family:
+ldstr "👨‍👩‍👧‍👦"
+br Convert
+Flag:
+ldstr "🇸🇪"
+br Convert
+CrLf:
+ldstr "\r\n"
+br Convert
+Default:
+ldloca character
+initobj Char
+br Render
+Convert:
+call neoCLR.Runtime.CharFromString(String)
+ldloca character
+call Copy(Char, Char&)
+pop
+Render:
+ldloc character
+call neoCLR.Runtime.CharText(Char)
+call neoCLR.Runtime.Fault(String)
+pop
+ldc.i4 42
+ret
+.end

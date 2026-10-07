@@ -100,6 +100,14 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     // Immutable length-prefixed UTF-8. Strings originate from these image literals
     // or explicit, bounded invocation-arena producers. No arbitrary host String,
     // null/default, erasure, object storage or escaping export is admitted.
+    // A default neoCLR Char is the single NUL grapheme, never a null pointer.
+    let default_character = module.declare_data("neoclr_default_character", Linkage::Local, false, false)?;
+    let mut character_data = DataDescription::new();
+    let mut character_bytes = 1u64.to_le_bytes().to_vec();
+    character_bytes.push(0);
+    character_data.define(character_bytes.into_boxed_slice());
+    character_data.set_align(8);
+    module.define_data(default_character, &character_data)?;
     let mut literals = std::collections::HashMap::new();
     for (i, f) in input.functions.iter().enumerate() {
         for (pc, op) in f.body.iter().enumerate() {
@@ -133,6 +141,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.params.extend([AbiParam::new(types::I32), AbiParam::new(types::I64), AbiParam::new(types::I64)]);
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_int32_to_string_v1", Linkage::Import, &sig)?)
+    } else { None };
+    let character_service = if details.is_some_and(|d| !d.char_from_string.is_empty()) {
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_is_single_grapheme_v1", Linkage::Import, &sig)?)
     } else { None };
     let object_service = if references && input.types.iter().any(|t| t.is_reference_type && !crate::selection::static_owner(t)) {
         let mut sig = module.make_signature();
@@ -217,6 +231,30 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 return_if_detailed(&mut b, failed, status, Some(&site));
                 let zero = b.ins().iconst(types::I32, 0);
                 if !f.no_result { write(&mut b, output, &[zero]); }
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks();
+                b.finalize();
+                module.define_function(ids[i], &mut context)?;
+                continue;
+            }
+            if details.is_some_and(|d| d.char_from_string.contains(&i) || d.char_text.contains(&i)) {
+                let pointer = parameters[0];
+                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                site.capture_frame = false;
+                let status = b.ins().iconst(types::I32, 3);
+                let null = b.ins().icmp_imm(IntCC::Equal, pointer, 0);
+                return_if_detailed(&mut b, null, status, Some(&site));
+                if details.unwrap().char_from_string.contains(&i) {
+                    let length = b.ins().load(types::I64, MemFlags::new(), pointer, 0);
+                    let bytes = b.ins().iadd_imm(pointer, 8);
+                    let service = module.declare_func_in_func(character_service.unwrap(), b.func);
+                    let call = b.ins().call(service, &[bytes, length]);
+                    let valid = b.inst_results(call)[0];
+                    let invalid = b.ins().icmp_imm(IntCC::NotEqual, valid, 1);
+                    return_if_detailed(&mut b, invalid, status, Some(&site));
+                }
+                write(&mut b, output, &[pointer]);
+                let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
@@ -389,8 +427,13 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     Op::InitializeObject(t) => {
                         let address = pop(&mut stack);
                         let ty = p.ty(t)?;
-                        let zeros: Vec<_> = lanes(&p, &ty).into_iter().map(|t| b.ins().iconst(t, 0)).collect();
-                        write(&mut b, address, &zeros);
+                        let values = if ty == Ty::Character {
+                            let data = module.declare_data_in_func(default_character, b.func);
+                            vec![b.ins().global_value(types::I64, data)]
+                        } else {
+                            lanes(&p, &ty).into_iter().map(|t| b.ins().iconst(t, 0)).collect()
+                        };
+                        write(&mut b, address, &values);
                     }
                     Op::LoadObject(t) => {
                         let address = pop(&mut stack);

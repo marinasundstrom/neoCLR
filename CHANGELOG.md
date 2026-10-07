@@ -47,7 +47,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   interpreter null/index/negative-length faults; report bounded array/native-memory
   exhaustion without publishing a result. Validate empty arrays, byte-store canaries
   and a fresh standalone Raven array/Console consumer. Other array element types
-  and stream/interface dispatch remain pending.
+  and stream/interface dispatch remain pending. Add explicit character text bindings
+  and immutable grapheme transport through locals, calls and output borrows, preserving
+  NUL defaults and exact invalid-input fault diagnostics. Statically link the same
+  pinned Unicode segmentation implementation as the interpreter; validate fresh
+  Raven Console.WriteLine(char) output for ASCII, accents, combining marks and emoji.
+  Original primitive-owner methods remain verified before private static-wrapper
+  lowering. Character fields, erasure and general text operations remain unsupported.
 
 ### 2026-10-07
 

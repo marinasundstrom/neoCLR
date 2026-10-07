@@ -13,6 +13,8 @@ pub struct Options {
     pub console_read_byte: Vec<usize>,
     pub console_write_line: Vec<usize>,
     pub int32_to_string: Vec<usize>,
+    pub char_from_string: Vec<usize>,
+    pub char_text: Vec<usize>,
     pub reference_arena: bool,
     pub frame_names: HashMap<usize, String>,
 }
@@ -41,6 +43,18 @@ impl Options {
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter().flatten()
                 .filter(|r| r["implementation"] == "int32-to-string-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            char_from_string: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "char-from-string-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            char_text: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "char-text-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             console_read_byte: report

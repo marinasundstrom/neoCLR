@@ -1,0 +1,17 @@
+import System.*
+
+func Echo(value: char) {
+    let copy = value
+    Console.WriteLine(copy)
+}
+
+func Main() -> int {
+    Echo('A')
+    Echo('å')
+    Echo('😀')
+    Echo(Char.FromString("é"))
+    Echo(Char.FromString("👨‍👩‍👧‍👦"))
+    Echo(Char.FromString("🇸🇪"))
+    Echo('\0')
+    return 0
+}

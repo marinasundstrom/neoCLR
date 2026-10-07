@@ -10,6 +10,7 @@ pub(super) enum Ty {
     Bool,
     Unit,
     Erased,
+    Character, // One validated extended grapheme, stored as immutable UTF-8 text.
     Literal, // Immutable image/explicit invocation-arena UTF-8; not a general managed String.
     Record(usize),
     Reference(usize),
@@ -250,6 +251,7 @@ impl<'a> Profile<'a> {
             Type::Void => Ty::Unit,
             Type::Value => Ty::Erased,
             Type::String => Ty::Literal,
+            Type::Char => Ty::Character,
             Type::UIntPtr => Ty::Size,
             Type::ArrayRef(t) if **t == Type::Byte && self.references => Ty::ByteArray,
             Type::Named(name) => {
@@ -294,7 +296,7 @@ impl<'a> Profile<'a> {
     }
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
-            Ty::Literal | Ty::Address(_) | Ty::Reference(_) | Ty::ByteArray | Ty::Size => vec![true],
+            Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::ByteArray | Ty::Size => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
             _ => vec![false; self.lanes(t)],

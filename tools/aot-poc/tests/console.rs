@@ -759,3 +759,70 @@ int main(int argc, char **argv) {
         assert!(String::from_utf8_lossy(&r.stderr).starts_with(message));
     }
 }
+
+const CHARACTER_SEED: &str = ".function neoCLR.Runtime.CharFromString(String value) -> Char\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.CharText(Char value) -> String\n.methodimpl InternalCall\n.end";
+
+#[test]
+fn character_binding_requires_exact_opted_in_services() {
+    let seed = neoclr::assemble(&format!("{TEXT_SEED}\n{CHARACTER_SEED}")).unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/characters.neoil");
+    for flags in [
+        vec!["--compile-system", "--bind-user-fault", "--bind-int32-to-string"],
+        vec!["--bind-character-text"],
+        vec!["--compile-system", "--bind-character-text", "--bind-character-text"],
+    ] {
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, source, &flags, false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    }
+    let mut impostor = seed.clone();
+    let f = impostor.functions.iter_mut().find(|f| f.name == "neoCLR.Runtime.CharText").unwrap();
+    f.impl_flags = 0;
+    f.body = vec![neoclr::metadata::Instruction::String("fake".into()), neoclr::metadata::Instruction::Return];
+    let dir = Temp::new();
+    let r = compile_source(&dir, &impostor, source, &["--compile-system", "--bind-user-fault", "--bind-int32-to-string", "--bind-character-text"], false);
+    assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    assert!(String::from_utf8_lossy(&r.stderr).contains("exact CharFromString"));
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn character_graphemes_defaults_borrows_and_faults_match_interpreter() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(&format!("{TEXT_SEED}\n{CHARACTER_SEED}")).unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/characters.neoil");
+    let r = compile_source(&dir, &seed, source, &["--compile-system", "--bind-user-fault", "--bind-int32-to-string", "--bind-character-text"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let base = root.join("docs/experiments");
+    let r = Command::new("cargo").args(["build", "--locked", "--release", "--manifest-path"])
+        .arg(root.join("tools/aot-native-text/Cargo.toml")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    fs::write(dir.0.join("host.c"), r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc, char **argv) {
+    uint64_t storage[8];
+    neoclr_aot_context ctx={ .text={(unsigned char*)storage,sizeof(storage),0} };
+    int32_t result=-99;
+    int status=neoclr_entry_v4(argc>1 ? atoi(argv[1]) : 0,&result,&ctx);
+    if ((status!=3 && status!=4) || result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
+    return neoclr_aot_render_fault(stderr,&ctx.fault);
+}
+"#).unwrap();
+    let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg(root.join("tools/aot-native-text/target/release/libneoclr_aot_native_text.a"))
+        .arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for value in [-3,-2,-1,0,1,2,3,4,5,9,10,i32::MIN] {
+        let fault = method.invoke(vec![neoclr::Value::Int32(value)],neoclr::Limits::default()).unwrap_err();
+        let r = Command::new(dir.0.join("app")).arg(value.to_string()).env_clear().output().unwrap();
+        assert!(r.status.success(), "{value}: {r:?}");
+        assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(), "{value}");
+    }
+}

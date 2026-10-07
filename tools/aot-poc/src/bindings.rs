@@ -160,7 +160,7 @@ pub fn console_write_line(
     Ok(bindings)
 }
 
-/// Only this admitted producer can introduce invocation-owned String data.
+/// Explicit formatting producer for invocation-owned String data.
 pub fn int32_to_string(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"]
@@ -203,6 +203,41 @@ pub fn int32_to_string(input: &mut neoclr::Module, selection: &Value) -> Result<
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
             "compiledIndex": row["compiledIndex"], "implementation": "int32-to-string-v1",
             "symbol": "neoclr_int32_to_string_v1", "storage": "caller-owned-text-arena-v4"}));
+    }
+    Ok(bindings)
+}
+
+/// UTF-8 grapheme characters retain immutable text; validation uses the same
+/// pinned Unicode segmentation dependency as the interpreter, statically linked.
+pub fn character_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        let (parameter, result, implementation) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.CharFromString") => (Type::String, Type::Char, "char-from-string-v1"),
+            Some("neoCLR.Runtime.CharText") => (Type::Char, Type::String, "char-text-v1"),
+            _ => continue,
+        };
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != row["name"].as_str().unwrap()
+            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != [parameter] || f.returns != result || f.no_result
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
+            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
+        { return Err("native character binding requires exact CharFromString(String) -> Char or CharText(Char) -> String InternalCall contract".into()); }
+        f.impl_flags = 0;
+        if result == Type::Char {
+            f.locals = vec![Type::Char];
+            f.body = vec![Op::LocalAddress(0), Op::InitializeObject(Type::Char), Op::Load(0), Op::Return];
+        } else {
+            f.body = vec![Op::String(String::new()), Op::Return];
+        }
+        bindings.push(json!({"definition": row["definition"], "name": row["name"],
+            "compiledIndex": row["compiledIndex"], "implementation": implementation,
+            "validationSymbol": if result == Type::Char { Some("neoclr_is_single_grapheme_v1") } else { None },
+            "storage": "borrowed immutable image or invocation text; no allocation"}));
     }
     Ok(bindings)
 }

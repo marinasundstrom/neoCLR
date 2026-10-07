@@ -268,3 +268,46 @@ capabilities. As with .NET arrays, typed indexing is checked and reference assig
 preserves shared storage; the invocation arena is a deliberately bounded alternative
 to the CLR managed heap, retaining unreachable arrays until reset. No performance
 or collection equivalence is claimed.
+
+## Character output (2026-10-08)
+
+`--bind-character-text` (requiring `--compile-system`) binds only the exact supplied
+InternalCall contracts `CharFromString(String) -> Char` and `CharText(Char) -> String`.
+The ordinary Raven `Char.FromString` and `Console.WriteLine(char)` wrappers compile
+as managed bodies. Static primitive-owned wrappers are verified in their original
+load-set scopes, reported as `staticPrimitiveOwners`, then lowered to private free
+functions because they have no receiver. This avoids rebinding their owner to the
+backend verifier's separate bundled Char declaration; source code and metadata are
+unchanged. There is no new compiler bridge encoding.
+
+Characters retain immutable length-prefixed UTF-8 pointers through locals, arguments,
+results and output borrows. `initobj Char` produces the image-owned NUL grapheme.
+String-to-character conversion validates exactly one extended grapheme; empty,
+multiple-grapheme and null text report interpreter-compatible RuntimeError with the
+managed caller's location. Conversion back to String retains the same immutable bytes,
+including embedded NUL and combining sequences, without normalization or allocation.
+Pointers keep their original image/invocation lifetime. Character fields, erasure,
+arrays, comparisons and generic payloads are not admitted in this slice.
+
+The allocation-free `tools/aot-native-text` static library uses **unicode-segmentation
+1.12.0**, exactly the interpreter's pinned implementation. Its private C symbol
+`int32_t neoclr_is_single_grapheme_v1(const uint8_t *bytes, size_t length)` returns 1
+only for one valid UTF-8 extended grapheme, otherwise 0; readable immutable storage
+of that length is a caller precondition. It retains no pointer and requires no shared
+Rust or managed framework. Build with `cargo build --locked --release --manifest-path
+tools/aot-native-text/Cargo.toml`, then link the resulting archive alongside the AOT
+object and Console adapter. Internal Rust panics abort; invalid guest text uses the
+ordinary checked result, not panic. No change to the exported v3/v4 hosting layout.
+
+`characters.neoil` compares default NUL, copied/output characters, decomposed accents,
+emoji families, flags, CRLF, invalid and dynamically formatted inputs against the
+interpreter's exact fault text. `characters.rvn`, `verify_interactive.py --characters`
+and `characters-validation.json` add fresh Raven Console output, standalone deployment
+and broken-pipe parity. The native archive is included in provenance hashes.
+
+The [existing text design comparison](../../design/text-abstraction.md)
+explains the distinction from .NET's UTF-16 Char and StringInfo text elements. Reusing
+the platform's segmentation gives consistent character boundaries across execution
+modes at the cost of linked Unicode tables and variable-length character storage.
+This is semantic parity, not a performance claim or a new text model. Stream-backed
+Write/ReadLine and broader numeric formatting remain subsequent Console work.
