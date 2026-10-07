@@ -145,9 +145,13 @@ pub(super) fn select_inventory(
         }
         for op in &input.functions[i].body {
             match op {
-                Op::Call(target) | Op::Construct(target) => pending.push(resolve(input, target)?),
-                Op::CallVirtual(_) => {
-                    return Err("closed-world selection does not support virtual calls".into());
+                Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
+                    let callee = resolve(input, target)?;
+                    let f = &input.functions[callee];
+                    if matches!(op, Op::CallVirtual(_)) && (f.is_virtual || f.is_abstract || f.is_override || f.owner.as_ref().and_then(|t| input.type_definition(t)).is_some_and(|t| t.representation == neoclr::metadata::Representation::Interface)) {
+                        return Err("virtual calls requiring dispatch need a later selection profile".into());
+                    }
+                    pending.push(callee);
                 }
                 _ => (), // Unsupported selected opcodes still fail ordinary AOT admission.
             }
@@ -250,7 +254,7 @@ pub(super) fn select_inventory(
             index: i as u32,
         });
         for op in &mut f.body {
-            if let Op::Call(target) | Op::Construct(target) = op {
+            if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
                 let old = resolve(input, target)?;
                 let new = rows.binary_search(&old).expect("selected call");
                 target.definition = Some(MemberId {

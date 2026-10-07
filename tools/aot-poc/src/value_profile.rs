@@ -203,8 +203,13 @@ impl<'a> Profile<'a> {
         let mut edges = vec![vec![]; input.functions.len()];
         for (i, f) in input.functions.iter().enumerate() {
             for op in &f.body {
-                if let Op::Call(target) | Op::Construct(target) = op {
+                if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
                     let callee = p.callee(target)?;
+                    if matches!(op, Op::CallVirtual(_)) &&
+                        (!references || !input.functions[callee].instance ||
+                         !matches!(p.args[callee].first(), Some(Ty::Reference(_)))) {
+                        return Err("callvirt requires an admitted nonvirtual reference member".into());
+                    }
                     if matches!(op, Op::Construct(_)) {
                         let c = &input.functions[callee];
                         if !c.instance || !c.name.ends_with("..ctor") || !c.no_result {
@@ -442,7 +447,7 @@ impl<'a> Profile<'a> {
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
                     state.stack.push(None);
                 }
-                Op::Call(target) | Op::Construct(target) => {
+                Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                     let c = self.callee(target)?;
                     let callee = &self.input.functions[c];
                     let construct = matches!(op, Op::Construct(_));
@@ -571,6 +576,7 @@ impl<'a> Profile<'a> {
                 | Op::SetField(_)
                 | Op::FieldAddress(_)
                 | Op::Call(_)
+                | Op::CallVirtual(_)
                 | Op::Construct(_)
                 | Op::Return
                 | Op::Fault(_)
@@ -715,7 +721,7 @@ impl<'a> Profile<'a> {
                         stack.push(if matches!(owner, Ty::Address(_)) { Ty::Unit } else { owner });
                     }
                 }
-                Op::Call(target) | Op::Construct(target) => {
+                Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                     let c = self.callee(target)?;
                     let construct = matches!(op, Op::Construct(_));
                     for t in self.args[c].iter().skip(usize::from(construct)).rev() {

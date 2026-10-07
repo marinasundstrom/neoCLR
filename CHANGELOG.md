@@ -38,7 +38,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   fields, output copies and identity in ABI v4. Preserve aliases/self-cycles until
   region reset and match interpreter null-field fault traces; validate exhaustion,
   repeated reuse and a fresh Raven class/Console consumer. There is no per-object GC,
-  inheritance, virtual/interface dispatch or array support yet.
+  inheritance, virtual/interface dispatch or array support yet. Support CIL callvirt
+  to exact nonvirtual class members under the reference-arena opt-in, including its
+  call-site null check. Preserve the distinct direct-call fault location and reject
+  genuine virtual/interface dispatch, including bodyless interface declarations.
 
 ### 2026-10-07
 

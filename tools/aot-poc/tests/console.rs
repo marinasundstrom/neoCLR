@@ -591,21 +591,31 @@ fn default_text_and_null_native_arguments_match_interpreter() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn bounded_reference_aliases_cycles_null_faults_and_reuse_match_interpreter() {
-    let dir = Temp::new();
-    let source = include_str!("../../../docs/experiments/aot-console/reference-cell.neoil");
-    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
-    let denied = compile_source(&dir, &seed, source, &["--compile-system"], false);
-    assert!(!denied.status.success() && !dir.0.join("app.o").exists());
-    let r = compile_source(
-        &dir,
-        &seed,
-        source,
-        &["--compile-system", "--reference-arena"],
-        false,
-    );
-    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
-    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
-    fs::write(dir.0.join("host.c"),r#"
+    for virtual_call in [false, true] {
+        let dir = Temp::new();
+        let original = include_str!("../../../docs/experiments/aot-console/reference-cell.neoil");
+        let source = if virtual_call {
+            original.replace(
+                "call instance Cell::Bump()",
+                "callvirt instance Cell::Bump()",
+            )
+        } else {
+            original.to_owned()
+        };
+        let source = source.as_str();
+        let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+        let denied = compile_source(&dir, &seed, source, &["--compile-system"], false);
+        assert!(!denied.status.success() && !dir.0.join("app.o").exists());
+        let r = compile_source(
+            &dir,
+            &seed,
+            source,
+            &["--compile-system", "--reference-arena"],
+            false,
+        );
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+        fs::write(dir.0.join("host.c"),r#"
 #include "text-arena.h"
 int main(void) {
     struct { uint64_t before; uint64_t bytes[8]; uint64_t after; } storage={ .before=123, .after=456 };
@@ -623,41 +633,42 @@ int main(void) {
     return 0;
 }
 "#).unwrap();
-    let r = Command::new("clang")
-        .args([
-            "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
-        ])
-        .arg(base.join("aot-console"))
-        .arg(dir.0.join("host.c"))
-        .arg(base.join("aot-console/text-arena.c"))
-        .arg(base.join("aot-fault-details/render.c"))
-        .arg(dir.0.join("app.o"))
-        .arg("-o")
-        .arg(dir.0.join("app"))
-        .output()
-        .unwrap();
-    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
-    let r = Command::new(dir.0.join("app"))
-        .env_clear()
-        .output()
-        .unwrap();
-    assert!(r.status.success(), "{r:?}");
-    let app = neoclr::assemble(source).unwrap();
-    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
-    let function = program
-        .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
-        .unwrap();
-    let result = function
-        .invoke(vec![neoclr::Value::Int32(1)], neoclr::Limits::default())
-        .unwrap();
-    assert_eq!(result.value, neoclr::Value::Int32(42));
-    let fault = function
-        .invoke(vec![neoclr::Value::Int32(0)], neoclr::Limits::default())
-        .unwrap_err();
-    assert_eq!(
-        String::from_utf8_lossy(&r.stderr),
-        fault.diagnostic().to_string()
-    );
+        let r = Command::new("clang")
+            .args([
+                "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
+            ])
+            .arg(base.join("aot-console"))
+            .arg(dir.0.join("host.c"))
+            .arg(base.join("aot-console/text-arena.c"))
+            .arg(base.join("aot-fault-details/render.c"))
+            .arg(dir.0.join("app.o"))
+            .arg("-o")
+            .arg(dir.0.join("app"))
+            .output()
+            .unwrap();
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let r = Command::new(dir.0.join("app"))
+            .env_clear()
+            .output()
+            .unwrap();
+        assert!(r.status.success(), "{r:?}");
+        let app = neoclr::assemble(source).unwrap();
+        let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+        let function = program
+            .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
+            .unwrap();
+        let result = function
+            .invoke(vec![neoclr::Value::Int32(1)], neoclr::Limits::default())
+            .unwrap();
+        assert_eq!(result.value, neoclr::Value::Int32(42));
+        let fault = function
+            .invoke(vec![neoclr::Value::Int32(0)], neoclr::Limits::default())
+            .unwrap_err();
+        assert_eq!(
+            String::from_utf8_lossy(&r.stderr),
+            fault.diagnostic().to_string()
+        );
+    }
 }
 
 #[test]
@@ -677,6 +688,7 @@ fn reference_arena_is_explicit_and_does_not_admit_virtual_calls() {
         "call instance Cell::Bump()",
         "callvirt instance Cell::Bump()",
     );
+    let virtual_source = virtual_source.replace(".method instance Bump()", ".method instance virtual Bump()");
     let r = compile_source(
         &dir,
         &seed,

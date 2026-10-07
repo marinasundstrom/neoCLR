@@ -251,8 +251,9 @@ impl Specializer<'_> {
             *t = self.lower(&substitute(t, arguments, methods).map_err(|e| e.to_string())?)?;
         }
         for op in &mut result.body {
+            let virtual_call = matches!(op, Op::CallVirtual(_));
             match op {
-                Op::Call(target) | Op::Construct(target) => {
+                Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                     let mut closed = target.clone();
                     closed.owner = target
                         .owner
@@ -273,6 +274,10 @@ impl Specializer<'_> {
                         .collect::<Result<_, _>>()
                         .map_err(|e| e.to_string())?;
                     let instance = self.resolve(&closed)?;
+                    let callee = &self.source.functions[instance.source];
+                    if virtual_call && (callee.is_virtual || callee.is_abstract || callee.is_override || callee.owner.as_ref().and_then(|t| self.source.type_definition(t)).is_some_and(|t| t.representation == neoclr::metadata::Representation::Interface)) {
+                        return Err("virtual calls requiring dispatch need a later specialization profile".into());
+                    }
                     target.definition = Some(neoclr::metadata::MemberId {
                         module: self.source.name.clone(),
                         revision: self.source.revision.clone(),
@@ -304,9 +309,6 @@ impl Specializer<'_> {
                 | Op::UnpackValue(t) => {
                     *t =
                         self.lower(&substitute(t, arguments, methods).map_err(|e| e.to_string())?)?
-                }
-                Op::CallVirtual(_) => {
-                    return Err("virtual calls require a later specialization profile".into());
                 }
                 _ => (), // Ordinary selected-body admission still rejects unsupported IL.
             }

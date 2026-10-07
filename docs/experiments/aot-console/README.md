@@ -221,3 +221,20 @@ An invocation region is useful here because no object can outlive the call; it a
 adding incomplete retain/release behavior and reclaims cycles together. The cost is
 retaining unreachable objects until reset. That bound must not be presented as normal
 GC behavior or a production strategy. No speed or memory-efficiency claim is made.
+
+## Nonvirtual callvirt (2026-10-08)
+
+The reference-arena profile now accepts `callvirt` when the exact resolved target is
+a nonvirtual class instance method. It performs the required null check at the caller
+before entering the body. Direct `call` retains its prior behavior and faults only if
+the body dereferences null. Original identities survive load-set projection and type
+specialization; there is no name-only intrinsic or substitution of a virtual slot.
+True virtual/override targets and all interface contracts remain rejected, including
+bodyless interface declarations without an explicit abstract flag.
+
+The same alias/cycle consumer now runs with direct and null-checked calls. Both
+return 42 on ordinary input; null input has exactly the interpreter's code, message
+and distinct stack location for each opcode. Negative interface and virtual tests
+remain in place. This follows the existing neoCLR CIL/CLR call distinction and is
+a prerequisite for ordinary class consumers, not implementation of stream interface
+dispatch.

@@ -97,7 +97,8 @@ and ABI v4 lifetime/exhaustion tests. Copied String-bearing records and generic
 payloads now use aligned mixed-width lanes, with String defaults/pattern tests and
 null-native-argument fault parity. An explicit bounded reference-arena profile now
 compiles nongeneric classes and preserves aliasing/cycles until invocation reset,
-with Raven class/Console evidence and interpreter null-fault parity. Interface views/
+with Raven class/Console evidence and interpreter null-fault parity. Exact nonvirtual
+class callvirt now preserves its separate call-site null check. Interface views/
 dispatch and array/stream support behind Write/ReadLine remain next; this region is
 not a replacement for general native collection. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and

@@ -440,7 +440,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             stack[start..start + value.len()].copy_from_slice(&value);
                         }
                     }
-                    Op::Call(target) | Op::Construct(target) => {
+                    Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                         let c = p.callee(target)?;
                         let construct = matches!(op, Op::Construct(_));
                         let count: usize = p.args[c]
@@ -476,6 +476,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         } else {
                             None
                         };
+                        if matches!(op, Op::CallVirtual(_)) {
+                            // Unlike direct call, callvirt checks null before entering
+                            // even a nonvirtual target; capture the caller's site.
+                            null_reference(&mut b, call_args[0], site.as_ref());
+                        }
                         let result = b.ins().stack_addr(types::I64, call_result, 0);
                         call_args.push(result);
                         if let Some(context) = fault_context { call_args.push(context); }
