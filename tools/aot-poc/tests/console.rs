@@ -358,3 +358,130 @@ int main(void) {
     assert_eq!(r.stdout, "världen 🌍\0end\n".as_bytes());
     assert!(r.stderr.is_empty());
 }
+
+const TEXT_SEED: &str = ".module System\n.references ()\n.function neoCLR.Runtime.Int32ToString(Int32 value) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String text) -> Void\n.methodimpl InternalCall\n.end\n.function System.Fail(String text) -> noresult\nldarg text\ncall neoCLR.Runtime.Fault(String)\npop\nret\n.end\n.function neoCLR.Runtime.Fault(String text) -> Void\n.methodimpl InternalCall\n.end";
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn invocation_text_survives_nested_calls_faults_and_reclaims_on_next_entry() {
+    let dir = Temp::new();
+    let source = include_str!("../../../docs/experiments/aot-console/text-lifetime.neoil");
+    let flags = [
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-write-line",
+        "--bind-int32-to-string",
+    ];
+    let seed = neoclr::assemble(TEXT_SEED).unwrap();
+    let r = compile_source(&dir, &seed, source, &flags, true);
+    let inspection: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(inspection["admission"]["accepted"], true, "{inspection}");
+    assert_eq!(
+        inspection["selection"]["nativeAbi"],
+        "caller-owned-text-arena-v4"
+    );
+    let r = compile_source(&dir, &seed, source, &flags, false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"), r#"
+#include "text-arena.h"
+#include <string.h>
+static int calls;
+int32_t neoclr_console_write_line_utf8_v1(const uint8_t *bytes, size_t length) {
+    static const char *expected[]={"-2147483648","7","2147483647","7"};
+    if (calls>=4 || length!=strlen(expected[calls]) || memcmp(bytes,expected[calls],length)) return 1;
+    calls++; return 0;
+}
+int main(void) {
+    struct { uint64_t before; uint64_t bytes[8]; uint64_t after; } storage = { .before=123, .after=456 };
+    neoclr_aot_context ctx={ .text={(unsigned char*)storage.bytes,sizeof(storage.bytes),0} };
+    int32_t result=-99;
+    if (neoclr_entry_v4(INT32_MIN,&result,&ctx) || result!=42 || ctx.text.used!=33) return 1;
+    if (neoclr_entry_v4(INT32_MAX,&result,&ctx) || result!=42 || ctx.text.used!=33 || calls!=4) return 2;
+    result=-99;
+    if (neoclr_entry_v4(1,&result,&ctx)!=4 || result!=-99 || ctx.fault.code!=4) return 3;
+    if (ctx.fault.message->length!=1 || ctx.fault.message->bytes[0]!='1') return 4;
+    if (neoclr_aot_render_fault(stderr,&ctx.fault)) return 5;
+    ctx.text.capacity=8; result=-99;
+    if (neoclr_entry_v4(0,&result,&ctx)!=5 || result!=-99 || ctx.fault.code!=5 || ctx.text.used!=0 || ctx.fault.frame_count!=1) return 6;
+    if (neoclr_aot_render_fault(stderr,&ctx.fault)) return 7;
+    ctx.text.capacity=16;
+    if (neoclr_entry_v4(0,&result,&ctx)!=5 || result!=-99 || ctx.text.used!=9) return 12;
+    if (((neoclr_aot_text*)storage.bytes)->length!=1 || ((neoclr_aot_text*)storage.bytes)->bytes[0]!='0') return 13;
+    ctx.text.capacity=8;ctx.text.used=0;
+    if (storage.before!=123 || storage.after!=456) return 8;
+    /* No write on exhausted or malformed arena, including alignment/overflow. */
+    const neoclr_aot_text *out=(void*)123;
+    if (neoclr_int32_to_string_v1(0,&ctx.text,&out)!=5 || out!=(void*)123) return 9;
+    ctx.text.used=UINT64_MAX;
+    if (neoclr_int32_to_string_v1(0,&ctx.text,&out)!=3 || out!=(void*)123) return 10;
+    ctx.text.used=0;ctx.text.capacity=64;ctx.text.data++;
+    if (neoclr_int32_to_string_v1(0,&ctx.text,&out)!=3 || out!=(void*)123) return 11;
+    return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args([
+            "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
+        ])
+        .arg(base.join("aot-console"))
+        .arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o"))
+        .arg("-o")
+        .arg(dir.0.join("app"))
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("app"))
+        .env_clear()
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{r:?}");
+    let stderr = String::from_utf8(r.stderr).unwrap();
+    assert!(
+        stderr.starts_with("UserFault: 1\n   at System.Fail [instruction 1]\n"),
+        "{stderr}"
+    );
+    assert!(stderr.contains("NativeMemoryLimitExceeded: Native memory limit exceeded\n   at Calculate [instruction 1]\n"), "{stderr}");
+}
+
+#[test]
+fn text_producer_requires_explicit_capability_and_exact_contract() {
+    let source = ".module App\n.function Calculate() -> Int32\nldc.i4 42\ncall neoCLR.Runtime.Int32ToString(Int32)\npop\nldc.i4 0\nret\n.end";
+    for flags in [
+        vec!["--compile-system"],
+        vec!["--bind-int32-to-string"],
+        vec![
+            "--compile-system",
+            "--bind-int32-to-string",
+            "--bind-int32-to-string",
+        ],
+    ] {
+        let dir = Temp::new();
+        let r = compile_source(
+            &dir,
+            &neoclr::assemble(TEXT_SEED).unwrap(),
+            source,
+            &flags,
+            false,
+        );
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    }
+    let mut seed = neoclr::assemble(TEXT_SEED).unwrap();
+    seed.functions[0].impl_flags = 0;
+    seed.functions[0].body = vec![
+        neoclr::metadata::Instruction::String("wrong".into()),
+        neoclr::metadata::Instruction::Return,
+    ];
+    let dir = Temp::new();
+    let r = compile_source(
+        &dir,
+        &seed,
+        source,
+        &["--compile-system", "--bind-int32-to-string"],
+        false,
+    );
+    assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    assert!(String::from_utf8_lossy(&r.stderr).contains("exact neoCLR.Runtime.Int32ToString"));
+}

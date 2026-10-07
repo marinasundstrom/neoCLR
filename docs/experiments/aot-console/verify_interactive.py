@@ -5,14 +5,16 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[3]
 p=argparse.ArgumentParser(description=__doc__)
 for key in ('compiler','runtime','aot','bundle','output'): p.add_argument('--'+key,type=Path,required=True)
+p.add_argument('--numeric',action='store_true',help='Validate invocation-owned numeric text and ABI v4')
 a=p.parse_args()
 compiler,runtime,aot,bundle,output=(getattr(a,k).resolve() for k in ('compiler','runtime','aot','bundle','output'))
 output.mkdir(parents=True,exist_ok=False)
 base=ROOT/'docs/experiments/aot-console';faults=base.parent/'aot-fault-details'
-source=base/'interactive.rvn'
+source=base/('numbers.rvn' if a.numeric else 'interactive.rvn')
+host=base/'text-host.c' if a.numeric else faults/'host.c'
 core,seed,library,ownership=(bundle/'lib'/n for n in ('Core.dll','System.runtime.neox','System.Runtime.dll','ownership.json'))
 sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
-report=dict(profile='aot-console-interactive-v1',baseRevision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),SDKROOT=os.environ.get('SDKROOT'),inputs={str(p):sha(p) for p in (compiler,runtime,aot,core,seed,library,ownership,source,base/'console.c',base.parent/'aot-scalar/console.c',faults/'host.c',faults/'render.c')},commands=[])
+report=dict(profile='aot-console-numeric-v1' if a.numeric else 'aot-console-interactive-v1',baseRevision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),SDKROOT=os.environ.get('SDKROOT'),inputs={str(p):sha(p) for p in (compiler,runtime,aot,core,seed,library,ownership,source,base/'console.c',base.parent/'aot-scalar/console.c',host,faults/'render.c',base/'text-arena.h',base/'text-arena.c')},commands=[])
 def save(): (output/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 def run(args,expected=0,**kwargs):
     r=subprocess.run(list(map(str,args)),cwd=ROOT,capture_output=True,timeout=120,**kwargs)
@@ -22,19 +24,23 @@ def run(args,expected=0,**kwargs):
 assembly,obj,binary=(output/n for n in ('Interactive.dll','interactive.o','interactive'))
 run(['dotnet',compiler,'neoclr','--core-reference',core,'--runtime-seed',seed,'--reference',library,'--bootstrap-intrinsics','--bootstrap-ownership',ownership,'--object-library','System.Runtime','-o',assembly,source])
 context=['--system',seed,'--module',library,'--object-root',library]
-cases=[(b'*',0),(b'A',2),(b'',0)]
+cases=[(b'*',0),(b'A',0 if a.numeric else 2),(b'',0)]
+if a.numeric: cases += [(b'\x00',0),(b'\xff',0)]
 interpreted=[run([runtime,'run',assembly]+context,expected=code,input=data) for data,code in cases]
 read_end,write_end=os.pipe();os.close(read_end)
 failed=run([runtime,'run',assembly]+context,expected=1,input=b'*',pass_fds=(write_end,),preexec_fn=lambda:os.dup2(write_end,1))
 assert failed.stderr.startswith(b'RuntimeError: Runtime error\n')
 flags=context+['--compile-system','--bind-user-fault','--bind-console-read-byte','--bind-console-write-line']
+if a.numeric: flags += ['--bind-int32-to-string']
 inspection=json.loads(run([aot,'--inspect',assembly,'@entry','--closed-world']+flags).stdout)
 assert inspection['admission']['accepted'] is True,inspection['admission']
 selection=json.loads(run([aot,'--closed-world',assembly,'@entry',obj]+flags).stdout)
 assert inspection['selection']==selection
 report['selection']={k:selection[k] for k in ('loadSet','functions','nativeBindings')}
-run(['clang','-arch','arm64','-std=c11','-Wall','-Wextra','-Werror',faults/'host.c',faults/'render.c',base/'console.c',base.parent/'aot-scalar/console.c',obj,'-o',binary])
-assert set(run(['nm','-u',obj]).stdout.decode().split())=={'_neoclr_console_read_byte_v1','_neoclr_console_write_line_utf8_v1'}
+run(['clang','-arch','arm64','-std=c11','-Wall','-Wextra','-Werror',host,faults/'render.c',base/'console.c',base.parent/'aot-scalar/console.c',*([base/'text-arena.c'] if a.numeric else []),obj,'-o',binary])
+imports={'_neoclr_console_read_byte_v1','_neoclr_console_write_line_utf8_v1'}
+if a.numeric: imports.add('_neoclr_int32_to_string_v1')
+assert set(run(['nm','-u',obj]).stdout.decode().split())==imports
 deps=[line.split()[0] for line in run(['otool','-L',binary]).stdout.decode().splitlines()[1:]]
 assert deps==['/usr/lib/libSystem.B.dylib']
 with tempfile.TemporaryDirectory() as d:
@@ -49,4 +55,4 @@ with tempfile.TemporaryDirectory() as d:
     report['native']=dict(outcomes=outcomes,outputFailureMatchesInterpreter=True,outputFault=r.stderr.decode(),executableOnlyDirectory=True,emptyEnvironment=True,dynamicDependencies=deps)
 os.close(write_end)
 report['artifacts']={p.name:sha(p) for p in (assembly,obj,binary)}
-save();print('Passed: standalone Raven Console input/output, Boolean/empty lines, exact fault parity.')
+save();print('Passed: standalone Raven Console input/output and exact fault parity; numeric arena:',a.numeric)

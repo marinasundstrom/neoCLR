@@ -101,3 +101,50 @@ Run the verifier with the same arguments as `verify.py`, additionally passing
 tests also exercise Unicode/NUL bytes, output failure, unchanged result storage and
 reuse of the fault context after success. Next: invocation-owned dynamic UTF-8 text
 for numeric formatting, then the stream/reference machinery behind Write/ReadLine.
+
+## Numeric output and text lifetime (2026-10-08)
+
+`--bind-int32-to-string` admits the exact verified
+`neoCLR.Runtime.Int32ToString(Int32) -> String` service. Ordinary Console integer and
+byte overloads now compile their existing conversion/output wrappers. No Console
+method is substituted. `numbers.rvn` prints an input byte and both signed Int32
+endpoints; `verify_interactive.py --numeric` builds fresh Raven metadata and compares
+native/interpreter output and broken-pipe diagnostics. See `numbers-validation.json`.
+
+This producer requires **experimental ABI v4**, declared in `text-arena.h`. The
+selection report names `caller-owned-text-arena-v4`, and the object exports
+`neoclr_entry_v4` instead of v3. The context contains the unchanged fault-record prefix
+and a host-owned text arena (buffer, capacity, cursor). The host supplies aligned
+storage, separate for each concurrent invocation, nonoverlapping with context/result.
+Each entry clears fault details and resets the arena cursor. Allocation never escapes
+the buffer, and exhaustion returns explicit status 5, NativeMemoryLimitExceeded,
+with the shared standard message and managed caller frames. The experimental native
+text budget is distinct from interpreter heap limits; identical allocation accounting
+is not claimed. Malformed arena state maps to RuntimeError.
+
+Strings use immutable length-prefixed UTF-8, as image literals do. Allocation aligns
+headers, preserves old strings across later conversions, and publishes a pointer only
+on success. Pointer copies across locals, calls and output slots remain valid until
+this invocation's storage is reused/released. **Render dynamic fault messages before
+the next entry call or releasing the buffer.** The Int32 root signature prevents guest
+String results escaping the invocation. Reference fields, String erasure, arbitrary
+host String inputs, persistent guest state and default/null strings remain rejected.
+The POC does not use reference counting, finalizers, a tracing collector, TLS or a
+process-global allocation list. The host example chooses a 64 KiB stack buffer;
+that size is sample policy, not a platform default.
+
+Compared with the [.NET/tracing and ownership alternatives](../../native-execution-investigation.md#reference-counting-as-an-early-native-experiment-2026-10-07),
+this is deliberately narrower: a bounded invocation region makes numeric Console
+output executable without a native root scanner or retain/release lowering. Its cost
+is retaining all produced text until the invocation ends or the next entry resets it;
+long-running producers can exhaust the buffer even if old strings are no longer used.
+This is not a claim of equivalent managed memory behavior or a production strategy.
+A general native heap still needs the recorded cycle, roots, reference-bearing values
+and cleanup work. No performance improvement is asserted.
+
+Tests preserve two simultaneous strings across a nested call, format Int32 endpoints,
+retain a dynamic UserFault message, exhaust both first and later allocations, check
+unchanged result/cursor/output and surrounding canaries, reject malformed arena state,
+and reuse a context after failure. Versions 2/3 remain unchanged when no dynamic text
+producer is selected. The next Console dependencies are wider numeric/text primitives
+and the ordinary stream/reference path used by Write and ReadLine.

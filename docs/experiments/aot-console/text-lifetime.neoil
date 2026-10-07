@@ -1,0 +1,32 @@
+.module TextLifetime
+.function Calculate(Int32 value) -> Int32
+.local String first
+.local String second
+ldarg value
+call neoCLR.Runtime.Int32ToString(Int32)
+call Echo(String)
+stloc first
+ldc.i4 7
+call neoCLR.Runtime.Int32ToString(Int32)
+stloc second
+ldarg value
+ldc.i4 1
+beq Fail
+ldloc first
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldloc second
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldc.i4 42
+ret
+Fail:
+ldloc first
+call System.Fail(String)
+ldc.i4 99
+ret
+.end
+.function Echo(String text) -> String
+ldarg text
+ret
+.end

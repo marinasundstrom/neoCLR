@@ -8,7 +8,8 @@ int neoclr_aot_render_fault(FILE *stream, const neoclr_aot_fault *fault) {
     const char *category = fault->code == 1 ? "DivideByZero" :
                            fault->code == 2 ? "ArithmeticOverflow" :
                            fault->code == 3 ? "RuntimeError" :
-                           fault->code == 4 ? "UserFault" : "UnknownFault";
+                           fault->code == 4 ? "UserFault" :
+                           fault->code == 5 ? "NativeMemoryLimitExceeded" : "UnknownFault";
     fprintf(stream, "%s: ", category);
     text(stream, fault->message);
     fputc('\n', stream);

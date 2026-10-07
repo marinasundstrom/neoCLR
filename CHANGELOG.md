@@ -22,7 +22,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and empty-line Console wrappers, preserve UTF-8/NUL output, and propagate output
   failures with shared diagnostics. The standalone host converts broken pipes into
   I/O faults. Validate a fresh Raven interactive union app and exact interpreter/
-  native output, exit and broken-pipe fault parity; numeric text remains pending.
+  native output, exit and broken-pipe fault parity. Add Int32 formatting through an
+  explicit caller-owned text arena (experimental ABI v4), enabling ordinary integer/
+  byte WriteLine wrappers. Preserve text across nested calls and dynamic fault
+  messages; bounded exhaustion reports NativeMemoryLimitExceeded. Arena text expires
+  on the next invocation or buffer release; render faults first. This is not general
+  managed memory/GC support. Validate endpoint formatting, allocation bounds, context
+  reuse and a standalone numeric Raven input/output app.
 
 ### 2026-10-07
 

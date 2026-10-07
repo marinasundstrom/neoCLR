@@ -12,6 +12,7 @@ pub struct Options {
     pub user_faults: Vec<usize>,
     pub console_read_byte: Vec<usize>,
     pub console_write_line: Vec<usize>,
+    pub int32_to_string: Vec<usize>,
     pub frame_names: HashMap<usize, String>,
 }
 impl Options {
@@ -34,6 +35,12 @@ impl Options {
                 .filter(|r| r["implementation"] == "console-write-line-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
+            int32_to_string: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "int32-to-string-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
             console_read_byte: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter().flatten()
@@ -53,7 +60,7 @@ impl Options {
 pub struct Data {
     frames: Vec<DataId>,
     messages: HashMap<(usize, usize), DataId>,
-    defaults: [DataId; 3],
+    defaults: [DataId; 4],
 }
 fn literal(module: &mut ObjectModule, name: &str, text: &str) -> Result<DataId, Error> {
     let id = module.declare_data(name, Linkage::Local, false, false)?;
@@ -106,6 +113,8 @@ impl Data {
                 "fault_runtime",
                 neoclr::FaultCode::RuntimeError.standard_message().unwrap(),
             )?,
+            literal(module, "fault_native_memory",
+                neoclr::FaultCode::NativeMemoryLimitExceeded.standard_message().unwrap())?,
         ];
         Ok(Self {
             frames,
@@ -142,7 +151,7 @@ pub struct Site {
     context: ir::Value,
     frame: ir::Value,
     pc: usize,
-    defaults: [ir::Value; 3],
+    defaults: [ir::Value; 4],
     pub message: Option<ir::Value>,
     pub capture_frame: bool,
 }
@@ -161,7 +170,9 @@ impl Site {
             let overflow = b.ins().icmp_imm(IntCC::Equal, status, 2);
             let other = b.ins().select(overflow, self.defaults[1], self.defaults[2]);
             let divide = b.ins().icmp_imm(IntCC::Equal, status, 1);
-            b.ins().select(divide, self.defaults[0], other)
+            let message = b.ins().select(divide, self.defaults[0], other);
+            let memory = b.ins().icmp_imm(IntCC::Equal, status, 5);
+            b.ins().select(memory, self.defaults[3], message)
         };
         b.ins().store(MemFlags::new(), status, self.context, 0);
         b.ins().store(MemFlags::new(), message, self.context, 8);

@@ -10,7 +10,7 @@ pub(super) enum Ty {
     Bool,
     Unit,
     Erased,
-    Literal, // Immutable module-owned UTF-8; not a general managed String.
+    Literal, // Immutable image/explicit invocation-arena UTF-8; not a general managed String.
     Record(usize),
     Address(Box<Ty>),
 }

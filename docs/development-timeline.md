@@ -11746,6 +11746,10 @@ and don’t stop”. This follows the AOT union, input and shared fault diagnost
 retaining the ordinary Raven wrapper and committing bounded slices. The native input
 [experiment](experiments/aot-console/README.md) records byte/EOF/error tests and the
 remaining Console dependencies. The following slice adds value-profile WriteLine
-and an interactive input/output consumer; dynamic text and stream/reference support
-remain open. This Console direction does
+and an interactive input/output consumer. The assistant then selected a bounded,
+host-owned invocation text region for Int32 formatting: preserve strings across calls
+and faults, reclaim together at the next invocation, and reject escaping reference
+storage. This is an experimental lifetime foundation, not an author decision to replace
+tracing with regions or reference counting. General memory and stream/reference
+support remain open. This Console direction does
 not establish a new permanent roadmap priority outside the author-directed AOT work.

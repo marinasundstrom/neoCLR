@@ -246,8 +246,10 @@ Immutable UTF-8 literals now cross value-profile locals, calls and output slots.
 actual ReadByte wrapper now runs natively with a linked stdin adapter, preserving
 byte/EOF/error outcomes and faults for invalid service statuses. A combined Raven
 input/output app now compiles ordinary string, Boolean and empty-line WriteLine
-wrappers, with interpreter/native broken-pipe fault parity. Numeric/dynamic text,
-ReadLine and the broader Console stream surface remain future work. An explicit failure binding now preserves
+wrappers, with interpreter/native broken-pipe fault parity. Int32/byte formatting now
+uses a bounded invocation-owned text arena with explicit lifetime and exhaustion
+behavior. General managed memory, wider numeric text, ReadLine and the broader
+Console stream surface remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked
 renderer and standalone exit-1 failure app are validated. Interpreter CLI execution

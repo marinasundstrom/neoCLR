@@ -168,3 +168,14 @@ experimental caller-owned equivalent and C renderer are documented in the
 image-owned; Rust's view borrows the Fault/trace. Neither lifetime implies guest-managed
 ownership. Standalone adapters exit 1 on an unhandled fault; embedding hosts choose their
 own recovery/exit policy. No stable native ABI or new guest exception API is introduced.
+
+### Experimental native text lifetime
+
+The AOT Console experiment's optional Int32 formatting binding exports ABI v4 with
+a caller-owned context and text buffer. Its fault prefix remains the ABI v3 layout;
+status 5 denotes NativeMemoryLimitExceeded and uses the shared standard message.
+UserFault messages may point into the invocation buffer: render/read them before the
+next entry call or releasing that buffer. Frame names and runtime messages remain
+image-owned. Each concurrent invocation needs distinct context and buffer storage.
+This is an experimental C hosting contract, not a Raven guest API or stable native ABI.
+See the [full contract and header](../docs/experiments/aot-console/README.md#numeric-output-and-text-lifetime-2026-10-08).

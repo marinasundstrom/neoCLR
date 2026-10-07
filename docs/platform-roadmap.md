@@ -92,7 +92,9 @@ Console.ReadByte wrapper, with byte/EOF/error and invalid-service fault evidence
 The author directs sustained Console support next (2026-10-08): value-profile
 WriteLine now compiles its string/Boolean/empty-line wrappers alongside input,
 with an interactive Raven consumer and broken-pipe fault parity. Invocation-owned
-dynamic UTF-8 text for numeric formatting is next, before stream/reference support. Multiple instantiations
+dynamic UTF-8 text now supports Int32/byte line output with bounded caller storage
+and ABI v4 lifetime/exhaustion tests. Wider numeric/text primitives and the ordinary
+stream/reference implementation behind Write/ReadLine remain next. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

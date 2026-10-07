@@ -1,0 +1,21 @@
+#include "text-arena.h"
+#include <inttypes.h>
+#include <string.h>
+
+int32_t neoclr_int32_to_string_v1(int32_t value, neoclr_aot_text_arena *arena,
+                                const neoclr_aot_text **output) {
+    if (arena->used > arena->capacity || (arena->capacity && !arena->data) ||
+        ((uintptr_t)arena->data & 7)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    char buffer[12]; /* sign + ten digits + terminator */
+    int length = snprintf(buffer, sizeof(buffer), "%" PRId32, value);
+    if (length < 0 || (size_t)length >= sizeof(buffer)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t padding = (8 - (arena->used & 7)) & 7;
+    uint64_t needed = padding + sizeof(uint64_t) + (uint64_t)length;
+    if (needed > arena->capacity - arena->used) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    neoclr_aot_text *text = (neoclr_aot_text *)(arena->data + arena->used + padding);
+    text->length = (uint64_t)length;
+    memcpy(text->bytes, buffer, (size_t)length);
+    arena->used += needed;
+    *output = text;
+    return NEOCLR_AOT_FAULT_NONE;
+}

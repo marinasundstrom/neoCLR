@@ -93,9 +93,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         "neoclr_values",
         cranelift_module::default_libcall_names(),
     )?);
-    // Same private read-only payload as the scalar literal profile. Every String
-    // value originates here; no null/default, allocation, erasure or native producer
-    // is admitted. Internal calls/fields cannot introduce arbitrary pointers.
+    // Immutable length-prefixed UTF-8. Strings originate from these image literals
+    // or explicit, bounded invocation-arena producers. No arbitrary host String,
+    // null/default, erasure, object storage or escaping export is admitted.
     let mut literals = std::collections::HashMap::new();
     for (i, f) in input.functions.iter().enumerate() {
         for (pc, op) in f.body.iter().enumerate() {
@@ -122,6 +122,13 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.params.extend([AbiParam::new(types::I64), AbiParam::new(types::I64)]);
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_console_write_line_utf8_v1", Linkage::Import, &sig)?)
+    } else { None };
+    let text_arena = details.is_some_and(|d| !d.int32_to_string.is_empty());
+    let format_service = if text_arena {
+        let mut sig = module.make_signature();
+        sig.params.extend([AbiParam::new(types::I32), AbiParam::new(types::I64), AbiParam::new(types::I64)]);
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_int32_to_string_v1", Linkage::Import, &sig)?)
     } else { None };
     let mut ids = vec![];
     for (i, _) in input.functions.iter().enumerate() {
@@ -187,6 +194,28 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 return_if_detailed(&mut b, failed, status, Some(&site));
                 let zero = b.ins().iconst(types::I32, 0);
                 if !f.no_result { write(&mut b, output, &[zero]); }
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks();
+                b.finalize();
+                module.define_function(ids[i], &mut context)?;
+                continue;
+            }
+            if details.is_some_and(|d| d.int32_to_string.contains(&i)) {
+                let service = module.declare_func_in_func(format_service.unwrap(), b.func);
+                let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                let call = b.ins().call(service, &[parameters[0], arena, output]);
+                let raw = b.inst_results(call)[0];
+                // Only success and resource exhaustion are service outcomes. Other
+                // failures become RuntimeError; adapters cannot manufacture UserFault.
+                let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                let memory = b.ins().iconst(types::I32, 5);
+                let runtime = b.ins().iconst(types::I32, 3);
+                let status = b.ins().select(exhausted, memory, runtime);
+                let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                site.capture_frame = false;
+                return_if_detailed(&mut b, failed, status, Some(&site));
+                let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
@@ -509,7 +538,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         .returns
         .push(AbiParam::new(types::I32));
     let export =
-        module.declare_function(if details.is_some() { "neoclr_entry_v3" } else { "neoclr_entry_v2" }, Linkage::Export, &context.func.signature)?;
+        module.declare_function(if text_arena { "neoclr_entry_v4" } else if details.is_some() { "neoclr_entry_v3" } else { "neoclr_entry_v2" }, Linkage::Export, &context.func.signature)?;
     let target = module.declare_func_in_func(ids[root], &mut context.func);
     let mut fb = FunctionBuilderContext::new();
     {
@@ -519,6 +548,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         b.switch_to_block(entry);
         let params = b.block_params(entry).to_vec();
         if details.is_some() { crate::fault_details::reset(&mut b, params[2]); }
+        if text_arena {
+            // Reset only the cursor; capacity/data belong to the host. Previous
+            // dynamic text, including fault messages, expires on this next call.
+            let zero = b.ins().iconst(types::I64, 0);
+            b.ins().store(MemFlags::new(), zero, params[2], 1064);
+        }
         let call_args = if p.args[root].is_empty() {
             &params[1..]
         } else {

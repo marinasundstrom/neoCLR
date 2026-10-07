@@ -159,3 +159,50 @@ pub fn console_write_line(
     }
     Ok(bindings)
 }
+
+/// Only this admitted producer can introduce invocation-owned String data.
+pub fn int32_to_string(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
+        if row["name"] != "neoCLR.Runtime.Int32ToString" {
+            continue;
+        }
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
+        if f.name != "neoCLR.Runtime.Int32ToString"
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != [Type::Int32]
+            || f.returns != Type::String
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err("native formatting binding requires exact neoCLR.Runtime.Int32ToString(Int32) -> String InternalCall contract".into());
+        }
+        f.impl_flags = 0;
+        f.body = vec![Op::String(String::new()), Op::Return];
+        bindings.push(json!({"definition": row["definition"], "name": row["name"],
+            "compiledIndex": row["compiledIndex"], "implementation": "int32-to-string-v1",
+            "symbol": "neoclr_int32_to_string_v1", "storage": "caller-owned-text-arena-v4"}));
+    }
+    Ok(bindings)
+}
