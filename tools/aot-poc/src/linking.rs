@@ -104,10 +104,29 @@ pub fn prepare(
         revision: app.revision.clone(),
         index: i as u32,
     };
+    // LoadedProgram binds matching InternalCall declarations in the caller's
+    // original module. Reproduce that narrow rule before flattening scopes;
+    // otherwise a source-owned service and its seed declaration become ambiguous.
+    // Original loading/verification above remains the authority for access/registry
+    // checks. This does not grant general name-based calls a local preference.
+    let local_services: Vec<_> = joined.functions.iter().enumerate()
+        .filter(|(_, f)| f.is_internal_call())
+        .map(|(i, f)| (i, f.clone())).collect();
     for (i, function) in joined.functions.iter_mut().enumerate() {
         function.definition = Some(method_id(i));
         for op in &mut function.body {
             if let Op::Call(target) | Op::Construct(target) = op {
+                if target.definition.is_none() {
+                    let matches: Vec<_> = local_services.iter().filter(|(index, f)| {
+                        methods[*index].module == methods[i].module
+                            && f.name == target.name && f.owner == target.owner
+                            && f.instance == target.instance && f.parameters == target.parameters
+                            && f.generic_parameters.is_empty() && target.generic_arguments.is_empty()
+                    }).collect();
+                    if let [candidate] = matches.as_slice() {
+                        target.definition = Some(methods[candidate.0].clone());
+                    }
+                }
                 if let Some(id) = &target.definition {
                     let i = methods
                         .iter()

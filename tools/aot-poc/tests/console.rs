@@ -89,3 +89,25 @@ int main(void) {
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     assert!(Command::new(dir.0.join("app")).env_clear().status().unwrap().success());
 }
+
+#[test]
+fn duplicate_service_declarations_keep_the_callers_module_identity() {
+    let dir = Temp::new();
+    let mut modules = neoclr::assembler::assemble_modules(&[
+        ".module App\n.function Calculate() -> Int32\ncall Read()\nvalue.unpack Byte\nconv.i4\nret\n.end",
+        ".module ConsoleLibrary\n.function Read() -> System.Value\ncall neoCLR.Runtime.ConsoleReadByte()\nret\n.end\n.function neoCLR.Runtime.ConsoleReadByte() -> System.Value\n.methodimpl InternalCall\n.end",
+    ]).unwrap();
+    if let neoclr::metadata::Instruction::Call(target) = &mut modules[1].functions[0].body[0] {
+        target.definition = None;
+    } else { panic!("expected call"); }
+    for (name, module) in [("app.neox", &modules[0]), ("lib.neox", &modules[1]), ("seed.neox", &neoclr::assemble(SEED).unwrap())] {
+        fs::write(dir.0.join(name), neoclr::metadata_container::write_module(module).unwrap()).unwrap();
+    }
+    let r = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        .arg("--inspect").arg(dir.0.join("app.neox")).args(["Calculate", "--closed-world", "--compile-system", "--bind-console-read-byte"])
+        .arg("--system").arg(dir.0.join("seed.neox")).arg("--module").arg(dir.0.join("lib.neox")).output().unwrap();
+    let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["admission"]["accepted"], true, "{report}");
+    assert_eq!(report["selection"]["nativeBindings"][0]["definition"]["module"], "ConsoleLibrary");
+    assert_eq!(report["selection"]["nativeBindings"].as_array().unwrap().len(), 1);
+}

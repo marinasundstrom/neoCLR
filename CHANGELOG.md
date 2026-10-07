@@ -14,6 +14,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   outcomes and managed faults for invalid adapter statuses. Validate exact service
   admission, all 256 bytes and the standalone Raven input consumer. This remains
   a bounded development profile; dynamic text and the rest of Console are pending.
+  Preserve caller-module InternalCall identities before flattening AOT load sets,
+  matching interpreter linking when the seed and source library both declare the
+  same service. Original load-set verification still controls access and signatures;
+  managed duplicate names gain no new local preference.
 
 ### 2026-10-07
 

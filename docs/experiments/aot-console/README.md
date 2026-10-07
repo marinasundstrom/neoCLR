@@ -60,3 +60,13 @@ print prompts/outcomes. The broader Console class still needs dynamic text owner
 numeric formatting, reference objects, arrays and stream dispatch for Write, ReadLine,
 In/Out/Error and standard streams. The current literal-only String profile does not
 provide these capabilities. These are implementation gaps, not permanent API limits.
+
+## Module-local service resolution
+
+A follow-up preserves the interpreter's local InternalCall binding rule when a seed
+and a source-owned library declare the same service. AOT now pins a name-only call
+to the exact local service definition before scope flattening. Original load-set
+verification still runs first; ordinary managed calls do not gain local preference.
+A duplicate-service test verifies the selected library identity, and all 18 explicit
+load-set tests pass. The combined Raven input/WriteLine probe drove this correction;
+its output service still requires the next explicit binding. No public API changes.
