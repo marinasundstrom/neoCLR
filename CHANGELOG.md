@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Refresh the shared RavenDoc compiler to Raven main `86c8dfbfc` and document the
+  generic callback inference fix carried to the neoCLR integration branch. Match
+  arms determine unresolved callback result types while lexical generic targets
+  remain authoritative. Runtime Contract and CLI bridge encodings are unchanged;
+  validation covers modern .NET and documentation generation, not native execution.
+
 - Add GitHub source-file links to API type/member pages through configurable shared
   RavenDoc repository settings and Raven declaration indexing. Preserve assembly
   names and omit links where no matching source declaration exists. Validate the

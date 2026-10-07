@@ -176,3 +176,12 @@ Validation: 55 focused RavenDoc tests, 18 website tests and a full site build;
 361 generated API pages contain source links. Browser checks followed Console
 from its type page to a member and verified the source link, assembly name and
 390px layout. Console, Int32 and ArrayList source URLs were checked on GitHub.
+
+The final release-preparation refresh pins Raven main `86c8dfbfc`, retaining these
+source-link and responsive-navigation capabilities and incorporating the shared
+generic callback inference correction. See the target-compilation guide for
+compiler validation and runtime limits.
+
+Validation of the refreshed bundle: all 18 website tests and the complete
+1,803-page build/link/anchor checks passed. Raven's browser regression checks
+also passed on the matching main revision. neoCLR publication remains separate.

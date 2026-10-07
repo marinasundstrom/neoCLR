@@ -264,3 +264,20 @@ methods, delayed task completion, GC and reference-field early returns. This
 is general compiler emission behavior, with no new Runtime Contract option,
 native metadata convention or temporary CLI encoding. Native neoCLR execution
 was not rerun for this fix; Raven's full release gates are still in progress.
+
+## Shared generic callback inference fix (2026-10-07)
+
+Raven main `86c8dfbfc` and integration branch `bb4a29ba8` defer an unresolved
+generic callback result parameter while binding synchronous match arms and block
+returns. The body determines the result type; an enclosing lexical type parameter
+remains authoritative, including when it has the same name as the method result
+parameter. Cold semantic queries and diagnostics-first queries agree.
+
+This is shared inference behavior, comparable to ordinary generic callback result
+inference on .NET. It adds no Runtime Contract option, metadata representation or
+CLI bridge encoding. Main passed 294 focused generic/match/sample checks and 410
+overload-resolution checks. The integration branch independently passed the same
+294 focused checks. The list-deconstruction sample compiles and executes
+on modern .NET with an empty row handled explicitly; NanoFramework metadata-test
+prerequisites now restore independently. These checks do not establish native
+neoCLR or device execution. Full Raven release gates are rerunning.
