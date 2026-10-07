@@ -1085,3 +1085,8 @@ The existing System.Attribute API page now describes its source-built abstract b
 and protected constructor. The matching reference projection and XML sidecar preserve
 that shape; the [reference-support guide](reference-support.md#source-attribute-base-development)
 distinguishes it from bootstrap-only attribute scaffolds and unimplemented .NET helpers.
+
+The source-unit bootstrap gate (2026-10-07) adds no guest API signatures. Existing
+System.Void and NativeMemory sources compile with explicit native unit ownership;
+inhabited unit parameters and no-result calls remain distinct. The integration guide
+records the source/native owner configuration and current full-bootstrap limitation.

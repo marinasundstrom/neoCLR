@@ -32,7 +32,7 @@ def main():
         'storage': [s for s in omitted if '/Storage/' in s],
         'calendar': [s for s in omitted if Path(s).stem in ('DateTime', 'LocalTimeMapping', 'TimeZone', 'TimeZoneError', 'ZonedDateTime')],
         'services': [s for s in omitted if '/Console/' in s or '/Environment/' in s or '/Math/' in s or '/NativeMemory/' in s or s.endswith(('/GC.rvn', '/ConsoleReadError.rvn', '/EnvironmentError.rvn', '/System/Functions.rvn'))],
-        'core': [s for s in omitted if Path(s).stem in ('Object', 'Value', 'Void', 'RuntimeTypeHandle', 'IntPtr', 'UIntPtr', 'UnionAttribute')],
+        'core': [s for s in omitted if Path(s).stem in ('Object', 'Value', 'Void', 'RuntimeTypeHandle', 'IntPtr', 'UIntPtr', 'Attribute', 'UnionAttribute')],
     }
     groups['contracts'] = sorted(set(omitted) - set(sum(groups.values(), [])))
     cases = [('baseline', baseline, False), ('network', network, True)]
@@ -70,7 +70,8 @@ def main():
         if name == 'full-owned-handle':
             library = manifest['libraries'][0]
             manifest['failure'] = dict(assemblyName=library['assemblyName'], namespaceName='System', functionName='Fail')
-            library['types'] = sorted(set(library['types']) | {'System.RuntimeTypeHandle'})
+            library['types'] = sorted(set(library['types']) | {'System.RuntimeTypeHandle', 'System.Void'})
+            manifest['unit'] = dict(assemblyName=library['assemblyName'], typeName='System.Void')
             manifest['nativePrimitives']['System.RuntimeTypeHandle'] = library['assemblyName']
             # Reuse the already implemented source-handle ownership contract. The
             # exact empty seed declaration must disappear when this owner is selected.
@@ -79,7 +80,10 @@ def main():
             if seed_text.count(declaration) != 1:
                 raise ValueError('Expected exactly one retained handle declaration')
             seed_source = directory / 'System.neoil'
-            seed_source.write_text(seed_text.replace(declaration, ''))
+            void_declaration = '.type System.Void\n.sealed\n.end\n'
+            if seed_text.count(void_declaration) != 1:
+                raise ValueError('Expected exactly one retained Void declaration')
+            seed_source.write_text(seed_text.replace(declaration, '').replace(void_declaration, ''))
             seed = directory / 'System.neox'
             assembled = subprocess.run([str(args.runtime.resolve()), 'assemble', str(seed_source), str(seed), '--format', 'neox'],
                                        cwd=ROOT, capture_output=True, text=True, timeout=60)

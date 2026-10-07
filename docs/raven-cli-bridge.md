@@ -6303,3 +6303,24 @@ marker. No format or Runtime Contract configuration change.
 checks canonical custom-attribute identity, constructor-chain execution, fallback and
 failure-before-publication. The full audit now reaches NativeMemory's pointer to source
 Void; this is not yet a completed System bootstrap or Raven imported-root consumer.
+
+### Source/native unit ownership (2026-10-07)
+
+Raven `7abe0adf7` allows the NeoCLR System.Void unit contract to name the current
+source assembly or an explicit native artifact. The chosen public empty value type
+backs unit values; callable unit results and pointers retain CLI no-result/PTR VOID
+encoding. Same-named unselected declarations do not receive that pointer treatment.
+Ownership manifests may omit unused iteration contracts. The primitive bootstrap
+remains explicit and does not become a native dependency fallback.
+
+The [source-unit gate](experiments/extended-cli-metadata/source-unit-2026-10-07.md)
+executes production NativeMemory and an inhabited unit argument from a separately
+compiled consumer. Its empty runtime seed contains no competing Void; native runtime
+services are authored in the library. Released libraries still referring to seed-owned
+Void are not interchangeable with this new owner. The full audit now selects source
+Void and stops at a remaining bootstrap Void reference during encoding, after passing
+binding and pointer validation. No full-System output is published.
+
+The independently useful diagnostic assertion correction is integrated into local
+Raven main as `8c53fa55b` (17 focused tests), with its temporary fix branch retired.
+Target-specific ownership changes remain on the native integration line.

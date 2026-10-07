@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Verify source/native unit ownership with production Void and NativeMemory sources:
+  a separate native consumer executes allocation/free and an inhabited unit parameter;
+  expected overflow/double-free faults and unsupported-pointer rejection pass. Retain
+  the ordinary-bootstrap control. The full audit now selects source Void explicitly
+  and omits the seed copy; encoding still exposes a residual bootstrap Void reference.
+
 - Add the source-built abstract System.Attribute base with a protected constructor;
   retain UnionAttribute inheritance and reuse its constructor for union metadata.
   Source and embedded marker gates execute, metadata identity checks pass, and invalid

@@ -13,6 +13,7 @@ def main():
     for name in ('compiler', 'core', 'seed', 'numbers', 'integers', 'inputs', 'ownership', 'runtime', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--compiler-revision', required=True)
+    parser.add_argument('--source-unit', action='store_true', help='Own System.Void in the rebuilt native library')
     args = parser.parse_args()
     for name in ('compiler', 'core', 'seed', 'numbers', 'integers', 'inputs', 'ownership', 'runtime', 'output'):
         setattr(args, name, getattr(args, name).resolve())
@@ -20,9 +21,17 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     sources = [ROOT / p for p in ('runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn',
         'runtime/raven/native/NativeAllocation.rvn', 'runtime/raven/native/RuntimeNativeAllocationCalls.rvn')]
+    if args.source_unit:
+        sources.append(ROOT / 'runtime/raven/src/System/Void.rvn')
     manifest = json.loads(args.ownership.read_text())
+    if args.source_unit:
+        # No released library with references to the old seed-owned Void participates.
+        manifest = dict(version=1, libraries=[])
     manifest['libraries'].append(dict(assemblyName='NativeMemory', sources=[str(p.relative_to(ROOT)) for p in sources],
                                      types=['System.Runtime.CompilerServices.NativeAllocation']))
+    if args.source_unit:
+        manifest['unit'] = dict(assemblyName='NativeMemory', typeName='System.Void')
+        manifest['libraries'][-1]['types'].append('System.Void')
     ownership = output / 'ownership.json'
     ownership.write_text(json.dumps(manifest, indent=2) + '\n')
     commands = []
@@ -35,17 +44,33 @@ def main():
             raise RuntimeError(json.dumps(commands[-1], indent=2))
         return result
 
-    common = ['dotnet', args.compiler, 'neoclr', '--core-reference', args.core, '--runtime-seed', args.seed,
-              '--bootstrap-ownership', ownership, '--reference', args.numbers, '--reference', args.integers]
+    seed = args.seed
+    seed_inputs = []
+    if args.source_unit:
+        source = output / 'System.neoil'
+        source.write_text('.module System\n.references ()\n')
+        seed = output / 'System.neox'
+        run([args.runtime, 'assemble', source, seed, '--format', 'neox'])
+        seed_inputs = [source, seed]
+    common = ['dotnet', args.compiler, 'neoclr', '--core-reference', args.core, '--runtime-seed', seed,
+              '--bootstrap-ownership', ownership]
+    if not args.source_unit:
+        common += ['--reference', args.numbers, '--reference', args.integers]
     library = output / 'NativeMemory.dll'
     run(common + ['--library', '-o', library] + sources)
     sample = Path(__file__).resolve().parent / 'bootstrap/native-memory-consumer.rvn'
-    dependencies = ['--system', args.seed, '--module', args.numbers, '--module', args.integers,
+    dependencies = ['--system', seed, '--module', args.numbers, '--module', args.integers,
                     '--module', args.inputs, '--module', library]
+    if args.source_unit:
+        dependencies = ['--system', seed, '--module', args.inputs, '--module', library]
     consumers = []
-    cases = [('Consumer', sample.read_text(), 42, None),
-             ('DoubleFree', sample.read_text().replace('Free(Identity(pointer))', 'Free(pointer)\n    Free(pointer)'), 1, 'double free'),
-             ('Overflow', sample.read_text().replace('NativeWidthInputs.Six()', 'NativeWidthInputs.Maximum()'), 1, 'code=ArithmeticOverflow')]
+    consumer_source = sample.read_text()
+    if args.source_unit:
+        consumer_source += '\nfunc Ignore(value: System.Void) { }\n'
+        consumer_source = consumer_source.replace('    let count =', '    Ignore(())\n    let count =')
+    cases = [('Consumer', consumer_source, 42, None),
+             ('DoubleFree', consumer_source.replace('Free(Identity(pointer))', 'Free(pointer)\n    Free(pointer)'), 1, 'double free'),
+             ('Overflow', consumer_source.replace('NativeWidthInputs.Six()', 'NativeWidthInputs.Maximum()'), 1, 'code=ArithmeticOverflow')]
     for name, source, expected, fault in cases:
         path = output / (name + '.rvn')
         path.write_text(source)
@@ -62,7 +87,7 @@ def main():
     result = run(common + ['--reference', library, '--library', '-o', rejected, bad], 1)
     if rejected.exists() or 'NEOMETA001' not in result.stderr + result.stdout:
         raise RuntimeError('Unsupported pointer must reject before publication')
-    inputs = sources + consumers + [Path(__file__), sample, bad, ownership, library, args.compiler,
+    inputs = seed_inputs + sources + consumers + [Path(__file__), sample, bad, ownership, library, args.compiler,
         args.core, args.seed, args.numbers, args.integers, args.inputs, args.ownership, args.runtime]
     inputs += [args.compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     evidence = dict(sourceRevision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),

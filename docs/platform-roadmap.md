@@ -10,6 +10,18 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Explicit source/native System.Void ownership now preserves inhabited unit parameters,
+no-result calls and PTR VOID signatures. The separately compiled NativeMemory consumer
+runs with source-owned Void; double-free, overflow and rejection gates pass, as does
+the ordinary-bootstrap control. The 195-input full-System audit clears binding and
+pointer admission but stops during encoding on a remaining **bootstrap System.Void
+reference**. Next trace and migrate that reference through semantic unit ownership;
+do not reintroduce a competing seed copy. No full System artifact is published.
+[Source-unit evidence](experiments/extended-cli-metadata/source-unit-2026-10-07.md).
+
+### Earlier source attribute frontier
+
+
 Source Attribute and UnionAttribute now preserve local inheritance, and native unions
 reuse the source marker constructor. Canonical metadata inspection, separate consumer
 execution (exit 42), embedded-marker control and invalid-marker rejection pass.
