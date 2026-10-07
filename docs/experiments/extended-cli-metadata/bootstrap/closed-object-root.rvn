@@ -1,0 +1,20 @@
+// JsonValue-shaped closed family: source Object -> family -> concrete child.
+public sealed class Value {
+    protected init() { }
+    abstract func Read() -> int
+}
+
+public class NumberValue : Value {
+    private val value: int
+
+    init(value: int): base() {
+        self.value = value
+    }
+
+    override func Read() -> int => value
+}
+
+public func RunGeneric() -> int {
+    let value: Value = NumberValue(42)
+    return value.Read()
+}

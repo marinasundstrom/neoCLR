@@ -10,23 +10,28 @@ using NeoCLR.Metadata.Experimental.Introspection;
 
 internal static class ClosedClassChecks
 {
-    private static AssemblyBuilder Create(bool manual)
+    private static AssemblyBuilder Create(bool manual, bool sourceRoot = false)
     {
         var host = typeof(object).Assembly.GetName();
         var core = new AssemblyIdentity(host.Name!, host.Version!, host.CultureName ?? "", Convert.ToHexString(host.GetPublicKeyToken() ?? []));
         var graph = new AssemblyBuilder(new("ClosedFamily" + Guid.NewGuid().ToString("N"), new(1, 0, 0, 0)), core);
+        var objectRoot = sourceRoot ? graph.AddNativeObjectRoot() : null;
+        var objectConstructor = objectRoot?.AddConstructor(Array.Empty<PrimitiveType>(), MethodVisibility.Protected);
+        objectConstructor?.GetILGenerator().Return();
         TypeBuilder root;
         if (manual)
         {
             var definition = new TypeDefinition("Example", "Root", 0x81,
-                graph.Definition.MainModule.ImportReference(core, "System", "Object"), true);
+                objectRoot?.Definition.ToReference() ?? graph.Definition.MainModule.ImportReference(core, "System", "Object"), true);
             graph.Definition.MainModule.Types.Add(definition);
-            root = graph.Types.Single();
+            root = graph.Types.Last();
         }
-        else root = graph.AddClosedClass("Example", "Root");
+        else root = objectRoot is null ? graph.AddClosedClass("Example", "Root") : graph.AddClosedClass("Example", "Root", objectRoot);
         var field = root.AddField("Value", PrimitiveType.Int32, FieldVisibility.Public);
         var initialize = root.AddConstructor([PrimitiveType.Int32], MethodVisibility.Protected);
-        var il = initialize.GetILGenerator(); il.LoadArgument(0); il.LoadArgument(1); il.StoreField(field); il.Return();
+        var il = initialize.GetILGenerator();
+        if (objectConstructor is not null) { il.LoadArgument(0); il.Call(objectConstructor); }
+        il.LoadArgument(0); il.LoadArgument(1); il.StoreField(field); il.Return();
         var child = graph.AddClass("Example", "Child", root);
         var constructor = child.AddConstructor(Array.Empty<PrimitiveType>());
         il = constructor.GetILGenerator(); il.LoadArgument(0); il.LoadConstant(42); il.Call(initialize); il.Return();
@@ -38,9 +43,11 @@ internal static class ClosedClassChecks
     internal static void Run()
     {
         foreach (bool manual in new[] { false, true })
+        foreach (bool sourceRoot in new[] { false, true })
         {
-            var graph = Create(manual);
-            if (!graph.Types[0].IsClosedHierarchy || !graph.Types[0].IsAbstract || graph.Types[0].IsStatic)
+            var graph = Create(manual, sourceRoot);
+            var authoredRoot = graph.Types.Single(t => t.Name == "Root");
+            if (!authoredRoot.IsClosedHierarchy || !authoredRoot.IsAbstract || authoredRoot.IsStatic)
                 throw new Exception("authored closed family flags lost");
             var image = RuntimeAssemblyContainer.WriteBinary(graph);
             using var pe = new PEReader(new MemoryStream(image));
@@ -58,6 +65,8 @@ internal static class ClosedClassChecks
                 !ReferenceEquals(root.GetPermittedDirectSubtypes().Single(), child) || child.GetPermittedDirectSubtypes().Count != 0 ||
                 root.GetConstructors().Single().Accessibility != MetadataAccessibility.Family)
                 throw new Exception("closed family native reader/facade contract lost");
+            if (sourceRoot && !ReferenceEquals(root.BaseType, context.Assemblies.Single().GetTypes().Single(t => t.Name == "Object")))
+                throw new Exception("closed family source Object base lost in native reader");
             Reject(() => graph.Write(), "native emission");
         }
         foreach (bool manual in new[] { false, true })
@@ -80,6 +89,29 @@ internal static class ClosedClassChecks
                 !closedContract.GetPermittedDirectSubtypes().Select(t => t.Name).SequenceEqual(new[] { "Branch", "Leaf" }))
                 throw new Exception("closed interface definition/builder round trip lost direct relationships");
             Reject(() => graph.Write(), "native emission");
+        }
+        foreach (bool manual in new[] { false, true })
+        {
+            var graph = Create(manual, true);
+            var foreignBase = Create(false).Types[0];
+            var unsupported = graph.AddGenericClass("Example", "Generic", ["T"]);
+            foreach (var parent in new[] { foreignBase, unsupported })
+            {
+                var count = graph.Types.Count;
+                try
+                {
+                    if (manual) graph.Definition.MainModule.Types.Add(new TypeDefinition("Example", "InvalidBase", 0x81, parent.Definition.ToReference(), true));
+                    else graph.AddClosedClass("Example", "InvalidBase", parent);
+                    throw new Exception("unsupported closed family base accepted");
+                }
+                catch (ArgumentException) { }
+                if (graph.Types.Count != count) throw new Exception("invalid closed family attached");
+            }
+            var constructor = graph.Types.Single(t => t.Name == "Root").Methods.Single(m => m.IsConstructor);
+            constructor.Definition.Body.ClearInstructions();
+            constructor.GetILGenerator().Return();
+            try { RuntimeAssemblyContainer.WriteBinary(graph); throw new Exception("closed family skipped source base initialization"); }
+            catch (InvalidDataException) { }
         }
         var ordinary = new AssemblyBuilder(new("Ordinary", new(1, 0, 0, 0)), Create(false).CoreLibrary);
         ordinary.AddClass("Example", "Open");

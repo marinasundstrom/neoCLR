@@ -10,6 +10,15 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Closed families now preserve source Object as their base. Protected initialization
+and virtual dispatch execute through the resulting three-level hierarchy. The
+195-input audit advances to **ObjectTypeHandle dependency-contract resolution**;
+next align this intrinsic with source Object/RuntimeTypeHandle ownership through
+explicit bootstrap contracts. No full System artifact is published.
+[Evidence](experiments/extended-cli-metadata/closed-object-root-2026-10-07.md).
+
+### Earlier unit ownership frontier
+
 Early unit resolution now rejects wrong-assembly lookup fallbacks. Source-owned Void
 remains canonical through generic interface signatures, including when unit is needed
 before source declarations exist. The native unit-interface consumer and NativeMemory

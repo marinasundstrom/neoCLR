@@ -7067,6 +7067,8 @@ checks do not add closed-interface or general sealed-leaf enforcement. See the
 ```csharp
 TypeBuilder AssemblyBuilder.AddClosedClass(string @namespace, string name,
     TypeVisibility visibility = TypeVisibility.Public);
+TypeBuilder AssemblyBuilder.AddClosedClass(string @namespace, string name,
+    TypeBuilder baseType, TypeVisibility visibility = TypeVisibility.Public);
 TypeDefinition(string @namespace, string name, uint attributes,
     TypeReference? baseType, bool isClosedHierarchy);
 bool TypeDefinition.IsClosedHierarchy { get; }
@@ -7081,7 +7083,14 @@ void AssemblyBuilder.DeclareClassBase(ImportedTypeReference type,
 The original four-argument TypeDefinition constructor is preserved. Closed declarations
 require Abstract without Sealed and a nongeneric top-level reference class; invalid
 manual definitions throw ArgumentException on attachment before modifying the module.
-AddClosedClass creates a root using the explicitly selected core Object reference.
+The overload without a base creates a root using the explicitly selected core Object
+reference. The base-taking overload (development, 2026-10-07) uses an already attached
+ordinary nongeneric reference class, including the native Object root. It shares
+manual-definition validation: null throws ArgumentNullException; foreign, generic,
+interface, static and value bases throw ArgumentException. Invalid visibility/name
+or duplicate types also reject. Constructors must initialize their direct base;
+missing initialization or a sealed base rejects during writer validation. Native
+reader and introspection retain the canonical base independently of family closure.
 Its constructors may be Protected. Ordinary local children use AddClass(baseType);
 abstract allocation fails writer validation with InvalidDataException.
 

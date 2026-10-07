@@ -6335,3 +6335,14 @@ identity. No runtime contract option, CLI encoding or runtime representation cha
 C# declaration-order regressions, native generic unit-interface dispatch, NativeMemory
 fault/success cases and an ordinary-bootstrap control. The complete System audit now
 reaches direct-base constructor validation rather than importing bootstrap Void.
+
+## Closed families over source Object (2026-10-07)
+
+Raven `793220f33` forwards the declared local base to the new metadata
+`AddClosedClass` overload. This fixes the source-root JsonValue constructor frontier
+without changing lowering, Runtime Contract configuration, CLI projection or native
+format. Definition authoring and builders share validation; the reader/introspection
+already retain local base identity. Protected chaining and virtual dispatch execute;
+32 ordinary .NET regressions and 163 metadata groups pass. The next full-System
+blocker is ObjectTypeHandle dependency-contract resolution. Source-built System is
+not complete. See [evidence and scope](experiments/extended-cli-metadata/closed-object-root-2026-10-07.md).

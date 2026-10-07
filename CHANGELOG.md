@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Add closed-class builder authoring over an owned local base, including source
+  Object, with existing definition validation and native encoding. Raven preserves
+  that base; protected constructor chaining and virtual dispatch execute successfully.
+  The full-System audit advances to ObjectTypeHandle dependency-contract resolution.
+
 - Verify early source-unit ownership through generic interface dispatch in a separately
   compiled native consumer, alongside NativeMemory success/fault checks and the legacy
   bootstrap control. Raven no longer caches a bootstrap Void before source declarations

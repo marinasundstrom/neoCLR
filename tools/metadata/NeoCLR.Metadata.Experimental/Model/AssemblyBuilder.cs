@@ -229,6 +229,24 @@ public sealed partial class AssemblyBuilder
         Definition.MainModule.Types.Add(definition);
         return definition.Producer!;
     }
+    /// <summary>Adds an abstract closed family derived from an owned ordinary class.</summary>
+    /// <param name="namespace">Metadata namespace.</param>
+    /// <param name="name">Nonempty unique metadata name.</param>
+    /// <param name="baseType">Already attached nongeneric reference base, including the native Object root.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <returns>The attached closed-family definition.</returns>
+    /// <exception cref="ArgumentNullException">The base is null.</exception>
+    /// <exception cref="ArgumentException">Invalid base, visibility, name or duplicate type.</exception>
+    /// <remarks>Uses the same validation as manually attached definitions. Constructors must initialize the direct base; closure constrains this family's direct children, not its base.</remarks>
+    public TypeBuilder AddClosedClass(string @namespace, string name, TypeBuilder baseType, TypeVisibility visibility = TypeVisibility.Public)
+    {
+        ArgumentNullException.ThrowIfNull(baseType);
+        if (!Enum.IsDefined(visibility)) throw new ArgumentException("invalid visibility", nameof(visibility));
+        var definition = new TypeDefinition(@namespace, name, (visibility == TypeVisibility.Public ? 1u : 0u) | 0x80,
+            baseType.Definition.ToReference(), true);
+        Definition.MainModule.Types.Add(definition);
+        return definition.Producer!;
+    }
     /// <summary>Adds a nongeneric interface whose direct implementations and derived interfaces belong to this output.</summary>
     /// <param name="namespace">Metadata namespace.</param>
     /// <param name="name">Nonempty unique metadata name.</param>
