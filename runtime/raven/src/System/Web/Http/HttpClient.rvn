@@ -1437,7 +1437,7 @@ public class HttpSocketHandler : HttpHandler {
 internal class HttpExchange {
     private var uploadRemaining: int = 0
     private var ownsUpload: bool = false
-    private var deadline: long = 0
+    private var deadline = NetworkDeadline.Expired
     private var token: CancellationToken
     private var request: HttpRequest
     private var source: Promise<Result<HttpResponse, HttpError>>
@@ -1481,7 +1481,7 @@ internal class HttpExchange {
             ownsUpload = true
             uploadRemaining = request.Content.Length
         }
-        deadline = RuntimeServices.SocketDeadlineAfter(15000)
+        deadline = NetworkDeadline.AfterMilliseconds(15000)
         let pending = Dns.GetHostAddressesUntil(request.Host, deadline, token)
         lookup = Some(pending)
         pending.OnCompleted(self.OnLookup)
@@ -1509,7 +1509,7 @@ internal class HttpExchange {
 
     private func Finish(result: Result<HttpResponse, HttpError>) {
         Cleanup()
-        if RuntimeServices.SocketDeadlineExpired(deadline) {
+        if deadline.IsExpired {
             _ = source.Complete(Error(HttpError.TimedOut))
         } else {
             _ = source.Complete(result)
@@ -1524,7 +1524,7 @@ internal class HttpExchange {
             }
             let result = pending.GetResult()
             lookup = None()
-            if RuntimeServices.SocketDeadlineExpired(deadline) {
+            if deadline.IsExpired {
                 Finish(Error(HttpError.TimedOut))
                 return
             }
@@ -1560,7 +1560,7 @@ internal class HttpExchange {
             Cancel()
             return
         }
-        if RuntimeServices.SocketDeadlineExpired(deadline) {
+        if deadline.IsExpired {
             Finish(Error(HttpError.TimedOut))
             return
         }
@@ -1577,7 +1577,7 @@ internal class HttpExchange {
                     Cancel()
                     return
                 }
-                if RuntimeServices.SocketDeadlineExpired(deadline) {
+                if deadline.IsExpired {
                     Finish(Error(HttpError.TimedOut))
                     return
                 }
@@ -1616,7 +1616,7 @@ internal class HttpExchange {
             }
             let result = pending.GetResult()
             transfer = None()
-            if RuntimeServices.SocketDeadlineExpired(deadline) {
+            if deadline.IsExpired {
                 Finish(Error(HttpError.TimedOut))
                 return
             }
@@ -1634,7 +1634,7 @@ internal class HttpExchange {
     }
 
     private func ReceiveNext() {
-        if RuntimeServices.SocketDeadlineExpired(deadline) {
+        if deadline.IsExpired {
             Finish(Error(HttpError.TimedOut))
             return
         }
@@ -1653,7 +1653,7 @@ internal class HttpExchange {
             }
             let result = pending.GetResult()
             transfer = None()
-            if RuntimeServices.SocketDeadlineExpired(deadline) {
+            if deadline.IsExpired {
                 Finish(Error(HttpError.TimedOut))
                 return
             }

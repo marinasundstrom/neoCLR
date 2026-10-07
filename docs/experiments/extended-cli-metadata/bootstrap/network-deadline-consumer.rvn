@@ -1,0 +1,50 @@
+import System.*
+import System.Networking.*
+import System.Networking.Sockets.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Result.*
+import System.Tasks.*
+
+class DeadlineHolder {
+    init() { }
+    var Value: NetworkDeadline { get; set; }
+}
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fail("Network deadline assertion failed")
+    }
+}
+
+async func Main() -> Task<int> {
+    let expired = NetworkDeadline.Expired
+    Check(expired.IsExpired)
+    let defaults = DeadlineHolder()
+    Check(defaults.Value.IsExpired)
+    let active = NetworkDeadline.AfterMilliseconds(60000)
+    let copied = active
+    Check(!copied.IsExpired)
+    let resolved = await Dns.GetHostAddressesUntil("localhost", active, CancellationToken.None)
+    Check(resolved is Ok(_))
+    Check(Dns.GetHostAddressesUntil("localhost", expired, CancellationToken.None).GetResult() is Error(DnsError.TimedOut))
+    let addresses = ArrayList<IPAddress>()
+    Check(Socket.ConnectUntil(addresses, 0, expired, CancellationToken.None).GetResult() is Error(SocketError.TimedOut))
+    let text = ArrayList<string>()
+    Check(Socket.ConnectUntil(text, 0, expired, CancellationToken.None).GetResult() is Error(SocketError.TimedOut))
+    let stopped = CancellationTokenSource()
+    stopped.Cancel()
+    Check(Dns.GetHostAddressesUntil("localhost", expired, stopped.Token).IsCancelled)
+    Check(Socket.ConnectUntil(addresses, 0, expired, stopped.Token).IsCancelled)
+    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 1) else {
+        System.Fail("Listener creation failed")
+        return 1
+    }
+    let buffer: byte[] = [(byte)0]
+    Check(listener.SendUntil(buffer, 0, 1, expired, CancellationToken.None).GetResult() is Error(SocketError.TimedOut))
+    Check(listener.ReceiveUntil(buffer, 0, 1, expired, CancellationToken.None).GetResult() is Error(SocketError.TimedOut))
+    listener.Close()
+    stopped.Dispose()
+    Console.WriteLine("Network deadline checks passed")
+    return 0
+}

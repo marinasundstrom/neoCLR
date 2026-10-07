@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Add development NetworkDeadline and five typed DNS/socket deadline overloads, keeping
+  raw stamps internal and the default expired. Separate Web consumes these native APIs
+  with its existing exchange budget. Add source-free executable acceptance, C# visibility
+  checks, API reference and website documentation. New bridge declarations support docs
+  only; legacy CLI-to-neoIL translation does not support the typed deadline contract.
+  Record passing consumers and loopback cancellation alongside an unresolved intermittent
+  System.Void clean-build failure; bootstrap/main merge remains gated on qualification.
+
 - Record planned real library/Platform project outputs and RavenDoc assembly bundles.
   Specify shared declaration provenance and exact revision-pinned source links for
   .NET/NeoCLR API documentation, with Source Link/PDB comparison and validation gates.

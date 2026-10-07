@@ -29,7 +29,7 @@ runtime constraints; no divergence is automatically an improvement.
 | Managed foundation | System.Runtime assembly and API documentation | Explicit bootstrap contract; the independent Runtime/orders gate passes |
 | Data | System.Data assembly and documentation | Runtime; separate JSON/array execution passes (development) |
 | Networking | System.Networking assembly and documentation | Runtime and matching native service capability; separate cancellation/socket consumer passes (development) |
-| Web | System.Web assembly and documentation | Runtime, Networking and Data; separate compilation exposes the internal shared-deadline boundary, execution remains open |
+| Web | System.Web assembly and documentation | Runtime, Networking and Data; selected separate HTTP consumers and cancellation execute; intermittent clean-build encoding remains open |
 | Platform runtime, per OS/architecture | Native runtime executable and required native assets | Matching metadata/runtime-service contract; macOS arm64 is the current POC qualification target |
 | Developer tools | Raven compiler integration, language server, disassembler and build support | Matching metadata contract plus current .NET host requirements; can initially be one bundle |
 | Bootstrap/development inputs | Primitive core and retained service seed, ownership catalog and provenance | Explicitly development-only until their bootstrap role is eliminated |

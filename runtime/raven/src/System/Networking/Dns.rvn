@@ -19,6 +19,17 @@ public class Dns {
         return GetHostAddressesUntil(hostName, 0, cancellationToken)
     }
 
+    /// <summary>Resolves within a shared deadline without renewing its budget.</summary>
+    /// <remarks>Pre-requested cancellation takes precedence over an expired deadline; expiry otherwise returns TimedOut.</remarks>
+    static func GetHostAddressesUntil(hostName: string, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<Sequence<IPAddress>, DnsError>> {
+        if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
+            let source = Promise<Result<Sequence<IPAddress>, DnsError>>()
+            _ = source.Complete(Error(DnsError.TimedOut))
+            return source.Task
+        }
+        return GetHostAddressesUntil(hostName, deadline.Stamp, cancellationToken)
+    }
+
     internal static func GetHostAddressesUntil(hostName: string, deadline: long) -> Task<Result<Sequence<IPAddress>, DnsError>> {
         return GetHostAddressesUntil(hostName, deadline, CancellationToken.None)
     }

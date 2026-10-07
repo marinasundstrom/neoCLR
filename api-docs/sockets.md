@@ -175,3 +175,22 @@ attempts. DNS cancellation cannot interrupt the host resolver; its bounded permi
 remains occupied until host work returns. Source disposal removes registrations
 without cancelling work. These tokens are invocation-local; the development HTTP
 client now forwards them through the same provider paths. See [Task cancellation contracts](xref:System.Concurrency.CancellationToken).
+
+## Shared deadlines (development, native assemblies)
+
+`NetworkDeadline.AfterMilliseconds(milliseconds)` creates a process-local monotonic
+budget of 1–60000 ms; an invalid budget causes a terminal fault. Copies share the same
+expiry. `Expired` and the default value are expired; `IsExpired` never renews a budget.
+The value is not a date or a portable/serializable timestamp.
+
+Pass this value and a cancellation token to `Dns.GetHostAddressesUntil`, either
+`Socket.ConnectUntil` address-sequence overload, `SendUntil` or `ReceiveUntil`.
+Pre-requested cancellation wins over expiry. Otherwise an expired deadline returns
+`TimedOut` before admission. Existing shorter phase limits remain; using a larger budget
+does not extend them. Partial transfers require successive calls with the same deadline.
+HTTP now uses this boundary across separate Networking/Web assemblies and retains its
+15-second exchange budget. Raw clock stamps and service adapters stay internal.
+
+The aggregate CLI reference includes declarations for documentation only. Execution of
+this new contract is supported through native metadata; legacy CLI-to-neoIL translation
+has no typed-deadline mapping. Existing duration/default overloads remain available.

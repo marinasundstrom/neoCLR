@@ -6568,3 +6568,18 @@ aligned. The native gate executes Raven source implementations through native me
 not those placeholder bodies. Array elements remain managed vectors; boxed scalars,
 reference identity and null retain existing storage semantics. Terminal array Faults
 are explicit development limits. See [the split Data gate](experiments/extended-cli-metadata/separate-data-2026-10-07.md).
+
+## Shared network deadlines across native libraries (2026-10-07)
+
+Networking owns the opaque NetworkDeadline value and public typed Until overloads.
+Web consumes these through ordinary native references, without reading internal clock
+stamps or RuntimeServices. The compiler remains at Raven 65f554a49; consumers explicitly
+select System.Runtime for Object and, when using async, its Task/builder symbols.
+The importer and emitter boundaries are unchanged.
+
+SocketBindings includes declaration-only CLI equivalents for the API reference and
+visibility checks. There is no new legacy CLI-to-neoIL translation mapping for this
+value or its overloads. Migrated HTTP sources require the native compilation path;
+these documentation declarations must not be treated as executable bridge support.
+Raw long overloads stay internal to applications. See the
+[separate Web evidence](experiments/extended-cli-metadata/separate-web-2026-10-07.md).

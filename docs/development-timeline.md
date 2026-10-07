@@ -11363,3 +11363,30 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
   correction, but the new async consumer currently rejects its Task<()> entry signature.
 - [API requirements](../api-docs/README.md#planned-bundles-and-declaration-source-links),
   [project direction](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md#real-project-graph-author-direction-2026-10-07).
+
+## 2026-10-07: Bootstrap and release scope reaffirmed
+
+- **Author:** Reaffirmed bootstrapping, full NeoCLR support and an acceptable developer
+  experience for the next release, explicitly including the website.
+- **Assistant response:** Kept executable library and project blockers first, with
+  documentation bundles/source links tied to release usability rather than a separate
+  reprioritization. No declaration that the release is ready.
+- **Action/outcome:** Typed shared network deadlines remove Web's private dependency on
+  Networking internals. Five consumers compile against emitted libraries only and execute;
+  header-phase loopback cancellation closes cancelled sockets while independent work
+  completes. API reference and website development content are updated in this slice.
+- **Open:** Real native project references (currently explicitly rejected by workspace
+  tests), Platform integration projects, build/LSP ownership catalogs, final artifacts
+  and release qualification. A new async fixture exposed a Task<()> return-conversion
+  gap; its explicit Task<int> form passes. This gap remains recorded, not fixed here.
+
+## 2026-10-07: Bootstrap branch merge gate
+
+- **Author:** Directed that codex/native-system-bootstrap be merged into neoCLR main
+  when bootstrap is ready, with continued development from there.
+- **Assistant response/action:** Recorded this as authorization conditional on bootstrap
+  qualification. Both HTTP cancellation cases now pass, but a fresh Web build exposed
+  intermittent System.Void metadata encoding failure; an identical retry succeeds.
+  Preserve both outcomes and investigate before claiming a reliable build.
+- **Open:** No merge performed. Reliable build, project/editor and artifact qualification
+  remain necessary; successful selected consumers alone do not close that gate.

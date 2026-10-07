@@ -11,7 +11,13 @@ static class SocketBindings
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public const string Declarations = """
         namespace Networking {
+            public struct NetworkDeadline {
+                public static NetworkDeadline AfterMilliseconds(int milliseconds) => default;
+                public static NetworkDeadline Expired => default;
+                public bool IsExpired => default;
+            }
             public sealed class Dns {
+                public static Tasks.Task<Result<Collections.Sequence<IPAddress>, DnsError>> GetHostAddressesUntil(string hostName, NetworkDeadline deadline, Concurrency.CancellationToken cancellationToken) => default;
                 public static Tasks.Task<Result<Collections.Sequence<IPAddress>, DnsError>> GetHostAddressesUntil(string hostName, long deadline) => default;
                 public static Tasks.Task<Result<Collections.Sequence<IPAddress>, DnsError>> GetHostAddressesUntil(string hostName, long deadline, Concurrency.CancellationToken cancellationToken) => default;
                 public static Tasks.Task<Result<Collections.Sequence<IPAddress>, DnsError>> GetHostAddresses(string hostName) => default;
@@ -28,6 +34,10 @@ static class SocketBindings
         }
         namespace Networking.Sockets {
             public sealed class Socket {
+                public static Tasks.Task<Result<Socket, SocketError>> ConnectUntil(Collections.Sequence<Networking.IPAddress> addresses, int port, Networking.NetworkDeadline deadline, Concurrency.CancellationToken cancellationToken) => default;
+                public static Tasks.Task<Result<Socket, SocketError>> ConnectUntil(Collections.Sequence<string> addresses, int port, Networking.NetworkDeadline deadline, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<int, SocketError>> SendUntil(byte[] buffer, int offset, int count, Networking.NetworkDeadline deadline, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<int, SocketError>> ReceiveUntil(byte[] buffer, int offset, int count, Networking.NetworkDeadline deadline, Concurrency.CancellationToken cancellationToken) => default;
                 public static Tasks.Task<Result<Socket, SocketError>> ConnectUntil(Collections.Sequence<string> addresses, int port, long deadline) => default;
                 public static Tasks.Task<Result<Socket, SocketError>> ConnectUntil(Collections.Sequence<string> addresses, int port, long deadline, Concurrency.CancellationToken cancellationToken) => default;
                 public Tasks.Task<Result<int, SocketError>> ReceiveUntil(byte[] buffer, int offset, int count, long deadline) => default;
@@ -80,7 +90,7 @@ static class SocketBindings
     public static void Project(ModuleDefinition module, bool libraryBootstrap = false) {
         foreach (var type in module.Types.Where(t => IsName(t.FullName))) {
             if (IsProvider(type)) type.Attributes = (type.Attributes & ~TypeAttributes.VisibilityMask) | TypeAttributes.NotPublic;
-            foreach (var method in type.Methods.Where(m => IsProvider(type) || m.IsConstructor || m.Name == "DecodeError" || m.Name.EndsWith("Until", StringComparison.Ordinal)))
+            foreach (var method in type.Methods.Where(m => IsProvider(type) || m.IsConstructor || m.Name == "DecodeError" || m.Name.EndsWith("Until", StringComparison.Ordinal) && !m.Parameters.Any(p => p.ParameterType.FullName == "System.Networking.NetworkDeadline")))
                 method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask)
                     | (libraryBootstrap && !IsProvider(type) && method.Name.EndsWith("Until", StringComparison.Ordinal)
                         ? MethodAttributes.Public : MethodAttributes.Assembly);

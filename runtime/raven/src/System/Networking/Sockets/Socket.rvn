@@ -45,6 +45,17 @@ public class Socket {
         return ConnectUntil(addresses, port, 0, cancellationToken)
     }
 
+    /// <summary>Performs the operation within a shared deadline without renewing its budget.</summary>
+    /// <remarks>Pre-requested cancellation takes precedence over an expired deadline; expiry otherwise returns TimedOut.</remarks>
+    static func ConnectUntil(addresses: Sequence<IPAddress>, port: int, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<Socket, SocketError>> {
+        if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
+            let source = Promise<Result<Socket, SocketError>>()
+            _ = source.Complete(Error(SocketError.TimedOut))
+            return source.Task
+        }
+        return ConnectUntil(addresses, port, deadline.Stamp, cancellationToken)
+    }
+
     internal static func ConnectUntil(addresses: Sequence<IPAddress>, port: int, deadline: long) -> Task<Result<Socket, SocketError>> {
         return ConnectUntil(addresses, port, deadline, CancellationToken.None)
     }
@@ -109,6 +120,17 @@ public class Socket {
         return ConnectUntil(addresses, port, 0, cancellationToken)
     }
 
+    /// <summary>Performs the operation within a shared deadline without renewing its budget.</summary>
+    /// <remarks>Pre-requested cancellation takes precedence over an expired deadline; expiry otherwise returns TimedOut.</remarks>
+    static func ConnectUntil(addresses: Sequence<string>, port: int, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<Socket, SocketError>> {
+        if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
+            let source = Promise<Result<Socket, SocketError>>()
+            _ = source.Complete(Error(SocketError.TimedOut))
+            return source.Task
+        }
+        return ConnectUntil(addresses, port, deadline.Stamp, cancellationToken)
+    }
+
     internal static func ConnectUntil(addresses: Sequence<string>, port: int, deadline: long) -> Task<Result<Socket, SocketError>> {
         return ConnectUntil(addresses, port, deadline, CancellationToken.None)
     }
@@ -157,6 +179,17 @@ public class Socket {
         return ReceiveUntil(buffer, offset, count, 0, cancellationToken)
     }
 
+    /// <summary>Performs the operation within a shared deadline without renewing its budget.</summary>
+    /// <remarks>Pre-requested cancellation takes precedence over an expired deadline; expiry otherwise returns TimedOut.</remarks>
+    func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+        if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
+            let source = Promise<Result<int, SocketError>>()
+            _ = source.Complete(Error(SocketError.TimedOut))
+            return source.Task
+        }
+        return ReceiveUntil(buffer, offset, count, deadline.Stamp, cancellationToken)
+    }
+
     internal func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: long) -> Task<Result<int, SocketError>> {
         return ReceiveUntil(buffer, offset, count, deadline, CancellationToken.None)
     }
@@ -175,6 +208,17 @@ public class Socket {
     /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
     func Send(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
         return SendUntil(buffer, offset, count, 0, cancellationToken)
+    }
+
+    /// <summary>Performs the operation within a shared deadline without renewing its budget.</summary>
+    /// <remarks>Pre-requested cancellation takes precedence over an expired deadline; expiry otherwise returns TimedOut.</remarks>
+    func SendUntil(buffer: byte[], offset: int, count: int, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+        if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
+            let source = Promise<Result<int, SocketError>>()
+            _ = source.Complete(Error(SocketError.TimedOut))
+            return source.Task
+        }
+        return SendUntil(buffer, offset, count, deadline.Stamp, cancellationToken)
     }
 
     internal func SendUntil(buffer: byte[], offset: int, count: int, deadline: long) -> Task<Result<int, SocketError>> {

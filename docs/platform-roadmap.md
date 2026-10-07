@@ -8,6 +8,11 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+Author reaffirmation (2026-10-07): bootstrapping remains the objective, with full native
+NeoCLR support and an acceptable developer experience for the next release, including
+the website. Documentation improvements support this gate; they do not replace native
+library, build, execution and editor qualification. Current evidence below is partial.
+
 ## Source-built System bootstrap frontier (2026-10-07)
 
 **The native source-owned orders gate passes.** The 197-input aggregate library is
@@ -43,11 +48,15 @@ Separate **System.Data now executes JSON object mapping** using the public Runti
 ArrayReflection boundary. Nested models, setters, managed/jagged arrays, mutation,
 reference identity and invalid-input checks pass against emitted references only.
 [Data gate](experiments/extended-cli-metadata/separate-data-2026-10-07.md).
-The separate Web build now has a reproducible failure-before-publication gate: HTTP
-uses internal Networking deadline creation/expiry and DNS/connect/send/receive methods.
-[Exact boundary and next slice](experiments/extended-cli-metadata/web-boundary-2026-10-07.md).
-Next: expose a supported shared monotonic deadline contract without leaking raw stamps
-or changing the end-to-end timeout, then execute Web and update project/LSP catalogs.
+Separate Web now compiles and executes through a supported NetworkDeadline contract
+owned by Networking. Source-free deadline, headers, base-address, JSON-client and route
+consumers pass, along with the loopback header-cancellation check. HTTP retains one
+15-second exchange budget. [Evidence](experiments/extended-cli-metadata/separate-web-2026-10-07.md).
+A clean rebuild also exposed intermittent `System.Void` native encoding failure; the
+identical command succeeded on retry. Diagnose this next; do not mask it with retries.
+Then: native project-reference/build and LSP catalogs, Platform service ownership and
+collected shipping artifacts. Existing native workspace tests explicitly reject project
+references; accepting a real project graph needs implementation and validation.
 The API site remains one namespace/type reference across assemblies; declaring-assembly
 provenance belongs on pages. Native multi-input RavenDoc migration must preserve that
 shape, as recorded in [API maintenance](../api-docs/README.md#one-class-library-reference-across-assemblies).
@@ -59,6 +68,10 @@ bundle and target-independent, commit-pinned declaration source links, including
 GitHub file/line locations. See [project gate](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md#real-project-graph-author-direction-2026-10-07)
 and [documentation acceptance](../api-docs/README.md#planned-bundles-and-declaration-source-links).
 These are recorded requirements; project/bundle/source-link implementation remains open.
+Author merge direction (2026-10-07): once bootstrap is ready, merge
+`codex/native-system-bootstrap` into neoCLR `main` and continue development there.
+Current intermittent build failures and unqualified project/editor artifacts keep this
+merge gate open; the instruction authorizes merging when qualified, not prematurely.
 
 Author-directed foundation rule (2026-10-07): System.Runtime owns well-defined
 fundamentals; higher-level packages depend on it, never the reverse. Exact Runtime

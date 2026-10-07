@@ -1,0 +1,28 @@
+namespace System.Networking
+
+import System.*
+import System.Runtime.CompilerServices.*
+
+/// <summary>A shared, process-local monotonic budget for network operations.</summary>
+/// <remarks>Copies retain the same deadline. The default value is expired; this is not a wall-clock timestamp.</remarks>
+public struct NetworkDeadline {
+    private val stamp: long
+
+    private init(stamp: long) {
+        self.stamp = stamp
+    }
+
+    /// <summary>Starts a budget of 1 through 60000 milliseconds.</summary>
+    /// <param name="milliseconds">The positive bounded budget; invalid values cause a terminal runtime fault.</param>
+    static func AfterMilliseconds(milliseconds: int) -> NetworkDeadline {
+        return NetworkDeadline(RuntimeServices.SocketDeadlineAfter(milliseconds))
+    }
+
+    /// <summary>An already expired deadline, also represented by the default value.</summary>
+    static val Expired: NetworkDeadline => NetworkDeadline(0)
+
+    /// <summary>Whether the budget has expired. Reading does not renew it.</summary>
+    val IsExpired: bool => stamp == 0 || RuntimeServices.SocketDeadlineExpired(stamp)
+
+    internal val Stamp: long => stamp
+}
