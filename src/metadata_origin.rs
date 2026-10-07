@@ -120,7 +120,14 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             .ok_or_else(|| Fault::new("nominal array backing definition is missing"))?;
         if !shape.is_reference_type
             || shape.is_abstract
-            || shape.base.is_some()
+            || shape.base.as_ref().is_some_and(|base| {
+                base != &crate::metadata::Type::from_name("System.Object")
+                    || module.type_definition(base).is_none_or(|parent| {
+                        module.object_root.is_none()
+                            || parent.definition.as_ref() != module.object_root.as_ref()
+                            || !parent.fields.is_empty()
+                    })
+            })
             || shape.declaring_type.is_some()
             || !matches!(
                 shape.representation,

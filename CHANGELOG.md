@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Align array backing validation across authoring, reading and runtime linking:
+  allow the explicitly selected fieldless source Object base, while rejecting
+  other/unselected bases. Managed-array allocation and alias mutation execute in
+  linked PE assemblies. Full-System emission next reaches String/Object inheritance.
+
 - Support explicitly owned System.Value runtime storage in metadata definitions,
   native signatures and introspection while retaining nominal CLI signatures.
   Source Environment payload type tests/unpacking execute through retained helpers;

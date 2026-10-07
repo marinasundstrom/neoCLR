@@ -10,6 +10,15 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Array backing validation now admits the explicitly selected fieldless source Object
+root. Linked PE execution verifies allocation and mutation through an alias, returning
+42. The 197-input audit advances to **System.String -> System.Object base-category
+validation**. Next align intrinsic String reference storage with that source-root
+relationship. Full System still publishes no artifact.
+[Evidence](experiments/extended-cli-metadata/array-root-2026-10-07.md).
+
+### Earlier erased-value frontier
+
 Source-owned System.Value now has the runtime erased-carrier representation; the
 real environment payload type-test/unpack gate executes successfully. The 197-input
 System audit advances to **native array backing-storage validation**. Next trace

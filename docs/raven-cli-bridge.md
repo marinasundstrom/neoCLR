@@ -6380,3 +6380,13 @@ physical evaluation storage. The seed omits the competing declaration and retain
 only the explicitly required generic helpers. The native environment payload gate
 executes; separate Raven import of a source Value API remains unqualified. No .NET
 compiler semantics or runtime behavior changes. [Evidence and next frontier](experiments/extended-cli-metadata/source-value-2026-10-07.md).
+
+## Managed array backing over source Object (2026-10-07)
+
+The metadata reader and runtime now accept an array backing class whose base is the
+explicitly selected fieldless Object root. Authoring validation matches that rule;
+foreign or unselected bases remain unsupported. Raven configuration and compiler
+emission are unchanged. This preserves managed T[] and nominal Array<T>, with no
+inline/value-array feature or altered CLI array signature. The runtime PE gate
+verifies alias mutation; full-System emission next stops at intrinsic String's Object
+base. [Validation and scope](experiments/extended-cli-metadata/array-root-2026-10-07.md).

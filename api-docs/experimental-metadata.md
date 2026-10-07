@@ -6124,7 +6124,10 @@ and reference payloads; see the bootstrap query acceptance workflow.
 
 Development API: selects the output-owned nominal class backing native vectors. `type`
 must be a nonabstract, nonstatic, nonnested generic class with one unconstrained parameter
-and exactly one private field of type `T[]`. Repeating the same selection is idempotent;
+and exactly one private field of type `T[]`. Its local base may be absent or the
+output-owned native Object root (development, 2026-10-07). Reading preserves that
+relationship; runtime linking requires the exact host-selected, fieldless root.
+Other bases remain unsupported. Repeating the same selection is idempotent;
 a different selection throws InvalidOperationException. Null throws ArgumentNullException;
 foreign/incompatible descriptors throw ArgumentException. Native writing revalidates the
 selection after subsequent definition edits.

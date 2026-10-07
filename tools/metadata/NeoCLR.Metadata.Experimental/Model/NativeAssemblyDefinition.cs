@@ -130,7 +130,9 @@ public sealed partial class NativeAssemblyDefinition
                 var backingFields = Array(backing, "fields", 256);
                 Require(backing.TryGetProperty("is_reference_type", out var referenceBacking) && referenceBacking.GetBoolean() &&
                     (!backing.TryGetProperty("is_abstract", out var abstractBacking) || !abstractBacking.GetBoolean()) &&
-                    !backing.TryGetProperty("base", out _) && !backing.TryGetProperty("declaring_type", out _) &&
+                    (!backing.TryGetProperty("base", out var backingBase) ||
+                        ReadBaseName(backingBase) == "System.Object" && typeElements.Any(t => Text(t, "name") == "System.Object")) &&
+                    !backing.TryGetProperty("declaring_type", out _) &&
                     Array(backing, "generic_parameters", 32).Length == 1 &&
                     (!backing.TryGetProperty("generic_constraints", out var bounds) || bounds.GetArrayLength() == 0) &&
                     backingFields.Length == 1 && Text(backingFields[0], "visibility") == "private" &&
@@ -327,7 +329,7 @@ public sealed partial class NativeAssemblyDefinition
                 type.BaseIndex = types.FindIndex(candidate => candidate.NativeName == type.BaseName);
                 Require(type.BaseIndex >= 0, "base class must be a local declaration");
                 var parent = types[type.BaseIndex];
-                Require((IsOrdinaryClass(type) || parent.IsObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType && type.DeclaringType < 0 && type.NativePrimitive is null && !type.NativeGrapheme) && IsOrdinaryClass(parent) && !parent.IsSealedClass, "unsupported base class category");
+                Require((IsOrdinaryClass(type) || parent.IsObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType && type.DeclaringType < 0 && type.NativePrimitive is null && !type.NativeGrapheme) && IsOrdinaryClass(parent) && !parent.IsSealedClass, $"unsupported base class category: {type.Namespace}.{type.Name} -> {parent.Namespace}.{parent.Name}");
                 var seen = new HashSet<int>();
                 for (var current = i; current >= 0; current = types[current].BaseName is { } name ? types.FindIndex(candidate => candidate.NativeName == name) : -1)
                     Require(seen.Add(current), "cyclic class inheritance");
