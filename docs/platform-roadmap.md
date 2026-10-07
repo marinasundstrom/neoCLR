@@ -10,6 +10,16 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+All 197 aggregate inputs emit, and the finalized retained seed now names the source
+owner explicitly. The combined load set verifies 2,433 IL functions and runs an
+API-authored control (42). The next gate is **ordinary Raven native consumption**:
+unchanged `application-order-collections` fails on native System.Value's classification
+as a nonexistent Raven SpecialType. Fix that importer fact before expanding execution
+or splitting core/Data/Networking/Web. Full class-library API coverage is not claimed.
+[Catalog evidence](experiments/extended-cli-metadata/retained-catalog-2026-10-07.md).
+
+### Earlier retained dependency frontier
+
 The selected source/imported System.Void now uses native unit storage, including
 callback results and generic arguments. API-authored execution and separately compiled
 Raven NativeMemory consumers pass. All 197 aggregate inputs emit; full admission now

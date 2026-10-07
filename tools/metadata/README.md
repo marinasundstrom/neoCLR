@@ -246,3 +246,20 @@ The graph-based `WriteBinary` overload selects existing schema 3 when a Double
 literal's raw bits require UInt64. The native-bytes overload remains schema 2.
 Single/Double signatures, literal overloads on `IILGenerator`, conversions and their
 validation are documented in the [public API reference](../../api-docs/experimental-metadata.md#floating-point-signatures-and-il-generation-development-2026-10-04).
+
+### Finalizing a retained bootstrap catalog (development)
+
+`NeoCLR.Metadata.Translate <source.json> <output.neox> --reference <native-artifact>`
+adds an explicit module/revision dependency read from a PE/#Neo or NEOX artifact through
+metadata reader APIs. Repeat `--reference` for distinct dependencies. Each must have an
+explicit revision; missing, malformed, duplicate and self references reject before
+output creation. Existing references are preserved. This does not resolve signatures,
+load dependencies implicitly, or prove runtime validity. Normal two-argument translation
+is unchanged.
+
+`audit-native-bootstrap.py --case full-owned-handle` emits `System.neox` for compilation
+and, after successful source compilation, `System.runtime.neox` for execution. The latter
+explicitly depends on the emitted owner; hashes and finalization commands are recorded.
+Use `verify_retained_catalog.py` to verify the load set and execute a control, including
+wrong-revision and failed-publication cases. See the
+[bootstrap catalog evidence](../../docs/experiments/extended-cli-metadata/retained-catalog-2026-10-07.md).

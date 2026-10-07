@@ -155,6 +155,21 @@ def main():
         outcome = 'emitted' if code == 0 and artifact.exists() else 'timeout' if code is None else 'compiler-crash' if code < 0 or 'Unhandled exception.' in stderr else 'rejected'
         entry = dict(name=name, outcome=outcome, sourceCount=len(sources), sources=sources, command=command, exitCode=code, outputPublished=artifact.exists(), stdout=stdout, stderr=stderr,
             errorCounts=dict(Counter(c for c, _ in diagnostics)), uniqueErrors=list(dict.fromkeys(m for _, m in diagnostics)))
+        if name == 'full-owned-handle' and outcome == 'emitted':
+            # The compile-time seed resolves the source-owned root before its artifact
+            # exists. Finalize a separate runtime seed from the emitted native identity;
+            # do not guess module hashes or silently disable dependency validation.
+            runtime_seed = directory / 'System.runtime.neox'
+            finalized = subprocess.run(['dotnet', 'run', '--project', 'tools/metadata/NeoCLR.Metadata.Translate', '--',
+                                        str(directory / 'System.retained.json'), str(runtime_seed), '--reference', str(artifact)],
+                                       cwd=ROOT, capture_output=True, text=True, timeout=60)
+            entry['runtimeSeedFinalization'] = dict(command=finalized.args, exitCode=finalized.returncode,
+                                                   stdout=finalized.stdout, stderr=finalized.stderr)
+            if finalized.returncode:
+                (output / 'audit.json').write_text(json.dumps(report | {'cases': report['cases'] + [entry]}, indent=2) + '\n')
+                raise RuntimeError(finalized.stdout + finalized.stderr)
+            entry['runtimeSeed'] = str(runtime_seed)
+            report['hashes'][str(runtime_seed)] = hashlib.sha256(runtime_seed.read_bytes()).hexdigest()
         if artifact.exists():
             entry['artifactSha256'] = hashlib.sha256(artifact.read_bytes()).hexdigest()
         report['cases'].append(entry)

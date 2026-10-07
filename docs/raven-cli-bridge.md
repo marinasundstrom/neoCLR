@@ -6446,3 +6446,19 @@ backend's existing unit carrier and no-result lowering are unchanged. Empty look
 structs do not acquire unit semantics. The metadata library owns canonical alias/scoped
 reference encoding and introspection, while Raven owns target selection/lowering.
 [Executable evidence and remaining bootstrap work](experiments/extended-cli-metadata/canonical-unit-2026-10-07.md).
+
+## Explicit retained-seed dependency catalog (2026-10-07)
+
+The diagnostic all-source audit now finalizes `System.runtime.neox` after emitting the
+source owner. Its module/revision reference is read from the native artifact, not inferred
+from a CLI projection or a hardcoded identity hash. `System.neox` remains the explicitly
+recorded compile-time seed, necessary before the source owner exists. These are distinct
+bootstrap stages; runtime loading uses the finalized catalog and validates dependencies.
+There is no implicit reference fallback or relaxed runtime check.
+
+The combined load set verifies 2,433 IL functions and executes an API-authored control
+returning 42. This is full artifact admission, not full class-library API execution or
+ordinary Raven consumer success. The unchanged orders consumer now fails native import
+when System.Value is parsed as a nonexistent Raven SpecialType. No compiler code or
+.NET behavior changes in this catalog slice. Runtime Contract ownership settings remain
+unchanged. [Evidence and next gate](experiments/extended-cli-metadata/retained-catalog-2026-10-07.md).

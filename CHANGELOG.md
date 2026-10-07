@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Finalize the full-source audit's runtime seed with an explicit revisioned dependency
+  read from the emitted native artifact. The combined load set verifies 2,433 IL
+  functions and executes a control application. Invalid/missing/duplicate inputs
+  publish no translated seed; wrong runtime revisions reject. Ordinary application
+  import next exposes Raven's native System.Value classification gap.
+
 - Encode the explicitly selected source/imported System.Void as canonical native unit
   storage, including callbacks and generic arguments. Keep no-result calling conventions
   distinct without introducing another language type. Metadata round trips and separate
