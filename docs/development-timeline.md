@@ -11693,3 +11693,19 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
 - **Action:** Updated the authoritative roadmap and API maintenance direction. The
   possible rewrite is recorded as exploration, not an approved implementation project.
   No runtime/compiler behavior or release qualification result changes in this update.
+
+
+## 2026-10-07: Native pattern-binding samples
+
+- **Author:** While the next AOT Result slice was underway, asked: “Can you also test
+  samples using the let <pattern> [else] and if let <pattern>”.
+- **Assistant action:** Added an ordinary Some/None pattern app covering both outcomes
+  of let-else and if-let, and used both forms in a local generic Result app. Both run
+  through Raven native metadata, the interpreter and isolated ARM64 executables.
+- **Observed limit:** Plain positional let deconstruction reaches an unsupported
+  BoundPatternAssignmentExpression in the pinned Raven native emitter. Retained a
+  negative source probe and checked its diagnostic/no-output behavior, rather than
+  claiming this form works. No shared Raven compiler change was made in this slice.
+- **Evidence/open work:** [Sources, reports and specialization limits](experiments/aot-values/README.md#generic-result-and-pattern-bindings-2026-10-07).
+  Raven native deconstruction, actual library Result dependencies, multiple closed
+  instantiations and native input/lifetimes remain open.

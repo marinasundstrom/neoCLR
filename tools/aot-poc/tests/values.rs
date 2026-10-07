@@ -1278,3 +1278,136 @@ fn closed_world_preserves_readonly_origin_facts_and_assembly_scope() {
         assert!(!temp.0.join("value.o").exists());
     }
 }
+
+const RESULT_APP: &[u8] = include_bytes!("../../../docs/experiments/aot-values/ResultApp.pe");
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn raven_generic_result_and_pattern_bindings_run_in_both_containers() {
+    for bytes in [
+        RESULT_APP,
+        include_bytes!("../../../docs/experiments/aot-values/PatternApp.pe").as_slice(),
+    ] {
+        native_mode(bytes, 0, 0, 0, "@entry", true);
+        native_mode(
+            &neoclr::metadata_container::write_module(&module(bytes)).unwrap(),
+            0,
+            0,
+            0,
+            "@entry",
+            true,
+        );
+    }
+    let temp = Temp::new();
+    assert!(!compile(RESULT_APP, &temp).status.success());
+    assert!(!temp.0.join("value.o").exists());
+    let result = compile_mode(RESULT_APP, &temp, "@entry", true);
+    assert!(result.status.success());
+    let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    let types = report["specialization"]["types"].as_array().unwrap();
+    assert_eq!(types.len(), 3);
+    assert_eq!(types[0]["arguments"], serde_json::json!(["Int32", "Byte"]));
+    assert_ne!(
+        types[1]["name"], types[2]["name"],
+        "equal native lane widths must retain distinct nominal case identities"
+    );
+}
+
+#[test]
+fn specialization_rejects_unsupported_shapes_and_preserves_verification() {
+    use neoclr::metadata::{ConstraintKind, GenericConstraint, Instruction as Op, Type};
+    for case in 0..10 {
+        let mut m = module(RESULT_APP);
+        let carrier = m
+            .types
+            .iter()
+            .position(|t| t.generic_parameters.len() == 2)
+            .unwrap();
+        let companion = m
+            .types
+            .iter()
+            .find(|t| t.is_reference_type && t.is_abstract)
+            .unwrap()
+            .name
+            .clone();
+        let root = m.functions.iter_mut().find(|f| f.name == m.entry).unwrap();
+        let shape = root
+            .locals
+            .iter()
+            .find(|t| matches!(t, Type::Constructed { .. }))
+            .unwrap()
+            .clone();
+        match case {
+            0..=3 => {
+                let Type::Constructed {
+                    mut arguments,
+                    definition,
+                } = shape
+                else {
+                    unreachable!()
+                };
+                match case {
+                    0 => arguments[0] = Type::Boolean,
+                    1 => arguments[0] = Type::String,
+                    2 => arguments[0] = Type::TypeParameter(0),
+                    _ => {
+                        arguments.pop();
+                    }
+                }
+                root.locals.push(Type::Constructed {
+                    definition,
+                    arguments,
+                });
+            }
+            4 => m.types[carrier]
+                .generic_constraints
+                .push(GenericConstraint {
+                    parameter: 0,
+                    kind: ConstraintKind::ValueType,
+                }),
+            5 => root.generic_parameters.push(Some("T".into())),
+            6 => root.locals.push(Type::Named(companion)),
+            7 => {
+                let target = root
+                    .body
+                    .iter_mut()
+                    .find_map(|op| if let Op::Call(t) = op { Some(t) } else { None })
+                    .unwrap();
+                target.generic_arguments.push(Type::Int32);
+            }
+            8 => {
+                let target = root
+                    .body
+                    .iter_mut()
+                    .find_map(|op| if let Op::Call(t) = op { Some(t) } else { None })
+                    .unwrap();
+                target.definition = Some(neoclr::metadata::MemberId {
+                    module: m.name.clone(),
+                    revision: m.revision.clone(),
+                    index: 999,
+                });
+            }
+            _ => m.types[carrier].origin.as_mut().unwrap().assembly = "Foreign".into(),
+        }
+        let temp = Temp::new();
+        let result = compile_mode(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp,
+            "@entry",
+            true,
+        );
+        let error = String::from_utf8_lossy(&result.stderr);
+        assert!(
+            !result.status.success(),
+            "case {case} unexpectedly accepted"
+        );
+        assert!(!temp.0.join("value.o").exists());
+        assert!(!error.contains("panicked"), "case {case}: {error}");
+        if case == 0 {
+            assert!(error.contains("multiple closed instantiations"), "{error}");
+        }
+        if case == 9 {
+            assert!(error.contains("source assembly"), "{error}");
+        }
+    }
+}

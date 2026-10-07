@@ -54,7 +54,11 @@ now constructs/matches Some and None natively under explicit closed-world select
 with standalone deployment evidence. Generated formatting/boxing, general library
 compilation and conditional output contracts remain unsupported. After this milestone,
 the assistant recommends a Result-driven interactive integer reader: value-only Result
-first, then native UTF-8 input/lifetimes and parsing. The author adds a console-input sample after unions, exercising input and
+first, then native UTF-8 input/lifetimes and parsing. The value-only first step now runs
+as local `ParseResult<int, byte>` with one closed shape per generic definition, reported
+specializations and standalone evidence. `let ... else` and `if let` execute both paths;
+plain positional `let` deconstruction is a recorded Raven native-emitter gap.
+Actual library Result dependencies, multiple instantiations and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

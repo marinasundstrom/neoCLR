@@ -1,6 +1,7 @@
 mod compiler;
 mod inspection;
 mod selection;
+mod specialization;
 
 use std::{
     env, fs,
@@ -68,7 +69,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
     let selection = if closed {
-        Some(selection::select(&input, root)?)
+        if input.types.iter().any(|t| !t.generic_parameters.is_empty()) {
+            let (expanded, specialization) = specialization::expand(&input, root)?;
+            let (selected, mut report) = selection::select(&expanded, root)?;
+            report["specialization"] = specialization;
+            Some((selected, report))
+        } else {
+            Some(selection::select(&input, root)?)
+        }
     } else {
         None
     };

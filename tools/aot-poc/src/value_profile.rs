@@ -37,12 +37,24 @@ impl<'a> Profile<'a> {
             );
         }
         for t in &input.types {
-            if t.is_reference_type
+            let lexical_companion = t.is_reference_type
+                && t.is_abstract
+                && t.is_sealed
+                && t.fields.is_empty()
+                && input.types.iter().any(|nested| {
+                    nested.declaring_type.as_ref().is_some_and(|owner| {
+                        input
+                            .types
+                            .get(owner.index as usize)
+                            .is_some_and(|owner| owner.name == t.name)
+                    })
+                });
+            if (t.is_reference_type && !lexical_companion)
                 || t.representation != Representation::Record
                 || t.enum_info.is_some()
                 || t.base.is_some()
                 || !t.implements.is_empty()
-                || t.is_abstract
+                || (t.is_abstract && !lexical_companion)
                 || !t.generic_parameters.is_empty()
                 || !t.generic_constraints.is_empty()
                 || t.packing.is_some()
@@ -213,13 +225,20 @@ impl<'a> Profile<'a> {
             Type::Byte => Ty::Byte,
             Type::Boolean => Ty::Bool,
             Type::Void => Ty::Unit,
-            Type::Named(name) => Ty::Record(
-                self.input
+            Type::Named(name) => {
+                let i = self
+                    .input
                     .types
                     .iter()
                     .position(|t| &t.name == name)
-                    .ok_or("value profile requires a local named record")?,
-            ),
+                    .ok_or("value profile requires a local named record")?;
+                if self.input.types[i].is_reference_type {
+                    return Err(
+                        "lexical companions cannot be used as values or member owners".into(),
+                    );
+                }
+                Ty::Record(i)
+            }
             _ => {
                 return Err(
                     "unsupported value type; references and generics require later profiles".into(),

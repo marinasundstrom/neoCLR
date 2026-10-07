@@ -61,7 +61,9 @@ projection. Invalid foreign assembly origins are rejected.
 This is an explicit, limited code-selection step brought forward from later trimming,
 not general reflection-aware trimming. Unused generated formatting, boxing and virtual
 members are excluded; executing them is unsupported. There is no dynamic loading,
-reflection, generic specialization, native managed heap or general library linking.
+reflection, native managed heap or general library linking. A subsequent
+[bounded generic Result slice](../aot-values/README.md#generic-result-and-pattern-bindings-2026-10-07)
+now supports one closed shape per local value definition.
 Reference-free union layout is the existing private bounded value ABI, not a stable
 foreign ABI. General union/library support and metadata retention remain unfinished.
 See the [selection contract](../aot-values/README.md#explicit-closed-world-selection).
@@ -78,6 +80,8 @@ Implement it in bounded stages:
 
 1. Compile a value-only Result success/error consumer with fixed inputs, and establish
    generic value specialization/dependency contracts needed by the actual library Result.
+   **Partial completion:** local ParseResult<int, byte> now runs with bounded specialization;
+   actual library dependencies and multiple instantiations are still open.
 2. Define the native UTF-8 line-input and lifetime contract, including empty line versus
    EOF and I/O failure. Link the service into the executable and retain interpreter parity.
 3. Compile parsing and output with valid, invalid, overflow and EOF tests. Use the ordinary
@@ -88,4 +92,4 @@ counting before selecting a mechanism; reference counting has not been chosen. A
 server remains the later motivating sample. Stable metadata/native ABI exploration and
 benchmarks remain separate work, driven by concrete consumers rather than prerequisites
 for this next console milestone. This is the assistant's recommendation after the union
-milestone, not a claim that Result, input or string lifetimes already work in native code.
+milestone, not a claim that the library Result, input or string lifetimes already work in native code.

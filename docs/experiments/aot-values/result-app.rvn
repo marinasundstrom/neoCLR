@@ -1,0 +1,32 @@
+import ParseResult.*
+
+union ParseResult<T, E> {
+    case Ok(T)
+    case Error(E)
+}
+
+func Make(valid: bool) -> ParseResult<int, byte> {
+    if valid {
+        return ParseResult<int, byte>.Ok(42)
+    }
+    return ParseResult<int, byte>.Error((byte)7)
+}
+
+func Read(item: ParseResult<int, byte>) -> int {
+    if let Ok(value) = item {
+        return value
+    }
+    let Error(error) = item else {
+        return 0
+    }
+    return 0 - (int)error
+}
+
+func Main() -> int {
+    let success = Make(true)
+    let failure = Make(false)
+    if Read(success) != 42 || Read(failure) != -7 {
+        return 1
+    }
+    return 0
+}

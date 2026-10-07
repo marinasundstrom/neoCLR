@@ -130,6 +130,9 @@ private per-function native symbols remain local to a single compilation. Stable
 for separate compilation is a future contract, not selected by this implementation.
 An [ordinary Raven Some/None app](experiments/aot-union/README.md) now runs natively
 with explicit closed-world code selection, covering both cases, patterns and copies.
+A subsequent [local generic Result/pattern slice](experiments/aot-values/README.md#generic-result-and-pattern-bindings-2026-10-07)
+adds one closed value instantiation per local definition; let-else and if-let execute
+natively, while plain positional let deconstruction remains a producer gap.
 Generated formatting/boxing, generic library unions and reference-bearing payloads remain
 subsequent work. The author adds console input after unions, exercising input/parse
 outcomes. Neither an input service nor a heap manager is implemented by these value records.

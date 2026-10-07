@@ -1,0 +1,15 @@
+struct Pair {
+    func Deconstruct(out first: int, out second: int) {
+        first = 12
+        second = 7
+    }
+}
+
+func Plain() -> int {
+    let (first, second) = Pair()
+    return first + second
+}
+
+func Main() -> int {
+    return Plain() - 19
+}

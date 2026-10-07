@@ -74,6 +74,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   a standalone Raven Some/None app with construction, both patterns, non-matches and
   copied payloads; record fresh producer/interpreter/native evidence and isolated
   deployment. Recommend a Result-driven interactive integer reader as the next consumer.
+  Add bounded closed-world specialization for one closed instantiation per local value
+  type definition, preserving nominal case identities and semantic origin checks. Compile
+  a Raven ParseResult<int, byte> app with success/error payloads and retain empty static
+  lexical companions as metadata only. Validate let-pattern-else and if-let success/miss
+  paths in interpreter and standalone ARM64 samples. Record the pinned Raven emitter's
+  plain positional let-deconstruction rejection with a reproducible negative probe.
+  Generic methods, constraints, multiple instantiations and reference payloads remain
+  rejected; 46 focused AOT tests pass. No public ABI or runtime APIs change.
   General unions, reference fields and library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime

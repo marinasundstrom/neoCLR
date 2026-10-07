@@ -4,7 +4,8 @@
 and nested-record samples now compile through **Raven → neoCLR metadata/IL → ARM64
 native executable**. They run without a shared managed framework or runtime. The
 [ordinary Some/None union app](../aot-union/README.md) now runs under explicit closed-world
-selection. Result and a console-input sample are the next proposed steps.
+selection. A local generic Result consumer and pattern-binding app now run too;
+console input and the actual library Result dependency contract remain later steps.
 The earlier [producer inventory](inventory.json) is historical: it records the
 pre-implementation rejection and the broader union requirements.
 
@@ -51,8 +52,10 @@ up to 32 local nongeneric value Record types, each with zero to eight fields con
 Int32, Byte, Boolean or other local records, and up to 128 functions/members.
 Each complete inline layout is limited to eight primitive/dummy lanes. Recursive inline
 layouts (including mutually recursive unused types), unresolved field types and layouts
-exceeding that bound are rejected before emission. Reference types, generics, inheritance,
-interfaces and explicit layout remain unsupported. Properties
+exceeding that bound are rejected before emission. Reference values, inheritance, interfaces and explicit layout remain unsupported.
+Explicit closed-world mode additionally supports the bounded type specialization below;
+empty abstract/sealed lexical companions retain metadata identity but cannot be used
+as values or executable member owners. Properties
 use their emitted accessor methods; they do not introduce separate native storage.
 
 Supported members have copied Int32/Byte/Boolean/record parameters and results or inhabited
@@ -112,7 +115,7 @@ call-identity mismatches and uninitialized locals. Three additional rejection ca
 cover mutual inline cycles, unresolved fields and oversized flattened storage. Native
 tests cover the nested Raven fixture in both containers and three-level field addresses,
 whole-payload replacement, deep alias preservation, empty nested records and clearing
-a payload without overwriting adjacent fields. Twenty-six value-profile tests pass; the earlier
+a payload without overwriting adjacent fields. Twenty-eight value-profile tests pass; the earlier
 fifteen scalar/Hello test results remain applicable.
 
 The [.NET struct baseline](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct)
@@ -298,7 +301,7 @@ Selection includes every direct call/constructor in each selected body, even cal
 in unreachable instructions, and recursively retains signature/local/field storage
 and lexical owner types. All selected instructions still pass ordinary AOT admission
 and verification. External calls, virtual dispatch, reference-bearing signatures and
-generics fail; the selected profile retains its existing bounds and recursion rejection.
+unsupported generic shapes fail; the selected profile retains its existing bounds and recursion rejection.
 Input inventories are bounded to 4,096 functions and 1,024 types. No reflection, metadata
 execution, callbacks or dynamic roots are supported; this mode must not be used for an
 application requiring them. Merely ignoring unsupported functions is not its contract.
@@ -319,3 +322,56 @@ smaller explicit direct-call contract. It lets ordinary Raven union value paths 
 first implementing their unused formatting/boxing services. The cost is a closed execution
 surface and omitted reflection metadata; it cannot promise general library compatibility.
 Full metadata retention policy, export roots and dynamic-use annotations remain future work.
+
+
+## Generic Result and pattern bindings (2026-10-07)
+
+[Result app](result-app.rvn) defines ordinary `ParseResult<T, E>` and instantiates
+`ParseResult<int, byte>`. It constructs both cases, returns/copies the carrier, binds
+Ok with `if let` and Error with `let ... else`, and checks 42 and -7. Different generic
+argument types exercise substitution of both parameter positions and Byte conversion.
+[Pattern app](pattern-app.rvn) separately exercises matching and non-matching paths for
+`let Choice.Some(value) = item else { ... }` and `if let Choice.Some(value) = item`.
+The generic app imports `ParseResult.*` for unqualified case patterns. These spellings
+were compiled with the pinned native producer; do not infer all pattern syntax works.
+
+Use `verify_union.py` with the compiler/bundle/runtime arguments in the
+[union reproduction](../aot-union/README.md), adding `--sample result-app` or
+`--sample pattern-app` and a fresh output directory. The checked-in
+[Result evidence](result-validation.json) and [pattern evidence](pattern-validation.json)
+record source/tool hashes, interpreter execution, native selection, object imports,
+OS-only dynamic linkage and execution alone in an empty directory/environment.
+[ResultApp.pe](ResultApp.pe) and [PatternApp.pe](PatternApp.pe) are the tested producer
+fixtures. Rust tests execute each in PE/#Neo and re-encoded NEOX form.
+
+**Plain `let` deconstruction is still a producer gap.** The
+[probe](pattern-deconstruction.rvn) uses `let (first, second) = Pair()` with an ordinary
+value-type `Deconstruct` member. Raven accepts the language form but its pinned native
+emitter rejects `BoundAssignmentStatement (BoundPatternAssignmentExpression)` with
+NEOMETA001, before neoCLR IL or an executable exists. The pattern reproduction checks
+this expected rejection and absence of an output artifact. A union-case `let` binding
+without `else` is not the same language construct; use `let ... else` for refutable
+union matching. Fixing native positional deconstruction belongs in Raven's shared
+compiler line and requires a new pinned native bundle; this slice changes no Raven code.
+
+Under `--closed-world`, the compiler specializes selected type-generic members and
+storage before ordinary selection/verification. It binds calls against the original
+closed nominal signatures, substitutes type parameters, and retains distinct case
+identities even when their native lane widths match. The JSON report records original
+definitions and chosen arguments. The original metadata is unchanged. Only **one closed
+instantiation per local type definition** is allowed in one executable; the existing
+32-type/128-function and layout limits still apply. Generic methods, constraints, open
+arguments, reference payloads, generic lexical owners and multiple instantiations are
+rejected. Empty static lexical companions are retained solely for access/identity facts.
+No public generic ABI, runtime generic dictionaries or new managed services are introduced.
+
+Compared with [.NET Native AOT](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
+(primary-source comparison reused from the investigation), value-type specialization
+moves layout and call decisions to build time; .NET supports multiple closed instantiations
+and documents their code-size cost. This experiment deliberately accepts one shape per
+local definition, allowing existing private symbols/metadata identities to remain unique.
+The benefit is a small verifiable foundation; the cost is rejection of ordinary programs
+using, for example, both `Result<int, byte>` and `Result<int, bool>`. Multi-instantiation
+identity/mangling, actual library dependencies and general trimming remain future work.
+The next consumer is still the interactive integer reader, beginning with those library
+contracts and native UTF-8 input/lifetimes rather than a network server.
