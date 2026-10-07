@@ -6,6 +6,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-07
+
+- Update the pinned RavenDoc publisher and enable site-wide icon search and code
+  copying. Include generated and manual API articles in search, list ordinary
+  nested types separately from union cases, and add authored namespace guidance.
+  Namespace comments now round-trip through Raven documentation sidecars; the
+  neoCLR reference snapshot, Runtime Contract and native/CLI encoding are unchanged.
+  Validate 1,803 pages and local links/anchors, 18 website tests, and mobile/desktop
+  browser behavior in both themes.
+
 ### 2026-10-05
 
 - Point repository entry guides to Preview 12 native installation and distinguish

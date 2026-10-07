@@ -11111,3 +11111,16 @@ against the accepted candidate. The manual Pages deployment passed; public homep
 installation instructions, Task.Run member/parameter signatures and String.FlatMap
 function signatures were checked. [Publication evidence](preview-12-publication.json).
 Full native System bootstrap and broader platform qualification remain future work.
+
+## 2026-10-07 — Shared RavenDoc website improvements
+
+The author requested migrating Raven's full website from DocFX to RavenDoc,
+retaining its structure/design and a visible API Reference for Raven.Core and
+Raven.Macros. They requested separate slices for configurable site search, code
+copying, nested-type listings and namespace documentation, and asked that the
+RavenDoc changes also reach neoCLR's site. They suggested using neoCLR's site as
+a design reference and specified an icon-triggered search field that can retain
+a query. The assistant implemented the shared changes on Raven main and applied
+the publisher/configuration changes to neoCLR main. The author requested local
+site review when complete; publication was not requested. Validation results are
+recorded in the integration notes and changelog.

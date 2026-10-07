@@ -105,3 +105,26 @@ Compact extension labels omit receiver-bound type parameters on receiver pages
 Receiver substitutions also apply inside parameter and return types, such as
 `Map<U>(selector: Func<Char, U>)` on String.
 The extension container and declaration signature keep the full generic contract.
+
+## Site search, copying and namespace documentation
+
+The site enables RavenDoc's `search` and `copyCode` configuration options. The
+navbar search icon opens a field covering guides and API articles, including
+manual API pages. A nonempty query keeps the panel open; Escape closes it without
+clearing the query. Results are served locally from a generated index. Copy
+buttons preserve displayed code and report clipboard failures accessibly.
+
+Public nested types appear under Nested types; union cases remain under Cases.
+Namespace `N:` comments are supported in source and Markdown/XML sidecars.
+`website/api-content` supplies additional namespace guidance without changing the
+reference snapshot. The build finalizes the index after assembling manual routes.
+These are shared RavenDoc/compiler documentation changes: no Runtime Contract,
+native metadata, CLI bridge encoding or runtime execution behavior changes.
+
+Validation for this update: pinned Raven revision
+`2f5fe343bdf8626cab99ccbc00e724b6894bccdd`, 1,803 generated pages with local
+links/anchors/HTML checked, and all 18 Python website tests passing. Browser
+checks passed at 390px and 1280px in light/dark themes on the homepage, API
+landing, System namespace and ArrayList pages, including search retention and
+API results, copy controls and namespace guidance. No native runtime execution
+is claimed for this documentation update. Local preview is not publication.

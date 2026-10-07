@@ -454,6 +454,7 @@ def main():
         raise ValueError('The site must explain development/release availability and link the published release')
     publisher_output = ROOT / 'target/website-rendered'
     config.update(output=str(publisher_output), api=str(ROOT / 'api-docs/reference/NeoCLR.CoreProbe.dll'),
+                  apiContent=str(SOURCE / 'api-content'),
                   types=None,  # Generate every public type, regardless of comment availability.
                   excludedMembers=list(json.loads((ROOT / 'api-docs/exclusions.json').read_text())), pages=[])
     sources = [(source, source.relative_to(SOURCE / 'content').with_suffix('.html'))
@@ -484,6 +485,9 @@ def main():
     write_legacy_routes()
     # All site links must work at the domain root and under a Pages project prefix.
     make_reference_links_relative()
+    config['output'] = str(OUTPUT)
+    manifest.write_text(json.dumps(config))
+    subprocess.run([sys.executable, str(ROOT / 'scripts/ravendoc.py'), '--finalize-site', str(manifest)], check=True)
     pages = {}
     for path in OUTPUT.rglob('*.html'):
         page = path.read_text()
