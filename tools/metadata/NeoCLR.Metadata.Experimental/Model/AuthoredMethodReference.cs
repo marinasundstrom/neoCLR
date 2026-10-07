@@ -3,7 +3,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<ImportedTypeReference, PrimitiveType> authoredPrimitiveOwners = [];
-    /// <summary>Declares the scalar representation of an output-owned external numeric value type or String reference type from host semantic facts.</summary>
+    /// <summary>Declares the scalar representation of an output-owned external canonical scalar (including unit Void) or String reference type from host semantic facts.</summary>
     /// <exception cref="ArgumentException">The reference is foreign or does not name the matching nongeneric System primitive category.</exception>
     /// <exception cref="InvalidDataException">Another dependency already owns the scalar representation.</exception>
     public void SetNativePrimitive(ImportedTypeReference type, PrimitiveType primitive)

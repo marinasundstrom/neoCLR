@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Encode the explicitly selected source/imported System.Void as canonical native unit
+  storage, including callbacks and generic arguments. Keep no-result calling conventions
+  distinct without introducing another language type. Metadata round trips and separate
+  Raven NativeMemory consumers execute; ordinary .NET unit tests remain green.
+
 - Preserve separately scoped unit-value and no-result declarations of runtime
   services when the registry explicitly admits both. Native WriteLine consumers
   execute with their own stack contracts; ordinary and same-module conflicts still

@@ -7699,3 +7699,26 @@ All other library limits remain: 32 MiB JSON, 2,097,152 nodes, depth 64, and 16 
 limit. Exceeding any applicable bound throws `InvalidDataException`; no partial
 compiler artifact is published. No execution or complete bootstrap is implied by a
 successful write. [Contracts and executable evidence](../docs/experiments/extended-cli-metadata/expanded-library-2026-10-07.md).
+
+### Canonical native unit (development, 2026-10-07)
+
+`TypeDefinition.SetNativePrimitive`, `TypeBuilder.SetNativePrimitive` and
+`AssemblyBuilder.SetNativePrimitive(ImportedTypeReference, PrimitiveType)` accept
+`PrimitiveType.Void` for the explicitly selected canonical `System.Void` declaration.
+It represents NeoCLR's inhabited unit, usable in parameters, generic arguments and
+function results. There is no additional native Unit type.
+
+Local declarations must be empty, nongeneric, top-level value types without
+constructors; wrong identities and storage reject through the existing validation.
+The external-reference API records host-supplied ownership without loading a
+consumer's dependencies. Native encoding records the scoped canonical unit alias;
+loading still requires its actual dependency. Manual definitions and builders share
+validation. Existing CLI executable primitive-provider rejection remains unchanged.
+
+A signature using the designated declaration denotes a unit **value**; a bare
+`PrimitiveType.Void` return retains the API's CLI-compatible **no-result** convention.
+`FunctionSignature.NoResult` preserves that stack distinction across encoding and
+introspection. This is a low-level calling convention, not two Raven language types.
+Nominal CLI signature transport is retained where CLI void is illegal. The compiler
+owns target-specific lowering and supplies RuntimeUnitContract ownership; an arbitrary
+empty struct is never inferred to be unit.

@@ -128,7 +128,7 @@ public sealed partial record SignatureType
     {
         ArgumentNullException.ThrowIfNull(type);
         if (type.IsStatic || type.GenericParameterNames.Count > 0) throw new ArgumentException("signature requires a nonstatic class or interface", nameof(type));
-        return type.NativePrimitive is { } primitive && primitive != PrimitiveType.Value ? (SignatureType)primitive : new(null, type);
+        return type.NativePrimitive is { } primitive && primitive is not (PrimitiveType.Value or PrimitiveType.Void) ? (SignatureType)primitive : new(null, type);
     }
     /// <summary>Returns a diagnostic name; it is not a serialized type identity.</summary>
     public override string ToString() => PointerElement is { } pointer ? pointer + "*" : IsSelf ? "Self" : ReferencedGenericInstance is { } loaded ? loaded.ToString() : ReferencedType is { } reference ? reference.Namespace + "." + reference.Name : FunctionSignature is { } function ? function.ToString() : ByReferenceElement is { } target ? target + "&" : ImportedType is { } imported ? imported.ToString() : GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;

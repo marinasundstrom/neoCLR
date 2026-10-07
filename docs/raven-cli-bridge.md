@@ -6432,3 +6432,17 @@ and same-module conflicts still reject. No Runtime Contract option, compiler cod
 CLI bridge mapping or metadata format changes. Full-System admission advances to
 DnsLookup's source-owned unit callback result.
 [Validation and next gate](experiments/extended-cli-metadata/scoped-service-results-2026-10-07.md).
+
+## Canonical native Void values (2026-10-07)
+
+NeoCLR void is the inhabited unit type. RuntimeUnitContract selects its System.Void
+owner; the native emitter marks that source declaration and output-owned imported
+references with native unit storage. It uses symbol facts and artifact identities,
+without reopening importer objects. Callbacks, parameters and generic arguments encode
+Void values. No-result methods remain a separate stack convention, not another type.
+
+CLI transport retains a nominal value signature wherever CLI void is illegal; the .NET
+backend's existing unit carrier and no-result lowering are unchanged. Empty lookalike
+structs do not acquire unit semantics. The metadata library owns canonical alias/scoped
+reference encoding and introspection, while Raven owns target selection/lowering.
+[Executable evidence and remaining bootstrap work](experiments/extended-cli-metadata/canonical-unit-2026-10-07.md).

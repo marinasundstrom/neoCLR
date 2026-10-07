@@ -10,6 +10,15 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+The selected source/imported System.Void now uses native unit storage, including
+callback results and generic arguments. API-authored execution and separately compiled
+Raven NativeMemory consumers pass. All 197 aggregate inputs emit; full admission now
+reaches a **retained seed dependency edge to the source owner**, after the DNS signature
+contract. Resolve the seed/source dependency catalog before splitting and consuming core.
+[Canonical unit evidence](experiments/extended-cli-metadata/canonical-unit-2026-10-07.md).
+
+### Earlier source-unit callback frontier
+
 Separately scoped WriteLine value/no-result declarations now execute under their
 own admitted registry contracts. Full-System admission advances to **source-owned
 unit in native callback signatures** (DnsLookup), with no new compiler or format

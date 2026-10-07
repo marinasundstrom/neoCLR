@@ -11252,3 +11252,21 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
   audit; the full-source artifact still emits. Runtime admission now identifies a
   retained/source WriteLine result-contract mismatch. No assembly split is implemented.
 - [Inventory and ordered proposed gates](experiments/extended-cli-metadata/library-boundaries-2026-10-07.md).
+
+## 2026-10-07 — Void is the NeoCLR unit type
+
+- **Author clarification:** Raven's separate .NET unit representation exists because
+  CLR void cannot occupy value/generic-argument positions. NeoCLR does not have to
+  inherit that restriction: “we only needed the void type, because we have given it
+  the meaning of the unit type.”
+- **Assistant response:** Treat NeoCLR void as the canonical inhabited unit, including
+  generic arguments and callbacks. Preserve .NET carrier lowering inside the .NET
+  target. A callable's no-result stack convention remains an encoding distinction,
+  not a second language type.
+- **Performed work:** Explicitly designated the selected System.Void declaration as
+  native unit storage, including output-owned external references. Metadata and native
+  callback/generic checks pass; a separately compiled Raven NativeMemory consumer
+  executes with unit parameters and generic interfaces. .NET unit regressions pass.
+- **Open:** Full-System admission reaches retained-seed dependency ownership. This is
+  not full bootstrap or a completed optional-library split.
+- [Evidence](experiments/extended-cli-metadata/canonical-unit-2026-10-07.md).

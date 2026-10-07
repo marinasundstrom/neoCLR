@@ -515,6 +515,7 @@ var tests = new (string Name, Action Body)[]
     ("Native library inventory and explicit static callable projections", NativeLibrarySymbolChecks.Run),
     ("Library binary profile and UInt64 bounds", LibraryBinaryChecks.Run),
     ("Expanded library byte budget", ExpandedLibraryChecks.Run),
+    ("Explicit native unit value representation", UnitRepresentationChecks.Run),
     ("Existing native module transport", NativeModuleChecks.Run),
     ("Binary CBOR profile and container roundtrips", BinaryEncodingChecks.Run),
     ("Native console literal emission and bounds", ConsoleWriterChecks.Run),

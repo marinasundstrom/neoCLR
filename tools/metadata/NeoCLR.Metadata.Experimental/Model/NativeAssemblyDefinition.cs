@@ -266,7 +266,7 @@ public sealed partial class NativeAssemblyDefinition
                 else if (isPrimitive)
                 {
                     Require(nativeName.StartsWith("System.", StringComparison.Ordinal), "primitive requires canonical identity");
-                    primitive = nativeName == "System.Char" ? null : ReadPrimitive(nativeName[7..], false);
+                    primitive = nativeName == "System.Char" ? null : ReadPrimitive(nativeName[7..], nativeName == "System.Void");
                     Require((nativeName == "System.Char" || primitive is { } scalar && TypeDefinition.IsSupportedNativePrimitive(scalar)) && isValueType == (primitive != PrimitiveType.String) && !isStatic &&
                         declaringType < 0 && typeNames.Length == 0 && fieldRows.Count == 0 && enumMembers is null,
                         "invalid runtime primitive declaration");
@@ -395,6 +395,8 @@ public sealed partial class NativeAssemblyDefinition
             {
                 if (element.ValueKind == JsonValueKind.String)
                 {
+                    if (!allowVoid && element.GetString() == "Void" && signatureOwners.SingleOrDefault(t => t.NativePrimitive == PrimitiveType.Void) is { } localUnit)
+                        return localUnit;
                     if (!allowVoid && element.GetString() == "Void" && nativeTypeAliases.TryGetValue(("System.Void", 0), out var unit) && unit.ValueType && unit.Namespace == "System" && unit.Name == "Void")
                         return ImportExternalType(signatureGraph, "System.Void", 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
                     if (element.GetString() == "Value")
@@ -824,7 +826,7 @@ public sealed partial class NativeAssemblyDefinition
                 owners[i].AddBaseTypeConstraint(constraint.Parameter, owners[System.Array.FindIndex(types, t => t.NativeName == constraint.Bound)]);
         for (int i = 0; i < types.Length; i++)
             foreach (var (parameter, flags) in types[i].SpecialConstraints) owners[i].SetSpecialConstraints(parameter, flags);
-        SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? type.GetString() == "Value" ? ProjectNamed("System.Value") : type.GetString() == "Char" ? ProjectNamed("System.Char") : type.GetString() == "Void" && nativeTypeAliases.ContainsKey(("System.Void", 0)) ? ProjectNamed("System.Void") : (SignatureType)ReadPrimitive(type.GetString(), false)
+        SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? type.GetString() == "Value" ? ProjectNamed("System.Value") : type.GetString() == "Char" ? ProjectNamed("System.Char") : type.GetString() == "Void" && (nativeTypeAliases.ContainsKey(("System.Void", 0)) || types.Any(t => t.NativePrimitive == PrimitiveType.Void)) ? ProjectNamed("System.Void") : (SignatureType)ReadPrimitive(type.GetString(), false)
             : type.TryGetProperty("Function", out var function) ? SignatureType.Function(new MethodSignature(function.GetProperty("no_result").GetBoolean() ? PrimitiveType.Void : ProjectType(function.GetProperty("returns")), Array(function, "parameters", 16).Select(ProjectType)))
             : type.TryGetProperty("TypeParameter", out var parameter) ? SignatureType.TypeParameter(parameter.GetInt32())
             : type.TryGetProperty("Constructed", out var instance) ? ProjectConstruction(Text(instance, "definition"), Array(instance, "arguments", 32).Select(ProjectType).ToArray())
