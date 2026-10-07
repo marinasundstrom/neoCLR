@@ -123,9 +123,19 @@ These are shared RavenDoc/compiler documentation changes: no Runtime Contract,
 native metadata, CLI bridge encoding or runtime execution behavior changes.
 
 Validation for this update: pinned Raven revision
-`29db57d676bb1389729f8451f833666b443d8888`, 1,803 generated pages with local
+`e5d187a1a76656b9ac6dc4ae3622bf5a2fd5fd25`, 1,803 generated pages with local
 links/anchors/HTML checked, and all 18 Python website tests passing. Browser
 checks passed at 390px and 1280px in light/dark themes on the homepage, API
 landing, System namespace and ArrayList pages, including search retention and
 API results, copy controls and namespace guidance. No native runtime execution
 is claimed for this documentation update. Local preview is not publication.
+
+The reviewed publisher also indexes explicitly documented compile-time macros,
+uses a separate collapsible section sidebar for ordinary articles, supports API source
+`title` display names (`apiTitle` for a single input), and keeps mobile theme/search
+controls alongside the brand. neoCLR retains its `apiNavigationRoot` browser for
+authored reference pages. Assembly identity and native runtime behavior are unchanged.
+
+A compatibility check preserves automatic library links on sites with no authored
+menu. Article sections open for the current page and support native keyboard
+toggling; generated API pages retain their symbol browser.

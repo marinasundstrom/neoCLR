@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Update RavenDoc with macro-partition navigation fixes, a dedicated article
+  sidebar with collapsible sections, configurable API source display names and
+  a compact mobile header. Retain library links when no authored menu is supplied.
+  Preserve assembly filenames in symbol metadata and neoCLR API navigation.
+
 - Refresh RavenDoc with integrated multi-library website support and floating
   copy controls that do not push signature or sample text downward. Keep neoCLR
   namespace navigation flat and preserve the existing single-API configuration.

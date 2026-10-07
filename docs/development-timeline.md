@@ -11129,3 +11129,9 @@ During site review, the author clarified that library APIs must share Raven's ma
 website shell and namespaces should be listed flat, as on neoCLR. They accepted
 copy buttons on signatures but required them to float without adding top spacing.
 The updated shared publisher carries that layout correction to neoCLR as well.
+
+The author next requested a clearer reading sidebar, responsive landing-page
+spacing and source display names (“Core extensions” and “Macros”) distinct from
+assembly filenames. Raven's authored content and spacing were updated, while
+the shared publisher's navigation/display-name support and compact mobile header
+were propagated here. A missing macro-only API sidebar was fixed at the same time.
