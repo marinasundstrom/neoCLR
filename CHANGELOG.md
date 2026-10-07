@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Extend installed VS Code acceptance to the split native class-library bundle,
+  including optional-library navigation and imported configuration recovery. Record
+  client-side hover timings and repeated/unsaved-edit Main.rvn checks; persistent
+  hover latency reported by the author remains under investigation. No compiler
+  performance fix or complete SDK qualification is claimed.
+
 - Emit a relocatable NeoCLR.ClassLibrary.props in staged bundles, with native references
   and matching Core/seed/ownership selections shared by compiler and editor project
   loading (Raven e93fcfdc1). Test symbol owners, missing/conflicting dependencies and HTTP execution from

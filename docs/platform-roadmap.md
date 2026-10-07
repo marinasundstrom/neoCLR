@@ -73,8 +73,12 @@ pass against those artifacts. [Bundle evidence](experiments/extended-cli-metadat
 The staged bundle also supplies relocatable project configuration. Workspace symbol
 loading and ordinary HTTP project execution pass after relocation, with native owners
 and missing/conflicting-input rejection checked. [Configuration evidence](experiments/extended-cli-metadata/native-bundle-configuration-2026-10-07.md).
-Next: Platform service ownership, API documentation and installed-editor qualification
-for this split, then the complete shipping toolchain. The bundle alone is not an SDK release.
+Installed-editor acceptance now covers this split, including native optional-library
+navigation, configuration recovery and orders/Tasks execution. Hover latency is
+measured separately; the reported persistent delay remains open.
+[Editor evidence](experiments/extended-cli-metadata/native-split-editor-2026-10-07.md).
+Next: Platform service ownership, API documentation and clean toolchain distribution.
+The bundle alone is not an SDK release.
 The API site remains one namespace/type reference across assemblies; declaring-assembly
 provenance belongs on pages. Native multi-input RavenDoc migration must preserve that
 shape, as recorded in [API maintenance](../api-docs/README.md#one-class-library-reference-across-assemblies).

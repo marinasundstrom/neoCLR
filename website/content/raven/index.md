@@ -173,6 +173,10 @@ A local matched compiler/server/extension/runtime bundle now passes extracted
 compilation and execution, plus 19 installed VS Code checks on macOS arm64, including
 API help and native reference refresh. Primitive bootstrap and retained runtime seed
 remain explicit dependencies. The matched download includes bootstrap dependencies with recorded source provenance.
+A subsequent development check also runs orders and Tasks/await from VS Code against
+separate Runtime, Data, Networking and Web assemblies using shared bundle project
+configuration. Documentation packaging for that split is still pending. Reported
+persistent hover delays remain under investigation; this is not a performance claim.
 
 The development `neoclr disassemble` command inspects native metadata and instructions
 without loading dependencies or executing the assembly. Its output is a diagnostic

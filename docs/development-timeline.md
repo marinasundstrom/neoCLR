@@ -11404,3 +11404,18 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
   the [bootstrap unit report](experiments/extended-cli-metadata/unit-bootstrap-2026-10-07.md).
 - **Open:** The handoff does not establish general-fix completion or a release. NeoCLR
   continues native execution qualification and project/editor/artifact bootstrapping.
+
+
+## 2026-10-07: Investigate repeated editor hover delays
+
+- **Author:** Reported VS Code hovers repeatedly remaining on “Loading...” and
+  identified one of the Main.rvn files opened in the previous session.
+- **Assistant:** Extended the real extension-host acceptance to record provider
+  request latency, repeated broad-sample hovers and requests after unsaved edits.
+  Kept this investigation alongside split class-library editor qualification.
+- **Observed:** The initial split run passed 24 checks. Warm Main.rvn requests took
+  3–13 ms, while some startup/reload requests took up to 2.749 seconds; the server
+  hover handler's maximum was 86.2 ms. This suggests waiting outside that handler,
+  but does not identify the cause of the author's persistent delay.
+- **Open:** Reproduce the original persistent workload and isolate any scheduling,
+  reload or client delay before claiming a fix. [Evidence and scope](experiments/extended-cli-metadata/native-split-editor-2026-10-07.md).
