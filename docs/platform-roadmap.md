@@ -10,6 +10,15 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Native System.Value now imports with its declared semantic identity. The unchanged
+orders consumer gets through binding and reaches **System.Collections.ArrayList<T>
+emission validation**. Investigate imported source Object ownership for generic classes
+before relaxing any capability checks. Full-artifact verification/control execution
+from the retained-catalog slice remains valid; broad application execution is still open.
+[Value import evidence](experiments/extended-cli-metadata/value-import-2026-10-07.md).
+
+### Earlier erased-value importer frontier
+
 All 197 aggregate inputs emit, and the finalized retained seed now names the source
 owner explicitly. The combined load set verifies 2,433 IL functions and runs an
 API-authored control (42). The next gate is **ordinary Raven native consumption**:

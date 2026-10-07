@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Integrate Raven's native erased Value import fix: preserve nominal semantic identity
+  instead of parsing a nonexistent CLR special type. The unchanged orders consumer
+  now reaches ArrayList emission validation; reconcile imported source-root ownership
+  next. Record focused symbol/ownership tests and compiler/artifact hashes.
+
 - Finalize the full-source audit's runtime seed with an explicit revisioned dependency
   read from the emitted native artifact. The combined load set verifies 2,433 IL
   functions and executes a control application. Invalid/missing/duplicate inputs

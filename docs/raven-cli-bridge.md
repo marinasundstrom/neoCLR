@@ -6462,3 +6462,18 @@ ordinary Raven consumer success. The unchanged orders consumer now fails native 
 when System.Value is parsed as a nonexistent Raven SpecialType. No compiler code or
 .NET behavior changes in this catalog slice. Runtime Contract ownership settings remain
 unchanged. [Evidence and next gate](experiments/extended-cli-metadata/retained-catalog-2026-10-07.md).
+
+## Native erased Value import (2026-10-07)
+
+Raven 801f131ba preserves native System.Value as a nominal value symbol with no CLR
+SpecialType. Its declaring assembly and parameter/return identity survive import;
+existing Runtime Contract ownership still selects its target meaning. No native format,
+reader, reflection surrogate, .NET default or bridge representation changes.
+
+A C# metadata-to-symbol regression reproduces the former Enum.Parse failure and now
+passes, alongside both erased-value ownership tests. The unchanged orders application
+against the full source-built native artifact reaches ArrayList<T> emission validation.
+The diagnostic now names the rejected type. The imported generic class uses the library's
+source Object root; reconcile consumer root selection next, without weakening checks.
+No consumer artifact was published and broad execution is not claimed.
+[Evidence](experiments/extended-cli-metadata/value-import-2026-10-07.md).
