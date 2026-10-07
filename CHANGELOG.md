@@ -118,6 +118,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   ReadByte now reaches its erased Value payload; native input services remain unimplemented.
   Record an intermittent pinned Raven ReadByte binding diagnostic; reuse the unchanged
   producer fixture for backend validation rather than claiming a compiler fix.
+  Add bounded primitive System.Value transport with exact Int32/Byte/Boolean/Void tags,
+  copied locals/calls/results/output slots and pack/test/unpack lowering. Incorrect unpack
+  returns RuntimeError without publishing a result; defaults, reference/record payloads,
+  nested erasure and Value fields remain rejected. Validate standalone CIL transport and
+  advance the unchanged ReadByte probe to its selected generic-helper boundary.
   System seed bodies remain validation-only; no native
   reference services, interface execution or public ABI/runtime APIs are added.
   General unions, reference fields and general library dependency compilation remain

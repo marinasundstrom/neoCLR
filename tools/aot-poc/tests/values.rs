@@ -1428,3 +1428,138 @@ fn static_owner_methods_work_in_whole_module_and_closed_world_modes() {
         native_mode(&bytes, 0, 0, 42, "@entry", closed);
     }
 }
+
+#[test]
+fn erased_primitives_preserve_exact_tags_copies_and_call_results() {
+    let kinds = [
+        ("Void", "ldvoid"),
+        ("Int32", "ldc.i4 255"),
+        ("Byte", "ldc.i4 511\nconv.u1"),
+        ("Boolean", "ldc.bool true"),
+    ];
+    let mut source = String::from(
+        ".module Erased\n.entry Main\n.function Copy(Value item) -> Value\nldarg item\nret\n.end\n.function Main() -> Int32\n.local Value item\n",
+    );
+    for (kind, value) in kinds {
+        source += &format!("{value}\nvalue.pack {kind}\ncall Copy(Value)\nstloc item\n");
+        for (target, _) in kinds {
+            source += &format!(
+                "ldloc item\nvalue.is {target}\n{} fail\n",
+                if kind == target { "brfalse" } else { "brtrue" }
+            );
+        }
+        source += &format!("ldloc item\nvalue.unpack {kind}\n");
+        source += match kind {
+            "Void" => "pop\n",
+            "Boolean" => "brfalse fail\n",
+            _ => "ldc.i4 255\nceq\nbrfalse fail\n",
+        };
+    }
+    source += "ldc.i4 42\nret\nfail:\nldc.i4 -1\nret\n.end";
+    let m = neoclr::assemble(&source).unwrap();
+    assert_eq!(
+        neoclr::LoadedProgram::new(&m)
+            .unwrap()
+            .run(neoclr::Limits::default())
+            .unwrap()
+            .value,
+        neoclr::Value::Int32(42)
+    );
+    let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+    for closed in [false, true] {
+        let temp = Temp::new();
+        let compiled = compile_mode(&bytes, &temp, "@entry", closed);
+        assert!(
+            compiled.status.success(),
+            "{}",
+            String::from_utf8_lossy(&compiled.stderr)
+        );
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        native_mode(&bytes, 0, 0, 42, "@entry", closed);
+    }
+}
+
+#[test]
+fn erased_outputs_addresses_and_branch_joins_preserve_payloads() {
+    let m = neoclr::assemble(".module ErasedOutput\n.entry Main\n.function Fill(out Value& result) -> noresult\nldarg result\nldc.i4 255\nvalue.pack Byte\nstobj Value\nret\n.end\n.function Main() -> Int32\n.local Value item\nldloca item\ncall Fill(Value&)\nldc.bool true\nbrfalse other\nldloca item\nldobj Value\nbr join\nother:\nldvoid\nvalue.pack Void\njoin:\nvalue.is Byte\nbrfalse fail\nldloc item\nvalue.unpack Byte\nret\nfail:\nldc.i4 -1\nret\n.end").unwrap();
+    assert_eq!(
+        neoclr::LoadedProgram::new(&m)
+            .unwrap()
+            .run(neoclr::Limits::default())
+            .unwrap()
+            .value,
+        neoclr::Value::Int32(255)
+    );
+    let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+    let temp = Temp::new();
+    let compiled = compile(&bytes, &temp);
+    assert!(
+        compiled.status.success(),
+        "{}",
+        String::from_utf8_lossy(&compiled.stderr)
+    );
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    native(&bytes, 0, 255);
+}
+
+#[test]
+fn wrong_erased_unpack_propagates_runtime_fault_without_publishing_result() {
+    for (kind, value) in [
+        ("Void", "ldvoid"),
+        ("Int32", "ldc.i4 255"),
+        ("Boolean", "ldc.bool true"),
+    ] {
+        let m = neoclr::assemble(&format!(".module WrongErased\n.entry Main\n.function Unpack(Value item) -> Int32\nldarg item\nvalue.unpack Byte\nret\n.end\n.function Main() -> Int32\n{value}\nvalue.pack {kind}\ncall Unpack(Value)\nldc.i4 1\nldc.i4 0\ndiv\nadd\nret\n.end")).unwrap();
+        let error = neoclr::LoadedProgram::new(&m)
+            .unwrap()
+            .run(neoclr::Limits::default())
+            .unwrap_err();
+        assert!(
+            error.to_string().contains("erased value contains"),
+            "{error}"
+        );
+        let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+        let temp = Temp::new();
+        let compiled = compile(&bytes, &temp);
+        assert!(
+            compiled.status.success(),
+            "{}",
+            String::from_utf8_lossy(&compiled.stderr)
+        );
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        native(&bytes, 3, 12345);
+    }
+}
+
+#[test]
+fn erased_profile_rejects_defaults_uninitialized_slots_and_unsupported_payloads() {
+    for (locals, body) in [
+        (
+            ".local Value item\n",
+            "ldloca item\ninitobj Value\nldc.i4 0\nret",
+        ),
+        (".local Value item\n", "ldloc item\nvalue.unpack Int32\nret"),
+        ("", "ldc.i4 0\nret\nvalue.pack String"),
+        ("", "ldc.i4 0\nret\nvalue.is Value"),
+        ("", "ldc.i4 0\nret\nvalue.unpack Int32&"),
+        ("", "ldc.i4 42\nvalue.is Int32\npop\nldc.i4 0\nret"),
+    ] {
+        // Feed the source directly so AOT must reject malformed or unsupported IL.
+        let source = format!(
+            ".module InvalidErased\n.entry Main\n.function Main() -> Int32\n{locals}{body}\n.end"
+        );
+        let temp = Temp::new();
+        let input = temp.0.join("invalid.neoil");
+        fs::write(&input, source).unwrap();
+        let compiled = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+            .arg("--closed-world")
+            .arg(input)
+            .arg("@entry")
+            .arg(temp.0.join("value.o"))
+            .output()
+            .unwrap();
+        assert!(!compiled.status.success(), "accepted {body}");
+        assert!(!temp.0.join("value.o").exists());
+        assert!(!String::from_utf8_lossy(&compiled.stderr).contains("panicked"));
+    }
+}

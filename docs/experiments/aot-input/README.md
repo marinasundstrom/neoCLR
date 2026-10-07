@@ -35,7 +35,7 @@ regression and existing invalid-conformance, generic-value and access-control ch
 interpreter returns exit 0 for EOF or byte 42 and exit 2 for another byte (tested with
 `x`). The original report records rejection of the static Console owner. With the subsequent
 static-owner slice, inspection/emission now reaches the erased `Value` local and rejects
-it explicitly. The current script asserts that exact boundary and absence of an object.
+it explicitly. That report retains the Value boundary; the current script asserts the later generic-method boundary and absence of an object.
 
 Removing that first restriction alone will not supply native input. The existing
 [console contract](../../console-io.md) implements the public method in Raven; its
@@ -43,8 +43,8 @@ runtime service transports Byte, Void or Int32 status through erased `System.Val
 The wrapper calls generic value-test/unpack services. These are further native backend
 requirements, not permission to replace the public method by name with a host intrinsic.
 
-The next bounded task is a deliberately limited erased-value representation and
-an explicit native input capability/service contract. Service tests must distinguish EOF,
+The bounded primitive erased-value slice below now passes; generic helper calls and
+an explicit native input capability/service contract remain. Service tests must distinguish EOF,
 zero/high bytes, unavailable capability and I/O failure, including interrupted reads.
 An input-driven ASCII integer parser can consume bytes without allocating strings;
 UTF-8 line decoding and text ownership remain subsequent work.
@@ -128,3 +128,61 @@ backend boundary checks reuse `ReadByte.pe` and its earlier interpreter evidence
 limitation, not a compiler issue fixed by the AOT change. `StaticOutcomes.pe` was freshly
 compiled from the static factory source and executed natively. All 43 focused load-set
 and value-profile tests pass.
+
+## Bounded erased transport (2026-10-07)
+
+The [erased CIL sample](erased-transport.neoil) now executes natively with explicit
+`value.pack`, `value.is` and `value.unpack` for Int32, Byte, Boolean and Void. This
+hand-authored backend consumer models the byte/EOF/error transport needed by the input
+wrapper; it performs no input. [Evidence](erased-validation.json) records interpreter
+parity, identical inspection/emission selection, no object imports and standalone ARM64
+execution with only libSystem linkage. The actual Raven ReadByte fixture now passes the
+Value-storage boundary and stops at selected generic methods. No public Console method
+is replaced or recognized specially.
+
+The private native representation is two 32-bit lanes: an exact primitive tag and a
+copied payload. Tags are compilation details, not runtime type ordinals, serialized
+metadata or a native service ABI. Byte packing uses the runtime's storage truncation;
+unpacking a Byte restores the Int32 evaluation-stack category without losing the Byte
+tag. Void is a valid erased payload. Boolean, Byte and Int32 remain distinct even when
+their numeric payloads coincide.
+
+Erased values can cross direct calls/results, local and argument storage, branch joins,
+and ordinary borrowed/output slots. A mismatched unpack returns the existing experimental
+RuntimeError status (3), terminates the invocation and leaves the exported result
+untouched. No exception crosses the C boundary. The ordinary verifier still checks
+initialization, signatures and borrow lifetimes. `initobj Value` is rejected because the
+runtime defines no default for Value; a zero tag is not permission to synthesize EOF.
+Record fields containing Value, record/reference payloads, nested erasure, generic Value
+arguments, reflection, generic methods and native input services remain unsupported.
+The exported entry still accepts/returns only the existing Int32 contract.
+
+This implements a bounded subset of the existing [erased-value contract](../../erased-inputs.md).
+.NET [boxing/unboxing](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/types/boxing-and-unboxing)
+uses an object representation and rejects an incompatible unbox with InvalidCastException
+(primary documentation reviewed 2026-10-07). neoCLR's existing explicit erasure similarly
+retains the exact payload type, but an invalid unpack is a runtime Fault. This backend
+uses an inline primitive representation to avoid needing object lifetime machinery for
+this consumer. The cost is a second lane and a strict payload whitelist; it does not
+implement general .NET boxing, object identity or a universal Value representation.
+General boxes or variable-size tagged payloads would support more types but require
+lifetime/layout contracts not exercised by byte input. No performance advantage is claimed.
+
+Four focused erased-value tests cover the complete primitive type-test matrix, copies,
+call results, output/address transport, control-flow joins, incorrect unpack propagation
+and rejection of defaults, uninitialized slots and unsupported operations even in dead
+code. The full isolated AOT suite has 67 tests.
+
+Reproduce the current backend slice without rebuilding unaffected Raven fixtures:
+
+```sh
+python3 docs/experiments/aot-input/verify_erased.py \
+  --runtime /absolute/path/to/neoclr \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --bundle /absolute/path/to/neoclr-native-poc \
+  --output target/aot-input-erased-transport
+```
+
+The next bounded task is specialization of the ordinary generic primitive test/unpack
+helpers with original member identities preserved. Native service binding and explicit
+capability/error tests follow; interactive parsing and UTF-8 text ownership remain later.

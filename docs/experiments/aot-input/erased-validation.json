@@ -1,0 +1,194 @@
+{
+  "profile": "aot-erased-primitive-transport-v1",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "baseRevision": "bf73b21af11a0078e766bbdb2bb7e90f9bc3310c",
+  "inputs": {
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "e31148e0a7b82a4001b251120b1cff884b557ff746443bd062c4386646c1bede",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-input/erased-transport.neoil": "64d730503d5433516542688a93598798cff178b465850fbe222d7faf5de8ca73",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe": "745c5cdd9ac8ec34c53603c09f134eafa46c3f91622dfd5060fdc788222143c0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea"
+  },
+  "commands": [
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/erased-transport.neoil"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/erased-transport.neoil",
+        "@entry",
+        "--closed-world"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 5522,
+        "sha256": "a178f21436bc9678c926427258e5b755768d5e49b9745da3b28e677d55113b4a"
+      }
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/erased-transport.neoil",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-input-erased-transport/transport.o"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": "{\n  \"excludedFunctions\": [],\n  \"excludedTypes\": [],\n  \"functions\": [\n    {\n      \"compiledIndex\": 0,\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"ErasedTransport\"\n      },\n      \"name\": \"Copy\",\n      \"sourceIndex\": 0\n    },\n    {\n      \"compiledIndex\": 1,\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"ErasedTransport\"\n      },\n      \"name\": \"Outcome\",\n      \"sourceIndex\": 1\n    },\n    {\n      \"compiledIndex\": 2,\n      \"definition\": {\n        \"index\": 2,\n        \"module\": \"ErasedTransport\"\n      },\n      \"name\": \"Inspect\",\n      \"sourceIndex\": 2\n    },\n    {\n      \"compiledIndex\": 3,\n      \"definition\": {\n        \"index\": 3,\n        \"module\": \"ErasedTransport\"\n      },\n      \"name\": \"Main\",\n      \"sourceIndex\": 3\n    }\n  ],\n  \"metadataPolicy\": \"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted\",\n  \"module\": \"ErasedTransport\",\n  \"policy\": \"explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch\",\n  \"root\": \"Main\",\n  \"schema\": \"neoclr-aot-selection-v1\",\n  \"types\": []\n}\n"
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-input-erased-transport/transport.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-input-erased-transport/transport"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-input-erased-transport/transport.o"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-input-erased-transport/transport"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-input-erased-transport/transport:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 8356,
+        "sha256": "2e4bb618cac80a7336362aabdfafc476f751ded05a874f280bd1fd2d3b2e5b2a"
+      }
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-input-erased-transport/read-byte.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 1,
+      "stderr": "aot-poc: generic methods are outside this specialization profile\n",
+      "stdout": ""
+    }
+  ],
+  "selection": {
+    "excludedFunctions": [],
+    "excludedTypes": [],
+    "functions": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 0,
+          "module": "ErasedTransport"
+        },
+        "name": "Copy",
+        "sourceIndex": 0
+      },
+      {
+        "compiledIndex": 1,
+        "definition": {
+          "index": 1,
+          "module": "ErasedTransport"
+        },
+        "name": "Outcome",
+        "sourceIndex": 1
+      },
+      {
+        "compiledIndex": 2,
+        "definition": {
+          "index": 2,
+          "module": "ErasedTransport"
+        },
+        "name": "Inspect",
+        "sourceIndex": 2
+      },
+      {
+        "compiledIndex": 3,
+        "definition": {
+          "index": 3,
+          "module": "ErasedTransport"
+        },
+        "name": "Main",
+        "sourceIndex": 3
+      }
+    ],
+    "metadataPolicy": "original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
+    "module": "ErasedTransport",
+    "policy": "explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch",
+    "root": "Main",
+    "schema": "neoclr-aot-selection-v1",
+    "types": []
+  },
+  "native": {
+    "executableOnlyDirectory": true,
+    "emptyEnvironment": true,
+    "exit": 0,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "readByteBoundary": {
+    "accepted": false,
+    "firstError": "generic methods are outside this specialization profile",
+    "phase": "selection"
+  },
+  "artifacts": {
+    "transport.o": "619a2f6999858dff5a08f033541b7fb660f5bb7fdac6744dbc250e1ac82dd78e",
+    "transport": "a0003f56c45c7afb7ae0ae34351b1f8decfc81a254adb9c460d70aa2ce9c11f1"
+  }
+}

@@ -1,0 +1,83 @@
+.module ErasedTransport
+.entry Main
+
+.function Copy(Value item) -> Value
+ldarg item
+ret
+.end
+
+.function Outcome(Int32 kind) -> Value
+ldarg kind
+ldc.i4 0
+ceq
+brfalse eof
+ldc.i4 511
+value.pack Byte
+ret
+eof:
+ldarg kind
+ldc.i4 1
+ceq
+brfalse error
+ldvoid
+value.pack Void
+ret
+error:
+ldc.i4 2
+value.pack Int32
+ret
+.end
+
+.function Inspect(Value item) -> Int32
+ldarg item
+value.is Byte
+brfalse eof
+ldarg item
+value.unpack Byte
+ret
+eof:
+ldarg item
+value.is Void
+brfalse error
+ldarg item
+value.unpack Void
+pop
+ldc.i4 -1
+ret
+error:
+ldarg item
+value.unpack Int32
+ldc.i4 -1
+mul
+ret
+.end
+
+.function Main() -> Int32
+.local Value copied
+ldc.i4 0
+call Outcome(Int32)
+call Copy(Value)
+stloc copied
+ldloc copied
+call Inspect(Value)
+ldc.i4 255
+ceq
+brfalse fail
+ldc.i4 1
+call Outcome(Int32)
+call Inspect(Value)
+ldc.i4 -1
+ceq
+brfalse fail
+ldc.i4 2
+call Outcome(Int32)
+call Inspect(Value)
+ldc.i4 -2
+ceq
+brfalse fail
+ldc.i4 0
+ret
+fail:
+ldc.i4 1
+ret
+.end

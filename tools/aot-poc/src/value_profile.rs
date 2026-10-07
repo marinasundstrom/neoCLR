@@ -9,6 +9,7 @@ pub(super) enum Ty {
     Byte,
     Bool,
     Unit,
+    Erased,
     Record(usize),
     Address(Box<Ty>),
 }
@@ -27,6 +28,17 @@ pub(super) struct Profile<'a> {
     pub results: Vec<Option<Ty>>,
 }
 pub(super) type Stacks = Vec<Option<Vec<Ty>>>;
+
+// Private compilation tags, not runtime Type ordinals or a public/native ABI.
+pub(super) fn erased_tag(ty: &Type) -> Result<i64, Error> {
+    match ty {
+        Type::Void => Ok(0),
+        Type::Int32 => Ok(1),
+        Type::Byte => Ok(2),
+        Type::Boolean => Ok(3),
+        _ => Err("erased payload requires Int32, Byte, Boolean or Void".into()),
+    }
+}
 
 impl<'a> Profile<'a> {
     pub fn new(input: &'a neoclr::Module) -> Result<Self, Error> {
@@ -226,6 +238,7 @@ impl<'a> Profile<'a> {
             Type::Byte => Ty::Byte,
             Type::Boolean => Ty::Bool,
             Type::Void => Ty::Unit,
+            Type::Value => Ty::Erased,
             Type::Named(name) => {
                 let i = self
                     .input
@@ -271,6 +284,7 @@ impl<'a> Profile<'a> {
     pub fn lanes(&self, t: &Ty) -> usize {
         match t {
             Ty::Record(i) => self.widths[*i],
+            Ty::Erased => 2,
             _ => 1,
         }
     }
@@ -390,6 +404,10 @@ impl<'a> Profile<'a> {
                         .filter(|n| f.out_parameters.contains(n)),
                 ),
                 Op::ConvertInt32 | Op::ConvertUInt8 => (),
+                Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_) => {
+                    readable(state.stack.pop().unwrap(), &state.assigned)?;
+                    state.stack.push(None);
+                }
                 Op::Dup => state.stack.push(*state.stack.last().unwrap()),
                 Op::StoreObject(_) => {
                     state.stack.pop();
@@ -561,6 +579,12 @@ impl<'a> Profile<'a> {
                 | Op::DivideUnsigned
                 | Op::Remainder
                 | Op::RemainderUnsigned => (),
+                Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
+                    erased_tag(t)?;
+                }
+                Op::InitializeObject(Type::Value) => {
+                    return Err(fail(pc, "Value has no default initialization"));
+                }
                 Op::InitializeObject(t) | Op::LoadObject(t) | Op::StoreObject(t) | Op::New(t) => {
                     self.stored(t)?;
                 }
@@ -589,6 +613,18 @@ impl<'a> Profile<'a> {
                 }
                 Op::Bool(_) => stack.push(Ty::Bool),
                 Op::Void => stack.push(Ty::Unit),
+                Op::PackValue(t) => {
+                    take(&mut stack, &self.ty(t)?)?;
+                    stack.push(Ty::Erased);
+                }
+                Op::IsValue(_) => {
+                    take(&mut stack, &Ty::Erased)?;
+                    stack.push(Ty::Bool);
+                }
+                Op::UnpackValue(t) => {
+                    take(&mut stack, &Ty::Erased)?;
+                    stack.push(Self::stack_type(&self.ty(t)?));
+                }
                 Op::Arg(n) => stack.push(Self::stack_type(&self.args[i][*n])),
                 Op::Load(n) => stack.push(Self::stack_type(&self.locals[i][*n])),
                 Op::ArgumentAddress(n) => stack.push(self.args[i][*n].clone().address()),

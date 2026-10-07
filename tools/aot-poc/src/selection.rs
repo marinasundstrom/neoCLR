@@ -147,8 +147,13 @@ pub(super) fn select_inventory(
         pending_types.extend(f.parameters.iter().chain(&f.locals).cloned());
         pending_types.push(f.returns.clone());
         for op in &f.body {
-            if let Op::New(t) | Op::InitializeObject(t) | Op::LoadObject(t) | Op::StoreObject(t) =
-                op
+            if let Op::New(t)
+            | Op::InitializeObject(t)
+            | Op::LoadObject(t)
+            | Op::StoreObject(t)
+            | Op::PackValue(t)
+            | Op::IsValue(t)
+            | Op::UnpackValue(t) = op
             {
                 pending_types.push(t.clone());
             }
@@ -193,7 +198,7 @@ pub(super) fn select_inventory(
                 }
             }
             Type::ByRef(t) => pending_types.push(*t),
-            Type::Int32 | Type::Byte | Type::Boolean | Type::Void => (),
+            Type::Int32 | Type::Byte | Type::Boolean | Type::Void | Type::Value => (),
             _ => {
                 return Err(
                     "closed-world selection requires reference-free nongeneric value signatures"

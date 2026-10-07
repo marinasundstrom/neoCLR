@@ -19,7 +19,21 @@ use std::collections::{HashMap, HashSet};
 type Error = Box<dyn std::error::Error>;
 
 pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool) -> Result<Vec<u8>, Error> {
-    if !input.types.is_empty() {
+    if !input.types.is_empty()
+        || input.functions.iter().any(|f| {
+            f.parameters
+                .iter()
+                .chain(&f.locals)
+                .chain([&f.returns])
+                .any(|t| {
+                    matches!(t, Type::Value)
+                        || matches!(t, Type::ByRef(inner) if **inner == Type::Value)
+                })
+                || f.body
+                    .iter()
+                    .any(|op| matches!(op, Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_)))
+        })
+    {
         return values::compile(input, root);
     }
     if input.name == "System" || input.functions.len() > 128 {

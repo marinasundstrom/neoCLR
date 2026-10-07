@@ -72,9 +72,10 @@ Interface dispatch remains unsupported. The [nested input-outcome sample](experi
 now executes the actual Result<Option<byte>, ConsoleReadError> shape natively, with
 metadata-only interface arguments kept outside executable specialization. Actual ReadByte
 passes interpreter checks. Empty static member owners now compile, including a Raven
-factory returning the nested result. ReadByte reaches its erased Value payload boundary;
-bounded erased-value transport and explicit native byte-input services are next, before
-UTF-8 text/lifetime contracts. Multiple instantiations
+factory returning the nested result. Bounded primitive erased-value transport now compiles
+pack/test/unpack, copied calls and output slots; mismatched unpack propagates RuntimeError.
+ReadByte reaches selected generic helpers. Their specialization and explicit native
+byte-input services are next, before UTF-8 text/lifetime contracts. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

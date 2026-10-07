@@ -179,6 +179,25 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                     }
                     Op::Bool(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
                     Op::Void => stack.push(b.ins().iconst(types::I32, 0)),
+                    Op::PackValue(t) => {
+                        let payload = pop(&mut stack);
+                        let payload = normalize(&mut b, &p, &p.ty(t)?, &[payload])[0];
+                        stack.push(b.ins().iconst(types::I32, profile::erased_tag(t)?));
+                        stack.push(payload);
+                    }
+                    Op::IsValue(t) | Op::UnpackValue(t) => {
+                        let payload = pop(&mut stack);
+                        let tag = pop(&mut stack);
+                        let matches = b.ins().icmp_imm(IntCC::Equal, tag, profile::erased_tag(t)?);
+                        if matches!(op, Op::IsValue(_)) {
+                            stack.push(b.ins().uextend(types::I32, matches));
+                        } else {
+                            let wrong = b.ins().icmp_imm(IntCC::Equal, matches, 0);
+                            let status = b.ins().iconst(types::I32, 3); // RuntimeError
+                            return_if(&mut b, wrong, status);
+                            stack.push(payload);
+                        }
+                    }
                     Op::Arg(n) | Op::Load(n) => {
                         let (s, t) = if matches!(op, Op::Arg(_)) {
                             (arguments[*n], &p.args[i][*n])

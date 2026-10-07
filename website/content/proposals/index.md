@@ -238,8 +238,9 @@ image. Original interface conformance is checked before relationships are omitte
 the private direct-call projection; interface execution remains unsupported. Native
 byte-input prerequisites now include a tested nested Result/Option outcome model.
 Empty static member owners now compile without object allocation; actual Console.ReadByte
-reaches its erased-value payload boundary. Native input services and UTF-8 text lifetime
-contracts remain future work.
+now passes bounded primitive erased-value storage and reaches generic helper calls.
+Primitive pack/test/unpack preserves exact types and propagates incorrect-unpack faults;
+generic helpers, native input services and UTF-8 text lifetimes remain future work.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

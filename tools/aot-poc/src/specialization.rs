@@ -32,7 +32,9 @@ impl Specializer<'_> {
     }
     fn lower(&mut self, ty: &Type) -> Result<Type, Error> {
         let (name, arguments) = match ty {
-            Type::Int32 | Type::Byte | Type::Boolean | Type::Void => return Ok(ty.clone()),
+            Type::Int32 | Type::Byte | Type::Boolean | Type::Void | Type::Value => {
+                return Ok(ty.clone());
+            }
             Type::ByRef(t) => return Ok(Type::ByRef(Box::new(self.lower(t)?))),
             Type::Named(name) => (name, vec![]),
             Type::Constructed {
@@ -223,9 +225,13 @@ impl Specializer<'_> {
                         .map(|t| self.lower(t))
                         .collect::<Result<_, _>>()?;
                 }
-                Op::New(t) | Op::InitializeObject(t) | Op::LoadObject(t) | Op::StoreObject(t) => {
-                    *t = self.close(t, arguments)?
-                }
+                Op::New(t)
+                | Op::InitializeObject(t)
+                | Op::LoadObject(t)
+                | Op::StoreObject(t)
+                | Op::PackValue(t)
+                | Op::IsValue(t)
+                | Op::UnpackValue(t) => *t = self.close(t, arguments)?,
                 Op::CallVirtual(_) => {
                     return Err("virtual calls require a later specialization profile".into());
                 }
