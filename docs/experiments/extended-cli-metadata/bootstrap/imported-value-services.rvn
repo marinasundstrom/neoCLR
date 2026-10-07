@@ -1,0 +1,20 @@
+import System.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+func Main() -> int {
+    let payload = RuntimeServices.ParseInt32("42")
+    if !RuntimeServices.IsValue<int>(payload) {
+        return 1
+    }
+    if RuntimeServices.UnpackValue<int>(payload) != 42 {
+        return 2
+    }
+    let invalid = RuntimeServices.ParseInt32("invalid")
+    if RuntimeServices.IsValue<int>(invalid) {
+        return 3
+    }
+    if RuntimeServices.UnpackValue<byte>(invalid) != (byte)1 {
+        return 4
+    }
+    return 42
+}

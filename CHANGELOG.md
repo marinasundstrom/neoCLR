@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Preserve selected imported System.Value ownership when mapping bootstrap helper
+  signatures, writing native storage aliases and matching retained runtime services.
+  C# introspection round trips retain exact external identity; a Raven parse/type-test/
+  unpack consumer verifies and returns 42. Networking now reaches imported virtual
+  Object.ToString support; optional-library execution remains open.
+
 - Add explicit external native Object authoring selection, shared by manual definitions,
   builders and method references. Preserve scoped identity through existing native aliases
   and CLI Object reference signatures; conflicting owners reject. API-authored and Raven

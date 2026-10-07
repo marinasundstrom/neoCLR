@@ -173,7 +173,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
     internal static bool IsIntrinsicChar(ImportedTypeReference type) => type.Owner.IsNativeGrapheme(type) ||
         type.AssemblyIdentity.Equals(type.Owner.CoreLibrary) && type.Owner.NativeBindingFor(type.AssemblyIdentity)?.Library.ModuleName == "System" &&
         type.DeclaringType is null && type.Namespace == "System" && type.Name == "Char" && type.IsValueType && type.GenericArity == 0;
-    internal static bool IsErasedValue(ImportedTypeReference type) =>
+    internal static bool IsErasedValue(ImportedTypeReference type) => type.Owner.AuthoredPrimitiveOwner(type) == PrimitiveType.Value ||
         type.AssemblyIdentity.Equals(type.Owner.CoreLibrary) && type.Owner.NativeBindingFor(type.AssemblyIdentity)?.Library.ModuleName == "System" &&
         type.DeclaringType is null && type.Namespace == "System" && type.Name == "Value" && type.IsValueType && type.GenericArity == 0;
     private string TypeKey(SignatureType type)

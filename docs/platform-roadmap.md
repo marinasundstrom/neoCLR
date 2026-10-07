@@ -28,8 +28,11 @@ is fixed. [Commands and diagnostics](experiments/extended-cli-metadata/optional-
 Explicit imported Object authoring now passes C# contracts and API/Raven consumer
 execution (42). Networking advances to a System.Value encoding dependency.
 [Imported-root evidence](experiments/extended-cli-metadata/imported-object-authoring-2026-10-07.md).
-Next: reconcile imported Value ownership for Networking, then the supported
-array-reflection boundary for Data.
+Imported Value ownership now passes source-free parse/type-test/unpack execution
+(42), with 165 metadata groups passing. Networking reaches imported virtual Object
+method calls. [Value evidence](experiments/extended-cli-metadata/imported-value-2026-10-07.md).
+Next: support symbol-authored imported Object slots, then the supported array-reflection
+boundary for Data.
 Resume executable Data/Networking consumers, then Web and project/LSP catalogs.
 The author's platform-package direction is recorded separately from assembly ownership:
 [candidate distribution boundaries](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md).

@@ -1,0 +1,107 @@
+{
+  "sourceBase": "e0832eee + imported Value changes",
+  "ravenRevision": "74c50ad2f",
+  "networking": {
+    "command": [
+      "dotnet",
+      "/tmp/external-value-compiler1007/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/failure1006b/Core.dll",
+      "--runtime-seed",
+      "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+      "--bootstrap-ownership",
+      "/tmp/runtime-split1007/runtime-owned/ownership.json",
+      "--reference",
+      "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+      "--object-library",
+      "System.Runtime",
+      "--library",
+      "-o",
+      "/tmp/value-network1007/System.Networking.dll",
+      "runtime/raven/src/System/Networking/Dns.rvn",
+      "runtime/raven/src/System/Networking/DnsError.rvn",
+      "runtime/raven/src/System/Networking/IPAddress.rvn",
+      "runtime/raven/src/System/Networking/IPAddressError.rvn",
+      "runtime/raven/src/System/Networking/Sockets/Socket.rvn",
+      "runtime/raven/src/System/Networking/Sockets/SocketError.rvn",
+      "runtime/raven/native/RuntimeNetworkCalls.rvn",
+      "runtime/raven/native/RuntimeNetworkServices.rvn"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "warning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV2103: This catch-all never matches.\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support native callable requires a supported symbol-only emission contract: virtual func ToString() -> string.\n"
+  },
+  "consumer": {
+    "command": [
+      "dotnet",
+      "/tmp/external-value-compiler1007/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/failure1006b/Core.dll",
+      "--runtime-seed",
+      "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+      "--bootstrap-ownership",
+      "/tmp/runtime-split1007/runtime-owned/ownership.json",
+      "--reference",
+      "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+      "--object-library",
+      "System.Runtime",
+      "-o",
+      "/tmp/value-network1007/ValueServices.dll",
+      "docs/experiments/extended-cli-metadata/bootstrap/imported-value-services.rvn"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "execution": [
+    {
+      "command": [
+        "target/debug/neoclr",
+        "verify",
+        "/tmp/value-network1007/ValueServices.dll",
+        "--system",
+        "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+        "--module",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+        "--object-root",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_B094BD22B55CDCC55B345DBB3D3B04BBBB5D74229D039EDC0A14C6F3938E0878: typed-stack/control-flow verification passed (1751 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "/tmp/value-network1007/ValueServices.dll",
+        "--system",
+        "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+        "--module",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+        "--object-root",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "metadataTests": "165/165 C# metadata contract tests passed",
+  "apiSnapshot": "Checked RavenDoc reference assembly and source fingerprints",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "180608db04f98d2834e0d520f7997adc54d9e86623fbd4ebcf2a62940599b750",
+    "/private/tmp/failure1006b/Core.dll": "7e5cee8e255704bbf44595173609c1c4834b7e7b512dba8704987fd05420dd88",
+    "/private/tmp/value-network1007/ValueServices.dll": "17501817da2c54b5d53b46d45b054e6aed030985b89654b9cce7541742e17b11",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/imported-value-services.rvn": "0d99ef36ddd58eca06db243cce9d2dd666befa086220bf809d0896a8c7df8cee",
+    "/private/tmp/external-value-compiler1007/rvnc.dll": "6650893584717178421eb290a8f969d8caef1712d2602e3cda0eca7b71f030ad",
+    "/private/tmp/external-value-compiler1007/Raven.CodeAnalysis.dll": "eab445a8748068db514d5f3f52b8767ca24519989463cef2c2a5510e4993e0d5",
+    "/private/tmp/external-value-compiler1007/Raven.CodeAnalysis.NeoClr.dll": "86dc55e2fed0401d979d24e7ebacbc7f1baf48d17c166c10b33455919353348f",
+    "/private/tmp/external-value-compiler1007/NeoCLR.Metadata.Experimental.dll": "903082f0716b599f66d29791c8212576dcde2b5bd061c1f84b4353b8983362d2",
+    "/private/tmp/runtime-split1007/runtime-owned/System.Runtime.dll": "a71beb14cae765cf85d45925cd28aa5ce9738ab5e12ff75f28c9c62ba5702c00",
+    "/private/tmp/runtime-split1007/runtime-owned/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/runtime-split1007/runtime-owned/ownership.json": "e74446ad9e70ac4fe9283f090cbc482acf154125c8bc2a9a760a34427dd95679"
+  }
+}

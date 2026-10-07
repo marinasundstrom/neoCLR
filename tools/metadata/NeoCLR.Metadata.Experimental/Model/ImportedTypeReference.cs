@@ -113,6 +113,10 @@ public sealed partial class AssemblyBuilder
             definition.Namespace == "System" && definition.Name == "Object" && !definition.IsValueType &&
             definition.GenericArity == 0 && definition.DeclaringType is null)
             return selectedRoot;
+        if (identity.Equals(CoreLibrary) && ExternalPrimitive(PrimitiveType.Value) is { } selectedValue &&
+            definition.Namespace == "System" && definition.Name == "Value" && definition.IsValueType &&
+            definition.GenericArity == 0 && definition.DeclaringType is null && definition.Fields.Count == 0)
+            return selectedValue;
         // A selected source Value owns the runtime carrier. The explicit core
         // facade may still describe generic helpers using its CLI Value token;
         // it must not require a competing retained-seed declaration.

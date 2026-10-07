@@ -6525,3 +6525,11 @@ The matching metadata API uses existing native aliases and preserves the primiti
 bootstrap separately. Manual/API and ordinary Raven consumers verify/run against
 System.Runtime with exit 42. No emitter access to importer objects or CLI fallback is
 added. [Contracts, commands and limits](experiments/extended-cli-metadata/imported-object-authoring-2026-10-07.md).
+
+### Imported erased carrier mapping — 2026-10-07
+
+Raven `74c50ad2f` registers System.Value from the selected root-owner assembly before
+bootstrap helper import. Metadata retains the explicit external owner and canonical
+Value encoding. Actual retained parsing/type-test/unpack services execute with success
+and error payload checks (42); no service stubs or new CLI projection participate.
+[Evidence and next blocker](experiments/extended-cli-metadata/imported-value-2026-10-07.md).

@@ -7753,3 +7753,22 @@ native root. Bootstrap-only behavior remains unchanged.
 cover manual/builder parity, wrong owners, conflicts, native round trips and a Raven
 consumer against the source-built Runtime. These are host metadata APIs, documented
 here rather than in the guest RavenDoc reference assembly.
+
+### Imported erased Value representation (development, 2026-10-07)
+
+The existing `AssemblyBuilder.SetNativePrimitive(reference, PrimitiveType.Value)`
+selection now preserves the external carrier through native writing, reading and
+introspection. It writes the Value storage tag with a scoped System.Value alias and
+value-type reference, using the existing format. Competing explicit primitive owners
+reject. A same-named unselected type does not acquire this representation.
+
+When importing the primitive bootstrap's empty nongeneric System.Value definition,
+an explicitly selected external carrier replaces that bootstrap reference. Retained
+service signature matching recognizes the same explicit Value designation without
+requiring a second seed-owned type. This does not replace System.Object or assign a
+.NET SpecialType to the carrier. Existing seed-owned and local-source cases remain
+supported; this adds no new public API or native instruction.
+
+[Executable evidence](../docs/experiments/extended-cli-metadata/imported-value-2026-10-07.md)
+covers successful/error payloads through actual runtime services and canonical
+introspection parameter/return identity.

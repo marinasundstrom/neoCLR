@@ -32,6 +32,19 @@ internal static class PrimitiveRepresentationChecks
                 signature.ReturnType.ReferencedType?.Resolve().NativePrimitive != PrimitiveType.Value ||
                 signature.ParameterTypes.Single() != signature.ReturnType)
                 throw new Exception("source Value representation or signature lost");
+            var consumer = new AssemblyBuilder(new("ImportedValueOwner", new(1, 0, 0, 0)), graph.CoreLibrary);
+            var external = consumer.CreateValueTypeReference(graph.Identity, graph.CoreLibrary, new string('A', 64), "System", "Value");
+            consumer.SetNativePrimitive(external, PrimitiveType.Value);
+            var echo = consumer.AddFunction("Echo", new(external, [external]));
+            echo.GetILGenerator().LoadArgument(0); echo.GetILGenerator().Return();
+            var importedSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(consumer));
+            var context = new MetadataLoadContext([snapshot, importedSnapshot]);
+            var importedEcho = context.Resolve(importedSnapshot.Identity).GetModules().Single().GetFunctions().Single();
+            if (!ReferenceEquals(importedEcho.ReturnType, context.Resolve(snapshot.Identity).GetTypes().Single()) ||
+                !ReferenceEquals(importedEcho.ReturnType, importedEcho.GetParameters().Single().ParameterType))
+                throw new Exception("external erased Value lost its selected owner");
+            var competing = consumer.CreateValueTypeReference(new("Other", new(1, 0, 0, 0)), graph.CoreLibrary, new string('B', 64), "System", "Value");
+            Reject<InvalidDataException>(() => consumer.SetNativePrimitive(competing, PrimitiveType.Value));
             Reject<ArgumentOutOfRangeException>(() => { SignatureType bare = PrimitiveType.Value; });
             value.AddField("Invalid", PrimitiveType.Int32);
             Reject<InvalidDataException>(() => RuntimeAssemblyContainer.WriteBinary(graph));
