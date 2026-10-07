@@ -132,6 +132,17 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   isolation of structural Function experiments remain recorded.
 
 
+- **Author follow-up during overloaded-member work:** “We might have to mangle function names?”
+- **Assistant response:** explains that private native symbols already use per-function
+  indices, avoiding overload collisions within the single compiled object. Calls first
+  resolve the exact metadata definition; symbol naming is a later lowering concern.
+  Proposes a future stable mangling contract for separate compilation that includes
+  module/type identity, signatures and generic arguments. No stable format is selected.
+- **Assistant action/outcome:** implements exact overload resolution with signature and
+  optional definition-ID guards; tests Raven members, constructors and nominal output
+  overloads. Records [the current symbol scheme and limits](experiments/aot-values/README.md#overloaded-members-and-native-symbols-2026-10-07).
+  Separate-object linking, stable native names and general union compilation remain open.
+
 ## 2026-10-07: Continue native bootstrap development on main
 
 - **Author:** Directed merging the native bootstrap branch into main and cleaning up

@@ -31,7 +31,7 @@ python3 docs/experiments/aot-values/verify_native.py \
   --output target/aot-values-run
 ```
 
-The output directory must be new. This runs all five samples in the interpreter, compiles
+The output directory must be new. This runs all six samples in the interpreter, compiles
 their PE/#Neo bodies to native objects, links the C startup adapter, checks for no
 object imports and only macOS `libSystem` executable linkage, then runs each copied
 executable alone with an empty environment. Select a compatible Apple SDK as in the
@@ -47,7 +47,7 @@ byte-identical producer rebuilds are not asserted.
 
 A module containing type declarations selects the value profile. It admits
 up to 32 local nongeneric value Record types, each with zero to eight fields containing
-Int32, Byte, Boolean or other local records, and up to 128 uniquely named functions/members.
+Int32, Byte, Boolean or other local records, and up to 128 functions/members.
 Each complete inline layout is limited to eight primitive/dummy lanes. Recursive inline
 layouts (including mutually recursive unused types), unresolved field types and layouts
 exceeding that bound are rejected before emission. Reference types, generics, inheritance,
@@ -62,7 +62,7 @@ verification still runs before native emission. References cannot be stored in f
 locals, ordinary parameters or results in this profile, so they cannot escape a frame.
 Explicit `out` parameters may borrow Int32, Byte, Boolean or local-record storage.
 Readonly receivers, conditional `out(true)` parameters, general `ref` parameters,
-virtual dispatch, overloaded names and external
+virtual dispatch and external
 library/service calls remain unsupported here, including console calls in value-bearing
 modules. The original scalar/literal-console profile remains available for Hello World.
 
@@ -110,7 +110,7 @@ call-identity mismatches and uninitialized locals. Three additional rejection ca
 cover mutual inline cycles, unresolved fields and oversized flattened storage. Native
 tests cover the nested Raven fixture in both containers and three-level field addresses,
 whole-payload replacement, deep alias preservation, empty nested records and clearing
-a payload without overwriting adjacent fields. Seventeen value-profile tests pass; the earlier
+a payload without overwriting adjacent fields. Twenty-one value-profile tests pass; the earlier
 fifteen scalar/Hello test results remain applicable.
 
 The [.NET struct baseline](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct)
@@ -170,7 +170,7 @@ Eight new native comparisons cover the Raven fixture, uninitialized/initialized 
 on both branches, two outputs aliasing the same nested payload, and an output callee
 Fault. Six rejection cases cover missing writes, premature reads, conditional/general
 reference contracts, invalid output indices and escaping output references. General
-Some/None execution still needs overloaded members,
+Some/None execution still needs
 attribute classes, generated boxing/string/virtual methods and library dependencies.
 
 ## Byte tags and conversions (2026-10-07)
@@ -203,8 +203,45 @@ Native checks cover the Raven sample in both metadata containers plus eight runt
 inputs (-1, 0, 128, 255, 256, 511 and Int32 extremes) across storage, call, output and
 conversion boundaries. An arithmetic check after `conv.u1` proves the stack result is
 not itself Byte storage. Three negative inputs reject Boolean conversion, unsupported
-checked narrowing and treating `Byte&` as `Int32&`. All seventeen value tests pass;
+checked narrowing and treating `Byte&` as `Int32&`. All twenty-one value tests pass;
 unchanged scalar evidence remains in the earlier report.
+
+## Overloaded members and native symbols (2026-10-07)
+
+[Overloads](overloads.rvn) exercises Raven instance methods with Int32 and Boolean
+parameter overloads. The [fixture](Overloads.pe) and [evidence](overloads-validation.json)
+record compilation through native metadata and execution without a managed runtime.
+Calls resolve by exact name, owner, instance/static mode and ordered parameter types.
+A supplied definition identity must also match, including its module/revision/row;
+a bad identity never falls back to a similarly named method. Symbolic calls must have
+one matching candidate. Return types are not overload selectors. The existing native
+loader/verifier remains responsible for metadata-definition validity and accessibility.
+Generic specialization, virtual dispatch and cross-module compilation remain unsupported.
+Root selection is still a name-only CLI argument: duplicate root names are rejected,
+even when only one overload has a supported entry signature. Use a uniquely named wrapper.
+
+This applies the existing [member identity contract](../../member-identities.md) to AOT,
+following the .NET/CLI distinction between metadata call identity and native linkage
+(the [metadata baseline](../../design/extended-cli-metadata.md) remains applicable).
+Matching only names loses overload identity; generating signature strings as semantic
+identities would duplicate metadata rules and risk conflating nominal payload types.
+The bounded candidate search uses exact existing metadata contracts. Its cost is at
+most 128 candidates and intentionally lacks source-language conversion-based selection.
+
+The author asks whether function names need mangling. Private native symbols already
+use `neoclr_value_<function-index>`, so methods with identical names do not collide in
+this single object. The public `neoclr_entry_v2` export is unchanged. These local symbols
+are neither stable metadata identities nor a separate-compilation ABI. A future mangling
+contract should account for module/type identity, method signatures and generic arguments,
+with versioning and collision rules; its format and compatibility policy remain open.
+No stable mangling scheme or separate-object linking is implemented by this slice.
+
+Tests cover the Raven fixture in PE/#Neo and NEOX, symbolic calls without definition
+IDs, overloaded constructors, and output overloads for two nominal payload types with
+the same field layout. Five negative inputs reject wrong definition IDs, owner, parameter
+types or instance mode, and ambiguous roots. Twenty-one value tests pass; the earlier
+scalar evidence remains applicable. Full generated Raven unions still need attribute,
+boxing/string/virtual member and library support; unsupported bodies are not trimmed.
 
 ## Next steps toward union-based console input
 

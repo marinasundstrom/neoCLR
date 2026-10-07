@@ -100,6 +100,9 @@ whole-slot assignment proof because interpreter callee-output checks are dynamic
 A Raven output-member probe runs natively; conditional output contracts remain deferred.
 Byte storage and unchecked tag conversions now preserve Int32 evaluation-stack
 semantics and low-eight-bit storage truncation, with Raven and boundary-value probes.
+Overloaded calls now resolve through exact signatures and optional definition identities;
+private per-function native symbols remain local to a single compilation. Stable mangling
+for separate compilation is a future contract, not selected by this implementation.
 Nested unions, their generated/library members and reference-bearing payloads remain
 subsequent work. The author adds console input after unions, exercising input/parse
 outcomes. Neither an input service nor a heap manager is implemented by these value records.

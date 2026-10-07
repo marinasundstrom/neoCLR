@@ -924,3 +924,181 @@ fn byte_profile_rejects_invalid_conversions_and_distinct_borrows() {
         assert!(!temp.0.join("value.o").exists());
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn raven_overloaded_members_resolve_by_signature() {
+    let bytes = include_bytes!("../../../docs/experiments/aot-values/Overloads.pe");
+    let m = module(bytes);
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(0)
+    );
+    native(bytes, 0, 0);
+    native(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 0);
+    let mut symbolic = m.clone();
+    for f in &mut symbolic.functions {
+        for op in &mut f.body {
+            if let neoclr::metadata::Instruction::Call(target)
+            | neoclr::metadata::Instruction::Construct(target) = op
+            {
+                target.definition = None;
+            }
+        }
+    }
+    native(
+        &neoclr::metadata_container::write_module(&symbolic).unwrap(),
+        0,
+        0,
+    );
+}
+
+const OVERLOADED_CONSTRUCTORS: &str = r#"
+.module Overloads
+.entry Main
+.type Cell
+.field Value Int32
+.method instance byref .ctor(Int32 value) -> noresult
+ldarg 0
+ldarg value
+stfld Cell::Value
+pop
+ret
+.end
+.method instance byref .ctor(Boolean value) -> noresult
+ldarg 0
+ldc.i4 7
+stfld Cell::Value
+pop
+ret
+.end
+.method instance byref Read() -> Int32
+ldarg 0
+ldfld Cell::Value
+ret
+.end
+.end
+.function Main() -> Int32
+.local Cell first
+.local Cell second
+ldc.i4 42
+newobj instance Cell::.ctor(Int32)
+stloc first
+ldc.bool true
+newobj instance Cell::.ctor(Boolean)
+stloc second
+ldloca first
+call instance Cell::Read()
+ldloca second
+call instance Cell::Read()
+add
+ret
+.end
+"#;
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn overloaded_constructors_preserve_member_identity() {
+    let m = neoclr::assemble(OVERLOADED_CONSTRUCTORS).unwrap();
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(49)
+    );
+    native(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        0,
+        49,
+    );
+}
+
+#[test]
+fn overloaded_calls_reject_identity_mismatches_and_ambiguous_roots() {
+    use neoclr::metadata::{Instruction as Op, Type};
+    let original = neoclr::assemble(OVERLOADED_CONSTRUCTORS).unwrap();
+    for case in 0..5 {
+        let mut m = original.clone();
+        let wrong_id = m.functions[1].definition.clone();
+        let main = m.functions.iter_mut().find(|f| f.name == "Main").unwrap();
+        let Op::Construct(target) = &mut main.body[1] else {
+            panic!("fixture changed")
+        };
+        match case {
+            0 => target.definition = wrong_id,
+            1 => target.owner = None,
+            2 => target.parameters = vec![Type::Byte],
+            3 => target.instance = false,
+            _ => {
+                let mut duplicate = main.clone();
+                duplicate.definition = None;
+                duplicate.parameters = vec![Type::Int32];
+                duplicate.parameter_names = vec![Some("input".into())];
+                m.functions.push(duplicate);
+            }
+        }
+        let temp = Temp::new();
+        let result = compile(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp,
+        );
+        assert!(!result.status.success(), "case {case}");
+        assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
+        assert!(!temp.0.join("value.o").exists());
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn overloaded_outputs_keep_identically_shaped_payloads_nominal() {
+    let source = r#"
+.module Payloads
+.entry Main
+.type Left
+.field Value Int32
+.end
+.type Right
+.field Value Int32
+.end
+.function Extract(out Left& value) -> Void
+ldarg value
+ldc.i4 42
+newobj Left
+stobj Left
+ldvoid
+ret
+.end
+.function Extract(out Right& value) -> Void
+ldarg value
+ldc.i4 7
+newobj Right
+stobj Right
+ldvoid
+ret
+.end
+.function Main() -> Int32
+.local Left left
+.local Right right
+ldloca left
+call Extract(Left&)
+pop
+ldloca right
+call Extract(Right&)
+pop
+ldloc left
+ldfld Left::Value
+ldloc right
+ldfld Right::Value
+sub
+ret
+.end
+"#;
+    let m = neoclr::assemble(source).unwrap();
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(35)
+    );
+    native(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        0,
+        35,
+    );
+}

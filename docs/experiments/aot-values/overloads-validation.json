@@ -1,0 +1,121 @@
+{
+  "profile": "raven-overload-values-v5",
+  "declaredCompilerRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "neoClrBaseRevision": "d7eab8fa0fc4c25373be56e29cac9c561e78b0eb",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-values/overloads-validation/overloads.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-values/overloads.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-values/overloads-validation/overloads.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "/Users/robert/Projects/neoclr/target/aot-values/overloads-validation/overloads.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-values/overloads-validation/overloads.o"
+      ],
+      "exit": 0,
+      "stdout": "Emitted aarch64-apple-darwin object; C export: int32_t neoclr_entry_v2(int32_t, int32_t *result)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-values/overloads-validation/overloads.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-values/overloads-validation/overloads"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-values/overloads-validation/overloads.o"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-values/overloads-validation/overloads"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-values/overloads-validation/overloads:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "samples": {
+    "overloads": {
+      "artifacts": {
+        "overloads.dll": "c6ba16a8b8d0e129092a4a71f5067f1600926a38bebdf84849c79395219528c5",
+        "overloads.o": "4160c9c6574937654226bc5baf9874ba147fc9a3fbe5087ee3f038e87bbd7194",
+        "overloads": "f420d594097e6c8bd703b1c4486025fc7ed7e3788f5b8a8ad3f3f73e81c38faf"
+      },
+      "exit": 0,
+      "stdout": "",
+      "stderr": "",
+      "emptyEnvironment": true,
+      "executableOnlyDirectory": true,
+      "dynamicDependencies": [
+        "/usr/lib/libSystem.B.dylib"
+      ]
+    }
+  },
+  "inputs": {
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "6cbe60b55519971e622aec2fc4aae279dfaa7d6958489fa2e88924248f59fd89",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-values/overloads.rvn": "d126e39477059a4eaf2ef03485704d1bf852e9107847b3548c0a2b44bf048d2d"
+  },
+  "date": "2026-10-07",
+  "tests": {
+    "command": "cargo test --locked --manifest-path tools/aot-poc/Cargo.toml --test values",
+    "valueTestsPassed": 21,
+    "valueNativeComparisons": 40,
+    "rejectedValueInputs": 27,
+    "unchangedScalarEvidence": "native-validation.json: 15 scalar tests passed before value extensions"
+  },
+  "sourceHashes": {
+    "tools/aot-poc/src/value_profile.rs": "3f6e22ee2e9580459ddfb73b77576e3cf5ba0ff3d4d1cff6d6c7028ff3d6cfe9",
+    "tools/aot-poc/tests/values.rs": "e8b58ff7fd294c06a53841c33582743a696e9c0cd9a0f0c7709c6de78bbd5b1e",
+    "docs/experiments/aot-values/Overloads.pe": "6dfb27ea42790ff76c7514c727445ae0eb8faf8c2f9834d0ad208651727aa87e",
+    "docs/experiments/aot-values/verify_native.py": "dee04d8afef3145b9e289735526705bc1959f256db3ea2ad13986ca57cc87094"
+  }
+}

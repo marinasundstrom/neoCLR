@@ -220,7 +220,8 @@ Raven source to neoCLR metadata containing its IL, then compiles that artifact t
 native ARM64 code. Standalone NEOX and neoIL inputs also remain supported. A bounded
 [value/member profile](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-values/README.md)
 now runs Raven constructors, fields, accessors and record-copy/branch samples natively,
-including nested reference-free payloads, ordinary output parameters and Byte tags. Generated
+including nested reference-free payloads, ordinary output parameters, Byte tags and
+overloaded members. Generated
 union members and a later console-input
 consumer remain next steps toward HTTP Server. Execution budgets and general managed
 services remain unsupported.

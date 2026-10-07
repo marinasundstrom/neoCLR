@@ -1,0 +1,23 @@
+struct Reader {
+    func Read(value: int) -> int {
+        return value + 1
+    }
+
+    func Read(value: bool) -> int {
+        if value {
+            return 7
+        }
+        return 9
+    }
+}
+
+func Main() -> int {
+    var reader = Reader()
+    if reader.Read(41) != 42 {
+        return 1
+    }
+    if reader.Read(true) != 7 || reader.Read(false) != 9 {
+        return 2
+    }
+    return 0
+}

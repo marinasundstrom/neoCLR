@@ -58,7 +58,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   forwarding workaround; conditional output contracts remain deferred. Add Byte
   storage and unchecked conv.u1/conv.i4 lowering for union tags, preserving truncation
   at storage/call boundaries and Int32 stack semantics. Validate a standalone Raven
-  tag sample and native/interpreter boundary inputs; the aggregate ABI remains private. Full
+  tag sample and native/interpreter boundary inputs; the aggregate ABI remains private.
+  Resolve overloaded value members by exact signature and optional definition identity,
+  rejecting mismatches and ambiguous roots. Validate Raven overloads, constructors and
+  nominal output payloads. Record existing private native symbol names and future stable
+  mangling requirements without introducing a linking ABI. Full
   unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime

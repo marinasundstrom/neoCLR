@@ -21,7 +21,7 @@ pub(super) struct Profile<'a> {
     pub input: &'a neoclr::Module,
     layouts: Vec<Vec<usize>>,
     widths: Vec<usize>,
-    names: HashMap<&'a str, usize>,
+    names: HashMap<&'a str, Vec<usize>>,
     pub args: Vec<Vec<Ty>>,
     pub locals: Vec<Vec<Ty>>,
     pub results: Vec<Option<Ty>>,
@@ -100,9 +100,7 @@ impl<'a> Profile<'a> {
             layout(&mut p, i, &mut states)?;
         }
         for (i, f) in input.functions.iter().enumerate() {
-            if p.names.insert(&f.name, i).is_some() {
-                return Err("value profile does not support overloaded names".into());
-            }
+            p.names.entry(&f.name).or_default().push(i);
             if f.is_virtual
                 || f.is_override
                 || f.is_abstract
@@ -290,26 +288,37 @@ impl<'a> Profile<'a> {
             .ty)
     }
     pub fn callee(&self, target: &FunctionRef) -> Result<usize, Error> {
-        let i = *self
+        if !target.generic_arguments.is_empty() {
+            return Err("generic value calls remain unsupported".into());
+        }
+        let candidates = self
             .names
             .get(target.name.as_str())
             .ok_or("value profile does not support external calls")?;
-        let f = &self.input.functions[i];
-        if f.owner != target.owner
-            || f.instance != target.instance
-            || f.parameters != target.parameters
-            || !target.generic_arguments.is_empty()
-            || target
-                .definition
-                .as_ref()
-                .is_some_and(|d| Some(d) != f.definition.as_ref())
-        {
-            return Err("value member call identity/signature mismatch".into());
+        let mut matches = candidates.iter().copied().filter(|&i| {
+            let f = &self.input.functions[i];
+            f.owner == target.owner
+                && f.instance == target.instance
+                && f.parameters == target.parameters
+                && target
+                    .definition
+                    .as_ref()
+                    .is_none_or(|id| Some(id) == f.definition.as_ref())
+        });
+        let i = matches
+            .next()
+            .ok_or("value member call identity/signature mismatch")?;
+        if matches.next().is_some() {
+            return Err("ambiguous value call requires a matching definition identity".into());
         }
         Ok(i)
     }
     pub fn root(&self, root: &str) -> Result<usize, Error> {
-        let i = *self.names.get(root).ok_or("root function not found")?;
+        let candidates = self.names.get(root).ok_or("root function not found")?;
+        let [i] = candidates.as_slice() else {
+            return Err("ambiguous value root name; use a uniquely named wrapper".into());
+        };
+        let i = *i;
         let f = &self.input.functions[i];
         if f.instance
             || self.results[i] != Some(Ty::Int)
