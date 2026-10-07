@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Teach native POC packaging to consume the split class-library bundle with its
+  generated help, exact producer checks and relative SDK/project configuration.
+  Read runtime modules from the archive manifest during extracted verification;
+  retain explicit legacy aggregate-bundle support. This is development packaging,
+  not a release publication or completion of Platform/API-documentation work.
+
 - Ship generated XML and Markdown help with each source-built native class-library
   assembly, validate documentation identity before publishing the bundle, and hash
   nested sidecar files. Extend relocation/editor checks to verify native IPAddress

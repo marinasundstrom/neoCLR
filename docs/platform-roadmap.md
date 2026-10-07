@@ -81,8 +81,12 @@ The bundle now also stages and hashes each assembly's generated XML/Markdown hel
 relocation verifies native IPAddress documentation. This transports existing comments,
 not complete API coverage: Data's generated XML currently contains no member entries.
 [Documentation packaging](experiments/extended-cli-metadata/native-bundle-documentation-2026-10-07.md).
+The native POC packager now accepts the split bundle and records its explicit Object
+root, runtime seed and module list. Extracted verification uses those same selections;
+relative sample projects and SDK settings avoid development checkout paths.
+[Distribution qualification](experiments/extended-cli-metadata/native-split-distribution-2026-10-07.md).
 Next: Platform service ownership, API documentation coverage/unified RavenDoc generation
-and clean toolchain distribution.
+and clean-checkout release reproduction.
 The bundle alone is not an SDK release.
 The API site remains one namespace/type reference across assemblies; declaring-assembly
 provenance belongs on pages. Native multi-input RavenDoc migration must preserve that

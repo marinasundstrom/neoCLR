@@ -186,3 +186,10 @@ listing, not reassemblable neoIL.
 [Tasks and their runtime limits →](../features/tasks/) ·
 [HTTP application case →](../cases/http-server/) ·
 [Published toolchain setup →](../try/)
+
+
+Development packaging now supports the separate Runtime, Data, Networking and Web
+assemblies with a shared project configuration, explicit runtime Object ownership and
+relative SDK selection. Extracted sample verification covers native compilation and
+execution; this candidate is not a new published download. Platform boundaries and
+complete API documentation remain release work.

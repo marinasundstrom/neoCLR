@@ -28,6 +28,14 @@ def main():
         report['verifiedFiles'] = len(manifest['files'])
         compiler = root / 'sdk/tools/rvnc/rvnc.dll'
         runtime = root / manifest['runtime']
+        seed = root / manifest.get('runtimeSeed', 'lib/System.neox')
+        modules = [root / name for name in manifest.get('modules', ['lib/Numbers.dll', 'lib/Http.dll'])]
+        object_root = root / manifest['objectRoot'] if manifest.get('objectRoot') else None
+        object_args = ['--object-root', object_root] if object_root else []
+        module_args = [item for module in modules for item in ('--module', module)]
+        for path in [runtime, seed, *modules, *([object_root] if object_root else [])]:
+            if path.relative_to(root).as_posix() not in manifest['files']:
+                raise ValueError('Untracked execution dependency: ' + str(path))
 
         def run(command, expected_stdout=None):
             result = subprocess.run([str(p) for p in command], cwd=root, capture_output=True, text=True, timeout=180)
@@ -43,15 +51,13 @@ def main():
             if not assembly.is_file():
                 raise RuntimeError('Missing native sample output: ' + name)
             if sample.get('expected') is not None:
-                run([runtime, 'run', assembly, '--system', root / 'lib/System.neox',
-                     '--module', root / 'lib/Numbers.dll', '--module', root / 'lib/Http.dll',
+                run([runtime, 'run', assembly, '--system', seed, *module_args, *object_args,
                      '--instructions', '100000000'], sample['expected'])
         http_report = args.report.with_name(args.report.stem + '-http.json')
         run([sys.executable, root / 'tools/verify-native-http-json.py', '--runtime', runtime,
              '--server', root / 'samples/http-json-server/bin/neoclr/App.dll',
              '--client', root / 'samples/http-json-client/bin/neoclr/App.dll',
-             '--seed', root / 'lib/System.neox', '--module', root / 'lib/Numbers.dll',
-             '--module', root / 'lib/Http.dll', '--output', http_report])
+             '--seed', seed, *module_args, *object_args, '--output', http_report])
         report['http'] = json.loads(http_report.read_text())
         report['passed'] = True
     except Exception as error:

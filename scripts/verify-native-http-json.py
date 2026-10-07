@@ -15,8 +15,9 @@ def main():
     for name in ('runtime', 'server', 'client', 'seed', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--module', type=Path, action='append', required=True)
+    parser.add_argument('--object-root', type=Path)
     args = parser.parse_args()
-    inputs = [args.runtime, args.server, args.client, args.seed, *args.module]
+    inputs = [args.runtime, args.server, args.client, args.seed, *args.module, *([args.object_root] if args.object_root else [])]
     report = {'inputs': {str(p.resolve()): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}, 'runs': [], 'passed': False}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     if args.output.exists():
@@ -26,6 +27,8 @@ def main():
         result = [str(args.runtime.resolve()), 'run', str(assembly.resolve()), '--system', str(args.seed.resolve()), '--instructions', '100000000']
         for module in args.module:
             result += ['--module', str(module.resolve())]
+        if args.object_root:
+            result += ['--object-root', str(args.object_root.resolve())]
         return result + ['--', argument]
 
     try:
