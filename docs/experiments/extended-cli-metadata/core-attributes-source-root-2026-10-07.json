@@ -1,0 +1,140 @@
+{
+  "sourceRevision": "04686f40cc86fb7fda9e6c195b69b2e08fab31e7",
+  "compilerRevision": "622041224",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/core-attributes-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--source-object-root",
+        "--library",
+        "-o",
+        "/private/tmp/core-attributes-gate1007-recorded/Root.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Introspection/BindingFlags.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/core-attributes-source-root.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+        "--",
+        "--generic-object-consumer",
+        "/private/tmp/core-attributes-gate1007-recorded/Root.dll",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "/private/tmp/core-attributes-gate1007-recorded/App.pe"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/core-attributes-gate1007-recorded/App.pe",
+        "--system",
+        "/private/tmp/core-attributes-gate1007-recorded/System.neoil",
+        "--module",
+        "/private/tmp/core-attributes-gate1007-recorded/Root.dll",
+        "--object-root",
+        "/private/tmp/core-attributes-gate1007-recorded/Root.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_F1536B34A7AC440DA89D557B92716FD7490242F49F82A1FA236F632A2A61AC81: typed-stack/control-flow verification passed (12 IL functions; maximum stack 2; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/core-attributes-gate1007-recorded/App.pe",
+        "--system",
+        "/private/tmp/core-attributes-gate1007-recorded/System.neoil",
+        "--module",
+        "/private/tmp/core-attributes-gate1007-recorded/Root.dll",
+        "--object-root",
+        "/private/tmp/core-attributes-gate1007-recorded/Root.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "source root attributes\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/core-attributes-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--source-object-root",
+        "--library",
+        "-o",
+        "/private/tmp/core-attributes-gate1007-recorded/Rejected-flags.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Introspection/BindingFlags.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/core-attributes-source-root.rvn",
+        "/private/tmp/core-attributes-gate1007-recorded/spoof-flags.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support only the configured core FlagsAttribute on native enums.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/core-attributes-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--source-object-root",
+        "--library",
+        "-o",
+        "/private/tmp/core-attributes-gate1007-recorded/Rejected-method.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Introspection/BindingFlags.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/core-attributes-source-root.rvn",
+        "/private/tmp/core-attributes-gate1007-recorded/spoof-method.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support runtime services require internal nongeneric bodyless functions in neoCLR.Runtime with the core MethodImpl(InternalCall) attribute.\n"
+    }
+  ],
+  "scope": "Source Object fixture with bootstrap attributes; consumer generated by metadata API, not Raven imported-root acceptance.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn": "9d4ac383f59d0bf29aa8926c8dc402b905e17393c9f65c903bc15f0ab950d4f6",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Introspection/BindingFlags.rvn": "d653a79edea57d664431ee9b6a1bd5e7980f873b6543308610a33286703f7d4e",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/core-attributes-source-root.rvn": "010bd86b6b32e443caf551d2064f09b369863dbfbab7c4f151e9ec3b2e118f63",
+    "/private/tmp/core-attributes-gate1007-recorded/spoof-flags.rvn": "8f899bd6f7ff5cec29c859e7cc8c77f13edda98bde66041b8659fb32b1cb5966",
+    "/private/tmp/core-attributes-gate1007-recorded/spoof-method.rvn": "b486310af09264ff26f56d5f54f28911d32822c9f538690215a9b3a7ccca150b",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_generic_object_root.py": "fc707f03ec039cbff57fa8316c0aeb7c1d109d534749019721b5a653d12ffeef",
+    "/private/tmp/core-attributes-compiler1007/rvnc.dll": "22b262b03f30a52960cf5e7e4f8e3175e68a66f5c895c27d623291fece747a59",
+    "/private/tmp/preview12-bootstrap/Core.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/preview12-bootstrap/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "a2d79f933a7ccfe95fb0f4be86c8e00c496cc6f28c21d84dd74ada335a0acb49",
+    "/private/tmp/core-attributes-gate1007-recorded/System.neoil": "b3de629ea4ba552863c8df2a94a8787ae1505a49da4e890dacc23e49c75dbbbd",
+    "/private/tmp/core-attributes-gate1007-recorded/Root.dll": "11868c9a7142a6f77b1152936304917d960efb26fadf60640ecf4fb8df9b2909",
+    "/private/tmp/core-attributes-gate1007-recorded/App.pe": "4e116ffd37578fa23b2794ce420f4edd4df50d5fdfcfb7641597f56ba170ca43",
+    "/private/tmp/core-attributes-compiler1007/Raven.CodeAnalysis.dll": "3eba9711d32213ae80c3984099ca4ff01fad743207b486241c9b0aac45532246",
+    "/private/tmp/core-attributes-compiler1007/Raven.CodeAnalysis.NeoClr.dll": "0bb2db5210960349f5c0aaa4a5c9cb22fa2222bd706c3637655104b44950f1d8",
+    "/private/tmp/core-attributes-compiler1007/NeoCLR.Metadata.Experimental.dll": "5c782b5cdd459863db904c2d90380b6bbb130663da5748a416419216f240c8b0"
+  },
+  "finalRavenCommit": "622041224",
+  "revisionNote": "Compiler snapshot has the behavior committed in finalRavenCommit; hashes identify tested binaries."
+}

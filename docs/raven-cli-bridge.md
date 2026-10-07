@@ -6274,3 +6274,17 @@ unsupported. A Raven-authored root fixture and Box<T> execute through an API-aut
 consumer; this does not remove the ordinary driver restriction on imported-root consumers.
 The System audit proceeds past Array<T> and next rejects enum attribute ownership.
 See [evidence and next boundary](experiments/extended-cli-metadata/generic-object-root-2026-10-07.md).
+
+### Bootstrap attribute ownership independent of Object (2026-10-07)
+
+Raven `622041224` validates FlagsAttribute and MethodImplAttribute against the exact
+host-provided core identity instead of System.Object's containing assembly. Source-owned
+Object therefore does not change the owner of these bootstrap declarations. Their names,
+constructor arguments and permitted target shapes remain checked; lookalike source
+attributes reject before publication. No Runtime Contract option or wire-format change
+is introduced. Ordinary .NET code is unchanged.
+
+Production BindingFlags plus an InternalCall execute with the source Object fixture;
+ordinary-bootstrap NativeMemory passes again. These are focused regressions, not full
+imported-root acceptance. The full-System audit proceeds to UnionAttribute's unsupported
+external System.Attribute base. [Reproduction and evidence](experiments/extended-cli-metadata/core-attributes-source-root-2026-10-07.md).

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Verify bootstrap FlagsAttribute and MethodImpl(InternalCall) with a source-owned
+  Object root after Raven's exact-core identity fix. Production BindingFlags and an
+  attributed runtime call execute; same-named source attributes reject before output.
+  Ordinary-bootstrap NativeMemory execution/fault checks still pass. Full System now
+  stops at UnionAttribute's unsupported external System.Attribute base.
+
 - Allow top-level generic reference classes to inherit the explicitly authored native
   Object root. Definition/builder validation, constructor flow and native reading retain
   the existing CLI/native base encoding; general generic inheritance stays unsupported.

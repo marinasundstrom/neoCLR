@@ -1,0 +1,19 @@
+import System.Runtime.CompilerServices.*
+import System.Introspection.*
+
+namespace neoCLR.Runtime {
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func WriteLine(message: string) -> System.Void;
+}
+
+public func RunGeneric() -> int {
+    let flags = BindingFlags.Public | BindingFlags.Instance
+    if (flags & BindingFlags.Public) != BindingFlags.Public {
+        return 1
+    }
+    if (flags & BindingFlags.Static) != BindingFlags.Default {
+        return 2
+    }
+    neoCLR.Runtime.WriteLine("source root attributes")
+    return 42
+}

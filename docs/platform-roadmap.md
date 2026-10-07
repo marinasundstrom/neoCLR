@@ -10,6 +10,16 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Native FlagsAttribute and MethodImpl(InternalCall) validation now uses the explicit
+primitive-bootstrap identity, independently of source Object ownership. The source-root
+regression and wrong-owner rejection pass; ordinary-bootstrap NativeMemory still runs.
+The 194-input System audit next rejects **UnionAttribute**, whose System.Attribute base
+is external bootstrap metadata. Next establish explicit Attribute ownership/inheritance
+for the source library and its metadata representation. Full System still emits no output.
+[Core-attribute evidence](experiments/extended-cli-metadata/core-attributes-source-root-2026-10-07.md).
+
+### Earlier generic-root frontier
+
 Generic reference classes can now inherit the source Object root through an explicit
 Raven target capability and the metadata builder/definition path. Generic storage,
 base construction and inherited dispatch execute in focused native tests. The System
