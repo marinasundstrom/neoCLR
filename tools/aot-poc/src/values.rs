@@ -327,6 +327,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                             stack.extend(read(&mut b, &p, t, result));
                         }
                     }
+                    Op::Fault(_) => {
+                        // Terminal UserFault; the experimental ABI carries category only.
+                        let status = b.ins().iconst(types::I32, 4);
+                        b.ins().return_(&[status]);
+                        continue;
+                    }
                     Op::Return => {
                         if let Some(t) = &p.results[i] {
                             write_typed(&mut b, &p, t, output, &stack);

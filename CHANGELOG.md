@@ -130,7 +130,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   selection of managed seed bodies, preserving original verification and identity reports;
   the default remains validation only. Validate actual primitive seed helpers in an isolated
   native executable and reject duplicate/missing context, nonpublic access and native
-  InternalCall services. ReadByte now reaches its String-based failure path. No native
+  InternalCall services. ReadByte now reaches its String-based failure path. Lower explicit
+  fault instructions in scalar/value code to experimental ABI status 4 (UserFault),
+  preserving first-fault propagation and untouched export results. Fault paths may end
+  before output assignment; normal returns retain assignment checks. Validate interpreter
+  parity and an isolated native consumer. Hosts naming statuses should recognize 4;
+  fault messages/stack traces and String-based System.Fail remain unsupported in AOT. No native
   reference services, interface execution or public ABI/runtime APIs are added.
   General unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,

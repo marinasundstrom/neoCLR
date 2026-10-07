@@ -226,7 +226,7 @@ fn assert_native_outcomes(source: &str, inputs: &[i32], oracle: Option<&dyn Fn(i
                 assert!(oracle.is_none(), "unexpected interpreter fault {fault}");
                 assert!(matches!(
                     fault.code,
-                    neoclr::FaultCode::DivideByZero | neoclr::FaultCode::ArithmeticOverflow
+                    neoclr::FaultCode::DivideByZero | neoclr::FaultCode::ArithmeticOverflow | neoclr::FaultCode::UserFault
                 ));
                 assert_eq!(
                     result.status.code(),
@@ -793,4 +793,25 @@ int main(void) {
         String::from_utf8_lossy(&result.stderr)
     );
     assert!(Command::new(executable).output().unwrap().status.success());
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn explicit_user_faults_match_interpreter_and_preserve_first_fault() {
+    let source = include_str!("../../../docs/experiments/aot-scalar/user-fault.neoil");
+    assert_native_outcomes(source, &[0, 1, -1], None);
+    // A fault discards a live operand stack and needs no return/fallthrough.
+    assert_native_outcomes(".module UserFault\n.function Calculate(Int32 value) -> Int32\nldarg value\nfault \"stop\"\n.end", &[42], None);
+    // A prior arithmetic fault must not be replaced by a subsequent UserFault.
+    assert_native_outcomes(".module FirstFault\n.function Calculate(Int32 value) -> Int32\nldc.i4 1\nldarg value\ndiv\nfault \"later\"\n.end", &[0, 1], None);
+}
+
+#[test]
+fn fault_does_not_hide_unsupported_dead_instructions() {
+    let temp = Temp::new();
+    let object = temp.0.join("dead.o");
+    let result = compile(".module DeadFault\n.function Calculate(Int32 value) -> Int32\nfault \"stop\"\nldc.i4 1\nldc.i4 2\nxor\nret\n.end", &object);
+    assert!(!result.status.success());
+    assert!(String::from_utf8_lossy(&result.stderr).contains("unsupported instruction"));
+    assert!(!object.exists());
 }

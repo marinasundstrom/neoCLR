@@ -1639,3 +1639,78 @@ fn generic_method_clones_are_bounded_and_keep_plain_callees_at_the_limit() {
         }
     }
 }
+
+#[test]
+fn user_fault_terminates_value_calls_and_output_assignment_paths() {
+    let source = r#".module ValueFault
+.function Fill(out Int32& value, Int32 fail) -> Void
+    ldarg fail
+    brfalse Success
+    fault "output rejected"
+Success:
+    ldarg value
+    ldc.i4 42
+    stobj Int32
+    ldvoid
+    ret
+.end
+.function Forward(Int32 fail) -> Int32
+    .local Int32 value
+    ldloca value
+    ldarg fail
+    call Fill(Int32&, Int32)
+    pop
+    ldloc value
+    ret
+.end
+.function Main(Int32 fail) -> Int32
+    ldarg fail
+    value.pack Int32
+    value.unpack Int32
+    call Forward(Int32)
+    ldarg fail
+    brfalse Done
+    ldc.i4 1
+    ldc.i4 0
+    div
+    add
+Done:
+    ret
+.end
+"#;
+    let m = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::new(&m).unwrap();
+    program.verify().unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap()).unwrap();
+    let fault = method.invoke(vec![neoclr::Value::Int32(1)], neoclr::Limits::default()).unwrap_err();
+    assert_eq!(fault.code, neoclr::FaultCode::UserFault);
+    assert!(fault.message.contains("output rejected"));
+    let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+    for closed in [false, true] {
+        let temp = Temp::new();
+        let result = compile_mode(&bytes, &temp, "Main", closed);
+        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))] {
+            native_mode(&bytes, 1, 4, 12345, "Main", closed);
+            native_mode(&bytes, 0, 0, 42, "Main", closed);
+        }
+    }
+    // A normal return still has to assign the output, even beside a fault path.
+    let bad = neoclr::assemble(&source.replace("    ldarg value\n    ldc.i4 42\n    stobj Int32\n", "")).unwrap();
+    let temp = Temp::new();
+    let result = compile_mode(&neoclr::metadata_container::write_module(&bad).unwrap(), &temp, "Main", true);
+    assert!(!result.status.success());
+    assert!(!temp.0.join("value.o").exists());
+    assert!(String::from_utf8_lossy(&result.stderr).contains("definite whole-slot assignment"));
+}
+
+#[test]
+fn user_fault_does_not_hide_unsupported_value_il() {
+    let m = neoclr::assemble(".module DeadValueFault\n.function Main() -> Int32\nfault \"stop\"\nldc.i4 1\nvalue.pack Int32\npop\nldc.i4 1\nldc.i4 2\nxor\nret\n.end").unwrap();
+    let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+    let temp = Temp::new();
+    let result = compile_mode(&bytes, &temp, "Main", true);
+    assert!(!result.status.success());
+    assert!(String::from_utf8_lossy(&result.stderr).contains("unsupported value instruction"));
+    assert!(!temp.0.join("value.o").exists());
+}

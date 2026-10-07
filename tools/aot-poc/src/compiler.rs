@@ -324,6 +324,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool) -> Resu
                         return_if(&mut builder, failed, status);
                         stack.push(builder.ins().stack_load(types::I32, call_result, 0));
                     }
+                    Op::Fault(_) => {
+                        // Terminal UserFault; the experimental ABI carries category only.
+                        let status = builder.ins().iconst(types::I32, 4);
+                        builder.ins().return_(&[status]);
+                        continue;
+                    }
                     Op::Return => {
                         let result = stack.pop().expect("validated stack");
                         builder.ins().store(MemFlags::new(), result, output, 0);

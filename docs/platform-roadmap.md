@@ -78,7 +78,9 @@ Primitive static generic methods now specialize into bounded private bodies, wit
 identities/origins reported and a Raven forwarding consumer validated. ReadByte's generic
 helpers now compile from an explicitly supplied System seed with `--compile-system`;
 the default remains validation only. The unchanged ReadByte probe now reaches its String-based
-failure path. That path and native byte-input services precede UTF-8 text/lifetime contracts. Multiple instantiations
+failure path. Explicit `fault` now lowers to terminal UserFault status in scalar/value
+code, with first-fault propagation and no result publication. String-based System.Fail
+and native byte-input services still precede UTF-8 text/lifetime contracts. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

@@ -1,0 +1,91 @@
+{
+  "profile": "aot-user-fault-v1",
+  "baseRevision": "1575b6d0dc4927bf9b9627207b699c9c97603b42",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "commands": [
+    {
+      "command": [
+        "tools/aot-poc/target/debug/neoclr-aot-poc",
+        "docs/experiments/aot-scalar/user-fault.neoil",
+        "Calculate",
+        "target/aot-user-fault/user-fault.o"
+      ],
+      "exit": 0,
+      "stdout": "Emitted aarch64-apple-darwin object; C export: int32_t neoclr_entry_v2(int32_t, int32_t *result)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "docs/experiments/aot-scalar/host.c",
+        "target/aot-user-fault/user-fault.o",
+        "-o",
+        "target/aot-user-fault/user-fault"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "target/aot-user-fault/user-fault.o"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "target/aot-user-fault/user-fault"
+      ],
+      "exit": 0,
+      "stdout": "target/aot-user-fault/user-fault:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "isolatedRuns": [
+    {
+      "input": "0",
+      "exit": 0,
+      "stdout": "42\n",
+      "stderr": ""
+    },
+    {
+      "input": "1",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault\n"
+    },
+    {
+      "input": "-1",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault\n"
+    }
+  ],
+  "native": {
+    "executableOnlyDirectory": true,
+    "emptyEnvironment": true,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ],
+    "faultOutputSentinelCheckedByHost": true
+  },
+  "hashes": {
+    "docs/experiments/aot-scalar/user-fault.neoil": "a1a9a8a433730eff2cf4d13e6d6d10ffec78a76c7a796fa8f4710a7dcc82c36e",
+    "tools/aot-poc/target/debug/neoclr-aot-poc": "8168d68a6db5f081bb490b6ae0176609a3ae21b0b4019347c468bea48e8709ff",
+    "docs/experiments/aot-scalar/host.c": "5207017f29c4385e245cb78dd0d3c866bb02e176bec7353ff4450d6882848fbb",
+    "docs/experiments/aot-scalar/abi.h": "8fd166293a4d011efefc80fa8e3baa9baf8c10dc77c5cda6d596736779ebaa34",
+    "target/aot-user-fault/user-fault.o": "2deee2d04d93189e020aa3d1e343e951c754f63a6cada6de99eb1ee21fa1e7bc",
+    "target/aot-user-fault/user-fault": "fe36fb0b148ea4d038b7f791b2fcabf191a9d79273ad0de1aaf6a72ab209cf57"
+  }
+}

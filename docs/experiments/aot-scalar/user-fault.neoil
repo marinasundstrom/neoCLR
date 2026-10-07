@@ -1,0 +1,26 @@
+.module UserFault
+.function Check(Int32 value) -> Int32
+    ldarg value
+    brfalse Success
+    fault "input was rejected"
+Success:
+    ldc.i4 42
+    ret
+.end
+.function Forward(Int32 value) -> Int32
+    ldarg value
+    call Check(Int32)
+    ret
+.end
+.function Calculate(Int32 value) -> Int32
+    ldarg value
+    call Forward(Int32)
+    ldarg value
+    brfalse Done
+    ldc.i4 1
+    ldc.i4 0
+    div
+    add
+Done:
+    ret
+.end

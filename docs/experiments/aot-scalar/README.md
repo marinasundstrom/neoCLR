@@ -174,7 +174,8 @@ int32_t neoclr_entry_v2(int32_t value, int32_t *result);
 
 Status 0 means success, 1 maps to `DivideByZero`, and 2 maps to
 `ArithmeticOverflow`. The console slice adds status 3 for `RuntimeError` on a
-failed host write. These are experiment-owned numbers, not Rust enum ordinals.
+failed host write. Explicit `fault` now returns status 4, `UserFault`. These are
+experiment-owned numbers, not Rust enum ordinals.
 The host must supply a valid aligned writable Int32 pointer. A failing invocation
 leaves that storage untouched. The symbol deliberately changes from the scalar
 probe's old `neoclr_entry`: rebuild the object and C host together. No stable public
@@ -207,3 +208,31 @@ The [fault consumer](faults.neoil) computes `100 / checked(value + 1)`: input 19
 prints 5; -1 exits with DivideByZero; Int32.MaxValue exits with ArithmeticOverflow.
 Use the same compiler/host commands with a fresh output path. Historical scalar and
 control-flow evidence remains tied to its recorded source hashes and v1 ABI.
+
+## Explicit guest faults (2026-10-07)
+
+The scalar and inline-value backends now lower `fault "message"` as a terminal
+`UserFault` (status 4). The instruction discards the live operand stack; it needs no
+return or fallthrough. Calls propagate the first status before reading result storage.
+Fault paths do not need to assign output parameters, while every normal return still
+does. Unsupported instructions remain rejected even after a terminal fault.
+
+The experimental C ABI returns the category only: diagnostic text and stack traces
+are not delivered or embedded by this lowering. Existing status numbers and the v2
+entry signature remain unchanged; hosts that name known statuses should add status 4
+and retain an unknown-status fallback. This is not a public hosting API.
+
+[The sample](user-fault.neoil) accepts 0 and returns 42; nonzero inputs fault across
+two call boundaries before a later divide-by-zero can execute. Reproduce with the
+compiler/host commands above, substituting this source and a fresh object/executable
+path. [Recorded native evidence](user-fault-validation.json) runs the executable alone
+with an empty environment, no managed runtime and only libSystem. All 54 scalar/value
+tests pass, covering interpreter classification, first-fault precedence, unchanged
+export results, terminal-only bodies, output contracts and unsupported dead IL.
+
+This reuses the [System.Fail comparison with .NET Environment.FailFast](../../system-fault.md#comparison-and-tradeoffs--2026-09-15).
+The native status ends the guest invocation while keeping the host process alive;
+it provides no process-abort, exception-unwinding or cleanup guarantee. The category-only
+ABI also loses diagnostics that the interpreter preserves. String-based System.Fail
+and its native service binding remain unsupported, including in the real ReadByte
+wrapper; this slice supplies the terminal control-flow foundation for that later work.

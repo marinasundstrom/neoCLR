@@ -243,7 +243,9 @@ Primitive pack/test/unpack preserves exact types and propagates incorrect-unpack
 primitive static generic helpers now specialize with source identities retained in build
 reports. Explicit `--compile-system` now compiles selected managed System seed helpers.
 The actual ReadByte wrapper reaches its String-based failure path; that path, native input
-services and UTF-8 text lifetimes remain future work.
+services and UTF-8 text lifetimes remain future work. Explicit `fault` instructions now
+return UserFault status through native calls without publishing a result; message/stack
+diagnostics and String-based System.Fail are not yet supported by this AOT profile.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

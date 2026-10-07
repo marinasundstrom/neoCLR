@@ -454,6 +454,7 @@ impl<'a> Profile<'a> {
                         state.stack.push(None);
                     }
                 }
+                Op::Fault(_) => continue,
                 Op::Return => {
                     if f.out_parameters.iter().any(|n| !state.assigned[*n]) {
                         return Err(fail());
@@ -558,6 +559,7 @@ impl<'a> Profile<'a> {
                 | Op::Call(_)
                 | Op::Construct(_)
                 | Op::Return
+                | Op::Fault(_)
                 | Op::Branch(_)
                 | Op::BranchTrue(_)
                 | Op::BranchFalse(_)
@@ -703,7 +705,7 @@ impl<'a> Profile<'a> {
                         return Err(fail(pc, "nonempty return stack"));
                     }
                 }
-                Op::Branch(_) => (),
+                Op::Fault(_) | Op::Branch(_) => (),
                 Op::BranchTrue(_) | Op::BranchFalse(_) => {
                     if !matches!(pop(&mut stack)?, Ty::Int | Ty::Bool) {
                         return Err(fail(pc, "branch requires Int32 or Boolean"));
@@ -735,7 +737,7 @@ impl<'a> Profile<'a> {
                 }
             }
             let successors = match op {
-                Op::Return => vec![],
+                Op::Return | Op::Fault(_) => vec![],
                 Op::Branch(n) => vec![*n],
                 Op::BranchTrue(n) | Op::BranchFalse(n) => vec![*n, pc + 1],
                 _ if flow::comparison(op).is_some() => {

@@ -64,13 +64,14 @@ pub(super) fn analyze(function: &Function) -> Result<Stacks, Error> {
             | Op::RemainderUnsigned => (2, 1),
             Op::Call(target) => (target.parameters.len(), 1),
             Op::Return => (1, 0),
+            Op::Fault(_) => (0, 0),
             Op::Branch(_) => (0, 0),
             Op::BranchTrue(_) | Op::BranchFalse(_) => (1, 0),
             _ if comparison(op).is_some() => (2, 0),
             _ => return Err(fail(pc, "unsupported instruction")),
         };
         let successors = match op {
-            Op::Return => vec![],
+            Op::Return | Op::Fault(_) => vec![],
             Op::Branch(target) => vec![*target],
             Op::BranchTrue(target) | Op::BranchFalse(target) => vec![*target, pc + 1],
             _ if comparison(op).is_some() => vec![comparison(op).unwrap().0, pc + 1],

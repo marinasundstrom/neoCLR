@@ -277,6 +277,9 @@ The unchanged Raven `ReadByte.pe` now passes seed helper selection and stops at
 `specialization requires closed reference-free local value types: String`: the ordinary
 wrapper includes an invalid-status failure path. It still emits no object. Supporting
 that path and explicitly binding the native byte-input service are subsequent tasks.
+The subsequent [explicit fault slice](../aot-scalar/README.md#explicit-guest-faults-2026-10-07)
+adds terminal `UserFault` status propagation in scalar/value code; it does not yet admit
+the wrapper's String-based System.Fail call.
 Existing reproduction scripts without the opt-in retain the earlier missing-body boundary.
 
 This extends the .NET Native AOT build-time dependency comparison above: managed seed

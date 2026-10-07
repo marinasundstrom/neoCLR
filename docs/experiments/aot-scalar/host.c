@@ -28,7 +28,8 @@ int main(int argc, char **argv) {
         }
         fprintf(stderr, "%s\n", status == NEOCLR_AOT_DIVIDE_BY_ZERO ? "DivideByZero" :
                 status == NEOCLR_AOT_ARITHMETIC_OVERFLOW ? "ArithmeticOverflow" :
-                status == NEOCLR_AOT_RUNTIME_ERROR ? "RuntimeError" : "UnknownFault");
+                status == NEOCLR_AOT_RUNTIME_ERROR ? "RuntimeError" :
+                status == NEOCLR_AOT_USER_FAULT ? "UserFault" : "UnknownFault");
         return 1;
     }
     printf("%" PRId32 "\n", result);
