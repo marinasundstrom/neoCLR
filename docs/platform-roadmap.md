@@ -61,8 +61,10 @@ plain positional `let` deconstruction is a recorded Raven native-emitter gap.
 The [real library Result probe](experiments/aot-values/README.md#real-library-result-dependency-boundary-2026-10-07)
 now passes Raven/interpreter execution and records AOT's external-call rejection.
 Closed-world inspection shares emission preparation and exposes this boundary.
-An explicit assembly-aware value-library load set is the next proposed implementation
-slice, before the library Result propagation-interface contract. Multiple instantiations
+An [explicit nongeneric value-library load set](experiments/aot-library/README.md) now
+compiles separate Raven library/application artifacts into one standalone executable,
+verifying original access scopes before projection. Generic library values are next,
+before the library Result propagation-interface contract. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

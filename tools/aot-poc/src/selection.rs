@@ -40,11 +40,11 @@ fn resolve(input: &neoclr::Module, target: &FunctionRef) -> Result<usize, Error>
     Ok(index)
 }
 
-pub fn select(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Value), Error> {
+pub(super) fn validate_source(input: &neoclr::Module, single_assembly: bool) -> Result<(), Error> {
     if input.functions.len() > 4096 || input.types.len() > 1024 {
         return Err("closed-world input inventory exceeds bounds".into());
     }
-    if input.assemblies.len() > 1 {
+    if single_assembly && input.assemblies.len() > 1 {
         return Err("closed-world selection requires one source assembly".into());
     }
     for origin in input
@@ -82,6 +82,19 @@ pub fn select(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
             return Err("noncanonical source type identity".into());
         }
     }
+    Ok(())
+}
+
+pub fn select(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Value), Error> {
+    select_inventory(input, root, true)
+}
+
+pub(super) fn select_inventory(
+    input: &neoclr::Module,
+    root: &str,
+    single_assembly: bool,
+) -> Result<(neoclr::Module, Value), Error> {
+    validate_source(input, single_assembly)?;
     let roots: Vec<_> = input
         .functions
         .iter()

@@ -1,0 +1,211 @@
+{
+  "profile": "raven-value-library-v1",
+  "declaredCompilerRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "neoClrBaseRevision": "06681870e844054c609516b4d7549e0e3ce94637",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--library",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/Values.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-library/library.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/Values.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/App.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-library/app.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/App.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/Values.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/App.dll",
+        "@entry",
+        "--closed-world",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/Values.dll"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"admission\": {\n    \"accepted\": true\n  },\n  \"admissionMode\": \"closed-world\",\n  \"assemblies\": [\n    {\n      \"full_name\": \"[\\\"App\\\",\\\"1.0.0.0\\\",\\\"\\\",\\\"\\\",\\\"0\\\"]\",\n      \"modules\": [\n        \"App.dll\"\n      ],\n      \"name\": \"App\",\n      \"references\": [\n        \"[\\\"Values\\\",\\\"1.0.0.0\\\",\\\"\\\",\\\"\\\",\\\"0\\\"]\"\n      ],\n      \"value_type_references\": [\n        \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572\"\n      ]\n    }\n  ],\n  \"capabilities\": {\n    \"console\": false\n  },\n  \"functions\": [\n    {\n      \"calls\": [\n        {\n          \"instruction\": 0,\n          \"operation\": \"newobj.ctor\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572..ctor\",\n            \"owner\": {\n              \"Named\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572\"\n            },\n            \"parameters\": []\n          }\n        },\n        {\n          \"instruction\": 5,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572.M_416476616E6365\",\n            \"owner\": {\n              \"Named\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572\"\n            },\n            \"parameters\": []\n          }\n        },\n        {\n          \"instruction\": 12,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572.M_416476616E6365\",\n            \"owner\": {\n              \"Named\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572\"\n            },\n            \"parameters\": []\n          }\n        },\n        {\n          \"instruction\": 21,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572.M_416476616E6365\",\n            \"owner\": {\n              \"Named\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572\"\n            },\n            \"parameters\": []\n          }\n        }\n      ],\n      \"definition\": null,\n      \"index\": 0,\n      \"instance\": false,\n      \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n      \"noResult\": false,\n      \"outParameters\": [],\n      \"owner\": null,\n      \"parameters\": [],\n      \"returns\": \"Int32\",\n      \"virtual\": false\n    }\n  ],\n  \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n  \"notice\": \"Build diagnostics only. Not a deployable metadata sidecar, stable ABI or export manifest.\",\n  \"opcodes\": {\n    \"brfalse\": 2,\n    \"brtrue\": 1,\n    \"call\": 3,\n    \"ceq\": 6,\n    \"ldc.bool\": 3,\n    \"ldc.i4\": 6,\n    \"ldloc\": 1,\n    \"ldloca\": 3,\n    \"newobj.ctor\": 1,\n    \"ret\": 3,\n    \"stloc\": 2\n  },\n  \"root\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n  \"schema\": \"neoclr-aot-inspection-v1\",\n  \"scope\": \"inventory includes all declarations; admission uses admissionMode\",\n  \"selection\": {\n    \"excludedFunctions\": [],\n    \"excludedTypes\": [],\n    \"functions\": [\n      {\n        \"compiledIndex\": 0,\n        \"definition\": {\n          \"index\": 0,\n          \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n        \"sourceIndex\": 0\n      },\n      {\n        \"compiledIndex\": 1,\n        \"definition\": {\n          \"index\": 0,\n          \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572.M_416476616E6365\",\n        \"sourceIndex\": 1\n      },\n      {\n        \"compiledIndex\": 2,\n        \"definition\": {\n          \"index\": 1,\n          \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572..ctor\",\n        \"sourceIndex\": 2\n      }\n    ],\n    \"loadSet\": {\n      \"limits\": \"nongeneric declarations; one to eight explicit dependencies; bundled System; no dynamic loading\",\n      \"modules\": [\n        {\n          \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        {\n          \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n          \"revision\": \"1.0.0.0\"\n        }\n      ],\n      \"validation\": \"all original bodies verified with runtime binder before private canonical projection\"\n    },\n    \"metadataPolicy\": \"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted\",\n    \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n    \"policy\": \"explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch\",\n    \"root\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n    \"schema\": \"neoclr-aot-selection-v1\",\n    \"types\": [\n      {\n        \"compiledIndex\": 0,\n        \"definition\": {\n          \"index\": 0,\n          \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572\",\n        \"sourceIndex\": 0\n      }\n    ]\n  },\n  \"types\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/App.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/app.o",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/Values.dll"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"excludedFunctions\": [],\n  \"excludedTypes\": [],\n  \"functions\": [\n    {\n      \"compiledIndex\": 0,\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n      \"sourceIndex\": 0\n    },\n    {\n      \"compiledIndex\": 1,\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572.M_416476616E6365\",\n      \"sourceIndex\": 1\n    },\n    {\n      \"compiledIndex\": 2,\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572..ctor\",\n      \"sourceIndex\": 2\n    }\n  ],\n  \"loadSet\": {\n    \"limits\": \"nongeneric declarations; one to eight explicit dependencies; bundled System; no dynamic loading\",\n    \"modules\": [\n      {\n        \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      {\n        \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n        \"revision\": \"1.0.0.0\"\n      }\n    ],\n    \"validation\": \"all original bodies verified with runtime binder before private canonical projection\"\n  },\n  \"metadataPolicy\": \"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted\",\n  \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n  \"policy\": \"explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch\",\n  \"root\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n  \"schema\": \"neoclr-aot-selection-v1\",\n  \"types\": [\n    {\n      \"compiledIndex\": 0,\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572\",\n      \"sourceIndex\": 0\n    }\n  ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/app.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/app"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/app.o"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-library-final/app"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-library-final/app:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "samples": {},
+  "selection": {
+    "excludedFunctions": [],
+    "excludedTypes": [],
+    "functions": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E",
+        "sourceIndex": 0
+      },
+      {
+        "compiledIndex": 1,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572.M_416476616E6365",
+        "sourceIndex": 1
+      },
+      {
+        "compiledIndex": 2,
+        "definition": {
+          "index": 1,
+          "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572..ctor",
+        "sourceIndex": 2
+      }
+    ],
+    "loadSet": {
+      "limits": "nongeneric declarations; one to eight explicit dependencies; bundled System; no dynamic loading",
+      "modules": [
+        {
+          "name": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5",
+          "revision": "1.0.0.0"
+        },
+        {
+          "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        }
+      ],
+      "validation": "all original bodies verified with runtime binder before private canonical projection"
+    },
+    "metadataPolicy": "original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
+    "module": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5",
+    "policy": "explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch",
+    "root": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E",
+    "schema": "neoclr-aot-selection-v1",
+    "types": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_436F756E746572",
+        "sourceIndex": 0
+      }
+    ]
+  },
+  "native": {
+    "artifacts": {
+      "Values.dll": "cf9a8ae2d3adb0c7ad4d148bb36b18fb858f73af1e538521b90ec8801c53c9e4",
+      "App.dll": "6b22f5b9a16320a10a48a52f4290e0ff9847089c8fc4a5b540a387d4cb2451c7",
+      "app.o": "145769f1a2f5a625be19bb165f9e2b9e4d1443b23891967309baee6ee982c8f1",
+      "app": "646be3b8998084fad4fcf98c4d9c37713236ae9cb471ec07553c404ed5e58712"
+    },
+    "exit": 0,
+    "emptyEnvironment": true,
+    "executableOnlyDirectory": true,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "inputs": {
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "c6ff01254a8b362deaacd4c0c5f0dcee74011eb98506acfad6e30d2480a9fc1a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d",
+    "/Users/robert/Projects/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll": "ceed4f239901f850a2a0194dec64e44ebc540c6d37c14c1db854b7e2a1d6f6a5",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-library/library.rvn": "3f4dd0b4ef1382bfd720cd24c68aa2434765a915d31c93de4de067e84991e439",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-library/app.rvn": "637d68ff97b6bc07e590ec99be32ce2ebcda93131c730be57a7cbd44934afb6c"
+  }
+}

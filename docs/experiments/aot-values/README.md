@@ -438,3 +438,9 @@ neoCLR's binding/identity semantics over concatenating declarations or recognizi
 concatenation risks repairing bad identities or weakening access checks. This is a
 provisional next-slice design, not implemented library AOT or a new public ABI. General
 trimming, multiple generic instantiations and input/lifetime services remain later work.
+
+
+The [subsequent explicit value-library slice](../aot-library/README.md) now implements
+nongeneric application-plus-library compilation with original-scope verification and
+standalone Raven evidence. Generic runtime-library/interface support remains open;
+this does not change the recorded rejection of the System.Result probe.

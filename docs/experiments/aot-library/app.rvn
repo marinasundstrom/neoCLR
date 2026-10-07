@@ -1,0 +1,13 @@
+import Values.*
+
+func Main() -> int {
+    var counter = Counter()
+    var copy = counter
+    if counter.Advance() != 42 || counter.Advance() != 44 {
+        return 1
+    }
+    if copy.Advance() != 42 {
+        return 2
+    }
+    return 0
+}

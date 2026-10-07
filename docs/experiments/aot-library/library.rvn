@@ -1,0 +1,10 @@
+namespace Values
+
+public struct Counter {
+    private var value: int = 40
+
+    func Advance() -> int {
+        value += 2
+        return value
+    }
+}

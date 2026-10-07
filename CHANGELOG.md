@@ -85,11 +85,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   using the same selection/specialization preparation as emission, with phase-specific
   failures and exact rejected call references. Validate the real System.Result<int, byte>
   consumer through Raven and the interpreter, recording expected external-dependency
-  rejection before object creation and its propagation-interface contract. Library AOT
+  rejection before object creation and its propagation-interface contract. Runtime-library Result AOT
   remains unsupported; an explicit assembly-aware value-library load set is the next
   proposed implementation slice. Five inspection and 28 value-profile tests pass.
-  No public ABI or runtime APIs change.
-  General unions, reference fields and library dependency compilation remain
+  Implement the first explicit nongeneric value-library load set with trailing --module
+  inputs. Verify original module scopes with the runtime binder/verifier before canonical
+  projection; preserve original identities in selection reports and reject cross-module
+  access violations. Compile a separate Raven Counter library/application into one ARM64
+  executable with no input DLLs at execution time. Add PE/NEOX, interpreter parity and
+  invalid dependency/access tests. No public ABI or runtime APIs change.
+  General unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime
   dependencies and public library APIs are unchanged. Cherry-pick this

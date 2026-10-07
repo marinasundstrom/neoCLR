@@ -3,7 +3,12 @@ use neoclr::metadata::Instruction as Op;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
-pub fn report(input: &neoclr::Module, root: &str, closed: bool) -> Value {
+pub fn report(
+    input: &neoclr::Module,
+    root: &str,
+    closed: bool,
+    dependencies: &[neoclr::Module],
+) -> Value {
     let mut histogram = BTreeMap::<String, usize>::new();
     let functions: Vec<_> = input
         .functions
@@ -35,7 +40,11 @@ pub fn report(input: &neoclr::Module, root: &str, closed: bool) -> Value {
     // Use actual compiler admission rather than maintaining a second capability list.
     // Object bytes are discarded and no linker or emitted code is executed.
     let prepared = if closed {
-        super::selection::prepare(input, root).map(Some)
+        if dependencies.is_empty() {
+            super::selection::prepare(input, root).map(Some)
+        } else {
+            super::linking::prepare(input, dependencies, root).map(Some)
+        }
     } else {
         Ok(None)
     };
