@@ -153,6 +153,11 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   Raven Some/None with both branches and payload extraction first; a Result-based console
   input/parser afterward to drive strings, input, failure and lifetime handling before HTTP.
   Native union completion remains pending at this inspection slice.
+- **Assistant implementation choice:** add an explicit closed-world direct-call mode to
+  compile value-only union paths without unused generated formatting/boxing services.
+  This brings limited code selection forward from later trimming; it reports exclusions
+  and preserves the original artifact. It does not silently change whole-module admission
+  or establish reflection-aware trimming. Full union sample validation follows this slice.
 
 ## 2026-10-07: Continue native bootstrap development on main
 

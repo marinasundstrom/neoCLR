@@ -86,7 +86,7 @@ The native layout is private to this experiment:
 - No-result member calls push nothing; inhabited Void has its own stack kind. Boolean
   comparisons produce Boolean values, and branch joins require matching types as well
   as matching stack height. Checked arithmetic and Fault statuses reuse scalar lowering.
-- All declared bodies/opcodes are admitted; unsupported dead instructions are rejected.
+- By default all declared bodies/opcodes are admitted; unsupported dead instructions are rejected.
   Supported unreachable instructions may be omitted. There is no trimmer. Recursive
   calls are rejected. Limits are 8,192 instructions, 1,024 locals and 32 explicit
   parameters per function, with at most 64 KiB of explicitly allocated frame slots
@@ -282,3 +282,36 @@ It remains rejected: six types/twenty methods include attribute classes, boxing,
 string formatting and virtual calls as well as the supported value/tag/member paths.
 The inspection report is build tooling, not the author's future native-interface metadata
 sidecar. It has no exported-address map, stable ABI or loader contract.
+
+## Explicit closed-world selection
+
+`neoclr-aot-poc --closed-world Choice.pe @entry choice.o > selection.json` opts into
+bounded direct-call selection. Normal compilation still checks all declarations.
+This is a limited form of code trimming brought forward to run value-only union paths;
+it is not the future general trimmer. The report lists selected/excluded functions and
+types with original identities and row mappings. No source-name recognition is used.
+
+Selection includes every direct call/constructor in each selected body, even calls
+in unreachable instructions, and recursively retains signature/local/field storage
+and lexical owner types. All selected instructions still pass ordinary AOT admission
+and verification. External calls, virtual dispatch, reference-bearing signatures and
+generics fail; the selected profile retains its existing bounds and recursion rejection.
+Input inventories are bounded to 4,096 functions and 1,024 types. No reflection, metadata
+execution, callbacks or dynamic roots are supported; this mode must not be used for an
+application requiring them. Merely ignoring unsupported functions is not its contract.
+
+The compiler creates a private canonical verification projection. It preserves executable
+names, signatures, visibility, layouts and bodies, relocates definition references, and
+removes descriptive origins, custom attributes and property descriptors from that internal
+projection. Accessor bodies enter through calls. The original native metadata artifact is
+unchanged; no rewritten deployment metadata or stable ABI is produced. A required missing
+callee/owner, invalid supplied identity, unsupported selected body or private-field access
+fails before object creation. Input outside the selected closure is inventoried, not fully
+verified for execution. Constructor initialization and output-assignment checks still run.
+
+Compared with [.NET Native AOT](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
+(reviewed 2026-10-07), which requires trimming and restricts dynamic loading, this is a much
+smaller explicit direct-call contract. It lets ordinary Raven union value paths run without
+first implementing their unused formatting/boxing services. The cost is a closed execution
+surface and omitted reflection metadata; it cannot promise general library compatibility.
+Full metadata retention policy, export roots and dynamic-use annotations remain future work.

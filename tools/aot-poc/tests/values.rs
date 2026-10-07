@@ -27,9 +27,16 @@ fn compile(bytes: &[u8], temp: &Temp) -> std::process::Output {
     compile_root(bytes, temp, "@entry")
 }
 fn compile_root(bytes: &[u8], temp: &Temp, root: &str) -> std::process::Output {
+    compile_mode(bytes, temp, root, false)
+}
+fn compile_mode(bytes: &[u8], temp: &Temp, root: &str, closed: bool) -> std::process::Output {
     let input = temp.0.join("input.bin");
     fs::write(&input, bytes).unwrap();
-    Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
+    if closed {
+        command.arg("--closed-world");
+    }
+    command
         .arg(input)
         .arg(root)
         .arg(temp.0.join("value.o"))
@@ -47,8 +54,20 @@ fn native(bytes: &[u8], expected_status: i32, expected_value: i32) {
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_input(bytes: &[u8], input: i32, expected_status: i32, expected_value: i32, root: &str) {
+    native_mode(bytes, input, expected_status, expected_value, root, false);
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_mode(
+    bytes: &[u8],
+    input: i32,
+    expected_status: i32,
+    expected_value: i32,
+    root: &str,
+    closed: bool,
+) {
     let temp = Temp::new();
-    let result = compile_root(bytes, &temp, root);
+    let result = compile_mode(bytes, &temp, root, closed);
     assert!(
         result.status.success(),
         "{}",
@@ -1101,4 +1120,96 @@ ret
         0,
         35,
     );
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn closed_world_compiles_original_raven_choice_without_runtime_imports() {
+    let bytes = include_bytes!("../../../docs/experiments/aot-values/Choice.pe");
+    native_mode(bytes, 0, 0, 0, "@entry", true);
+    native_mode(
+        &neoclr::metadata_container::write_module(&module(bytes)).unwrap(),
+        0,
+        0,
+        0,
+        "@entry",
+        true,
+    );
+}
+
+#[test]
+fn closed_world_is_explicit_and_never_omits_called_unsupported_code() {
+    use neoclr::metadata::Instruction as Op;
+    let source = ".module Selection\n.entry Main\n.type Cell\n.field Value Int32\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n.function Unused() -> Int32\nldc.i8 1\npop\nldc.i4 0\nret\n.end";
+    let m = neoclr::assemble(source).unwrap();
+    let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+    let temp = Temp::new();
+    assert!(!compile(&bytes, &temp).status.success());
+    let selected = compile_mode(&bytes, &temp, "@entry", true);
+    assert!(
+        selected.status.success(),
+        "{}",
+        String::from_utf8_lossy(&selected.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&selected.stdout).unwrap();
+    assert_eq!(report["excludedFunctions"][0]["name"], "Unused");
+    assert_eq!(report["excludedTypes"][0]["name"], "Cell");
+    for kind in 0..3 {
+        let mut called = m.clone();
+        called.functions[0].body = vec![
+            Op::Call(neoclr::assembler::parse_function_ref("Unused()").unwrap()),
+            Op::Return,
+        ];
+        if kind == 1 {
+            // Calls in dead instructions are retained conservatively too.
+            called.functions[0]
+                .body
+                .splice(0..0, [Op::Int(42), Op::Return]);
+        } else if kind == 2 {
+            if let Op::Call(target) = &mut called.functions[0].body[0] {
+                target.definition = m.functions[1].definition.clone().map(|mut id| {
+                    id.index = 999;
+                    id
+                });
+            }
+        }
+        let temp = Temp::new();
+        let result = compile_mode(
+            &neoclr::metadata_container::write_module(&called).unwrap(),
+            &temp,
+            "@entry",
+            true,
+        );
+        assert!(!result.status.success());
+        assert!(!temp.0.join("value.o").exists());
+        assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
+    }
+}
+
+#[test]
+fn closed_world_keeps_private_field_access_checks() {
+    use neoclr::metadata::Instruction as Op;
+    let mut m = module(COUNTER);
+    let root = m.functions.iter_mut().find(|f| f.name == m.entry).unwrap();
+    let constructor = root
+        .body
+        .iter()
+        .find(|op| matches!(op, Op::Construct(_)))
+        .unwrap()
+        .clone();
+    root.body = vec![constructor, Op::Field(0), Op::Return];
+    let temp = Temp::new();
+    let result = compile_mode(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        &temp,
+        "@entry",
+        true,
+    );
+    assert!(!result.status.success());
+    assert!(
+        String::from_utf8_lossy(&result.stderr).contains("access denied"),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    assert!(!temp.0.join("value.o").exists());
 }

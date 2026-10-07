@@ -61,7 +61,10 @@ The author also proposes future metadata alongside native images for richer nati
 calling interfaces, requiring stable ABI conventions. [Options and costs](native-execution-investigation.md#metadata-beside-native-images-future-exploration-2026-10-07)
 remain exploratory. Continue the immediate union sample milestone first. A read-only
 AOT inspection command now exposes full declarations/calls/opcode inventories and actual
-compiler admission; it does not trim or establish an interface ABI.
+compiler admission; it does not trim or establish an interface ABI. An explicit
+`--closed-world` follow-up selects the bounded direct-call closure and reports exclusions
+to enable value-only union paths. This brings limited code selection forward; general
+reflection-aware trimming and metadata retention policy remain later work.
 
 ## Existing native release gates
 

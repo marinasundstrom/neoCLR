@@ -65,7 +65,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   mangling requirements without introducing a linking ABI. Add read-only AOT metadata/
   call/opcode inspection with actual compiler admission and no output image; retain the
   generated union fixture to expose remaining requirements. Record future metadata-next-
-  to-image ABI exploration and the author-directed union-app completion milestone. Full
+  to-image ABI exploration and the author-directed union-app completion milestone.
+  Add explicit --closed-world direct-call selection with reported exclusions and original
+  identity mappings. Preserve selected-body verification and access checks; ordinary
+  whole-module admission remains the default. This limited code-selection step is not
+  a general metadata/reflection-aware trimmer. Full
   unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime

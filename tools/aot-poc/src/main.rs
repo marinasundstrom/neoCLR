@@ -1,5 +1,6 @@
 mod compiler;
 mod inspection;
+mod selection;
 
 use std::{
     env, fs,
@@ -16,9 +17,10 @@ fn main() {
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = env::args_os().skip(1).collect();
-    if !(args.len() == 3 || (args.len() == 4 && args[3] == "--console")) {
+    let closed = args.first().is_some_and(|a| a == "--closed-world");
+    if !(args.len() == 3 || (args.len() == 4 && (args[3] == "--console" || closed))) {
         return Err(
-            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry>"
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry>; or --closed-world <input> <root-name|@entry> <output.o>"
                 .into(),
         );
     }
@@ -26,7 +28,13 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if inspect && args.len() != 3 {
         return Err("usage: neoclr-aot-poc --inspect <input> <root-name|@entry>".into());
     }
-    let input_path = &args[usize::from(inspect)];
+    if closed && args.len() != 4 {
+        return Err(
+            "usage: neoclr-aot-poc --closed-world <input> <root-name|@entry> <output.o>".into(),
+        );
+    }
+    let shifted = inspect || closed;
+    let input_path = &args[usize::from(shifted)];
     // Reuse the runtime's native CIL decoder; never translate binary metadata back
     // through text or interpret CLI projection bodies as neoCLR instructions.
     let mut bytes = Vec::new();
@@ -48,7 +56,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         return Err("expected neoCLR CIL in NEOX, PE/#Neo or .neoil source".into());
     };
-    let root = args[1 + usize::from(inspect)]
+    let root = args[1 + usize::from(shifted)]
         .to_str()
         .ok_or("root name must be UTF-8")?;
     let root = if root == "@entry" { &input.entry } else { root };
@@ -59,13 +67,23 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         );
         return Ok(());
     }
-    let object = compiler::compile(&input, root, args.len() == 4)?;
+    let selection = if closed {
+        Some(selection::select(&input, root)?)
+    } else {
+        None
+    };
+    let compile_input = selection.as_ref().map_or(&input, |(module, _)| module);
+    let object = compiler::compile(compile_input, root, !closed && args.len() == 4)?;
     // Do not clobber an existing artifact, including on failed compilation.
     let mut output = fs::OpenOptions::new()
         .write(true)
         .create_new(true)
-        .open(&args[2])?;
+        .open(&args[2 + usize::from(closed)])?;
     output.write_all(&object)?;
+    if let Some((_, report)) = selection {
+        println!("{}", serde_json::to_string_pretty(&report)?);
+        return Ok(());
+    }
     println!(
         "Emitted aarch64-apple-darwin object; C export: int32_t neoclr_entry_v2(int32_t, int32_t *result)"
     );
