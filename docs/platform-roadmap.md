@@ -87,7 +87,10 @@ and a standalone Raven consumer. The author directs consistent interpreter/nativ
 and accepts exit 1 for standalone unhandled faults; embedding hosts retain control.
 [Shared host diagnostics](experiments/aot-fault-details/README.md) use a code-defined runtime
 message catalog and a common 64-frame truncation contract. Interpreter CLI execution
-faults now use the same presentation and exit convention; native byte-input binding is next, before dynamic UTF-8 text/lifetime contracts. Multiple instantiations
+faults now use the same presentation and exit convention; [native byte input](experiments/aot-console/README.md) now executes the ordinary Raven
+Console.ReadByte wrapper, with byte/EOF/error and invalid-service fault evidence.
+The author directs sustained Console support next (2026-10-08): value-profile
+WriteLine precedes dynamic UTF-8 text/lifetime and stream/reference support. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

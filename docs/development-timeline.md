@@ -11737,3 +11737,14 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
   Loader/verifier detail and legacy host/debugger Display remain compatible. The Raven
   failure reproduction now checks exact interpreter/native diagnostic text when run
   against the updated CLI, in addition to message and frame parity.
+
+## 2026-10-08 — Continue toward native Console support
+
+**Author direction:** “Continue towards the immediate goal of supporting Console class
+and don’t stop”. This follows the AOT union, input and shared fault diagnostic slices.
+**Assistant action:** continued on main with explicit native byte-input binding,
+retaining the ordinary Raven wrapper and committing bounded slices. The native input
+[experiment](experiments/aot-console/README.md) records byte/EOF/error tests and the
+remaining Console dependencies. The next proposed slice is value-profile WriteLine;
+dynamic text and stream/reference support remain open. This Console direction does
+not establish a new permanent roadmap priority outside the author-directed AOT work.

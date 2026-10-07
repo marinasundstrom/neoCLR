@@ -1,0 +1,692 @@
+{
+  "profile": "aot-console-read-byte-v1",
+  "baseRevision": "2b11dda449e137f668ab7f680da3daf491a388e7",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "724250b15ad229c9ada29411dc9565f1ce4bbe911a6a528bf228ddaf492c53ac",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "d08cc9fcf8924f2e411938232b10913d55dc2b95437512edd84a3804dec08d9c",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe": "745c5cdd9ac8ec34c53603c09f134eafa46c3f91622dfd5060fdc788222143c0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-input/read-byte.rvn": "8e161fa8790ea19f13039beb799b1260e26d0d5b0eb115285f781f13fafbb21d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "dbda7662e542ac4670b29bfc421c00923abac2482710a1ed78fd700253043419",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "5d68b62bc454792832616553cb81af4c4f48a98ceb24a95a44ad5ee639a12288",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/host.c": "4d42a90903ef06179b5fcab033501842bd5aafcbfe758363a35b00c12bd358cd",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "645221509db70c5038e0eb72c1761916ef30d242f03f63eab10937364953f0e6",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "86320e78fcb471c164c55d7850cd75e3eb12beaab3e6115bdf0aa79720b58eb8"
+  },
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 2,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 2,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 2,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-read-byte"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "e24041b53bd83586e0f1638528e08df238c72da661fa7e79bdf462f0140f7dbe",
+        "bytes": 969822
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/input.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-read-byte"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "178acfc6cec172d44b4b4321a988c71d07f87c50f99ba52e7d2d9b27b51eced3",
+        "bytes": 917161
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/input.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/input"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/input.o"
+      ],
+      "exit": 0,
+      "stdout": "_neoclr_console_read_byte_v1\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/input"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-console-input-verified/input:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/stub.c",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/input.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/stub-2"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/stub-2"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/stub.c",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/input.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/stub-3"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/stub-3"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/stub.c",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/input.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/stub256"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/stub256"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: invalid native I/O status\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65.M_5265616442797465 [instruction 27]\n   at NeoMetadata_A294298D3BA662630EAB870DDD2F4F481FC0F845C448BD9918B5B175A467509B.F_4D61696E [instruction 0]\n"
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/stub.c",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/input.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/stub-4"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/aot-console-input-verified/stub-4"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: invalid native I/O status\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65.M_5265616442797465 [instruction 27]\n   at NeoMetadata_A294298D3BA662630EAB870DDD2F4F481FC0F845C448BD9918B5B175A467509B.F_4D61696E [instruction 0]\n"
+    }
+  ],
+  "selection": {
+    "loadSet": {
+      "limits": "one closed instantiation per local value definition; primitive static generic methods; one to eight explicit dependencies; no dynamic loading",
+      "modules": [
+        {
+          "name": "NeoMetadata_A294298D3BA662630EAB870DDD2F4F481FC0F845C448BD9918B5B175A467509B",
+          "revision": "1.0.0.0"
+        },
+        {
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        {
+          "name": "System",
+          "revision": null
+        }
+      ],
+      "runtimeContext": {
+        "bindConsoleReadByte": true,
+        "bindUserFault": true,
+        "compileSystem": true,
+        "explicit": true,
+        "objectRoot": {
+          "index": 8,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "revision": null,
+        "scope": "explicit managed System body selection; native services still require bindings",
+        "system": "System"
+      },
+      "validation": "all original bodies verified with runtime binder before private canonical projection"
+    },
+    "functions": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_A294298D3BA662630EAB870DDD2F4F481FC0F845C448BD9918B5B175A467509B",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_A294298D3BA662630EAB870DDD2F4F481FC0F845C448BD9918B5B175A467509B.F_4D61696E",
+        "sourceIndex": 0
+      },
+      {
+        "compiledIndex": 1,
+        "compiledName": "$aot_linked_1",
+        "definition": {
+          "index": 30,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "neoCLR.Runtime.ConsoleReadByte",
+        "sourceIndex": 31
+      },
+      {
+        "compiledIndex": 2,
+        "definition": {
+          "index": 63,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643",
+        "sourceIndex": 64
+      },
+      {
+        "compiledIndex": 3,
+        "definition": {
+          "index": 64,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "neoCLR.Runtime.Fail",
+        "sourceIndex": 65
+      },
+      {
+        "compiledIndex": 4,
+        "definition": {
+          "index": 1196,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4F7074696F6E6031..ctor",
+        "sourceIndex": 1197
+      },
+      {
+        "compiledIndex": 5,
+        "definition": {
+          "index": 1197,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4F7074696F6E6031.M_54727947657456616C7565",
+        "sourceIndex": 1198
+      },
+      {
+        "compiledIndex": 6,
+        "definition": {
+          "index": 1198,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4F7074696F6E6031..ctor",
+        "sourceIndex": 1199
+      },
+      {
+        "compiledIndex": 7,
+        "definition": {
+          "index": 1205,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4F7074696F6E.N_536F6D656031..ctor",
+        "sourceIndex": 1206
+      },
+      {
+        "compiledIndex": 8,
+        "definition": {
+          "index": 1206,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4F7074696F6E.N_536F6D656031.M_6765745F56616C7565",
+        "sourceIndex": 1207
+      },
+      {
+        "compiledIndex": 9,
+        "definition": {
+          "index": 1210,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4F7074696F6E.N_4E6F6E65..ctor",
+        "sourceIndex": 1211
+      },
+      {
+        "compiledIndex": 10,
+        "definition": {
+          "index": 1271,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65526561644572726F72..ctor",
+        "sourceIndex": 1272
+      },
+      {
+        "compiledIndex": 11,
+        "definition": {
+          "index": 1273,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65526561644572726F72..ctor",
+        "sourceIndex": 1274
+      },
+      {
+        "compiledIndex": 12,
+        "definition": {
+          "index": 1278,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65526561644572726F72.N_556E617661696C61626C65..ctor",
+        "sourceIndex": 1279
+      },
+      {
+        "compiledIndex": 13,
+        "definition": {
+          "index": 1281,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65526561644572726F72.N_526561644661696C6564..ctor",
+        "sourceIndex": 1282
+      },
+      {
+        "compiledIndex": 14,
+        "definition": {
+          "index": 1306,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65.M_5265616442797465",
+        "sourceIndex": 1307
+      },
+      {
+        "compiledIndex": 15,
+        "definition": {
+          "index": 1406,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573.M_436F6E736F6C655265616442797465",
+        "sourceIndex": 1407
+      },
+      {
+        "compiledIndex": 16,
+        "definition": {
+          "index": 1420,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+        "sourceIndex": 1421
+      },
+      {
+        "compiledIndex": 17,
+        "definition": {
+          "index": 1421,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+        "sourceIndex": 1422
+      },
+      {
+        "compiledIndex": 18,
+        "definition": {
+          "index": 1422,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+        "sourceIndex": 1423
+      },
+      {
+        "compiledIndex": 19,
+        "definition": {
+          "index": 1429,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031..ctor",
+        "sourceIndex": 1430
+      },
+      {
+        "compiledIndex": 20,
+        "definition": {
+          "index": 1430,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031.M_6765745F56616C7565",
+        "sourceIndex": 1431
+      },
+      {
+        "compiledIndex": 21,
+        "definition": {
+          "index": 1434,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031..ctor",
+        "sourceIndex": 1435
+      },
+      {
+        "compiledIndex": 22,
+        "definition": {
+          "index": 1485,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465",
+        "sourceIndex": 1486
+      },
+      {
+        "compiledIndex": 23,
+        "compiledName": "System.Runtime.CompilerServices.RuntimeServices.IsValue$aot_method_2103",
+        "definition": {
+          "index": 27,
+          "module": "System"
+        },
+        "expandedIndex": 2103,
+        "methodArguments": [
+          "Int32"
+        ],
+        "name": "System.Runtime.CompilerServices.RuntimeServices.IsValue",
+        "sourceIndex": 1987
+      },
+      {
+        "compiledIndex": 24,
+        "compiledName": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue$aot_method_2104",
+        "definition": {
+          "index": 28,
+          "module": "System"
+        },
+        "expandedIndex": 2104,
+        "methodArguments": [
+          "Int32"
+        ],
+        "name": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue",
+        "sourceIndex": 1988
+      },
+      {
+        "compiledIndex": 25,
+        "compiledName": "System.Runtime.CompilerServices.RuntimeServices.IsValue$aot_method_2105",
+        "definition": {
+          "index": 27,
+          "module": "System"
+        },
+        "expandedIndex": 2105,
+        "methodArguments": [
+          "Void"
+        ],
+        "name": "System.Runtime.CompilerServices.RuntimeServices.IsValue",
+        "sourceIndex": 1987
+      },
+      {
+        "compiledIndex": 26,
+        "compiledName": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue$aot_method_2106",
+        "definition": {
+          "index": 28,
+          "module": "System"
+        },
+        "expandedIndex": 2106,
+        "methodArguments": [
+          "Byte"
+        ],
+        "name": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue",
+        "sourceIndex": 1988
+      }
+    ],
+    "nativeBindings": [
+      {
+        "compiledIndex": 3,
+        "definition": {
+          "index": 64,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+        "implementation": "terminal-user-fault-v1",
+        "name": "neoCLR.Runtime.Fail",
+        "status": 4
+      },
+      {
+        "compiledIndex": 1,
+        "definition": {
+          "index": 30,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "implementation": "console-read-byte-v1",
+        "name": "neoCLR.Runtime.ConsoleReadByte",
+        "symbol": "neoclr_console_read_byte_v1"
+      }
+    ]
+  },
+  "native": {
+    "outcomes": [
+      {
+        "inputHex": "2a",
+        "exit": 0
+      },
+      {
+        "inputHex": "41",
+        "exit": 2
+      },
+      {
+        "inputHex": "00",
+        "exit": 2
+      },
+      {
+        "inputHex": "ff",
+        "exit": 2
+      },
+      {
+        "inputHex": "",
+        "exit": 0
+      }
+    ],
+    "closedInputExit": 1,
+    "executableOnlyDirectory": true,
+    "emptyEnvironment": true,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "artifacts": {
+    "input.o": "ba394e9a7e2096c1697ded62315aaae69c03e3a746b08a0c657db2028af6667c",
+    "input": "9059cae6803087d4cda284a418041e05f50ec20ef76e1649efce624b397233c1"
+  }
+}

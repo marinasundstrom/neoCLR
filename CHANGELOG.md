@@ -6,6 +6,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-08
+
+- Extend experimental ARM64 AOT with explicit native Console.ReadByte binding while
+  compiling the ordinary Raven wrapper and its Result/Option branches. Link stdin
+  support into the executable; preserve all bytes, EOF, unavailable/read-failed
+  outcomes and managed faults for invalid adapter statuses. Validate exact service
+  admission, all 256 bytes and the standalone Raven input consumer. This remains
+  a bounded development profile; dynamic text and the rest of Console are pending.
+
 ### 2026-10-07
 
 - Investigate future ARM64-first JIT/AOT execution, retaining interpretation and

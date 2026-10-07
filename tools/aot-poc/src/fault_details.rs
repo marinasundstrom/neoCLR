@@ -10,6 +10,7 @@ type Error = Box<dyn std::error::Error>;
 #[derive(Default)]
 pub struct Options {
     pub user_faults: Vec<usize>,
+    pub console_read_byte: Vec<usize>,
     pub frame_names: HashMap<usize, String>,
 }
 impl Options {
@@ -26,10 +27,17 @@ impl Options {
                     ))
                 })
                 .collect(),
+            console_read_byte: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "console-read-byte-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
             user_faults: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter()
                 .flatten()
+                .filter(|r| r["implementation"] == "terminal-user-fault-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
         }

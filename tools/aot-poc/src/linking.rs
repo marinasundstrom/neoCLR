@@ -9,6 +9,7 @@ pub struct RuntimeContext {
     pub object_root: Option<TypeDefId>,
     pub compile_system: bool,
     pub bind_user_fault: bool,
+    pub bind_console_read_byte: bool,
 }
 
 pub fn prepare(
@@ -201,6 +202,11 @@ pub fn prepare(
     report["nativeBindings"] = if bind_user_fault {
         super::bindings::user_fault(&mut selected, &report)?
     } else { json!([]) };
+    let bind_console_read_byte = context.is_some_and(|c| c.bind_console_read_byte);
+    if bind_console_read_byte {
+        let rows = super::bindings::console_read_byte(&mut selected, &report)?;
+        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+    }
     // The backend re-verifies the private module with its bundled System context.
     // Give selected seed/library members private names so originals such as
     // System.Fail cannot collide with that context. Exact definition IDs still bind calls.
@@ -229,7 +235,7 @@ pub fn prepare(
     }
     report["loadSet"] = json!({"modules": inputs.iter().map(|m| json!({"name": m.name, "revision": m.revision})).collect::<Vec<_>>(),
         "validation": "all original bodies verified with runtime binder before private canonical projection",
-        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
+        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
         "limits": "one closed instantiation per local value definition; primitive static generic methods; one to eight explicit dependencies; no dynamic loading"});
     Ok((selected, report))
 }

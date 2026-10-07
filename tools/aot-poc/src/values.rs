@@ -112,6 +112,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         }
     }
     let diagnostic_data = details.map(|options| crate::fault_details::Data::new(&mut module, input, options)).transpose()?;
+    let input_service = if details.is_some_and(|d| !d.console_read_byte.is_empty()) {
+        let mut sig = module.make_signature();
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_console_read_byte_v1", Linkage::Import, &sig)?)
+    } else { None };
     let mut ids = vec![];
     for (i, _) in input.functions.iter().enumerate() {
         let mut sig = module.make_signature();
@@ -140,6 +145,29 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             let parameters = b.block_params(entry).to_vec();
             let output = parameters[parameters.len() - 1 - usize::from(details.is_some())];
             let fault_context = details.map(|_| *parameters.last().unwrap());
+            if details.is_some_and(|d| d.console_read_byte.contains(&i)) {
+                let service = module.declare_func_in_func(input_service.unwrap(), b.func);
+                let call = b.ins().call(service, &[]);
+                let value = b.inst_results(call)[0];
+                let byte = b.ins().icmp_imm(IntCC::UnsignedLessThan, value, 256);
+                let eof = b.ins().icmp_imm(IntCC::Equal, value, -1);
+                let unavailable = b.ins().icmp_imm(IntCC::Equal, value, -2);
+                let failed = b.ins().icmp_imm(IntCC::Equal, value, -3);
+                let zero = b.ins().iconst(types::I32, 0);
+                let one = b.ins().iconst(types::I32, 1);
+                let two = b.ins().iconst(types::I32, 2);
+                let tag = b.ins().select(eof, zero, one);
+                let tag = b.ins().select(byte, two, tag);
+                let error = b.ins().select(failed, two, zero);
+                let error = b.ins().select(unavailable, one, error);
+                let payload = b.ins().select(byte, value, error);
+                write(&mut b, output, &[tag, payload]);
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks();
+                b.finalize();
+                module.define_function(ids[i], &mut context)?;
+                continue;
+            }
             let mut frame_bytes = 32usize;
             let mut arguments = vec![];
             let mut at = 0;

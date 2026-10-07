@@ -36,9 +36,16 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if bind_user_fault && !compile_system {
         return Err("--bind-user-fault requires --compile-system".into());
     }
+    let input_count = args.iter().filter(|a| *a == "--bind-console-read-byte").count();
+    if input_count > 1 { return Err("duplicate --bind-console-read-byte option".into()); }
+    let bind_console_read_byte = input_count == 1;
+    args.retain(|a| a != "--bind-console-read-byte");
+    if bind_console_read_byte && !compile_system {
+        return Err("--bind-console-read-byte requires --compile-system".into());
+    }
     let fault_details_count = args.iter().filter(|a| *a == "--fault-details").count();
     if fault_details_count > 1 { return Err("duplicate --fault-details option".into()); }
-    let fault_details = fault_details_count == 1 || bind_user_fault;
+    let fault_details = fault_details_count == 1 || bind_user_fault || bind_console_read_byte;
     args.retain(|a| a != "--fault-details");
     let dependency_args = args
         .iter()
@@ -75,7 +82,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
     {
         return Err(
-            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --fault-details exports ABI v3 with caller-owned diagnostics"
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --fault-details exports ABI v3 with caller-owned diagnostics"
                 .into(),
         );
     }
@@ -139,6 +146,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 object_root,
                 compile_system,
                 bind_user_fault,
+                bind_console_read_byte,
             })
         })
         .transpose()?;

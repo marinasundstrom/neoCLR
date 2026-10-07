@@ -243,8 +243,9 @@ Primitive pack/test/unpack preserves exact types and propagates incorrect-unpack
 primitive static generic helpers now specialize with source identities retained in build
 reports. Explicit `--compile-system` now compiles selected managed System seed helpers.
 Immutable UTF-8 literals now cross value-profile locals, calls and output slots. The
-actual ReadByte wrapper reaches native service admission; its input service binding
-and dynamic text lifetimes remain future work. An explicit failure binding now preserves
+actual ReadByte wrapper now runs natively with a linked stdin adapter, preserving
+byte/EOF/error outcomes and faults for invalid service statuses. Dynamic text lifetimes
+and the broader Console class remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked
 renderer and standalone exit-1 failure app are validated. Interpreter CLI execution

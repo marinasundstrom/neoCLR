@@ -340,3 +340,9 @@ The next [fault diagnostic slice](../aot-fault-details/README.md) supplies an ex
 ordinary System.Fail wrapper, preserves user messages and captures managed callers in
 ABI v3 fault records. The interpreter and native renderer share code/message rules and
 a 64-frame truncation limit. The byte-input service remains the next execution boundary.
+
+## Native input (2026-10-08)
+
+The [Console slice](../aot-console/README.md) now supplies the explicit input binding
+and runs this ReadByte fixture as a standalone ARM64 executable. The earlier boundary
+reports above remain historical evidence and still describe behavior without opt-in.
