@@ -68,7 +68,11 @@ closed generic value shape across that boundary, validated by Pair<int, byte>. T
 runtime-owned System/Object validation context is now explicit and tested. The real
 Result probe now runs as a standalone ARM64 executable: original interface conformance
 is verified before metadata-only relationships are omitted from the direct-call projection.
-Interface dispatch remains unsupported. Native UTF-8 input and lifetime contracts are next. Multiple instantiations
+Interface dispatch remains unsupported. The [nested input-outcome sample](experiments/aot-input/README.md)
+now executes the actual Result<Option<byte>, ConsoleReadError> shape natively, with
+metadata-only interface arguments kept outside executable specialization. Actual ReadByte
+passes interpreter checks but AOT rejects its static Console owner. Static member owners
+and explicit native byte-input services are next, before UTF-8 text/lifetime contracts. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

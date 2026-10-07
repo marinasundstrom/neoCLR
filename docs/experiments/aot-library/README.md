@@ -196,3 +196,10 @@ while retaining neoCLR's existing root validation. The cost is another bounded i
 and full-source verification. This is not a native GC, a stable hosting ABI or support for
 calling arbitrary runtime services. The next bounded step is preserving verified interface
 contracts for reference-free direct-call code without enabling interface dispatch implicitly.
+
+
+The [input-outcome follow-up](../aot-input/README.md) now removes verified relationships
+before executable specialization and reports their full closed constructed types.
+This admits Option's metadata-only Void argument and distinct Propagatable shapes without
+relaxing executable value-shape limits. The earlier reports above remain historical;
+the new nested Result/Option sample records the current report representation.

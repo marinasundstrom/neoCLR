@@ -236,7 +236,9 @@ type definition. Explicit runtime-owned System/Object validation contexts now pa
 the real library Result now executes both success/error paths in a standalone ARM64
 image. Original interface conformance is checked before relationships are omitted from
 the private direct-call projection; interface execution remains unsupported. Native
-UTF-8 input and lifetime contracts are the next consumer-driven step.
+byte-input prerequisites now include a tested nested Result/Option outcome model.
+Actual Console.ReadByte still stops at static-owner selection; native services and
+UTF-8 text lifetime contracts remain future work.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

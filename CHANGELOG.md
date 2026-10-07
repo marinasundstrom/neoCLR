@@ -107,7 +107,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   specialized relationships, then omits metadata-only relationships from the private
   direct-call projection. The actual System.Result<int, byte> consumer runs standalone
   on ARM64, covering success/error `if let` and `let ... else` branches. Reject malformed
-  implementations, interface storage and dead dispatch. System seed bodies remain validation-only; no native
+  implementations, interface storage and dead dispatch. A follow-up moves verified
+  metadata-only relationships ahead of executable specialization, reporting full closed
+  interface arguments without consuming native shape limits. Compile the real nested
+  Result<Option<byte>, ConsoleReadError> outcome model, covering zero/high bytes, EOF
+  and both errors. Record the actual Console.ReadByte interpreter probe and its current
+  static-owner AOT boundary; input services remain unimplemented.
+  System seed bodies remain validation-only; no native
   reference services, interface execution or public ABI/runtime APIs are added.
   General unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,

@@ -1,0 +1,53 @@
+import System.*
+import System.Result.*
+import System.Option.*
+
+func Outcome(kind: int, value: byte) -> Result<Option<byte>, ConsoleReadError> {
+    if kind == 0 {
+        let present: Option<byte> = Some(value)
+        return Ok(present)
+    }
+    if kind == 1 {
+        let absent: Option<byte> = None()
+        return Ok(absent)
+    }
+    if kind == 2 {
+        return Error(ConsoleReadError.Unavailable())
+    }
+    return Error(ConsoleReadError.ReadFailed())
+}
+
+func Inspect(item: Result<Option<byte>, ConsoleReadError>) -> int {
+    if let Ok(option) = item {
+        if let Some(value) = option {
+            return value
+        }
+        if let None = option {
+            return -1
+        }
+        return -4
+    }
+    let Error(error) = item else {
+        return -4
+    }
+    if let ConsoleReadError.Unavailable = error {
+        return -2
+    }
+    if let ConsoleReadError.ReadFailed = error {
+        return -3
+    }
+    return -4
+}
+
+func Main() -> int {
+    if Inspect(Outcome(0, (byte)255)) != 255 || Inspect(Outcome(1, (byte)0)) != -1 {
+        return 1
+    }
+    if Inspect(Outcome(2, (byte)0)) != -2 || Inspect(Outcome(3, (byte)0)) != -3 {
+        return 2
+    }
+    if Inspect(Outcome(0, (byte)0)) != 0 || Inspect(Outcome(0, (byte)128)) != 128 {
+        return 3
+    }
+    return 0
+}

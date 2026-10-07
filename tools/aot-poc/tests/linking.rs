@@ -581,3 +581,37 @@ fn selected_interface_storage_and_dead_dispatch_stay_unsupported() {
         );
     }
 }
+
+#[test]
+fn metadata_only_interface_arguments_do_not_consume_native_shapes() {
+    let m = neoclr::assembler::assemble_modules(&[
+        ".module App\n.references (Models)\n.entry Main\n.function Main() -> Int32\n.local First a\n.local Second b\nldc.i4 42\nret\n.end",
+        ".module Models\n.interface Marker<T>\n.end\n.type First\n.implements Marker<Void>\n.end\n.type Second\n.implements Marker<Int32>\n.end"
+    ]).unwrap();
+    let dir = Temp::new();
+    let result = invoke(&dir, &encode(&m[0]), &[encode(&m[1])], "@entry", false);
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    let relationships = report["verifiedInterfaceRelationships"].as_array().unwrap();
+    assert_eq!(relationships.len(), 2);
+    assert_eq!(
+        relationships[0]["interfaces"][0]["Constructed"]["arguments"][0],
+        "Void"
+    );
+    assert_eq!(
+        relationships[1]["interfaces"][0]["Constructed"]["arguments"][0],
+        "Int32"
+    );
+    assert!(
+        report["specialization"]["types"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    native(&dir, 42);
+}

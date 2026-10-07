@@ -88,9 +88,12 @@ Implement it in bounded stages:
    compile. Explicit runtime-owned validation contexts now pass too; the Result
    interface conformance is now verified before direct-call compilation; the actual library
    Result success/error consumer runs standalone. Multiple instantiations remain open.
-2. Define the native UTF-8 line-input and lifetime contract, including empty line versus
+2. The [nested input-outcome sample](../aot-input/README.md) now validates the actual
+   Result<Option<byte>, ConsoleReadError> shape. Admit metadata-only static member owners
+   and define explicit native byte-input services before extending to text.
+3. Define the native UTF-8 line-input and lifetime contract, including empty line versus
    EOF and I/O failure. Link the service into the executable and retain interpreter parity.
-3. Compile parsing and output with valid, invalid, overflow and EOF tests. Use the ordinary
+4. Compile parsing and output with valid, invalid, overflow and EOF tests. Use the ordinary
    library APIs once supported; do not replace them with silent backend intrinsics.
 
 The input/lifetime step should compare bounded owned buffers, native tracing and reference

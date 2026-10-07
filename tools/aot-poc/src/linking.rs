@@ -116,6 +116,14 @@ pub fn prepare(
             ty.declaring_type = Some(type_id(i));
         }
     }
+    // Conformance was verified in original scopes. Metadata-only relationships
+    // must not consume executable specialization shapes (Option and Result share
+    // Propagatable with different arguments, including metadata-only Void).
+    let relationships: Vec<_> = joined
+        .types
+        .iter_mut()
+        .map(|ty| std::mem::take(&mut ty.implements))
+        .collect();
     let specialized = if joined
         .types
         .iter()
@@ -125,24 +133,7 @@ pub fn prepare(
     } else {
         None
     };
-    // Original conformance was verified above, before relocation or specialization.
-    // Direct code does not need interface relationships. Preserve them in the report,
-    // but do not pull unused contracts into the executable closure. Interface types,
-    // explicit implementations and interface operations still fail backend admission.
-    let mut direct = specialized
-        .as_ref()
-        .map_or(&joined, |(module, _)| module)
-        .clone();
-    let relationships: Vec<_> = direct
-        .types
-        .iter_mut()
-        .enumerate()
-        .map(|(i, ty)| {
-            let interfaces = std::mem::take(&mut ty.implements);
-            json!({"definition": types[i], "name": ty.name, "interfaces": interfaces})
-        })
-        .collect();
-    let input = &direct;
+    let input = specialized.as_ref().map_or(&joined, |(module, _)| module);
     let (selected, mut report) = super::selection::select_inventory(input, root, false)?;
     if let Some((_, mut specialization)) = specialized {
         for row in specialization["types"].as_array_mut().unwrap() {
@@ -160,15 +151,30 @@ pub fn prepare(
             row["definition"] = json!(types[row["sourceIndex"].as_u64().unwrap() as usize]);
         }
     }
-    report["verifiedInterfaceRelationships"] = json!(
-        report["types"]
+    let mut verified_relationships = vec![];
+    for row in report["types"].as_array().unwrap() {
+        let index = row["sourceIndex"].as_u64().unwrap() as usize;
+        if relationships[index].is_empty() {
+            continue;
+        }
+        let arguments: Vec<neoclr::metadata::Type> = report["specialization"]["types"]
             .as_array()
-            .unwrap()
+            .and_then(|rows| rows.iter().find(|r| r["sourceIndex"] == row["sourceIndex"]))
+            .map(|r| serde_json::from_value(r["arguments"].clone()))
+            .transpose()?
+            .unwrap_or_default();
+        let interfaces = relationships[index]
             .iter()
-            .map(|row| &relationships[row["sourceIndex"].as_u64().unwrap() as usize])
-            .filter(|row| !row["interfaces"].as_array().unwrap().is_empty())
-            .collect::<Vec<_>>()
-    );
+            .map(|t| {
+                t.substitute_type_parameters(&arguments)
+                    .map_err(|e| e.to_string())
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        verified_relationships.push(
+            json!({"definition": types[index], "name": row["name"], "interfaces": interfaces}),
+        );
+    }
+    report["verifiedInterfaceRelationships"] = json!(verified_relationships);
     report["interfacePolicy"] = json!(
         "original load-set conformance verified; relationships omitted only from private direct-call projection; interface operations, storage and explicit implementations unsupported"
     );

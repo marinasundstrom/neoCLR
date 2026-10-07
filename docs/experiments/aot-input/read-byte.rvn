@@ -1,0 +1,17 @@
+import System.*
+import System.Result.*
+import System.Option.*
+
+func Main() -> int {
+    let item = Console.ReadByte()
+    let Ok(option) = item else {
+        return 1
+    }
+    if let Some(value) = option {
+        return if value == 42 { 0 } else { 2 }
+    }
+    if let None = option {
+        return 0
+    }
+    return 3
+}
