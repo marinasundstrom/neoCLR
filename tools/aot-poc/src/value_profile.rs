@@ -44,23 +44,12 @@ impl<'a> Profile<'a> {
                 )
                 .into());
             }
-            let lexical_companion = t.is_reference_type
-                && t.is_abstract
-                && t.is_sealed
-                && t.fields.is_empty()
-                && input.types.iter().any(|nested| {
-                    nested.declaring_type.as_ref().is_some_and(|owner| {
-                        input
-                            .types
-                            .get(owner.index as usize)
-                            .is_some_and(|owner| owner.name == t.name)
-                    })
-                });
-            if (t.is_reference_type && !lexical_companion)
+            let static_owner = crate::selection::static_owner(t);
+            if (t.is_reference_type && !static_owner)
                 || t.representation != Representation::Record
                 || t.enum_info.is_some()
                 || t.base.is_some()
-                || (t.is_abstract && !lexical_companion)
+                || (t.is_abstract && !static_owner)
                 || !t.generic_parameters.is_empty()
                 || !t.generic_constraints.is_empty()
                 || t.packing.is_some()
@@ -146,17 +135,23 @@ impl<'a> Profile<'a> {
             }
             let mut args = vec![];
             if let Some(owner) = &f.owner {
-                let ty = p.ty(owner)?;
-                if !matches!(ty, Ty::Record(_)) {
-                    return Err("value member requires a local record owner".into());
-                }
-                if f.instance {
-                    if !f.receiver_byref {
-                        return Err("value member requires a by-reference receiver".into());
+                let metadata_only = matches!(owner, Type::Named(name) if input.types.iter()
+                    .any(|t| t.name == *name && crate::selection::static_owner(t)));
+                if metadata_only && !f.instance && !f.receiver_byref {
+                    // Static owner contributes identity/access only, with no receiver.
+                } else {
+                    let ty = p.ty(owner)?;
+                    if !matches!(ty, Ty::Record(_)) {
+                        return Err("value member requires a local record owner".into());
                     }
-                    args.push(ty.address());
-                } else if f.receiver_byref {
-                    return Err("static member cannot have a by-reference receiver".into());
+                    if f.instance {
+                        if !f.receiver_byref {
+                            return Err("value member requires a by-reference receiver".into());
+                        }
+                        args.push(ty.address());
+                    } else if f.receiver_byref {
+                        return Err("static member cannot have a by-reference receiver".into());
+                    }
                 }
             } else if f.instance || f.receiver_byref {
                 return Err("instance member requires a record owner".into());
@@ -240,7 +235,7 @@ impl<'a> Profile<'a> {
                     .ok_or("value profile requires a local named record")?;
                 if self.input.types[i].is_reference_type {
                     return Err(
-                        "lexical companions cannot be used as values or member owners".into(),
+                        "static owners cannot be used as values or instance receivers".into(),
                     );
                 }
                 Ty::Record(i)

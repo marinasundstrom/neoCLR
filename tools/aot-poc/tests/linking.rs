@@ -615,3 +615,85 @@ fn metadata_only_interface_arguments_do_not_consume_native_shapes() {
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
     native(&dir, 42);
 }
+
+fn static_owner_modules(generic: bool) -> Vec<neoclr::Module> {
+    let cell = if generic { "Cell<Int32>" } else { "Cell" };
+    let definition = if generic {
+        ".type Cell<T>\n.field Value T"
+    } else {
+        ".type Cell\n.field Value Int32"
+    };
+    neoclr::assembler::assemble_modules(&[
+        ".module App\n.references (Models)\n.entry Main\n.function Main() -> Int32\ncall Factory::Make()\nldfld 0\nret\n.end",
+        &format!(".module Models\n{definition}\n.end\n.type class abstract Factory\n.sealed\n.method static Make() -> {cell}\nldc.i4 42\nnewobj {cell}\nret\n.end\n.end")
+    ]).unwrap()
+}
+
+#[test]
+fn empty_static_owners_allow_direct_calls_with_and_without_specialization() {
+    for generic in [false, true] {
+        let m = static_owner_modules(generic);
+        let program =
+            neoclr::LoadedProgram::with_modules(&m[0], neoclr::library::system().unwrap(), &m[1..])
+                .unwrap();
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
+        let dir = Temp::new();
+        let result = invoke(&dir, &encode(&m[0]), &[encode(&m[1])], "@entry", false);
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+        assert!(
+            report["types"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|t| t["name"] == "Factory")
+        );
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        native(&dir, 42);
+    }
+}
+
+#[test]
+fn static_owners_do_not_enable_reference_values_or_bypass_access() {
+    for generic in [false, true] {
+        for case in 0..6 {
+            let mut m = static_owner_modules(generic);
+            let owner = m[1].types.iter_mut().find(|t| t.name == "Factory").unwrap();
+            match case {
+                0 => owner.is_sealed = false,
+                1 => owner.is_abstract = false,
+                2 => owner.fields.push(neoclr::metadata::Field {
+                    name: "state".into(),
+                    ty: neoclr::metadata::Type::Int32,
+                    deferred: false,
+                    visibility: Visibility::Public,
+                }),
+                3 => {
+                    m[0].functions[0]
+                        .locals
+                        .push(neoclr::metadata::Type::Named("Factory".into()));
+                    m[0].functions[0].local_names.push(Some("forbidden".into()));
+                }
+                4 => m[1].functions[0].visibility = Visibility::Private,
+                5 => owner.visibility = Visibility::Internal,
+                _ => unreachable!(),
+            }
+            let dir = Temp::new();
+            let result = invoke(&dir, &encode(&m[0]), &[encode(&m[1])], "@entry", false);
+            assert!(!result.status.success(), "generic={generic} case={case}");
+            assert!(!dir.0.join("app.o").exists());
+            let error = String::from_utf8_lossy(&result.stderr);
+            assert!(!error.contains("panicked"), "{error}");
+            if case >= 4 {
+                assert!(error.contains("access denied"), "{error}");
+            }
+        }
+    }
+}

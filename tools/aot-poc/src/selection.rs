@@ -5,6 +5,21 @@ use serde_json::{Value, json};
 use std::collections::BTreeSet;
 type Error = Box<dyn std::error::Error>;
 
+/// Metadata-only owner of static methods; never an executable reference value.
+pub(crate) fn static_owner(t: &neoclr::metadata::TypeDef) -> bool {
+    t.is_reference_type
+        && t.is_abstract
+        && t.is_sealed
+        && t.representation == neoclr::metadata::Representation::Record
+        && t.fields.is_empty()
+        && t.base.is_none()
+        && t.enum_info.is_none()
+        && t.generic_parameters.is_empty()
+        && t.generic_constraints.is_empty()
+        && t.packing.is_none()
+        && t.minimum_size.is_none()
+}
+
 /// Shared preparation for native emission and read-only admission inspection.
 pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Value), Error> {
     if input.types.iter().any(|t| !t.generic_parameters.is_empty()) {

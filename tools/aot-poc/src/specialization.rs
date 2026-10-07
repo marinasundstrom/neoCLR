@@ -40,9 +40,10 @@ impl Specializer<'_> {
                 arguments,
             } => (definition, arguments.clone()),
             _ => {
-                return Err(
-                    "specialization requires closed reference-free local value types".into(),
-                );
+                return Err(format!(
+                    "specialization requires closed reference-free local value types: {ty:?}"
+                )
+                .into());
             }
         };
         let i = self.type_index(name)?;
@@ -106,6 +107,21 @@ impl Specializer<'_> {
         }
         Ok(Type::Named(name.clone()))
     }
+    fn owner(&mut self, ty: &Type, instance: bool) -> Result<Type, Error> {
+        if !instance {
+            if let Type::Named(name) = ty {
+                let i = self.type_index(name)?;
+                if super::selection::static_owner(&self.source.types[i]) {
+                    if !self.shapes.contains_key(&i) && self.shapes.len() >= 32 {
+                        return Err("specialized type count exceeds 32".into());
+                    }
+                    self.shapes.insert(i, vec![]);
+                    return Ok(ty.clone());
+                }
+            }
+        }
+        self.lower(ty)
+    }
     fn resolve(&self, target: &FunctionRef) -> Result<(usize, Vec<Type>), Error> {
         if !target.generic_arguments.is_empty() {
             return Err("generic methods are outside this specialization profile".into());
@@ -163,7 +179,12 @@ impl Specializer<'_> {
         result.owner = f
             .owner
             .as_ref()
-            .map(|t| self.close(t, arguments))
+            .map(|t| {
+                let closed = t
+                    .substitute_type_parameters(arguments)
+                    .map_err(|e| e.to_string())?;
+                self.owner(&closed, f.instance)
+            })
             .transpose()?;
         for t in result
             .parameters
@@ -191,7 +212,11 @@ impl Specializer<'_> {
                         .map_err(|e| e.to_string())?;
                     let instance = self.resolve(&closed)?;
                     pending.push(instance);
-                    target.owner = closed.owner.as_ref().map(|t| self.lower(t)).transpose()?;
+                    target.owner = closed
+                        .owner
+                        .as_ref()
+                        .map(|t| self.owner(t, closed.instance))
+                        .transpose()?;
                     target.parameters = closed
                         .parameters
                         .iter()

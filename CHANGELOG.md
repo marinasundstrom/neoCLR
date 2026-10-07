@@ -112,7 +112,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   interface arguments without consuming native shape limits. Compile the real nested
   Result<Option<byte>, ConsoleReadError> outcome model, covering zero/high bytes, EOF
   and both errors. Record the actual Console.ReadByte interpreter probe and its current
-  static-owner AOT boundary; input services remain unimplemented.
+  initial static-owner AOT boundary. Admit nongeneric empty abstract sealed owners for
+  direct static calls while rejecting their use as values/instance receivers and retaining
+  access checks. Validate a Raven static factory returning the nested input result.
+  ReadByte now reaches its erased Value payload; native input services remain unimplemented.
+  Record an intermittent pinned Raven ReadByte binding diagnostic; reuse the unchanged
+  producer fixture for backend validation rather than claiming a compiler fix.
   System seed bodies remain validation-only; no native
   reference services, interface execution or public ABI/runtime APIs are added.
   General unions, reference fields and general library dependency compilation remain

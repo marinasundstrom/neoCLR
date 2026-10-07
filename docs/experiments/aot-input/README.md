@@ -33,8 +33,9 @@ regression and existing invalid-conformance, generic-value and access-control ch
 
 [read-byte.rvn](read-byte.rvn) calls the existing `Console.ReadByte()`. The pinned
 interpreter returns exit 0 for EOF or byte 42 and exit 2 for another byte (tested with
-`x`). AOT inspection/emission currently reject selection of the reference-type static
-Console owner. The script asserts this exact boundary and absence of an object.
+`x`). The original report records rejection of the static Console owner. With the subsequent
+static-owner slice, inspection/emission now reaches the erased `Value` local and rejects
+it explicitly. The current script asserts that exact boundary and absence of an object.
 
 Removing that first restriction alone will not supply native input. The existing
 [console contract](../../console-io.md) implements the public method in Raven; its
@@ -42,7 +43,7 @@ runtime service transports Byte, Void or Int32 status through erased `System.Val
 The wrapper calls generic value-test/unpack services. These are further native backend
 requirements, not permission to replace the public method by name with a host intrinsic.
 
-The next bounded task is metadata-only static member owners, followed by inventory and
+The next bounded task is a deliberately limited erased-value representation and
 an explicit native input capability/service contract. Service tests must distinguish EOF,
 zero/high bytes, unavailable capability and I/O failure, including interrupted reads.
 An input-driven ASCII integer parser can consume bytes without allocating strings;
@@ -75,6 +76,7 @@ Set SDKROOT to the matching Xcode SDK on macOS ARM64, then run:
 python3 docs/experiments/aot-input/verify.py \
   --compiler /absolute/path/to/rvnc.dll \
   --compiler-revision 70aea9a7e9e424159a48b0227869245a95bf2ec2 \
+  --reuse-read-byte \
   --bundle /absolute/path/to/neoclr-native-poc \
   --runtime /absolute/path/to/neoclr \
   --aot tools/aot-poc/target/debug/neoclr-aot-poc \
@@ -84,3 +86,45 @@ python3 docs/experiments/aot-input/verify.py \
 The output directory must not exist. Producer fixtures use the same pinned bundle as
 the [library Result experiment](../aot-library/README.md); no shared framework/runtime
 is needed to execute the resulting native outcomes app.
+
+
+## Static member owners (2026-10-07)
+
+The [static factory consumer](static-outcomes.rvn) now compiles ordinary static methods
+returning the nested input-result shape. [Updated evidence](static-validation.json)
+repeats both native consumers and records ReadByte's erased-Value boundary. No Console
+method is replaced by a special intrinsic.
+
+A metadata-only owner must be a nongeneric, empty, abstract sealed reference record,
+without an explicit base, enum information, packing, minimum size or generic constraints.
+The owner contributes nominal method identity and access checks; it contributes no
+receiver or native object allocation. Static methods remain ordinary compiled bodies.
+Local/parameter/result storage, fields and instance receivers still cannot use that type.
+The same predicate is applied by specialization and value admission. Empty lexical union
+companions continue to work. Static state, generic static owners and reference allocation
+are outside this profile.
+
+This follows C#'s [static-class distinction](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/static-classes-and-static-class-members)
+(primary documentation reviewed 2026-10-07): member grouping does not require an object
+instance. This slice adds backend coverage of existing Raven/native metadata behavior,
+not a language or runtime contract. Unlike general .NET static-class support, this AOT
+profile admits only empty owners and does not add type-initialization or static-storage
+machinery. Preserving owner identities costs a metadata row but avoids flattening names
+or weakening library visibility. General managed-reference support would be unnecessary
+for these calls and remains separate.
+
+Focused tests cover whole-module/closed-world execution, library calls with and without
+generic value specialization, and rejection of storage, field-bearing/non-static owners
+and private/internal access. The current consumer's library wrappers still need erased
+value operations, generic runtime helper calls and service binding before native input
+can execute; passing the static owner boundary does not imply those features work.
+
+
+The static-owner validation encountered an intermittent producer diagnostic on unchanged
+ReadByte source (`Console has no member ReadByte`); an immediate retry with the same
+input files succeeded. The evidence retains the failed command and records the retry;
+backend boundary checks reuse `ReadByte.pe` and its earlier interpreter evidence.
+`--reuse-read-byte` reproduces that focused path. This is a pinned Raven reproducibility
+limitation, not a compiler issue fixed by the AOT change. `StaticOutcomes.pe` was freshly
+compiled from the static factory source and executed natively. All 43 focused load-set
+and value-profile tests pass.

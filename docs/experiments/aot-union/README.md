@@ -89,8 +89,9 @@ Implement it in bounded stages:
    interface conformance is now verified before direct-call compilation; the actual library
    Result success/error consumer runs standalone. Multiple instantiations remain open.
 2. The [nested input-outcome sample](../aot-input/README.md) now validates the actual
-   Result<Option<byte>, ConsoleReadError> shape. Admit metadata-only static member owners
-   and define explicit native byte-input services before extending to text.
+   Result<Option<byte>, ConsoleReadError> shape. Metadata-only static member owners now
+   compile. Bound erased-value transport and explicit native byte-input services remain
+   before extending to text.
 3. Define the native UTF-8 line-input and lifetime contract, including empty line versus
    EOF and I/O failure. Link the service into the executable and retain interpreter parity.
 4. Compile parsing and output with valid, invalid, overflow and EOF tests. Use the ordinary

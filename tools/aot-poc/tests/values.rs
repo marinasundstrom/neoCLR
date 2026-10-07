@@ -1411,3 +1411,20 @@ fn specialization_rejects_unsupported_shapes_and_preserves_verification() {
         }
     }
 }
+
+#[test]
+fn static_owner_methods_work_in_whole_module_and_closed_world_modes() {
+    let m = neoclr::assemble(".module StaticOwner\n.entry Main\n.type class abstract Helpers\n.sealed\n.method static Answer() -> Int32\nldc.i4 42\nret\n.end\n.end\n.function Main() -> Int32\ncall Helpers::Answer()\nret\n.end").unwrap();
+    let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+    for closed in [false, true] {
+        let dir = Temp::new();
+        let result = compile_mode(&bytes, &dir, "@entry", closed);
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        native_mode(&bytes, 0, 0, 42, "@entry", closed);
+    }
+}
