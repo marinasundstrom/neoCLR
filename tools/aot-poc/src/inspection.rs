@@ -3,7 +3,7 @@ use neoclr::metadata::Instruction as Op;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
-pub fn report(input: &neoclr::Module, root: &str) -> Value {
+pub fn report(input: &neoclr::Module, root: &str, closed: bool) -> Value {
     let mut histogram = BTreeMap::<String, usize>::new();
     let functions: Vec<_> = input
         .functions
@@ -34,13 +34,34 @@ pub fn report(input: &neoclr::Module, root: &str) -> Value {
         .collect();
     // Use actual compiler admission rather than maintaining a second capability list.
     // Object bytes are discarded and no linker or emitted code is executed.
-    let admission = match super::compiler::compile(input, root, false) {
-        Ok(_) => json!({"accepted": true}),
-        Err(e) => json!({"accepted": false, "firstError": e.to_string()}),
+    let prepared = if closed {
+        super::selection::prepare(input, root).map(Some)
+    } else {
+        Ok(None)
+    };
+    let (admission, selection) = match prepared {
+        Err(e) => (
+            json!({"accepted": false, "phase": "selection", "firstError": e.to_string()}),
+            Value::Null,
+        ),
+        Ok(prepared) => {
+            let module = prepared.as_ref().map_or(input, |(module, _)| module);
+            let admission = match super::compiler::compile(module, root, false) {
+                Ok(_) => json!({"accepted": true}),
+                Err(e) => {
+                    json!({"accepted": false, "phase": "compilation", "firstError": e.to_string()})
+                }
+            };
+            (
+                admission,
+                prepared.map_or(Value::Null, |(_, report)| report),
+            )
+        }
     };
     json!({"schema": "neoclr-aot-inspection-v1", "module": input.name, "root": root,
-        "scope": "all declarations; no trimming or reachability filtering",
-        "capabilities": {"console": false}, "admission": admission,
+        "scope": "inventory includes all declarations; admission uses admissionMode",
+        "admissionMode": if closed { "closed-world" } else { "whole-module" },
+        "selection": selection, "capabilities": {"console": false}, "admission": admission,
         "assemblies": input.assemblies, "types": input.types, "functions": functions, "opcodes": histogram,
         "notice": "Build diagnostics only. Not a deployable metadata sidecar, stable ABI or export manifest."})
 }

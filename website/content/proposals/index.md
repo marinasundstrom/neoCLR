@@ -229,7 +229,9 @@ services remain unsupported.
 A local generic Result app now runs with one closed instantiation per local value type;
 `let ... else` and `if let` patterns cover success and non-match branches. Plain positional
 `let` deconstruction remains a pinned Raven native-emitter gap. General library Result,
-multiple generic instantiations and native input/lifetimes are still pending.
+multiple generic instantiations and native input/lifetimes are still pending. A real
+library Result consumer now passes the interpreter; read-only closed-world inspection
+reports its external-call AOT boundary. This is dependency evidence, not library AOT support.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

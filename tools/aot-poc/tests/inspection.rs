@@ -22,14 +22,18 @@ impl Drop for Temp {
     }
 }
 fn inspect(bytes: &[u8]) -> serde_json::Value {
+    inspect_mode(bytes, false)
+}
+fn inspect_mode(bytes: &[u8], closed: bool) -> serde_json::Value {
     let dir = Temp::new();
     let input = dir.0.join("input.pe");
     fs::write(&input, bytes).unwrap();
-    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
-        .args(["--inspect", input.to_str().unwrap(), "@entry"])
-        .current_dir(&dir.0)
-        .output()
-        .unwrap();
+    let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
+    command.args(["--inspect", input.to_str().unwrap(), "@entry"]);
+    if closed {
+        command.arg("--closed-world");
+    }
+    let result = command.current_dir(&dir.0).output().unwrap();
     assert!(
         result.status.success(),
         "{}",
@@ -116,4 +120,80 @@ fn inspection_rejects_corrupt_metadata_instead_of_reporting_admission() {
     assert!(!result.status.success());
     assert!(result.stdout.is_empty());
     assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
+}
+
+#[test]
+fn closed_world_inspection_uses_emission_preparation_and_keeps_full_inventory() {
+    let bytes = include_bytes!("../../../docs/experiments/aot-values/ResultApp.pe");
+    assert_eq!(inspect(bytes)["admission"]["accepted"], false);
+    let report = inspect_mode(bytes, true);
+    assert_eq!(report["admission"]["accepted"], true);
+    assert_eq!(report["admissionMode"], "closed-world");
+    assert_eq!(report, inspect_mode(bytes, true));
+    assert_eq!(
+        report["selection"]["specialization"]["types"]
+            .as_array()
+            .unwrap()
+            .len(),
+        3
+    );
+    let original = neoclr::metadata_container::decode(bytes).unwrap();
+    assert_eq!(
+        report["functions"].as_array().unwrap().len(),
+        original.functions.len()
+    );
+    assert!(report["selection"]["functions"].as_array().unwrap().len() < original.functions.len());
+
+    let dir = Temp::new();
+    let input = dir.0.join("input.pe");
+    fs::write(&input, bytes).unwrap();
+    let emitted = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        .arg("--closed-world")
+        .arg(input)
+        .arg("@entry")
+        .arg(dir.0.join("result.o"))
+        .output()
+        .unwrap();
+    assert!(emitted.status.success());
+    assert_eq!(
+        report["selection"],
+        serde_json::from_slice::<serde_json::Value>(&emitted.stdout).unwrap()
+    );
+}
+
+#[test]
+fn closed_world_inspection_distinguishes_selection_and_body_failures() {
+    let bytes = include_bytes!("../../../docs/experiments/aot-values/LibraryResultApp.pe");
+    let report = inspect_mode(bytes, true);
+    assert_eq!(report["admission"]["accepted"], false);
+    assert_eq!(report["admission"]["phase"], "selection");
+    assert!(
+        report["admission"]["firstError"]
+            .as_str()
+            .unwrap()
+            .contains("FunctionRef")
+    );
+    assert!(report["selection"].is_null());
+    assert_eq!(report["functions"].as_array().unwrap().len(), 3);
+
+    let mut module = neoclr::metadata_container::decode(include_bytes!(
+        "../../../docs/experiments/aot-values/ResultApp.pe"
+    ))
+    .unwrap();
+    module
+        .functions
+        .iter_mut()
+        .find(|f| f.name == module.entry)
+        .unwrap()
+        .body
+        .push(neoclr::metadata::Instruction::String(
+            "unsupported dead instruction".into(),
+        ));
+    let report = inspect_mode(
+        &neoclr::metadata_container::write_module(&module).unwrap(),
+        true,
+    );
+    assert_eq!(report["admission"]["accepted"], false);
+    assert_eq!(report["admission"]["phase"], "compilation");
+    assert!(report["selection"].is_object());
 }

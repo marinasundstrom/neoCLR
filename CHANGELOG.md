@@ -81,7 +81,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   paths in interpreter and standalone ARM64 samples. Record the pinned Raven emitter's
   plain positional let-deconstruction rejection with a reproducible negative probe.
   Generic methods, constraints, multiple instantiations and reference payloads remain
-  rejected; 46 focused AOT tests pass. No public ABI or runtime APIs change.
+  rejected; 46 focused AOT tests pass. Add read-only closed-world admission inspection
+  using the same selection/specialization preparation as emission, with phase-specific
+  failures and exact rejected call references. Validate the real System.Result<int, byte>
+  consumer through Raven and the interpreter, recording expected external-dependency
+  rejection before object creation and its propagation-interface contract. Library AOT
+  remains unsupported; an explicit assembly-aware value-library load set is the next
+  proposed implementation slice. Five inspection and 28 value-profile tests pass.
+  No public ABI or runtime APIs change.
   General unions, reference fields and library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime

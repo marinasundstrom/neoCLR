@@ -5,6 +5,18 @@ use serde_json::{Value, json};
 use std::collections::BTreeSet;
 type Error = Box<dyn std::error::Error>;
 
+/// Shared preparation for native emission and read-only admission inspection.
+pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Value), Error> {
+    if input.types.iter().any(|t| !t.generic_parameters.is_empty()) {
+        let (expanded, specialization) = super::specialization::expand(input, root)?;
+        let (selected, mut report) = select(&expanded, root)?;
+        report["specialization"] = specialization;
+        Ok((selected, report))
+    } else {
+        select(input, root)
+    }
+}
+
 fn resolve(input: &neoclr::Module, target: &FunctionRef) -> Result<usize, Error> {
     if !target.generic_arguments.is_empty() {
         return Err("closed-world selection does not support generic calls".into());
@@ -19,9 +31,9 @@ fn resolve(input: &neoclr::Module, target: &FunctionRef) -> Result<usize, Error>
                 .as_ref()
                 .is_none_or(|id| Some(id) == f.definition.as_ref())
     });
-    let (index, _) = candidates
-        .next()
-        .ok_or("closed-world call is external or has an invalid identity/signature")?;
+    let (index, _) = candidates.next().ok_or_else(|| {
+        format!("closed-world call is external or has an invalid identity/signature: {target:?}")
+    })?;
     if candidates.next().is_some() {
         return Err("ambiguous closed-world call".into());
     }

@@ -18,7 +18,7 @@ def main():
     for name in ('compiler', 'bundle', 'runtime', 'aot', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--compiler-revision', required=True)
-    parser.add_argument('--sample', choices=['union-app', 'result-app', 'pattern-app'], default='union-app')
+    parser.add_argument('--sample', choices=['union-app', 'result-app', 'pattern-app', 'library-result-app'], default='union-app')
     args = parser.parse_args()
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':
         parser.error('Native execution requires macOS ARM64')
@@ -43,9 +43,9 @@ def main():
     def save():
         (output / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')
 
-    def run(command, expected_error=None):
+    def run(command, expected_error=None, summarize=False):
         result = subprocess.run(list(map(str, command)), cwd=ROOT, capture_output=True, text=True, timeout=120)
-        report['commands'].append(dict(command=result.args, exit=result.returncode, stdout=result.stdout, stderr=result.stderr))
+        report['commands'].append(dict(command=result.args, exit=result.returncode, stdout='Inventory summarized in libraryContract' if summarize else result.stdout, stderr=result.stderr))
         save()
         if expected_error is not None:
             assert result.returncode != 0 and expected_error in result.stdout + result.stderr, result
@@ -66,6 +66,28 @@ def main():
         assert not rejected.exists()
         report['deconstructionProbe'] = 'Rejected by Raven native emitter: BoundPatternAssignmentExpression'
     assert run([runtime, 'run', assembly, '--system', system, '--module', library, '--object-root', library]) == ''
+    if args.sample == 'library-result-app':
+        report['inspection'] = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world']))
+        assert report['inspection']['admission']['accepted'] is False
+        assert report['inspection']['admission']['phase'] == 'selection'
+        run([aot, '--closed-world', assembly, '@entry', obj],
+            expected_error='closed-world call is external or has an invalid identity/signature')
+        assert not obj.exists()
+        inventory = json.loads(run([aot, '--inspect', library, '@entry'], summarize=True))
+        owners = {c['target']['owner']['Constructed']['definition']
+                  for f in report['inspection']['functions'] for c in f['calls']
+                  if isinstance(c['target'].get('owner'), dict) and 'Constructed' in c['target']['owner']}
+        selected = [t for t in inventory['types'] if t['name'] in owners]
+        lexical = {t['declaring_type']['index'] for t in selected if 'declaring_type' in t}
+        report['libraryContract'] = dict(typeCount=len(inventory['types']), functionCount=len(inventory['functions']),
+                                        referencedTypes=selected,
+                                        lexicalOwners=[inventory['types'][i] for i in sorted(lexical)])
+        assert all(name in {t['name'] for t in selected} for name in owners)
+        report['native'] = dict(produced=False, boundary='external library call selection')
+        report['artifacts'] = {assembly.name: sha(assembly)}
+        save()
+        print('Passed: library Result interpreter behavior and explicit AOT dependency rejection')
+        return
     report['selection'] = json.loads(run([aot, '--closed-world', assembly, '@entry', obj]))
     run(['clang', '-arch', 'arm64', '-Wall', '-Wextra', '-Werror', host, obj, '-o', binary])
     assert run(['nm', '-u', obj]) == ''

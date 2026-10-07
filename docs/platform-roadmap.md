@@ -58,7 +58,12 @@ first, then native UTF-8 input/lifetimes and parsing. The value-only first step 
 as local `ParseResult<int, byte>` with one closed shape per generic definition, reported
 specializations and standalone evidence. `let ... else` and `if let` execute both paths;
 plain positional `let` deconstruction is a recorded Raven native-emitter gap.
-Actual library Result dependencies, multiple instantiations and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
+The [real library Result probe](experiments/aot-values/README.md#real-library-result-dependency-boundary-2026-10-07)
+now passes Raven/interpreter execution and records AOT's external-call rejection.
+Closed-world inspection shares emission preparation and exposes this boundary.
+An explicit assembly-aware value-library load set is the next proposed implementation
+slice, before the library Result propagation-interface contract. Multiple instantiations
+and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

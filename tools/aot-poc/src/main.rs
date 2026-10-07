@@ -18,16 +18,21 @@ fn main() {
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = env::args_os().skip(1).collect();
+    let inspect = args.first().is_some_and(|a| a == "--inspect");
+    let inspect_closed = inspect && args.get(3).is_some_and(|a| a == "--closed-world");
     let closed = args.first().is_some_and(|a| a == "--closed-world");
-    if !(args.len() == 3 || (args.len() == 4 && (args[3] == "--console" || closed))) {
+    if !(args.len() == 3
+        || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
+    {
         return Err(
-            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry>; or --closed-world <input> <root-name|@entry> <output.o>"
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>"
                 .into(),
         );
     }
-    let inspect = args[0] == "--inspect";
-    if inspect && args.len() != 3 {
-        return Err("usage: neoclr-aot-poc --inspect <input> <root-name|@entry>".into());
+    if inspect && !(args.len() == 3 || inspect_closed) {
+        return Err(
+            "usage: neoclr-aot-poc --inspect <input> <root-name|@entry> [--closed-world]".into(),
+        );
     }
     if closed && args.len() != 4 {
         return Err(
@@ -64,19 +69,12 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if inspect {
         println!(
             "{}",
-            serde_json::to_string_pretty(&inspection::report(&input, root))?
+            serde_json::to_string_pretty(&inspection::report(&input, root, inspect_closed))?
         );
         return Ok(());
     }
     let selection = if closed {
-        if input.types.iter().any(|t| !t.generic_parameters.is_empty()) {
-            let (expanded, specialization) = specialization::expand(&input, root)?;
-            let (selected, mut report) = selection::select(&expanded, root)?;
-            report["specialization"] = specialization;
-            Some((selected, report))
-        } else {
-            Some(selection::select(&input, root)?)
-        }
+        Some(selection::prepare(&input, root)?)
     } else {
         None
     };

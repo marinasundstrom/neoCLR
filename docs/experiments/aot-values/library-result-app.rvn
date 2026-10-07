@@ -1,0 +1,28 @@
+import System.*
+import System.Result.*
+
+func Make(valid: bool) -> Result<int, byte> {
+    if valid {
+        return Result<int, byte>.Ok(42)
+    }
+    return Result<int, byte>.Error((byte)7)
+}
+
+func Read(item: Result<int, byte>) -> int {
+    if let Ok(value) = item {
+        return value
+    }
+    let Error(error) = item else {
+        return 0
+    }
+    return 0 - error
+}
+
+func Main() -> int {
+    let success = Make(true)
+    let failure = Make(false)
+    if Read(success) != 42 || Read(failure) != -7 {
+        return 1
+    }
+    return 0
+}

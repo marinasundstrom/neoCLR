@@ -81,7 +81,10 @@ Implement it in bounded stages:
 1. Compile a value-only Result success/error consumer with fixed inputs, and establish
    generic value specialization/dependency contracts needed by the actual library Result.
    **Partial completion:** local ParseResult<int, byte> now runs with bounded specialization;
-   actual library dependencies and multiple instantiations are still open.
+   actual library dependencies and multiple instantiations are still open. The
+   [real library probe](../aot-values/README.md#real-library-result-dependency-boundary-2026-10-07)
+   now passes the interpreter and records the external-call AOT boundary; an explicit
+   assembly-aware value-library load set is the proposed next implementation slice.
 2. Define the native UTF-8 line-input and lifetime contract, including empty line versus
    EOF and I/O failure. Link the service into the executable and retain interpreter parity.
 3. Compile parsing and output with valid, invalid, overflow and EOF tests. Use the ordinary

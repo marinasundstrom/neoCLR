@@ -281,7 +281,9 @@ object bytes. It never executes native code, links, writes an output image, trim
 or changes accepted programs. Exit zero means inspection succeeded; inspect
 `admission.accepted` for compilation status. Corrupt containers fail the command.
 The first compiler error is not an exhaustive diagnostic list; the full inventory
-shows other features and dependencies that remain to be addressed.
+shows other features and dependencies that remain to be addressed. Add `--closed-world`
+after the root to inspect explicit selection/specialization; see the
+[library dependency boundary](#real-library-result-dependency-boundary-2026-10-07).
 
 [Choice.pe](Choice.pe) is the original pinned producer artifact from [inventory.json](inventory.json).
 It remains rejected: six types/twenty methods include attribute classes, boxing,
@@ -375,3 +377,64 @@ using, for example, both `Result<int, byte>` and `Result<int, bool>`. Multi-inst
 identity/mangling, actual library dependencies and general trimming remain future work.
 The next consumer is still the interactive integer reader, beginning with those library
 contracts and native UTF-8 input/lifetimes rather than a network server.
+
+
+## Real library Result dependency boundary (2026-10-07)
+
+[Library consumer](library-result-app.rvn) uses `System.Result<int, byte>` from the
+pinned native `System.Runtime.dll`, with the same success/error assertions and pattern
+bindings as the local generic sample. **Raven native emission and interpreter execution
+pass; native compilation remains unsupported.** There is no replacement carrier or
+Result-specific backend intrinsic. [Evidence](library-result-validation.json) records
+producer/runtime/AOT hashes, exact commands, the emitted application, both inspection and
+actual compilation rejection, and the relevant library declarations. The
+[fixture](LibraryResultApp.pe) drives the focused inspection regression test.
+
+Reproduce using the same `verify_union.py` compiler/bundle/runtime arguments as above,
+with `--sample library-result-app` and a fresh output directory. This mode deliberately
+expects interpreter success followed by dependency rejection and verifies no object is
+created. It does **not** claim a standalone executable was produced.
+
+Read-only admission now supports the same explicit selection mode as emission:
+
+```sh
+neoclr-aot-poc --inspect ResultApp.pe @entry --closed-world
+neoclr-aot-poc --inspect LibraryResultApp.pe @entry --closed-world
+```
+
+The first accepts the local generic sample and includes its selection/specialization
+report; the second reports an external `TryGetValue` call with its exact owner, generic
+arguments and output payload signature. `admissionMode` identifies whole-module or
+closed-world admission. `admission.phase` distinguishes a selection failure from a
+selected-body compilation failure. `selection` is null when preparation failed, and is
+retained when preparation succeeded but body admission failed. The original declaration
+and opcode inventory always covers the whole source artifact. Inspection exits zero
+when it produced a report, even when `admission.accepted` is false. Input decoding and
+CLI errors still fail the command. It creates no object and executes no generated code;
+it is not a native metadata sidecar. Default inspection remains whole-module admission.
+
+### Next bounded linking work
+
+The pinned library contains 334 types and 1,959 functions. The app's external signatures
+refer to the Result carrier and distinct generic Ok/Error case types; the case types also
+need their static lexical companion. The carrier implements
+`Propagatable<Result<T, E>, T, E>`. These are real metadata dependencies even though this
+consumer makes direct calls rather than using interface dispatch. The current one-source-
+assembly selector and reference-free record profile cannot simply accept this load set.
+
+The next implementation should first prove an explicit application-plus-value-library
+load set with exact module/revision/definition binding, assembly-aware private/internal
+access checks, and a reported direct-call closure. Then address generic interface
+contracts needed by the actual Result without silently deleting `implements` metadata.
+Add negative probes for wrong revisions, missing dependencies, duplicate definitions
+and cross-assembly access before extending the application to native input.
+
+This follows the existing [.NET Native AOT comparison](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
+and [metadata identity baseline](../../design/extended-cli-metadata.md): closed-world
+compilation must resolve required library code at build time, while source language
+patterns lower to calls and branches independently of native linkage. Prefer reusing
+neoCLR's binding/identity semantics over concatenating declarations or recognizing
+`System.Result` by name. Reuse costs an explicit load-set/projection contract; ad-hoc
+concatenation risks repairing bad identities or weakening access checks. This is a
+provisional next-slice design, not implemented library AOT or a new public ABI. General
+trimming, multiple generic instantiations and input/lifetime services remain later work.

@@ -1,0 +1,890 @@
+{
+  "profile": "raven-closed-world-union-v1",
+  "sample": "library-result-app",
+  "declaredCompilerRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "neoClrBaseRevision": "c82cf90fbb07bd83c0cebaa236bae7b53664ae99",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-library-result-contract/library-result-app.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-values/library-result-app.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-library-result-contract/library-result-app.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-library-result-contract/library-result-app.dll",
+        "@entry",
+        "--closed-world"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"admission\": {\n    \"accepted\": false,\n    \"firstError\": \"closed-world call is external or has an invalid identity/signature: FunctionRef { definition: None, name: \\\"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565\\\", owner: Some(Constructed { definition: \\\"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\\\", arguments: [Int32, Byte] }), instance: true, generic_arguments: [], parameters: [ByRef(Constructed { definition: \\\"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031\\\", arguments: [Int32] })] }\",\n    \"phase\": \"selection\"\n  },\n  \"admissionMode\": \"closed-world\",\n  \"assemblies\": [\n    {\n      \"full_name\": \"[\\\"library-result-app\\\",\\\"1.0.0.0\\\",\\\"\\\",\\\"\\\",\\\"0\\\"]\",\n      \"modules\": [\n        \"library-result-app.dll\"\n      ],\n      \"name\": \"library-result-app\",\n      \"native_module_bindings\": [\n        {\n          \"assembly\": \"[\\\"System.Runtime\\\",\\\"1.0.0.0\\\",\\\"\\\",\\\"\\\",\\\"0\\\"]\",\n          \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n          \"revision\": \"1.0.0.0\"\n        }\n      ],\n      \"native_type_bindings\": [\n        {\n          \"arity\": 0,\n          \"assembly\": \"[\\\"System.Runtime\\\",\\\"1.0.0.0\\\",\\\"\\\",\\\"\\\",\\\"0\\\"]\",\n          \"declaring\": null,\n          \"name\": \"Object\",\n          \"namespace\": \"System\",\n          \"native_name\": \"System.Object\",\n          \"value_type\": false\n        },\n        {\n          \"arity\": 0,\n          \"assembly\": \"[\\\"System.Runtime\\\",\\\"1.0.0.0\\\",\\\"\\\",\\\"\\\",\\\"0\\\"]\",\n          \"declaring\": null,\n          \"name\": \"Value\",\n          \"namespace\": \"System\",\n          \"native_name\": \"System.Value\",\n          \"value_type\": true\n        }\n      ],\n      \"references\": [\n        \"[\\\"System.Runtime\\\",\\\"1.0.0.0\\\",\\\"\\\",\\\"\\\",\\\"0\\\"]\"\n      ],\n      \"value_type_references\": [\n        \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031\",\n        \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031\",\n        \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\",\n        \"System.Value\"\n      ]\n    }\n  ],\n  \"capabilities\": {\n    \"console\": false\n  },\n  \"functions\": [\n    {\n      \"calls\": [\n        {\n          \"instruction\": 3,\n          \"operation\": \"newobj.ctor\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031..ctor\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Int32\"\n                ],\n                \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031\"\n              }\n            },\n            \"parameters\": [\n              \"Int32\"\n            ]\n          }\n        },\n        {\n          \"instruction\": 4,\n          \"operation\": \"newobj.ctor\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Int32\",\n                  \"Byte\"\n                ],\n                \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\"\n              }\n            },\n            \"parameters\": [\n              {\n                \"Constructed\": {\n                  \"arguments\": [\n                    \"Int32\"\n                  ],\n                  \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031\"\n                }\n              }\n            ]\n          }\n        },\n        {\n          \"instruction\": 8,\n          \"operation\": \"newobj.ctor\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031..ctor\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Byte\"\n                ],\n                \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031\"\n              }\n            },\n            \"parameters\": [\n              \"Byte\"\n            ]\n          }\n        },\n        {\n          \"instruction\": 9,\n          \"operation\": \"newobj.ctor\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Int32\",\n                  \"Byte\"\n                ],\n                \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\"\n              }\n            },\n            \"parameters\": [\n              {\n                \"Constructed\": {\n                  \"arguments\": [\n                    \"Byte\"\n                  ],\n                  \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031\"\n                }\n              }\n            ]\n          }\n        }\n      ],\n      \"definition\": null,\n      \"index\": 0,\n      \"instance\": false,\n      \"name\": \"NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_4D616B65\",\n      \"noResult\": false,\n      \"outParameters\": [],\n      \"owner\": null,\n      \"parameters\": [\n        \"Boolean\"\n      ],\n      \"returns\": {\n        \"Constructed\": {\n          \"arguments\": [\n            \"Int32\",\n            \"Byte\"\n          ],\n          \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\"\n        }\n      },\n      \"virtual\": false\n    },\n    {\n      \"calls\": [\n        {\n          \"instruction\": 4,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Int32\",\n                  \"Byte\"\n                ],\n                \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\"\n              }\n            },\n            \"parameters\": [\n              {\n                \"ByRef\": {\n                  \"Constructed\": {\n                    \"arguments\": [\n                      \"Int32\"\n                    ],\n                    \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031\"\n                  }\n                }\n              }\n            ]\n          }\n        },\n        {\n          \"instruction\": 7,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031.M_6765745F56616C7565\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Int32\"\n                ],\n                \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031\"\n              }\n            },\n            \"parameters\": []\n          }\n        },\n        {\n          \"instruction\": 15,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Int32\",\n                  \"Byte\"\n                ],\n                \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\"\n              }\n            },\n            \"parameters\": [\n              {\n                \"ByRef\": {\n                  \"Constructed\": {\n                    \"arguments\": [\n                      \"Byte\"\n                    ],\n                    \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031\"\n                  }\n                }\n              }\n            ]\n          }\n        },\n        {\n          \"instruction\": 18,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031.M_6765745F56616C7565\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Byte\"\n                ],\n                \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031\"\n              }\n            },\n            \"parameters\": []\n          }\n        }\n      ],\n      \"definition\": null,\n      \"index\": 1,\n      \"instance\": false,\n      \"name\": \"NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_52656164\",\n      \"noResult\": false,\n      \"outParameters\": [],\n      \"owner\": null,\n      \"parameters\": [\n        {\n          \"Constructed\": {\n            \"arguments\": [\n              \"Int32\",\n              \"Byte\"\n            ],\n            \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\"\n          }\n        }\n      ],\n      \"returns\": \"Int32\",\n      \"virtual\": false\n    },\n    {\n      \"calls\": [\n        {\n          \"instruction\": 1,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": false,\n            \"name\": \"NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_4D616B65\",\n            \"owner\": null,\n            \"parameters\": [\n              \"Boolean\"\n            ]\n          }\n        },\n        {\n          \"instruction\": 4,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": false,\n            \"name\": \"NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_4D616B65\",\n            \"owner\": null,\n            \"parameters\": [\n              \"Boolean\"\n            ]\n          }\n        },\n        {\n          \"instruction\": 7,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": false,\n            \"name\": \"NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_52656164\",\n            \"owner\": null,\n            \"parameters\": [\n              {\n                \"Constructed\": {\n                  \"arguments\": [\n                    \"Int32\",\n                    \"Byte\"\n                  ],\n                  \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\"\n                }\n              }\n            ]\n          }\n        },\n        {\n          \"instruction\": 14,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": false,\n            \"name\": \"NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_52656164\",\n            \"owner\": null,\n            \"parameters\": [\n              {\n                \"Constructed\": {\n                  \"arguments\": [\n                    \"Int32\",\n                    \"Byte\"\n                  ],\n                  \"definition\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\"\n                }\n              }\n            ]\n          }\n        }\n      ],\n      \"definition\": null,\n      \"index\": 2,\n      \"instance\": false,\n      \"name\": \"NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_4D61696E\",\n      \"noResult\": false,\n      \"outParameters\": [],\n      \"owner\": null,\n      \"parameters\": [],\n      \"returns\": \"Int32\",\n      \"virtual\": false\n    }\n  ],\n  \"module\": \"NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136\",\n  \"notice\": \"Build diagnostics only. Not a deployable metadata sidecar, stable ABI or export manifest.\",\n  \"opcodes\": {\n    \"br\": 1,\n    \"brfalse\": 4,\n    \"brtrue\": 1,\n    \"call\": 8,\n    \"ceq\": 4,\n    \"conv.i4\": 1,\n    \"conv.u1\": 1,\n    \"ldarg\": 3,\n    \"ldc.bool\": 4,\n    \"ldc.i4\": 8,\n    \"ldloc\": 4,\n    \"ldloca\": 6,\n    \"newobj.ctor\": 4,\n    \"ret\": 7,\n    \"stloc\": 6,\n    \"sub\": 1\n  },\n  \"root\": \"NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_4D61696E\",\n  \"schema\": \"neoclr-aot-inspection-v1\",\n  \"scope\": \"inventory includes all declarations; admission uses admissionMode\",\n  \"selection\": null,\n  \"types\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-library-result-contract/library-result-app.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-library-result-contract/library-result-app.o"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "aot-poc: closed-world call is external or has an invalid identity/signature: FunctionRef { definition: None, name: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565\", owner: Some(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\", arguments: [Int32, Byte] }), instance: true, generic_arguments: [], parameters: [ByRef(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031\", arguments: [Int32] })] }\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "@entry"
+      ],
+      "exit": 0,
+      "stdout": "Inventory summarized in libraryContract",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "7c28db6ca6708c63a760a1fc23d395e788df9143a305cb4c23773157fb17587e",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-values/library-result-app.rvn": "613be5bce3ee5c638c0551fcfa41e093c3b90dd56d26f4c34d943ad9f393dfb7",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d"
+  },
+  "inspection": {
+    "admission": {
+      "accepted": false,
+      "firstError": "closed-world call is external or has an invalid identity/signature: FunctionRef { definition: None, name: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565\", owner: Some(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\", arguments: [Int32, Byte] }), instance: true, generic_arguments: [], parameters: [ByRef(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031\", arguments: [Int32] })] }",
+      "phase": "selection"
+    },
+    "admissionMode": "closed-world",
+    "assemblies": [
+      {
+        "full_name": "[\"library-result-app\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "modules": [
+          "library-result-app.dll"
+        ],
+        "name": "library-result-app",
+        "native_module_bindings": [
+          {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          }
+        ],
+        "native_type_bindings": [
+          {
+            "arity": 0,
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "declaring": null,
+            "name": "Object",
+            "namespace": "System",
+            "native_name": "System.Object",
+            "value_type": false
+          },
+          {
+            "arity": 0,
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "declaring": null,
+            "name": "Value",
+            "namespace": "System",
+            "native_name": "System.Value",
+            "value_type": true
+          }
+        ],
+        "references": [
+          "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]"
+        ],
+        "value_type_references": [
+          "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031",
+          "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031",
+          "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032",
+          "System.Value"
+        ]
+      }
+    ],
+    "capabilities": {
+      "console": false
+    },
+    "functions": [
+      {
+        "calls": [
+          {
+            "instruction": 3,
+            "operation": "newobj.ctor",
+            "target": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031..ctor",
+              "owner": {
+                "Constructed": {
+                  "arguments": [
+                    "Int32"
+                  ],
+                  "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031"
+                }
+              },
+              "parameters": [
+                "Int32"
+              ]
+            }
+          },
+          {
+            "instruction": 4,
+            "operation": "newobj.ctor",
+            "target": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+              "owner": {
+                "Constructed": {
+                  "arguments": [
+                    "Int32",
+                    "Byte"
+                  ],
+                  "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+                }
+              },
+              "parameters": [
+                {
+                  "Constructed": {
+                    "arguments": [
+                      "Int32"
+                    ],
+                    "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "instruction": 8,
+            "operation": "newobj.ctor",
+            "target": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031..ctor",
+              "owner": {
+                "Constructed": {
+                  "arguments": [
+                    "Byte"
+                  ],
+                  "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031"
+                }
+              },
+              "parameters": [
+                "Byte"
+              ]
+            }
+          },
+          {
+            "instruction": 9,
+            "operation": "newobj.ctor",
+            "target": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+              "owner": {
+                "Constructed": {
+                  "arguments": [
+                    "Int32",
+                    "Byte"
+                  ],
+                  "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+                }
+              },
+              "parameters": [
+                {
+                  "Constructed": {
+                    "arguments": [
+                      "Byte"
+                    ],
+                    "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "definition": null,
+        "index": 0,
+        "instance": false,
+        "name": "NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_4D616B65",
+        "noResult": false,
+        "outParameters": [],
+        "owner": null,
+        "parameters": [
+          "Boolean"
+        ],
+        "returns": {
+          "Constructed": {
+            "arguments": [
+              "Int32",
+              "Byte"
+            ],
+            "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+          }
+        },
+        "virtual": false
+      },
+      {
+        "calls": [
+          {
+            "instruction": 4,
+            "operation": "call",
+            "target": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+              "owner": {
+                "Constructed": {
+                  "arguments": [
+                    "Int32",
+                    "Byte"
+                  ],
+                  "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+                }
+              },
+              "parameters": [
+                {
+                  "ByRef": {
+                    "Constructed": {
+                      "arguments": [
+                        "Int32"
+                      ],
+                      "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "instruction": 7,
+            "operation": "call",
+            "target": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031.M_6765745F56616C7565",
+              "owner": {
+                "Constructed": {
+                  "arguments": [
+                    "Int32"
+                  ],
+                  "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031"
+                }
+              },
+              "parameters": []
+            }
+          },
+          {
+            "instruction": 15,
+            "operation": "call",
+            "target": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+              "owner": {
+                "Constructed": {
+                  "arguments": [
+                    "Int32",
+                    "Byte"
+                  ],
+                  "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+                }
+              },
+              "parameters": [
+                {
+                  "ByRef": {
+                    "Constructed": {
+                      "arguments": [
+                        "Byte"
+                      ],
+                      "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "instruction": 18,
+            "operation": "call",
+            "target": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031.M_6765745F56616C7565",
+              "owner": {
+                "Constructed": {
+                  "arguments": [
+                    "Byte"
+                  ],
+                  "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031"
+                }
+              },
+              "parameters": []
+            }
+          }
+        ],
+        "definition": null,
+        "index": 1,
+        "instance": false,
+        "name": "NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_52656164",
+        "noResult": false,
+        "outParameters": [],
+        "owner": null,
+        "parameters": [
+          {
+            "Constructed": {
+              "arguments": [
+                "Int32",
+                "Byte"
+              ],
+              "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+            }
+          }
+        ],
+        "returns": "Int32",
+        "virtual": false
+      },
+      {
+        "calls": [
+          {
+            "instruction": 1,
+            "operation": "call",
+            "target": {
+              "instance": false,
+              "name": "NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_4D616B65",
+              "owner": null,
+              "parameters": [
+                "Boolean"
+              ]
+            }
+          },
+          {
+            "instruction": 4,
+            "operation": "call",
+            "target": {
+              "instance": false,
+              "name": "NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_4D616B65",
+              "owner": null,
+              "parameters": [
+                "Boolean"
+              ]
+            }
+          },
+          {
+            "instruction": 7,
+            "operation": "call",
+            "target": {
+              "instance": false,
+              "name": "NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_52656164",
+              "owner": null,
+              "parameters": [
+                {
+                  "Constructed": {
+                    "arguments": [
+                      "Int32",
+                      "Byte"
+                    ],
+                    "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "instruction": 14,
+            "operation": "call",
+            "target": {
+              "instance": false,
+              "name": "NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_52656164",
+              "owner": null,
+              "parameters": [
+                {
+                  "Constructed": {
+                    "arguments": [
+                      "Int32",
+                      "Byte"
+                    ],
+                    "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "definition": null,
+        "index": 2,
+        "instance": false,
+        "name": "NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_4D61696E",
+        "noResult": false,
+        "outParameters": [],
+        "owner": null,
+        "parameters": [],
+        "returns": "Int32",
+        "virtual": false
+      }
+    ],
+    "module": "NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136",
+    "notice": "Build diagnostics only. Not a deployable metadata sidecar, stable ABI or export manifest.",
+    "opcodes": {
+      "br": 1,
+      "brfalse": 4,
+      "brtrue": 1,
+      "call": 8,
+      "ceq": 4,
+      "conv.i4": 1,
+      "conv.u1": 1,
+      "ldarg": 3,
+      "ldc.bool": 4,
+      "ldc.i4": 8,
+      "ldloc": 4,
+      "ldloca": 6,
+      "newobj.ctor": 4,
+      "ret": 7,
+      "stloc": 6,
+      "sub": 1
+    },
+    "root": "NeoMetadata_45EF7D6DDECAB27574B7893D66C75A77367910200201F37BAB9CD10C280DC136.F_4D61696E",
+    "schema": "neoclr-aot-inspection-v1",
+    "scope": "inventory includes all declarations; admission uses admissionMode",
+    "selection": null,
+    "types": []
+  },
+  "libraryContract": {
+    "typeCount": 334,
+    "functionCount": 1959,
+    "referencedTypes": [
+      {
+        "custom_attributes": [
+          {
+            "constructor": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_556E696F6E417474726962757465..ctor",
+              "owner": {
+                "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_556E696F6E417474726962757465"
+              },
+              "parameters": []
+            }
+          },
+          {
+            "arguments": [
+              {
+                "String": "System.Result+Ok`1"
+              },
+              {
+                "String": "Ok"
+              },
+              {
+                "Int32": 0
+              }
+            ],
+            "constructor": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E43617365417474726962757465..ctor",
+              "owner": {
+                "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E43617365417474726962757465"
+              },
+              "parameters": [
+                "String",
+                "String",
+                "Int32"
+              ]
+            }
+          },
+          {
+            "arguments": [
+              {
+                "String": "System.Result+Error`1"
+              },
+              {
+                "String": "Error"
+              },
+              {
+                "Int32": 1
+              }
+            ],
+            "constructor": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E43617365417474726962757465..ctor",
+              "owner": {
+                "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E43617365417474726962757465"
+              },
+              "parameters": [
+                "String",
+                "String",
+                "Int32"
+              ]
+            }
+          }
+        ],
+        "fields": [
+          {
+            "name": "<Tag>",
+            "ty": "Byte",
+            "visibility": "private"
+          },
+          {
+            "name": "<OkPayload>",
+            "ty": {
+              "Constructed": {
+                "arguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ],
+                "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031"
+              }
+            },
+            "visibility": "private"
+          },
+          {
+            "name": "<ErrorPayload>",
+            "ty": {
+              "Constructed": {
+                "arguments": [
+                  {
+                    "TypeParameter": 1
+                  }
+                ],
+                "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031"
+              }
+            },
+            "visibility": "private"
+          }
+        ],
+        "generic_parameters": [
+          "T",
+          "E"
+        ],
+        "implements": [
+          {
+            "Constructed": {
+              "arguments": [
+                {
+                  "Constructed": {
+                    "arguments": [
+                      {
+                        "TypeParameter": 0
+                      },
+                      {
+                        "TypeParameter": 1
+                      }
+                    ],
+                    "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+                  }
+                },
+                {
+                  "TypeParameter": 0
+                },
+                {
+                  "TypeParameter": 1
+                }
+              ],
+              "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_50726F706167617461626C656033"
+            }
+          }
+        ],
+        "is_abstract": false,
+        "is_sealed": true,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032",
+        "origin": {
+          "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+          "field_access": [
+            "Private",
+            "Private",
+            "Private"
+          ],
+          "field_readonly": [
+            false,
+            false,
+            false
+          ],
+          "field_tokens": [
+            67109228,
+            67109229,
+            67109230
+          ],
+          "module": "System.Runtime.dll",
+          "name": "System.Result`2",
+          "property_tokens": [
+            385876230,
+            385876231
+          ],
+          "publicly_visible": true,
+          "token": 33554663
+        },
+        "properties": [
+          {
+            "getter": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_6765745F56616C7565",
+              "owner": {
+                "Constructed": {
+                  "arguments": [
+                    {
+                      "TypeParameter": 0
+                    },
+                    {
+                      "TypeParameter": 1
+                    }
+                  ],
+                  "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+                }
+              },
+              "parameters": []
+            },
+            "instance": true,
+            "name": "Value",
+            "parameters": [],
+            "ty": {
+              "Named": "System.Object"
+            }
+          },
+          {
+            "getter": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_6765745F48617356616C7565",
+              "owner": {
+                "Constructed": {
+                  "arguments": [
+                    {
+                      "TypeParameter": 0
+                    },
+                    {
+                      "TypeParameter": 1
+                    }
+                  ],
+                  "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+                }
+              },
+              "parameters": []
+            },
+            "instance": true,
+            "name": "HasValue",
+            "parameters": [],
+            "ty": "Boolean"
+          }
+        ],
+        "representation": "Record"
+      },
+      {
+        "declaring_type": {
+          "index": 230,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "fields": [
+          {
+            "name": "<value>k__BackingField",
+            "ty": {
+              "TypeParameter": 0
+            },
+            "visibility": "private"
+          }
+        ],
+        "generic_parameters": [
+          "T"
+        ],
+        "is_abstract": false,
+        "is_sealed": true,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031",
+        "origin": {
+          "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+          "declaring_type_token": 33554664,
+          "field_access": [
+            "Private"
+          ],
+          "field_readonly": [
+            true
+          ],
+          "field_tokens": [
+            67109231
+          ],
+          "module": "System.Runtime.dll",
+          "name": "Ok`1",
+          "property_tokens": [
+            385876232
+          ],
+          "publicly_visible": true,
+          "token": 33554665
+        },
+        "properties": [
+          {
+            "getter": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031.M_6765745F56616C7565",
+              "owner": {
+                "Constructed": {
+                  "arguments": [
+                    {
+                      "TypeParameter": 0
+                    }
+                  ],
+                  "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031"
+                }
+              },
+              "parameters": []
+            },
+            "instance": true,
+            "name": "Value",
+            "parameters": [],
+            "ty": {
+              "TypeParameter": 0
+            }
+          }
+        ],
+        "representation": "Record"
+      },
+      {
+        "declaring_type": {
+          "index": 230,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "fields": [
+          {
+            "name": "<value>k__BackingField",
+            "ty": {
+              "TypeParameter": 0
+            },
+            "visibility": "private"
+          }
+        ],
+        "generic_parameters": [
+          "E"
+        ],
+        "is_abstract": false,
+        "is_sealed": true,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031",
+        "origin": {
+          "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+          "declaring_type_token": 33554664,
+          "field_access": [
+            "Private"
+          ],
+          "field_readonly": [
+            true
+          ],
+          "field_tokens": [
+            67109232
+          ],
+          "module": "System.Runtime.dll",
+          "name": "Error`1",
+          "property_tokens": [
+            385876233
+          ],
+          "publicly_visible": true,
+          "token": 33554666
+        },
+        "properties": [
+          {
+            "getter": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031.M_6765745F56616C7565",
+              "owner": {
+                "Constructed": {
+                  "arguments": [
+                    {
+                      "TypeParameter": 0
+                    }
+                  ],
+                  "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031"
+                }
+              },
+              "parameters": []
+            },
+            "instance": true,
+            "name": "Value",
+            "parameters": [],
+            "ty": {
+              "TypeParameter": 0
+            }
+          }
+        ],
+        "representation": "Record"
+      }
+    ],
+    "lexicalOwners": [
+      {
+        "custom_attributes": [
+          {
+            "arguments": [
+              {
+                "String": "System.Result`2"
+              }
+            ],
+            "constructor": {
+              "instance": true,
+              "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E436F6D70616E696F6E417474726962757465..ctor",
+              "owner": {
+                "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E436F6D70616E696F6E417474726962757465"
+              },
+              "parameters": [
+                "String"
+              ]
+            }
+          }
+        ],
+        "fields": [],
+        "is_abstract": true,
+        "is_reference_type": true,
+        "is_sealed": true,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74",
+        "origin": {
+          "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+          "module": "System.Runtime.dll",
+          "name": "System.Result",
+          "publicly_visible": true,
+          "token": 33554664
+        },
+        "representation": "Record"
+      }
+    ]
+  },
+  "native": {
+    "produced": false,
+    "boundary": "external library call selection"
+  },
+  "artifacts": {
+    "library-result-app.dll": "2d7da923aea2e7d25e1c4b21c8577feacc27851738fcc3dead1b4b343f44cf73"
+  }
+}
