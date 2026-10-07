@@ -43,7 +43,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   union consumers as the author-selected next milestone. Inventory emitted Counter
   and Some/None types/members with interpreter validation and explicit AOT rejection;
   record a reference-counting versus tracing experiment proposal without changing
-  managed lifetime policy. General library dependency compilation, loop budgets/cancellation,
+  managed lifetime policy. Implement the first flat-value AOT slice: compile Raven
+  Counter and Int32/Boolean record-copy samples with constructors, fields, property
+  accessors and borrowed instance receivers. Preserve copied arguments/results and
+  stack joins, default initialization and Fault output rules; keep the v2 C entry.
+  Record private aggregate ABI limits, native/interpreter checks and independent
+  executable deployment. Union-based console input is the next sample direction;
+  nested unions, reference fields and general library dependency compilation remain
+  unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime
   dependencies and public library APIs are unchanged. Cherry-pick this
   isolated slice to main at the author's correction, retaining main's newer native

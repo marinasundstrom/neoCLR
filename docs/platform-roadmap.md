@@ -41,8 +41,13 @@ is implemented or required for this first Hello World milestone. The author sele
 types and members next, especially value types supporting union samples such as
 Result and Some, to exercise payload access and control flow/branches. Inspect Raven
 metadata/IL before selecting the first bounded representation and member slice.
-The [value/member producer inventory](experiments/aot-values/README.md) compiles and
-interprets Counter and Some/None probes; their native compilation remains unsupported.
+The [first native value/member slice](experiments/aot-values/README.md) now compiles
+Raven Counter and copied Int32/Boolean records, including constructors, fields,
+accessors, borrowed receivers and branches. Some/None and Result unions remain next:
+nested payloads, out-parameter matching and generated/library members are not yet
+supported. The author adds a console-input sample after unions, exercising input and
+parse outcomes; strings, native input services and their lifetime contracts are later
+requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.
 [Compare it with the existing tracing contract](native-execution-investigation.md#reference-counting-as-an-early-native-experiment-2026-10-07);
 this remains exploratory and does not select a new managed lifetime policy.

@@ -1,0 +1,209 @@
+{
+  "profile": "raven-flat-values-v1",
+  "declaredCompilerRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "neoClrBaseRevision": "a9f8a5d7faa52473cfae173c99674954674a15b1",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/counter.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-values/counter.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/counter.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/counter.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/counter.o"
+      ],
+      "exit": 0,
+      "stdout": "Emitted aarch64-apple-darwin object; C export: int32_t neoclr_entry_v2(int32_t, int32_t *result)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/counter.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/counter"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/counter.o"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/counter"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-values/native-validation/counter:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/copies.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-values/copies.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/copies.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/copies.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/copies.o"
+      ],
+      "exit": 0,
+      "stdout": "Emitted aarch64-apple-darwin object; C export: int32_t neoclr_entry_v2(int32_t, int32_t *result)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/copies.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/copies"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/copies.o"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-values/native-validation/copies"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-values/native-validation/copies:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "samples": {
+    "counter": {
+      "artifacts": {
+        "counter.dll": "fa1a088a5a094aafea6abe52cdad07459d2933f4887062c3d792098a1b50c00f",
+        "counter.o": "053d90ff6d70ba0d12946539ea671676538e463b6388cd7a2eb41f3fc694ab9c",
+        "counter": "8fd614d733a078dc85283923778e67b287cc1539e5166785e332dac6e4eb8448"
+      },
+      "exit": 0,
+      "stdout": "",
+      "stderr": "",
+      "emptyEnvironment": true,
+      "executableOnlyDirectory": true,
+      "dynamicDependencies": [
+        "/usr/lib/libSystem.B.dylib"
+      ]
+    },
+    "copies": {
+      "artifacts": {
+        "copies.dll": "600c484ac24bb1c54f6b16bdf6c3acdcc46de77e57ced22eeca8bf79aa04fe2c",
+        "copies.o": "a1de76bef303ff86e3f22ee931e5100ae3453d0609061cb83a96b8a15e139c19",
+        "copies": "e09711aa4653adcfe747c2af841779ac65f9268fefc75e064ae6384492f2b398"
+      },
+      "exit": 0,
+      "stdout": "",
+      "stderr": "",
+      "emptyEnvironment": true,
+      "executableOnlyDirectory": true,
+      "dynamicDependencies": [
+        "/usr/lib/libSystem.B.dylib"
+      ]
+    }
+  },
+  "inputs": {
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "d5e3f3835eac6d78683be5c3cd0e32c83d3cbf4393008caee6081e939e1df513",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-values/counter.rvn": "eaccf3272d96b3c6e4e434dd29346cb2ed22e565a4fab061b57dd229f96959c6",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-values/copies.rvn": "fcec0d0d9d17f18a8803d6f7787bb56e1d9d52e831b31485beeb8464c6d99dce"
+  },
+  "date": "2026-10-07",
+  "tests": {
+    "command": "cargo test --locked --manifest-path tools/aot-poc/Cargo.toml",
+    "scalarTestsPassed": 15,
+    "valueTestsPassed": 7,
+    "valueNativeComparisons": 14,
+    "rejectedValueInputs": 10
+  },
+  "sourceHashes": {
+    "tools/aot-poc/src/values.rs": "eb9b83a168f90060ca47ab2f346ba6250ba73413e2fe5987b876e56b3196cf0d",
+    "tools/aot-poc/src/value_profile.rs": "3a81bd0f1763101cba9073e0b884bff5e4465cbaefaf07c0c24f9ccd4f5a7f51",
+    "tools/aot-poc/tests/values.rs": "c73cd0b929352823f05c01a7a21e6330dfcd00be4a8313e1a81b2705291e4370",
+    "docs/experiments/aot-values/Counter.pe": "63a59cc239312f7bf06023744dd9a99d44b3e5c342ac3b9c35ea4d2be502e453",
+    "docs/experiments/aot-values/Copies.pe": "e7de8e9a48876b59231ea4db7e159de2a0833a48b78ec1a1b52dcd022bb19f20"
+  }
+}

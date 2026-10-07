@@ -9,6 +9,8 @@ use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext, Variable};
 
 #[path = "flow.rs"]
 mod flow;
+#[path = "values.rs"]
+mod values;
 use cranelift_module::{DataDescription, Linkage, Module};
 use cranelift_object::{ObjectBuilder, ObjectModule};
 use neoclr::metadata::{Function, FunctionRef, Instruction as Op, Type};
@@ -17,7 +19,10 @@ use std::collections::{HashMap, HashSet};
 type Error = Box<dyn std::error::Error>;
 
 pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool) -> Result<Vec<u8>, Error> {
-    if input.name == "System" || !input.types.is_empty() || input.functions.len() > 128 {
+    if !input.types.is_empty() {
+        return values::compile(input, root);
+    }
+    if input.name == "System" || input.functions.len() > 128 {
         return Err(
             "scalar profile requires an application with no types and at most 128 functions".into(),
         );
@@ -386,6 +391,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool) -> Resu
         }
         module.define_function(export, &mut context)?;
     }
+    finish(module)
+}
+
+fn finish(module: ObjectModule) -> Result<Vec<u8>, Error> {
     let mut product = module.finish();
     // Baseline macOS ARM64 object, not a claim of testing every macOS version.
     // No SDK was used to compile these scalar functions (sdk = 0).

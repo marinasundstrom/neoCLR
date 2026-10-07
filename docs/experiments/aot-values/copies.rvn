@@ -1,0 +1,51 @@
+struct Counter {
+    var Value: int = 7
+    var Enabled: bool = true
+
+    func Bump() -> int {
+        Value += 1
+        return Value
+    }
+}
+
+func Advance(counter: Counter) -> Counter {
+    counter.Bump()
+    return counter
+}
+
+func Select(first: bool, left: Counter, right: Counter) -> Counter {
+    if first {
+        return left
+    }
+    return right
+}
+
+func Main() -> int {
+    var original = Counter()
+    var copy = original
+    copy.Value = 10
+    copy.Enabled = false
+    if original.Value != 7 || original.Enabled != true {
+        return 1
+    }
+    let advanced = Advance(original)
+    if advanced.Value != 8 || original.Value != 7 {
+        return 2
+    }
+    let left = Select(true, original, copy)
+    let right = Select(false, original, copy)
+    if left.Value != 7 || right.Value != 10 || right.Enabled != false {
+        return 3
+    }
+    let cleared = default(Counter)
+    if cleared.Value != 0 || cleared.Enabled != false {
+        return 4
+    }
+    while original.Value < 9 {
+        original.Bump()
+    }
+    if original.Value != 9 || copy.Value != 10 {
+        return 5
+    }
+    return 0
+}

@@ -116,6 +116,16 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   value handling and return/Fault cleanup. AOT/JIT and memory-management choices are
   independent. Records [sources, costs and validation needs](native-execution-investigation.md#reference-counting-as-an-early-native-experiment-2026-10-07).
   No reference-counting implementation or benchmark is performed.
+- **Author console-input direction:** “When we have unions we can also do console
+  inputs in sample”. **Assistant proposal:** read input with end/failure cases, parse
+  an integer into Result and match success/error, exercising strings, input services
+  and branches. This is a subsequent sample direction, not implemented input support.
+- **Assistant continuation outcome:** implements a bounded flat-value backend and
+  compiles the Raven Counter and copied Int32/Boolean record consumers to native ARM64.
+  Adds constructors, fields/accessors, borrowed receivers, value copies and typed
+  control flow with interpreter parity and Fault/rejection tests. Standalone executables
+  need only the OS library. [Evidence and limits](experiments/aot-values/native-validation.json)
+  distinguish this completed slice from still-unsupported nested unions and console input.
 - **Open:** backend choice, OS qualification order, native ABI/GC/metadata contracts,
   edit compatibility, measurements and implementation scheduling. These details are
   assistant proposals, not subsequent author decisions. The active Raven work and

@@ -217,8 +217,10 @@ The first standalone executable milestone is now
 [Hello World](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-hello/README.md),
 with UTF-8 console support linked into the image. The bounded pipeline now compiles
 Raven source to neoCLR metadata containing its IL, then compiles that artifact to
-native ARM64 code. Standalone NEOX and neoIL inputs also remain supported. More
-complex samples follow toward HTTP Server. Execution budgets and general managed
+native ARM64 code. Standalone NEOX and neoIL inputs also remain supported. A bounded
+[flat value/member profile](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-values/README.md)
+now runs Raven constructors, fields, accessors and record-copy/branch samples natively.
+Nested unions and a later console-input consumer remain next steps toward HTTP Server. Execution budgets and general managed
 services remain unsupported.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 [Scalar experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-scalar/README.md).
