@@ -1,0 +1,33 @@
+{
+  "baseRevision": "c41ed617",
+  "compilerRevision": "ca4aeccfb",
+  "scope": "API-authored native PE library and digest-bound consumer; not full source System execution.",
+  "command": [
+    "dotnet",
+    "run",
+    "--project",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+    "--",
+    "--string-root-runtime",
+    "target/debug/neoclr",
+    "/tmp/string-runtime1007f"
+  ],
+  "exitCode": 0,
+  "stdout": "PASS source String/Object: native PE verify/run returns 42; unselected root rejects; base constructor body executes\n",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/inheritance.rs": "c81c2dc57227ac7fac861bf6b7ba0675d7c10e882f049d42a72516aa84f36ca1",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/vm.rs": "b83b7d87f53d4d53911aa84a99bd34388b217e2bed581f1842c15d96fc4e4562",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "587466373ebfba3f4eb2a0a6ee69e5e9d72c3c36fcced4ec28f242fa11258807",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/StringRepresentationChecks.cs": "9495e559d6d2bcd71ae51c1e2a9ee530f8a8c3e41114439eaa82a1380c9e1dbc",
+    "/tmp/string-runtime1007f/unselected.log": "28f658a62e3d6533f0bf2d85ef5677b28f6c3c2f2fc45efc49e174539d320e27",
+    "/tmp/string-runtime1007f/verify.log": "37caa4cd8541b237dec0bbf2de4b77457f700a964688112c5f72a32190409c61",
+    "/tmp/string-runtime1007f/run.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/string-runtime1007f/SourceString.dll": "3d5cf88d9746be630e4ccadf2906adc431d667f2434e3bd5c6b7198ba5770552",
+    "/tmp/string-runtime1007f/SourceString.dll.fault.app": "e8ef191e68b95a86740569e2edcf4cf0a7f9c6d5c68f59e6533e97c63058acaa",
+    "/tmp/string-runtime1007f/SourceString.dll.app": "bcc2e06fc78d31e15bcfe9e692a16aa5da5456f390a0693c39a5876336dc0f8d",
+    "/tmp/string-runtime1007f/SourceString.dll.neoil": "b3de629ea4ba552863c8df2a94a8787ae1505a49da4e890dacc23e49c75dbbbd",
+    "/tmp/string-runtime1007f/SourceString.dll.fault.neoil": "b3de629ea4ba552863c8df2a94a8787ae1505a49da4e890dacc23e49c75dbbbd",
+    "/tmp/string-runtime1007f/SourceString.dll.fault": "459ce2517dd613e85db9dccf4e32a1535894f91c8a987a6bfe8c0a707565b81b",
+    "/tmp/string-runtime1007f/base-body.log": "f4351436689c61cc4c2a5de74b5b3380f0fca9ec921d45c43f41e7b1f8f1e134"
+  }
+}

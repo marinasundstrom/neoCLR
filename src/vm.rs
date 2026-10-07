@@ -610,10 +610,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
     }
     for definition in &module.types {
-        if definition
-            .base
-            .as_ref()
-            .is_some_and(|base| module.is_reference_type(base) != definition.is_reference_type)
+        let intrinsic_string_root =
+            crate::inheritance::has_intrinsic_string_root(module, definition);
+        if !intrinsic_string_root
+            && definition
+                .base
+                .as_ref()
+                .is_some_and(|base| module.is_reference_type(base) != definition.is_reference_type)
         {
             return Err(Fault::new(
                 "base and derived types must have the same storage category",
@@ -3636,6 +3639,47 @@ fn interpret_instructions_with_dispatch(
                         frames.push(child);
                         return Ok(None);
                     }
+                    // Intrinsic String keeps text storage; its fieldless Object base
+                    // still executes with the ordinary Object receiver ABI.
+                    let string_base_chain = callee.instance
+                        && callee.name == "System.Object..ctor"
+                        && crate::object_root::owns_slot(module, &callee)
+                        && function.name == "System.String..ctor"
+                        && function
+                            .owner
+                            .as_ref()
+                            .and_then(|owner| module.type_definition(owner))
+                            .is_some_and(|owner| {
+                                crate::inheritance::has_intrinsic_string_root(module, owner)
+                            });
+                    if string_base_chain {
+                        let receiver_index = frame
+                            .stack
+                            .len()
+                            .checked_sub(callee.parameters.len() + 1)
+                            .ok_or_else(|| Fault::new("missing String constructor receiver"))?;
+                        let own = frame.args[0].borrow().get()?.clone();
+                        if frame.constructor_chained
+                            || !matches!((&own, &frame.stack[receiver_index]),
+                            (Value::String(a), Value::String(b)) if a.same_owner(b))
+                        {
+                            return Err(Fault::new(
+                                "String constructor must chain once using its own receiver",
+                            ));
+                        }
+                        if heap.len() >= limits.heap_objects {
+                            return Err(Fault::coded(
+                                crate::FaultCode::HeapLimitExceeded,
+                                "heap object limit exceeded",
+                            ));
+                        }
+                        let index = heap.allocate(frame.stack[receiver_index].clone())?;
+                        frame.stack[receiver_index] =
+                            Value::ObjectReference(crate::value::ObjectReference {
+                                reference: heap.address(index)?,
+                                view: callee.owner.clone(),
+                            });
+                    }
                     let mut args = frame.args(module, &callee.argument_types())?;
                     if callee.instance
                         && callee.name.ends_with("..ctor")
@@ -3652,8 +3696,9 @@ fn interpret_instructions_with_dispatch(
                             .get()?
                             .clone();
                         if frame.constructor_chained
-                            || !matches!((&own, args.first()),
-                            (Value::ObjectReference(a), Some(Value::ObjectReference(b))) if a == b)
+                            || (!string_base_chain
+                                && !matches!((&own, args.first()),
+                            (Value::ObjectReference(a), Some(Value::ObjectReference(b))) if a == b))
                         {
                             return Err(Fault::new(
                                 "class constructor must chain once using its own receiver",

@@ -10,6 +10,14 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Intrinsic String now retains and executes its selected source Object relationship.
+The linked PE constructor gate returns 42; the 197-input audit advances to the
+**binary library payload limit**, with no published output. Next inspect payload
+size and coordinated writer/reader budgets before expanding them.
+[Evidence](experiments/extended-cli-metadata/string-root-2026-10-07.md).
+
+### Earlier array frontier
+
 Array backing validation now admits the explicitly selected fieldless source Object
 root. Linked PE execution verifies allocation and mutation through an alias, returning
 42. The 197-input audit advances to **System.String -> System.Object base-category

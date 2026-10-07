@@ -6390,3 +6390,12 @@ emission are unchanged. This preserves managed T[] and nominal Array<T>, with no
 inline/value-array feature or altered CLI array signature. The runtime PE gate
 verifies alias mutation; full-System emission next stops at intrinsic String's Object
 base. [Validation and scope](experiments/extended-cli-metadata/array-root-2026-10-07.md).
+
+## Intrinsic String and source Object (2026-10-07)
+
+Native reading and runtime execution now preserve String's selected Object base
+without changing its intrinsic UTF-8 receiver ABI. Protected constructor chaining
+checks identity and executes the real base body through an Object handle view.
+No new Runtime Contract option, compiler mapping or temporary CLI bridge encoding.
+The 197-source audit next reaches the binary library payload limit; output remains
+unpublished. [Evidence](experiments/extended-cli-metadata/string-root-2026-10-07.md).

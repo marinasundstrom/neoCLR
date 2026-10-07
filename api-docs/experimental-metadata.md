@@ -7674,3 +7674,13 @@ core/System bootstrap alias can share evaluation storage with this selected carr
 arbitrary foreign or unmarked local types do not acquire erased storage. No format
 version change or runtime instruction was added. See the
 [source bootstrap gate and remaining limits](https://github.com/marinasundstrom/neoCLR/blob/codex/native-system-bootstrap/docs/experiments/extended-cli-metadata/source-value-2026-10-07.md).
+
+### Intrinsic String over an explicit Object root (development, 2026-10-07)
+
+`AddClass("System", "String", objectRoot)` followed by
+`SetNativePrimitive(PrimitiveType.String)` retains its canonical Object base when
+read through `AssemblyDefinition.ReadNativeAssembly`. Runtime loading requires
+explicit selection of that fieldless Object root. String retains intrinsic UTF-8
+storage, not record fields; unrelated primitive bases remain unsupported. Use
+`GetILGenerator()` for constructor bodies, including the direct base call.
+[Runtime evidence](../docs/experiments/extended-cli-metadata/string-root-2026-10-07.md).

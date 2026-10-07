@@ -94,6 +94,10 @@ if (args.Length == 5 && args[0] == "--native-comparer-binding")
 {
     await NativeComparerBindingChecks.Run(args[1], args[2], args[3], args[4]); return 0;
 }
+if (args.Length == 3 && args[0] == "--string-root-runtime")
+{
+    await StringRepresentationChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--array-backing-runtime")
 {
     await ArrayBackingChecks.RunRuntime(args[1], args[2]); return 0;

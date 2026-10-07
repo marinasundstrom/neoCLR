@@ -4,6 +4,25 @@ use crate::{
     metadata::{Field, Representation, Type},
 };
 
+/// String has reference semantics while retaining runtime-owned text storage.
+/// Its only admitted explicit base is the host-selected fieldless Object root.
+pub(crate) fn has_intrinsic_string_root(
+    module: &Module,
+    definition: &crate::metadata::TypeDef,
+) -> bool {
+    definition.name == "System.String"
+        && definition.representation == Representation::Runtime
+        && definition.fields.is_empty()
+        && definition.base.as_ref().is_some_and(|base| {
+            base == &Type::from_name("System.Object")
+                && module.type_definition(base).is_some_and(|parent| {
+                    module.object_root.is_some()
+                        && parent.definition.as_ref() == module.object_root.as_ref()
+                        && parent.fields.is_empty()
+                })
+        })
+}
+
 pub(crate) fn base(module: &Module, ty: &Type) -> Result<Option<Type>, Fault> {
     if matches!(ty, Type::Function(_)) {
         return Ok(Some(Type::from_name("System.Object")));
@@ -27,7 +46,9 @@ pub(crate) fn lineage(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
         let definition = module
             .type_definition(&ty)
             .ok_or_else(|| Fault::new("unknown base type"))?;
-        if definition.representation != Representation::Record {
+        if definition.representation != Representation::Record
+            && !has_intrinsic_string_root(module, definition)
+        {
             return Err(Fault::new("base inheritance requires record definitions"));
         }
         if chain.len() >= 64
@@ -97,6 +118,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             continue;
         }
         if !definition.is_reference_type
+            && !has_intrinsic_string_root(module, definition)
             && module.functions.iter().any(|f| {
                 f.name.ends_with("..ctor")
                     && !f.receiver_byref

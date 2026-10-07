@@ -329,7 +329,7 @@ public sealed partial class NativeAssemblyDefinition
                 type.BaseIndex = types.FindIndex(candidate => candidate.NativeName == type.BaseName);
                 Require(type.BaseIndex >= 0, "base class must be a local declaration");
                 var parent = types[type.BaseIndex];
-                Require((IsOrdinaryClass(type) || parent.IsObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType && type.DeclaringType < 0 && type.NativePrimitive is null && !type.NativeGrapheme) && IsOrdinaryClass(parent) && !parent.IsSealedClass, $"unsupported base class category: {type.Namespace}.{type.Name} -> {parent.Namespace}.{parent.Name}");
+                Require((IsOrdinaryClass(type) || parent.IsObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType && type.DeclaringType < 0 && type.NativePrimitive is null or PrimitiveType.String && !type.NativeGrapheme) && IsOrdinaryClass(parent) && !parent.IsSealedClass, $"unsupported base class category: {type.Namespace}.{type.Name} -> {parent.Namespace}.{parent.Name}");
                 var seen = new HashSet<int>();
                 for (var current = i; current >= 0; current = types[current].BaseName is { } name ? types.FindIndex(candidate => candidate.NativeName == name) : -1)
                     Require(seen.Add(current), "cyclic class inheritance");

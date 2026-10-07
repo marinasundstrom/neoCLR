@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Preserve intrinsic String inheritance from the selected source Object root in
+  native metadata and runtime constructor execution, retaining UTF-8 text storage.
+  Linked PE execution passes; full-System encoding next reaches the payload limit.
+
 - Align array backing validation across authoring, reading and runtime linking:
   allow the explicitly selected fieldless source Object base, while rejecting
   other/unselected bases. Managed-array allocation and alias mutation execute in
