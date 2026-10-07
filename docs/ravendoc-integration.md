@@ -123,7 +123,7 @@ These are shared RavenDoc/compiler documentation changes: no Runtime Contract,
 native metadata, CLI bridge encoding or runtime execution behavior changes.
 
 Validation for this update: pinned Raven revision
-`e88ea43cf16185734d01f6c50e620fdb40fd3b36`, 1,803 generated pages with local
+`816b5d8a63e71891e364d98a470aa506debc1609`, 1,803 generated pages with local
 links/anchors/HTML checked, and all 18 Python website tests passing. Browser
 checks passed at 390px and 1280px in light/dark themes on the homepage, API
 landing, System namespace and ArrayList pages, including search retention and
@@ -154,3 +154,10 @@ and retains its existing configuration.
 
 Wide tables scroll inside articles on mobile screens, including when platform
 font metrics make a comparison table wider than the available content column.
+
+The mobile main navbar uses a three-dot disclosure alongside color theme and
+site search. Copy controls stay fixed at the visible edge while code scrolls.
+The 390px, 768px and 1280px previews passed menu/Escape, theme/search visibility,
+code-scroll alignment and overflow checks in both themes; all 18 website tests
+and the complete site build passed. These changes are staged locally for neoCLR;
+publication remains a separate action.

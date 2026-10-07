@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Update RavenDoc with a mobile three-dot navbar menu beside theme/search controls
+  and stationary copy buttons during horizontal code scrolling. Validate all 18
+  website tests, generated pages and both themes at mobile/tablet/desktop widths.
+
 - Record the shared Raven heap-async resumption fix on main and the source-object
   metadata integration branch. Seventeen focused .NET tests pass; native runtime
   behavior and Runtime Contract configuration are unchanged. See the target
