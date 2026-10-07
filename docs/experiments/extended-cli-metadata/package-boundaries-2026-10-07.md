@@ -29,7 +29,7 @@ runtime constraints; no divergence is automatically an improvement.
 | Managed foundation | System.Runtime assembly and API documentation | Explicit bootstrap contract; the independent Runtime/orders gate passes |
 | Data | System.Data assembly and documentation | Runtime; separate JSON/array execution passes (development) |
 | Networking | System.Networking assembly and documentation | Runtime and matching native service capability; separate cancellation/socket consumer passes (development) |
-| Web | System.Web assembly and documentation | Runtime, Networking and currently Data; separate compilation/execution remain open |
+| Web | System.Web assembly and documentation | Runtime, Networking and Data; separate compilation exposes the internal shared-deadline boundary, execution remains open |
 | Platform runtime, per OS/architecture | Native runtime executable and required native assets | Matching metadata/runtime-service contract; macOS arm64 is the current POC qualification target |
 | Developer tools | Raven compiler integration, language server, disassembler and build support | Matching metadata contract plus current .NET host requirements; can initially be one bundle |
 | Bootstrap/development inputs | Primitive core and retained service seed, ownership catalog and provenance | Explicitly development-only until their bootstrap role is eliminated |
@@ -46,6 +46,15 @@ networking/storage implementations may remain in that executable while their man
 APIs ship separately. Further native packages need evidence of an independent dependency,
 ABI and deployment benefit. Likewise, splitting Runtime's remaining IO/reflection/tasks
 surfaces needs dependency evidence; their presence does not make them a minimal core.
+
+## Unified documentation (author direction, 2026-10-07)
+
+Keep one class-library API reference across the assembly/package split. Namespace/type
+navigation and search are unified; actual declaring assembly is provenance on the page,
+not a separate API section. A PE container or package name does not replace assembly
+identity. This does not change binary ownership or dependency direction. The current
+aggregate documentation bridge remains explicit until RavenDoc can consume the split
+native inputs into one model. See [the migration gate](../../../api-docs/README.md#one-class-library-reference-across-assemblies).
 
 ## Compatibility and catalogs
 

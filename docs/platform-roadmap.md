@@ -43,7 +43,14 @@ Separate **System.Data now executes JSON object mapping** using the public Runti
 ArrayReflection boundary. Nested models, setters, managed/jagged arrays, mutation,
 reference identity and invalid-input checks pass against emitted references only.
 [Data gate](experiments/extended-cli-metadata/separate-data-2026-10-07.md).
-Next: independently compile/execute Web, then project/LSP catalogs.
+The separate Web build now has a reproducible failure-before-publication gate: HTTP
+uses internal Networking deadline creation/expiry and DNS/connect/send/receive methods.
+[Exact boundary and next slice](experiments/extended-cli-metadata/web-boundary-2026-10-07.md).
+Next: expose a supported shared monotonic deadline contract without leaking raw stamps
+or changing the end-to-end timeout, then execute Web and update project/LSP catalogs.
+The API site remains one namespace/type reference across assemblies; declaring-assembly
+provenance belongs on pages. Native multi-input RavenDoc migration must preserve that
+shape, as recorded in [API maintenance](../api-docs/README.md#one-class-library-reference-across-assemblies).
 
 Author-directed foundation rule (2026-10-07): System.Runtime owns well-defined
 fundamentals; higher-level packages depend on it, never the reverse. Exact Runtime

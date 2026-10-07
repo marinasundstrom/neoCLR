@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Record independent Data/Networking compilation against an emitted Runtime candidate."""
+"""Record separate optional-library compilation against an emitted Runtime candidate."""
 import argparse
 import hashlib
 import json
@@ -15,6 +15,7 @@ def main():
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--compiler-revision', required=True)
     parser.add_argument('--runtime', type=Path, help='Also compile and execute the unchanged networking consumer')
+    parser.add_argument('--include-web', action='store_true', help='Build Web against the emitted Data and Networking artifacts')
     args = parser.parse_args()
     directory = args.runtime_library_directory.resolve()
     compiler = args.compiler.resolve()
@@ -33,17 +34,26 @@ def main():
     report = dict(sourceRevision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   compilerRevision=args.compiler_revision,
                   scope='Compilation frontier only; emission is not execution acceptance.', cases=[])
-    for group in ('Data', 'Networking'):
+    artifacts = {}
+    groups = ('Data', 'Networking', 'Web') if args.include_web else ('Data', 'Networking')
+    for group in groups:
+        if group == 'Web' and any(case['exitCode'] != 0 for case in report['cases']):
+            raise RuntimeError('Data and Networking must compile before the Web audit')
         sources = sorted((ROOT / 'runtime/raven/src/System' / group).rglob('*.rvn'))
         if group == 'Networking':
             sources += [ROOT / 'runtime/raven/native' / (name + '.rvn')
                         for name in ('RuntimeNetworkCalls', 'RuntimeNetworkServices')]
         inputs += sources
         artifact = output / ('System.' + group + '.dll')
+        artifacts[group] = artifact
+        references = [library] if group != 'Web' else [library, artifacts['Data'], artifacts['Networking']]
         command = ['dotnet', compiler, 'neoclr', '--core-reference', core,
                    '--runtime-seed', seed, '--bootstrap-ownership', ownership,
-                   '--reference', library, '--object-library', 'System.Runtime',
-                   '--bootstrap-intrinsics', '--library', '-o', artifact] + sources
+                   '--object-library', 'System.Runtime', '--bootstrap-intrinsics',
+                   '--library', '-o', artifact]
+        for reference in references:
+            command += ['--reference', reference]
+        command += sources
         result = subprocess.run(list(map(str, command)), cwd=ROOT, capture_output=True, text=True, timeout=180)
         entry = dict(name=group, command=result.args, exitCode=result.returncode,
                      stdout=result.stdout, stderr=result.stderr, sourceCount=len(sources),
@@ -57,8 +67,9 @@ def main():
             raise RuntimeError('Failed compilation published an output artifact')
         print(group, result.returncode, flush=True)
     if args.runtime:
-        if report['cases'][-1]['exitCode'] != 0:
+        if next(case for case in report['cases'] if case['name'] == 'Networking')['exitCode'] != 0:
             raise RuntimeError('Networking must compile before execution acceptance')
+        artifact = artifacts['Networking']
         runtime = args.runtime.resolve()
         source = ROOT / 'docs/experiments/network-cancellation/Main.rvn'
         consumer = output / 'NetworkConsumer.dll'

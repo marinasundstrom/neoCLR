@@ -11324,3 +11324,22 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
   editor catalogs. No package IDs, registry or version scheme was selected here.
 - [Dependency rule](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md),
   [execution evidence](experiments/extended-cli-metadata/separate-data-2026-10-07.md).
+
+## 2026-10-07: A unified class-library API reference
+
+- **Author:** Asked to continue and proposed presenting the split class library “as one”
+  in the RavenDoc-generated site, without separate sections, while retaining where each
+  type/function is declared (assembly/file provenance).
+- **Assistant response:** Proposed one namespace/type navigation tree with assembly
+  provenance on declaration pages. Distinguished logical assembly identity from a PE
+  container, package and namespace.
+- **Action:** Reviewed RavenDoc's existing per-API grouping and the aggregate docs bridge.
+  Recorded a unified native-input migration gate; did not claim that multi-assembly
+  rendering is already implemented or change the existing site into per-DLL sections.
+  Continued the Web split audit against independently compiled dependencies.
+- **Observed outcome:** Web is blocked by private shared-deadline operations crossing
+  Networking's boundary. No Web artifact is published; Runtime's dependency direction
+  remains unchanged. A typed supported deadline contract is the next design/implementation
+  slice; raw runtime-service integers are not promoted to public APIs by this audit.
+- [Reference direction](../api-docs/README.md#one-class-library-reference-across-assemblies),
+  [Web boundary evidence](experiments/extended-cli-metadata/web-boundary-2026-10-07.md).

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Extend optional-library auditing with a separate Web build against emitted Runtime,
+  Data and Networking references. Record private deadline API failures and absence of
+  output. Document the author-directed unified RavenDoc class-library reference with
+  declaring-assembly provenance; native multi-assembly documentation migration remains
+  planned, not implemented. Keep separate package ownership and one-way dependencies.
+
 - Add development ArrayReflection.GetLength/GetValue/Create for supported managed
   vectors, with terminal checked faults and preserved reference identity. JSON mapping
   consumes this public boundary across separate Runtime/Data assemblies. Align API

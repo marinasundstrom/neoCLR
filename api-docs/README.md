@@ -50,6 +50,35 @@ The selected namespace container and XML member entry include the new name; host
 and FaultCode retain their manual reference. Source callers must migrate from
 `System.Fault` and use the matching reference/compiler/runtime bundle.
 
+## One class-library reference across assemblies
+
+Author direction (2026-10-07): present the class library as one reference, organized by
+namespace and type. Splitting Runtime/Data/Networking/Web into assemblies or distribution
+packages must not create separate API sections, duplicate namespace trees or per-DLL
+landing pages. Keep `/docs/` navigation, cross-references and search unified.
+
+A type/member page should identify its actual declaring assembly, and may additionally
+show package and file provenance when known. An assembly is the logical metadata and
+identity unit; a PE file is its container, often named `.dll`. Package, namespace,
+assembly and filename are different facts and should not be conflated. Inherited and
+extension members should retain their declaration provenance rather than acquire the
+viewed type's assembly. Never guess ownership from a namespace.
+
+Current rendering still uses the aggregate `NeoCLR.CoreProbe.dll` documentation bridge.
+That displayed assembly is a bridge identity, not evidence of a Runtime/Data production
+owner. The native multi-assembly reference migration remains work ahead. RavenDoc's
+current `apis` configuration generates per-API groups; do not configure one such group
+per split class-library DLL. The migration needs one combined documentation model over
+explicit native inputs, retaining actual declaration identities, one canonical page
+per type, merged namespaces, cross-assembly links and conflict diagnostics. Keep
+source links and documentation associated with their original declarations.
+
+Acceptance for that migration: Runtime/Data/Networking/Web share one namespace tree;
+a cross-assembly member type links to its unique type page; declaration ownership is
+correct on type, ordinary member, inherited member and extension-member pages; duplicate
+identities reject rather than silently overwrite; existing URLs remain stable where
+possible. This is a presentation direction, not a requirement to merge runtime binaries.
+
 ## Build and refresh
 
 Author direction (2026-09-27): run only validation needed for the change; do not
