@@ -12,7 +12,9 @@ standard message: its supplied UTF-8 text is preserved exactly. `Fault::diagnost
 returns a borrowed Rust host view (`code`, `message`, `stack_trace`), whose Display prints
 `Code: message` followed by innermost-first frames. Original Fault fields and legacy
 Display retain their detailed site-specific diagnostics for compatibility; this view is
-the common presentation path, not a claim that every legacy host/debugger migrated.
+the common presentation path. The interpreter CLI now uses it for captured execution
+faults. Pre-execution loader/verifier details and existing debugger/host Display remain
+compatible; this is not a claim that every legacy host/debugger migrated.
 See the [host API reference](../../../api-docs/faults.md).
 
 Both captures use `StackTrace::MAX_FRAMES` (64), with explicit truncation. Native capture
@@ -68,7 +70,8 @@ UTF-8/NUL messages, normal wrappers, native-service identity and configuration r
 
 [The Raven consumer](fail.rvn) forwards a message through two functions to ordinary
 System.Fail in the pinned source library. [Recorded evidence](validation.json) compiles
-it freshly, compares message and managed frames with the interpreter, and verifies exit
+it freshly, compares exact diagnostic text (including message and managed frames) with
+the current interpreter CLI, and verifies exit
 1 from an otherwise empty directory/environment with only libSystem linked dynamically.
 The native image has no unresolved runtime imports. No shared managed framework is used.
 
@@ -94,5 +97,5 @@ Caller-owned storage keeps capture predictable and independent of allocation/GC.
 cost is an explicit lifetime and fixed trace capacity. Capturing logical frames at native
 failure propagation avoids an OS unwinder and debug-symbol requirement; it requires each
 backend to preserve the same frame and first-fault rules. Shared code messages and parity
-tests keep those implementations aligned. Default CLI presentation migration and native
-input binding are the next slices; broad runtime diagnostic migration remains explicit.
+tests keep those implementations aligned. The interpreter CLI now uses this presentation for execution faults, with exit 1.
+Native input binding is the next slice; broad legacy host/debugger migration remains explicit.

@@ -359,7 +359,14 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
                     ..ExecutionOptions::default()
                 })
             }
-            .map_err(|e| e.to_string())?;
+            .map_err(|fault| {
+                if fault.stack_trace.is_none() {
+                    // Preserve detailed loader/verifier diagnostics before execution.
+                    return fault.to_string();
+                }
+                let diagnostic = fault.diagnostic().to_string();
+                diagnostic.strip_suffix('\n').unwrap_or(&diagnostic).to_owned()
+            })?;
             if gc_stats {
                 let stats = execution.heap.statistics();
                 writeln!(

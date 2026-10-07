@@ -51,7 +51,7 @@ fn cli_fault_has_failure_exit_code() {
     assert!(
         String::from_utf8(output.stderr)
             .unwrap()
-            .contains("at Main:0")
+            .contains("at Main [instruction 0]")
     );
 }
 
@@ -201,4 +201,26 @@ fn cli_rejects_invalid_instruction_budget_before_loading() {
         );
         assert!(output.stdout.is_empty());
     }
+}
+
+#[test]
+fn cli_execution_faults_share_host_presentation_and_exit_one() {
+    let path = std::env::temp_dir().join(format!("neoclr-common-fault-{}.neoil", std::process::id()));
+    for body in ["fault \"Unicode 🌍\\u0000message\"", "ldc.i4 1\nldc.i4 0\ndiv", "ldc.i4 2147483647\nldc.i4 1\nadd.ovf", "ldc.i4 1\nvalue.pack Int32\nvalue.unpack Byte"] {
+        let source=format!(".module CliFault\n.entry Main\n.function Leaf() -> Int32\n{body}\nret\n.end\n.function Main() -> Int32\ncall Leaf()\nret\n.end");
+        std::fs::write(&path,&source).unwrap();
+        let module=neoclr::assemble(&source).unwrap();
+        let fault=neoclr::run(&module,neoclr::Limits::default()).unwrap_err();
+        let output=Command::new(env!("CARGO_BIN_EXE_neoclr")).arg("run").arg(&path).output().unwrap();
+        assert_eq!(output.status.code(),Some(1));
+        assert!(output.stdout.is_empty());
+        assert_eq!(String::from_utf8(output.stderr).unwrap().replace("\r\n","\n"),fault.diagnostic().to_string());
+    }
+    for code in [0, 1, 42] {
+        std::fs::write(&path,format!(".module Exit\n.entry Main\n.function Main() -> Int32\nldc.i4 {code}\nret\n.end")).unwrap();
+        let output=Command::new(env!("CARGO_BIN_EXE_neoclr")).arg("run").arg(&path).output().unwrap();
+        assert_eq!(output.status.code(),Some(code));
+        assert!(output.stdout.is_empty() && output.stderr.is_empty());
+    }
+    std::fs::remove_file(path).unwrap();
 }

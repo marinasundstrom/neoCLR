@@ -247,7 +247,8 @@ actual ReadByte wrapper reaches native service admission; its input service bind
 and dynamic text lifetimes remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked
-renderer and standalone exit-1 failure app are validated. Explicit `fault` instructions now
+renderer and standalone exit-1 failure app are validated. Interpreter CLI execution
+faults use the same message/trace format and exit convention. Explicit `fault` instructions now
 return UserFault status through native calls without publishing a result; message/stack
 diagnostics are available through opt-in ABI v3 and String-based System.Fail now has an
 explicit native binding. Native input remains unimplemented.

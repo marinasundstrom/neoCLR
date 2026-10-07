@@ -147,7 +147,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   a linked C renderer. Bind exact supplied native failure services explicitly while
   compiling ordinary System.Fail wrappers. Standalone unhandled faults exit 1; hosts
   receive code/message/trace and control their own policy. Validate cross-backend
-  diagnostics and a standalone Raven failure app. No native
+  diagnostics and a standalone Raven failure app. Route interpreter CLI execution faults
+  through the shared renderer, matching native code/message/trace formatting and exit 1;
+  successful program exit values remain intact. Loader/verifier diagnostics and legacy
+  Fault Display stay compatible. CLI text consumers must adopt the new execution format. No native
   reference services, interface execution or stable native hosting ABI are added.
   General unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,

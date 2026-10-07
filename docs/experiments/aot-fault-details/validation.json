@@ -1,11 +1,11 @@
 {
   "profile": "aot-fault-details-v1",
-  "baseRevision": "2a7f6bb3e355de2ea9b4225fd83189e4f116b128",
+  "baseRevision": "7fae158e8a6db2beabe1cecd631527b8c6e1c9a2",
   "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
   "inputs": {
     "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
-    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
-    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "645a08979828565cd07d21787917df78963f323c7c1d636cd287139324826672",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "724250b15ad229c9ada29411dc9565f1ce4bbe911a6a528bf228ddaf492c53ac",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "56bc191fe6ccc1e1f609d68b3692e8cc834d7fcb2645fa210aa28332934a730e",
     "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
     "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
     "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
@@ -33,7 +33,7 @@
         "--object-library",
         "System.Runtime",
         "-o",
-        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/Failure.dll",
+        "/Users/robert/Projects/neoclr/target/aot-fault-cli-parity/Failure.dll",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fail.rvn"
       ],
       "exit": 0,
@@ -42,9 +42,9 @@
     },
     {
       "command": [
-        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
         "run",
-        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/Failure.dll",
+        "/Users/robert/Projects/neoclr/target/aot-fault-cli-parity/Failure.dll",
         "--system",
         "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
         "--module",
@@ -54,13 +54,13 @@
       ],
       "exit": 1,
       "stdout": "",
-      "stderr": "Fault: The operation failed: v\u00e4rlden \ud83c\udf0d [code=UserFault] at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465:1\n  at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465(String) owner=Named(\"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265\") [NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17#1.0.0.0:1485] IL instruction 1\n  at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643(String) [NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17#1.0.0.0:63] IL instruction 1\n  at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_53746F70(String) [NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46#1.0.0.0:0] IL instruction 1\n  at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_466F7277617264(String) [NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46#1.0.0.0:1] IL instruction 1\n  at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_4D61696E() [NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46#1.0.0.0:2] IL instruction 1\n"
+      "stderr": "UserFault: The operation failed: v\u00e4rlden \ud83c\udf0d\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_53746F70 [instruction 1]\n   at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_466F7277617264 [instruction 1]\n   at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_4D61696E [instruction 1]\n"
     },
     {
       "command": [
         "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
         "--inspect",
-        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/Failure.dll",
+        "/Users/robert/Projects/neoclr/target/aot-fault-cli-parity/Failure.dll",
         "@entry",
         "--closed-world",
         "--system",
@@ -83,9 +83,9 @@
       "command": [
         "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/Failure.dll",
+        "/Users/robert/Projects/neoclr/target/aot-fault-cli-parity/Failure.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/failure.o",
+        "/Users/robert/Projects/neoclr/target/aot-fault-cli-parity/failure.o",
         "--system",
         "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
         "--module",
@@ -113,9 +113,9 @@
         "-Werror",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/host.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
-        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/failure.o",
+        "/Users/robert/Projects/neoclr/target/aot-fault-cli-parity/failure.o",
         "-o",
-        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/failure"
+        "/Users/robert/Projects/neoclr/target/aot-fault-cli-parity/failure"
       ],
       "exit": 0,
       "stdout": "",
@@ -125,7 +125,7 @@
       "command": [
         "nm",
         "-u",
-        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/failure.o"
+        "/Users/robert/Projects/neoclr/target/aot-fault-cli-parity/failure.o"
       ],
       "exit": 0,
       "stdout": "",
@@ -135,10 +135,10 @@
       "command": [
         "otool",
         "-L",
-        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/failure"
+        "/Users/robert/Projects/neoclr/target/aot-fault-cli-parity/failure"
       ],
       "exit": 0,
-      "stdout": "/Users/robert/Projects/neoclr/target/aot-fault-details-final/failure:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-fault-cli-parity/failure:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
       "stderr": ""
     }
   ],
@@ -256,6 +256,7 @@
     "stdout": "",
     "stderr": "UserFault: The operation failed: v\u00e4rlden \ud83c\udf0d\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_53746F70 [instruction 1]\n   at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_466F7277617264 [instruction 1]\n   at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_4D61696E [instruction 1]\n",
     "framesMatchInterpreter": true,
+    "renderingMatchesInterpreter": true,
     "messagePreserved": true,
     "executableOnlyDirectory": true,
     "emptyEnvironment": true,
@@ -264,7 +265,7 @@
     ]
   },
   "artifacts": {
-    "Failure.dll": "c853b6b42d2ab0fc1ccb3af926b04974a40719b088fa98fbcea17ad485d3296a",
+    "Failure.dll": "764d875f45a5402a92dd9a9700b7cbd3734c2ea61bbd471ebcc68e3cce24ea92",
     "failure.o": "3508d7e380c632c688865e72abe6695935be03dee0f9eed8cc2313b0accc941d",
     "failure": "12639b2fdb53be7197c70010e89fa75f6300e33c1409aae707b4ca7eb1c26c34"
   }

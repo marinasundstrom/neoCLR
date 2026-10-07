@@ -25,8 +25,9 @@ assembly, obj, binary = (output/n for n in ('Failure.dll','failure.o','failure')
 run(['dotnet',compiler,'neoclr','--core-reference',core,'--runtime-seed',seed,'--reference',library,'--bootstrap-intrinsics','--bootstrap-ownership',ownership,'--object-library','System.Runtime','-o',assembly,source])
 context=['--system',seed,'--module',library,'--object-root',library]
 interpreted=run([runtime,'run',assembly]+context,expected=1)
-assert interpreted.stdout=='' and '[code=UserFault]' in interpreted.stderr
-frames=re.findall(r'^  at ([^(]+)\(.* IL instruction (\d+)',interpreted.stderr,re.M)
+assert interpreted.stdout=='' and ('[code=UserFault]' in interpreted.stderr or interpreted.stderr.startswith('UserFault: '))
+frames=re.findall(r'^   at (.+) \[instruction (\d+)\]$',interpreted.stderr,re.M)
+if not frames: frames=re.findall(r'^  at ([^(]+)\(.* IL instruction (\d+)',interpreted.stderr,re.M)
 assert len(frames)==5,interpreted.stderr
 context+=['--compile-system','--bind-user-fault']
 inspection=json.loads(run([aot,'--inspect',assembly,'@entry','--closed-world']+context).stdout)
@@ -45,6 +46,7 @@ with tempfile.TemporaryDirectory() as d:
     assert r.stderr.startswith('UserFault: The operation failed: världen 🌍\n'),r.stderr
     native_frames=re.findall(r'^   at (.+) \[instruction (\d+)\]$',r.stderr,re.M)
     assert native_frames==frames,(native_frames,frames)
-    report['native']=dict(exit=r.returncode,stdout=r.stdout,stderr=r.stderr,framesMatchInterpreter=True,messagePreserved=True,executableOnlyDirectory=True,emptyEnvironment=True,dynamicDependencies=deps)
+    if interpreted.stderr.startswith('UserFault: '): assert r.stderr==interpreted.stderr
+    report['native']=dict(exit=r.returncode,stdout=r.stdout,stderr=r.stderr,framesMatchInterpreter=True,renderingMatchesInterpreter=(r.stderr==interpreted.stderr),messagePreserved=True,executableOnlyDirectory=True,emptyEnvironment=True,dynamicDependencies=deps)
 report['artifacts']={p.name:sha(p) for p in (assembly,obj,binary)}
 save();print('Passed: Raven System.Fail preserves message/frames, exits 1 and runs standalone.')

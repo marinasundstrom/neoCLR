@@ -86,7 +86,15 @@ claim to catch a Rust/OS stack overflow or an arbitrary host process failure.
 
 ## CLI and debugger
 
-The CLI retains the diagnostic and adds the code:
+**Development (2026-10-07):** CLI execution faults with a captured stack use the shared
+`Fault::diagnostic()` format: `Code: message`, then `   at Function [instruction N]`.
+They exit 1. Normal completion preserves the program's exit code, including a deliberate
+1; diagnostic stderr distinguishes an unhandled fault. Standard runtime messages come
+from the code catalog; user messages are preserved. Loader/verifier errors before
+execution retain their detailed format. Tools parsing CLI execution text must migrate;
+embedding hosts should use fault fields instead.
+
+Earlier CLI versions used this format (also retained by legacy Fault Display):
 
 ```text
 Fault: frame limit exceeded [code=StackOverflow] at Main:0

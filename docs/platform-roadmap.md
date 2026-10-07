@@ -86,8 +86,8 @@ failure binding now captures shared code/message/trace diagnostics with explicit
 and a standalone Raven consumer. The author directs consistent interpreter/native faults
 and accepts exit 1 for standalone unhandled faults; embedding hosts retain control.
 [Shared host diagnostics](experiments/aot-fault-details/README.md) use a code-defined runtime
-message catalog and a common 64-frame truncation contract. CLI presentation alignment and
-native byte-input binding remain next, before dynamic UTF-8 text/lifetime contracts. Multiple instantiations
+message catalog and a common 64-frame truncation contract. Interpreter CLI execution
+faults now use the same presentation and exit convention; native byte-input binding is next, before dynamic UTF-8 text/lifetime contracts. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

@@ -11731,3 +11731,9 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
   migration follows separately. Native trace source locations and richer identities,
   input services and a stable native hosting ABI remain future work. No catch/unwinding
   or guest exception hierarchy was requested or introduced.
+
+- **Follow-through:** The next committed slice routes interpreter CLI execution faults
+  through the common presentation, with exit 1 and unchanged successful exit values.
+  Loader/verifier detail and legacy host/debugger Display remain compatible. The Raven
+  failure reproduction now checks exact interpreter/native diagnostic text when run
+  against the updated CLI, in addition to message and frame parity.
