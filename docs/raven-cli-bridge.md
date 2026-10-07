@@ -6498,3 +6498,14 @@ audit; no source/consumer rewriting or CLI projection fallback participates.
 propagation to project/LSP configuration and separate production assembly packaging are
 next; this is not execution of every class-library API or removal of bootstrap inputs.
 [Acceptance and hashes](experiments/extended-cli-metadata/source-owned-orders-2026-10-07.md).
+
+### Runtime candidate packaging — 2026-10-07
+
+The existing native compiler/importer/emitter contracts also support the selected
+source library under `System.Runtime`, without Data, Networking or Web sources.
+All selected primitive, iteration, propagation, introspection, unit and failure
+owners move together in the generated ownership manifest. The source build uses
+`--source-object-root`; consumers use `--object-library System.Runtime` and a native
+reference. No CLI projection or new compiler mapping participates. The finalized
+retained service seed references the emitted Runtime artifact by identity/revision.
+[Build, execution and remaining packaging gates](experiments/extended-cli-metadata/runtime-split-2026-10-07.md).

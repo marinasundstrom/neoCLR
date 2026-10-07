@@ -18,9 +18,11 @@ the finalized retained seed and explicit source-root artifact. This meets the br
 native application gate under the permitted bootstrap dependencies, not complete API
 coverage or a bootstrap-free/production-packaged release.
 
-Next: establish the proposed core/Data/Networking/Web assembly boundaries with
-separate-library consumers, then carry their owner/dependency catalog into project/LSP
-configuration. Keep the existing POC sample/editor gates as ownership moves.
+The 174-input **System.Runtime candidate also builds independently** of Data,
+Networking and Web; unchanged orders imports it and executes with exact output/exit 0.
+[Runtime split evidence](experiments/extended-cli-metadata/runtime-split-2026-10-07.md).
+Next: compile Data and Networking separately against Runtime, then Web, and carry
+their owner/dependency catalog into project/LSP configuration. Keep the existing POC sample/editor gates as ownership moves.
 [Commands and evidence](experiments/extended-cli-metadata/source-owned-orders-2026-10-07.md).
 
 ### Earlier imported source-root frontier

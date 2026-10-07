@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Build the 174-input System.Runtime candidate without Data, Networking, Web or
+  network adapters. Its source-free orders consumer verifies and executes with exact
+  output/exit 0, retaining explicit primitive and service bootstrap dependencies.
+  Record reproducible packaging evidence; optional assembly builds remain next.
+
 - Establish the native source-owned orders gate: all 197 aggregate library inputs
   emit, and unchanged application-order-collections imports that artifact, compiles,
   verifies and executes with exact output/exit 0. Raven explicitly selects the imported

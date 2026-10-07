@@ -104,3 +104,12 @@ The inventory rejects duplicate native type identities and cyclic/foreign declar
 owners. Recorded checks count all 430 types and 2,643 methods, retain the nested union
 owners, reproduce the five edges above and reject a synthetic declaring-type cycle.
 This is read-only planning tooling, not an assembly splitter or a semantic importer.
+
+## Runtime candidate gate completed
+
+The retained-service/root ABI and aggregate consumer gates were resolved in the
+[subsequent source-owned acceptance](source-owned-orders-2026-10-07.md). The
+[Runtime candidate now builds and executes orders independently](runtime-split-2026-10-07.md):
+174 source inputs, with Data/Networking/Web and network adapters excluded. The
+remaining bootstrap dependencies are explicit; this is not a minimal-core claim.
+Next is gate 3 above, separately compiling Data and Networking against this owner.

@@ -44,15 +44,18 @@ def main():
     full_sources = production + [s for s in adapters if not s.endswith('/ObjectIntrospection.rvn')]
     cases += [('full-source', full_sources, False),
               ('full-bootstrap-handle', [s for s in full_sources if not s.endswith('/RuntimeTypeHandle.rvn')], False)]
-    if args.runtime or 'full-owned-handle' in (args.case or []):
+    if args.runtime or set(args.case or []) & {'full-owned-handle', 'runtime-owned'}:
         cases.append(('full-owned-handle', full_sources, False))
+        runtime_sources = [s for s in full_sources if not any(part in s for part in ('/Data/', '/Networking/', '/Web/'))
+                           and Path(s).stem not in ('RuntimeNetworkCalls', 'RuntimeNetworkServices')]
+        cases.append(('runtime-owned', runtime_sources, False))
     if args.case:
         unknown = set(args.case) - {name for name, _, _ in cases}
         if unknown:
             parser.error('Unknown cases: ' + ', '.join(sorted(unknown)))
         cases = [case for case in cases if case[0] in args.case]
-    if any(name == 'full-owned-handle' for name, _, _ in cases) and not args.runtime:
-        parser.error('full-owned-handle requires --runtime to assemble its retained seed')
+    if any(name in ('full-owned-handle', 'runtime-owned') for name, _, _ in cases) and not args.runtime:
+        parser.error('Owned-root cases require --runtime to assemble their retained seed')
     inputs = [args.compiler, args.core, args.seed, args.libraries / 'Numbers.dll', args.libraries / 'Http.dll', Path(__file__), ROOT / 'runtime/raven/native/poc-ownership.json']
     inputs += [args.compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     inputs += [ROOT / s for s in production + adapters]
@@ -68,8 +71,19 @@ def main():
         manifest = json.loads(json.dumps(original))
         if not imported:
             manifest['libraries'][0]['sources'] = sources
+        if name == 'runtime-owned':
+            # Migrate every selected contract owner, not just the output filename.
+            def rename_owner(value):
+                if isinstance(value, dict):
+                    return {k: rename_owner(v) for k, v in value.items()}
+                if isinstance(value, list):
+                    return [rename_owner(v) for v in value]
+                return 'System.Runtime' if value == 'Numbers' else value
+            manifest = rename_owner(manifest)
+            manifest['libraries'][0]['types'] = [t for t in manifest['libraries'][0]['types']
+                if not t.startswith(('System.Data.', 'System.Networking.', 'System.Web.'))]
         seed = args.seed.resolve()
-        if name == 'full-owned-handle':
+        if name in ('full-owned-handle', 'runtime-owned'):
             library = manifest['libraries'][0]
             manifest['failure'] = dict(assemblyName=library['assemblyName'], namespaceName='System', functionName='Fail')
             library['types'] = sorted(set(library['types']) | {'System.RuntimeTypeHandle', 'System.Void', 'System.Value'})
@@ -134,14 +148,14 @@ def main():
         ownership = directory / 'ownership.json'
         ownership.write_text(json.dumps(manifest, indent=2) + '\n')
         report['hashes'][str(ownership)] = hashlib.sha256(ownership.read_bytes()).hexdigest()
-        artifact = directory / ('Additional.dll' if imported else 'Numbers.dll')
+        artifact = directory / ('Additional.dll' if imported else manifest['libraries'][0]['assemblyName'] + '.dll')
         command = ['dotnet', str(args.compiler.resolve()), 'neoclr', '--core-reference', str(args.core.resolve()), '--runtime-seed', str(seed),
             '--bootstrap-ownership', str(ownership), '--bootstrap-intrinsics', '--library', '-o', str(artifact)]
         if imported:
             command += ['--reference', str((args.libraries / 'Numbers.dll').resolve())]
             if name != 'network':
                 command += ['--reference', str((args.libraries / 'Http.dll').resolve())]
-        if name.startswith('full-'):
+        if name.startswith('full-') or name == 'runtime-owned':
             command += ['--source-object-root']
         command += sources
         try:
@@ -155,7 +169,7 @@ def main():
         outcome = 'emitted' if code == 0 and artifact.exists() else 'timeout' if code is None else 'compiler-crash' if code < 0 or 'Unhandled exception.' in stderr else 'rejected'
         entry = dict(name=name, outcome=outcome, sourceCount=len(sources), sources=sources, command=command, exitCode=code, outputPublished=artifact.exists(), stdout=stdout, stderr=stderr,
             errorCounts=dict(Counter(c for c, _ in diagnostics)), uniqueErrors=list(dict.fromkeys(m for _, m in diagnostics)))
-        if name == 'full-owned-handle' and outcome == 'emitted':
+        if name in ('full-owned-handle', 'runtime-owned') and outcome == 'emitted':
             # The compile-time seed resolves the source-owned root before its artifact
             # exists. Finalize a separate runtime seed from the emitted native identity;
             # do not guess module hashes or silently disable dependency validation.

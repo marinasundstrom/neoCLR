@@ -1,4 +1,4 @@
-"""Compile and execute unchanged orders against the full source-owned native library."""
+"""Compile and execute unchanged orders against a source-owned native library."""
 import argparse
 import hashlib
 import json
@@ -13,18 +13,20 @@ def main():
     for name in ('compiler', 'core', 'audit', 'runtime', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--compiler-revision', required=True)
+    parser.add_argument('--case', default='full-owned-handle', choices=('full-owned-handle', 'runtime-owned'))
     args = parser.parse_args()
     for name in ('compiler', 'core', 'audit', 'runtime', 'output'):
         setattr(args, name, getattr(args, name).resolve())
     args.output.mkdir(parents=True, exist_ok=False)
     audit_path = args.audit / 'audit.json'
     audit = json.loads(audit_path.read_text())
-    case = next(c for c in audit['cases'] if c['name'] == 'full-owned-handle')
+    case = next(c for c in audit['cases'] if c['name'] == args.case)
     if case['outcome'] != 'emitted' or case['runtimeSeedFinalization']['exitCode'] != 0:
         raise ValueError('The source library and finalized runtime seed must exist')
     seed = Path(case['runtimeSeed'])
-    library = seed.parent / 'Numbers.dll'
     ownership = seed.parent / 'ownership.json'
+    owner = json.loads(ownership.read_text())['libraries'][0]['assemblyName']
+    library = seed.parent / (owner + '.dll')
     source = ROOT / 'docs/experiments/raven-target/samples/application-order-collections.rvn'
     expected = source.with_suffix('.expected.txt')
     app = args.output / 'Orders.dll'
@@ -41,14 +43,14 @@ def main():
     common = ['dotnet', args.compiler, 'neoclr', '--core-reference', args.core,
               '--runtime-seed', seed, '--bootstrap-ownership', ownership, '--reference', library]
     # No class-library sources, CLI projections or consumer rewrites participate.
-    run(common + ['--object-library', 'Numbers', '-o', app, source])
+    run(common + ['--object-library', owner, '-o', app, source])
     dependencies = ['--system', seed, '--module', library, '--object-root', library]
     run([args.runtime, 'verify', app] + dependencies)
     result = run([args.runtime, 'run', app] + dependencies)
     if result.stdout != expected.read_text() or result.stderr:
         raise RuntimeError('Orders output differs from its checked-in expectation')
     for name, selection in [('missing', ['--object-library', 'Missing']),
-                            ('conflicting', ['--object-library', 'Numbers', '--source-object-root', '--library'])]:
+                            ('conflicting', ['--object-library', owner, '--source-object-root', '--library'])]:
         rejected = args.output / (name + '.dll')
         run(common + selection + ['-o', rejected, source], 1)
         if rejected.exists():
