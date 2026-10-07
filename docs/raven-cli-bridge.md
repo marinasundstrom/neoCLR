@@ -6346,3 +6346,12 @@ already retain local base identity. Protected chaining and virtual dispatch exec
 32 ordinary .NET regressions and 163 metadata groups pass. The next full-System
 blocker is ObjectTypeHandle dependency-contract resolution. Source-built System is
 not complete. See [evidence and scope](experiments/extended-cli-metadata/closed-object-root-2026-10-07.md).
+
+## Source Object handle boundary (2026-10-07)
+
+Source Object.GetType now calls the native `NativeObject.GetTypeHandle` facade,
+backed by the existing internal-call declaration. Bootstrap RuntimeServices retains
+its older signature; no compiler fallback, signature relaxation or CLI projection is
+introduced. Source-owned Object and RuntimeTypeHandle use their explicit source
+configuration. The API-authored executable consumer verifies identity/hash behavior;
+full System advances to ReflectionConstruct. [Scope and evidence](experiments/extended-cli-metadata/object-handles-2026-10-07.md).

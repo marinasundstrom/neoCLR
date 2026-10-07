@@ -7,8 +7,12 @@ in the legacy .NET bridge source glob.
 `RuntimeHandleServices.rvn` declares two internal runtime services using the selected
 primitive core's `MethodImpl(InternalCall)` marker. The native emitter consumes that
 marker into the existing implementation flag; no attribute object or placeholder
-method executes. Object and RuntimeTypeHandle retain their existing bootstrap/runtime
-identities. The service implementations already exist in the runtime.
+method executes. Object and RuntimeTypeHandle use the explicitly selected owners,
+including source owners during full bootstrap. The service implementations already
+exist in the runtime. `NativeObject.GetTypeHandle` is a distinct internal facade for
+source Object.GetType: an extension cannot override the existing bootstrap static
+RuntimeServices member. The legacy ObjectIntrospection extension retains its prior
+bootstrap path. See the [source-owner gate](../../../docs/experiments/extended-cli-metadata/object-handles-2026-10-07.md).
 
 Production introspection/JSON sources now compile and execute with the associated
 `RuntimeIntrospection*` adapters; see the recorded native JSON integration gates.

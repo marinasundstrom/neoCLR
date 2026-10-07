@@ -1,0 +1,21 @@
+import System.*
+import System.Runtime.CompilerServices.*
+
+public func RunGeneric() -> int {
+    let value = System.Item()
+    let alias: object = value
+    let handle = NativeObject.GetTypeHandle(alias)
+    if neoCLR.Runtime.TypeArgumentCount(handle) != 0 {
+        return 1
+    }
+    if !RuntimeServices.ObjectReferenceEquals(value, alias) {
+        return 2
+    }
+    if RuntimeServices.ObjectReferenceEquals(value, System.Item()) {
+        return 3
+    }
+    if RuntimeServices.ObjectIdentityHash(value) != RuntimeServices.ObjectIdentityHash(alias) {
+        return 4
+    }
+    return 42
+}

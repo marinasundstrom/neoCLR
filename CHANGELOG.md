@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Route source Object.GetType through an explicit native handle facade instead of
+  the bootstrap RuntimeServices signature. Source-owned Object/RuntimeTypeHandle
+  verification and identity/hash checks execute; the full-System audit advances
+  to ReflectionConstruct dependency resolution. Public API signatures are unchanged.
+
 - Add closed-class builder authoring over an owned local base, including source
   Object, with existing definition validation and native encoding. Raven preserves
   that base; protected constructor chaining and virtual dispatch execute successfully.

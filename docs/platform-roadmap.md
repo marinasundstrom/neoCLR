@@ -10,6 +10,15 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Source Object now uses an explicit native handle service facade. A source-owned
+Object/RuntimeTypeHandle consumer verifies and executes identity/hash checks. The
+196-input audit advances to **ReflectionConstruct dependency-contract resolution**.
+Next resolve that remaining bootstrap signature through the native adapter boundary;
+full System still publishes no artifact.
+[Evidence](experiments/extended-cli-metadata/object-handles-2026-10-07.md).
+
+### Earlier closed-family frontier
+
 Closed families now preserve source Object as their base. Protected initialization
 and virtual dispatch execute through the resulting three-level hierarchy. The
 195-input audit advances to **ObjectTypeHandle dependency-contract resolution**;

@@ -1,0 +1,9 @@
+namespace System.Runtime.CompilerServices
+
+// Use a distinct facade: the bootstrap RuntimeServices.ObjectTypeHandle member
+// takes precedence over extensions and carries the bootstrap Object identity.
+internal static class NativeObject {
+    static func GetTypeHandle(value: object) -> System.RuntimeTypeHandle {
+        return neoCLR.Runtime.ObjectTypeHandle(value)
+    }
+}
