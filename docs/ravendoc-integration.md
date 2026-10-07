@@ -185,3 +185,15 @@ compiler validation and runtime limits.
 Validation of the refreshed bundle: all 18 website tests and the complete
 1,803-page build/link/anchor checks passed. Raven's browser regression checks
 also passed on the matching main revision. neoCLR publication remains separate.
+
+The subsequent publisher refresh pins `023497d70`, including the shared emitted
+generic-arity correction for sealed-case member calls. The site configuration and
+reference assembly are unchanged.
+
+The release publisher now pins `8aa4cba6d`, also incorporating the shared async
+unit-return binder correction. The responsive controls and GitHub source links
+remain configured as above.
+
+Validation at `8aa4cba6d`: all 18 website tests and the full 1,803-page build,
+link and anchor checks passed. GitHub source links remain available on 361 API
+pages. This is local validation; publication remains a separate action.

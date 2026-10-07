@@ -281,3 +281,31 @@ overload-resolution checks. The integration branch independently passed the same
 on modern .NET with an empty row handled explicitly; NanoFramework metadata-test
 prerequisites now restore independently. These checks do not establish native
 neoCLR or device execution. Full Raven release gates are rerunning.
+
+## Shared sealed-case member emission fix (2026-10-07)
+
+Raven main `023497d70` and integration branch `88f2a09e2` resolve constructed
+member owners using the emitted generic definition's arity. A case hoisted from a
+generic sealed hierarchy to a top-level CLI type carries only its own parameters;
+member calls and record-formatting helpers no longer add phantom enclosing
+arguments. Ordinary nested CLR types retain their enclosing arguments.
+
+Twenty-five focused modern .NET checks pass on main, covering Debug/Release
+case calls/formatting and ordinary nested generic owners. The original generic
+math hierarchy sample runs and returns 126 through both direct and pattern-based
+evaluation; a reduced case sample passes IL verification. This corrects the use
+of the existing representation, with no new Runtime Contract setting, source
+semantic rule or CLI bridge encoding. Native neoCLR execution is not claimed.
+
+## Shared async unit-return binding fix (2026-10-07)
+
+Raven main `8aa4cba6d` and integration branch `af47cb0a5` validate async returns
+against the selected task payload. Bare and arrow-body returns in `Task<unit>`
+and `ValueTask<unit>` now supply unit consistently for awaitless and suspended
+methods. Bare returns for integer payloads still fail. Non-generic task behavior,
+Runtime Contract options and CLI bridge encodings are unchanged.
+
+Twenty-four focused unit/await tests pass on main and the integration branch;
+twenty-five sealed-case/nested-generic checks also pass on both. These are modern
+.NET results. Native async bootstrap qualification remains owned by the separate
+integration work and is not inferred from these tests.

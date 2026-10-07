@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Refresh RavenDoc to Raven main `8aa4cba6d` and record the shared sealed-case
+  member emission fix on the integration branch. Constructed member owners use
+  actual emitted generic arity; ordinary nested types retain enclosing arguments.
+  This repairs existing CLI metadata without changing native contracts. Include
+  the shared Task/ValueTask unit-return binder fix; 24 unit/await and 25 case/owner
+  tests pass on main and the integration branch.
+
 - Refresh the shared RavenDoc compiler to Raven main `86c8dfbfc` and document the
   generic callback inference fix carried to the neoCLR integration branch. Match
   arms determine unresolved callback result types while lexical generic targets
