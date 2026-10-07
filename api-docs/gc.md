@@ -52,6 +52,6 @@ The source-built GC facade executes counters, collection and KeepAlive, includin
 runtime control signatures are supported. Matching development compiler/metadata tools
 preserve the callable nullable parameter annotation across assembly boundaries; older
 Preview 12 tooling does not include this fix. No runtime nullability semantics changed.
-See [native source GC evidence](../docs/experiments/extended-cli-metadata/source-heap-2026-10-06.md)
+See [native source GC evidence](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/source-heap-2026-10-06.md)
 for the retained failing fixture and the passing retention checks. Published Preview 12
 artifacts have not changed.

@@ -220,3 +220,14 @@ Native definitions use declared visibility; primitives and generic parameter
 descriptors are visible. This is descriptive information, not invocation permission:
 open types and private members remain subject to their execution restrictions.
 The route-mapper case uses it to reject nonpublic schemas during preparation.
+
+<a id="attribute-constructor"></a>
+
+## Attribute base constructor
+
+`protected Attribute()` initializes a derived attribute. Only constructors of derived
+attribute classes may invoke it. `System.Attribute` is abstract; this constructor does
+not create attribute instances for metadata discovery. Use introspection to inspect
+attribute data without executing constructors.
+
+[Attribute type reference](xref:System.Attribute)

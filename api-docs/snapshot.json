@@ -3,7 +3,7 @@
   "inputs": {
     "api-docs/NeoCLR.CoreProbe.xml": "904f19ba5dcf7abdc53f17238aa6a693326c85fc8da87fe11580208144c80ae3",
     "api-docs/exclusions.json": "dfbbab53935ec02fec642d8b5281a5bb01f12ff30d27d2fe47900430c26e642a",
-    "api-docs/manual-members.json": "0095803d78be03e5dfd16ca19bb95a6295c96db48f7c0db190cdd049da2120f4",
+    "api-docs/manual-members.json": "8c9bce210fd2d822bf7ff2e28d776dca14e30427f61ac51e34c13064e262bcb0",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
     "api-docs/types.json": "463878defe34aecd4c7aea02c3baf54555d8c6523ab527934cf73367dace07c7",
     "docs/experiments/raven-target/ApplicationImport.cs": "66855a52e0d43532222cdbae0530de57ce13f25a00cd7e7d0cd791da7bf2607a",

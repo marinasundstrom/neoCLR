@@ -1,169 +1,70 @@
-# Build and run a Raven project
+# Install neoCLR
 
-## Preview 12: native Raven POC (macOS arm64)
+The matched bundle includes the runtime, Raven compiler, VS Code extension and samples.
+The current native toolchain download supports **macOS on Apple silicon**.
+Windows support for this workflow is being qualified; there is no matching Windows
+native toolchain download yet.
 
-[Download the matched native bundle](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.12/neoclr-preview12-osx-arm64.tar.gz).
-Install .NET 11 for the compiler, .NET 10 SDK/reference packs, Python 3 and VS Code.
-Extract the archive, then from `neoclr-native-poc` run:
+## 1. Install prerequisites
 
-```sh
-python3 tools/verify-native-bundle.py --report ../acceptance.json
-code --install-extension editor/raven-vscode.vsix
-```
-
-Open an individual folder under `samples/` and use the `neoCLR: Run` task. The
-verifier compiles five projects and checks collections, Tasks, JSON and live HTTP.
-Library references use native metadata; the primitive core and retained runtime
-seed are explicit temporary bootstrap dependencies. This is a bounded POC, not full
-System bootstrap. No global Raven SDK is required.
-
-[Release notes and limits](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.12).
-The older Preview 11 bridge instructions are retained below for that release.
-
-
-Start with a saved .rvnproj project. The same project describes your source files and runtime references for the editor and build tools.
-
-**Published Preview 11.** These instructions use the matching macOS arm64 packages. The feature pages describe current behavior and possible future directions.
-
-[Preview 11 release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.11)
-cover included features, platform prerequisites, known limits and validation.
-
-[Set up the preview ↓](#install)
+Install the [.NET 11 SDK and .NET 10 SDK](https://dotnet.microsoft.com/download),
+[Python 3](https://www.python.org/downloads/) and [VS Code](https://code.visualstudio.com/).
+.NET is required by the Raven compiler and language server, not by neoCLR itself.
 
 <a id="install"></a>
 
-## Install the matching tools
-The prebuilt preview supports **macOS on Apple silicon**. For the development tools, install .NET SDK `11.0.100-rc.1.26425.128`, Python 3.9 or later, and VS Code.
+## 2. Download and extract
 
-**neoCLR itself and programs running on neoCLR do not depend on .NET.** The .NET requirement belongs to the surrounding tools: the Raven compiler, MSBuild, the import bridge and Raven Language Server. The VS Code extension uses that language server for editor features. Once a program is built and imported, running it with the neoCLR runtime and its matching runtime library does not require .NET.
+[Download neoCLR for macOS arm64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.12/neoclr-preview12-osx-arm64.tar.gz).
+Extract the archive and keep its folders together.
 
-Download these four assets from [Preview 11’s downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.11):
-
-- `neoclr-0.1.0-preview.11-osx-arm64.tar.gz` — runtime, project and samples.
-- `raven-sdk-0.1.12-neoclr.preview11.20260927-osx-arm64.tar.gz` — matching compiler tools.
-- `raven-vscode-0.1.12-neoclr.preview11.20260927.vsix` — matching editor extension.
-- `raven-tool-notices-0.1.12-neoclr.preview11.20260927.tar.gz` — companion notices.
-
-Extract the runtime and SDK archives into separate folders. In VS Code, open Extensions, use the ⋯ menu, choose **Install from VSIX…** and select the downloaded extension. Reload any open VS Code windows afterward.
-
-Open a terminal in the extracted runtime folder. Replace the SDK path below with the actual extracted SDK directory:
-
-```text
-python3 configure.py --sdk /absolute/path/to/extracted/raven-sdk
-code msbuild-demo
-```
-
-If `code` is unavailable, use VS Code’s **File → Open Folder** and select `msbuild-demo`. Keep the bundle directories together; rerun configure.py if you move them.
+In VS Code, open **Extensions → ⋯ → Install from VSIX…** and select
+`editor/raven-vscode.vsix` from the extracted folder.
 
 <a id="run"></a>
 
-## Build, then run
-Open `Main.rvn`. Use **Tasks: Run Build Task** to compile and verify it. Use **Tasks: Run Task → neoCLR: Run (MSBuild)** to build and execute the program. Save edits before building.
+## 3. Run a sample
 
-The supplied program prints:
+In VS Code, choose **File → Open Folder** and open `samples/collections` inside
+the extracted folder. Open `application-order-collections.rvn`, then choose
+**Terminal → Run Task → neoCLR: Run**. Save edits before running again.
 
-```text
-42
-Saved
-Completed
-Overflow
-Value found
-42
-Absent
-```
+The task compiles your Raven code and runs it on neoCLR. Try the `tasks` and `json`
+sample folders next.
 
-From a terminal in the runtime bundle, the equivalent steps are:
-
-```text
-dotnet msbuild msbuild-demo/Demo.rvnproj -p:RavenSdkRoot=/absolute/path/to/extracted/raven-sdk
-./bin/neoclr run msbuild-demo/bin/neoclr/Debug/App.neoil --system msbuild-demo/bin/neoclr/Debug/System.neoil
-```
-
-Build checks the program and writes verified output; it does not execute it. The dedicated neoCLR task runs that output. The ordinary Raven toolbar is not this target’s run/debug pipeline.
+[Learn Raven →](../raven/) · [Explore the APIs →](../docs/)
 
 <a id="project"></a>
-
-## Project configuration
-
-The bundled `Demo.rvnproj` is small:
-
-```text
-{{PROJECT_SAMPLE}}
-```
-
-`NeoCLRRoot` locates the extracted runtime bundle. The imports supply runtime references and build steps. `Compile` lists your Raven files; add an entry for each additional source file. For a project outside the bundle, set NeoCLRRoot to its installed location.
-
-Unlike a .NET SDK project, this project does not need `Microsoft.NET.Sdk` or a .NET `TargetFramework`. `RavenSdkRoot` selects the host compiler. The editor reads the project’s imported references and target contracts too.
-
-To explore a library, open the bundle’s `project-reference-demo/App` folder. Its application references a separate Raven library and prints `42` and `Library call`. The preview supports one direct library ProjectReference; use the same bundle for both projects.
-
 <a id="explore"></a>
 
-## Application source and examples
+## Your project
 
-Make a copy of `msbuild-demo/Main.rvn`, then replace it with a sample from the bundle’s `tools/samples` folder. Build and run the same Demo.rvnproj. Start with `library-async-default-queue.rvn` for a worker and await, `library-task-composition.rvn` for completion composition, or `library-introspection-tour.rvn` for type discovery, `library-grapheme-strings.rvn` for text, or `library-calendar.rvn` for dates. `library-files.rvn` creates or replaces its demo file in the working directory.
+Start with a copy of a bundled sample folder, kept under `samples/`. Its `.rvnproj`
+file selects the native libraries and its VS Code settings select the bundled compiler.
+Keep compiler, runtime, library and extension versions together when updating.
 
-Meet the syntax on the [Raven language page](../raven/), then explore [Option and Result](../features/outcomes/) or [collection capabilities](../features/collections/). Use the matching bundled examples. The `samples/http` folder includes typed JSON client/server and stream-upload checks; see [Web and HTTP](../features/web/).
+Hover over a type or member to see its signature and available API documentation.
+Libraries can supply XML or Markdown documentation beside their assemblies.
+Source debugging on neoCLR is not available; use the run task and printed output.
 
 <a id="limits"></a>
-
-## If something does not work
-- **Missing SDK:** run `dotnet --list-sdks` and check the exact version above is installed.
-- **Missing references or completion:** rerun configure.py with the matching SDK and reopen the project folder. Keep the compiler, extension and runtime bundle versions together.
-- **Build or importer error:** read the first diagnostic. The importer accepts a bounded subset of Raven/CLI programs; unsupported input stops the build. A failed build invalidates earlier runnable output.
-- **No debugging:** Raven source debugging on neoCLR is not implemented. Use the dedicated build/run tasks and printed output.
-
-This preview always rebuilds. It has no package restore, incremental build, Clean/Rebuild targets or multi-level project graphs. Prebuilt Raven tools are validated for macOS arm64; source checks on other hosts do not establish equivalent binary support.
-
-## Windows native runtime
-
-Download `neoclr-0.1.0-preview.11-win-x64.zip` from the same release. Extract it and
-run this command in PowerShell from the extracted folder:
-
-```powershell
-./bin/neoclr.exe run samples/neoil/type-categories.neoil --system lib/System.neoil
-```
-
-It prints 42, 7 and 9 on separate lines. This native package includes the System
-library, direct-runtime samples and notices; it requires no .NET installation.
-The executable imports `VCRUNTIME140.dll`; install the current
-[Microsoft Visual C++ x64 Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) if the runtime is absent.
-The Raven SDK, compiler bridge and editor workflow are qualified on macOS arm64 only.
-
 <a id="development"></a>
 
-## Preview compatibility
+## Help and verification
 
-Use the runtime, SDK, extension and reference library from the same preview. Rebuild
-applications and libraries after changing tools. Preview APIs and artifact formats
-remain experimental.
+If a build fails, check the first diagnostic and confirm both .NET SDKs are installed
+with `dotnet --list-sdks`. If editor symbols are missing, open the sample folder
+containing the `.rvnproj` file and reload VS Code after installing the extension.
 
-The [feature pages](../#feature-pages) show tested examples and current limits. The [proposal overview](../proposals/) explains the open questions and possible future additions. Tell us what works for your programs and where these contracts should improve.
+To check the complete installation, run this optional command from the extracted
+`neoclr-native-poc` folder:
 
+```sh
+python3 tools/verify-native-bundle.py --report ../acceptance.json
+```
 
-### Native editor integration in Preview 12
+It compiles and runs the bundled collections, Tasks, JSON and HTTP examples.
 
-The native development workflow has passed a real VS Code acceptance test on macOS
-arm64. Projects import native libraries for completion, hover and read-only declaration
-navigation; replacing a reference refreshes symbols while preserving unsaved text.
-Missing references produce project diagnostics and recover when restored.
-
-VS Code tasks build and run the unchanged collections and Tasks/await samples against
-source-built libraries. The compiler and language server use the same evaluated project
-references and bootstrap configuration. Ordinary .NET editor behavior is checked too.
-
-The Preview 12 matched
-compiler/server/extension/runtime bundle has passed installation qualification,
-including 19 VS Code checks and extracted collections, Tasks, JSON and live HTTP
-execution. The native bundle setup is above; the older bridge workflow remains version-specific.
-
-### API documentation in the development editor
-
-The native development compiler and language server can display API descriptions
-alongside signatures in VS Code hovers and completion details. Keep a library's
-matching `.xml` file and/or Raven `.docs` directory beside its assembly. Markdown
-member documentation takes precedence, with XML fallback. Native library project
-builds can generate both from documentation comments.
-
-This support is included in the Preview 12 matched bundle. APIs without supplied descriptions still show signatures.
-Longer tutorials and guides stay on this website; they need not be inline comments.
+[Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.12)
+include the exact supported toolchain and limitations. Older installation instructions
+belong to their [matching release](https://github.com/marinasundstrom/neoCLR/releases).

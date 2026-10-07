@@ -2,14 +2,7 @@
 
 Sequence provides count and indexed read access. MutableSequence adds replacement; List adds growth. Arrays and lists can be consumed through these capabilities.
 
-**Preview 11 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
-
-## Native compiler integration (development)
-
-The native types sample now constructs structs with auto-properties and verifies their
-copy behavior through ArrayList: later changes to the original struct do not change the
-stored copy. Class elements retain shared object identity. This is verified on the
-metadata/compiler development branches; it does not change the published collection API.
+Struct elements are copied into collections; class elements retain shared object identity.
 
 <a id="example"></a>
 
@@ -105,7 +98,9 @@ Report issues with a small program, the toolchain version, expected behavior and
 
 Generic API signatures admit Object map keys and values. `HashMap<Object, Object>` uses explicit equality and hash callbacks: Path and type descriptors use their own contracts, supported boxed integers and Booleans compare by value, and ordinary classes retain allocation identity. A tested sample covers mixed keys, collisions, replacement, table growth and reference-preserving values through GC. A default comparer is not supplied. Strings use content equality and hashes through Object; callers still select the callbacks.
 
-## Comparer policies (development)
+<a id="comparer-policies-development"></a>
+
+## Comparer policies
 
 `EqualityComparer<T>` pairs equality with hashing and `Comparer<T>`
 supplies ordering. `StringComparer.Ordinal` implements both for exact string content.
@@ -125,7 +120,7 @@ implement the interfaces for a named policy. Policy behavior and keys must remai
 stable while stored; callbacks must not reenter the same map. No universal default or
 culture policy is supplied. `StringComparer.OrdinalIgnoreCase` additionally uses
 Unicode simple folding consistently for equality/hash and ordering; see the
-[string comparison contract](../strings/#explicit-comparison-policies-development). Use matching Preview 11 references and runtime library artifacts.
+[string comparison contract](../strings/#explicit-comparison-policies-development). Use matching compiler and runtime library artifacts.
 
 ## API reference
 
@@ -138,9 +133,11 @@ Browse [ArrayList](xref:System.Collections.ArrayList`1),
 [query operators](xref:System.Linq.Operators) for signatures,
 member descriptions and the current development contract.
 
-## Value tuples (development)
+<a id="value-tuples-development"></a>
 
-After Preview 11, `System.Tuple<T1,...,TN>` adds heterogeneous value tuples with one
+## Value tuples
+
+`System.Tuple<T1,...,TN>` provides heterogeneous value tuples with one
 through seven components. Raven tuple syntax uses this family; copying a tuple
 copies its fields while retaining the identity of referenced objects. See the
 [value-tuple API guide](/docs/tuples.html) for construction, fields and limitations.

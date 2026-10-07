@@ -1222,3 +1222,7 @@ RavenDoc. The earlier provider plan remains recorded for future use, not as an a
 release gate. Keep the existing bridge identity and limitations explicit; do not invent
 production assembly ownership in the current reference. Normal accuracy/coverage upkeep
 and the already shipped IDE sidecars remain useful; renderer redesign is deferred.
+
+The protected `System.Attribute()` constructor is documented in the
+[manual introspection reference](introspection.md#attribute-constructor), with a route in
+`manual-members.json`: the pinned RavenDoc renderer omits protected constructors.

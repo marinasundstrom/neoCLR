@@ -43,8 +43,8 @@ snapshot refresh and coverage.
 The site tracks development and can be published before the corresponding runtime
 release. Every content/reference page carries a visible notice from `site.json`
 stating that documented features may not yet be released, plus a link to the latest
-published release. Keep released examples, development changes and proposals labeled
-locally too. Never infer release availability from a docs publication or CI success.
+published release. Keep concrete availability limits and proposals clear. Avoid repeating release
+history or experimental disclaimers on each page; the changelog records changes. Never infer release availability from a docs publication or CI success.
 The compact notice is mandatory and validated by the website checks.
 
 The Pages workflow validates relevant pushes and pull requests. It publishes only

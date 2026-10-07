@@ -2,8 +2,6 @@
 
 An array is fixed-size managed storage. Assigning it shares the same array; changing an element is visible through its aliases. neoCLR keeps these familiar .NET behaviors while giving arrays a generic API shape and invariant element types.
 
-**Preview 11 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
-
 <a id="example"></a>
 
 ## Array aliasing and copying

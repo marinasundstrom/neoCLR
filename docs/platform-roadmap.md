@@ -13,6 +13,16 @@ NeoCLR support and an acceptable developer experience for the next release, incl
 the website. Documentation improvements support this gate; they do not replace native
 library, build, execution and editor qualification. Current evidence below is partial.
 
+Author release direction (2026-10-07): Windows is required for the next native metadata
+release, alongside macOS. Runtime-only Windows CI does not qualify the compiler,
+source-built libraries or editor. The manual `native-toolchain.yml` workflow builds a
+matched Windows x64 candidate and runs extracted native samples; its execution and
+installed VS Code acceptance are still pending. See [Windows qualification](windows-native-qualification.md).
+Installation pages should give one short current path, with detailed troubleshooting
+linked separately. Feature pages explain behavior and limits; history belongs in the
+changelog. Raven must be accessible from the main navigation, including links to its
+language website and playground.
+
 ## Source-built System bootstrap frontier (2026-10-07)
 
 **The native source-owned orders gate passes.** The 197-input aggregate library is

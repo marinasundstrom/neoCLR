@@ -12,9 +12,5 @@ bounds. Floating-point functions return Double values.
 This page preserves the public container's reference entry while the function
 signatures and descriptions remain on their generated member pages.
 
-
-**Native development (2026-10-06):** the same public functions compile as native
-module functions, without this CLI container. A separate consumer executes all 20
-functions. The retained CLI bootstrap's Math type requires an explicit namespace alias
-in that mixed configuration; see the [Math guide](math.html). Published Preview 12
-artifacts are unchanged. No public signature or result contract changes in this slice.
+Native metadata represents these namespace functions as module functions without this
+CLI container. The function signatures and result contracts are the same.

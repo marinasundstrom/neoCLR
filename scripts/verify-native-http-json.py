@@ -4,10 +4,33 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
-import selectors
+import queue
+import threading
 import subprocess
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
+
+
+def read_port(stream, timeout=60):
+    """Read readiness from a pipe on Windows as well as Unix, with a deadline."""
+    result = queue.Queue(maxsize=1)
+
+    def read():
+        try:
+            result.put(stream.readline())
+        except Exception as error:
+            result.put(error)
+
+    reader = threading.Thread(target=read, daemon=True)
+    reader.start()
+    try:
+        value = result.get(timeout=timeout)
+    except queue.Empty as error:
+        raise TimeoutError('Server did not report a port') from error
+    reader.join()
+    if isinstance(value, Exception):
+        raise value
+    return value.strip()
 
 
 def main():
@@ -35,20 +58,16 @@ def main():
         for paired in (False, True):
             run = {'serverCommand': command(args.server, '2' if paired else '4'), 'requests': []}
             report['runs'].append(run)
-            server = subprocess.Popen(run['serverCommand'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            server = subprocess.Popen(run['serverCommand'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8')
             try:
-                with selectors.DefaultSelector() as selector:
-                    selector.register(server.stdout, selectors.EVENT_READ)
-                    if not selector.select(60):
-                        raise TimeoutError('Server did not report a port')
-                port = server.stdout.readline().strip()
+                port = read_port(server.stdout)
                 run['port'] = port
                 if not port.isdecimal():
                     raise AssertionError('Expected server port: ' + port)
                 base = f'http://127.0.0.1:{port}'
                 if paired:
                     run['clientCommand'] = command(args.client, base + '/')
-                    client = subprocess.run(run['clientCommand'], capture_output=True, text=True, timeout=60)
+                    client = subprocess.run(run['clientCommand'], capture_output=True, text=True, encoding='utf-8', timeout=60)
                     run['client'] = {'exitCode': client.returncode, 'stdout': client.stdout, 'stderr': client.stderr}
                     assert client.returncode == 0 and not client.stderr, run['client']
                     assert json.loads(client.stdout) == {'accepted': True}, run['client']

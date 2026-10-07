@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Require Windows qualification for the next native metadata release. Add a manual
+  Windows x64 compiler/bootstrap/library/package execution workflow; qualification and
+  installed-editor acceptance remain pending. Make HTTP pipe readiness portable and
+  decode runtime verification output as UTF-8 rather than the host code page.
+- Simplify installation to one matched native workflow, add Raven to the main navigation
+  with website/playground links, and remove superseded setup and integration chronology.
+  Preserve actual download availability and concrete limitations. Cover the protected
+  Attribute constructor with a manual reference because the pinned renderer omits it,
+  and repair stale API-guide and maintainer-evidence links.
+
 - Record independent-checkout macOS arm64 bootstrap/distribution qualification from
   pinned NeoCLR/Raven sources. Document explicit compatible Apple SDK selection and
   sequential shared-project builds after preserving initial toolchain/reference-output

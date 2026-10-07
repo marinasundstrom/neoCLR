@@ -1,6 +1,6 @@
 # Globalization: cultures, languages and calendars
 
-**Provisional Preview 11 API.** Culture describes language and
+Culture describes language and
 formatting preferences. Calendar defines date arithmetic and the interpretation of
 year, month and day. You can choose each independently.
 
@@ -58,8 +58,7 @@ digits for Hebrew fields and is **not a Gregorian ISO serialization format**.
 
 System discovery was tested on macOS; Windows/Linux adapters have not been exercised.
 Preferred language discovery does not promise OS regional pattern overrides.
-Arbitrary format strings, parsing, timezone rules and bidirectional layout are outside
-this slice. The UI controls text direction when embedding Hebrew output.
+Arbitrary format strings, parsing, timezone rules and bidirectional layout are not supported. The UI controls text direction when embedding Hebrew output.
 
 ## Localization is independent
 
@@ -70,13 +69,3 @@ not own resource loading. Those unified localization interfaces remain future wo
 
 [API reference →](../../docs/namespaces.html) · [Date/time APIs →](../time/)
 · [Design comparisons and evidence →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/calendar-globalization.md)
-
-
-## Native compiler integration (development)
-
-On the metadata integration branch, Raven now compiles the unchanged calendar and
-globalization sources into a native library that separate applications import and run.
-The Hebrew-formatting example above and the larger calendar/culture contract sample
-execute through native metadata. The larger sample uses the explicit CLI option
-`--instructions 1000000`; the default remains 100,000. This is development evidence,
-not a new published release or full .NET class-library parity.

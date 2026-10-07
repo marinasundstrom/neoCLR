@@ -51,7 +51,7 @@ also accept these pointer signatures via `CreateFunctionReference`; its explicit
 identity/digest contract remains unchanged. Raven now maps and consumes these callable
 signatures, and separately compiled source NativeMemory consumers execute. Pointer
 arithmetic and nominal pointer targets are still outside this bounded compiler gate;
-full System output remains pending. [Source acceptance](../docs/experiments/extended-cli-metadata/source-native-memory-2026-10-07.md).
+full System output remains pending. [Source acceptance](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/source-native-memory-2026-10-07.md).
 
 ## Generic classes over the native Object root (development, 2026-10-07)
 
@@ -75,7 +75,7 @@ generic definition; this does not add reflection or inherited member enumeration
 
 Validation includes definition/builder parity, base round trips, canonical facade identity,
 missing initialization rejection and executed generic storage plus inherited virtual dispatch.
-[Source Raven regression and limits](../docs/experiments/extended-cli-metadata/generic-object-root-2026-10-07.md).
+[Source Raven regression and limits](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/generic-object-root-2026-10-07.md).
 
 ## Namespace and types
 
@@ -7615,7 +7615,7 @@ Validation: `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Te
 -- --nullable-annotations` checks authored-definition/builder parity, defensive copying,
 CLI round trips, facade exposure, malformed input and .NET `NullabilityInfoContext`
 interpretation. The generated identity methods execute without changing object identity.
-See the [design and integration boundary](../docs/design/callable-nullability.md).
+See the [design and integration boundary](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/design/callable-nullability.md).
 
 ## Native-width integers (development, 2026-10-06)
 
@@ -7684,7 +7684,7 @@ read through `AssemblyDefinition.ReadNativeAssembly`. Runtime loading requires
 explicit selection of that fieldless Object root. String retains intrinsic UTF-8
 storage, not record fields; unrelated primitive bases remain unsupported. Use
 `GetILGenerator()` for constructor bodies, including the direct base call.
-[Runtime evidence](../docs/experiments/extended-cli-metadata/string-root-2026-10-07.md).
+[Runtime evidence](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/string-root-2026-10-07.md).
 
 ### Expanded library envelope (development, 2026-10-07)
 
@@ -7699,7 +7699,7 @@ All other library limits remain: 32 MiB JSON, 2,097,152 nodes, depth 64, and 16 
 **total PE** (`MaxLibraryImageSize`). Container/CLI overhead counts toward that PE
 limit. Exceeding any applicable bound throws `InvalidDataException`; no partial
 compiler artifact is published. No execution or complete bootstrap is implied by a
-successful write. [Contracts and executable evidence](../docs/experiments/extended-cli-metadata/expanded-library-2026-10-07.md).
+successful write. [Contracts and executable evidence](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/expanded-library-2026-10-07.md).
 
 ### Canonical native unit (development, 2026-10-07)
 
@@ -7750,7 +7750,7 @@ with no new format version. Reading checks the alias and exact Equals owner. The
 reference image uses ELEMENT_TYPE_OBJECT; executable CLI output rejects a selected
 native root. Bootstrap-only behavior remains unchanged.
 
-[Validation and executable examples](../docs/experiments/extended-cli-metadata/imported-object-authoring-2026-10-07.md)
+[Validation and executable examples](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/imported-object-authoring-2026-10-07.md)
 cover manual/builder parity, wrong owners, conflicts, native round trips and a Raven
 consumer against the source-built Runtime. These are host metadata APIs, documented
 here rather than in the guest RavenDoc reference assembly.
@@ -7770,7 +7770,7 @@ requiring a second seed-owned type. This does not replace System.Object or assig
 .NET SpecialType to the carrier. Existing seed-owned and local-source cases remain
 supported; this adds no new public API or native instruction.
 
-[Executable evidence](../docs/experiments/extended-cli-metadata/imported-value-2026-10-07.md)
+[Executable evidence](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/imported-value-2026-10-07.md)
 covers successful/error payloads through actual runtime services and canonical
 introspection parameter/return identity.
 
@@ -7795,7 +7795,7 @@ Body validation accepts reference-class receivers for the explicitly selected ex
 root; values still require explicit boxing or constrained dispatch. Selection does not
 make arbitrary same-named types universal receivers.
 
-[C# and executable Raven validation](../docs/experiments/extended-cli-metadata/imported-object-slots-2026-10-07.md)
+[C# and executable Raven validation](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/imported-object-slots-2026-10-07.md)
 covers slot interning/category, wrong signatures, incompatible contracts, wrong dispatch
 opcode and execution through a base-typed receiver. General imported virtual class
 methods remain outside this bounded API. Host API documentation lives here; it is not

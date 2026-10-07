@@ -2,11 +2,7 @@
 
 Read a line, write text, or work with the standard streams. Recoverable input errors and end-of-input are separate outcomes.
 
-**Preview 11.** Use matching references and runtime libraries. Console remains a static class in System.
-
-Development: the source-built Console now passes a separate native metadata consumer,
-including UTF-8 input/output and independent wrapper closure. Full System source
-bootstrap remains in progress; published toolchains retain their documented inputs.
+Console is a static class in System. Standard streams use UTF-8.
 
 <a id="input"></a>
 

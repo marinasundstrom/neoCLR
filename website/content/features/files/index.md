@@ -56,7 +56,9 @@ helpers. Console exposes the same text and byte interfaces through standard stre
 
 <a id="limits"></a>
 
-## Selected text encodings (development)
+<a id="selected-text-encodings-development"></a>
+
+## Selected text encodings
 
 StreamReader and StreamWriter accept an [Encoding](xref:System.Text.Encoding), with
 UTF-8 as the default. `Encodings.Ascii` selects strict ASCII. Both adapters retain

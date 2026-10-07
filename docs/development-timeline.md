@@ -25,6 +25,21 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-07: Windows native release and simpler website instructions
+
+- **Author:** Required Windows support for a native metadata release and asked to remove
+  historical details and change notes from the website, using the changelog for history.
+  Asked for simple installation instructions and prominent Raven navigation, with links
+  to the language website and playground.
+- **Assistant action:** Reduced setup to prerequisites, one matched download and running
+  a sample; removed superseded bridge setup and accumulated integration reports. Added
+  Raven navigation and external language links, retaining concrete target limits.
+  Added a Windows native toolchain qualification workflow and replaced Unix-specific
+  HTTP pipe readiness with a bounded portable reader.
+- **Open:** Windows runner execution, installed editor acceptance and a qualified Windows
+  download remain required. Local changes and CI configuration alone do not establish
+  Windows support or publish the website. RavenDoc provider redesign remains deferred.
+
 ## 2026-10-02: Separate compiler semantics from metadata authoring
 
 - **Author:** Asked for abstract Raven loader/emitter interfaces and an ILGenerator

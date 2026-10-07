@@ -2,9 +2,12 @@
 
 Raven is a typed, general-purpose language for .NET. It brings functions, pattern matching, classes and interfaces into one language, and is the first language being adapted to neoCLR.
 
-**In active development.** Raven has its own language and toolchain. The neoCLR target is an experimental integration with a bounded runtime API; support on .NET does not automatically mean support on neoCLR.
+Raven targets both .NET and neoCLR. Each target has its own libraries and runtime capabilities.
 
-[Meet the language ↓](#examples) · [Raven’s language website ↗](https://marinasundstrom.github.io/raven/)
+[Raven website ↗](https://marinasundstrom.github.io/raven/) · [Try the language playground ↗](https://marinasundstrom.github.io/raven/playground/)
+
+The playground introduces Raven syntax; use the [neoCLR bundle](../try/) to run
+programs against neoCLR’s libraries.
 
 <a id="examples"></a>
 
@@ -48,7 +51,7 @@ For properties, `val` expresses read-only access. Explicit mutability helps read
 
 ## The .NET and neoCLR targets
 
-Raven normally targets .NET and can use its libraries. The Raven compiler and Raven Language Server run on .NET; the VS Code extension uses that server for editor features. neoCLR itself and programs running on it do not depend on .NET. The published integration uses a bounded CLI importer. The development native target emits NeoCLR PE assemblies directly and imports native library metadata into Raven symbols; it still needs an explicit primitive bootstrap and compatible runtime seed.
+Raven normally targets .NET and can use its libraries. The Raven compiler and Raven Language Server run on .NET; the VS Code extension uses that server for editor features. neoCLR itself and programs running on it do not depend on .NET. The native target emits PE assemblies directly and imports native library metadata into Raven symbols. The matched bundle supplies its primitive bootstrap and runtime seed.
 
 This gives us a source language for applications and for the Raven-authored System.Runtime library. It also makes language and runtime gaps visible through real programs. It is not a promise that arbitrary .NET libraries or every Raven feature already run on neoCLR.
 
@@ -63,139 +66,45 @@ For the language’s ordinary .NET target, visit [Raven’s language website](ht
 
 <a id="direction"></a>
 
-## Compiler integration and planned work
+## Interfaces
 
-The neoCLR work exercises runtime contracts, metadata and library ergonomics. General compiler improvements belong in Raven’s ordinary development; neoCLR policies remain isolated until they are ready. Both projects are open to feedback, and their APIs can change.
+Interfaces can supply public default implementations and static helpers. A class's
+own implementation takes precedence. Private helpers remain private to the interface.
+Private instance helpers and static virtual defaults are not supported.
 
-[Explore neoCLR’s proposals →](../proposals/)
+## Entry points
 
-## Interface bodies in development
+Use a static, nongeneric `Main`, either a file-scope function or a class method.
+Native programs support no-result and integer entry points, plus `Task<unit>` and
+`Task<int>` for async entry points. An integer result becomes the process exit status;
+a no-result entry exits with status zero on success.
 
-Application interfaces can supply public default implementations and public or private
-static helper methods. Defaults execute on the original object, and a class's own
-implementation takes precedence. Private helpers stay private to the interface.
-These capabilities are included in Preview 11. Private instance helpers,
-static virtual defaults and broader interface accessibility remain future work.
+An async Main can await directly. The runtime drives its default task queue and
+registered host operations before obtaining the result. Cancellation and unresolved
+tasks fail explicitly. Generic async methods and native `Task<Result<…>>` entry
+points are not supported.
 
-Explicit interface methods are also supported for non-generic
-application classes and interfaces. Two interfaces can select different private
-implementations of the same-named method while the class keeps a separate public
-method. Explicit accessors, generic/value-type import and implementations of external
-core-library contracts remain outside this bounded slice.
-
-
-<a id="entry-points"></a>
-
-## Supported entry points
-
-**Preview 11.** Use the matching compiler, bridge
-and runtime. A program has one static, nongeneric `Main`, either a file-scope
-function or a static class method. Each return type below accepts no arguments
-or one `string[]` argument containing the application arguments, without the
-executable name.
-
-| Main return type | Successful process exit status |
-| --- | --- |
-| `()` (or omitted) | `0` |
-| `int` | Returned integer |
-| `Result<int, E>` | Integer in `Ok` |
-| `Result<(), E>` | `0` for `Ok` |
-| `Task<()>` | `0` after completion |
-| `Task<int>` | Integer after completion |
-| `Task<Result<int, E>>` | Integer in `Ok` after completion |
-| `Task<Result<(), E>>` | `0` for `Ok` after completion |
-
-A Result `Error` prints its payload to standard error and returns status `1`.
-Cancelled tasks and tasks still pending after available work drains produce a
-runtime failure. `unit` is another spelling of `()`; neoCLR uses `Task<unit>`
-instead of a separate nongeneric .NET `Task` type.
-
-An async Main can await directly. The runtime drives the default task queue and
-registered host operations before obtaining its result. Explicit private task
-queues remain caller-driven. Ordinary `Task.GetResult()` stays nonblocking.
-
-[See a tested async Main awaiting a worker →](../features/tasks/#await)
-
-`neoclr run` also uses integer entry values as process status for Neo and neoIL.
-Existing scripts that previously ignored a nonzero integer result should account
-for that status.
+[Tasks and await →](../features/tasks/#await)
 
 <a id="native-target"></a>
 
-## Native target: Preview 12 POC
+## Native libraries and tools
 
-**Preview 12, macOS arm64.** Raven's `rvnc neoclr` command
-emits assemblies that neoCLR loads and executes directly. Native library references
-supply compiler symbols without translating those libraries back to .NET metadata.
-The explicit primitive bootstrap, retained runtime seed and matching dependency
-artifacts remain required. The ordinary .NET target keeps its existing backend.
+Raven compiles application and library projects for neoCLR. Consumers import compiled
+library metadata without including library sources. The class library covers collections,
+Unicode text, JSON, networking and HTTP. The bundled samples demonstrate callbacks,
+shared object identity, Tasks and client/server requests.
 
-All ten selected POC samples now have compilation and checked execution evidence.
-They cover collections and queries, interface and virtual calls, class identity and struct copies,
-JSON object mapping, Tasks/await, cancellation, and an HTTP client/server pair tested
-over localhost. This is a bounded sample gate, not a claim that every Raven program
-or the entire System class library compiles natively.
+In VS Code, native metadata supplies completion, hover documentation and read-only
+declaration navigation. The project file selects the same references for the editor
+and compiler. Library XML and Markdown sidecars supply API descriptions where available.
 
-Selected source-library assemblies are also compiled and consumed separately, including
-Unicode String/Char, encoding, text streams and JSON work. The text model distinguishes
-grapheme clusters, Unicode scalars and bytes; native UTF-8 storage does not change the
-ordinary .NET target's Char semantics. Support and limitations remain target-specific.
+`neoclr disassemble` inspects metadata and instructions without executing the assembly
+or loading its dependencies. Its output is a diagnostic listing, not reassemblable neoIL.
 
-**Development beyond Preview 12:** the full 197-input class-library audit now emits a
-source-owned native assembly. The unchanged orders application imports that assembly
-with library sources absent, then compiles and runs with its expected collection,
-callback, query and shared-identity behavior. Explicit Object-root ownership, primitive
-bootstrap and a retained runtime seed are still required. This is a development acceptance
-gate; production library packaging and editor configuration for this layout remain work
-in progress, and not every class-library API has execution coverage.
+The native target does not support every Raven or .NET feature. Local nongeneric class
+virtual dispatch is supported; external class overrides and generic virtual classes
+remain limited. Runtime suspension and green threads are not implemented.
 
-The development class-library split now has native projects for System.Runtime,
-System.Data, System.Networking and System.Web. A staged build produces matching
-assemblies and a retained seed with artifact hashes; five HTTP/networking consumers
-and a separate project consumer execute against that bundle. Platform service extraction,
-API-documentation bundling and editor qualification for this split remain open. This
-class-library artifact bundle is not a complete SDK release. It now includes a relocatable
-project configuration; headless workspace symbol loading and an unchanged HTTP project
-pass after relocation. Installed-editor acceptance of this split remains separate.
-
-Native nongeneric async functions and class methods use the existing heap state-machine
-lowering. `Task<unit>` and `Task<int>` entries drain registered work before obtaining their
-result; cancellation and unresolved tasks fail explicitly. Generic async methods and
-native `Task<Result<…>>` entry points remain unsupported. The Preview 11 entry-point table
-above describes the published bridge path, not blanket native-target support. Runtime
-suspension and green threads are future work.
-
-The unchanged `application-inheritance` sample now executes abstract base, interface,
-virtual/override and direct base-call behavior with the same output as the .NET target.
-Support is bounded to local nongeneric class slots; external class overrides, generic
-virtual classes and new-slot hiding remain outside this native slice.
-A local matched compiler/server/extension/runtime bundle now passes extracted
-compilation and execution, plus 19 installed VS Code checks on macOS arm64, including
-API help and native reference refresh. Primitive bootstrap and retained runtime seed
-remain explicit dependencies. The matched download includes bootstrap dependencies with recorded source provenance.
-A subsequent development check also runs orders and Tasks/await from VS Code against
-separate Runtime, Data, Networking and Web assemblies using shared bundle project
-configuration. The development bundle now carries generated XML/Markdown API help; coverage is
-incomplete and the unified RavenDoc migration remains pending. Reported
-persistent hover delays remain under investigation; this is not a performance claim.
-
-The development `neoclr disassemble` command inspects native metadata and instructions
-without loading dependencies or executing the assembly. Its output is a diagnostic
-listing, not reassemblable neoIL.
-
-[Tasks and their runtime limits →](../features/tasks/) ·
-[HTTP application case →](../cases/http-server/) ·
-[Published toolchain setup →](../try/)
-
-
-Development packaging now supports the separate Runtime, Data, Networking and Web
-assemblies with a shared project configuration, explicit runtime Object ownership and
-relative SDK selection. Extracted sample verification covers native compilation and
-execution; this candidate is not a new published download. Platform boundaries and
-complete API documentation remain release work.
-
-
-The development bootstrap workflow has also been exercised from isolated source
-checkouts on macOS arm64, regenerating the primitive bootstrap and retained seed before
-building the four libraries. This is local qualification of the documented dependency
-chain, not compiler self-hosting or a new release announcement.
+[Install and run →](../try/) · [HTTP application case →](../cases/http-server/) ·
+[API reference →](../docs/)

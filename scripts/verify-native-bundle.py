@@ -38,7 +38,7 @@ def main():
                 raise ValueError('Untracked execution dependency: ' + str(path))
 
         def run(command, expected_stdout=None):
-            result = subprocess.run([str(p) for p in command], cwd=root, capture_output=True, text=True, timeout=180)
+            result = subprocess.run([str(p) for p in command], cwd=root, capture_output=True, text=True, encoding='utf-8', timeout=180)
             item = dict(command=[str(p) for p in command], exitCode=result.returncode, stdout=result.stdout, stderr=result.stderr)
             report['commands'].append(item)
             if result.returncode or expected_stdout is not None and (result.stdout != expected_stdout or result.stderr):
