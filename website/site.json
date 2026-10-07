@@ -48,5 +48,6 @@
     "System.Tasks"
   ],
   "search": true,
-  "copyCode": true
+  "copyCode": true,
+  "navigationScope": "section"
 }

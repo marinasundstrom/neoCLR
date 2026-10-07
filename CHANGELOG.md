@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Cross-check RavenDoc site-wide navigation support against neoCLR and explicitly
+  retain section navigation here. Raven can share one documentation hierarchy
+  without changing neoCLR's intentional API browser boundaries.
+
 - Update RavenDoc with macro-partition navigation fixes, a dedicated article
   sidebar with collapsible sections, configurable API source display names and
   a compact mobile header. Retain library links when no authored menu is supplied.

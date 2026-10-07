@@ -11135,3 +11135,13 @@ spacing and source display names (“Core extensions” and “Macros”) distin
 assembly filenames. Raven's authored content and spacing were updated, while
 the shared publisher's navigation/display-name support and compact mobile header
 were propagated here. A missing macro-only API sidebar was fixed at the same time.
+
+The author asked for a click-through review of Raven's page organization and for
+RavenDoc features to remain general site-generator capabilities cross-checked
+against neoCLR. The publisher now offers site-wide or section-local navigation;
+Raven uses one composed article hierarchy, while neoCLR explicitly keeps its
+existing section/API boundaries.
+
+The author emphasized that navigation should follow simple content conventions,
+with configuration for deliberate overrides; repository-specific organization
+belongs in content/TOCs rather than hard-coded RavenDoc behavior.
