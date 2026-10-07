@@ -11,12 +11,14 @@ fn main() {
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = env::args_os().skip(1).collect();
-    if args.len() != 3 {
-        return Err("usage: neoclr-aot-poc <source.neoil> <root-name> <output.o>".into());
+    if !(args.len() == 3 || (args.len() == 4 && args[3] == "--console")) {
+        return Err(
+            "usage: neoclr-aot-poc <source.neoil> <root-name> <output.o> [--console]".into(),
+        );
     }
     let source = fs::read_to_string(&args[0])?;
     let root = args[1].to_str().ok_or("root name must be UTF-8")?;
-    let object = compiler::compile(&source, root)?;
+    let object = compiler::compile(&source, root, args.len() == 4)?;
     // Do not clobber an existing artifact, including on failed compilation.
     let mut output = fs::OpenOptions::new()
         .write(true)

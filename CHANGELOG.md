@@ -27,8 +27,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   calls, preserving first-fault behavior and leaving output untouched on failure.
   The experimental C export becomes neoclr_entry_v2 (status plus result pointer);
   rebuild probe objects and C hosts together. Nine tests cover 174 native/interpreter
-  comparisons. Loop budgets/cancellation, managed allocation and the web demo remain
-  future work; runtime dependencies and public APIs are unchanged. Cherry-pick this
+  comparisons. Complete the next executable slice as ARM64 Hello World: lower UTF-8
+  literals through an explicit console capability, generate position-independent
+  code and link native startup/output services into the executable. Check exact
+  bytes, OS-only dynamic dependencies, execution without companion files and service
+  failures. Record the author's early self-contained CIL-to-native foundation and
+  Hello World-to-HTTP Server sequence, with trimming recorded as a later step.
+  Input is still neoIL; CIL AOT ingestion, loop
+  budgets/cancellation, managed allocation and HTTP remain future work. Runtime
+  dependencies and public library APIs are unchanged. Cherry-pick this
   isolated slice to main at the author's correction, retaining main's newer native
   bootstrap work and refreshing the tool lockfile for the current runtime.
 

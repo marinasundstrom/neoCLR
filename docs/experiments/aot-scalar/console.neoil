@@ -1,0 +1,32 @@
+.module AotConsole
+
+.function Greet(Int32 value) -> Int32
+    ldstr "Hello from ARM64 AOT — hej, שלום, 🌍!"
+    call neoCLR.Runtime.WriteLine(String)
+    pop
+    ldarg value
+    ret
+.end
+
+.function Calculate(Int32 value) -> Int32
+    ldarg value
+    call Greet(Int32)
+    pop
+    ldarg value
+    brfalse Zero
+    ldstr "nonzero"
+    br Print
+Zero:
+    ldstr "zero"
+Print:
+    call neoCLR.Runtime.WriteLine(String)
+    pop
+    ldstr ""
+    call neoCLR.Runtime.WriteLine(String)
+    pop
+    ldstr "NUL: A\u0000B; combining: é"
+    call neoCLR.Runtime.WriteLine(String)
+    pop
+    ldarg value
+    ret
+.end

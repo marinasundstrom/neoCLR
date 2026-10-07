@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-07",
+  "branch": "main",
+  "base_revision": "1ef81d0b7a84eb36dd77e546cc32e46ce4b64277",
+  "scope": "native Hello World and literal UTF-8 console service",
+  "input": "handwritten neoIL; CIL AOT ingestion pending",
+  "command": "cargo test --locked --manifest-path tools/aot-poc/Cargo.toml",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin",
+  "result": {
+    "passed": 12,
+    "failed": 0,
+    "prior_arithmetic_comparisons": 174,
+    "console_byte_comparisons": 3,
+    "scalar_rejections": 17,
+    "console_rejections": 4,
+    "missing_service_link_rejected": true,
+    "failing_service_propagation": true,
+    "closed_stdout_fault": true
+  },
+  "hello": {
+    "stdout_utf8": "Hello, world!\n",
+    "stderr_utf8": "",
+    "exit": 0,
+    "isolated_directory": true,
+    "empty_environment": true,
+    "dynamic_dependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ],
+    "linked_support": [
+      "native startup adapter",
+      "UTF-8 console service"
+    ],
+    "companion_files": []
+  },
+  "limitations": [
+    "no CIL AOT input",
+    "no trimmer",
+    "no general managed String/GC",
+    "no execution budgets/cancellation",
+    "no HTTP Server"
+  ],
+  "sha256": {
+    "tools/aot-poc/src/compiler.rs": "36d14977f0d2ed2be9536358affea34f47028d50b934a426ff5d5152f9cc0553",
+    "tools/aot-poc/src/flow.rs": "11e488298db3fe1d5a5538b15405ece0fd04207ae2d1da12c4c386d64b52e91b",
+    "tools/aot-poc/src/main.rs": "424a1da3bf658f9b74e82d7a7f6c530adc49410166173088ce1df2deb5b5a788",
+    "tools/aot-poc/tests/scalar.rs": "12cf436d863b2e3befab1c26afb089d970e10455e9d6df4124055f277af58c51",
+    "tools/aot-poc/Cargo.lock": "5e01f8ba8f8874b863c1d038cdf26fec21108e00d52da551d7f0d456732a349d",
+    "docs/experiments/aot-hello/hello.neoil": "2aaaedc19bb192a21afd155bcbe9f20b50e84db171f98a246be96572d1f8073d",
+    "docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "docs/experiments/aot-scalar/console.neoil": "aae868acae2b70a14bbd2a4aa95d022da4fb4836bb69604915d31fb7bd38c0c2",
+    "docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "docs/experiments/aot-scalar/console.h": "d3db18f048ad9c214af9a22327f0dcfe45b91251e9c6d60827534c5d8fc642e1",
+    "docs/experiments/aot-scalar/abi.h": "ef50831fe2932328bc886da1d5e0827eab684c01c1c6a954680f25b31cb41ecb",
+    "docs/experiments/aot-scalar/host.c": "fa9f728123135e4113ff9804dd7e011a006e0d25b6a2b54aa7cbb379d87fa109",
+    "target/aot-hello/hello.o": "6f63c1609ba9e0b9fd9e2c8610a8a937afe888a7bdf9e1a26e9c759aa5843122",
+    "target/aot-hello/hello": "3a6e9e9452d6494480ca16d889d297ea91ab51a2425a4f24d08e48fa2e4d9dc1"
+  }
+}

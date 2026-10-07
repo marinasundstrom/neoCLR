@@ -1,6 +1,6 @@
 //! Scalar CFG acceptance and stack heights, independent of Cranelift lowering.
 //! Definite local initialization remains the ordinary neoCLR verifier's job.
-use super::Error;
+use super::{Error, console_call};
 use cranelift_codegen::ir::condcodes::IntCC;
 use neoclr::metadata::{Function, Instruction as Op};
 use std::collections::VecDeque;
@@ -21,7 +21,16 @@ pub(super) fn comparison(op: &Op) -> Option<(usize, IntCC)> {
     })
 }
 
-pub(super) fn analyze(function: &Function) -> Result<Vec<Option<usize>>, Error> {
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum Kind {
+    Int32,
+    Literal,
+    Unit,
+}
+
+pub(super) type Stacks = Vec<Option<Vec<Kind>>>;
+
+pub(super) fn analyze(function: &Function) -> Result<Stacks, Error> {
     let fail =
         |pc, message| -> Error { format!("{} instruction {pc}: {message}", function.name).into() };
     let count = function.body.len();
@@ -34,7 +43,7 @@ pub(super) fn analyze(function: &Function) -> Result<Vec<Option<usize>>, Error> 
     let mut edges = Vec::new();
     for (pc, op) in function.body.iter().enumerate() {
         let effect = match op {
-            Op::Int(_) => (0, 1),
+            Op::Int(_) | Op::String(_) => (0, 1),
             Op::Arg(index) if *index < function.parameters.len() => (0, 1),
             Op::Load(index) if *index < function.locals.len() => (0, 1),
             Op::Store(index) if *index < function.locals.len() => (1, 0),
@@ -70,37 +79,66 @@ pub(super) fn analyze(function: &Function) -> Result<Vec<Option<usize>>, Error> 
         effects.push(effect);
         edges.push(successors);
     }
-    let mut depths = vec![None; count];
-    depths[0] = Some(0);
+    let mut stacks: Stacks = vec![None; count];
+    stacks[0] = Some(vec![]);
     let mut work = VecDeque::from([0]);
     while let Some(pc) = work.pop_front() {
-        let depth = depths[pc].unwrap();
-        let (pops, pushes) = effects[pc];
-        if matches!(function.body[pc], Op::Return) && depth != 1 {
+        let mut stack = stacks[pc].as_ref().unwrap().clone();
+        let depth = stack.len();
+        let (pops, _) = effects[pc];
+        let op = &function.body[pc];
+        if matches!(op, Op::Return) && depth != 1 {
             return Err(fail(pc, "invalid return: expected exactly one value"));
         }
         if depth < pops {
             return Err(fail(pc, "stack underflow"));
         }
-        let next_depth = depth - pops + pushes;
+        let popped = stack.split_off(depth - pops);
+        let expected = if matches!(op, Op::Call(target) if console_call(target)) {
+            Kind::Literal
+        } else {
+            Kind::Int32
+        };
+        if !matches!(op, Op::Dup | Op::Pop) && popped.iter().any(|kind| *kind != expected) {
+            return Err(fail(
+                pc,
+                "unsupported operand type for scalar/console instruction",
+            ));
+        }
+        match op {
+            Op::String(_) => stack.push(Kind::Literal),
+            Op::Call(target) if console_call(target) => stack.push(Kind::Unit),
+            Op::Dup => {
+                stack.extend_from_slice(&popped);
+                stack.extend_from_slice(&popped);
+            }
+            _ => {
+                for _ in 0..effects[pc].1 {
+                    stack.push(Kind::Int32);
+                }
+            }
+        }
         for &next in &edges[pc] {
             if next >= count {
                 return Err(fail(pc, "control flow leaves function body"));
             }
-            match depths[next] {
-                Some(existing) if existing != next_depth => {
+            match &stacks[next] {
+                Some(existing) if existing.len() != stack.len() => {
                     return Err(fail(
                         next,
                         "incompatible stack heights at control-flow join",
                     ));
                 }
+                Some(existing) if *existing != stack => {
+                    return Err(fail(next, "incompatible stack types at control-flow join"));
+                }
                 Some(_) => (),
                 None => {
-                    depths[next] = Some(next_depth);
+                    stacks[next] = Some(stack.clone());
                     work.push_back(next);
                 }
             }
         }
     }
-    Ok(depths)
+    Ok(stacks)
 }

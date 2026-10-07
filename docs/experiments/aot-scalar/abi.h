@@ -6,6 +6,7 @@
 #define NEOCLR_AOT_OK 0
 #define NEOCLR_AOT_DIVIDE_BY_ZERO 1
 #define NEOCLR_AOT_ARITHMETIC_OVERFLOW 2
+#define NEOCLR_AOT_RUNTIME_ERROR 3
 
 /* result must point to writable, aligned Int32 storage. Only success writes it.
    Fault status terminates guest invocation; no exception crosses this boundary.

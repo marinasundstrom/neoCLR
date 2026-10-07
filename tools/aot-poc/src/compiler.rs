@@ -1,5 +1,6 @@
 //! Experimental scalar lowering, deliberately separate from the public runtime API.
 use cranelift_codegen::ir::condcodes::IntCC;
+use cranelift_codegen::settings::Configurable;
 use cranelift_codegen::{
     ir::{self, AbiParam, InstBuilder, MemFlags, StackSlotData, StackSlotKind, types},
     isa, settings,
@@ -8,20 +9,28 @@ use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext, Variable};
 
 #[path = "flow.rs"]
 mod flow;
-use cranelift_module::{Linkage, Module};
+use cranelift_module::{DataDescription, Linkage, Module};
 use cranelift_object::{ObjectBuilder, ObjectModule};
-use neoclr::metadata::{Function, Instruction as Op, Type};
+use neoclr::metadata::{Function, FunctionRef, Instruction as Op, Type};
 use std::collections::{HashMap, HashSet};
 
 type Error = Box<dyn std::error::Error>;
 
-pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
+pub(super) fn compile(source: &str, root: &str, console: bool) -> Result<Vec<u8>, Error> {
     let input = neoclr::assemble(source).map_err(|error| error.to_string())?;
     if input.name == "System" || !input.types.is_empty() || input.functions.len() > 128 {
         return Err(
             "scalar profile requires an application with no types and at most 128 functions".into(),
         );
     }
+    if input
+        .functions
+        .iter()
+        .any(|f| f.name == "neoCLR.Runtime.WriteLine")
+    {
+        return Err("application cannot replace the reserved console service".into());
+    }
+    let mut uses_console = false;
     let mut names = HashMap::new();
     let mut flows = Vec::new();
     for (index, function) in input.functions.iter().enumerate() {
@@ -40,6 +49,13 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
     for (index, function) in input.functions.iter().enumerate() {
         for (pc, op) in function.body.iter().enumerate() {
             if let Op::Call(target) = op {
+                if console_call(target) {
+                    if !console {
+                        return Err("console service requires --console capability".into());
+                    }
+                    uses_console = true;
+                    continue;
+                }
                 if target.owner.is_some()
                     || target.instance
                     || target.definition.is_some()
@@ -68,7 +84,7 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
             }
         }
     }
-    // Native stack budgets/Fault propagation are not implemented: reject cycles.
+    // Native recursion budgets are not implemented: reject call-graph cycles.
     fn visit(
         node: usize,
         edges: &[Vec<usize>],
@@ -99,12 +115,48 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
     let target = "aarch64-apple-darwin"
         .parse()
         .expect("fixed valid target triple");
-    let isa = isa::lookup(target)?.finish(settings::Flags::new(settings::builder()))?;
+    let mut settings = settings::builder();
+    settings.set("is_pic", "true")?;
+    let isa = isa::lookup(target)?.finish(settings::Flags::new(settings))?;
     let mut module = ObjectModule::new(ObjectBuilder::new(
         isa,
         "neoclr_scalar",
         cranelift_module::default_libcall_names(),
     )?);
+    let console_id = if uses_console {
+        let mut signature = module.make_signature();
+        signature.params = vec![AbiParam::new(types::I64), AbiParam::new(types::I64)];
+        signature.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function(
+            "neoclr_console_write_line_utf8_v1",
+            Linkage::Import,
+            &signature,
+        )?)
+    } else {
+        None
+    };
+    // Literal-only temporary representation: [u64 byte count][UTF-8 bytes].
+    // This is private read-only object data, not a managed String ABI.
+    let mut literals = HashMap::new();
+    for (index, function) in input.functions.iter().enumerate() {
+        for (pc, op) in function.body.iter().enumerate() {
+            if let Op::String(text) = op {
+                let id = module.declare_data(
+                    &format!("neoclr_literal_{index}_{pc}"),
+                    Linkage::Local,
+                    false,
+                    false,
+                )?;
+                let mut data = DataDescription::new();
+                let mut bytes = (text.len() as u64).to_le_bytes().to_vec();
+                bytes.extend_from_slice(text.as_bytes());
+                data.define(bytes.into_boxed_slice());
+                data.set_align(8);
+                module.define_data(id, &data)?;
+                literals.insert((index, pc), id);
+            }
+        }
+    }
     let mut ids = Vec::new();
     for (index, function) in input.functions.iter().enumerate() {
         let mut sig = module.make_signature();
@@ -143,10 +195,16 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
                 .iter()
                 .map(|_| builder.create_block())
                 .collect();
-            for (pc, depth) in flows[index].iter().enumerate() {
-                if let Some(depth) = depth {
-                    for _ in 0..*depth {
-                        builder.append_block_param(blocks[pc], types::I32);
+            for (pc, stack) in flows[index].iter().enumerate() {
+                if let Some(stack) = stack {
+                    for kind in stack {
+                        builder.append_block_param(
+                            blocks[pc],
+                            match kind {
+                                flow::Kind::Literal => types::I64,
+                                flow::Kind::Int32 | flow::Kind::Unit => types::I32,
+                            },
+                        );
                     }
                 }
             }
@@ -161,11 +219,17 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
                 builder.switch_to_block(blocks[pc]);
                 // SSA local parameters may be appended while translating predecessors;
                 // only the explicit first parameters represent the IL operand stack.
-                let mut stack: Vec<ir::Value> =
-                    builder.block_params(blocks[pc])[..flows[index][pc].unwrap()].to_vec();
+                let mut stack: Vec<ir::Value> = builder.block_params(blocks[pc])
+                    [..flows[index][pc].as_ref().unwrap().len()]
+                    .to_vec();
                 match op {
                     Op::Int(value) => {
                         stack.push(builder.ins().iconst(types::I32, i64::from(*value)))
+                    }
+                    Op::String(_) => {
+                        let data =
+                            module.declare_data_in_func(literals[&(index, pc)], builder.func);
+                        stack.push(builder.ins().global_value(types::I64, data));
                     }
                     Op::Arg(index) => stack.push(args[*index]),
                     Op::Load(index) => {
@@ -203,6 +267,22 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
                         let right = stack.pop().expect("validated stack");
                         let left = stack.pop().expect("validated stack");
                         stack.push(checked_arithmetic(&mut builder, op, left, right));
+                    }
+                    Op::Call(target) if console_call(target) => {
+                        let literal = stack.pop().expect("validated literal");
+                        let length = builder.ins().load(types::I64, MemFlags::new(), literal, 0);
+                        let bytes = builder.ins().iadd_imm(literal, 8);
+                        let reference = module.declare_func_in_func(
+                            console_id.expect("declared service"),
+                            builder.func,
+                        );
+                        let call = builder.ins().call(reference, &[bytes, length]);
+                        let service_status = builder.inst_results(call)[0];
+                        let failed = builder.ins().icmp_imm(IntCC::NotEqual, service_status, 0);
+                        let fault = builder.ins().iconst(types::I32, 3);
+                        return_if(&mut builder, failed, fault);
+                        // Preserve inhabited Void on the IL stack without a public layout.
+                        stack.push(builder.ins().iconst(types::I32, 0));
                     }
                     Op::Call(target) => {
                         let callee = names[target.name.as_str()];
@@ -279,7 +359,7 @@ pub(super) fn compile(source: &str, root: &str) -> Result<Vec<u8>, Error> {
     Ok(product.emit()?)
 }
 
-fn check_function(function: &Function) -> Result<Vec<Option<usize>>, Error> {
+fn check_function(function: &Function) -> Result<flow::Stacks, Error> {
     if function.owner.is_some()
         || function.instance
         || function.is_abstract
@@ -382,4 +462,13 @@ fn checked_arithmetic(
     let overflow = builder.ins().icmp(IntCC::NotEqual, wide, restored);
     return_if(builder, overflow, overflow_status);
     result
+}
+
+fn console_call(target: &FunctionRef) -> bool {
+    target.name == "neoCLR.Runtime.WriteLine"
+        && target.parameters == [Type::String]
+        && target.owner.is_none()
+        && target.definition.is_none()
+        && !target.instance
+        && target.generic_arguments.is_empty()
 }

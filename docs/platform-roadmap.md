@@ -23,7 +23,20 @@ adds branches, locals, loops and stack joins with seven focused tests and 79 nat
 interpreter comparisons on main. A following arithmetic-Fault slice adds checked
 arithmetic, division/remainder and status propagation through compiled calls, with
 a versioned experimental C ABI and nine tests/174 native comparisons. Execution
-budgets, managed services, the web demo, JIT and hot reload remain future work.
+budgets, general managed services, the web demo, JIT and hot reload remain future work.
+The next slice completes [native Hello World](experiments/aot-hello/README.md):
+UTF-8 literal output with startup and console code linked into an executable that
+runs independently of a shared managed framework/runtime.
+
+**Author clarification:** build the CIL-to-native, self-contained executable foundation
+early, and extend it alongside platform evolution. **Hello World is the first executable
+milestone**, followed by increasingly complex samples until HTTP Server. Current
+Hello World input is handwritten neoIL; supported CIL input through the same pipeline
+is the next proposed proof. Required library/runtime support should be baked into
+the final image. Scalar and Fault tests support this progression; they do not replace
+the executable milestones. The author identifies trimming as a later step: establish
+code/metadata roots and dynamic-use rules before removing dependencies. No trimming
+is implemented or required for this first Hello World milestone.
 
 ## Existing native release gates
 

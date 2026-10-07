@@ -14,6 +14,24 @@ This investigation does not replace the active Raven integration work with a nat
 compiler milestone. See the [roadmap](platform-roadmap.md) and
 [execution architecture](execution-architecture.md).
 
+## Subsequent author clarification: early self-contained CIL foundation
+
+The author specifies CIL-to-native compilation and executables with dependencies
+baked in, without a shared framework/managed runtime installation. Runtime services
+must be linked into the application where required. This is compatible with ordinary
+OS dependencies and separate optional interpreter/JIT deployments; it is not a demand
+that every executable contain all execution engines.
+
+The foundation should be exercised early as the platform evolves. The author selects
+**Hello World first**, then increasingly complex executable samples until **HTTP
+Server**. The [native Hello World probe](experiments/aot-hello/README.md) implements
+literal UTF-8 output and self-contained native service linking, with neoIL input.
+A supported CIL consumer through the same pipeline is still pending and is the next
+proposed input proof. The broader experimental list below is research context; this
+later author-directed sample progression controls the immediate work. The author
+also identifies trimming as a future step; establish explicit code/metadata retention
+and dynamic-use roots, without making trimming a prerequisite for Hello World.
+
 ## Findings and proposed direction
 
 JIT and AOT are plausible extensions of the existing architecture, but adding a code

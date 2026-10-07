@@ -68,6 +68,22 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   stash, cherry-picks the isolated scalar commit onto main, preserves newer native
   bootstrap/release documentation, and revalidates against main before continuing
   the control-flow slice. Original feature-branch evidence remains historical.
+- **Author deployment clarification:** wants an executable with dependencies baked
+  in and no shared framework/runtime requirement: “the goal is compiling CIL to
+  native code”. Adds that establishing the foundation early will make implementation
+  easier as the platform evolves. Then specifies Hello World first, followed by more
+  complex samples until HTTP Server.
+- **Assistant response/action:** records self-contained CIL AOT as the target and
+  sample progression as the immediate sequence. Implements a neoIL-based native
+  Hello World with startup/UTF-8 console code linked into its executable; checks
+  independent execution, OS-only linkage, byte fidelity and service failures.
+  CIL input remains pending; proposes exercising it next through shared verification,
+  lowering and linking. These steps do not claim arbitrary .NET compatibility,
+  freestanding execution or an implemented native HTTP Server.
+- **Author trimming follow-up:** “In a future step, we will have to figure out trimming”.
+- **Assistant response/action:** records trimming as later work, with code/metadata
+  roots, reflection/dynamic use, initialization and runtime-helper dependencies to
+  establish. Keeps the current non-trimming Hello World proof bounded.
 - **Open:** backend choice, OS qualification order, native ABI/GC/metadata contracts,
   edit compatibility, measurements and implementation scheduling. These details are
   assistant proposals, not subsequent author decisions. The active Raven work and

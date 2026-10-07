@@ -23,6 +23,46 @@ for backend alternatives, version lifetimes, state compatibility and validation 
 The subsequent author instruction to continue AOT produces the isolated scalar
 experiment above; hot reload remains design work.
 
+### Self-contained CIL AOT foundation
+
+The author clarifies that the target is **compiling CIL to native code**, producing
+an executable with required dependencies baked in and no dependency on an installed
+shared framework or managed runtime. Required runtime services still exist; their
+selected implementation code is linked into the executable. OS libraries and explicit
+foreign dependencies need a recorded deployment policy; this direction does not by
+itself require a freestanding binary or static linking of every system library.
+
+Establish this foundation early and exercise it as the platform evolves. Keep the
+input reader/importer, shared resolution/verification, native lowering, runtime ABI
+and final linker as distinct boundaries. Handwritten neoIL is useful for conformance,
+but must not become the only exercised input path. The next input proof should compile
+a supported CIL consumer through this pipeline, with explicit diagnostics for unsupported
+metadata/instructions; it is not a promise to run arbitrary existing .NET applications.
+
+The author selects **Hello World first**, then increasingly complex samples until
+**HTTP Server**. The [first executable probe](experiments/aot-hello/README.md) uses
+neoIL and statically linked native startup/console code. CIL AOT input remains pending.
+For each subsequent platform feature, identify native representation, lowering,
+reachable dependencies and service/GC requirements; extend the small native conformance
+path when supported or record the exact gap. Full JIT/AOT coverage is not a prerequisite
+for every library feature, but backend requirements should not be deferred wholesale.
+
+### Future trimming
+
+The author explicitly identifies trimming as future work. Self-contained deployment
+means carrying required dependencies, not necessarily every framework member. Today's
+AOT probe checks and emits every declared function and does not claim to trim code
+or metadata. Keep the current Hello World milestone independent of trimming.
+
+A future trimmer must account for entry/export roots, calls and indirect dispatch,
+initialization, runtime/generated helpers, required layouts and explicit reflection
+or dynamic-use roots. Code reachability and metadata retention are distinct policies;
+retaining a descriptor does not by itself provide native invocation code. Reuse the
+existing reachability/service analysis where applicable, but audit its gaps before
+using it to remove code. Native linker dead stripping alone cannot infer guest dynamic
+semantics. Validate retained behavior and explicit missing-root diagnostics alongside
+size measurements; do not silently remove code that runtime behavior can reach.
+
 ## Shared semantic contract
 
 neoCLR defines observable behavior independently of the backend. Shared contracts
@@ -62,9 +102,10 @@ backend, but interoperability boundaries require explicit representation agreeme
 | Native AOT | Generate native code before execution | Identify compilation roots, resolve dependencies and required instantiations, and emit explicit runtime/native imports |
 
 Recommend two early AOT outputs: a standalone executable and a native library with
-explicit exports. An AOT executable may link a runtime support library; native AOT
-does not imply freestanding execution or absence of runtime services. A future
-freestanding profile would be a separate requirement.
+explicit exports. For the author's standalone executable goal, link the required
+runtime support into the image; do not require a separately installed shared managed
+runtime. AOT does not imply absence of runtime services. A future freestanding
+profile would be a separate requirement.
 
 Capabilities such as runtime compilation, IL interpretation, metadata discovery,
 and loading additional precompiled modules must be distinct. Loading a native module

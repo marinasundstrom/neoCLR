@@ -18,12 +18,18 @@ the old validation.json remains historical evidence, not a claim about the new b
 native C/interpreter parity and eleven rejection cases, against Preview 12 main. The source input
 is hand-authored neoIL; Raven-produced native execution remains to validate.
 
+The first user-facing executable milestone is now
+[Hello World](../aot-hello/README.md). These scalar cases remain supporting compiler
+conformance tests. CIL input is the target; the current tool accepts neoIL only.
+
 ## Supported contract
 
 - One source module, no declared types; at most 128 uniquely named functions.
 - Nongeneric free functions with Int32 parameters/results and up to 1,024 Int32
-  locals; no native imports, special parameter contracts or managed runtime services.
+  locals; no general native imports or special parameter contracts. `--console`
+  enables only the existing `neoCLR.Runtime.WriteLine(String)` service.
 - `ldc.i4`, `ldarg`, `ldloc`, `stloc`, `dup`, `pop`, wrapping `add`/`sub`/`mul`,
+  literal `ldstr` values and explicit console service calls,
   signed/unsigned checked `add.ovf`/`sub.ovf`/`mul.ovf`, `div`/`rem` and their
   unsigned forms, direct unqualified local `call`, and `ret` with exactly one result. Early returns
   are supported; reachable paths must return or remain within the function's CFG.
@@ -52,15 +58,16 @@ and a Mach-O macOS 11.0 minimum-version marker. The scalar compiler does not use
 platform SDK and records SDK version zero; the C host link supplies its own SDK and
 deployment target. The marker is not a claim of macOS 11 qualification. Only the
 recorded local host has been tested. Other architectures and OS object formats are
-not yet exposed. Cranelift default optimization settings are used; these are
+not yet exposed. Cranelift default optimization settings and explicit PIC code generation are used; these are
 correctness results, not performance measurements.
 
 The existing interpreter defines unchecked Int32 arithmetic by wrapping operations
 ([implementation](../../../src/numeric.rs)); Cranelift I32 add/sub/mul preserves that
 behavior without C signed-overflow assumptions. The fixture computes `2*x + 2` via
 separate multiply and two-argument subtraction helpers. Values come from a C host
-at execution time, so native output is not just a precomputed constant. Recursion, guest pointers, allocation, GC, Strings, HTTP, JIT and hot reload
-remain unsupported. AOT does not yet run the web-app POC.
+at execution time, so native output is not just a precomputed constant. Recursion, guest pointers, allocation, GC, general managed Strings, HTTP, JIT and
+hot reload remain unsupported. Literal-only UTF-8 output is now supported as described
+in the Hello World milestone. AOT does not yet run the web-app POC.
 
 ## Reproduce on macOS ARM64
 
@@ -138,8 +145,9 @@ nonterminating inputs can run indefinitely. This trusted-code probe is not suita
 for resource-limited hosting. The interpreter's quota behavior is not promised by
 this native profile. Fixtures deliberately bound their loops.
 
-Next proposed slice: UTF-8 console/runtime service boundaries, followed by managed
-allocation/root reporting and the minimal AOT HTTP consumer. Keep benchmarking as a later measured comparison.
+The UTF-8 literal console boundary is now implemented in the Hello World slice.
+Next proposed input proof: supported CIL Hello World, then increasingly complex
+samples before the HTTP Server scenario. Keep benchmarking as a later measured comparison.
 
 The tool's [manifest](../../../tools/aot-poc/Cargo.toml) and separate lockfile keep
 experimental compiler dependencies out of the runtime manifest/lockfile. Its
@@ -156,7 +164,8 @@ int32_t neoclr_entry_v2(int32_t value, int32_t *result);
 ```
 
 Status 0 means success, 1 maps to `DivideByZero`, and 2 maps to
-`ArithmeticOverflow`. These are experiment-owned numbers, not Rust enum ordinals.
+`ArithmeticOverflow`. The console slice adds status 3 for `RuntimeError` on a
+failed host write. These are experiment-owned numbers, not Rust enum ordinals.
 The host must supply a valid aligned writable Int32 pointer. A failing invocation
 leaves that storage untouched. The symbol deliberately changes from the scalar
 probe's old `neoclr_entry`: rebuild the object and C host together. No stable public

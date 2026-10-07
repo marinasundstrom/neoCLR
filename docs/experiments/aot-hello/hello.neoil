@@ -1,0 +1,9 @@
+.module AotHello
+
+.function Main(Int32 unused) -> Int32
+    ldstr "Hello, world!"
+    call neoCLR.Runtime.WriteLine(String)
+    pop
+    ldc.i4 0
+    ret
+.end
