@@ -1226,3 +1226,10 @@ and the already shipped IDE sidecars remain useful; renderer redesign is deferre
 The protected `System.Attribute()` constructor is documented in the
 [manual introspection reference](introspection.md#attribute-constructor), with a route in
 `manual-members.json`: the pinned RavenDoc renderer omits protected constructors.
+
+### Shared host fault diagnostics (2026-10-07)
+
+FaultDiagnostic, Fault::diagnostic and FaultCode::standard_message are Rust host APIs,
+covered in [the manual fault reference](faults.md); they are not Raven class-library
+types and do not enter the RavenDoc type selection. The guest reference assembly and
+snapshot remain unchanged. The snapshot check passes for this slice.

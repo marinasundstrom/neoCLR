@@ -81,8 +81,13 @@ the default remains validation only. The unchanged ReadByte probe now reaches it
 failure path. Explicit `fault` now lowers to terminal UserFault status in scalar/value
 code, with first-fault propagation and no result publication. Immutable UTF-8 literals
 now pass through value-profile locals, calls and output slots, with a Raven producer
-validated in PE/NEOX. ReadByte reaches native service admission; the failure and byte-input
-service bindings remain next, before dynamic UTF-8 text/lifetime contracts. Multiple instantiations
+validated in PE/NEOX. ReadByte reaches native service admission; an explicit
+failure binding now captures shared code/message/trace diagnostics with explicit ABI v3
+and a standalone Raven consumer. The author directs consistent interpreter/native faults
+and accepts exit 1 for standalone unhandled faults; embedding hosts retain control.
+[Shared host diagnostics](experiments/aot-fault-details/README.md) use a code-defined runtime
+message catalog and a common 64-frame truncation contract. CLI presentation alignment and
+native byte-input binding remain next, before dynamic UTF-8 text/lifetime contracts. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

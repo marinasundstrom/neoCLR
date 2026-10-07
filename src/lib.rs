@@ -84,6 +84,8 @@ pub use program::{LoadedFunction, LoadedProgram};
 pub use value::Value;
 pub use vm::{Execution, Limits, run, run_with_library, run_with_native};
 
+mod fault_diagnostic;
+pub use fault_diagnostic::FaultDiagnostic;
 mod fault_code;
 pub use fault_code::FaultCode;
 

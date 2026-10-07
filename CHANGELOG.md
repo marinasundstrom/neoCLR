@@ -140,8 +140,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   slots and control-flow joins using private read-only image data. Validate a fresh Raven
   producer in PE/NEOX and CIL transport including empty/embedded-NUL text; defaults,
   fields, erasure, generic String arguments and dynamic text remain rejected. ReadByte
-  now passes String signature selection and stops at its native ConsoleReadByte service. No native
-  reference services, interface execution or public ABI/runtime APIs are added.
+  now passes String signature selection and stops at its native ConsoleReadByte service.
+  Add shared FaultCode runtime messages and a borrowed FaultDiagnostic host view;
+  legacy diagnostics remain compatible. Add opt-in AOT ABI v3 caller-owned fault records,
+  UTF-8 messages, managed traces with the interpreter's 64-frame bound/truncation, and
+  a linked C renderer. Bind exact supplied native failure services explicitly while
+  compiling ordinary System.Fail wrappers. Standalone unhandled faults exit 1; hosts
+  receive code/message/trace and control their own policy. Validate cross-backend
+  diagnostics and a standalone Raven failure app. No native
+  reference services, interface execution or stable native hosting ABI are added.
   General unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime

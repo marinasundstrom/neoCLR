@@ -332,3 +332,11 @@ than this literal-only representation. Static UTF-8 data avoids runtime allocati
 this bounded consumer; the cost is no dynamic text, identity/interning contract or general
 String operations. No performance comparison is claimed. Native service bindings are
 the next slice; reference counting versus GC for dynamically produced text remains open.
+
+## Failure-service binding and host diagnostics (2026-10-07)
+
+The next [fault diagnostic slice](../aot-fault-details/README.md) supplies an explicit
+`--bind-user-fault` binding for the verified runtime failure contracts. It compiles the
+ordinary System.Fail wrapper, preserves user messages and captures managed callers in
+ABI v3 fault records. The interpreter and native renderer share code/message rules and
+a 64-frame truncation limit. The byte-input service remains the next execution boundary.

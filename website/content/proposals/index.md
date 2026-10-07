@@ -243,10 +243,14 @@ Primitive pack/test/unpack preserves exact types and propagates incorrect-unpack
 primitive static generic helpers now specialize with source identities retained in build
 reports. Explicit `--compile-system` now compiles selected managed System seed helpers.
 Immutable UTF-8 literals now cross value-profile locals, calls and output slots. The
-actual ReadByte wrapper reaches native service admission; failure/input service bindings
-and dynamic text lifetimes remain future work. Explicit `fault` instructions now
+actual ReadByte wrapper reaches native service admission; its input service binding
+and dynamic text lifetimes remain future work. An explicit failure binding now preserves
+user messages and managed traces in caller-owned native records; a shared interpreter
+host view uses the same runtime message catalog and 64-frame truncation rule. A linked
+renderer and standalone exit-1 failure app are validated. Explicit `fault` instructions now
 return UserFault status through native calls without publishing a result; message/stack
-diagnostics and String-based System.Fail are not yet supported by this AOT profile.
+diagnostics are available through opt-in ABI v3 and String-based System.Fail now has an
+explicit native binding. Native input remains unimplemented.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

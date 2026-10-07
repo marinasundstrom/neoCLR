@@ -45,6 +45,31 @@ pub enum FaultCode {
     InternPoolLimitExceeded,
 }
 impl FaultCode {
+    /// Standard English message for host presentation. UserFault has no standard
+    /// message: its text is supplied by guest code. Wording is diagnostic, not an
+    /// identifier; compare codes instead. Shared by interpreter and AOT presenters.
+    pub const fn standard_message(self) -> Option<&'static str> {
+        Some(match self {
+            Self::UserFault => return None,
+            Self::RuntimeError => "Runtime error",
+            Self::InvalidProgram => "Invalid program",
+            Self::StackOverflow => "Call stack limit exceeded",
+            Self::EvaluationStackOverflow => "Evaluation stack limit exceeded",
+            Self::InstructionLimitExceeded => "Instruction limit exceeded",
+            Self::ExecutionCancelled => "Execution cancelled",
+            Self::NullReference => "Null reference",
+            Self::InvalidCast => "Invalid cast",
+            Self::NullPointer => "Null pointer",
+            Self::IndexOutOfRange => "Index out of range",
+            Self::ArithmeticOverflow => "Arithmetic overflow",
+            Self::DivideByZero => "Division by zero",
+            Self::HeapLimitExceeded => "Managed heap limit exceeded",
+            Self::ArrayLimitExceeded => "Array limit exceeded",
+            Self::NativeMemoryLimitExceeded => "Native memory limit exceeded",
+            Self::InternPoolLimitExceeded => "String intern pool limit exceeded",
+        })
+    }
+
     /// Stable, case-sensitive identifier for logs and machine-readable diagnostics.
     pub const fn as_str(self) -> &'static str {
         match self {

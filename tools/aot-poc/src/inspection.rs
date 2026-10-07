@@ -9,6 +9,7 @@ pub fn report(
     closed: bool,
     dependencies: &[neoclr::Module],
     context: Option<&super::linking::RuntimeContext>,
+    fault_details: bool,
 ) -> Value {
     let mut histogram = BTreeMap::<String, usize>::new();
     let functions: Vec<_> = input
@@ -56,7 +57,8 @@ pub fn report(
         ),
         Ok(prepared) => {
             let module = prepared.as_ref().map_or(input, |(module, _)| module);
-            let admission = match super::compiler::compile(module, root, false) {
+            let details = fault_details.then(|| super::fault_details::Options::from_report(prepared.as_ref().map(|(_, r)| r)));
+            let admission = match super::compiler::compile(module, root, false, details.as_ref()) {
                 Ok(_) => json!({"accepted": true}),
                 Err(e) => {
                     json!({"accepted": false, "phase": "compilation", "firstError": e.to_string()})
@@ -71,7 +73,7 @@ pub fn report(
     json!({"schema": "neoclr-aot-inspection-v1", "module": input.name, "root": root,
         "scope": "inventory includes all declarations; admission uses admissionMode",
         "admissionMode": if closed { "closed-world" } else { "whole-module" },
-        "selection": selection, "capabilities": {"console": false}, "admission": admission,
+        "selection": selection, "capabilities": {"console": false, "faultDetails": fault_details}, "admission": admission,
         "assemblies": input.assemblies, "types": input.types, "functions": functions, "opcodes": histogram,
         "notice": "Build diagnostics only. Not a deployable metadata sidecar, stable ABI or export manifest."})
 }

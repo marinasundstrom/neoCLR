@@ -1,5 +1,5 @@
 //! Inline value/member lowering. Records travel as field snapshots, not owning pointers.
-use super::{Error, checked_arithmetic, flow, return_if};
+use super::{Error, checked_arithmetic, flow, return_if_detailed};
 #[path = "value_profile.rs"]
 mod profile;
 use cranelift_codegen::ir::condcodes::IntCC;
@@ -73,7 +73,7 @@ fn args(values: &[ir::Value]) -> Vec<ir::BlockArg> {
     values.iter().copied().map(Into::into).collect()
 }
 
-pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Error> {
+pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
     let p = Profile::new(input)?;
     let root = p.root(root)?;
     let flows: Vec<_> = (0..input.functions.len())
@@ -111,6 +111,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
             }
         }
     }
+    let diagnostic_data = details.map(|options| crate::fault_details::Data::new(&mut module, input, options)).transpose()?;
     let mut ids = vec![];
     for (i, _) in input.functions.iter().enumerate() {
         let mut sig = module.make_signature();
@@ -119,6 +120,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                 .extend((0..p.lanes(t)).map(|_| AbiParam::new(lane(t))));
         }
         sig.params.push(AbiParam::new(types::I64)); // caller-owned result storage
+        if details.is_some() { sig.params.push(AbiParam::new(types::I64)); }
         sig.returns.push(AbiParam::new(types::I32)); // Fault status, same as scalar profile
         ids.push(module.declare_function(&format!("neoclr_value_{i}"), Linkage::Local, &sig)?);
     }
@@ -136,7 +138,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
             b.append_block_params_for_function_params(entry);
             b.switch_to_block(entry);
             let parameters = b.block_params(entry).to_vec();
-            let output = *parameters.last().unwrap();
+            let output = parameters[parameters.len() - 1 - usize::from(details.is_some())];
+            let fault_context = details.map(|_| *parameters.last().unwrap());
             let mut frame_bytes = 32usize;
             let mut arguments = vec![];
             let mut at = 0;
@@ -188,6 +191,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                 let mut stack = b.block_params(blocks[pc]).to_vec();
                 let top = || shape.last().unwrap();
                 let pop = |s: &mut Vec<ir::Value>| s.pop().expect("checked stack");
+                let mut site = diagnostic_data.as_ref().map(|d| d.site(&mut module, &mut b, fault_context.unwrap(), i, pc));
                 match op {
                     Op::Int(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
                     Op::String(_) => {
@@ -216,7 +220,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                         } else {
                             let wrong = b.ins().icmp_imm(IntCC::Equal, matches, 0);
                             let status = b.ins().iconst(types::I32, 3); // RuntimeError
-                            return_if(&mut b, wrong, status);
+                            return_if_detailed(&mut b, wrong, status, site.as_ref());
                             stack.push(payload);
                         }
                     }
@@ -338,11 +342,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                         };
                         let result = b.ins().stack_addr(types::I64, call_result, 0);
                         call_args.push(result);
+                        if let Some(context) = fault_context { call_args.push(context); }
                         let target = module.declare_func_in_func(ids[c], b.func);
                         let call = b.ins().call(target, &call_args);
                         let status = b.inst_results(call)[0];
                         let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                        return_if(&mut b, failed, status);
+                        return_if_detailed(&mut b, failed, status, site.as_ref());
                         if let Some((t, address)) = constructed {
                             stack.extend(read(&mut b, &p, &t, address));
                         } else if let Some(t) = &p.results[c] {
@@ -350,8 +355,15 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                         }
                     }
                     Op::Fault(_) => {
-                        // Terminal UserFault; the experimental ABI carries category only.
+                        if details.is_some_and(|d| d.user_faults.contains(&i)) {
+                            let pointer = b.ins().stack_load(types::I64, arguments[0], 0);
+                            site.as_mut().unwrap().message = Some(pointer);
+                            // The interpreter reports the managed call site, not an
+                            // artificial frame for an InternalCall implementation.
+                            site.as_mut().unwrap().capture_frame = false;
+                        }
                         let status = b.ins().iconst(types::I32, 4);
+                        if let Some(site) = &site { site.record(&mut b, status); }
                         b.ins().return_(&[status]);
                         continue;
                     }
@@ -423,7 +435,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                     _ => {
                         let r = pop(&mut stack);
                         let l = pop(&mut stack);
-                        stack.push(checked_arithmetic(&mut b, op, l, r));
+                        stack.push(checked_arithmetic(&mut b, op, l, r, site.as_ref()));
                     }
                 }
                 b.ins().jump(blocks[pc + 1], &args(&stack));
@@ -437,13 +449,14 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
     // are intentionally not a public ARM64 struct ABI.
     let mut context = module.make_context();
     context.func.signature.params = vec![AbiParam::new(types::I32), AbiParam::new(types::I64)];
+    if details.is_some() { context.func.signature.params.push(AbiParam::new(types::I64)); }
     context
         .func
         .signature
         .returns
         .push(AbiParam::new(types::I32));
     let export =
-        module.declare_function("neoclr_entry_v2", Linkage::Export, &context.func.signature)?;
+        module.declare_function(if details.is_some() { "neoclr_entry_v3" } else { "neoclr_entry_v2" }, Linkage::Export, &context.func.signature)?;
     let target = module.declare_func_in_func(ids[root], &mut context.func);
     let mut fb = FunctionBuilderContext::new();
     {
@@ -452,6 +465,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
         b.append_block_params_for_function_params(entry);
         b.switch_to_block(entry);
         let params = b.block_params(entry).to_vec();
+        if details.is_some() { crate::fault_details::reset(&mut b, params[2]); }
         let call_args = if p.args[root].is_empty() {
             &params[1..]
         } else {

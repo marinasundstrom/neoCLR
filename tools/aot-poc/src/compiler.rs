@@ -18,8 +18,8 @@ use std::collections::{HashMap, HashSet};
 
 type Error = Box<dyn std::error::Error>;
 
-pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool) -> Result<Vec<u8>, Error> {
-    if !input.types.is_empty()
+pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
+    if details.is_some() || !input.types.is_empty()
         || input.functions.iter().any(|f| {
             f.parameters
                 .iter()
@@ -35,7 +35,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool) -> Resu
                 })
         })
     {
-        return values::compile(input, root);
+        return values::compile(input, root, details);
     }
     if input.name == "System" || input.functions.len() > 128 {
         return Err(
@@ -295,7 +295,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool) -> Resu
                     | Op::RemainderUnsigned => {
                         let right = stack.pop().expect("validated stack");
                         let left = stack.pop().expect("validated stack");
-                        stack.push(checked_arithmetic(&mut builder, op, left, right));
+                        stack.push(checked_arithmetic(&mut builder, op, left, right, None));
                     }
                     Op::Call(target) if console_call(target) => {
                         let literal = stack.pop().expect("validated literal");
@@ -461,10 +461,15 @@ fn block_args(stack: &[ir::Value]) -> Vec<ir::BlockArg> {
 
 // Faults use status returns, never a guest Result or unwinding through C/Rust.
 fn return_if(builder: &mut FunctionBuilder<'_>, failed: ir::Value, status: ir::Value) {
+    return_if_detailed(builder, failed, status, None);
+}
+
+fn return_if_detailed(builder: &mut FunctionBuilder<'_>, failed: ir::Value, status: ir::Value, site: Option<&crate::fault_details::Site>) {
     let fault = builder.create_block();
     let next = builder.create_block();
     builder.ins().brif(failed, fault, &[], next, &[]);
     builder.switch_to_block(fault);
+    if let Some(site) = site { site.record(builder, status); }
     builder.ins().return_(&[status]);
     builder.switch_to_block(next);
 }
@@ -474,6 +479,7 @@ fn checked_arithmetic(
     op: &Op,
     left: ir::Value,
     right: ir::Value,
+    site: Option<&crate::fault_details::Site>,
 ) -> ir::Value {
     let overflow_status = builder.ins().iconst(types::I32, 2);
     if matches!(
@@ -482,14 +488,14 @@ fn checked_arithmetic(
     ) {
         let zero = builder.ins().icmp_imm(IntCC::Equal, right, 0);
         let zero_status = builder.ins().iconst(types::I32, 1);
-        return_if(builder, zero, zero_status);
+        return_if_detailed(builder, zero, zero_status, site);
         if matches!(op, Op::Divide | Op::Remainder) {
             let min = builder
                 .ins()
                 .icmp_imm(IntCC::Equal, left, i64::from(i32::MIN));
             let negative_one = builder.ins().icmp_imm(IntCC::Equal, right, -1);
             let overflow = builder.ins().band(min, negative_one);
-            return_if(builder, overflow, overflow_status);
+            return_if_detailed(builder, overflow, overflow_status, site);
         }
         return match op {
             Op::Divide => builder.ins().sdiv(left, right),
@@ -527,7 +533,7 @@ fn checked_arithmetic(
         builder.ins().sextend(types::I64, result)
     };
     let overflow = builder.ins().icmp(IntCC::NotEqual, wide, restored);
-    return_if(builder, overflow, overflow_status);
+    return_if_detailed(builder, overflow, overflow_status, site);
     result
 }
 

@@ -1,4 +1,6 @@
+mod bindings;
 mod compiler;
+mod fault_details;
 mod inspection;
 mod linking;
 mod selection;
@@ -25,6 +27,19 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     }
     let compile_system = compile_system_count == 1;
     args.retain(|a| a != "--compile-system");
+    let bind_user_fault_count = args.iter().filter(|a| *a == "--bind-user-fault").count();
+    if bind_user_fault_count > 1 {
+        return Err("duplicate --bind-user-fault option".into());
+    }
+    let bind_user_fault = bind_user_fault_count == 1;
+    args.retain(|a| a != "--bind-user-fault");
+    if bind_user_fault && !compile_system {
+        return Err("--bind-user-fault requires --compile-system".into());
+    }
+    let fault_details_count = args.iter().filter(|a| *a == "--fault-details").count();
+    if fault_details_count > 1 { return Err("duplicate --fault-details option".into()); }
+    let fault_details = fault_details_count == 1 || bind_user_fault;
+    args.retain(|a| a != "--fault-details");
     let dependency_args = args
         .iter()
         .position(|a| a == "--module" || a == "--system" || a == "--object-root")
@@ -60,7 +75,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
     {
         return Err(
-            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection"
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --fault-details exports ABI v3 with caller-owned diagnostics"
                 .into(),
         );
     }
@@ -123,6 +138,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 system,
                 object_root,
                 compile_system,
+                bind_user_fault,
             })
         })
         .transpose()?;
@@ -138,7 +154,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 root,
                 inspect_closed,
                 &dependencies,
-                context.as_ref()
+                context.as_ref(),
+                fault_details
             ))?
         );
         return Ok(());
@@ -153,7 +170,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         None
     };
     let compile_input = selection.as_ref().map_or(&input, |(module, _)| module);
-    let object = compiler::compile(compile_input, root, !closed && args.len() == 4)?;
+    let details = fault_details.then(|| fault_details::Options::from_report(selection.as_ref().map(|(_, r)| r)));
+    let object = compiler::compile(compile_input, root, !closed && args.len() == 4, details.as_ref())?;
     // Do not clobber an existing artifact, including on failed compilation.
     let mut output = fs::OpenOptions::new()
         .write(true)
@@ -164,9 +182,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         println!("{}", serde_json::to_string_pretty(&report)?);
         return Ok(());
     }
-    println!(
-        "Emitted aarch64-apple-darwin object; C export: int32_t neoclr_entry_v2(int32_t, int32_t *result)"
-    );
+    println!("Emitted aarch64-apple-darwin object; C export: {}", if fault_details { "neoclr_entry_v3 with caller-owned fault details" } else { "neoclr_entry_v2" });
     Ok(())
 }
 

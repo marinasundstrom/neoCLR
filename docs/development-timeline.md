@@ -11709,3 +11709,25 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
 - **Evidence/open work:** [Sources, reports and specialization limits](experiments/aot-values/README.md#generic-result-and-pattern-bindings-2026-10-07).
   Raven native deconstruction, actual library Result dependencies, multiple closed
   instantiations and native input/lifetimes remain open.
+
+## 2026-10-07: Consistent interpreter and native faults
+
+- **Author:** Clarified that faults should render a message and stack trace like .NET
+  exceptions; distinguished user faults from runtime faults by code, with standardized
+  runtime messages. Suggested a host-visible fault object and printing utility, then
+  emphasized the same experience under interpretation and native compilation.
+- **Assistant:** Replaced the in-progress status-only failure binding with a shared host
+  presentation contract and caller-owned native diagnostic capture. Proposed exit code 1
+  for standalone unhandled faults, preserving ordinary program exit codes and allowing
+  embedding hosts to decide their own policy.
+- **Author:** Replied “Ok. Sounds right” to that exit-code convention and directed further
+  work after the current slice.
+- **Actions/evidence:** Added a shared code-message catalog and borrowed interpreter
+  diagnostic view, native message/frame capture, a C printing utility, and explicit
+  failure-service bindings. Original managed wrappers remain compiled. Focused parity
+  tests cover code/message/frame order, native-service frame omission, first-fault rules
+  and a common 64-frame truncation limit. See [implementation and evidence](experiments/aot-fault-details/README.md).
+- **Open:** Legacy raw diagnostic fields/display remain compatible; CLI presentation
+  migration follows separately. Native trace source locations and richer identities,
+  input services and a stable native hosting ABI remain future work. No catch/unwinding
+  or guest exception hierarchy was requested or introduced.

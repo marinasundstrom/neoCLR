@@ -1,0 +1,271 @@
+{
+  "profile": "aot-fault-details-v1",
+  "baseRevision": "2a7f6bb3e355de2ea9b4225fd83189e4f116b128",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "inputs": {
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "645a08979828565cd07d21787917df78963f323c7c1d636cd287139324826672",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fail.rvn": "91badab64cb2697e1ed35b5a01e264b36e2d7d6aa2706dff13af7e36ff8acc5a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/host.c": "4d42a90903ef06179b5fcab033501842bd5aafcbfe758363a35b00c12bd358cd",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "645221509db70c5038e0eb72c1761916ef30d242f03f63eab10937364953f0e6",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "86320e78fcb471c164c55d7850cd75e3eb12beaab3e6115bdf0aa79720b58eb8"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/Failure.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fail.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/Failure.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Fault: The operation failed: v\u00e4rlden \ud83c\udf0d [code=UserFault] at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465:1\n  at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465(String) owner=Named(\"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265\") [NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17#1.0.0.0:1485] IL instruction 1\n  at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643(String) [NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17#1.0.0.0:63] IL instruction 1\n  at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_53746F70(String) [NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46#1.0.0.0:0] IL instruction 1\n  at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_466F7277617264(String) [NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46#1.0.0.0:1] IL instruction 1\n  at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_4D61696E() [NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46#1.0.0.0:2] IL instruction 1\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/Failure.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "85e087fe14ced815ca5964b28727c723008d2ccb410319ca5061036f079a14fe",
+        "bytes": 955805
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/Failure.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/failure.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "c1fb76f6d71998da4bafe5154826aa847f2c153f86b702c445aa3225e75406de",
+        "bytes": 907833
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/failure.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/failure"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/failure.o"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-fault-details-final/failure"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-fault-details-final/failure:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "selection": {
+    "loadSet": {
+      "limits": "one closed instantiation per local value definition; primitive static generic methods; one to eight explicit dependencies; no dynamic loading",
+      "modules": [
+        {
+          "name": "NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46",
+          "revision": "1.0.0.0"
+        },
+        {
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        {
+          "name": "System",
+          "revision": null
+        }
+      ],
+      "runtimeContext": {
+        "bindUserFault": true,
+        "compileSystem": true,
+        "explicit": true,
+        "objectRoot": {
+          "index": 8,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "revision": null,
+        "scope": "explicit managed System body selection; native services still require bindings",
+        "system": "System"
+      },
+      "validation": "all original bodies verified with runtime binder before private canonical projection"
+    },
+    "functions": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_53746F70",
+        "sourceIndex": 0
+      },
+      {
+        "compiledIndex": 1,
+        "definition": {
+          "index": 1,
+          "module": "NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_466F7277617264",
+        "sourceIndex": 1
+      },
+      {
+        "compiledIndex": 2,
+        "definition": {
+          "index": 2,
+          "module": "NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_4D61696E",
+        "sourceIndex": 2
+      },
+      {
+        "compiledIndex": 3,
+        "definition": {
+          "index": 63,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643",
+        "sourceIndex": 66
+      },
+      {
+        "compiledIndex": 4,
+        "definition": {
+          "index": 64,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "neoCLR.Runtime.Fail",
+        "sourceIndex": 67
+      },
+      {
+        "compiledIndex": 5,
+        "definition": {
+          "index": 1485,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465",
+        "sourceIndex": 1488
+      }
+    ],
+    "nativeBindings": [
+      {
+        "compiledIndex": 4,
+        "definition": {
+          "index": 64,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+        "implementation": "terminal-user-fault-v1",
+        "name": "neoCLR.Runtime.Fail",
+        "status": 4
+      }
+    ]
+  },
+  "native": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": "UserFault: The operation failed: v\u00e4rlden \ud83c\udf0d\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_53746F70 [instruction 1]\n   at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_466F7277617264 [instruction 1]\n   at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_4D61696E [instruction 1]\n",
+    "framesMatchInterpreter": true,
+    "messagePreserved": true,
+    "executableOnlyDirectory": true,
+    "emptyEnvironment": true,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "artifacts": {
+    "Failure.dll": "c853b6b42d2ab0fc1ccb3af926b04974a40719b088fa98fbcea17ad485d3296a",
+    "failure.o": "3508d7e380c632c688865e72abe6695935be03dee0f9eed8cc2313b0accc941d",
+    "failure": "12639b2fdb53be7197c70010e89fa75f6300e33c1409aae707b4ca7eb1c26c34"
+  }
+}

@@ -1,0 +1,14 @@
+import System.*
+
+func Stop(message: string) {
+    System.Fail(message)
+}
+
+func Forward(message: string) {
+    Stop(message)
+}
+
+func Main() -> int {
+    Forward("The operation failed: världen 🌍")
+    return 42
+}

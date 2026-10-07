@@ -134,3 +134,29 @@ above is resolved with Raven's explicit RuntimeFailureContract. The selected nat
 owner now works in let-else, including separate compilation. Ordinary .NET methods
 remain unchanged; missing or incompatible owners reject before output. This changes
 compiler configuration, not the public Fail signature or runtime fault behavior.
+
+## Development: shared host presentation (2026-10-07)
+
+Rust `FaultCode::standard_message(self) -> Option<&'static str>` returns the standard
+English runtime message for that code. It returns None for UserFault, whose message
+is supplied by the guest. Wording is diagnostic; use codes for machine decisions.
+
+`Fault::diagnostic(&self) -> FaultDiagnostic<'_>` returns a borrowed, allocation-free
+host view with public fields `code: FaultCode`, `message: &str`, and
+`stack_trace: Option<&StackTrace>`. The message follows the code rule above. An absent
+trace remains absent; frames are not fabricated for loader/host failures. Display prints
+code/message, then innermost-first method names and neoIL instruction indices, marking
+truncation. It does not terminate the host, capture argument/local values or run cleanup.
+
+```rust
+let diagnostic = fault.diagnostic();
+eprint!("{diagnostic}");
+```
+
+Legacy Fault fields and Display remain compatible, including site-specific runtime
+messages. The common view is the backend-neutral presentation contract. Native AOT's
+experimental caller-owned equivalent and C renderer are documented in the
+[fault capture experiment](../docs/experiments/aot-fault-details/README.md). Its text is
+image-owned; Rust's view borrows the Fault/trace. Neither lifetime implies guest-managed
+ownership. Standalone adapters exit 1 on an unhandled fault; embedding hosts choose their
+own recovery/exit policy. No stable native ABI or new guest exception API is introduced.
