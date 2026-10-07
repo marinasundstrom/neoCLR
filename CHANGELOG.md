@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Refresh RavenDoc to Raven main `a00fa5ee6` so shared API navigation fills the
+  full mobile viewport when opened as a drawer. This follows the Raven 0.1.14
+  release as a site-only fix; desktop navigation keeps its reserved height.
+  All 18 website contract tests and the full 1,804-page build pass. Browser
+  validation on ComparableTo<T> confirms full-height drawers at 844px and 650px.
+
 - Opt into RavenDoc's shared API navigation to avoid repeating the full tree on
   every reference page. Normal static pages and no-JavaScript namespace links
   remain available; the shared generator keeps inline navigation as its default.

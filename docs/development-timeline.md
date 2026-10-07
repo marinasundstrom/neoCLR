@@ -11179,3 +11179,12 @@ specified that it must be opt-in for large sites. The assistant implemented
 `sharedApiNavigation`, defaulting to false, and enabled it in both Raven and
 neoCLR site configurations. Normal page navigation and namespace fallback links
 remain static. This is a site-generator capability rather than a neoCLR overlay.
+
+
+### Follow-up: full-height mobile navigation
+
+The author reported that the shared API drawer stopped above the bottom of a
+mobile viewport and directed that it be fixed after the Raven release through
+an incremental site publish. The shared RavenDoc fix excludes modal drawers
+from the desktop height reservation. neoCLR adopts the same upstream generator;
+no target-specific stylesheet workaround or neoCLR deployment is introduced.
