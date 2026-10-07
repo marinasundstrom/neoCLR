@@ -62,6 +62,13 @@ public sealed partial class AssemblyBuilder
 
     internal void ValidateNativeObjectSlots()
     {
+        if (NativeObjectRoot is null && ExternalObjectRoot is { } external)
+        {
+            foreach (var name in new[] { "ToString", "Equals", "GetHashCode" })
+                if (!authoredCallableReferences.Any(m => Equals(m.DeclaringReference, external) && m.Name == name && m.Target.NativeImportObjectSlot))
+                    throw new InvalidDataException("native boxing requires a complete external Object slot contract: " + name);
+            return;
+        }
         var root = NativeObjectRoot ?? throw new InvalidDataException("no authored native Object root");
         foreach (var name in new[] { "ToString", "Equals", "GetHashCode" })
             if (!root.Methods.Any(m => m.IsNativeObjectSlot && m.Name == name && MethodDefinition.IsNativeObjectSlot(name, m.Signature, root)))

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Validate external-root boxing against the complete authored Object slot contract;
+  reject incomplete contracts before encoding. Separate System.Networking now compiles
+  and runs the unchanged cancellation consumer against System.Runtime (exit 0).
+  Correct optional-library auditing to enable explicit bootstrap intrinsics: the earlier
+  CheckedStorage failure was missing build configuration, not a required new mapping.
+  Add reproducible compiler/verify/run acceptance and C# incomplete-contract coverage.
+
 - Add explicit selected-root Object slot references with exact signature and virtual
   dispatch validation. Source-free Raven dispatch through an object receiver reaches
   derived ToString/GetHashCode/Equals overrides (42); the API fixture also executes

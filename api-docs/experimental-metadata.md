@@ -7436,10 +7436,11 @@ No dependency is loaded and this property does not select runtime host ownership
 `Box` and value-type `Isinst` stack results use `ObjectType`. Native emission with an
 authored root validates all three concrete root slots instead of demanding a separate
 legacy System binding. An incomplete root or a body expecting the unrelated bootstrap
-Object fails with `InvalidDataException` before bytes are returned. Without an authored
-root, the existing explicit System binding requirement is unchanged. External root signature selection supports the bounded override contracts below.
-External boxing still requires the explicit legacy System binding; selecting a root
-does not claim a complete external boxing/service contract.
+Object fails with `InvalidDataException` before bytes are returned. With an external root, author all three exact slot references through
+`CreateObjectSlotReference` before native writing: ToString, Equals and GetHashCode.
+Missing slots reject with `InvalidDataException`; a selected name alone is insufficient.
+The host supplies the contract and the runtime checks the actual linked definitions.
+Without either selected root, the existing explicit System binding requirement is unchanged.
 
 The API-produced fixture's `BoxedDisplay()` now emits boxing and virtual dispatch and
 executes with result `"42"` under explicit runtime root selection. This tests executable

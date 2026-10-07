@@ -57,7 +57,7 @@ public sealed partial class AssemblyBuilder
             }
         if (methods.Any(m => m.Instructions.Any(i => i.Op == "object.box" || i.Op == "reference.test" && !MethodBuilder.IsReferenceSignature(i.Type!))))
         {
-            if (NativeObjectRoot is not null) ValidateNativeObjectSlots();
+            if (NativeObjectRoot is not null || ExternalObjectRoot is not null) ValidateNativeObjectSlots();
             else (NativeBindingFor(CoreLibrary) ?? throw new InvalidDataException("native boxing/value type tests require an explicit System core binding")).ValidateBoxingCore();
         }
 

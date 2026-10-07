@@ -34,9 +34,12 @@ method calls. [Value evidence](experiments/extended-cli-metadata/imported-value-
 Imported Object slot references now execute ToString/GetHashCode/Equals overrides
 through an object receiver (42), with 165 metadata groups passing.
 [Slot evidence](experiments/extended-cli-metadata/imported-object-slots-2026-10-07.md).
-Next: resolve the source/retained CheckedStorage dependency mapping exposed by separate
-Networking compilation, then the supported array-reflection boundary for Data.
-Resume executable Data/Networking consumers, then Web and project/LSP catalogs.
+Separate **System.Networking now compiles and executes** the unchanged cancellation
+consumer against System.Runtime (exact stdout, exit 0). The CheckedStorage failure was
+an omitted explicit `--bootstrap-intrinsics` audit option; the subsequent boxing gap
+now validates the complete selected external Object contract.
+[Networking gate](experiments/extended-cli-metadata/separate-networking-2026-10-07.md).
+Next: the supported array-reflection boundary for Data, then Web and project/LSP catalogs.
 The author's platform-package direction is recorded separately from assembly ownership:
 [candidate distribution boundaries](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md).
 No new package resolver or native plugin mechanism is a prerequisite for these gates. Keep the existing POC sample/editor gates as ownership moves.

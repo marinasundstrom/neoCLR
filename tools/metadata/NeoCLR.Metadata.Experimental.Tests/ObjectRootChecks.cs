@@ -12,6 +12,7 @@ internal static class ObjectRootChecks
     internal static void Run()
     {
         ExternalRoot();
+        ExternalBoxing();
         foreach (bool manual in new[] { false, true })
         {
             var graph = Create();
@@ -82,10 +83,34 @@ internal static class ObjectRootChecks
         equals.GetILGenerator().Emit(OpCode.Ldc_Bool, true); equals.GetILGenerator().Return();
         var main = graph.AddFunction("Main"); graph.EntryPoint = main;
         var il = main.GetILGenerator(); var failed = il.DefineLabel();
+        _ = graph.CreateObjectSlotReference("ToString", new(PrimitiveType.String, []));
+        _ = graph.CreateObjectSlotReference("GetHashCode", new(PrimitiveType.Int32, []));
+        il.LoadConstant(42); il.Box(PrimitiveType.Int32); il.IsInstance(PrimitiveType.Int32);
+        il.IsNull(); il.Emit(OpCode.Brtrue, failed);
         il.NewObject(ctor); il.LoadDefault(root); il.Emit(OpCode.Callvirt, graph.CreateObjectSlotReference("Equals", new(PrimitiveType.Boolean, [root])));
         il.Emit(OpCode.Brfalse, failed); il.LoadConstant(42); il.Return();
         il.MarkLabel(failed); il.LoadConstant(1); il.Return();
         File.WriteAllBytes(output, RuntimeAssemblyContainer.WriteBinary(graph));
+    }
+
+    private static void ExternalBoxing()
+    {
+        var graph = Create();
+        var root = graph.CreateTypeReference(new("ExternalRoot", new Version(1, 0, 0, 0)),
+            graph.CoreLibrary, new string('A', 64), "System", "Object", 0);
+        graph.SetNativeObjectRoot(root);
+        var box = graph.AddFunction("Box", new MethodSignature(root, []));
+        box.GetILGenerator().LoadConstant(42);
+        box.GetILGenerator().Box(PrimitiveType.Int32);
+        box.GetILGenerator().Return();
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+        _ = graph.CreateObjectSlotReference("ToString", new(PrimitiveType.String, []));
+        _ = graph.CreateObjectSlotReference("Equals", new(PrimitiveType.Boolean, [root]));
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+        _ = graph.CreateObjectSlotReference("GetHashCode", new(PrimitiveType.Int32, []));
+        var loaded = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph));
+        if (loaded.MainModule.Functions.Single().Name != "Box")
+            throw new Exception("external-root boxing lost on roundtrip");
     }
 
     private static void ExternalRoot()

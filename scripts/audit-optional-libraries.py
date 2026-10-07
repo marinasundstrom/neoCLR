@@ -14,6 +14,7 @@ def main():
     for name in ('compiler', 'core', 'runtime-library-directory', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--compiler-revision', required=True)
+    parser.add_argument('--runtime', type=Path, help='Also compile and execute the unchanged networking consumer')
     args = parser.parse_args()
     directory = args.runtime_library_directory.resolve()
     compiler = args.compiler.resolve()
@@ -42,7 +43,7 @@ def main():
         command = ['dotnet', compiler, 'neoclr', '--core-reference', core,
                    '--runtime-seed', seed, '--bootstrap-ownership', ownership,
                    '--reference', library, '--object-library', 'System.Runtime',
-                   '--library', '-o', artifact] + sources
+                   '--bootstrap-intrinsics', '--library', '-o', artifact] + sources
         result = subprocess.run(list(map(str, command)), cwd=ROOT, capture_output=True, text=True, timeout=180)
         entry = dict(name=group, command=result.args, exitCode=result.returncode,
                      stdout=result.stdout, stderr=result.stderr, sourceCount=len(sources),
@@ -55,6 +56,40 @@ def main():
         if result.returncode != 0 and artifact.exists():
             raise RuntimeError('Failed compilation published an output artifact')
         print(group, result.returncode, flush=True)
+    if args.runtime:
+        if report['cases'][-1]['exitCode'] != 0:
+            raise RuntimeError('Networking must compile before execution acceptance')
+        runtime = args.runtime.resolve()
+        source = ROOT / 'docs/experiments/network-cancellation/Main.rvn'
+        consumer = output / 'NetworkConsumer.dll'
+        common = ['--system', seed, '--module', library, '--module', artifact,
+                  '--object-root', library]
+        commands = [
+            ['dotnet', compiler, 'neoclr', '--core-reference', core,
+             '--runtime-seed', seed, '--bootstrap-ownership', ownership,
+             '--reference', library, '--reference', artifact, '--object-library',
+             'System.Runtime', '-o', consumer, source],
+            [runtime, 'verify', consumer] + common,
+            [runtime, 'run', consumer] + common,
+        ]
+        report['scope'] = 'Optional-library compilation frontier and source-free networking execution.'
+        report['execution'] = []
+        for command in commands:
+            result = subprocess.run(list(map(str, command)), cwd=ROOT,
+                                    capture_output=True, text=True, timeout=180)
+            report['execution'].append(dict(command=result.args, exitCode=result.returncode,
+                                            stdout=result.stdout, stderr=result.stderr))
+            (output / 'audit.json').write_text(json.dumps(report, indent=2) + '\n')
+            if result.returncode != 0:
+                raise RuntimeError('Networking acceptance failed: ' + str(command[1]))
+        expected = 'Network token cancellation checks passed\n'
+        if result.stdout != expected:
+            raise RuntimeError('Networking stdout mismatch: ' + repr(result.stdout))
+        report['expectedStdout'] = expected
+        report['hashes'].update({str(p): hashlib.sha256(p.read_bytes()).hexdigest()
+                                 for p in (runtime, source, consumer)})
+        (output / 'audit.json').write_text(json.dumps(report, indent=2) + '\n')
+        print('Networking execution passed', flush=True)
 
 
 if __name__ == '__main__':

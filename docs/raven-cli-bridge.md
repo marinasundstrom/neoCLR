@@ -6541,3 +6541,14 @@ The metadata API requires Callvirt and retains external identity while encoding 
 Object owner/name. Ordinary Raven calls through an object receiver execute all three
 derived overrides (42), without library sources or importer access during emission.
 [Validation and remaining Networking gap](experiments/extended-cli-metadata/imported-object-slots-2026-10-07.md).
+
+### Separate Networking and imported-root boxing — 2026-10-07
+
+Raven now supplies all three selected external Object slot contracts from symbols,
+regardless of called methods. Metadata validates completeness for boxing without
+requiring a competing seed Object. Runtime linking still validates the dependency.
+The optional class-library compiler invocation explicitly enables bootstrap intrinsics;
+ordinary consumer invocation does not. Unchanged network cancellation executes against
+independently built Runtime and Networking. Native import remains direct; the primitive
+bootstrap and finalized retained runtime services remain explicit dependencies.
+[Commands, evidence and remaining scope](experiments/extended-cli-metadata/separate-networking-2026-10-07.md).
