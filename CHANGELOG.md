@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Record the proposed distinction between managed assembly ownership, optional library
+  packages, platform runtime payloads and developer tooling. Keep package IDs/layouts
+  provisional and bootstrap inputs explicit; no package resolver or release split is
+  implemented. Detail imported-root authoring as the next end-to-end dependency.
+
 - Integrate Raven eab5b3e7d: native flags-enum marker lookup remains on the explicit
   primitive bootstrap when Object belongs to an imported Runtime. Record separate
   Data/Networking compilation: Data now reaches internal array-reflection dependencies;

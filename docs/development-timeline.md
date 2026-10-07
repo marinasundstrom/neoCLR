@@ -11289,3 +11289,21 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
   wider API execution coverage and removal of permitted bootstrap inputs. This outcome
   does not establish a new release or imply every API has been executed.
 - [Acceptance evidence](experiments/extended-cli-metadata/source-owned-orders-2026-10-07.md).
+
+## 2026-10-07: Platform distribution packages versus assembly ownership
+
+- **Author:** “Platform packages perhaps need to be their own package and potentially
+  more pacakages”.
+- **Assistant proposal:** Separate managed foundation/optional libraries, OS/architecture
+  runtime payloads and developer tools; packages may contain multiple assemblies and
+  native assets. Keep further splits evidence-driven.
+- **Author follow-up:** Asked to continue. This is not recorded as approval of specific
+  package IDs, formats, versioning or a native plugin architecture.
+- **Action:** Recorded the [candidate package boundaries](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md),
+  their compatibility/qualification gates and .NET asset-selection comparison. Inspected
+  imported Object override validation across metadata authoring, method references and
+  reader reconstruction; documented the coordinated change needed rather than weakening
+  one check.
+- **Outcome/open:** Documentation only in this slice. Runtime/orders acceptance remains
+  the prior passing evidence; optional-library execution, package implementation and
+  CLI/LSP catalog propagation remain open.

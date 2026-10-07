@@ -27,7 +27,10 @@ select an imported native Object identity. The primitive flags-marker import blo
 is fixed. [Commands and diagnostics](experiments/extended-cli-metadata/optional-library-frontier-2026-10-07.md).
 Next: support explicit imported Object contracts in metadata authoring (shared by
 optional-library overrides), then a supported array-reflection boundary for Data.
-Resume executable Data/Networking consumers, then Web and project/LSP catalogs. Keep the existing POC sample/editor gates as ownership moves.
+Resume executable Data/Networking consumers, then Web and project/LSP catalogs.
+The author's platform-package direction is recorded separately from assembly ownership:
+[candidate distribution boundaries](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md).
+No new package resolver or native plugin mechanism is a prerequisite for these gates. Keep the existing POC sample/editor gates as ownership moves.
 [Commands and evidence](experiments/extended-cli-metadata/source-owned-orders-2026-10-07.md).
 
 ### Earlier imported source-root frontier

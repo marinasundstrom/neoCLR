@@ -113,3 +113,10 @@ The retained-service/root ABI and aggregate consumer gates were resolved in the
 174 source inputs, with Data/Networking/Web and network adapters excluded. The
 remaining bootstrap dependencies are explicit; this is not a minimal-core claim.
 Next is gate 3 above, separately compiling Data and Networking against this owner.
+
+## Distribution is a separate boundary
+
+The author's later platform-package suggestion is recorded in the
+[candidate distribution layout](package-boundaries-2026-10-07.md). Packages may group
+assemblies, native platform assets and tooling. Assembly ownership remains stable
+across that grouping; the executable assembly gates above still precede packaging.
