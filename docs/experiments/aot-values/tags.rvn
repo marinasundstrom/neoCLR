@@ -1,0 +1,27 @@
+struct TaggedValue {
+    var Tag: byte = (byte)1
+    var Value: int = 42
+
+    func Read() -> int {
+        if Tag == 1 {
+            return Value
+        }
+        return -1
+    }
+}
+
+func Main() -> int {
+    var item = TaggedValue()
+    if item.Read() != 42 {
+        return 1
+    }
+    item.Tag = (byte)255
+    if item.Read() != -1 || item.Tag != 255 {
+        return 2
+    }
+    let cleared = default(TaggedValue)
+    if cleared.Tag != 0 || cleared.Value != 0 {
+        return 3
+    }
+    return 0
+}

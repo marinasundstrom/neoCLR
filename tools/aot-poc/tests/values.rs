@@ -773,3 +773,154 @@ fn invalid_output_initialization_and_borrow_contracts_never_emit() {
         assert!(!temp.0.join("value.o").exists());
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn raven_byte_tag_members_branch_without_runtime_support() {
+    let bytes = include_bytes!("../../../docs/experiments/aot-values/Tags.pe");
+    let m = module(bytes);
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(0)
+    );
+    native(bytes, 0, 0);
+    native(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 0);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn byte_storage_truncates_at_every_native_boundary() {
+    let source = r#"
+.module Bytes
+.type Tag
+.field Code Byte
+.end
+.function Echo(Byte value) -> Byte
+ldarg value
+ret
+.end
+.function Update(Byte slot, Int32 input) -> Byte
+ldarg input
+starg slot
+ldarg slot
+ret
+.end
+.function Result(Int32 value) -> Byte
+ldarg value
+ret
+.end
+.function Assign(out Byte& value, Int32 input) -> Void
+ldarg value
+ldarg input
+conv.u1
+stobj Byte
+ldvoid
+ret
+.end
+.function Main(Int32 input) -> Int32
+.local Byte value
+.local Tag tag
+; Local storage.
+ldarg input
+stloc value
+ldloc value
+; Indirect storage, with no explicit conversion.
+ldloca value
+ldarg input
+stobj Byte
+ldloc value
+add
+; Raw record construction.
+ldarg input
+newobj Tag
+stloc tag
+ldloc tag
+ldfld Tag::Code
+add
+; Value field store.
+ldloc tag
+ldarg input
+stfld Tag::Code
+ldfld Tag::Code
+add
+; Borrowed field store.
+ldloca tag
+ldarg input
+stfld Tag::Code
+pop
+ldloc tag
+ldfld Tag::Code
+add
+; Parameter and return storage.
+ldarg input
+call Echo(Byte)
+add
+ldarg input
+call Result(Int32)
+add
+ldc.i4 0
+ldarg input
+call Update(Byte,Int32)
+add
+; Output storage and conv.u1 preserve Int32 evaluation-stack semantics.
+ldloca value
+ldarg input
+call Assign(Byte&,Int32)
+pop
+ldloc value
+conv.i4
+add
+; Conversion result remains Int32 until stored.
+ldarg input
+conv.u1
+ldc.i4 256
+add
+add
+ret
+.end
+"#;
+    let m = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::new(&m).unwrap();
+    let entry = program
+        .resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap())
+        .unwrap();
+    for input in [-1, 0, 128, 255, 256, 511, i32::MIN, i32::MAX] {
+        let expected = (input as u8 as i32) * 10 + 256;
+        assert_eq!(
+            entry
+                .invoke(vec![neoclr::Value::Int32(input)], neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(expected)
+        );
+        native_input(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            input,
+            0,
+            expected,
+            "Main",
+        );
+    }
+}
+
+#[test]
+fn byte_profile_rejects_invalid_conversions_and_distinct_borrows() {
+    for body in [
+        "ldc.bool true\nconv.u1\nret",
+        "ldc.i4 256\nconv.ovf.u1\nret",
+        ".local Byte value\nldloca value\ninitobj Int32\nldc.i4 0\nret",
+    ] {
+        let source = format!(
+            ".module Invalid\n.entry Main\n.type Tag\n.field Code Byte\n.end\n.function Main() -> Int32\n{body}\n.end"
+        );
+        let m = neoclr::assemble(&source).unwrap();
+        let temp = Temp::new();
+        let result = compile(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp,
+        );
+        assert!(!result.status.success());
+        assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
+        assert!(!temp.0.join("value.o").exists());
+    }
+}

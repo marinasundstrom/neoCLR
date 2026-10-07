@@ -6,6 +6,7 @@ use std::collections::{HashMap, VecDeque};
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(super) enum Ty {
     Int,
+    Byte,
     Bool,
     Unit,
     Record(usize),
@@ -48,10 +49,14 @@ impl<'a> Profile<'a> {
                 || t.minimum_size.is_some()
                 || t.fields.len() > 8
                 || t.fields.iter().any(|f| {
-                    f.deferred || !matches!(f.ty, Type::Int32 | Type::Boolean | Type::Named(_))
+                    f.deferred
+                        || !matches!(
+                            f.ty,
+                            Type::Int32 | Type::Byte | Type::Boolean | Type::Named(_)
+                        )
                 })
             {
-                return Err(format!("{}: value profile requires nongeneric records with at most eight Int32/Boolean/local-record fields", t.name).into());
+                return Err(format!("{}: value profile requires nongeneric records with at most eight Int32/Byte/Boolean/local-record fields", t.name).into());
             }
         }
         let mut p = Self {
@@ -207,6 +212,7 @@ impl<'a> Profile<'a> {
     pub fn ty(&self, t: &Type) -> Result<Ty, Error> {
         Ok(match t {
             Type::Int32 => Ty::Int,
+            Type::Byte => Ty::Byte,
             Type::Boolean => Ty::Bool,
             Type::Void => Ty::Unit,
             Type::Named(name) => Ty::Record(
@@ -229,6 +235,20 @@ impl<'a> Profile<'a> {
             return Err("Void storage is outside the value profile".into());
         }
         Ok(t)
+    }
+    pub fn stack_type(t: &Ty) -> Ty {
+        if *t == Ty::Byte { Ty::Int } else { t.clone() }
+    }
+    pub fn byte_lanes(&self, t: &Ty) -> Vec<bool> {
+        match t {
+            Ty::Byte => vec![true],
+            Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
+                .fields
+                .iter()
+                .flat_map(|f| self.byte_lanes(&self.ty(&f.ty).expect("admitted field")))
+                .collect(),
+            _ => vec![false; self.lanes(t)],
+        }
     }
     pub fn lanes(&self, t: &Ty) -> usize {
         match t {
@@ -340,6 +360,7 @@ impl<'a> Profile<'a> {
                     n.checked_sub(offset)
                         .filter(|n| f.out_parameters.contains(n)),
                 ),
+                Op::ConvertInt32 | Op::ConvertUInt8 => (),
                 Op::Dup => state.stack.push(*state.stack.last().unwrap()),
                 Op::StoreObject(_) => {
                     state.stack.pop();
@@ -478,6 +499,8 @@ impl<'a> Profile<'a> {
                 }
                 Op::Load(n) | Op::Store(n) | Op::LocalAddress(n) if *n < self.locals[i].len() => (),
                 Op::Int(_)
+                | Op::ConvertInt32
+                | Op::ConvertUInt8
                 | Op::Bool(_)
                 | Op::Void
                 | Op::Dup
@@ -524,17 +547,21 @@ impl<'a> Profile<'a> {
             let op = &f.body[pc];
             let pop = |s: &mut Vec<Ty>| s.pop().ok_or_else(|| fail(pc, "stack underflow"));
             let take = |s: &mut Vec<Ty>, expected: &Ty| -> Result<(), Error> {
-                if &pop(s)? != expected {
+                if pop(s)? != Self::stack_type(expected) {
                     return Err(fail(pc, "value operand type mismatch"));
                 }
                 Ok(())
             };
             match op {
                 Op::Int(_) => stack.push(Ty::Int),
+                Op::ConvertInt32 | Op::ConvertUInt8 => {
+                    take(&mut stack, &Ty::Int)?;
+                    stack.push(Ty::Int);
+                }
                 Op::Bool(_) => stack.push(Ty::Bool),
                 Op::Void => stack.push(Ty::Unit),
-                Op::Arg(n) => stack.push(self.args[i][*n].clone()),
-                Op::Load(n) => stack.push(self.locals[i][*n].clone()),
+                Op::Arg(n) => stack.push(Self::stack_type(&self.args[i][*n])),
+                Op::Load(n) => stack.push(Self::stack_type(&self.locals[i][*n])),
                 Op::ArgumentAddress(n) => stack.push(self.args[i][*n].clone().address()),
                 Op::LocalAddress(n) => stack.push(self.locals[i][*n].clone().address()),
                 Op::StoreArg(n) => take(&mut stack, &self.args[i][*n])?,
@@ -550,7 +577,7 @@ impl<'a> Profile<'a> {
                 Op::LoadObject(t) => {
                     let t = self.ty(t)?;
                     take(&mut stack, &t.clone().address())?;
-                    stack.push(t);
+                    stack.push(Self::stack_type(&t));
                 }
                 Op::StoreObject(t) => {
                     let t = self.ty(t)?;
@@ -576,13 +603,13 @@ impl<'a> Profile<'a> {
                         }
                         stack.push(t.address());
                     } else {
-                        stack.push(t);
+                        stack.push(Self::stack_type(&t));
                     }
                 }
                 Op::SetField(n) => {
                     let value = pop(&mut stack)?;
                     let owner = pop(&mut stack)?;
-                    if self.field(&owner, *n)? != value {
+                    if Self::stack_type(&self.field(&owner, *n)?) != value {
                         return Err(fail(pc, "field store type mismatch"));
                     }
                     stack.push(if matches!(owner, Ty::Address(_)) {
@@ -600,7 +627,7 @@ impl<'a> Profile<'a> {
                     if construct {
                         stack.push(self.ty(target.owner.as_ref().unwrap())?);
                     } else if let Some(t) = &self.results[c] {
-                        stack.push(t.clone());
+                        stack.push(Self::stack_type(t));
                     }
                 }
                 Op::Return => {

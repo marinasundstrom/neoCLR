@@ -40,6 +40,32 @@ fn write(b: &mut FunctionBuilder<'_>, pointer: ir::Value, values: &[ir::Value]) 
             .store(MemFlags::new(), *value, pointer, i as i32 * 4);
     }
 }
+fn normalize(
+    b: &mut FunctionBuilder<'_>,
+    p: &Profile<'_>,
+    t: &Ty,
+    values: &[ir::Value],
+) -> Vec<ir::Value> {
+    values
+        .iter()
+        .zip(p.byte_lanes(t))
+        .map(
+            |(v, byte)| {
+                if byte { b.ins().band_imm(*v, 255) } else { *v }
+            },
+        )
+        .collect()
+}
+fn write_typed(
+    b: &mut FunctionBuilder<'_>,
+    p: &Profile<'_>,
+    t: &Ty,
+    pointer: ir::Value,
+    values: &[ir::Value],
+) {
+    let values = normalize(b, p, t, values);
+    write(b, pointer, &values);
+}
 fn slot(b: &mut FunctionBuilder<'_>, bytes: u32) -> ir::StackSlot {
     b.create_sized_stack_slot(StackSlotData::new(StackSlotKind::ExplicitSlot, bytes, 3))
 }
@@ -100,7 +126,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                 let s = slot(&mut b, p.bytes(t));
                 frame_bytes += p.bytes(t) as usize + 7;
                 let address = b.ins().stack_addr(types::I64, s, 0);
-                write(&mut b, address, &parameters[at..at + p.lanes(t)]);
+                write_typed(&mut b, &p, t, address, &parameters[at..at + p.lanes(t)]);
                 arguments.push(s);
                 at += p.lanes(t);
             }
@@ -146,6 +172,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                 let pop = |s: &mut Vec<ir::Value>| s.pop().expect("checked stack");
                 match op {
                     Op::Int(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
+                    Op::ConvertInt32 => (),
+                    Op::ConvertUInt8 => {
+                        let value = pop(&mut stack);
+                        stack.push(b.ins().band_imm(value, 255));
+                    }
                     Op::Bool(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
                     Op::Void => stack.push(b.ins().iconst(types::I32, 0)),
                     Op::Arg(n) | Op::Load(n) => {
@@ -173,7 +204,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                         };
                         let value = stack.split_off(stack.len() - p.lanes(top()));
                         let address = b.ins().stack_addr(types::I64, s, 0);
-                        write(&mut b, address, &value);
+                        let ty = if matches!(op, Op::StoreArg(_)) {
+                            &p.args[i][*n]
+                        } else {
+                            &p.locals[i][*n]
+                        };
+                        write_typed(&mut b, &p, ty, address, &value);
                     }
                     Op::Dup => {
                         let value = stack[stack.len() - p.lanes(top())..].to_vec();
@@ -195,7 +231,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                     Op::StoreObject(t) => {
                         let value = stack.split_off(stack.len() - p.lanes(&p.ty(t)?));
                         let address = pop(&mut stack);
-                        write(&mut b, address, &value);
+                        write_typed(&mut b, &p, &p.ty(t)?, address, &value);
                     }
                     Op::New(t) => {
                         let Ty::Record(owner) = p.ty(t)? else {
@@ -205,6 +241,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                         if input.types[owner].fields.is_empty() {
                             stack.push(b.ins().iconst(types::I32, 0));
                         }
+                        let ty = Ty::Record(owner);
+                        let value = stack.split_off(stack.len() - p.lanes(&ty));
+                        stack.extend(normalize(&mut b, &p, &ty, &value));
                     }
                     Op::Field(n) | Op::FieldAddress(n) => {
                         let field = p.field(top(), *n)?;
@@ -226,6 +265,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                         let value = stack.split_off(stack.len() - p.lanes(top()));
                         let owner = &shape[shape.len() - 2];
                         let offset = p.field_offset(owner, *n);
+                        let value = normalize(&mut b, &p, &p.field(owner, *n)?, &value);
                         if matches!(owner, Ty::Address(_)) {
                             let owner = pop(&mut stack);
                             let address = b.ins().iadd_imm(owner, (offset * 4) as i64);
@@ -269,8 +309,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                         }
                     }
                     Op::Return => {
-                        if p.results[i].is_some() {
-                            write(&mut b, output, &stack);
+                        if let Some(t) = &p.results[i] {
+                            write_typed(&mut b, &p, t, output, &stack);
                         }
                         let success = b.ins().iconst(types::I32, 0);
                         b.ins().return_(&[success]);

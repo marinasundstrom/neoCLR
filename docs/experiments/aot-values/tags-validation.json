@@ -1,0 +1,122 @@
+{
+  "profile": "raven-byte-values-v4",
+  "declaredCompilerRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "neoClrBaseRevision": "521fce33b6044c39bbefd21cdd44f1bfd07c50b2",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-values/tags-validation/tags.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-values/tags.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-values/tags-validation/tags.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "/Users/robert/Projects/neoclr/target/aot-values/tags-validation/tags.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-values/tags-validation/tags.o"
+      ],
+      "exit": 0,
+      "stdout": "Emitted aarch64-apple-darwin object; C export: int32_t neoclr_entry_v2(int32_t, int32_t *result)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-values/tags-validation/tags.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-values/tags-validation/tags"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-values/tags-validation/tags.o"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-values/tags-validation/tags"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-values/tags-validation/tags:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "samples": {
+    "tags": {
+      "artifacts": {
+        "tags.dll": "72a544380c0b305b0c66304037b994f94895ef1ff8969278cd55b8a1b97c8db3",
+        "tags.o": "ef8701398233f24dbb803f8bcb8e19c7c416dffebb78bc099badbf92105904df",
+        "tags": "077f672dc86097f08af14020df3ffd69e706ad9e29d8cae9efe1cc0268fe76e7"
+      },
+      "exit": 0,
+      "stdout": "",
+      "stderr": "",
+      "emptyEnvironment": true,
+      "executableOnlyDirectory": true,
+      "dynamicDependencies": [
+        "/usr/lib/libSystem.B.dylib"
+      ]
+    }
+  },
+  "inputs": {
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "1e4721cfa6ac1477e3fb44824175a5d66deb67601a8ac4c289f7244ba91137c2",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-values/tags.rvn": "fe458a3911ba55d97e69a03a1cc25fa101011e3a718310afbd2fc428649460c4"
+  },
+  "date": "2026-10-07",
+  "tests": {
+    "command": "cargo test --locked --manifest-path tools/aot-poc/Cargo.toml --test values",
+    "valueTestsPassed": 17,
+    "valueNativeComparisons": 35,
+    "rejectedValueInputs": 22,
+    "unchangedScalarEvidence": "native-validation.json: 15 scalar tests passed before value extensions"
+  },
+  "sourceHashes": {
+    "tools/aot-poc/src/values.rs": "02f61606ca8fe187bce5a1bea065bed2483fdc27c14d6ca3a68cb17b08a63fc1",
+    "tools/aot-poc/src/value_profile.rs": "1b98040bdf24131114678892510471c7495fca29c5c10c509ad152fc7b1223fe",
+    "tools/aot-poc/tests/values.rs": "71fb12f4b3f4ab6ea3ba05a1f42cc09abf16f11b81b087eff97e2d9cbf56f0c2",
+    "docs/experiments/aot-values/Tags.pe": "3db9320576a8f6e0de350d8944650ee4b42e37e372ee006dce398c5544debe20",
+    "docs/experiments/aot-values/verify_native.py": "421d8c43ebbf05e7a98813f185f7b40792a71a5e425c4e5a004683077962af14"
+  }
+}

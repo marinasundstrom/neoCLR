@@ -157,8 +157,8 @@ Result/Some union samples with payload access and branching. Inspect actual Rave
 metadata/IL and add the smallest required representation/member contracts before
 claiming general unions, managed memory or library support. The first
 [value/member samples](../aot-values/README.md), including nested records, now execute
-natively. Ordinary output calls now pass a Raven member probe; union tags and
-generated-member dependencies remain next. The author adds console input after
+natively. Ordinary output calls now pass a Raven member probe; Byte tags also pass Raven and numeric probes.
+Generated-member dependencies remain next for unions. The author adds console input after
 unions, to exercise input/parse outcomes and branches. A one-endpoint HTTP Server comes after its actual dependencies
 compile and execute. Do not build a large benchmark suite or a new web framework as
 prerequisites. Keep interpreter parity and explicit unsupported-feature diagnostics

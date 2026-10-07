@@ -55,7 +55,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the next sample direction. Add ordinary output-parameter calls with conservative
   whole-slot definite-assignment checks, preserving forwarding, nested aliases and
   Fault propagation. Validate Raven output members and record the pinned producer
-  forwarding workaround; conditional output contracts remain deferred. Full
+  forwarding workaround; conditional output contracts remain deferred. Add Byte
+  storage and unchecked conv.u1/conv.i4 lowering for union tags, preserving truncation
+  at storage/call boundaries and Int32 stack semantics. Validate a standalone Raven
+  tag sample and native/interpreter boundary inputs; the aggregate ABI remains private. Full
   unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime

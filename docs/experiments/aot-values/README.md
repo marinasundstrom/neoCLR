@@ -31,7 +31,7 @@ python3 docs/experiments/aot-values/verify_native.py \
   --output target/aot-values-run
 ```
 
-The output directory must be new. This runs all four samples in the interpreter, compiles
+The output directory must be new. This runs all five samples in the interpreter, compiles
 their PE/#Neo bodies to native objects, links the C startup adapter, checks for no
 object imports and only macOS `libSystem` executable linkage, then runs each copied
 executable alone with an empty environment. Select a compatible Apple SDK as in the
@@ -47,20 +47,20 @@ byte-identical producer rebuilds are not asserted.
 
 A module containing type declarations selects the value profile. It admits
 up to 32 local nongeneric value Record types, each with zero to eight fields containing
-Int32, Boolean or other local records, and up to 128 uniquely named functions/members.
+Int32, Byte, Boolean or other local records, and up to 128 uniquely named functions/members.
 Each complete inline layout is limited to eight primitive/dummy lanes. Recursive inline
 layouts (including mutually recursive unused types), unresolved field types and layouts
 exceeding that bound are rejected before emission. Reference types, generics, inheritance,
 interfaces and explicit layout remain unsupported. Properties
 use their emitted accessor methods; they do not introduce separate native storage.
 
-Supported members have copied Int32/Boolean/record parameters and results or inhabited
+Supported members have copied Int32/Byte/Boolean/record parameters and results or inhabited
 Void/no-result returns. Instance methods require a borrowed by-reference receiver.
 Constructors use the same member call machinery and publish a value only after success.
 The source module's ordinary metadata, member-access, initialization and lifetime
 verification still runs before native emission. References cannot be stored in fields,
 locals, ordinary parameters or results in this profile, so they cannot escape a frame.
-Explicit `out` parameters may borrow Int32, Boolean or local-record storage.
+Explicit `out` parameters may borrow Int32, Byte, Boolean or local-record storage.
 Readonly receivers, conditional `out(true)` parameters, general `ref` parameters,
 virtual dispatch, overloaded names and external
 library/service calls remain unsupported here, including console calls in value-bearing
@@ -68,7 +68,7 @@ modules. The original scalar/literal-console profile remains available for Hello
 
 The native layout is private to this experiment:
 
-- Each Int32 or Boolean field uses a four-byte lane, in metadata field order. Empty
+- Each Int32, Byte or Boolean field uses a four-byte lane, in metadata field order. Empty
   records use an unobservable dummy lane. Nested records are recursively flattened,
   including empty-record dummy lanes, with field offsets computed from full child widths.
   This is not the public platform layout;
@@ -110,7 +110,7 @@ call-identity mismatches and uninitialized locals. Three additional rejection ca
 cover mutual inline cycles, unresolved fields and oversized flattened storage. Native
 tests cover the nested Raven fixture in both containers and three-level field addresses,
 whole-payload replacement, deep alias preservation, empty nested records and clearing
-a payload without overwriting adjacent fields. Fourteen value-profile tests pass; the earlier
+a payload without overwriting adjacent fields. Seventeen value-profile tests pass; the earlier
 fifteen scalar/Hello test results remain applicable.
 
 The [.NET struct baseline](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct)
@@ -170,8 +170,41 @@ Eight new native comparisons cover the Raven fixture, uninitialized/initialized 
 on both branches, two outputs aliasing the same nested payload, and an output callee
 Fault. Six rejection cases cover missing writes, premature reads, conditional/general
 reference contracts, invalid output indices and escaping output references. General
-Some/None execution still needs the emitted Byte tag/conversions, overloaded members,
+Some/None execution still needs overloaded members,
 attribute classes, generated boxing/string/virtual methods and library dependencies.
+
+## Byte tags and conversions (2026-10-07)
+
+[Tags](tags.rvn) compiles Raven Byte fields, getters/setters, construction, default
+initialization and tag-dependent branches to native code. The [Tags fixture](Tags.pe)
+and [deployment evidence](tags-validation.json) use the same pinned producer. This is
+a primitive tag probe, not a replacement implementation of Raven unions. Their emitted
+Byte tag and `conv.i4` operations motivated this slice; full unions remain unsupported.
+
+Byte retains its storage identity (including distinct `Byte&` borrows), while loads,
+parameters and call results use Int32 evaluation-stack values. Every Byte storage write
+truncates to the low eight bits: locals, arguments, fields, raw record construction,
+indirect stores and function results. Aggregate normalization follows nested field
+layouts. `conv.u1` truncates but leaves an Int32 stack value; `conv.i4` is admitted only
+for the existing Int32 evaluation category. Boolean, record and address operands are
+rejected. Other narrow/wide numeric types, checked conversions and floating-point
+conversions are outside this slice. The scalar-only profile is unchanged.
+
+The [.NET 10 OpCodes.Conv_U1 contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.conv_u1?view=net-10.0)
+(reviewed 2026-10-07) distinguishes unsigned-byte conversion from the Int32 stack slot.
+This follows the same observable behavior, with neoCLR's interpreter as the executable
+oracle. Treating Byte as unrestricted Int32 storage would mishandle overflow; using
+physical one-byte native slots would instead require new layout and call rules. The
+bounded backend keeps four-byte private lanes and masks writes, trading compactness
+and potential extra operations for reuse of the tested aggregate ABI. This is not a
+public layout choice or performance claim. No Raven/compiler bridge changes are needed.
+
+Native checks cover the Raven sample in both metadata containers plus eight runtime
+inputs (-1, 0, 128, 255, 256, 511 and Int32 extremes) across storage, call, output and
+conversion boundaries. An arithmetic check after `conv.u1` proves the stack result is
+not itself Byte storage. Three negative inputs reject Boolean conversion, unsupported
+checked narrowing and treating `Byte&` as `Int32&`. All seventeen value tests pass;
+unchanged scalar evidence remains in the earlier report.
 
 ## Next steps toward union-based console input
 
@@ -190,7 +223,7 @@ The explicit native dependency configuration succeeds in the interpreter; no Rav
 or native union execution is claimed by this slice.
 
 Nested value storage and ordinary output parameters are now implemented. Next admit
-the union tag and remaining generated-member/dependency contracts, retaining nominal identities and actual field contracts rather than recognizing union source names.
+the remaining generated-member/dependency contracts, retaining nominal identities and actual field contracts rather than recognizing union source names.
 Exercise both Some/None branches, then Result success/error. Resolve generated-member
 and library dependencies explicitly. Reference-bearing payloads and console input follow
 with defined native lifetime and service contracts. Trimming and general heap management
