@@ -201,9 +201,20 @@ different compiler and library contracts. No public Scheduler API is selected.
 ## Runtime and language integration
 
 The interpreter runs a bounded imported CLI subset. Native interoperation, language
-projections and JIT/AOT execution remain possible directions. .NET runtime, ABI and
-compiler layers are comparison points; extra execution paths bring verification,
-portability and testing obligations. No replacement backend is selected.
+projections and JIT/AOT execution remain possible directions. **Future direction
+(2026-10-07):** investigate native AOT first with ARM64 as the primary architecture,
+retain the interpreter, and design hot reload independently of execution mode.
+An AOT-compiled web app is the proposed POC destination, starting with scalar and
+Hello World experiments before a minimal HTTP endpoint.
+Reloadable AOT would need compatible precompiled replacements and explicit state
+and code-lifetime rules. .NET runtime, ABI and compiler layers are comparison points;
+extra execution paths bring verification, portability and testing obligations.
+**Development experiment:** an isolated ARM64 scalar tool now emits native objects
+for wrapping integer arithmetic and direct calls, validated through a C consumer.
+General AOT applications, the web demo, JIT and hot reload remain future work.
+[Scalar experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-scalar/README.md).
+
+[Investigation and tradeoffs](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-execution-investigation.md)
 
 [Execution direction](https://github.com/marinasundstrom/neoCLR/blob/main/docs/execution-architecture.md)
 

@@ -1,14 +1,27 @@
 # Platform execution and compilation architecture
 
 Status: architectural requirements and proposed implementation sequence. Interpretation
-is implemented; JIT compilation, native AOT, a high-level compiler, and a general
-embedding API are not. This document does not introduce executable backend flags or
+is implemented; a separate [ARM64 scalar AOT experiment](experiments/aot-scalar/README.md)
+now emits a small native subset. General native AOT, JIT compilation and a general
+embedding API remain unimplemented. This document does not introduce executable backend flags or
 commit to a native code generator, binary schema, or public hosting ABI.
 
 Interpretation, JIT, and native AOT are platform-wide architectural concerns. They
 influence the type system, metadata, instructions, linking, verification, library,
 and runtime services. Hosting is a separate consumer of these contracts, not the
 place where execution-mode semantics are defined.
+
+## Author direction — 2026-10-07
+
+Retain interpretation alongside future JIT and native AOT, with particular interest
+in AOT and **ARM64 as the primary native target architecture**. Hot reload is an
+independent runtime capability, not a feature restricted to interpretation. An AOT
+profile may accept precompiled replacement modules; a sealed static profile may
+omit replacement support. Both need explicit capability and optimization contracts.
+See the [investigation and proposed experiments](native-execution-investigation.md)
+for backend alternatives, version lifetimes, state compatibility and validation gaps.
+The subsequent author instruction to continue AOT produces the isolated scalar
+experiment above; hot reload remains design work.
 
 ## Shared semantic contract
 

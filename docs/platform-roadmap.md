@@ -1,5 +1,28 @@
 # neoCLR platform roadmap
 
+## Bounded AOT investigation and first implementation (2026-10-07)
+
+**Future execution investigation (author-directed 2026-10-07).** Investigate JIT
+and especially native AOT while retaining the interpreter as a supported option.
+Hot reload must be designed independently of execution mode. ARM64 is the primary
+architecture direction for future native backends; this does not withdraw existing
+host support. The [investigation](native-execution-investigation.md) records source
+comparisons, runtime gaps and proposed AOT/reload experiments. Backend choice and
+implementation scheduling remain open. The author identifies an AOT-compiled web app
+as the motivating POC, with explicit direction to start simple: proposed scalar and
+Hello World steps precede a minimal HTTP handler; hot reload follows separately.
+The author also requests eventual benchmarking against .NET and other
+languages/platforms; compare equivalent workloads once native consumers work,
+without making a broad benchmark suite a prerequisite for the first simple proof.
+**Bounded implementation follow-up:** the author then directs “Continue work on AOT”.
+The [scalar ARM64 experiment](experiments/aot-scalar/README.md) implements native
+wrapping integer arithmetic/direct calls through Cranelift and a C consumer, with
+focused validation. This selects a bounded AOT slice on main; the native bootstrap/release
+qualification priorities recorded below remain in place. Branches/locals and a native
+Fault contract are the next proposed AOT boundaries; the web demo, JIT and hot reload remain future work.
+
+## Existing native release gates
+
 The release also requires updated website content, matching sample downloads and setup
 instructions, and an editor/LSP workflow using native NeoCLR metadata;
 see the [author-directed tooling gate](#author-directed-release-gate-editor-and-native-metadata-2026-10-05).

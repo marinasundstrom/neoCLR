@@ -1,0 +1,17 @@
+[package]
+name = "neoclr-aot-poc"
+version = "0.0.0"
+edition = "2024"
+publish = false
+license = "MIT"
+
+# Isolate the experimental compiler dependencies from the runtime distribution.
+[workspace]
+
+[dependencies]
+neoclr = { path = "../.." }
+cranelift-codegen = { version = "=0.121.2", default-features = false, features = ["std", "arm64"] }
+cranelift-frontend = "=0.121.2"
+cranelift-module = "=0.121.2"
+cranelift-object = "=0.121.2"
+object = { version = "=0.36.7", default-features = false, features = ["write"] }

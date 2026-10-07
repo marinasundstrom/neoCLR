@@ -8,6 +8,7 @@
 These are maintained design discussions and decisions; individual pages state implementation status.
 See the [original proposals](../proposals/README.md) for the supplied source material.
 
+- [ARM64 JIT/AOT and mode-independent hot reload investigation](../native-execution-investigation.md)
 - [Platform roadmap: themed milestones and sample products](../platform-roadmap.md)
 - [HTTP application POC: first milestone details](../http-poc-roadmap.md)
 - [Runtime library API design](../api-design.md)

@@ -126,3 +126,11 @@ The generated scalar-category and simple-case-fold tables use Unicode data under
 [Unicode License V3](third-party/unicode/LICENSE.txt). Case folding uses Unicode
 17.0.0 CaseFolding.txt; its pinned source URL and SHA-256 are recorded in
 `scripts/generate-string-case-folding.py` and `src/string_case_folding.rs`.
+
+## Isolated AOT experiment
+
+The optional source-only [scalar AOT tool](tools/aot-poc/Cargo.toml) has a separate
+lockfile and [dependency inventory](tools/aot-poc/THIRD_PARTY_NOTICES.md), including
+Cranelift 0.121.2 under Apache-2.0 WITH LLVM-exception. These compiler dependencies
+are not added to the runtime distribution. The experiment's emitted scalar object
+has no Cranelift or neoCLR runtime imports.

@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-07",
+  "branch": "main",
+  "base_revision": "0e930d653c5c1fe04471ca0aae6c091b81c9f53f",
+  "cherry_picked_source": "3571ab79",
+  "scope": "scalar slice revalidation on main before control-flow work",
+  "command": "cargo test --manifest-path tools/aot-poc/Cargo.toml",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "result": {
+    "passed": 3,
+    "failed": 0,
+    "native_interpreter_inputs": 10,
+    "rejected_programs": 11
+  },
+  "source_sha256": {
+    "tools/aot-poc/src/compiler.rs": "4a6b664e65fc8d99585f9b5c2062fada7936a170207e3665e2dc62fe917ca7f1",
+    "tools/aot-poc/tests/scalar.rs": "e77e8f386056b42d5c46b88019a57b76c9dbf05beb66384e3bd2fde4e321bb32",
+    "tools/aot-poc/Cargo.lock": "5e01f8ba8f8874b863c1d038cdf26fec21108e00d52da551d7f0d456732a349d",
+    "docs/experiments/aot-scalar/scalar.neoil": "33df2ac6c3d2e1d7cd70f1094de476fa3d58e348af705dcfba07dceead789db7"
+  }
+}

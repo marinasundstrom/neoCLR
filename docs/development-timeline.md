@@ -25,6 +25,55 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-07 — Investigate ARM64 JIT/AOT and independent hot reload
+
+- **Author:** asks to investigate future JIT and AOT, emphasizing AOT; retain the
+  interpreter because it eases some hot-reload scenarios, but do not tie hot reload
+  to interpreted execution. States: “I would set ARM64 to be our primary target
+  architecture”.
+- **Assistant proposal:** investigate AOT first through shared semantic/runtime
+  contracts, with Cranelift as an initial feasibility candidate and LLVM as an AOT
+  alternative. Model hot reload as versioned body/module replacement across modes;
+  distinguish reloadable from sealed AOT. Propose compatible body edits before state
+  migration and macOS ARM64 before a Linux ARM64 qualification.
+- **Action/outcome:** inspected current runtime foundations and primary platform
+  documentation; recorded the [investigation](native-execution-investigation.md),
+  linked architecture/design guidance, and updated roadmap and website proposals.
+  This is research, with no native compilation or reload experiments performed.
+- **Author follow-up:** “An attractive POC demo would be to AOT compile a web app.”
+  Then clarifies: “But we should start simple”.
+- **Assistant response/action:** records the web app as the motivating demo and
+  proposes scalar native code, Hello World/runtime services, then one HTTP endpoint.
+  A native launcher running interpreted handlers would not satisfy the AOT demo.
+  Hot reload is a separate later experiment, not a prerequisite for the first demo.
+- **Author benchmarking follow-up:** “Eventually we can compare with .NET and other
+  languages/platform. Do benchmarking”.
+- **Assistant response/action:** records a later comparative benchmarking stage,
+  including .NET JIT/Native AOT and candidate additional platforms, equivalent
+  workloads, startup/throughput/latency/memory/size measurements and reproducible
+  evidence. Benchmark implementation and execution remain future work; this does
+  not expand the first simple AOT proof.
+- **Author implementation follow-up:** “Continue work on AOT”.
+- **Assistant action/outcome:** implements an isolated Cranelift 0.121.2 scalar tool
+  that emits ARM64 Mach-O objects and exports an Int32 function to a C executable.
+  Focused tests establish native/interpreter parity at integer boundaries, reject
+  unsupported inputs and check artifact format/no runtime imports. See the
+  [experiment and evidence](experiments/aot-scalar/README.md). This bounded probe
+  does not implement branches, native Fault propagation, GC, HTTP, JIT or hot reload,
+  and does not change Raven or the CLI bridge. Production backend choice stays open.
+- **Author branch correction:** requests a commit for each slice, then corrects the
+  assistant's use of `codex/structural-types`: “It should be main”, followed by
+  “Cherry pick changes over to main an continue from there”.
+- **Assistant action:** preserves unrelated structural proposal edits in a named Git
+  stash, cherry-picks the isolated scalar commit onto main, preserves newer native
+  bootstrap/release documentation, and revalidates against main before continuing
+  the control-flow slice. Original feature-branch evidence remains historical.
+- **Open:** backend choice, OS qualification order, native ABI/GC/metadata contracts,
+  edit compatibility, measurements and implementation scheduling. These details are
+  assistant proposals, not subsequent author decisions. The active Raven work and
+  isolation of structural Function experiments remain recorded.
+
+
 ## 2026-10-07: Continue native bootstrap development on main
 
 - **Author:** Directed merging the native bootstrap branch into main and cleaning up

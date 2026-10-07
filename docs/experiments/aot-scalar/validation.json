@@ -1,0 +1,156 @@
+{
+  "date": "2026-10-07",
+  "status": "local scalar feasibility only; no benchmark or release qualification",
+  "base_revision": "a081c6e3c9e7674e1050ddf4441d13f4a1bbbb9b",
+  "branch": "codex/structural-types",
+  "working_tree": "base plus uncommitted isolated AOT tool; source hashes below",
+  "target": "aarch64-apple-darwin",
+  "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin",
+  "host": "Darwin arm64",
+  "sdkroot": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "cranelift": "0.121.2",
+  "optimization": "Cranelift defaults; correctness only",
+  "tests": {
+    "command": "cargo test --manifest-path tools/aot-poc/Cargo.toml --locked",
+    "environment": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+      "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer"
+    },
+    "passed": 3,
+    "failed": 0,
+    "rejected_programs": 11,
+    "native_interpreter_inputs": [
+      -2147483648,
+      -2147483647,
+      -100,
+      -1,
+      0,
+      1,
+      20,
+      100,
+      1073741823,
+      2147483647
+    ],
+    "invalid_host_inputs": 3
+  },
+  "artifacts": {
+    "tools/aot-poc/Cargo.toml": {
+      "sha256": "60be44f96aa01c1629be6033fe999bf75d04e8698f21b871c25bee6bf9bb4813",
+      "bytes": 511
+    },
+    "tools/aot-poc/Cargo.lock": {
+      "sha256": "a81af3b8685eec1212f72cfb49f2b989346c6cfc9a9bd22b85f9d688683cf9c1",
+      "bytes": 23158
+    },
+    "tools/aot-poc/src/compiler.rs": {
+      "sha256": "4a6b664e65fc8d99585f9b5c2062fada7936a170207e3665e2dc62fe917ca7f1",
+      "bytes": 9952
+    },
+    "tools/aot-poc/src/main.rs": {
+      "sha256": "c06c88a29e917df87d8408437d738a1bb1ce05269c6e631153c150b31e3fd0e0",
+      "bytes": 901
+    },
+    "tools/aot-poc/tests/scalar.rs": {
+      "sha256": "e77e8f386056b42d5c46b88019a57b76c9dbf05beb66384e3bd2fde4e321bb32",
+      "bytes": 6126
+    },
+    "docs/experiments/aot-scalar/scalar.neoil": {
+      "sha256": "33df2ac6c3d2e1d7cd70f1094de476fa3d58e348af705dcfba07dceead789db7",
+      "bytes": 377
+    },
+    "docs/experiments/aot-scalar/host.c": {
+      "sha256": "242fce0a201554ddfe3c1c87f7eb0b9abd3941fbdaa14a837433a16357e239ee",
+      "bytes": 674
+    },
+    "target/aot-scalar/scalar-final.o": {
+      "sha256": "3cfcc59319a2ec84a8959e5d95d1f0ef21b85f6318fbf19a9b7f07816b2e77e3",
+      "bytes": 488
+    },
+    "target/aot-scalar/scalar-final": {
+      "sha256": "c428401e250c921e9b464f431abaa3121d1c15006c98f3885f0fc54ee5ecda39",
+      "bytes": 33744
+    }
+  },
+  "commands": [
+    {
+      "command": [
+        "tools/aot-poc/target/debug/neoclr-aot-poc",
+        "docs/experiments/aot-scalar/scalar.neoil",
+        "Calculate",
+        "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final.o"
+      ],
+      "stdout": "Emitted aarch64-apple-darwin object; C export: int32_t neoclr_entry(int32_t)",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "docs/experiments/aot-scalar/host.c",
+        "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final"
+      ],
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "file",
+        "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final.o",
+        "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final"
+      ],
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final.o: Mach-O 64-bit object arm64\n/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final:   Mach-O 64-bit executable arm64",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final.o"
+      ],
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final"
+      ],
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-l",
+        "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final.o"
+      ],
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final.o:\nLoad command 0\n      cmd LC_SEGMENT_64\n  cmdsize 152\n  segname \n   vmaddr 0x0000000000000000\n   vmsize 0x0000000000000034\n  fileoff 312\n filesize 52\n  maxprot 0x00000007\n initprot 0x00000007\n   nsects 1\n    flags 0x0\nSection\n  sectname __text\n   segname __TEXT\n      addr 0x0000000000000000\n      size 0x0000000000000034\n    offset 312\n     align 2^2 (4)\n    reloff 368\n    nreloc 2\n     flags 0x80000400\n reserved1 0\n reserved2 0\nLoad command 1\n      cmd LC_BUILD_VERSION\n  cmdsize 24\n platform 1\n    minos 11.0\n      sdk n/a\n   ntools 0\nLoad command 2\n     cmd LC_SYMTAB\n cmdsize 24\n  symoff 384\n   nsyms 3\n  stroff 432\n strsize 56\nLoad command 3\n            cmd LC_DYSYMTAB\n        cmdsize 80\n      ilocalsym 0\n      nlocalsym 2\n     iextdefsym 2\n     nextdefsym 1\n      iundefsym 3\n      nundefsym 0\n         tocoff 0\n           ntoc 0\n      modtaboff 0\n        nmodtab 0\n   extrefsymoff 0\n    nextrefsyms 0\n indirectsymoff 0\n  nindirectsyms 0\n      extreloff 0\n        nextrel 0\n      locreloff 0\n        nlocrel 0",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-tv",
+        "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final.o"
+      ],
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final.o:\n(__TEXT,__text) section\n_neoclr_scalar_0:\n0000000000000000\tsub\tw0, w0, w1\n0000000000000004\tret\n_neoclr_scalar_1:\n0000000000000008\tmov\tw3, #0x2\n000000000000000c\tmul\tw0, w0, w3\n0000000000000010\tret\n_neoclr_entry:\n0000000000000014\tstp\tx29, x30, [sp, #-0x10]!\n0000000000000018\tmov\tx29, sp\n000000000000001c\tbl\t0x1c\n0000000000000020\tmov\tw1, #0x3\n0000000000000024\tbl\t0x24\n0000000000000028\tadd\tw0, w0, #0x5\n000000000000002c\tldp\tx29, x30, [sp], #0x10\n0000000000000030\tret",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/aot-scalar/scalar-final",
+        "20"
+      ],
+      "stdout": "42",
+      "stderr": ""
+    }
+  ]
+}

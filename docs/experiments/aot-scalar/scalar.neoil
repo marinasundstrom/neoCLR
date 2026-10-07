@@ -1,0 +1,25 @@
+.module AotScalar
+
+.function Difference(Int32 left, Int32 right) -> Int32
+    ldarg left
+    ldarg right
+    sub
+    ret
+.end
+
+.function Twice(Int32 value) -> Int32
+    ldarg value
+    ldc.i4 2
+    mul
+    ret
+.end
+
+.function Calculate(Int32 value) -> Int32
+    ldarg value
+    call Twice(Int32)
+    ldc.i4 3
+    call Difference(Int32, Int32)
+    ldc.i4 5
+    add
+    ret
+.end

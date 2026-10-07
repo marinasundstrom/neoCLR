@@ -8,6 +8,22 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Investigate future ARM64-first JIT/AOT execution, retaining interpretation and
+  treating hot reload as a separate capability. Record primary-source comparisons,
+  native runtime gaps, backend alternatives and proposed AOT/reload experiments;
+  align architecture, roadmap and website proposal guidance. Record an AOT web app
+  as the motivating POC, starting with scalar/Hello World steps before HTTP, and
+  plan later reproducible benchmarks against .NET and selected other platforms.
+  The research does not implement general compilation or hot reload or permanently
+  replace Raven priorities. Following the author's instruction to continue AOT,
+  add an isolated Cranelift 0.121.2 scalar compiler emitting macOS ARM64 objects
+  with a C-callable Int32 export. Validate wrapping arithmetic/direct calls against
+  the interpreter, unsupported-input rejection, object format and no runtime imports.
+  Branches, native Fault propagation, managed allocation and the web demo remain
+  future work; runtime dependencies and public APIs are unchanged. Cherry-pick this
+  isolated slice to main at the author's correction, retaining main's newer native
+  bootstrap work and refreshing the tool lockfile for the current runtime.
+
 - Merge native System bootstrap into main while retaining the newer shared RavenDoc
   publisher/navigation. Continue development on main; Windows native toolchain and
   installed-editor qualification remain open release gates. The merged tree passes

@@ -6,6 +6,7 @@ Executable probes and local validation support design decisions; their presence
 does not imply a shipped runtime capability. Read each experiment's status and
 reproduction instructions before using its output.
 
+- [ARM64 scalar AOT: native object and C consumer](aot-scalar/README.md)
 - [JSON document: a sensor report and acknowledgement](json-document/README.md)
 - [JSON message: a bounded string round trip](json-message/README.md)
 - [UTF-8 chunks: stateful text over partial byte reads](utf8-chunks/README.md)
