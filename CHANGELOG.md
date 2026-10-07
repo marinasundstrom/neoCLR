@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Configure RavenDoc assembly inputs as a list sharing one API namespace tree.
+  Keep the current CoreProbe snapshot's real identity; future split snapshots
+  can join the same tree. Refresh shared source links, static-type presentation,
+  cross-source references and nested-type navigation with Raven main `bb93da2da`.
+  All 18 website contract tests pass; the full build checks 1,803 pages. Browser
+  review confirms static Console metadata, GitHub source links and member grouping.
+
 - Refresh RavenDoc to Raven main `7ad0f5817` and record the .NET 11 runtime-async
   unit payload fix carried to the integration branch. Preserve generic unit
   results and discard awaited payloads in statement position; 45 focused tests

@@ -6,6 +6,22 @@ assembly/XML snapshot, content, styling and site configuration. The portable
 compiler checkout or full runtime release build. See the
 [build procedure](../api-docs/README.md#build-and-refresh).
 
+## Assembly sources
+
+`website/site.json` declares `apiInputs`, resolved relative to the repository root
+by the website build. RavenDoc combines those assemblies into one namespace and
+type tree while preserving the actual declaring assembly on every API page.
+The current input is the combined `NeoCLR.CoreProbe.dll` CLI projection. It is
+not relabeled as native System.Runtime, System.Data or System.Networking. When
+separate documented assembly snapshots exist, add them to this array; navigation
+does not require separate library sections.
+
+Source links use the configured Raven declaration paths. The shared generator
+also understands C# declaration paths for other assembly sources. Static types
+and extension containers omit inheritance and inherited-member controls. Nested
+types appear on their owner's page, with separate namespace and containing-type
+metadata, rather than expanding the sidebar.
+
 ## Shared behavior
 
 Type pages show inherited instance members and implemented interface contracts

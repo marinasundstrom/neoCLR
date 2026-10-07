@@ -15,7 +15,10 @@ section-navigation model as authored menus. On small screens the sidebar opens
 as an off-canvas drawer. neoCLR selects `namespaceNavigation: flat`, listing full
 namespace names as peers while each expands to its types. RavenDoc also supports
 `hierarchical` (the default); this option does not change reference URLs. Every
-populated namespace expands to its overview and direct members. Empty namespaces
+populated namespace expands to its overview and direct members. Nested types
+remain on their containing type pages rather than adding sidebar branches.
+`apiInputs` combines assembly snapshots in that tree; API metadata retains the
+real declaring assembly and configured Raven/C# declaration source links. Empty namespaces
 are hidden by default; `showEmptyNamespaces: true` restores their grouping rows.
 Type navigation and headings show declared names such as Object, String and Char;
 code signatures keep Raven aliases.

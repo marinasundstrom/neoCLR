@@ -11150,3 +11150,22 @@ The author refined the organization: Getting started (renamed from Docs) and
 Language reference should keep distinct hierarchies because they are separate
 navbar destinations. RavenDoc gained explicit directory/TOC boundaries and labels
 without changing neoCLR's existing navigation policy.
+
+
+## 2026-10-07 — Shared RavenDoc assembly sources and future processors
+
+The author requested that general RavenDoc fixes also reach the neoCLR branch
+and site, and that libraries split across System.Runtime, System.Data and
+System.Networking share one namespace tree while retaining assembly identity.
+The author also proposed future customization of Markdown and code-source
+handling through processor extensions, and later clarified a loader-independent
+member model for Raven and C# inputs.
+
+The assistant implemented a configurable assembly-input list for the site,
+using its current combined CoreProbe snapshot without inventing separate native
+assembly identities. The shared RavenDoc implementation supports grouped
+assembly namespaces, cross-source links, C# source lookup, static-type metadata
+and nested types on their owner's page. Loader/model/renderer extensibility is
+documented as future direction; no plugin API is introduced in this release.
+Validation and the pinned generator revision are recorded in the changelog and
+`tools/ravendoc/version.json`. These local changes do not publish the neoCLR site.

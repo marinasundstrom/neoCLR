@@ -455,7 +455,8 @@ def main():
     if config.get('sourceRepository'):
         config['sourceRepository']['root'] = str((SOURCE / config['sourceRepository'].get('root', '.')).resolve())
     publisher_output = ROOT / 'target/website-rendered'
-    config.update(output=str(publisher_output), api=str(ROOT / 'api-docs/reference/NeoCLR.CoreProbe.dll'),
+    config['apiInputs'] = [str((ROOT / path).resolve()) for path in config['apiInputs']]
+    config.update(output=str(publisher_output),
                   apiContent=str(SOURCE / 'api-content'),
                   types=None,  # Generate every public type, regardless of comment availability.
                   excludedMembers=list(json.loads((ROOT / 'api-docs/exclusions.json').read_text())), pages=[])
