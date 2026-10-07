@@ -1,6 +1,9 @@
 # Separate Web execution — 2026-10-07
 
-**Execution passes with the recorded artifacts; clean rebuild reliability remains open.**
+**Original slice: execution passes with the recorded artifacts; clean rebuild reliability
+was open.** Follow-up: [canonical bootstrap Void binding](unit-bootstrap-2026-10-07.md)
+fixes the reproduced lookup failure, with six clean builds and five passing consumers.
+The original evidence and limitations below are retained as the investigation record.
 System.Runtime (175 sources), Data (6), Networking (9 including native service adapters)
 and Web (9) are independently compiled native assemblies. Consumers import their emitted
 artifacts without library sources. Primitive Core and the retained runtime seed are still

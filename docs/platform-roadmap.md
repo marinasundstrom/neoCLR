@@ -52,9 +52,11 @@ Separate Web now compiles and executes through a supported NetworkDeadline contr
 owned by Networking. Source-free deadline, headers, base-address, JSON-client and route
 consumers pass, along with the loopback header-cancellation check. HTTP retains one
 15-second exchange budget. [Evidence](experiments/extended-cli-metadata/separate-web-2026-10-07.md).
-A clean rebuild also exposed intermittent `System.Void` native encoding failure; the
-identical command succeeded on retry. Diagnose this next; do not mask it with retries.
-Then: native project-reference/build and LSP catalogs, Platform service ownership and
+Raven e141006f3 fixes the intermittent `System.Void` encoding failure at type binding:
+exact bootstrap Void lookup now honors the selected native unit owner. Two deterministic
+regressions and six fresh builds pass. [Evidence](experiments/extended-cli-metadata/unit-bootstrap-2026-10-07.md).
+The general async unit-return correction is handed to the author-designated Raven release
+task; consume its qualified revision for native validation. Next: native project-reference/build and LSP catalogs, Platform service ownership and
 collected shipping artifacts. Existing native workspace tests explicitly reject project
 references; accepting a real project graph needs implementation and validation.
 The API site remains one namespace/type reference across assemblies; declaring-assembly

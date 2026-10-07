@@ -6583,3 +6583,14 @@ value or its overloads. Migrated HTTP sources require the native compilation pat
 these documentation declarations must not be treated as executable bridge support.
 Raw long overloads stay internal to applications. See the
 [separate Web evidence](experiments/extended-cli-metadata/separate-web-2026-10-07.md).
+
+## Canonical bootstrap unit syntax (2026-10-07)
+
+Raven e141006f3 normalizes namespace lookup of primitive-bootstrap System.Void to the
+explicit native RuntimeUnitContract owner. Qualified and unqualified spellings no longer
+make generic fields depend on lookup order or require a retained-seed Void declaration.
+Default .NET policy, unit/no-result distinction and native metadata validation are
+unchanged. Two forced-lookup regressions, 29 focused tests and six fresh separate Web
+compilations pass. See [evidence](experiments/extended-cli-metadata/unit-bootstrap-2026-10-07.md).
+General async unit-return corrections are owned by the Raven release task following the
+author's handoff instruction, and remain separate from this target-specific fix.

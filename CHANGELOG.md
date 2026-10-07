@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Record Raven e141006f3's canonical bootstrap Void binding correction: two deterministic
+  lookup regressions, six fresh Web compilations and five source-free executable consumers
+  pass without metadata fallbacks. Preserve commands, artifact hashes and prior failures.
+  Hand the separate general async unit-return fix to the author-designated Raven release
+  task; retain native project/editor/artifact qualification as bootstrap work ahead.
+
 - Add development NetworkDeadline and five typed DNS/socket deadline overloads, keeping
   raw stamps internal and the default expired. Separate Web consumes these native APIs
   with its existing exchange budget. Add source-free executable acceptance, C# visibility

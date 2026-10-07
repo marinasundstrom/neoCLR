@@ -11390,3 +11390,17 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
   Preserve both outcomes and investigate before claiming a reliable build.
 - **Open:** No merge performed. Reliable build, project/editor and artifact qualification
   remain necessary; successful selected consumers alone do not close that gate.
+
+## 2026-10-07: Release-task ownership of general Raven fixes
+
+- **Author:** Directed that the general Raven issue be handled by task
+  01a11579-77d7-7500-8561-950c20b1f6bc, which is working on a release.
+- **Assistant action:** Sent that task the main-based codex/fix-async-unit-return branch,
+  complete patch, baseline failures and focused test results. Left its remaining main
+  validation, changelog/commit and release integration with that task; did not merge main.
+- **Separate bootstrap outcome:** Raven e141006f3 fixes exact bootstrap Void namespace
+  lookup. Both forced-lookup regressions failed before and all 29 focused tests pass
+  after; six fresh Web compilations succeed. Native consumer evidence is recorded in
+  the [bootstrap unit report](experiments/extended-cli-metadata/unit-bootstrap-2026-10-07.md).
+- **Open:** The handoff does not establish general-fix completion or a release. NeoCLR
+  continues native execution qualification and project/editor/artifact bootstrapping.
