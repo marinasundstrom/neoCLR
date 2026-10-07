@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile the Raven flat-value samples through neoCLR metadata to native ARM64."""
+"""Compile the Raven value samples through neoCLR metadata to native ARM64."""
 import argparse
 import hashlib
 import json
@@ -18,6 +18,7 @@ def main():
     for name in ('compiler', 'runtime', 'aot', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--compiler-revision', required=True)
+    parser.add_argument('--samples', nargs='+', choices=('counter', 'copies', 'nested'), default=['counter', 'copies', 'nested'])
     args = parser.parse_args()
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':
         parser.error('Native execution requires macOS ARM64')
@@ -27,7 +28,7 @@ def main():
             parser.error('Missing built tool: ' + str(path))
     output.mkdir(parents=True, exist_ok=False)
     sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
-    report = dict(profile='raven-flat-values-v1', declaredCompilerRevision=args.compiler_revision,
+    report = dict(profile='raven-inline-values-v2', declaredCompilerRevision=args.compiler_revision,
                   neoClrBaseRevision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   host=platform.platform(), SDKROOT=os.environ.get('SDKROOT'), commands=[], samples={})
 
@@ -44,7 +45,7 @@ def main():
 
     inputs = [compiler, runtime, aot, ROOT / 'docs/experiments/aot-hello/main.c']
     inputs += [compiler.parent / n for n in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
-    for name in ('counter', 'copies'):
+    for name in args.samples:
         source = ROOT / f'docs/experiments/aot-values/{name}.rvn'
         assembly, obj, binary = (output / (name + extension) for extension in ('.dll', '.o', ''))
         inputs.append(source)
@@ -65,7 +66,7 @@ def main():
                                       executableOnlyDirectory=True, dynamicDependencies=dependencies)
     report['inputs'] = {str(p): sha(p) for p in inputs}
     save()
-    print('Passed: Raven Counter and value-copy samples -> neoCLR IL -> independent ARM64 executables')
+    print('Passed: Raven value samples -> neoCLR IL -> independent ARM64 executables')
 
 
 if __name__ == '__main__':

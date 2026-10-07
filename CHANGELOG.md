@@ -48,7 +48,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   accessors and borrowed instance receivers. Preserve copied arguments/results and
   stack joins, default initialization and Fault output rules; keep the v2 C entry.
   Record private aggregate ABI limits, native/interpreter checks and independent
-  executable deployment. Union-based console input is the next sample direction;
+  executable deployment. Extend the following slice with bounded nested record layouts,
+  aggregate field copies and deep interior borrows, rejecting inline cycles and oversized
+  payloads. Validate a Raven Envelope consumer as an independent ARM64 executable and
+  nested copy/alias operations against the interpreter. Union-based console input is
+  the next sample direction;
   nested unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime

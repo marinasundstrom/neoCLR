@@ -1,0 +1,54 @@
+struct Payload {
+    var Value: int = 7
+    var Enabled: bool = true
+
+    func Bump() -> int {
+        Value += 1
+        return Value
+    }
+}
+
+struct Envelope {
+    var Prefix: int = 11
+    var Data: Payload = Payload()
+    var Suffix: int = 13
+}
+
+func Advance(envelope: Envelope) -> Envelope {
+    var payload = envelope.Data
+    payload.Bump()
+    envelope.Data = payload
+    return envelope
+}
+
+func Select(first: bool, left: Envelope, right: Envelope) -> Envelope {
+    if first {
+        return left
+    }
+    return right
+}
+
+func Main() -> int {
+    let original = Envelope()
+    let advanced = Advance(original)
+    if original.Data.Value != 7 || advanced.Data.Value != 8 {
+        return 1
+    }
+    if advanced.Prefix != 11 || advanced.Suffix != 13 || advanced.Data.Enabled != true {
+        return 2
+    }
+    let left = Select(true, original, advanced)
+    let right = Select(false, original, advanced)
+    if left.Data.Value != 7 || right.Data.Value != 8 {
+        return 3
+    }
+    var cleared = default(Envelope)
+    if cleared.Prefix != 0 || cleared.Suffix != 0 || cleared.Data.Value != 0 || cleared.Data.Enabled != false {
+        return 4
+    }
+    cleared.Data = original.Data
+    if cleared.Data.Value != 7 || cleared.Data.Enabled != true || cleared.Suffix != 0 {
+        return 5
+    }
+    return 0
+}

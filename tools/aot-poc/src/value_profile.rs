@@ -1,4 +1,4 @@
-//! Bounded flat value records. All managed addresses borrow active frame storage.
+//! Bounded inline value records. All managed addresses borrow active frame storage.
 use super::{Error, flow};
 use neoclr::metadata::{FunctionRef, Instruction as Op, Representation, Type};
 use std::collections::{HashMap, VecDeque};
@@ -18,6 +18,8 @@ impl Ty {
 }
 pub(super) struct Profile<'a> {
     pub input: &'a neoclr::Module,
+    layouts: Vec<Vec<usize>>,
+    widths: Vec<usize>,
     names: HashMap<&'a str, usize>,
     pub args: Vec<Vec<Ty>>,
     pub locals: Vec<Vec<Ty>>,
@@ -45,20 +47,53 @@ impl<'a> Profile<'a> {
                 || t.packing.is_some()
                 || t.minimum_size.is_some()
                 || t.fields.len() > 8
-                || t.fields
-                    .iter()
-                    .any(|f| f.deferred || !matches!(f.ty, Type::Int32 | Type::Boolean))
+                || t.fields.iter().any(|f| {
+                    f.deferred || !matches!(f.ty, Type::Int32 | Type::Boolean | Type::Named(_))
+                })
             {
-                return Err(format!("{}: value profile requires flat nongeneric records with at most eight Int32/Boolean fields", t.name).into());
+                return Err(format!("{}: value profile requires nongeneric records with at most eight Int32/Boolean/local-record fields", t.name).into());
             }
         }
         let mut p = Self {
             input,
+            layouts: vec![vec![]; input.types.len()],
+            widths: vec![0; input.types.len()],
             names: HashMap::new(),
             args: vec![],
             locals: vec![],
             results: vec![],
         };
+        // Compute bounded inline layouts before using any storage or call signatures.
+        // A visiting node is an illegal inline cycle, including otherwise unused types.
+        fn layout(p: &mut Profile<'_>, i: usize, states: &mut [u8]) -> Result<(), Error> {
+            if states[i] == 1 {
+                return Err("recursive inline value layout is unsupported".into());
+            }
+            if states[i] == 2 {
+                return Ok(());
+            }
+            states[i] = 1;
+            let fields = p.input.types[i].fields.clone();
+            let mut width = 0;
+            for field in fields {
+                let ty = p.stored(&field.ty)?;
+                if let Ty::Record(child) = ty {
+                    layout(p, child, states)?;
+                }
+                p.layouts[i].push(width);
+                width += p.lanes(&ty);
+                if width > 8 {
+                    return Err("value layout exceeds eight flattened lanes".into());
+                }
+            }
+            p.widths[i] = width.max(1);
+            states[i] = 2;
+            Ok(())
+        }
+        let mut states = vec![0; input.types.len()];
+        for i in 0..input.types.len() {
+            layout(&mut p, i, &mut states)?;
+        }
         for (i, f) in input.functions.iter().enumerate() {
             if p.names.insert(&f.name, i).is_some() {
                 return Err("value profile does not support overloaded names".into());
@@ -156,10 +191,21 @@ impl<'a> Profile<'a> {
     }
     pub fn ty(&self, t: &Type) -> Result<Ty, Error> {
         Ok(match t {
-            Type::Int32 => Ty::Int, Type::Boolean => Ty::Bool, Type::Void => Ty::Unit,
-            Type::Named(name) => Ty::Record(self.input.types.iter().position(|t| &t.name == name)
-                .ok_or("value profile requires a local named record")?),
-            _ => return Err("unsupported value type; references, nested values and generics require later profiles".into()),
+            Type::Int32 => Ty::Int,
+            Type::Boolean => Ty::Bool,
+            Type::Void => Ty::Unit,
+            Type::Named(name) => Ty::Record(
+                self.input
+                    .types
+                    .iter()
+                    .position(|t| &t.name == name)
+                    .ok_or("value profile requires a local named record")?,
+            ),
+            _ => {
+                return Err(
+                    "unsupported value type; references and generics require later profiles".into(),
+                );
+            }
         })
     }
     fn stored(&self, t: &Type) -> Result<Ty, Error> {
@@ -171,7 +217,7 @@ impl<'a> Profile<'a> {
     }
     pub fn lanes(&self, t: &Ty) -> usize {
         match t {
-            Ty::Record(i) => self.input.types[*i].fields.len().max(1),
+            Ty::Record(i) => self.widths[*i],
             _ => 1,
         }
     }
@@ -181,6 +227,17 @@ impl<'a> Profile<'a> {
         } else {
             self.lanes(t) as u32 * 4
         }
+    }
+    pub fn field_offset(&self, t: &Ty, index: usize) -> usize {
+        let t = if let Ty::Address(t) = t {
+            t.as_ref()
+        } else {
+            t
+        };
+        let Ty::Record(owner) = t else {
+            unreachable!("checked field owner")
+        };
+        self.layouts[*owner][index]
     }
     pub fn field(&self, t: &Ty, index: usize) -> Result<Ty, Error> {
         let t = if let Ty::Address(t) = t {

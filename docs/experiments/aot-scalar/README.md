@@ -26,7 +26,7 @@ standalone NEOX assemblies; Raven Hello World exercises that pipeline. This does
 not import ordinary .NET CIL.
 
 Modules containing declarations now use the separate bounded
-[flat value/member profile](../aot-values/README.md). The scalar/literal-console
+[value/member profile](../aot-values/README.md). The scalar/literal-console
 contract below remains unchanged for modules without declarations.
 
 ## Supported contract

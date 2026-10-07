@@ -1,4 +1,4 @@
-//! Flat value/member lowering. Records travel as field snapshots, not owning pointers.
+//! Inline value/member lowering. Records travel as field snapshots, not owning pointers.
 use super::{Error, checked_arithmetic, flow, return_if};
 #[path = "value_profile.rs"]
 mod profile;
@@ -207,30 +207,33 @@ pub(super) fn compile(input: &neoclr::Module, root: &str) -> Result<Vec<u8>, Err
                         }
                     }
                     Op::Field(n) | Op::FieldAddress(n) => {
+                        let field = p.field(top(), *n)?;
+                        let offset = p.field_offset(top(), *n);
                         if matches!(top(), Ty::Address(_)) {
-                            let address = pop(&mut stack);
-                            stack.push(if matches!(op, Op::FieldAddress(_)) {
-                                b.ins().iadd_imm(address, (*n * 4) as i64)
+                            let owner = pop(&mut stack);
+                            let address = b.ins().iadd_imm(owner, (offset * 4) as i64);
+                            if matches!(op, Op::FieldAddress(_)) {
+                                stack.push(address);
                             } else {
-                                b.ins()
-                                    .load(types::I32, MemFlags::new(), address, (*n * 4) as i32)
-                            });
+                                stack.extend(read(&mut b, &p, &field, address));
+                            }
                         } else {
                             let value = stack.split_off(stack.len() - p.lanes(top()));
-                            stack.push(value[*n]);
+                            stack.extend_from_slice(&value[offset..offset + p.lanes(&field)]);
                         }
                     }
                     Op::SetField(n) => {
-                        let value = pop(&mut stack);
+                        let value = stack.split_off(stack.len() - p.lanes(top()));
                         let owner = &shape[shape.len() - 2];
+                        let offset = p.field_offset(owner, *n);
                         if matches!(owner, Ty::Address(_)) {
-                            let address = pop(&mut stack);
-                            b.ins()
-                                .store(MemFlags::new(), value, address, (*n * 4) as i32);
+                            let owner = pop(&mut stack);
+                            let address = b.ins().iadd_imm(owner, (offset * 4) as i64);
+                            write(&mut b, address, &value);
                             stack.push(b.ins().iconst(types::I32, 0)); // inhabited Void
                         } else {
-                            let start = stack.len() - p.lanes(owner);
-                            stack[start + n] = value;
+                            let start = stack.len() - p.lanes(owner) + offset;
+                            stack[start..start + value.len()].copy_from_slice(&value);
                         }
                     }
                     Op::Call(target) | Op::Construct(target) => {

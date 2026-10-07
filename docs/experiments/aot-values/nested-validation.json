@@ -1,0 +1,122 @@
+{
+  "profile": "raven-inline-values-v2",
+  "declaredCompilerRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "neoClrBaseRevision": "db4daea0bd390194365aa72c3297c184e40e3d6f",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-values/nested-validation/nested.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-values/nested.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-values/nested-validation/nested.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "/Users/robert/Projects/neoclr/target/aot-values/nested-validation/nested.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-values/nested-validation/nested.o"
+      ],
+      "exit": 0,
+      "stdout": "Emitted aarch64-apple-darwin object; C export: int32_t neoclr_entry_v2(int32_t, int32_t *result)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-values/nested-validation/nested.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-values/nested-validation/nested"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-values/nested-validation/nested.o"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-values/nested-validation/nested"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-values/nested-validation/nested:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "samples": {
+    "nested": {
+      "artifacts": {
+        "nested.dll": "0705c88c7715f553ab5c910c8552b29add74c9cde703475b401ccdc0a23bd9c9",
+        "nested.o": "5d9eaf85ad7c278aaa2ee6bc9236cb1c4b87a2fb4ab01990cf8ef21174ab8d98",
+        "nested": "6cc81164e2ce19551b751ac68cfec62b8a321682e8fa1d8488340e286b4d3a87"
+      },
+      "exit": 0,
+      "stdout": "",
+      "stderr": "",
+      "emptyEnvironment": true,
+      "executableOnlyDirectory": true,
+      "dynamicDependencies": [
+        "/usr/lib/libSystem.B.dylib"
+      ]
+    }
+  },
+  "inputs": {
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "b3fa545ec6ccc150738329ea25b4dfe59dd6a404f2a3e278f9bca475139fc025",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/private/tmp/clean-sdk-retry1007/raven-sdk-0.1.13-neoclr.dev.20261007-osx-arm64/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-values/nested.rvn": "1822386ffa45188118e9483ed19d3dfbdee2dd75fee5b6bae3779721d43a853a"
+  },
+  "date": "2026-10-07",
+  "tests": {
+    "command": "cargo test --locked --manifest-path tools/aot-poc/Cargo.toml --test values",
+    "valueTestsPassed": 10,
+    "valueNativeComparisons": 17,
+    "rejectedValueInputs": 13,
+    "unchangedScalarEvidence": "native-validation.json: 15 scalar tests passed before nested-value slice"
+  },
+  "sourceHashes": {
+    "tools/aot-poc/src/values.rs": "589567e24040d56682fb9bf1c0b61ec3bbab7ec6470d23761462bb7ed4889ac3",
+    "tools/aot-poc/src/value_profile.rs": "7bc3b2bca190946c4a2662ff4ed37ff3bf2435b25af01942d18dbd46b0e8033b",
+    "tools/aot-poc/tests/values.rs": "9316a4262311c57dc9e8a0348e1bb0fc75b2a40ab4aaf7cdf5c57fe07d8665c8",
+    "docs/experiments/aot-values/Nested.pe": "9880be00a2436adf226a73a79da306858f18dbe92a16883870445ae53b320b22",
+    "docs/experiments/aot-values/verify_native.py": "00180aff16d1837b0fde33edef84efc7edfc7e3d3f6e0830b0cb72127bb6a89c"
+  }
+}

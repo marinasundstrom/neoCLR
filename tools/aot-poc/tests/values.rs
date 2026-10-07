@@ -429,3 +429,171 @@ fn scalar_host_input_reaches_value_functions() {
         );
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn raven_nested_values_preserve_constructor_and_copy_semantics() {
+    let bytes = include_bytes!("../../../docs/experiments/aot-values/Nested.pe");
+    let m = module(bytes);
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(0)
+    );
+    native(bytes, 0, 0);
+    native(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 0);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn nested_field_addresses_and_aggregate_updates_preserve_neighbors() {
+    let source = r#"
+.module Nested
+.entry Main
+.type Empty
+.end
+.type Pair
+.field A Int32
+.field B Int32
+.end
+.type Middle
+.field Empty Empty
+.field Pair Pair
+.field Tail Int32
+.end
+.type Outer
+.field Prefix Int32
+.field Middle Middle
+.field Suffix Int32
+.end
+.function Echo(Outer value) -> Outer
+ldarg value
+ret
+.end
+.function Main() -> Int32
+.local Outer original
+.local Outer copy
+.local Int32 observed
+ldc.i4 1000
+newobj Empty
+ldc.i4 3
+ldc.i4 4
+newobj Pair
+ldc.i4 100
+newobj Middle
+ldc.i4 10
+newobj Outer
+stloc original
+; Whole aggregate snapshots and nested value stfld.
+ldloc original
+ldloc original
+ldfld Outer::Middle
+ldc.i4 5
+ldc.i4 6
+newobj Pair
+stfld Middle::Pair
+stfld Outer::Middle
+call Echo(Outer)
+stloc copy
+; Keep a deep interior address across replacement of its containing value.
+ldloca original
+ldflda Outer::Middle
+ldflda Middle::Pair
+ldflda Pair::B
+ldloca original
+ldloc copy
+stobj Outer
+ldc.i4 7
+stobj Int32
+ldloc original
+ldfld Outer::Middle
+ldfld Middle::Pair
+ldfld Pair::B
+stloc observed
+; Aggregate field store through borrowed storage.
+ldloca original
+ldflda Outer::Middle
+ldc.i4 8
+ldc.i4 9
+newobj Pair
+stfld Middle::Pair
+pop
+; Clearing nested storage must preserve adjacent fields.
+ldloca copy
+ldflda Outer::Middle
+ldflda Middle::Pair
+initobj Pair
+ldloc original
+ldfld Outer::Prefix
+ldloc original
+ldfld Outer::Middle
+ldfld Middle::Tail
+add
+ldloc original
+ldfld Outer::Suffix
+add
+ldloc original
+ldfld Outer::Middle
+ldfld Middle::Pair
+ldfld Pair::A
+add
+ldloc original
+ldfld Outer::Middle
+ldfld Middle::Pair
+ldfld Pair::B
+add
+ldloc copy
+ldfld Outer::Middle
+ldfld Middle::Pair
+ldfld Pair::A
+add
+ldloc observed
+add
+ret
+.end
+"#;
+    let m = neoclr::assemble(source).unwrap();
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(1134)
+    );
+    native(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        0,
+        1134,
+    );
+}
+
+#[test]
+fn cyclic_unknown_and_oversized_inline_layouts_never_emit() {
+    for (fields, diagnostic) in [
+        (
+            ".type A\n.field Child B\n.end\n.type B\n.field Child A\n.end",
+            "recursive inline",
+        ),
+        (".type A\n.field Child Int32\n.end", "local named record"),
+        (
+            ".type A\n.field X Int32\n.field Y Int32\n.field Z Int32\n.end\n.type B\n.field X A\n.field Y A\n.field Z A\n.end",
+            "eight flattened lanes",
+        ),
+    ] {
+        let source = format!(
+            ".module Invalid\n.entry Main\n{fields}\n.function Main() -> Int32\nldc.i4 0\nret\n.end\n"
+        );
+        let mut m = neoclr::assemble(&source).unwrap();
+        if diagnostic == "local named record" {
+            m.types[0].fields[0].ty = neoclr::metadata::Type::Named("Missing".into());
+        }
+        let temp = Temp::new();
+        let result = compile(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp,
+        );
+        assert!(!result.status.success());
+        assert!(
+            String::from_utf8_lossy(&result.stderr).contains(diagnostic),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        assert!(!temp.0.join("value.o").exists());
+    }
+}

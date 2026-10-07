@@ -1,8 +1,8 @@
 # AOT value types and members
 
-**2026-10-07 — bounded native implementation on main.** Raven Counter and a second
-copy/member sample now compile through **Raven → neoCLR metadata/IL → ARM64 native
-executable**. Both run without a shared managed framework or runtime. Some/None and
+**2026-10-07 — bounded native implementation on main.** Raven Counter, copy/member
+and nested-record samples now compile through **Raven → neoCLR metadata/IL → ARM64
+native executable**. They run without a shared managed framework or runtime. Some/None and
 Result unions remain the next representation step, followed by a console-input sample.
 The earlier [producer inventory](inventory.json) is historical: it records the
 pre-implementation rejection and the broader union requirements.
@@ -13,7 +13,10 @@ pre-implementation rejection and the broader union requirements.
 on its result. [Copies](copies.rvn) adds an Int32/Boolean record, assignment, copied
 parameters/results, selection through branches, default initialization and a loop.
 Each exits zero only when its assertions pass. [Native evidence](native-validation.json)
-records the exact compiler/runtime inputs, source/artifact hashes and commands.
+records the first flat-value slice. [Nested](nested.rvn) adds a record payload between
+scalar fields, nested constructors, property copies, branching and default initialization.
+[Nested evidence](nested-validation.json) records its producer and native deployment checks.
+Both reports include exact compiler/runtime inputs, source/artifact hashes and commands.
 
 Build the AOT tool and use the pinned native-enabled Raven compiler from the
 [clean bootstrap qualification](../extended-cli-metadata/clean-bootstrap-reproduction-2026-10-07.md):
@@ -28,24 +31,27 @@ python3 docs/experiments/aot-values/verify_native.py \
   --output target/aot-values-run
 ```
 
-The output directory must be new. This runs both samples in the interpreter, compiles
+The output directory must be new. This runs all three samples in the interpreter, compiles
 their PE/#Neo bodies to native objects, links the C startup adapter, checks for no
 object imports and only macOS `libSystem` executable linkage, then runs each copied
 executable alone with an empty environment. Select a compatible Apple SDK as in the
 [Hello World instructions](../aot-hello/README.md). Raven's existing primitive bootstrap
 is a build-time dependency; native code never executes CLI projection bodies.
 
-The checked-in [Counter](Counter.pe) and [Copies](Copies.pe) artifacts come from the
-same pinned producer and corresponding sources. Rust tests use them without invoking
+The checked-in [Counter](Counter.pe), [Copies](Copies.pe) and [Nested](Nested.pe) artifacts
+come from the same pinned producer and corresponding sources. Rust tests use them without invoking
 Raven on each run. Fixture hashes and fresh run hashes are recorded separately;
 byte-identical producer rebuilds are not asserted.
 
 ## Implemented value profile
 
-A module containing type declarations selects the new flat-value profile. It admits
-up to 32 local nongeneric value Record types, each with zero to eight Int32/Boolean
-fields, and up to 128 uniquely named functions/members. Reference types, nested record
-fields, generics, inheritance, interfaces and explicit layout are rejected. Properties
+A module containing type declarations selects the value profile. It admits
+up to 32 local nongeneric value Record types, each with zero to eight fields containing
+Int32, Boolean or other local records, and up to 128 uniquely named functions/members.
+Each complete inline layout is limited to eight primitive/dummy lanes. Recursive inline
+layouts (including mutually recursive unused types), unresolved field types and layouts
+exceeding that bound are rejected before emission. Reference types, generics, inheritance,
+interfaces and explicit layout remain unsupported. Properties
 use their emitted accessor methods; they do not introduce separate native storage.
 
 Supported members have copied Int32/Boolean/record parameters and results or inhabited
@@ -61,7 +67,9 @@ modules. The original scalar/literal-console profile remains available for Hello
 The native layout is private to this experiment:
 
 - Each Int32 or Boolean field uses a four-byte lane, in metadata field order. Empty
-  records use an unobservable dummy lane. This is not the public platform layout;
+  records use an unobservable dummy lane. Nested records are recursively flattened,
+  including empty-record dummy lanes, with field offsets computed from full child widths.
+  This is not the public platform layout;
   `sizeof`, packing, native pointer access and foreign struct ABI operations are rejected.
 - Arguments and locals occupy frame slots. A value load copies field values into SSA
   operands; stores, parameters, returns and branch joins preserve those snapshots.
@@ -94,9 +102,14 @@ comparisons for record snapshots across mutating calls, typed record stack joins
 argument/result copies, value field updates, interior references, self-copy, and zero/eight
 field records crossing the private call boundary. Scalar host input reaches value
 functions at Int32 extremes. Constructor/member arithmetic Faults preserve the output
-sentinel. Ten negative inputs cover classes, reference/nested fields, packing, invalid
+sentinel. Ten negative inputs cover classes, reference fields and recursive inline storage, packing, invalid
 receivers, field indices, dead unsupported instructions, escaping receiver values,
-call-identity mismatches and uninitialized locals. Existing scalar/Hello tests remain.
+call-identity mismatches and uninitialized locals. Three additional rejection cases
+cover mutual inline cycles, unresolved fields and oversized flattened storage. Native
+tests cover the nested Raven fixture in both containers and three-level field addresses,
+whole-payload replacement, deep alias preservation, empty nested records and clearing
+a payload without overwriting adjacent fields. Ten value-profile tests pass; the earlier
+fifteen scalar/Hello test results remain applicable.
 
 The [.NET struct baseline](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct)
 copies values on assignment, parameter passing and return, and distinguishes default
@@ -108,12 +121,19 @@ primitive lanes simplify this bounded backend at the cost of more arguments and 
 provisional layout; they are not a performance improvement claim or a settled ABI.
 The original native decoder/verifier and common Fault lowering remain shared.
 
+Nested storage extends the same .NET-style value-copy contract and interpreter oracle;
+it adds no new source or metadata convention. Keeping nested payloads inline avoids
+allocation and preserves deep field borrows, but copies every primitive lane and keeps
+a strict size bound. Pointer-backed payloads would require lifetime and aliasing rules
+that this slice deliberately does not introduce. Layout is still private: no foreign ABI,
+layout-query, GC, reflection or performance guarantee is inferred from these tests.
+
 ## Next steps toward union-based console input
 
 The author proposes console input once unions work: represent available input,
 end-of-input/failure and parse success/error, then branch over the results. That will
 exercise input services and reference-containing strings as well as union control flow.
-It does not follow automatically from primitive flat-record support.
+It does not follow automatically from reference-free record support.
 
 The inspected Choice/Some/None producer emits nested Record payloads, a tag, out-parameter
 pattern extraction and branches, plus supporting attribute classes and generated
@@ -124,7 +144,7 @@ references. Its initial host-bootstrap attempt rejected generated ToString with
 The explicit native dependency configuration succeeds in the interpreter; no Raven fix
 or native union execution is claimed by this slice.
 
-Next add nested value storage and the required member/out-parameter semantics, retaining
+Nested value storage is now implemented; next add the required out-parameter semantics, retaining
 nominal identities and actual field contracts rather than recognizing union source names.
 Exercise both Some/None branches, then Result success/error. Resolve generated-member
 and library dependencies explicitly. Reference-bearing payloads and console input follow

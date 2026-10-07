@@ -43,9 +43,10 @@ Result and Some, to exercise payload access and control flow/branches. Inspect R
 metadata/IL before selecting the first bounded representation and member slice.
 The [first native value/member slice](experiments/aot-values/README.md) now compiles
 Raven Counter and copied Int32/Boolean records, including constructors, fields,
-accessors, borrowed receivers and branches. Some/None and Result unions remain next:
-nested payloads, out-parameter matching and generated/library members are not yet
-supported. The author adds a console-input sample after unions, exercising input and
+accessors, borrowed receivers and branches. A follow-up slice adds nested
+reference-free records with copied payloads and interior field borrows, validated by
+the Raven Envelope sample. Some/None and Result unions remain next: out-parameter
+matching and generated/library members are not yet supported. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

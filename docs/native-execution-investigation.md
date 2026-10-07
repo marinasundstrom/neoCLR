@@ -42,7 +42,7 @@ The author asks whether reference types should initially use reference counting,
 replacement for tracing. Memory management is independent of code-generation timing:
 AOT requires no JIT, and either native execution mode can call a statically linked
 memory manager. The value/member work is [recorded separately](experiments/aot-values/README.md):
-flat reference-free records now execute natively, without selecting a heap strategy.
+reference-free records (including nested storage) now execute natively, without selecting a heap strategy.
 
 The existing interpreter has a nonmoving tracing heap and reclaims unreachable cycles
 ([implementation](../src/gc.rs), [contract](garbage-collection.md)). .NET's baseline
@@ -90,12 +90,14 @@ No reference-counting implementation or benchmark is added in this planning slic
 
 Raven Counter and Int32/Boolean record consumers now exercise native constructors,
 fields, accessors, borrowed receivers, copied arguments/results and typed branch joins.
+A subsequent nested-record slice adds inline payload storage, aggregate field copies and
+interior borrows with cycle/size rejection; the Raven Envelope sample runs independently.
 The [value profile](experiments/aot-values/README.md) documents the private flattened
 ABI, interpreter comparisons and unsupported cases. It reuses the original native
 metadata reader/verifier and arithmetic-Fault lowering; no new Raven encoding is added.
 Nested unions, their generated/library members and reference-bearing payloads remain
 subsequent work. The author adds console input after unions, exercising input/parse
-outcomes. Neither an input service nor a heap manager is implemented by flat values.
+outcomes. Neither an input service nor a heap manager is implemented by these value records.
 
 ## Findings and proposed direction
 
