@@ -7,13 +7,28 @@ owns metadata identities; a package delivers a compatible set of artifacts. Movi
 assembly between packages must not change its metadata identity or silently select a
 second owner for its types.
 
+## Author-directed foundation rule (2026-10-07)
+
+System.Runtime is the well-defined managed foundation. Higher-level packages depend
+on its fundamental contracts; Runtime must not depend on Data, Networking or Web.
+The author explicitly permits different boundaries from .NET when they benefit neoCLR.
+This sets dependency direction, not a claim that the current Runtime candidate is
+already minimal or that its exact membership is final.
+
+Place an operation in Runtime because it owns a fundamental mechanism, not merely
+because an optional package needs to call it. In this slice managed array reflection
+belongs with Runtime's execution/reflection support, while serialization policy stays
+in Data. Avoid moving JSON models into Runtime or exporting the whole internal service
+facade. Evaluate further abstractions by dependency direction, reuse, API cost and
+runtime constraints; no divergence is automatically an improvement.
+
 ## Candidate layout
 
 | Package role (names provisional) | Contents | Dependencies and gate |
 | --- | --- | --- |
 | Managed foundation | System.Runtime assembly and API documentation | Explicit bootstrap contract; the independent Runtime/orders gate passes |
-| Data | System.Data assembly and documentation | Runtime; array-reflection boundary and JSON execution remain open |
-| Networking | System.Networking assembly and documentation | Runtime and matching native service capability; imported-root overrides and socket/task execution remain open |
+| Data | System.Data assembly and documentation | Runtime; separate JSON/array execution passes (development) |
+| Networking | System.Networking assembly and documentation | Runtime and matching native service capability; separate cancellation/socket consumer passes (development) |
 | Web | System.Web assembly and documentation | Runtime, Networking and currently Data; separate compilation/execution remain open |
 | Platform runtime, per OS/architecture | Native runtime executable and required native assets | Matching metadata/runtime-service contract; macOS arm64 is the current POC qualification target |
 | Developer tools | Raven compiler integration, language server, disassembler and build support | Matching metadata contract plus current .NET host requirements; can initially be one bundle |

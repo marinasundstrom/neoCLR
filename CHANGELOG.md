@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Add development ArrayReflection.GetLength/GetValue/Create for supported managed
+  vectors, with terminal checked faults and preserved reference identity. JSON mapping
+  consumes this public boundary across separate Runtime/Data assemblies. Align API
+  declarations, XML reference, snapshot and website limits. Preserve canonical external
+  Object ownership for ordinary GetType references; add C# and source-free execution
+  regressions. Default runtime instruction limits remain unchanged.
+
 - Validate external-root boxing against the complete authored Object slot contract;
   reject incomplete contracts before encoding. Separate System.Networking now compiles
   and runs the unchanged cancellation consumer against System.Runtime (exit 0).

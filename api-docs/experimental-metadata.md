@@ -7800,3 +7800,13 @@ covers slot interning/category, wrong signatures, incompatible contracts, wrong 
 opcode and execution through a base-typed receiver. General imported virtual class
 methods remain outside this bounded API. Host API documentation lives here; it is not
 a new guest class-library API for the RavenDoc assembly snapshot.
+
+### Ordinary selected-root method references (development, 2026-10-07)
+
+`CreateMethodReference` on the explicitly selected external Object root now uses the
+same canonical native owner/member names as authored root definitions. This includes
+nonvirtual `GetType`; it remains an ordinary instance call. Only
+`CreateObjectSlotReference` claims virtual-slot dispatch. Exact artifact identity and
+CLI member scopes are retained; no dependency is opened by authoring. A C# regression
+checks canonical names and ordinary-call classification, and the API fixture executes
+GetType against the actual source-built Runtime. This closes a JSON mapping link failure.

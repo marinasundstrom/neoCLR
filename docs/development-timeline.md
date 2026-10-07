@@ -11307,3 +11307,20 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
 - **Outcome/open:** Documentation only in this slice. Runtime/orders acceptance remains
   the prior passing evidence; optional-library execution, package implementation and
   CLI/LSP catalog propagation remain open.
+
+## 2026-10-07: Runtime as the dependency foundation
+
+- **Author:** Directed that the system.runtime package be well defined around core
+  runtime functionality, with all other packages depending on those fundamentals,
+  “and not the other way around.” Said this direction need not copy .NET exactly.
+- **Assistant response:** Agreed to enforce dependency direction and distinguish
+  fundamental mechanisms from optional policy. Proposed Runtime-owned managed array
+  reflection consumed by Data-owned JSON mapping as the current concrete boundary.
+- **Action/outcome:** Added ArrayReflection and migrated ObjectMapper off internal
+  cross-assembly services. Separate Runtime/Data consumers now execute nested JSON,
+  setters, arrays, mutation and identity checks. Corrected imported Object call names
+  and native root type-syntax ownership exposed by that execution.
+- **Open:** Exact minimal Runtime membership, separate Web acceptance and distribution/
+  editor catalogs. No package IDs, registry or version scheme was selected here.
+- [Dependency rule](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md),
+  [execution evidence](experiments/extended-cli-metadata/separate-data-2026-10-07.md).

@@ -36,6 +36,7 @@ public sealed partial class MethodBuilder
     internal bool NativeValueOverride { get; set; }
     internal string? NativeImportName { get; set; }
     internal bool NativeImportObjectSlot { get; set; }
+    internal bool NativeImportObjectOwner { get; set; }
     internal bool NativeImportCharOwner { get; set; }
     internal PrimitiveType? NativeImportPrimitiveOwner { get; set; }
     internal bool NativeImportIsNamespaceFunction { get; set; }

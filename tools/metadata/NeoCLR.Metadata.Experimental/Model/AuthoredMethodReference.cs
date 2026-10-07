@@ -108,7 +108,8 @@ public sealed partial class AssemblyBuilder
         { DeclaringReference = declaringType, RequiresVirtualDispatch = (isObjectSlot || isInterface || isOverride && !declaringType.IsValueType) && !isStatic };
         reference.Target.NativeValueOverride = isOverride;
         reference.Target.NativeImportObjectSlot = isObjectSlot;
-        if (isObjectSlot) reference.Target.NativeImportName = "System.Object." + name;
+        reference.Target.NativeImportObjectOwner = Equals(ExternalObjectRoot, declaringType);
+        if (reference.Target.NativeImportObjectOwner) reference.Target.NativeImportName = "System.Object." + (constructor ? ".ctor" : name);
         reference.Target.NativeImportPrimitiveOwner = nativePrimitive;
         reference.Target.NativeImportCharOwner = IsNativeGrapheme(declaringType);
         authoredCallableReferences.Add(reference);

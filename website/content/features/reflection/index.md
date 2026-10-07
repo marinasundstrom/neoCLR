@@ -9,6 +9,15 @@ Import `System.Runtime.Reflection.*` to add execution extensions to those descri
 Expected validation failures are `Result` values, so callers can inspect an error or
 propagate it with `?`.
 
+## Development: dynamic arrays
+
+Separately compiled JSON mapping can use `ArrayReflection` to read managed vector
+lengths and boxed elements, or construct a vector from a runtime-backed array descriptor.
+Reference elements retain identity. These bounded operations use terminal Faults for
+invalid inputs and do not support custom value elements or multidimensional arrays.
+See the [API contract](/docs/reflection/#dynamic-managed-arrays-development-2026-10-07).
+This is development work after Preview 12; use matching rebuilt libraries.
+
 ## Construct and invoke
 
 This excerpt comes from the executable reflection consumer. `Model` has a public

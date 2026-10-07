@@ -1097,3 +1097,8 @@ is unchanged. Its two public declarations in the temporary bootstrap are transla
 scaffolding, like RuntimeServices, and are intentionally outside RavenDoc selection.
 Source constructor execution and access checks are documented in the
 [construction gate](../docs/experiments/extended-cli-metadata/reflection-construction-2026-10-07.md).
+
+Development 2026-10-07: ArrayReflection is included in the generated reference and XML
+member documentation, with source-backed GetLength/GetValue/Create and vector/Fault
+limits in [the reflection guide](reflection.md). The reference bridge supplies only
+matching declarations; native acceptance compiles the actual Raven implementations.

@@ -1,0 +1,38 @@
+import System.*
+import System.Runtime.Reflection.*
+
+public class Item {
+    init() { }
+    var Count: int { get; set; } = 1
+}
+
+func Main() -> int {
+    let source: Object?[] = [1, 2]
+    let array = ArrayReflection.Create(typeof(int[]), source)
+    source[0] = 99
+    if ArrayReflection.GetLength(array) != 2 {
+        return 1
+    }
+    if ArrayReflection.GetValue(array, 0) is int number {
+        if number != 1 {
+            return 2
+        }
+    } else {
+        return 3
+    }
+    let item = Item()
+    let references = ArrayReflection.Create(typeof(Item[]), [item, null])
+    if ArrayReflection.GetValue(references, 0) is Item shared {
+        shared.Count = 42
+    } else {
+        return 4
+    }
+    if item.Count != 42 || ArrayReflection.GetValue(references, 1) != null {
+        return 5
+    }
+    let empty = ArrayReflection.Create(typeof(int[]), [])
+    if ArrayReflection.GetLength(empty) != 0 {
+        return 6
+    }
+    return 42
+}

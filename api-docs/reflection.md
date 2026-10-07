@@ -123,3 +123,29 @@ collection before using the same retained-constructor invocation contract. This
 supports cached route bindings without exposing private array-allocation services.
 The caller controls collection mutation while it is copied. It adds no overload
 selection or coercion, and provider/constructor Faults remain terminal.
+
+## Dynamic managed arrays (development, 2026-10-07)
+
+[ArrayReflection](xref:System.Runtime.Reflection.ArrayReflection) supplies three bounded
+operations used by independently compiled JSON mapping:
+
+- `GetLength(array: Object) -> int` returns vector length.
+- `GetValue(array: Object, index: int) -> Object?` boxes scalars and preserves references/null.
+- `Create(arrayType: TypeInfo, values: Object?[]) -> Object` creates a new vector from
+  a runtime-backed **array** descriptor and copies exact boxed scalars or compatible references.
+
+For example, `ArrayReflection.Create(typeof(int[]), [1, 2])` produces a managed Int32
+vector. Input element storage is copied; referenced objects retain identity. Operations
+use ordinary VM type, bounds, allocation and rooting checks. Invalid indexes, wrong
+boxed types, null array inputs, unbound descriptors and unsupported element types cause
+terminal runtime Faults; these methods do not return ReflectionError. Supported elements
+are the runtime's built-in numeric/Boolean/Char scalars and object-reference types,
+including arrays. Custom structs/unions and multidimensional arrays are unsupported.
+
+Compared with [.NET Array](https://learn.microsoft.com/en-us/dotnet/api/system.array),
+which supplies instance GetValue/GetLength and length-based CreateInstance overloads,
+this facade takes Object and a vector descriptor because the dynamic caller has no
+compile-time element type. Initializing from supplied values avoids exposing partially
+initialized value storage. The cost is a copy and a narrower API; this is not a claim
+of better performance. A future checked Result API remains possible without exposing
+the internal RuntimeServices surface. Introspection descriptors alone stay non-executable.

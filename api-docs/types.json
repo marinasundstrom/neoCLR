@@ -227,6 +227,7 @@
   "System.Runtime.CompilerServices.UnionAttribute",
   "System.Runtime.GC",
   "System.Runtime.InteropServices.NativeMemory",
+  "System.Runtime.Reflection.ArrayReflection",
   "System.Runtime.Reflection.ConstructorReflectionExtensions",
   "System.Runtime.Reflection.FieldReflectionExtensions",
   "System.Runtime.Reflection.MethodReflectionExtensions",

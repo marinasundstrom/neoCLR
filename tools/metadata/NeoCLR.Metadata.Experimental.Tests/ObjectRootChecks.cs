@@ -87,6 +87,11 @@ internal static class ObjectRootChecks
         _ = graph.CreateObjectSlotReference("GetHashCode", new(PrimitiveType.Int32, []));
         il.LoadConstant(42); il.Box(PrimitiveType.Int32); il.IsInstance(PrimitiveType.Int32);
         il.IsNull(); il.Emit(OpCode.Brtrue, failed);
+        var typeInfo = graph.CreateTypeReference(library.Identity, core.Identity,
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), "System.Introspection", "TypeInfo", 0);
+        var getType = graph.CreateMethodReference(root, "GetType", new(typeInfo, []));
+        if (getType.RequiresVirtualDispatch) throw new Exception("GetType must retain ordinary instance dispatch");
+        il.NewObject(ctor); il.Call(getType); il.Emit(OpCode.Pop);
         il.NewObject(ctor); il.LoadDefault(root); il.Emit(OpCode.Callvirt, graph.CreateObjectSlotReference("Equals", new(PrimitiveType.Boolean, [root])));
         il.Emit(OpCode.Brfalse, failed); il.LoadConstant(42); il.Return();
         il.MarkLabel(failed); il.LoadConstant(1); il.Return();
@@ -147,7 +152,17 @@ internal static class ObjectRootChecks
             else method = owner.AddOverride("Equals", signature);
             method.GetILGenerator().Emit(OpCode.Ldc_Bool, true);
             method.GetILGenerator().Return();
-            var native = NativeAssemblyDefinition.ReadAssembly(graph.WriteNativeAssembly());
+            var ordinaryMember = graph.CreateMethodReference(root, "GetType", new(root, []));
+            if (ordinaryMember.RequiresVirtualDispatch) throw new Exception("ordinary root method became virtual");
+            var caller = graph.AddFunction("RootMember", new(root, [root]));
+            caller.GetILGenerator().LoadArgument(0);
+            caller.GetILGenerator().Call(ordinaryMember);
+            caller.GetILGenerator().Return();
+            var nativeImage = graph.WriteNativeAssembly();
+            var text = System.Text.Encoding.UTF8.GetString(nativeImage);
+            if (!text.Contains("System.Object.GetType") || text.Contains("T_53797374656D_4F626A656374"))
+                throw new Exception("ordinary external Object method lost canonical owner/name");
+            var native = NativeAssemblyDefinition.ReadAssembly(nativeImage);
             _ = native.CreateReferenceAssembly(graph.CoreLibrary);
             var loaded = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph));
             if (loaded.MainModule.Types.Single().Methods.Single().Name != "Equals")

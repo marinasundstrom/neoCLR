@@ -6552,3 +6552,19 @@ ordinary consumer invocation does not. Unchanged network cancellation executes a
 independently built Runtime and Networking. Native import remains direct; the primitive
 bootstrap and finalized retained runtime services remain explicit dependencies.
 [Commands, evidence and remaining scope](experiments/extended-cli-metadata/separate-networking-2026-10-07.md).
+
+### Separate Data and array reflection — 2026-10-07
+
+Runtime exports the bounded ArrayReflection facade; ObjectMapper no longer calls
+internal array services across an assembly boundary. The native driver uses separate
+Runtime and Data references, with explicit selected Object ownership. Raven normalizes
+bootstrap Object type syntax to the selected native root, including parent-namespace
+lookup, while ordinary .NET behavior stays unchanged. Metadata authoring preserves
+canonical Object ownership for nonvirtual GetType as well as virtual slots.
+
+The CLI reference bridge adds matching ArrayReflection declarations/signature admission
+and source-library export selection solely to keep the existing reference/docs workflow
+aligned. The native gate executes Raven source implementations through native metadata,
+not those placeholder bodies. Array elements remain managed vectors; boxed scalars,
+reference identity and null retain existing storage semantics. Terminal array Faults
+are explicit development limits. See [the split Data gate](experiments/extended-cli-metadata/separate-data-2026-10-07.md).

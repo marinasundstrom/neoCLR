@@ -39,7 +39,16 @@ consumer against System.Runtime (exact stdout, exit 0). The CheckedStorage failu
 an omitted explicit `--bootstrap-intrinsics` audit option; the subsequent boxing gap
 now validates the complete selected external Object contract.
 [Networking gate](experiments/extended-cli-metadata/separate-networking-2026-10-07.md).
-Next: the supported array-reflection boundary for Data, then Web and project/LSP catalogs.
+Separate **System.Data now executes JSON object mapping** using the public Runtime
+ArrayReflection boundary. Nested models, setters, managed/jagged arrays, mutation,
+reference identity and invalid-input checks pass against emitted references only.
+[Data gate](experiments/extended-cli-metadata/separate-data-2026-10-07.md).
+Next: independently compile/execute Web, then project/LSP catalogs.
+
+Author-directed foundation rule (2026-10-07): System.Runtime owns well-defined
+fundamentals; higher-level packages depend on it, never the reverse. Exact Runtime
+membership remains subject to dependency review. .NET is a comparison point, not a
+required package layout; document benefits and costs of different boundaries.
 The author's platform-package direction is recorded separately from assembly ownership:
 [candidate distribution boundaries](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md).
 No new package resolver or native plugin mechanism is a prerequisite for these gates. Keep the existing POC sample/editor gates as ownership moves.
