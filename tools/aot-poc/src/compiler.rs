@@ -29,9 +29,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool) -> Resu
                     matches!(t, Type::Value)
                         || matches!(t, Type::ByRef(inner) if **inner == Type::Value)
                 })
-                || f.body
-                    .iter()
-                    .any(|op| matches!(op, Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_)))
+                || f.body.iter().any(|op| {
+                    matches!(op, Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
+                        || matches!(op, Op::Call(target) if target.definition.is_some())
+                })
         })
     {
         return values::compile(input, root);

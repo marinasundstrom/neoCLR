@@ -122,7 +122,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   copied locals/calls/results/output slots and pack/test/unpack lowering. Incorrect unpack
   returns RuntimeError without publishing a result; defaults, reference/record payloads,
   nested erasure and Value fields remain rejected. Validate standalone CIL transport and
-  advance the unchanged ReadByte probe to its selected generic-helper boundary.
+  advance the unchanged ReadByte probe to its selected generic-helper boundary. Add
+  bounded primitive static generic-method specialization, exact call binding and distinct
+  private bodies with original identities/origins reported. Validate Raven forwarding in
+  PE/NEOX, cross-library method shapes and clone/identity/access rejection. ReadByte now
+  exposes managed helper bodies in the validation-only System seed; no implicit seed
+  compilation or native service binding is added.
   System seed bodies remain validation-only; no native
   reference services, interface execution or public ABI/runtime APIs are added.
   General unions, reference fields and general library dependency compilation remain

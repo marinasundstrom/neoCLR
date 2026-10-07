@@ -186,3 +186,62 @@ python3 docs/experiments/aot-input/verify_erased.py \
 The next bounded task is specialization of the ordinary generic primitive test/unpack
 helpers with original member identities preserved. Native service binding and explicit
 capability/error tests follow; interactive parsing and UTF-8 text ownership remain later.
+
+## Primitive generic method specialization (2026-10-07)
+
+The [Raven generic-method consumer](generic-methods.rvn) now compiles `Identity<T>` and
+`Forward<T>` on an ordinary static class for Int32, Byte and Boolean. Both PE and NEOX
+inputs execute natively. [Pipeline evidence](method-validation.json) covers freshly
+compiled Raven metadata, interpreter parity, matching inspection/emission reports and
+standalone ARM64 deployment. `GenericMethods.pe` is the checked producer fixture.
+
+Closed-world preparation binds each original call by name, owner, instance mode, exact
+substituted parameters, generic arity and supplied definition identity. It interns
+primitive method shapes, copies ordinary bodies, substitutes signatures and type-bearing
+instructions, and rewrites calls to explicit private clone identities. This supports
+forwarding one method parameter into another generic call and different instantiations
+whose nongeneric call signatures are identical. There is no helper-name intrinsic.
+
+The scope is static methods on nongeneric owners (or module functions), up to four
+Int32/Byte/Boolean/Void method arguments, 32 clones and 128 selected functions. Generic
+constraints, generic instance methods, generic methods on constructed owners, reference
+arguments and recursive call graphs remain rejected. Value-type specialization still
+permits only one shape per definition. Void method arguments are useful for `value.is`
+and `value.unpack`; they do not enable Void local or field storage.
+
+`specialization.methods` records each source definition, source origin, arguments and
+private expanded row. Selected function rows retain the original source identity/name,
+with `compiledName`, `expandedIndex` and `methodArguments` describing the clone. Excluded
+original generic templates are not executable bodies; their selected instances appear
+separately. Original metadata is unchanged. Clones receive unused private method tokens
+and absent parameter-row markers, retaining assembly/access facts. Original metadata is
+verified before this projection, including standalone modules with generic clones, so
+new tokens cannot repair an invalid source. These names/tokens are private build details,
+not stable native exports or a deployed metadata sidecar.
+
+This extends the existing [.NET Native AOT comparison](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/):
+compile closed generic value shapes ahead of execution, accepting code-size growth as a
+cost. The bounded compiler uses copied bodies rather than general shared generic code
+or runtime dictionaries. This keeps exact primitive type tests straightforward but caps
+coverage and duplicates bodies. No performance advantage or general .NET generic support
+is claimed. Exact member binding and original-scope verification remain the foundation.
+
+The actual ReadByte call now exposes the next dependency: `RuntimeServices.IsValue<T>`
+resolves to a managed IL body in the System seed. That seed remains **validation only**,
+so its bodies are not silently imported. The current reproduction scripts assert this
+missing-body boundary. Selective managed seed-body compilation needs an explicit opt-in
+contract and must still reject internal calls/native services until their bindings exist.
+
+```sh
+python3 docs/experiments/aot-input/verify_methods.py \
+  --compiler /absolute/path/to/rvnc.dll \
+  --compiler-revision 70aea9a7e9e424159a48b0227869245a95bf2ec2 \
+  --runtime /absolute/path/to/neoclr \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --bundle /absolute/path/to/neoclr-native-poc \
+  --output target/aot-generic-methods
+```
+
+Tests cover multi-shape erased type tests/unpack, forwarded generic arguments, original
+library revisions, bad signatures/arity/identities, private access, constraints, recursive
+calls, 32-versus-33 clone bounds and malformed original source tokens.

@@ -457,7 +457,7 @@ fn invalid_runtime_contexts_never_emit() {
 }
 
 #[test]
-fn unused_generic_methods_are_verified_but_selected_ones_still_fail() {
+fn unused_generic_methods_are_verified_and_selected_primitive_ones_compile() {
     let (seed, mut m) = runtime_context_fixture();
     let template = neoclr::assemble(
         ".module Template\n.function Unused<T>(T value) -> T\nldarg value\nret\n.end",
@@ -488,8 +488,13 @@ fn unused_generic_methods_are_verified_but_selected_ones_still_fail() {
     ];
     let dir = Temp::new();
     let result = invoke_context(&dir, &seed, &m, 0, false);
-    assert!(!result.status.success());
-    assert!(!dir.0.join("app.o").exists());
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    native(&dir, 42);
 }
 
 fn interface_modules() -> Vec<neoclr::Module> {
@@ -695,5 +700,111 @@ fn static_owners_do_not_enable_reference_values_or_bypass_access() {
                 assert!(error.contains("access denied"), "{error}");
             }
         }
+    }
+}
+
+fn generic_method_modules() -> Vec<neoclr::Module> {
+    neoclr::assembler::assemble_modules(&[
+        ".module App\n.references (Helpers#r1)\n.entry Main\n.function Main() -> Int32\n.local Value item\nldc.i4 255\nvalue.pack Byte\nstloc item\nldloc item\ncall Forward<Byte>(Value)\nbrfalse fail\nldloc item\ncall Is<Int32>(Value)\nbrtrue fail\nldvoid\nvalue.pack Void\ncall Is<Void>(Value)\nbrfalse fail\nldc.bool true\nvalue.pack Boolean\ncall Is<Boolean>(Value)\nbrfalse fail\nldloc item\ncall Unpack<Byte>(Value)\nret\nfail:\nldc.i4 -1\nret\n.end",
+        ".module Helpers\n.revision r1\n.function Is<T>(Value item) -> Boolean\nldarg item\nvalue.is T\nret\n.end\n.function Forward<T>(Value item) -> Boolean\nldarg item\ncall Is<T>(Value)\nret\n.end\n.function Unpack<T>(Value item) -> T\nldarg item\nvalue.unpack T\nret\n.end"
+    ]).unwrap()
+}
+
+#[test]
+fn primitive_generic_methods_clone_exact_shapes_and_preserve_library_identities() {
+    let m = generic_method_modules();
+    let program =
+        neoclr::LoadedProgram::with_modules(&m[0], neoclr::library::system().unwrap(), &m[1..])
+            .unwrap();
+    assert_eq!(
+        program.run(neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(255)
+    );
+    let dir = Temp::new();
+    let inspected = invoke(&dir, &encode(&m[0]), &[encode(&m[1])], "@entry", true);
+    let inspection: serde_json::Value = serde_json::from_slice(&inspected.stdout).unwrap();
+    assert_eq!(inspection["admission"]["accepted"], true, "{inspection}");
+    let result = invoke(&dir, &encode(&m[0]), &[encode(&m[1])], "@entry", false);
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert_eq!(report, inspection["selection"]);
+    let methods = report["specialization"]["methods"].as_array().unwrap();
+    assert_eq!(methods.len(), 6); // Four Is shapes, Forward<Byte>, Unpack<Byte>.
+    assert!(
+        methods
+            .iter()
+            .all(|m| m["definition"]["module"] == "Helpers" && m["definition"]["revision"] == "r1")
+    );
+    let tests: Vec<_> = report["functions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|m| m["name"] == "Is")
+        .collect();
+    assert_eq!(tests.len(), 4);
+    assert!(
+        tests.iter().all(|m| m["definition"]["index"] == 0
+            && m["methodArguments"].as_array().unwrap().len() == 1)
+    );
+    assert_eq!(
+        tests
+            .iter()
+            .map(|m| m["compiledName"].as_str().unwrap())
+            .collect::<std::collections::HashSet<_>>()
+            .len(),
+        4
+    );
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    native(&dir, 255);
+}
+
+#[test]
+fn generic_method_specialization_rejects_bad_identity_access_and_shapes() {
+    for case in 0..7 {
+        let mut m = generic_method_modules();
+        let call = m[0].functions[0]
+            .body
+            .iter_mut()
+            .find_map(|op| {
+                if let Op::Call(target) = op {
+                    Some(target)
+                } else {
+                    None
+                }
+            })
+            .unwrap();
+        match case {
+            0 => call.generic_arguments[0] = neoclr::metadata::Type::String,
+            1 => call.generic_arguments.push(neoclr::metadata::Type::Int32),
+            2 => call.parameters[0] = neoclr::metadata::Type::Int32,
+            3 => {
+                call.definition = Some(neoclr::metadata::MemberId {
+                    module: "Helpers".into(),
+                    revision: Some("wrong".into()),
+                    index: 1,
+                })
+            }
+            4 => m[1].functions[1].visibility = Visibility::Private,
+            5 => m[1].functions[1]
+                .generic_constraints
+                .push(neoclr::metadata::GenericConstraint {
+                    parameter: 0,
+                    kind: neoclr::metadata::ConstraintKind::ValueType,
+                }),
+            6 => {
+                let recursive = neoclr::assemble(".module Recursive\n.function Is<T>(Value item) -> Boolean\nldarg item\ncall Is<T>(Value)\nret\n.end").unwrap();
+                m[1].functions[0].body = recursive.functions[0].body.clone();
+            }
+            _ => unreachable!(),
+        }
+        let dir = Temp::new();
+        let result = invoke(&dir, &encode(&m[0]), &[encode(&m[1])], "@entry", false);
+        assert!(!result.status.success(), "accepted case {case}");
+        assert!(!dir.0.join("app.o").exists());
+        assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
     }
 }

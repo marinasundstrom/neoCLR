@@ -22,9 +22,23 @@ pub(crate) fn static_owner(t: &neoclr::metadata::TypeDef) -> bool {
 
 /// Shared preparation for native emission and read-only admission inspection.
 pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Value), Error> {
-    if input.types.iter().any(|t| !t.generic_parameters.is_empty()) {
+    validate_source(input, true)?;
+    if input.types.iter().any(|t| !t.generic_parameters.is_empty())
+        || input
+            .functions
+            .iter()
+            .any(|f| !f.generic_parameters.is_empty())
+    {
         let (expanded, specialization) = super::specialization::expand(input, root)?;
+        if !specialization["methods"].as_array().unwrap().is_empty() {
+            // Cloning assigns private origin tokens. Verify originals first so this
+            // cannot repair invalid source metadata or bypass generic contracts.
+            neoclr::LoadedProgram::new(input)
+                .and_then(|p| p.verify())
+                .map_err(|e| e.to_string())?;
+        }
         let (selected, mut report) = select(&expanded, root)?;
+        super::specialization::restore_methods(&mut report, &specialization);
         report["specialization"] = specialization;
         Ok((selected, report))
     } else {

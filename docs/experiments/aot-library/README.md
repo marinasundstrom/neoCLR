@@ -46,7 +46,8 @@ neoclr-aot-poc --inspect App.pe @entry --closed-world --module Values.pe
 - Each input is limited to 16 MiB; the combined inventory is limited to 4,096 functions
   and 1,024 types. Selected code keeps the existing 128-function/32-type/inline-layout
   limits. Source modules and source assemblies must be distinct. No dependency discovery,
-  dynamic loading, selected generic methods or interface dispatch is supported.
+  dynamic loading or interface dispatch is supported. Primitive static generic methods
+  now have bounded specialization; see the [generic helper slice](../aot-input/README.md#primitive-generic-method-specialization-2026-10-07).
   Explicit System/Object validation contexts are available as described below. The
   follow-up generic profile admits one closed instantiation per value
   definition, as described below; constraints and reference payloads remain unsupported.
@@ -147,7 +148,8 @@ Object type definition identity and whether the context was explicit. The seed i
 for **validation only**; its bodies are not compilation inputs. A selected call requiring
 an unsupplied System implementation still fails. Native reference allocation, virtual
 calls and interface execution remain unsupported. Unselected generic methods in a supplied
-library are now permitted after ordinary verification; selected generic methods still fail.
+library are permitted after ordinary verification; the subsequent primitive static
+method-specialization slice now admits bounded selected generic methods.
 This admits the complete runtime library without claiming its entire API can compile.
 
 [Context evidence](context-validation.json) uses the pinned runtime-owned seed/library

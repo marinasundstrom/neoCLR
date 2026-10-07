@@ -128,6 +128,10 @@ pub fn prepare(
         .types
         .iter()
         .any(|t| !t.generic_parameters.is_empty())
+        || joined
+            .functions
+            .iter()
+            .any(|f| !f.generic_parameters.is_empty())
     {
         Some(super::specialization::expand(&joined, root)?)
     } else {
@@ -139,6 +143,10 @@ pub fn prepare(
         for row in specialization["types"].as_array_mut().unwrap() {
             row["definition"] = json!(types[row["sourceIndex"].as_u64().unwrap() as usize]);
         }
+        for row in specialization["methods"].as_array_mut().unwrap() {
+            row["definition"] = json!(methods[row["sourceIndex"].as_u64().unwrap() as usize]);
+        }
+        super::specialization::restore_methods(&mut report, &specialization);
         report["specialization"] = specialization;
     }
     for key in ["functions", "excludedFunctions"] {
@@ -181,6 +189,6 @@ pub fn prepare(
     report["loadSet"] = json!({"modules": inputs.iter().map(|m| json!({"name": m.name, "revision": m.revision})).collect::<Vec<_>>(),
         "validation": "all original bodies verified with runtime binder before private canonical projection",
         "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "scope": "validation only; System seed bodies are not compilation inputs"},
-        "limits": "one closed instantiation per local value definition; no selected generic methods; one to eight explicit dependencies; no dynamic loading"});
+        "limits": "one closed instantiation per local value definition; primitive static generic methods; one to eight explicit dependencies; no dynamic loading"});
     Ok((selected, report))
 }

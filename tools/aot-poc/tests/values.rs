@@ -1563,3 +1563,79 @@ fn erased_profile_rejects_defaults_uninitialized_slots_and_unsupported_payloads(
         assert!(!String::from_utf8_lossy(&compiled.stderr).contains("panicked"));
     }
 }
+
+#[test]
+fn raven_generic_methods_compile_from_pe_and_neox_with_original_tokens_reported() {
+    let pe = include_bytes!("../../../docs/experiments/aot-input/GenericMethods.pe");
+    let m = module(pe);
+    for bytes in [
+        pe.to_vec(),
+        neoclr::metadata_container::write_module(&m).unwrap(),
+    ] {
+        let temp = Temp::new();
+        let compiled = compile_mode(&bytes, &temp, "@entry", true);
+        assert!(
+            compiled.status.success(),
+            "{}",
+            String::from_utf8_lossy(&compiled.stderr)
+        );
+        let report: serde_json::Value = serde_json::from_slice(&compiled.stdout).unwrap();
+        let methods = report["specialization"]["methods"].as_array().unwrap();
+        assert_eq!(methods.len(), 6);
+        for method in methods {
+            let source = method["sourceIndex"].as_u64().unwrap() as usize;
+            assert_eq!(
+                method["sourceOrigin"]["token"],
+                m.functions[source].origin.as_ref().unwrap().token
+            );
+        }
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        native_mode(&bytes, 0, 0, 0, "@entry", true);
+    }
+    let mut invalid = m;
+    invalid.functions[1].origin.as_mut().unwrap().token =
+        invalid.functions[0].origin.as_ref().unwrap().token;
+    let temp = Temp::new();
+    let result = compile_mode(
+        &neoclr::metadata_container::write_module(&invalid).unwrap(),
+        &temp,
+        "@entry",
+        true,
+    );
+    assert!(!result.status.success());
+    assert!(String::from_utf8_lossy(&result.stderr).contains("metadata token"));
+    assert!(!temp.0.join("value.o").exists());
+}
+
+#[test]
+fn generic_method_clones_are_bounded_and_keep_plain_callees_at_the_limit() {
+    for count in [32, 33] {
+        let mut source =
+            String::from(".module MethodLimit\n.entry Main\n.function Main() -> Int32\n");
+        for i in 0..count {
+            source += &format!("call Helper{i}<Int32>()\npop\n");
+        }
+        source += "call Tail()\nret\n.end\n.function Tail() -> Int32\nldc.i4 42\nret\n.end\n";
+        for i in 0..count {
+            source += &format!(".function Helper{i}<T>() -> Int32\nldc.i4 1\nret\n.end\n");
+        }
+        let m = neoclr::assemble(&source).unwrap();
+        let temp = Temp::new();
+        let result = compile_mode(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp,
+            "@entry",
+            true,
+        );
+        assert_eq!(
+            result.status.success(),
+            count == 32,
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        if count == 33 {
+            assert!(String::from_utf8_lossy(&result.stderr).contains("32 clones"));
+            assert!(!temp.0.join("value.o").exists());
+        }
+    }
+}

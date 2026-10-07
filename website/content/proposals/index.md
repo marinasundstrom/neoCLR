@@ -240,7 +240,9 @@ byte-input prerequisites now include a tested nested Result/Option outcome model
 Empty static member owners now compile without object allocation; actual Console.ReadByte
 now passes bounded primitive erased-value storage and reaches generic helper calls.
 Primitive pack/test/unpack preserves exact types and propagates incorrect-unpack faults;
-generic helpers, native input services and UTF-8 text lifetimes remain future work.
+primitive static generic helpers now specialize with source identities retained in build
+reports. Explicit compilation of selected System seed bodies, native input services and
+UTF-8 text lifetimes remain future work.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

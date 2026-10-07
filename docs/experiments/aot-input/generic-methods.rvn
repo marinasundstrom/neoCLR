@@ -1,0 +1,22 @@
+static class Helpers {
+    static func Identity<T>(value: T) -> T {
+        return value
+    }
+
+    static func Forward<T>(value: T) -> T {
+        return Identity<T>(value)
+    }
+}
+
+func Main() -> int {
+    if Helpers.Forward<int>(42) != 42 {
+        return 1
+    }
+    if Helpers.Forward<byte>((byte)255) != 255 {
+        return 2
+    }
+    if !Helpers.Forward<bool>(true) || Helpers.Forward<bool>(false) {
+        return 3
+    }
+    return 0
+}

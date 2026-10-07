@@ -1,0 +1,442 @@
+{
+  "profile": "aot-primitive-generic-methods-v1",
+  "declaredCompilerRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "baseRevision": "31df944c6cb377b2da9d214444badf3fae408fd9",
+  "inputs": {
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "8bcad98a8f927e8841d4674667e6a2f1947cb3e5b9c2022dd023ad5c04857906",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-input/generic-methods.rvn": "e58256ae55406803a100c32852929f7363b3ebc1dff9a012e9c0b7f47bc2ec4f",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe": "745c5cdd9ac8ec34c53603c09f134eafa46c3f91622dfd5060fdc788222143c0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-generic-methods/GenericMethods.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/generic-methods.rvn"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-generic-methods/GenericMethods.dll"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-generic-methods/GenericMethods.dll",
+        "@entry",
+        "--closed-world"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 16574,
+        "sha256": "62bbc03f0bb5a97b1228739cfc646d98390294dd948f769512ab1abde7d49f6f"
+      }
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-generic-methods/GenericMethods.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-generic-methods/transport.o"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 9988,
+        "sha256": "efced8237b8222d634895f24752078865d20757a7385c3329e32c25e7be61888"
+      }
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-generic-methods/transport.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-generic-methods/transport"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-generic-methods/transport.o"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-generic-methods/transport"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-generic-methods/transport:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "bytes": 8596,
+        "sha256": "23e3c096f1625cd0ea11d8024341d59b7dc3592bcdde0e7c34a418ce90904b41"
+      }
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-input/ReadByte.pe",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-generic-methods/read-byte.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 1,
+      "stderr": "aot-poc: generic call identity/signature is missing or ambiguous: FunctionRef { definition: None, name: \"System.Runtime.CompilerServices.RuntimeServices.IsValue\", owner: Some(Named(\"System.Runtime.CompilerServices.RuntimeServices\")), instance: false, generic_arguments: [Int32], parameters: [Value] }\n",
+      "stdout": ""
+    }
+  ],
+  "selection": {
+    "excludedFunctions": [
+      {
+        "definition": null,
+        "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_4964656E74697479",
+        "sourceIndex": 1
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_466F7277617264",
+        "sourceIndex": 2
+      }
+    ],
+    "excludedTypes": [],
+    "functions": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.F_4D61696E",
+        "sourceIndex": 0
+      },
+      {
+        "compiledIndex": 1,
+        "compiledName": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_466F7277617264$aot_method_3",
+        "definition": {
+          "index": 2,
+          "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 3,
+        "methodArguments": [
+          "Int32"
+        ],
+        "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_466F7277617264",
+        "sourceIndex": 2
+      },
+      {
+        "compiledIndex": 2,
+        "compiledName": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_466F7277617264$aot_method_4",
+        "definition": {
+          "index": 2,
+          "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 4,
+        "methodArguments": [
+          "Byte"
+        ],
+        "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_466F7277617264",
+        "sourceIndex": 2
+      },
+      {
+        "compiledIndex": 3,
+        "compiledName": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_466F7277617264$aot_method_5",
+        "definition": {
+          "index": 2,
+          "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 5,
+        "methodArguments": [
+          "Boolean"
+        ],
+        "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_466F7277617264",
+        "sourceIndex": 2
+      },
+      {
+        "compiledIndex": 4,
+        "compiledName": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_4964656E74697479$aot_method_6",
+        "definition": {
+          "index": 1,
+          "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 6,
+        "methodArguments": [
+          "Boolean"
+        ],
+        "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_4964656E74697479",
+        "sourceIndex": 1
+      },
+      {
+        "compiledIndex": 5,
+        "compiledName": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_4964656E74697479$aot_method_7",
+        "definition": {
+          "index": 1,
+          "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 7,
+        "methodArguments": [
+          "Byte"
+        ],
+        "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_4964656E74697479",
+        "sourceIndex": 1
+      },
+      {
+        "compiledIndex": 6,
+        "compiledName": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_4964656E74697479$aot_method_8",
+        "definition": {
+          "index": 1,
+          "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 8,
+        "methodArguments": [
+          "Int32"
+        ],
+        "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_4964656E74697479",
+        "sourceIndex": 1
+      }
+    ],
+    "metadataPolicy": "original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
+    "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+    "policy": "explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch",
+    "root": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.F_4D61696E",
+    "schema": "neoclr-aot-selection-v1",
+    "specialization": {
+      "methods": [
+        {
+          "arguments": [
+            "Int32"
+          ],
+          "definition": {
+            "index": 2,
+            "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 3,
+          "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_466F7277617264",
+          "sourceIndex": 2,
+          "sourceOrigin": {
+            "assembly": "[\"GenericMethods\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "GenericMethods.dll",
+            "name": "Forward",
+            "parameter_tokens": [
+              134217730
+            ],
+            "token": 100663299
+          }
+        },
+        {
+          "arguments": [
+            "Byte"
+          ],
+          "definition": {
+            "index": 2,
+            "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 4,
+          "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_466F7277617264",
+          "sourceIndex": 2,
+          "sourceOrigin": {
+            "assembly": "[\"GenericMethods\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "GenericMethods.dll",
+            "name": "Forward",
+            "parameter_tokens": [
+              134217730
+            ],
+            "token": 100663299
+          }
+        },
+        {
+          "arguments": [
+            "Boolean"
+          ],
+          "definition": {
+            "index": 2,
+            "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 5,
+          "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_466F7277617264",
+          "sourceIndex": 2,
+          "sourceOrigin": {
+            "assembly": "[\"GenericMethods\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "GenericMethods.dll",
+            "name": "Forward",
+            "parameter_tokens": [
+              134217730
+            ],
+            "token": 100663299
+          }
+        },
+        {
+          "arguments": [
+            "Boolean"
+          ],
+          "definition": {
+            "index": 1,
+            "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 6,
+          "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_4964656E74697479",
+          "sourceIndex": 1,
+          "sourceOrigin": {
+            "assembly": "[\"GenericMethods\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "GenericMethods.dll",
+            "name": "Identity",
+            "parameter_tokens": [
+              134217729
+            ],
+            "token": 100663298
+          }
+        },
+        {
+          "arguments": [
+            "Byte"
+          ],
+          "definition": {
+            "index": 1,
+            "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 7,
+          "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_4964656E74697479",
+          "sourceIndex": 1,
+          "sourceOrigin": {
+            "assembly": "[\"GenericMethods\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "GenericMethods.dll",
+            "name": "Identity",
+            "parameter_tokens": [
+              134217729
+            ],
+            "token": 100663298
+          }
+        },
+        {
+          "arguments": [
+            "Int32"
+          ],
+          "definition": {
+            "index": 1,
+            "module": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 8,
+          "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273.M_4964656E74697479",
+          "sourceIndex": 1,
+          "sourceOrigin": {
+            "assembly": "[\"GenericMethods\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "GenericMethods.dll",
+            "name": "Identity",
+            "parameter_tokens": [
+              134217729
+            ],
+            "token": 100663298
+          }
+        }
+      ],
+      "policy": "one shape per value definition; primitive static generic methods, at most 32 clones and 128 selected functions; no constraints",
+      "types": []
+    },
+    "types": [
+      {
+        "compiledIndex": 0,
+        "definition": null,
+        "name": "NeoMetadata_1771AD7090175705705E0A476B8503D5C727B947EDA361CFA1BB78CF86CD7670.T__48656C70657273",
+        "sourceIndex": 0
+      }
+    ]
+  },
+  "native": {
+    "executableOnlyDirectory": true,
+    "emptyEnvironment": true,
+    "exit": 0,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "readByteBoundary": {
+    "accepted": false,
+    "firstError": "generic call identity/signature is missing or ambiguous: FunctionRef { definition: None, name: \"System.Runtime.CompilerServices.RuntimeServices.IsValue\", owner: Some(Named(\"System.Runtime.CompilerServices.RuntimeServices\")), instance: false, generic_arguments: [Int32], parameters: [Value] }",
+    "phase": "selection"
+  },
+  "artifacts": {
+    "GenericMethods.dll": "6dea2e487d76d3dc69999b5a42154d3943f0aff4dfbae933de803a837eb7449d",
+    "transport.o": "34b711344e9f33441552c66bd0b119154bd855400e8eefc2f0e59155a2abe97f",
+    "transport": "80088597468ab8c69434a199e8a24cf46f483aef6aa50176614d664edbd0903e"
+  }
+}

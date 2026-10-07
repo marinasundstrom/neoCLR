@@ -62,7 +62,8 @@ for source in sources:
     if source.stem == 'read-byte':
         assert inspection['admission']['accepted'] is False
         assert inspection['admission']['phase'] == 'selection'
-        assert inspection['admission']['firstError'] == 'generic methods are outside this specialization profile'
+        assert inspection['admission']['firstError'].startswith('generic call identity/signature is missing or ambiguous:')
+        assert 'RuntimeServices.IsValue' in inspection['admission']['firstError']
         run([aot, '--closed-world', assembly, '@entry', obj] + context, success=False)
         assert not obj.exists()
         report['readByteBoundary'] = inspection['admission']

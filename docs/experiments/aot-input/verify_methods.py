@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate bounded erased CIL transport and the next actual ReadByte boundary."""
+"""Compile Raven primitive generic methods into a standalone native executable."""
 import argparse
 import hashlib
 import json
@@ -13,17 +13,20 @@ ROOT = Path(__file__).resolve().parents[3]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
+p.add_argument('--compiler', type=Path, required=True)
+p.add_argument('--compiler-revision', required=True)
 a = p.parse_args()
+compiler = a.compiler.resolve()
 runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
-source = ROOT / 'docs/experiments/aot-input/erased-transport.neoil'
+source = ROOT / 'docs/experiments/aot-input/generic-methods.rvn'
 probe = ROOT / 'docs/experiments/aot-input/ReadByte.pe'
 host = ROOT / 'docs/experiments/aot-hello/main.c'
 seed, library = (bundle / 'lib' / n for n in ('System.runtime.neox', 'System.Runtime.dll'))
 sha = lambda b: hashlib.sha256(b).hexdigest()
-report = dict(profile='aot-erased-primitive-transport-v1', SDKROOT=os.environ.get('SDKROOT'),
+report = dict(profile='aot-primitive-generic-methods-v1', declaredCompilerRevision=a.compiler_revision, SDKROOT=os.environ.get('SDKROOT'),
               baseRevision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
-              inputs={str(f): sha(f.read_bytes()) for f in (runtime, aot, source, probe, host, seed, library)}, commands=[])
+              inputs={str(f): sha(f.read_bytes()) for f in (runtime, aot, source, probe, host, seed, library, compiler, compiler.parent / 'Raven.CodeAnalysis.dll', compiler.parent / 'Raven.CodeAnalysis.NeoClr.dll', compiler.parent / 'NeoCLR.Metadata.Experimental.dll')}, commands=[])
 def save():
     (output / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')
 def run(args, success=True):
@@ -33,13 +36,16 @@ def run(args, success=True):
     save()
     assert (r.returncode == 0) == success, r.stderr
     return r.stdout
-assert run([runtime, 'run', source]) == ''
-inspection = json.loads(run([aot, '--inspect', source, '@entry', '--closed-world']))
+assembly = output / 'GenericMethods.dll'
+run(['dotnet', compiler, 'neoclr', '-o', assembly, source])
+assert run([runtime, 'run', assembly]) == ''
+inspection = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world']))
 assert inspection['admission']['accepted'] is True
 obj, binary = output / 'transport.o', output / 'transport'
-selection = json.loads(run([aot, '--closed-world', source, '@entry', obj]))
+selection = json.loads(run([aot, '--closed-world', assembly, '@entry', obj]))
 assert selection == inspection['selection']
 report['selection'] = selection
+assert len(selection['specialization']['methods']) == 6
 run(['clang', '-arch', 'arm64', '-Wall', '-Wextra', '-Werror', host, obj, '-o', binary])
 assert run(['nm', '-u', obj]) == ''
 dependencies = [line.split()[0] for line in run(['otool', '-L', binary]).splitlines()[1:]]
@@ -58,6 +64,6 @@ assert 'RuntimeServices.IsValue' in boundary['firstError']
 run([aot, '--closed-world', probe, '@entry', output / 'read-byte.o'] + context, success=False)
 assert not (output / 'read-byte.o').exists()
 report['readByteBoundary'] = boundary
-report['artifacts'] = {f.name: sha(f.read_bytes()) for f in (obj, binary)}
+report['artifacts'] = {f.name: sha(f.read_bytes()) for f in (assembly, obj, binary)}
 save()
-print('Passed: standalone erased transport and actual ReadByte seed-helper boundary')
+print('Passed: Raven generic methods standalone execution and actual ReadByte seed-helper boundary')
