@@ -10,6 +10,15 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Separately scoped WriteLine value/no-result declarations now execute under their
+own admitted registry contracts. Full-System admission advances to **source-owned
+unit in native callback signatures** (DnsLookup), with no new compiler or format
+change. Resolve that selected-unit representation next, then resume core admission
+and the candidate optional-library split.
+[Evidence](experiments/extended-cli-metadata/scoped-service-results-2026-10-07.md).
+
+### Earlier retained-service frontier
+
 The full-source audit now removes the competing seed Object; all 197 inputs emit.
 Runtime admission advances past Array backing to **retained/source WriteLine result
 ABI** (Void value versus no-result). Reconcile service ownership/contracts next.

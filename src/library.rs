@@ -198,3 +198,100 @@ pub(crate) fn bind_member_references(module: &mut Module) -> Result<(), Fault> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod scoped_service_result_tests {
+    use crate::{
+        Limits, LoadedProgram, Value,
+        assembler::{ModuleInput, read_modules},
+    };
+
+    fn load(
+        no_result: bool,
+        ordinary: bool,
+        wrong_return: bool,
+    ) -> Result<LoadedProgram, crate::Fault> {
+        let system = crate::assembler::parse_module(".module System\n.references ()\n")?;
+        let name = if ordinary {
+            "Service"
+        } else {
+            "neoCLR.Runtime.WriteLine"
+        };
+        let implementation = if ordinary {
+            ".local Void unit\nldloca unit\ninitobj Void\nldloc unit\nret"
+        } else {
+            ".methodimpl InternalCall"
+        };
+        let a = format!(
+            ".module A\n.references ()\n.function {name}(String text) -> Void\n{implementation}\n.end\n.function A.Emit() -> Void\nldstr \"value\"\ncall {name}(String)\nret\n.end\n"
+        );
+        let result = if wrong_return {
+            "Int32"
+        } else if no_result {
+            "noresult"
+        } else {
+            "Void"
+        };
+        let b = format!(
+            ".module B\n.references ()\n.function {name}(String text) -> {result}\n{implementation}\n.end\n.function B.Emit() -> {result}\nldstr \"control\"\ncall {name}(String)\nret\n.end\n"
+        );
+        let pop = if no_result { "" } else { "pop" };
+        let app = format!(
+            ".module App\n.references (A,B)\n.entry Main\n.function Main() -> Int32\ncall A.Emit()\npop\ncall B.Emit()\n{pop}\nldc.i4 42\nret\n.end\n"
+        );
+        let modules = read_modules(
+            &[
+                ModuleInput::Source(&app),
+                ModuleInput::Source(&a),
+                ModuleInput::Source(&b),
+            ],
+            &system,
+        )?;
+        let images = modules
+            .iter()
+            .map(crate::metadata_container::write_module)
+            .collect::<Result<Vec<_>, _>>()?;
+        let inputs = images
+            .iter()
+            .map(|image| ModuleInput::NativeEnvelope(image))
+            .collect::<Vec<_>>();
+        let modules = read_modules(&inputs, &system)?;
+        LoadedProgram::with_modules(&modules[0], &system, &modules[1..])
+    }
+
+    #[test]
+    fn separate_service_declarations_preserve_value_and_no_result_stacks() {
+        for no_result in [false, true] {
+            let execution = load(no_result, false, false)
+                .unwrap()
+                .run(Limits::default())
+                .unwrap();
+            assert_eq!(execution.value, Value::Int32(42));
+            assert_eq!(execution.output, ["value", "control"]);
+            assert_eq!(execution.stdout, b"value\ncontrol\n");
+            assert!(execution.stderr.is_empty());
+        }
+    }
+
+    #[test]
+    fn result_abi_allowance_does_not_admit_ordinary_or_wrong_result_declarations() {
+        for ordinary in [false, true] {
+            let error = load(true, ordinary, !ordinary).err().unwrap();
+            assert!(
+                error.message.contains("conflicting function signature"),
+                "{error}"
+            );
+        }
+        let system = crate::assembler::parse_module(".module System\n.references ()\n").unwrap();
+        let duplicate = ".module Duplicate\n.references ()\n.function neoCLR.Runtime.WriteLine(String text) -> Void\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String text) -> noresult\n.methodimpl InternalCall\n.end\n";
+        let error = read_modules(&[ModuleInput::Source(duplicate)], &system)
+            .err()
+            .unwrap();
+        assert!(
+            error
+                .message
+                .contains("duplicate internal-call declaration in one module"),
+            "{error}"
+        );
+    }
+}

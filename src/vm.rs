@@ -571,11 +571,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         ) {
             // Separate assemblies may declare the same runtime service. Keep their
             // definition identities; do not merge declarations or relax overloads.
+            // Registered Void services may explicitly admit both a unit value and
+            // a no-result call ABI. Each scoped call keeps its declaring contract.
             if previous.is_internal_call()
                 && function.is_internal_call()
                 && previous.parameters == function.parameters
                 && previous.returns == function.returns
-                && previous.no_result == function.no_result
+                && (previous.no_result == function.no_result
+                    || (previous.returns == Type::Void
+                        && crate::native::bind_in(module, previous).is_ok()
+                        && crate::native::bind_in(module, function).is_ok()))
                 && previous
                     .definition
                     .as_ref()

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Preserve separately scoped unit-value and no-result declarations of runtime
+  services when the registry explicitly admits both. Native WriteLine consumers
+  execute with their own stack contracts; ordinary and same-module conflicts still
+  reject. Full-System loading next reaches source-unit callback signature admission.
+
 - Remove the competing bootstrap Object from the full-source audit's retained native
   seed. All 197 inputs still emit; admission advances to the retained/source WriteLine
   result-contract conflict, now identified with declaration and return details.

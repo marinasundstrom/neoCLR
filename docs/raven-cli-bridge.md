@@ -6422,3 +6422,13 @@ before encoding NEOX and is not a runtime input fallback.
 The author-suggested Runtime/Data/Networking/Web split has an emitted local-dependency
 inventory and ordered separate-compilation gates, not final assembly ownership.
 [Details and remaining ABI work](experiments/extended-cli-metadata/library-boundaries-2026-10-07.md).
+
+## Scoped service result ABI (2026-10-07)
+
+Runtime linking now admits separate-module unit-value/no-result Void service
+contracts only where the registry validates both. Each call keeps its own scoped
+member and stack behavior. Retained and source WriteLine execute together; ordinary
+and same-module conflicts still reject. No Runtime Contract option, compiler code,
+CLI bridge mapping or metadata format changes. Full-System admission advances to
+DnsLookup's source-owned unit callback result.
+[Validation and next gate](experiments/extended-cli-metadata/scoped-service-results-2026-10-07.md).
