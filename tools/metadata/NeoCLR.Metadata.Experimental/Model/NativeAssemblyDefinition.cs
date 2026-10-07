@@ -719,6 +719,11 @@ public sealed partial class NativeAssemblyDefinition
                         "internal calls require bodyless nongeneric assembly functions");
                 methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
+            nativeTypeAliases.TryGetValue(("System.Object", 0), out var externalRootAlias);
+            if (externalRootAlias is not null)
+                Require(externalRootAlias.Namespace == "System" && externalRootAlias.Name == "Object" &&
+                    !externalRootAlias.ValueType && externalRootAlias.Declaring is null && signatureGraph.NativeObjectRoot is null,
+                    "invalid external Object root alias");
             foreach (var method in methods.Where(m => m.Override))
             {
                 MethodRow? inherited = null;
@@ -729,8 +734,8 @@ public sealed partial class NativeAssemblyDefinition
                     if (inherited is not null) break;
                 }
                 Require(inherited is not null ? inherited.Virtual && inherited.Signature.Matches(method.Signature) :
-                    MethodDefinition.IsObjectOverride(method.Name, method.Signature, signatureGraph.NativeObjectRoot is null ? null : identity, signatureGraph.NativeObjectRoot) &&
-                    (signatureGraph.NativeObjectRoot is not null || nativeModuleAliases.Values.Count(m => m.Module == "System") == 1), "unsupported or incompatible native override");
+                    MethodDefinition.IsObjectOverride(method.Name, method.Signature, signatureGraph.NativeObjectRoot is null ? externalRootAlias?.Assembly : identity, signatureGraph.NativeObjectRoot) &&
+                    (signatureGraph.NativeObjectRoot is not null || externalRootAlias is not null || nativeModuleAliases.Values.Count(m => m.Module == "System") == 1), "unsupported or incompatible native override");
             }
             genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();
@@ -820,6 +825,8 @@ public sealed partial class NativeAssemblyDefinition
             throw new InvalidDataException("Value projection requires the explicit core scope");
         if (methods.Any(m => m.ExplicitInterfaces.Length != 0)) throw new NotSupportedException("explicit mappings require direct native import");
         var graph = new AssemblyBuilder(Identity, coreLibrary);
+        if (nativeTypeAliases.TryGetValue(("System.Object", 0), out _))
+            graph.SetNativeObjectRoot(ImportExternalType(graph, "System.Object", 0, References, valueTypeReferences, nativeTypeAliases));
         var owners = DefineTypes(graph, types);
         for (int i = 0; i < types.Length; i++)
             foreach (var constraint in types[i].Constraints)

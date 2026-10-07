@@ -108,7 +108,7 @@ public sealed partial class AssemblyBuilder
         var declaringReference = !intrinsicPrimitiveOwner && type is not null && (!definition.IsStatic || type.GenericArity > 0)
             ? ImportReference(type, dependencyCoreLibrary) : null;
         var signature = definition.DecodeImportedSignature(this, dependencyCoreLibrary, resolver);
-        if (nativeOverride && (!type!.IsValueType && type.GenericArity != 0 || !MethodDefinition.IsObjectOverride(definition.Name, signature, CoreLibrary))) throw new InvalidDataException("unsupported native Object override");
+        if (nativeOverride && (!type!.IsValueType && type.GenericArity != 0 || !MethodDefinition.IsObjectOverride(definition.Name, signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot))) throw new InvalidDataException("unsupported native Object override");
         if (definition.Name == ".ctor" && (signature!.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0 || signature.ParameterTypes.Any(p => p.ByReferenceElement is not null)))
             throw new InvalidDataException("constructor requires a nongeneric void signature without byref parameters");
         if (!importedGraphs.TryGetValue(identity, out var imported))

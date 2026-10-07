@@ -7428,7 +7428,7 @@ source Object/compiler integration is still pending.
 ### Selected Object signatures and boxing
 
 `AssemblyBuilder.ObjectType : SignatureType` returns the explicitly authored native
-root when present, otherwise the existing imported bootstrap Object signature.
+root when present, otherwise the explicitly selected external root or existing bootstrap Object signature.
 `CoreObjectType : ImportedTypeReference` keeps its original bootstrap meaning.
 Declare the root before creating signatures; existing signatures are not rewritten.
 No dependency is loaded and this property does not select runtime host ownership.
@@ -7437,9 +7437,9 @@ No dependency is loaded and this property does not select runtime host ownership
 authored root validates all three concrete root slots instead of demanding a separate
 legacy System binding. An incomplete root or a body expecting the unrelated bootstrap
 Object fails with `InvalidDataException` before bytes are returned. Without an authored
-root, the existing explicit System binding requirement is unchanged. Root signature
-selection does not yet implement imported root selection. Local overrides are supported
-as described below.
+root, the existing explicit System binding requirement is unchanged. External root signature selection supports the bounded override contracts below.
+External boxing still requires the explicit legacy System binding; selecting a root
+does not claim a complete external boxing/service contract.
 
 The API-produced fixture's `BoxedDisplay()` now emits boxing and virtual dispatch and
 executes with result `"42"` under explicit runtime root selection. This tests executable
@@ -7722,3 +7722,34 @@ introspection. This is a low-level calling convention, not two Raven language ty
 Nominal CLI signature transport is retained where CLI void is illegal. The compiler
 owns target-specific lowering and supplies RuntimeUnitContract ownership; an arbitrary
 empty struct is never inferred to be unit.
+
+### External native Object authoring (development, 2026-10-07)
+
+`AssemblyBuilder.SetNativeObjectRoot(ImportedTypeReference root) : void` selects an
+output-owned nongeneric, nonnested reference named System.Object. Construct the reference
+with `CreateTypeReference` from the exact dependency identity/core/artifact digest, then
+select it before authoring signatures. Use `AssemblyBuilder.ForDefinition(definition)`
+for the same selection when manually constructing definitions. `ObjectType` returns
+that signature; `CoreObjectType` retains its explicit bootstrap identity.
+
+The method rejects null/foreign/malformed references with argument exceptions and
+conflicting local/external selections with InvalidOperationException. Repeating the
+same selection is allowed. A caller supplies the host-validated root identity; this
+API does not load or inspect the dependency and does not substitute runtime admission.
+Unselected same-named identities do not satisfy Equals override validation.
+
+Manual method definitions and builders share the exact Boolean Equals(selected Object)
+validation; ToString/GetHashCode retain their existing signatures. Authored/imported
+method references apply the same selected identity. Primitive-bootstrap Object type
+references and ELEMENT_TYPE_OBJECT signatures map to the selected root during import.
+Already-created signatures are not rewritten.
+
+Native writing uses existing scoped module/type aliases for canonical System.Object,
+with no new format version. Reading checks the alias and exact Equals owner. The CLI
+reference image uses ELEMENT_TYPE_OBJECT; executable CLI output rejects a selected
+native root. Bootstrap-only behavior remains unchanged.
+
+[Validation and executable examples](../docs/experiments/extended-cli-metadata/imported-object-authoring-2026-10-07.md)
+cover manual/builder parity, wrong owners, conflicts, native round trips and a Raven
+consumer against the source-built Runtime. These are host metadata APIs, documented
+here rather than in the guest RavenDoc reference assembly.

@@ -16,6 +16,8 @@ public sealed partial class TypeDefinition
     public void SetNativeObjectRoot()
     {
         ValidateNativeObjectRoot();
+        if (Producer?.Assembly.ExternalObjectRoot is not null)
+            throw new InvalidOperationException("conflicting native Object ownership");
         if (BaseType is { } parent && (Producer is null || !Equals(parent.ExplicitScope, Producer.Assembly.CoreLibrary) ||
             parent.Namespace != "System" || parent.Name != "Object"))
             throw new ArgumentException("native Object root cannot replace an explicit class base");
@@ -37,7 +39,24 @@ public sealed partial class AssemblyBuilder
     /// <summary>Gets the output's designated native Object root signature, or its explicit bootstrap Object reference.</summary>
     /// <remarks>Declare a native root before constructing signatures. CoreObjectType always retains its bootstrap meaning.
     /// This selects authoring identity only; runtime admission still requires explicit host configuration.</remarks>
-    public SignatureType ObjectType => NativeObjectRoot is { } root ? root : CoreObjectType;
+    public SignatureType ObjectType => NativeObjectRoot is { } root ? root : ExternalObjectRoot ?? CoreObjectType;
+
+    internal ImportedTypeReference? ExternalObjectRoot { get; private set; }
+
+    /// <summary>Selects an output-owned external System.Object identity for native Object slot contracts.</summary>
+    /// <remarks>Select before authoring methods. This does not load or admit a dependency; the host must validate the actual root. CoreObjectType retains its bootstrap meaning.</remarks>
+    /// <exception cref="ArgumentException">The reference is foreign, nested, generic or not a reference System.Object.</exception>
+    /// <exception cref="InvalidOperationException">A different external or local root is already selected.</exception>
+    public void SetNativeObjectRoot(ImportedTypeReference root)
+    {
+        ArgumentNullException.ThrowIfNull(root);
+        if (!ReferenceEquals(root.Owner, this) || root.Namespace != "System" || root.Name != "Object" ||
+            root.IsValueType || root.GenericArity != 0 || root.DeclaringType is not null || root.TypeArguments.Count != 0)
+            throw new ArgumentException("native Object reference requires an output-owned nongeneric System.Object", nameof(root));
+        if (NativeObjectRoot is not null || ExternalObjectRoot is not null && !Equals(ExternalObjectRoot, root))
+            throw new InvalidOperationException("conflicting native Object ownership");
+        ExternalObjectRoot = root;
+    }
 
     internal TypeBuilder? NativeObjectRoot => types.SingleOrDefault(t => t.IsNativeObjectRoot);
 

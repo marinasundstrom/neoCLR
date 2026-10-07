@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Add explicit external native Object authoring selection, shared by manual definitions,
+  builders and method references. Preserve scoped identity through existing native aliases
+  and CLI Object reference signatures; conflicting owners reject. API-authored and Raven
+  Equals consumers verify/run against source-built Runtime with exit 42. All 165 metadata
+  groups pass; Networking now reaches a separate System.Value encoding blocker.
+
 - Record the proposed distinction between managed assembly ownership, optional library
   packages, platform runtime payloads and developer tooling. Keep package IDs/layouts
   provisional and bootstrap inputs explicit; no package resolver or release split is

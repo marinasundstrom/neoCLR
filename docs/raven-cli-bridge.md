@@ -6517,3 +6517,11 @@ bootstrap even when System.Runtime owns Object. Its native C# probe reproduces t
 prior failure and passes with both ordinary/imported roots; .NET loading is unchanged.
 The marker remains a temporary CLI bootstrap fact, not an implicit projection of
 application/library metadata. [Optional-library frontier](experiments/extended-cli-metadata/optional-library-frontier-2026-10-07.md).
+
+### Imported native Object override authoring — 2026-10-07
+
+Raven `d920e57c0` selects the output-owned external root before signatures are imported.
+The matching metadata API uses existing native aliases and preserves the primitive
+bootstrap separately. Manual/API and ordinary Raven consumers verify/run against
+System.Runtime with exit 42. No emitter access to importer objects or CLI fallback is
+added. [Contracts, commands and limits](experiments/extended-cli-metadata/imported-object-authoring-2026-10-07.md).

@@ -1,0 +1,155 @@
+{
+  "sourceBase": "a46e080c + external Object authoring changes",
+  "ravenRevision": "d920e57c0",
+  "compile": {
+    "command": [
+      "dotnet",
+      "/tmp/external-root-final1007/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/failure1006b/Core.dll",
+      "--runtime-seed",
+      "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+      "--bootstrap-ownership",
+      "/tmp/runtime-split1007/runtime-owned/ownership.json",
+      "--reference",
+      "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+      "--object-library",
+      "System.Runtime",
+      "-o",
+      "/tmp/external-root-equals1007.dll",
+      "/tmp/external-root-equals1007.rvn"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "execution": [
+    {
+      "command": [
+        "target/debug/neoclr",
+        "verify",
+        "/tmp/external-object-api1007.dll",
+        "--system",
+        "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+        "--module",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+        "--object-root",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_20CEE8BA4813FBD5F9CADADAD7F9EEAA84277BDB9E6B01E8EAF5909813D9DE30: typed-stack/control-flow verification passed (1753 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "/tmp/external-object-api1007.dll",
+        "--system",
+        "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+        "--module",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+        "--object-root",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "verify",
+        "/tmp/external-root-equals1007.dll",
+        "--system",
+        "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+        "--module",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+        "--object-root",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_5B74809001B53D7139CA2B26D864CEA0FD518FFC10B72539CB317321DA11335E: typed-stack/control-flow verification passed (1753 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "/tmp/external-root-equals1007.dll",
+        "--system",
+        "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+        "--module",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+        "--object-root",
+        "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "networking": {
+    "command": [
+      "dotnet",
+      "/tmp/external-root-final1007/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/failure1006b/Core.dll",
+      "--runtime-seed",
+      "/tmp/runtime-split1007/runtime-owned/System.runtime.neox",
+      "--bootstrap-ownership",
+      "/tmp/runtime-split1007/runtime-owned/ownership.json",
+      "--reference",
+      "/tmp/runtime-split1007/runtime-owned/System.Runtime.dll",
+      "--object-library",
+      "System.Runtime",
+      "--library",
+      "-o",
+      "/tmp/optional-split1007/System.Networking.final.dll",
+      "runtime/raven/src/System/Networking/Dns.rvn",
+      "runtime/raven/src/System/Networking/DnsError.rvn",
+      "runtime/raven/src/System/Networking/IPAddress.rvn",
+      "runtime/raven/src/System/Networking/IPAddressError.rvn",
+      "runtime/raven/src/System/Networking/Sockets/Socket.rvn",
+      "runtime/raven/src/System/Networking/Sockets/SocketError.rvn",
+      "runtime/raven/native/RuntimeNetworkCalls.rvn",
+      "runtime/raven/native/RuntimeNetworkServices.rvn"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "warning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV2103: This catch-all never matches.\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\nerror NEOMETA003: Native metadata encoding failed: native type missing or ambiguous: System.Value.\n"
+  },
+  "hashes": {
+    "/private/tmp/external-object-api1007.dll": "dbc03ba418e164fcffa428725ee00af3c347de3bf2135ec3518a3e9633c70016",
+    "/private/tmp/external-root-equals1007.dll": "27dbab811d1fb03c7279cda83da7019c96275023a638982e5581f90143f53296",
+    "/private/tmp/external-root-equals1007.rvn": "a6a903d156cf2c47f914f5450ab259c789ccf73e313c1840096fe9beed7f31ed",
+    "/private/tmp/failure1006b/Core.dll": "7e5cee8e255704bbf44595173609c1c4834b7e7b512dba8704987fd05420dd88",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "180608db04f98d2834e0d520f7997adc54d9e86623fbd4ebcf2a62940599b750",
+    "/private/tmp/external-root-final1007/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/private/tmp/external-root-final1007/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/private/tmp/external-root-final1007/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/private/tmp/external-root-final1007/RavenDoc.dll": "24daa2ef855abbddd8018e5d271150153e640c27a91370a1ec6b5faefdd4fb00",
+    "/private/tmp/external-root-final1007/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/private/tmp/external-root-final1007/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/private/tmp/external-root-final1007/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/private/tmp/external-root-final1007/Raven.CodeAnalysis.Console.dll": "fda15a5d1077b705656af401d5505ed297cdf2a5d0350eb62ddf6be46f4364fd",
+    "/private/tmp/external-root-final1007/NeoCLR.Metadata.Experimental.dll": "fabc9c43e08ac4e5ee6ba346258269e0aa00bdc73b76b2bfc79fb40c2b2a0015",
+    "/private/tmp/external-root-final1007/rvnc.dll": "74e299a0f6f607902cbf5a57253440130c8ed3620e3b95b5b227ef09f00e4b45",
+    "/private/tmp/external-root-final1007/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/private/tmp/external-root-final1007/Raven.CodeAnalysis.NeoClr.dll": "74a57fb0412b2649e6880124dbdaf1d828b0cb07d0766bbeacb34f9f279f53c5",
+    "/private/tmp/external-root-final1007/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/private/tmp/external-root-final1007/Raven.CodeAnalysis.dll": "1707957b9c6178f79b81964fd0ba23a1fb1b746f325f70a46e0efd415a0550e7",
+    "/private/tmp/external-root-final1007/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/private/tmp/external-root-final1007/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/private/tmp/external-root-final1007/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/private/tmp/external-root-final1007/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/private/tmp/runtime-split1007/runtime-owned/System.Runtime.dll": "a71beb14cae765cf85d45925cd28aa5ce9738ab5e12ff75f28c9c62ba5702c00",
+    "/private/tmp/runtime-split1007/runtime-owned/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/runtime-split1007/runtime-owned/ownership.json": "e74446ad9e70ac4fe9283f090cbc482acf154125c8bc2a9a760a34427dd95679",
+    "/private/tmp/external-root-final-suite1007.log": "ec73fd708279ce68dbdf659a83c70b9303507c38ad5835fb41b983bac99fc16a",
+    "/private/tmp/external-root-focused1007.log": "02dc6499a270a0fc1eda9341bca205aba53179e577de16f9fd022a21986f0b11",
+    "/private/tmp/external-root-apidocs1007.log": "4cb8d1fd9c31376815473df52b21ae7c0f3f6177cdb5b415223d150273f780eb"
+  }
+}

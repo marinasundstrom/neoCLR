@@ -125,7 +125,7 @@ public sealed partial class AssemblyBuilder
             foreach (var method in methods)
             {
                 int arity = method.DeclaringType?.GenericParameterNames.Count ?? 0;
-                if (method.IsImplicitObjectOverride && !MethodDefinition.IsObjectOverride(method.Name, method.Signature, CoreLibrary, NativeObjectRoot))
+                if (method.IsImplicitObjectOverride && !MethodDefinition.IsObjectOverride(method.Name, method.Signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot))
                     throw new InvalidDataException("Object override does not match the selected root signature");
                 method.Signature.ValidateOwner(this, arity, complete: true, allowSelf: method.DeclaringType?.IsInterface == true);
                 foreach (var bound in method.InterfaceConstraints)
@@ -343,7 +343,7 @@ public sealed partial class AssemblyBuilder
     private byte[] WriteImage(bool referenceOnly)
     {
         var methods = ValidateGraph(validateBodies: !referenceOnly);
-        if (!referenceOnly && types.Any(t => t.Definition.IsNativeObjectRoot))
+        if (!referenceOnly && (ExternalObjectRoot is not null || types.Any(t => t.Definition.IsNativeObjectRoot)))
             throw new InvalidDataException("native Object root requires native emission; CLI projection is reference-only");
         if (!referenceOnly && types.Any(t => t.IsClosedHierarchy))
             throw new InvalidDataException("closed class families require native emission; CLI closed-family attributes are not authored");
@@ -472,7 +472,7 @@ public sealed partial class AssemblyBuilder
                 {
                     encoder.Char(); return;
                 }
-                if (imported.AssemblyIdentity.Equals(CoreLibrary) && imported is { Namespace: "System", Name: "Object", IsValueType: false, GenericArity: 0, DeclaringType: null })
+                if (Equals(imported, ExternalObjectRoot) || imported.AssemblyIdentity.Equals(CoreLibrary) && imported is { Namespace: "System", Name: "Object", IsValueType: false, GenericArity: 0, DeclaringType: null })
                 {
                     encoder.Object(); return;
                 }

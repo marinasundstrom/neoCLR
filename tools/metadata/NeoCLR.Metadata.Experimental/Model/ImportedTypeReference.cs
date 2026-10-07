@@ -109,6 +109,10 @@ public sealed partial class AssemblyBuilder
         if (!CoreLibrary.Equals(dependencyCoreLibrary) || !definition.CanImportReference || definition.IsValueType && !definition.Module.Assembly.IsNative && !Equals(definition.ValueTypeCore, dependencyCoreLibrary) || (definition.Attributes & 7) != (definition.DeclaringType is null ? 1u : 2u))
             throw new InvalidDataException("unsupported imported type or core contract: " + definition.Namespace + "." + definition.Name + " (value core " + definition.ValueTypeCore?.Name + ", expected " + dependencyCoreLibrary.Name + ")");
         var identity = definition.Module.Assembly.Identity;
+        if (identity.Equals(CoreLibrary) && ExternalObjectRoot is { } selectedRoot &&
+            definition.Namespace == "System" && definition.Name == "Object" && !definition.IsValueType &&
+            definition.GenericArity == 0 && definition.DeclaringType is null)
+            return selectedRoot;
         // A selected source Value owns the runtime carrier. The explicit core
         // facade may still describe generic helpers using its CLI Value token;
         // it must not require a competing retained-seed declaration.

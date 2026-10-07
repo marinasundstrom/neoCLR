@@ -50,7 +50,7 @@ public sealed partial class MethodDefinition
         declarationAttributes = (ushort)((visibility == MethodVisibility.Public ? 6 : 3) | 0x10);
         this.signature = [];
     }
-    internal static bool IsObjectOverride(string name, MethodSignature signature, AssemblyIdentity? core = null, TypeBuilder? root = null)
+    internal static bool IsObjectOverride(string name, MethodSignature signature, AssemblyIdentity? core = null, TypeBuilder? root = null, ImportedTypeReference? externalRoot = null)
     {
         if (signature.GenericParameterNames.Count != 0) return false;
         return name switch
@@ -61,7 +61,7 @@ public sealed partial class MethodDefinition
                 (signature.ParameterTypes[0].ClassType is { IsNativeObjectRoot: true } localRoot &&
                     (core is null || ReferenceEquals(localRoot, root)) ||
                 root is null && signature.ParameterTypes[0].ImportedType is { Namespace: "System", Name: "Object", GenericArity: 0, DeclaringType: null, IsValueType: false } owner &&
-                (core is null || owner.AssemblyIdentity.Equals(core))),
+                (core is null || (externalRoot is not null ? Equals(owner, externalRoot) : owner.AssemblyIdentity.Equals(core)))),
             _ => false
         };
     }
@@ -206,7 +206,7 @@ public sealed partial class TypeBuilder
             if (method.IsOverride)
             {
                 if (inherited is not null ? !inherited.IsVirtual || !inherited.Signature.Matches(method.Signature) :
-                    !MethodDefinition.IsObjectOverride(method.Name, method.Signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot))
+                    !MethodDefinition.IsObjectOverride(method.Name, method.Signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot, Assembly.ExternalObjectRoot))
                     throw new InvalidDataException("override requires an exact inherited virtual contract");
             }
             else if (inherited is not null) throw new InvalidDataException("inherited method hiding is unsupported");
@@ -230,12 +230,12 @@ public sealed partial class TypeBuilder
         var slotFlags = definition.DeclarationAttributes & 0x540;
         if (slotFlags == 0x40 && (IsInterface || IsStatic || IsNativeObjectRoot ||
             (LocalBase is null || MethodDefinition.IsObjectOverride(definition.Name, signature)) &&
-            !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot)))
+            !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot, Assembly.ExternalObjectRoot)))
             throw new InvalidOperationException("override requires a class owner and the exact inherited contract");
         if (IsNativeObjectRoot && slotFlags != 0 && (slotFlags != 0x140 || !MethodDefinition.IsNativeObjectSlot(definition.Name, signature, this)))
             throw new InvalidOperationException("native Object slots require their exact root signature");
         if (slotFlags != 0 && !IsInterface && !IsNativeObjectRoot &&
-            (IsStatic || !IsValueType && GenericParameterNames.Count != 0 || IsValueType && (slotFlags != 0x40 || !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot))))
+            (IsStatic || !IsValueType && GenericParameterNames.Count != 0 || IsValueType && (slotFlags != 0x40 || !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot, Assembly.ExternalObjectRoot))))
             throw new InvalidOperationException("virtual slots require a nongeneric reference class or supported Object value override");
         if (definition.Producer is null && (IsInterface && slotFlags != 0x540 || !IsInterface && slotFlags == 0x540 && (!IsAbstract || definition.IsStatic)))
             throw new InvalidOperationException("abstract methods require an abstract class or interface");

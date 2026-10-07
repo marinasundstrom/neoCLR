@@ -4,6 +4,15 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--external-object-consumer", var externalLibrary, var externalCore, var externalOutput])
+{
+    ObjectRootChecks.WriteExternalConsumer(externalLibrary, externalCore, externalOutput); return 0;
+}
+if (args is ["--object-roots"])
+{
+    ObjectRootChecks.Run(); GenericObjectRootChecks.Run();
+    Console.WriteLine("PASS native Object root contracts"); return 0;
+}
 if (args is ["--check-source-attributes", var attributeLibrary])
 {
     SourceAttributeChecks.Check(attributeLibrary); return 0;

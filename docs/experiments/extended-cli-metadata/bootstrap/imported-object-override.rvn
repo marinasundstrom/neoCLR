@@ -1,0 +1,14 @@
+import System.*
+
+public class Item {
+    init() { }
+    override func Equals(other: Object?) -> bool => true
+}
+
+func Main() -> int {
+    let item = Item()
+    if item.Equals(null) {
+        return 42
+    }
+    return 1
+}

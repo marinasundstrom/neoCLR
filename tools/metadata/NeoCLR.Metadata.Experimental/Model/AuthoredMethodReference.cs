@@ -46,7 +46,7 @@ public sealed partial class AssemblyBuilder
             declaringType.IsValueType != (primitive != PrimitiveType.String) || declaringType.Namespace != "System" || declaringType.Name != primitive.ToString() ||
             declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name == ".cctor" || name == ".ctor" && primitive != PrimitiveType.String || isOverride))
             throw new ArgumentException("invalid native primitive member owner", nameof(nativePrimitive));
-        if (isOverride && (isStatic || !declaringType.IsValueType && declaringType.GenericArity != 0 || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary)))
+        if (isOverride && (isStatic || !declaringType.IsValueType && declaringType.GenericArity != 0 || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot)))
             throw new ArgumentException("override reference requires an exact instance Object slot signature");
         if (IsNativeGrapheme(declaringType) && (name is ".ctor" or ".cctor" || isOverride || nativePrimitive is not null))
             throw new ArgumentException("grapheme members require ordinary methods without primitive reinterpretation");

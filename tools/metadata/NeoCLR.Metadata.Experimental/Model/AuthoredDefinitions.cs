@@ -165,7 +165,11 @@ public sealed partial class AssemblyBuilder
     private static bool IsOrdinaryBase(TypeBuilder type) => !type.IsStatic && !type.IsInterface && !type.IsValueType && type.NativePrimitive is null && !type.NativeGrapheme && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null;
     internal TypeDefinition AttachType(TypeDefinition definition)
     {
-        if (definition.IsNativeObjectRoot) definition.ValidateNativeObjectRoot();
+        if (definition.IsNativeObjectRoot)
+        {
+            if (ExternalObjectRoot is not null) throw new InvalidOperationException("conflicting native Object ownership");
+            definition.ValidateNativeObjectRoot();
+        }
         if (types.Count >= DefinitionLimits.AuthoredTypes || types.Any(t => t.Namespace == definition.Namespace && t.Name == definition.Name && ReferenceEquals(t.Definition.DeclaringType, definition.DeclaringType)) ||
             definition.MetadataToken != 0 || definition.Producer is { } existing && !ReferenceEquals(existing.Assembly, this))
             throw new ArgumentException("foreign, duplicate or excessive type definition");

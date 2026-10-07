@@ -25,8 +25,11 @@ The first separate Data/Networking attempts expose two bounded gaps: Data's inte
 array-reflection helpers cross the new boundary; metadata override validation cannot
 select an imported native Object identity. The primitive flags-marker import blocker
 is fixed. [Commands and diagnostics](experiments/extended-cli-metadata/optional-library-frontier-2026-10-07.md).
-Next: support explicit imported Object contracts in metadata authoring (shared by
-optional-library overrides), then a supported array-reflection boundary for Data.
+Explicit imported Object authoring now passes C# contracts and API/Raven consumer
+execution (42). Networking advances to a System.Value encoding dependency.
+[Imported-root evidence](experiments/extended-cli-metadata/imported-object-authoring-2026-10-07.md).
+Next: reconcile imported Value ownership for Networking, then the supported
+array-reflection boundary for Data.
 Resume executable Data/Networking consumers, then Web and project/LSP catalogs.
 The author's platform-package direction is recorded separately from assembly ownership:
 [candidate distribution boundaries](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md).
