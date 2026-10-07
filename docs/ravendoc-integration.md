@@ -197,3 +197,11 @@ remain configured as above.
 Validation at `8aa4cba6d`: all 18 website tests and the full 1,803-page build,
 link and anchor checks passed. GitHub source links remain available on 361 API
 pages. This is local validation; publication remains a separate action.
+
+The publisher is refreshed to `7ad0f5817` for the .NET 11 runtime-async unit
+payload follow-up. This shared compiler change preserves the site's configured
+source links, navigation and responsive controls.
+
+Validation of `7ad0f5817`: all 18 website tests and the full 1,803-page site
+build/link/anchor checks passed. This refresh is committed locally; it does not
+publish the neoCLR website.

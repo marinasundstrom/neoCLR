@@ -309,3 +309,17 @@ Twenty-four focused unit/await tests pass on main and the integration branch;
 twenty-five sealed-case/nested-generic checks also pass on both. These are modern
 .NET results. Native async bootstrap qualification remains owned by the separate
 integration work and is not inferred from these tests.
+
+## .NET 11 unit payload emission follow-up (2026-10-07)
+
+Raven main `7ad0f5817` and integration branch `819d3780f` distinguish the stored
+unit payload of a runtime-async generic Task/ValueTask from ordinary unit's void
+return ABI. Explicit, implicit, arrow and finally-exiting returns preserve the
+payload, while statement-position awaits discard returned values. Non-generic
+tasks and ordinary unit methods keep their existing behavior.
+
+Forty-five runtime-async/unit tests pass independently on main and the integration
+branch. The updated .NET 11 framework-matrix sample and a fresh external project
+run successfully. This corrects the .NET backend, with no new Runtime Contract
+configuration or native metadata/CLI bridge encoding. It does not establish
+native neoCLR async execution.

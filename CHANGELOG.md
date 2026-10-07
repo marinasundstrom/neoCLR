@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Refresh RavenDoc to Raven main `7ad0f5817` and record the .NET 11 runtime-async
+  unit payload fix carried to the integration branch. Preserve generic unit
+  results and discard awaited payloads in statement position; 45 focused tests
+  pass on both branches. Native async qualification remains separate.
+
 - Refresh RavenDoc to Raven main `8aa4cba6d` and record the shared sealed-case
   member emission fix on the integration branch. Constructed member owners use
   actual emitted generic arity; ordinary nested types retain enclosing arguments.
