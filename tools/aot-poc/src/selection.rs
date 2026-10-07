@@ -32,6 +32,23 @@ pub fn select(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
     if input.functions.len() > 4096 || input.types.len() > 1024 {
         return Err("closed-world input inventory exceeds bounds".into());
     }
+    if input.assemblies.len() > 1 {
+        return Err("closed-world selection requires one source assembly".into());
+    }
+    for origin in input
+        .functions
+        .iter()
+        .filter_map(|f| f.origin.as_ref())
+        .chain(input.types.iter().filter_map(|t| t.origin.as_ref()))
+    {
+        if !input
+            .assemblies
+            .iter()
+            .any(|a| a.full_name == origin.assembly && a.modules.contains(&origin.module))
+        {
+            return Err("closed-world origin must belong to the source assembly".into());
+        }
+    }
     // Never let projection repair a malformed supplied identity.
     for (i, f) in input.functions.iter().enumerate() {
         let expected = MemberId {
@@ -153,7 +170,13 @@ pub fn select(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
     // Compile a private, canonical verification projection. Semantic names, visibility,
     // signatures, storage and instruction bodies remain; non-executable descriptions
     // stay in the original artifact. Report the original-to-projection row map.
-    projected.assemblies.clear();
+    for assembly in &mut projected.assemblies {
+        assembly.references.clear();
+        assembly.value_type_references.clear();
+        assembly.native_module_bindings.clear();
+        assembly.native_type_bindings.clear();
+        assembly.array_backing = None;
+    }
     projected.references = None;
     projected.entry = if input.functions[*root_index].parameters.is_empty() {
         root.to_owned()
@@ -161,7 +184,6 @@ pub fn select(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
         String::new()
     };
     for (i, f) in projected.functions.iter_mut().enumerate() {
-        f.origin = None;
         f.custom_attributes.clear();
         f.definition = Some(MemberId {
             module: input.name.clone(),
@@ -181,7 +203,9 @@ pub fn select(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
         }
     }
     for (i, t) in projected.types.iter_mut().enumerate() {
-        t.origin = None;
+        if let Some(origin) = &mut t.origin {
+            origin.property_tokens.clear();
+        }
         t.custom_attributes.clear();
         t.properties.clear(); // Accessor bodies are selected through actual calls.
         t.definition = Some(TypeDefId {
@@ -197,7 +221,7 @@ pub fn select(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
     }
     let report = json!({"schema":"neoclr-aot-selection-v1", "module":input.name, "root":root,
         "policy":"explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch",
-        "metadataPolicy":"original artifact unchanged; private verification projection omits origins, attributes and property descriptors and relocates definition rows",
+        "metadataPolicy":"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
         "functions": rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.functions[*old].definition,"name":input.functions[*old].name})).collect::<Vec<_>>(),
         "types": type_rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.types[*old].definition,"name":input.types[*old].name})).collect::<Vec<_>>(),
         "excludedFunctions": input.functions.iter().enumerate().filter(|(i,_)| !functions.contains(i)).map(|(i,f)| json!({"sourceIndex":i,"definition":f.definition,"name":f.name})).collect::<Vec<_>>(),

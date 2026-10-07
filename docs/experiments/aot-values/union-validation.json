@@ -1,0 +1,311 @@
+{
+  "profile": "raven-closed-world-union-v1",
+  "declaredCompilerRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "neoClrBaseRevision": "b08b4a7213850adc3285aaf2bbe6d36f8553afc4",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-values/union-validation-final/UnionApp.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-values/union-app.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-values/union-validation-final/UnionApp.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-values/union-validation-final/UnionApp.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-values/union-validation-final/union-app.o"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"excludedFunctions\": [\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.ToString\",\n      \"sourceIndex\": 3\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.M_3C526176656E466F726D6174556E696F6E56616C75653E\",\n      \"sourceIndex\": 4\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.M_6765745F56616C7565\",\n      \"sourceIndex\": 9\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.M_6765745F48617356616C7565\",\n      \"sourceIndex\": 10\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_536F6D65.M_4465636F6E737472756374\",\n      \"sourceIndex\": 13\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_536F6D65.ToString\",\n      \"sourceIndex\": 14\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_536F6D65.M_3C526176656E466F726D6174556E696F6E56616C75653E\",\n      \"sourceIndex\": 15\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_4E6F6E65.ToString\",\n      \"sourceIndex\": 17\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_4E6F6E65.M_3C526176656E466F726D6174556E696F6E56616C75653E\",\n      \"sourceIndex\": 18\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_556E696F6E417474726962757465..ctor\",\n      \"sourceIndex\": 19\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E43617365417474726962757465..ctor\",\n      \"sourceIndex\": 20\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E436F6D70616E696F6E417474726962757465..ctor\",\n      \"sourceIndex\": 21\n    }\n  ],\n  \"excludedTypes\": [\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_556E696F6E417474726962757465\",\n      \"sourceIndex\": 3\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E43617365417474726962757465\",\n      \"sourceIndex\": 4\n    },\n    {\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E436F6D70616E696F6E417474726962757465\",\n      \"sourceIndex\": 5\n    }\n  ],\n  \"functions\": [\n    {\n      \"compiledIndex\": 0,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.F_4D616B65\",\n      \"sourceIndex\": 0\n    },\n    {\n      \"compiledIndex\": 1,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.F_52656164\",\n      \"sourceIndex\": 1\n    },\n    {\n      \"compiledIndex\": 2,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.F_4D61696E\",\n      \"sourceIndex\": 2\n    },\n    {\n      \"compiledIndex\": 3,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365..ctor\",\n      \"sourceIndex\": 5\n    },\n    {\n      \"compiledIndex\": 4,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.M_54727947657456616C7565\",\n      \"sourceIndex\": 6\n    },\n    {\n      \"compiledIndex\": 5,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365..ctor\",\n      \"sourceIndex\": 7\n    },\n    {\n      \"compiledIndex\": 6,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.M_54727947657456616C7565\",\n      \"sourceIndex\": 8\n    },\n    {\n      \"compiledIndex\": 7,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_536F6D65..ctor\",\n      \"sourceIndex\": 11\n    },\n    {\n      \"compiledIndex\": 8,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_536F6D65.M_6765745F56616C7565\",\n      \"sourceIndex\": 12\n    },\n    {\n      \"compiledIndex\": 9,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_4E6F6E65..ctor\",\n      \"sourceIndex\": 16\n    }\n  ],\n  \"metadataPolicy\": \"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted\",\n  \"module\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796\",\n  \"policy\": \"explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch\",\n  \"root\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.F_4D61696E\",\n  \"schema\": \"neoclr-aot-selection-v1\",\n  \"types\": [\n    {\n      \"compiledIndex\": 0,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365\",\n      \"sourceIndex\": 0\n    },\n    {\n      \"compiledIndex\": 1,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_536F6D65\",\n      \"sourceIndex\": 1\n    },\n    {\n      \"compiledIndex\": 2,\n      \"definition\": null,\n      \"name\": \"NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_4E6F6E65\",\n      \"sourceIndex\": 2\n    }\n  ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-values/union-validation-final/union-app.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-values/union-validation-final/union-app"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-values/union-validation-final/union-app.o"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-values/union-validation-final/union-app"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-values/union-validation-final/union-app:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "46d5d401b735f7739197b46b0b0c1a478235f334c7c7c55e1d257b666b2e7784",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-values/union-app.rvn": "8a9765c3d38773909defd34f9ef271a76fd8a6e3de82327de810094da5fff08a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d"
+  },
+  "selection": {
+    "excludedFunctions": [
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.ToString",
+        "sourceIndex": 3
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.M_3C526176656E466F726D6174556E696F6E56616C75653E",
+        "sourceIndex": 4
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.M_6765745F56616C7565",
+        "sourceIndex": 9
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.M_6765745F48617356616C7565",
+        "sourceIndex": 10
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_536F6D65.M_4465636F6E737472756374",
+        "sourceIndex": 13
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_536F6D65.ToString",
+        "sourceIndex": 14
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_536F6D65.M_3C526176656E466F726D6174556E696F6E56616C75653E",
+        "sourceIndex": 15
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_4E6F6E65.ToString",
+        "sourceIndex": 17
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_4E6F6E65.M_3C526176656E466F726D6174556E696F6E56616C75653E",
+        "sourceIndex": 18
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_556E696F6E417474726962757465..ctor",
+        "sourceIndex": 19
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E43617365417474726962757465..ctor",
+        "sourceIndex": 20
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E436F6D70616E696F6E417474726962757465..ctor",
+        "sourceIndex": 21
+      }
+    ],
+    "excludedTypes": [
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_556E696F6E417474726962757465",
+        "sourceIndex": 3
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E43617365417474726962757465",
+        "sourceIndex": 4
+      },
+      {
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T_526176656E2E52756E74696D652E436F6D70696C65725365727669636573_526176656E556E696F6E436F6D70616E696F6E417474726962757465",
+        "sourceIndex": 5
+      }
+    ],
+    "functions": [
+      {
+        "compiledIndex": 0,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.F_4D616B65",
+        "sourceIndex": 0
+      },
+      {
+        "compiledIndex": 1,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.F_52656164",
+        "sourceIndex": 1
+      },
+      {
+        "compiledIndex": 2,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.F_4D61696E",
+        "sourceIndex": 2
+      },
+      {
+        "compiledIndex": 3,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365..ctor",
+        "sourceIndex": 5
+      },
+      {
+        "compiledIndex": 4,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.M_54727947657456616C7565",
+        "sourceIndex": 6
+      },
+      {
+        "compiledIndex": 5,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365..ctor",
+        "sourceIndex": 7
+      },
+      {
+        "compiledIndex": 6,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.M_54727947657456616C7565",
+        "sourceIndex": 8
+      },
+      {
+        "compiledIndex": 7,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_536F6D65..ctor",
+        "sourceIndex": 11
+      },
+      {
+        "compiledIndex": 8,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_536F6D65.M_6765745F56616C7565",
+        "sourceIndex": 12
+      },
+      {
+        "compiledIndex": 9,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_4E6F6E65..ctor",
+        "sourceIndex": 16
+      }
+    ],
+    "metadataPolicy": "original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
+    "module": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796",
+    "policy": "explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch",
+    "root": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.F_4D61696E",
+    "schema": "neoclr-aot-selection-v1",
+    "types": [
+      {
+        "compiledIndex": 0,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365",
+        "sourceIndex": 0
+      },
+      {
+        "compiledIndex": 1,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_536F6D65",
+        "sourceIndex": 1
+      },
+      {
+        "compiledIndex": 2,
+        "definition": null,
+        "name": "NeoMetadata_C0B5C2D28451E2E3DAD00A05534CE281D1299D2CDA1E68E7ED2CC59D36888796.T__43686F696365.N_4E6F6E65",
+        "sourceIndex": 2
+      }
+    ]
+  },
+  "native": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "emptyEnvironment": true,
+    "executableOnlyDirectory": true,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "artifacts": {
+    "UnionApp.dll": "94f406a7c1efa07f1955f7053de52a1a06c0c3512fcd396cf3cbe6033bd1ec3b",
+    "union-app.o": "908a5c226f02a33612aa07d0bbd05f6efe11562855a224ce1a2c4e346fc66855",
+    "union-app": "5ae865922d9a4ae04d2793d238f23d519b4578f4a679bbfc3f367f034e61d480"
+  },
+  "date": "2026-10-07",
+  "tests": {
+    "command": "cargo test --locked --manifest-path tools/aot-poc/Cargo.toml",
+    "inspectionTestsPassed": 3,
+    "scalarTestsPassed": 15,
+    "valueTestsPassed": 26,
+    "totalTestsPassed": 44
+  },
+  "sourceHashes": {
+    "tools/aot-poc/src/selection.rs": "fb2596a05101be7261efd53fa85b6528ea7aa526fc3e3bc73d7a6c57db94ac8d",
+    "tools/aot-poc/src/values.rs": "02f61606ca8fe187bce5a1bea065bed2483fdc27c14d6ca3a68cb17b08a63fc1",
+    "tools/aot-poc/src/value_profile.rs": "3f6e22ee2e9580459ddfb73b77576e3cf5ba0ff3d4d1cff6d6c7028ff3d6cfe9",
+    "tools/aot-poc/tests/values.rs": "d0a1573afd572b28375718260bc7c2efb62e86495dd1e4717db96deeda6eef48",
+    "docs/experiments/aot-values/UnionApp.pe": "155b9749be273761a03923559d2b293ce20b0a4cf87ed9f44a6c7ce745dc135d",
+    "docs/experiments/aot-values/verify_union.py": "4e2f6e3ddb470dc3ee85960a5c2680d5407d6189b28f02e2ac97f5c26ddcb0c1"
+  }
+}

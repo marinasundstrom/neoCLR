@@ -2,8 +2,9 @@
 
 **2026-10-07 — bounded native implementation on main.** Raven Counter, copy/member
 and nested-record samples now compile through **Raven → neoCLR metadata/IL → ARM64
-native executable**. They run without a shared managed framework or runtime. Some/None and
-Result unions remain the next representation step, followed by a console-input sample.
+native executable**. They run without a shared managed framework or runtime. The
+[ordinary Some/None union app](../aot-union/README.md) now runs under explicit closed-world
+selection. Result and a console-input sample are the next proposed steps.
 The earlier [producer inventory](inventory.json) is historical: it records the
 pre-implementation rejection and the broader union requirements.
 
@@ -87,7 +88,8 @@ The native layout is private to this experiment:
   comparisons produce Boolean values, and branch joins require matching types as well
   as matching stack height. Checked arithmetic and Fault statuses reuse scalar lowering.
 - By default all declared bodies/opcodes are admitted; unsupported dead instructions are rejected.
-  Supported unreachable instructions may be omitted. There is no trimmer. Recursive
+  Supported unreachable instructions may be omitted. Default admission does not select
+  a call closure; explicit closed-world selection is documented below. Recursive
   calls are rejected. Limits are 8,192 instructions, 1,024 locals and 32 explicit
   parameters per function, with at most 64 KiB of explicitly allocated frame slots
   including alignment allowance. This does not bound backend spills or total native
@@ -110,7 +112,7 @@ call-identity mismatches and uninitialized locals. Three additional rejection ca
 cover mutual inline cycles, unresolved fields and oversized flattened storage. Native
 tests cover the nested Raven fixture in both containers and three-level field addresses,
 whole-payload replacement, deep alias preservation, empty nested records and clearing
-a payload without overwriting adjacent fields. Twenty-one value-profile tests pass; the earlier
+a payload without overwriting adjacent fields. Twenty-six value-profile tests pass; the earlier
 fifteen scalar/Hello test results remain applicable.
 
 The [.NET struct baseline](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct)
@@ -203,7 +205,7 @@ Native checks cover the Raven sample in both metadata containers plus eight runt
 inputs (-1, 0, 128, 255, 256, 511 and Int32 extremes) across storage, call, output and
 conversion boundaries. An arithmetic check after `conv.u1` proves the stack result is
 not itself Byte storage. Three negative inputs reject Boolean conversion, unsupported
-checked narrowing and treating `Byte&` as `Int32&`. All twenty-one value tests pass;
+checked narrowing and treating `Byte&` as `Int32&`. All twenty-six value tests pass;
 unchanged scalar evidence remains in the earlier report.
 
 ## Overloaded members and native symbols (2026-10-07)
@@ -239,7 +241,7 @@ No stable mangling scheme or separate-object linking is implemented by this slic
 Tests cover the Raven fixture in PE/#Neo and NEOX, symbolic calls without definition
 IDs, overloaded constructors, and output overloads for two nominal payload types with
 the same field layout. Five negative inputs reject wrong definition IDs, owner, parameter
-types or instance mode, and ambiguous roots. Twenty-one value tests pass; the earlier
+types or instance mode, and ambiguous roots. Twenty-six value tests pass; the earlier
 scalar evidence remains applicable. Full generated Raven unions still need attribute,
 boxing/string/virtual member and library support; unsupported bodies are not trimmed.
 
@@ -256,15 +258,16 @@ members using boxing, virtual calls and strings. Counter has one type/five metho
 Choice has six types/twenty methods. The union probe requires explicit native Runtime
 references. Its initial host-bootstrap attempt rejected generated ToString with
 `Native emission does not support union body ToString: optional/expanded arguments.`
-The explicit native dependency configuration succeeds in the interpreter; no Raven fix
-or native union execution is claimed by this slice.
+The explicit native dependency configuration succeeds in the interpreter. The subsequent
+[union app milestone](../aot-union/README.md) now executes selected value-only paths
+natively; formatting/boxing members remain excluded in explicit closed-world mode.
 
-Nested value storage and ordinary output parameters are now implemented. Next admit
-the remaining generated-member/dependency contracts, retaining nominal identities and actual field contracts rather than recognizing union source names.
-Exercise both Some/None branches, then Result success/error. Resolve generated-member
+Nested value storage, ordinary output parameters and both Some/None branches now work.
+The [post-milestone reassessment](../aot-union/README.md#reassessment-next-sample) recommends
+Result success/error followed by an interactive integer reader. Resolve generated-member
 and library dependencies explicitly. Reference-bearing payloads and console input follow
-with defined native lifetime and service contracts. Trimming and general heap management
-remain separate later work; unsupported union bodies are not silently discarded.
+with defined native lifetime and service contracts. General trimming and heap management
+remain later work; explicit closed-world mode reports every excluded declaration.
 
 ## Read-only compiler inspection
 
@@ -302,8 +305,9 @@ application requiring them. Merely ignoring unsupported functions is not its con
 
 The compiler creates a private canonical verification projection. It preserves executable
 names, signatures, visibility, layouts and bodies, relocates definition references, and
-removes descriptive origins, custom attributes and property descriptors from that internal
-projection. Accessor bodies enter through calls. The original native metadata artifact is
+removes custom attributes and property descriptors from that internal projection.
+Origins retain field readonly/access facts; source assembly membership is checked, while
+external assembly bindings and omitted property tokens are removed. Accessor bodies enter through calls. The original native metadata artifact is
 unchanged; no rewritten deployment metadata or stable ABI is produced. A required missing
 callee/owner, invalid supplied identity, unsupported selected body or private-field access
 fails before object creation. Input outside the selected closure is inventoried, not fully

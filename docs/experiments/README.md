@@ -20,3 +20,6 @@ reproduction instructions before using its output.
 - [Class semantics](../class-semantics.md)
 
 Generated `bin`, `obj` and local toolchain outputs are not documentation sources.
+
+- [Native Raven union app](aot-union/README.md): Some/None patterns and copies compiled
+  to standalone ARM64 under explicit closed-world selection; next-sample reassessment.

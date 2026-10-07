@@ -157,7 +157,17 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   compile value-only union paths without unused generated formatting/boxing services.
   This brings limited code selection forward from later trimming; it reports exclusions
   and preserves the original artifact. It does not silently change whole-module admission
-  or establish reflection-aware trimming. Full union sample validation follows this slice.
+  or establish reflection-aware trimming.
+- **Assistant completed outcome:** the ordinary Raven Some/None app now passes fresh
+  producer/interpreter/native validation and executable-only deployment on macOS ARM64.
+  It exercises both cases, patterns, non-matches and copies; selection reports ten compiled
+  functions/three value types and twelve excluded generated methods/three attribute classes.
+  Source readonly/access facts remain enforced. [Evidence and limits](experiments/aot-union/README.md).
+- **Assistant reassessment:** recommends an interactive integer reader driven by actual
+  Option/Result semantics. First add value-only Result/generic specialization, then define
+  native UTF-8 input and lifetime handling, then parsing/output and EOF/error cases. HTTP,
+  stable metadata/ABI and benchmarks remain later work; no memory-management choice or
+  implementation approval beyond the completed union milestone is inferred.
 
 ## 2026-10-07: Continue native bootstrap development on main
 

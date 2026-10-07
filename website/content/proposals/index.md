@@ -221,9 +221,10 @@ native ARM64 code. Standalone NEOX and neoIL inputs also remain supported. A bou
 [value/member profile](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-values/README.md)
 now runs Raven constructors, fields, accessors and record-copy/branch samples natively,
 including nested reference-free payloads, ordinary output parameters, Byte tags and
-overloaded members. Generated
-union members and a later console-input
-consumer remain next steps toward HTTP Server. Execution budgets and general managed
+overloaded members. An [ordinary Raven Some/None app](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-union/README.md)
+now runs as a standalone ARM64 executable using explicit closed-world code selection;
+its unused generated formatting/boxing members are reported as excluded. Result and
+a console-input consumer remain next steps toward HTTP Server. Execution budgets and general managed
 services remain unsupported.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future

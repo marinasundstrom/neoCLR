@@ -49,8 +49,12 @@ the Raven Envelope sample. Ordinary output parameters now support a Raven member
 forwarding probe, with a native definite-assignment check and alias/Fault tests.
 Byte tag storage and unchecked Int32/Byte conversions now pass Raven and numeric
 boundary probes. Exact overloaded call/member resolution now passes a Raven consumer,
-constructor and nominal output-overload tests. Some/None and Result execution remains next: generated/library
-members are not yet supported; conditional output contracts remain deferred. The author adds a console-input sample after unions, exercising input and
+constructor and nominal output-overload tests. The [ordinary Raven union app](experiments/aot-union/README.md)
+now constructs/matches Some and None natively under explicit closed-world selection,
+with standalone deployment evidence. Generated formatting/boxing, general library
+compilation and conditional output contracts remain unsupported. After this milestone,
+the assistant recommends a Result-driven interactive integer reader: value-only Result
+first, then native UTF-8 input/lifetimes and parsing. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.
@@ -59,7 +63,8 @@ this remains exploratory and does not select a new managed lifetime policy.
 
 The author also proposes future metadata alongside native images for richer native
 calling interfaces, requiring stable ABI conventions. [Options and costs](native-execution-investigation.md#metadata-beside-native-images-future-exploration-2026-10-07)
-remain exploratory. Continue the immediate union sample milestone first. A read-only
+remain exploratory. The immediate Some/None sample milestone is complete within the
+explicit closed-world profile; the interactive integer reader is the proposed next consumer. A read-only
 AOT inspection command now exposes full declarations/calls/opcode inventories and actual
 compiler admission; it does not trim or establish an interface ABI. An explicit
 `--closed-world` follow-up selects the bounded direct-call closure and reports exclusions

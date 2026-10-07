@@ -1,0 +1,41 @@
+union Choice {
+    case Some(int)
+    case None
+}
+
+func Make(present: bool, value: int) -> Choice {
+    if present {
+        return Choice.Some(value)
+    }
+    return Choice.None
+}
+
+func Read(item: Choice) -> int {
+    if item is .Some(let value) {
+        return value
+    }
+    if item is .None {
+        return -1
+    }
+    return -2
+}
+
+func Main() -> int {
+    let some = Make(true, 42)
+    let none = Make(false, 99)
+    if Read(some) != 42 || Read(none) != -1 {
+        return 1
+    }
+    if none is .Some(let unexpected) {
+        return 2
+    }
+    if some is .None {
+        return 3
+    }
+    var copy = some
+    copy = none
+    if Read(some) != 42 || Read(copy) != -1 {
+        return 4
+    }
+    return 0
+}

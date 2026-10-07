@@ -69,8 +69,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add explicit --closed-world direct-call selection with reported exclusions and original
   identity mappings. Preserve selected-body verification and access checks; ordinary
   whole-module admission remains the default. This limited code-selection step is not
-  a general metadata/reflection-aware trimmer. Full
-  unions, reference fields and general library dependency compilation remain
+  a general metadata/reflection-aware trimmer. Preserve source access/readonly facts
+  and reject foreign assembly origins in the selected verification projection. Complete
+  a standalone Raven Some/None app with construction, both patterns, non-matches and
+  copied payloads; record fresh producer/interpreter/native evidence and isolated
+  deployment. Recommend a Result-driven interactive integer reader as the next consumer.
+  General unions, reference fields and library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime
   dependencies and public library APIs are unchanged. Cherry-pick this

@@ -1213,3 +1213,68 @@ fn closed_world_keeps_private_field_access_checks() {
     );
     assert!(!temp.0.join("value.o").exists());
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn raven_union_app_exercises_both_cases_patterns_and_copies() {
+    let bytes = include_bytes!("../../../docs/experiments/aot-values/UnionApp.pe");
+    native_mode(bytes, 0, 0, 0, "@entry", true);
+    native_mode(
+        &neoclr::metadata_container::write_module(&module(bytes)).unwrap(),
+        0,
+        0,
+        0,
+        "@entry",
+        true,
+    );
+    let temp = Temp::new();
+    assert!(
+        !compile(bytes, &temp).status.success(),
+        "whole-module admission must remain strict"
+    );
+    assert!(!temp.0.join("value.o").exists());
+    let result = compile_mode(bytes, &temp, "@entry", true);
+    assert!(result.status.success());
+    let selection: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert_eq!(selection["types"].as_array().unwrap().len(), 3);
+    assert!(selection["excludedTypes"].as_array().unwrap().len() >= 3);
+    assert!(
+        selection["excludedFunctions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|f| f["name"].as_str().unwrap().ends_with(".ToString"))
+    );
+}
+
+#[test]
+fn closed_world_preserves_readonly_origin_facts_and_assembly_scope() {
+    let original = module(COUNTER);
+    for case in 0..2 {
+        let mut m = original.clone();
+        if case == 0 {
+            m.types[0].origin.as_mut().unwrap().field_readonly = vec![true];
+        } else {
+            m.functions[0].origin.as_mut().unwrap().assembly = "Foreign".into();
+        }
+        let temp = Temp::new();
+        let result = compile_mode(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp,
+            "@entry",
+            true,
+        );
+        assert!(!result.status.success());
+        let error = String::from_utf8_lossy(&result.stderr);
+        assert!(!error.contains("panicked"));
+        assert!(
+            if case == 0 {
+                error.contains("readonly")
+            } else {
+                error.contains("source assembly")
+            },
+            "{error}"
+        );
+        assert!(!temp.0.join("value.o").exists());
+    }
+}
