@@ -311,3 +311,28 @@ the platform's segmentation gives consistent character boundaries across executi
 modes at the cost of linked Unicode tables and variable-length character storage.
 This is semantic parity, not a performance claim or a new text model. Stream-backed
 Write/ReadLine and broader numeric formatting remain subsequent Console work.
+
+## Small-integer output (2026-10-08)
+
+SByte, Int16 and UInt16 now pass through locals, fields, parameters, results and
+output borrows. Unchecked `conv.i1`/`conv.i2` truncate and sign-extend; `conv.u2`
+truncates and zero-extends. Like Byte, these storage types use the Int32 evaluation
+stack category. Typed loads read one/two bytes with the correct extension, and typed
+stores write one/two bytes. Padded private record/call slots retain their eight-byte
+spacing; this is not a new public aggregate layout. Checked narrowing, other array
+element types and wider integer formatting remain unsupported.
+
+This follows the existing neoCLR CIL/CLR distinction between integer storage widths
+and evaluation categories, reusing the scalar backend's arithmetic contract. The
+benefit is consistent values at every storage boundary, including signed Console
+output; the cost is explicit narrowing/extension in the private backend. There is
+no claimed performance advantage or .NET API change. Primitive method/type
+specialization also admits these small integer shapes within the existing bounds.
+
+The storage-boundary test now compares 48 native/interpreter inputs across four
+width/sign categories, including overflow truncation and sign boundaries.
+`small-integers.rvn` uses typed forwarding methods and Console output for the signed
+8/16-bit endpoints and unsigned 16-bit maximum. `verify_interactive.py --small-integers`
+and `small-integers-validation.json` record fresh compilation, exact output/fault
+parity and standalone deployment. The existing Int32 text binding provides formatting;
+no new Console native service or public managed API is added.

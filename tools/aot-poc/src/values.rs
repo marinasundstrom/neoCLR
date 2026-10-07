@@ -23,10 +23,15 @@ fn read(
     t: &Ty,
     pointer: ir::Value,
 ) -> Vec<ir::Value> {
-    lanes(p, t).into_iter().zip(p.byte_lanes(t)).enumerate()
-        .map(|(i, (ty, byte))| {
-            let value = b.ins().load(if byte { types::I8 } else { ty }, MemFlags::new(), pointer, i as i32 * 8);
-            if byte { b.ins().uextend(types::I32, value) } else { value }
+    lanes(p, t).into_iter().zip(p.narrow_lanes(t)).enumerate()
+        .map(|(i, (ty, narrow))| {
+            let storage = narrow.map_or(ty, |(bits, _)| if bits == 8 { types::I8 } else { types::I16 });
+            let value = b.ins().load(storage, MemFlags::new(), pointer, i as i32 * 8);
+            match narrow {
+                Some((_, true)) => b.ins().sextend(types::I32, value),
+                Some((_, false)) => b.ins().uextend(types::I32, value),
+                None => value,
+            }
         })
         .collect()
 }
@@ -44,10 +49,13 @@ fn normalize(
 ) -> Vec<ir::Value> {
     values
         .iter()
-        .zip(p.byte_lanes(t))
+        .zip(p.narrow_lanes(t))
         .map(
-            |(v, byte)| {
-                if byte { b.ins().band_imm(*v, 255) } else { *v }
+            |(v, narrow)| {
+                if let Some((bits, signed)) = narrow {
+                    let narrow = b.ins().ireduce(if bits == 8 { types::I8 } else { types::I16 }, *v);
+                    if signed { b.ins().sextend(types::I32, narrow) } else { b.ins().uextend(types::I32, narrow) }
+                } else { *v }
             },
         )
         .collect()
@@ -59,8 +67,8 @@ fn write_typed(
     pointer: ir::Value,
     values: &[ir::Value],
 ) {
-    let values: Vec<_> = normalize(b, p, t, values).into_iter().zip(p.byte_lanes(t))
-        .map(|(value, byte)| if byte { b.ins().ireduce(types::I8, value) } else { value }).collect();
+    let values: Vec<_> = normalize(b, p, t, values).into_iter().zip(p.narrow_lanes(t))
+        .map(|(value, narrow)| if let Some((bits, _)) = narrow { b.ins().ireduce(if bits == 8 { types::I8 } else { types::I16 }, value) } else { value }).collect();
     write(b, pointer, &values);
 }
 fn slot(b: &mut FunctionBuilder<'_>, bytes: u32) -> ir::StackSlot {
@@ -359,10 +367,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             stack.push(b.ins().ireduce(types::I32, value));
                         }
                     }
-                    Op::ConvertUInt8 => {
+                    Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 => {
                         let value = pop(&mut stack);
                         let value = if matches!(top(), Ty::Size) { b.ins().ireduce(types::I32, value) } else { value };
-                        stack.push(b.ins().band_imm(value, 255));
+                        let narrow = b.ins().ireduce(if matches!(op, Op::ConvertUInt8 | Op::ConvertInt8) { types::I8 } else { types::I16 }, value);
+                        stack.push(if matches!(op, Op::ConvertInt8 | Op::ConvertInt16) { b.ins().sextend(types::I32, narrow) } else { b.ins().uextend(types::I32, narrow) });
                     }
                     Op::Bool(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
                     Op::Void => stack.push(b.ins().iconst(types::I32, 0)),

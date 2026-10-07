@@ -1,0 +1,14 @@
+import System.*
+
+func SignedByte(value: sbyte) -> sbyte => value
+func SignedShort(value: short) -> short => value
+func UnsignedShort(value: ushort) -> ushort => value
+
+func Main() -> int {
+    Console.WriteLine(SignedByte((sbyte)-128))
+    Console.WriteLine(SignedByte((sbyte)127))
+    Console.WriteLine(SignedShort((short)-32768))
+    Console.WriteLine(SignedShort((short)32767))
+    Console.WriteLine(UnsignedShort((ushort)65535))
+    return 0
+}

@@ -41,7 +41,7 @@ impl Specializer<'_> {
     }
     fn lower(&mut self, ty: &Type) -> Result<Type, Error> {
         let (name, arguments) = match ty {
-            Type::Int32 | Type::Byte | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UIntPtr => {
+            Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UIntPtr => {
                 return Ok(ty.clone());
             }
             Type::ByRef(t) => return Ok(Type::ByRef(Box::new(self.lower(t)?))),
@@ -141,10 +141,10 @@ impl Specializer<'_> {
         if target
             .generic_arguments
             .iter()
-            .any(|t| !matches!(t, Type::Int32 | Type::Byte | Type::Boolean | Type::Void))
+            .any(|t| !matches!(t, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void))
         {
             return Err(
-                "generic method arguments require primitive Int32/Byte/Boolean/Void shapes".into(),
+                "generic method arguments require primitive Int32/small-integer/Boolean/Void shapes".into(),
             );
         }
         let arguments = match &target.owner {
@@ -331,7 +331,7 @@ fn validate_argument(ty: &Type, depth: usize) -> Result<(), Error> {
         return Err("generic argument nesting exceeds 16".into());
     }
     match ty {
-        Type::Int32 | Type::Byte | Type::Boolean | Type::String | Type::Named(_) => Ok(()),
+        Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::String | Type::Named(_) => Ok(()),
         Type::Constructed { arguments, .. } => {
             for arg in arguments {
                 validate_argument(arg, depth + 1)?;

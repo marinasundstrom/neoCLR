@@ -54,6 +54,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Raven Console.WriteLine(char) output for ASCII, accents, combining marks and emoji.
   Original primitive-owner methods remain verified before private static-wrapper
   lowering. Character fields, erasure and general text operations remain unsupported.
+  Add SByte/Int16/UInt16 storage and unchecked narrowing with signed/unsigned loads,
+  retaining Int32 stack arithmetic and existing numeric text formatting. Validate
+  48 boundary cases across fields, borrows, parameters and returns, plus a fresh
+  standalone Raven small-integer Console sample. Checked narrowing and wider
+  integer formatting remain outside this slice.
 
 ### 2026-10-07
 

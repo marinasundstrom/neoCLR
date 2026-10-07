@@ -255,7 +255,8 @@ at reset, with distinct direct-call and nonvirtual callvirt null behavior. Packe
 arrays now support bounded allocation, shared mutation, length and checked indexing,
 including one-byte interior borrows; other array kinds remain unsupported. Character
 WriteLine now preserves combining marks and emoji graphemes, with the interpreter’s
-pinned Unicode validation baked into the executable. General
+pinned Unicode validation baked into the executable. Signed-byte and 16-bit integer
+Console output also compile with interpreter storage-boundary parity. General
 collection, interface dispatch, wider numeric text, ReadLine
 and the broader Console stream surface remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter

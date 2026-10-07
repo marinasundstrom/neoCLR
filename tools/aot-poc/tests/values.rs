@@ -808,7 +808,7 @@ fn raven_byte_tag_members_branch_without_runtime_support() {
 
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-fn byte_storage_truncates_at_every_native_boundary() {
+fn narrow_integer_storage_normalizes_every_native_boundary() {
     let source = r#"
 .module Bytes
 .type Tag
@@ -898,27 +898,37 @@ add
 ret
 .end
 "#;
-    let m = neoclr::assemble(source).unwrap();
-    let program = neoclr::LoadedProgram::new(&m).unwrap();
-    let entry = program
-        .resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap())
-        .unwrap();
-    for input in [-1, 0, 128, 255, 256, 511, i32::MIN, i32::MAX] {
-        let expected = (input as u8 as i32) * 10 + 256;
-        assert_eq!(
-            entry
-                .invoke(vec![neoclr::Value::Int32(input)], neoclr::Limits::default())
-                .unwrap()
-                .value,
-            neoclr::Value::Int32(expected)
-        );
-        native_input(
-            &neoclr::metadata_container::write_module(&m).unwrap(),
-            input,
-            0,
-            expected,
-            "Main",
-        );
+    for (ty, conversion) in [("Byte", "conv.u1"), ("SByte", "conv.i1"), ("Int16", "conv.i2"), ("UInt16", "conv.u2")] {
+        let source = source.replace("Byte", ty).replace("conv.u1", conversion);
+        let m = neoclr::assemble(&source).unwrap();
+        let program = neoclr::LoadedProgram::new(&m).unwrap();
+        let entry = program
+            .resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap())
+            .unwrap();
+        for input in [-1, 0, 127, 128, 255, 256, 32767, 32768, 65535, 65536, i32::MIN, i32::MAX] {
+            let narrowed = match ty {
+                "Byte" => input as u8 as i32,
+                "SByte" => input as i8 as i32,
+                "Int16" => input as i16 as i32,
+                "UInt16" => input as u16 as i32,
+                _ => unreachable!(),
+            };
+            let expected = narrowed * 10 + 256;
+            assert_eq!(
+                entry
+                    .invoke(vec![neoclr::Value::Int32(input)], neoclr::Limits::default())
+                    .unwrap()
+                    .value,
+                neoclr::Value::Int32(expected)
+            );
+            native_input(
+                &neoclr::metadata_container::write_module(&m).unwrap(),
+                input,
+                0,
+                expected,
+                "Main",
+            );
+        }
     }
 }
 

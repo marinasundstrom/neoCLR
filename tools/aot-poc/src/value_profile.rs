@@ -7,6 +7,9 @@ use std::collections::{HashMap, VecDeque};
 pub(super) enum Ty {
     Int,
     Byte,
+    SByte,
+    Short,
+    UShort,
     Bool,
     Unit,
     Erased,
@@ -75,11 +78,11 @@ impl<'a> Profile<'a> {
                 || t.fields.len() > 8
                 || t.fields.iter().any(|f| {
                     f.deferred
-                        || !(matches!(f.ty, Type::Int32 | Type::Byte | Type::Boolean | Type::String | Type::Named(_))
+                        || !(matches!(f.ty, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::String | Type::Named(_))
                             || (references && matches!(&f.ty, Type::ArrayRef(t) if **t == Type::Byte)))
                 })
             {
-                return Err(format!("{}: value profile requires nongeneric records with at most eight Int32/Byte/Boolean/String/local-record fields", t.name).into());
+                return Err(format!("{}: value profile requires nongeneric records with at most eight Int32/small-integer/Boolean/String/local-record fields", t.name).into());
             }
         }
         let mut p = Self {
@@ -247,6 +250,9 @@ impl<'a> Profile<'a> {
         Ok(match t {
             Type::Int32 => Ty::Int,
             Type::Byte => Ty::Byte,
+            Type::SByte => Ty::SByte,
+            Type::Int16 => Ty::Short,
+            Type::UInt16 => Ty::UShort,
             Type::Boolean => Ty::Bool,
             Type::Void => Ty::Unit,
             Type::Value => Ty::Erased,
@@ -281,17 +287,20 @@ impl<'a> Profile<'a> {
         Ok(t)
     }
     pub fn stack_type(t: &Ty) -> Ty {
-        if *t == Ty::Byte { Ty::Int } else { t.clone() }
+        if matches!(t, Ty::Byte | Ty::SByte | Ty::Short | Ty::UShort) { Ty::Int } else { t.clone() }
     }
-    pub fn byte_lanes(&self, t: &Ty) -> Vec<bool> {
+    pub fn narrow_lanes(&self, t: &Ty) -> Vec<Option<(u8, bool)>> {
         match t {
-            Ty::Byte => vec![true],
+            Ty::Byte => vec![Some((8, false))],
+            Ty::SByte => vec![Some((8, true))],
+            Ty::Short => vec![Some((16, true))],
+            Ty::UShort => vec![Some((16, false))],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields
                 .iter()
-                .flat_map(|f| self.byte_lanes(&self.ty(&f.ty).expect("admitted field")))
+                .flat_map(|f| self.narrow_lanes(&self.ty(&f.ty).expect("admitted field")))
                 .collect(),
-            _ => vec![false; self.lanes(t)],
+            _ => vec![None; self.lanes(t)],
         }
     }
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
@@ -426,7 +435,7 @@ impl<'a> Profile<'a> {
                     n.checked_sub(offset)
                         .filter(|n| f.out_parameters.contains(n)),
                 ),
-                Op::ConvertInt32 | Op::ConvertUInt8 => (),
+                Op::ConvertInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 => (),
                 Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_)
                 | Op::IsInstance(_) | Op::CastClass(_) | Op::ReferenceIsNull | Op::NewArray(_) | Op::ArrayLength => {
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
@@ -582,6 +591,9 @@ impl<'a> Profile<'a> {
                 | Op::String(_)
                 | Op::ConvertInt32
                 | Op::ConvertUInt8
+                | Op::ConvertInt8
+                | Op::ConvertInt16
+                | Op::ConvertUInt16
                 | Op::Bool(_)
                 | Op::Void
                 | Op::Dup
@@ -646,7 +658,7 @@ impl<'a> Profile<'a> {
             match op {
                 Op::Int(_) => stack.push(Ty::Int),
                 Op::String(_) => stack.push(Ty::Literal),
-                Op::ConvertInt32 | Op::ConvertUInt8 => {
+                Op::ConvertInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 => {
                     if !matches!(pop(&mut stack)?, Ty::Int | Ty::Size) { return Err(fail(pc, "conversion requires Int32 or array length")); }
                     stack.push(Ty::Int);
                 }
