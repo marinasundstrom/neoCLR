@@ -35,6 +35,31 @@ later author-directed sample progression controls the immediate work. The author
 also identifies trimming as a future step; establish explicit code/metadata retention
 and dynamic-use roots, without making trimming a prerequisite for Hello World.
 
+## Metadata beside native images (future exploration, 2026-10-07)
+
+The author proposes retaining metadata alongside a native image as a richer interface
+for calling native functions, with stable ABI conventions. This remains exploratory,
+not a selected file format, loader or export ABI. The existing POC's private aggregate
+calling convention and row-based symbol names do not satisfy that future contract.
+
+The .NET Native AOT baseline exports explicitly annotated methods as C entry points
+([Microsoft interop documentation](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/interop),
+reviewed 2026-10-07). GNOME's [GIRepository typelibs](https://gnome.pages.gitlab.gnome.org/gtk/girepository/)
+describe native C APIs for introspection and bindings (reviewed 2026-10-07). These are
+useful comparison points: retain a conventional native ABI and describe it in metadata,
+or define a neoCLR ABI with generated adapters. Neither is selected here.
+
+Potential benefits are discoverable signatures, generated bindings and consistent
+UTF-8/ownership contracts. Costs include metadata/image pairing, compatibility/version
+rules, foreign tooling and adapter overhead. Explore stable exported identities, target
+and calling convention, field layout/alignment, strings, ownership/borrows, result/Fault
+encoding and callbacks. Verify image/metadata association and reject incompatible pairs.
+A sidecar is independently inspectable but can become mismatched; an embedded section
+simplifies pairing but couples tools to image formats. Neither requires a shared managed
+runtime merely to describe an exported interface. Start a future experiment with one
+scalar export and an independently compiled consumer, including mismatch rejection.
+No ABI improvement or performance advantage is established yet.
+
 ## Reference counting as an early native experiment (2026-10-07)
 
 The author asks whether reference types should initially use reference counting,

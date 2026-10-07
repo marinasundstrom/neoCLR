@@ -540,6 +540,7 @@ dependencies = [
  "cranelift-object",
  "neoclr",
  "object",
+ "serde_json",
 ]
 
 [[package]]

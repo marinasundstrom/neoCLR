@@ -62,7 +62,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Resolve overloaded value members by exact signature and optional definition identity,
   rejecting mismatches and ambiguous roots. Validate Raven overloads, constructors and
   nominal output payloads. Record existing private native symbol names and future stable
-  mangling requirements without introducing a linking ABI. Full
+  mangling requirements without introducing a linking ABI. Add read-only AOT metadata/
+  call/opcode inspection with actual compiler admission and no output image; retain the
+  generated union fixture to expose remaining requirements. Record future metadata-next-
+  to-image ABI exploration and the author-directed union-app completion milestone. Full
   unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime

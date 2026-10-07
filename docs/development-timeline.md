@@ -143,6 +143,17 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   overloads. Records [the current symbol scheme and limits](experiments/aot-values/README.md#overloaded-members-and-native-symbols-2026-10-07).
   Separate-object linking, stable native names and general union compilation remain open.
 
+- **Author direction:** explore metadata alongside a native image as an improved calling
+  interface in the future, recognizing the need for stable ABI conventions; continue
+  current work. **Assistant response:** records comparison with .NET Native AOT C exports
+  and GIRepository metadata, pairing/layout/ownership tradeoffs and validation needs.
+  Adds read-only AOT inspection to expose generated union requirements, not a native ABI.
+- **Author milestone instruction:** continue slices until a working union sample app,
+  then reassess which sample should drive further work. **Assistant proposal:** ordinary
+  Raven Some/None with both branches and payload extraction first; a Result-based console
+  input/parser afterward to drive strings, input, failure and lifetime handling before HTTP.
+  Native union completion remains pending at this inspection slice.
+
 ## 2026-10-07: Continue native bootstrap development on main
 
 - **Author:** Directed merging the native bootstrap branch into main and cleaning up

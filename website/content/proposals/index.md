@@ -226,6 +226,8 @@ union members and a later console-input
 consumer remain next steps toward HTTP Server. Execution budgets and general managed
 services remain unsupported.
 General AOT applications, the web demo, JIT and hot reload remain future work.
+Metadata alongside native images and stable calling conventions are a future
+interop exploration; the current compiler inspection report is build tooling only.
 [Scalar experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-scalar/README.md).
 
 [Investigation and tradeoffs](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-execution-investigation.md)

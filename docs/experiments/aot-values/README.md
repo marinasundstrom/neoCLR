@@ -265,3 +265,20 @@ Exercise both Some/None branches, then Result success/error. Resolve generated-m
 and library dependencies explicitly. Reference-bearing payloads and console input follow
 with defined native lifetime and service contracts. Trimming and general heap management
 remain separate later work; unsupported union bodies are not silently discarded.
+
+## Read-only compiler inspection
+
+`neoclr-aot-poc --inspect Choice.pe @entry` prints deterministic JSON describing all
+input types, function signatures/definition IDs, call operands and opcode counts. It
+also runs real compiler admission with console capability disabled, discarding any
+object bytes. It never executes native code, links, writes an output image, trims input
+or changes accepted programs. Exit zero means inspection succeeded; inspect
+`admission.accepted` for compilation status. Corrupt containers fail the command.
+The first compiler error is not an exhaustive diagnostic list; the full inventory
+shows other features and dependencies that remain to be addressed.
+
+[Choice.pe](Choice.pe) is the original pinned producer artifact from [inventory.json](inventory.json).
+It remains rejected: six types/twenty methods include attribute classes, boxing,
+string formatting and virtual calls as well as the supported value/tag/member paths.
+The inspection report is build tooling, not the author's future native-interface metadata
+sidecar. It has no exported-address map, stable ABI or loader contract.

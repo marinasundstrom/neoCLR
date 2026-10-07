@@ -57,6 +57,12 @@ The author also raises reference counting for initial native reference types.
 [Compare it with the existing tracing contract](native-execution-investigation.md#reference-counting-as-an-early-native-experiment-2026-10-07);
 this remains exploratory and does not select a new managed lifetime policy.
 
+The author also proposes future metadata alongside native images for richer native
+calling interfaces, requiring stable ABI conventions. [Options and costs](native-execution-investigation.md#metadata-beside-native-images-future-exploration-2026-10-07)
+remain exploratory. Continue the immediate union sample milestone first. A read-only
+AOT inspection command now exposes full declarations/calls/opcode inventories and actual
+compiler admission; it does not trim or establish an interface ABI.
+
 ## Existing native release gates
 
 The release also requires updated website content, matching sample downloads and setup
