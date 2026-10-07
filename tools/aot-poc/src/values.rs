@@ -141,6 +141,20 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_console_write_line_utf8_v1", Linkage::Import, &sig)?)
     } else { None };
+    let mut stream_services = std::collections::HashMap::new();
+    if let Some(d) = details {
+        for (indices, symbol, parameters) in [
+            (&d.console_write_bytes, "neoclr_console_write_bytes_v1", vec![types::I32, types::I64, types::I64, types::I32, types::I32]),
+            (&d.console_flush, "neoclr_console_flush_v1", vec![types::I32]),
+        ] {
+            if indices.is_empty() { continue; }
+            let mut sig = module.make_signature();
+            sig.params.extend(parameters.into_iter().map(AbiParam::new));
+            sig.returns.push(AbiParam::new(types::I32));
+            let service = module.declare_function(symbol, Linkage::Import, &sig)?;
+            for index in indices { stream_services.insert(*index, service); }
+        }
+    }
     let text_arena = references || details.is_some_and(|d| !d.int32_to_string.is_empty() || !d.int64_to_string.is_empty() || !d.uint64_to_string.is_empty());
     let format_service = if details.is_some_and(|d| !d.int32_to_string.is_empty()) {
         let mut sig = module.make_signature();
@@ -228,6 +242,47 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     site.record(&mut b, status);
                 }
                 b.ins().return_(&[status]);
+                b.seal_all_blocks();
+                b.finalize();
+                module.define_function(ids[i], &mut context)?;
+                continue;
+            }
+            if let Some(service) = stream_services.get(&i) {
+                let service = module.declare_func_in_func(*service, b.func);
+                let mut call_args = vec![parameters[0]];
+                if details.unwrap().console_write_bytes.contains(&i) {
+                    let array = parameters[1];
+                    let null = b.ins().icmp_imm(IntCC::Equal, array, 0);
+                    let status = b.ins().iconst(types::I32, 3);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                    site.capture_frame = false;
+                    return_if_detailed(&mut b, null, status, Some(&site));
+                    let bytes = b.ins().iadd_imm(array, 16);
+                    let length = b.ins().load(types::I64, MemFlags::new(), array, 8);
+                    call_args.extend([bytes, length, parameters[2], parameters[3]]);
+                }
+                let call = b.ins().call(service, &call_args);
+                let raw = b.inst_results(call)[0];
+                let negative = b.ins().icmp_imm(IntCC::SignedLessThan, raw, 0);
+                let oversized = if details.unwrap().console_write_bytes.contains(&i) {
+                    b.ins().icmp(IntCC::SignedGreaterThan, raw, parameters[3])
+                } else { b.ins().icmp_imm(IntCC::NotEqual, raw, 0) };
+                let failed = b.ins().bor(negative, oversized);
+                let byte_tag = b.ins().iconst(types::I32, 2);
+                let int_tag = b.ins().iconst(types::I32, 1);
+                let tag = b.ins().select(failed, byte_tag, int_tag);
+                let mut code = b.ins().iconst(types::I32, 10);
+                if details.unwrap().console_write_bytes.contains(&i) {
+                    for status in [7, 8] {
+                        let matches = b.ins().icmp_imm(IntCC::Equal, raw, -status);
+                        let value = b.ins().iconst(types::I32, status);
+                        code = b.ins().select(matches, value, code);
+                    }
+                }
+                let payload = b.ins().select(failed, code, raw);
+                write(&mut b, output, &[tag, payload]);
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
                 module.define_function(ids[i], &mut context)?;

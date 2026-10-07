@@ -1,0 +1,42 @@
+import System.*
+import System.IO.*
+import System.Result.*
+
+func Main() -> int {
+    let output = Console.OpenStandardOutput()
+    let error = Console.OpenStandardError()
+    let bytes: byte[] = [(byte)65, (byte)0, (byte)66]
+    let Ok(empty) = output.Write(bytes, 0, 0) else {
+        return 1
+    }
+    if empty != 0 {
+        return 2
+    }
+    let Error(_) = output.Write(bytes, -1, 1) else {
+        return 3
+    }
+    let Ok(written) = output.Write(bytes, 0, 3) else {
+        return 4
+    }
+    if written != 3 {
+        return 5
+    }
+    let Ok(_) = output.Flush() else {
+        return 6
+    }
+    let Ok(_) = error.Write(bytes, 2, 1) else {
+        return 7
+    }
+    let Ok(_) = error.Flush() else {
+        return 8
+    }
+    output.Close()
+    let Error(_) = output.Write(bytes, 0, 1) else {
+        return 9
+    }
+    let Error(_) = output.Flush() else {
+        return 10
+    }
+    Console.WriteLine("Closed output")
+    return 0
+}

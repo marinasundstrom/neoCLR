@@ -81,7 +81,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and preserve original conformance/access checks. Extend the private budget to
   64 types and sixteen value lanes for StreamError, with matching call-result storage
   and boundary tests. Compile ordinary standard-input Read/Close methods and validate
-  byte, EOF, zero-count, invalid-range and closed-stream outcomes.
+  byte, EOF, zero-count, invalid-range and closed-stream outcomes. Add explicit raw
+  stdout/stderr Write/Flush service bindings, preserving byte counts, ranges, limits,
+  NULs, recoverable I/O results and null fault frames. Match line/stderr flush policy
+  and reject invalid host counts. Admit inhabited unit storage for Result<unit,...>,
+  distinct from no-result methods. Validate ordinary output-stream interfaces,
+  handled broken-pipe errors, adapter boundaries and unit/adjacent-field copies.
 
 ### 2026-10-07
 

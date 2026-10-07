@@ -1884,3 +1884,49 @@ fn multiple_value_shape_discovery_stays_bounded() {
     assert!(!r.status.success() && !temp.0.join("value.o").exists());
     assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 64"));
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn unit_payloads_and_output_borrows_preserve_adjacent_fields() {
+    let source=r#"
+.module UnitStorage
+.entry Main
+.type Box<T>
+.field Value T
+.field Neighbor Int32
+.end
+.function Fill(out Void& value) -> noresult
+ldarg value
+ldvoid
+stobj Void
+ret
+.end
+.function Echo(Void value) -> Void
+ldarg value
+ret
+.end
+.function Main() -> Int32
+.local Box<Void> box
+.local Void unit
+ldloca unit
+initobj Void
+ldloc unit
+call Echo(Void)
+ldc.i4 42
+newobj Box<Void>
+stloc box
+ldloca box
+ldflda Box<Void>::Value
+call Fill(Void&)
+ldloc box
+ldfld Box<Void>::Value
+pop
+ldloc box
+ldfld Box<Void>::Neighbor
+ret
+.end
+"#;
+    let m=neoclr::assemble(source).unwrap();
+    assert_eq!(neoclr::run(&m,neoclr::Limits::default()).unwrap().value,neoclr::Value::Int32(42));
+    native_mode(&neoclr::metadata_container::write_module(&m).unwrap(),0,0,42,"Main",true);
+}

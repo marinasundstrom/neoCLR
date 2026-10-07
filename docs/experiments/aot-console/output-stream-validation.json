@@ -1,0 +1,1716 @@
+{
+  "profile": "aot-console-output-stream-v1",
+  "baseRevision": "d8685e418211133fbe6c7e9c2e336aba94d3c173",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "inputs": {
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "724250b15ad229c9ada29411dc9565f1ce4bbe911a6a528bf228ddaf492c53ac",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "4a6e99dbb1645815da2a27b974e793bba696607251c099f6c305067091d6049e",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/output-stream.rvn": "0565b169c4df4b46659511bbf1365d5954f3670fe353622f02f3990eeae54e25",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-host.c": "34db6501003bce9d6aa58e625aad2fad947d44721af1122625eef0bfc523419a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "abc5c07f84e1b4f505bdd92b5d924acf10db2624ad0b348168567f1ee93a6dd0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "17a7b7a0e508f9a4b2ea1aa5acc76bdc4ea78bf48cb25eb1241f56c88cf51b88",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "c1664518ede7dc2155cc6be27d073d565ec010a8d87f3e6ef8f7ed4e595bf02c"
+  },
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-output-stream-3/Interactive.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "A\u0000BClosed output\n",
+      "stderr": "B"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-output-stream-3/Interactive.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 6,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-console-output-stream-3/Interactive.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--reference-arena"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "aac9048fb5e2ebf065d3babdcd693eee395d8e75cceb9d609caf07132e208ccc",
+        "bytes": 1014189
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-console-output-stream-3/Interactive.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-console-output-stream-3/interactive.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--reference-arena"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "9489a2de6228bf208029fdbc18bcf8c9dc4fe8f60ec7e58cad1e274fcb563416",
+        "bytes": 942423
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/target/aot-console-output-stream-3/interactive.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-console-output-stream-3/interactive"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-console-output-stream-3/interactive.o"
+      ],
+      "exit": 0,
+      "stdout": "_neoclr_allocate_bytes_v1\n_neoclr_allocate_object_v1\n_neoclr_console_flush_v1\n_neoclr_console_write_bytes_v1\n_neoclr_console_write_line_utf8_v1\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-console-output-stream-3/interactive"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-console-output-stream-3/interactive:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "reusedCompilation": {
+    "evidence": "/Users/robert/Projects/neoclr/target/aot-console-output-stream-1/validation.json",
+    "evidenceSha256": "d67bfdc392ef1cb8d2293c5d9067a8aa38a165fb14f5c8e8134c8c85d5ede1df",
+    "assemblySha256": "3bb2bd6a9164d521a17f15ee1f8cde16e53591df1b286617f8863510b52510ef",
+    "command": {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-console-output-stream-1/Interactive.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/output-stream.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "selection": {
+    "loadSet": {
+      "limits": "up to 64 closed value shapes and 32 function clones; primitive static generic methods; one to eight explicit dependencies; no dynamic loading",
+      "modules": [
+        {
+          "name": "NeoMetadata_1995ABB851616B0303DD08177EE28D6AE87602ECA4889B1BBB27E68984004F24",
+          "revision": "1.0.0.0"
+        },
+        {
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        {
+          "name": "System",
+          "revision": null
+        }
+      ],
+      "runtimeContext": {
+        "bindCharacterText": false,
+        "bindConsoleReadByte": true,
+        "bindConsoleStreamOutput": true,
+        "bindConsoleWriteLine": true,
+        "bindInt32ToString": true,
+        "bindIntegerText": false,
+        "bindUserFault": true,
+        "compileSystem": true,
+        "explicit": true,
+        "objectRoot": {
+          "index": 8,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "referenceArena": true,
+        "revision": null,
+        "scope": "explicit managed System body selection; native services still require bindings",
+        "system": "System"
+      },
+      "validation": "all original bodies verified with runtime binder before private canonical projection"
+    },
+    "functions": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_1995ABB851616B0303DD08177EE28D6AE87602ECA4889B1BBB27E68984004F24",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_1995ABB851616B0303DD08177EE28D6AE87602ECA4889B1BBB27E68984004F24.F_4D61696E",
+        "sourceIndex": 0
+      },
+      {
+        "compiledIndex": 1,
+        "definition": {
+          "index": 31,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "neoCLR.Runtime.ConsoleWriteBytes",
+        "sourceIndex": 32
+      },
+      {
+        "compiledIndex": 2,
+        "definition": {
+          "index": 32,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "neoCLR.Runtime.ConsoleFlush",
+        "sourceIndex": 33
+      },
+      {
+        "compiledIndex": 3,
+        "compiledName": "$aot_linked_3",
+        "definition": {
+          "index": 33,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "neoCLR.Runtime.WriteLine",
+        "sourceIndex": 34
+      },
+      {
+        "compiledIndex": 4,
+        "compiledName": "$aot_ObjectBase..ctor",
+        "definition": {
+          "index": 171,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "System.Object..ctor",
+        "sourceIndex": 172
+      },
+      {
+        "compiledIndex": 5,
+        "definition": {
+          "index": 389,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_436F6E736F6C654F757470757453747265616D..ctor",
+        "sourceIndex": 390
+      },
+      {
+        "compiledIndex": 6,
+        "definition": {
+          "index": 390,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_436F6E736F6C654F757470757453747265616D.M_5772697465",
+        "sourceIndex": 391
+      },
+      {
+        "compiledIndex": 7,
+        "definition": {
+          "index": 391,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_436F6E736F6C654F757470757453747265616D.M_466C757368",
+        "sourceIndex": 392
+      },
+      {
+        "compiledIndex": 8,
+        "definition": {
+          "index": 392,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_436F6E736F6C654F757470757453747265616D.M_436C6F7365",
+        "sourceIndex": 393
+      },
+      {
+        "compiledIndex": 9,
+        "definition": {
+          "index": 1035,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72..ctor",
+        "sourceIndex": 1036
+      },
+      {
+        "compiledIndex": 10,
+        "definition": {
+          "index": 1037,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72..ctor",
+        "sourceIndex": 1038
+      },
+      {
+        "compiledIndex": 11,
+        "definition": {
+          "index": 1039,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72..ctor",
+        "sourceIndex": 1040
+      },
+      {
+        "compiledIndex": 12,
+        "definition": {
+          "index": 1043,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72..ctor",
+        "sourceIndex": 1044
+      },
+      {
+        "compiledIndex": 13,
+        "definition": {
+          "index": 1065,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_436C6F736564..ctor",
+        "sourceIndex": 1066
+      },
+      {
+        "compiledIndex": 14,
+        "definition": {
+          "index": 1068,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_496E76616C696452616E6765..ctor",
+        "sourceIndex": 1069
+      },
+      {
+        "compiledIndex": 15,
+        "definition": {
+          "index": 1071,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_4C696D69744578636565646564..ctor",
+        "sourceIndex": 1072
+      },
+      {
+        "compiledIndex": 16,
+        "definition": {
+          "index": 1077,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_496F4661696C757265..ctor",
+        "sourceIndex": 1078
+      },
+      {
+        "compiledIndex": 17,
+        "definition": {
+          "index": 1307,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65.M_57726974654C696E65",
+        "sourceIndex": 1308
+      },
+      {
+        "compiledIndex": 18,
+        "definition": {
+          "index": 1325,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65.M_4F70656E5374616E646172644F7574707574",
+        "sourceIndex": 1326
+      },
+      {
+        "compiledIndex": 19,
+        "definition": {
+          "index": 1326,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65.M_4F70656E5374616E646172644572726F72",
+        "sourceIndex": 1327
+      },
+      {
+        "compiledIndex": 20,
+        "definition": {
+          "index": 1407,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573.M_436F6E736F6C6557726974654279746573",
+        "sourceIndex": 1408
+      },
+      {
+        "compiledIndex": 21,
+        "definition": {
+          "index": 1408,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573.M_436F6E736F6C65466C757368",
+        "sourceIndex": 1409
+      },
+      {
+        "compiledIndex": 22,
+        "definition": {
+          "index": 1409,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573.M_57726974654C696E65",
+        "sourceIndex": 1410
+      },
+      {
+        "compiledIndex": 23,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_337..ctor",
+        "definition": {
+          "index": 1420,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 1421,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+        "sourceIndex": 1421,
+        "typeArguments": [
+          "Void",
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      },
+      {
+        "compiledIndex": 24,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+        "definition": {
+          "index": 1421,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 1422,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+        "sourceIndex": 1422,
+        "typeArguments": [
+          "Int32",
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      },
+      {
+        "compiledIndex": 25,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_337..ctor",
+        "definition": {
+          "index": 1422,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 1423,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+        "sourceIndex": 1423,
+        "typeArguments": [
+          "Void",
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      },
+      {
+        "compiledIndex": 26,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+        "definition": {
+          "index": 1423,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 1424,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+        "sourceIndex": 1424,
+        "typeArguments": [
+          "Int32",
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      },
+      {
+        "compiledIndex": 27,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031$aot_shape_338..ctor",
+        "definition": {
+          "index": 1429,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 1430,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031..ctor",
+        "sourceIndex": 1430,
+        "typeArguments": [
+          "Void"
+        ]
+      },
+      {
+        "compiledIndex": 28,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031.M_6765745F56616C7565",
+        "definition": {
+          "index": 1430,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 1431,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031.M_6765745F56616C7565",
+        "sourceIndex": 1431,
+        "typeArguments": [
+          "Int32"
+        ]
+      },
+      {
+        "compiledIndex": 29,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031..ctor",
+        "definition": {
+          "index": 1434,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 1435,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031..ctor",
+        "sourceIndex": 1435,
+        "typeArguments": [
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      },
+      {
+        "compiledIndex": 30,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031.M_6765745F56616C7565",
+        "definition": {
+          "index": 1435,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 1436,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031.M_6765745F56616C7565",
+        "sourceIndex": 1436,
+        "typeArguments": [
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      },
+      {
+        "compiledIndex": 31,
+        "definition": {
+          "index": 1913,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_4F757470757453747265616D.M_5772697465",
+        "sourceIndex": 1914
+      },
+      {
+        "compiledIndex": 32,
+        "definition": {
+          "index": 1914,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_4F757470757453747265616D.M_466C757368",
+        "sourceIndex": 1915
+      },
+      {
+        "compiledIndex": 33,
+        "definition": {
+          "index": 1915,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_4F757470757453747265616D.M_436C6F7365",
+        "sourceIndex": 1916
+      },
+      {
+        "compiledIndex": 34,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_337.M_54727947657456616C7565",
+        "definition": {
+          "index": 1421,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 2103,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+        "sourceIndex": 1422,
+        "typeArguments": [
+          "Void",
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      },
+      {
+        "compiledIndex": 35,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031$aot_shape_338.M_6765745F56616C7565",
+        "definition": {
+          "index": 1430,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 2104,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031.M_6765745F56616C7565",
+        "sourceIndex": 1431,
+        "typeArguments": [
+          "Void"
+        ]
+      },
+      {
+        "compiledIndex": 36,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_337.M_54727947657456616C7565",
+        "definition": {
+          "index": 1423,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 2105,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+        "sourceIndex": 1424,
+        "typeArguments": [
+          "Void",
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      },
+      {
+        "compiledIndex": 37,
+        "compiledName": "System.Runtime.CompilerServices.RuntimeServices.IsValue$aot_method_2106",
+        "definition": {
+          "index": 27,
+          "module": "System"
+        },
+        "expandedIndex": 2106,
+        "methodArguments": [
+          "Byte"
+        ],
+        "name": "System.Runtime.CompilerServices.RuntimeServices.IsValue",
+        "sourceIndex": 1987,
+        "typeArguments": []
+      },
+      {
+        "compiledIndex": 38,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+        "definition": {
+          "index": 1422,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 2107,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+        "sourceIndex": 1423,
+        "typeArguments": [
+          "Int32",
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      },
+      {
+        "compiledIndex": 39,
+        "compiledName": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue$aot_method_2108",
+        "definition": {
+          "index": 28,
+          "module": "System"
+        },
+        "expandedIndex": 2108,
+        "methodArguments": [
+          "Byte"
+        ],
+        "name": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue",
+        "sourceIndex": 1988,
+        "typeArguments": []
+      },
+      {
+        "compiledIndex": 40,
+        "compiledName": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue$aot_method_2109",
+        "definition": {
+          "index": 28,
+          "module": "System"
+        },
+        "expandedIndex": 2109,
+        "methodArguments": [
+          "Int32"
+        ],
+        "name": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue",
+        "sourceIndex": 1988,
+        "typeArguments": []
+      },
+      {
+        "compiledIndex": 41,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031..ctor",
+        "definition": {
+          "index": 1429,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 2110,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031..ctor",
+        "sourceIndex": 1430,
+        "typeArguments": [
+          "Int32"
+        ]
+      },
+      {
+        "compiledIndex": 42,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+        "definition": {
+          "index": 1420,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 2111,
+        "methodArguments": [],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+        "sourceIndex": 1421,
+        "typeArguments": [
+          "Int32",
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      }
+    ],
+    "nativeBindings": [
+      {
+        "compiledIndex": 3,
+        "definition": {
+          "index": 33,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "implementation": "console-write-line-v1",
+        "name": "neoCLR.Runtime.WriteLine",
+        "symbol": "neoclr_console_write_line_utf8_v1"
+      },
+      {
+        "compiledIndex": 1,
+        "definition": {
+          "index": 31,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "implementation": "console-write-bytes-v1",
+        "name": "neoCLR.Runtime.ConsoleWriteBytes",
+        "symbol": "neoclr_console_write_bytes_v1"
+      },
+      {
+        "compiledIndex": 2,
+        "definition": {
+          "index": 32,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "implementation": "console-flush-v1",
+        "name": "neoCLR.Runtime.ConsoleFlush",
+        "symbol": "neoclr_console_flush_v1"
+      }
+    ],
+    "types": [
+      {
+        "compiledIndex": 0,
+        "compiledName": "$aot_ObjectBase",
+        "definition": {
+          "index": 8,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "System.Object",
+        "sourceIndex": 8
+      },
+      {
+        "compiledIndex": 1,
+        "definition": {
+          "index": 24,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_436F6E736F6C654F757470757453747265616D",
+        "sourceIndex": 24
+      },
+      {
+        "compiledIndex": 2,
+        "definition": {
+          "index": 155,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72",
+        "sourceIndex": 155
+      },
+      {
+        "compiledIndex": 3,
+        "definition": {
+          "index": 156,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_496E76616C696450617468",
+        "sourceIndex": 156
+      },
+      {
+        "compiledIndex": 4,
+        "definition": {
+          "index": 157,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_4E6F74466F756E64",
+        "sourceIndex": 157
+      },
+      {
+        "compiledIndex": 5,
+        "definition": {
+          "index": 158,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_41636365737344656E696564",
+        "sourceIndex": 158
+      },
+      {
+        "compiledIndex": 6,
+        "definition": {
+          "index": 159,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_57726F6E674B696E64",
+        "sourceIndex": 159
+      },
+      {
+        "compiledIndex": 7,
+        "definition": {
+          "index": 160,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_416C7265616479457869737473",
+        "sourceIndex": 160
+      },
+      {
+        "compiledIndex": 8,
+        "definition": {
+          "index": 161,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_436C6F736564",
+        "sourceIndex": 161
+      },
+      {
+        "compiledIndex": 9,
+        "definition": {
+          "index": 162,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_496E76616C696452616E6765",
+        "sourceIndex": 162
+      },
+      {
+        "compiledIndex": 10,
+        "definition": {
+          "index": 163,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_4C696D69744578636565646564",
+        "sourceIndex": 163
+      },
+      {
+        "compiledIndex": 11,
+        "definition": {
+          "index": 164,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_57726F6E67416363657373",
+        "sourceIndex": 164
+      },
+      {
+        "compiledIndex": 12,
+        "definition": {
+          "index": 165,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_496F4661696C757265",
+        "sourceIndex": 165
+      },
+      {
+        "compiledIndex": 13,
+        "definition": {
+          "index": 166,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72.N_496E76616C6964456E636F64696E67",
+        "sourceIndex": 166
+      },
+      {
+        "compiledIndex": 14,
+        "definition": {
+          "index": 208,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65",
+        "sourceIndex": 208
+      },
+      {
+        "compiledIndex": 15,
+        "definition": {
+          "index": 221,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573",
+        "sourceIndex": 221
+      },
+      {
+        "compiledIndex": 16,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032",
+        "definition": {
+          "index": 229,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 229,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032",
+        "sourceIndex": 229,
+        "typeArguments": [
+          "Int32",
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      },
+      {
+        "compiledIndex": 17,
+        "definition": {
+          "index": 230,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74",
+        "sourceIndex": 230
+      },
+      {
+        "compiledIndex": 18,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031",
+        "definition": {
+          "index": 231,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 231,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031",
+        "sourceIndex": 231,
+        "typeArguments": [
+          "Int32"
+        ]
+      },
+      {
+        "compiledIndex": 19,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031",
+        "definition": {
+          "index": 232,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 232,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031",
+        "sourceIndex": 232,
+        "typeArguments": [
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      },
+      {
+        "compiledIndex": 20,
+        "definition": {
+          "index": 312,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_4F757470757453747265616D",
+        "sourceIndex": 312
+      },
+      {
+        "compiledIndex": 21,
+        "definition": {
+          "index": 1,
+          "module": "System"
+        },
+        "name": "System.Runtime.CompilerServices.RuntimeServices",
+        "sourceIndex": 335
+      },
+      {
+        "compiledIndex": 22,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_337",
+        "definition": {
+          "index": 229,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 337,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032",
+        "sourceIndex": 229,
+        "typeArguments": [
+          "Void",
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+          }
+        ]
+      },
+      {
+        "compiledIndex": 23,
+        "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031$aot_shape_338",
+        "definition": {
+          "index": 231,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "expandedIndex": 338,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031",
+        "sourceIndex": 231,
+        "typeArguments": [
+          "Void"
+        ]
+      }
+    ],
+    "specialization": {
+      "methods": [
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1421,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 1422,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+          "sourceIndex": 1422,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": "TryGetValue",
+            "parameter_tokens": [
+              134218829
+            ],
+            "token": 100664718
+          },
+          "typeArguments": [
+            "Int32",
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ]
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1430,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 1431,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031.M_6765745F56616C7565",
+          "sourceIndex": 1431,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": "get_Value",
+            "token": 100664727
+          },
+          "typeArguments": [
+            "Int32"
+          ]
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1423,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 1424,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+          "sourceIndex": 1424,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": "TryGetValue",
+            "parameter_tokens": [
+              134218831
+            ],
+            "token": 100664720
+          },
+          "typeArguments": [
+            "Int32",
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ]
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1435,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 1436,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031.M_6765745F56616C7565",
+          "sourceIndex": 1436,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": "get_Value",
+            "token": 100664732
+          },
+          "typeArguments": [
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ]
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1421,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 2103,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+          "sourceIndex": 1422,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": "TryGetValue",
+            "parameter_tokens": [
+              134218829
+            ],
+            "token": 100664718
+          },
+          "typeArguments": [
+            "Void",
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ]
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1430,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 2104,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031.M_6765745F56616C7565",
+          "sourceIndex": 1431,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": "get_Value",
+            "token": 100664727
+          },
+          "typeArguments": [
+            "Void"
+          ]
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1423,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 2105,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032.M_54727947657456616C7565",
+          "sourceIndex": 1424,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": "TryGetValue",
+            "parameter_tokens": [
+              134218831
+            ],
+            "token": 100664720
+          },
+          "typeArguments": [
+            "Void",
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ]
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1434,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 1435,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031..ctor",
+          "sourceIndex": 1435,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": ".ctor",
+            "parameter_tokens": [
+              134218838
+            ],
+            "token": 100664731
+          },
+          "typeArguments": [
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ]
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1422,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 1423,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+          "sourceIndex": 1423,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": ".ctor",
+            "parameter_tokens": [
+              134218830
+            ],
+            "token": 100664719
+          },
+          "typeArguments": [
+            "Void",
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ]
+        },
+        {
+          "arguments": [
+            "Byte"
+          ],
+          "definition": {
+            "index": 27,
+            "module": "System"
+          },
+          "expandedIndex": 2106,
+          "name": "System.Runtime.CompilerServices.RuntimeServices.IsValue",
+          "sourceIndex": 1987,
+          "sourceOrigin": null,
+          "typeArguments": []
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1429,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 1430,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031..ctor",
+          "sourceIndex": 1430,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": ".ctor",
+            "parameter_tokens": [
+              134218835
+            ],
+            "token": 100664726
+          },
+          "typeArguments": [
+            "Void"
+          ]
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1420,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 1421,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+          "sourceIndex": 1421,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": ".ctor",
+            "parameter_tokens": [
+              134218828
+            ],
+            "token": 100664717
+          },
+          "typeArguments": [
+            "Void",
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ]
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1422,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 2107,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+          "sourceIndex": 1423,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": ".ctor",
+            "parameter_tokens": [
+              134218830
+            ],
+            "token": 100664719
+          },
+          "typeArguments": [
+            "Int32",
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ]
+        },
+        {
+          "arguments": [
+            "Byte"
+          ],
+          "definition": {
+            "index": 28,
+            "module": "System"
+          },
+          "expandedIndex": 2108,
+          "name": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue",
+          "sourceIndex": 1988,
+          "sourceOrigin": null,
+          "typeArguments": []
+        },
+        {
+          "arguments": [
+            "Int32"
+          ],
+          "definition": {
+            "index": 28,
+            "module": "System"
+          },
+          "expandedIndex": 2109,
+          "name": "System.Runtime.CompilerServices.RuntimeServices.UnpackValue",
+          "sourceIndex": 1988,
+          "sourceOrigin": null,
+          "typeArguments": []
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1429,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 2110,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031..ctor",
+          "sourceIndex": 1430,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": ".ctor",
+            "parameter_tokens": [
+              134218835
+            ],
+            "token": 100664726
+          },
+          "typeArguments": [
+            "Int32"
+          ]
+        },
+        {
+          "arguments": [],
+          "definition": {
+            "index": 1420,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 2111,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032..ctor",
+          "sourceIndex": 1421,
+          "sourceOrigin": {
+            "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+            "member_access": "Public",
+            "module": "System.Runtime.dll",
+            "name": ".ctor",
+            "parameter_tokens": [
+              134218828
+            ],
+            "token": 100664717
+          },
+          "typeArguments": [
+            "Int32",
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ]
+        }
+      ],
+      "policy": "up to 64 closed value shapes; primitive static generic methods and closed owner methods, at most 32 function clones and 128 selected functions; no constraints",
+      "types": [
+        {
+          "arguments": [
+            "Int32",
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ],
+          "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032",
+          "definition": {
+            "index": 229,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 229,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032",
+          "sourceIndex": 229
+        },
+        {
+          "arguments": [
+            "Int32"
+          ],
+          "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031",
+          "definition": {
+            "index": 231,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 231,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031",
+          "sourceIndex": 231
+        },
+        {
+          "arguments": [
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ],
+          "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031",
+          "definition": {
+            "index": 232,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 232,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031",
+          "sourceIndex": 232
+        },
+        {
+          "arguments": [
+            "Void",
+            {
+              "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+            }
+          ],
+          "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_337",
+          "definition": {
+            "index": 229,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 337,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032",
+          "sourceIndex": 229
+        },
+        {
+          "arguments": [
+            "Void"
+          ],
+          "compiledName": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031$aot_shape_338",
+          "definition": {
+            "index": 231,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "expandedIndex": 338,
+          "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031",
+          "sourceIndex": 231
+        }
+      ]
+    },
+    "verifiedInterfaceRelationships": [
+      {
+        "definition": {
+          "index": 24,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "interfaces": [
+          {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_4F757470757453747265616D"
+          }
+        ],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_436F6E736F6C654F757470757453747265616D"
+      },
+      {
+        "definition": {
+          "index": 229,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "interfaces": [
+          {
+            "Constructed": {
+              "arguments": [
+                {
+                  "Constructed": {
+                    "arguments": [
+                      "Int32",
+                      {
+                        "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+                      }
+                    ],
+                    "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+                  }
+                },
+                "Int32",
+                {
+                  "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+                }
+              ],
+              "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_50726F706167617461626C656033"
+            }
+          }
+        ],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+      },
+      {
+        "definition": {
+          "index": 229,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "interfaces": [
+          {
+            "Constructed": {
+              "arguments": [
+                {
+                  "Constructed": {
+                    "arguments": [
+                      "Void",
+                      {
+                        "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+                      }
+                    ],
+                    "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+                  }
+                },
+                "Void",
+                {
+                  "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E494F_53747265616D4572726F72"
+                }
+              ],
+              "definition": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_50726F706167617461626C656033"
+            }
+          }
+        ],
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032"
+      }
+    ],
+    "staticPrimitiveOwners": [],
+    "objectBaseProjection": {
+      "compiledIndex": 0,
+      "compiledName": "$aot_ObjectBase",
+      "policy": "verified empty Object base/ordinary constructor; private nominal base, no virtual Object slots",
+      "sourceName": "System.Object"
+    },
+    "interfaceDispatch": [
+      {
+        "contractCompiledIndex": 31,
+        "contractSourceIndex": 1914,
+        "targets": [
+          {
+            "functionCompiledIndex": 6,
+            "typeCompiledIndex": 1
+          }
+        ]
+      },
+      {
+        "contractCompiledIndex": 32,
+        "contractSourceIndex": 1915,
+        "targets": [
+          {
+            "functionCompiledIndex": 7,
+            "typeCompiledIndex": 1
+          }
+        ]
+      },
+      {
+        "contractCompiledIndex": 33,
+        "contractSourceIndex": 1916,
+        "targets": [
+          {
+            "functionCompiledIndex": 8,
+            "typeCompiledIndex": 1
+          }
+        ]
+      }
+    ]
+  },
+  "native": {
+    "outcomes": [
+      {
+        "inputHex": "",
+        "exit": 0,
+        "stdout": "A\u0000BClosed output\n",
+        "stderr": "B"
+      }
+    ],
+    "outputFailureMatchesInterpreter": true,
+    "outputFailureExit": 6,
+    "outputFault": "",
+    "executableOnlyDirectory": true,
+    "emptyEnvironment": true,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "artifacts": {
+    "Interactive.dll": "3bb2bd6a9164d521a17f15ee1f8cde16e53591df1b286617f8863510b52510ef",
+    "interactive.o": "bc787bf6485dfd30e83c759d0d9b45237abe731b9bcae9c42acf150258a0f241",
+    "interactive": "e0ae6e1b5536744c307b416eaf6de379bac70d86a6f30af785ec99be568f3d4c"
+  }
+}

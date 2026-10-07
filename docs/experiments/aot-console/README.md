@@ -484,3 +484,44 @@ checking source/compiler/dependency hashes and retaining the original successful
 command and assembly hash. This does not claim the producer issue is fixed. Standard
 output/error Write/Flush bindings are the next Console slice; text readers/writers
 and Console.ReadLine still need further library dependencies.
+
+
+## Standard output and error streams (2026-10-08)
+
+`--bind-console-stream-output` explicitly binds the exact supplied InternalCall
+ConsoleWriteBytes(Boolean, arrayref<Byte>, Int32, Int32) and ConsoleFlush(Boolean)
+services. It requires `--compile-system --reference-arena`. Ordinary factories,
+Write/Flush/Close methods, range/status decoding and Result carriers remain compiled
+CIL. Native objects import only the selected service symbols, which the standalone
+host links from `console.c`; no shared neoCLR or .NET framework is introduced.
+
+The byte adapter borrows array contents synchronously. It validates signed ranges
+before the 65,536-byte operation limit, skips host I/O for zero counts, routes the
+Boolean channel to stdout/stderr, and never closes host resources. Stdout flushes
+through the last LF and stderr on every nonempty write, matching the interpreter's
+StdioConsole policies; explicit Flush handles remaining buffered bytes. Nonnegative
+counts represent successful writes; -7/-8/-10 represent range/limit/I/O failures.
+Generated service lowering maps these to the existing erased Int32/Byte contract,
+checks impossible host counts, and turns unknown adapter failures into IoFailure.
+Null arrays report RuntimeError with the managed caller's original fault frame.
+
+Result<unit, StreamError> requires inhabited Void storage: unit now travels through
+locals, parameters, fields, closed generic payloads and output borrows as one private
+zero-valued lane. It remains distinct from no-result methods. A focused test checks unit
+initialization/copy/forwarding without corrupting an adjacent Int32 field.
+
+`output-stream.rvn` exercises ordinary stdout/stderr interfaces, NUL bytes, zero
+counts, invalid ranges, flush, close and closed-wrapper errors. A broken pipe returns
+a recoverable Flush error; this app handles it with exit 6 and no fault diagnostic.
+This is consistent with the existing neoCLR stream Result design; unlike CLR stream
+exceptions, I/O failure here is an explicit return value. Native execution preserves
+that choice rather than introducing another error model.
+
+The selected sample has 43 functions and 24 types. `output-stream-validation.json`
+records compiler/interpreter/native evidence and executable-only deployment with
+libSystem as the only dynamic dependency. The first fresh Raven compilation is
+reused after backend additions via matching producer/source hashes. Twenty-one
+Console and forty-three value tests pass, including service opt-in/impostor rejection,
+33 adapter-status cases, null fault parity, range/limit/channel checks and broken
+pipe checks for line output, stderr and explicit flush. Full text Console.Write,
+Out/Error writers and ReadLine remain the next dependencies to compile.

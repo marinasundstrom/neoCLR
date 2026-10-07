@@ -50,6 +50,13 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if bind_console_write_line && !compile_system {
         return Err("--bind-console-write-line requires --compile-system".into());
     }
+    let stream_output_count = args.iter().filter(|a| *a == "--bind-console-stream-output").count();
+    if stream_output_count > 1 { return Err("duplicate --bind-console-stream-output option".into()); }
+    let bind_console_stream_output = stream_output_count == 1;
+    args.retain(|a| a != "--bind-console-stream-output");
+    if bind_console_stream_output && !compile_system {
+        return Err("--bind-console-stream-output requires --compile-system".into());
+    }
     let format_count = args.iter().filter(|a| *a == "--bind-int32-to-string").count();
     if format_count > 1 { return Err("duplicate --bind-int32-to-string option".into()); }
     let bind_int32_to_string = format_count == 1;
@@ -78,9 +85,12 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if reference_arena && !compile_system {
         return Err("--reference-arena requires --compile-system".into());
     }
+    if bind_console_stream_output && !reference_arena {
+        return Err("--bind-console-stream-output requires --reference-arena".into());
+    }
     let fault_details_count = args.iter().filter(|a| *a == "--fault-details").count();
     if fault_details_count > 1 { return Err("duplicate --fault-details option".into()); }
-    let fault_details = fault_details_count == 1 || bind_user_fault || bind_console_read_byte || bind_console_write_line || bind_int32_to_string || bind_character_text || bind_integer_text || reference_arena;
+    let fault_details = fault_details_count == 1 || bind_user_fault || bind_console_read_byte || bind_console_write_line || bind_console_stream_output || bind_int32_to_string || bind_character_text || bind_integer_text || reference_arena;
     args.retain(|a| a != "--fault-details");
     let dependency_args = args
         .iter()
@@ -117,7 +127,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
     {
         return Err(
-            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds signed/unsigned 64-bit formatting and native-width conversion services; --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics"
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds signed/unsigned 64-bit formatting and native-width conversion services; --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics"
                 .into(),
         );
     }
@@ -183,6 +193,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 bind_user_fault,
                 bind_console_read_byte,
                 bind_console_write_line,
+                bind_console_stream_output,
                 bind_int32_to_string,
                 bind_character_text,
                 bind_integer_text,

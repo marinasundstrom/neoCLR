@@ -263,8 +263,9 @@ distinct layouts/methods, demonstrated by several Option/Result instantiations i
 one Console input/output app. Nongeneric interface views and the verified empty
 Object base now support the three standard-stream factories in a standalone sample.
 Bounded implicit interface dispatch now supports standard-input Read/Close, byte
-buffers and stream-result unions. General collection, ReadLine and output-stream
-services remain future work. An explicit failure binding now preserves
+buffers and stream-result unions. Explicit raw output/flush services also compile
+stdout/stderr streams with recoverable I/O results. General collection, text writers
+and ReadLine remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked
 renderer and standalone exit-1 failure app are validated. Interpreter CLI execution

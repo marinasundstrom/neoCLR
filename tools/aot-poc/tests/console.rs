@@ -1005,3 +1005,190 @@ int main(int argc, char **argv) {
         }
     }
 }
+
+const STREAM_SEED: &str = ".module System\n.references ()\n";
+const STREAM_APP: &str = r#"
+.module StreamOutput
+.function neoCLR.Runtime.ConsoleWriteBytes(Boolean error, arrayref<Byte> bytes, Int32 offset, Int32 count) -> System.Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ConsoleFlush(Boolean error) -> System.Value
+.methodimpl InternalCall
+.end
+.function Calculate(Int32 mode) -> Int32
+.local arrayref<Byte> bytes
+ldarg mode
+ldc.i4 2
+beq Flush
+ldarg mode
+ldc.i4 3
+beq Null
+ldc.i4 3
+newarr Byte
+stloc bytes
+ldloc bytes
+ldc.i4 1
+ldc.i4 255
+conv.u1
+stelem Byte
+ldloc bytes
+ldc.i4 2
+ldc.i4 65
+conv.u1
+stelem Byte
+br Write
+Null:
+ldloca bytes
+initobj arrayref<Byte>
+Write:
+ldarg mode
+ldc.i4 1
+ceq
+ldloc bytes
+ldc.i4 0
+ldc.i4 3
+call neoCLR.Runtime.ConsoleWriteBytes(Boolean, arrayref<Byte>, Int32, Int32)
+br Decode
+Flush:
+ldc.bool true
+call neoCLR.Runtime.ConsoleFlush(Boolean)
+Decode:
+dup
+value.is Byte
+brfalse Count
+value.unpack Byte
+conv.i4
+ldc.i4 1000
+add
+ret
+Count:
+value.unpack Int32
+ret
+.end
+"#;
+#[test]
+fn stream_output_services_require_exact_opt_in() {
+    for flags in [
+        vec!["--compile-system","--reference-arena"],
+        vec!["--compile-system","--bind-console-stream-output"],
+        vec!["--bind-console-stream-output"],
+        vec!["--compile-system","--reference-arena","--bind-console-stream-output","--bind-console-stream-output"],
+    ] {
+        let dir = Temp::new();
+        let r = compile_source(&dir,&neoclr::assemble(STREAM_SEED).unwrap(),STREAM_APP,&flags,false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    }
+    for service in 0..2 {
+        let mut source=STREAM_APP.to_owned();
+        let at=source.match_indices(".methodimpl InternalCall").nth(service).unwrap().0;
+        source.replace_range(at..at+".methodimpl InternalCall".len(), "ldc.i4 0\nvalue.pack Int32\nret");
+        let dir=Temp::new();
+        let r=compile_source(&dir,&neoclr::assemble(STREAM_SEED).unwrap(),&source,&["--compile-system","--reference-arena","--bind-console-stream-output"],false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+        assert!(String::from_utf8_lossy(&r.stderr).contains("exact ConsoleWriteBytes"), "{}", String::from_utf8_lossy(&r.stderr));
+    }
+}
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn stream_output_transports_bytes_statuses_and_null_faults() {
+    let dir=Temp::new();
+    let seed=neoclr::assemble(STREAM_SEED).unwrap();
+    let r=compile_source(&dir,&seed,STREAM_APP,&["--compile-system","--reference-arena","--bind-console-stream-output"],false);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include "console.h"
+#include <limits.h>
+#include <stdlib.h>
+static int32_t supplied, channel, calls;
+int32_t neoclr_console_write_bytes_v1(int32_t error,const unsigned char *bytes,uint64_t length,int32_t offset,int32_t count) {
+    if (error!=channel || length!=3 || offset!=0 || count!=3 || bytes[0]!=0 || bytes[1]!=255 || bytes[2]!=65) abort();
+    calls++; return supplied;
+}
+int32_t neoclr_console_flush_v1(int32_t error) {
+    if (error!=1) abort(); calls++; return supplied;
+}
+int main(void) {
+    uint64_t storage[32];
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    int32_t values[]={INT_MIN,-11,-10,-8,-7,-1,0,1,3,4,INT_MAX};
+    for (int mode=0;mode<3;mode++) for (unsigned i=0;i<sizeof(values)/sizeof(values[0]);i++) {
+        supplied=values[i];channel=mode;calls=0;int32_t result=-99;
+        int expected=mode==2 ? (supplied==0 ? 0 : 1010) :
+            supplied>=0 && supplied<=3 ? supplied : supplied==-7 ? 1007 : supplied==-8 ? 1008 : 1010;
+        if (neoclr_entry_v4(mode,&result,&ctx)!=0 || ctx.fault.code || result!=expected || calls!=1) return 1;
+    }
+    calls=0;int32_t result=-99;
+    if (neoclr_entry_v4(3,&result,&ctx)!=3 || result!=-99 || ctx.fault.code!=3 || calls!=0) return 2;
+    return neoclr_aot_render_fault(stderr,&ctx.fault);
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c")).arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-fault-details/render.c")).arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let r=Command::new(dir.0.join("app")).env_clear().output().unwrap();
+    assert!(r.status.success(),"{r:?}");
+    let app=neoclr::assemble(STREAM_APP).unwrap();
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let function=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    let fault=function.invoke(vec![neoclr::Value::Int32(3)],neoclr::Limits::default()).unwrap_err();
+    assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string());
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn linked_stream_adapter_preserves_ranges_limits_and_channels() {
+    let dir=Temp::new();
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"),r#"
+#include "console.h"
+#include <limits.h>
+#include <signal.h>
+#include <unistd.h>
+static unsigned char data[65537];
+int main(int argc, char **argv) {
+    if (argc>1) {
+        int fds[2];
+        if (pipe(fds)!=0 || signal(SIGPIPE,SIG_IGN)==SIG_ERR) return 4;
+        close(fds[0]);
+        int error=argv[1][0]=='e';
+        if (dup2(fds[1],error ? 2 : 1)<0) return 5;
+        close(fds[1]);
+        const unsigned char bytes[]={'A',0,'B','\n'};
+        if (argv[1][0]=='f') {
+            if (neoclr_console_write_bytes_v1(0,bytes,4,0,3)!=3) return 6;
+            return neoclr_console_flush_v1(0)==-10 ? 0 : 7;
+        }
+        return neoclr_console_write_bytes_v1(error,bytes,4,0,error ? 3 : 4)==-10 ? 0 : 8;
+    }
+    if (neoclr_console_write_bytes_v1(0,data,3,-1,1)!=-7 ||
+        neoclr_console_write_bytes_v1(0,data,3,0,-1)!=-7 ||
+        neoclr_console_write_bytes_v1(0,data,3,4,0)!=-7 ||
+        neoclr_console_write_bytes_v1(0,data,3,2,2)!=-7 ||
+        neoclr_console_write_bytes_v1(0,data,3,INT_MAX,INT_MAX)!=-7 ||
+        neoclr_console_write_bytes_v1(0,data,3,0,65537)!=-7 ||
+        neoclr_console_write_bytes_v1(0,data,65537,0,65537)!=-8 ||
+        neoclr_console_write_bytes_v1(0,data,3,3,0)!=0) return 1;
+    if (neoclr_console_write_bytes_v1(0,data,65537,0,65536)!=65536 ||
+        neoclr_console_flush_v1(0)!=0) return 2;
+    data[0]='A';data[1]=0;data[2]=255;
+    if (neoclr_console_write_bytes_v1(1,data,3,0,3)!=3 ||
+        neoclr_console_flush_v1(1)!=0) return 3;
+    return 0;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(&base).arg(dir.0.join("host.c")).arg(base.join("console.c")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let r=Command::new(dir.0.join("app")).env_clear().output().unwrap();
+    assert!(r.status.success());
+    assert_eq!(r.stdout,vec![0;65536]);
+    assert_eq!(r.stderr,b"A\0\xff");
+    for mode in ["line", "error", "flush"] {
+        let r=Command::new(dir.0.join("app")).arg(mode).env_clear().output().unwrap();
+        assert!(r.status.success(),"{mode}: {r:?}");
+        assert!(r.stdout.is_empty() && r.stderr.is_empty());
+    }
+}

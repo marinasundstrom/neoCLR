@@ -115,8 +115,9 @@ Console.ReadByte. Bounds and original-scope validation remain enforced. Nongener
 interface views/casts and the verified empty Object base now let all three standard
 stream factories compile, with standalone Raven evidence. Constructed-class implicit
 interface dispatch now compiles standard-input Read/Close and StreamError outcomes;
-its measured graph extends private bounds to 64 types/sixteen value lanes. Output
-stream services and broader text reader/writer capabilities remain open. The author adds a console-input sample after unions, exercising input and
+its measured graph extends private bounds to 64 types/sixteen value lanes. Explicit raw output/flush bindings and inhabited unit storage now compile ordinary
+stdout/stderr streams with recoverable I/O outcomes and standalone parity. Text
+reader/writer dependencies behind Write/ReadLine remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

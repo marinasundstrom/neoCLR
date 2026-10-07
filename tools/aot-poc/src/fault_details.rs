@@ -12,6 +12,8 @@ pub struct Options {
     pub user_faults: Vec<usize>,
     pub console_read_byte: Vec<usize>,
     pub console_write_line: Vec<usize>,
+    pub console_write_bytes: Vec<usize>,
+    pub console_flush: Vec<usize>,
     pub int32_to_string: Vec<usize>,
     pub char_from_string: Vec<usize>,
     pub char_text: Vec<usize>,
@@ -42,6 +44,18 @@ impl Options {
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter().flatten()
                 .filter(|r| r["implementation"] == "console-write-line-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            console_write_bytes: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "console-write-bytes-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            console_flush: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "console-flush-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             int32_to_string: report

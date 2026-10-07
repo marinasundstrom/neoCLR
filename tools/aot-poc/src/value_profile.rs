@@ -101,7 +101,7 @@ impl<'a> Profile<'a> {
                 || t.fields.len() > 16
                 || t.fields.iter().any(|f| {
                     f.deferred
-                        || !(matches!(f.ty, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::String | Type::Named(_))
+                        || !(matches!(f.ty, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::Void | Type::String | Type::Named(_))
                             || (references && matches!(&f.ty, Type::ArrayRef(t) if **t == Type::Byte)))
                 })
             {
@@ -317,11 +317,7 @@ impl<'a> Profile<'a> {
         })
     }
     fn stored(&self, t: &Type) -> Result<Ty, Error> {
-        let t = self.ty(t)?;
-        if t == Ty::Unit {
-            return Err("Void storage is outside the value profile".into());
-        }
-        Ok(t)
+        self.ty(t)
     }
     pub fn stack_type(t: &Ty) -> Ty {
         if matches!(t, Ty::Byte | Ty::SByte | Ty::Short | Ty::UShort) { Ty::Int } else { t.clone() }
