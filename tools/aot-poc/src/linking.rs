@@ -158,7 +158,15 @@ pub fn prepare(
     let relationships: Vec<_> = joined
         .types
         .iter_mut()
-        .map(|ty| std::mem::take(&mut ty.implements))
+        .map(|ty| {
+            let relationships = ty.implements.clone();
+            // Reference objects need their verified interface views at runtime.
+            // Value-only conformance remains metadata-only in this profile.
+            if !context.is_some_and(|c| c.reference_arena) || !ty.is_reference_type {
+                ty.implements.clear();
+            }
+            relationships
+        })
         .collect();
     let specialized = if joined
         .types
@@ -220,7 +228,7 @@ pub fn prepare(
     }
     report["verifiedInterfaceRelationships"] = json!(verified_relationships);
     report["interfacePolicy"] = json!(
-        "original load-set conformance verified; relationships omitted only from private direct-call projection; interface operations, storage and explicit implementations unsupported"
+        "original load-set conformance verified; value relationships omitted from private projection; reference-arena class interface views retained; interface dispatch and explicit implementations unsupported"
     );
     let bind_user_fault = context.is_some_and(|c| c.bind_user_fault);
     report["nativeBindings"] = if bind_user_fault {
@@ -276,6 +284,43 @@ pub fn prepare(
             }
         }
     }
+    if reference_arena {
+        if let Some(index) = selected.types.iter().position(|t| t.name == "System.Object") {
+            let mut name = "$aot_ObjectBase".to_owned();
+            while selected.types.iter().any(|t| t.name == name) { name.push('_'); }
+            // Keep the ordinary empty base and constructor, but do not ask the
+            // backend verifier to install a second runtime Object slot registry.
+            // The complete original Object contract was verified above.
+            selected.types[index].name = name.clone();
+            fn rename(value: &mut Value, name: &str) {
+                match value {
+                    Value::Object(object) => {
+                        if object.get("owner") == Some(&json!({"Named":"System.Object"})) {
+                            if let Some(Value::String(member)) = object.get_mut("name") {
+                                if let Some(suffix) = member.strip_prefix("System.Object.") {
+                                    *member = format!("{name}.{suffix}");
+                                }
+                            }
+                        }
+                        if object.get("Named") == Some(&json!("System.Object")) {
+                            object.insert("Named".into(), json!(name));
+                        }
+                        for child in object.values_mut() { rename(child, name); }
+                    }
+                    Value::Array(values) => for child in values { rename(child, name); },
+                    _ => (),
+                }
+            }
+            let mut encoded = serde_json::to_value(&selected)?;
+            rename(&mut encoded, &name);
+            selected = serde_json::from_value(encoded)?;
+            report["objectBaseProjection"] = json!({"compiledIndex": index, "sourceName": "System.Object", "compiledName": name,
+                "policy": "verified empty Object base/ordinary constructor; private nominal base, no virtual Object slots"});
+            for row in report["types"].as_array_mut().unwrap() {
+                if row["compiledIndex"] == index { row["compiledName"] = json!(name); }
+            }
+        }
+    }
     // The backend re-verifies the private module with its bundled System context.
     // Give selected seed/library members private names so originals such as
     // System.Fail cannot collide with that context. Exact definition IDs still bind calls.
@@ -305,6 +350,6 @@ pub fn prepare(
     report["loadSet"] = json!({"modules": inputs.iter().map(|m| json!({"name": m.name, "revision": m.revision})).collect::<Vec<_>>(),
         "validation": "all original bodies verified with runtime binder before private canonical projection",
         "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "bindConsoleWriteLine": bind_console_write_line, "bindInt32ToString": bind_int32_to_string, "bindCharacterText": bind_character_text, "bindIntegerText": bind_integer_text, "referenceArena": reference_arena, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
-        "limits": "one closed instantiation per local value definition; primitive static generic methods; one to eight explicit dependencies; no dynamic loading"});
+        "limits": "up to 32 closed value shapes and 32 function clones; primitive static generic methods; one to eight explicit dependencies; no dynamic loading"});
     Ok((selected, report))
 }

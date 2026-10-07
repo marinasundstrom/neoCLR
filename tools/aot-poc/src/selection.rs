@@ -172,7 +172,7 @@ pub(super) fn select_inventory(
             | Op::StoreObject(t)
             | Op::PackValue(t)
             | Op::IsValue(t)
-            | Op::UnpackValue(t)
+            | Op::UnpackValue(t) | Op::IsInstance(t) | Op::CastClass(t)
             | Op::NewArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t) | Op::ArrayAddress(t) = op
             {
                 pending_types.push(t.clone());

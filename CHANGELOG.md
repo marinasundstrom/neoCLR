@@ -70,7 +70,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   reports. Preserve access/readonly verification and enforce 32 selected shapes,
   32 function clones and 128 selected functions. Validate cloned members/faults,
   discovery bounds and a standalone Raven app combining several Option/Result
-  shapes, Error/None patterns and Console.ReadByte.
+  shapes, Error/None patterns and Console.ReadByte. Add identity-preserving nongeneric
+  interface views and checked casts to the reference arena, retaining interpreter
+  null/mismatch behavior and fault locations. Privately project the verified empty
+  Object base while compiling its ordinary constructor; validate fresh standalone
+  Console.OpenStandardInput/Output/Error factories. General inheritance, Object
+  virtual slots and interface method dispatch remain pending.
 
 ### 2026-10-07
 

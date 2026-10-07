@@ -1,0 +1,12 @@
+import System.*
+
+func Main() -> int {
+    let input = Console.OpenStandardInput()
+    let output = Console.OpenStandardOutput()
+    let error = Console.OpenStandardError()
+    if input is null || output is null || error is null {
+        return 1
+    }
+    Console.WriteLine("Opened standard input, output and error")
+    return 0
+}

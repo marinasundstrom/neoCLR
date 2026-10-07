@@ -111,7 +111,9 @@ views/dispatch and broader stream support behind Write/ReadLine remain next; thi
 not a replacement for general native collection. Multiple closed value shapes now
 compile with separate layouts/methods and retained source identities: a fresh Raven
 app combines Option<int/string/byte> and Result<int/string/input-outcome> with
-Console.ReadByte. Bounds and original-scope validation remain enforced. Interface
+Console.ReadByte. Bounds and original-scope validation remain enforced. Nongeneric
+interface views/casts and the verified empty Object base now let all three standard
+stream factories compile, with standalone Raven evidence. Interface
 dispatch and broader stream/text capabilities remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

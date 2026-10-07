@@ -86,16 +86,14 @@ fn null_reference(b: &mut FunctionBuilder<'_>, pointer: ir::Value, site: Option<
 
 pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
     let references = details.is_some_and(|d| d.reference_arena);
-    let p = Profile::new(input, references)?;
+    let p = Profile::new(input, references, details.and_then(|d| d.object_base))?;
     let root = p.root(root)?;
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))
         .collect::<Result<_, _>>()?;
     // The backend's narrow shape analysis is additional admission, not a replacement
     // for type/member identity, accessibility, initialization or byref lifetime checks.
-    neoclr::LoadedProgram::new(input)
-        .and_then(|v| v.verify())
-        .map_err(|e| e.to_string())?;
+    neoclr::LoadedProgram::new(input).and_then(|v| v.verify()).map_err(|e| e.to_string())?;
     let mut flags = settings::builder();
     flags.set("is_pic", "true")?;
     let isa = isa::lookup("aarch64-apple-darwin".parse().unwrap())?
@@ -371,6 +369,34 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         stack.push(b.ins().global_value(types::I64, data));
                     }
                     Op::IsInstance(neoclr::metadata::Type::String) | Op::CastClass(neoclr::metadata::Type::String) => (),
+                    Op::IsInstance(target) | Op::CastClass(target) => {
+                        let value = pop(&mut stack);
+                        let probe = b.create_block();
+                        let joined = b.create_block();
+                        b.append_block_param(joined, types::I64);
+                        let null = b.ins().icmp_imm(IntCC::Equal, value, 0);
+                        b.ins().brif(null, joined, &[value.into()], probe, &[]);
+                        b.switch_to_block(probe);
+                        let tag = b.ins().load(types::I64, MemFlags::new(), value, 0);
+                        let mut matches = b.ins().iconst(types::I8, 0);
+                        for index in p.cast_targets(&p.ty(target)?) {
+                            let matched = b.ins().icmp_imm(IntCC::Equal, tag, index as i64);
+                            matches = b.ins().bor(matches, matched);
+                        }
+                        let zero = b.ins().iconst(types::I64, 0);
+                        let cast = b.ins().select(matches, value, zero);
+                        b.ins().jump(joined, &[cast.into()]);
+                        b.switch_to_block(joined);
+                        let result = b.block_params(joined)[0];
+                        if matches!(op, Op::CastClass(_)) {
+                            let absent = b.ins().icmp_imm(IntCC::Equal, result, 0);
+                            let present = b.ins().icmp_imm(IntCC::NotEqual, value, 0);
+                            let invalid = b.ins().band(absent, present);
+                            let status = b.ins().iconst(types::I32, 3); // Existing interpreter class/interface cast contract
+                            return_if_detailed(&mut b, invalid, status, site.as_ref());
+                        }
+                        stack.push(result);
+                    }
                     Op::ReferenceIsNull => {
                         let value = pop(&mut stack);
                         let is_null = b.ins().icmp_imm(IntCC::Equal, value, 0);

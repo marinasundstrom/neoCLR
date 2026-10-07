@@ -67,6 +67,9 @@ impl Specializer<'_> {
         };
         let i = self.type_index(name)?;
         let definition = &self.source.types[i];
+        if definition.representation == neoclr::metadata::Representation::Interface && !definition.generic_parameters.is_empty() {
+            return Err("interface views require nongeneric source contracts".into());
+        }
         if (definition.is_reference_type && !definition.generic_parameters.is_empty())
             || !definition.generic_constraints.is_empty()
             || definition.generic_parameters.len() != arguments.len()
@@ -323,7 +326,7 @@ impl Specializer<'_> {
                 | Op::StoreObject(t)
                 | Op::PackValue(t)
                 | Op::IsValue(t)
-                | Op::UnpackValue(t)
+                | Op::UnpackValue(t) | Op::IsInstance(t) | Op::CastClass(t)
                 | Op::NewArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t) | Op::ArrayAddress(t) => {
                     *t =
                         self.lower(&substitute(t, arguments, methods).map_err(|e| e.to_string())?)?

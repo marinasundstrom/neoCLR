@@ -17,6 +17,7 @@ pub(super) enum Ty {
     Literal, // Immutable image/explicit invocation-arena UTF-8; not a general managed String.
     Record(usize),
     Reference(usize),
+    Interface(usize),
     ByteArray,
     Size,
     Wide,
@@ -30,6 +31,7 @@ impl Ty {
 pub(super) struct Profile<'a> {
     pub input: &'a neoclr::Module,
     references: bool,
+    object_base: Option<usize>,
     layouts: Vec<Vec<usize>>,
     widths: Vec<usize>,
     names: HashMap<&'a str, Vec<usize>>,
@@ -50,28 +52,47 @@ pub(super) fn erased_tag(ty: &Type) -> Result<i64, Error> {
     }
 }
 
+fn object_base_shape(t: &neoclr::metadata::TypeDef) -> bool {
+    t.is_reference_type && t.is_abstract
+        && t.representation == Representation::Record && t.fields.is_empty()
+        && t.base.is_none() && t.generic_parameters.is_empty() && t.implements.is_empty()
+}
+
 impl<'a> Profile<'a> {
-    pub fn new(input: &'a neoclr::Module, references: bool) -> Result<Self, Error> {
+    pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>) -> Result<Self, Error> {
         if input.name == "System" || input.types.len() > 32 || input.functions.len() > 128 {
             return Err(
                 "value profile requires an application with at most 32 types and 128 functions"
                     .into(),
             );
         }
-        for t in &input.types {
-            if !t.implements.is_empty() {
-                return Err(format!(
-                    "{}: implemented interfaces require a later AOT profile",
-                    t.name
-                )
-                .into());
+        if object_base.is_some_and(|i| !references || input.types.get(i).is_none_or(|t| !object_base_shape(t))) {
+            return Err("invalid private Object base projection".into());
+        }
+        for (index, t) in input.types.iter().enumerate() {
+            if references && t.representation == Representation::Interface {
+                if !t.fields.is_empty() || t.base.is_some() || !t.implements.is_empty()
+                    || !t.generic_parameters.is_empty() || !t.generic_constraints.is_empty()
+                    || t.enum_info.is_some() || t.packing.is_some() || t.minimum_size.is_some() {
+                    return Err("interface views require fieldless nongeneric contracts without inheritance".into());
+                }
+                continue;
+            }
+            if !t.implements.is_empty() && (!references || !t.is_reference_type || t.implements.iter().any(|interface| {
+                !matches!(interface, Type::Named(_)) || input.type_definition(interface)
+                    .is_none_or(|t| t.representation != Representation::Interface || !t.generic_parameters.is_empty())
+            })) {
+                return Err(format!("{}: only reference-arena nongeneric interface views are supported", t.name).into());
             }
             let static_owner = crate::selection::static_owner(t);
+            let root = references && object_base == Some(index);
+            let root_base = references && t.is_reference_type && t.base.as_ref()
+                .is_some_and(|base| object_base.is_some_and(|i| *base == Type::Named(input.types[i].name.clone())));
             if (t.is_reference_type && !static_owner && !references)
                 || t.representation != Representation::Record
                 || t.enum_info.is_some()
-                || t.base.is_some()
-                || (t.is_abstract && !static_owner)
+                || (t.base.is_some() && !root_base)
+                || (t.is_abstract && !static_owner && !root)
                 || !t.generic_parameters.is_empty()
                 || !t.generic_constraints.is_empty()
                 || t.packing.is_some()
@@ -89,6 +110,7 @@ impl<'a> Profile<'a> {
         let mut p = Self {
             input,
             references,
+            object_base,
             layouts: vec![vec![]; input.types.len()],
             widths: vec![0; input.types.len()],
             names: HashMap::new(),
@@ -272,7 +294,8 @@ impl<'a> Profile<'a> {
                 if crate::selection::static_owner(&self.input.types[i]) {
                     return Err("static owners cannot be used as values or instance receivers".into());
                 }
-                if self.input.types[i].is_reference_type { Ty::Reference(i) } else { Ty::Record(i) }
+                if self.input.types[i].representation == Representation::Interface && self.references { Ty::Interface(i) }
+                else if self.input.types[i].is_reference_type { Ty::Reference(i) } else { Ty::Record(i) }
             }
             _ => {
                 return Err(
@@ -307,7 +330,7 @@ impl<'a> Profile<'a> {
     }
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
-            Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::ByteArray | Ty::Size | Ty::Wide => vec![true],
+            Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::Size | Ty::Wide => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
             _ => vec![false; self.lanes(t)],
@@ -324,6 +347,28 @@ impl<'a> Profile<'a> {
         // Private slots use eight bytes per scalar lane so mixed pointer/Int32
         // records remain aligned. This is not an external aggregate ABI.
         self.lanes(t) as u32 * 8
+    }
+    fn reference_assignable(&self, actual: &Ty, expected: &Ty) -> bool {
+        match (actual, expected) {
+            (Ty::Reference(actual), Ty::Reference(expected)) if self.object_base == Some(*expected) =>
+                self.input.types[*actual].base.as_ref().is_some_and(|t| *t == Type::Named(self.input.types[*expected].name.clone())),
+            _ => false,
+        }
+    }
+    pub fn cast_targets(&self, target: &Ty) -> Vec<usize> {
+        match target {
+            Ty::Reference(i) if self.object_base == Some(*i) => self.input.types.iter().enumerate()
+                .filter(|(_, t)| t.is_reference_type && t.representation == Representation::Record && !t.is_abstract)
+                .map(|(i, _)| i).collect(),
+            Ty::Reference(i) => vec![*i],
+            Ty::Interface(i) => {
+                let target = Type::Named(self.input.types[*i].name.clone());
+                self.input.types.iter().enumerate()
+                    .filter(|(_, t)| t.is_reference_type && t.representation == Representation::Record && t.implements.contains(&target))
+                    .map(|(i, _)| i).collect()
+            }
+            _ => unreachable!("admitted reference target"),
+        }
     }
     pub fn object_bytes(&self, index: usize) -> u32 { 8 + self.widths[index] as u32 * 8 }
     pub fn field_offset(&self, t: &Ty, index: usize) -> usize {
@@ -637,6 +682,7 @@ impl<'a> Profile<'a> {
                 | Op::Remainder
                 | Op::RemainderUnsigned => (),
                 Op::IsInstance(Type::String) | Op::CastClass(Type::String) | Op::ReferenceIsNull | Op::ReferenceEqual => (),
+                Op::IsInstance(t) | Op::CastClass(t) if self.references && matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_)) => (),
                 Op::NewArray(Type::Byte) | Op::ArrayElement(Type::Byte) | Op::StoreArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) | Op::ArrayLength if self.references => (),
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
@@ -659,7 +705,9 @@ impl<'a> Profile<'a> {
             let op = &f.body[pc];
             let pop = |s: &mut Vec<Ty>| s.pop().ok_or_else(|| fail(pc, "stack underflow"));
             let take = |s: &mut Vec<Ty>, expected: &Ty| -> Result<(), Error> {
-                if pop(s)? != Self::stack_type(expected) {
+                let actual = pop(s)?;
+                let expected = Self::stack_type(expected);
+                if actual != expected && !self.reference_assignable(&actual, &expected) {
                     return Err(fail(pc, "value operand type mismatch"));
                 }
                 Ok(())
@@ -728,15 +776,21 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &Ty::Literal)?;
                     stack.push(Ty::Literal);
                 }
+                Op::IsInstance(t) | Op::CastClass(t) => {
+                    if !matches!(pop(&mut stack)?, Ty::Reference(_) | Ty::Interface(_)) {
+                        return Err(fail(pc, "reference casts require a class or interface view"));
+                    }
+                    stack.push(self.ty(t)?);
+                }
                 Op::ReferenceIsNull => {
-                    if !matches!(pop(&mut stack)?, Ty::Literal | Ty::Reference(_) | Ty::ByteArray) {
+                    if !matches!(pop(&mut stack)?, Ty::Literal | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray) {
                         return Err(fail(pc, "null test requires text or reference"));
                     }
                     stack.push(Ty::Bool);
                 }
                 Op::ReferenceEqual => {
                     let ty = pop(&mut stack)?;
-                    if !matches!(ty, Ty::Reference(_) | Ty::ByteArray) { return Err(fail(pc, "identity requires same reference type")); }
+                    if !matches!(ty, Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray) { return Err(fail(pc, "identity requires same reference type")); }
                     take(&mut stack, &ty)?;
                     stack.push(Ty::Bool);
                 }

@@ -19,12 +19,14 @@ pub struct Options {
     pub uint64_to_string: Vec<usize>,
     pub native_integer_to64: Vec<usize>,
     pub reference_arena: bool,
+    pub object_base: Option<usize>,
     pub frame_names: HashMap<usize, String>,
 }
 impl Options {
     pub fn from_report(report: Option<&serde_json::Value>) -> Self {
         Self {
             reference_arena: report.is_some_and(|r| r["referenceArena"] == true),
+            object_base: report.and_then(|r| r["objectBaseProjection"]["compiledIndex"].as_u64()).map(|i| i as usize),
             frame_names: report
                 .and_then(|r| r["functions"].as_array())
                 .into_iter()

@@ -412,3 +412,34 @@ source/shape provenance and interpreter/native output, EOF and broken-pipe parit
 Focused CIL tests exercise two same-width generic layouts, cloned member returns and
 faults, and excessive-shape rejection. This removes one of the ordinary stream
 library's prerequisites; the next boundary is interface views and calls.
+
+
+## Standard stream views (2026-10-08)
+
+The explicit reference-arena profile now preserves nongeneric class interface views
+through storage, casts, parameters and output borrows. Views retain the original
+object pointer and identity; no wrapper is allocated. `isinst` returns null for a
+mismatch, while `castclass` preserves null and reports the interpreter's RuntimeError
+for a nonnull mismatch, at the original instruction. Generic interfaces, inherited
+interfaces and interface method dispatch remain outside this slice.
+
+`stream-views.rvn` compiles the ordinary Console.OpenStandardInput/Output/Error
+factories and their source-owned constructors. The verified empty System.Object
+base and ordinary constructor are privately renamed to avoid installing a second
+runtime Object slot registry. Original load-set access/conformance checks precede
+this projection; it admits no Object virtual slots or general class inheritance.
+Reports retain the original identity and expose `objectBaseProjection` explicitly.
+
+Like CLR interface references, these views preserve reference identity. The private
+native type-tag checks provide a small closed-world implementation, at the cost of
+excluding dynamic loading and broader inheritance; they establish no stable ABI.
+The existing [research](../../native-execution-investigation.md) comparison remains
+applicable. The region still retains all objects until invocation reset.
+
+Seventeen Console and eighteen linking tests pass, including eight interpreter/native
+cast and alias cases. `verify_interactive.py --stream-views` and
+`stream-views-validation.json` record fresh Raven compilation, normal output, exact
+broken-pipe fault parity, standalone execution and libSystem-only dependencies.
+The pinned Raven compiler intermittently rejected unchanged standard-stream members
+before the successful retry; this slice does not fix that producer issue. Next:
+compile calls through these stream interfaces, beginning with standard input.
