@@ -1,7 +1,10 @@
 #include "fault-details.h"
 #include <stdlib.h>
 #include <inttypes.h>
+#include <signal.h>
 int main(int argc, char **argv) {
+    /* Standalone host policy: broken pipes become I/O faults, as in the Rust CLI. */
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) return 2;
     int32_t result = 12345;
     neoclr_aot_fault fault;
     int32_t input = argc > 1 ? (int32_t)strtol(argv[1], NULL, 10) : 0;

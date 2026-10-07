@@ -117,6 +117,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_console_read_byte_v1", Linkage::Import, &sig)?)
     } else { None };
+    let output_service = if details.is_some_and(|d| !d.console_write_line.is_empty()) {
+        let mut sig = module.make_signature();
+        sig.params.extend([AbiParam::new(types::I64), AbiParam::new(types::I64)]);
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_console_write_line_utf8_v1", Linkage::Import, &sig)?)
+    } else { None };
     let mut ids = vec![];
     for (i, _) in input.functions.iter().enumerate() {
         let mut sig = module.make_signature();
@@ -162,6 +168,25 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let error = b.ins().select(unavailable, one, error);
                 let payload = b.ins().select(byte, value, error);
                 write(&mut b, output, &[tag, payload]);
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks();
+                b.finalize();
+                module.define_function(ids[i], &mut context)?;
+                continue;
+            }
+            if details.is_some_and(|d| d.console_write_line.contains(&i)) {
+                let service = module.declare_func_in_func(output_service.unwrap(), b.func);
+                let length = b.ins().load(types::I64, MemFlags::new(), parameters[0], 0);
+                let bytes = b.ins().iadd_imm(parameters[0], 8);
+                let call = b.ins().call(service, &[bytes, length]);
+                let result = b.inst_results(call)[0];
+                let failed = b.ins().icmp_imm(IntCC::NotEqual, result, 0);
+                let status = b.ins().iconst(types::I32, 3); // RuntimeError, same as interpreter
+                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                site.capture_frame = false; // InternalCall has no managed frame
+                return_if_detailed(&mut b, failed, status, Some(&site));
+                let zero = b.ins().iconst(types::I32, 0);
+                if !f.no_result { write(&mut b, output, &[zero]); }
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();

@@ -244,8 +244,10 @@ primitive static generic helpers now specialize with source identities retained 
 reports. Explicit `--compile-system` now compiles selected managed System seed helpers.
 Immutable UTF-8 literals now cross value-profile locals, calls and output slots. The
 actual ReadByte wrapper now runs natively with a linked stdin adapter, preserving
-byte/EOF/error outcomes and faults for invalid service statuses. Dynamic text lifetimes
-and the broader Console class remain future work. An explicit failure binding now preserves
+byte/EOF/error outcomes and faults for invalid service statuses. A combined Raven
+input/output app now compiles ordinary string, Boolean and empty-line WriteLine
+wrappers, with interpreter/native broken-pipe fault parity. Numeric/dynamic text,
+ReadLine and the broader Console stream surface remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked
 renderer and standalone exit-1 failure app are validated. Interpreter CLI execution

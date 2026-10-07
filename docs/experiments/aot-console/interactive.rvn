@@ -1,0 +1,19 @@
+import System.*
+import System.Result.*
+import System.Option.*
+
+func Main() -> int {
+    Console.WriteLine("Enter a byte (42 is '*'):")
+    let Ok(option) = Console.ReadByte() else {
+        Console.WriteLine("Input unavailable or failed")
+        return 1
+    }
+    if let Some(value) = option {
+        Console.WriteLine(if value == 42 { "Matched * — världen 🌍" } else { "Other byte" })
+        Console.WriteLine(value == 42)
+        Console.WriteLine()
+        return if value == 42 { 0 } else { 2 }
+    }
+    Console.WriteLine("End of input")
+    return 0
+}

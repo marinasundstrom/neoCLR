@@ -1,13 +1,27 @@
-use std::{fs, path::PathBuf, process::Command, sync::atomic::{AtomicUsize, Ordering}};
+use std::{
+    fs,
+    path::PathBuf,
+    process::Command,
+    sync::atomic::{AtomicUsize, Ordering},
+};
 static NEXT: AtomicUsize = AtomicUsize::new(0);
 struct Temp(PathBuf);
 impl Temp {
     fn new() -> Self {
-        let path = std::env::temp_dir().join(format!("aot-console-{}-{}", std::process::id(), NEXT.fetch_add(1, Ordering::Relaxed)));
-        fs::create_dir(&path).unwrap(); Self(path)
+        let path = std::env::temp_dir().join(format!(
+            "aot-console-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir(&path).unwrap();
+        Self(path)
     }
 }
-impl Drop for Temp { fn drop(&mut self) { let _ = fs::remove_dir_all(&self.0); } }
+impl Drop for Temp {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
 const SEED: &str = ".module System\n.references ()\n.function neoCLR.Runtime.ConsoleReadByte() -> System.Value\n.methodimpl InternalCall\n.end";
 const APP: &str = r#"
 .module App
@@ -33,34 +47,87 @@ ldc.i4 -1
 ret
 .end
 "#;
-fn compile(dir: &Temp, seed: &neoclr::Module, flags: &[&str], inspect: bool) -> std::process::Output {
-    fs::write(dir.0.join("seed.neox"), neoclr::metadata_container::write_module(seed).unwrap()).unwrap();
-    fs::write(dir.0.join("app.neoil"), APP).unwrap();
+fn compile(
+    dir: &Temp,
+    seed: &neoclr::Module,
+    flags: &[&str],
+    inspect: bool,
+) -> std::process::Output {
+    compile_source(dir, seed, APP, flags, inspect)
+}
+fn compile_source(
+    dir: &Temp,
+    seed: &neoclr::Module,
+    app: &str,
+    flags: &[&str],
+    inspect: bool,
+) -> std::process::Output {
+    fs::write(
+        dir.0.join("seed.neox"),
+        neoclr::metadata_container::write_module(seed).unwrap(),
+    )
+    .unwrap();
+    fs::write(dir.0.join("app.neoil"), app).unwrap();
     fs::write(dir.0.join("lib.neoil"), ".module Helpers\n.references ()\n").unwrap();
     let mut c = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
-    c.arg(if inspect { "--inspect" } else { "--closed-world" }).arg(dir.0.join("app.neoil")).arg("Calculate");
-    if inspect { c.arg("--closed-world"); } else { c.arg(dir.0.join("app.o")); }
-    c.arg("--system").arg(dir.0.join("seed.neox")).arg("--module").arg(dir.0.join("lib.neoil")).args(flags).output().unwrap()
+    c.arg(if inspect {
+        "--inspect"
+    } else {
+        "--closed-world"
+    })
+    .arg(dir.0.join("app.neoil"))
+    .arg("Calculate");
+    if inspect {
+        c.arg("--closed-world");
+    } else {
+        c.arg(dir.0.join("app.o"));
+    }
+    c.arg("--system")
+        .arg(dir.0.join("seed.neox"))
+        .arg("--module")
+        .arg(dir.0.join("lib.neoil"))
+        .args(flags)
+        .output()
+        .unwrap()
 }
 #[test]
 fn input_binding_is_explicit_and_exact() {
-    for flags in [vec![], vec!["--compile-system"], vec!["--bind-console-read-byte"], vec!["--compile-system", "--bind-console-read-byte", "--bind-console-read-byte"]] {
+    for flags in [
+        vec![],
+        vec!["--compile-system"],
+        vec!["--bind-console-read-byte"],
+        vec![
+            "--compile-system",
+            "--bind-console-read-byte",
+            "--bind-console-read-byte",
+        ],
+    ] {
         let dir = Temp::new();
         let r = compile(&dir, &neoclr::assemble(SEED).unwrap(), &flags, false);
         assert!(!r.status.success() && !dir.0.join("app.o").exists());
     }
     let mut seed = neoclr::assemble(SEED).unwrap();
     seed.functions[0].impl_flags = 0;
-    seed.functions[0].body = vec![neoclr::metadata::Instruction::Void, neoclr::metadata::Instruction::PackValue(neoclr::metadata::Type::Void), neoclr::metadata::Instruction::Return];
+    seed.functions[0].body = vec![
+        neoclr::metadata::Instruction::Void,
+        neoclr::metadata::Instruction::PackValue(neoclr::metadata::Type::Void),
+        neoclr::metadata::Instruction::Return,
+    ];
     let dir = Temp::new();
-    let r = compile(&dir, &seed, &["--compile-system", "--bind-console-read-byte"], false);
+    let r = compile(
+        &dir,
+        &seed,
+        &["--compile-system", "--bind-console-read-byte"],
+        false,
+    );
     assert!(!r.status.success() && !dir.0.join("app.o").exists());
     assert!(String::from_utf8_lossy(&r.stderr).contains("exact neoCLR.Runtime.ConsoleReadByte"));
 }
 #[test]
-#[cfg(all(target_os="macos", target_arch="aarch64"))]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn input_transport_preserves_all_bytes_and_distinct_outcomes() {
-    let dir = Temp::new(); let seed = neoclr::assemble(SEED).unwrap();
+    let dir = Temp::new();
+    let seed = neoclr::assemble(SEED).unwrap();
     let flags = ["--compile-system", "--bind-console-read-byte"];
     let r = compile(&dir, &seed, &flags, true);
     let inspection: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
@@ -85,9 +152,27 @@ int main(void) {
 }
 "#).unwrap();
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
-    let r = Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"]).arg(base.join("aot-fault-details")).arg("-I").arg(base.join("aot-console")).arg(dir.0.join("host.c")).arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    let r = Command::new("clang")
+        .args([
+            "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
+        ])
+        .arg(base.join("aot-fault-details"))
+        .arg("-I")
+        .arg(base.join("aot-console"))
+        .arg(dir.0.join("host.c"))
+        .arg(dir.0.join("app.o"))
+        .arg("-o")
+        .arg(dir.0.join("app"))
+        .output()
+        .unwrap();
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
-    assert!(Command::new(dir.0.join("app")).env_clear().status().unwrap().success());
+    assert!(
+        Command::new(dir.0.join("app"))
+            .env_clear()
+            .status()
+            .unwrap()
+            .success()
+    );
 }
 
 #[test]
@@ -99,15 +184,177 @@ fn duplicate_service_declarations_keep_the_callers_module_identity() {
     ]).unwrap();
     if let neoclr::metadata::Instruction::Call(target) = &mut modules[1].functions[0].body[0] {
         target.definition = None;
-    } else { panic!("expected call"); }
-    for (name, module) in [("app.neox", &modules[0]), ("lib.neox", &modules[1]), ("seed.neox", &neoclr::assemble(SEED).unwrap())] {
-        fs::write(dir.0.join(name), neoclr::metadata_container::write_module(module).unwrap()).unwrap();
+    } else {
+        panic!("expected call");
+    }
+    for (name, module) in [
+        ("app.neox", &modules[0]),
+        ("lib.neox", &modules[1]),
+        ("seed.neox", &neoclr::assemble(SEED).unwrap()),
+    ] {
+        fs::write(
+            dir.0.join(name),
+            neoclr::metadata_container::write_module(module).unwrap(),
+        )
+        .unwrap();
     }
     let r = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
-        .arg("--inspect").arg(dir.0.join("app.neox")).args(["Calculate", "--closed-world", "--compile-system", "--bind-console-read-byte"])
-        .arg("--system").arg(dir.0.join("seed.neox")).arg("--module").arg(dir.0.join("lib.neox")).output().unwrap();
+        .arg("--inspect")
+        .arg(dir.0.join("app.neox"))
+        .args([
+            "Calculate",
+            "--closed-world",
+            "--compile-system",
+            "--bind-console-read-byte",
+        ])
+        .arg("--system")
+        .arg(dir.0.join("seed.neox"))
+        .arg("--module")
+        .arg(dir.0.join("lib.neox"))
+        .output()
+        .unwrap();
     let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
     assert_eq!(report["admission"]["accepted"], true, "{report}");
-    assert_eq!(report["selection"]["nativeBindings"][0]["definition"]["module"], "ConsoleLibrary");
-    assert_eq!(report["selection"]["nativeBindings"].as_array().unwrap().len(), 1);
+    assert_eq!(
+        report["selection"]["nativeBindings"][0]["definition"]["module"],
+        "ConsoleLibrary"
+    );
+    assert_eq!(
+        report["selection"]["nativeBindings"]
+            .as_array()
+            .unwrap()
+            .len(),
+        1
+    );
+}
+
+const OUTPUT_SEED: &str = ".module System\n.references ()\n.function neoCLR.Runtime.WriteLine(String text) -> Void\n.methodimpl InternalCall\n.end";
+const OUTPUT_APP: &str = r#"
+.module App
+.function Calculate() -> Int32
+call Say()
+ldc.i4 42
+ret
+.end
+.function Say() -> noresult
+ldstr "världen 🌍\u0000end"
+call neoCLR.Runtime.WriteLine(String)
+pop
+ret
+.end
+"#;
+#[test]
+fn output_binding_is_explicit_and_exact() {
+    for flags in [
+        vec!["--compile-system"],
+        vec!["--bind-console-write-line"],
+        vec![
+            "--compile-system",
+            "--bind-console-write-line",
+            "--bind-console-write-line",
+        ],
+    ] {
+        let dir = Temp::new();
+        let r = compile_source(
+            &dir,
+            &neoclr::assemble(OUTPUT_SEED).unwrap(),
+            OUTPUT_APP,
+            &flags,
+            false,
+        );
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    }
+    let mut seed = neoclr::assemble(OUTPUT_SEED).unwrap();
+    seed.functions[0].impl_flags = 0;
+    seed.functions[0].body = vec![
+        neoclr::metadata::Instruction::Void,
+        neoclr::metadata::Instruction::Return,
+    ];
+    let dir = Temp::new();
+    let r = compile_source(
+        &dir,
+        &seed,
+        OUTPUT_APP,
+        &["--compile-system", "--bind-console-write-line"],
+        false,
+    );
+    assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    assert!(String::from_utf8_lossy(&r.stderr).contains("exact neoCLR.Runtime.WriteLine"));
+}
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn line_output_preserves_utf8_nul_and_fault_caller_frames() {
+    let dir = Temp::new();
+    let flags = ["--compile-system", "--bind-console-write-line"];
+    let seed = neoclr::assemble(OUTPUT_SEED).unwrap();
+    let r = compile_source(&dir, &seed, OUTPUT_APP, &flags, true);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let inspection: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(inspection["admission"]["accepted"], true, "{inspection}");
+    let r = compile_source(&dir, &seed, OUTPUT_APP, &flags, false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    assert_eq!(
+        serde_json::from_slice::<serde_json::Value>(&r.stdout).unwrap(),
+        inspection["selection"]
+    );
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "fault-details.h"
+#include <stddef.h>
+#include <string.h>
+static int failure=1;
+int32_t neoclr_console_write_line_utf8_v1(const uint8_t *bytes, size_t length) {
+    static const char text[]="världen 🌍\0end";
+    if (length!=sizeof(text)-1 || memcmp(bytes,text,length)) return 99;
+    return failure;
+}
+int main(void) {
+    neoclr_aot_fault fault; int32_t result=12345;
+    if (neoclr_entry_v3(0,&result,&fault)!=3 || result!=12345 || fault.code!=3 || fault.frame_count!=2) return 1;
+    if (neoclr_aot_render_fault(stderr,&fault)) return 2;
+    failure=0;
+    if (neoclr_entry_v3(0,&result,&fault) || result!=42 || fault.code || fault.frame_count) return 3;
+    return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args([
+            "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
+        ])
+        .arg(base.join("aot-fault-details"))
+        .arg(dir.0.join("host.c"))
+        .arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o"))
+        .arg("-o")
+        .arg(dir.0.join("stub"))
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("stub"))
+        .env_clear()
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{r:?}");
+    assert_eq!(
+        String::from_utf8_lossy(&r.stderr),
+        "RuntimeError: Runtime error\n   at Say [instruction 1]\n   at Calculate [instruction 0]\n"
+    );
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror"])
+        .arg(base.join("aot-fault-details/host.c"))
+        .arg(base.join("aot-fault-details/render.c"))
+        .arg(base.join("aot-scalar/console.c"))
+        .arg(dir.0.join("app.o"))
+        .arg("-o")
+        .arg(dir.0.join("stdio"))
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("stdio"))
+        .env_clear()
+        .output()
+        .unwrap();
+    assert_eq!(r.status.code(), Some(42));
+    assert_eq!(r.stdout, "världen 🌍\0end\n".as_bytes());
+    assert!(r.stderr.is_empty());
 }

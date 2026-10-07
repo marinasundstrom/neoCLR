@@ -18,6 +18,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   matching interpreter linking when the seed and source library both declare the
   same service. Original load-set verification still controls access and signatures;
   managed duplicate names gain no new local preference.
+  Add explicit value-profile WriteLine binding: compile ordinary string, Boolean
+  and empty-line Console wrappers, preserve UTF-8/NUL output, and propagate output
+  failures with shared diagnostics. The standalone host converts broken pipes into
+  I/O faults. Validate a fresh Raven interactive union app and exact interpreter/
+  native output, exit and broken-pipe fault parity; numeric text remains pending.
 
 ### 2026-10-07
 

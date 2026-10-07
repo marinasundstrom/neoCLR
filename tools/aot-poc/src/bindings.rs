@@ -56,20 +56,46 @@ pub fn user_fault(input: &mut neoclr::Module, selection: &Value) -> Result<Value
 }
 
 /// Bind only the verified reserved service, never its public managed wrapper.
-pub fn console_read_byte(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+pub fn console_read_byte(
+    input: &mut neoclr::Module,
+    selection: &Value,
+) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
-        if row["name"] != "neoCLR.Runtime.ConsoleReadByte" { continue; }
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
+        if row["name"] != "neoCLR.Runtime.ConsoleReadByte" {
+            continue;
+        }
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         if f.name != "neoCLR.Runtime.ConsoleReadByte"
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || !f.parameters.is_empty() || f.returns != Type::Value || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("native byte input binding requires exact neoCLR.Runtime.ConsoleReadByte() -> System.Value InternalCall contract".into()); }
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || !f.parameters.is_empty()
+            || f.returns != Type::Value
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err("native byte input binding requires exact neoCLR.Runtime.ConsoleReadByte() -> System.Value InternalCall contract".into());
+        }
         // A verifiable private placeholder. Only this reported definition is lowered
         // to the native service; no opcode or guest name is an intrinsic by itself.
         f.impl_flags = 0;
@@ -77,6 +103,59 @@ pub fn console_read_byte(input: &mut neoclr::Module, selection: &Value) -> Resul
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
             "compiledIndex": row["compiledIndex"], "implementation": "console-read-byte-v1",
             "symbol": "neoclr_console_read_byte_v1"}));
+    }
+    Ok(bindings)
+}
+
+/// Output service used by the ordinary string, Boolean and empty-line wrappers.
+pub fn console_write_line(
+    input: &mut neoclr::Module,
+    selection: &Value,
+) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
+        if row["name"] != "neoCLR.Runtime.WriteLine" {
+            continue;
+        }
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
+        if f.name != "neoCLR.Runtime.WriteLine"
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != [Type::String]
+            || f.returns != Type::Void
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err("native line output binding requires exact neoCLR.Runtime.WriteLine(String) -> Void/noresult InternalCall contract".into());
+        }
+        f.impl_flags = 0;
+        f.body = if f.no_result {
+            vec![Op::Return]
+        } else {
+            vec![Op::Void, Op::Return]
+        };
+        bindings.push(json!({"definition": row["definition"], "name": row["name"],
+            "compiledIndex": row["compiledIndex"], "implementation": "console-write-line-v1",
+            "symbol": "neoclr_console_write_line_utf8_v1"}));
     }
     Ok(bindings)
 }

@@ -11745,6 +11745,7 @@ and don’t stop”. This follows the AOT union, input and shared fault diagnost
 **Assistant action:** continued on main with explicit native byte-input binding,
 retaining the ordinary Raven wrapper and committing bounded slices. The native input
 [experiment](experiments/aot-console/README.md) records byte/EOF/error tests and the
-remaining Console dependencies. The next proposed slice is value-profile WriteLine;
-dynamic text and stream/reference support remain open. This Console direction does
+remaining Console dependencies. The following slice adds value-profile WriteLine
+and an interactive input/output consumer; dynamic text and stream/reference support
+remain open. This Console direction does
 not establish a new permanent roadmap priority outside the author-directed AOT work.

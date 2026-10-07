@@ -70,3 +70,34 @@ verification still runs first; ordinary managed calls do not gain local preferen
 A duplicate-service test verifies the selected library identity, and all 18 explicit
 load-set tests pass. The combined Raven input/WriteLine probe drove this correction;
 its output service still requires the next explicit binding. No public API changes.
+
+## Interactive output (2026-10-08)
+
+`--bind-console-write-line` binds the exact verified
+`neoCLR.Runtime.WriteLine(String) -> Void/noresult` InternalCall and implies ABI v3. The
+ordinary `WriteLine(string)`, `WriteLine(bool)` and `WriteLine()` library wrappers
+compile unchanged. The linked UTF-8 adapter from the scalar experiment accepts a
+byte pointer and explicit length, preserving embedded NUL; it writes LF and flushes.
+Nonzero adapter results become RuntimeError with the standardized message and
+managed callers, excluding the native service from the trace. Partial output cannot
+be rolled back. This slice adds no dynamic String allocation or public guest API.
+
+The standalone host ignores SIGPIPE so broken stdout pipes become ordinary I/O
+faults rather than signal termination. Embedding hosts own their process signal
+policy; the adapter itself does not change it. This matches the Rust CLI's broken-pipe
+behavior. Closed-fd stdout was not a valid interpreter parity oracle because Rust
+may ignore that error; use the broken-pipe test.
+
+`interactive.rvn` reads the real nested Result/Option, prints prompts and branch
+outcomes, and exercises Boolean and empty-line overloads. `verify_interactive.py`
+compiles fresh Raven metadata and compares interpreter/native output, exit codes and
+broken-pipe diagnostics exactly. `interactive-validation.json` records the pinned
+compiler/bundle and standalone evidence. The pinned compiler intermittently reports
+missing Console/union members on unchanged source; a fresh retry compiled the sample.
+This is a recorded compiler reproducibility limitation, not an AOT fix.
+
+Run the verifier with the same arguments as `verify.py`, additionally passing
+`--compiler /path/to/rvnc.dll`, and choose a fresh output directory. Focused backend
+tests also exercise Unicode/NUL bytes, output failure, unchanged result storage and
+reuse of the fault context after success. Next: invocation-owned dynamic UTF-8 text
+for numeric formatting, then the stream/reference machinery behind Write/ReadLine.

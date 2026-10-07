@@ -90,7 +90,9 @@ message catalog and a common 64-frame truncation contract. Interpreter CLI execu
 faults now use the same presentation and exit convention; [native byte input](experiments/aot-console/README.md) now executes the ordinary Raven
 Console.ReadByte wrapper, with byte/EOF/error and invalid-service fault evidence.
 The author directs sustained Console support next (2026-10-08): value-profile
-WriteLine precedes dynamic UTF-8 text/lifetime and stream/reference support. Multiple instantiations
+WriteLine now compiles its string/Boolean/empty-line wrappers alongside input,
+with an interactive Raven consumer and broken-pipe fault parity. Invocation-owned
+dynamic UTF-8 text for numeric formatting is next, before stream/reference support. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
