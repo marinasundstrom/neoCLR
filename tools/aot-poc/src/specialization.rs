@@ -80,7 +80,7 @@ impl Specializer<'_> {
         if let Some(existing) = self.shapes.iter().find(|v| v.source == i && v.arguments == arguments) {
             return Ok(Type::Named(existing.name.clone()));
         }
-        if self.shapes.len() >= 64 { return Err("specialized type count exceeds 64".into()); }
+        if self.shapes.len() >= 128 { return Err("specialized type count exceeds 128".into()); }
         let row = if self.shapes.iter().any(|v| v.source == i) {
             let row = self.source.types.len() + self.type_clones;
             self.type_clones += 1;
@@ -118,8 +118,8 @@ impl Specializer<'_> {
                 // Keep lexical identity only. The value profile separately validates
                 // empty static companions and rejects every executable use.
                 let owner_index = self.type_index(&owner.name)?;
-                if !self.shapes.iter().any(|v| v.source == owner_index) && self.shapes.len() >= 64 {
-                    return Err("specialized type count exceeds 64".into());
+                if !self.shapes.iter().any(|v| v.source == owner_index) && self.shapes.len() >= 128 {
+                    return Err("specialized type count exceeds 128".into());
                 }
                 if !self.shapes.iter().any(|v| v.source == owner_index) {
                     self.shapes.push(Shape { source: owner_index, arguments: vec![], row: owner_index, name: owner.name.clone() });
@@ -135,8 +135,8 @@ impl Specializer<'_> {
             if let Type::Named(name) = ty {
                 let i = self.type_index(name)?;
                 if super::selection::static_owner(&self.source.types[i]) {
-                    if !self.shapes.iter().any(|v| v.source == i) && self.shapes.len() >= 64 {
-                        return Err("specialized type count exceeds 64".into());
+                    if !self.shapes.iter().any(|v| v.source == i) && self.shapes.len() >= 128 {
+                        return Err("specialized type count exceeds 128".into());
                     }
                     if !self.shapes.iter().any(|v| v.source == i) {
                         self.shapes.push(Shape { source: i, arguments: vec![], row: i, name: name.clone() });
@@ -209,10 +209,10 @@ impl Specializer<'_> {
         }) {
             return Ok(instance.clone());
         }
-        if self.instances.len() >= 128
-            || (self.clones >= 32 && (!target.generic_arguments.is_empty() || self.instances.iter().any(|v| v.source == i)))
+        if self.instances.len() >= 256
+            || (self.clones >= 64 && (!target.generic_arguments.is_empty() || self.instances.iter().any(|v| v.source == i)))
         {
-            return Err("method specialization exceeds 128 selected functions or 32 clones".into());
+            return Err("method specialization exceeds 256 selected functions or 64 clones".into());
         }
         let row = if target.generic_arguments.is_empty() && !self.instances.iter().any(|v| v.source == i) {
             i
@@ -508,7 +508,7 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
         }
         expanded.types[shape.row] = t;
     }
-    let report = json!({"policy":"up to 64 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 32 function clones and 128 selected functions; no constraints",
+    let report = json!({"policy":"up to 128 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 64 function clones and 256 selected functions; no constraints",
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
     Ok((expanded, report))

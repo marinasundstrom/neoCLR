@@ -110,6 +110,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   replacement checks. Validate snapshots, null/empty input, limits and exhaustion;
   reject mutable element borrows/defaults. General object erasure and managed-array
   interface views remain pending; internal native bodies must be rebuilt together.
+  Compile verified ordinary String instance wrappers via an explicit-receiver private
+  projection, retaining bodies and fault identities. Validate a standalone Raven
+  byte-count/slice Result consumer and null argument behavior. Extend measured
+  selection budgets to 256 functions/128 shapes/64 clones with boundary rejection
+  tests; boxed union cases and array dispatch remain Console.Write dependencies.
 
 ### 2026-10-07
 

@@ -125,9 +125,11 @@ static generic String helpers now preserve pointer width/lifetime and exact faul
 parity. Explicit UTF-8 byte-count/slice bindings now preserve interpreter range/boundary
 results and exact dynamic fault messages. UTF-8 encoding now returns immutable byte
 value snapshots, preserving fixed-extent replacement and the bridge's ordinary copy
-loop. Console.Write still requires String instance members, array interface views
-and a measured function/clone budget extension (currently 151 functions, 68 types,
-37 clones before array dispatch). The author adds a console-input sample after unions, exercising input and
+loop. Ordinary String instance bodies now run in a standalone Raven slice/count
+consumer with Result patterns and exact interpreter fault parity. Measured selection
+budgets expand to 256 functions/128 types/64 clones (Console.Write already selects
+151/68/37 before array dispatch). Boxed union cases, String pattern casts and array
+interface dispatch remain the next writer dependencies. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

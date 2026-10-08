@@ -1,0 +1,26 @@
+import System.*
+import System.Result.*
+
+func Main() -> int {
+    let text = "aé😀\u0000z"
+    Console.WriteLine(text.GetUtf8ByteCount())
+    let Ok(slice) = text.SliceUtf8(1, 6) else {
+        return 2
+    }
+    Console.WriteLine(slice)
+    if let Error(_) = text.SliceUtf8(2, 0) {
+        Console.WriteLine("invalid boundary")
+    } else {
+        return 3
+    }
+    if let Error(_) = text.SliceUtf8(-1, 0) {
+        Console.WriteLine("out of range")
+    } else {
+        return 4
+    }
+    let Ok(empty) = text.SliceUtf8(9, 0) else {
+        return 5
+    }
+    Console.WriteLine(empty.GetUtf8ByteCount())
+    return 0
+}

@@ -1621,7 +1621,7 @@ fn raven_generic_methods_compile_from_pe_and_neox_with_original_tokens_reported(
 
 #[test]
 fn generic_method_clones_are_bounded_and_keep_plain_callees_at_the_limit() {
-    for count in [32, 33] {
+    for count in [64, 65] {
         let mut source =
             String::from(".module MethodLimit\n.entry Main\n.function Main() -> Int32\n");
         for i in 0..count {
@@ -1641,12 +1641,12 @@ fn generic_method_clones_are_bounded_and_keep_plain_callees_at_the_limit() {
         );
         assert_eq!(
             result.status.success(),
-            count == 32,
+            count == 64,
             "{}",
             String::from_utf8_lossy(&result.stderr)
         );
-        if count == 33 {
-            assert!(String::from_utf8_lossy(&result.stderr).contains("32 clones"));
+        if count == 65 {
+            assert!(String::from_utf8_lossy(&result.stderr).contains("64 clones"));
             assert!(!temp.0.join("value.o").exists());
         }
     }
@@ -1872,16 +1872,21 @@ ret
 
 #[test]
 fn multiple_value_shape_discovery_stays_bounded() {
+    for count in [64,65] {
     let mut source = String::from(".module ManyShapes\n.type Box<T>\n.field Value T\n.end\n");
-    for n in 0..65 { source.push_str(&format!(".type Leaf{n}\n.end\n")); }
+    for n in 0..count { source.push_str(&format!(".type Leaf{n}\n.end\n")); }
     source.push_str(".function Main() -> Int32\n");
-    for n in 0..65 { source.push_str(&format!(".local Box<Leaf{n}> item{n}\n")); }
+    for n in 0..count { source.push_str(&format!(".local Box<Leaf{n}> item{n}\n")); }
     source.push_str("ldc.i4 0\nret\n.end\n");
     let m = neoclr::assemble(&source).unwrap();
     let temp = Temp::new();
     let r = compile_mode(&neoclr::metadata_container::write_module(&m).unwrap(),&temp,"Main",true);
-    assert!(!r.status.success() && !temp.0.join("value.o").exists());
-    assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 64"));
+    assert_eq!(r.status.success(),count==64,"{}",String::from_utf8_lossy(&r.stderr));
+    if count==65 {
+    assert!(!temp.0.join("value.o").exists());
+    assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 128"));
+    }
+    }
 }
 
 #[test]
@@ -1928,4 +1933,23 @@ ret
     let m=neoclr::assemble(source).unwrap();
     assert_eq!(neoclr::run(&m,neoclr::Limits::default()).unwrap().value,neoclr::Value::Int32(42));
     native_mode(&neoclr::metadata_container::write_module(&m).unwrap(),0,0,42,"Main",true);
+}
+
+#[test]
+fn expanded_value_function_budget_accepts_256_and_rejects_257() {
+    for count in [256,257] {
+        let mut source=String::from(".module FunctionBudget\n.function Main() -> Int32\n");
+        for n in 1..count { source.push_str(&format!("call F{n}()\npop\n")); }
+        source.push_str("ldc.i4 42\nret\n.end\n");
+        for n in 1..count { source.push_str(&format!(".function F{n}() -> Int32\nldc.i4 0\nret\n.end\n")); }
+        source.push_str(".function Unselected() -> Int32\nldc.i4 0\nret\n.end\n");
+        let module=neoclr::assemble(&source).unwrap();
+        let temp=Temp::new();
+        let r=compile_mode(&neoclr::metadata_container::write_module(&module).unwrap(),&temp,"Main",true);
+        assert_eq!(r.status.success(),count==256,"{}",String::from_utf8_lossy(&r.stderr));
+        if count==257 {
+            assert!(!temp.0.join("value.o").exists());
+            assert!(String::from_utf8_lossy(&r.stderr).contains("selected functions exceed"));
+        }
+    }
 }

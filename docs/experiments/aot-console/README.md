@@ -677,3 +677,38 @@ managed byte[] returned by Encoding.UTF8.GetBytes, the existing neoCLR native se
 returns value bytes and its temporary bridge copies them into a managed array. This
 keeps that contract intact but costs an additional retained arena allocation/copy;
 it is not a proposed permanent encoding optimization.
+
+
+## Ordinary String instance wrappers (2026-10-08)
+
+The verified public nonvirtual String wrappers now compile as private functions with
+an explicit String receiver. Their ordinary CIL bodies and argument indices stay
+unchanged; selected source identities remain in reports and fault frames. This
+projection is needed because the backend's bootstrap String definition belongs to a
+different module. Original load-set verification still precedes projection. It does
+not admit String constructors, field storage, virtual members or generic instance
+methods. Current String CIL uses direct instance calls: null receivers reach the
+ordinary body, and native services validate null arguments with RuntimeError, exactly
+as the interpreter does. No additional null-call convention is imposed by AOT.
+
+The tested `utf8-text.rvn` consumer exercises GetUtf8ByteCount and SliceUtf8 through
+real library Result patterns (`let ... else`, `if let`), valid UTF-8/NUL, empty slices,
+invalid boundaries and ranges. Run `verify_interactive.py --utf8-text` with the pinned
+producer arguments above. [Validation](utf8-text-validation.json) records the producer
+command, artifact hashes, interpreter/native output and exact broken-pipe fault parity,
+and deployment into an executable-only directory with an empty environment. Only
+libSystem is dynamically linked. The successful source compilation from run 2 is
+reused with verified matching source/producer hashes after backend fixes; the report
+records that provenance rather than claiming a fresh compiler run.
+
+Selection limits now admit 256 functions, 128 closed types and 64 function clones.
+The measured Console.Write graph already needs 151 functions, 68 types and 37 clones
+before nominal array dispatch, exceeding the previous 128/64/32 profile. Focused
+boundary tests accept the new limits and reject the next function/clone or oversized
+type discovery. Stack/frame, field and arena limits are unchanged. These are explicit
+POC limits, not neoCLR platform promises. Like ordinary .NET instance methods, wrapper
+logic stays managed compiler input; the private projection is a temporary bootstrap
+verification detail, not a public calling convention.
+
+Full Console.Write next reaches boxed empty union cases, String pattern casts and
+managed-array interface dispatch. ReadLine follows the writer path.
