@@ -35,8 +35,9 @@ void neoclr_probe_leave_v1(neoclr_probe_frame *frame);
 void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction,
     const uint64_t *lanes, uint32_t lane_count, const char *plan, uint32_t length);
 /* Phase 1: initialized constructor storage; phase 2: successful call/constructor result.
+ * Phase 3: seeded caller result scratch, not a published guest result.
  * Live slot addresses persist until the next pre-operation snapshot or frame leave. */
-void neoclr_probe_transient_v1(neoclr_probe_frame *frame, uint32_t phase,
+void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length);
 /* Diagnostic state is thread-local, cumulative counts span entry invocations.
  * Each frame records its host context; the chain can contain nested contexts. */

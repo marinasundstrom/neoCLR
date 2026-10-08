@@ -1152,6 +1152,18 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             null_reference(&mut b, call_args[0], site.as_ref());
                         }
                         let result = b.ins().stack_addr(types::I64, call_result, 0);
+                        if !construct {
+                            if let (Some(probes), Some(t)) = (&root_probes, &p.results[c]) {
+                                // Seed only traceable scratch lanes; this does not publish
+                                // a guest result. The caller retains their addresses while
+                                // the callee writes and removes its diagnostic frame.
+                                let zero = b.ins().iconst(types::I64, 0);
+                                for lane in gc_layout::seed_lanes(&p, t) {
+                                    b.ins().store(MemFlags::new(), zero, result, (lane * 8) as i32);
+                                }
+                                probes.publish(&mut module, &mut b, i, pc, 3, probe_frame.unwrap(), transient_table.unwrap(), result);
+                            }
+                        }
                         call_args.push(result);
                         if let Some(context) = fault_context { call_args.push(context); }
                         let target = module.declare_func_in_func(ids[c], b.func);

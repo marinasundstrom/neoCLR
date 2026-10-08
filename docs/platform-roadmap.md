@@ -205,7 +205,9 @@ Typed argument/local lane addresses are now published in those frames, with boun
 reads and seeded local roots ([validation](experiments/aot-console/route-root-storage-validation.json)).
 Initialized constructor storage and successful call results now have phased diagnostic
 publication ([validation](experiments/aot-console/route-transient-root-validation.json)).
-Borrowed pointees, result handoff, adapter internals and host/fault roots remain incomplete.
+Ordinary-call result handoff now uses seeded caller-owned pending storage observable at
+callee removal ([validation](experiments/aot-console/route-result-handoff-validation.json)).
+Borrowed pointees, adapter internals and host/fault roots remain incomplete.
 Extend that coverage next, then add allocation descriptors and nonmoving tracing/reclamation
 before qualifying
 sustained HTTP execution. This is planned integration work, not an implemented native

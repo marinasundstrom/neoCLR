@@ -88,7 +88,7 @@ impl Probes {
             .map(AbiParam::new),
         );
         let publish =
-            module.declare_function("neoclr_probe_transient_v1", Linkage::Import, &sig)?;
+            module.declare_function("neoclr_probe_transient_v2", Linkage::Import, &sig)?;
         let mut transient = HashMap::new();
         let mut points = HashMap::new();
         let mut storage = HashMap::new();
@@ -153,7 +153,7 @@ impl Probes {
                     }
                     Op::Call(target) | Op::CallVirtual(target) => p.results[p.callee(target)?]
                         .clone()
-                        .map(|t| vec![(2, t)])
+                        .map(|t| vec![(3, t.clone()), (2, t)])
                         .unwrap_or_default(),
                     _ => vec![],
                 };

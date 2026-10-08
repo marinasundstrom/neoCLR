@@ -77,7 +77,7 @@ ret
 #include "root-probe.h"
 #include <stdlib.h>
 #include <string.h>
-static unsigned calls, enters, leaves, depth, peak, results;
+static unsigned calls, enters, leaves, depth, peak, results, pending, handoffs;
 static neoclr_probe_frame *head;
 static int text(uint64_t value, const char *expected) {
     const neoclr_aot_text *t = (const void *)(uintptr_t)value;
@@ -107,15 +107,29 @@ void neoclr_probe_enter_v3(neoclr_probe_frame *frame, const void *context, uint3
             !text(*(const uint64_t *)caller->previous->storage[0].address, "keep")) abort();
     }
 }
-void neoclr_probe_transient_v1(neoclr_probe_frame *frame, uint32_t phase,
+void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
-    if (head != frame || phase != 2 || count != 2 || !plan || strlen(plan) != length ||
-        storage[0].read_bytes != 4 || *(const uint32_t *)storage[0].address != 4 ||
-        !text(*(const uint64_t *)storage[1].address, "argument")) abort();
-    results++;
+    if (head != frame || count != 2 || !plan || strlen(plan) != length || storage[0].read_bytes != 4) abort();
+    frame->transient = storage; frame->transient_count = count; frame->transient_phase = phase;
+    if (phase == 3) {
+        if (*(const uint32_t *)storage[0].address || *(const uint64_t *)storage[1].address) abort();
+        pending++;
+    } else if (phase == 2) {
+        if (*(const uint32_t *)storage[0].address != 4 || !text(*(const uint64_t *)storage[1].address, "argument")) abort();
+        results++;
+    } else abort();
 }
 void neoclr_probe_leave_v1(neoclr_probe_frame *frame) {
     if (head != frame || !depth) abort();
+    if (frame->previous) {
+        const neoclr_probe_frame *caller = frame->previous;
+        if (caller->transient_phase != 3) abort();
+        uint32_t tag = *(const uint32_t *)caller->transient[0].address;
+        if (tag == 4) {
+            if (!text(*(const uint64_t *)caller->transient[1].address, "argument")) abort();
+            handoffs++;
+        } else if (tag != 0 || *(const uint64_t *)caller->transient[1].address) abort();
+    }
     head = frame->previous; depth--; leaves++;
     memset(frame, 0, sizeof(*frame));
 }
@@ -147,7 +161,7 @@ int main(void) {
             if (status != 1 || result != -99 || fault.code != 1 || fault.frame_count != 3) return 1;
         } else if (status || result != 42 || fault.code || fault.frame_count) return 2;
     }
-    return calls == 12 && enters == 9 && leaves == 9 && peak == 3 && results == 4 ? 0 : 3;
+    return calls == 12 && enters == 9 && leaves == 9 && peak == 3 && results == 4 && pending == 6 && handoffs == 4 ? 0 : 3;
 }
 "#).unwrap();
     let binary = dir.0.join("app");
@@ -308,7 +322,7 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *f, uint32_t pc, const uint6
     f->instruction = pc; f->lanes = s; f->lane_count = n; f->plan = p; f->length = len;
     f->transient = NULL; f->transient_phase = 0; f->transient_count = 0;
 }
-void neoclr_probe_transient_v1(neoclr_probe_frame *f, uint32_t phase,
+void neoclr_probe_transient_v2(neoclr_probe_frame *f, uint32_t phase,
     const neoclr_probe_storage *s, uint32_t n, const char *p, uint32_t len) {
     if (head != f || n != 1 || s->read_bytes != 8 || !p || strlen(p) != len) abort();
     if (phase == 1) { if (*(const uint64_t *)s->address) abort(); before++; }

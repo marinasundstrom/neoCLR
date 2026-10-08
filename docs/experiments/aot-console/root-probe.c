@@ -53,9 +53,9 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
     (void)value;
     calls++;
 }
-void neoclr_probe_transient_v1(neoclr_probe_frame *frame, uint32_t phase,
+void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
-    if (head != frame || (phase != 1 && phase != 2) || !storage || !plan || strlen(plan) != length) abort();
+    if (head != frame || (phase != 1 && phase != 2 && phase != 3) || !storage || !plan || strlen(plan) != length) abort();
     frame->transient = storage; frame->transient_count = count;
     frame->transient_plan = plan; frame->transient_length = length; frame->transient_phase = phase;
     volatile uint64_t observed = 0;

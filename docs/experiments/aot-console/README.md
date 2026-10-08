@@ -1833,3 +1833,37 @@ collect or reenter; they must not use an incomplete root set to reclaim memory.
 Compared with the existing CLR/root-map baseline, explicit activation avoids interpreting
 uninitialized scratch as roots but does not yet close every safepoint gap. Tables and
 callbacks add diagnostic storage/work, with no performance improvement claimed.
+
+## Caller-owned result handoff (2026-10-08)
+
+Ordinary instrumented calls with a result now add phase 3 before invoking the callee:
+clear the traceable lanes of the caller-owned result buffer, then register their live
+addresses in the caller's diagnostic frame. Integer-only lanes remain unobserved. Erased
+scratch clears both tag and payload. This is internal pending storage, not a valid guest
+result or permission to read a variable before assignment.
+
+The callee writes into that same buffer on success. Its removal callback can still
+observe the result through the parent frame, and the caller then transitions to the
+existing phase 2 after checking the returned status. On failure, phase 2 is never
+activated; normal fault cleanup removes the pending view with its frame. Constructors
+retain their separate initialized-receiver protocol and no-result calls register no
+result buffer. The next pre-operation point retires previous transient views.
+
+The callback becomes `neoclr_probe_transient_v2`, accepting phase 3 as well as constructor
+phase 1 and successful-result phase 2. Frame size remains 104 bytes and enter/leave hooks
+retain their versions. Relink instrumented hosts/images together against the matching
+header. Ordinary emission and entry ABI v3/v4 remain unchanged.
+
+The three-level ARM64 test observes six cleared pending buffers, four successful results
+at callee removal, and four later success-phase publications across success/fault/reentry.
+The faulting invocation has neither a populated pending buffer nor a success publication;
+all frames are removed. Sixteen focused tests pass. [Handoff validation](route-result-handoff-validation.json)
+records the real routing consumer, output/fault parity and frame cleanup.
+
+This closes the diagnostic handoff for ordinary managed calls and the caller-owned output
+slot of bound services. It does not cover references held internally by native adapters,
+borrowed pointee ownership/initialization, or host/fault roots. Hooks still cannot collect,
+allocate or reenter. The existing CLR comparison applies: caller-owned pending storage
+simplifies lifetime continuity but adds initialization and retains values conservatively;
+it is not precise liveness metadata or a performance claim. The current exported root
+returns only Int32; a future reference-returning host entry needs its own ownership contract.

@@ -37,7 +37,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   slot addresses and explicit activation phases. Faulted calls publish no result roots.
   Frames now grow to 104 bytes with enter-v3 and a transient callback; next-operation
   snapshots retire prior transient roots. Collection and adapter-internal root coverage
-  remain disabled/incomplete.
+  remain disabled/incomplete. Close the ordinary-call diagnostic result handoff gap by
+  seeding and registering caller-owned traceable result lanes before invocation, keeping
+  the callee's output writes visible during frame removal. Pending scratch is distinct
+  from successful guest-result publication; faults never activate the success phase.
+  The private transient callback advances to v2 for the new pending phase.
 
 - Add a real RoutePattern workload covering eight repeated routing outcomes, pattern
   errors and capture retention. Measure native arena growth from 2,433 bytes before

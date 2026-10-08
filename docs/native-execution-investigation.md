@@ -550,3 +550,10 @@ calls publish no result roots. Live slot addresses preserve constructor writes o
 from nested callbacks. [Contract and evidence](experiments/aot-console/README.md#constructor-and-call-result-activation-2026-10-08)
 record the 104-byte frame/enter-v3 migration. Callee-to-caller result handoff, native adapter
 internals, borrowed ownership/initialization and host/fault roots still precede collection.
+
+Ordinary-call handoff now registers seeded caller-owned result lanes before invocation.
+The same addresses remain observable while the callee removes its frame; only success
+activates the returned-result phase. [Contract and validation](experiments/aot-console/README.md#caller-owned-result-handoff-2026-10-08)
+record exact pending/handoff counts and the private transient-v2 migration. This closes
+that diagnostic lifetime gap without resolving native adapter internals, borrowed
+pointees or host/fault roots, and does not enable collection.
