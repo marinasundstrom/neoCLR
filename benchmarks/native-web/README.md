@@ -313,3 +313,18 @@ The next-release teaser is this native execution path with reproducible samples 
 limits. Full Raven compiler-target bootstrap through neoCLR metadata without the .NET
 bridge remains a separate release requirement; the development Core.dll input does not
 satisfy that gate merely because the resulting executable has no .NET dependency.
+
+
+## Native GC lookup follow-up
+
+A profile-driven sparse address index improves the same native HTTP object from 20.08
+to 96.05 requests/s in three short alternating adapter comparisons. Median per-request
+latency changes from 49.74 to 10.43 ms. [Evidence](gc-index-validation.json) includes
+correctness, cleanup, sanitizer and stack-frame checks. This is a native-adapter
+before/after comparison; the interpreter was not timed again and no .NET ranking follows.
+
+For focused C-adapter changes, `verify_server.py --reuse-build <validated-directory>`
+checks compiler/source/library hashes and reuses its assembly/object while rebuilding
+adapters. In persistent mode, `--native-baseline <validated-directory> --rounds 3`
+compares the old standalone image against the new one, requiring identical assembly
+and object hashes. Without that option, comparison remains interpreter versus native.

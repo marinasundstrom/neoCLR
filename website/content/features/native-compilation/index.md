@@ -148,3 +148,13 @@ with bounded fault traces and GC-frame cleanup. This is a private POC adapter; n
 HTTP requests now pass in both modes, including post-entry queue draining. Runtime-owned
 scheduling and green threads remain future work. Their services should span interpreter,
 AOT and eventual JIT; current TaskQueue and pthread adapters remain provisional.
+
+
+### Development follow-up: native GC lookup
+
+A later three-pair comparison of the same native object measured **20.08 → 96.05
+requests/s** after improving GC address lookup (49.74 → 10.43 ms median request latency).
+Correctness and native cleanup checks pass. This short local adapter comparison does
+not rerun the interpreter or establish a .NET comparison. Collection still runs at
+every native boundary; production GC policy remains future work.
+See the checked-in `benchmarks/native-web/gc-index-validation.json` for raw evidence.

@@ -10,6 +10,7 @@ from pathlib import Path
 import select
 import statistics
 import platform
+import shutil
 import socket
 import subprocess
 import time
@@ -18,11 +19,15 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
+p.add_argument('--reuse-build', type=Path, help='Reuse validated Server.dll/Server.o for focused adapter changes; verify compiler/source/library hashes')
+p.add_argument('--native-baseline', type=Path, help='Persistent mode: compare a validated standalone image from this directory instead of rerunning the unchanged interpreter')
 p.add_argument('--persistent', action='store_true', help='Serve 32 sequential requests per process')
 p.add_argument('--rounds', type=int, default=0, help='Persistent mode: at least three measured interpreter/native pairs; zero validates only')
 a = p.parse_args()
 if a.rounds and (not a.persistent or a.rounds < 3):
     p.error('--rounds requires --persistent and at least three pairs')
+if a.native_baseline and not a.persistent:
+    p.error('--native-baseline requires --persistent')
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
 base = ROOT / 'docs/experiments/aot-console'
@@ -66,12 +71,41 @@ for f in [Path(__file__), source, compiler, runtime, aot, core, seed, ownership,
           *ROOT.joinpath('tools/aot-poc/src').glob('*.rs'), *compiler.parent.glob('*.dll')]:
     report['inputs'][str(f)] = digest(f)
 assembly, obj = output / 'Server.dll', output / 'Server.o'
-run(['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
-     *[x for lib in libs for x in ('--reference', lib)], '--bootstrap-intrinsics', '--bootstrap-ownership',
-     ownership, '--object-library', 'System.Runtime', '-o', assembly, source])
-run([aot, '--closed-world', assembly, '@entry', obj, *flags])
+if a.reuse_build:
+    previous = a.reuse_build.resolve()
+    manifest_path = previous / 'validation.json'
+    manifest = json.loads(manifest_path.read_text())
+    assert manifest.get('passed'), 'Reuse requires successful recorded validation'
+    # Backend and compiler inputs must match. C adapters are intentionally rebuilt.
+    required = [source, compiler, runtime, aot, core, seed, ownership, *libs,
+                *ROOT.joinpath('tools/aot-poc/src').glob('*.rs'), *compiler.parent.glob('*.dll')]
+    for path in required:
+        assert digest(path) == manifest['inputs'].get(str(path)), f'Reused build input changed: {path}'
+    for name, key, destination in [('Server.dll', 'assemblySha256', assembly), ('Server.o', 'objectSha256', obj)]:
+        assert digest(previous / name) == manifest['artifact'][key], f'Reused artifact changed: {name}'
+        shutil.copyfile(previous / name, destination)
+    report['reusedBuild'] = {'manifest': str(manifest_path), 'sha256': digest(manifest_path),
+                             'reason': 'Same CIL/object; rebuild changed native adapters and reuse unaffected compiler/interpreter evidence'}
+else:
+    run(['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
+         *[x for lib in libs for x in ('--reference', lib)], '--bootstrap-intrinsics', '--bootstrap-ownership',
+         ownership, '--object-library', 'System.Runtime', '-o', assembly, source])
+    run([aot, '--closed-world', assembly, '@entry', obj, *flags])
 report['artifact'] = {'assemblySha256': digest(assembly), 'objectSha256': digest(obj)}
+reference_mode = 'interpreter'
 commands = {'interpreter': [runtime, 'run', assembly, *context, '--instructions', '100000000']}
+if a.native_baseline:
+    previous = a.native_baseline.resolve()
+    manifest_path = previous / 'validation.json'
+    manifest = json.loads(manifest_path.read_text())
+    baseline = previous / 'native-standalone'
+    assert manifest.get('passed') and manifest.get('requestsPerProcess') == 32
+    assert manifest['artifact'] == report['artifact'], 'Native comparison requires the identical Raven artifact and object'
+    assert digest(baseline) == manifest['standalone']['sha256'], 'Baseline executable changed'
+    reference_mode = 'baseline-native'
+    commands = {reference_mode: [baseline]}
+    report['nativeBaseline'] = {'manifest': str(manifest_path), 'manifestSha256': digest(manifest_path),
+                               'binarySha256': digest(baseline), 'policy': 'Same compiled object; native adapter comparison only'}
 for name, sanitizer in [('native-sanitized', ['-fsanitize=undefined,bounds']), ('native-standalone', [])]:
     binary = output / name
     run(['clang', '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
@@ -91,7 +125,7 @@ expected_response = (b'HTTP/1.1 200 OK\r\nContent-Length: 10\r\nConnection: clos
                      b'Content-Type: text/plain; charset=utf-8\r\n\r\n' + 'Café 🌍'.encode())
 
 def serve(command, request, fragmented):
-    process = subprocess.Popen(list(map(str, command)), cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(list(map(str, command)), cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
     response = b''
     try:
         if not select.select([process.stdout], [], [], 30)[0]:
@@ -127,7 +161,7 @@ def serve(command, request, fragmented):
 
 def serve_many(command):
     launched = time.perf_counter_ns()
-    process = subprocess.Popen(list(map(str, command)), cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(list(map(str, command)), cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
     latencies = []
     try:
         if not select.select([process.stdout], [], [], 30)[0]:
@@ -169,9 +203,9 @@ if a.persistent:
         report['warmupAndQualification'][mode] = serve_many(command)
         save()
         print(mode, '32 requests and cleanup passed', flush=True)
-    report['measured'] = {'interpreter': [], 'native-standalone': []}
+    report['measured'] = {reference_mode: [], 'native-standalone': []}
     for index in range(a.rounds):
-        order = ['interpreter', 'native-standalone']
+        order = [reference_mode, 'native-standalone']
         if index % 2:
             order.reverse()
         for mode in order:

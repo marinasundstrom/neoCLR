@@ -29,8 +29,12 @@ atomic byte values from String arrays even when their existing payload kind tags
 An intrusive mark worklist uses aligned header pointers in the existing state word.
 Each reachable allocation is queued once, without recursion or external allocation.
 Failure clears temporary links before returning; no sweep occurs on an invalid array
-descriptor. Payload lookup still walks allocation ranges linearly, so graph tracing
-can remain quadratic as the heap grows.
+descriptor. A per-collection 256-bucket sparse address index starts each candidate lookup at
+the block containing its bucket boundary. Exact payload bounds still decide membership;
+headers, padding and free spans are excluded. This costs about 2 KiB of bounded stack
+storage and one linear index-building pass per collection. The index holds no addresses
+between collections, allocates nothing and leaves the heap ABI/rooting policy unchanged.
+Bucket-local scans remain linear; this is not a constant-time or production collector.
 There are no generations, compaction, concurrent collection, finalizers or weak handles.
 Fragmentation or a large live set can still exhaust the buffer. Thread-local counters
 are cumulative diagnostics, not shared heap state; contexts and buffers remain isolated.
@@ -238,3 +242,30 @@ selection limit (the helper still used 512). The focused
 `published_frame_function_bound_matches_native_selection` test checks ID 1023
 enter/leave and rejection of ID 1024 in both GC and diagnostic builds. This fixes
 a native helper admission mismatch; it does not broaden the compiler's limit.
+
+
+## HTTP-driven address lookup optimization (2026-10-08)
+
+A separate one-second CPU sample of the 32-request native HTTP consumer put 672 of
+731 main-thread samples in the collector. The sparse index targets its repeated
+whole-heap candidate searches. Three alternating before/after pairs, using the exact
+same Raven artifact and native object, measured median throughput 20.08 versus 96.05
+requests/s (median request latency 49.74 versus 10.43 ms). These short local samples
+support this adapter optimization, not a general runtime or cross-platform ranking.
+The collection-at-every-boundary stress policy remains unchanged.
+
+Ten focused kernel tests pass, including a 4,096-object reverse chain across buckets,
+interior roots, header/padding rejection and repeated reuse. Persistent HTTP passes
+baseline, sanitized candidate and standalone candidate; all twelve single-request
+HTTP mode/case checks also pass. A sanitized static-frame audit measures the collector
+at 7,104 bytes (-O0) and 3,264 bytes (-O2), within the existing 192 KiB helper reserve;
+it does not model libSystem or sanitizer internal frames.
+[Raw evidence](../../../benchmarks/native-web/gc-index-validation.json) records inputs,
+commands, samples and the test-driver stdout buffering correction.
+
+The interpreter already resolves managed identities through its object map
+(`src/gc.rs`); it does not perform these ambiguous native-address scans. Porting this
+index would add cost without solving the same problem. Shared root/lifetime invariants
+and the HTTP workload remain cross-cutting; no interpreter speedup is claimed.
+The existing .NET/Boehm comparison above remains applicable: neither this lookup change
+nor conservative tracing substitutes for precise descriptors or a GC scheduling policy.

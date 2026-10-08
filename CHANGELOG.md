@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Index native GC allocation ranges per collection, preserving interior roots and
+  payload bounds without changing the heap ABI or collection policy. Ten kernel
+  tests and HTTP checks pass; same-object native HTTP measurements improve from
+  20.08 to 96.05 requests/s in short local runs. Record profiling/stack evidence,
+  add hash-checked adapter comparison, and fix stdout read-ahead in the HTTP verifier.
+
 - Add a Raven HTTP consumer serving 32 sequential requests per process and a matched
   interpreter/native validation and measurement mode. Record three short pairs, raw
   request/startup samples and limitations; all responses and native cleanup checks pass.

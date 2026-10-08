@@ -140,29 +140,45 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
     statistics.allocations++;
     return 0;
 }
-static void mark(neoclr_aot_text_arena *a, uint64_t word, block **pending) {
-    uintptr_t base = (uintptr_t)a->data;
-    if (word < base || word - base >= a->used) return;
+/* Sparse byte-range index rebuilt from validated spans for each collection.
+ * Bounded 2 KiB stack storage; no allocation, retained addresses or heap ABI change.
+ * A bucket points to the block containing its first byte, including free spans.
+ * Interior/tagged candidates still require the exact allocated payload bounds. */
+typedef struct { block *start[256]; unsigned shift; } block_index;
+static void build_index(neoclr_aot_text_arena *a, block_index *index) {
+    index->shift = 6;
+    while (a->used && ((a->used - 1) >> index->shift) >= 256) index->shift++;
+    unsigned bucket = 0;
     for (uint64_t at = 0; at < a->used;) {
         block *b = (void *)(a->data + at);
-        uint64_t begin = at + sizeof(block);
-        /* Includes interior addresses and low-bit tagged String object views. */
-        if (b->state && word - base >= begin && word - base - begin < b->bytes) {
-            if (!(b->state & MARKED)) {
-                /* Aligned header pointers share the state word with low-bit flags.
-                 * No allocation, recursion or additional per-object storage. */
+        uint64_t end = at + b->span;
+        while (bucket < 256 && ((uint64_t)bucket << index->shift) < end)
+            index->start[bucket++] = b;
+        at = end;
+    }
+}
+static void mark(neoclr_aot_text_arena *a, const block_index *index, uint64_t word, block **pending) {
+    uintptr_t base = (uintptr_t)a->data;
+    if (word < base || word - base >= a->used) return;
+    uint64_t offset = word - base;
+    block *first = index->start[offset >> index->shift];
+    for (uint64_t at = (uintptr_t)first - base; at < a->used;) {
+        block *b = (void *)(a->data + at);
+        if (offset < at + b->span) {
+            uint64_t begin = at + sizeof(block);
+            if (b->state && offset >= begin && offset - begin < b->bytes && !(b->state & MARKED)) {
                 b->state = (uint64_t)(uintptr_t)*pending | ALLOCATED | MARKED;
                 *pending = b;
             }
-            return;
+            return; /* Headers, padding and free spans are never managed roots. */
         }
         at += b->span;
     }
 }
-static void mark_slots(neoclr_aot_text_arena *a, const neoclr_probe_storage *slots, uint32_t count, block **pending) {
+static void mark_slots(neoclr_aot_text_arena *a, const block_index *index, const neoclr_probe_storage *slots, uint32_t count, block **pending) {
     for (uint32_t i = 0; i < count; i++) {
         if (slots[i].read_bytes != 8) continue; /* 32-bit discriminators are not pointers. */
-        uint64_t word; memcpy(&word, slots[i].address, 8); mark(a, word, pending);
+        uint64_t word; memcpy(&word, slots[i].address, 8); mark(a, index, word, pending);
     }
 }
 int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head) {
@@ -176,18 +192,20 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
     for (uint64_t at = 0; at < a->used;) {
         block *b = (void *)(a->data + at); b->state &= ALLOCATED; at += b->span;
     }
+    block_index index;
+    build_index(a, &index);
     block *pending = NULL;
-    mark_slots(a, fault, (uint32_t)count, &pending);
+    mark_slots(a, &index, fault, (uint32_t)count, &pending);
     for (host_root *root = host_head; root; root = root->next)
-        if (root->context == context) mark(a, (uintptr_t)root->value, &pending);
+        if (root->context == context) mark(a, &index, (uintptr_t)root->value, &pending);
     for (const neoclr_probe_frame *f = head; f; f = f->previous) {
         if (f->context != context) continue;
-        mark_slots(a, f->storage, f->storage_count, &pending);
-        mark_slots(a, f->transient, f->transient_count, &pending);
-        for (uint32_t i = 0; i < f->lane_count; i++) mark(a, f->lanes[i], &pending);
+        mark_slots(a, &index, f->storage, f->storage_count, &pending);
+        mark_slots(a, &index, f->transient, f->transient_count, &pending);
+        for (uint32_t i = 0; i < f->lane_count; i++) mark(a, &index, f->lanes[i], &pending);
     }
     /* Each newly marked allocation enters the intrusive worklist exactly once.
-     * Address lookup remains linear; this removes repeated whole-heap scan passes. */
+     * The sparse index bounds address searches to a bucket plus its crossing block. */
     while (pending) {
         block *b = pending;
         pending = (block *)(uintptr_t)(b->state & ~UINT64_C(7));
@@ -195,7 +213,7 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
         const unsigned char *data = (const void *)(b + 1);
         if (b->kind == NEOCLR_GC_OBJECT) {
             for (uint64_t offset = 8; offset + 8 <= b->bytes; offset += 8) {
-                uint64_t word; memcpy(&word, data + offset, 8); mark(a, word, &pending);
+                uint64_t word; memcpy(&word, data + offset, 8); mark(a, &index, word, &pending);
             }
         } else if (b->kind == NEOCLR_GC_RECORDS) {
             uint64_t kind, length, lanes;
@@ -208,7 +226,7 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
                 if (!data[markers + i]) continue;
                 for (uint64_t lane = 0; lane < lanes; lane++) {
                     uint64_t word; memcpy(&word, data + 24 + (i * lanes + lane) * 8, 8);
-                    mark(a, word, &pending);
+                    mark(a, &index, word, &pending);
                 }
             }
         } else if (b->kind == NEOCLR_GC_STRINGS) {
@@ -220,7 +238,7 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
                 length > (b->bytes - 16) / (reserved ? 9 : 8)) goto invalid_descriptor;
             for (uint64_t i = 0; i < length; i++) {
                 if (reserved && !data[16 + 8 * length + i]) continue;
-                uint64_t word; memcpy(&word, data + 16 + 8 * i, 8); mark(a, word, &pending);
+                uint64_t word; memcpy(&word, data + 16 + 8 * i, 8); mark(a, &index, word, &pending);
             }
         }
     }
