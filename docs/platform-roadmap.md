@@ -338,7 +338,8 @@ A [reduced native-core probe](experiments/native-core-bootstrap/README.md) now c
 one writer blocker: native core containers can reference their own local core types.
 The explicit compiler API native-metadata mode now bypasses the .NET session and
 compiles an integer consumer that returns 42 in interpreter and ARM64 native execution.
-The catalog/driver/project path and complete source-runtime core remain pending. This
+The explicit native core/library catalog API also passes a separate-library consumer
+in both modes. Driver/project integration and complete source-runtime core remain pending. This
 is not full bootstrap qualification or a replacement for the application/editor gates.
 Compiler host tooling and compiler self-hosting are separate scope questions; this
 clarification specifically concerns the compiler target and emitted execution path.

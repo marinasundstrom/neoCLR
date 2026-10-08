@@ -7015,7 +7015,27 @@ author's target-path gate. The current primitive consumer returns 42 interpreted
 ARM64 native; its C harness links only libSystem. Minimal Object fixture slots and an
 empty native System seed do not establish full runtime-library semantics.
 
-Catalog/driver/MSBuild/editor, complete source-runtime ownership and platform gates
+Driver/MSBuild/editor, complete source-runtime ownership and platform gates
 remain pending. RavenDoc's separate portable-reference loader must also gain a native
 provider before its public pages can derive real library ownership instead of CoreProbe.
 That documentation migration remains future work, rather than relabeling existing inputs.
+
+
+### Native-only catalog API (2026-10-08)
+
+Raven's explicit `NeoClrReferenceCatalog.ReadNative(corePath, nativeReferencePaths)`
+now snapshots native core and library inputs with matching emission dependencies.
+Use its References, Dependencies and CoreIdentity with the native Runtime Contracts
+above. `CoreReference` works across modes; native catalogs expose `NativeCore` and
+`UsesNativeMetadata`, while `Bootstrap` throws because no CLI bootstrap was selected.
+The existing `Read` API preserves its CLI behavior. Both paths have focused regression
+coverage; the native path rejects CLI-only/malformed files and duplicate paths or
+identities, snapshots optional XML, and leaves missing dependencies diagnostic.
+
+The [updated consumer](experiments/native-core-bootstrap/README.md) calls a separate
+native library and returns 42 interpreted and ARM64 native, with only libSystem linked.
+Raven owns catalog loading and semantic/emission bindings; neoCLR owns the native
+metadata producer and execution. Native PE/#Neo remains the transport, without using
+its CLI projection for semantics. Seeds are separate runtime inputs, not translated
+core implementations. This is a loading API change with no IL-semantic or performance
+claim; it does not establish complete core declarations or migrate existing hosts.

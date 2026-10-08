@@ -10,7 +10,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Exercise Raven's explicit native-only metadata mode with an authored native core:
   compile an integer consumer without CLI semantic references and run it interpreted
-  and ARM64 native with result 42. Check missing cores, exact identity mismatch and
+  and ARM64 native with result 42. Extend the probe through Raven’s explicit native
+  reference catalog to call a separate native library with the same result. Check
+  immutable catalog snapshots, CLI-input rejection, missing cores, exact identity mismatch and
   CLI emission refusal; standalone output links only libSystem. Full source-runtime
   and driver/editor bootstrap remain pending. Record RavenDoc's separate native-input
   migration so eventual ownership labels come from real library metadata.

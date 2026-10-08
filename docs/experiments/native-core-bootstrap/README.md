@@ -27,7 +27,8 @@ cannot satisfy the author's no-bridge target gate on its own.
 ## Reproducer and remaining work
 
 `Program.cs` authors a small core directly through the native metadata API, imports
-it exclusively as `NeoClrMetadataReference`, and tries to compile an integer consumer.
+it and a separate native library through `NeoClrReferenceCatalog.ReadNative`, and
+compiles an integer consumer using the catalog’s references and emission dependencies.
 No C# reference assembly is generated or passed to Raven. The .NET process hosts the
 compiler and metadata tools; compiler hosting is separate from target bootstrapping.
 The current core uses the explicit `NativeCore` identity and remains deliberately
@@ -53,7 +54,8 @@ bypasses that session. The current fixture uses its own `NativeCore` identity,
 explicit unit/Object contracts and native semantic references only. It includes
 Int32, Int64, Boolean, Void and String plus minimal Object slots and attribute support.
 These are test fixtures; constant hash/display/Equals bodies are not production Object
-behavior. `consumer.rvn` only exercises integer arithmetic and return. No fixture
+behavior. `consumer.rvn` exercises a static call into a separate native library,
+integer arithmetic and return. No fixture
 Object method is selected by the AOT closure.
 
 The probe checks symbols, emission, missing-core rejection, exact core-version
@@ -72,10 +74,16 @@ python3 docs/experiments/native-core-bootstrap/verify.py \
 ```
 
 [Execution evidence](execution-validation.json) records commands and artifact hashes.
-This is an API-level prerequisite: `NeoClrReferenceCatalog`, rvnc/project/editor
-configuration and complete source-runtime bootstrapping still use the CLI core path.
-Next extend the explicit catalog contract and test native core declaration completeness
-before changing the full bundle. RavenDoc likewise needs its own native input provider;
+The [catalog execution evidence](catalog-execution-validation.json) records the
+follow-through using `ReadNative` and a separate library. The earlier execution report
+retains the direct-reference arithmetic-only baseline. Focused Raven catalog checks
+cover immutable snapshots, replacement, optional XML, dependency emission, missing
+dependencies, duplicate identities/paths and CLI/malformed input rejection; the old
+CLI-bootstrap catalog remains supported and its regression probe passes.
+
+This is an API-level prerequisite: rvnc/project/editor configuration and complete
+source-runtime bootstrapping still use the CLI core path. Next wire explicit host
+selection and test native core declaration completeness before changing the full bundle. RavenDoc likewise needs its own native input provider;
 changing semantic initialization does not automatically migrate documentation inputs.
 
 ## Validation

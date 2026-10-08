@@ -1,4 +1,4 @@
 func Main() -> int {
-    let value = 40
+    let value = Example.Input.Value()
     return value + 2
 }

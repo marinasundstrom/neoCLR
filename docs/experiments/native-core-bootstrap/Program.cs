@@ -39,13 +39,20 @@ foreach (var primitive in new[] { PrimitiveType.Int32, PrimitiveType.Int64, Prim
 core.AddClass("System", "String", root).SetNativePrimitive(PrimitiveType.String);
 var bytes = RuntimeAssemblyContainer.WriteLibraryBinary(core);
 File.WriteAllBytes(Path.Combine(output, "NativeCore.dll"), bytes);
-var reference = NeoClrMetadataReference.ReadAssembly(bytes);
+var input = new AssemblyBuilder(new("Input", new(1, 0, 0, 0)), identity);
+var method = input.AddType("Example", "Input").AddMethod("Value", new(PrimitiveType.Int32, []));
+method.GetILGenerator().LoadConstant(40);
+method.GetILGenerator().Return();
+var libraryPath = Path.Combine(output, "Input.dll");
+File.WriteAllBytes(libraryPath, RuntimeAssemblyContainer.WriteLibraryBinary(input));
+var catalog = NeoClrReferenceCatalog.ReadNative(Path.Combine(output, "NativeCore.dll"), [libraryPath]);
+var reference = catalog.NativeCore!;
 var options = CompilationOptions.NeoCLR.WithRuntimeTypeOfContract(null)
     .WithTargetCoreAssemblyName(identity.Name)
     .WithRuntimeUnitContract(new(identity.Name, "System.Void"))
     .WithMetadataImportOptions(new MetadataImportOptions(identity.Name).WithObjectAssemblyName(identity.Name).WithNativeMetadata());
 var source = SyntaxTree.ParseText(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "consumer.rvn")));
-var compilation = Compilation.Create("Consumer", [source], [reference], options);
+var compilation = Compilation.Create("Consumer", [source], catalog.References.ToArray(), options);
 var errors = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
 if (errors.Length != 0)
 {
@@ -81,7 +88,7 @@ if (!missing.GetDiagnostics().Any(d => d.Severity == DiagnosticSeverity.Error))
     throw new Exception("Missing native core fell back to host declarations.");
 using var image = new MemoryStream();
 var emitted = compilation.Emit(image, null, new EmitOptions().WithBackend(new NeoClrEmissionBackend(
-    new(new("Consumer", new(1, 0, 0, 0)), identity, [new NeoClrMetadataDependency(reference, identity)]))));
+    new(new("Consumer", new(1, 0, 0, 0)), identity, catalog.Dependencies))));
 if (!emitted.Success) throw new Exception(string.Join("\n", emitted.Diagnostics));
 File.WriteAllBytes(Path.Combine(output, "Consumer.dll"), image.ToArray());
 Console.WriteLine("PASS native-only core symbols, consumer emission, missing-core/identity rejection and CLI output guard");

@@ -20,7 +20,7 @@ def main():
         raise FileExistsError(output)
     output.mkdir(parents=True)
     artifacts = output / 'artifacts'
-    report = {'scope': 'Native-only core integer consumer; explicit fixture Object and empty runtime seed.', 'commands': []}
+    report = {'scope': 'Native-only catalog core and separate-library integer consumer; explicit fixture Object and empty runtime seed.', 'commands': []}
 
     def run(command, expected=0, include_stderr=False):
         command = list(map(str, command))
@@ -38,10 +38,11 @@ def main():
     runtime = args.runtime.resolve()
     aot = args.aot.resolve()
     core = artifacts / 'NativeCore.dll'
+    library = artifacts / 'Input.dll'
     consumer = artifacts / 'Consumer.dll'
     seed = artifacts / 'System.neox'
     run([runtime, 'assemble', HERE / 'System.neoil', seed, '--format', 'neox'])
-    dependencies = ['--module', core, '--system', seed, '--object-root', core]
+    dependencies = ['--module', core, '--module', library, '--system', seed, '--object-root', core]
     interpreted = run([runtime, 'run', consumer, *dependencies, '--show-result'], expected=42, include_stderr=True)
     if interpreted.strip() != '=> Int32(42)':
         raise AssertionError(interpreted)
@@ -60,7 +61,7 @@ def main():
                            for name, path in [('neoclr', ROOT), ('raven', args.raven)]}
     inputs = [runtime, aot, *[p for p in HERE.iterdir() if p.suffix in ('.cs', '.csproj', '.rvn', '.neoil', '.c', '.py')]]
     inputs += list((HERE / 'bin/Debug/net10.0').glob('*.dll'))
-    inputs += [core, consumer, seed, artifacts / 'consumer']
+    inputs += [core, library, consumer, seed, artifacts / 'consumer']
     report['sha256'] = {str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs}
     (output / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')
     print('PASS native-only core consumer: interpreter=42, native=42, libSystem only')
