@@ -215,3 +215,10 @@ trimming. As in the existing .NET Native AOT comparison, the compiler must mater
 required closed instantiations. Raising checked caps accommodates this consumer but
 can increase compilation time/memory; it does not reduce reachability or prove an
 optimization. The original input-metadata, frame-size and runtime heap limits remain.
+
+`ReferenceList.rvn` now passes the next dependency: checked ArrayList<Counter> growth,
+copy sharing and 1,000 replacements while only the copy retains the original objects.
+Run `verify_callbacks.py --case ReferenceList`; [evidence](reference-array-validation.json)
+records matching interpreter/native results, sanitized GC and standalone dependencies.
+The full server now reaches the unbound ObjectReferenceEquals service. See the
+[reference-array contract and limits](../../docs/experiments/aot-console/record-arrays.md#reserved-reference-arrays-2026-10-08).

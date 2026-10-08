@@ -3546,3 +3546,77 @@ fn enum_layout_and_nominal_identity_are_verified_before_native_projection() {
         assert!(!dir.0.join("app.o").exists());
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_reference_arrays_preserve_identity_owners_and_faults() {
+    let dir = Temp::new();
+    let source = include_str!("../../../docs/experiments/aot-console/reference-arrays.neoil");
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let flags = ["--compile-system", "--reference-arena", "--native-gc"];
+    let r = compile_source(&dir, &seed, source, &flags, false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+int main(void) {
+    uint64_t buffer[257];
+    buffer[256] = UINT64_C(0x1122334455667788);
+    neoclr_aot_context ctx = {.text = {(unsigned char *)buffer, 2048, 0}};
+    for (int mode = 0; mode < 4; mode++) {
+        int32_t result = -99;
+        int status = neoclr_entry_v4(mode, &result, &ctx);
+        if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 1;
+        if (!mode) {
+            if (status || result != 42 || ctx.fault.code) return 2;
+        } else {
+            if (status != (mode == 1 ? 3 : mode == 2 ? 8 : 6) || result != -99 || ctx.fault.code != (uint32_t)status) return 3;
+            if (neoclr_aot_render_fault(stderr, &ctx.fault)) return 4;
+        }
+        if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used) return 5;
+    }
+    neoclr_gc_statistics stats = neoclr_gc_statistics_v1();
+    if (stats.collections < 1000 || stats.reclaimed_allocations < 1000) return 6;
+    return buffer[256] == UINT64_C(0x1122334455667788) ? 0 : 7;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(dir.0.join("host.c"))
+        .arg(base.join("root-probe.c")).arg(base.join("native-gc.c")).arg(base.join("text-arena.c"))
+        .arg(base.join("../aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host"))
+        .output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
+    assert!(r.status.success(), "{r:?}");
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    assert_eq!(method.invoke(vec![neoclr::Value::Int32(0)], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    let mut faults = String::new();
+    for mode in 1..4 {
+        let fault = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default()).unwrap_err();
+        faults.push_str(&fault.diagnostic().to_string());
+    }
+    assert_eq!(String::from_utf8_lossy(&r.stderr), faults);
+}
+
+#[test]
+fn native_reference_arrays_reject_default_creation_borrows_and_wrong_elements() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let flags = ["--compile-system", "--reference-arena", "--native-gc"];
+    for body in [
+        "ldc.i4 1\nnewarr Cell\npop",
+        "ldc.i4 1\narray.reserve Cell\nldc.i4 0\nldelema Cell\npop",
+        "ldc.i4 1\narray.reserve Cell\nldc.i4 0\nldloca other\ninitobj Other\nldloc other\nstelem Cell",
+    ] {
+        let source = format!(".module InvalidReferenceArray\n.type class Cell\n.end\n.type class Other\n.end\n.function Calculate() -> Int32\n.local Other other\n{body}\nldc.i4 0\nret\n.end");
+        let dir = Temp::new();
+        let result = compile_source(&dir, &seed, &source, &flags, false);
+        assert!(!result.status.success());
+        assert!(!dir.0.join("app.o").exists());
+        let message = String::from_utf8_lossy(&result.stderr);
+        assert!(message.contains("unsupported value instruction") || message.contains("element borrows") || message.contains("Fault:"), "{message}");
+    }
+}

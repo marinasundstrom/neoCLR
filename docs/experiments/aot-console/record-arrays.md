@@ -5,7 +5,7 @@ supports `array.reserve` of closed admitted value records, with indexed snapshot
 stores, length and null tests. Closed nominal generic method arguments allow the real
 `CheckedStorage.Reserve<T>` wrapper to specialize. The original load set is verified
 before lowering; array element identities and generic contracts remain checked.
-Ordinary default-initialized record arrays, reference-class arrays, element borrows,
+Ordinary default-initialized nominal arrays, interface-element arrays, element borrows,
 array equality and nominal array/interface views remain outside this bounded profile.
 This adds no Raven syntax, public library API or temporary CLI bridge encoding.
 
@@ -96,3 +96,29 @@ allocation and GC of a last-lane reference with uninitialized elements ignored, 
 buffer canaries. [HTTP result evidence](../../../benchmarks/native-web/http-result-validation.json)
 records interpreter/native parity in a 64 KiB heap and libSystem-only standalone
 linkage. The next selection slice now admits the full server within coordinated 256-type/1,024-function/256-clone bounds; reference arrays are the next rejection.
+
+### Reserved reference arrays (2026-10-08)
+
+The same checked storage now admits nominal reference-class elements. Each element
+is one strong pointer slot, with its existing initialization marker. The original
+runtime verifier checks the declared element identity; no array covariance or
+interface-element admission is added. Unwritten reads fault, whereas an explicitly
+stored null is initialized and reads successfully (dereferencing it then faults).
+Default newarr, element borrows, array identity and nominal array/interface views
+remain unsupported in this bounded native slice.
+
+As with .NET List<T> for reference types, copying the container copies references:
+mutating an object through either copy is visible through both, and replacing one
+slot does not replace the other's. This reuses the checked-capacity comparison above;
+neoCLR's reservation markers distinguish unwritten storage from initialized nulls.
+Reusing the record-array allocator/scanner avoids another C ABI or allocation kind,
+but retains its 24-byte header and conservative scanning. No performance improvement
+is claimed; the interpreter already has these semantics.
+
+`reference-arrays.neoil` verifies array-only owner retention, shared mutations,
+1,000 replacements in a 2 KiB heap, unwritten/bounds/null fault parity, and canaries.
+Negative tests reject default creation, element borrows and wrong nominal elements.
+[ReferenceList.rvn](../../../benchmarks/native-web/ReferenceList.rvn) exercises the real
+Raven ArrayList<Counter> growth/copy/replacement path in both modes with sanitized
+adapters, 64 KiB GC and libSystem-only standalone linkage. [Evidence](../../../benchmarks/native-web/reference-array-validation.json)
+records the full-server's next missing binding: neoCLR.Runtime.ObjectReferenceEquals.

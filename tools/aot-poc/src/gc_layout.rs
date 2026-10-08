@@ -9,6 +9,7 @@ enum Trace {
     Text,
     Callable,
     CallableArray,
+    ReferenceArray(usize),
     RecordArray(usize),
     Object(usize),
     Interface(usize),
@@ -27,6 +28,7 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
     let trace = match ty {
         Ty::Callable(_) => Trace::Callable,
         Ty::CallableArray(_) => Trace::CallableArray,
+        Ty::ReferenceArray(i) => Trace::ReferenceArray(*i),
         Ty::RecordArray(i) => Trace::RecordArray(*i),
         Ty::Literal | Ty::Character => Trace::Text,
         Ty::Reference(i) if p.array_backing == Some(*i) => Trace::ByteArray,
@@ -89,6 +91,7 @@ pub(super) fn seed_lanes(p: &Profile<'_>, ty: &Ty) -> Vec<usize> {
 fn encode(slots: Vec<Slot>) -> Vec<Value> {
     slots.into_iter().map(|slot| {
         let recipe = match slot.trace {
+            Trace::ReferenceArray(i) => json!({"kind": "reference-array", "typeIndex": i, "elements": "initialized-strong-reference-slots"}),
             Trace::RecordArray(i) => json!({"kind": "record-array", "typeIndex": i, "elements": "initialized-value-snapshots"}),
             Trace::CallableArray => json!({"kind": "callable-array", "elements": "initialized-callback-slots"}),
             Trace::Callable => json!({"kind": "callable", "receiver": "strong-heap-owner"}),

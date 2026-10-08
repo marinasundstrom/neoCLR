@@ -1,0 +1,100 @@
+.module ReferenceArrays
+.type class Counter
+.field Number Int32
+.method instance .ctor(Int32 number) -> noresult
+ldarg 0
+ldarg number
+stfld Counter::Number
+ret
+.end
+.method instance Add(Int32 delta) -> Int32
+ldarg 0
+ldarg 0
+ldfld Counter::Number
+ldarg delta
+add
+stfld Counter::Number
+ldarg 0
+ldfld Counter::Number
+ret
+.end
+.end
+.function Calculate(Int32 mode) -> Int32
+.local arrayref<Counter> values
+.local Counter alias
+.local Counter empty
+.local Int32 count
+ldc.i4 2
+array.reserve Counter
+stloc values
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Uninitialized
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Bounds
+ldarg mode
+ldc.i4 3
+ceq
+brtrue Null
+ldloc values
+ldc.i4 1
+ldc.i4 40
+newobj.ctor instance Counter::.ctor(Int32)
+stelem Counter
+ldc.i4 0
+stloc count
+Loop:
+ldloc values
+ldc.i4 0
+ldloc count
+newobj.ctor instance Counter::.ctor(Int32)
+stelem Counter
+ldloc count
+ldc.i4 1
+add
+stloc count
+ldloc count
+ldc.i4 1000
+blt Loop
+ldloc values
+ldc.i4 1
+ldelem Counter
+stloc alias
+ldloc alias
+ldc.i4 2
+call instance Counter::Add(Int32)
+pop
+ldloc values
+ldc.i4 1
+ldelem Counter
+ldfld Counter::Number
+ret
+Uninitialized:
+ldloc values
+ldc.i4 0
+ldelem Counter
+ldfld Counter::Number
+ret
+Bounds:
+ldloc values
+ldc.i4 -1
+ldelem Counter
+ldfld Counter::Number
+ret
+Null:
+ldloca empty
+initobj Counter
+ldloc values
+ldc.i4 0
+ldloc empty
+stelem Counter
+ldloc values
+ldc.i4 0
+ldelem Counter
+ldc.i4 0
+call instance Counter::Add(Int32)
+ret
+.end

@@ -20,7 +20,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   unions, status payloads, let/if-let matching, copies and GC under replacement.
   Coordinate native selection/boxing/codegen bounds at 256 types, 1,024 functions and
   256 clones, with counted diagnostics and boundary tests. The full server now clears
-  selection (208 shapes/570 functions/213 clones) and exposes reference-array admission.
+  selection (208 shapes/570 functions/213 clones). Add checked reference-class array
+  slots with nominal typing, strong GC retention, shared-copy identity and distinct
+  unwritten/null faults. The real Raven ArrayList<Counter> consumer passes both modes;
+  the full server next needs the ObjectReferenceEquals native binding.
 
 - Add development System.Text.StringBuilder with fluent append, atomic byte-limit
   faults, LF line append, clear/reuse and cached immutable snapshots. Add separator-aware
