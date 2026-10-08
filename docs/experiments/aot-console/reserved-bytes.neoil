@@ -1,0 +1,138 @@
+.module ReservedBytes
+.function neoCLR.Runtime.ConsoleWriteBytes(Boolean error, arrayref<Byte> bytes, Int32 offset, Int32 count) -> Value
+.methodimpl InternalCall
+.end
+.function Calculate(Int32 mode) -> Int32
+.local arrayref<Byte> bytes
+.local arrayref<Byte> alias
+ldarg mode
+ldc.i4 5
+beq Null
+ldarg mode
+ldc.i4 6
+beq Empty
+ldarg mode
+ldc.i4 7
+beq Negative
+ldarg mode
+ldc.i4 8
+beq Limit
+ldarg mode
+ldc.i4 9
+beq Exhaust
+ldc.i4 2
+array.reserve Byte
+stloc bytes
+ldarg mode
+ldc.i4 1
+beq Read
+ldarg mode
+ldc.i4 11
+beq Write
+ldarg mode
+ldc.i4 12
+beq Range
+ldarg mode
+ldc.i4 14
+beq Zero
+ldloc bytes
+stloc alias
+ldloc alias
+ldc.i4 0
+ldc.i4 42
+conv.u1
+stelem Byte
+ldarg mode
+ldc.i4 2
+beq Unwritten
+ldarg mode
+ldc.i4 3
+beq Default
+ldarg mode
+ldc.i4 4
+beq Outside
+ldarg mode
+ldc.i4 13
+beq Write
+Read:
+ldloc bytes
+ldc.i4 0
+ldelem Byte
+ret
+Unwritten:
+ldloc bytes
+ldc.i4 1
+ldelem Byte
+ret
+Default:
+ldc.i4 1
+newarr Byte
+ldc.i4 0
+ldelem Byte
+ret
+Outside:
+ldloc bytes
+ldc.i4 2
+ldelem Byte
+ret
+Null:
+ldloca bytes
+initobj arrayref<Byte>
+br Read
+Empty:
+ldc.i4 0
+array.reserve Byte
+ldlen
+conv.i4
+ret
+Negative:
+ldc.i4 -1
+array.reserve Byte
+pop
+ldc.i4 -1
+ret
+Limit:
+ldc.i4 65537
+array.reserve Byte
+pop
+ldc.i4 -1
+ret
+Exhaust:
+ldc.i4 512
+array.reserve Byte
+pop
+ldc.i4 -1
+ret
+Write:
+ldc.bool false
+ldloc bytes
+ldc.i4 0
+ldc.i4 1
+call neoCLR.Runtime.ConsoleWriteBytes(Boolean, arrayref<Byte>, Int32, Int32)
+br Decode
+Range:
+ldc.bool false
+ldloc bytes
+ldc.i4 -1
+ldc.i4 1
+call neoCLR.Runtime.ConsoleWriteBytes(Boolean, arrayref<Byte>, Int32, Int32)
+br Decode
+Zero:
+ldc.bool false
+ldloc bytes
+ldc.i4 0
+ldc.i4 0
+call neoCLR.Runtime.ConsoleWriteBytes(Boolean, arrayref<Byte>, Int32, Int32)
+Decode:
+dup
+value.is Byte
+brfalse Count
+value.unpack Byte
+conv.i4
+ldc.i4 1000
+add
+ret
+Count:
+value.unpack Int32
+ret
+.end

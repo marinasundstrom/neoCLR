@@ -1244,3 +1244,107 @@ int main(int argc, char **argv) {
         }
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn reserved_bytes_keep_unwritten_reads_checked_and_preserve_service_ordering() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/reserved-bytes.neoil");
+    let denied = compile_source(&dir,&seed,source,&["--compile-system"],false);
+    assert!(!denied.status.success() && !dir.0.join("app.o").exists());
+    let r = compile_source(&dir,&seed,source,&["--compile-system","--reference-arena","--bind-console-stream-output"],false);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+#include "console.h"
+int32_t neoclr_console_write_bytes_v1(int32_t error, const unsigned char *bytes, uint64_t length, int32_t offset, int32_t count) {
+    if (error) abort();
+    if (offset<0 || count<0 || (uint64_t)offset>length || (uint64_t)count>length-(uint64_t)offset) return -7;
+    if (count && bytes[offset]!=42) abort();
+    return count;
+}
+int main(int argc, char **argv) {
+    uint64_t storage[64];
+    neoclr_aot_context ctx={ .text={(unsigned char*)storage,sizeof(storage),0} };
+    int32_t result=-99;
+    int status=neoclr_entry_v4(argc>1 ? atoi(argv[1]) : 0,&result,&ctx);
+    if (status) {
+        if (result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
+        neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
+    }
+    printf("%d\n",result);return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("app")).arg("9").env_clear().output().unwrap();
+    assert_eq!(r.status.code(),Some(1));
+    assert!(String::from_utf8_lossy(&r.stderr).starts_with("NativeMemoryLimitExceeded:"));
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in (0..15).filter(|m| *m!=9) {
+        let reference = method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default());
+        let r = Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        match reference {
+            Ok(result) => {
+                assert_eq!(r.status.code(),Some(0),"{mode}: {r:?}");
+                let neoclr::Value::Int32(value) = result.value else { panic!("expected Int32") };
+                assert_eq!(r.stdout,format!("{value}\n").as_bytes());
+                assert!(r.stderr.is_empty());
+            }
+            Err(fault) => {
+                assert_eq!(r.status.code(),Some(1),"{mode}: {r:?}");
+                assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(),"{mode}");
+            }
+        }
+    }
+}
+
+#[test]
+fn reserved_array_borrows_are_rejected_before_emission() {
+    let source=include_str!("../../../docs/experiments/aot-console/reserved-bytes.neoil")
+        .replacen("ldelem Byte", "ldelema Byte\nldobj Byte", 1);
+    let dir=Temp::new();
+    let seed=neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let r=compile_source(&dir,&seed,&source,&["--compile-system","--reference-arena","--bind-console-stream-output"],false);
+    assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    assert!(String::from_utf8_lossy(&r.stderr).contains("initialization-aware addresses"));
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn sixteen_field_reference_allocation_respects_arena_canaries() {
+    let dir=Temp::new();
+    let seed=neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let fields=(0..16).map(|i| format!(".field F{i} Int32\n")).collect::<String>();
+    let source=format!(".module WideObject\n.type class Wide\n{fields}.method instance .ctor() -> noresult\nldarg 0\nldc.i4 42\nstfld 15\nret\n.end\n.end\n.function Calculate() -> Int32\n.local Wide value\nnewobj.ctor instance Wide::.ctor()\nstloc value\nldloc value\nldfld 0\nldloc value\nldfld 15\nadd\nret\n.end");
+    let r=compile_source(&dir,&seed,&source,&["--compile-system","--reference-arena"],false);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <string.h>
+int main(void) {
+    uint64_t storage[18];memset(storage,0xa5,sizeof(storage));
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,136,0}};
+    int32_t result=-99;
+    if (neoclr_entry_v4(0,&result,&ctx) || result!=42 || ctx.text.used!=136) return 1;
+    for (unsigned i=136;i<sizeof(storage);i++) if (((unsigned char*)storage)[i]!=0xa5) return 2;
+    ctx.text.capacity=135;result=-99;
+    if (neoclr_entry_v4(0,&result,&ctx)!=5 || result!=-99 || ctx.text.used!=0) return 3;
+    return 0;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(&base).arg(dir.0.join("host.c")).arg(base.join("text-arena.c")).arg(dir.0.join("app.o"))
+        .arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    assert!(Command::new(dir.0.join("app")).env_clear().status().unwrap().success());
+}

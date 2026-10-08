@@ -1,0 +1,15 @@
+import System.*
+import System.Collections.*
+
+func Main() -> int {
+    let values = ArrayList<byte>()
+    for value in 0..<9 {
+        values.Add((byte)value)
+    }
+    let sequence: Sequence<byte> = values
+    Console.WriteLine(sequence.Count)
+    Console.WriteLine(sequence[8])
+    values[8] = (byte)42
+    Console.WriteLine(sequence[8])
+    return 0
+}

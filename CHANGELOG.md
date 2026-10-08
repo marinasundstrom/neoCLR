@@ -91,7 +91,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and exact closed member signatures. Preserve inherited interface dispatch and
   identity-preserving upcasts; verify original contracts before generic projection.
   Validate two generic class shapes, mutations and exact null/cast fault parity.
-  ArrayList backing reservations and String-valued erased services remain pending.
+  Add checked reserved byte capacity with shared publication markers, interpreter-
+  compatible unreadable-slot faults and native output initialization checks. Keep
+  ordinary array defaults and range/zero-count service behavior; reject reserved-
+  array element borrows until addresses carry initialization state. Validate ordinary
+  ArrayList<byte> growth and inherited Sequence views in a Console consumer. Privately
+  rename verified static/empty seed Console owners to avoid backend seed collisions,
+  preserving their shapes and source diagnostics. Align the object allocator with
+  sixteen-field admission and test exact-fit/exhaustion/canaries. String-valued
+  erased services and broader text operations remain pending.
 
 ### 2026-10-07
 

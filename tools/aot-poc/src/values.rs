@@ -85,6 +85,7 @@ fn null_reference(b: &mut FunctionBuilder<'_>, pointer: ir::Value, site: Option<
 }
 
 pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
+    let reservations = input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ReserveArray(_))));
     let references = details.is_some_and(|d| d.reference_arena);
     let p = Profile::new(input, references, details.and_then(|d| d.object_base))?;
     let root = p.root(root)?;
@@ -191,6 +192,18 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_allocate_bytes_v1", Linkage::Import, &sig)?)
     } else { None };
+    let reserve_service = if references && reservations {
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64, types::I32, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_reserve_bytes_v1", Linkage::Import, &sig)?)
+    } else { None };
+    let initialized_service = if reservations && details.is_some_and(|d| !d.console_write_bytes.is_empty()) {
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64, types::I32, types::I32].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_check_bytes_initialized_v1", Linkage::Import, &sig)?)
+    } else { None };
     let mut ids = vec![];
     for (i, _) in input.functions.iter().enumerate() {
         let mut sig = module.make_signature();
@@ -257,6 +270,13 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
                     site.capture_frame = false;
                     return_if_detailed(&mut b, null, status, Some(&site));
+                    if let Some(check) = initialized_service {
+                        let check = module.declare_func_in_func(check, b.func);
+                        let call = b.ins().call(check, &[array, parameters[2], parameters[3]]);
+                        let status = b.inst_results(call)[0];
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        return_if_detailed(&mut b, failed, status, Some(&site));
+                    }
                     let bytes = b.ins().iadd_imm(array, 16);
                     let length = b.ins().load(types::I64, MemFlags::new(), array, 8);
                     call_args.extend([bytes, length, parameters[2], parameters[3]]);
@@ -603,11 +623,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let value = stack.split_off(stack.len() - p.lanes(&ty));
                         stack.extend(normalize(&mut b, &p, &ty, &value));
                     }
-                    Op::NewArray(neoclr::metadata::Type::Byte) => {
+                    Op::NewArray(neoclr::metadata::Type::Byte) | Op::ReserveArray(neoclr::metadata::Type::Byte) => {
                         let count = pop(&mut stack);
                         let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                         let output = b.ins().stack_addr(types::I64, call_result, 0);
-                        let service = module.declare_func_in_func(array_service.unwrap(), b.func);
+                        let service = module.declare_func_in_func(if matches!(op, Op::ReserveArray(_)) { reserve_service.unwrap() } else { array_service.unwrap() }, b.func);
                         let call = b.ins().call(service, &[arena, count, output]);
                         let status = b.inst_results(call)[0];
                         let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
@@ -631,6 +651,27 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let offset = b.ins().uextend(types::I64, index);
                         let data = b.ins().iadd_imm(array, 16);
                         let address = b.ins().iadd(data, offset);
+                        if reservations {
+                            let kind = b.ins().load(types::I64, MemFlags::new(), array, 0);
+                            let reserved = b.ins().icmp_imm(IntCC::Equal, kind, 0x80000002);
+                            let check = b.create_block();
+                            let ready = b.create_block();
+                            b.ins().brif(reserved, check, &[], ready, &[]);
+                            b.switch_to_block(check);
+                            let length = b.ins().uextend(types::I64, length);
+                            let marker = b.ins().iadd(address, length);
+                            if value.is_some() {
+                                let initialized = b.ins().iconst(types::I8, 1);
+                                b.ins().store(MemFlags::new(), initialized, marker, 0);
+                            } else {
+                                let initialized = b.ins().load(types::I8, MemFlags::new(), marker, 0);
+                                let unreadable = b.ins().icmp_imm(IntCC::Equal, initialized, 0);
+                                let status = b.ins().iconst(types::I32, 3);
+                                return_if_detailed(&mut b, unreadable, status, site.as_ref());
+                            }
+                            b.ins().jump(ready, &[]);
+                            b.switch_to_block(ready);
+                        }
                         if let Some(value) = value {
                             let byte = b.ins().ireduce(types::I8, value);
                             b.ins().store(MemFlags::new(), byte, address, 0);

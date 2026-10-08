@@ -106,9 +106,8 @@ with NUL defaults, invalid-input parity and a fresh Raven consumer. Signed-byte 
 16-bit integer storage/conversions now feed ordinary numeric Console output, with
 boundary and fresh Raven evidence. Explicit 64-bit formatting/native-width bindings
 now cover the remaining integer Console output paths, including signed/unsigned
-endpoints, with full-width storage and conversion parity. Interface
-views/dispatch and broader stream support behind Write/ReadLine remain next; this region is
-not a replacement for general native collection. Multiple closed value shapes now
+endpoints, with full-width storage and conversion parity. Invocation-region storage
+does not provide general garbage collection. Multiple closed value shapes now
 compile with separate layouts/methods and retained source identities: a fresh Raven
 app combines Option<int/string/byte> and Result<int/string/input-outcome> with
 Console.ReadByte. Bounds and original-scope validation remain enforced. Nongeneric
@@ -119,7 +118,10 @@ its measured graph extends private bounds to 64 types/sixteen value lanes. Expli
 stdout/stderr streams with recoverable I/O outcomes and standalone parity. Text
 reader/writer dependencies behind Write/ReadLine remain open. Closed generic classes
 and inherited interface dispatch now pass nominal-shape and fault tests; the real
-ArrayList<byte> dependency next requires checked backing reservations. The author adds a console-input sample after unions, exercising input and
+ArrayList<byte> dependency now compiles with checked byte reservations, growth and
+interface aliasing. Unwritten reads and output validation preserve interpreter faults;
+reserved-array element borrows remain rejected. String-bearing erased services and
+text operations remain the next Console.Write dependencies. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

@@ -298,28 +298,7 @@ pub fn prepare(
             // backend verifier to install a second runtime Object slot registry.
             // The complete original Object contract was verified above.
             selected.types[index].name = name.clone();
-            fn rename(value: &mut Value, name: &str) {
-                match value {
-                    Value::Object(object) => {
-                        if object.get("owner") == Some(&json!({"Named":"System.Object"})) {
-                            if let Some(Value::String(member)) = object.get_mut("name") {
-                                if let Some(suffix) = member.strip_prefix("System.Object.") {
-                                    *member = format!("{name}.{suffix}");
-                                }
-                            }
-                        }
-                        if object.get("Named") == Some(&json!("System.Object")) {
-                            object.insert("Named".into(), json!(name));
-                        }
-                        for child in object.values_mut() { rename(child, name); }
-                    }
-                    Value::Array(values) => for child in values { rename(child, name); },
-                    _ => (),
-                }
-            }
-            let mut encoded = serde_json::to_value(&selected)?;
-            rename(&mut encoded, &name);
-            selected = serde_json::from_value(encoded)?;
+            rename_nominal(&mut selected, "System.Object", &name, root)?;
             report["objectBaseProjection"] = json!({"compiledIndex": index, "sourceName": "System.Object", "compiledName": name,
                 "policy": "verified empty Object base/ordinary constructor; private nominal base, no virtual Object slots"});
             for row in report["types"].as_array_mut().unwrap() {
@@ -327,6 +306,30 @@ pub fn prepare(
             }
         }
     }
+    let system_type_names: std::collections::BTreeSet<_> = neoclr::library::system()
+        .map_err(|e| e.to_string())?.types.iter().map(|t| t.name.as_str()).collect();
+    let mut static_projections = vec![];
+    for index in 0..selected.types.len() {
+        let ty = &selected.types[index];
+        // The supplied compatibility seed represents Console as an empty value
+        // owner rather than the source library's static class. Keep its shape.
+        let seed_console = ty.name == "System.Console" && !ty.is_reference_type
+            && ty.representation == neoclr::metadata::Representation::Record
+            && ty.fields.is_empty() && ty.base.is_none() && ty.implements.is_empty()
+            && ty.generic_parameters.is_empty() && ty.generic_constraints.is_empty()
+            && ty.enum_info.is_none() && ty.packing.is_none() && ty.minimum_size.is_none();
+        if !(super::selection::static_owner(ty) || seed_console) || !system_type_names.contains(ty.name.as_str()) { continue; }
+        let source = selected.types[index].name.clone();
+        let mut name = format!("$aot_StaticOwner_{index}");
+        while selected.types.iter().any(|t| t.name == name) { name.push('_'); }
+        selected.types[index].name = name.clone();
+        rename_nominal(&mut selected, &source, &name, root)?;
+        static_projections.push(json!({"compiledIndex":index,"sourceName":source,"compiledName":name,"policy":"verified static/empty seed Console owner; private nominal name, original shape retained"}));
+        for row in report["types"].as_array_mut().unwrap() {
+            if row["compiledIndex"] == index { row["compiledName"] = json!(name); }
+        }
+    }
+    report["staticOwnerProjections"] = json!(static_projections);
     // The backend re-verifies the private module with its bundled System context.
     // Give selected seed/library members private names so originals such as
     // System.Fail cannot collide with that context. Exact definition IDs still bind calls.
@@ -358,4 +361,30 @@ pub fn prepare(
         "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "bindConsoleWriteLine": bind_console_write_line, "bindConsoleStreamOutput": bind_console_stream_output, "bindInt32ToString": bind_int32_to_string, "bindCharacterText": bind_character_text, "bindIntegerText": bind_integer_text, "referenceArena": reference_arena, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
         "limits": "up to 64 closed value/reference/interface shapes and 32 function clones; primitive static generic methods; one to eight explicit dependencies; no dynamic loading"});
     Ok((selected, report))
+}
+
+// Rename only structural nominal types and their owned method spellings. Source
+// strings, origins and definition identities remain intact for diagnostics/access.
+fn rename_nominal(module: &mut neoclr::Module, old: &str, new: &str, root: &str) -> Result<(), Error> {
+    fn rename(value: &mut Value, old: &str, new: &str, root: &str) {
+        match value {
+            Value::Object(object) => {
+                if object.get("owner") == Some(&json!({"Named":old})) {
+                    if let Some(Value::String(member)) = object.get_mut("name") {
+                        if member != root {
+                            if let Some(suffix) = member.strip_prefix(&format!("{old}.")) { *member = format!("{new}.{suffix}"); }
+                        }
+                    }
+                }
+                if object.get("Named") == Some(&json!(old)) { object.insert("Named".into(), json!(new)); }
+                for child in object.values_mut() { rename(child, old, new, root); }
+            }
+            Value::Array(values) => for child in values { rename(child, old, new, root); },
+            _ => (),
+        }
+    }
+    let mut encoded = serde_json::to_value(&*module)?;
+    rename(&mut encoded, old, new, root);
+    *module = serde_json::from_value(encoded)?;
+    Ok(())
 }

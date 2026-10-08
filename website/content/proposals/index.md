@@ -265,16 +265,16 @@ Object base now support the three standard-stream factories in a standalone samp
 Bounded implicit interface dispatch now supports standard-input Read/Close, byte
 buffers and stream-result unions. Explicit raw output/flush services also compile
 stdout/stderr streams with recoverable I/O results. Closed generic reference classes
-and inherited interface dispatch are also tested; checked collection backing storage,
-text writers
-and ReadLine remain future work. An explicit failure binding now preserves
+and inherited interface dispatch now support ArrayList<byte> growth with checked
+reserved capacity and a standalone Console consumer. Text writers and ReadLine
+remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked
 renderer and standalone exit-1 failure app are validated. Interpreter CLI execution
 faults use the same message/trace format and exit convention. Explicit `fault` instructions now
 return UserFault status through native calls without publishing a result; message/stack
 diagnostics are available through opt-in ABI v3 and String-based System.Fail now has an
-explicit native binding. Native input remains unimplemented.
+explicit native binding. Native line-oriented text input remains pending.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

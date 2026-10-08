@@ -67,6 +67,10 @@ impl<'a> Profile<'a> {
                     .into(),
             );
         }
+        if input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ReserveArray(_))))
+            && input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ArrayAddress(_)))) {
+            return Err("reserved byte arrays require indexed access; element borrows need initialization-aware addresses".into());
+        }
         if object_base.is_some_and(|i| !references || input.types.get(i).is_none_or(|t| !object_base_shape(t))) {
             return Err("invalid private Object base projection".into());
         }
@@ -494,7 +498,7 @@ impl<'a> Profile<'a> {
                 ),
                 Op::ConvertInt32 | Op::ConvertUInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 | Op::ConvertInt64 | Op::ConvertUInt64 | Op::ConvertNativeInt | Op::ConvertNativeUInt => (),
                 Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_)
-                | Op::IsInstance(_) | Op::CastClass(_) | Op::ReferenceIsNull | Op::NewArray(_) | Op::ArrayLength => {
+                | Op::IsInstance(_) | Op::CastClass(_) | Op::ReferenceIsNull | Op::NewArray(_) | Op::ReserveArray(_) | Op::ArrayLength => {
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
                     state.stack.push(None);
                 }
@@ -694,7 +698,7 @@ impl<'a> Profile<'a> {
                 | Op::RemainderUnsigned => (),
                 Op::IsInstance(Type::String) | Op::CastClass(Type::String) | Op::ReferenceIsNull | Op::ReferenceEqual => (),
                 Op::IsInstance(t) | Op::CastClass(t) if self.references && matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_)) => (),
-                Op::NewArray(Type::Byte) | Op::ArrayElement(Type::Byte) | Op::StoreArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) | Op::ArrayLength if self.references => (),
+                Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte) | Op::ArrayElement(Type::Byte) | Op::StoreArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) | Op::ArrayLength if self.references => (),
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
                 }
@@ -805,7 +809,7 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &ty)?;
                     stack.push(Ty::Bool);
                 }
-                Op::NewArray(Type::Byte) => {
+                Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte) => {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(Ty::ByteArray);
                 }

@@ -554,3 +554,45 @@ The real ArrayList<byte>/Sequence<byte> Console consumer exposed `array.reserve`
 as the next dependency after generic admission. It must retain checked unreadable
 slots rather than silently substituting zero-initialized newarr. Full Console.Write
 also reaches String-valued erased runtime services; those are later slices.
+
+
+## Checked byte capacity and ArrayList (2026-10-08)
+
+`array.reserve Byte` now allocates invocation-owned backing capacity with a private
+initialization byte for each payload byte. Stores publish slots; indexed reads of
+unwritten slots report the same RuntimeError and instruction as the interpreter.
+Ordinary newarr remains zero-initialized. Aliases share both bytes and publication
+state. Range/null/array-limit checks and native-memory exhaustion retain their
+existing order and result-publication rules. ConsoleWriteBytes checks the selected
+range's initialization before host output, while invalid ranges and zero counts
+retain their recoverable service outcomes.
+
+For now, a selected program containing a reservation rejects every element-address
+instruction before emission. This conservative restriction avoids losing publication
+state through raw interior pointers; initialization-aware borrows remain future
+work. Other array element types are still unsupported. Reserved storage uses twice
+the byte payload space plus its header and retains old ArrayList buffers until the
+invocation ends; this is a correctness foundation, not an allocation optimization.
+See the existing [reserved-capacity design](../../reserved-array-capacity.md) for the
+comparison with CLR uninitialized allocation and its different read contract.
+
+`collections.rvn` compiles ordinary ArrayList<byte> construction, Add/growth, indexing
+and inherited Sequence/Collection member calls, then prints through Console. The
+15-function/nine-type graph grows through capacities 0/4/8/16 and observes mutation
+through its interface alias. `verify_interactive.py --collections` and
+`collections-validation.json` record the successful fresh compiler artifact reused
+after backend additions, exact interpreter/native output and broken-pipe fault
+parity, plus executable-only deployment and libSystem-only dynamic dependencies.
+
+This artifact selects the seed's empty System.Console owner. It receives a private
+nominal name to avoid collision with the backend verifier's bundled seed; its original
+shape, access facts, method bodies and source diagnostics remain. The existing Object
+base projection uses the same structural renaming helper. `staticOwnerProjections`
+records these changes; literal strings are never rewritten. The object allocator's
+ceiling now also matches the admitted sixteen padded fields (136 bytes including the
+header), with exact-fit, exhaustion and neighboring-buffer canary checks.
+
+Focused tests cover uninitialized/initialized and alias reads, null/range/limit faults,
+zero capacity, arena exhaustion, ordinary default arrays, native output validation
+order and early borrow rejection. Full Console.Write still requires String-bearing
+erased services and text operations; the collection dependency now compiles normally.

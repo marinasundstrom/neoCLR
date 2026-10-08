@@ -34,7 +34,7 @@ int32_t neoclr_int64_to_string_v1(int64_t value, neoclr_aot_text_arena *arena,
 int32_t neoclr_uint64_to_string_v1(uint64_t value, neoclr_aot_text_arena *arena,
                                  const neoclr_aot_text **output);
 /* Internal object allocation for the explicit reference-arena profile. Header is
- * a private type index; bytes includes header and padded payload (8..72 bytes).
+ * a private type index; bytes includes header and padded payload (8..136 bytes).
  * The arena owns objects and cycles until the next entry/reset, just like text.
  */
 int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
@@ -42,4 +42,8 @@ int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
 /* Packed byte arrays, zero-initialized, length 0..65536. Negative length is
  * RuntimeError (matching the interpreter); excessive length is ArrayLimitExceeded. */
 int32_t neoclr_allocate_bytes_v1(neoclr_aot_text_arena *arena, int32_t length, void **output);
+/* Checked reserved capacity uses one initialization byte per payload byte.
+ * Indexed stores publish slots; unchecked interior borrows remain unsupported. */
+int32_t neoclr_reserve_bytes_v1(neoclr_aot_text_arena *arena, int32_t length, void **output);
+int32_t neoclr_check_bytes_initialized_v1(const void *array, int32_t offset, int32_t count);
 #endif
