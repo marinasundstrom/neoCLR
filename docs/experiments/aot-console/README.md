@@ -1008,3 +1008,40 @@ A driver-DLL hash alone was insufficient to detect those implementations changin
 Legacy reports lacking the complete producer hashes are rejected for reuse; a negative
 check confirms a missing Raven.CodeAnalysis hash rejects before artifact copying.
 This strengthens validation provenance without changing guest compilation semantics.
+
+## Interpolation argument conversions (2026-10-08)
+
+Raven's synthesized String.Concat calls previously omitted argument conversions.
+`"Value: $value"`, `"${value}"` and `"Value: " + value` could therefore reach native
+metadata verification with Int32 where Object was required (NEOMETA003). The shared
+binder now applies ordinary argument conversion and parameter-array mapping after
+existing overload selection. Raven integration commit `9d2f6ae4e` and main commit
+`45650a975` carry the same fix; 11 focused tests pass on each, including emitted .NET
+execution, null text and evaluation order. Three new conversion regressions failed
+on both branches before the fix. This changes no Runtime Contract defaults or ABI.
+
+[interpolation.rvn](interpolation.rvn) freshly compiles into native CIL, verifies and
+runs integer interpolation/addition for 42 and both Int32 endpoints, plus null text.
+Its standalone AOT admission still rejects boxed Object display, and rejection must
+publish no object file. This is the next native profile boundary, not a compiler
+emission error. A richer Counter probe also ran in native CIL; its class without a
+ToString override hits the separate default-display metadata guard during AOT selection.
+
+[interpolation-text.rvn](interpolation-text.rvn) exercises the supported String-only
+path, preserving Unicode and embedded NUL through native CIL and standalone ARM64.
+The executable runs alone with an empty environment and links only libSystem; host
+adapters are linked into it. [Validation](interpolation-validation.json) records fresh
+commands and compiler, bundle, adapter and artifact hashes. Long command output is
+compacted with full-output hashes; the reproduction driver retains full output. Reproduce with:
+
+```sh
+SDKROOT="$(xcrun --show-sdk-path)" python3 docs/experiments/aot-console/verify_interpolation.py \
+  --compiler /path/to/rvnc.dll --runtime target/debug/neoclr \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --bundle /path/to/neoclr-native-poc --output /tmp/fresh-interpolation
+```
+
+Compared with .NET's Object formatting/boxing support, this is a smaller explicit
+native profile. Normalizing calls in Raven preserves semantic information for either
+backend; it does not supply native boxed primitive dispatch or general type metadata.
+The existing bounded text arena, private ABI and UTF-8 contracts remain unchanged.

@@ -1,0 +1,8 @@
+import System.*
+
+func Main() -> int {
+    let first = "hé😀"
+    let second = "z\u0000end"
+    Console.WriteLine("Text: ${first}/${second}")
+    return 0
+}

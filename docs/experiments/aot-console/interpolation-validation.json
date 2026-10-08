@@ -1,0 +1,328 @@
+{
+  "profile": "raven-concat-conversions-v1",
+  "baseRevision": "06be5560ceea7b8746ea1c78bb26d5a5c96339ff",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "inputs": {
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "eec237e8a924743fbf56ac9c24932cab0a92fbc35c9e2cc23d0a2fe4a5a9fc24",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "ac7efe36e95e2c848d81c7bef37fe8e270146f8222ea91cf4866c4348f043234",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "428f0709baf84634025e0d6387a5726edffb1bcc7c18d28795317705e5fb43de",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "bfbfda2f336a73059418c84899787d4f8cc680f27d4864d70785692b048d0382",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.deps.json": "c02d34dc57e38be4c1ad97a24aeea0a41f87ce4208e77072f6c5cdb4d7599832",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "6ca8ab4df3f3f57be16d971c56101ef83511f6ad151945cd7854174d85fb318c",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.deps.json": "8439a508ae1b5e7d33490958bfef66338c921292adf5a2eb3f22784cb5fb9ce0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "c59a935b707df3e6df0aa948ff77d7ff651e4994dec21c2b0f3169a5d22db2d7",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.runtimeconfig.json": "d093ce9035033b5e5815db98bc0e0fe667311b1109bfeff2ffa2394ef059290d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "af2354b2cf1154e0156295a18c1ec6adee23c0e5345a50907fb986512ea7d812",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "b3e0ee18fe6fcd81275b9f11867c48b2a86e8483963507b17414a73a9fca5012",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-host.c": "34db6501003bce9d6aa58e625aad2fad947d44721af1122625eef0bfc523419a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/verify_interpolation.py": "b813147c276c321b2f8d452290b84fd4761cfd39b18e8790c72ed3c75cc247f7",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "abc5c07f84e1b4f505bdd92b5d924acf10db2624ad0b348168567f1ee93a6dd0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "724250b15ad229c9ada29411dc9565f1ce4bbe911a6a528bf228ddaf492c53ac",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "d5b1f216a862f7312b50994bd303e296c786d0940b05dac85d176965d4e4b5ca",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/interpolation.rvn": "b4a25c9f9ad796b664a03d7f39520483a5e900281fe8549197f23fd48af090f0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/interpolation-text.rvn": "6d18bba3cddea673ca64698baa75faf901f1c52caa320ade69af8916a3e454b0"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/interpolation.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "NeoMetadata_EB4B0F955465D66A163ED63B00255EDE2B8879E463A734F67A1F1CF6B8426520: typed-stack/control-flow verification passed (1755 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "Value: 42\n42\nValue: 42\nValue: -2147483648\n-2147483648\nValue: -2147483648\nValue: 2147483647\n2147483647\nValue: 2147483647\nNull: \n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-write-line",
+        "--bind-utf8-text",
+        "--bind-int32-to-string",
+        "--reference-arena"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"schema\": \"neoclr-aot-inspection-v1\",\n  \"admission\": {\n    \"accepted\": false,\n    \"firstError\": \"Object display with boxing or arrays requires a later receiver/metadata profile\",\n    \"phase\": \"selection\"\n  },\n  \"notice\": \"Build diagnostics only. Not a deployable metadata sidecar, stable ABI or export manifest.\"\n}",
+      "stderr": "",
+      "stdoutSha256": "52b55cb0d5b785a6d24aabe525be8ada743020b4045142b553b53dceaf895dc2",
+      "stdoutOriginalBytes": 8030
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-write-line",
+        "--bind-utf8-text",
+        "--bind-int32-to-string",
+        "--reference-arena"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "aot-poc: Object display with boxing or arrays requires a later receiver/metadata profile\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation-text.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/interpolation-text.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation-text.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "NeoMetadata_3DBEB5D7A89C146FF1BD31019654BEED0D70123F6CD29D3ED55C313A1A568D0E: typed-stack/control-flow verification passed (1754 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation-text.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "Text: h\u00e9\ud83d\ude00/z\u0000end\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation-text.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-write-line",
+        "--bind-utf8-text",
+        "--bind-int32-to-string",
+        "--reference-arena"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"schema\": \"neoclr-aot-inspection-v1\",\n  \"admission\": {\n    \"accepted\": true\n  },\n  \"notice\": \"Build diagnostics only. Not a deployable metadata sidecar, stable ABI or export manifest.\"\n}",
+      "stderr": "",
+      "stdoutSha256": "82b8b0b7b3b8da6d80acf77f078886ecbd09528d66e11e33f7af20527571aaae",
+      "stdoutOriginalBytes": 956422
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation-text.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation-text.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-write-line",
+        "--bind-utf8-text",
+        "--bind-int32-to-string",
+        "--reference-arena"
+      ],
+      "exit": 0,
+      "stdout": "Metadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      {\n        \"name\": \"System\",\n        \"revision\": null\n      }\n    ],\n    \"runtimeContext\": {\n      \"bindCharacterText\": false,\n      \"bindConsoleReadByte\": false,\n      \"bindConsoleStreamOutput\": false,\n      \"bindConsoleWriteLine\": true,\n      \"bindInt32ToString\": true,\n      \"bindIntegerText\": false,\n      \"bindUserFault\": true,\n      \"bindUtf8Text\": true,\n      \"compileSystem\": true,\n      \"explicit\": true,\n      \"objectRoot\": {\n        \"index\": 8,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"referenceArena\": true,\n      \"revision\": null,\n      \"scope\": \"explicit managed System body selection; native services still require bindings\",\n      \"system\": \"System\"\n    },\n    \"validation\": \"all original bodies verified with runtime binder before private canonical projection\"\n  },\n  \"metadataPolicy\": \"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted\",\n  \"module\": \"NeoMetadata_3DBEB5D7A89C146FF1BD31019654BEED0D70123F6CD29D3ED55C313A1A568D0E\",\n  \"nativeAbi\": \"caller-owned-text-arena-v4\",\n  \"nativeBindings\": [\n    {\n      \"compiledIndex\": 1,\n      \"definition\": {\n        \"index\": 33,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"implementation\": \"console-write-line-v1\",\n      \"name\": \"neoCLR.Runtime.WriteLine\",\n      \"symbol\": \"neoclr_console_write_line_utf8_v1\"\n    },\n    {\n      \"compiledIndex\": 5,\n      \"definition\": {\n        \"index\": 2,\n        \"module\": \"System\"\n      },\n      \"implementation\": \"string-concat-v1\",\n      \"name\": \"neoCLR.Runtime.StringConcat\",\n      \"symbol\": \"neoclr_string_concat_v1\"\n    }\n  ],\n  \"objectDisplayDispatch\": [],\n  \"policy\": \"explicit closed world with constructed-class implicit interface dispatch; ordinary selected bodies retained; verified Object.ToString override dispatch replaces its private slot body; no reflection, dynamic loading or general class virtual dispatch\",\n  \"referenceArena\": true,\n  \"root\": \"NeoMetadata_3DBEB5D7A89C146FF1BD31019654BEED0D70123F6CD29D3ED55C313A1A568D0E.F_4D61696E\",\n  \"schema\": \"neoclr-aot-selection-v1\",\n  \"specialization\": {\n    \"methods\": [],\n    \"policy\": \"up to 128 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 128 function clones and 512 selected functions; no constraints\",\n    \"types\": []\n  },\n  \"staticOwnerProjections\": [],\n  \"staticPrimitiveOwners\": [\n    {\n      \"compiledIndex\": 4,\n      \"lowering\": \"verified static wrapper to private free function\",\n      \"owner\": \"String\"\n    }\n  ],\n  \"stringInstanceProjections\": [],\n  \"types\": [\n    {\n      \"compiledIndex\": 0,\n      \"definition\": {\n        \"index\": 208,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65\",\n      \"sourceIndex\": 208\n    },\n    {\n      \"compiledIndex\": 1,\n      \"definition\": {\n        \"index\": 221,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573\",\n      \"sourceIndex\": 221\n    },\n    {\n      \"compiledIndex\": 2,\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"System\"\n      },\n      \"name\": \"System.Runtime.CompilerServices.RuntimeServices\",\n      \"sourceIndex\": 335\n    }\n  ],\n  \"verifiedInterfaceRelationships\": []\n}\n",
+      "stderr": "",
+      "stdoutSha256": "bd7f7388958931e8e48d3388e42918a2c42af63987a8f1c186cfa4e705edaebd",
+      "stdoutOriginalBytes": 908498
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation-text.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation-text"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation-text.o"
+      ],
+      "exit": 0,
+      "stdout": "_neoclr_console_write_line_utf8_v1\n_neoclr_string_concat_v1\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation-text"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-console-interpolation-2/interpolation-text:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "interpolation": {
+    "assemblySha256": "ca6b317b3d86ff00ec2396b5687c941195da6ddb9580ef71ef84d85361e189df",
+    "stdout": "Value: 42\n42\nValue: 42\nValue: -2147483648\n-2147483648\nValue: -2147483648\nValue: 2147483647\n2147483647\nValue: 2147483647\nNull: \n",
+    "admission": {
+      "accepted": false,
+      "firstError": "Object display with boxing or arrays requires a later receiver/metadata profile",
+      "phase": "selection"
+    }
+  },
+  "interpolation-text": {
+    "assemblySha256": "512847e39f5b40bfdeb9e0cd8c2c3fcc068ca31925dc98798be68c60bb119cf3",
+    "stdout": "Text: h\u00e9\ud83d\ude00/z\u0000end\n",
+    "admission": {
+      "accepted": true
+    },
+    "executableSha256": "4b9fa99956a39033c7cc1e12341b6a216b1bf9033065860155461bc01d1c7b00",
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ],
+    "executableOnlyDirectory": true,
+    "emptyEnvironment": true,
+    "nativeMatchesInterpreter": true
+  },
+  "reportNote": "Long command output compacted after successful validation: inspection admission retained, other output tails retained; hashes cover complete output. Reproduction driver retains full output."
+}

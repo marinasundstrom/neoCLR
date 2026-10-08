@@ -6701,3 +6701,17 @@ for independent .NET regressions, compiler assembly hashes and the fresh Raven-t
 consumer. General duplicate-type ambiguity policy remains Raven's existing policy;
 complete Roslyn lookup parity, removal of obsolete bootstrap facades and broader native
 emitter coverage remain separate work.
+
+## Synthesized Console interpolation calls (2026-10-08)
+
+Raven integration `9d2f6ae4e` and shared main `45650a975` preserve ordinary invocation
+conversions in synthesized String.Concat calls, including boxing and params mapping.
+The explicit core/seed/native Runtime reference, bootstrap ownership and object-library
+configuration above are unchanged. Native CIL now receives the selected signature's
+argument types; no temporary CLI representation or metadata encoding is added.
+Raven owns semantic normalization; neoCLR owns native boxed display admission/codegen.
+Ordinary .NET emission is independently validated with 11 focused tests per branch.
+See [the interpolation consumer](experiments/aot-console/README.md#interpolation-argument-conversions-2026-10-08)
+for integer/null native CIL execution and standalone text interpolation. Boxed numeric
+Object display remains rejected by AOT pending a receiver/metadata profile; this is
+not a permanent language or Console restriction. No public API snapshot changes.

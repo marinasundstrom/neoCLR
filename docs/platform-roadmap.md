@@ -147,7 +147,10 @@ String wrappers for ReadToEnd; nine standalone line/remainder cases and output-f
 parity are verified ([evidence](experiments/aot-console/read-to-end-validation.json)).
 Shared Raven lookup fixes now qualify a fresh imported-Console compilation through
 standalone execution, with no producer staging or reuse
-([evidence](experiments/aot-console/raven-lookup-validation.json)). The author adds a console-input sample after unions, exercising input and
+([evidence](experiments/aot-console/raven-lookup-validation.json)). Shared Raven concat
+conversion fixes also unblock integer/null interpolation in native CIL. String-only
+interpolation runs standalone; boxed numeric Object display remains the next AOT gate
+([evidence](experiments/aot-console/interpolation-validation.json)). The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

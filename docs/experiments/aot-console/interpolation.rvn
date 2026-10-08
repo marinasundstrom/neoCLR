@@ -1,0 +1,16 @@
+import System.*
+
+func Display(value: int) {
+    Console.WriteLine("Value: $value")
+    Console.WriteLine("${value}")
+    Console.WriteLine("Value: " + value)
+}
+
+func Main() -> int {
+    Display(42)
+    Display(-2147483648)
+    Display(2147483647)
+    let absent: object? = null
+    Console.WriteLine("Null: ${absent}")
+    return 0
+}

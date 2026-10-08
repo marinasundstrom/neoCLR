@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Qualify Raven's shared synthesized-concat conversion fix on main and the native
+  integration branch: fresh native CIL preserves integer endpoints and null text;
+  text-only interpolation runs as a standalone ARM64 executable with UTF-8/NUL parity
+  and only libSystem linked dynamically. Record compiler/bundle hashes and executable
+  isolation. Keep boxed Object display explicitly rejected by AOT without publishing
+  an object file; this remains a native profile gap, not a Raven emission failure.
+
 - Extend experimental ARM64 AOT with explicit native Console.ReadByte binding while
   compiling the ordinary Raven wrapper and its Result/Option branches. Link stdin
   support into the executable; preserve all bytes, EOF, unavailable/read-failed
