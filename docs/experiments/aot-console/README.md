@@ -973,3 +973,38 @@ its only dynamic dependency is macOS libSystem. The [producer record](read-to-en
 preserves the successful fresh isolated compilation and the earlier static-String
 admission failure; final validation reused its hash-verified artifact after that
 admission gap was fixed. All 43 Console tests and 18 linking tests pass.
+
+## Raven lookup fixes and fresh native qualification (2026-10-08)
+
+The earlier intermittent producer failures are now reduced to shared Raven lookup
+bugs, rather than source-path behavior. The primitive CLI bootstrap has a limited
+Console declaration alongside the native System.Runtime Console. Qualified expression
+lookup selected the first namespace candidate, and source-assembly metadata lookup
+could return a referenced CLI declaration. Wildcard imports had another first-candidate
+path. Raven now keeps source-assembly lookup local and uses its existing compilation
+type-selection policy for qualified and imported namespace types. Closure Object
+resolution uses the owning compilation's selected special type. No new native mapping,
+CLI encoding or runtime service is introduced.
+
+The general fixes are on Raven `codex/source-object-metadata-resolution`
+(`b7a22b9e1`, `8b46ab9eb`) and `main` (`9c7db32a2`, `26cc6caae`). The native backend
+and tested compiler build remain on the former branch. Ordinary CLI regressions fail
+on unmodified main and qualify the fixes independently of neoCLR; 68 focused import,
+namespace, alias and lookup tests pass on each branch. Earlier qualification also
+passed 46 lookup/closure/root tests on the integration branch and 22 applicable tests
+on main. This is modern .NET evidence, not a .NET Framework/NanoFramework matrix.
+
+The reader sample now uses `import System.*` and ordinary `Console` calls.
+[Fresh validation](raven-lookup-validation.json) compiles the checked-in source without
+isolated staging or compilation reuse, then compares interpreter and standalone native
+behavior. All nine inputs and exact broken-pipe fault/exit parity pass; the executable
+runs alone with an empty environment and only macOS libSystem as a dynamic dependency.
+Earlier validation files retain their original producer limitations and hashes.
+No claim is made that all native emitter or lookup gaps are closed.
+
+The driver now records and checks adjacent compiler DLLs and dependency/runtime
+configuration JSON, including the binding and native-emission implementation assemblies.
+A driver-DLL hash alone was insufficient to detect those implementations changing.
+Legacy reports lacking the complete producer hashes are rejected for reuse; a negative
+check confirms a missing Raven.CodeAnalysis hash rejects before artifact copying.
+This strengthens validation provenance without changing guest compilation semantics.

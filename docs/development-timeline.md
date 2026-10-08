@@ -25,6 +25,28 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-08 — Move native compilation blockers into Raven
+
+- **Author:** directs work to Raven `codex/source-object-metadata-resolution`,
+  believed to be the neoCLR integration branch. Asks to investigate related lookup
+  problems while keeping native compilation the primary goal, and compare with main
+  so general fixes can be placed there too.
+- **Assistant action:** confirms the branch, commits the completed neoCLR Console
+  remainder-reader slice on main (`d7af270b`), and switches Raven to the requested
+  integration branch. Reduces the intermittent Console errors to lookup before
+  emission: a CLI bootstrap stub competes with the source-built native declaration.
+- **Findings/actions:** reproduces failures in ordinary .NET tests on both compiler
+  branches. Fixes source-assembly ownership, qualified type selection and wildcard
+  import selection; updates closure Object resolution. Commits the shared fixes on
+  both Raven branches. Strengthens producer reuse hashes to include compiler
+  implementation assemblies, and changes the reader sample to imported Console calls.
+- **Validation/outcome:** 68 focused import/namespace/lookup tests pass on each branch.
+  The [Console qualification](experiments/aot-console/README.md#raven-lookup-fixes-and-fresh-native-qualification-2026-10-08)
+  records the native consumer result and exact compiler evidence. Native backend
+  availability on Raven main is not implied by the shared fixes; wider native emitter
+  coverage and eventual HTTP AOT remain open. This compiler investigation supports
+  the existing author-directed AOT goal, rather than changing the whole roadmap.
+
 ## 2026-10-07 — Investigate ARM64 JIT/AOT and independent hot reload
 
 - **Author:** asks to investigate future JIT and AOT, emphasizing AOT; retain the

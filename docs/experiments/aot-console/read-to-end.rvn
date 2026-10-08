@@ -4,8 +4,8 @@ import System.Result.*
 import System.Option.*
 
 func Main() -> int {
-    System.Console.Write("Input: ")
-    let reader = System.Console.In
+    Console.Write("Input: ")
+    let reader = Console.In
     let Error(TextReadError.InvalidRange) = reader.ReadToEnd(-1) else {
         return 2
     }
@@ -16,15 +16,15 @@ func Main() -> int {
         return 4
     }
     if let Some(line) = first {
-        System.Console.WriteLine(line)
+        Console.WriteLine(line)
     } else {
-        System.Console.WriteLine("EOF")
+        Console.WriteLine("EOF")
     }
     let Ok(rest) = reader.ReadToEnd(32) else {
-        System.Console.WriteLine("Read failed")
+        Console.WriteLine("Read failed")
         return 1
     }
-    System.Console.WriteLine(string.Concat("Rest: ", rest))
+    Console.WriteLine(string.Concat("Rest: ", rest))
     let Ok(empty) = reader.ReadToEnd(0) else {
         return 5
     }

@@ -6678,3 +6678,26 @@ in its SDK path executes successfully. See the
 [configuration gate](experiments/extended-cli-metadata/native-bundle-configuration-2026-10-07.md).
 Installed VS Code event/hover acceptance remains separate; this is headless workspace
 and ordinary compiler evidence. No public Runtime API or metadata encoding changes.
+
+## Console producer lookup reliability (2026-10-08)
+
+Raven `b7a22b9e1` and `8b46ab9eb` fix assembly-local source lookup and canonical
+qualified/imported namespace type selection. These are general compiler fixes also
+placed on main as `9c7db32a2` and `26cc6caae`; the native backend remains on
+`codex/source-object-metadata-resolution`. A retained CLI Console stub previously
+competed with the native Runtime declaration, intermittently rejecting ordinary
+Console members before emission. Temporary source-path staging was not the cause
+or a durable fix.
+
+Runtime Contract configuration remains the explicit primitive core, retained runtime
+seed, native Runtime reference, bootstrap ownership manifest and `--object-library
+System.Runtime`. Existing primitive/unit providers are unchanged. The semantic change
+keeps source-assembly queries within their assembly and makes qualified/imported
+expression lookup follow compilation-level selection. Native metadata/CIL emission,
+ABI and guest API contracts are unchanged; no CLI bridge representation is added.
+
+See [the native Console evidence](experiments/aot-console/README.md#raven-lookup-fixes-and-fresh-native-qualification-2026-10-08)
+for independent .NET regressions, compiler assembly hashes and the fresh Raven-to-AOT
+consumer. General duplicate-type ambiguity policy remains Raven's existing policy;
+complete Roslyn lookup parity, removal of obsolete bootstrap facades and broader native
+emitter coverage remain separate work.

@@ -153,6 +153,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   preserved compilation hash when reusing that artifact. Verify nine standalone
   reader cases, exact output-fault parity, 43 Console tests and 18 linking tests;
   the executable runs alone with only the macOS system-library dependency.
+  Investigate Raven producer failures on codex/source-object-metadata-resolution:
+  qualify shared assembly/namespace/import lookup fixes also applied to Raven main.
+  Exercise imported Console names in the reader sample and hash adjacent compiler
+  implementations/configuration before accepting compilation reuse. Fresh Raven-to-AOT
+  compilation passes all nine reader cases and exact fault/exit parity, without staging
+  or reuse and with only the macOS system-library dependency.
 
 ### 2026-10-07
 

@@ -144,7 +144,10 @@ and exact output-fault parity pass. Constructor admission now rejects missing or
 repeated base initialization rather than admitting a native/interpreter mismatch.
 The next Console reader slice adds exact UTF-8 concatenation and ordinary static
 String wrappers for ReadToEnd; nine standalone line/remainder cases and output-fault
-parity are verified ([evidence](experiments/aot-console/read-to-end-validation.json)). The author adds a console-input sample after unions, exercising input and
+parity are verified ([evidence](experiments/aot-console/read-to-end-validation.json)).
+Shared Raven lookup fixes now qualify a fresh imported-Console compilation through
+standalone execution, with no producer staging or reuse
+([evidence](experiments/aot-console/raven-lookup-validation.json)). The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.
