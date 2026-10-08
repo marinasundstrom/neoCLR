@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Remove the competing System.Math placeholder from the explicit source-runtime
+  bootstrap. Rebuilt native bundles resolve qualified/wildcard Math calls without
+  changing Raven/.NET lookup precedence. The unchanged string sample passes
+  interpreted, sanitized native and standalone execution with exact expected output.
+  Older Core.dll inputs must be regenerated; the temporary CLI bootstrap remains.
+
 - Bind exact native PathCombine and PathGetFileName services with explicit
   --bind-paths opt-in on macOS ARM64. Preserve Unix lexical UTF-8 behavior, immutable
   owned results, GC roots and unchanged outputs on failure; no filesystem access or

@@ -21,10 +21,10 @@ static class TargetSurface
         NamespaceFunctions.Owner(method.DeclaringType) == "System." + m.Owner && method.Name == m.Name
         && method.ReturnType.FullName == "System." + m.Returns
         && method.Parameters.Select(p => p.ParameterType.FullName).SequenceEqual(m.Parameters.Select(p => "System." + p)));
-    public static string Declarations(bool includeConsole, bool stringParameter) => string.Join("\n",
-        Methods.Where(m => m.Owner != "Console" || includeConsole && (stringParameter || m.Parameters[0] != "String"))
+    public static string Declarations(bool includeConsole, bool stringParameter, bool includeMath = true) => string.Join("\n",
+        Methods.Where(m => (m.Owner != "Math" || includeMath) && (m.Owner != "Console" || includeConsole && (stringParameter || m.Parameters[0] != "String")))
             .GroupBy(m => m.Owner).Select(group => $"public static class {group.Key} {{ " + string.Join(" ", group.Select(m =>
-                $"public static {CSharp(m.Returns)} {m.Name}({string.Join(',', m.Parameters.Select((p,i) => CSharp(p) + " " + m.ParameterName(i)))}) " +
+                $"public static {CSharp(m.Returns)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " " + m.ParameterName(i)))}) " +
                 (m.Returns == "Void" ? "{ }" : "=> 0;"))) + " }"));
     static string CSharp(string type) => type switch { "Int32" => "int", "String" => "string", "Void" => "void", _ => throw new InvalidDataException(type) };
 }

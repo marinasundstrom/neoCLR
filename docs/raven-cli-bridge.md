@@ -6943,3 +6943,21 @@ Independent main comparison: the same four .NET completed/pending discarded-awai
 controls pass on Raven main `d0a115dcf`. Its portable planner is absent, and its .NET
 emitter needs no corresponding fix. The temporary control file was removed and the
 integration branch restored; no main compiler change is claimed.
+
+### Source-owned Math lookup — 2026-10-08
+
+Native intent: Math is a namespace owned by System.Runtime. The explicit source-runtime
+bootstrap generator (`--reference-source-runtime-core`) now omits its old System.Math
+CLI placeholder and Fail, while keeping the required primitive/storage declarations.
+`prepare-native-bootstrap.py` selects this narrower contract. Previous command modes
+retain their surfaces for historical probes. Rebuild Core.dll and the native bundle;
+Raven options, lookup precedence and native function emission are unchanged.
+
+Reduced qualified/wildcard Sign calls previously selected the bootstrap type and
+failed emission; a namespace alias reached the native function. With corrected inputs,
+the unchanged string sample passes VM, sanitized AOT and libSystem-only standalone
+execution. Four Raven namespace metadata tests pass on integration 2c8c1f9de;
+comparison with main found only unrelated union-companion abstraction in ImportBinder.
+No shared Raven lookup fix was needed. Native core ownership will eventually remove
+the entire temporary CLI input; this slice does not meet the no-bridge release gate.
+[Evidence](../benchmarks/native-web/math-lookup-validation.json).

@@ -26,8 +26,10 @@ now preserves the exact backing specialization independently of discovery order,
 30 native/interpreter comparisons and closed-backing construction rejection. This
 does not imply general array views or covariance. Following the [next-fix reassessment](experiments/aot-sample-assessment/README.md#reassessment-after-reference-array-views-2026-10-08),
 [lexical path bindings](path.md#native-compilation-poc-2026-10-08) now pass the unchanged
-Raven sample in all three modes. Math target lookup and shared introspection faults
-remain distinct next priorities, and bootstrap remains a release gate.
+Raven sample in all three modes. [Math target lookup](math.md#source-runtime-bootstrap-ownership-2026-10-08)
+is corrected by removing competing bootstrap declarations; shared introspection faults
+remain a next priority, and bootstrap remains a release gate. Author-requested Math
+constants require a separate native namespace-constant metadata/emitter slice.
 The wider audit also found the handwritten legacy union bridge's `IUnion`; it now
 uses `UnionValue`, with regenerated fragments and executable union/time checks. This does not change the bootstrap release gate or promise
 runtime suspension, JIT, reflection or stable callback ABI support.

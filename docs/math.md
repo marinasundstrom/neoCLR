@@ -11,9 +11,9 @@ for the CLI container contract, bootstrap representation and build instructions.
 
 Unchanged Math sources now compile to a native library and a separate native consumer
 executes all 20 functions using the existing runtime services. This is development work
-beyond the published Preview 12 library selection. With the retained CLI primitive
+beyond the published Preview 12 library selection. In that historical gate, with the retained CLI primitive
 bootstrap, explicitly alias the native namespace (`alias NativeMath = System.Math`);
-`import System.Math.*` currently selects the bootstrap type. The gate uses
+`import System.Math.*` selected the bootstrap type. The gate uses
 `NativeMath.Sqrt(9.0)` and tests Result failures as well as floating results.
 [Reproduction and limitations](experiments/extended-cli-metadata/source-math-2026-10-06.md).
 
@@ -95,3 +95,18 @@ source type errors, NaN comparisons, signed zero and typed failures. The pinned
 The experimental [Raven Clamp projection](raven-clamp-api.md) completes the current
 Int32 Math subset through the bounded importer. The [Double Math slice](raven-floating-math-api.md)
 projects all 15 floating-point methods with bounded literal, slot and receiver support.
+
+## Source-runtime bootstrap ownership (2026-10-08)
+
+The native class-library bootstrap now omits the old System.Math placeholder type,
+so qualified calls and wildcard imports resolve the source-owned Math namespace.
+Rebuild with `prepare-native-bootstrap.py` and the matching native library bundle;
+old Core.dll files still have the collision. This corrects neoCLR bootstrap ownership,
+without changing Raven's ordinary .NET type/namespace lookup precedence or adding
+name-based native call substitution. The separate historical primitive/CLI probe
+modes retain their explicitly selected surfaces. Namespace constants are a separate
+emitter/metadata task; they are not part of this lookup correction.
+
+The unchanged `library-strings.rvn` exercises negative, zero and positive Sign results
+with exact expected text in the interpreter, sanitized native and standalone runs.
+See [validation](../benchmarks/native-web/math-lookup-validation.json).

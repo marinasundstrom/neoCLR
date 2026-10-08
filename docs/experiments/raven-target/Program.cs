@@ -254,6 +254,15 @@ if (args.Length == 2 && args[0] == "--native-service-catalog")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--reference-source-runtime-core")
+{
+    CoreDeclarations.Write(args[1], comparerStorage: true, includeFail: false, includeMath: false);
+    using var bootstrap = Mono.Cecil.AssemblyDefinition.ReadAssembly(args[1]);
+    if (bootstrap.MainModule.GetType("System.Math") is not null || bootstrap.MainModule.GetType("System.FailFunctions") is not null)
+        throw new InvalidDataException("Native source bootstrap contains a library-owned declaration.");
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--reference-source-failure-core")
 {
     CoreDeclarations.Write(args[1], comparerStorage: true, includeFail: false);

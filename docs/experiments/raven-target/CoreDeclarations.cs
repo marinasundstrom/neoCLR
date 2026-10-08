@@ -7,10 +7,10 @@ using Microsoft.CodeAnalysis.CSharp;
 static class CoreDeclarations
 {
     public const string Identity = "NeoCLR.CoreProbe";
-    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false, bool collectionProbe = false, bool libraryBootstrap = false, bool checkedStorage = false, bool collectionStorage = false, bool comparerStorage = false, bool includeFail = true)
+    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false, bool collectionProbe = false, bool libraryBootstrap = false, bool checkedStorage = false, bool collectionStorage = false, bool comparerStorage = false, bool includeFail = true, bool includeMath = true)
     {
         collectionStorage |= comparerStorage;
-        var declarations = TargetSurface.Declarations(includeConsole, stringParameter);
+        var declarations = TargetSurface.Declarations(includeConsole, stringParameter, includeMath);
         if (comparerStorage) declarations += "public struct RuntimeTypeHandle { } namespace Runtime.CompilerServices { public struct Self { } public enum MethodImplOptions { NoInlining = 8, InternalCall = 4096 } public sealed class MethodImplAttribute : System.Attribute { public MethodImplAttribute(MethodImplOptions options) { } } }";
         if (checkedStorage || collectionStorage) declarations += CheckedStorageBindings.Declarations;
         if (collectionStorage) declarations += FunctionBindings.Declarations

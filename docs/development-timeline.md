@@ -12114,3 +12114,19 @@ invariance rule. The [contract and validation](array-variance.md#type-tests-reta
 distinguish this correction from a new divergence. Keep the existing array-view work
 and sample-driven release assessment in scope; no full IL audit or universal parity
 claim follows from these focused checks.
+
+## 2026-10-08 — Math constants alongside native lookup
+
+- **Author:** asks whether the Math namespace provides constants such as Pi, and
+  requests adding them while the native lookup work continues.
+- **Assistant investigation:** no Math constants are currently declared. Proposes
+  Pi, E and Tau as Double constants with .NET-equivalent rounded values. A native
+  source build exposes missing namespace-constant declaration support; this is a
+  separate metadata/emitter requirement, not merely adding literals to a source file.
+- **Action/outcome:** isolates the lookup collision to neoCLR's primitive bootstrap
+  including a competing System.Math type. Rebuilds the explicit source-runtime
+  bootstrap without that placeholder; the unchanged string consumer passes VM,
+  sanitized native and standalone runs. No Raven lookup semantics were changed.
+- **Open:** implement and validate namespace constants through separate compilation,
+  both execution modes and the API reference. The proposed constants are not yet
+  shipped by this lookup slice. [Lookup evidence](../benchmarks/native-web/math-lookup-validation.json).

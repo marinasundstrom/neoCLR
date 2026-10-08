@@ -69,8 +69,8 @@ def main():
             raise RuntimeError(result.stdout + result.stderr)
 
     core = output / 'Core.dll'
-    # This narrow CLI bootstrap excludes Fail: the native source library owns it.
-    run(['dotnet', args.probe.resolve(), '--reference-source-failure-core', core])
+    # This narrow CLI bootstrap excludes Fail and Math: the native source library owns them.
+    run(['dotnet', args.probe.resolve(), '--reference-source-runtime-core', core])
     seed_source = output / 'System.neoil'
     seed_source.write_text(seed_text)
     bootstrap_json = output / 'System.bootstrap.json'
