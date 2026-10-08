@@ -2,8 +2,10 @@
 
 **Author-directed module foundation (2026-10-09):** implement logical modules as
 declaration containers, retaining assembly deployment identity. The
-[module contract](declaration-modules.md) records the format/API foundation and
-remaining compiler, guest-runtime and access-policy boundaries. This explicitly
+[module contract](declaration-modules.md) records the format/API foundation. Raven
+module syntax/imports and neoCLR editor/documentation terminology are implemented;
+[consumer evidence](experiments/declaration-modules/validation.json) covers interpreted
+and ARM64 native execution. Guest-runtime and access-policy boundaries remain open. This explicitly
 advances the earlier exploration without adopting the entire proposal.
 
 **Author-directed API organization (2026-10-09):** group date/time values, clocks,

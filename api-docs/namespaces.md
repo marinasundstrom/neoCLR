@@ -1,18 +1,19 @@
-# Namespace overview
+# Module overview
 
 Use this overview to find the part of the neoCLR library that fits your task.
-It describes the **Preview 11 API**. Use matching compiler, reference and runtime
+It describes the **development module organization**. Use matching compiler, reference and runtime
 artifacts. Names and contracts remain experimental.
 
 The list grows as APIs are implemented. Every public reference type is inventoried, with generated pages or an explicitly
-linked manual entry for a renderer limitation. A namespace here does not imply the full corresponding .NET API
+linked manual entry for a renderer limitation. A module here does not imply the full corresponding .NET API
 is supported.
 
-## Application namespaces
+## Application modules
 
-| Namespace | What it contains | Explore |
+| Module | What it contains | Explore |
 | --- | --- | --- |
-| `System` | Core types such as Object, Value, HashCode, primitives, String and Array; Func delegates; Option and Result; common capability and error types; Console; dates, times, durations and clocks; development DateTime union, TimeOffset and named-zone mapping. Console is a class in this namespace. | [Core reference](xref:System), [Object and Value](objects.md), [Console](console.md), [arrays](/features/arrays/index.html), [outcomes](/features/outcomes/index.html), [dates and clocks](/features/time/index.html) |
+| `System` | Core types such as Object, Value, HashCode, primitives, String and Array; Func delegates; Option and Result; common capability and error types; Console. Console is a class in this module. | [Core reference](xref:System), [Object and Value](objects.md), [Console](console.md), [arrays](/features/arrays/index.html), [outcomes](/features/outcomes/index.html), [dates and clocks](/features/time/index.html) |
+| `System.Time` | Dates, TimeOfDay, durations, clocks, calendars, timezone mappings and related errors. | [Reference](xref:System.Time), [time guide](/features/time/) |
 | `System.Globalization` | Development culture/language profiles, calendar-selecting date/time formatters and fixed/system culture providers. | [Reference](xref:System.Globalization), [globalization guide](/features/globalization/) |
 | `System.Collections` | Iteration and collection capabilities: Iterable, Iterator, Collection, Sequence, List and map interfaces, with ArrayList and HashMap implementations. | [Collections reference](xref:System.Collections) · [ArrayList](xref:System.Collections.ArrayList`1) · [HashMap](xref:System.Collections.HashMap`2) · [Collections guide](/features/collections/index.html) |
 | `System.Networking` | Host-backed IPv4 lookup through Dns and typed DnsError, separate from connecting. | [Networking guide](/features/networking/), [reference](xref:System.Networking) |
@@ -31,22 +32,22 @@ is supported.
 
 ## Runtime and compiler support
 
-These namespaces serve lower-level integration rather than ordinary collection,
+These modules serve lower-level integration rather than ordinary collection,
 text or I/O workflows. Public metadata support is included and labelled separately from application services.
 
-| Namespace | What it contains |
+| Module | What it contains |
 | --- | --- |
 | `System.Runtime.CompilerServices` | Compiler-facing metadata such as UnionAttribute and [IsExternalInit](xref:System.Runtime.CompilerServices.IsExternalInit), [IsReadOnlyAttribute](/docs/reference-readonly-attribute.html), plus runtime integration support. Internal bootstrap services are not application APIs. |
 | `System.Runtime.InteropServices` | [NativeMemory](xref:System.Runtime.InteropServices.NativeMemory) allocation and freeing for the supported unsafe pointer surface. This is separate from managed object and array storage. |
 
 ## Finding a type
 
-Expand namespaces in the [generated reference](xref:System) to browse documented
+Expand modules in the [generated reference](xref:System) to browse documented
 types and members. See [reference support and renderer limits](reference-support.md) for the few manual entries. Generated declarations use
 Raven notation; the [API guide](index.md#reading-generated-declarations)
 explains how to read them for Raven.
 
-Future namespace ideas belong in [proposals](/proposals/index.html) until they have
+Future module ideas belong in [proposals](/proposals/index.html) until they have
 implemented APIs. This list will expand alongside the library.
 
 The [transitional async builder guide](async-builders.md) covers generated state ownership and links the compiler-facing System.Runtime.CompilerServices contracts to their temporary role.

@@ -1,0 +1,7 @@
+module Example.App
+
+import Example.Numbers.*
+
+func Main() -> int {
+    Answer()
+}

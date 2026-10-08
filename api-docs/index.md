@@ -70,7 +70,7 @@ boxed enum identity. See [Introspection](/features/introspection/) for current l
 [JSON serialization](json.md) describes the DOM and provisional flat-object overloads,
 including property, error and borrowed-stream rules.
 
-Start with a feature guide for behavior and working examples, or open a namespace
+Start with a feature guide for behavior and working examples, or open a module
 for generated type and member documentation. Both are parts of this site.
 
 <a id="explicit-threads-in-development"></a>
@@ -110,7 +110,7 @@ walks through the compiled hostname/echo POC.
 | Compiler support | [Transitional async builders](async-builders.md) | [System.Runtime.CompilerServices](xref:System.Runtime.CompilerServices) |
 | Runtime failures | [Terminal faults and host diagnostics](faults.md) | Manual host reference in that guide |
 
-[Browse all generated namespaces](api/) · [Namespace overview](namespaces.md) ·
+[Browse all generated modules](api/) · [Module overview](namespaces.md) ·
 [All feature guides](/guides/)
 
 <a id="reading-generated-declarations"></a>

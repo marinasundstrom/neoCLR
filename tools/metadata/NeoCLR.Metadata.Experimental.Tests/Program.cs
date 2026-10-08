@@ -4,6 +4,17 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--check-module-consumer", var moduleConsumer])
+{
+    var assembly = AssemblyDefinition.ReadNativeAssembly(File.ReadAllBytes(moduleConsumer));
+    var modules = assembly.GetModules();
+    if (!modules.Select(m => m.Name).SequenceEqual(new[] { "Example.App", "Example.Numbers", "Example.Reserved" }) || modules.Any(m => m.IsProjection))
+        throw new Exception("Raven module names or empty module were lost");
+    if (modules[2].GetMembers().Count != 0 || modules[1].GetMembers().Single().Name != "Answer")
+        throw new Exception("Raven module ownership mismatch");
+    Console.WriteLine("PASS Raven explicit and empty declaration modules"); return 0;
+}
+
 if (args.Length >= 1 && args[0] == "--declaration-modules") { DeclarationModuleChecks.Run(args.Length > 1 ? args[1] : null); return 0; }
 
 if (args is ["--native-core"]) { NativeCoreChecks.Run(); return 0; }

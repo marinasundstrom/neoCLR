@@ -871,14 +871,12 @@ including scalar managed receivers and metadata-only inspection. It rejects reco
 storage on those declarations. This is infrastructure for source numeric ownership;
 Raven's full Number/class-library gate remains unfinished.
 
-## Modules as namespaces
+## Further module capabilities
 
-An open proposal explores making a module the namespace itself: a named metadata
-container owning types, functions and constants, with its own visibility boundary
-and a module-centered RuntimeContext. Assembly packaging may remain underneath;
-its public prominence is being reassessed. This could make ownership and discovery more explicit than CLI
-namespace names, but requires decisions about cross-assembly imports, identity,
-metadata compatibility and consistent interpreter/native access checks. Artifact
-names and language syntax remain undecided. This is not a release commitment.
+The [development module foundation](../features/modules/) implements named metadata
+containers for types, functions and constants. Assembly packaging and identity remain
+explicit. Module-private access, re-exports and a module-centered guest RuntimeContext
+remain open follow-ups; the foundation does not establish those policies. The original
+proposal's artifact names and independent loading behavior are not adopted.
 
 [Proposal and assessment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/module-system-assessment.md)

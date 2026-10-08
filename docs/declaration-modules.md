@@ -79,4 +79,8 @@ PE/NEOX round trips, empty modules, nested-type exclusion, same-name modules in 
 assemblies, older-input projection and invalid manifests. Rust tests
 `declaration_modules` and `function_namespaces` cover admission and unchanged scalar
 execution. Raven syntax, import and native-consumer evidence is recorded alongside
-its compiler contract.
+its compiler contract and the [checked consumer](experiments/declaration-modules/README.md).
+Raven ced9e1a686b3946de517b06e6817b324a5847819 supplies the module syntax, native
+ownership emission/import and target-aware language-server presentation. The compiler
+retains namespace-shaped syntax/symbol scopes in this foundation; guest RuntimeContext
+migration and independent module loading are not implied.

@@ -13,6 +13,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   modules and validation in the runtime. Older metadata exposes marked namespace
   projections; older readers reject the new field. Physical metadata modules and
   guest RuntimeContext remain unchanged; module-private access is not implemented.
+  Integrate Raven file/block module syntax, qualified imports and target-aware editor
+  labels, with a checked sample returning 42 in interpreted and ARM64 native modes,
+  including a separate library assembly. Add a development Modules feature page and
+  module navigation/labels while retaining real Assembly owners in native API pages.
+  The vendored RavenDoc gains explicit module terminology; existing routes remain valid.
 
 - Preserve the selected native API preview across ordinary local website rebuilds.
   Apply and validate it before replacing the served website; fail without replacing

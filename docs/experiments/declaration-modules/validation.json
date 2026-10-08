@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-09",
+  "status": "development foundation",
+  "metadataCommit": "a4afca29",
+  "ravenBranch": "codex/source-object-metadata-resolution",
+  "ravenRevision": "ced9e1a686b3946de517b06e6817b324a5847819",
+  "sources": {
+    "Main.rvn": "73acaa61798ea6b21da974805c80867b02ec567a17319b972b77d81544cce98e",
+    "Numbers.rvn": "487bdb5652923d215a305ebde0f1b70b13995754f74cb0765d99890e2d3a6cd2",
+    "host.c": "2d571589c309d06590a616b5036a7c7e6782f8b2b3c8a7cd9258f8113a826dc5"
+  },
+  "metadataChecks": "PASS logical modules in binary PE and NEOX; scoped authoring; empty module; same-name assemblies; legacy projection; malformed tables",
+  "ravenOwnership": "PASS Example.App, Example.Numbers, Example.Reserved (empty)",
+  "ravenTests": {
+    "passed": 20,
+    "scope": "parser, symbol, nested imports, existing namespaces and module/assembly documentation labels"
+  },
+  "rustTests": {
+    "passed": 6,
+    "scope": "module admission and unchanged function qualification"
+  },
+  "execution": {
+    "singleAssembly": {
+      "interpreterValue": 42,
+      "interpreterExit": 42,
+      "nativeOutput": "42",
+      "nativeExit": 0
+    },
+    "separateLibrary": {
+      "interpreterValue": 42,
+      "interpreterExit": 42,
+      "nativeOutput": "42",
+      "nativeExit": 0
+    }
+  },
+  "limitations": [
+    "temporary explicit CLI primitive bootstrap",
+    "guest RuntimeContext and physical ModuleInfo unchanged",
+    "module-private access, re-exports and forwarding not implemented",
+    "Framework/NanoFramework execution not tested",
+    "native link used matching Xcode macOS SDK"
+  ],
+  "languageServerTests": {
+    "passed": 15,
+    "scope": "target-aware hover, completion symbol display, workspace symbol kind and syntax-only outline; no installed VS Code client exercised"
+  },
+  "website": {
+    "pagesChecked": 3486,
+    "retainedLegacyPages": 136,
+    "browserReview": "Modules feature page and native LocalDateTime reference: Module System.Time, Assembly System.Runtime.dll, Module overview navigation"
+  }
+}

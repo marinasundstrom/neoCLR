@@ -63,5 +63,6 @@
     "paths": [
       "runtime/raven/src"
     ]
-  }
+  },
+  "moduleTerminology": true
 }

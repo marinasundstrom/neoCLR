@@ -37,10 +37,21 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Assistant:** chooses bounded slices for native metadata/API ownership, Raven's
   syntax and existing import/qualified lookup, and website documentation. Retains
   physical-image APIs explicitly rather than silently reinterpreting their identity.
+- **Later author requirement:** “The Visual Studio Code experience for NeoCLR should
+  of course say module instead of namespace.” The assistant extends target-aware
+  symbol presentation, hover, completion descriptions and outline/workspace kinds,
+  retaining ordinary .NET namespace presentation.
 - **Implemented foundation:** [versioned declaration containers](declaration-modules.md),
   scoped authoring, reader/discovery views and runtime validation. Guest RuntimeContext,
   module-private access and re-exports remain open; those proposal details are not
   treated as author-approved completed contracts.
+- **Compiler/consumer evidence:** file/block syntax, nested imports and module
+  ownership round-trip; a checked sample returns 42 in interpreted and ARM64 native
+  modes both within one assembly and across a separately compiled library. Focused
+  compiler, RavenDoc and language-server tests cover presentation. Browser inspection
+  confirms Module labels with real System.Runtime.dll assembly ownership and neoCLR
+  branding. The feature page labels this as a development foundation; no installed
+  VS Code client or guest module reflection is claimed as tested.
 
 ## 2026-10-08 — Move native compilation blockers into Raven
 

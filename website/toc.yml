@@ -4,7 +4,9 @@
   items:
     - name: neoCLR and .NET
       href: comparison/index.md
-    - name: Namespaces
+    - name: Modules
+      href: features/modules/index.md
+    - name: Library modules
       href: docs/namespaces.md
     - name: Function types
       href: features/functions/index.md

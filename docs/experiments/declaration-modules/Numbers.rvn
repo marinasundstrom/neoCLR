@@ -1,0 +1,8 @@
+module Example.Numbers {
+    public func Answer() -> int {
+        42
+    }
+}
+
+module Example.Reserved {
+}

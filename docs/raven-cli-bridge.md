@@ -7108,3 +7108,28 @@ only the exact Instant-to-LocalDateTime Int64 factory call. The normal consumer
 reference omits it. Native source compilation retains the ordinary internal method
 without this shim. Local layout and public-factory rejection tests cover that bound;
 the native metadata/source compiler replaces this split-slice bridge.
+
+## Logical module declarations (2026-10-09)
+
+Raven accepts file/block `module` declarations using existing namespace syntax nodes,
+qualified lookup and import binding. `INamespaceSymbol.IsModule` identifies explicit
+module source and neoCLR target scopes (including legacy/CLI projections); physical
+`IModuleSymbol` is unchanged. Native metadata separately identifies projection status.
+No new Runtime Contract switch is required. The native backend writes the versioned
+[declaration-module manifest](declaration-modules.md), preserving empty modules.
+Ordinary CLI output uses namespaces and existing function carriers, losing explicit
+module identity and empty declarations. This is a temporary projection, not the native
+ownership model. No module-private access, re-exports or guest discovery is implied.
+
+Validated on Raven's `codex/source-object-metadata-resolution` integration line with
+neoCLR main: Raven ced9e1a686b3946de517b06e6817b324a5847819, 20 focused
+parser/symbol/documentation tests and 15 language-server tests, plus a checked module consumer
+in interpreter/ARM64 AOT modes, including a separate library assembly. The native
+metadata reader also checks explicit/empty owner names. .NET Framework/NanoFramework
+and module-specific runtime reflection are not covered.
+
+VS Code presents neoCLR scopes as modules in hover, completion descriptions and
+document/workspace symbols, including legacy namespace spelling. Ordinary .NET
+namespace presentation remains the default. Focused language-server tests validate
+the presentation and syntax-only outline path; an installed VS Code extension was
+not exercised for this slice.

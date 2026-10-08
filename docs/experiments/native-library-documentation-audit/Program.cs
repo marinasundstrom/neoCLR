@@ -146,6 +146,7 @@ if (args.Length == 3)
         Favicon = Setting("favicon"),
         NamespaceNavigation = Setting("namespaceNavigation") ?? "flat",
         SharedApiNavigation = true,
+        ModuleTerminology = true,
         ApiContent = Path.Combine(repository, "website/api-content")
     };
 }

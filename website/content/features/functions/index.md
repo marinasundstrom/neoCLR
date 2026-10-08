@@ -57,7 +57,7 @@ identifies Function shapes; IsNominalType is false.
 
 Structural types can have members and extension members without having names.
 [NominalTypeInfo](xref:System.Introspection.NominalTypeInfo) carries declaration
-names and namespaces. Collections can narrow descriptor results with
+names and module paths. Collections can narrow descriptor results with
 `module.GetTypes().OfType<NominalTypeInfo>()`.
 See [introspection](../introspection/) and the [Function API reference](../../docs/functions.html)
 for exact contracts and limits.

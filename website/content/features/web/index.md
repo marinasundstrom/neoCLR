@@ -435,7 +435,7 @@ implemented. Retaining the response also retains that request and its content.
 
 ## Generic JSON client helpers
 
-The development `System.Web.Http.Json` namespace adds `GetFromJson<T>` and
+The development `System.Web.Http.Json` module adds `GetFromJson<T>` and
 `PostAsJson<T>`. GET requires a successful status and reads a supported model;
 POST serializes a model and returns the response for the application to inspect.
 Both use the client's base URI, default headers and handler, with string/Uri and
