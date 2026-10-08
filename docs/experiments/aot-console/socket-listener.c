@@ -9,9 +9,29 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
 
 static _Thread_local neoclr_socket_scope *head;
 static _Atomic uint64_t next_id = 1;
+#ifdef NEOCLR_NATIVE_GC
+static void release_transfer(neoclr_socket_scope *scope, unsigned i) {
+    if (scope->operations[i].buffer_root) {
+        neoclr_gc_host_root_release_v1(scope->context, scope->operations[i].buffer_root);
+        scope->operations[i].buffer_root = 0;
+    }
+    if (scope->operations[i].buffer) {
+        free(scope->operations[i].buffer);
+        scope->operations[i].buffer = NULL;
+        scope->transfer_bytes -= scope->operations[i].count;
+    }
+}
+static uint64_t monotonic_ns(void) {
+    struct timespec now;
+    if (clock_gettime(CLOCK_MONOTONIC, &now)) return 0;
+    return (uint64_t)now.tv_sec * UINT64_C(1000000000) + (uint64_t)now.tv_nsec;
+}
+#endif
 static neoclr_socket_scope *find_scope(neoclr_aot_context *context) {
     for (neoclr_socket_scope *s = head; s; s = s->previous) if (s->context == context) return s;
     return NULL;
@@ -47,8 +67,9 @@ int32_t neoclr_socket_scope_leave_v1(neoclr_socket_scope *scope) {
     }
 #ifdef NEOCLR_NATIVE_GC
     for (unsigned i = 0; i < 64; i++) {
-        if (scope->accepts[i].callback && neoclr_gc_host_root_release_v1(scope->context, scope->accepts[i].callback)) status = 3;
-        memset(&scope->accepts[i], 0, sizeof(scope->accepts[i]));
+        if (scope->operations[i].callback && neoclr_gc_host_root_release_v1(scope->context, scope->operations[i].callback)) status = 3;
+        release_transfer(scope, i);
+        memset(&scope->operations[i], 0, sizeof(scope->operations[i]));
     }
 #endif
     head = scope->previous;
@@ -121,9 +142,10 @@ int32_t neoclr_socket_close_v1(uint64_t handle, neoclr_aot_context *context, voi
         scope->slots[i].id = 0;
 #ifdef NEOCLR_NATIVE_GC
         for (unsigned op = 0; op < 64; op++) {
-            if (scope->accepts[op].state == 1 && scope->accepts[op].listener == handle) {
-                scope->accepts[op].state = 2;
-                scope->accepts[op].tag = 2; scope->accepts[op].value = 1;
+            if (scope->operations[op].state == 1 && scope->operations[op].listener == handle) {
+                scope->operations[op].state = 2;
+                scope->operations[op].tag = 2; scope->operations[op].value = 1;
+                release_transfer(scope, op);
             }
         }
 #endif
@@ -151,57 +173,154 @@ int32_t neoclr_socket_accept_v1(uint64_t listener, void *callback,
     if (!scope->slots[socket].listener) return publish(output, 2, 12);
     for (unsigned i = 0; i < 64; i++) {
         resources += scope->slots[i].id != 0;
-        resources += scope->accepts[i].state == 1;
-        if (scope->accepts[i].state == 1 && scope->accepts[i].listener == listener)
+        resources += scope->operations[i].state == 1 && scope->operations[i].kind == 1;
+        if (scope->operations[i].state == 1 && scope->operations[i].kind == 1 && scope->operations[i].listener == listener)
             return publish(output, 2, 2);
     }
-    while (operation < 64 && scope->accepts[operation].state) operation++;
+    while (operation < 64 && scope->operations[operation].state) operation++;
     if (operation == 64 || resources >= 64) return publish(output, 2, 4);
     uint64_t id = new_operation_id(), root;
     if (!id) return publish(output, 2, 4);
     int32_t status = neoclr_gc_host_root_create_v1(context, callback, &root);
     if (status) return status;
-    scope->accepts[operation].id = id;
-    scope->accepts[operation].listener = listener;
-    scope->accepts[operation].callback = root;
-    scope->accepts[operation].state = 1;
+    scope->operations[operation].id = id;
+    scope->operations[operation].listener = listener;
+    scope->operations[operation].callback = root;
+    scope->operations[operation].state = 1;
+    scope->operations[operation].kind = 1;
     return publish(output, 5, id);
 }
 int32_t neoclr_socket_cancel_v1(uint64_t operation, neoclr_aot_context *context, int32_t *output) {
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !output) return 3;
-    for (unsigned i = 0; i < 64; i++) if (operation && scope->accepts[i].id == operation) {
-        *output = scope->accepts[i].state == 1;
+    for (unsigned i = 0; i < 64; i++) if (operation && scope->operations[i].id == operation) {
+        *output = scope->operations[i].state == 1;
         if (*output) {
-            scope->accepts[i].state = 2;
-            scope->accepts[i].tag = 2; scope->accepts[i].value = 5;
+            scope->operations[i].state = 2;
+            scope->operations[i].tag = 2; scope->operations[i].value = 5;
+            release_transfer(scope, i);
         }
         return 0;
     }
     return 3;
 }
-int32_t neoclr_socket_connect_result_v1(uint64_t operation, neoclr_aot_context *context, void *output) {
+static int32_t take_result(uint64_t operation, neoclr_aot_context *context, void *output, int accept_result) {
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !output) return 3;
-    for (unsigned i = 0; i < 64; i++) if (operation && scope->accepts[i].id == operation) {
-        if (scope->accepts[i].state != 3) return 3;
-        if (neoclr_gc_host_root_release_v1(context, scope->accepts[i].callback)) return 3;
-        publish(output, scope->accepts[i].tag, scope->accepts[i].value);
-        memset(&scope->accepts[i], 0, sizeof(scope->accepts[i]));
+    for (unsigned i = 0; i < 64; i++) if (operation && scope->operations[i].id == operation) {
+        if (scope->operations[i].state != 3 || ((scope->operations[i].kind == 1) != accept_result)) return 3;
+        if (neoclr_gc_host_root_release_v1(context, scope->operations[i].callback)) return 3;
+        publish(output, scope->operations[i].tag, scope->operations[i].value);
+        release_transfer(scope, i);
+        memset(&scope->operations[i], 0, sizeof(scope->operations[i]));
         return 0;
     }
     return 3;
 }
-int32_t neoclr_socket_poll_accept_v1(neoclr_aot_context *context, uint64_t *callback) {
+int32_t neoclr_socket_connect_result_v1(uint64_t operation, neoclr_aot_context *context, void *output) {
+    return take_result(operation, context, output, 1);
+}
+int32_t neoclr_socket_transfer_result_v1(uint64_t operation, neoclr_aot_context *context, void *output) {
+    return take_result(operation, context, output, 0);
+}
+static int32_t transfer(int sending, uint64_t socket, void *array, int32_t offset, int32_t count,
+    void *callback, neoclr_aot_context *context, void *output) {
+    neoclr_socket_scope *scope = find_scope(context);
+    if (!scope || !array || !callback || !output) return 3;
+    unsigned slot = 0, op = 0;
+    while (slot < 64 && scope->slots[slot].id != socket) slot++;
+    if (!socket || slot == 64) return publish(output, 2, 1);
+    if (scope->slots[slot].listener) return publish(output, 2, 12);
+    unsigned kind = sending ? 3 : 2;
+    for (unsigned i = 0; i < 64; i++)
+        if (scope->operations[i].state == 1 && scope->operations[i].kind == kind && scope->operations[i].listener == socket)
+            return publish(output, 2, 2);
+    /* Verified CIL supplies the array; range/header checks precede payload access. */
+    uint64_t header, length;
+    memcpy(&header, array, 8); memcpy(&length, (unsigned char *)array + 8, 8);
+    if ((header != UINT64_C(0x80000001) && header != UINT64_C(0x80000002)) || length > 65536) return 3;
+    if (offset < 0 || count < 0 || (uint64_t)offset > length || (uint64_t)count > length - (uint64_t)offset)
+        return publish(output, 2, 3);
+    while (op < 64 && scope->operations[op].state) op++;
+    if (op == 64 || (uint64_t)count > UINT64_C(262144) - scope->transfer_bytes) return publish(output, 2, 4);
+    if (sending && neoclr_check_bytes_initialized_v1(array, offset, count)) return 3;
+    uint64_t now = monotonic_ns(), id = new_operation_id(), root = 0, destination = 0;
+    if (!now) return 3;
+    if (!id) return publish(output, 2, 4);
+    unsigned char *copy = count ? malloc((size_t)count) : NULL;
+    if (count && !copy) return publish(output, 2, 4);
+    int32_t status = neoclr_gc_host_root_create_v1(context, callback, &root);
+    if (!status && !sending) status = neoclr_gc_host_root_create_v1(context, array, &destination);
+    if (status) {
+        if (root) neoclr_gc_host_root_release_v1(context, root);
+        free(copy); return status;
+    }
+    if (sending && count) memcpy(copy, (unsigned char *)array + 16 + offset, (size_t)count);
+    scope->operations[op].id = id; scope->operations[op].listener = socket;
+    scope->operations[op].callback = root; scope->operations[op].buffer_root = destination;
+    scope->operations[op].state = 1; scope->operations[op].kind = kind;
+    scope->operations[op].offset = (uint32_t)offset; scope->operations[op].count = (uint32_t)count;
+    scope->operations[op].buffer = copy; scope->operations[op].deadline = now + UINT64_C(5000000000);
+    scope->transfer_bytes += (uint64_t)count;
+    return publish(output, 5, id);
+}
+int32_t neoclr_socket_receive_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
+    void *callback, neoclr_aot_context *context, void *output) {
+    return transfer(0, socket, array, offset, count, callback, context, output);
+}
+int32_t neoclr_socket_send_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
+    void *callback, neoclr_aot_context *context, void *output) {
+    return transfer(1, socket, array, offset, count, callback, context, output);
+}
+int32_t neoclr_socket_poll_v1(neoclr_aot_context *context, uint64_t *callback) {
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !callback || context->fault.code) return -3;
     for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
         if (f->context == context) return -3;
     for (unsigned n = 0; n < 64; n++) {
         unsigned i = (scope->poll_cursor + n) % 64;
-        if (scope->accepts[i].state == 1) {
+        if (scope->operations[i].state == 1 && scope->operations[i].kind != 1) {
+            unsigned slot = 0;
+            while (slot < 64 && scope->slots[slot].id != scope->operations[i].listener) slot++;
+            if (slot == 64) return -3;
+            uint64_t now = monotonic_ns();
+            if (!now) return -3;
+            uint32_t count = scope->operations[i].count;
+            int sending = scope->operations[i].kind == 3;
+            uint64_t tag = 1, value = 0;
+            if (count && now >= scope->operations[i].deadline) { tag = 2; value = 10; }
+            else if (count) {
+                int fd = scope->slots[slot].descriptor;
+#ifdef SO_NOSIGPIPE
+                int one = 1;
+                if (sending && setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one))) return -3;
+#endif
+                int flags = 0;
+#ifdef MSG_NOSIGNAL
+                flags = MSG_NOSIGNAL;
+#endif
+                ssize_t transferred = sending ? send(fd, scope->operations[i].buffer, count, flags)
+                    : recv(fd, scope->operations[i].buffer, count, 0);
+                if (transferred < 0 && (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)) continue;
+                if (transferred < 0) { tag = 2; value = error_code(errno); }
+                else if (!transferred && sending) { tag = 2; value = 11; }
+                else value = (uint64_t)transferred;
+            }
+            if (tag == 1 && !sending && value) {
+                void *array = NULL;
+                if (neoclr_gc_host_root_read_v1(context, scope->operations[i].buffer_root, &array)) return -3;
+                uint64_t header, length;
+                memcpy(&header, array, 8); memcpy(&length, (unsigned char *)array + 8, 8);
+                memcpy((unsigned char *)array + 16 + scope->operations[i].offset, scope->operations[i].buffer, (size_t)value);
+                if (header == UINT64_C(0x80000002))
+                    memset((unsigned char *)array + 16 + length + scope->operations[i].offset, 1, (size_t)value);
+            }
+            scope->operations[i].tag = tag; scope->operations[i].value = value;
+            scope->operations[i].state = 2; release_transfer(scope, i);
+        }
+        if (scope->operations[i].state == 1 && scope->operations[i].kind == 1) {
             unsigned listener = 0, slot = 0;
-            while (listener < 64 && scope->slots[listener].id != scope->accepts[i].listener) listener++;
+            while (listener < 64 && scope->slots[listener].id != scope->operations[i].listener) listener++;
             if (listener == 64) return -3;
             int fd = accept(scope->slots[listener].descriptor, NULL, NULL);
             if (fd < 0 && (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)) continue;
@@ -219,13 +338,13 @@ int32_t neoclr_socket_poll_accept_v1(neoclr_aot_context *context, uint64_t *call
                 }
                 if (tag == 2) close(fd);
             }
-            scope->accepts[i].tag = tag; scope->accepts[i].value = value;
-            scope->accepts[i].state = 2;
+            scope->operations[i].tag = tag; scope->operations[i].value = value;
+            scope->operations[i].state = 2;
         }
-        if (scope->accepts[i].state == 2) {
-            scope->accepts[i].state = 3;
+        if (scope->operations[i].state == 2) {
+            scope->operations[i].state = 3;
             scope->poll_cursor = (i + 1) % 64;
-            *callback = scope->accepts[i].callback;
+            *callback = scope->operations[i].callback;
             return 1;
         }
     }

@@ -3127,7 +3127,7 @@ int main(void) {
 "#).unwrap();
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     for (name, inputs) in [
-        ("kernel", vec![base.join("socket-listener-test.c"), base.join("socket-listener.c"), base.join("root-probe.c"), base.join("native-gc.c")]),
+        ("kernel", vec![base.join("socket-listener-test.c"), base.join("socket-listener.c"), base.join("root-probe.c"), base.join("native-gc.c"), base.join("text-arena.c")]),
         ("compiled", vec![dir.0.join("host.c"), dir.0.join("app.o"), base.join("socket-listener.c"), base.join("root-probe.c"), base.join("native-gc.c"), base.join("text-arena.c")]),
     ] {
         let binary = dir.0.join(name);
@@ -3791,7 +3791,7 @@ int main(void) {
         uint64_t root = 999;
         int peer = -1;
         if (!cancel) {
-            CHECK(!neoclr_socket_poll_accept_v1(&c, &root) && root == 999);
+            CHECK(!neoclr_socket_poll_v1(&c, &root) && root == 999);
             struct sockaddr_in endpoint = {0};
             endpoint.sin_family = AF_INET; endpoint.sin_port = htons((uint16_t)port);
             endpoint.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
@@ -3799,14 +3799,14 @@ int main(void) {
             CHECK(peer >= 0 && !connect(peer, (const void *)&endpoint, sizeof(endpoint)));
         }
         int ready = 0;
-        for (unsigned retry = 0; retry < 1000 && !ready; retry++) ready = neoclr_socket_poll_accept_v1(&c, &root);
+        for (unsigned retry = 0; retry < 1000 && !ready; retry++) ready = neoclr_socket_poll_v1(&c, &root);
         CHECK(ready == 1);
         CHECK(!neoclr_invoke_void_callback_v1(root, &c) && !c.fault.code);
-        CHECK(!neoclr_root_probe_depth_v1() && !neoclr_socket_poll_accept_v1(&c, &root));
+        CHECK(!neoclr_root_probe_depth_v1() && !neoclr_socket_poll_v1(&c, &root));
         CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
         unsigned sockets = 0;
         for (unsigned i = 0; i < 64; i++) {
-            CHECK(!scope.accepts[i].state);
+            CHECK(!scope.operations[i].state);
             sockets += scope.slots[i].id != 0;
         }
         CHECK(sockets == 1); /* Guest callback closed accepted connection. */

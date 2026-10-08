@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Extend the private native socket kernel with bounded send snapshots and rooted receive
+  copy-back, partial/EOF results, five-second deadlines and terminal scratch cleanup.
+  Share operation slots/polling with accept; rename the private poll helper to
+  neoclr_socket_poll_v1 and require the matching text adapter. Sanitized kernel and
+  compiled-accept regressions pass; CIL transfer bindings and HTTP execution remain open.
+
 - Add a private nonblocking native accept kernel with retained completion roots,
   deferred single delivery, cancellation/result consumption and scope cleanup. Validate
   real loopback TCP and listener compatibility. GC socket builds now link the GC/root

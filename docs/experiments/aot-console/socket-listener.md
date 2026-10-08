@@ -128,3 +128,37 @@ Full Raven Server admission with the new flag clears these services and next rej
 SocketReceive. This is compiled CIL/native loopback evidence, not a completed Raven
 HttpServer or a throughput comparison. TaskQueue integration and transfer services
 remain necessary. [Admission evidence](../../../benchmarks/native-web/accept-admission.json).
+
+## Buffered transfer kernel — 2026-10-08
+
+The private GC adapter now also supports nonblocking receive/send and single-use
+transfer results. Accept and transfers share 64 operation slots and one rotating poll
+cursor. The private poll entry is now `neoclr_socket_poll_v1`; experimental hosts must
+rebuild with the matching header. Each pending transfer has a five-second monotonic
+deadline, matching the interpreter's ordinary transfer policy. Explicit request-deadline
+services are not yet implemented. Empty transfers succeed with zero without I/O; EOF
+receives succeed with zero; partial transfers report the actual byte count.
+
+Send snapshots the initialized admitted range into native scratch before returning.
+Receive retains its guest array through a strong root, reads into native scratch and
+copies only successfully received bytes, setting reserved-array initialization markers
+only for that range. Cancellation, expiry and close settle once and release scratch
+and receive-buffer roots before callback delivery. Completed callbacks remain rooted
+until result consumption or scope cleanup. Pending work has no background guest writes.
+
+Scratch allocations use libc malloc/free with a 256 KiB aggregate per-scope budget;
+arrays remain limited to 65,536 bytes. This is separate from the managed GC heap budget.
+A native allocation failure is a recoverable SocketError.LimitExceeded; failure to retain
+a GC root is a NativeMemoryLimit fault. One pending operation per socket/direction is
+allowed, while receive and send can coexist. No raw guest pointer is passed to an
+asynchronous OS operation. This follows the interpreter's snapshot and copy-back policy,
+with explicit bounded costs rather than a claim of zero-copy or improved throughput.
+The existing .NET socket comparison remains relevant; no public API changes occur here.
+
+All seven native_gc tests pass with sanitizers. The new loopback transfer fixture checks
+send snapshot stability after mutation/GC, partial receive data and initialization,
+Busy/range/uninitialized errors, cancellation, forced deadline expiry, empty send,
+EOF and fault teardown with pending receive. Compiled accept and existing listener
+lifecycle tests also pass. These are kernel tests; CIL transfer binding and the real
+HTTP application remain unfinished. Socket GC builds now also link text-arena.c for
+initialized-byte validation.
