@@ -321,7 +321,7 @@ static class LibraryImplementation
             throw new InvalidDataException("Unsupported instance library export: " + string.Join(";", methods.Select(m => m.FullName + " " + m.Attributes + " matches=" + contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)))));
         // Private implementation helpers are not exports, but remain roots so even
         // unused bodies are checked and emitted with their original visibility.
-        var expected = contract.Methods.Where(m => m.IsPublic && !OpaqueLibrary.IsOmittedConstructor(m) && !OpaqueLibrary.IsStringOperator(m) && !GenericUnionLibrary.IsProtocol(m)).ToArray();
+        var expected = contract.Methods.Where(m => m.IsPublic && !OpaqueLibrary.IsOmittedConstructor(m) && !GenericUnionLibrary.IsProtocol(m)).ToArray();
         var exports = methods.Where(m => m.IsPublic).ToArray();
         if (contract.Methods.Where(m => m.IsAssembly && !m.IsConstructor).Any(c =>
             methods.Count(m => m.IsAssembly && MatchMethod(c, m)) != 1))
@@ -358,7 +358,7 @@ static class LibraryImplementation
 
     public static bool SameType(TypeReference left, TypeReference right)
     {
-        if (JsonBindings.SameType(left, right) || HttpBindings.SameType(left, right) || ReaderBindings.SameType(left, right) || FileSystemBindings.SameType(left, right) || StorageItemBindings.SameType(left, right) || StorageProviderBindings.SameType(left, right) || IPAddressBindings.SameType(left, right) || UriBindings.SameType(left, right) || PathBindings.SameType(left, right) || StreamBindings.SameType(left, right) || SocketBindings.SameType(left, right) || CancellationBindings.SameType(left, right) || WorkerBindings.SameType(left, right) || AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right)) return true;
+        if (StringBuilderBindings.SameType(left, right) || JsonBindings.SameType(left, right) || HttpBindings.SameType(left, right) || ReaderBindings.SameType(left, right) || FileSystemBindings.SameType(left, right) || StorageItemBindings.SameType(left, right) || StorageProviderBindings.SameType(left, right) || IPAddressBindings.SameType(left, right) || UriBindings.SameType(left, right) || PathBindings.SameType(left, right) || StreamBindings.SameType(left, right) || SocketBindings.SameType(left, right) || CancellationBindings.SameType(left, right) || WorkerBindings.SameType(left, right) || AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right)) return true;
         if (left is ByReferenceType lb)
             return right is ByReferenceType rb && SameType(lb.ElementType, rb.ElementType);
         if (left is ArrayType la)

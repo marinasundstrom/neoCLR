@@ -86,6 +86,15 @@ pub(super) fn interface_contract(input: &neoclr::Module, f: &neoclr::metadata::F
         .is_some_and(|t| t.representation == neoclr::metadata::Representation::Interface)
 }
 
+/// A verified sealed reference owner cannot acquire a more-derived implementation.
+/// Keep callvirt for its null check; only the private native projection loses slots.
+pub(super) fn sealed_member(input: &neoclr::Module, f: &neoclr::metadata::Function) -> bool {
+    f.instance && !f.is_abstract && !f.receiver_byref && f.impl_flags == 0
+        && f.owner.as_ref().and_then(|t| input.type_definition(t))
+            .is_some_and(|t| t.is_reference_type && t.is_sealed
+                && t.representation != neoclr::metadata::Representation::Interface)
+}
+
 /// Narrow class-virtual slice used by Console.WriteLine(Object). Original load-set
 /// verification supplies slot ancestry; a same-named ordinary member is never enough.
 pub(super) fn object_display_contract(f: &neoclr::metadata::Function) -> bool {
@@ -318,7 +327,7 @@ pub(super) fn select_inventory(
                         if callable_invoke(target).is_some() { continue; }
                         let callee = resolve(input, target)?;
                         let f = &input.functions[callee];
-                        if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && !object_display_contract(f) && (f.is_virtual || f.is_abstract || f.is_override) {
+                        if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && !object_display_contract(f) && !sealed_member(input, f) && (f.is_virtual || f.is_abstract || f.is_override) {
                             return Err("virtual calls requiring dispatch need a later selection profile".into());
                         }
                         if matches!(op, Op::Call(_)) && object_display_contract(f) {

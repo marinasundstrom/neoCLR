@@ -11,6 +11,20 @@ The runtime also supports `String.Concat(Object?, Object?)`, using virtual
 contract for Raven interpolation of numbers and other objects. Formatting follows
 the value's `ToString` implementation; format-provider overloads are not included.
 
+## Building and joining text — development
+
+`System.Text.StringBuilder` provides fluent `Append`, `AppendLine`, `Clear`, and
+immutable `ToString` snapshots. `Utf8ByteCount` and `MaxUtf8Bytes` use explicit byte
+units. The current builder limit is at most 65536 bytes; exceeding it faults before
+changing content. `AppendLine` uses LF; HTTP framing needs explicit CRLF.
+
+`String.Join(separator, values)` joins a string array with separators between its
+elements, including empty elements. Inputs must be initialized and non-null.
+Both APIs have interpreter and experimental native coverage; native execution is
+still work in progress. See the API reference at [/docs/](../../docs/) for signatures
+and limits. Benchmark results are development evidence, not a claim that builders
+always outperform concatenation or that the HTTP server is native-ready.
+
 ## Character counting and iteration
 
 `Length` counts grapheme clusters. Iterating a string yields `Char` values, including combining sequences and emoji sequences. The read-only integer indexer addresses grapheme clusters.

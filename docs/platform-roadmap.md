@@ -2252,7 +2252,11 @@ constructors accept encoding selection with UTF-8 defaults and strict ASCII, bac
 by focused consumer checks. The [bounded report construction evaluation](design/text-abstraction.md#bounded-report-construction-evaluation--2026-09-27)
 passes its contracts but does not justify promoting the managed builder: ordinary
 concatenation is faster for the tested report sizes. Keep public builder promotion
-deferred; do not start a builder optimization project. The [Encoder acceptance/drain evaluation](design/text-abstraction.md#encoder-progress-and-writer-evaluation--2026-09-27)
+deferred under that earlier evaluation. On 2026-10-08 the author explicitly selected
+a related [StringBuilder and String.Join side quest](design/string-building.md), with
+fluent append, byte-limit faults and shared interpreter/native materialization. This
+bounded development API work revisits the deferral without replacing the native HTTP
+priority or endorsing the earlier prototype. The [Encoder acceptance/drain evaluation](design/text-abstraction.md#encoder-progress-and-writer-evaluation--2026-09-27)
 led to the [public Encoder integration](design/text-abstraction.md#public-encoder-integration-development--2026-09-27):
 independent factories, bounded progress and explicit StreamWriter.Finish are implemented
 in development with matching API artifacts and focused consumers. The bounded

@@ -136,6 +136,7 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/EncodingError.neoil')
         result += build(ROOT / 'runtime/raven/Encodings.neoil')
         result += build(ROOT / 'runtime/raven/Utf8.neoil')
+        result += build(ROOT / 'runtime/raven/StringBuilder.neoil')
         result += build(ROOT / 'runtime/raven/EntryKind.neoil')
         result += build(ROOT / 'runtime/raven/StorageLookupError.neoil')
         result += build(ROOT / 'runtime/raven/StorageMetadata.neoil')

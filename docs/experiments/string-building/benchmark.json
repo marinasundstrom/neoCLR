@@ -1,0 +1,119 @@
+{
+  "validationSha256": "9b655227f4d10868a1fedfe4c60f6ddb9e1237d11676e9dfd53b89f8b937e90c",
+  "scriptSha256": "bd95e56d86fb06f4bcee69bd868a8cfbb9cc0f9e4feab196715bc62300b0cb0d",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "hardware": "Apple M1",
+  "scope": "Process wall time including startup, metadata load, verification, GC and execution; 16 x 1024 fragments of 16 UTF-8 bytes. Five alternating-order measured runs after one warmup. Not HTTP throughput or a platform ranking.",
+  "commands": {
+    "BenchmarkConcat/interpreted": [
+      "/Users/robert/Projects/neoclr/target/release/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.dll",
+      "--system",
+      "/private/tmp/string-builder-native1008d/System.runtime.neox",
+      "--module",
+      "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+      "--object-root",
+      "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+      "--instructions",
+      "100000000"
+    ],
+    "BenchmarkConcat/native": [
+      "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat-standalone"
+    ],
+    "BenchmarkBuilder/interpreted": [
+      "/Users/robert/Projects/neoclr/target/release/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.dll",
+      "--system",
+      "/private/tmp/string-builder-native1008d/System.runtime.neox",
+      "--module",
+      "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+      "--object-root",
+      "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+      "--instructions",
+      "100000000"
+    ],
+    "BenchmarkBuilder/native": [
+      "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder-standalone"
+    ],
+    "BenchmarkJoin/interpreted": [
+      "/Users/robert/Projects/neoclr/target/release/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.dll",
+      "--system",
+      "/private/tmp/string-builder-native1008d/System.runtime.neox",
+      "--module",
+      "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+      "--object-root",
+      "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+      "--instructions",
+      "100000000"
+    ],
+    "BenchmarkJoin/native": [
+      "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin-standalone"
+    ]
+  },
+  "timings": {
+    "BenchmarkConcat/interpreted": {
+      "seconds": [
+        1.2053800829999997,
+        1.2607377090000007,
+        1.3526292500000032,
+        1.2422281250000005,
+        1.1828632910000003
+      ],
+      "medianSeconds": 1.2422281250000005
+    },
+    "BenchmarkConcat/native": {
+      "seconds": [
+        0.018635333999999837,
+        0.02193875000000034,
+        0.02264008399999895,
+        0.0209840409999984,
+        0.018684582999998867
+      ],
+      "medianSeconds": 0.0209840409999984
+    },
+    "BenchmarkBuilder/interpreted": {
+      "seconds": [
+        3.6137921660000005,
+        2.9106330410000023,
+        2.792630334000002,
+        2.781527040999997,
+        2.733366791999998
+      ],
+      "medianSeconds": 2.792630334000002
+    },
+    "BenchmarkBuilder/native": {
+      "seconds": [
+        0.06102349999999923,
+        0.060133875,
+        0.05915841699999902,
+        0.05991087499999992,
+        0.061071083000001636
+      ],
+      "medianSeconds": 0.060133875
+    },
+    "BenchmarkJoin/interpreted": {
+      "seconds": [
+        1.494228875000001,
+        1.5092715830000003,
+        1.480856333000002,
+        1.605398417,
+        1.4610789159999982
+      ],
+      "medianSeconds": 1.494228875000001
+    },
+    "BenchmarkJoin/native": {
+      "seconds": [
+        0.05833933299999927,
+        0.05771304200000138,
+        0.0604277919999987,
+        0.058894375000001276,
+        0.05981708399999519
+      ],
+      "medianSeconds": 0.058894375000001276
+    }
+  }
+}

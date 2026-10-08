@@ -11909,3 +11909,25 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
 - **Action and open status:** Inspect current source and research; record this exchange.
   No public builder was implemented or reprioritized by this question, and no author
   decision approving its API or implementation is available. Continue the authorized AOT work.
+
+## 2026-10-08 — Author-selected builder side quest and separator joins
+
+- **Author direction:** “We may implement it now as a side quest as it is related.”
+  This explicitly revisits the prior deferral while retaining the native HTTP goal.
+- **Assistant proposal:** A small UTF-8 builder with append, line append, clear/reuse,
+  immutable snapshots and native/interpreter validation, followed by measurement.
+- **Author API choice:** “Append returns the builder for chaining, with a fault when
+  its limit is exceeded”. The author then asked whether Result<StringBuilder, ...>
+  with propagation was worthwhile. The assistant proposed retaining fluent Append
+  and considering TryAppend only for a consumer needing recoverable quota errors.
+  The author directed continuation; no TryAppend API was requested or implemented.
+- **Additional author direction:** “We also need a String.Join that can handle
+  separators”. The assistant included the string-array overload and a shared joining
+  service, preserving separators around empty elements.
+- **Actions:** Implement ordinary Raven storage and snapshot caching, a shared
+  interpreter/native joining service, and sealed-owner native call admission needed
+  for ToString. Keep development API/reference and integration documentation aligned.
+  See [design and validation](design/string-building.md) for contracts and evidence.
+- **Open:** Broad formatter/collection overloads, mutable native-buffer ownership,
+  larger quotas and replacing actual HTTP construction remain later work. This side
+  quest does not establish that the HTTP server runs natively or change its priority.

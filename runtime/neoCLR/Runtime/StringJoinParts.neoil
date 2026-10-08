@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.StringJoinParts(arrayref<String> parts, Int32 count, String separator, Int32 expectedUtf8Bytes) -> String
+    .methodimpl InternalCall
+.end

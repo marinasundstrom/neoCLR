@@ -1,0 +1,2046 @@
+{
+  "revision": "95cbd971d401526e6ffdc7e59bfeb3ea76a7dda5",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/string-building/verify.py": "c1ec8cb7db2f96b285a564a8b6cffd13e6ffac36eed50e6d6685af0ea5e521b8",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "c59a935b707df3e6df0aa948ff77d7ff651e4994dec21c2b0f3169a5d22db2d7",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "1dce6941418f7a32fff61e5cc9a8083aec687cd1e3ef9541910c7b3801149be2",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "fcbfc426c7f83d9b9f4e9be93d0900b9431eabf4bb3de5fe913375a10309c56d",
+    "/private/tmp/string-builder-native1008d/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/string-builder-native1008d/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/string-builder-native1008d/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/private/tmp/string-builder-native1008d/System.Runtime.dll": "29186a4a01a2cfdad8826e7bf3d0583566aecf5bb99ae06e47f86825c8d89e74",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c": "4657f547a492d51a3caf9f9dfc36e153cb5f3b094828de382780737a353e9e62",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "a5251579303ff2df8ac857a44dc6d3cd0f6dc0d7f14847db1d82ffe7a1155979",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "d8a267ae84635a75e4bb319810d70caa04bce79962504aac2503e695946efc28",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "c8150e5aa8f4d1ebcebd46820d34d3332e8a08c4593ee30f0e5278ebf6609468",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "abc5c07f84e1b4f505bdd92b5d924acf10db2624ad0b348168567f1ee93a6dd0",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/flow.rs": "bf87fc1a01e7ce015ecc1a17b34fc931953e84e10d68610647ce523c0aae7d8d",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/boxing.rs": "82b2a08f99dfcd929cac7455c761eee000a661ada0e9c088f0d23413e4294b53",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_layout.rs": "2fafb9b3a9a40b20537218cd82ec80274edc80bbdd94a28cc95ce9ad6ccf05d0",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/fault_details.rs": "7f8be620b76663d326327b17566801d4edadbacdeef7cff12d9c8b9f0e84dd3d",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/compiler.rs": "fb3414de0cdc17edc84409d8b3711dff1c22203b377cc2a7306a3a0b4db00559",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_probe.rs": "a162c14ac728cc1433e1fe79eb3deb35bf5a5014e27ea75aa98b6168dd3e2e78",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/values.rs": "dcefbcd7ca77d71048ebc78d038caf93c28683544e48fa7a616e477ff18df67f",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/specialization.rs": "288f5ddca5a06535be43ca7070dc07d462f62fbed0b8119029bb0a93777f2f3e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_points.rs": "b05c78b4710717d0ec2982aa9f55bf693dcf2da17d558bb33adf51bc0164885d",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/value_profile.rs": "befc4ea744887a7dc5c688e7687b43958c62802f66cb39909232a7cdae5c4309",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/selection.rs": "7b1187de01567425967007f6717f3ce7cdbde6b7793d71adc2d9e0fba9d35803",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/main.rs": "ac6d3c409bf0f946ad597ba4b85f055d762d6d4e95aeb43dcdea6badab186cdd",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/linking.rs": "bef5600fd6dadd0c1c63d851baa55ac30a2252f3e41db26cdbd59ffc2696ab41",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/bindings.rs": "1d6973aed8838370ca7bd1083d0f6c5e095ec94d41726cd2792a6336ef899456",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/inspection.rs": "c3c07130675b2c58b1c9103249e5ae64b592660074ffa714b3b78cba1f66430f",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "9310c81673b991cac85e291bf68756f7d5c5467e732bb2d4aa012af2eeebe43b",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "8bd9392fa1e1363c52c62e8fbb532bff5f8757c532b29629f5341cdb753e782b",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "6acf68c4f273795edc1b56834ff9861d4e4e9020e3b53b990185b39d5b0841d5",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "86320e78fcb471c164c55d7850cd75e3eb12beaab3e6115bdf0aa79720b58eb8",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "6ca8ab4df3f3f57be16d971c56101ef83511f6ad151945cd7854174d85fb318c",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "ac7efe36e95e2c848d81c7bef37fe8e270146f8222ea91cf4866c4348f043234",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "eec237e8a924743fbf56ac9c24932cab0a92fbc35c9e2cc23d0a2fe4a5a9fc24",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "428f0709baf84634025e0d6387a5726edffb1bcc7c18d28795317705e5fb43de",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "bfbfda2f336a73059418c84899787d4f8cc680f27d4864d70785692b048d0382",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/Users/robert/Projects/neoclr/docs/experiments/string-building/Build.rvn": "8584e90a1275fc4a2e8733a3ee25a799a040292caefab5cf6af6c754f8776701",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build.dll": "3faf5521ec5a06a4b421eb7ce3f403c7268c951ba61e8ee5bae565e0147490b8",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build.o": "074d65fbdee0fc1e0631ae82621c1c4ec7b34e81e5f473e55c19194e4be2c489",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build-standalone": "809073a34855e038390dc277714f5492a1972fb27a56b8d48fcc5a4971827a9d",
+    "/Users/robert/Projects/neoclr/docs/experiments/string-building/Limit.rvn": "9a0ebd0a65ecf6345fbd75250b66b6c243643523ae2b2b45e01f5dc30ef96edb",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit.dll": "38258659bd03878a108a80e1fe896aed8d68916fe1c72c256c2ac7c5874f990a",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit.o": "4d26acf9609f56383508049cc27521f1ea8f1fb26df750ef396892f3ab9313ba",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit-standalone": "0a208aea8ab8d1773c661623157645d4b502534b0686be4da978f20cc719c830",
+    "/Users/robert/Projects/neoclr/docs/experiments/string-building/LineLimit.rvn": "851efdb07cb693d43405cffa3e368c64ef9ed7df17610b66de3b61e8e7d7599e",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit.dll": "8225abe9cc1203d05ce5d994888d0324c0d91111ad6776563625978654b8d6d9",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit.o": "b8e34a6f96df838b1bd2a8384f29650b8773b9a6ce6ca24be49c5aa52e4c2e01",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit-standalone": "355587166833758c9ef63092e2e8d8cbf1333c7fc6cb857b21cfddf8dd9dc169",
+    "/Users/robert/Projects/neoclr/docs/experiments/string-building/InvalidLimit.rvn": "a3f6209428a8fcf69291126709cdc2b5d1a8a7fd0d60b66f21418b4cac8e5c14",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit.dll": "f6761348232dca13f04e69fd07aeb92456ce8b4964b95214071f8bcaad3c95fc",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit.o": "a591fdd045b995b2df22d7d68858bed5f44e4d11654d5374a59d2ab987177c57",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit-standalone": "26da27823da0033c7f2537c8c9d9917d07f2492626a2077b82272c794d0f82ba",
+    "/Users/robert/Projects/neoclr/docs/experiments/string-building/BenchmarkConcat.rvn": "09832611f59b84a371488af4250b6cebd29279bb18300b12b6363fdf9719de42",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.dll": "8167124cc3f58358290fe5070df7da2eaa3b807db4e44dd6a67d93d789f8bc64",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.o": "d09ff544d1aa326a4a24601eec5b6eb4aac56108a2e519d802a699597adef52a",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat-standalone": "f170c5bedcb534b9cfa4079ce0fad90e72ee2161d7cda785a440c8fcc51a849e",
+    "/Users/robert/Projects/neoclr/docs/experiments/string-building/BenchmarkBuilder.rvn": "8872d2902b4be0553a5a3d28946c3117d21acb0b389bb46e5125a96e283d32ac",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.dll": "bef28f017c827bd3bcbf5355537b9921fecfb01a1e46717e3a9a4ce737988321",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.o": "85198925650c9d40693bfbb3f5f7c93bab54c48f366bd25cda2ed00be8afadff",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder-standalone": "a13bfc61487ad942020333763caa62c09b3c4005e1eff348aff5b645252eb41c",
+    "/Users/robert/Projects/neoclr/docs/experiments/string-building/BenchmarkJoin.rvn": "64a811a09a7a32f8658cb130d8f9fb081eaaf70c3ca8c767daf3f4364ea990d5",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.dll": "5b0699ba22bed05cf2d4474cc95fdd8bfa8312124c46d98080ee9e87cf992a72",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.o": "17e88c8553162daa1d43c435aefedc94cd4e84c64d4e3b951d7b9ddad9138aee",
+    "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin-standalone": "0bf56d93a584aa74733d5bb19dd3271dd27b7d1687d75d2889aa315ed82a4336"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/string-builder-native1008d/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/string-building/Build.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "5a0bba4a62317e4ccfc31465e9acb756ebce9b8139efe9f47bccb787ec21e5fc"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build.o",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "1b4b9126fa3a6e5cf66a7d3b641177bee3d74ca8c0373dc695c62a5fb3a412ac"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build-standalone"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Build-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/string-builder-native1008d/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/string-building/Limit.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572.M_417070656E64 [instruction 12]\n   at NeoMetadata_B1708BBB7642272CFBCA2416C837B964A08CE33571F6F4CC7C833DFCE8C49889.F_4D61696E [instruction 5]\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "092b0a4214c4c4011089c3f501c6978d10b8f8d2b15029d1024f8f7aa941dda0"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit.o",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "b7965d857f4f3f533027d21a1b3313523855dd001a84092cadd9b051787acbb3"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572.M_417070656E64 [instruction 12]\n   at NeoMetadata_B1708BBB7642272CFBCA2416C837B964A08CE33571F6F4CC7C833DFCE8C49889.F_4D61696E [instruction 5]\n"
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit-standalone"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/Limit-standalone"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572.M_417070656E64 [instruction 12]\n   at NeoMetadata_B1708BBB7642272CFBCA2416C837B964A08CE33571F6F4CC7C833DFCE8C49889.F_4D61696E [instruction 5]\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/string-builder-native1008d/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/string-building/LineLimit.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572.M_417070656E644C696E65 [instruction 12]\n   at NeoMetadata_214AB1106597A9CB163A242699E945969FA0FEC37C06A95A23F568FD3C646E1F.F_4D61696E [instruction 5]\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "555c96f2a74e124ea5cd6d487fae934a1be9c782427da50387dcffd8d19cb2c1"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit.o",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "036488c74fc196fc982cdf698327e1089506ff487d91de331a312da1a07d4c96"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572.M_417070656E644C696E65 [instruction 12]\n   at NeoMetadata_214AB1106597A9CB163A242699E945969FA0FEC37C06A95A23F568FD3C646E1F.F_4D61696E [instruction 5]\n"
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit-standalone"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/LineLimit-standalone"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572.M_417070656E644C696E65 [instruction 12]\n   at NeoMetadata_214AB1106597A9CB163A242699E945969FA0FEC37C06A95A23F568FD3C646E1F.F_4D61696E [instruction 5]\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/string-builder-native1008d/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/string-building/InvalidLimit.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder limit must be between 0 and 65536 UTF-8 bytes\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572..ctor [instruction 56]\n   at NeoMetadata_834065C04C9C237528F07704D219AAEC400795227D64E2C10874AB362C529469.F_4D61696E [instruction 1]\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "ecb201a06eac417dadb2872bc81464756244003f88f50ec60cdaa648e224cfbc"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit.o",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "71f97da18e3ec28a318488dc8814f8af001a1e158fc3e80fbfe24c64f1814c7a"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder limit must be between 0 and 65536 UTF-8 bytes\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572..ctor [instruction 56]\n   at NeoMetadata_834065C04C9C237528F07704D219AAEC400795227D64E2C10874AB362C529469.F_4D61696E [instruction 1]\n"
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit-standalone"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/InvalidLimit-standalone"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder limit must be between 0 and 65536 UTF-8 bytes\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572..ctor [instruction 56]\n   at NeoMetadata_834065C04C9C237528F07704D219AAEC400795227D64E2C10874AB362C529469.F_4D61696E [instruction 1]\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/string-builder-native1008d/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/string-building/BenchmarkConcat.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "4083ef86f00636e6609c9766dcb1aa1ea6cc636aa7030198d6d1dfcef4b51140"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.o",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "31ce2976dd6c87473503beaec31c8d61a0943df26b8750e771a2478ad9bffc13"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat-standalone"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/string-builder-native1008d/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/string-building/BenchmarkBuilder.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "9695d806a34fa30edd371e382ed798879999df26f3d6152de8ff573ac02e2308"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.o",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "ec34e7024f2d2d79299f358c4bb407aceeeb5bac844dc5736ec88cec17127468"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder-standalone"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/string-builder-native1008d/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/string-building/BenchmarkJoin.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "5c49132ce84f808705303c2e80f325693035c900e039059f287917f271999bab"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.o",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "014b7f2e9bcc97207126366afe4c3449b24cd9a0cba64e7ea139b53c1c71d8a2"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin-standalone"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkConcat-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkBuilder-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-validation4/BenchmarkJoin-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "cases": {
+    "Build": {
+      "status": 0,
+      "output": "",
+      "fault": "",
+      "heapCapacity": 65536,
+      "bindings": [
+        {
+          "compiledIndex": 2,
+          "definition": {
+            "index": 60,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        },
+        {
+          "compiledIndex": 3,
+          "definition": {
+            "index": 66,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "implementation": "string-join-parts-v1",
+          "name": "neoCLR.Runtime.StringJoinParts",
+          "symbol": "neoclr_string_join_parts_v1"
+        },
+        {
+          "compiledIndex": 19,
+          "definition": {
+            "index": 2,
+            "module": "System"
+          },
+          "implementation": "string-concat-v1",
+          "name": "neoCLR.Runtime.StringConcat",
+          "symbol": "neoclr_string_concat_v1"
+        },
+        {
+          "compiledIndex": 23,
+          "definition": {
+            "index": 96,
+            "module": "System"
+          },
+          "implementation": "string-byte-count-v1",
+          "name": "neoCLR.Runtime.StringByteCount",
+          "symbol": "neoclr_string_byte_count_v1"
+        }
+      ]
+    },
+    "Limit": {
+      "status": 1,
+      "output": "",
+      "fault": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572.M_417070656E64 [instruction 12]\n   at NeoMetadata_B1708BBB7642272CFBCA2416C837B964A08CE33571F6F4CC7C833DFCE8C49889.F_4D61696E [instruction 5]\n",
+      "heapCapacity": 65536,
+      "bindings": [
+        {
+          "compiledIndex": 2,
+          "definition": {
+            "index": 60,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        },
+        {
+          "compiledIndex": 9,
+          "definition": {
+            "index": 96,
+            "module": "System"
+          },
+          "implementation": "string-byte-count-v1",
+          "name": "neoCLR.Runtime.StringByteCount",
+          "symbol": "neoclr_string_byte_count_v1"
+        }
+      ]
+    },
+    "LineLimit": {
+      "status": 1,
+      "output": "",
+      "fault": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572.M_417070656E644C696E65 [instruction 12]\n   at NeoMetadata_214AB1106597A9CB163A242699E945969FA0FEC37C06A95A23F568FD3C646E1F.F_4D61696E [instruction 5]\n",
+      "heapCapacity": 65536,
+      "bindings": [
+        {
+          "compiledIndex": 2,
+          "definition": {
+            "index": 60,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        },
+        {
+          "compiledIndex": 10,
+          "definition": {
+            "index": 2,
+            "module": "System"
+          },
+          "implementation": "string-concat-v1",
+          "name": "neoCLR.Runtime.StringConcat",
+          "symbol": "neoclr_string_concat_v1"
+        },
+        {
+          "compiledIndex": 13,
+          "definition": {
+            "index": 96,
+            "module": "System"
+          },
+          "implementation": "string-byte-count-v1",
+          "name": "neoCLR.Runtime.StringByteCount",
+          "symbol": "neoclr_string_byte_count_v1"
+        }
+      ]
+    },
+    "InvalidLimit": {
+      "status": 1,
+      "output": "",
+      "fault": "UserFault: StringBuilder limit must be between 0 and 65536 UTF-8 bytes\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572..ctor [instruction 56]\n   at NeoMetadata_834065C04C9C237528F07704D219AAEC400795227D64E2C10874AB362C529469.F_4D61696E [instruction 1]\n",
+      "heapCapacity": 65536,
+      "bindings": [
+        {
+          "compiledIndex": 2,
+          "definition": {
+            "index": 60,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        }
+      ]
+    },
+    "BenchmarkConcat": {
+      "status": 0,
+      "output": "",
+      "fault": "",
+      "heapCapacity": 65536,
+      "bindings": [
+        {
+          "compiledIndex": 2,
+          "definition": {
+            "index": 60,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        },
+        {
+          "compiledIndex": 6,
+          "definition": {
+            "index": 2,
+            "module": "System"
+          },
+          "implementation": "string-concat-v1",
+          "name": "neoCLR.Runtime.StringConcat",
+          "symbol": "neoclr_string_concat_v1"
+        },
+        {
+          "compiledIndex": 9,
+          "definition": {
+            "index": 96,
+            "module": "System"
+          },
+          "implementation": "string-byte-count-v1",
+          "name": "neoCLR.Runtime.StringByteCount",
+          "symbol": "neoclr_string_byte_count_v1"
+        }
+      ]
+    },
+    "BenchmarkBuilder": {
+      "status": 0,
+      "output": "",
+      "fault": "",
+      "heapCapacity": 65536,
+      "bindings": [
+        {
+          "compiledIndex": 2,
+          "definition": {
+            "index": 60,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        },
+        {
+          "compiledIndex": 3,
+          "definition": {
+            "index": 66,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "implementation": "string-join-parts-v1",
+          "name": "neoCLR.Runtime.StringJoinParts",
+          "symbol": "neoclr_string_join_parts_v1"
+        },
+        {
+          "compiledIndex": 12,
+          "definition": {
+            "index": 96,
+            "module": "System"
+          },
+          "implementation": "string-byte-count-v1",
+          "name": "neoCLR.Runtime.StringByteCount",
+          "symbol": "neoclr_string_byte_count_v1"
+        }
+      ]
+    },
+    "BenchmarkJoin": {
+      "status": 0,
+      "output": "",
+      "fault": "",
+      "heapCapacity": 65536,
+      "bindings": [
+        {
+          "compiledIndex": 2,
+          "definition": {
+            "index": 60,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        },
+        {
+          "compiledIndex": 3,
+          "definition": {
+            "index": 66,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "implementation": "string-join-parts-v1",
+          "name": "neoCLR.Runtime.StringJoinParts",
+          "symbol": "neoclr_string_join_parts_v1"
+        },
+        {
+          "compiledIndex": 9,
+          "definition": {
+            "index": 96,
+            "module": "System"
+          },
+          "implementation": "string-byte-count-v1",
+          "name": "neoCLR.Runtime.StringByteCount",
+          "symbol": "neoclr_string_byte_count_v1"
+        }
+      ]
+    }
+  },
+  "timings": {
+    "BenchmarkConcat/interpreted": {
+      "seconds": [
+        1.8425077089999888,
+        1.2963313750000225,
+        1.3072068339999987,
+        1.3198349170000085,
+        1.2558226250000075
+      ],
+      "medianSeconds": 1.3072068339999987
+    },
+    "BenchmarkConcat/native": {
+      "seconds": [
+        0.04954370799998742,
+        0.022349667000014506,
+        0.028369542000007186,
+        0.023127167000012605,
+        0.021267749999992702
+      ],
+      "medianSeconds": 0.023127167000012605
+    },
+    "BenchmarkBuilder/interpreted": {
+      "seconds": [
+        3.136773792000014,
+        2.9933715829999983,
+        3.014569999999992,
+        3.0346230000000105,
+        2.883812708000022
+      ],
+      "medianSeconds": 3.014569999999992
+    },
+    "BenchmarkBuilder/native": {
+      "seconds": [
+        0.06467783300001884,
+        0.06455237500000521,
+        0.0674075420000122,
+        0.06403166699999474,
+        0.06419537500002548
+      ],
+      "medianSeconds": 0.06455237500000521
+    },
+    "BenchmarkJoin/interpreted": {
+      "seconds": [
+        1.586313667000013,
+        1.6144830830000103,
+        1.5804378329999906,
+        1.5895302499999957,
+        1.6359940830000141
+      ],
+      "medianSeconds": 1.5895302499999957
+    },
+    "BenchmarkJoin/native": {
+      "seconds": [
+        0.066180624999987,
+        0.06373887500001274,
+        0.06438500000001568,
+        0.06372212499999819,
+        0.07173904100000073
+      ],
+      "medianSeconds": 0.06438500000001568
+    }
+  },
+  "timingScope": "Process wall time including startup, metadata load, verification, GC and execution; 16 x 1024 fragments of 16 UTF-8 bytes. Five alternating-order measured runs after one warmup. Not HTTP throughput or a platform ranking."
+}

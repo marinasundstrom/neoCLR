@@ -1,0 +1,4 @@
+import System.Text.*func Main() -> int {
+    StringBuilder(3).Append("e").AppendLine("́")
+    return 0
+}

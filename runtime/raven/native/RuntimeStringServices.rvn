@@ -1,0 +1,9 @@
+namespace System
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+internal extension StringRuntimeServices for RuntimeServices {
+    static func StringJoinParts(parts: string[], count: int, separator: string, expectedUtf8Bytes: int) -> string {
+        return neoCLR.Runtime.StringJoinParts(parts, count, separator, expectedUtf8Bytes)
+    }
+}

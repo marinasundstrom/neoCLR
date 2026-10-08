@@ -55,3 +55,23 @@ fn reserved_record_array_kernel_validates_extents_and_traces_initialized_element
     }
     fs::remove_dir_all(dir).unwrap();
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn string_join_kernel_validates_separators_and_atomic_failure() {
+    let dir = std::env::temp_dir().join(format!("neoclr-string-join-{}", std::process::id()));
+    fs::create_dir_all(&dir).unwrap();
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    for gc in [false, true] {
+        let binary = dir.join(if gc { "gc" } else { "arena" });
+        let mut command = Command::new("clang");
+        command.args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
+            .arg(base.join("join-parts-test.c")).arg(base.join("text-arena.c"));
+        if gc { command.arg("-DNEOCLR_NATIVE_GC").arg(base.join("native-gc.c")).arg(base.join("root-probe.c")); }
+        let r = command.arg("-o").arg(&binary).output().unwrap();
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let r = Command::new(binary).output().unwrap();
+        assert!(r.status.success(), "{r:?}");
+    }
+    fs::remove_dir_all(dir).unwrap();
+}

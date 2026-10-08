@@ -1,0 +1,71 @@
+{
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll",
+        "--reference-core",
+        "/Users/robert/Projects/neoclr/target/string-building-cli-final/demo/NeoCLR.CoreProbe.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "/Users/robert/Projects/neoclr/target/string-building-cli-final/Public.rvnproj",
+        "--no-project-restore",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/string-building-cli-final/compiled"
+      ],
+      "exit": 0,
+      "stdout": "Build succeeded in 0,9s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll",
+        "--import",
+        "/Users/robert/Projects/neoclr/target/string-building-cli-final/compiled/Public.dll",
+        "/Users/robert/Projects/neoclr/target/string-building-cli-final/demo/NeoCLR.CoreProbe.dll",
+        "/Users/robert/Projects/neoclr/target/string-building-cli-final/imported"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "/Users/robert/Projects/neoclr/docs/experiments/raven-target/collection_library.py",
+        "/Users/robert/Projects/neoclr/target/string-building-cli-final/System.neoil"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-building-cli-final/imported/App.neoil",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/string-building-cli-final/System.neoil",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "c59a935b707df3e6df0aa948ff77d7ff651e4994dec21c2b0f3169a5d22db2d7",
+    "/Users/robert/Projects/neoclr/docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll": "cf907d94f2cf3bb395e8e1e5511842f26531bda3fc74156366016c7cc71bec0c",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "1dce6941418f7a32fff61e5cc9a8083aec687cd1e3ef9541910c7b3801149be2",
+    "/Users/robert/Projects/neoclr/docs/experiments/string-building/Public.rvn": "6a7b1f21ba586885616866c64d58cb9d42a73a7b3e983b803207662fff9742b7"
+  }
+}

@@ -1,0 +1,19 @@
+import System.*
+import System.Text.*
+func Main() -> int {
+    var iteration = 0
+    while iteration < 16 {
+        let parts = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(1024)
+        var index = 0
+        while index < 1024 {
+            parts[index] = "0123456789abcdef"
+            index += 1
+        }
+        let text = String.Join("", parts)
+        if text.GetUtf8ByteCount() != 16384 {
+            System.Fail("Construction size mismatch")
+        }
+        iteration += 1
+    }
+    return 0
+}

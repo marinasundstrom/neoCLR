@@ -284,6 +284,17 @@ static class SignatureProbe
         Check("Generic Void result remains a carrier", RuntimeSignatures.Map(voidOwner, ResultBindings.Type, returns: true)
             == "System.Result<Void,System.Storage.FileWriteError>");
         var stringType = module.GetType("System.String");
+        var join = stringType.Methods.Single(m => m.Name == "Join");
+        Check("String.Join separator and array", StringBindings.Bind(Reference(join, stringType), join, false)?.Arguments.SequenceEqual(new[] { "String", "arrayref<String>" }) == true);
+        var malformedJoin = Reference(join, stringType);
+        malformedJoin.Parameters[1].ParameterType = new ArrayType(module.TypeSystem.Int32);
+        Reject("String.Join rejects another element type", () => StringBindings.Bind(malformedJoin, join, false));
+        var builder = module.GetType(StringBuilderBindings.Name);
+        var append = builder.Methods.Single(m => m.Name == "Append");
+        Check("StringBuilder fluent return", StringBuilderBindings.Bind(Reference(append, builder), append, false)?.Result == StringBuilderBindings.Name);
+        var malformedAppend = Reference(append, builder);
+        malformedAppend.ReturnType = module.TypeSystem.String;
+        Reject("StringBuilder rejects changed return", () => StringBuilderBindings.Bind(malformedAppend, append, false));
         var stringConstructor = stringType.Methods.Single(StringBindings.IsSequenceConstructor);
         Check("String converts to Sequence", InterfaceBindings.Convert("String", "System.Collections.Sequence<Char>") == "castclass System.Collections.Sequence<Char>\n");
         Check("String converts to Collection", InterfaceBindings.Converts("String", "System.Collections.Collection<Char>"));

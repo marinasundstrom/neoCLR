@@ -1,0 +1,2 @@
+.include "generated/StringBuilder.methods.neoil"
+.include "generated/StringBuilder.helpers.neoil"

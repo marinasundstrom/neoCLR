@@ -1,0 +1,26 @@
+.module SealedMember
+.type class Answer
+.sealed
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance virtual Get() -> Int32
+ldc.i4 42
+ret
+.end
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Answer value
+ldarg mode
+brtrue Null
+newobj.ctor instance Answer::.ctor()
+stloc value
+br Invoke
+Null:
+ldloca value
+initobj Answer
+Invoke:
+ldloc value
+callvirt instance Answer::Get()
+ret
+.end

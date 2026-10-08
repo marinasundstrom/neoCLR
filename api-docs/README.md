@@ -1233,3 +1233,9 @@ FaultDiagnostic, Fault::diagnostic and FaultCode::standard_message are Rust host
 covered in [the manual fault reference](faults.md); they are not Raven class-library
 types and do not enter the RavenDoc type selection. The guest reference assembly and
 snapshot remain unchanged. The snapshot check passes for this slice.
+
+Development 2026-10-08: StringBuilder and String.Join(string, string[]) are included
+in the aggregate reference, complete type inventory and authored XML. The builder
+uses explicit UTF-8 quota units and fluent faulting append; Join preserves empty
+elements and rejects null inputs. Native class-library ownership is System.Runtime;
+the documentation assembly remains the temporary CLI aggregate described above.

@@ -1,0 +1,35 @@
+.module JoinParts
+.function Calculate(Int32 mode) -> Int32
+.local arrayref<String> parts
+.local String result
+ldc.i4 3
+array.reserve String
+stloc parts
+ldloc parts
+ldc.i4 0
+ldstr "e"
+stelem String
+ldloc parts
+ldc.i4 1
+ldstr "́"
+stelem String
+ldloc parts
+ldarg mode
+ldstr "•"
+ldc.i4 6
+call neoCLR.Runtime.StringJoinParts(arrayref<String>,Int32,String,Int32)
+stloc result
+ldloc parts
+ldc.i4 0
+ldstr "changed"
+stelem String
+ldloc result
+ldstr "e•́"
+ceq
+brfalse Wrong
+ldc.i4 42
+ret
+Wrong:
+ldc.i4 0
+ret
+.end

@@ -18,7 +18,7 @@ static class OpaqueLibrary
         && CollectionBindings.Type(method.Overrides[0].DeclaringType) == "System.Collections.Collection<Char>"
         && !method.Overrides[0].HasParameters && method.Overrides[0].ReturnType.MetadataType == MetadataType.Int32;
     public static bool IsOmittedConstructor(MethodDefinition method) =>
-        method.DeclaringType.FullName == "System.String" && (IsStringConstructor(method) || StringBindings.IsSequenceConstructor(method));
+        method.DeclaringType.FullName == "System.String" && (IsStringConstructor(method) || StringBindings.IsSequenceConstructor(method, requireCore: false));
     static bool IsStringConstructor(MethodDefinition method)
     {
         if (!method.IsConstructor || !method.IsPublic || method.IsStatic || method.HasParameters
@@ -54,8 +54,7 @@ static class OpaqueLibrary
                 || candidate.Fields.Count != 1 || candidate.Fields[0].Name != "m_value"
                 || candidate.Fields[0].FieldType.MetadataType != MetadataType.String
                 || !candidate.Fields[0].IsPrivate || candidate.Fields[0].IsStatic
-                || candidate.Methods.Any(m => m.IsConstructor && !IsStringConstructor(m) && !StringBindings.IsSequenceConstructor(m)))
+                || candidate.Methods.Any(m => m.IsConstructor && !IsStringConstructor(m) && !StringBindings.IsSequenceConstructor(m, requireCore: candidate == contract)))
                 throw new InvalidDataException("Unsupported intrinsic String storage or constructor: " + candidate.Module.Name + " sealed=" + candidate.IsSealed + " fields=" + string.Join(";", candidate.Fields.Select(f => f.FullName)) + " ctors=" + string.Join(";", candidate.Methods.Where(m => m.IsConstructor).Select(m => m.Attributes + ":" + string.Join(",", m.Body.Instructions))));
-        if (type.Methods.Any(IsStringOperator)) throw new InvalidDataException("String operators remain compiler intrinsics.");
     }
 }

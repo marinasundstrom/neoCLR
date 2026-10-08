@@ -75,6 +75,7 @@ pub(crate) enum Binding {
     Utf8Encode,
     Utf8Decode,
     StringConcat,
+    StringJoinParts,
     StringIntern,
     StringFromChars,
     StringGraphemeAt,
@@ -538,6 +539,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::StringGraphemeAt, Type::Char)
         }
         ("neoCLR.Runtime.StringIntern", [Type::String]) => (Binding::StringIntern, Type::String),
+        (
+            "neoCLR.Runtime.StringJoinParts",
+            [Type::ArrayRef(element), Type::Int32, Type::String, Type::Int32],
+        ) if **element == Type::String => (Binding::StringJoinParts, Type::String),
         ("neoCLR.Runtime.StringConcat", [Type::String, Type::String]) => {
             (Binding::StringConcat, Type::String)
         }
@@ -1299,6 +1304,59 @@ impl Binding {
                     )
                 })?;
                 Ok(Value::Char(character.to_owned()))
+            }
+            (
+                Self::StringJoinParts,
+                [Value::ObjectReference(parts), Value::Int32(count), Value::String(separator), Value::Int32(expected)],
+            ) => {
+                let Value::Array {
+                    element: Type::String,
+                    elements,
+                } = parts.reference.read()?
+                else {
+                    return Err(Fault::new("String joining requires a String array"));
+                };
+                if *count < 0
+                    || *expected < 0
+                    || elements.len() > 65536
+                    || *count as usize > elements.len()
+                {
+                    return Err(Fault::new("Invalid string joining bounds"));
+                }
+                let mut length = separator
+                    .len()
+                    .checked_mul((*count as usize).saturating_sub(1))
+                    .filter(|length| *length <= *expected as usize)
+                    .ok_or_else(|| Fault::new("String joining byte count mismatch"))?;
+                for element in &elements[..*count as usize] {
+                    let Value::String(text) = element else {
+                        return Err(Fault::new("String joining requires initialized strings"));
+                    };
+                    length = length
+                        .checked_add(text.len())
+                        .filter(|length| *length <= *expected as usize)
+                        .ok_or_else(|| Fault::new("String joining byte count mismatch"))?;
+                }
+                if length != *expected as usize {
+                    return Err(Fault::new("String joining byte count mismatch"));
+                }
+                let mut text = String::new();
+                text.try_reserve_exact(length).map_err(|_| {
+                    Fault::coded(
+                        crate::FaultCode::NativeMemoryLimitExceeded,
+                        "String joining allocation failed",
+                    )
+                })?;
+                for (index, element) in elements[..*count as usize].iter().enumerate() {
+                    if index != 0 {
+                        text.push_str(separator);
+                    }
+                    let Value::String(part) = element else {
+                        unreachable!()
+                    };
+                    text.push_str(part);
+                }
+                Ok(Value::String(text.into()))
             }
             (Self::StringConcat, [Value::String(left), Value::String(right)]) => {
                 let length = left

@@ -1,0 +1,16 @@
+import System.*
+import System.Text.*
+
+func Main() -> int {
+    let builder = StringBuilder(32).Append("e").Append("́")
+    let first = builder.ToString()
+    builder.AppendLine("!").Clear().Append("reused")
+    let empty: string[] = []
+    if first != "é" || builder.ToString() != "reused" || builder.MaxUtf8Bytes != 32 || String.Join("x", empty) != "" {
+        return 1
+    }
+    if String.Join("•", ["e", "", "́"]) != "e••́" {
+        return 2
+    }
+    return 0
+}

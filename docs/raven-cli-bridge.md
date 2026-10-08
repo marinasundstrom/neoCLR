@@ -6790,3 +6790,38 @@ compiler fix is needed. The consumer supplies Runtime/Web/Networking/Data module
 Native tracing/reclamation remains a future integration requirement, not a restriction
 imposed on the HTTP API by the temporary arena. Element borrows and nominal String-array
 views remain excluded from the current backend profile.
+
+## UTF-8 construction and joins — 2026-10-08 development
+
+The author-selected StringBuilder/String.Join slice adds ordinary System.Runtime
+Raven declarations and the exact private service
+`StringJoinParts(arrayref<String>, Int32, String, Int32) -> String`. Parameters are
+the initialized prefix, count, separator and expected UTF-8 bytes. Runtime services
+validate the prefix and byte sum before one immutable result allocation. Null or
+uninitialized service inputs fault; spare checked capacity is not read.
+
+The CLI reference bridge projects a sealed System.Text.StringBuilder class, fluent
+class returns, properties, ToString override, and String.Join's string-array overload.
+The bootstrap-only RuntimeServices facade maps the exact join signature. Native
+metadata instead carries the real source-owned class and namespace InternalCall;
+RuntimeStringServices is a source wrapper, not a public compatibility API. Existing
+RavenTargetPlatform/metadata/core/unit/array ownership configuration is unchanged;
+ordinary .NET still resolves its own framework StringBuilder and String.Join.
+The legacy importer now recognizes String's source-owned sequence constructor and
+imports its authored equality operators instead of rejecting the refreshed source.
+Bad storage, signatures and constructors remain rejected by focused checks.
+
+Public semantics, limits and .NET differences are in
+[the design](design/string-building.md). No formatting/iterable join bridge, typed
+TryAppend error, new CIL instruction or stable native ABI is implied. The managed
+class owns fragments/snapshots; Rust and the statically linked AOT C adapter own
+materialization and fault behavior. AOT retains callvirt null checks when projecting
+verified sealed-owner methods. General class virtual dispatch remains outside that
+projection. The temporary CLI inventory is replaced by direct native metadata in
+native builds; API documentation still consumes the matching aggregate CLI reference.
+
+Validation: [same-source consumers and benchmark](experiments/string-building/README.md),
+matching native class-library bundle from Raven `codex/source-object-metadata-resolution`
+revision `2acfd40ecc88f5ae45ec4178e2f310c12cee8113`, interpreter/native results and fault
+stacks, sanitized C kernels, and opaque legacy bridge admission tests. neoCLR work is
+on main. Compiler availability alone does not imply a published runtime release.

@@ -1,0 +1,41 @@
+import System.*
+import System.Text.*
+func Main() -> int {
+    let builder = StringBuilder(32)
+    builder.Append("e").Append("́")
+    let first = builder.ToString()
+    if first != "é" || builder.Utf8ByteCount != 3 {
+        System.Fail("UTF-8 construction mismatch")
+    }
+    builder.AppendLine("!").AppendLine()
+    let second = builder.ToString()
+    if second != "é!\n\n" || first != "é" || builder.ToString() != second {
+        System.Fail("Snapshot mismatch")
+    }
+    builder.Clear().Append("reused")
+    if builder.ToString() != "reused" || second != "é!\n\n" || builder.MaxUtf8Bytes != 32 {
+        System.Fail("Clear/reuse mismatch")
+    }
+    let exact = StringBuilder(3).Append("é")
+    if exact.Utf8ByteCount != 3 || exact.ToString() != "é" {
+        System.Fail("Exact limit mismatch")
+    }
+    let empty = StringBuilder(0).Append("")
+    if empty.ToString() != "" || empty.Utf8ByteCount != 0 {
+        System.Fail("Empty builder mismatch")
+    }
+    let values = ["e", "", "́"]
+    if String.Join("•", values) != "e••́" || String.Join("", values) != "é" {
+        System.Fail("Separator mismatch")
+    }
+    let snapshot = String.Join("/", values)
+    values[0] = "changed"
+    if snapshot != "e//́" {
+        System.Fail("Join snapshot changed")
+    }
+    let noValues = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(0)
+    if String.Join("unused", noValues) != "" || String.Join("unused", ["only"]) != "only" {
+        System.Fail("Empty or singleton join mismatch")
+    }
+    return 0
+}

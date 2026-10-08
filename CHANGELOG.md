@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add development System.Text.StringBuilder with fluent append, atomic byte-limit
+  faults, LF line append, clear/reuse and cached immutable snapshots. Add separator-aware
+  String.Join for initialized non-null string arrays. Share checked one-allocation
+  materialization between interpreter and native C services; retain existing GC owners.
+  Admit verified sealed-owner native virtual calls while preserving null checks.
+  Refresh CLI library/reference projections, String constructor/operator admission,
+  API documentation and executable samples. Compare construction workloads in both
+  modes; the current builder is not a demonstrated performance improvement over Concat.
+  This author-selected side quest revisits the earlier deferral; native HTTP remains WIP.
+
 - Add bounded AOT execution of existing Function metadata: static/bound heap callbacks,
   typed stored values, closed generic owners, GC receiver retention and result handoff.
   Preserve interpreter fault diagnostics, including null binding versus null invocation.
@@ -23,7 +33,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   in both modes. The full server now reaches the 128-type specialization budget; HTTP
   enum storage and task/socket completion remain open. No public API, Raven compiler
   or bridge contract changes. Record the StringBuilder discussion and existing deferred
-  prototype evidence; no public builder or change in roadmap priority is introduced.
+  prototype evidence; the subsequent author-selected builder side quest is described above.
 
 - Extend AOT erased transport and closed specialization with Int64/UInt64, preserving
   high bits and exact type tags through generic calls. Admit full-width equality;

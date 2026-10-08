@@ -1,0 +1,5 @@
+import System.Text.*
+
+func Main() -> int {
+    return StringBuilder(-1).Utf8ByteCount
+}

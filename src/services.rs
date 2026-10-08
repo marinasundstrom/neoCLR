@@ -1,7 +1,7 @@
 //! Logical runtime-service uses; no target ABI or ownership policy is implied.
 use crate::{
-    Fault,
     metadata::{Function, Instruction as Op},
+    Fault,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -180,6 +180,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             crate::native::Binding::CharCategory => RuntimeService::CharacterClassification,
             crate::native::Binding::Utf8Encode
             | crate::native::Binding::Utf8Decode
+            | crate::native::Binding::StringJoinParts
             | crate::native::Binding::StringFromChars
             | crate::native::Binding::StringGraphemeAt
             | crate::native::Binding::StringIntern
@@ -252,6 +253,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
                 | crate::native::Binding::EnvironmentArguments
                 | crate::native::Binding::Utf8Encode
                 | crate::native::Binding::Utf8Decode
+                | crate::native::Binding::StringJoinParts
                 | crate::native::Binding::StringFromChars
         ) {
             uses.push(ServiceUse {

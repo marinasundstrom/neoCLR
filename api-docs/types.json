@@ -320,6 +320,7 @@
   "System.Text.EncodingError.UnrepresentableText",
   "System.Text.Encodings",
   "System.Text.InvalidUtf8Error",
+  "System.Text.StringBuilder",
   "System.Text.UnicodeScalar",
   "System.Text.Utf8",
   "System.Text.Utf8SliceError",

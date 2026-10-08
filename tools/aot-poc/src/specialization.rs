@@ -315,7 +315,7 @@ impl Specializer<'_> {
                     }
                     let instance = self.resolve(&closed)?;
                     let callee = &self.source.functions[instance.source];
-                    if virtual_call && !super::selection::interface_contract(self.source, callee) && !super::selection::object_display_contract(callee) && (callee.is_virtual || callee.is_abstract || callee.is_override) {
+                    if virtual_call && !super::selection::interface_contract(self.source, callee) && !super::selection::object_display_contract(callee) && !super::selection::sealed_member(self.source, callee) && (callee.is_virtual || callee.is_abstract || callee.is_override) {
                         return Err("virtual calls requiring dispatch need a later specialization profile".into());
                     }
                     if !virtual_call && super::selection::object_display_contract(callee) {

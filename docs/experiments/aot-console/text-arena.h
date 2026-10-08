@@ -61,6 +61,13 @@ int32_t neoclr_utf8_decode_v1(const void *array, neoclr_aot_text_arena *arena, v
 int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_text *right,
                                neoclr_aot_text_arena *arena, const neoclr_aot_text **output);
 
+/* Private bounded StringBuilder materialization. Join the initialized prefix of a
+ * String[] into one immutable UTF-8 allocation. Validate the exact byte count
+ * (0..Int32.MaxValue) before allocating. Invalid/null/uninitialized inputs return 3;
+ * exhaustion returns 5. Failure publishes no output. No collection/reentry. */
+int32_t neoclr_string_join_parts_v1(const void *parts, int32_t count, const neoclr_aot_text *separator, int32_t expected,
+                                  neoclr_aot_text_arena *arena, const neoclr_aot_text **output);
+
 /* Exact ASCII [+-]?[0-9]+; complete grammar validation precedes range.
  * Publishes erased Int32 or Byte(1=InvalidFormat, 2=Overflow), no allocation.
  * Null arguments fault without publishing output. */

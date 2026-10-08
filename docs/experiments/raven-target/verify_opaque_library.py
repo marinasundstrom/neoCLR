@@ -33,7 +33,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
         ('StringExtraStorage', 'String', strings.replace('private field m_value:', 'private field extra: int\n    private field m_value:'), 'String storage'),
         ('StringWrite', 'String', strings.replace('return RuntimeServices.StringByteCount(m_value)', 'm_value = "changed"\n        return 0'), 'backing storage is readonly'),
         ('StringConstruct', 'String', strings.replace('return RuntimeServices.StringByteCount(m_value)', 'let value = String()\n        return 0'), 'requires a runtime factory'),
-        ('StringSignature', 'String', strings.replace('Concat(value0:', 'Concat(renamed:').replace('StringConcat(value0,', 'StringConcat(renamed,'), 'export does not match'),
+        ('StringSignature', 'String', strings.replace('Concat(left: string,', 'Concat(renamed: string,').replace('StringConcat(left, right)', 'StringConcat(renamed, right)'), 'export does not match'),
     ]
     for name, owner, text, diagnostic in cases:
         folder = root / name
@@ -45,6 +45,9 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
   <Import Project="{escape(str(ROOT / 'build/NeoCLR.Raven.props'))}" />
   <ItemGroup><Compile Include="Main.rvn" /></ItemGroup>
 </Project>''')
+        if name == 'StringConstruct':
+            run(['dotnet', args.compiler.resolve(), project, '--no-project-restore', '-o', folder / 'bin'], 'RAV1501')
+            continue  # Source-owned String exposes no parameterless constructor.
         run(['dotnet', args.compiler.resolve(), project, '--no-project-restore', '-o', folder / 'bin'])
         output = folder / 'imported'
         run(['dotnet', args.bridge.resolve(), '--library-implementation', folder / 'bin' / (name + '.dll'),

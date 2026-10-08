@@ -245,6 +245,52 @@ int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_te
 }
 
 
+int32_t neoclr_string_join_parts_v1(const void *parts, int32_t count, const neoclr_aot_text *separator, int32_t expected,
+                                  neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    if (!parts || !separator || !output || count < 0 || expected < 0)
+        return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    const unsigned char *array = parts;
+    uint64_t kind, capacity;
+    memcpy(&kind, array, 8);
+    memcpy(&capacity, array + 8, 8);
+    if ((kind != UINT64_C(0x80000003) && kind != UINT64_C(0x80000004)) ||
+        capacity > 65536 || (uint64_t)count > capacity)
+        return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t separators = count > 0 ? (uint64_t)(count - 1) : 0;
+    if (separators && separator->length > (uint64_t)expected / separators)
+        return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t length = separators * separator->length;
+    for (int32_t i = 0; i < count; i++) {
+        if (kind == UINT64_C(0x80000004) && !array[16 + capacity * 8 + (uint32_t)i])
+            return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+        const neoclr_aot_text *part;
+        memcpy(&part, array + 16 + (uint32_t)i * 8, 8);
+        if (!part || part->length > (uint64_t)expected - length)
+            return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+        length += part->length;
+    }
+    if (length != (uint64_t)expected) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    void *storage;
+    int32_t status = reserve_storage(arena, 8 + length, TEXT_STORAGE, &storage);
+    if (status) return status;
+    neoclr_aot_text *text = storage;
+    text->length = length;
+    uint64_t offset = 0;
+    for (int32_t i = 0; i < count; i++) {
+        const neoclr_aot_text *part;
+        memcpy(&part, array + 16 + (uint32_t)i * 8, 8);
+        if (i) {
+            memcpy(text->bytes + offset, separator->bytes, (size_t)separator->length);
+            offset += separator->length;
+        }
+        memcpy(text->bytes + offset, part->bytes, (size_t)part->length);
+        offset += part->length;
+    }
+    *output = text;
+    return NEOCLR_AOT_FAULT_NONE;
+}
+
+
 int32_t neoclr_parse_int32_v1(const neoclr_aot_text *text, void *output) {
     if (!text || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     uint64_t start = 0;

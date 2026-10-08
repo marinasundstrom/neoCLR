@@ -1,0 +1,102 @@
+namespace System.Text
+
+import System.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+/// Builds immutable UTF-8 strings within an explicit byte limit. Not thread-safe.
+public class StringBuilder {
+    private var parts: string[] = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(0)
+    private var count: int = 0
+    private var size: int = 0
+    private var limit: int = 65536
+    private var snapshot: string = ""
+    private var dirty: bool = false
+
+    /// Creates an empty builder with a 65536-byte limit.
+    init() { }
+
+    /// Creates an empty builder; maxUtf8Bytes must be between zero and 65536.
+    init(maxUtf8Bytes: int) {
+        if !(maxUtf8Bytes >= 0) || maxUtf8Bytes > 65536 {
+            System.Fail("StringBuilder limit must be between 0 and 65536 UTF-8 bytes")
+        }
+        limit = maxUtf8Bytes
+    }
+
+    /// Number of UTF-8 bytes currently stored, rather than graphemes or UTF-16 units.
+    val Utf8ByteCount: int => size
+
+    /// Maximum permitted UTF-8 byte count.
+    val MaxUtf8Bytes: int => limit
+
+    /// Appends text and returns this builder. A limit fault leaves content unchanged.
+    func Append(text: string) -> StringBuilder {
+        let bytes = text.GetUtf8ByteCount()
+        if bytes > limit - size {
+            System.Fail("StringBuilder UTF-8 byte limit exceeded")
+        }
+        if bytes == 0 {
+            return self
+        }
+        var buffer = parts
+        if count == buffer.Length {
+            var capacity = 4
+            if count != 0 {
+                capacity = count * 2
+            }
+            if capacity > limit {
+                capacity = limit
+            }
+            buffer = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(capacity)
+            var index = 0
+            while index < count {
+                buffer[index] = parts[index]
+                index += 1
+            }
+        }
+        buffer[count] = text
+        parts = buffer
+        count += 1
+        size += bytes
+        dirty = true
+        return self
+    }
+
+    /// Appends text and LF atomically. HTTP framing must use explicit CRLF instead.
+    func AppendLine(text: string) -> StringBuilder {
+        if text.GetUtf8ByteCount() >= limit - size {
+            System.Fail("StringBuilder UTF-8 byte limit exceeded")
+        }
+        return Append(String.Concat(text, "\n"))
+    }
+
+    /// Appends LF and returns this builder.
+    func AppendLine() -> StringBuilder {
+        return Append("\n")
+    }
+
+    /// Releases retained fragments and resets content, preserving the byte limit.
+    func Clear() -> StringBuilder {
+        let empty = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(0)
+        parts = empty
+        count = 0
+        size = 0
+        snapshot = ""
+        dirty = false
+        return self
+    }
+
+    /// Returns a cached immutable snapshot, independent of subsequent mutations.
+    override func ToString() -> string {
+        if dirty {
+            let text = RuntimeServices.StringJoinParts(parts, count, "", size)
+            let compact = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(1)
+            compact[0] = text
+            parts = compact
+            count = 1
+            snapshot = text
+            dirty = false
+        }
+        return snapshot
+    }
+}

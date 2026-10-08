@@ -422,6 +422,15 @@ pub fn prepare(
             }
         }
     }
+    let sealed_members: Vec<_> = selected.functions.iter().enumerate()
+        .filter(|(_, f)| (f.is_virtual || f.is_override) && super::selection::sealed_member(&selected, f))
+        .map(|(i, _)| i).collect();
+    for &i in &sealed_members {
+        selected.functions[i].is_virtual = false;
+        selected.functions[i].is_override = false;
+    }
+    report["sealedMemberProjections"] = json!(sealed_members.iter().map(|i| json!({"compiledIndex":i,
+        "policy":"verified sealed reference owner; retain callvirt null checks and ordinary method body"})).collect::<Vec<_>>());
     super::boxing::project(&mut selected, &mut report)?;
     let boxed_display = report["int32Boxes"].as_array().is_some_and(|r| !r.is_empty())
         && report["objectDisplayDispatch"].as_array().is_some_and(|r| !r.is_empty());

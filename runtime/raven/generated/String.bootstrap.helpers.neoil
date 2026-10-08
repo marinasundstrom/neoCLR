@@ -1,4 +1,9 @@
 ; Generated from runtime/raven/src/System/String.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.String.RuntimeStringGetUtf8ByteCount(String source) -> Int32
+ldarg source
+call instance System.String::GetUtf8ByteCount()
+ret
+.end
 .function neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorNewSystemTextUtf8SliceErrorOutOfRange(System.Text.Utf8SliceError.OutOfRange value) -> System.Text.Utf8SliceError
 ldarg value
 newobj instance System.Text.Utf8SliceError::.ctor(System.Text.Utf8SliceError.OutOfRange)

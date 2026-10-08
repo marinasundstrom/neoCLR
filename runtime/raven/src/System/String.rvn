@@ -44,6 +44,30 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         return RuntimeServices.StringConcat(left, right)
     }
 
+    /// Joins initialized non-null strings, inserting separator between every pair.
+    /// Empty input produces an empty string; size overflow faults before allocation.
+    static func Join(separator: string, values: string[]) -> string {
+        let count = values.Length
+        let separatorBytes = separator.GetUtf8ByteCount()
+        var size = 0
+        var index = 0
+        while index < count {
+            if index != 0 {
+                if separatorBytes > 2147483647 - size {
+                    System.Fail("String.Join UTF-8 byte count overflow")
+                }
+                size += separatorBytes
+            }
+            let bytes = values[index].GetUtf8ByteCount()
+            if bytes > 2147483647 - size {
+                System.Fail("String.Join UTF-8 byte count overflow")
+            }
+            size += bytes
+            index += 1
+        }
+        return RuntimeServices.StringJoinParts(values, count, separator, size)
+    }
+
     /// Concatenates textual representations; null contributes an empty string.
     static func Concat(left: Object?, right: Object?) -> string {
         let first = if left is Object value { value.ToString() } else { "" }

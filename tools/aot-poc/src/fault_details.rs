@@ -24,6 +24,7 @@ pub struct Options {
     pub string_contains_ordinal: Vec<usize>,
     pub string_starts_with_ordinal: Vec<usize>,
     pub string_ends_with_ordinal: Vec<usize>,
+    pub string_join_parts: Vec<usize>,
     pub string_concat: Vec<usize>,
     pub string_byte_count: Vec<usize>,
     pub utf8_decode: Vec<usize>,
@@ -123,6 +124,9 @@ impl Options {
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             string_ends_with_ordinal: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "string-ends-with-ordinal-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            string_join_parts: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-join-parts-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             string_concat: report
                 .and_then(|r| r["nativeBindings"].as_array())

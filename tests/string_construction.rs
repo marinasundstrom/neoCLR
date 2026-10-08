@@ -162,3 +162,70 @@ ret
         Value::String("é👩‍💻".into())
     );
 }
+
+#[test]
+fn join_parts_validates_prefix_byte_count_and_preserves_snapshot() {
+    for (count, bytes, expected) in [
+        (0, 0, Some("")),
+        (1, 1, Some("e")),
+        (2, 6, Some("e•́")),
+        (3, 3, None),
+        (-1, 0, None),
+        (2, 2, None),
+        (2, 4, None),
+        (2, 65537, None),
+        (4, 3, None),
+    ] {
+        let source = format!(
+            r#"
+.module JoinParts
+.entry Main
+.function Main() -> String
+.local arrayref<String> parts
+.local String snapshot
+ldc.i4 3
+array.reserve String
+stloc parts
+ldloc parts
+ldc.i4 0
+ldstr "e"
+stelem String
+ldloc parts
+ldc.i4 1
+ldstr "́"
+stelem String
+ldloc parts
+ldc.i4 {count}
+ldstr "•"
+ldc.i4 {bytes}
+call neoCLR.Runtime.StringJoinParts(arrayref<String>,Int32,String,Int32)
+stloc snapshot
+ldloc parts
+ldc.i4 0
+ldstr "changed"
+stelem String
+ldloc snapshot
+ret
+.end
+"#
+        );
+        let library = neoclr::assemble(concat!(
+            ".module System\n",
+            include_str!("../runtime/neoCLR/Runtime/StringJoinParts.neoil")
+        ))
+        .unwrap();
+        let module = neoclr::assemble(&source).unwrap();
+        let p = LoadedProgram::with_library(&module, &library).unwrap();
+        p.verify().unwrap();
+        match expected {
+            Some(text) => assert_eq!(
+                p.run(Limits::default()).unwrap().value,
+                Value::String(text.into())
+            ),
+            None => assert_eq!(
+                p.run(Limits::default()).unwrap_err().code,
+                FaultCode::RuntimeError
+            ),
+        }
+    }
+}
