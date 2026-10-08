@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Fix Raven portable emission of discarded awaits by retaining statement-boundary
+  control flow. Add a native success consumer and remove the named-local workaround
+  from the async callback-fault sample. Nested expressions retain their operand guard;
+  runtime contracts and metadata formats are unchanged. Raven `2c8c1f9de` passes
+  67 focused compiler controls and three native/interpreter consumer comparisons.
+  Four .NET controls also pass unchanged on Raven main; its portable backend is absent.
+  Strengthen the consumer verifier to compare standalone output/fault text with the
+  interpreter as well.
+
 - Add bounded native `DrainEntryTasks` support for queue-only async entry points.
   Keep startup roots live through callbacks, release the entry-drain guard on faults,
   and reject entry pumping with host socket completions. The separate quiescent host

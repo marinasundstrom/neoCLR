@@ -8,6 +8,10 @@ now replace the source protocol names. The native class-interface callback slice
 passes three real async consumers and focused GC/fault checks. The subsequent
 `DrainEntryTasks` slice adds queue-only entry pumping; host-I/O async entry waiting
 remains a runtime service gap. See the [sample assessment](experiments/aot-sample-assessment/README.md).
+The portable Raven emitter now also preserves statement context for discarded awaits;
+[native success/fault checks](../benchmarks/native-web/discard-await-validation.json)
+cover the corrected source form. This is a compiler correction, not new scheduling
+or metadata capability. The portable planner is not yet on Raven main.
 The wider audit also found the handwritten legacy union bridge's `IUnion`; it now
 uses `UnionValue`, with regenerated fragments and executable union/time checks. This does not change the bootstrap release gate or promise
 runtime suspension, JIT, reflection or stable callback ABI support.

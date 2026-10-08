@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
-p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault', 'PrimitiveMembers', 'AsyncEntry', 'AsyncEntryFault', 'AsyncEntryPending', 'AsyncEntryCancelled'))
+p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault', 'PrimitiveMembers', 'AsyncEntry', 'AsyncEntryFault', 'AsyncEntryPending', 'AsyncEntryCancelled', 'AsyncEntryDiscard'))
 a = p.parse_args()
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
@@ -65,6 +65,8 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultLis
     executed = run([native], expected)
     if name == 'AsyncEntry':
         assert executed.stdout == 'Suspended\n42\n'
+    if name == 'AsyncEntryDiscard':
+        assert executed.stdout == 'Queued\nResumed\n'
     if name == 'AsyncEntryFault':
         assert 'Async entry callback fault' in executed.stderr
     if name == 'PrimitiveMembers':
@@ -81,7 +83,9 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultLis
     dependencies = run(['otool', '-L', plain]).stdout.splitlines()[1:]
     if [line.split()[0] for line in dependencies] != ['/usr/lib/libSystem.B.dylib']:
         raise RuntimeError(dependencies)
-    run([plain], expected)
+    standalone = run([plain], expected)
+    if standalone.stdout != interpreted.stdout or standalone.stderr != interpreted.stderr:
+        raise RuntimeError(f'Standalone output/fault mismatch: {standalone} vs {interpreted}')
     for f in (assembly, obj, plain):
         report['inputs'][str(f)] = hashlib.sha256(f.read_bytes()).hexdigest()
     save()

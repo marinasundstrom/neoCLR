@@ -6909,3 +6909,37 @@ and `42`. Native-enabled compiler rebuild succeeds. This is tested on
 `codex/source-object-metadata-resolution`; the general cache fix is independently
 on Raven main as `d0a115dcf`. No bridge-free bootstrap or general native async
 entry-draining support is claimed.
+
+
+## Discarded await portable emission correction (2026-10-08)
+
+Native semantic intent: `_ = await task` must still await completion and execute the
+continuation, discarding only the resulting value. Raven's portable emitter dropped
+the enclosing statement-boundary context, so its async suspension branch was rejected
+as `value block cannot exit its enclosing expression`. It now forwards that context;
+a discard inside a larger expression retains the earlier-operand restriction.
+
+There is no new temporary CLI encoding, metadata schema or runtime representation.
+Existing state-machine/Task contracts remain in effect, with the explicit
+`System.Runtime` async provider and unprefixed `AsyncStateMachine`/`TaskAwaiter` names.
+The compiler owns control-flow emission; interpreted/native entry draining owns task
+progress. Queue-only native entry support does not imply host-I/O waits or suspension.
+No semantic-model or Runtime Contract configuration behavior is changed.
+
+The fix is on Raven's `codex/source-object-metadata-resolution` integration line.
+The portable planner is absent from Raven main, so the general correction must move
+with that backend rather than importing its dependencies as a one-line patch. This
+remains shared compiler work, not a permanent target-specific discard rule. The
+native consumer uses unchanged metadata/runtime bundles with the corrected compiler.
+
+Raven `2c8c1f9de` passes 67 focused shared-body/.NET async controls. The same emitted
+artifacts for discarded-await success, discarded-await callback fault and the existing
+async-entry sample pass interpreter, sanitized native and standalone execution. Exact
+stdout/stderr/exit comparisons, heap/frame cleanup and libSystem-only standalone
+linkage pass; HTTP still passes compiler admission.
+[Commands, hashes and evidence](../benchmarks/native-web/discard-await-validation.json).
+
+Independent main comparison: the same four .NET completed/pending discarded-await
+controls pass on Raven main `d0a115dcf`. Its portable planner is absent, and its .NET
+emitter needs no corresponding fix. The temporary control file was removed and the
+integration branch restored; no main compiler change is claimed.

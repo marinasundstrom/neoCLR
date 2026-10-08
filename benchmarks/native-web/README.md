@@ -344,3 +344,11 @@ pumping with host I/O remains rejected; ordinary callback-driven HTTP is unchang
 [Recorded five-case validation](async-entry-validation.json) includes the existing
 `QueuePumpFault` regression, exact standalone output/fault comparisons and successful
 HTTP compiler admission. All recorded inputs were unchanged during that run.
+
+`--case AsyncEntryDiscard` checks `_ = await` with a queued completion and literal
+`Queued`/`Resumed` output. `AsyncEntryFault` now also uses discarded await directly.
+The verifier checks standalone output and fault text against the interpreter, in
+addition to its existing sanitized comparison and standalone dependency check.
+
+[Discarded-await validation](discard-await-validation.json) records the corrected
+Raven compiler, three matching consumers and the unchanged HTTP admission result.

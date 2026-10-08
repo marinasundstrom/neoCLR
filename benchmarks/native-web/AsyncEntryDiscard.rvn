@@ -4,8 +4,10 @@ import System.Tasks.*
 async func Main() -> Task<unit> {
     let result = Promise<int>()
     TaskQueue.Default.Post(() => {
-        System.Fail("Async entry callback fault")
+        System.Console.WriteLine("Queued")
+        _ = result.Complete(41)
     })
     _ = await result.Task
+    System.Console.WriteLine("Resumed")
     return ()
 }

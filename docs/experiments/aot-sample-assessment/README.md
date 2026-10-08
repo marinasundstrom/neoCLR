@@ -309,10 +309,10 @@ used as an in-guest wait. See the [private lifecycle contract](../aot-console/ta
 A new callback-fault consumer initially used `_ = await result.Task` and reached
 Raven's `value block cannot exit its enclosing expression` native-emission diagnostic.
 Changing that statement to a named awaited local followed by `WriteLine` emitted
-successfully with the same compiler/bundle. This is a deferred Raven lowering/emission
-candidate, not an AOT runtime failure; no fix or general .NET comparison is claimed.
-The callback faults before the write, so the final consumer isolates runtime fault
-propagation without relying on the unsupported discarded-await shape.
+successfully with the same compiler/bundle. That isolated a Raven lowering/emission
+candidate rather than an AOT runtime failure. The subsequent discarded-await correction is recorded below.
+In that earlier consumer, the callback faulted before the write, isolating runtime
+fault propagation without relying on the then-unsupported discarded-await shape.
 
 [Five-case executable evidence](../../../benchmarks/native-web/async-entry-validation.json)
 records exact exit/output/fault parity for async success, callback fault, pending and
@@ -320,3 +320,26 @@ cancelled entries, plus the existing post-entry queue fault. All pass sanitized 
 standalone native execution with libSystem-only linkage and cleanup checks. The HTTP
 server still passes compiler admission; its request/throughput evidence is reused,
 not rerun or remeasured by this slice. The original 104-case survey remains historical.
+
+## Discarded await compiler correction (2026-10-08)
+
+The portable compiler now preserves empty-stack statement context through discard
+assignment. `_ = await task` may suspend and resume before dropping the result; the
+same syntax inside a larger value expression retains the previous stack-safety guard.
+The native callback-fault sample no longer needs a named-local workaround, and a
+separate successful consumer prints `Queued` then `Resumed`.
+
+Raven main does not yet contain the portable planner. The correction belongs with
+that shared backend on the integration line; the independently usable .NET async
+controls cover both completed and pending awaits in Debug and Release. This does not
+change target profiles, metadata encodings, runtime APIs or the host-I/O entry gap.
+
+[Three-case executable evidence](../../../benchmarks/native-web/discard-await-validation.json)
+uses Raven `2c8c1f9de`: success, callback fault and the original async entry agree in
+interpreter, sanitized native and standalone execution. HTTP compiler admission still
+passes. Existing HTTP timing evidence is unchanged; this is a compiler correctness fix.
+
+The four .NET controls also pass independently on Raven main `d0a115dcf` with no
+implementation change. This confirms the integration portable-emitter gap without
+misclassifying it as a main .NET regression. The temporary control file was removed
+and the Raven integration checkout restored after the comparison.
