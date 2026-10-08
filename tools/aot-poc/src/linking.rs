@@ -17,6 +17,7 @@ pub struct RuntimeContext {
     pub bind_character_text: bool,
     pub bind_integer_text: bool,
     pub bind_socket_listener: bool,
+    pub bind_socket_accept: bool,
     pub reference_arena: bool,
 }
 
@@ -311,6 +312,11 @@ pub fn prepare(
         let rows = super::bindings::socket_listener(&mut selected, &report)?;
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
     }
+    let bind_socket_accept = context.is_some_and(|c| c.bind_socket_accept);
+    if bind_socket_accept {
+        let rows = super::bindings::socket_accept(&mut selected, &report)?;
+        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+    }
     let reference_arena = context.is_some_and(|c| c.reference_arena);
     report["referenceArena"] = json!(reference_arena);
     if reference_arena {
@@ -552,7 +558,7 @@ pub fn prepare(
     }
     report["loadSet"] = json!({"modules": inputs.iter().map(|m| json!({"name": m.name, "revision": m.revision})).collect::<Vec<_>>(),
         "validation": "all original bodies verified with runtime binder before private canonical projection",
-        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "bindConsoleWriteLine": bind_console_write_line, "bindConsoleStreamOutput": bind_console_stream_output, "bindInt32ToString": bind_int32_to_string, "bindUtf8Text": bind_utf8_text, "bindCharacterText": bind_character_text, "bindIntegerText": bind_integer_text, "bindSocketListener": bind_socket_listener, "referenceArena": reference_arena, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
+        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "bindConsoleWriteLine": bind_console_write_line, "bindConsoleStreamOutput": bind_console_stream_output, "bindInt32ToString": bind_int32_to_string, "bindUtf8Text": bind_utf8_text, "bindCharacterText": bind_character_text, "bindIntegerText": bind_integer_text, "bindSocketListener": bind_socket_listener, "bindSocketAccept": bind_socket_accept, "referenceArena": reference_arena, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
         "limits": "up to 128 closed value/reference/interface shapes and 128 function clones; primitive static generic methods; one to eight explicit dependencies; no dynamic loading"});
     Ok((selected, report))
 }

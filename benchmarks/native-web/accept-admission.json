@@ -1,0 +1,113 @@
+{
+  "baseRevision": "a31d8da64be0e34d70174c8a56697a2757e9b189",
+  "scope": "Raven Server native admission only; not execution",
+  "command": [
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+    "--inspect",
+    "/Users/robert/Projects/neoclr/target/native-host-callback-validation/Server.dll",
+    "@entry",
+    "--closed-world",
+    "--system",
+    "/private/tmp/string-builder-native1008d/System.runtime.neox",
+    "--module",
+    "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+    "--module",
+    "/private/tmp/string-builder-native1008d/System.Web.dll",
+    "--module",
+    "/private/tmp/string-builder-native1008d/System.Networking.dll",
+    "--module",
+    "/private/tmp/string-builder-native1008d/System.Data.dll",
+    "--object-root",
+    "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+    "--compile-system",
+    "--bind-user-fault",
+    "--reference-arena",
+    "--native-gc",
+    "--bind-int32-to-string",
+    "--bind-utf8-text",
+    "--bind-socket-listener",
+    "--bind-console-write-line",
+    "--bind-integer-text",
+    "--bind-socket-accept"
+  ],
+  "admission": {
+    "accepted": false,
+    "firstError": "neoCLR.Runtime.SocketReceive: unsupported value member contract",
+    "phase": "compilation"
+  },
+  "nativeBindings": [
+    {
+      "compiledIndex": 243,
+      "definition": {
+        "index": 9,
+        "module": "NeoMetadata_40D79FC0B3932A3A425471CCEA184165691C48877A93B817F2C054993299299E",
+        "revision": "1.0.0.0"
+      },
+      "implementation": "socket-close-v1",
+      "name": "neoCLR.Runtime.SocketClose",
+      "storage": "explicit host socket scope; 64 listeners; no guest references or callbacks retained",
+      "symbol": "neoclr_socket_close_v1"
+    },
+    {
+      "compiledIndex": 245,
+      "definition": {
+        "index": 11,
+        "module": "NeoMetadata_40D79FC0B3932A3A425471CCEA184165691C48877A93B817F2C054993299299E",
+        "revision": "1.0.0.0"
+      },
+      "implementation": "socket-listen-v1",
+      "name": "neoCLR.Runtime.SocketListen",
+      "storage": "explicit host socket scope; 64 listeners; no guest references or callbacks retained",
+      "symbol": "neoclr_socket_listen_v1"
+    },
+    {
+      "compiledIndex": 247,
+      "definition": {
+        "index": 13,
+        "module": "NeoMetadata_40D79FC0B3932A3A425471CCEA184165691C48877A93B817F2C054993299299E",
+        "revision": "1.0.0.0"
+      },
+      "implementation": "socket-local-port-v1",
+      "name": "neoCLR.Runtime.SocketLocalPort",
+      "storage": "explicit host socket scope; 64 listeners; no guest references or callbacks retained",
+      "symbol": "neoclr_socket_local_port_v1"
+    },
+    {
+      "compiledIndex": 240,
+      "definition": {
+        "index": 6,
+        "module": "NeoMetadata_40D79FC0B3932A3A425471CCEA184165691C48877A93B817F2C054993299299E",
+        "revision": "1.0.0.0"
+      },
+      "implementation": "socket-connect-result-v1",
+      "name": "neoCLR.Runtime.SocketConnectResult",
+      "storage": "explicit host socket scope; 64 accept operations; rooted callbacks; owner-thread deferred polling",
+      "symbol": "neoclr_socket_connect_result_v1"
+    },
+    {
+      "compiledIndex": 246,
+      "definition": {
+        "index": 12,
+        "module": "NeoMetadata_40D79FC0B3932A3A425471CCEA184165691C48877A93B817F2C054993299299E",
+        "revision": "1.0.0.0"
+      },
+      "implementation": "socket-accept-v1",
+      "name": "neoCLR.Runtime.SocketAccept",
+      "storage": "explicit host socket scope; 64 accept operations; rooted callbacks; owner-thread deferred polling",
+      "symbol": "neoclr_socket_accept_v1"
+    },
+    {
+      "compiledIndex": 252,
+      "definition": {
+        "index": 20,
+        "module": "NeoMetadata_40D79FC0B3932A3A425471CCEA184165691C48877A93B817F2C054993299299E",
+        "revision": "1.0.0.0"
+      },
+      "implementation": "socket-cancel-v1",
+      "name": "neoCLR.Runtime.SocketCancel",
+      "storage": "explicit host socket scope; 64 accept operations; rooted callbacks; owner-thread deferred polling",
+      "symbol": "neoclr_socket_cancel_v1"
+    }
+  ],
+  "aotSha256": "a3cf7c070a5d3e922ee1ec7502780cac3bae7c8122715253c2613df5ab549c60"
+}

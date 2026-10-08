@@ -106,3 +106,25 @@ accept, independent accepted-socket lifetime and abandoned-operation cleanup on 
 The existing native listener lifecycle fixture passes with its GC dependencies linked;
 the non-GC listener kernel also passes separately. GC-enabled users of socket-listener.c
 must now link native-gc.c and root-probe.c even when only synchronous methods are used.
+
+## CIL accept bindings — 2026-10-08
+
+`--bind-socket-accept` now admits the exact reserved SocketAccept(Int64, fn<Void>)
+-> Value, SocketConnectResult(Int64) -> Value and SocketCancel(Int64) -> Boolean
+InternalCall contracts. It requires --compile-system and --native-gc (and therefore
+--reference-arena). Listen/LocalPort/Close still use --bind-socket-listener. Ordinary
+managed bodies with these names are rejected, not replaced. Native root exhaustion
+propagates NativeMemoryLimit rather than being collapsed to RuntimeError.
+
+The compiled `socket-accept.neoil` consumer creates a receiver, binds its completion,
+submits accept and saves the returned operation token in the receiver before returning
+the port. The host connects, polls and dispatches; the compiled callback consumes the
+result and closes the accepted socket. A second run cancels before polling. Sanitized
+checks verify no remaining operations/roots, GC reclamation, retained receiver state,
+listener-only ownership after completion and canaries. The focused negative test checks
+missing/duplicate options, required GC and managed impostors for all three services.
+
+Full Raven Server admission with the new flag clears these services and next rejects
+SocketReceive. This is compiled CIL/native loopback evidence, not a completed Raven
+HttpServer or a throughput comparison. TaskQueue integration and transfer services
+remain necessary. [Admission evidence](../../../benchmarks/native-web/accept-admission.json).

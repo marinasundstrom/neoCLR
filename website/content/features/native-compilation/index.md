@@ -99,7 +99,8 @@ an advantage over it; useful comparisons require equivalent behavior and measure
   Private host root handles now retain allocations across guest frame returns, with
   explicit release and entry-reset checks. Private host dispatch can invoke retained
   zero-argument Void callbacks between guest calls. A native accept kernel passes
-  loopback completion/cancellation tests. CIL binding and task-queue/socket integration,
+  loopback completion/cancellation tests, including compiled CIL callbacks. Transfer
+  services and task-queue integration,
   precise maps, pressure scheduling and general hosting handles remain open.
 - **Faults:** tested paths preserve fault codes, messages and managed stack traces.
   This does not yet qualify every server disconnect, cancellation or cleanup path.

@@ -306,6 +306,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     let mut socket_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
+            (&d.socket_accept, "neoclr_socket_accept_v1", vec![types::I64, types::I64, types::I64, types::I64]),
+            (&d.socket_connect_result, "neoclr_socket_connect_result_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.socket_cancel, "neoclr_socket_cancel_v1", vec![types::I64, types::I64, types::I64]),
             (&d.socket_listen, "neoclr_socket_listen_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
             (&d.socket_local_port, "neoclr_socket_local_port_v1", vec![types::I64, types::I64, types::I64]),
             (&d.socket_close, "neoclr_socket_close_v1", vec![types::I64, types::I64, types::I64]),
@@ -582,7 +585,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let call = b.ins().call(service, &args);
                 let raw = b.inst_results(call)[0];
                 let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                let status = b.ins().iconst(types::I32, 3);
+                let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                let memory = b.ins().iconst(types::I32, 5);
+                let runtime = b.ins().iconst(types::I32, 3);
+                let status = b.ins().select(exhausted, memory, runtime);
                 let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
