@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#ifdef NEOCLR_ROOT_PROBES
+#include "root-probe.h"
+#endif
 
 /* Diagnostic harness: capacity is a measurement variable, not server policy. */
 int main(int argc, char **argv) {
@@ -21,6 +24,12 @@ int main(int argc, char **argv) {
     if (context.text.used > capacity || (status && (result != -99 || context.fault.code != (uint32_t)status))) return 3;
     if (!status && (context.fault.code || context.fault.frame_count || context.fault.message)) return 3;
     if (status) neoclr_aot_render_fault(stderr, &context.fault);
+    if (audit) {
+#ifdef NEOCLR_ROOT_PROBES
+        if (!neoclr_root_probe_count_v1()) return 3;
+        fprintf(stderr, "ROOT_PROBES %" PRIu64 "\n", neoclr_root_probe_count_v1());
+#endif
+    }
     if (audit) fprintf(stderr, "AOT_MEASURE {\"requests\":%d,\"capacity\":%zu,\"used\":%" PRIu64 ",\"status\":%d,\"result\":%d}\n",
                        requests, capacity, context.text.used, status, result);
     free(storage);

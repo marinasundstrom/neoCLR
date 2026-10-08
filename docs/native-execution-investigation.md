@@ -519,6 +519,12 @@ Pre-operation planning now uses the checked CFG stack shapes to classify retaine
 values and consumed operands, including erased tag/payload spill lanes. Constructor
 receivers and successful results are separate activation phases; native adapter/dispatch
 bodies remain explicitly uncovered. See the [contract and evidence](experiments/aot-console/README.md#pre-operation-stack-root-plans-2026-10-08).
-This extends step 2's analysis, not native publication: no root frames or spills are
-emitted yet. Conservative stack retention trades simpler coverage for potentially longer
+At that planning checkpoint, step 2 still emitted no root frames or spills. Conservative stack retention trades simpler coverage for potentially longer
 lifetimes; existing CLR comparison and collector performance questions remain unchanged.
+
+An opt-in executable probe now materializes the planned stack lanes and exposes them to
+a synchronous read-only linked callback. Native tests validate actual values and routing
+checks preserve output/fault behavior. See the [probe contract](experiments/aot-console/README.md#executable-stack-root-probes-2026-10-08).
+This closes the observability gap for pre-operation stack spills, while persistent root
+frames, ancestor roots, native adapters and result/fault lifetimes remain unimplemented.
+It adds diagnostic overhead and does not enable collection or claim CLR-equivalent roots.

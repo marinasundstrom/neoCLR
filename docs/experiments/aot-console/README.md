@@ -1673,3 +1673,46 @@ the full traceable stack simplifies the first implementation but can retain dead
 it is not CLR register-liveness metadata or a performance improvement. Native registration
 must make the planned spills observable and validate nested calls and fault cleanup before
 reclamation is enabled.
+
+## Executable stack-root probes (2026-10-08)
+
+`--probe-stack-roots` now emits the planned stack spills before each covered operation
+and calls `neoclr_probe_stack_roots_v1`. It requires `--fault-details` or an existing
+context-enabled binding, preserving that profile's entry ABI. It is off by default;
+ordinary emission adds no callback import or probe data. Inspection uses the same option
+and reports `capabilities.stackRootProbes`.
+
+The callback receives the compiled function index, IL instruction, a read-only array of
+64-bit lanes, its count, and an image-owned JSON plan with byte length and a trailing NUL.
+The [private header](root-probe.h) states the contract. Each point overwrites a per-function
+scratch snapshot: required pointer/discriminator lanes come from the actual current SSA
+values, 32-bit tags are extended, and numeric holes are zero. The buffer is included in
+the existing 64 KiB frame-storage budget. Published callback arguments make the spills
+observable in executable code, unlike unused stores intended for future registration.
+
+Snapshots are valid only during the synchronous callback. The hook must not allocate,
+reenter, retain pointers, mutate roots or trigger collection. No parent frame, local or
+argument root set is registered, and no future result/constructor receiver is active in
+this pre-operation snapshot. Native adapters remain uncovered. Persistent frames, host
+state, owner recovery, result activation and success/fault cleanup still precede GC.
+The callback is diagnostic only; it is not a stable ABI or the proposed native metadata
+interop interface. The default runtime and managed contracts are unchanged.
+
+The [diagnostic adapter](root-probe.c) reads the initialized snapshots without following
+pointers and counts calls per thread. Its counter accumulates across entry invocations;
+there is no global active-root registry. The route harness reports counts only in its
+measurement mode, leaving normal output/fault comparisons unchanged. Reproduce the
+existing lifetime driver with `--probe-stack-roots`; it links this adapter explicitly.
+
+The ARM64 native probe test validates exact retained String and erased String values,
+zero numeric holes, nested calls, a divide fault with unpublished result, and successful
+reentry. It also checks the import is absent without the option. Six fault-detail tests
+and six inspection tests pass alongside the two probe tests. The real routing execution
+is recorded in [probe validation](route-root-probe-validation.json): 35,402 callbacks at
+128 requests, unchanged 117,507-byte arena usage, exact broken-pipe fault parity and
+libSystem-only dynamic dependencies. The fixed 64 KiB run still fails cleanly.
+
+Compared with the existing CLR root-map baseline, this demonstrates stack materialization
+at selected boundaries but still lacks complete root lifetime registration and safepoint
+coverage. The opt-in path adds stores, static JSON and synchronous calls; it is a
+correctness instrument with overhead, not a performance optimization or collector.

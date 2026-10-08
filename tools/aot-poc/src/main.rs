@@ -22,6 +22,10 @@ fn main() {
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut args: Vec<_> = env::args_os().skip(1).collect();
+    let probe_count = args.iter().filter(|a| *a == "--probe-stack-roots").count();
+    if probe_count > 1 { return Err("duplicate --probe-stack-roots option".into()); }
+    let probe_stack_roots = probe_count == 1;
+    args.retain(|a| a != "--probe-stack-roots");
     let compile_system_count = args.iter().filter(|a| *a == "--compile-system").count();
     if compile_system_count > 1 {
         return Err("duplicate --compile-system option".into());
@@ -101,6 +105,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if fault_details_count > 1 { return Err("duplicate --fault-details option".into()); }
     let fault_details = fault_details_count == 1 || bind_user_fault || bind_console_read_byte || bind_console_write_line || bind_console_stream_output || bind_int32_to_string || bind_character_text || bind_integer_text || reference_arena;
     args.retain(|a| a != "--fault-details");
+    if probe_stack_roots && !fault_details {
+        return Err("--probe-stack-roots requires --fault-details or an existing context-enabled binding".into());
+    }
     let dependency_args = args
         .iter()
         .position(|a| a == "--module" || a == "--system" || a == "--object-root")
@@ -136,7 +143,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
     {
         return Err(
-            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-utf8-text binds UTF-8 encoding/decoding, concatenation, ordinal predicates, byte counts and scalar-boundary slices with --reference-arena; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds Int32 parsing, signed/unsigned 64-bit formatting and native-width conversion services; --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics"
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-utf8-text binds UTF-8 encoding/decoding, concatenation, ordinal predicates, byte counts and scalar-boundary slices with --reference-arena; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds Int32 parsing, signed/unsigned 64-bit formatting and native-width conversion services; --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics; --probe-stack-roots adds a read-only pre-operation spill callback (requires a context-enabled profile, not a collector)"
                 .into(),
         );
     }
@@ -224,7 +231,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 inspect_closed,
                 &dependencies,
                 context.as_ref(),
-                fault_details
+                fault_details,
+                probe_stack_roots
             ))?
         );
         return Ok(());
@@ -240,6 +248,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     };
     let compile_input = selection.as_ref().map_or(&input, |(module, _)| module);
     let details = fault_details.then(|| fault_details::Options::from_report(selection.as_ref().map(|(_, r)| r)));
+    let details = details.map(|mut d| { d.probe_stack_roots = probe_stack_roots; d });
     let object = compiler::compile(compile_input, root, !closed && args.len() == 4, details.as_ref())?;
     // Do not clobber an existing artifact, including on failed compilation.
     let mut output = fs::OpenOptions::new()

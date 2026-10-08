@@ -6,6 +6,8 @@ mod profile;
 mod gc_layout;
 #[path = "gc_points.rs"]
 mod gc_points;
+#[path = "gc_probe.rs"]
+mod gc_probe;
 
 pub(super) fn trace_layout(input: &neoclr::Module, details: Option<&crate::fault_details::Options>) -> Result<serde_json::Value, Error> {
     let p = Profile::new(input, details.is_some_and(|d| d.reference_arena), details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch))?;
@@ -386,6 +388,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32)); // Fault status, same as scalar profile
         ids.push(module.declare_function(&format!("neoclr_value_{i}"), Linkage::Local, &sig)?);
     }
+    let root_probes = if details.is_some_and(|d| d.probe_stack_roots) {
+        Some(gc_probe::Probes::prepare(&mut module, &p, &flows, details)?)
+    } else { None };
     for (i, f) in input.functions.iter().enumerate() {
         let mut context = module.make_context();
         context.func.signature = module
@@ -746,6 +751,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     constructors.insert(pc, slot(&mut b, bytes));
                 }
             }
+            let root_spill = root_probes.as_ref().and_then(|probes| probes.storage_bytes(i)).map(|bytes| {
+                frame_bytes += bytes as usize + 7;
+                slot(&mut b, bytes)
+            });
             if frame_bytes > 65536 {
                 return Err("value profile frame storage exceeds 64 KiB".into());
             }
@@ -769,6 +778,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let top = || shape.last().unwrap();
                 let pop = |s: &mut Vec<ir::Value>| s.pop().expect("checked stack");
                 let mut site = diagnostic_data.as_ref().map(|d| d.site(&mut module, &mut b, fault_context.unwrap(), i, pc));
+                if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
+                    probes.emit(&mut module, &mut b, i, pc, spill, &stack);
+                }
                 match op {
                     Op::Int(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
                     Op::Int64(v) => stack.push(b.ins().iconst(types::I64, *v)),

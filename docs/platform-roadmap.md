@@ -196,8 +196,10 @@ native prologues now clear traceable local lanes and erased tags without changin
 assignment rules ([validation](experiments/aot-console/route-root-seed-validation.json)).
 Reachable IL-boundary plans now identify retained evaluation-stack roots, pending operands
 and spill lanes ([evidence](experiments/aot-console/route-root-points-validation.json));
-native adapter/dispatch internals are explicit coverage gaps. This prepares storage and
-analysis only; implement root-frame publication, spills and cleanup, adapter coverage and
+native adapter/dispatch internals are explicit coverage gaps. Opt-in stack probes now
+emit the planned spills and expose initialized snapshots to a linked read-only diagnostic
+callback ([validation](experiments/aot-console/route-root-probe-validation.json)). Implement
+persistent root-frame publication and cleanup, adapter coverage and
 emitted allocation descriptors next, then nonmoving tracing/reclamation before qualifying
 sustained HTTP execution. This is planned integration work, not an implemented native
 collector. Borrowed String interface receivers remain unsupported.

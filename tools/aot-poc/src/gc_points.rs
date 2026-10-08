@@ -6,7 +6,7 @@ use super::{
 use neoclr::metadata::Instruction as Op;
 use serde_json::{Value, json};
 
-fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fault_details::Options>) -> bool {
+pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fault_details::Options>) -> bool {
     if p.dispatch.contains_key(&i) {
         return true;
     }
@@ -39,7 +39,7 @@ fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fault_details:
     })
 }
 
-fn point(p: &Profile<'_>, op: &Op, stack: &[Ty]) -> Result<Option<Value>, Error> {
+pub(super) fn point(p: &Profile<'_>, op: &Op, stack: &[Ty]) -> Result<Option<Value>, Error> {
     let (consumed, kind, result, receiver) = match op {
         Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
             let callee = p.callee(target)?;

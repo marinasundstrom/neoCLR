@@ -317,8 +317,8 @@ diagnostics show temporary objects being reclaimed. AOT inspection now reports t
 storage layouts that distinguish reference slots from integers, and ordinary native
 function prologues clear traceable local storage. Inspection also plans evaluation-stack
 roots across calls and allocation operations, with native adapters explicitly uncovered.
-Emitted spills, safepoint root registration and
-emitted allocation descriptors are the next foundation; no native collector is
+Opt-in probes now emit stack snapshots for a read-only diagnostic callback. Persistent
+root registration and emitted allocation descriptors are the next foundation; no native collector is
 implemented yet. The HTTP API drives this work, and sustained server execution remains unqualified.
 The bounded arena is a temporary experiment, not a final server memory policy.
 General AOT applications, the web demo, JIT and hot reload remain future work.

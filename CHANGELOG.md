@@ -20,8 +20,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and scalar-only local initialization are unchanged. Add reachable pre-operation root
   plans for calls, constructors, arrays and text materialization, distinguishing retained
   stack values from pending operands and selecting spill lanes including erased tags.
-  Report native adapter/dispatch bodies as explicit coverage gaps. These plans do not
-  emit spills, register roots or enable collection.
+  Report native adapter/dispatch bodies as explicit coverage gaps. Add opt-in
+  `--probe-stack-roots` emission of initialized stack snapshots and private JSON plans
+  to a synchronous linked diagnostic callback. Validate actual ARM64 values across
+  nested calls, faults and reentry; default emission has no probe dependency. This is
+  read-only observation, not persistent root registration or collection.
 
 - Add a real RoutePattern workload covering eight repeated routing outcomes, pattern
   errors and capture retention. Measure native arena growth from 2,433 bytes before
