@@ -723,3 +723,12 @@ fault explicitly under the current loaded-catalog API contract.
 Validation also retains two legacy executing-assembly controls and the loaded-catalog
 missing-reference/array-limit control. The scoped-frame test covers application,
 dependency, ordinary runtime-library and foreign same-name callers. All pass.
+
+
+### Module-centered RuntimeContext exploration — 2026-10-08
+
+The author directs reconsidering RuntimeContext around modules, with Assembly less
+prominent, as part of the [modules-as-namespaces exploration](design/module-system-assessment.md#runtimecontext-centered-on-modules).
+Direct module discovery, executable binding, packaging identity and migration from
+ExecutingAssembly remain design questions. The current assembly/module APIs described
+above are unchanged; the supplied proposal is not an implemented reflection contract.

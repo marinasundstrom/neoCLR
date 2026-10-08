@@ -12182,3 +12182,30 @@ claim follows from these focused checks.
 - **Integration revision:** Raven adapter and compiler documentation committed as
   `bc3c500e6` on `codex/source-object-metadata-resolution`; neoCLR owns the metadata
   model and renamed manifest contract on main.
+
+
+## 2026-10-08 — Exploring modules as namespaces
+
+- **Author request:** first record the supplied “First-Class Module System”, Version
+  0.2 proposal. The author cautioned that artifact names do not reflect current
+  direction, found the structure interesting, and asked about building around modules
+  rather than namespaces. Follow-up: “The module becomes the namespace, technically”.
+- **Further author direction:** “RuntimeContext will have to be adapted around modules
+  too. Since Assembly is not prominent anymore.” This expands the proposed runtime
+  API focus; exact loading, identity and packaging contracts remain unresolved.
+- **Assistant interpretation:** explore a named metadata declaration container whose
+  path supplies qualification and whose identity supplies ownership and visibility.
+  Distinguish this from physical CLI modules; assess same-name modules across
+  assemblies, access checks, native metadata and migration of current member APIs.
+  Evaluate direct module discovery through RuntimeContext, with assembly packaging
+  potentially retained underneath rather than required for ordinary discovery.
+- **Actions:** preserved the supplied text verbatim in the
+  [proposal archive](proposals/first-class-module-system.md), with its supplied ending
+  at section 17 Phase 1 documented in the index. Added a separate
+  [assessment](design/module-system-assessment.md) comparing the CLI baseline, Rust
+  module privacy and alternatives; linked the discussion from the website proposals.
+- **Status and open questions:** the earlier assembly-level-member direction remains
+  the implemented model. This discussion explores evolving it; no module encoding,
+  Raven syntax, artifact names, implementation experiment or release reprioritization
+  has been adopted. The assistant's bounded experiment is a suggestion, not performed
+  work. Cross-assembly imports, identity migration and runtime enforcement remain open.

@@ -2,9 +2,9 @@
 
 [Documentation index](../README.md) · [Maintained design notes](../design/README.md)
 
-These are the original proposal texts supplied by the author and added to the
-repository in the documentation slice of 2026-09-19. Their original composition
-dates are not established here. They describe proposed contracts, not a statement
+These are original proposal texts supplied by the author. The initial collection
+was added on 2026-09-19; later additions are identified below. Original composition
+dates are not established unless stated in the supplied text. They describe proposed contracts, not a statement
 of the currently executable API. The texts are preserved as supplied.
 
 The [unified platform roadmap](../platform-roadmap.md) organizes these inputs into
@@ -58,3 +58,14 @@ The [metadata proposal](metadata-format.md) now has a maintained
 [extended CLI metadata design](../design/extended-cli-metadata.md), including structural
 types and staged Raven integration. This is feature-branch exploration, not implemented
 format support. Original proposal texts remain inputs rather than final specifications.
+
+## First-class modules (recorded 2026-10-08)
+
+[First-class module system](first-class-module-system.md) preserves the supplied
+Version 0.2 proposal verbatim, including its illustrative syntax and artifact names.
+The supplied text ends after the first paragraph of section 17's Phase 1; no later
+phases were supplied. Its naming and proposed decisions are not adopted contracts.
+The author clarified: “The module becomes the namespace, technically.”
+See the [module assessment](../design/module-system-assessment.md) for that exploration,
+current ownership contracts, alternatives and unresolved compatibility questions.
+This records a design discussion without changing release priorities.

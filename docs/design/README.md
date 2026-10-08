@@ -36,3 +36,5 @@ See the [original proposals](../proposals/README.md) for the supplied source mat
 - [Designing types and APIs for NeoCLR and Neo](../type-design.md)
 
 - [Next-preview feature pages](feature-pages.md): planned API walkthroughs, tested samples and evaluator feedback.
+
+- [Modules as namespaces: initial assessment](module-system-assessment.md) — exploratory ownership and compatibility review.

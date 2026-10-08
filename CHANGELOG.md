@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Record the supplied first-class module proposal verbatim and assess the author's
+  clarifications that modules become namespaces and RuntimeContext should center on
+  modules rather than assemblies. Separate exploratory ownership,
+  visibility and compatibility choices from current metadata APIs and release scope;
+  preserve illustrative artifact names without adopting them. No runtime change.
+
 - Bind exact native ReadAllText/WriteAllText with explicit --bind-file-input and
   --bind-file-output on macOS ARM64. Preserve UTF-8 bytes, preflight limits/path checks,
   regular-file checks before truncation, error statuses and handle cleanup. Reads probe

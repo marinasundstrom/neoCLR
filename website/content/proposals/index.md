@@ -870,3 +870,15 @@ The development metadata API also supports explicit numeric runtime declarations
 including scalar managed receivers and metadata-only inspection. It rejects record
 storage on those declarations. This is infrastructure for source numeric ownership;
 Raven's full Number/class-library gate remains unfinished.
+
+## Modules as namespaces
+
+An open proposal explores making a module the namespace itself: a named metadata
+container owning types, functions and constants, with its own visibility boundary
+and a module-centered RuntimeContext. Assembly packaging may remain underneath;
+its public prominence is being reassessed. This could make ownership and discovery more explicit than CLI
+namespace names, but requires decisions about cross-assembly imports, identity,
+metadata compatibility and consistent interpreter/native access checks. Artifact
+names and language syntax remain undecided. This is not a release commitment.
+
+[Proposal and assessment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/module-system-assessment.md)
