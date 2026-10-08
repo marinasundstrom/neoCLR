@@ -22,14 +22,14 @@ pub struct AssemblyMetadata {
     /// Explicit nominal descriptor backing managed vector storage.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub array_backing: Option<crate::metadata::TypeDefId>,
-    /// Compile-time namespace literals, with exact binary64 bits and no execution storage.
+    /// Compile-time assembly-level literals, with exact binary64 bits and no execution storage.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub namespace_constants: Vec<NamespaceConstant>,
+    pub constants: Vec<AssemblyConstant>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct NamespaceConstant {
+pub struct AssemblyConstant {
     pub namespace: String,
     pub name: String,
     #[serde(rename = "type")]
@@ -169,8 +169,8 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                 && s.chars().count() <= 1024
                 && !s.chars().any(|c| c.is_control() || c == '.')
         };
-        for constant in &assembly.namespace_constants {
-            if assembly.namespace_constants.len() > 4096
+        for constant in &assembly.constants {
+            if assembly.constants.len() > 4096
                 || !name(&constant.name)
                 || constant.namespace.chars().count() > 1024
                 || (!constant.namespace.is_empty() && !constant.namespace.split('.').all(name))
@@ -185,7 +185,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                 || !u64::from_str_radix(&constant.bits, 16)
                     .is_ok_and(|bits| f64::from_bits(bits).is_finite())
             {
-                return Err(Fault::new("invalid or duplicate namespace constant"));
+                return Err(Fault::new("invalid or duplicate assembly-level constant"));
             }
         }
         if !text(&assembly.name)

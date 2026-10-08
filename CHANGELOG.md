@@ -8,8 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
-- Add development System.Math namespace constants Pi, E and Tau with .NET-equivalent
-  Double bits. Native namespace constants retain exact values across separate
+- Adopt assembly-level member terminology for types, functions and constants, whose
+  qualified names include namespaces. Rename the unreleased constant APIs to
+  AssemblyConstantDefinition / AddConstant / Constants and the manifest member to
+  assemblies[].constants. Rebuild same-day prototype consumers and artifacts; no
+  compatibility aliases for the previous names. Add a common assembly member view
+  to authored/read metadata and the introspection facade, preserving kinds, assembly
+  ownership, qualified names and overload signatures. Constants attach to one graph;
+  nested and type-owned declarations retain their owners. Values and lookup remain.
+
+- Add development System.Math assembly-level constants Pi, E and Tau with .NET-equivalent
+  Double bits. Native assembly-level constants retain exact values across separate
   compilation and interpreted execution without runtime storage. AOT admission still
   rejects Double instructions; native execution is pending. The initial
   public/internal finite-Double metadata contract rejects malformed/duplicate values;

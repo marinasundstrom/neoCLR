@@ -12136,7 +12136,7 @@ claim follows from these focused checks.
   The separate consumer first exposed that qualified namespace lookup collected only
   direct native methods, not constants; Raven now includes direct constant symbols
   and permits their receiverless binding. Ordinary CLI namespace carriers remain.
-  Native metadata/consumer evidence is linked from [Math](math.md#namespace-constants-development-2026-10-08).
+  Native metadata/consumer evidence is linked from [Math](math.md#assembly-level-constants-development-2026-10-08).
 
 - **Validation boundary:** the constant consumer passes the interpreter, but AOT
   rejects its first Double literal. The assistant records this gap explicitly and
@@ -12149,3 +12149,36 @@ claim follows from these focused checks.
   round-trip/rejection checks, six emission/visibility controls and the .NET literal-bit
   reference check pass. The Math constant sample is deliberately recorded as
   interpreter-passed/AOT-blocked, not universal execution parity.
+
+## 2026-10-08 — Assembly-level members include qualified namespaces
+
+- **Author correction:** “We shouldn't call them namespace functions or namespace
+  constants. They are assembly-level members”. Clarifies that types, functions and
+  constants can be assembly-level members, and that their names include namespaces.
+- **Assistant response/action:** adopts assembly ownership with namespace-qualified
+  names, updates current terminology and the new constant API/metadata names, and
+  keeps namespace lookup/import behavior. Historical conversation entries and
+  completed validation artifacts retain their original wording as evidence.
+- **Implementation:** the unreleased host API is AssemblyConstantDefinition,
+  AssemblyBuilder.AddConstant and ModuleDefinition.Constants; metadata uses
+  assemblies[].constants. Matching compiler/runtime bundles must be regenerated.
+  [Naming contract](design/extended-cli-metadata.md#assembly-level-members-and-qualified-names-2026-10-08).
+
+- **Author follow-up:** metadata itself and the libraries for reading/writing it must
+  reflect this structure.
+- **Assistant implementation:** adds AssemblyDefinition.GetMembers for writer graphs
+  and reader snapshots, and AssemblyInfo.GetMembers for the metadata facade. The
+  typed member views preserve kind, declaring assembly/module and qualified name;
+  constants attach to one graph. Round-trip controls cover types, overloaded functions
+  and constants together, equal names in distinct assemblies, rejected reattachment,
+  and exclusion of nested/type-owned declarations from the assembly-level view.
+  This is metadata tooling, not new guest reflection or native Double execution.
+
+- **Validation:** authored and native-container round trips, reader facade ownership,
+  overloads and rejected reattachment pass. Six compiler emission/visibility controls
+  pass with the renamed contract; the Math consumer remains interpreter-passed and
+  AOT-blocked on Double instructions. The API snapshot is current.
+  [Compiler evidence](experiments/extended-cli-metadata/assembly-constants-validation.json).
+- **Integration revision:** Raven adapter and compiler documentation committed as
+  `bc3c500e6` on `codex/source-object-metadata-resolution`; neoCLR owns the metadata
+  model and renamed manifest contract on main.

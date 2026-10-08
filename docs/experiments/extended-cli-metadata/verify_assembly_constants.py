@@ -1,4 +1,4 @@
-"""Check native namespace-constant emission boundaries and cross-assembly visibility."""
+"""Check native assembly-level constant emission boundaries and cross-assembly visibility."""
 import argparse
 import hashlib
 import json
@@ -44,7 +44,7 @@ def main():
             ['--reference', output / 'definitions.dll'], rejected)
     for path in inputs:
         assert hashlib.sha256(path.read_bytes()).hexdigest() == evidence['inputs'][str(path)], path
-    print('PASS native namespace constant contracts and visibility')
+    print('PASS native assembly-level constant contracts and visibility')
 
 
 if __name__ == '__main__':

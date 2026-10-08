@@ -34,10 +34,10 @@ and implemented preview behavior remains open to revision.
 
 ## Modern library direction (2026-09-13)
 
-The author wants modern APIs, including base types and namespace-level functions,
+The author wants modern APIs, including base types and assembly-level functions,
 rather than inheriting historical library shapes solely for familiarity. Compare
 current .NET designs as well as older APIs. Choose instance members, static helpers
-or namespace functions by the contract they express, discoverability and target-language
+or assembly-level functions by the contract they express, discoverability and target-language
 projection; namespace syntax alone is not a reason to change CLI metadata.
 
 Date/time is a future review example: separate date/time data from acquiring the

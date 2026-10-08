@@ -342,8 +342,8 @@ public sealed partial class AssemblyBuilder
 
     private byte[] WriteImage(bool referenceOnly)
     {
-        if (!referenceOnly && namespaceConstants.Count != 0)
-            throw new InvalidDataException("namespace constants require native emission");
+        if (!referenceOnly && assemblyConstants.Count != 0)
+            throw new InvalidDataException("assembly-level constants require native emission");
         var methods = ValidateGraph(validateBodies: !referenceOnly);
         if (!referenceOnly && (ExternalObjectRoot is not null || types.Any(t => t.Definition.IsNativeObjectRoot)))
             throw new InvalidDataException("native Object root requires native emission; CLI projection is reference-only");

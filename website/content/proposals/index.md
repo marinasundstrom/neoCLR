@@ -644,7 +644,7 @@ The full application with source-built queries remains blocked at the source/see
 iteration contract boundary; its existing translated-library execution is separate.
 
 Direct native metadata reading has begun: the experimental host library now materializes
-primitive namespace functions into shared definitions without a CLI projection. Broader
+primitive assembly-level functions into shared definitions without a CLI projection. Broader
 metadata coverage remains development work.
 
 Raven now binds a bounded native function library directly into its semantic model,
@@ -723,7 +723,7 @@ focused compiler tests and all six native runtime consumers pass. Native generic
 and the full class-library bootstrap remain under development.
 
 The development metadata reader now preserves unconstrained static generic methods
-and namespace functions. C# consumers execute imported generic calls on CLR and neoCLR;
+and assembly-level functions. C# consumers execute imported generic calls on CLR and neoCLR;
 Raven now imports this profile and executes generic forwarding, overloads and array
 aliases; all seven native consumers pass (42). Generic owners and constraints remain
 pending. This is not full generic import.

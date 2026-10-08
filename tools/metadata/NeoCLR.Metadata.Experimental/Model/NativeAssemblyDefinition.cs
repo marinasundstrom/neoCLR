@@ -33,7 +33,7 @@ public sealed partial class NativeAssemblyDefinition
     private readonly PropertyRow[] properties;
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
-    private NamespaceConstantDefinition[] namespaceConstants = [];
+    private AssemblyConstantDefinition[] assemblyConstants = [];
     private readonly uint entryPointToken;
     private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, PropertyRow[] properties, AssemblyIdentity[] references, HashSet<string> valueTypeReferences, Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases, uint entryPointToken)
     { this.entryPointToken = entryPointToken; this.nativeTypeAliases = nativeTypeAliases; this.valueTypeReferences = valueTypeReferences; Identity = identity; this.types = types; this.methods = methods; this.properties = properties; References = System.Array.AsReadOnly(references); }
@@ -99,20 +99,20 @@ public sealed partial class NativeAssemblyDefinition
                 }
             }
             if (manifest.TryGetProperty("array_backing", out _)) manifestFields.Add("array_backing");
-            var constants = new List<NamespaceConstantDefinition>();
-            if (manifest.TryGetProperty("namespace_constants", out _))
+            var constants = new List<AssemblyConstantDefinition>();
+            if (manifest.TryGetProperty("constants", out _))
             {
-                manifestFields.Add("namespace_constants");
+                manifestFields.Add("constants");
                 var names = new HashSet<(string, string)>();
-                foreach (var row in Array(manifest, "namespace_constants", 4096))
+                foreach (var row in Array(manifest, "constants", 4096))
                 {
                     Shape(row, "namespace", "name", "type", "bits", "visibility");
                     var ns = row.GetProperty("namespace").GetString(); var name = Text(row, "name"); var bits = Text(row, "bits");
-                    Require(ns is not null && NamespaceConstantDefinition.ValidNamespace(ns) && NamespaceConstantDefinition.ValidName(name) && names.Add((ns, name)), "invalid or duplicate namespace constant");
-                    Require(Text(row, "type") == "Double" && bits.Length == 16 && bits.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f'), "unsupported namespace constant encoding");
+                    Require(ns is not null && AssemblyConstantDefinition.ValidNamespace(ns) && AssemblyConstantDefinition.ValidName(name) && names.Add((ns, name)), "invalid or duplicate assembly-level constant");
+                    Require(Text(row, "type") == "Double" && bits.Length == 16 && bits.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f'), "unsupported assembly-level constant encoding");
                     var value = BitConverter.Int64BitsToDouble(unchecked((long)ulong.Parse(bits, NumberStyles.HexNumber, CultureInfo.InvariantCulture)));
-                    Require(double.IsFinite(value), "nonfinite namespace constant");
-                    var visibility = Text(row, "visibility") switch { "public" => MethodVisibility.Public, "internal" => MethodVisibility.Internal, _ => throw new InvalidDataException("invalid namespace constant visibility") };
+                    Require(double.IsFinite(value), "nonfinite assembly-level constant");
+                    var visibility = Text(row, "visibility") switch { "public" => MethodVisibility.Public, "internal" => MethodVisibility.Internal, _ => throw new InvalidDataException("invalid assembly-level constant visibility") };
                     constants.Add(new(ns!, name, value, visibility));
                 }
             }
@@ -819,7 +819,7 @@ public sealed partial class NativeAssemblyDefinition
                 Require(candidates.Length == 1, "invalid native entry point");
                 entryPointToken = 0x06000001u + (uint)candidates[0].index;
             }
-            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences, nativeTypeAliases, entryPointToken) { namespaceConstants = constants.ToArray() };
+            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences, nativeTypeAliases, entryPointToken) { assemblyConstants = constants.ToArray() };
         }
         catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException or OverflowException)
         { throw new InvalidDataException("invalid native metadata", error); }
@@ -834,8 +834,8 @@ public sealed partial class NativeAssemblyDefinition
     /// This is compiler reference metadata, never an executable replacement for the native artifact. Per-call MVIDs may differ.</remarks>
     public byte[] CreateReferenceAssembly(AssemblyIdentity coreLibrary)
     {
-        if (namespaceConstants.Length != 0)
-            throw new NotSupportedException("standalone CLI projection of namespace constants is not implemented");
+        if (assemblyConstants.Length != 0)
+            throw new NotSupportedException("standalone CLI projection of assembly-level constants is not implemented");
         if (types.Any(type => type.BaseName is not null))
             throw new NotSupportedException("class inheritance reference projection is not implemented");
 

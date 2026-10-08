@@ -2245,7 +2245,7 @@ is reserved by AddFunction even in the global namespace to avoid collisions. Exi
 unnamespaced function encoding is unchanged. Native snapshot/reference creation and
 ImportReference preserve the namespace through that encoding. Raw CLI snapshots
 expose the encoded physical Name; ordinary .NET source loaders do not gain native
-namespace-function lookup. Native bodies remain authoritative in PE/#Neo artifacts.
+assembly-level-function lookup. Native bodies remain authoritative in PE/#Neo artifacts.
 
 ```csharp
 var min = assembly.AddFunction("System.Math", "Min",
@@ -4362,7 +4362,7 @@ unread slot fault), projection loading, executable CLI refusal, invalid element 
 parameter scope, and an invalid length stack type. Raven separately tests the matched
 explicit authoring-seed mapping and its default-disabled configuration.
 
-### Native namespace-function dependency binding (development, 2026-10-02)
+### Native assembly-level-function dependency binding (development, 2026-10-02)
 
 BindNativeLibrary also recognizes public, nongeneric, abstract sealed top-level CLI
 containers carrying the exact configured core's System.Runtime.CompilerServices.TopLevelAttribute.
@@ -4378,7 +4378,7 @@ not a general public custom-attribute API or native semantic importer.
 
 `AssemblyDefinition.ReadNativeAssembly(ReadOnlySpan<byte> image)` reads API-produced
 PE/#Neo schema-1/2 containers into the existing definition model. This first profile
-admits nongeneric namespace functions and fieldless top-level classes with
+admits nongeneric assembly-level functions and fieldless top-level classes with
 Int32, Int64, Boolean, String or no-result method signatures. It rejects other types and unsupported
 signatures with InvalidDataException rather than silently returning a partial assembly.
 Input/container limits and required-schema/binding checks still apply. No dependency
@@ -4424,7 +4424,7 @@ unchanged. These host C# APIs are covered here rather than the guest RavenDoc se
 ### Native callable imports (development, 2026-10-02)
 
 `AssemblyBuilder.ImportReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary)`
-now accepts primitive nongeneric native namespace-function definitions obtained from
+now accepts primitive nongeneric native assembly-level-function definitions obtained from
 ReadNativeAssembly. It returns the existing immutable ImportedMethodReference; Call
 and raw call operands use the same native reference encoding. Namespace, overload
 signature and exact dependency identity are retained. No producer body is copied.
@@ -4799,7 +4799,7 @@ API or array covariance rule is introduced.
 ### Direct native static generic methods (2026-10-02 development)
 
 `AssemblyDefinition.ReadNativeAssembly` now also admits unconstrained static generic
-methods and namespace functions on nongeneric owners. `MethodDefinition.GenericArity`
+methods and assembly-level functions on nongeneric owners. `MethodDefinition.GenericArity`
 and `TryGetSignature` preserve parameter names, positional `SignatureType.MethodParameter`
 references and their one-dimensional vectors. `TryGetStaticGenericValueSignature`
 recognizes the primitive/parameter/vector subset; nongeneric helpers reject even unused
@@ -4877,7 +4877,7 @@ encoding is reused. No synthetic CLI blobs or reflection types are introduced.
 `AssemblyBuilder.CreateFunctionReference(AssemblyIdentity dependency,
 AssemblyIdentity dependencyCoreLibrary, string artifactSha256, string namespace,
 string name, MethodSignature signature) -> ImportedMethodReference` creates a native
-assembly/namespace-function reference from resolved values. It needs no reader,
+assembly-level function reference from resolved values. It needs no reader,
 MethodDefinition or resolver. The returned reference is owned by the output builder;
 matching name/parameter/arity contracts are interned. Use Call or MakeGenericInstance
 on the result through the existing emission API.
@@ -5378,7 +5378,7 @@ Resolve requires a method definition from an exact registered snapshot. Null inp
 ArgumentNullException; missing snapshots/undecodable signatures throw InvalidDataException.
 Methods are interned by original definition and declaring owner view. GetMethods returns
 all declared non-constructor methods including accessors, without inherited lookup or
-visibility filtering. Module.GetFunctions enumerates namespace functions. Enumeration
+visibility filtering. Module.GetFunctions enumerates assembly-level functions. Enumeration
 collections are read-only; repeated calls preserve element identities. Constructor
 metadata can be resolved directly as MethodInfo; a dedicated ConstructorInfo facade is
 not added. Names/tokens describe declarations, never runtime handles.
@@ -5496,7 +5496,7 @@ var call = mixed.MakeGenericMethod(context.ResolveSignature(PrimitiveType.Boolea
 ```
 
 This pattern is tested by the C# fixture against equivalent CLR metadata inspection.
-Namespace functions support construction too. Supplied caller type/method parameters
+Assembly-level functions support construction too. Supplied caller type/method parameters
 remain caller-scoped and are not recursively rebound. Repeated equal requests return
 the same view within one context; differing owners or contexts remain distinct.
 
@@ -7811,13 +7811,14 @@ CLI member scopes are retained; no dependency is opened by authoring. A C# regre
 checks canonical names and ordinary-call classification, and the API fixture executes
 GetType against the actual source-built Runtime. This closes a JSON mapping link failure.
 
-## Native namespace Double constants (development, 2026-10-08)
+## Native assembly-level Double constants (development, 2026-10-08)
 
-`NeoCLR.Metadata.Experimental.Model.NamespaceConstantDefinition(string namespace,
-string name, double value, MethodVisibility visibility = Public)` describes a
-compile-time constant. Read-only `Namespace`, `Name`, `Value`, `Visibility` properties
-return its exact declaration; `AssemblyBuilder.AddNamespaceConstant(definition)`
-adds it, and `ModuleDefinition.NamespaceConstants` reads authored/native snapshots.
+`NeoCLR.Metadata.Experimental.Model.AssemblyConstantDefinition(string namespace,
+string name, double value, MethodVisibility visibility = Public)` describes an
+assembly-level compile-time constant. Namespace and Name together form its qualified
+name; the containing assembly owns its identity. Read-only `Namespace`, `Name`, `Value`, `Visibility` properties
+return its exact declaration; `AssemblyBuilder.AddConstant(definition)`
+adds it, and `ModuleDefinition.Constants` reads authored/native snapshots.
 These host APIs are documented manually here, outside the guest RavenDoc selection.
 
 Namespace/name are at most 1024 characters; namespace may be global/empty, otherwise
@@ -7829,10 +7830,62 @@ constants per assembly. Returned collections are read-only; loaded editing is ab
 Values are inlined by the compiler, with no field address/storage or runtime initializer.
 
 Native JSON/NEOX/PE retains exact 16-digit lowercase binary64 bit strings in
-`assemblies[].namespace_constants`, including negative zero. Native readers reject
+`assemblies[].constants`, including negative zero. Native readers reject
 unsupported types, malformed bits, nonfinite values, unknown members and duplicates.
 Older readers reject the extension. Ordinary CLI reads expose no native constants;
 standalone CLI writing/projection explicitly rejects a graph containing them.
 The nonauthoritative CLI envelope accompanying a native PE does not project these
 constants; native readers must use #Neo. No native execution or guest reflection API
 is implied by this descriptive metadata. See [Math contracts](../docs/math.md).
+
+**Terminology correction (2026-10-08):** this unreleased API is now
+AssemblyConstantDefinition / AddConstant / Constants, and its manifest key is
+`assemblies[].constants`. Rebuild consumers and artifacts from the preceding same-day
+prototype; the former names/key are not compatibility aliases. Namespace remains
+part of the member name. Types and functions can also be assembly-level members;
+see [the naming contract](../docs/design/extended-cli-metadata.md#assembly-level-members-and-qualified-names-2026-10-08).
+
+## Assembly-level member model (development, 2026-10-08)
+
+`Model.AssemblyDefinition.GetMembers() : IReadOnlyList<AssemblyMemberDefinition>`
+provides one read-only view over authored graphs and loaded metadata. The writer's
+`AssemblyBuilder.Definition` exposes the same API as the reader's returned definition.
+The view has no new identity separate from its underlying declaration.
+
+`AssemblyMemberKind` has Type, Function and Constant cases. Each
+`AssemblyMemberDefinition` exposes Kind, Module, Assembly, Namespace, Name and FullName,
+and exactly one non-null typed property: Type (TypeDefinition), Function
+(MethodDefinition) or Constant (AssemblyConstantDefinition). FullName includes the
+namespace, but excludes assembly identity and overload signatures. Resolve a member
+using its assembly identity and declaration contract as well as its qualified name.
+
+`Introspection.AssemblyInfo.GetMembers() : IReadOnlyList<AssemblyMemberInfo>` provides
+the corresponding reader facade. AssemblyMemberInfo exposes Kind, Assembly
+(AssemblyInfo), Module (ModuleInfo), Namespace, Name, FullName, and lazily obtained
+Type (NominalTypeInfo?) / Function (MethodInfo?) views. ConstantValue (double?) returns
+the current finite-Double constant value, or null for another member kind. Type/function
+view resolution uses the supplied MetadataLoadContext and its existing resolution errors;
+no CLR assembly loading or guest invocation occurs.
+
+Both lists include public and internal assembly-level declarations, in type/function/
+constant groups with declaration order retained within each group. Nested types,
+type-owned methods/fields and the CLI Module pseudo-type are excluded. Existing typed
+collections remain available for those relationships. Lists are fresh/read-only;
+underlying authored graphs keep their existing append-only behavior. Single-manifest-
+module support remains the present limit. Ordinary CLI input retains its physical
+declarations; the API does not reinterpret a compiler-generated carrier as native members.
+
+AssemblyConstantDefinition also exposes FullName, Module? and Assembly?. A newly
+constructed constant is unattached. AddConstant attaches it once; reusing that
+instance in another graph throws InvalidOperationException without modifying either
+graph. Loaded constants are already attached to their module and assembly. Native
+round trips preserve that ownership, member kinds, qualified names and overload
+signatures. Equal qualified names in different assemblies retain different owners.
+
+Compared with [.NET Assembly.GetTypes](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assembly.gettypes?view=net-10.0)
+and [Module.GetMethods](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.module.getmethods?view=net-10.0),
+this facade offers one assembly-level declaration view across types, functions and
+constants. Unlike GetTypes, the new GetMembers view excludes nested types because
+they keep a declaring-type owner. This makes ownership explicit to metadata tools;
+the cost is an additional view object per enumerated member and a bounded single-module
+implementation. No performance or complete CLR-reflection compatibility claim is made.

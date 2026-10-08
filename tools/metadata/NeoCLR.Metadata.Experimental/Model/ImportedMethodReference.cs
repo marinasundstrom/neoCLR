@@ -49,7 +49,7 @@ public sealed partial class AssemblyBuilder
     /// <remarks>With an explicit native System binding, core String, Int32 and Int64 methods use validated intrinsic receiver signatures. Core Object.GetHashCode requires its exact virtual Int32 slot.
     /// No core identity is inferred from the host or from primitive signature bytes. Nested public owners are supported; signed dependencies are unsupported. Generic nominal owners must be invariant and unconstrained; instance methods must be nongeneric.
     /// Nominal signature types must be public top-level unconstrained class/interface/value definitions in the same dependency; native cross-dependency signatures require the explicit-resolver overload; CLI cross-dependency decoding remains unsupported.
-    /// Native primitive/nominal-reference/vector namespace functions, unconstrained static generic calls with method parameters, and bounded class methods/constructors are imported directly; native snapshots use an image fingerprint instead of a CLI MVID. Global references support native emission only. The native dependency must use the same format-5 naming contract as this writer.</remarks>
+    /// Native primitive/nominal-reference/vector assembly-level functions, unconstrained static generic calls with method parameters, and bounded class methods/constructors are imported directly; native snapshots use an image fingerprint instead of a CLI MVID. Global references support native emission only. The native dependency must use the same format-5 naming contract as this writer.</remarks>
     public ImportedMethodReference ImportReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary)
         => ImportReference(definition, dependencyCoreLibrary, null);
 

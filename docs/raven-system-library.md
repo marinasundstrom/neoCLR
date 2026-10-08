@@ -305,7 +305,7 @@ changelogs in both repositories under the Raven integration workflow.
 foundational runtime APIs. Its sources include `src/System/Math/Functions.rvn`, `src/System/Linq/Operators.rvn`, `src/System/Int32.rvn`, `src/System/Char.rvn`, `src/System/Collections/ArrayList.rvn`, `src/System/Collections/HashMap.rvn`, `src/System/Time.rvn` and `src/System/Date.rvn`; additional namespaces
 and types should join this project as their importing requirements are validated.
 Each declared namespace has its own folder below `src`: for example, `System/Date.rvn`,
-`System/Collections/ArrayList.rvn` and `System/Math/Functions.rvn`. Namespace functions
+`System/Collections/ArrayList.rvn` and `System/Math/Functions.rvn`. Assembly-level functions
 use `Functions.rvn`; types use their type names. Do not create an assembly per utility namespace. This is an incremental source
 migration, not yet a self-hosting build of the complete core reference assembly.
 
@@ -353,7 +353,7 @@ public functions `Abs`, `Min`, `Max`, `Sign` and `Clamp` for Int32. Abs and Clam
 preserve their existing typed Result outcomes, including minimum-Int32 overflow and
 invalid bounds. Double operations are also Raven-authored wrappers over the same native services.
 
-Raven's usual CLI contract represents namespace functions as static methods on a
+Raven's usual CLI contract represents assembly-level functions as static methods on a
 container marked with the target's TopLevelAttribute. The importer recognizes that
 marker and verifies exported signatures against the supplied core, including nominal
 assembly identities. It does not infer namespace membership from container spelling.
@@ -405,7 +405,7 @@ without executable output. Existing Rust Math tests cover the direct runtime and
 archived Neo callers.
 
 Qualified namespace calls with consumer declarations exposed a general Raven lookup
-bug: source-only namespace lookup omitted referenced namespace functions/constants.
+bug: source-only namespace lookup omitted referenced assembly-level functions/constants.
 Its regression uses ordinary .NET reference metadata. The fix is `3ec32c96e` on
 Raven main and `008cb3245` on the experimental branch; the previously installed
 `.14` SDK predates it. Keep this compiler correction
@@ -420,7 +420,7 @@ unqualified-return diagnostic issue was fixed independently; see the
 
 ## Initial namespace gate
 
-The initial namespace/static gate accepts public namespace functions and static API methods matching existing
+The initial namespace/static gate accepts public assembly-level functions and static API methods matching existing
 reference signatures, including the bounded generic body gate below. It rejects stateful
 containers, unexported helpers, new application-type identities, constrained
 generic signatures and unsupported constructed shapes, byref/out exports and no-result exports. Support for these is future work, not implied by compiling the pilot.
@@ -584,7 +584,7 @@ baseline.
 The two sources use marked namespace containers as implementation fragments. Their
 methods match the existing static members on the core Int32/Char reference types;
 public metadata still exposes `Int32.Divide` and `Char.IsAscii`, etc. They do not
-redeclare primitive types or turn their public APIs into namespace functions. Static
+redeclare primitive types or turn their public APIs into assembly-level functions. Static
 fragments can now target a public nongeneric class/value owner with matching static
 methods, rather than requiring the reference owner itself to be a static class.
 This keeps primitive layout and instance operations in the existing runtime while
@@ -857,7 +857,7 @@ receivers, and `ldobj` copies a value onto the evaluation stack. See
 [ECMA-335, Partition I §8.9.7 and Partition II §10.5.1](https://ecma-international.org/wp-content/uploads/ECMA-335_6th_edition_june_2012.pdf)
 and [the Microsoft ldobj documentation](https://learn.microsoft.com/lb-lu/dotnet/api/system.reflection.emit.opcodes.ldobj?view=net-7.0).
 Keeping constructors as methods preserves ownership checks; making their fields public
-or assigning arbitrary namespace functions owner privileges would weaken those checks.
+or assigning arbitrary assembly-level functions owner privileges would weaken those checks.
 The cost of the bounded gate is that it cannot yet admit the complete calendar types.
 
 `verify_value_library.py` exercises constructor invocation from IL and from Raven,

@@ -28,8 +28,8 @@ does not imply general array views or covariance. Following the [next-fix reasse
 [lexical path bindings](path.md#native-compilation-poc-2026-10-08) now pass the unchanged
 Raven sample in all three modes. [Math target lookup](math.md#source-runtime-bootstrap-ownership-2026-10-08)
 is corrected by removing competing bootstrap declarations; shared introspection faults
-remain a next priority, and bootstrap remains a release gate. Author-requested [Math constants](math.md#namespace-constants-development-2026-10-08)
-now use finite Double namespace metadata and compile-time inlining. Their interpreter
+remain a next priority, and bootstrap remains a release gate. Author-requested [Math constants](math.md#assembly-level-constants-development-2026-10-08)
+now use finite Double assembly-level metadata and compile-time inlining. Their interpreter
 consumer passes; Double instruction lowering remains the immediate AOT gap.
 The wider audit also found the handwritten legacy union bridge's `IUnion`; it now
 uses `UnionValue`, with regenerated fragments and executable union/time checks. This does not change the bootstrap release gate or promise
@@ -1534,7 +1534,7 @@ collections sample, retaining only the explicit primitive bootstrap/runtime seed
 Author clarification (2026-10-02): importer and emitter must communicate through Raven
 symbols, without emission reusing loader objects. Raven compiler contracts and the
 metadata library body-generator API are independent boundaries. The first bounded
-slice now emits primitive/method-generic/vector namespace-function references from
+slice now emits primitive/method-generic/vector assembly-level-function references from
 symbols and artifact values (seven consumers execute; 107 metadata C# groups pass).
 Public top-level root-class identities, including unconstrained generics, now also
 author directly from symbols; other type profiles retain their existing conversion
@@ -1633,7 +1633,7 @@ See [nominal call evidence](experiments/extended-cli-metadata/symbol-only-nomina
 
 Author-directed priority (2026-10-02): proceed with direct native metadata import into
 Raven, developing the reader/writer library toward its existing builders → definitions
-→ metadata → PE architecture. Primitive namespace functions now materialize directly into the existing definitions
+→ metadata → PE architecture. Primitive assembly-level functions now materialize directly into the existing definitions
 (103 metadata groups pass). Raven now binds these native functions directly with
 exact dependency identity and compilation-owned symbols; 67 .NET regressions pass.
 Native calls now import and execute across that boundary, including a Raven-produced
@@ -1672,7 +1672,7 @@ identity; Raven consumes Box<int> factory/identity calls (42). Scoped local cons
 Box<T> and their vectors now also import and execute with preserved method/owner parameter
 identity; all seven consumers still return 42. External constructions now also resolve
 through exact dependencies; a three-assembly generic consumer executes (42), with 106 C#
-metadata groups passing. Qualified namespace-function lookup now includes native ownerless
+metadata groups passing. Qualified assembly-level-function lookup now includes native ownerless
 methods; inferred/explicit calls execute, invalid explicit arguments diagnose and .NET
 controls pass. See [qualified lookup evidence](experiments/extended-cli-metadata/native-qualified-functions-2026-10-02.json).
 Constraints remain pending before full System loading. See [external generic evidence](experiments/extended-cli-metadata/native-external-generics-2026-10-02.json). See [open signature evidence](experiments/extended-cli-metadata/native-open-signatures-2026-10-02.json). See [closed signature evidence](experiments/extended-cli-metadata/native-closed-signatures-2026-10-02.json). See [generic owner evidence](experiments/extended-cli-metadata/native-generic-owners-2026-10-02.json).
@@ -1688,7 +1688,7 @@ application now compiles to native PE/#Neo, verifies and executes with exact exp
 output against the explicitly bound translated System library. All 95 metadata contract
 groups pass. Unchanged ArrayList plus its source interfaces now compile to native PE
 and execute growth, copy independence, iteration, callback searches and Option results,
-with expected negative-capacity/index faults. Explicit namespace-function dependency
+with expected negative-capacity/index faults. Explicit assembly-level-function dependency
 binding and configured array-shape length support complete this bounded source slice.
 Translated System remains required; full library source emission and native semantic
 symbol loading remain open. Unchanged callback comparer implementations now also execute

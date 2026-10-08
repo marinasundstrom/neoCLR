@@ -53,7 +53,7 @@ Use a fresh output directory for each attempt.
   Existing same-type private calls remain possible. This is not a complete CLI
   accessibility implementation (`internal`, friend assemblies and protected access
   are not added).
-- Raven namespace functions use their existing emitted CLI container and target-owned
+- Raven assembly-level functions use their existing emitted CLI container and target-owned
   `TopLevelAttribute` marker. Direct cross-assembly wildcard imports now work with the
   refreshed core and Raven `neoclr` compiler. No guessed
   container name or new namespace-function ABI is used. The earlier RAV0103 probe

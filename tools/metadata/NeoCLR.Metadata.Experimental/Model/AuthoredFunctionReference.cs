@@ -4,7 +4,7 @@ public sealed partial class AssemblyBuilder
 {
     private readonly List<ImportedMethodReference> authoredCallableReferences = [];
 
-    /// <summary>Authors a native namespace-function reference from a resolved contract, without a reader definition.</summary>
+    /// <summary>Authors a native assembly-level-function reference from a resolved contract, without a reader definition.</summary>
     /// <param name="dependency">Exact unsigned dependency identity, distinct from this output.</param>
     /// <param name="dependencyCoreLibrary">Explicit core identity, equal to this output's core.</param>
     /// <param name="artifactSha256">64 hexadecimal digits identifying the selected native dependency image.</param>

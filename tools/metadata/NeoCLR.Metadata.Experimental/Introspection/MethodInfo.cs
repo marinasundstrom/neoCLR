@@ -41,7 +41,7 @@ public sealed class MethodInfo
     public uint MetadataToken { get; }
     /// <summary>Gets the declaring module view.</summary>
     public ModuleInfo Module { get; }
-    /// <summary>Gets the open/constructed declaring type; null for namespace functions.</summary>
+    /// <summary>Gets the open/constructed declaring type; null for assembly-level functions.</summary>
     public TypeInfo? DeclaringType { get; }
     /// <summary>Gets the return signature projected in both generic scopes.</summary>
     public TypeInfo ReturnType => returns.Value;

@@ -180,7 +180,7 @@ to real member pages. Documentation is maintained in the XML sidecar, not claime
 to be extracted from Raven source comments.
 
 `manual-types.json` records the exact pinned-renderer limitations and manual routes:
-the two namespace-function containers and IsReadOnlyAttribute. These remain part of
+the two assembly-level-function containers and IsReadOnlyAttribute. These remain part of
 the public inventory, with linked manual entries and checked routes. No public type
 is excluded from the inventory. `exclusions.json` records intentional page exclusions
 with reasons: non-generic Array, Option, Result and TaskOutcome are importer/exporter
@@ -1134,7 +1134,7 @@ still reports the pre-existing stale guest reference; no partial replacement was
 The current snapshot was regenerated from the repository bridge using Raven main
 `08f34891b` (.NET 11), not copied from an older reference. It includes the existing
 `System.ParamArrayAttribute` compiler marker with type/constructor documentation and
-corrects the manual namespace-function link to `System.Fail`. The bridge now names the
+corrects the manual assembly-level-function link to `System.Fail`. The bridge now names the
 source owner in projection errors. Source fingerprints and the assembly checksum are
 recorded in `snapshot.json`.
 
@@ -1269,11 +1269,17 @@ and `42`. Native-enabled compiler rebuild succeeds. This is tested on
 on Raven main as `d0a115dcf`. No bridge-free bootstrap or general native async
 entry-draining support is claimed.
 
-### Math namespace constants (2026-10-08 development)
+### Math assembly-level constants (2026-10-08 development)
 
 Pi, E and Tau are literal Double members on the already selected System.Math namespace
 container. Their XML descriptions and matching reference/snapshot are refreshed together.
 The native library stores them directly as namespace metadata; the CLI carrier here is
-only the documentation bridge. The new host NamespaceConstantDefinition,
-AssemblyBuilder.AddNamespaceConstant and ModuleDefinition.NamespaceConstants APIs are
-covered in [the manual metadata reference](experimental-metadata.md#native-namespace-double-constants-development-2026-10-08), not silently omitted guest APIs.
+only the documentation bridge. The new host AssemblyConstantDefinition,
+AssemblyBuilder.AddConstant and ModuleDefinition.Constants APIs are
+covered in [the manual metadata reference](experimental-metadata.md#native-assembly-level-double-constants-development-2026-10-08), not silently omitted guest APIs.
+
+Assembly-level member naming/ownership (2026-10-08): new host AssemblyMemberKind,
+AssemblyMemberDefinition, AssemblyMemberInfo, both GetMembers methods and constant
+ownership/FullName properties have [manual API coverage](experimental-metadata.md#assembly-level-member-model-development-2026-10-08).
+They are host metadata APIs, outside the guest RavenDoc assembly. The renamed constant
+APIs and assembly manifest key require rebuilding earlier same-day prototype artifacts.

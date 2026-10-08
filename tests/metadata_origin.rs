@@ -181,9 +181,9 @@ fn callable_nullable_annotations_roundtrip_without_runtime_semantics() {
 }
 
 #[test]
-fn namespace_constants_preserve_bits_and_reject_invalid_contracts() {
+fn constants_preserve_bits_and_reject_invalid_contracts() {
     let mut module = assemble(&source()).unwrap();
-    let constant = neoclr::metadata_origin::NamespaceConstant {
+    let constant = neoclr::metadata_origin::AssemblyConstant {
         namespace: "System.Math".into(),
         name: "Pi".into(),
         ty: "Double".into(),
@@ -191,12 +191,12 @@ fn namespace_constants_preserve_bits_and_reject_invalid_contracts() {
         visibility: "public".into(),
     };
     module.assemblies[0]
-        .namespace_constants
+        .constants
         .push(constant.clone());
     let json = serde_json::to_string(&module).unwrap();
     let roundtrip = load(&json).unwrap();
     assert_eq!(
-        roundtrip.assemblies[0].namespace_constants,
+        roundtrip.assemblies[0].constants,
         [constant.clone()]
     );
     for (field, value) in [
@@ -208,9 +208,9 @@ fn namespace_constants_preserve_bits_and_reject_invalid_contracts() {
         ("visibility", "private"),
     ] {
         let mut invalid = serde_json::to_value(&module).unwrap();
-        invalid["assemblies"][0]["namespace_constants"][0][field] = value.into();
+        invalid["assemblies"][0]["constants"][0][field] = value.into();
         assert!(load(&invalid.to_string()).is_err(), "{field}: {value}");
     }
-    module.assemblies[0].namespace_constants.push(constant);
+    module.assemblies[0].constants.push(constant);
     assert!(load(&serde_json::to_string(&module).unwrap()).is_err());
 }

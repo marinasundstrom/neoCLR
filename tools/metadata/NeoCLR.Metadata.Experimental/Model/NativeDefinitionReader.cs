@@ -2,7 +2,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 
 public sealed partial class AssemblyDefinition
 {
-    /// <summary>Reads authoritative native namespace-function and bounded class/value/interface declarations directly from PE/#Neo or standalone NEOX.</summary>
+    /// <summary>Reads authoritative native assembly-level-function and bounded class/value/interface declarations directly from PE/#Neo or standalone NEOX.</summary>
     /// <param name="image">Complete schema-1/2/3 PE runtime container or schema-2/3 standalone NEOX with an assembly manifest.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
     /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including constrained and generic static owners and generic instance methods, unsupported field types and signatures beyond the bounded native profile.</exception>
@@ -117,7 +117,7 @@ public sealed partial class NativeAssemblyDefinition
                     : new InterfaceImplementation(owner.ReferencedType!);
                 return new ExplicitInterfaceImplementation(relationship, mapping.Name);
             }));
-        result.MainModule.SetNamespaceConstants(namespaceConstants);
+        result.MainModule.SetConstants(assemblyConstants);
         return result;
     }
 }

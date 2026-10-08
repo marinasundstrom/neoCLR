@@ -797,7 +797,7 @@ Native emission now collects and validates all supported source declarations fir
 then creates type/callable definitions, registers references, and emits bodies. Empty
 static types remain declarations even when they have no callable plans. The native
 syntax/capability validator remains adapter-owned; it still rejects unsupported attributes,
-visibility, namespace functions and richer type contracts rather than dropping metadata.
+visibility, assembly-level functions and richer type contracts rather than dropping metadata.
 
 Compared with the previous inline builder creation, the plan separates source semantics
 from backend lifetime/ownership and gives both adapters one callable definition/body
@@ -1690,7 +1690,7 @@ compatibility and validation](design/extended-cli-metadata.md#ownerless-function
 
 ## Namespaced functions and real Math source — 2026-10-01
 
-Raven now admits block/file namespace functions through a distinct shared target
+Raven now admits block/file assembly-level functions through a distinct shared target
 capability, preserving the full semantic namespace and simple name. Both bounded
 backend profiles opt in; ordinary .NET remains the default. Native functions retain
 no type owner. No Runtime Contract setting changes. The native adapter requires the
@@ -3149,7 +3149,7 @@ from the CLI namespace container; it still does not emit or execute as a complet
 implementation ([report](experiments/extended-cli-metadata/array-list-after-reservation-2026-10-02.json)).
 The broader collections application remains executable with exact output
 ([regression evidence](experiments/extended-cli-metadata/collections-after-reservation-2026-10-02.json)).
-Next is namespace-function dependency mapping. The CLI seed and translated System remain
+Next is assembly-level-function dependency mapping. The CLI seed and translated System remain
 explicit temporary dependencies; native metadata importing remains their eventual
 replacement. Compiler support on its feature branch does not imply runtime publication
 or a main-branch merge.
@@ -3162,7 +3162,7 @@ copy independence, iteration, FindAll, Exists, TrueForAll, Find/FindLast and the
 variants, including absent Option results. Negative capacity and invalid indexing reach
 the expected System.Fail faults. The broad collections application retains exact output.
 
-Native namespace functions are temporarily imported through public abstract sealed CLI
+Native assembly-level functions are temporarily imported through public abstract sealed CLI
 containers marked by the exact configured core's parameterless TopLevelAttribute. The
 metadata binding validates the public static method signature and maps namespace/name
 to an ownerless native function. CLI writing retains the original container MemberRef.
@@ -3254,7 +3254,7 @@ The importer and native System contract resolution remain unimplemented.
 
 ### Direct native reader foundation (2026-10-02)
 
-The metadata library now reads primitive nongeneric namespace functions from native
+The metadata library now reads primitive nongeneric assembly-level functions from native
 PE/#Neo directly into shared definitions, including scoped references and entry identity.
 The compiler can inspect these via TryGetSignature without a CLI projection or reflection.
 Existing exact dependency resolution accepts the snapshots. Both container encodings
@@ -3295,7 +3295,7 @@ AssemblyBuilder.ImportReference. The host supplies the registered native referen
 its exact Definition and matching explicit core in NeoClrMetadataDependency; mismatched
 snapshots or translated implementation mappings are rejected without output.
 
-Both an API-authored native overload library and a Raven-authored namespace-function
+Both an API-authored native overload library and a Raven-authored assembly-level-function
 library are read directly, consumed by Raven and executed in neoCLR, returning
 Int32(42). The primitive core remains the explicit CLI bootstrap. This follows the
 shared definitions/reader/writer direction; neither a reflection facade nor a native
@@ -3317,7 +3317,7 @@ The shared definition reader now materializes fieldless nongeneric top-level sta
 classes and their primitive methods, retaining native type origin tokens, namespace,
 visibility and canonical method ownership. Raven supplies compilation-owned nominal
 symbols, normal type lookup and primitive overload resolution. The emitter imports the
-bound native method definition through the same route as namespace functions; there is
+bound native method definition through the same route as assembly-level functions; there is
 no synthetic CLI dependency or reflection representation.
 
 The C# native-symbol runtime probe adds a Raven-produced static class library and a
@@ -3611,7 +3611,7 @@ constructed-field emission remain pending. CLI core/translated System bootstrap 
 
 Direct native signatures now retain local Box<int>-style constructions in an immutable
 ReferencedGenericType model. Raven resolves these through its existing module signature
-cache and shared type construction. CreateBox/EchoBox native namespace functions now
+cache and shared type construction. CreateBox/EchoBox native assembly-level functions now
 carry constructed parameters/results across the library boundary; all seven consumers
 execute (42). C# metadata checks and CLR/native factory consumers pass (105 groups).
 No Runtime Contract, format or runtime change. Open/external generic constructions and
@@ -3642,7 +3642,7 @@ Reproduce independently before attributing this to a general binder defect or ch
 shared compiler behavior; this is not a metadata-format restriction.
 
 
-### Qualified native namespace functions resolved (2026-10-02)
+### Qualified native assembly-level functions resolved (2026-10-02)
 
 Raven shared lookup now includes directly namespace-owned static methods alongside
 CLI-container promotions, and binds these functions without a synthetic type receiver.
@@ -3670,7 +3670,7 @@ translated System bootstrap remain unchanged; seven executing consumers establis
 current behavior, not completion of the planned separation.
 
 
-### Symbol-only namespace-function emission (2026-10-02)
+### Symbol-only assembly-level-function emission (2026-10-02)
 
 Raven `2197fc2a2` and metadata `19a164d0` now author primitive/method-generic/vector
 namespace calls from semantic symbols and captured assembly/artifact values. The
@@ -3695,7 +3695,7 @@ reference on CLR and both native containers. See [evidence](experiments/extended
 
 ### Symbol-owned nominal namespace calls (2026-10-02)
 
-Raven `269c60b07` reconstructs namespace-function signatures carrying external root
+Raven `269c60b07` reconstructs assembly-level-function signatures carrying external root
 classes, including open/closed constructions and vectors, from symbols. The writer
 recognizes these authored calls during graph validation. The three-assembly generic
 forwarding case and all seven runtime consumers execute (42); 107 C# groups pass.
@@ -3912,7 +3912,7 @@ semantics but its guest implementation is unchanged. No performance claim is mad
 
 
 Method/parameter facade checkpoint (2026-10-02): MethodInfo, ParameterInfo and
-MethodGenericParameterTypeInfo now project namespace functions and declared methods,
+MethodGenericParameterTypeInfo now project assembly-level functions and declared methods,
 including methods viewed on constructed owners. Owner and method argument scopes are
 separate and substitution is simultaneous. Method/parameter identities remain canonical
 within the context; no invocation or runtime loading is introduced.
@@ -3982,7 +3982,7 @@ Generic method inspection checkpoint (2026-10-03): MethodInfo.MakeGenericMethod 
 returns a canonical metadata view whose owner and method argument scopes are applied
 simultaneously. GetGenericMethodDefinition retains the same open/constructed declaring
 owner. Inputs are copied; caller-scoped parameters keep their original identity.
-Namespace functions and vectors use the same projection. These views cannot invoke or
+Assembly-level functions and vectors use the same projection. These views cannot invoke or
 emit code; Raven continues its own inference and compiler-symbol construction.
 
 The comparison baseline is .NET 10 MethodInfo.MakeGenericMethod (Microsoft Learn,
@@ -6251,7 +6251,7 @@ errors remain. See the [bounded public contract](../api-docs/experimental-metada
 ### Source NativeMemory now executes (2026-10-07)
 
 Raven's native target maps metadata pointer views to semantic pointer symbols and
-uses an explicit shared pointer capability for emission. External namespace functions
+uses an explicit shared pointer capability for emission. External assembly-level functions
 are authored from those symbols and host identities; no importer object is reused.
 Both Alloc overloads and Free in the unchanged source NativeMemory implementation
 execute through the real NativeAllocation adapter and existing tracked runtime heap.
@@ -6962,16 +6962,16 @@ No shared Raven lookup fix was needed. Native core ownership will eventually rem
 the entire temporary CLI input; this slice does not meet the no-bridge release gate.
 [Evidence](../benchmarks/native-web/math-lookup-validation.json).
 
-### Native namespace constants — 2026-10-08
+### Native assembly-level constants — 2026-10-08
 
-Native intent: namespace Double constants are descriptive metadata and inline at
+Native intent: assembly-level Double constants are descriptive metadata and inline at
 compile time, with no nominal carrier, storage or initialization. Raven's native
 adapter emits public/internal finite Double declarations and imports exact values
 as namespace field symbols from the native assembly snapshot. The shared portable
 body planner loads Double constant fields directly. No Runtime Contract option changes.
 Ordinary .NET still emits CLI literal fields on Raven's namespace-member carrier.
 
-neoCLR metadata tools and runtime own the optional namespace_constants assembly list;
+neoCLR metadata tools and runtime own the optional constants assembly list;
 Raven owns declaration/semantic import and inlining. The native PE's incidental CLI
 reference envelope omits these constants; it is not authoritative and cannot be used
 as a standalone constant-bearing .NET reference. Explicit standalone CLI projection
@@ -6979,7 +6979,7 @@ rejects instead of silently losing values. The documentation bridge separately e
 Pi/E/Tau as namespace carrier literal fields. All artifacts must be rebuilt together.
 The native contract currently supports finite Double only; other constant types and
 runtime reflection remain future slices. Full native core ownership replaces the
-remaining CLI bootstrap independently. [Contracts and evidence](math.md#namespace-constants-development-2026-10-08).
+remaining CLI bootstrap independently. [Contracts and evidence](math.md#assembly-level-constants-development-2026-10-08).
 
 Validated compiler: Raven `codex/source-object-metadata-resolution` commit
 `c3dcf4f5f` (with the same built artifacts used by the recorded checks). Its native

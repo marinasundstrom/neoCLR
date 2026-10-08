@@ -9,6 +9,31 @@ now transports #Neo and tests ordinary reader behavior. This opening section rec
 a bounded Raven/runtime integration. See the [current assessment](../experiments/extended-cli-metadata/state-assessment-2026-10-01.md)
 for implemented coverage. Production numeric encodings remain unassigned.
 
+## Assembly-level members and qualified names (2026-10-08)
+
+Author clarification: types, functions and constants can be assembly-level members.
+Their names include namespaces. Assembly identity supplies ownership; the namespace
+is part of the qualified name and supports source lookup/imports.
+
+For example, System.Runtime declares the type `System.String`, the function
+`System.Math.Sign`, and the constant `System.Math.Pi`. The metadata may store the
+namespace and simple name separately; together they represent the qualified name.
+Function overloads also retain signatures. A qualified name alone does not replace
+assembly identity when resolving dependencies. Type-owned members and nested types
+retain their declaring-type relationships.
+
+Use **assembly-level function**, **assembly-level constant** or **assembly-level
+member** in APIs and documentation. The existing `Namespace` metadata property and
+namespace imports describe name qualification. This terminology does not change
+CLI instruction semantics, runtime storage, overload identity or ABI conventions.
+
+The reader/writer definition model now exposes `AssemblyDefinition.GetMembers()`;
+the introspection reader exposes `AssemblyInfo.GetMembers()`. Their discriminated views
+retain assembly/module ownership, qualified names and typed declarations for all three
+member kinds. Constant definitions attach once to their owning graph. This is a logical
+view over existing metadata tables/lists, not a forced physical nesting of every row.
+[API contract and limits](../../api-docs/experimental-metadata.md#assembly-level-member-model-development-2026-10-08).
+
 ## Compatibility baseline reaffirmed — 2026-10-01
 
 The author reaffirmed that the format should remain basically compatible with .NET

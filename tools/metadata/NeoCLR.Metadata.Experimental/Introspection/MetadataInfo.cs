@@ -5,14 +5,21 @@ namespace NeoCLR.Metadata.Experimental.Introspection;
 /// <summary>A metadata-only assembly facade, shaped after System.Introspection.AssemblyInfo.</summary>
 public sealed class AssemblyInfo
 {
+    private readonly MetadataLoadContext context;
     private readonly IReadOnlyList<ModuleInfo> modules;
     private readonly Lazy<IReadOnlyList<AssemblyInfo>> references;
     internal AssemblyInfo(MetadataLoadContext context, AssemblyDefinition definition)
     {
+        this.context = context;
         Definition = definition;
         modules = Array.AsReadOnly(new[] { new ModuleInfo(context, this, definition.MainModule) });
         references = new(() => Array.AsReadOnly(definition.MainModule.AssemblyReferences.Select(context.Resolve).ToArray()));
     }
+    /// <summary>Gets assembly-level type, function and constant views with qualified names and ownership.</summary>
+    /// <remarks>Matches AssemblyDefinition.GetMembers ordering and exclusions. Returned lists are read-only;
+    /// the initial reader supports a single manifest module.</remarks>
+    public IReadOnlyList<AssemblyMemberInfo> GetMembers() => Array.AsReadOnly(Definition.GetMembers()
+        .Select(member => new AssemblyMemberInfo(context, this, modules[0], member)).ToArray());
     internal AssemblyDefinition Definition { get; }
     /// <summary>Gets the simple metadata name.</summary>
     public string Name => Definition.Name;
@@ -46,7 +53,7 @@ public sealed class ModuleInfo
     public AssemblyInfo Assembly { get; }
     /// <summary>Gets declared nominal types in metadata order, including nested types.</summary>
     public IReadOnlyList<NominalTypeInfo> GetTypes() => types.Value;
-    /// <summary>Gets namespace-level functions in metadata order.</summary>
+    /// <summary>Gets assembly-level functions in metadata order.</summary>
     public IReadOnlyList<MethodInfo> GetFunctions() => Array.AsReadOnly(definition.Functions.Select(context.Resolve).ToArray());
 }
 

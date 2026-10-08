@@ -9,6 +9,24 @@ neoCLR's target API and bootstrap have narrower capabilities than ordinary Raven
 on .NET. Compile examples against the target rather than assuming similar syntax
 or host APIs work here.
 
+## Assembly-level members and qualified names (2026-10-08)
+
+Author clarification: types, functions and constants can be assembly-level members.
+Their names include namespaces. Assembly identity supplies ownership; the namespace
+is part of the qualified name and supports source lookup/imports.
+
+For example, System.Runtime declares the type `System.String`, the function
+`System.Math.Sign`, and the constant `System.Math.Pi`. The metadata may store the
+namespace and simple name separately; together they represent the qualified name.
+Function overloads also retain signatures. A qualified name alone does not replace
+assembly identity when resolving dependencies. Type-owned members and nested types
+retain their declaring-type relationships.
+
+Use **assembly-level function**, **assembly-level constant** or **assembly-level
+member** in APIs and documentation. The existing `Namespace` metadata property and
+namespace imports describe name qualification. This terminology does not change
+CLI instruction semantics, runtime storage, overload identity or ABI conventions.
+
 ## Sources and scope
 
 Reviewed in the Raven `neoclr` checkout on 2026-09-19, revision `9b2a558ae`:

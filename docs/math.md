@@ -104,16 +104,18 @@ Rebuild with `prepare-native-bootstrap.py` and the matching native library bundl
 old Core.dll files still have the collision. This corrects neoCLR bootstrap ownership,
 without changing Raven's ordinary .NET type/namespace lookup precedence or adding
 name-based native call substitution. The separate historical primitive/CLI probe
-modes retain their explicitly selected surfaces. Namespace constants are a separate
+modes retain their explicitly selected surfaces. Assembly-level constants are a separate
 emitter/metadata task; they are not part of this lookup correction.
 
 The unchanged `library-strings.rvn` exercises negative, zero and positive Sign results
 with exact expected text in the interpreter, sanitized native and standalone runs.
 See [validation](../benchmarks/native-web/math-lookup-validation.json).
 
-## Namespace constants (development, 2026-10-08)
+## Assembly-level constants (development, 2026-10-08)
 
-`System.Math` now declares `public const Pi: double`, `E: double` and `Tau: double`.
+System.Runtime declares the assembly-level constants `System.Math.Pi`,
+`System.Math.E` and `System.Math.Tau`, each with type Double. Their qualified names
+include the `System.Math` namespace.
 Pi is the circumference-to-diameter ratio, E is the base of natural logarithms,
 and Tau is a full turn in radians. Their binary64 bits match .NET 10 Math.PI,
 Math.E and Math.Tau: `400921fb54442d18`, `4005bf0a8b145769` and `401921fb54442d18`.
@@ -128,7 +130,7 @@ The [checked-in sample](experiments/raven-target/samples/library-math-constants.
 checks all three values, qualified and wildcard access, Tau = 2 * Pi, and Sign.
 
 Compared with .NET's literal fields on a static class, native metadata retains
-namespace constants directly in an optional assembly manifest list. The initial
+assembly-level constants directly in an optional assembly manifest list. The initial
 contract is bounded to finite Double values and public/internal visibility, with
 exact hexadecimal binary64 bits. Invalid/duplicate definitions reject; older readers
 reject this added field, so refresh compiler, metadata tools and runtime together.
@@ -146,12 +148,12 @@ execution of this sample is not supported yet. Double instruction support is the
 next bounded task, separately from floating Math service bindings.
 
 Reproduce the admission assessment with `verify_math_constants.py` and the visibility/
-emission controls with `verify_namespace_constants.py` in
+emission controls with `verify_assembly_constants.py` in
 `docs/experiments/extended-cli-metadata/`, using the same compiler and bundle.
 The former requires `--compiler`, `--bundle`, `--runtime`, `--aot`, `--output`;
 the latter requires `--compiler`, `--bundle`, `--output`. Outputs must be fresh directories.
 Metadata round trips and rejection controls run with
-`dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --namespace-constants`;
+`dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --assembly-constants`;
 runtime validation runs with `cargo test --test metadata_origin`.
 
 Validation: six focused Raven namespace/.NET controls, ten runtime metadata-origin
@@ -160,4 +162,4 @@ emission/visibility controls pass. The .NET executable control also reads the re
 documentation DLL and verifies all three literal values, avoiding drift between the
 handwritten temporary CLI declarations and the source Math API. Run it with
 `dotnet run --project docs/experiments/math-dotnet -- api-docs/reference/NeoCLR.CoreProbe.dll`.
-[Compiler control evidence](experiments/extended-cli-metadata/namespace-constants-validation.json).
+[Compiler control evidence](experiments/extended-cli-metadata/assembly-constants-validation.json).

@@ -1290,7 +1290,7 @@
 
     <member name="P:System.AttributeUsageAttribute.AllowMultiple"><summary>Gets or sets whether the attribute permits repeated applications.</summary></member>
     <member name="P:System.AttributeUsageAttribute.Inherited"><summary>Gets or sets whether attribute metadata is inherited.</summary></member>
-    <member name="T:System.Math.NamespaceMembers"><summary>Namespace functions and constants for integer and floating-point mathematics.</summary></member>
+    <member name="T:System.Math.NamespaceMembers"><summary>Assembly-level functions and constants for integer and floating-point mathematics.</summary></member>
     <member name="F:System.Math.NamespaceMembers.Pi"><summary>The circle circumference-to-diameter ratio, rounded to Double precision.</summary><remarks>Development API. Equivalent to .NET Math.PI; named Pi using neoCLR casing. Compile-time constant: consumers inline its value.</remarks></member>
     <member name="F:System.Math.NamespaceMembers.E"><summary>Euler's number, the base of natural logarithms, rounded to Double precision.</summary><remarks>Development compile-time constant equivalent to .NET Math.E.</remarks></member>
     <member name="F:System.Math.NamespaceMembers.Tau"><summary>One full turn in radians, equal to twice Pi at Double precision.</summary><remarks>Development compile-time constant equivalent to .NET Math.Tau.</remarks></member>
@@ -1334,7 +1334,7 @@
 
     <member name="M:System.Math.NamespaceMembers.Sign(System.Int32)"><summary>Returns -1, 0 or 1 according to the integer sign.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="T:System.NamespaceMembers"><summary>Namespace functions including the terminal Fault operation.</summary></member>
+    <member name="T:System.NamespaceMembers"><summary>Assembly-level functions including the terminal Fault operation.</summary></member>
     <member name="M:System.NamespaceMembers.Fail(System.String)"><summary>Terminates the current invocation with the supplied fault message.</summary><param name="message">The terminal fault message.</param></member>
 
     <member name="T:System.Propagatable`3"><summary>The compiler-facing contract for separating successful output from a residual outcome during propagation.</summary></member>

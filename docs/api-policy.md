@@ -26,7 +26,7 @@ alone do not justify additional consumer-visible differences.
 
 ## Namespaces for utility functions (2026-09-14)
 
-Prefer namespace functions when an API only groups operations and does not need a
+Prefer assembly-level functions when an API only groups operations and does not need a
 type contract. The author selected `System.Math` as the first example: a namespace
 can contain functions, constants where the language supports them, and related
 types. Do not introduce a public utility class solely to act as a namespace.
@@ -46,7 +46,7 @@ remain distinct representations; importing must preserve their documented mappin
 Compared with exposing a .NET-style static utility class, this gives the namespace
 room for related types and avoids making a type part of the API merely to group
 functions. It does not imply a performance benefit. The cost is a different source
-contract for languages without namespace functions, plus deliberate handling of
+contract for languages without assembly-level functions, plus deliberate handling of
 generated containers in metadata, reflection and tooling. Such languages may need
 to call the emitted static methods. Preserve normal CLI metadata for now rather
 than introducing another binary format to hide that difference.
