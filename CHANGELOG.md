@@ -28,7 +28,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   host-context identity, readable suspended caller snapshots and cleanup before every
   generated return, including propagated faults. The private probe callback advances to
   v2 and requires matching enter/leave adapters; entry ABI v3/v4 is unchanged. Root
-  coverage remains incomplete and collection stays disabled.
+  coverage remains incomplete and collection stays disabled. Publish typed argument/local
+  lane addresses in diagnostic frames, including seeded unassigned local roots; observe
+  later writes without following borrowed pointees. Read discriminators as 32 bits to
+  avoid uninitialized padding. Frames grow to 72 bytes and the private enter adapter
+  advances to v2; diagnostic hosts/images must be relinked together.
 
 - Add a real RoutePattern workload covering eight repeated routing outcomes, pattern
   errors and capture retention. Measure native arena growth from 2,433 bytes before

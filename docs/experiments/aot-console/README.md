@@ -1692,8 +1692,8 @@ observable in executable code, unlike unused stores intended for future registra
 
 Snapshots may be observed through the active diagnostic chain during callbacks. The hook
 must not allocate, reenter, retain frames beyond their lifetime, mutate roots or trigger
-collection. No local or argument root set is registered, and no future result/constructor
-receiver is active in this pre-operation snapshot. Native adapters remain uncovered. Complete root coverage, host roots, owner recovery and result activation still precede GC.
+collection. Traceable argument/local addresses are now exposed as described below; no
+future result/constructor receiver is active in this pre-operation snapshot. Native adapters remain uncovered. Complete root coverage, host roots, owner recovery and result activation still precede GC.
 The callback is diagnostic only; it is not a stable ABI or the proposed native metadata
 interop interface. The default runtime and managed contracts are unchanged.
 
@@ -1718,7 +1718,7 @@ correctness instrument with overhead, not a performance optimization or collecto
 
 ## Diagnostic frame lifetimes (2026-10-08)
 
-The opt-in probe now links a 48-byte, stack-owned frame on entry to every ordinary managed
+The initial lifetime slice linked a 48-byte, stack-owned frame on entry to every ordinary managed
 body, including bodies without a pre-operation point. Each frame records its host context,
 function index, prior frame and latest initialized stack snapshot. A callee's callback can
 observe its suspended callers' snapshots. Native adapter/dispatch wrappers remain omitted;
@@ -1732,7 +1732,8 @@ unchanged. Default, uninstrumented builds add no frame storage or callback depen
 
 The private callback ABI changes from `neoclr_probe_stack_roots_v1` to v2, taking a frame
 pointer instead of a function index; function/context identities are in the frame.
-Instrumented images now also require `neoclr_probe_enter_v1` and `neoclr_probe_leave_v1`.
+The initial frame contract added enter/leave hooks; the storage extension below uses
+`neoclr_probe_enter_v2` with the existing `neoclr_probe_leave_v1`.
 Recompile/relink diagnostic hosts and images together against [root-probe.h](root-probe.h).
 This does not change guest APIs or select a stable external GC/hosting ABI.
 
@@ -1754,3 +1755,43 @@ This follows the existing CLR/shadow-stack comparison: lexical frame lifetime an
 are necessary but insufficient for a precise collector. Arguments/locals, initialized
 borrow pointees, constructor/result activation, native adapters and host/fault roots still
 need coverage. Diagnostic ancestor scanning adds overhead; no speed or memory claim is made.
+
+## Argument and local storage in diagnostic frames (2026-10-08)
+
+Ordinary instrumented functions now publish addresses of their traceable argument and
+local lanes alongside the evaluation-stack snapshot. Each table entry contains a slot
+address, read width and flags; an image-owned JSON descriptor identifies argument/local
+index, padded lane and typed layout. Numeric-only slots are excluded. A borrow entry
+publishes the address of the slot holding the borrow, never the borrowed pointee itself.
+
+Arguments are copied before publication. Local reference lanes and erased tags are seeded
+before publication, so an unassigned String or erased local is observable as internal zero
+storage without becoming guest-readable. Guest definite assignment remains unchanged.
+The table points to live frame storage: a subsequent store is visible to nested callbacks
+without refreshing a snapshot. Discriminators are read as four bytes and reference/payload
+lanes as eight; argument-tag padding need not be initialized and must not be read.
+
+The private frame grows from 48 to 72 bytes, plus 16 bytes per selected storage lane.
+Both allocations count toward the 64 KiB frame budget. `neoclr_probe_enter_v2` receives
+the table and JSON descriptor; stack observation remains `neoclr_probe_stack_roots_v2`
+and removal remains `neoclr_probe_leave_v1`. Recompile/relink instrumented images and
+hosts together against the matching header. Guest metadata and entry ABI v3/v4 are unchanged.
+Default emission still publishes no diagnostic frame or table.
+
+The adapter reads only the specified bytes at each slot address. Flag 1 marks a
+discriminator; flag 2 marks a borrowed-address slot. Neither flags nor JSON authorize
+following borrowed pointees, treating numeric erased payloads as references or running a
+collector. Reference-valued locals remain conservatively retained after assignment;
+precise liveness, owner recovery and output-pointee initialization remain unresolved.
+Native adapters, pending constructor/results and host/fault roots still need coverage.
+
+Validation extends the three-level ARM64 lifecycle test to inspect erased arguments,
+zeroed unassigned local roots, and a later local String write through the suspended parent
+frame. A separate adapter test passes an inaccessible borrowed pointee and succeeds by
+reading only the slot. Fifteen focused probe, inspection and fault-detail tests pass.
+[Routing storage evidence](route-root-storage-validation.json) records standalone
+execution, ancestor storage reads, output/fault parity and empty chains at host return.
+
+This follows the existing CLR/root-map comparison: typed slot locations and widths are
+necessary inputs, not complete safepoint metadata. Address-table storage and diagnostic
+reads add overhead. No collector, liveness precision or performance advantage is claimed.

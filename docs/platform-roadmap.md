@@ -201,8 +201,10 @@ emit the planned spills and expose initialized snapshots to a linked read-only d
 callback ([validation](experiments/aot-console/route-root-probe-validation.json)). Opt-in
 diagnostic frames now retain ancestor
 snapshots and unlink on success/fault returns ([validation](experiments/aot-console/route-probe-frame-validation.json)).
-Arguments, locals, borrows, pending results, adapters and host/fault roots remain incomplete.
-Extend frame coverage next, then add allocation descriptors and nonmoving tracing/reclamation
+Typed argument/local lane addresses are now published in those frames, with bounded-width
+reads and seeded local roots ([validation](experiments/aot-console/route-root-storage-validation.json)).
+Borrowed pointees, pending results, adapters and host/fault roots remain incomplete.
+Extend that coverage next, then add allocation descriptors and nonmoving tracing/reclamation
 before qualifying
 sustained HTTP execution. This is planned integration work, not an implemented native
 collector. Borrowed String interface receivers remain unsupported.

@@ -1,6 +1,6 @@
 //! Opt-in diagnostic frame chain. Incomplete roots: collection remains forbidden.
 use super::{
-    Error, gc_points,
+    Error, gc_layout, gc_points,
     profile::{Profile, Stacks},
 };
 use cranelift_codegen::cursor::{Cursor, FuncCursor};
@@ -10,6 +10,11 @@ use cranelift_module::{DataDescription, DataId, FuncId, Linkage, Module};
 use cranelift_object::ObjectModule;
 use std::collections::HashMap;
 
+struct Storage {
+    data: DataId,
+    length: usize,
+    lanes: Vec<(bool, usize, usize, u32, u32)>,
+}
 struct Point {
     data: DataId,
     length: usize,
@@ -21,6 +26,7 @@ pub(super) struct Probes {
     enter: FuncId,
     leave: FuncId,
     points: HashMap<(usize, usize), Point>,
+    storage: HashMap<usize, Storage>,
 }
 impl Probes {
     pub fn prepare(
@@ -44,20 +50,72 @@ impl Probes {
         let callback =
             module.declare_function("neoclr_probe_stack_roots_v2", Linkage::Import, &sig)?;
         let mut enter_sig = module.make_signature();
-        enter_sig
-            .params
-            .extend([types::I64, types::I64, types::I32].map(AbiParam::new));
+        enter_sig.params.extend(
+            [
+                types::I64,
+                types::I64,
+                types::I32,
+                types::I64,
+                types::I32,
+                types::I64,
+                types::I32,
+            ]
+            .map(AbiParam::new),
+        );
         let enter =
-            module.declare_function("neoclr_probe_enter_v1", Linkage::Import, &enter_sig)?;
+            module.declare_function("neoclr_probe_enter_v2", Linkage::Import, &enter_sig)?;
         let mut leave_sig = module.make_signature();
         leave_sig.params.push(AbiParam::new(types::I64));
         let leave =
             module.declare_function("neoclr_probe_leave_v1", Linkage::Import, &leave_sig)?;
         let mut points = HashMap::new();
+        let mut storage = HashMap::new();
         for (i, f) in p.input.functions.iter().enumerate() {
             if gc_points::native_body(p, i, details) {
                 continue;
             }
+            let mut lanes = vec![];
+            let mut entries = vec![];
+            for (argument, types) in [(true, &p.args[i]), (false, &p.locals[i])] {
+                for (index, ty) in types.iter().enumerate() {
+                    let wide = p.pointer_lanes(ty);
+                    for lane in gc_layout::seed_lanes(p, ty) {
+                        let width = if wide[lane] { 8 } else { 4 };
+                        let flags = if matches!(ty, super::profile::Ty::Address(_)) {
+                            2
+                        } else if width == 4 {
+                            1
+                        } else {
+                            0
+                        };
+                        lanes.push((argument, index, lane, width, flags));
+                        entries.push(serde_json::json!({"argument": argument, "index": index,
+                            "lane": lane, "readBytes": width, "flags": flags, "layout": gc_layout::layout(p, ty)}));
+                    }
+                }
+            }
+            let mut bytes = serde_json::to_vec(
+                &serde_json::json!({"schema":"neoclr-probe-storage-v1", "entries":entries}),
+            )?;
+            let length = bytes.len();
+            bytes.push(0);
+            let data = module.declare_data(
+                &format!("neoclr_root_storage_{i}"),
+                Linkage::Local,
+                false,
+                false,
+            )?;
+            let mut description = DataDescription::new();
+            description.define(bytes.into_boxed_slice());
+            module.define_data(data, &description)?;
+            storage.insert(
+                i,
+                Storage {
+                    data,
+                    length,
+                    lanes,
+                },
+            );
             for (pc, op) in f.body.iter().enumerate() {
                 let Some(stack) = &flows[i][pc] else {
                     continue;
@@ -98,6 +156,7 @@ impl Probes {
             enter,
             leave,
             points,
+            storage,
         })
     }
     pub fn enter(
@@ -107,11 +166,36 @@ impl Probes {
         frame: StackSlot,
         context: ir::Value,
         function: usize,
+        table: StackSlot,
+        arguments: &[StackSlot],
+        locals: &[StackSlot],
     ) {
         let address = b.ins().stack_addr(types::I64, frame, 0);
+        let storage = &self.storage[&function];
+        for (n, &(argument, index, lane, width, flags)) in storage.lanes.iter().enumerate() {
+            let slot = if argument {
+                arguments[index]
+            } else {
+                locals[index]
+            };
+            let pointer = b.ins().stack_addr(types::I64, slot, (lane * 8) as i32);
+            b.ins().stack_store(pointer, table, (n * 16) as i32);
+            let width = b.ins().iconst(types::I32, width as i64);
+            let flags = b.ins().iconst(types::I32, flags as i64);
+            b.ins().stack_store(width, table, (n * 16 + 8) as i32);
+            b.ins().stack_store(flags, table, (n * 16 + 12) as i32);
+        }
+        let table = b.ins().stack_addr(types::I64, table, 0);
+        let count = b.ins().iconst(types::I32, storage.lanes.len() as i64);
+        let data = module.declare_data_in_func(storage.data, b.func);
+        let plan = b.ins().global_value(types::I64, data);
+        let length = b.ins().iconst(types::I32, storage.length as i64);
         let function = b.ins().iconst(types::I32, function as i64);
         let enter = module.declare_func_in_func(self.enter, b.func);
-        b.ins().call(enter, &[address, context, function]);
+        b.ins().call(
+            enter,
+            &[address, context, function, table, count, plan, length],
+        );
     }
     // Lowering emits returns in many fault branches. Instrument the completed IR
     // so all returns, including arithmetic/null faults, share the same cleanup.
@@ -128,6 +212,9 @@ impl Probes {
             let address = cursor.ins().stack_addr(types::I64, frame, 0);
             cursor.ins().call(leave, &[address]);
         }
+    }
+    pub fn table_bytes(&self, function: usize) -> u32 {
+        (self.storage[&function].lanes.len().max(1) * 16) as u32
     }
     pub fn storage_bytes(&self, function: usize) -> Option<u32> {
         self.points

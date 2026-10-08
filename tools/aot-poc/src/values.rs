@@ -756,15 +756,17 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 frame_bytes += bytes as usize + 7;
                 slot(&mut b, bytes)
             });
-            if root_probes.is_some() {
-                frame_bytes += 48 + 7;
-                probe_frame = Some(slot(&mut b, 48));
-            }
+            let storage_table = root_probes.as_ref().map(|probes| {
+                let bytes = probes.table_bytes(i);
+                frame_bytes += 72 + 7 + bytes as usize + 7;
+                probe_frame = Some(slot(&mut b, 72));
+                slot(&mut b, bytes)
+            });
             if frame_bytes > 65536 {
                 return Err("value profile frame storage exceeds 64 KiB".into());
             }
             if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                probes.enter(&mut module, &mut b, frame, fault_context.unwrap(), i);
+                probes.enter(&mut module, &mut b, frame, fault_context.unwrap(), i, storage_table.unwrap(), &arguments, &locals);
             }
             let blocks: Vec<_> = f.body.iter().map(|_| b.create_block()).collect();
             for (pc, stack) in flows[i].iter().enumerate() {

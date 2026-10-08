@@ -33,8 +33,12 @@ call Id(Value,Int32)
 ret
 .end
 .function Main(Int32 fail) -> Int32
+.local String held
+.local Value never
 ldc.i8 99
 ldstr "keep"
+dup
+stloc held
 ldstr "argument"
 value.pack String
 ldarg fail
@@ -79,15 +83,28 @@ static int text(uint64_t value, const char *expected) {
     const neoclr_aot_text *t = (const void *)(uintptr_t)value;
     return t && t->length == strlen(expected) && !memcmp(t->bytes, expected, t->length);
 }
-void neoclr_probe_enter_v1(neoclr_probe_frame *frame, const void *context, uint32_t function) {
+void neoclr_probe_enter_v2(neoclr_probe_frame *frame, const void *context, uint32_t function,
+    const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
     if (!frame || !context || (head && head->context != context)) abort();
     memset(frame, 0, sizeof(*frame));
     frame->previous = head; frame->context = context; frame->function = function;
+    frame->storage = storage; frame->storage_count = count;
+    frame->storage_plan = plan; frame->storage_length = length;
+    if (!plan || strlen(plan) != length) abort();
+    if (function == 2) {
+        if (count != 3 || storage[0].read_bytes != 8 || *(const uint64_t *)storage[0].address ||
+            storage[1].read_bytes != 4 || storage[1].flags != 1 || *(const uint32_t *)storage[1].address ||
+            *(const uint64_t *)storage[2].address) abort();
+    } else {
+        if (count != 2 || storage[0].read_bytes != 4 || *(const uint32_t *)storage[0].address != 4 ||
+            !text(*(const uint64_t *)storage[1].address, "argument")) abort();
+    }
     head = frame; enters++; depth++; if (depth > peak) peak = depth;
     if (function == 0) {
         const neoclr_probe_frame *caller = frame->previous;
         if (!caller || caller->function != 1 || !caller->previous || caller->previous->function != 2 ||
-            !text(caller->previous->lanes[1], "keep")) abort();
+            !text(caller->previous->lanes[1], "keep") ||
+            !text(*(const uint64_t *)caller->previous->storage[0].address, "keep")) abort();
     }
 }
 void neoclr_probe_leave_v1(neoclr_probe_frame *frame) {
@@ -104,9 +121,9 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t pc,
     if (!plan || strlen(plan) != length || !strstr(plan, "requiredSpillLanes")) abort();
     if (function == 2 && pc == 1) {
         if (count != 1 || lanes[0]) abort();
-    } else if (function == 2 && pc == 2) {
+    } else if (function == 2 && pc == 4) {
         if (count != 2 || lanes[0] || !text(lanes[1], "keep")) abort();
-    } else if (function == 2 && pc == 5) {
+    } else if (function == 2 && pc == 7) {
         if (count != 5 || lanes[4] || lanes[0] || !text(lanes[1], "keep") || lanes[2] != 4 || !text(lanes[3], "argument")) abort();
     } else if (function == 1 && pc == 2) {
         if (count != 3 || lanes[2] || lanes[0] != 4 || !text(lanes[1], "argument")) abort();
@@ -165,4 +182,49 @@ fn probes_require_context_and_reject_duplicates() {
         assert!(!r.status.success());
         assert!(String::from_utf8_lossy(&r.stderr).contains("--probe-stack-roots"));
     }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn adapter_reads_slots_without_following_uninitialized_borrow_pointees() {
+    let dir =
+        Temp(std::env::temp_dir().join(format!("neoclr-probe-borrows-{}", std::process::id())));
+    fs::create_dir(&dir.0).unwrap();
+    let host = dir.0.join("host.c");
+    fs::write(
+        &host,
+        r#"
+#include "root-probe.h"
+#include <string.h>
+int main(void) {
+    uint64_t inaccessible_pointee = 1;
+    uint32_t tag = 4;
+    neoclr_probe_storage storage[] = {{&inaccessible_pointee, 8, 2}, {&tag, 4, 1}};
+    neoclr_probe_frame frame;
+    uint64_t lane = 0;
+    const char *plan = "{\"requiredSpillLanes\":[]}";
+    neoclr_probe_enter_v2(&frame, &frame, 0, storage, 2, plan, (uint32_t)strlen(plan));
+    neoclr_probe_stack_roots_v2(&frame, 0, &lane, 1, plan, (uint32_t)strlen(plan));
+    if (neoclr_root_probe_head_v1() != &frame || neoclr_root_probe_depth_v1() != 1) return 1;
+    neoclr_probe_leave_v1(&frame);
+    return neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1();
+}
+"#,
+    )
+    .unwrap();
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    let binary = dir.0.join("host");
+    let r = Command::new("clang")
+        .args([
+            "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
+        ])
+        .arg(&base)
+        .arg(&host)
+        .arg(base.join("root-probe.c"))
+        .arg("-o")
+        .arg(&binary)
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    assert!(Command::new(binary).status().unwrap().success());
 }

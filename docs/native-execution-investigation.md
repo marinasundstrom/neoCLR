@@ -536,3 +536,10 @@ fault propagation and reentry; the real route host requires an empty chain at re
 record the private v2 probe migration. This is a lifetime audit of incomplete root sets,
 not activation of the proposed collector. Native wrappers and non-stack root categories
 remain outstanding; ancestor scanning adds diagnostic cost.
+
+Diagnostic frames now additionally expose typed addresses of traceable argument/local
+lanes. Seeded local roots are safe to observe internally, later writes remain visible,
+and discriminator reads avoid uninitialized padding. The adapter never follows borrowed
+pointees. [Contract and validation](experiments/aot-console/README.md#argument-and-local-storage-in-diagnostic-frames-2026-10-08)
+record the 72-byte frame/enter-v2 migration and added storage cost. Pointee initialization,
+owner recovery, result activation, adapter and host/fault roots remain open before tracing.

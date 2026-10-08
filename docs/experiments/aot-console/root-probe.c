@@ -4,12 +4,16 @@
 static _Thread_local uint64_t calls;
 static _Thread_local uint32_t depth;
 static _Thread_local neoclr_probe_frame *head;
-void neoclr_probe_enter_v1(neoclr_probe_frame *frame, const void *context, uint32_t function) {
+void neoclr_probe_enter_v2(neoclr_probe_frame *frame, const void *context, uint32_t function,
+    const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
     if (!frame || !context || function >= 512) abort();
     memset(frame, 0, sizeof(*frame));
     frame->previous = head;
     frame->context = context;
     frame->function = function;
+    if (!storage || !plan || strlen(plan) != length) abort();
+    frame->storage = storage; frame->storage_count = count;
+    frame->storage_plan = plan; frame->storage_length = length;
     head = frame;
     depth++;
 }
@@ -30,6 +34,13 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
     frame->length = length;
     volatile uint64_t value = 0;
     for (const neoclr_probe_frame *f = head; f; f = f->previous) {
+        for (uint32_t i = 0; i < f->storage_count; i++) {
+            const neoclr_probe_storage *s = &f->storage[i];
+            if (!s->address || (s->read_bytes != 4 && s->read_bytes != 8) || s->flags > 2) abort();
+            uint64_t word = 0;
+            memcpy(&word, s->address, s->read_bytes);
+            value ^= word; /* Observe the slot only; never follow a borrowed pointee. */
+        }
         for (uint32_t i = 0; i < f->lane_count; i++) value ^= f->lanes[i];
     }
     (void)value;

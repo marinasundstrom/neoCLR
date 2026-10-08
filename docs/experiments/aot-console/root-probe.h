@@ -9,16 +9,25 @@
  * JSON belongs to the image; numeric holes are zero. Output-borrow pointees may be
  * uninitialized. Never scan the chain as complete roots or retain frames after leave.
  */
+typedef struct {
+    const void *address;
+    uint32_t read_bytes, flags; /* 1 = discriminator, 2 = borrow address; never follow it. */
+} neoclr_probe_storage;
+_Static_assert(sizeof(neoclr_probe_storage) == 16, "storage entry size");
 typedef struct neoclr_probe_frame {
     struct neoclr_probe_frame *previous;
     const void *context;
     const uint64_t *lanes;
     const char *plan;
     uint32_t length, lane_count, function, instruction;
+    const neoclr_probe_storage *storage;
+    const char *storage_plan;
+    uint32_t storage_count, storage_length;
 } neoclr_probe_frame;
-_Static_assert(sizeof(neoclr_probe_frame) == 48, "private probe frame size");
+_Static_assert(sizeof(neoclr_probe_frame) == 72, "private probe frame size");
 _Static_assert(offsetof(neoclr_probe_frame, function) == 40, "private probe frame layout");
-void neoclr_probe_enter_v1(neoclr_probe_frame *frame, const void *context, uint32_t function);
+void neoclr_probe_enter_v2(neoclr_probe_frame *frame, const void *context, uint32_t function,
+    const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length);
 void neoclr_probe_leave_v1(neoclr_probe_frame *frame);
 void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction,
     const uint64_t *lanes, uint32_t lane_count, const char *plan, uint32_t length);
