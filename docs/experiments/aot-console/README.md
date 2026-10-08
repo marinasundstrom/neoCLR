@@ -906,14 +906,14 @@ contract tests. They are not a claim that the whole runtime library compiles.
 | WriteLine | String, blank line, Boolean, Char and integer overloads |
 | Write | String and Int32 through ordinary text writers |
 | OpenStandardInput/Output/Error | Non-owning stream construction and supported Read/Write/Flush/Close calls |
-| In / Out / Error | Text-reader line input and text-writer Write/Flush, with non-owning Close |
+| In / Out / Error | Text-reader ReadLine/ReadToEnd and text-writer Write/Flush, with non-owning Close |
 | ReadLine / ReadLine(maxUtf8Bytes) | UTF-8 lines, EOF, typed errors, default/explicit limits and consecutive reads |
 | WriteLine(object?) | Null and qualifying explicit class ToString overrides; no default metadata formatting or boxed/array receiver support |
 
 The next sample should combine parsing and repeated console interaction within an
 explicit host lifetime budget. Before calling this general Console support, address
 default Object display/type metadata, broader receiver dispatch and long-lived
-allocation reclamation. `TextReader.ReadToEnd` is not established by ReadLine coverage.
+allocation reclamation. ReadToEnd has its own bounded consumer below.
 The pinned Raven producer's source-path/member-lookup issue also remains a separate
 integration limitation. Trimming, stable external ABI and HTTP stay later steps.
 
@@ -924,3 +924,52 @@ with a byte-identical `/tmp` input after the checked-in-path attempt reported mi
 WriteLine overloads. The final validation records the compiler build containing both
 the private slot rename and tightened constructor admission. Focused dispatch tests
 also vary source-origin display names: the native slot name controls override choice.
+
+## Reading the remaining Console input (2026-10-08)
+
+`Console.In.ReadToEnd(maxUtf8Bytes)` now compiles its ordinary StreamReader and
+decoder CIL. The [reader sample](read-to-end.rvn) reads one line and then the remaining
+input through the same reader, prefixes the result with `String.Concat`, checks EOF
+with a zero-byte limit, and verifies closed-reader and invalid-limit outcomes. It
+continues to exercise nested `let Error(...) else`, `let Ok(...) else` and `if let`
+patterns. No reader-specific native shortcut is introduced.
+
+The existing `--bind-utf8-text` capability now binds the exact reserved
+`neoCLR.Runtime.StringConcat(String, String) -> String` service. Its C adapter copies
+both immutable UTF-8 inputs into one aligned arena allocation, including embedded
+NUL. Null inputs and size overflow retain RuntimeError; the native invocation budget
+reports NativeMemoryLimitExceeded. Failure publishes neither an output pointer nor
+an updated cursor. Ordinary static String wrappers use the existing private static
+primitive projection; reports preserve their actual String/Char owner and source
+identity. Original load-set verification still precedes projection.
+
+This reuses the [String contract and .NET comparison](../../text-model.md): immutable
+concatenation preserves neoCLR's UTF-8 contents rather than changing guest APIs or
+adopting UTF-16 storage. The benefit is one service shared by ordinary library and
+application CIL. The costs are copied bytes and invocation-retained intermediates;
+repeated concatenation may accumulate quadratic copying/storage. This slice does
+not claim throughput improvement or general long-running Console memory management.
+The sample's 32-byte remainder limit fits the host's 64 KiB arena; the public 65536-byte
+limit is not a guarantee that every native host budget can satisfy a read.
+
+Focused tests compare eleven interpreter/native cases with nested calls, repeated
+concatenation, UTF-8/NUL and null faults. Adapter tests cover identical/arena-backed
+inputs, alignment padding, empty strings, exact-fit/exhaustion, overflow, invalid
+arena state, canaries and unchanged failure outputs. Exact opt-in and source-service
+conflict rejection remain covered.
+
+`verify_interactive.py --read-to-end` covers nine inputs including LF/CRLF, EOF,
+Unicode/NUL, an exact byte limit, an excessive remainder, invalid UTF-8 and an
+unfinished scalar. `--isolated-compilation` explicitly stages byte-identical source
+and compiler output in a temporary directory, records the paths/source hash, and
+preserves a hashed artifact in the validation directory. This reproduces the temporary
+source-path workaround without hiding it. The producer lookup issue remains unresolved.
+Compilation reuse now verifies that preserved artifact hash before native validation;
+the validation report also hashes the driver itself.
+
+The [final validation](read-to-end-validation.json) passes all nine inputs and exact
+broken-pipe fault/exit parity. The executable runs alone with an empty environment;
+its only dynamic dependency is macOS libSystem. The [producer record](read-to-end-producer.json)
+preserves the successful fresh isolated compilation and the earlier static-String
+admission failure; final validation reused its hash-verified artifact after that
+admission gap was fixed. All 43 Console tests and 18 linking tests pass.

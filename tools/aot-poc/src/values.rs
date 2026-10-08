@@ -187,6 +187,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         for (indices, symbol, parameters) in [
             (&d.utf8_encode, "neoclr_utf8_encode_v1", vec![types::I64, types::I64, types::I64]),
             (&d.utf8_decode, "neoclr_utf8_decode_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.string_concat, "neoclr_string_concat_v1", vec![types::I64, types::I64, types::I64, types::I64]),
             (&d.string_byte_count, "neoclr_string_byte_count_v1", vec![types::I64, types::I64]),
             (&d.string_slice_utf8, "neoclr_string_slice_utf8_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
         ] {
@@ -460,6 +461,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let args = if details.unwrap().string_slice_utf8.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], parameters[2], arena, output]
+                } else if details.unwrap().string_concat.contains(&i) {
+                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                    vec![parameters[0], parameters[1], arena, output]
                 } else if details.unwrap().utf8_encode.contains(&i) || details.unwrap().utf8_decode.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], arena, output]

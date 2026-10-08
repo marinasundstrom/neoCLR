@@ -1,0 +1,39 @@
+import System.*
+import System.IO.TextReadError
+import System.Result.*
+import System.Option.*
+
+func Main() -> int {
+    System.Console.Write("Input: ")
+    let reader = System.Console.In
+    let Error(TextReadError.InvalidRange) = reader.ReadToEnd(-1) else {
+        return 2
+    }
+    let Error(TextReadError.LimitExceeded) = reader.ReadToEnd(65537) else {
+        return 3
+    }
+    let Ok(first) = reader.ReadLine(32) else {
+        return 4
+    }
+    if let Some(line) = first {
+        System.Console.WriteLine(line)
+    } else {
+        System.Console.WriteLine("EOF")
+    }
+    let Ok(rest) = reader.ReadToEnd(32) else {
+        System.Console.WriteLine("Read failed")
+        return 1
+    }
+    System.Console.WriteLine(string.Concat("Rest: ", rest))
+    let Ok(empty) = reader.ReadToEnd(0) else {
+        return 5
+    }
+    if empty.GetUtf8ByteCount() != 0 {
+        return 6
+    }
+    reader.Close()
+    let Error(TextReadError.Closed) = reader.ReadToEnd(32) else {
+        return 7
+    }
+    return 0
+}

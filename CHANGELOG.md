@@ -145,6 +145,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   construction-fault mismatch. Validate standalone override/null Console output,
   exact output-fault parity, rootless/declared-base dispatch and source-name
   independence. Retain the producer lookup limitation in the evidence.
+  Extend the explicit UTF-8 binding with immutable String concatenation and compile
+  ordinary static String wrappers. Preserve NUL/UTF-8, null and overflow faults,
+  arena limits and failure publication; test copied/aliased inputs and boundaries.
+  Add a Console.In line/remainder consumer for ReadToEnd, including EOF, typed
+  errors and byte limits. Record opt-in isolated producer staging and verify the
+  preserved compilation hash when reusing that artifact. Verify nine standalone
+  reader cases, exact output-fault parity, 43 Console tests and 18 linking tests;
+  the executable runs alone with only the macOS system-library dependency.
 
 ### 2026-10-07
 

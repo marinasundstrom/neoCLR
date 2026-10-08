@@ -1,0 +1,267 @@
+{
+  "profile": "aot-console-read-to-end-v1",
+  "baseRevision": "41e577c1a4f0ce41fef10d62a96612fcb4bb1342",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "inputs": {
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "724250b15ad229c9ada29411dc9565f1ce4bbe911a6a528bf228ddaf492c53ac",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "ed30c390ae5db6624de8f5fc40deebdcd409bf37dc56c94d77a16f160f66e80c",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/read-to-end.rvn": "d65a7f362b44ad6458d46eebcf106f2e0516ffdb9fbad646aa5d014b3cc8886e",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-host.c": "34db6501003bce9d6aa58e625aad2fad947d44721af1122625eef0bfc523419a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "abc5c07f84e1b4f505bdd92b5d924acf10db2624ad0b348168567f1ee93a6dd0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "b3e0ee18fe6fcd81275b9f11867c48b2a86e8483963507b17414a73a9fca5012",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "af2354b2cf1154e0156295a18c1ec6adee23c0e5345a50907fb986512ea7d812",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/verify_interactive.py": "fee6f5a179c990c662356f6bc5fa8a312ae7d9ea5b504f96752c3afbeac906f7"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-aot-producer-f3h7peys/Interactive.dll",
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-aot-producer-f3h7peys/read-to-end.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-read-to-end-2/Interactive.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--instructions",
+        "10000000"
+      ],
+      "exit": 0,
+      "stdout": "Input: head\nRest: rest\nend\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-read-to-end-2/Interactive.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--instructions",
+        "10000000"
+      ],
+      "exit": 0,
+      "stdout": "Input: h\u00e9\ud83d\ude00\nRest: \u00e9\ud83d\ude00\u0000\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-read-to-end-2/Interactive.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--instructions",
+        "10000000"
+      ],
+      "exit": 0,
+      "stdout": "Input: \nRest: \n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-read-to-end-2/Interactive.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--instructions",
+        "10000000"
+      ],
+      "exit": 0,
+      "stdout": "Input: EOF\nRest: \n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-read-to-end-2/Interactive.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--instructions",
+        "10000000"
+      ],
+      "exit": 0,
+      "stdout": "Input: head\nRest: \n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-read-to-end-2/Interactive.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--instructions",
+        "10000000"
+      ],
+      "exit": 0,
+      "stdout": "Input: head\nRest: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-read-to-end-2/Interactive.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--instructions",
+        "10000000"
+      ],
+      "exit": 1,
+      "stdout": "Input: head\nRead failed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-read-to-end-2/Interactive.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--instructions",
+        "10000000"
+      ],
+      "exit": 1,
+      "stdout": "Input: head\nRead failed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-read-to-end-2/Interactive.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--instructions",
+        "10000000"
+      ],
+      "exit": 1,
+      "stdout": "Input: head\nRead failed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-read-to-end-2/Interactive.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--instructions",
+        "10000000"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: console output failed\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65.M_5772697465 [instruction 52]\n   at NeoMetadata_1995ABB851616B0303DD08177EE28D6AE87602ECA4889B1BBB27E68984004F24.F_4D61696E [instruction 1]\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-console-read-to-end-2/Interactive.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-utf8-text",
+        "--bind-int32-to-string",
+        "--reference-arena"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "57ceb3df77bbfbe4b852f0db7a1504b5cc8135b72e768f15840a51137f741c48",
+        "bytes": 1259715
+      },
+      "stderr": ""
+    }
+  ],
+  "isolatedCompilation": {
+    "originalSource": "/Users/robert/Projects/neoclr/docs/experiments/aot-console/read-to-end.rvn",
+    "stagedSource": "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-aot-producer-f3h7peys/read-to-end.rvn",
+    "sourceSha256": "d65a7f362b44ad6458d46eebcf106f2e0516ffdb9fbad646aa5d014b3cc8886e",
+    "reason": "Pinned producer source-path/member-lookup investigation; no semantic source edits"
+  },
+  "compilation": {
+    "artifact": "/Users/robert/Projects/neoclr/target/aot-console-read-to-end-2/Interactive.dll",
+    "sha256": "911476285f18a0f3a5ef8f91a4acf51095c7f361d51837c686e52b5a20abd113"
+  }
+}

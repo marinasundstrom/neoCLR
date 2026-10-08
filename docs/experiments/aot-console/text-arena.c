@@ -199,3 +199,24 @@ int32_t neoclr_utf8_decode_v1(const void *array, neoclr_aot_text_arena *arena, v
     memcpy((unsigned char *)output + 8, &payload, sizeof(payload));
     return NEOCLR_AOT_FAULT_NONE;
 }
+
+int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_text *right,
+                               neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    if (!left || !right || !arena || !output || arena->used > arena->capacity ||
+        (arena->capacity && !arena->data) || ((uintptr_t)arena->data & 7))
+        return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    /* Preserve the runtime's size-overflow fault before applying the native budget. */
+    if (right->length > UINT64_MAX - left->length) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t length = left->length + right->length;
+    uint64_t padding = (8 - (arena->used & 7)) & 7;
+    uint64_t available = arena->capacity - arena->used;
+    if (padding > available || 8 > available - padding || length > available - padding - 8)
+        return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    neoclr_aot_text *text = (neoclr_aot_text *)(arena->data + arena->used + padding);
+    text->length = length;
+    memcpy(text->bytes, left->bytes, (size_t)left->length);
+    memcpy(text->bytes + left->length, right->bytes, (size_t)right->length);
+    arena->used += padding + 8 + length;
+    *output = text;
+    return NEOCLR_AOT_FAULT_NONE;
+}

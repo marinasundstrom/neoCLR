@@ -2094,3 +2094,114 @@ fn object_display_rejects_fallback_base_calls_and_unverified_overrides() {
         if mode==4 {assert!(error.contains("requires --reference-arena"),"{r:?}");}
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn string_concatenation_preserves_bytes_snapshots_and_faults() {
+    let dir=Temp::new();
+    let seed=neoclr::assemble(UTF8_SEED).unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/concat.neoil");
+    let r=compile_source(&dir,&seed,source,&["--compile-system","--reference-arena","--bind-user-fault","--bind-utf8-text"],false);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc, char **argv) {
+    uint64_t storage[128];
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    int32_t result=-99;
+    int status=neoclr_entry_v4(argc>1 ? atoi(argv[1]) : 0,&result,&ctx);
+    if (status) {
+        if (result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
+        neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
+    }
+    printf("%d\n",result);return 0;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let app=neoclr::assemble(source).unwrap();
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in -3..8 {
+        let reference=method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default());
+        let r=Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        match reference {
+            Ok(result)=>{
+                assert_eq!(r.status.code(),Some(0),"{mode}: {r:?}");
+                let neoclr::Value::Int32(value)=result.value else {panic!("expected Int32")};
+                assert_eq!(r.stdout,format!("{value}\n").as_bytes());
+                assert!(r.stderr.is_empty());
+            }
+            Err(fault)=>{
+                assert_eq!(r.status.code(),Some(1),"{mode}: {r:?}");
+                assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(),"{mode}");
+            }
+        }
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn concatenation_arena_bounds_aliases_and_failure_publication() {
+    let dir=Temp::new();
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <string.h>
+int main(void) {
+    const struct {uint64_t length;unsigned char bytes[4];} value={4,{0xc3,0xa9,0,0x7a}};
+    const neoclr_aot_text *input=(const neoclr_aot_text*)&value;
+    const struct {uint64_t length;} empty={0},huge={UINT64_MAX},one={1};
+    uint64_t storage[8];memset(storage,0xa5,sizeof(storage));
+    neoclr_aot_text_arena arena={(unsigned char*)storage,16,0};
+    const neoclr_aot_text *output=0;
+    if(neoclr_string_concat_v1(input,input,&arena,&output) || arena.used!=16 || output->length!=8 ||
+       memcmp(output->bytes,value.bytes,4) || memcmp(output->bytes+4,value.bytes,4))return 1;
+    for(unsigned i=16;i<sizeof(storage);i++)if(((unsigned char*)storage)[i]!=0xa5)return 2;
+    const neoclr_aot_text *saved=output;
+    if(neoclr_string_concat_v1(input,input,&arena,&output)!=5 || arena.used!=16 || output!=saved)return 3;
+    arena.capacity=48;
+    if(neoclr_string_concat_v1(saved,saved,&arena,&output) || arena.used!=40 || output->length!=16 ||
+       memcmp(output->bytes,saved->bytes,8) || memcmp(output->bytes+8,saved->bytes,8) || saved->length!=8)return 4;
+    saved=output;arena.used=1;arena.capacity=23;
+    if(neoclr_string_concat_v1(input,input,&arena,&output)!=5 || arena.used!=1 || output!=saved)return 5;
+    arena.capacity=24;
+    if(neoclr_string_concat_v1(input,input,&arena,&output) || arena.used!=24 || ((uintptr_t)output&7))return 6;
+    saved=output;
+    if(neoclr_string_concat_v1(0,input,&arena,&output)!=3 || arena.used!=24 || output!=saved)return 7;
+    if(neoclr_string_concat_v1(input,0,&arena,&output)!=3 || arena.used!=24 || output!=saved)return 8;
+    if(neoclr_string_concat_v1((const neoclr_aot_text*)&huge,(const neoclr_aot_text*)&one,&arena,&output)!=3 || arena.used!=24 || output!=saved)return 9;
+    if(neoclr_string_concat_v1((const neoclr_aot_text*)&huge,(const neoclr_aot_text*)&empty,&arena,&output)!=5 || arena.used!=24 || output!=saved)return 10;
+    arena.used=0;arena.capacity=8;
+    if(neoclr_string_concat_v1((const neoclr_aot_text*)&empty,(const neoclr_aot_text*)&empty,&arena,&output) || arena.used!=8 || output->length)return 11;
+    saved=output;arena.used=9;
+    if(neoclr_string_concat_v1(input,input,&arena,&output)!=3 || arena.used!=9 || output!=saved)return 12;
+    return 0;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(&base).arg(dir.0.join("host.c")).arg(base.join("text-arena.c"))
+        .arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    assert!(Command::new(dir.0.join("app")).env_clear().status().unwrap().success());
+}
+
+#[test]
+fn concatenation_requires_exact_opt_in_contract() {
+    let seed=neoclr::assemble(UTF8_SEED).unwrap();
+    let original=include_str!("../../../docs/experiments/aot-console/concat.neoil");
+    for mode in 0..3 {
+        let source=if mode==2 {original.replace(".methodimpl InternalCall", "ldstr \"impostor\"\nret")}else{original.into()};
+        let mut flags=vec!["--compile-system","--bind-user-fault"];
+        if mode!=1 {flags.push("--reference-arena");}
+        if mode!=0 {flags.push("--bind-utf8-text");}
+        let dir=Temp::new();let r=compile_source(&dir,&seed,&source,&flags,false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists(),"{mode}: {r:?}");
+        if mode==2 {assert!(String::from_utf8_lossy(&r.stderr).contains("conflicting function signature"),"{r:?}");}
+    }
+}

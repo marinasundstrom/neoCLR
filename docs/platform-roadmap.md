@@ -141,7 +141,10 @@ parity. A second standalone session covers default/consecutive reads, typed rang
 errors and non-owning wrapper close behavior. Object WriteLine now has bounded dispatch to verified class ToString overrides;
 default/base display still depends on type metadata. Standalone object output
 and exact output-fault parity pass. Constructor admission now rejects missing or
-repeated base initialization rather than admitting a native/interpreter mismatch. The author adds a console-input sample after unions, exercising input and
+repeated base initialization rather than admitting a native/interpreter mismatch.
+The next Console reader slice adds exact UTF-8 concatenation and ordinary static
+String wrappers for ReadToEnd; nine standalone line/remainder cases and output-fault
+parity are verified ([evidence](experiments/aot-console/read-to-end-validation.json)). The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

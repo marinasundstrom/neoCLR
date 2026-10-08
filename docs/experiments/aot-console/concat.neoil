@@ -1,0 +1,73 @@
+.module Concat
+.function Join(String left, String right) -> String
+ldarg left
+ldarg right
+call neoCLR.Runtime.StringConcat(String, String)
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local String text
+.local String saved
+.local String absent
+.local Int32 index
+ldloca absent
+initobj String
+ldarg mode
+ldc.i4 -1
+ceq
+brtrue NullLeft
+ldarg mode
+ldc.i4 -2
+ceq
+brtrue NullRight
+ldarg mode
+ldc.i4 -3
+ceq
+brtrue BothNull
+ldstr ""
+stloc text
+ldstr "snapshot"
+stloc saved
+ldc.i4 0
+stloc index
+br Test
+Loop:
+ldloc text
+ldstr "é😀\u0000z"
+call Join(String, String)
+stloc text
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldarg mode
+blt Loop
+ldloc text
+ldloc saved
+call Join(String, String)
+call neoCLR.Runtime.Fault(String)
+pop
+ldc.i4 0
+ret
+NullLeft:
+ldloc absent
+ldstr ""
+br JoinNull
+NullRight:
+ldstr ""
+ldloc absent
+br JoinNull
+BothNull:
+ldloc absent
+ldloc absent
+JoinNull:
+call Join(String, String)
+pop
+ldc.i4 0
+ret
+.end
+.function neoCLR.Runtime.StringConcat(String, String) -> String
+.methodimpl InternalCall
+.end
