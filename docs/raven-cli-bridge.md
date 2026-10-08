@@ -6747,3 +6747,11 @@ consumer; no Raven option, compiler lowering, temporary CLI encoding or metadata
 changes. String interface method calls remain explicitly rejected by AOT until receiver
 dispatch is implemented. The same integration compiler and bundle are recorded in the
 fresh consumer evidence; no public API snapshot changes.
+
+
+The [String equality prerequisite](experiments/aot-console/README.md#string-content-equality-prerequisite-2026-10-08)
+compiles the existing typed String ceq used by ordinary equality wrappers. The same
+compiler/bundle emits the consumer; native UTF-8 byte comparison preserves content and
+null semantics without new bridge encoding or service binding. String interface method
+dispatch remains unsupported; equality operators and interface dispatch are distinct
+capabilities. No compiler configuration, metadata schema or public API snapshot changes.

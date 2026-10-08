@@ -1,0 +1,132 @@
+.module StringEquality
+.function Equal(String left, String right) -> Int32
+ldarg left
+ldarg right
+ceq
+brfalse Different
+ldc.i4 1
+ret
+Different:
+ldc.i4 0
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local String absent
+ldloca absent
+initobj String
+ldarg mode
+ldc.i4 0
+ceq
+brtrue Case0
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Case1
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Case2
+ldarg mode
+ldc.i4 3
+ceq
+brtrue Case3
+ldarg mode
+ldc.i4 4
+ceq
+brtrue Case4
+ldarg mode
+ldc.i4 5
+ceq
+brtrue Case5
+ldarg mode
+ldc.i4 6
+ceq
+brtrue Case6
+ldarg mode
+ldc.i4 7
+ceq
+brtrue Case7
+ldarg mode
+ldc.i4 8
+ceq
+brtrue Case8
+ldarg mode
+ldc.i4 9
+ceq
+brtrue Case9
+ldarg mode
+ldc.i4 10
+ceq
+brtrue Case10
+ldarg mode
+ldc.i4 11
+ceq
+brtrue Case11
+ldc.i4 -1
+ret
+Case0:
+ldstr ""
+ldstr ""
+call Equal(String,String)
+ret
+Case1:
+ldstr ""
+ldstr "x"
+call Equal(String,String)
+ret
+Case2:
+ldstr "hé😀"
+ldstr "hé😀"
+call Equal(String,String)
+ret
+Case3:
+ldstr "a\u0000x"
+ldstr "a\u0000y"
+call Equal(String,String)
+ret
+Case4:
+ldstr "a\u0000x"
+ldstr "a\u0000x"
+call Equal(String,String)
+ret
+Case5:
+ldstr "é"
+ldstr "é"
+call Equal(String,String)
+ret
+Case6:
+ldloc absent
+ldloc absent
+call Equal(String,String)
+ret
+Case7:
+ldloc absent
+ldstr ""
+call Equal(String,String)
+ret
+Case8:
+ldstr ""
+ldloc absent
+call Equal(String,String)
+ret
+Case9:
+ldstr "hé"
+ldstr "😀"
+call neoCLR.Runtime.StringConcat(String,String)
+ldstr "hé😀"
+call Equal(String,String)
+ret
+Case10:
+ldstr "prefix"
+ldstr "prefix-more"
+call Equal(String,String)
+ret
+Case11:
+ldstr "Same"
+ldstr "same"
+call Equal(String,String)
+ret
+.end
+.function neoCLR.Runtime.StringConcat(String left, String right) -> String
+.methodimpl InternalCall
+.end

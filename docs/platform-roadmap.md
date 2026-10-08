@@ -162,7 +162,10 @@ interpolation across seven grapheme/NUL cases
 Verified closed String interface views now preserve casts and identity, including
 inherited generic contracts; EquatableTo<string> round-trips run standalone
 ([evidence](experiments/aot-console/string-interface-views-validation.json)).
-String interface method dispatch remains the next bounded gap.
+String content ceq is now compiled with exact UTF-8/null semantics, enabling ordinary
+Raven equality and inequality without comparison allocations
+([evidence](experiments/aot-console/string-equality-validation.json)). This is a
+prerequisite; String interface method dispatch remains the next bounded gap.
 The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

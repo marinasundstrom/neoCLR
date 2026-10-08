@@ -1229,3 +1229,37 @@ storage; casts allocate no wrappers. No performance improvement is claimed. Gene
 String interface dispatch is the next gap, naturally driven by EquatableTo<string>.Equals.
 Raven/compiler configuration, metadata format, public APIs and the private context ABI
 are unchanged; this is native-backend work consuming existing emitted contracts.
+
+## String content equality prerequisite (2026-10-08)
+
+Investigating EquatableTo<string>.Equals exposed a smaller prerequisite: its library
+body ultimately uses neoCLR's typed String ceq, which the AOT value profile previously
+rejected. This slice admits String ceq and compiles exact UTF-8 content comparison.
+Equal addresses and two nulls compare equal; one null compares unequal; otherwise the
+native code compares lengths and then bytes, including embedded NUL. Empty strings,
+case and normalization differences follow the interpreter. Reference identity remains
+the separate ref.eq operation. No service binding, allocation, adapter or ABI change
+is needed for the comparison itself; ordinary library equality bodies stay compiled.
+
+The [metadata consumer](string-equality.neoil) compares 12 cases with interpretation,
+including both null orders, two nulls, empty text, unequal prefixes, non-ASCII text,
+embedded NUL, case differences, decomposed/composed text and a dynamically concatenated
+String. It checks that only the explicit concatenation consumes arena space. All 49
+Console tests and 45 value-profile tests pass.
+
+The [Raven consumer](string-equality.rvn) exercises ordinary == and != through parameterized
+calls and a parameterized Join, so the dynamic case cannot disappear through source
+constant folding. [Fresh evidence](string-equality-validation.json) records tool/bundle
+hashes, exact interpreter/native output, broken-pipe fault parity and standalone ARM64
+execution with only libSystem dynamically linked. Run the existing driver with
+`--sample string-equality`; its default now qualifies six consumers.
+
+This restores the existing [text equality contract](../../text-model.md) in native
+execution. .NET-like String content equality is the ergonomic target; the instruction
+being compiled is neoCLR's typed String ceq, not a claim of identical CLI instruction
+semantics. The simple length/byte loop preserves UTF-8 semantics without allocating or
+normalizing. No speedup is claimed; vectorization or library-assisted comparison should
+be considered only with a relevant benchmark. String interface method dispatch remains
+explicitly rejected: receiver projection and dispatch must still be implemented before
+EquatableTo<string>.Equals calls become supported. No Raven compiler, Runtime Contract,
+metadata format or public API change is introduced by this prerequisite.

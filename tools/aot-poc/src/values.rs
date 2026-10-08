@@ -115,6 +115,50 @@ fn copy_text(module: &mut ObjectModule, b: &mut FunctionBuilder<'_>,
     b.ins().load(types::I64, MemFlags::new(), output, 0)
 }
 
+// String ceq compares exact UTF-8 contents, independently of owner identity.
+// Both pointers are verified image/arena text or null, never arbitrary host memory.
+fn string_equal(b: &mut FunctionBuilder<'_>, left: ir::Value, right: ir::Value) -> ir::Value {
+    let different = b.create_block();
+    let lengths = b.create_block();
+    let scan = b.create_block();
+    let byte = b.create_block();
+    let advance = b.create_block();
+    let done = b.create_block();
+    b.append_block_param(scan, types::I64);
+    b.append_block_param(done, types::I32);
+    let yes = b.ins().iconst(types::I32, 1);
+    let no = b.ins().iconst(types::I32, 0);
+    let same = b.ins().icmp(IntCC::Equal, left, right);
+    b.ins().brif(same, done, &[yes.into()], different, &[]);
+    b.switch_to_block(different);
+    let left_null = b.ins().icmp_imm(IntCC::Equal, left, 0);
+    let right_null = b.ins().icmp_imm(IntCC::Equal, right, 0);
+    let null = b.ins().bor(left_null, right_null);
+    b.ins().brif(null, done, &[no.into()], lengths, &[]);
+    b.switch_to_block(lengths);
+    let length = b.ins().load(types::I64, MemFlags::new(), left, 0);
+    let other = b.ins().load(types::I64, MemFlags::new(), right, 0);
+    let equal = b.ins().icmp(IntCC::Equal, length, other);
+    let zero = b.ins().iconst(types::I64, 0);
+    b.ins().brif(equal, scan, &[zero.into()], done, &[no.into()]);
+    b.switch_to_block(scan);
+    let index = b.block_params(scan)[0];
+    let complete = b.ins().icmp(IntCC::Equal, index, length);
+    b.ins().brif(complete, done, &[yes.into()], byte, &[]);
+    b.switch_to_block(byte);
+    let l = b.ins().iadd(left, index);
+    let r = b.ins().iadd(right, index);
+    let l = b.ins().load(types::I8, MemFlags::new(), l, 8);
+    let r = b.ins().load(types::I8, MemFlags::new(), r, 8);
+    let equal = b.ins().icmp(IntCC::Equal, l, r);
+    b.ins().brif(equal, advance, &[], done, &[no.into()]);
+    b.switch_to_block(advance);
+    let next = b.ins().iadd_imm(index, 1);
+    b.ins().jump(scan, &[next.into()]);
+    b.switch_to_block(done);
+    b.block_params(done)[0]
+}
+
 fn null_reference(b: &mut FunctionBuilder<'_>, pointer: ir::Value, site: Option<&crate::fault_details::Site>) {
     let null = b.ins().icmp_imm(IntCC::Equal, pointer, 0);
     let status = b.ins().iconst(types::I32, 6);
@@ -1063,6 +1107,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             Op::Sub => b.ins().isub(l, r),
                             _ => b.ins().imul(l, r),
                         });
+                    }
+                    Op::Equal if *top() == Ty::Literal => {
+                        let right = pop(&mut stack);
+                        let left = pop(&mut stack);
+                        stack.push(string_equal(&mut b, left, right));
                     }
                     Op::Equal | Op::Greater | Op::GreaterUnsigned | Op::Less | Op::LessUnsigned => {
                         let r = pop(&mut stack);

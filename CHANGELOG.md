@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Compile typed String ceq in experimental ARM64 AOT with exact UTF-8 content and
+  null comparison, distinct from reference identity. Equality allocates no storage;
+  ordinary Raven ==/!= wrappers compile unchanged. Validate 49 Console and 45 value
+  tests plus standalone Unicode/NUL/dynamic-text equality and exact output-fault
+  parity. This is a prerequisite for String interface Equals, whose method dispatch
+  remains unsupported. No new service binding, compiler contract or ABI change.
+
 - Admit verified String interface views in experimental ARM64 AOT. Retain original
   closed conformance before private projection, including inherited generic interfaces;
   preserve String/Object identity and null/cast behavior. Validate 48 Console AOT tests

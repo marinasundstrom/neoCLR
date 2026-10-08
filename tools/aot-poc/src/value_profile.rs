@@ -945,8 +945,8 @@ impl<'a> Profile<'a> {
                 }
                 Op::Equal => {
                     let t = pop(&mut stack)?;
-                    if !matches!(t, Ty::Int | Ty::Bool) {
-                        return Err(fail(pc, "equality requires Int32 or Boolean"));
+                    if !matches!(t, Ty::Int | Ty::Bool | Ty::Literal) {
+                        return Err(fail(pc, "equality requires Int32, Boolean or String"));
                     }
                     take(&mut stack, &t)?;
                     stack.push(Ty::Bool);
