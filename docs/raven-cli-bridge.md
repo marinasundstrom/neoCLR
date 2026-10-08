@@ -7072,3 +7072,21 @@ rejection without overwriting existing output. All 63 .NET generation/site contr
 pass. The full aggregate documentation snapshot remains on its CLI bridge until the
 native production bundle meets the same public-API inventory. This preserves its current
 experience rather than publishing fewer APIs or changing ownership labels speculatively.
+
+## Native nested unit-owner correction (2026-10-09)
+
+Raven integration `92a593ff7` fixes the HttpContext constructor's native metadata
+error. Its field and initializer had nested Promise<Result<Void, HttpError>> types
+with different Void owners: System.Runtime versus NeoCLR.CoreProbe. With an explicit
+RuntimeUnitContract, native emission now maps the selected primitive core's inhabited
+Void token to the configured unit representation. Ordinary no-result calls and .NET
+emission remain unchanged; arbitrary same-named foreign types are not aliases and
+the metadata verifier remains strict.
+
+The temporary CLI primitive bootstrap still exists. Its native replacement must
+preserve the same explicit unit-owner contract. Raven's checked-in
+`tools/NeoClrMetadataProbe/check-unit-owner.py` reproduces NEOMETA003 without the fix
+and accepts both System.Void and unit nested constructor cases with it. Seven existing
+unit contract controls pass. A fresh Runtime/Data/Networking/Web build succeeds with
+the correction (using the in-progress System.Time migration); no retry is treated as
+a fix. This compiler correction is committed separately from that API migration.

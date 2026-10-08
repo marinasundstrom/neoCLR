@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Fix the native HttpContext constructor metadata mismatch through Raven's explicit
+  unit-owner mapping (92a593ff7). Nested Promise<Result<Void, HttpError>> signatures
+  now consistently select System.Runtime.Void instead of mixing in the temporary
+  primitive core's Void. A reduced regression fails before the fix and both unit
+  spellings pass after it; the complete native library bundle rebuilds successfully.
+
 - Integrate the native API migration preview into the local neoCLR website shell,
   at the normal API URLs, including branding, navigation, authored API additions
   and search. Recover matching reviewed XML comments using canonical native IDs;
