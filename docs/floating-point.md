@@ -81,3 +81,10 @@ See the [floating-point sample](../examples/floating.neoil). Decimal, Half, math
 library coverage, full comparison/branch opcode coverage, full native marshalling, and the
 remaining verifier work are separate follow-ups. This slice changes no allocation
 or ownership policy.
+
+## Native compilation (development, 2026-10-08)
+
+The [bounded ARM64 Double slice](experiments/aot-double/README.md) now supports
+binary64 literals/storage/calls, add/sub/mul/div and comparisons/branches, including
+unordered NaN cases. This does not yet cover every interpreter instruction described
+above. See that slice for exclusions and native/interpreter/.NET validation.

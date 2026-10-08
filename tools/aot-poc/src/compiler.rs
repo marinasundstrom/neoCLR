@@ -31,11 +31,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool, details
                 .chain(&f.locals)
                 .chain([&f.returns])
                 .any(|t| {
-                    matches!(t, Type::Value | Type::String)
+                    matches!(t, Type::Value | Type::String | Type::Double)
                         || matches!(t, Type::ByRef(inner) if matches!(**inner, Type::Value | Type::String))
                 })
                 || f.body.iter().any(|op| {
-                    matches!(op, Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
+                    matches!(op, Op::Float64 { .. } | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
                         || matches!(op, Op::Call(target) if target.definition.is_some())
                 })
         })

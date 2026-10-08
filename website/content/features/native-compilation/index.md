@@ -205,8 +205,9 @@ callbacks run; async entry waiting for host I/O remains unsupported. The runtime
 artifacts need recompilation. These coverage checks are not new benchmark results.
 
 Development Math constants `Pi`, `E` and `Tau` now survive separate compilation
-into native metadata and pass interpreted execution. AOT currently rejects the
-sample because Double instructions are not yet supported. The
+into native metadata and pass interpreted, sanitized native and standalone execution.
+A bounded Double instruction slice supports basic arithmetic and comparisons;
+Single, conversions and floating Math services remain gaps. The
 [tested sample](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/raven-target/samples/library-math-constants.rvn)
 uses qualified and wildcard imports. Assembly-level constant metadata currently supports
 finite Double values; rebuild compiler/runtime bundles together. This remains work in progress.

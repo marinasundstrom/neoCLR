@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Lower a bounded Double instruction profile in ARM64 AOT: literals, typed storage,
+  calls, add/sub/mul/div and ordered/unordered comparisons and branches. Preserve
+  binary64 lanes, signed zero and NaN behavior; Double values are not GC roots.
+  Math constants now pass interpreted, sanitized native and standalone execution;
+  HTTP admission remains accepted. Single, conversions, remainder/negation and
+  floating Math services remain unsupported; no complete floating IL claim.
+
 - Adopt assembly-level member terminology for types, functions and constants, whose
   qualified names include namespaces. Rename the unreleased constant APIs to
   AssemblyConstantDefinition / AddConstant / Constants and the manifest member to

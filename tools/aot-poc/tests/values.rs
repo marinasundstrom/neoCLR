@@ -2048,3 +2048,67 @@ fn ordinary_int32_borrow_is_not_authorized_by_a_primitive_like_name() {
     assert!(String::from_utf8_lossy(&result.stderr).contains("explicit borrowed parameters require an output contract"));
     assert!(!temp.0.join("value.o").exists());
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn double_arithmetic_comparisons_and_storage_match_interpreter() {
+    let cases = [
+        ("ldc.r8 7.5\nldc.r8 2\nadd\nldc.r8 9.5\nceq", true),
+        ("ldc.r8 7.5\nldc.r8 2\nsub\nldc.r8 5.5\nceq", true),
+        ("ldc.r8 3.141592653589793\nldc.r8 2\nmul\nldc.r8 6.283185307179586\nceq", true),
+        ("ldc.r8 7.5\nldc.r8 2\ndiv\nldc.r8 3.75\nceq", true),
+        ("ldc.r8 1\nldc.r8 -0.0\ndiv\nldc.r8 -inf\nceq", true),
+        ("ldc.r8 1e308\nldc.r8 2\nmul\nldc.r8 inf\nceq", true),
+        ("ldc.r8 0\nldc.r8 0\ndiv\ndup\nceq", false),
+        ("ldc.r8 -0.0\nldc.r8 0.0\nceq", true),
+    ];
+    for (body, expected) in cases {
+        double_check(body, expected);
+    }
+    for (op, ordered, unordered) in [("ceq", false, false), ("cgt", true, false),
+        ("clt", false, false), ("cgt.un", true, true), ("clt.un", false, true)] {
+        double_check(&format!("ldc.r8 2\nldc.r8 1\n{op}"), ordered);
+        for (left, right) in [("nan", "1"), ("1", "nan"), ("nan", "nan")] {
+            double_check(&format!("ldc.r8 {left}\nldc.r8 {right}\n{op}"), unordered);
+        }
+    }
+    for (op, expected) in [("beq", false), ("bne.un", true), ("bgt", false),
+        ("blt", false), ("bge", false), ("ble", false), ("bgt.un", true),
+        ("blt.un", true), ("bge.un", true), ("ble.un", true)] {
+        let source = format!(".module DoubleBranch\n.entry Main\n.function Main() -> Int32\nldc.r8 nan\nldc.r8 1\n{op} yes\nldc.i4 0\nret\nyes:\nldc.i4 1\nret\n.end");
+        double_program(&source, i32::from(expected));
+    }
+    // A nested record, local and call return exercise mixed F64/I32 ABI lanes.
+    let source = ".module DoubleStorage\n.entry Main\n.type Inner\n.field Number Double\n.end\n.type Outer\n.field Inner Inner\n.field Count Int32\n.end\n.function Echo(Outer value) -> Outer\nldarg value\nret\n.end\n.function Main() -> Int32\n.local Outer value\nldc.r8 -0.0\nnewobj Inner\nldc.i4 7\nnewobj Outer\ncall Echo(Outer)\nstloc value\nldc.r8 1\nldloc value\nldfld 0\nldfld 0\ndiv\nldc.r8 -inf\nceq\nbrfalse fail\nldloc value\nldfld 1\nret\nfail:\nldc.i4 -1\nret\n.end";
+    double_program(source, 7);
+    let source = ".module DoubleDefault\n.entry Main\n.function Main() -> Int32\n.local Double value\nldloca value\ninitobj Double\nldc.r8 1\nldloc value\ndiv\nldc.r8 inf\nceq\nbrfalse fail\nldloca value\nldc.r8 -0.0\nstobj Double\nldc.r8 1\nldloca value\nldobj Double\ndiv\nldc.r8 -inf\nceq\nbrfalse fail\nldc.i4 1\nret\nfail:\nldc.i4 0\nret\n.end";
+    double_program(source, 1);
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn double_check(body: &str, expected: bool) {
+    let source = format!(".module DoubleCheck\n.entry Main\n.function Main() -> Int32\n{body}\nbrtrue yes\nldc.i4 0\nret\nyes:\nldc.i4 1\nret\n.end");
+    double_program(&source, i32::from(expected));
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn double_program(source: &str, expected: i32) {
+    let m = neoclr::assemble(source).unwrap();
+    assert_eq!(neoclr::LoadedProgram::new(&m).unwrap().run(neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(expected), "{source}");
+    native(&neoclr::metadata_container::write_module(&m).unwrap(), 0, expected);
+}
+
+#[test]
+fn double_profile_rejects_unsupported_operations_before_codegen() {
+    for body in ["ldc.r8 1\nldc.r8 2\nrem", "ldc.r8 1\nneg", "ldc.r8 1\nconv.i4"] {
+        let result_type = if body.ends_with("conv.i4") { "Int32" } else { "Double" };
+        let source = format!(".module RejectedDouble\n.entry Main\n.function Work() -> {result_type}\n{body}\nret\n.end\n.function Main() -> Int32\ncall Work()\npop\nldc.i4 0\nret\n.end");
+        let m = neoclr::assemble(&source).unwrap();
+        let temp = Temp::new();
+        let result = compile(&neoclr::metadata_container::write_module(&m).unwrap(), &temp);
+        assert!(!result.status.success());
+        assert!(!temp.0.join("value.o").exists());
+        assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
+    }
+}

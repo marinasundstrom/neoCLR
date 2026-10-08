@@ -72,7 +72,8 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
         | Ty::Bool
         | Ty::Unit
         | Ty::Size
-        | Ty::Wide => return vec![],
+        | Ty::Wide
+        | Ty::Double => return vec![],
     };
     vec![Slot { lane: 0, trace }]
 }
@@ -174,7 +175,7 @@ mod tests {
     fn wide_integers_are_not_roots_but_scalar_borrows_keep_owners() {
         let module = module();
         let p = profile(&module);
-        for ty in [Ty::Int, Ty::Size, Ty::Wide, Ty::Unit, Ty::Bool] {
+        for ty in [Ty::Int, Ty::Size, Ty::Wide, Ty::Double, Ty::Unit, Ty::Bool] {
             assert!(slots(&p, &ty).is_empty());
             assert_eq!(
                 slots(&p, &ty.address()),

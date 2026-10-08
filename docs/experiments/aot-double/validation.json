@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-08",
+  "nativeInterpretedPrograms": 40,
+  "clrControls": 38,
+  "checks": [
+    {
+      "name": "Double native/interpreter and rejection controls",
+      "output": "   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.21s\n     Running tests/values.rs (tools/aot-poc/target/debug/deps/values-a323a5d861faab07)\n\nrunning 2 tests\ntest double_profile_rejects_unsupported_operations_before_codegen ... ok\ntest double_arithmetic_comparisons_and_storage_match_interpreter ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 50 filtered out; finished in 39.22s\n\n"
+    },
+    {
+      "name": "GC atomic Double control",
+      "output": "    Blocking waiting for file lock on artifact directory\n   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.17s\n     Running unittests src/main.rs (tools/aot-poc/target/debug/deps/neoclr_aot_poc-7b7f4729c128d9d0)\n\nrunning 1 test\ntest compiler::values::gc_layout::tests::wide_integers_are_not_roots_but_scalar_borrows_keep_owners ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.00s\n\n"
+    },
+    {
+      "name": "Existing record regression",
+      "output": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.24s\n     Running tests/values.rs (tools/aot-poc/target/debug/deps/values-a323a5d861faab07)\n\nrunning 1 test\ntest raven_records_preserve_copy_constructor_member_and_branch_semantics ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 51 filtered out; finished in 3.13s\n\n"
+    },
+    {
+      "name": "CLR instruction baseline",
+      "output": "PASS 38 CLR floating instruction controls; .NET 10.0.0; Arm64\n"
+    }
+  ]
+}

@@ -16,7 +16,7 @@ pub(super) fn trace_layout(input: &neoclr::Module, details: Option<&crate::fault
     Ok(report)
 }
 
-use cranelift_codegen::ir::condcodes::IntCC;
+use cranelift_codegen::ir::condcodes::{FloatCC, IntCC};
 use cranelift_codegen::settings::Configurable;
 use cranelift_codegen::{
     ir::{self, AbiParam, InstBuilder, MemFlags, StackSlotData, StackSlotKind, types},
@@ -29,8 +29,36 @@ use neoclr::metadata::Instruction as Op;
 use profile::{Profile, Ty};
 
 fn lanes(p: &Profile<'_>, t: &Ty) -> Vec<ir::Type> {
-    p.pointer_lanes(t).into_iter().map(|pointer| if pointer { types::I64 } else { types::I32 }).collect()
+    match t {
+        Ty::Double => vec![types::F64],
+        Ty::Record(i) if !p.input.types[*i].fields.is_empty() => p.input.types[*i].fields.iter()
+            .flat_map(|f| lanes(p, &p.ty(&f.ty).expect("admitted field"))).collect(),
+        _ => p.pointer_lanes(t).into_iter().map(|pointer| if pointer { types::I64 } else { types::I32 }).collect(),
+    }
 }
+fn zero(b: &mut FunctionBuilder<'_>, ty: ir::Type) -> ir::Value {
+    if ty == types::F64 { b.ins().f64const(0.0) } else { b.ins().iconst(ty, 0) }
+}
+
+// Cranelift 0.121's ARM64 lowering lacks unordered relational FloatCCs.
+// Invert the complementary ordered test so NaN still follows CLI .un semantics.
+fn float_compare(b: &mut FunctionBuilder<'_>, cc: IntCC, left: ir::Value, right: ir::Value) -> ir::Value {
+    let (cc, invert) = match cc {
+        IntCC::Equal => (FloatCC::Equal, false),
+        IntCC::NotEqual => (FloatCC::NotEqual, false),
+        IntCC::SignedGreaterThan => (FloatCC::GreaterThan, false),
+        IntCC::SignedLessThan => (FloatCC::LessThan, false),
+        IntCC::SignedGreaterThanOrEqual => (FloatCC::GreaterThanOrEqual, false),
+        IntCC::SignedLessThanOrEqual => (FloatCC::LessThanOrEqual, false),
+        IntCC::UnsignedGreaterThan => (FloatCC::LessThanOrEqual, true),
+        IntCC::UnsignedLessThan => (FloatCC::GreaterThanOrEqual, true),
+        IntCC::UnsignedGreaterThanOrEqual => (FloatCC::LessThan, true),
+        IntCC::UnsignedLessThanOrEqual => (FloatCC::GreaterThan, true),
+    };
+    let result = b.ins().fcmp(cc, left, right);
+    if invert { b.ins().bxor_imm(result, 1) } else { result }
+}
+
 fn read(
     b: &mut FunctionBuilder<'_>,
     p: &Profile<'_>,
@@ -1013,6 +1041,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 match op {
                     Op::Int(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
                     Op::Int64(v) => stack.push(b.ins().iconst(types::I64, *v)),
+                    Op::Float64 { bits } => stack.push(b.ins().f64const(ir::immediates::Ieee64::with_bits(*bits))),
                     Op::String(_) => {
                         let data = module.declare_data_in_func(literals[&(i, pc)], b.func);
                         let pointer = b.ins().global_value(types::I64, data);
@@ -1173,7 +1202,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             let data = module.declare_data_in_func(default_character, b.func);
                             vec![b.ins().global_value(types::I64, data)]
                         } else {
-                            lanes(&p, &ty).into_iter().map(|t| b.ins().iconst(t, 0)).collect()
+                            lanes(&p, &ty).into_iter().map(|t| zero(&mut b, t)).collect()
                         };
                         write(&mut b, address, &values);
                     }
@@ -1510,7 +1539,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                                 return_if_detailed(&mut b, failed, status, site.as_ref());
                                 b.ins().load(types::I64, MemFlags::new(), address, 0)
                             } else {
-                                let zeros: Vec<_> = lanes(&p, &t).into_iter().map(|t| b.ins().iconst(t, 0)).collect();
+                                let zeros: Vec<_> = lanes(&p, &t).into_iter().map(|t| zero(&mut b, t)).collect();
                                 write(&mut b, address, &zeros);
                                 address
                             };
@@ -1599,6 +1628,16 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             _ => b.ins().bxor(left, right),
                         });
                     }
+                    Op::Add | Op::Sub | Op::Mul | Op::Divide if *top() == Ty::Double => {
+                        let r = pop(&mut stack);
+                        let l = pop(&mut stack);
+                        stack.push(match op {
+                            Op::Add => b.ins().fadd(l, r),
+                            Op::Sub => b.ins().fsub(l, r),
+                            Op::Mul => b.ins().fmul(l, r),
+                            _ => b.ins().fdiv(l, r),
+                        });
+                    }
                     Op::Add | Op::Sub | Op::Mul => {
                         let r = pop(&mut stack);
                         let l = pop(&mut stack);
@@ -1623,7 +1662,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             Op::Less => IntCC::SignedLessThan,
                             _ => IntCC::UnsignedLessThan,
                         };
-                        let bool8 = b.ins().icmp(cc, l, r);
+                        let bool8 = if *top() == Ty::Double { float_compare(&mut b, cc, l, r) } else { b.ins().icmp(cc, l, r) };
                         stack.push(b.ins().uextend(types::I32, bool8));
                     }
                     Op::Branch(n) => {
@@ -1651,7 +1690,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let (n, cc) = flow::comparison(op).unwrap();
                         let r = pop(&mut stack);
                         let l = pop(&mut stack);
-                        let condition = b.ins().icmp(cc, l, r);
+                        let condition = if *top() == Ty::Double { float_compare(&mut b, cc, l, r) } else { b.ins().icmp(cc, l, r) };
                         b.ins().brif(
                             condition,
                             blocks[n],

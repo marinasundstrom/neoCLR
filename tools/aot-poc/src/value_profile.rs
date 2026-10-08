@@ -23,6 +23,7 @@ pub(super) enum Ty {
     ByteValues, // Immutable native-produced value-array snapshot; no element addresses.
     Size,
     Wide,
+    Double,
     ReferenceArray(usize), // Default-null or reserved slots retaining nominal object identity.
     RecordArray(usize), // Checked reserved snapshots of a closed value record.
     ScalarArray(Type), // Atomic one-lane slots; exact element identity retained.
@@ -132,12 +133,12 @@ impl<'a> Profile<'a> {
                 || t.fields.len() > 16
                 || t.fields.iter().any(|f| {
                     f.deferred
-                        || !(matches!(f.ty, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::Void | Type::String | Type::Named(_))
+                        || !(matches!(f.ty, Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::Void | Type::String | Type::Named(_))
                             || (references && matches!(&f.ty, Type::Function(_)))
                             || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Function(_) | Type::Named(_)) || crate::selection::scalar_array_element(t))))
                 })
             {
-                return Err(format!("{}: value profile requires nongeneric records with at most sixteen Int32/small-integer/Boolean/String/local-record fields", t.name).into());
+                return Err(format!("{}: value profile requires nongeneric records with at most sixteen supported scalar/reference/local-record fields", t.name).into());
             }
         }
         let mut p = Self {
@@ -427,6 +428,7 @@ impl<'a> Profile<'a> {
             Type::Char => Ty::Character,
             Type::IntPtr | Type::UIntPtr => Ty::Size,
             Type::Int64 | Type::UInt64 => Ty::Wide,
+            Type::Double => Ty::Double,
             Type::Array(t) if **t == Type::Byte && self.references => Ty::ByteValues,
             Type::ArrayRef(t) if **t == Type::Byte && self.references => Ty::ByteArray,
             Type::ArrayRef(t) if **t == Type::String && self.references => Ty::StringArray,
@@ -729,6 +731,7 @@ impl<'a> Profile<'a> {
                 Op::Branch(_) => (),
                 Op::Int(_)
                 | Op::Int64(_)
+                | Op::Float64 { .. }
                 | Op::String(_)
                 | Op::Bool(_)
                 | Op::Void
@@ -800,6 +803,7 @@ impl<'a> Profile<'a> {
                 Op::Load(n) | Op::Store(n) | Op::LocalAddress(n) if *n < self.locals[i].len() => (),
                 Op::Int(_)
                 | Op::Int64(_)
+                | Op::Float64 { .. }
                 | Op::String(_)
                 | Op::ConvertInt32
                 | Op::ConvertUInt32
@@ -896,6 +900,7 @@ impl<'a> Profile<'a> {
             match op {
                 Op::Int(_) => stack.push(Ty::Int),
                 Op::Int64(_) => stack.push(Ty::Wide),
+                Op::Float64 { .. } => stack.push(Ty::Double),
                 Op::String(_) => stack.push(Ty::Literal),
                 Op::ConvertInt32 | Op::ConvertUInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 | Op::ConvertInt64 | Op::ConvertUInt64 | Op::ConvertNativeInt | Op::ConvertNativeUInt => {
                     let source = pop(&mut stack)?;
@@ -1130,38 +1135,38 @@ impl<'a> Profile<'a> {
                 }
                 Op::Add | Op::Sub | Op::Mul => {
                     let t = pop(&mut stack)?;
-                    if !matches!(t, Ty::Int | Ty::Wide) { return Err(fail(pc, "wrapping arithmetic requires Int32 or Int64")); }
+                    if !matches!(t, Ty::Int | Ty::Wide | Ty::Double) { return Err(fail(pc, "arithmetic requires Int32, Int64 or Double")); }
                     take(&mut stack, &t)?;
                     stack.push(t);
                 }
                 Op::Divide | Op::DivideUnsigned | Op::Remainder | Op::RemainderUnsigned => {
                     let t = pop(&mut stack)?;
-                    if !matches!(t, Ty::Int | Ty::Wide) {
-                        return Err(fail(pc, "division requires matching Int32 or Int64/UInt64 operands"));
+                    if !matches!(t, Ty::Int | Ty::Wide) && !(t == Ty::Double && matches!(op, Op::Divide)) {
+                        return Err(fail(pc, "division requires matching integer operands or Double div"));
                     }
                     take(&mut stack, &t)?;
                     stack.push(t);
                 }
                 Op::Equal => {
                     let t = pop(&mut stack)?;
-                    if !matches!(t, Ty::Int | Ty::Wide | Ty::Bool | Ty::Literal) {
-                        return Err(fail(pc, "equality requires Int32, Int64/UInt64, Boolean or String"));
+                    if !matches!(t, Ty::Int | Ty::Wide | Ty::Double | Ty::Bool | Ty::Literal) {
+                        return Err(fail(pc, "equality requires Int32, Int64/UInt64, Double, Boolean or String"));
                     }
                     take(&mut stack, &t)?;
                     stack.push(Ty::Bool);
                 }
                 Op::Greater | Op::Less | Op::GreaterUnsigned | Op::LessUnsigned => {
                     let t = pop(&mut stack)?;
-                    if !matches!(t, Ty::Int | Ty::Wide) {
-                        return Err(fail(pc, "ordering requires matching Int32 or Int64/UInt64 operands"));
+                    if !matches!(t, Ty::Int | Ty::Wide | Ty::Double) {
+                        return Err(fail(pc, "ordering requires matching integer or Double operands"));
                     }
                     take(&mut stack, &t)?;
                     stack.push(Ty::Bool);
                 }
                 _ if flow::comparison(op).is_some() => {
                     let t = pop(&mut stack)?;
-                    if !matches!(t, Ty::Int | Ty::Wide) {
-                        return Err(fail(pc, "comparison branch requires matching Int32 or Int64/UInt64 operands"));
+                    if !matches!(t, Ty::Int | Ty::Wide | Ty::Double) {
+                        return Err(fail(pc, "comparison branch requires matching integer or Double operands"));
                     }
                     take(&mut stack, &t)?;
                 }

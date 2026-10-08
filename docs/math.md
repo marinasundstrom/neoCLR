@@ -141,11 +141,12 @@ future work. The CLI bootstrap remains; this is not bridge-free compilation.
 Primary reference: [.NET 10 Math declarations](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Math.cs).
 [Native-metadata interpreter/AOT assessment](../benchmarks/native-web/math-constants-validation.json).
 
-**AOT limitation:** the sample currently passes interpreted execution, but native
-admission rejects its Double literal at the first instruction. The AOT backend does
-not yet lower Double instructions. Metadata emission/inlining is in place; native
-execution of this sample is not supported yet. Double instruction support is the
-next bounded task, separately from floating Math service bindings.
+**AOT development support:** the unchanged sample now passes interpreted, sanitized
+native and standalone execution. The bounded Double literal/arithmetic/comparison
+slice is described in [native Double](experiments/aot-double/README.md), with
+[execution evidence](../benchmarks/native-web/math-double-validation.json).
+Floating Math service bindings and the remaining floating instructions are separate
+work. The previous admission assessment records the earlier blocker.
 
 Reproduce the admission assessment with `verify_math_constants.py` and the visibility/
 emission controls with `verify_assembly_constants.py` in

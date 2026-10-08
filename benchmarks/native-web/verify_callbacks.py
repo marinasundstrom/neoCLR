@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
-p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault', 'PrimitiveMembers', 'AsyncEntry', 'AsyncEntryFault', 'AsyncEntryPending', 'AsyncEntryCancelled', 'AsyncEntryDiscard', 'ReferenceArrays', 'OrderCollections', 'Paths', 'Strings'))
+p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault', 'PrimitiveMembers', 'AsyncEntry', 'AsyncEntryFault', 'AsyncEntryPending', 'AsyncEntryCancelled', 'AsyncEntryDiscard', 'ReferenceArrays', 'OrderCollections', 'Paths', 'Strings', 'MathConstants'))
 a = p.parse_args()
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
@@ -43,6 +43,7 @@ for f in [Path(__file__), compiler, runtime, aot, core, seed, ownership, *libs, 
     report['inputs'][str(f)] = hashlib.sha256(f.read_bytes()).hexdigest()
 for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList')):
     source = {
+        'MathConstants': ROOT / 'docs/experiments/raven-target/samples/library-math-constants.rvn',
         'Strings': ROOT / 'docs/experiments/raven-target/samples/library-strings.rvn',
         'Paths': ROOT / 'docs/experiments/raven-target/samples/library-paths.rvn',
         'OrderCollections': ROOT / 'docs/experiments/raven-target/samples/application-order-collections.rvn',
@@ -66,6 +67,8 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultLis
     run(['clang', '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
          '-fsanitize=undefined,bounds', '-DNEOCLR_NATIVE_GC', *host_flags, *adapters, obj, '-o', native])
     executed = run([native], expected)
+    if name == 'MathConstants':
+        assert executed.stdout == 'Math constants passed\n'
     if name == 'Strings':
         assert executed.stdout == 'Hello, värld!\n14\nyes\nno\nyes\nno\nyes\nyes\nyes\nno\n-1\n0\n1\n'
     if name == 'Paths':

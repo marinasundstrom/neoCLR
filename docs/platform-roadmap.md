@@ -30,7 +30,9 @@ Raven sample in all three modes. [Math target lookup](math.md#source-runtime-boo
 is corrected by removing competing bootstrap declarations; shared introspection faults
 remain a next priority, and bootstrap remains a release gate. Author-requested [Math constants](math.md#assembly-level-constants-development-2026-10-08)
 now use finite Double assembly-level metadata and compile-time inlining. Their interpreter
-consumer passes; Double instruction lowering remains the immediate AOT gap.
+consumer and native/standalone runs now pass after [bounded Double lowering](experiments/aot-double/README.md).
+Remaining floating instructions and Math services are explicit gaps; shared introspection
+faults and bootstrap qualification remain the next release priorities.
 The wider audit also found the handwritten legacy union bridge's `IUnion`; it now
 uses `UnionValue`, with regenerated fragments and executable union/time checks. This does not change the bootstrap release gate or promise
 runtime suspension, JIT, reflection or stable callback ABI support.
