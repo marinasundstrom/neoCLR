@@ -313,6 +313,7 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
         let name = row["name"].as_str().unwrap();
         let (parameters, result, implementation, symbol) = match name {
+            "neoCLR.Runtime.Utf8Encode" => (vec![Type::String], Type::Array(Box::new(Type::Byte)), "utf8-encode-v1", "neoclr_utf8_encode_v1"),
             "neoCLR.Runtime.StringByteCount" => (vec![Type::String], Type::Int32, "string-byte-count-v1", "neoclr_string_byte_count_v1"),
             "neoCLR.Runtime.StringSliceUtf8" => (vec![Type::String, Type::Int32, Type::Int32], Type::Value, "string-slice-utf8-v1", "neoclr_string_slice_utf8_v1"),
             _ => continue,
@@ -325,10 +326,13 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
             || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
             || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
             || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
-            return Err("native UTF-8 binding requires exact StringByteCount(String) -> Int32 or StringSliceUtf8(String, Int32, Int32) -> Value InternalCall contract".into());
+            return Err("native UTF-8 binding requires exact StringByteCount(String) -> Int32 or StringSliceUtf8(String, Int32, Int32) -> Value or Utf8Encode(String) -> Byte[] InternalCall contract".into());
         }
         f.impl_flags = 0;
-        f.body = if result == Type::Value { vec![Op::String(String::new()), Op::PackValue(Type::String), Op::Return] }
+        // A verifier-valid nonreturning placeholder needs no unsupported array
+        // constructor; only the reported InternalCall is lowered to native code.
+        f.body = if matches!(result, Type::Array(_)) { vec![Op::Branch(0)] }
+            else if result == Type::Value { vec![Op::String(String::new()), Op::PackValue(Type::String), Op::Return] }
             else { vec![Op::Int(0), Op::Return] };
         bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],"implementation":implementation,"symbol":symbol}));
     }

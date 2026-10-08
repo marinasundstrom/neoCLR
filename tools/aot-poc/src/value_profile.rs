@@ -19,6 +19,7 @@ pub(super) enum Ty {
     Reference(usize),
     Interface(usize),
     ByteArray,
+    ByteValues, // Immutable native-produced value-array snapshot; no element addresses.
     Size,
     Wide,
     Address(Box<Ty>),
@@ -300,6 +301,7 @@ impl<'a> Profile<'a> {
             Type::Char => Ty::Character,
             Type::IntPtr | Type::UIntPtr => Ty::Size,
             Type::Int64 | Type::UInt64 => Ty::Wide,
+            Type::Array(t) if **t == Type::Byte && self.references => Ty::ByteValues,
             Type::ArrayRef(t) if **t == Type::Byte && self.references => Ty::ByteArray,
             Type::Named(name) => {
                 let i = self
@@ -344,7 +346,7 @@ impl<'a> Profile<'a> {
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
             Ty::Erased => vec![false, true],
-            Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::Size | Ty::Wide => vec![true],
+            Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::ByteValues | Ty::Size | Ty::Wide => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
             _ => vec![false; self.lanes(t)],
@@ -704,6 +706,9 @@ impl<'a> Profile<'a> {
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
                 }
+                Op::InitializeObject(Type::Array(t)) if **t == Type::Byte => {
+                    return Err(fail(pc, "byte value arrays require an explicit native producer; default initialization is unsupported"));
+                }
                 Op::InitializeObject(Type::Value) => {
                     return Err(fail(pc, "Value has no default initialization"));
                 }
@@ -816,12 +821,17 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::ByteArray);
                 }
                 Op::ArrayLength => {
-                    take(&mut stack, &Ty::ByteArray)?;
+                    if !matches!(pop(&mut stack)?, Ty::ByteArray | Ty::ByteValues) {
+                        return Err(fail(pc, "array length requires a byte array or immutable byte values"));
+                    }
                     stack.push(Ty::Size);
                 }
                 Op::ArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) => {
                     take(&mut stack, &Ty::Int)?;
-                    take(&mut stack, &Ty::ByteArray)?;
+                    let array = pop(&mut stack)?;
+                    if array != Ty::ByteArray && !(array == Ty::ByteValues && matches!(op, Op::ArrayElement(_))) {
+                        return Err(fail(pc, "byte value arrays permit only indexed reads; mutable borrows are unsupported"));
+                    }
                     stack.push(if matches!(op, Op::ArrayAddress(_)) { Ty::Byte.address() } else { Ty::Int });
                 }
                 Op::StoreArrayElement(Type::Byte) => {

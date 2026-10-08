@@ -1404,6 +1404,9 @@ int main(int argc, char **argv) {
 const UTF8_SEED: &str = r#"
 .module System
 .references ()
+.function neoCLR.Runtime.Utf8Encode(String) -> Byte[]
+.methodimpl InternalCall
+.end
 .function neoCLR.Runtime.StringByteCount(String) -> Int32
 .methodimpl InternalCall
 .end
@@ -1427,8 +1430,8 @@ fn utf8_text_services_require_exact_opt_in() {
         assert!(!r.status.success() && !dir.0.join("app.o").exists(),"{r:?}");
     }
     let mut impostor=seed.clone();
-    impostor.functions[0].impl_flags=0;
-    impostor.functions[0].body=vec![neoclr::metadata::Instruction::Int(0),neoclr::metadata::Instruction::Return];
+    impostor.functions[1].impl_flags=0;
+    impostor.functions[1].body=vec![neoclr::metadata::Instruction::Int(0),neoclr::metadata::Instruction::Return];
     let dir=Temp::new();
     let r=compile_source(&dir,&impostor,source,&["--compile-system","--reference-arena","--bind-user-fault","--bind-utf8-text"],false);
     assert!(!r.status.success() && !dir.0.join("app.o").exists());
@@ -1515,6 +1518,24 @@ int main(void) {
     const struct { uint64_t length; } huge={(uint64_t)INT32_MAX+1};
     if (neoclr_string_byte_count_v1((const neoclr_aot_text *)&huge,&count)!=3 || count!=-99) return 9;
     if (neoclr_string_byte_count_v1(text,&count) || count!=4) return 10;
+    memset(storage,0xa5,sizeof(storage));arena.data=(unsigned char *)storage;arena.capacity=20;arena.used=0;
+    const void *bytes=0;
+    if (neoclr_utf8_encode_v1(text,&arena,&bytes) || arena.used!=20) return 11;
+    uint64_t kind,length;memcpy(&kind,bytes,8);memcpy(&length,(const unsigned char *)bytes+8,8);
+    if (kind!=UINT64_C(0x80000003) || length!=4 || memcmp((const unsigned char *)bytes+16,input.bytes,4)) return 12;
+    for (unsigned i=20;i<sizeof(storage);i++) if (((unsigned char*)storage)[i]!=0xa5) return 13;
+    const void *saved_bytes=bytes;arena.used=0;arena.capacity=19;
+    if (neoclr_utf8_encode_v1(text,&arena,&bytes)!=5 || arena.used || bytes!=saved_bytes) return 14;
+    const struct { uint64_t length; } excessive={65537};
+    if (neoclr_utf8_encode_v1((const neoclr_aot_text *)&excessive,&arena,&bytes)!=7 || arena.used || bytes!=saved_bytes) return 15;
+    if (neoclr_utf8_encode_v1(0,&arena,&bytes)!=3 || arena.used || bytes!=saved_bytes) return 16;
+    static const struct { uint64_t length; unsigned char bytes[65536]; } largest={65536,{0}};
+    static uint64_t large_storage[8195];
+    arena.data=(unsigned char *)large_storage;arena.capacity=65552;
+    large_storage[8194]=UINT64_C(0xa5a5a5a5a5a5a5a5);
+    if (neoclr_utf8_encode_v1((const neoclr_aot_text *)&largest,&arena,&bytes) || arena.used!=65552 ||
+        memcmp((const unsigned char *)bytes+16,largest.bytes,65536) || large_storage[8194]!=UINT64_C(0xa5a5a5a5a5a5a5a5)) return 17;
+
     return 0;
 }
 "#).unwrap();
@@ -1523,4 +1544,68 @@ int main(void) {
         .arg("-o").arg(dir.0.join("app")).output().unwrap();
     assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
     assert!(Command::new(dir.0.join("app")).env_clear().status().unwrap().success());
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn utf8_encoding_snapshots_and_managed_copy_match_interpreter() {
+    let dir=Temp::new();
+    let seed=neoclr::assemble(UTF8_SEED).unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/utf8-encode.neoil");
+    let r=compile_source(&dir,&seed,source,&["--compile-system","--reference-arena","--bind-user-fault","--bind-utf8-text"],false);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc, char **argv) {
+    uint64_t storage[32];
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    int32_t result=-99;
+    int status=neoclr_entry_v4(argc>1 ? atoi(argv[1]) : 0,&result,&ctx);
+    if (status) {
+        if (result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
+        neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
+    }
+    printf("%d\n",result);return 0;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let app=neoclr::assemble(source).unwrap();
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in -6..11 {
+        let reference=method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default());
+        let r=Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        match reference {
+            Ok(result)=>{
+                assert_eq!(r.status.code(),Some(0),"{mode}: {r:?}");
+                let neoclr::Value::Int32(value)=result.value else {panic!("expected Int32")};
+                assert_eq!(r.stdout,format!("{value}\n").as_bytes());
+                assert!(r.stderr.is_empty());
+            }
+            Err(fault)=>{
+                assert_eq!(r.status.code(),Some(1),"{mode}: {r:?}; interpreter: {}",fault.diagnostic());
+                assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(),"{mode}");
+            }
+        }
+    }
+}
+
+#[test]
+fn utf8_value_snapshots_reject_mutation_and_default_initialization() {
+    let seed=neoclr::assemble(UTF8_SEED).unwrap();
+    let original=include_str!("../../../docs/experiments/aot-console/utf8-encode.neoil");
+    for operations in ["ldloca original\nldc.i4 0\nldc.i4 42\nstelem Byte",
+        "ldloca original\nldc.i4 0\nldelema Byte\npop", "ldloca original\ninitobj Byte[]"] {
+        let source=original.replacen("stloc original",&format!("stloc original\n{operations}"),1);
+        let dir=Temp::new();
+        let r=compile_source(&dir,&seed,&source,&["--compile-system","--reference-arena","--bind-utf8-text"],false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists(),"{operations}: {r:?}");
+        if !operations.contains("initobj") { assert!(!String::from_utf8_lossy(&r.stderr).contains("Fault:"),"source must verify before native rejection: {r:?}"); }
+    }
 }

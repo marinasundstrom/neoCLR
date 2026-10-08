@@ -105,8 +105,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   output copies and fault messages. Add exact opt-in UTF-8 byte-count/slice services,
   preserving range/boundary results, null faults, embedded NUL and invocation-owned
   slice lifetimes. Validate 135 interpreter/native cases and allocation bounds,
-  failure publication and canaries. General object erasure and text writer array
-  dependencies remain pending; internal native bodies must be rebuilt together.
+  failure publication and canaries. Bind UTF-8 encoding to immutable byte-value
+  snapshots with indexed reads, ordinary managed-array copying and fixed-extent
+  replacement checks. Validate snapshots, null/empty input, limits and exhaustion;
+  reject mutable element borrows/defaults. General object erasure and managed-array
+  interface views remain pending; internal native bodies must be rebuilt together.
 
 ### 2026-10-07
 

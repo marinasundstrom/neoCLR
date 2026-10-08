@@ -309,7 +309,7 @@ pub(super) fn select_inventory(
                 }
             }
             Type::ByRef(t) => pending_types.push(*t),
-            Type::ArrayRef(t) if *t == Type::Byte => (),
+            Type::Array(t) | Type::ArrayRef(t) if *t == Type::Byte => (),
             Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr => (),
             _ => {
                 return Err(

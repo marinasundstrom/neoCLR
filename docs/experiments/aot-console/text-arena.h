@@ -38,6 +38,9 @@ int32_t neoclr_uint64_to_string_v1(uint64_t value, neoclr_aot_text_arena *arena,
 int32_t neoclr_string_byte_count_v1(const neoclr_aot_text *text, int32_t *output);
 int32_t neoclr_string_slice_utf8_v1(const neoclr_aot_text *text, int32_t start, int32_t length,
                                    neoclr_aot_text_arena *arena, void *output);
+/* Immutable Byte[] snapshot, length <=65536; copied values share read-only storage. */
+int32_t neoclr_utf8_encode_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
+                             const void **output);
 /* Internal object allocation for the explicit reference-arena profile. Header is
  * a private type index; bytes includes header and padded payload (8..136 bytes).
  * The arena owns objects and cycles until the next entry/reset, just like text.

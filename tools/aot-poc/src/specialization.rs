@@ -52,7 +52,7 @@ impl Specializer<'_> {
                 return Ok(ty.clone());
             }
             Type::ByRef(t) => return Ok(Type::ByRef(Box::new(self.lower(t)?))),
-            Type::ArrayRef(t) if **t == Type::Byte => return Ok(ty.clone()),
+            Type::Array(t) | Type::ArrayRef(t) if **t == Type::Byte => return Ok(ty.clone()),
             Type::Named(name) => (name, vec![]),
             Type::Constructed {
                 definition,

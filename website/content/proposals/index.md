@@ -268,7 +268,8 @@ stdout/stderr streams with recoverable I/O results. Closed generic reference cla
 and inherited interface dispatch now support ArrayList<byte> growth with checked
 reserved capacity and a standalone Console consumer. String-valued erased transport
 preserves native pointers and managed fault behavior. UTF-8 byte counts and slices
-now preserve range/boundary results and invocation-owned text. Text writers and ReadLine
+now preserve range/boundary results and invocation-owned text. UTF-8 encoding produces
+immutable byte values for the ordinary managed-array copy loop. Text writers and ReadLine
 remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked

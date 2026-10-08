@@ -1,0 +1,146 @@
+.module Utf8Encode
+.function Snapshot(Byte[] source) -> Byte[]
+ldarg source
+ret
+.end
+.function Replace(Byte[] original, Byte[] replacement) -> Byte[]
+ldarg replacement
+starg original
+ldarg original
+ret
+.end
+.function CopyInto(Byte[] source, out Byte[]& target) -> noresult
+ldarg target
+ldarg source
+stobj Byte[]
+ret
+.end
+.function Copy(String text) -> arrayref<Byte>
+.local Byte[] source
+.local arrayref<Byte> destination
+.local Int32 index
+ldarg text
+call neoCLR.Runtime.Utf8Encode(String)
+call Snapshot(Byte[])
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr Byte
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem Byte
+stelem Byte
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Byte[] original
+.local Byte[] snapshot
+.local String text
+.local arrayref<Byte> copy
+ldarg mode
+ldc.i4 -3
+ceq
+brtrue Null
+ldarg mode
+ldc.i4 -2
+ceq
+brtrue Empty
+ldstr "aé😀\u0000z"
+call neoCLR.Runtime.Utf8Encode(String)
+stloc original
+ldarg mode
+ldc.i4 -5
+ceq
+brtrue ResizeArgument
+ldarg mode
+ldc.i4 -6
+ceq
+brtrue ResizeOutput
+ldloc original
+call Snapshot(Byte[])
+ldloca snapshot
+call CopyInto(Byte[], Byte[]&)
+ldarg mode
+ldc.i4 -4
+ceq
+brtrue Resize
+ldstr "123456789"
+br Replace
+Resize:
+ldstr "replacement"
+Replace:
+call neoCLR.Runtime.Utf8Encode(String)
+stloc original
+ldstr "aé😀\u0000z"
+call Copy(String)
+stloc copy
+ldloc copy
+ldc.i4 0
+ldc.i4 42
+stelem Byte
+ldarg mode
+ldc.i4 -1
+ceq
+brtrue Length
+ldloc snapshot
+ldarg mode
+ldelem Byte
+conv.i4
+ret
+Length:
+ldloc snapshot
+ldlen
+conv.i4
+ret
+Empty:
+ldstr ""
+call neoCLR.Runtime.Utf8Encode(String)
+ldlen
+conv.i4
+ret
+ResizeArgument:
+ldloc original
+ldstr ""
+call neoCLR.Runtime.Utf8Encode(String)
+call Replace(Byte[], Byte[])
+pop
+ldc.i4 0
+ret
+ResizeOutput:
+ldstr ""
+call neoCLR.Runtime.Utf8Encode(String)
+ldloca original
+call CopyInto(Byte[], Byte[]&)
+ldc.i4 0
+ret
+Null:
+ldloca text
+initobj String
+ldloc text
+call neoCLR.Runtime.Utf8Encode(String)
+pop
+ldc.i4 0
+ret
+.end
+.function neoCLR.Runtime.Utf8Encode(String) -> Byte[]
+.methodimpl InternalCall
+.end

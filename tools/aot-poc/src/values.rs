@@ -84,6 +84,24 @@ fn null_reference(b: &mut FunctionBuilder<'_>, pointer: ir::Value, site: Option<
     return_if_detailed(b, null, status, site);
 }
 
+// Value-array slots have fixed extent after their first assignment, matching the
+// interpreter even though immutable snapshots can share their backing bytes.
+fn check_byte_value_replacement(b: &mut FunctionBuilder<'_>, address: ir::Value, value: ir::Value, site: Option<&crate::fault_details::Site>) {
+    let old = b.ins().load(types::I64, MemFlags::new(), address, 0);
+    let assigned = b.ins().icmp_imm(IntCC::NotEqual, old, 0);
+    let check = b.create_block();
+    let ready = b.create_block();
+    b.ins().brif(assigned, check, &[], ready, &[]);
+    b.switch_to_block(check);
+    let old_length = b.ins().load(types::I64, MemFlags::new(), old, 8);
+    let new_length = b.ins().load(types::I64, MemFlags::new(), value, 8);
+    let mismatch = b.ins().icmp(IntCC::NotEqual, old_length, new_length);
+    let status = b.ins().iconst(types::I32, 3);
+    return_if_detailed(b, mismatch, status, site);
+    b.ins().jump(ready, &[]);
+    b.switch_to_block(ready);
+}
+
 pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
     let reservations = input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ReserveArray(_))));
     let references = details.is_some_and(|d| d.reference_arena);
@@ -159,6 +177,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     let mut utf8_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
+            (&d.utf8_encode, "neoclr_utf8_encode_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_byte_count, "neoclr_string_byte_count_v1", vec![types::I64, types::I64]),
             (&d.string_slice_utf8, "neoclr_string_slice_utf8_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
         ] {
@@ -411,6 +430,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let args = if details.unwrap().string_slice_utf8.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], parameters[2], arena, output]
+                } else if details.unwrap().utf8_encode.contains(&i) {
+                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                    vec![parameters[0], arena, output]
                 } else { vec![parameters[0], output] };
                 let call = b.ins().call(service, &args);
                 let raw = b.inst_results(call)[0];
@@ -418,6 +440,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let memory = b.ins().iconst(types::I32, 5);
                 let runtime = b.ins().iconst(types::I32, 3);
                 let status = b.ins().select(exhausted, memory, runtime);
+                let status = if details.unwrap().utf8_encode.contains(&i) {
+                    let limited = b.ins().icmp_imm(IntCC::Equal, raw, 7);
+                    let array_limit = b.ins().iconst(types::I32, 7);
+                    b.ins().select(limited, array_limit, status)
+                } else { status };
                 let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
                 let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
                 site.capture_frame = false;
@@ -468,6 +495,13 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     slot(&mut b, p.bytes(t))
                 })
                 .collect();
+            for (ty, local) in p.locals[i].iter().zip(&locals) {
+                if *ty == Ty::ByteValues {
+                    // Zero is an internal unassigned marker, never an exposed Byte[] value.
+                    let zero = b.ins().iconst(types::I64, 0);
+                    b.ins().stack_store(zero, *local, 0);
+                }
+            }
             // All profile return values fit in sixteen padded scalar lanes; snapshots are read
             // immediately after each successful call, before this storage can be reused.
             let call_result = slot(&mut b, 128);
@@ -621,6 +655,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         } else {
                             &p.locals[i][*n]
                         };
+                        if *ty == Ty::ByteValues { check_byte_value_replacement(&mut b, address, value[0], site.as_ref()); }
                         write_typed(&mut b, &p, ty, address, &value);
                     }
                     Op::Dup => {
@@ -648,6 +683,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     Op::StoreObject(t) => {
                         let value = stack.split_off(stack.len() - p.lanes(&p.ty(t)?));
                         let address = pop(&mut stack);
+                        if p.ty(t)? == Ty::ByteValues { check_byte_value_replacement(&mut b, address, value[0], site.as_ref()); }
                         write_typed(&mut b, &p, &p.ty(t)?, address, &value);
                     }
                     Op::New(t) => {

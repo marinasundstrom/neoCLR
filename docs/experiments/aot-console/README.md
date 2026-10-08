@@ -650,3 +650,30 @@ semantics, not a new claim of superiority or a stable native ABI.
 
 The full Console.Write graph still needs byte-value-array encoding and managed byte
 array interface views, followed by a measured extension of selection budgets.
+
+
+## Immutable encoded byte values (2026-10-08)
+
+The UTF-8 capability also binds exact Utf8Encode(String) -> Byte[]. Its native
+producer stores UTF-8 bytes in an invocation-owned immutable value-array snapshot,
+limited to 65,536 bytes. Admitted code can copy/pass/return these values, inspect their
+length and read indexed bytes. The ordinary bridge loop copies them into mutable
+`arrayref<Byte>` storage. Value and managed arrays are distinct types; this does not
+turn value arrays into aliased mutable references. Element mutation/borrows, defaults,
+array-valued fields and general value-array producers remain outside the profile.
+
+Immutable snapshots share backing storage safely. Replacing an initialized local,
+argument or output slot still requires equal lengths, matching the interpreter's
+fixed-extent value-array contract; a mismatch faults at the store. Unassigned local
+slots have a private zero marker, never an observable default Byte[] value. Null
+native String arguments fault; range errors, the array limit and arena exhaustion
+retain their existing fault codes and original managed caller frames.
+
+`utf8-encode.neoil` runs 17 interpreter/native comparisons for multibyte UTF-8/NUL,
+empty/null input, snapshots across same-length replacement, rejected extent changes,
+indexed bounds and an ordinary managed copy loop. Adapter checks exercise exact-fit
+allocation, failure publication, 65,536/65,537-byte limits and canaries. Unlike .NET's
+managed byte[] returned by Encoding.UTF8.GetBytes, the existing neoCLR native service
+returns value bytes and its temporary bridge copies them into a managed array. This
+keeps that contract intact but costs an additional retained arena allocation/copy;
+it is not a proposed permanent encoding optimization.

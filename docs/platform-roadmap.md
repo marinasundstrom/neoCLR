@@ -123,8 +123,11 @@ interface aliasing. Unwritten reads and output validation preserve interpreter f
 reserved-array element borrows remain rejected. String-valued erased transport and
 static generic String helpers now preserve pointer width/lifetime and exact fault
 parity. Explicit UTF-8 byte-count/slice bindings now preserve interpreter range/boundary
-results and exact dynamic fault messages. Console.Write still requires byte-value
-encoding, array interface views and a measured function/clone budget extension. The author adds a console-input sample after unions, exercising input and
+results and exact dynamic fault messages. UTF-8 encoding now returns immutable byte
+value snapshots, preserving fixed-extent replacement and the bridge's ordinary copy
+loop. Console.Write still requires String instance members, array interface views
+and a measured function/clone budget extension (currently 151 functions, 68 types,
+37 clones before array dispatch). The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

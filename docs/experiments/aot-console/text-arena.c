@@ -130,3 +130,19 @@ int32_t neoclr_string_slice_utf8_v1(const neoclr_aot_text *text, int32_t start, 
     memcpy((unsigned char *)output + 8, &payload, sizeof(payload));
     return NEOCLR_AOT_FAULT_NONE;
 }
+
+int32_t neoclr_utf8_encode_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
+                             const void **output) {
+    if (!text) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (text->length > 65536) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
+    void *array;
+    int32_t status = allocate_bytes(arena, (int32_t)text->length, 0, &array);
+    if (status) return status;
+    /* Distinct private kind. No admitted operation mutates these value snapshots;
+     * copies can safely share storage until the invocation arena is released. */
+    uint64_t kind = UINT64_C(0x80000003);
+    memcpy(array, &kind, 8);
+    memcpy((unsigned char *)array + 16, text->bytes, (size_t)text->length);
+    *output = array;
+    return NEOCLR_AOT_FAULT_NONE;
+}

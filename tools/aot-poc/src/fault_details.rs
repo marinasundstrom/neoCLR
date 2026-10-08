@@ -16,6 +16,7 @@ pub struct Options {
     pub console_flush: Vec<usize>,
     pub int32_to_string: Vec<usize>,
     pub string_byte_count: Vec<usize>,
+    pub utf8_encode: Vec<usize>,
     pub string_slice_utf8: Vec<usize>,
     pub char_from_string: Vec<usize>,
     pub char_text: Vec<usize>,
@@ -58,6 +59,12 @@ impl Options {
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter().flatten()
                 .filter(|r| r["implementation"] == "console-flush-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            utf8_encode: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "utf8-encode-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             string_byte_count: report
