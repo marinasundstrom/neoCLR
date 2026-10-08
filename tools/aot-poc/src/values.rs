@@ -10,7 +10,7 @@ mod gc_points;
 mod gc_probe;
 
 pub(super) fn trace_layout(input: &neoclr::Module, details: Option<&crate::fault_details::Options>) -> Result<serde_json::Value, Error> {
-    let p = Profile::new(input, details.is_some_and(|d| d.reference_arena), details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.int32_receivers.as_slice()), details.is_some_and(|d| d.native_stack_budget))?;
+    let p = Profile::new(input, details.is_some_and(|d| d.reference_arena), details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.primitive_receivers.as_slice()), details.is_some_and(|d| d.native_stack_budget))?;
     let mut report = gc_layout::report(&p);
     report["preOperationPlans"] = gc_points::report(&p, details)?;
     Ok(report)
@@ -207,7 +207,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     if stack_budget && !details.is_some_and(|d| d.native_gc) {
         return Err("native stack budget requires GC frame publication".into());
     }
-    let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.int32_receivers.as_slice()), details.is_some_and(|d| d.native_stack_budget))?;
+    let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.primitive_receivers.as_slice()), details.is_some_and(|d| d.native_stack_budget))?;
     let root = p.root(root)?;
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))

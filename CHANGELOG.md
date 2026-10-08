@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Extend verified native primitive wrappers to Boolean, Int64 and UInt64 with exact
+  borrowed receivers, and admit existing 64-bit ordering/branch lowering. Boolean and
+  generic-collection Raven samples now match interpreted execution; 56 comparison
+  cases, four receiver-mutation checks and a standalone primitive consumer pass.
+  General virtual dispatch and wider arithmetic remain separate work.
+
 - Compile bounded scalar arrays for integer, Boolean and Void elements, preserving
   default/reserved initialization, exact element identities, checked access and atomic
   GC payloads. Verify 77 native/interpreter mode/type comparisons and real Raven array

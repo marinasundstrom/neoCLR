@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
-p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault'))
+p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault', 'PrimitiveMembers'))
 a = p.parse_args()
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
@@ -51,13 +51,17 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultLis
     expected = 1 if name in ('CallbackFault', 'QueuePumpFault') else 0
     host_flags = ['-DNEOCLR_HOST_TASK_PUMP'] if name in ('TaskQueue', 'QueuePump', 'QueuePumpFault') else []
     interpreted = run([runtime, 'run', assembly, *context, '--instructions', '100000000'], expected)
-    inspection = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world', *flags]).stdout)
+    case_flags = flags + (['--bind-integer-text'] if name == 'PrimitiveMembers' else [])
+    inspection = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world', *case_flags]).stdout)
     if not inspection['admission']['accepted']:
         raise RuntimeError(inspection['admission'])
-    run([aot, '--closed-world', assembly, '@entry', obj, *flags])
+    run([aot, '--closed-world', assembly, '@entry', obj, *case_flags])
     run(['clang', '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
          '-fsanitize=undefined,bounds', '-DNEOCLR_NATIVE_GC', *host_flags, *adapters, obj, '-o', native])
     executed = run([native], expected)
+    if name == 'PrimitiveMembers':
+        assert executed.stdout == '1\n-1\n0\n-9223372036854775808\n9223372036854775807\n-1\n1\n0\n1\n-1\n0\n1\n42\n'
+        report['primitiveInstanceProjections'] = inspection['selection']['primitiveInstanceProjections']
     if executed.stdout != interpreted.stdout or executed.stderr != interpreted.stderr:
         raise RuntimeError(f'Output/fault mismatch: {executed} vs {interpreted}')
     report['cases'][name] = {'status': expected, 'output': executed.stdout, 'fault': interpreted.stderr,

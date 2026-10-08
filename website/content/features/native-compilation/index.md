@@ -179,3 +179,8 @@ The first coverage follow-up adds bounded integer, Boolean and Void arrays, incl
 checked reserved storage and atomic GC payloads. The ordinary Raven array sample now
 runs in both modes. Nine other selected samples advance to further metadata, primitive
 wrapper, callback and service gaps; broad Tasks/await parity is not yet claimed.
+
+
+A further fix enables ordinary Boolean/Int64/UInt64 wrappers and 64-bit ordering.
+The Boolean and generic-collection samples now also match interpreted execution.
+General virtual dispatch, Tasks entry lifecycle and reflection remain separate gaps.

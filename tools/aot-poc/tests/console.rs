@@ -4401,3 +4401,88 @@ fn native_scalar_arrays_reject_element_borrows_and_incompatible_elements() {
         assert!(!r.status.success(), "unsupported scalar array contract admitted");
     }
 }
+
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_wide_ordering_matches_signed_unsigned_and_comparison_branches() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let dir = Temp::new();
+    let mut source = String::from(".module WideOrdering\n");
+    let mut count = 0;
+    for (left, right) in [(i64::MIN, i64::MAX), (-1, 1), (0, 0), (i64::MAX, i64::MIN)] {
+        for (op, expected, branch) in [
+            ("clt", left < right, false), ("cgt", left > right, false),
+            ("clt.un", (left as u64) < right as u64, false), ("cgt.un", (left as u64) > right as u64, false),
+            ("beq", left == right, true), ("bne.un", left != right, true),
+            ("blt", left < right, true), ("bgt", left > right, true),
+            ("ble", left <= right, true), ("bge", left >= right, true),
+            ("blt.un", (left as u64) < right as u64, true), ("bgt.un", (left as u64) > right as u64, true),
+            ("ble.un", (left as u64) <= right as u64, true), ("bge.un", (left as u64) >= right as u64, true),
+        ] {
+            let comparison = if branch { format!("{op} Yes") } else { format!("{op}\nbrtrue Yes") };
+            source.push_str(&format!(".function Case{count}() -> Int32\nldc.i8 {left}\nldc.i8 {right}\n{comparison}\nldc.i4 {}\nret\nYes:\nldc.i4 {}\nret\n.end\n", i32::from(!expected), i32::from(expected)));
+            count += 1;
+        }
+    }
+    source.push_str(".function Calculate() -> Int32\nldc.i4 0\n");
+    for i in 0..count { source.push_str(&format!("call Case{i}()\nadd\n")); }
+    source.push_str("ret\n.end\n");
+    let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(base.join("text-host.c")).arg(base.join("text-arena.c"))
+        .arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+        .arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).output().unwrap();
+    assert_eq!(r.status.code(), Some(count), "{r:?}");
+    assert!(r.stdout.is_empty() && r.stderr.is_empty());
+    let app = neoclr::assemble(&source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate()").unwrap()).unwrap();
+    assert_eq!(method.invoke(vec![], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(count));
+}
+
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn primitive_instance_projection_preserves_borrowed_storage() {
+    use neoclr::metadata::{Instruction as Op, Type};
+    let template = neoclr::assemble(".module Template\n.type Owner\n.field Number Int32\n.method instance byref Set(Int32 value) -> noresult\nret\n.end\n.end").unwrap();
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    for (ty, name, value) in [
+        (Type::Boolean, "Boolean", "ldc.bool true"),
+        (Type::Int32, "Int32", "ldc.i4 -2147483648"),
+        (Type::Int64, "Int64", "ldc.i8 -9223372036854775808"),
+        (Type::UInt64, "UInt64", "ldc.i8 -1\nconv.u8"),
+    ] {
+        let mut seed = neoclr::library::system().unwrap().clone();
+        let mut method = template.functions[0].clone();
+        method.name = format!("System.{name}.AotSet");
+        method.owner = Some(ty.clone());
+        method.parameters = vec![ty.clone()];
+        method.definition = None;
+        method.body = vec![Op::Arg(0), Op::Arg(1), Op::StoreObject(ty), Op::Return];
+        seed.functions.push(method);
+        let source = format!(".module PrimitiveBorrow\n.function Calculate() -> Int32\n.local {name} value\nldloca value\ninitobj {name}\nldloca value\n{value}\ncall instance System.{name}::AotSet({name})\nldloc value\n{value}\nceq\nbrfalse Bad\nldc.i4 42\nret\nBad:\nldc.i4 -1\nret\n.end");
+        let dir = Temp::new();
+        let app = neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)], &seed).unwrap().remove(0);
+        let r = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena"]);
+        assert!(r.status.success(), "{name}: {}", String::from_utf8_lossy(&r.stderr));
+        let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+        assert_eq!(report["primitiveInstanceProjections"].as_array().unwrap().len(), 1);
+        assert_eq!(report["primitiveInstanceProjections"][0]["receiverType"], name);
+        let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-fsanitize=undefined,bounds", "-I"])
+            .arg(&base).arg(base.join("text-host.c")).arg(base.join("text-arena.c"))
+            .arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+            .arg("-o").arg(dir.0.join("host")).output().unwrap();
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let r = Command::new(dir.0.join("host")).output().unwrap();
+        assert_eq!(r.status.code(), Some(42), "{name}: {r:?}");
+        let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+        let entry = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate()").unwrap()).unwrap();
+        assert_eq!(entry.invoke(vec![], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    }
+}

@@ -233,7 +233,7 @@ impl<'a> Profile<'a> {
             }
             for (index, t) in f.parameters.iter().enumerate() {
                 if let Type::ByRef(target) = t {
-                    let projected_receiver = index == 0 && **target == Type::Int32
+                    let projected_receiver = index == 0 && matches!(**target, Type::Int32 | Type::Boolean | Type::Int64 | Type::UInt64)
                         && primitive_receivers.is_some_and(|indices| indices.contains(&i));
                     if !f.out_parameters.contains(&index) && !projected_receiver {
                         return Err(
@@ -1112,6 +1112,21 @@ impl<'a> Profile<'a> {
                     }
                     take(&mut stack, &t)?;
                     stack.push(Ty::Bool);
+                }
+                Op::Greater | Op::Less | Op::GreaterUnsigned | Op::LessUnsigned => {
+                    let t = pop(&mut stack)?;
+                    if !matches!(t, Ty::Int | Ty::Wide) {
+                        return Err(fail(pc, "ordering requires matching Int32 or Int64/UInt64 operands"));
+                    }
+                    take(&mut stack, &t)?;
+                    stack.push(Ty::Bool);
+                }
+                _ if flow::comparison(op).is_some() => {
+                    let t = pop(&mut stack)?;
+                    if !matches!(t, Ty::Int | Ty::Wide) {
+                        return Err(fail(pc, "comparison branch requires matching Int32 or Int64/UInt64 operands"));
+                    }
+                    take(&mut stack, &t)?;
                 }
                 _ => {
                     take(&mut stack, &Ty::Int)?;

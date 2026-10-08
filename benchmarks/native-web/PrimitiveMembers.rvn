@@ -1,0 +1,29 @@
+import System.*
+
+func CompareSigned(value: long, other: long) -> int {
+    return value.CompareTo(other)
+}
+
+func Main() -> int {
+    let yes = true
+    let no = false
+    Console.WriteLine(yes.CompareTo(no))
+    Console.WriteLine(no.CompareTo(yes))
+    Console.WriteLine(yes.CompareTo(true))
+    let minimum = Int64.MinValue
+    let maximum = Int64.MaxValue
+    Console.WriteLine(minimum.ToString())
+    Console.WriteLine(maximum.ToString())
+    Console.WriteLine(CompareSigned(minimum, maximum))
+    Console.WriteLine(CompareSigned(maximum, minimum))
+    Console.WriteLine(CompareSigned(maximum, maximum))
+    let unsigned = (ulong)-1L
+    let zero = UInt64.Zero
+    Console.WriteLine(unsigned.CompareTo(zero))
+    Console.WriteLine(zero.CompareTo(unsigned))
+    Console.WriteLine(unsigned.CompareTo(unsigned))
+    let integer = 42
+    Console.WriteLine(integer.CompareTo(41))
+    Console.WriteLine(integer.ToString())
+    return 0
+}

@@ -134,6 +134,23 @@ historical evidence; this follow-up supersedes its primitive-array implementatio
 Next inspect primitive wrapper ownership as a potentially small fix; Tasks entry draining
 and value-receiver callbacks remain distinct runtime/ABI work.
 
+## Second implemented follow-up: primitive members and wide ordering
+
+Boolean, Int64 and UInt64 ordinary nonvirtual wrappers now use the same verified
+borrow-preserving projection as Int32. Wide ordering and comparison branches now admit
+matching 64-bit operands; the existing code generator already implements the machine
+comparisons. [Evidence](primitive-member-followup.json) records 56 signed/unsigned
+comparison cases, mutation through four exact borrowed receiver types, and a Raven
+consumer with hard-coded expected outputs in interpreted/sanitized/standalone modes.
+
+`library-booleans` and `library-generic-collections` now pass both modes with matching
+output. `library-calendar` advances to unsupported wide arithmetic in Time.get_Hour;
+calendar services and broad numeric coverage are not claimed. Together with scalar
+arrays, three previously blocked samples now pass. The original 104-case survey is not
+rerun wholesale, and its historical counts above are not presented as a fresh census.
+Next distinguish small arithmetic gaps from Tasks entry lifecycle/value-receiver
+callback work; preserve the release's explicit bootstrap and baseline priorities.
+
 ## Per-sample matrix
 
 `Emission blocked` means neither mode was run. Interpreter `expected 1/23` identifies
