@@ -331,24 +331,28 @@ impl<'a> Profile<'a> {
             }
             edges[contract].push(target);
         }
-        fn visit(i: usize, edges: &[Vec<usize>], states: &mut [u8]) -> Result<(), Error> {
+        fn visit(i: usize, edges: &[Vec<usize>], states: &mut [u8], path: &mut Vec<usize>, input: &neoclr::Module) -> Result<(), Error> {
             if states[i] == 1 {
-                return Err("recursive calls require a native stack-budget contract".into());
+                let start = path.iter().position(|n| *n == i).unwrap_or(0);
+                let cycle = path[start..].iter().copied().chain([i]).map(|n| {
+                    let f = &input.functions[n];
+                    let name = f.origin.as_ref().map_or(f.name.as_str(), |o| o.name.as_str());
+                    let owner = f.owner.as_ref().and_then(|ty| input.type_definition(ty))
+                        .map(|ty| ty.origin.as_ref().map_or(ty.name.as_str(), |o| o.name.as_str()));
+                    match owner { Some(owner) => format!("{owner}::{name} [#{n}]"), None => format!("{name} [#{n}]") }
+                }).collect::<Vec<_>>().join(" -> ");
+                return Err(format!("recursive calls require a native stack-budget contract: {cycle}").into());
             }
-            if states[i] == 2 {
-                return Ok(());
-            }
+            if states[i] == 2 { return Ok(()); }
             states[i] = 1;
-            for &next in &edges[i] {
-                visit(next, edges, states)?;
-            }
+            path.push(i);
+            for &next in &edges[i] { visit(next, edges, states, path, input)?; }
+            path.pop();
             states[i] = 2;
             Ok(())
         }
         let mut states = vec![0; edges.len()];
-        for i in 0..edges.len() {
-            visit(i, &edges, &mut states)?;
-        }
+        for i in 0..edges.len() { visit(i, &edges, &mut states, &mut vec![], input)?; }
         Ok(p)
     }
     pub fn callable_targets(&self, shape: &Type) -> Result<Vec<usize>, Error> {

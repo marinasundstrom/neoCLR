@@ -3212,6 +3212,11 @@ fn native_callbacks_reject_recursion_borrows_and_excess_dispatch_targets() {
         let dir = Temp::new();
         let r = compile_source(&dir, &seed, source, &flags, false);
         assert!(!r.status.success());
+        if source == recursive {
+            let diagnostic = String::from_utf8_lossy(&r.stderr);
+            assert_eq!(diagnostic.matches("Again [#").count(), 2, "{diagnostic}");
+            assert!(diagnostic.contains(" -> "), "{diagnostic}");
+        }
         assert!(String::from_utf8_lossy(&r.stderr).contains(message), "{}", String::from_utf8_lossy(&r.stderr));
     }
 }

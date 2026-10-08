@@ -51,3 +51,25 @@ reached unsupported ArrayRef<Int32> specialization. Those are deferred compiler/
 candidates, not solved by this adapter. Do not infer support for them from this consumer.
 No benchmark was added: the current claim is behavioral parity; scheduler/HTTP timing
 still requires an executing server and representative completion workload.
+
+## Server cycle witness
+
+The recursion diagnostic now preserves original member/owner names and compiled
+indices. The full Server inspection reports:
+
+```
+Raven.Generated.UnitCallback::Invoke [#7]
+ -> $closure$0::Invoke [#5]
+ -> System.Web.Http.HttpServer::Close [#211]
+ -> System.Concurrency.CancellationTokenSource::Cancel [#75]
+ -> System.Concurrency.CancellationRegistration::Invoke [#83]
+ -> Raven.Generated.UnitCallback::Invoke [#7]
+```
+
+These indices belong to this selection only. Interface/callable dispatch includes
+all admitted targets, so the graph witness does not establish infinite recursion
+in the running application. It does identify a path the backend cannot currently
+bound. Admission remains unchanged: removing the guard requires either sounder
+receiver/target analysis or a native stack-budget contract. The focused callback
+rejection test checks the repeated member and cycle separator; the full Server
+inspection supplies the integration witness. No native HTTP execution is claimed.
