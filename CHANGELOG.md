@@ -17,7 +17,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   erased discriminators in ordinary native function prologues, while retaining verifier
   rejection of unassigned reads. Inspection reports the selected local seed lanes.
   This adds initialization stores, not root registration or collection; runtime ABI
-  and scalar-only local initialization are unchanged.
+  and scalar-only local initialization are unchanged. Add reachable pre-operation root
+  plans for calls, constructors, arrays and text materialization, distinguishing retained
+  stack values from pending operands and selecting spill lanes including erased tags.
+  Report native adapter/dispatch bodies as explicit coverage gaps. These plans do not
+  emit spills, register roots or enable collection.
 
 - Add a real RoutePattern workload covering eight repeated routing outcomes, pattern
   errors and capture retention. Measure native arena growth from 2,433 bytes before

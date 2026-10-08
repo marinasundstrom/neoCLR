@@ -25,6 +25,7 @@ fn inspect(bytes: &[u8]) -> serde_json::Value {
     inspect_mode(bytes, false)
 }
 fn inspect_mode(bytes: &[u8], closed: bool) -> serde_json::Value {
+
     let dir = Temp::new();
     let input = dir.0.join("input.pe");
     fs::write(&input, bytes).unwrap();
@@ -197,4 +198,56 @@ fn closed_world_inspection_distinguishes_selection_and_body_failures() {
     assert_eq!(report["admission"]["accepted"], false);
     assert_eq!(report["admission"]["phase"], "compilation");
     assert!(report["selection"].is_object());
+}
+
+#[test]
+fn root_plans_keep_stack_only_references_and_pending_erased_arguments_separate() {
+    let source = br#".module Roots
+.entry Main
+.function Echo(Value input) -> Value
+ldarg input
+ret
+.end
+.function Main() -> Int32
+ldstr "retained"
+ldc.bool true
+brfalse Other
+ldstr "one"
+value.pack String
+br Call
+Other:
+ldc.i4 7
+value.pack Int32
+Call:
+call Echo(Value)
+pop
+pop
+ldc.i4 0
+ret
+ldstr "unreachable"
+pop
+ldc.i4 1
+ret
+.end
+"#;
+    let module = neoclr::assemble(std::str::from_utf8(source).unwrap()).unwrap();
+    let report = inspect(&neoclr::metadata_container::write_module(&module).unwrap());
+    assert_eq!(report["admission"]["accepted"], true, "{report}");
+    let functions = report["traceLayout"]["preOperationPlans"]["functions"].as_array().unwrap();
+    let main = functions.iter().find(|f| f["name"] == "Main").unwrap();
+    let points = main["points"].as_array().unwrap();
+    assert_eq!(points.len(), 3, "dead literal must not introduce a root boundary");
+    let call = points.iter().find(|p| p["kind"] == "call").unwrap();
+    assert_eq!(call["stackValues"], 2);
+    assert_eq!(call["stackLanes"], 3);
+    assert_eq!(call["requiredSpillLanes"], serde_json::json!([0, 1, 2]));
+    assert_eq!(call["consumedValues"], 1);
+    assert_eq!(call["roots"][0]["role"], "caller-retained");
+    assert_eq!(call["roots"][0]["laneBase"], 0);
+    assert_eq!(call["roots"][1]["role"], "pending-operand");
+    assert_eq!(call["roots"][1]["laneBase"], 1);
+    assert_eq!(call["roots"][1]["layout"]["traceSlots"][0]["trace"]["tagLane"], 0);
+    assert_eq!(call["resultActiveBeforeOperation"], false);
+    assert_eq!(call["resultAfterSuccess"]["lanes"], 2);
+    assert!(call["constructorReceiverBeforeCall"].is_null());
 }

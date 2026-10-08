@@ -1626,3 +1626,50 @@ unassigned reads. The freshly compiled standalone routing consumer retains exact
 and broken-pipe fault parity, retained captures, libSystem-only dependencies and unchanged
 arena measurements (117,507 bytes at 128 requests; clean failure with a 64 KiB budget).
 No collector or reduced-memory claim follows from these initialization checks.
+
+## Pre-operation stack root plans (2026-10-08)
+
+`traceLayout.preOperationPlans` now derives plans from the same checked CFG stack shapes
+used by value lowering. At each reachable call, constructor, array allocation/reservation
+or String literal materialization, it records stack values, flattened lane bases, typed
+root layouts and required spill lanes. All calls and text materializations are conservative
+candidates; a particular call may not allocate and a literal may remain in image data.
+Unreachable IL contributes no point, but remains subject to normal backend admission.
+
+The plan separates the stack prefix retained by the caller from operands about to be
+consumed by the operation. Both can hold the only reference to an object. Erased values
+need their discriminator and payload spilled together; ordinary wide integers do not
+become roots. Slot/tag offsets inside each layout are relative to its `laneBase`, not
+the complete evaluation stack. `requiredSpillLanes` uses absolute flattened stack lanes.
+These plans describe pre-lowering operand representations, before any call-boundary
+String/Object tagging or receiver conversion.
+
+A constructor consumes explicit arguments before its new receiver exists. Its receiver
+layout is reported separately for activation after allocation/value initialization and
+before the constructor call. The eventual result is likewise separate and inactive before
+the operation; it becomes valid only on success. No-result calls report no result layout.
+A pending output borrow identifies an address/owner obligation; it does not prove the
+pointee initialized or permit tracing unassigned caller storage.
+
+Function indices join the existing argument/local layouts. Native adapter and dispatch
+bodies receive an explicit `native-body-requires-separate-plan` coverage marker instead
+of plans for their synthetic IL. Those bodies can allocate or forward calls and remain
+mandatory work. Wrapper classification follows the current backend substitutions and
+must be extended with new native bindings. Local liveness, spills, root-frame publication
+and cleanup, adapter internals, pending result storage, borrow owner/initialization
+tracking and host/fault roots are still incomplete. This is analysis, not emitted native
+safepoints or permission to run a collector.
+
+[Routing root-plan evidence](route-root-points-validation.json) records actual consumer
+admission, plan counts, selected function excerpts and native-body gaps. Seven unit tests
+and six inspection tests pass, including branch joins, dead IL, retained stack-only text,
+erased payloads, integer exclusion, constructor staging, array lengths and output borrows.
+Code generation and runtime behavior are unchanged; the preceding standalone validation
+remains the execution baseline.
+
+This continues the existing CLR/root-map comparison: metadata describing locals alone
+cannot cover evaluation-stack temporaries across allocating calls. Conservatively keeping
+the full traceable stack simplifies the first implementation but can retain dead values;
+it is not CLR register-liveness metadata or a performance improvement. Native registration
+must make the planned spills observable and validate nested calls and fault cleanup before
+reclamation is enabled.

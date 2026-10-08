@@ -95,7 +95,7 @@ fn encode(slots: Vec<Slot>) -> Vec<Value> {
         json!({"lane": slot.lane, "byteOffset": slot.lane * 8, "trace": recipe})
     }).collect()
 }
-fn layout(p: &Profile<'_>, ty: &Ty) -> Value {
+pub(super) fn layout(p: &Profile<'_>, ty: &Ty) -> Value {
     json!({"lanes": p.lanes(ty), "storageBytes": p.bytes(ty), "traceSlots": encode(slots(p, ty))})
 }
 pub(super) fn report(p: &Profile<'_>) -> Value {

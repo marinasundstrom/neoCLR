@@ -514,3 +514,11 @@ lanes in inspection. This prepares part of step 2 without registering roots or s
 arguments, evaluation stacks, scratch results, initialization through managed borrows and
 host/fault roots still need a complete scanning contract. Optimizers may eliminate stores
 until root publication makes them observable, so this is not a collector-readiness claim.
+
+Pre-operation planning now uses the checked CFG stack shapes to classify retained stack
+values and consumed operands, including erased tag/payload spill lanes. Constructor
+receivers and successful results are separate activation phases; native adapter/dispatch
+bodies remain explicitly uncovered. See the [contract and evidence](experiments/aot-console/README.md#pre-operation-stack-root-plans-2026-10-08).
+This extends step 2's analysis, not native publication: no root frames or spills are
+emitted yet. Conservative stack retention trades simpler coverage for potentially longer
+lifetimes; existing CLR comparison and collector performance questions remain unchanged.

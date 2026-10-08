@@ -194,7 +194,10 @@ diagnostics now distinguish reference slots, conditional erased payloads and man
 borrows ([evidence](experiments/aot-console/route-trace-layout-validation.json)). Ordinary
 native prologues now clear traceable local lanes and erased tags without changing guest
 assignment rules ([validation](experiments/aot-console/route-root-seed-validation.json)).
-This prepares storage only; establish native root registration at allocating calls and
+Reachable IL-boundary plans now identify retained evaluation-stack roots, pending operands
+and spill lanes ([evidence](experiments/aot-console/route-root-points-validation.json));
+native adapter/dispatch internals are explicit coverage gaps. This prepares storage and
+analysis only; implement root-frame publication, spills and cleanup, adapter coverage and
 emitted allocation descriptors next, then nonmoving tracing/reclamation before qualifying
 sustained HTTP execution. This is planned integration work, not an implemented native
 collector. Borrowed String interface receivers remain unsupported.
