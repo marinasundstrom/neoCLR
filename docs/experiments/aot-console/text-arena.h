@@ -81,7 +81,7 @@ int32_t neoclr_string_ends_with_ordinal_v1(const neoclr_aot_text *text, const ne
  * Arena retains owners for the entire invocation; no per-slot retain/release. */
 int32_t neoclr_allocate_strings_v1(neoclr_aot_text_arena *arena, int32_t length,
                                   int32_t reserved, void **output);
-/* Checked snapshots of 1..32 padded lanes. No default initialization or element borrows.
+/* Checked snapshots of 1..64 padded lanes. No default initialization or element borrows.
  * Success alone publishes the array; markers distinguish unwritten elements. */
 int32_t neoclr_reserve_records_v1(neoclr_aot_text_arena *arena, int32_t length,
                                 uint32_t lanes, void **output);

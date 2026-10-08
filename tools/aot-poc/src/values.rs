@@ -815,7 +815,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
-            let mut frame_bytes = 256usize;
+            let call_result_bytes = p.call_result_bytes();
+            let mut frame_bytes = call_result_bytes as usize;
             let mut arguments = vec![];
             let mut at = 0;
             for t in &p.args[i] {
@@ -842,9 +843,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     b.ins().stack_store(zero, *local, (lane * 8) as i32);
                 }
             }
-            // All profile return values fit in thirty-two padded scalar lanes; snapshots are read
+            // Size scratch for the selected layouts (up to sixty-four lanes); snapshots are read
             // immediately after each successful call, before this storage can be reused.
-            let call_result = slot(&mut b, 256);
+            let call_result = slot(&mut b, call_result_bytes);
             let mut constructors = std::collections::HashMap::new();
             for (pc, op) in f.body.iter().enumerate() {
                 if let Op::Construct(target) = op {

@@ -162,8 +162,8 @@ impl<'a> Profile<'a> {
                 }
                 p.layouts[i].push(width);
                 width += p.lanes(&ty);
-                if width > 32 {
-                    return Err(format!("{}: value layout exceeds thirty-two flattened lanes ({width})", p.input.types[i].name).into());
+                if width > 64 {
+                    return Err(format!("{}: value layout exceeds sixty-four flattened lanes ({width})", p.input.types[i].name).into());
                 }
             }
             p.widths[i] = width.max(1);
@@ -455,6 +455,10 @@ impl<'a> Profile<'a> {
             _ => 1,
         }
     }
+    pub fn call_result_bytes(&self) -> u32 {
+        (self.widths.iter().copied().max().unwrap_or(1) * 8).max(256) as u32
+    }
+
     pub fn bytes(&self, t: &Ty) -> u32 {
         // Private slots use eight bytes per scalar lane so mixed pointer/Int32
         // records remain aligned. This is not an external aggregate ABI.

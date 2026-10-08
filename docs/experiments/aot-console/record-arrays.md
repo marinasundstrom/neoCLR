@@ -13,7 +13,7 @@ This adds no Raven syntax, public library API or temporary CLI bridge encoding.
 
 Private storage consists of a 24-byte header (kind, length and padded lane count),
 then inline snapshots and one initialization byte per element. The existing value
-layout has at most 32 eight-byte lanes; array length remains bounded by 65,536 and the
+layout has at most 64 eight-byte lanes; array length remains bounded by 65,536 and the
 host's actual heap byte budget. The allocator validates ranges before allocating,
 clears all storage, never collects internally and publishes output only on success.
 Native stores write the complete typed snapshot before marking its slot initialized.
@@ -75,3 +75,25 @@ claimed. Direct Int32.ToString receiver projection and Object-display candidate 
 also surfaced while developing the storage sample; the passing consumer uses the existing
 explicit String.Concat path to keep this slice about arrays. Those backend gaps and
 bounded full-server selection remain follow-up work, alongside task/socket completion.
+
+### HTTP nested results (2026-10-08)
+
+TaskResultList now passes with the real ArrayList<Result<Void,HttpError>> path,
+including an unnamed HttpStatusCode payload, let/if-let patterns, copies and 1,000
+string replacements. HttpError needs 40 flattened lanes. The bounded profile and
+array allocator/collector now agree on a 64-lane maximum; layouts beyond it remain
+rejected. Call scratch is sized for selected layouts, retaining a 256-byte floor,
+and contributes to the existing 64 KiB frame bound. This can increase stack use in
+programs selecting wide types. No public type, metadata format or stable ABI changes.
+
+This continues the value-copy/.NET comparison above. Overlaying inactive union
+payloads could reduce these widths, but requires a separate layout and precise GC
+contract. Increasing the checked bound lets the current source representation run
+without pretending it is an efficient final union layout. Existing smaller array
+storage is unchanged. No speed or memory advantage is claimed.
+
+Validation covers a 64-lane returned record, oversized-layout rejection, sanitized
+allocation and GC of a last-lane reference with uninitialized elements ignored, and
+buffer canaries. [HTTP result evidence](../../../benchmarks/native-web/http-result-validation.json)
+records interpreter/native parity in a 64 KiB heap and libSystem-only standalone
+linkage. The full server still hits the separate 128-type specialization limit.

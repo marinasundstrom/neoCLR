@@ -111,7 +111,7 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
             uint64_t kind, length, lanes;
             if (b->bytes < 24) goto invalid_descriptor;
             memcpy(&kind, data, 8); memcpy(&length, data + 8, 8); memcpy(&lanes, data + 16, 8);
-            if (kind != UINT64_C(0x80000005) || !lanes || lanes > 32 ||
+            if (kind != UINT64_C(0x80000005) || !lanes || lanes > 64 ||
                 length > 65536 || length > (b->bytes - 24) / (lanes * 8 + 1)) goto invalid_descriptor;
             uint64_t markers = 24 + length * lanes * 8;
             for (uint64_t i = 0; i < length; i++) {

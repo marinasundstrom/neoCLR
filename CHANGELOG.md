@@ -15,7 +15,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the specialization budget. Fix explicit-core inhabited Void imports without requiring
   a nominal seed declaration; preserve value/no-result distinctions and reject wrong
   core bindings. The nested HTTP-result probe now compiles and runs interpreted,
-  then reaches the native 32-lane layout limit (HttpError needs 40).
+  and now runs natively after extending the checked value/array/GC layout bound to
+  64 lanes and sizing call scratch for selected layouts. Validate nested HTTP error
+  unions, status payloads, let/if-let matching, copies and GC under replacement.
 
 - Add development System.Text.StringBuilder with fluent append, atomic byte-limit
   faults, LF line append, clear/reuse and cached immutable snapshots. Add separator-aware

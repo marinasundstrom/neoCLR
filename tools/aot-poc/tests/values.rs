@@ -591,8 +591,8 @@ fn cyclic_unknown_and_oversized_inline_layouts_never_emit() {
         ),
         (".type A\n.field Child Int32\n.end", "local named record"),
         (
-            ".type A\n.field X Int32\n.field Y Int32\n.field Z Int32\n.end\n.type B\n.field X A\n.field Y A\n.field Z A\n.field U A\n.field V A\n.field W A\n.field A0 A\n.field A1 A\n.field A2 A\n.field A3 A\n.field A4 A\n.end",
-            "thirty-two flattened lanes",
+            ".type A\n.field X Int32\n.field Y Int32\n.field Z Int32\n.field U Int32\n.field V Int32\n.field W Int32\n.end\n.type B\n.field X A\n.field Y A\n.field Z A\n.field U A\n.field V A\n.field W A\n.field A0 A\n.field A1 A\n.field A2 A\n.field A3 A\n.field A4 A\n.end",
+            "sixty-four flattened lanes",
         ),
     ] {
         let source = format!(
@@ -1962,6 +1962,16 @@ fn thirty_two_lane_nested_record_crosses_call_boundary() {
     let source=format!(".module Wide\n.type Pair\n.field X Int32\n.field Y Int32\n.end\n.type Wide\n{fields}.end\n.function Echo(Wide value) -> Wide\nldarg value\nret\n.end\n.function Main() -> Int32\n{values}newobj Wide\ncall Echo(Wide)\nldfld 15\nldfld 1\nret\n.end\n");
     let m=neoclr::assemble(&source).unwrap();
     native_mode(&neoclr::metadata_container::write_module(&m).unwrap(),0,0,16,"Main",true);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn sixty_four_lane_nested_record_crosses_call_boundary() {
+    let fields=(0..16).map(|i| format!(".field F{i} Pair\n")).collect::<String>();
+    let values=(0..16).map(|i| format!("ldc.i4 {i}\nldc.i4 {}\nldc.i4 41\nldc.i4 42\nnewobj Pair\n",i+1)).collect::<String>();
+    let source=format!(".module Wide\n.type Pair\n.field X Int32\n.field Y Int32\n.field Z Int32\n.field W Int32\n.end\n.type Wide\n{fields}.end\n.function Echo(Wide value) -> Wide\nldarg value\nret\n.end\n.function Main() -> Int32\n{values}newobj Wide\ncall Echo(Wide)\nldfld 15\nldfld 3\nret\n.end\n");
+    let m=neoclr::assemble(&source).unwrap();
+    native_mode(&neoclr::metadata_container::write_module(&m).unwrap(),0,0,42,"Main",true);
 }
 
 #[test]
