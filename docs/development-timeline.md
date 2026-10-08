@@ -11944,3 +11944,18 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
   [proposal and primary sources](http-client-design.md#future-httpmethod-type--proposal-2026-10-08).
   No API is implemented or approved by this exchange. Native HTTP execution remains
   the active goal; host GC root work is still in progress.
+
+## 2026-10-08 — Reassess runtime foundations during native HTTP work
+
+- **Author direction:** Re-evaluate approaches across the runtime, including Function
+  types and delegate-like objects, because runtime async suspension and green threads
+  will probably be introduced later. Continue toward the HttpServer POC.
+- **Assistant response:** Keep callable contracts separate from suspended activations,
+  I/O completion and scheduling. Treat native descriptor layout, thread-local roots and
+  quiescent callback dispatch as provisional implementation choices.
+- **Action:** Inspect current FunctionObject, AOT descriptors, TaskQueue and prior
+  scheduling design; record a [cross-runtime review](runtime-scheduling-design.md#cross-runtime-reassessment--author-direction-2026-10-08)
+  with .NET and Java comparisons, migration boundaries and validation questions.
+- **Open:** No green-thread stack model, public scheduler API, callable semantic change
+  or implementation schedule is selected. Native callback dispatch is being developed;
+  this discussion is not evidence of completed runtime suspension.

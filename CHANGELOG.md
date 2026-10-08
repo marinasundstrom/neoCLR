@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Record the author-directed cross-runtime reassessment of Function objects, scheduling
+  and GC ownership for future async suspension/green threads. Compare alternatives and
+  identify migration tests; no callable semantics or suspension implementation changes.
+
 - Add private bounded native GC host root handles with explicit replacement/release,
   context/thread lookup and entry-reset guards. Validate retention, reclamation, stale
   handles, quotas and compiled entry behavior. GC-enabled native objects require the

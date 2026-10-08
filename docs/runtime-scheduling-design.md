@@ -285,3 +285,67 @@ uses the same ready slot and default queue adapter. Connect and receive callback
 complete library-owned Promises with Result values; no compiler builder protocol is
 added. The private registry also owns pending native connects and retains their
 callbacks as roots. Application methods expose neither registry IDs nor callbacks.
+
+## Cross-runtime reassessment — author direction, 2026-10-08
+
+While pursuing the native HttpServer POC, the author asks us to re-evaluate runtime
+approaches, especially Function types and delegate-like objects, in anticipation of
+runtime async suspension and green threads. This expands the design review scope;
+it does not select a stack model, promise green threads in the POC, or reinstate
+Delegate as a public type. Preserve the prior structural Function direction as the
+current contract while reviewing its implementation and any future semantic changes.
+
+The present interpreter FunctionObject keeps a checked target, receiver and separate
+object identity. Structural equality uses signature/target/receiver identity. Native
+AOT uses a private heap descriptor with an image-local selected-function number and
+receiver pointer. Those are different representations of a callable contract, neither
+of which should define suspended execution. Native host strong handles currently live
+in thread-local storage; native published frames refer to live C stack slots. Both
+need explicit reconsideration before execution can suspend or migrate between carriers.
+
+### Boundaries to preserve in the POC
+
+- **Callable contract:** retain signature checking, receiver/capture lifetime and defined
+  equality independently of entry addresses and scheduler IDs. A callable may be invoked
+  repeatedly; a particular suspended activation must resume at most once per wakeup.
+- **Pending operation:** own I/O resources and retained buffers until terminal completion
+  or cancellation acknowledgement. Completion makes an opaque work item runnable; its
+  adapter may invoke today's callback or resume a future runtime activation.
+- **Execution ownership:** associate roots, faults and logical context with an invocation
+  or future execution unit. Current thread-local registries and quiescent host dispatch
+  are bounded native adapters, not a requirement for all future schedulers.
+- **Suspension:** never retain addresses into expired native frames. Interpreter frames,
+  compiler-generated state machines and native saved stacks need different root maps and
+  resume machinery behind the same outcome/cancellation contracts. Native foreign calls
+  require an explicit blocking/pinning policy before carrier scheduling can work.
+- **Diagnostics and reload:** preserve fault code/message and define logical stacks across
+  suspension; raw callback IDs are private to a loaded image. Reload/version retention,
+  active-frame lifetime, introspection and unwind behavior require their own tests.
+
+### Alternatives and primary comparisons
+
+Reviewed 2026-10-08: [.NET Delegate](https://learn.microsoft.com/en-us/dotnet/api/system.delegate?view=net-10.0)
+binds methods and receivers; [.NET IAsyncStateMachine](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.iasyncstatemachine?view=net-10.0)
+provides a compiler-generated async resumption protocol. These are useful separate
+layers, not a reason to make a Function object itself a suspended stack.
+[OpenJDK JEP 444](https://openjdk.org/jeps/444) provides the Java 21 virtual-thread
+comparison, including GC-managed stack chunks. Its implementation is not a specification
+for neoCLR or a claim about all subsequent JDK versions.
+
+Retaining generated state machines costs least now and already supports the Task API,
+but ties lowering and some diagnostics to compiler protocols. Runtime-owned stackless
+activations could centralize ownership/rooting while still requiring explicit suspend
+points and compiler/backend cooperation. Stackful green threads could suspend ordinary
+call chains, at the cost of native stack capture, unwind metadata, GC maps, foreign-call
+constraints and scheduling machinery. Neither option automatically supplies CPU
+parallelism, fairness, thread-safe captures or a moving GC. No implementation winner or
+performance advantage is selected by this review.
+
+Use the HTTP app to build evidence: completion-before-registration, cancellation races,
+exactly-once delivery, abandoned operations/shutdown, callbacks retaining captures through
+GC, nested awaits, fault stack continuity and progress under a busy queue. Compare the
+same workload in interpreter and AOT. Later add suspension memory per operation, root
+scan cost, allocation rate and scheduler latency measurements; benchmark green-thread
+alternatives only once implementations exist. Review these boundaries at each scheduler,
+Function, GC, metadata/ABI or async-lowering change, without blocking the current POC on
+a general suspension implementation.

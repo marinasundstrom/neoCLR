@@ -446,3 +446,12 @@ structural types into type-and-member pages similar to nominal type pages. The
 current authored family guides are interim. This presentation work is explicitly
 deferred; documentation identities must still remain distinct from nominal runtime
 names and declarations.
+
+## Execution machinery reassessment — 2026-10-08
+
+The author asks that Function objects and runtime approaches be reconsidered alongside
+future async suspension and green threads. See the
+[cross-runtime review](runtime-scheduling-design.md#cross-runtime-reassessment--author-direction-2026-10-08).
+The current callable contract remains in force; private target IDs, closure allocation
+and host dispatch are not permanent suspension or scheduling contracts. No change to
+Function equality or reintroduction of Delegate is implied by this review.
