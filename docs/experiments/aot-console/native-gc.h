@@ -21,6 +21,12 @@ int32_t neoclr_gc_host_root_read_v1(neoclr_aot_context *context, uint64_t handle
 int32_t neoclr_gc_host_root_release_v1(neoclr_aot_context *context, uint64_t handle);
 /* Entry reset is forbidden while this thread holds roots or guest frames for the context. */
 int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context);
+/* Private dispatcher admission: quiescent, fault-free context and rooted Function
+ * descriptor. Output remains unchanged on rejection. Context belongs to one image. */
+int32_t neoclr_gc_callback_read_v1(neoclr_aot_context *context, uint64_t handle, void **output);
+/* Generated only for images with bound fn<Void> targets. Does not reset the heap,
+ * release the root, or clear a prior fault. Host failures return 3 without a guest fault. */
+int32_t neoclr_invoke_void_callback_v1(uint64_t handle, neoclr_aot_context *context);
 /* Allocation never collects; output is published only on success. */
 int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *arena, uint64_t bytes,
                              uint32_t kind, void **output);

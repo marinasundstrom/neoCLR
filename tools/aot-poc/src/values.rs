@@ -1589,5 +1589,76 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         b.finalize();
     }
     module.define_function(export, &mut context)?;
+    if details.is_some_and(|d| d.native_gc) {
+        compile_host_callbacks(&mut module, &p, &ids)?;
+    }
     super::finish(module)
+}
+
+// Quiescent host entry for the existing inhabited-Void callback shape. The strong
+// handle keeps the descriptor/receiver alive across the callee's collection points.
+fn compile_host_callbacks(module: &mut ObjectModule, p: &Profile<'_>, ids: &[cranelift_module::FuncId]) -> Result<(), Error> {
+    use neoclr::metadata::{FunctionType, Type};
+    let shape = Type::Function(Box::new(FunctionType {
+        parameters: vec![], returns: Type::Void, no_result: false,
+        out_parameters: vec![], out_when_true: vec![],
+    }));
+    let targets = p.callable_targets(&shape)?;
+    if targets.is_empty() { return Ok(()); }
+    let mut signature = module.make_signature();
+    signature.params.extend([types::I64, types::I64, types::I64].map(AbiParam::new));
+    signature.returns.push(AbiParam::new(types::I32));
+    let reader = module.declare_function("neoclr_gc_callback_read_v1", Linkage::Import, &signature)?;
+    signature.params.pop();
+    let export = module.declare_function("neoclr_invoke_void_callback_v1", Linkage::Export, &signature)?;
+    let mut context = module.make_context();
+    context.func.signature = signature;
+    let mut fb = FunctionBuilderContext::new();
+    {
+        let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+        let entry = b.create_block();
+        b.append_block_params_for_function_params(entry);
+        b.switch_to_block(entry);
+        let params = b.block_params(entry).to_vec();
+        let storage = slot(&mut b, 16);
+        let output = b.ins().stack_addr(types::I64, storage, 0);
+        let reader = module.declare_func_in_func(reader, b.func);
+        let call = b.ins().call(reader, &[params[1], params[0], output]);
+        let status = b.inst_results(call)[0];
+        let rejected = b.create_block();
+        b.append_block_param(rejected, types::I32);
+        let admitted = b.create_block();
+        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+        b.ins().brif(failed, rejected, &[status.into()], admitted, &[]);
+        b.switch_to_block(admitted);
+        let descriptor = b.ins().load(types::I64, MemFlags::new(), output, 0);
+        let identity = b.ins().load(types::I64, MemFlags::new(), descriptor, 8);
+        let result = b.ins().stack_addr(types::I64, storage, 8);
+        for c in targets {
+            let matched = b.create_block();
+            let next = b.create_block();
+            let equal = b.ins().icmp_imm(IntCC::Equal, identity, (c + 1) as i64);
+            b.ins().brif(equal, matched, &[], next, &[]);
+            b.switch_to_block(matched);
+            let mut args = vec![];
+            if p.input.functions[c].instance {
+                args.push(b.ins().load(types::I64, MemFlags::new(), descriptor, 16));
+            }
+            args.extend([result, params[1]]);
+            let callee = module.declare_func_in_func(ids[c], b.func);
+            let call = b.ins().call(callee, &args);
+            let status = b.inst_results(call)[0];
+            b.ins().return_(&[status]);
+            b.switch_to_block(next);
+        }
+        let invalid = b.ins().iconst(types::I32, 3);
+        b.ins().jump(rejected, &[invalid.into()]);
+        b.switch_to_block(rejected);
+        let status = b.block_params(rejected)[0];
+        b.ins().return_(&[status]);
+        b.seal_all_blocks();
+        b.finalize();
+    }
+    module.define_function(export, &mut context)?;
+    Ok(())
 }

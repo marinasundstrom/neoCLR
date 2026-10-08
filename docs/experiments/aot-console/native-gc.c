@@ -88,6 +88,20 @@ int32_t neoclr_gc_host_root_release_v1(neoclr_aot_context *context, uint64_t han
     *root = (host_root){0};
     return 0;
 }
+int32_t neoclr_gc_callback_read_v1(neoclr_aot_context *context, uint64_t handle, void **output) {
+    host_root *root = find_host_root(context, handle);
+    if (!root || !output || !root->value || context->fault.code ||
+        !blocks_valid(&context->text) || !live_base(&context->text, root->value)) return 3;
+    for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
+        if (f->context == context) return 3;
+    const block *allocation = (const block *)root->value - 1;
+    uint64_t kind;
+    if (allocation->kind != NEOCLR_GC_OBJECT || allocation->bytes != 24) return 3;
+    memcpy(&kind, root->value, 8);
+    if (kind != UINT32_MAX) return 3;
+    *output = root->value;
+    return 0;
+}
 int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context) {
     if (!context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (host_root *root = host_head; root; root = root->next)

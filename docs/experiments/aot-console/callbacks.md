@@ -110,3 +110,45 @@ native consumer matches the interpreter and links only libSystem.
 reproduction and the next server boundary: arrays of `Result<Void, HttpError>` used by
 its task state. [Reserved value-array storage](record-arrays.md) now handles admitted records; bounded
 full-server selection and HTTP enum storage are next. The HTTP server itself has not yet run natively.
+
+## Private host dispatch — 2026-10-08
+
+GC-enabled images containing bound `fn<Void>` targets now export the experimental
+`neoclr_invoke_void_callback_v1(handle, context)` entry. The host supplies an existing
+strong root handle, not a raw code pointer. The helper validates a live Function
+allocation and the generated dispatcher admits only selected targets of the exact
+zero-argument, inhabited-Void shape. It calls the ordinary compiled body with its
+retained receiver. The dispatcher neither resets the arena nor releases the handle.
+
+This is a quiescent host adapter: no guest frame for that context may be active and
+no prior guest fault may be pending. Invalid/stale/wrong-context/null/non-Function or
+wrong-shape handles return RuntimeError (3) without creating a guest fault. Guest
+execution failures preserve their existing code/message/frames; the host must stop
+dispatch after a fault and clean up before resetting the invocation. A successful
+callback may be invoked again; exactly-once I/O completion is the scheduler's separate
+responsibility. Contexts belong to one image and thread; selected IDs are not stable
+method IDs, persistent metadata or a cross-image ABI. No argument-bearing callback,
+no-result callback, frame migration or runtime suspension is added.
+
+This uses the existing Function/.NET delegate comparison above and the
+[cross-runtime reassessment](../../runtime-scheduling-design.md#cross-runtime-reassessment--author-direction-2026-10-08).
+Its bounded target chain favors implementation reuse over dispatch optimization.
+Pending operations should own opaque runnable work and roots, allowing this callback
+adapter to be replaced by runtime activation resumption later. No throughput claim
+or extra microbenchmark is justified before that workload exists.
+
+The sanitized `native_host_callbacks_preserve_roots_state_and_faults_without_entry_reset`
+test compiles `host-callbacks.neoil`, dispatches static and bound callbacks after entry
+returns, checks receiver mutation across GC, and compares divide-by-zero diagnostics
+with the interpreter. It rejects wrong signatures, released/foreign/null/ordinary-object
+handles, pending faults and active guest frames; checks output atomicity and canaries;
+and releases/reclaims the entire heap. All five native GC kernel tests also pass.
+The fixture discovers its descriptor by inspecting the private heap solely to isolate
+codegen; actual services must receive and register callbacks while submitting work.
+Host submission and task-queue/socket completion remain the next integration steps.
+
+The existing Raven Callbacks consumer also passes interpreter, sanitized native and
+standalone native execution after this change; the standalone binary links only
+libSystem. [Recorded inputs and results](../../../benchmarks/native-web/host-callback-validation.json).
+This consumer exercises existing guest invocation; host invocation is covered by the
+focused fixture above. Full Server admission still stops at SocketConnectResult.

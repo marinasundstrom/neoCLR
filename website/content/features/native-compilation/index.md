@@ -97,8 +97,9 @@ an advantage over it; useful comparisons require equivalent behavior and measure
 - **Memory:** the opt-in collector is nonmoving and conservatively scans object payloads.
   It can retain extra objects, fragment its bounded buffer and collect too frequently.
   Private host root handles now retain allocations across guest frame returns, with
-  explicit release and entry-reset checks. Async callback dispatch remains open, as
-  do precise maps, pressure scheduling and general hosting handles.
+  explicit release and entry-reset checks. Private host dispatch can invoke retained
+  zero-argument Void callbacks between guest calls. Task-queue/socket integration,
+  precise maps, pressure scheduling and general hosting handles remain open.
 - **Faults:** tested paths preserve fault codes, messages and managed stack traces.
   This does not yet qualify every server disconnect, cancellation or cleanup path.
 - **Deployment:** required support is linked into tested images, but OS dependencies

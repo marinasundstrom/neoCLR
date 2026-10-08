@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add experimental native host dispatch for rooted zero-argument Void callbacks.
+  Preserve receivers, heap contents and guest fault traces; reject invalid handles,
+  wrong shapes and active-context reentry. This private image-local adapter does not
+  establish a stable callable ABI or implement async sockets/runtime suspension.
+
 - Record the author-directed cross-runtime reassessment of Function objects, scheduling
   and GC ownership for future async suspension/green threads. Compare alternatives and
   identify migration tests; no callable semantics or suspension implementation changes.
