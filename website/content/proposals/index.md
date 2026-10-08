@@ -322,8 +322,10 @@ diagnostic frames retain caller snapshots, expose typed argument/local storage a
 up on normal/fault returns. Constructor storage and successful call results have explicit
 diagnostic activation phases. Caller-owned pending result slots preserve observation
 through callee frame removal. Native service/dispatch wrappers now expose typed argument
-copies and clean up on every return without adding guest fault frames. Borrowed pointees,
-service-internal temporaries and host/fault roots remain uncovered.
+copies and clean up on every return without adding guest fault frames. Fault-context
+message and frame-name slots now remain available to diagnostics after unwinding, until
+reset or context release. Borrowed pointees, service-internal temporaries and general
+host root registration remain incomplete.
 Complete root coverage and emitted allocation descriptors remain the next foundation; no native collector is
 implemented yet. The HTTP API drives this work, and sustained server execution remains unqualified.
 The bounded arena is a temporary experiment, not a final server memory policy.

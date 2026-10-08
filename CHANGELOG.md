@@ -45,7 +45,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   diagnostic frames to native service and dispatch wrappers, publishing typed argument
   copies and unlinking on every generated return, including early faults. Synthetic
   frames stay out of guest fault traces. Service-internal temporaries remain uncovered;
-  frame/callback ABI and default uninstrumented emission are unchanged.
+  frame/callback ABI and default uninstrumented emission are unchanged. Add bounded
+  read-only enumeration of fault-context message/frame-name slots during diagnostic
+  unwinding and after host return, including arena-backed user messages. Code-zero
+  contexts expose no stale frame slots; malformed counts and short output tables are
+  rejected without partial publication. Validate independent contexts, reentry and
+  interpreter fault-rendering parity. This is not host root registration or collection.
 
 - Add a real RoutePattern workload covering eight repeated routing outcomes, pattern
   errors and capture retention. Measure native arena growth from 2,433 bytes before

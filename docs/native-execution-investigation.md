@@ -567,3 +567,12 @@ cover live service-side observation and the routing consumer. This reuses the CL
 comparison above: explicit argument storage makes boundary lifetime observable at the cost
 of extra stack copies/hooks. It is not a complete native transition/handle protocol;
 service temporaries, borrowed pointees and host/fault roots still block collection.
+
+
+Fault-context diagnostic enumeration (2026-10-08) now exposes initialized message and
+frame-name slot addresses both during unwinding and after host return. Dynamic user
+messages retain the existing v4 arena lifetime; separate contexts are independent and
+entry reset retires prior fault slots. [Contract and validation](experiments/aot-console/README.md#fault-context-root-slots-2026-10-08)
+include exact interpreter rendering parity. The CLR comparison still distinguishes this
+read-only slot view from registered hosting handles and runtime-owned exception objects:
+the host continues to own context/arena lifetime, with no reclamation or lifetime extension.

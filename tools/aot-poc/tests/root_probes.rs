@@ -216,15 +216,38 @@ fn adapter_reads_slots_without_following_uninitialized_borrow_pointees() {
         &host,
         r#"
 #include "root-probe.h"
+#include "../aot-fault-details/fault-details.h"
 #include <string.h>
 int main(void) {
+    neoclr_aot_fault fault;
+    memset(&fault, 0xa5, sizeof(fault));
+    fault.code = 0;
+    neoclr_probe_storage slots[65], untouched[65];
+    memset(slots, 0xa5, sizeof(slots)); memcpy(untouched, slots, sizeof(slots));
+    if (neoclr_probe_fault_roots_v1(&fault, NULL, 0) != 0) return 10;
+    if (neoclr_probe_fault_roots_v1(NULL, slots, 65) != -1) return 11;
+    fault.code = 4; fault.frame_count = 64;
+    if (neoclr_probe_fault_roots_v1(&fault, slots, 64) != -1 ||
+        memcmp(slots, untouched, sizeof(slots))) return 12;
+    fault.frame_count = 65;
+    if (neoclr_probe_fault_roots_v1(&fault, slots, 65) != -1 ||
+        memcmp(slots, untouched, sizeof(slots))) return 13;
+    fault.frame_count = 64;
+    if (neoclr_probe_fault_roots_v1(&fault, slots, 65) != 65 ||
+        slots[0].address != &fault.message || slots[64].address != &fault.frames[63].function) return 14;
+    for (unsigned i = 0; i < 65; i++) if (slots[i].read_bytes != 8 || slots[i].flags) return 15;
+    if (neoclr_probe_fault_roots_v1(&fault, NULL, 65) != -1) return 16;
+    /* Inaccessible text values must never be followed by the diagnostic adapter. */
+    fault.frame_count = 1;
+    fault.message = (const void *)(uintptr_t)1;
+    fault.frames[0].function = (const void *)(uintptr_t)1;
     uint64_t inaccessible_pointee = 1;
     uint32_t tag = 4;
     neoclr_probe_storage storage[] = {{&inaccessible_pointee, 8, 2}, {&tag, 4, 1}};
     neoclr_probe_frame frame;
     uint64_t lane = 0;
     const char *plan = "{\"requiredSpillLanes\":[]}";
-    neoclr_probe_enter_v3(&frame, &frame, 0, storage, 2, plan, (uint32_t)strlen(plan));
+    neoclr_probe_enter_v3(&frame, &fault, 0, storage, 2, plan, (uint32_t)strlen(plan));
     neoclr_probe_stack_roots_v2(&frame, 0, &lane, 1, plan, (uint32_t)strlen(plan));
     if (neoclr_root_probe_head_v1() != &frame || neoclr_root_probe_depth_v1() != 1) return 1;
     neoclr_probe_leave_v1(&frame);

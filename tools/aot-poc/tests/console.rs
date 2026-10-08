@@ -2910,3 +2910,81 @@ int main(void) {
     let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
     assert!(r.status.success(), "{r:?}");
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn fault_root_slots_survive_unwind_and_reset_with_the_owning_context() {
+    let dir = Temp::new();
+    let source = r#".module FaultRoots
+.function Calculate(Int32 mode) -> Int32
+ldarg mode
+brfalse Success
+ldarg mode
+call neoCLR.Runtime.Int32ToString(Int32)
+call System.Fail(String)
+Success:
+ldc.i4 42
+ret
+.end
+"#;
+    let seed = neoclr::assemble(TEXT_SEED).unwrap();
+    let r = compile_source(&dir, &seed, source,
+        &["--compile-system", "--bind-int32-to-string", "--bind-user-fault", "--probe-stack-roots"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "root-probe.h"
+#include "text-arena.h"
+#include <string.h>
+static int verify(neoclr_aot_context *ctx, int32_t value, const char *expected,
+                  neoclr_probe_storage *slots) {
+    int32_t result = -99;
+    if (neoclr_entry_v4(value, &result, ctx) != 4 || result != -99 || ctx->fault.code != 4 ||
+        ctx->fault.frame_count != 2 || neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 1;
+    if (neoclr_probe_fault_roots_v1(ctx, slots, 65) != 3 || slots[0].address != &ctx->fault.message ||
+        slots[1].address != &ctx->fault.frames[0].function ||
+        slots[2].address != &ctx->fault.frames[1].function) return 2;
+    const neoclr_aot_text *text = *(const neoclr_aot_text *const *)slots[0].address;
+    if ((uintptr_t)text < (uintptr_t)ctx->text.data ||
+        (uintptr_t)text >= (uintptr_t)ctx->text.data + ctx->text.used ||
+        text->length != strlen(expected) || memcmp(text->bytes, expected, text->length)) return 3;
+    return neoclr_aot_render_fault(stderr, &ctx->fault);
+}
+int main(void) {
+    uint64_t a_buffer[32], b_buffer[32];
+    neoclr_aot_context a = {.text = {(unsigned char *)a_buffer, sizeof(a_buffer), 0}};
+    neoclr_aot_context b = {.text = {(unsigned char *)b_buffer, sizeof(b_buffer), 0}};
+    neoclr_probe_storage a_slots[65], b_slots[65];
+    if (verify(&a, 12345, "12345", a_slots) || verify(&b, -77, "-77", b_slots)) return 1;
+    /* A second independent context does not replace the first host's fault roots. */
+    const neoclr_aot_text *a_text = *(const neoclr_aot_text *const *)a_slots[0].address;
+    if (a_text->length != 5 || memcmp(a_text->bytes, "12345", 5)) return 2;
+    int32_t result = -99;
+    if (neoclr_entry_v4(0, &result, &a) || result != 42 || a.text.used ||
+        neoclr_probe_fault_roots_v1(&a, NULL, 0) != 0 ||
+        *(const neoclr_aot_text *const *)a_slots[0].address ||
+        neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 3;
+    /* The old frame-name storage can remain populated; code/count retire that view. */
+    if (neoclr_probe_fault_roots_v1(&b, b_slots, 65) != 3 || b.fault.message->length != 3) return 4;
+    return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I"])
+        .arg(&base).arg(dir.0.join("host.c"))
+        .arg(base.join("root-probe.c")).arg(base.join("text-arena.c"))
+        .arg(base.join("../aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host"))
+        .output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
+    assert!(r.status.success(), "{r:?}");
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    let expected: String = [12345, -77].into_iter().map(|mode| {
+        method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default())
+            .unwrap_err().diagnostic().to_string()
+    }).collect();
+    assert_eq!(String::from_utf8_lossy(&r.stderr), expected);
+}

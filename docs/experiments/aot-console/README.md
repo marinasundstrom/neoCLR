@@ -1903,3 +1903,42 @@ observable but add diagnostic work and conservative retention. Service-internal 
 references, borrowed pointee ownership/initialization and host/fault roots remain open;
 this does not authorize collection, mutation, allocation or reentry from probe hooks.
 No stable hosting ABI, native GC or performance improvement is claimed.
+
+
+### Fault-context root slots (2026-10-08)
+
+The linked diagnostic adapter now exposes `neoclr_probe_fault_roots_v1(context, output,
+capacity)`, a private read-only view of ABI v3/v4 fault storage. For an active fault it
+returns the address of the message slot followed by initialized frame-name slots, each
+an eight-byte text-reference slot. At most 65 entries are returned. Code-zero contexts
+return zero without reading stale message/frame storage. Invalid frame counts, null
+contexts and insufficient output capacity return -1 without partially writing a table.
+The helper never dereferences text pointers; the context and writable output table must
+be valid and nonoverlapping, and callers must not query while the context is changing.
+
+The adapter observes these slots before removing a diagnostic frame and while observing
+ancestor snapshots. The host can query the same context after the chain is empty. The
+routing measurement host does so on success and fault returns. This is explicit enumeration,
+not a global registry: the caller supplies the context, and the helper retains nothing.
+
+Slot addresses remain valid only while their owning context exists. An active user message
+may point into its context's arena; function names and standardized runtime messages are
+image data. Entry reset clears the header and retires all prior fault roots, even though
+unused frame-name storage can remain populated. Message bytes do not survive arena reset
+or release under the existing v4 contract. Previously returned tables must not be treated
+as active roots after reset. There is no new exported-entry or frame/callback ABI version;
+the helper is an additive private symbol in the linked diagnostic adapter.
+
+Seven focused tests pass: four root-probe checks (including bounded fault-slot enumeration,
+short tables, invalid counts, stale code-zero storage and inaccessible text pointees), the
+native-wrapper and interface-dispatch regressions, and a new dynamic user-fault consumer.
+That consumer verifies two independent arena-backed messages after unwinding, successful
+reentry retiring one fault while the other remains intact, and exact interpreter rendering
+parity. [Routing evidence](route-fault-root-validation.json) records the real RoutePattern
+workload with host-return enumeration and unchanged fault/output behavior.
+
+The existing CLR/root-map comparison applies: this makes an owned fault context observable
+with bounded stack work, but supplies neither GC handles nor runtime-owned exception objects.
+General host root registration, borrowed ownership/initialization and native service
+internals still need contracts before a collector can use the roots. Collection remains
+disabled, and this slice does not change fault codes, standardized messages or exit status.

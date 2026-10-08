@@ -210,7 +210,10 @@ callee removal ([validation](experiments/aot-console/route-result-handoff-valida
 Native service/dispatch wrappers now publish typed argument copies in diagnostic frames
 and unlink on all return paths without adding guest fault frames
 ([validation](experiments/aot-console/route-wrapper-root-validation.json)).
-Borrowed pointees, service-internal temporaries and host/fault roots remain incomplete.
+Fault-context message/frame-name slots now have bounded diagnostic enumeration during
+unwinding and after host return; successful reentry retires the prior view
+([validation](experiments/aot-console/route-fault-root-validation.json)).
+Borrowed pointees, service-internal temporaries and general host root registration remain incomplete.
 Extend that coverage next, then add allocation descriptors and nonmoving tracing/reclamation
 before qualifying
 sustained HTTP execution. This is planned integration work, not an implemented native

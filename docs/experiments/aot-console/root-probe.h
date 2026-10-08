@@ -39,6 +39,16 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
  * Live slot addresses persist until the next pre-operation snapshot or frame leave. */
 void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length);
+/* Read-only fault-context slot view for ABI v3/v4, including after frame removal.
+ * Context must be initialized, alive and quiescent. Code zero returns zero without
+ * reading stale frame storage. Otherwise output contains message, then frame names.
+ * Returns slot count (at most 65), or -1 for null context, invalid frame count or
+ * insufficient output capacity. Failure writes no entries. Never follows text pointers.
+ * Slot addresses expire when the context is released; their values change on reentry.
+ * Arena-backed text expires at entry reset/buffer release under the v4 contract.
+ * This is diagnostic enumeration, not host root registration or a GC handle. */
+int32_t neoclr_probe_fault_roots_v1(const void *context, neoclr_probe_storage *output,
+                                   uint32_t capacity);
 /* Diagnostic state is thread-local, cumulative counts span entry invocations.
  * Each frame records its host context; the chain can contain nested contexts. */
 const neoclr_probe_frame *neoclr_root_probe_head_v1(void);
