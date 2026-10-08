@@ -10,7 +10,7 @@ release qualification. Any POC included in the next release remains work in prog
   It checks eight target forms (including UTF-8, invalid escapes, missing routes and
   integer overflow), retains a pattern and capture, and prints `1024` only on success.
 - `../../docs/experiments/http-server/Server.rvn`: the existing Raven HTTP app is
-  the server admission driver. It serves one GET `/greeting` with the UTF-8 bytes
+  the working one-request interpreter/native POC. It serves one GET `/greeting` with the UTF-8 bytes
   `Café 🌍`, then closes. Its source and interpreter verifier remain checked in there.
 - `dotnet/Program.cs`: ASP.NET Core comparison candidate for that successful exchange,
   targeting .NET 10. It serves repeatedly until stopped. Invalid requests, request
@@ -249,3 +249,32 @@ native host pumps the existing Drain body; the same artifacts run under interpre
 implicit pumping. [Evidence](queue-pump-validation.json) records exact output/fault
 parity, sanitized cleanup and standalone libSystem-only linkage. This is behavior
 validation, not a Scheduler implementation or HTTP throughput benchmark.
+
+## First native HTTP execution
+
+The same Raven Server artifact now passes four cases in the interpreter, sanitized
+native code and a standalone native image: greeting, fragmented request, duplicate
+Content-Length, and handler rejection. Response bytes and application output match.
+The native host verifies published-frame cleanup, socket/task scope release and zero
+remaining managed heap bytes on normal termination. The standalone binary links only
+libSystem. [Recorded evidence](http-validation.json).
+
+```sh
+SDKROOT=$(xcrun --show-sdk-path) python3 benchmarks/native-web/verify_server.py \
+  --compiler /path/to/rvnc.dll --runtime target/release/neoclr \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --bundle /path/to/matching-native-bundle --output target/native-http-validation
+```
+
+The output directory must be new. The script compiles Raven once, AOT-compiles that
+artifact, links the matched C adapters and runs loopback clients against each mode.
+The private host uses a 1 MiB nonmoving managed heap, polled nonblocking sockets,
+explicit TaskQueue draining and an opt-in native stack guard. Its 15-second host
+completion watchdog and the script's process watchdog are test guards, not scheduler
+fairness or a guest instruction budget. Request error paths close without HTTP error
+responses, matching this library contract. Four cases do not qualify every cancellation,
+shutdown or disconnect race. Runtime Scheduler/green-thread design remains separate.
+
+Each process serves one request, so this evidence is **not HTTP throughput**. Next use
+one long-lived process and repeated equivalent requests, with startup recorded
+separately. Keep .NET comparisons provisional until workloads and load settings match.

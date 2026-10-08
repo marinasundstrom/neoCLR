@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Run the existing Raven HttpServer app natively through a private queue/socket host.
+  Check in a same-artifact interpreter/native verifier: greeting, fragmented input,
+  duplicate Content-Length and handler rejection match across interpreter, sanitized
+  native and standalone ARM64. Validate native cleanup and libSystem-only linkage.
+  Document this first HTTP correctness POC as WIP, with no throughput claim.
+
 - Retain verified TaskQueue.Drain as an explicit host compilation root and export a
   private quiescent drain adapter. Validate real Raven nested posting and post-entry
   faults in interpreter/native modes, with root cleanup and standalone linkage.

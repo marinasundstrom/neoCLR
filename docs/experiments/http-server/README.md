@@ -48,3 +48,12 @@ The native transfer deadline now also covers a peer that connects but leaves req
 headers incomplete. Select `--requests-only --case 'stalled request'` for this case.
 It must close the accepted connection and finish with the existing receive error,
 without depending on peer EOF. Accept and handler waiting still have no deadline.
+
+## Native compilation follow-up (2026-10-08)
+
+This exact Server source now runs through Raven neoCLR CIL to a standalone macOS
+ARM64 image. The [native-web verifier](../../../benchmarks/native-web/README.md#first-native-http-execution)
+compares one compiled artifact across interpreter/native execution for four request
+cases, with response/output parity and native cleanup checks. This narrower evidence
+complements the interpreter verifier above; it does not carry over its entire case
+matrix to native mode or establish server throughput. The POC remains work in progress.

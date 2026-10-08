@@ -11978,3 +11978,20 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
   probes and interpreter frame storage remain implementation mechanisms. Require
   applicable fixes and cross-mode tests to inform interpreter work, without claiming
   an unmeasured performance improvement or an implemented JIT.
+
+
+## 2026-10-08 — First matched native HTTP execution
+
+- **Context:** The author's continuing objective is an AOT HttpServer app, followed by
+  useful interpreter/native and external-platform benchmarks, with WIP caveats.
+- **Assistant implementation outcome:** The existing Raven Server source now compiles
+  through neoCLR metadata/CIL into native ARM64 and serves a real loopback request.
+  The same artifact subsequently passes four cases in interpreter, sanitized native
+  and standalone native modes: greeting, fragmented input, duplicate Content-Length
+  and handler rejection. Response bytes/application output match. Native scope/frame
+  cleanup checks pass and the standalone image links only libSystem.
+- **Evidence:** [Reproduction and recorded checks](../benchmarks/native-web/README.md#first-native-http-execution).
+- **Next proposed driver:** Repeated requests in one process, GC/lifetime pressure and
+  matched load measurement. These one-request results are correctness evidence, not
+  throughput results or a production-readiness claim. Runtime Scheduler work remains
+  guided by the author's cross-cutting-services clarification above.
