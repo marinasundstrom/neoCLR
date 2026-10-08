@@ -758,8 +758,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             });
             let storage_table = root_probes.as_ref().map(|probes| {
                 let bytes = probes.table_bytes(i);
-                frame_bytes += 72 + 7 + bytes as usize + 7;
-                probe_frame = Some(slot(&mut b, 72));
+                frame_bytes += 104 + 7 + bytes as usize + 7;
+                probe_frame = Some(slot(&mut b, 104));
+                slot(&mut b, bytes)
+            });
+            let transient_table = root_probes.as_ref().and_then(|probes| probes.transient_bytes(i)).map(|bytes| {
+                frame_bytes += bytes as usize + 7;
                 slot(&mut b, bytes)
             });
             if frame_bytes > 65536 {
@@ -1134,6 +1138,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                                 write(&mut b, address, &zeros);
                                 address
                             };
+                            if let Some(probes) = &root_probes {
+                                probes.publish(&mut module, &mut b, i, pc, 1, probe_frame.unwrap(), transient_table.unwrap(), address);
+                            }
                             call_args.insert(0, receiver);
                             Some((t, address))
                         } else {
@@ -1153,8 +1160,14 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                         return_if_detailed(&mut b, failed, status, site.as_ref());
                         if let Some((t, address)) = constructed {
+                            if let Some(probes) = &root_probes {
+                                probes.publish(&mut module, &mut b, i, pc, 2, probe_frame.unwrap(), transient_table.unwrap(), address);
+                            }
                             stack.extend(read(&mut b, &p, &t, address));
                         } else if let Some(t) = &p.results[c] {
+                            if let Some(probes) = &root_probes {
+                                probes.publish(&mut module, &mut b, i, pc, 2, probe_frame.unwrap(), transient_table.unwrap(), result);
+                            }
                             stack.extend(read(&mut b, &p, t, result));
                         }
                     }

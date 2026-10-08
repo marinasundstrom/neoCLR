@@ -203,7 +203,9 @@ diagnostic frames now retain ancestor
 snapshots and unlink on success/fault returns ([validation](experiments/aot-console/route-probe-frame-validation.json)).
 Typed argument/local lane addresses are now published in those frames, with bounded-width
 reads and seeded local roots ([validation](experiments/aot-console/route-root-storage-validation.json)).
-Borrowed pointees, pending results, adapters and host/fault roots remain incomplete.
+Initialized constructor storage and successful call results now have phased diagnostic
+publication ([validation](experiments/aot-console/route-transient-root-validation.json)).
+Borrowed pointees, result handoff, adapter internals and host/fault roots remain incomplete.
 Extend that coverage next, then add allocation descriptors and nonmoving tracing/reclamation
 before qualifying
 sustained HTTP execution. This is planned integration work, not an implemented native

@@ -32,7 +32,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   lane addresses in diagnostic frames, including seeded unassigned local roots; observe
   later writes without following borrowed pointees. Read discriminators as 32 bits to
   avoid uninitialized padding. Frames grow to 72 bytes and the private enter adapter
-  advances to v2; diagnostic hosts/images must be relinked together.
+  advances to v2; diagnostic hosts/images must be relinked together. Extend diagnostics
+  to initialized constructor storage and successful call/constructor results, using live
+  slot addresses and explicit activation phases. Faulted calls publish no result roots.
+  Frames now grow to 104 bytes with enter-v3 and a transient callback; next-operation
+  snapshots retire prior transient roots. Collection and adapter-internal root coverage
+  remain disabled/incomplete.
 
 - Add a real RoutePattern workload covering eight repeated routing outcomes, pattern
   errors and capture retention. Measure native arena growth from 2,433 bytes before

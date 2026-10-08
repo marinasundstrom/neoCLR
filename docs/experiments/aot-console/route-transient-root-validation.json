@@ -1,0 +1,443 @@
+{
+  "profile": "route-lifetime-diagnostic-v1",
+  "baseRevision": "34b327401e7423333cba2b715cc850613aba565b",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "inputs": {
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "eec237e8a924743fbf56ac9c24932cab0a92fbc35c9e2cc23d0a2fe4a5a9fc24",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "ac7efe36e95e2c848d81c7bef37fe8e270146f8222ea91cf4866c4348f043234",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "428f0709baf84634025e0d6387a5726edffb1bcc7c18d28795317705e5fb43de",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "bfbfda2f336a73059418c84899787d4f8cc680f27d4864d70785692b048d0382",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.deps.json": "c02d34dc57e38be4c1ad97a24aeea0a41f87ce4208e77072f6c5cdb4d7599832",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "6ca8ab4df3f3f57be16d971c56101ef83511f6ad151945cd7854174d85fb318c",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.deps.json": "8439a508ae1b5e7d33490958bfef66338c921292adf5a2eb3f22784cb5fb9ce0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "c59a935b707df3e6df0aa948ff77d7ff651e4994dec21c2b0f3169a5d22db2d7",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.runtimeconfig.json": "d093ce9035033b5e5815db98bc0e0fe667311b1109bfeff2ffa2394ef059290d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/route-lifetime.rvn": "d9370ab0573130d5305a42561f09f679a2fdbde92bdfef7da536855f55641b0c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/verify_route_lifetime.py": "2d6db02e94ef03139078b5d7cd3e8cac8a33486d5f31ba1b5a8f7322aeb0f03e",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "fdbc030dc54e16c71f9f915bb4785a7713cd93256bf9b049cc39f2fa4a00afad",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "2ef7edf45a7eb37afa5631bc72bba54f46ffc3fc65d503d6bc5022365f86574d",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll": "fdf3c7866a8cae147578bc315a2c6b72eea4edb08d2a496a6134c662c8aa12df",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll": "7c33d97e0e65a23876e300fdddc069b03fad6bc87ffb7c1bea4333f21f0e9ea2",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll": "2ceee479056bca82e9752f81d84881db118dc106af5efa8cf121c345ea94ce7b",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "b502b2987b4513860f855435e08b7f9b3e36869ad5716a184aaff799c5de506c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "858ec6a53c8ff173487717129976c8c4bfd68f727dc3a0083ced1a55c2503e8d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/route-lifetime-host.c": "d6f1728693c20d68c6b4f39f80ff35809a8e8fd5506b7537d212b9fd1e028d04",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "abc5c07f84e1b4f505bdd92b5d924acf10db2624ad0b348168567f1ee93a6dd0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "02983fe29eb39c84d2818f70ad0e9315cdd22a9e2f4ced11d0b55dc7efbfd86d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "180d4bf0287540efe2fff0cd80c8a35b5c9a02f64397bf14767f9c7dc5e5bb7c",
+    "tools/aot-poc/src/gc_probe.rs": "9fff48b6c88e94f20236be743c69c3f09ad6d9d7d809ad391f59afc8dda20428",
+    "tools/aot-poc/src/values.rs": "45925fee5769a7a3516290de3fa7fbc45f5e39991604d4c4cd78945f929cb273",
+    "tools/aot-poc/tests/root_probes.rs": "7fa21aaa159431a6c794ec1095f7b87b10e6d36c5f5928cbaa0762231933b5a5"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/Route.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/route-lifetime.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/Route.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000",
+        "--gc-stats",
+        "--gc-events"
+      ],
+      "exit": 0,
+      "stdout": "16\n",
+      "stderr": "GC: allocated=439 live=0 peak=64 collections=9 reclaimed=439\nGC #1 AllocationPressure: roots=11 before=64 after=10 reclaimed=54\nGC #2 AllocationPressure: roots=24 before=64 after=19 reclaimed=45\nGC #3 AllocationPressure: roots=19 before=64 after=16 reclaimed=48\nGC #4 AllocationPressure: roots=14 before=64 after=11 reclaimed=53\nGC #5 AllocationPressure: roots=24 before=64 after=19 reclaimed=45\nGC #6 AllocationPressure: roots=19 before=64 after=16 reclaimed=48\nGC #7 AllocationPressure: roots=19 before=64 after=16 reclaimed=48\nGC #8 AllocationPressure: roots=19 before=64 after=16 reclaimed=48\nGC #9 ExecutionCompleted: roots=0 before=50 after=0 reclaimed=50\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/Route.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-write-line",
+        "--bind-utf8-text",
+        "--bind-integer-text",
+        "--bind-int32-to-string",
+        "--reference-arena",
+        "--probe-stack-roots"
+      ],
+      "exit": 0,
+      "stdout": {
+        "bytes": 2450071,
+        "sha256": "fdb15b9a029f23669827e78b103d5486644df8fa9b850e6a29af870478600ff6"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/Route.dll",
+        "NeoMetadata_F36FEB1B50009672E7B642339321E13F1E5D26699DACA29C76820FC3194F2A92.F_52756E",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/route.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-write-line",
+        "--bind-utf8-text",
+        "--bind-integer-text",
+        "--bind-int32-to-string",
+        "--reference-arena",
+        "--probe-stack-roots"
+      ],
+      "exit": 0,
+      "stdout": {
+        "bytes": 1452865,
+        "sha256": "01eb5eb8f62ecfb9fce34f5fc1a513e69c1b6f1b1c000c6fdad050775c48a253"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_ROOT_PROBES",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/route-lifetime-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/route.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/route"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/Route.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/entry.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-write-line",
+        "--bind-utf8-text",
+        "--bind-integer-text",
+        "--bind-int32-to-string",
+        "--reference-arena",
+        "--probe-stack-roots"
+      ],
+      "exit": 0,
+      "stdout": {
+        "bytes": 1452895,
+        "sha256": "b95269549a2ae02835ba4494614b017cce2f69e21e2ec1f4f5a462d72e676199"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_ROOT_PROBES",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/route-lifetime-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/entry.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/entry"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/route.o"
+      ],
+      "exit": 0,
+      "stdout": "_neoclr_allocate_bytes_v1\n_neoclr_allocate_object_v1\n_neoclr_allocate_strings_v1\n_neoclr_console_write_line_utf8_v1\n_neoclr_int32_to_string_v1\n_neoclr_parse_int32_v1\n_neoclr_probe_enter_v3\n_neoclr_probe_leave_v1\n_neoclr_probe_stack_roots_v2\n_neoclr_probe_transient_v1\n_neoclr_reserve_bytes_v1\n_neoclr_string_byte_count_v1\n_neoclr_string_concat_v1\n_neoclr_string_slice_utf8_v1\n_neoclr_utf8_decode_v1\n_neoclr_utf8_encode_v1\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/route"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-route-transient-1/route:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-route-transient-1/entry"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-route-transient-1/entry:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "assemblySha256": "3f086b35d2e7772f90813bee74ccfb19e3ca64a6cbdf47574ef1f1496fb5dae1",
+  "interpreterGC": {
+    "allocated": 439,
+    "live": 0,
+    "peak": 64,
+    "collections": 9,
+    "reclaimed": 439,
+    "events": [
+      "GC #1 AllocationPressure: roots=11 before=64 after=10 reclaimed=54",
+      "GC #2 AllocationPressure: roots=24 before=64 after=19 reclaimed=45",
+      "GC #3 AllocationPressure: roots=19 before=64 after=16 reclaimed=48",
+      "GC #4 AllocationPressure: roots=14 before=64 after=11 reclaimed=53",
+      "GC #5 AllocationPressure: roots=24 before=64 after=19 reclaimed=45",
+      "GC #6 AllocationPressure: roots=19 before=64 after=16 reclaimed=48",
+      "GC #7 AllocationPressure: roots=19 before=64 after=16 reclaimed=48",
+      "GC #8 AllocationPressure: roots=19 before=64 after=16 reclaimed=48",
+      "GC #9 ExecutionCompleted: roots=0 before=50 after=0 reclaimed=50"
+    ]
+  },
+  "admission": {
+    "accepted": true
+  },
+  "nativeRoot": "NeoMetadata_F36FEB1B50009672E7B642339321E13F1E5D26699DACA29C76820FC3194F2A92.F_52756E",
+  "nativeImports": [
+    "_neoclr_allocate_bytes_v1",
+    "_neoclr_allocate_object_v1",
+    "_neoclr_allocate_strings_v1",
+    "_neoclr_console_write_line_utf8_v1",
+    "_neoclr_int32_to_string_v1",
+    "_neoclr_parse_int32_v1",
+    "_neoclr_probe_enter_v3",
+    "_neoclr_probe_leave_v1",
+    "_neoclr_probe_stack_roots_v2",
+    "_neoclr_probe_transient_v1",
+    "_neoclr_reserve_bytes_v1",
+    "_neoclr_string_byte_count_v1",
+    "_neoclr_string_concat_v1",
+    "_neoclr_string_slice_utf8_v1",
+    "_neoclr_utf8_decode_v1",
+    "_neoclr_utf8_encode_v1"
+  ],
+  "lifetime": {
+    "measurements": [
+      {
+        "requests": 0,
+        "capacity": 1048576,
+        "used": 2433,
+        "status": 0,
+        "result": 0,
+        "rootProbes": 650
+      },
+      {
+        "requests": 1,
+        "capacity": 1048576,
+        "used": 3457,
+        "status": 0,
+        "result": 0,
+        "rootProbes": 981
+      },
+      {
+        "requests": 8,
+        "capacity": 1048576,
+        "used": 9625,
+        "status": 0,
+        "result": 0,
+        "rootProbes": 2822
+      },
+      {
+        "requests": 16,
+        "capacity": 1048576,
+        "used": 16818,
+        "status": 0,
+        "result": 0,
+        "rootProbes": 4994
+      },
+      {
+        "requests": 32,
+        "capacity": 1048576,
+        "used": 31202,
+        "status": 0,
+        "result": 0,
+        "rootProbes": 9338
+      },
+      {
+        "requests": 64,
+        "capacity": 1048576,
+        "used": 59970,
+        "status": 0,
+        "result": 0,
+        "rootProbes": 18026
+      },
+      {
+        "requests": 128,
+        "capacity": 1048576,
+        "used": 117507,
+        "status": 0,
+        "result": 0,
+        "rootProbes": 35402
+      }
+    ],
+    "fixedBudgetFailure": {
+      "requests": 128,
+      "capacity": 65536,
+      "used": 65484,
+      "status": 5,
+      "result": -99
+    },
+    "fault": "NativeMemoryLimitExceeded: Native memory limit exceeded\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031.M_416464 [instruction 35]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_526F7574655061747465726E.M_4D61746368 [instruction 214]\n   at NeoMetadata_F36FEB1B50009672E7B642339321E13F1E5D26699DACA29C76820FC3194F2A92.F_436865636B52657175657374 [instruction 50]\n   at NeoMetadata_F36FEB1B50009672E7B642339321E13F1E5D26699DACA29C76820FC3194F2A92.F_52756E [instruction 89]\n"
+  },
+  "rootProbesEnabled": true,
+  "native": {
+    "stdout": "16\n",
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ],
+    "executableOnlyDirectory": true,
+    "emptyEnvironment": true,
+    "brokenPipeFault": "RuntimeError: Runtime error\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573.M_57726974654C696E65 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65.M_57726974654C696E65 [instruction 2]\n   at NeoMetadata_F36FEB1B50009672E7B642339321E13F1E5D26699DACA29C76820FC3194F2A92.F_52756E [instruction 127]\n   at NeoMetadata_F36FEB1B50009672E7B642339321E13F1E5D26699DACA29C76820FC3194F2A92.F_4D61696E [instruction 1]\n",
+    "faultMatchesInterpreter": true,
+    "executableSha256": "f26dc6bd3af3ab37e6a68694ef8a8601aa8c45bcafdf8ab4c32bf9de8a671f1b",
+    "measurementExecutableSha256": "ac37cbca5ca065932a98457978ab8568e95da5bb8d3e4324ad88400109c3a574"
+  },
+  "focusedTests": {
+    "passed": {
+      "rootProbes": 4,
+      "inspection": 6,
+      "faultDetails": 6
+    },
+    "commands": [
+      "cargo test --manifest-path tools/aot-poc/Cargo.toml --test root_probes --test inspection --test fault_details",
+      "cargo test --manifest-path tools/aot-poc/Cargo.toml --test root_probes"
+    ],
+    "constructorTest": {
+      "initializedPublications": 2,
+      "successfulResultPublications": 1,
+      "faultResultPublications": 0
+    },
+    "nestedCallTest": {
+      "successfulResultPublications": 4,
+      "faultResultPublications": 0
+    }
+  },
+  "transientRoots": {
+    "frameBytes": 104,
+    "enterAdapter": "neoclr_probe_enter_v3",
+    "phase1": "initialized constructor storage",
+    "phase2": "successful call or constructor result",
+    "collectorEnabled": false
+  }
+}

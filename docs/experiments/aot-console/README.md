@@ -1795,3 +1795,41 @@ execution, ancestor storage reads, output/fault parity and empty chains at host 
 This follows the existing CLR/root-map comparison: typed slot locations and widths are
 necessary inputs, not complete safepoint metadata. Address-table storage and diagnostic
 reads add overhead. No collector, liveness precision or performance advantage is claimed.
+
+## Constructor and call-result activation (2026-10-08)
+
+Instrumented ordinary calls now publish transient storage in two phases. Phase 1 exposes
+constructor storage only after reference allocation succeeds or inline storage is zeroed,
+before calling the constructor. Its typed table points to live slots, so nested callbacks
+can observe constructor writes through the suspended caller. Phase 2 exposes the result
+only after a successful call/constructor status check. No-result ordinary calls have no
+phase-2 event; failed calls do not publish their uninitialized result buffer.
+
+`neoclr_probe_transient_v1` receives the frame, phase, bounded-width lane-address table and
+image-owned typed layout. The next pre-operation snapshot retires the old transient view,
+and leaving the frame clears it. Prior results remain in the diagnostic view until then,
+so this is conservative retention rather than exact liveness. The adapter observes
+transient slot bytes in ancestor frames without following pointers.
+
+The private frame grows from 72 to 104 bytes and uses `neoclr_probe_enter_v3`; the transient
+table also counts toward the existing 64 KiB frame budget. The stack observation and leave
+hooks retain their current versions. Recompile/relink diagnostic images and hosts together
+with the current header. Ordinary uninstrumented output and entry ABI v3/v4 are unchanged.
+Earlier sections describe the incremental contracts; this is the current frame layout.
+
+The ARM64 constructor test observes zeroed String storage before entry, the constructor's
+later write through its caller's live table, and one successful result publication across
+a successful and a faulting construction. The nested-call test observes four successful
+erased-result publications across two successful invocations and none on its faulting
+invocation. Sixteen focused tests pass. [Routing validation](route-transient-root-validation.json)
+records real-library execution, frame cleanup, output/fault parity and unchanged arena use.
+
+This remains diagnostic observation, not a complete collector root protocol. Publication
+occurs after the callee returns: return-value protection during the callee-to-caller handoff,
+transient roots inside native adapters, borrowed ownership/initialization and host/fault
+roots still require explicit handling. Array/text service results are observed at later
+stack points rather than by this call/constructor phase hook. Hooks cannot allocate,
+collect or reenter; they must not use an incomplete root set to reclaim memory.
+Compared with the existing CLR/root-map baseline, explicit activation avoids interpreting
+uninitialized scratch as roots but does not yet close every safepoint gap. Tables and
+callbacks add diagnostic storage/work, with no performance improvement claimed.

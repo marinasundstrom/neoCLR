@@ -23,14 +23,21 @@ typedef struct neoclr_probe_frame {
     const neoclr_probe_storage *storage;
     const char *storage_plan;
     uint32_t storage_count, storage_length;
+    const neoclr_probe_storage *transient;
+    const char *transient_plan;
+    uint32_t transient_count, transient_length, transient_phase, reserved;
 } neoclr_probe_frame;
-_Static_assert(sizeof(neoclr_probe_frame) == 72, "private probe frame size");
+_Static_assert(sizeof(neoclr_probe_frame) == 104, "private probe frame size");
 _Static_assert(offsetof(neoclr_probe_frame, function) == 40, "private probe frame layout");
-void neoclr_probe_enter_v2(neoclr_probe_frame *frame, const void *context, uint32_t function,
+void neoclr_probe_enter_v3(neoclr_probe_frame *frame, const void *context, uint32_t function,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length);
 void neoclr_probe_leave_v1(neoclr_probe_frame *frame);
 void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction,
     const uint64_t *lanes, uint32_t lane_count, const char *plan, uint32_t length);
+/* Phase 1: initialized constructor storage; phase 2: successful call/constructor result.
+ * Live slot addresses persist until the next pre-operation snapshot or frame leave. */
+void neoclr_probe_transient_v1(neoclr_probe_frame *frame, uint32_t phase,
+    const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length);
 /* Diagnostic state is thread-local, cumulative counts span entry invocations.
  * Each frame records its host context; the chain can contain nested contexts. */
 const neoclr_probe_frame *neoclr_root_probe_head_v1(void);

@@ -543,3 +543,10 @@ and discriminator reads avoid uninitialized padding. The adapter never follows b
 pointees. [Contract and validation](experiments/aot-console/README.md#argument-and-local-storage-in-diagnostic-frames-2026-10-08)
 record the 72-byte frame/enter-v2 migration and added storage cost. Pointee initialization,
 owner recovery, result activation, adapter and host/fault roots remain open before tracing.
+
+Constructor storage is now published after initialization and before the constructor call;
+successful call/constructor results have a separate diagnostic activation phase. Faulting
+calls publish no result roots. Live slot addresses preserve constructor writes observed
+from nested callbacks. [Contract and evidence](experiments/aot-console/README.md#constructor-and-call-result-activation-2026-10-08)
+record the 104-byte frame/enter-v3 migration. Callee-to-caller result handoff, native adapter
+internals, borrowed ownership/initialization and host/fault roots still precede collection.

@@ -77,13 +77,13 @@ ret
 #include "root-probe.h"
 #include <stdlib.h>
 #include <string.h>
-static unsigned calls, enters, leaves, depth, peak;
+static unsigned calls, enters, leaves, depth, peak, results;
 static neoclr_probe_frame *head;
 static int text(uint64_t value, const char *expected) {
     const neoclr_aot_text *t = (const void *)(uintptr_t)value;
     return t && t->length == strlen(expected) && !memcmp(t->bytes, expected, t->length);
 }
-void neoclr_probe_enter_v2(neoclr_probe_frame *frame, const void *context, uint32_t function,
+void neoclr_probe_enter_v3(neoclr_probe_frame *frame, const void *context, uint32_t function,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
     if (!frame || !context || (head && head->context != context)) abort();
     memset(frame, 0, sizeof(*frame));
@@ -106,6 +106,13 @@ void neoclr_probe_enter_v2(neoclr_probe_frame *frame, const void *context, uint3
             !text(caller->previous->lanes[1], "keep") ||
             !text(*(const uint64_t *)caller->previous->storage[0].address, "keep")) abort();
     }
+}
+void neoclr_probe_transient_v1(neoclr_probe_frame *frame, uint32_t phase,
+    const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
+    if (head != frame || phase != 2 || count != 2 || !plan || strlen(plan) != length ||
+        storage[0].read_bytes != 4 || *(const uint32_t *)storage[0].address != 4 ||
+        !text(*(const uint64_t *)storage[1].address, "argument")) abort();
+    results++;
 }
 void neoclr_probe_leave_v1(neoclr_probe_frame *frame) {
     if (head != frame || !depth) abort();
@@ -140,7 +147,7 @@ int main(void) {
             if (status != 1 || result != -99 || fault.code != 1 || fault.frame_count != 3) return 1;
         } else if (status || result != 42 || fault.code || fault.frame_count) return 2;
     }
-    return calls == 12 && enters == 9 && leaves == 9 && peak == 3 ? 0 : 3;
+    return calls == 12 && enters == 9 && leaves == 9 && peak == 3 && results == 4 ? 0 : 3;
 }
 "#).unwrap();
     let binary = dir.0.join("app");
@@ -203,7 +210,7 @@ int main(void) {
     neoclr_probe_frame frame;
     uint64_t lane = 0;
     const char *plan = "{\"requiredSpillLanes\":[]}";
-    neoclr_probe_enter_v2(&frame, &frame, 0, storage, 2, plan, (uint32_t)strlen(plan));
+    neoclr_probe_enter_v3(&frame, &frame, 0, storage, 2, plan, (uint32_t)strlen(plan));
     neoclr_probe_stack_roots_v2(&frame, 0, &lane, 1, plan, (uint32_t)strlen(plan));
     if (neoclr_root_probe_head_v1() != &frame || neoclr_root_probe_depth_v1() != 1) return 1;
     neoclr_probe_leave_v1(&frame);
@@ -221,6 +228,115 @@ int main(void) {
         .arg(&base)
         .arg(&host)
         .arg(base.join("root-probe.c"))
+        .arg("-o")
+        .arg(&binary)
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    assert!(Command::new(binary).status().unwrap().success());
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn constructor_storage_is_live_before_call_and_faults_never_publish_results() {
+    let dir = Temp(std::env::temp_dir().join(format!("neoclr-probe-ctor-{}", std::process::id())));
+    fs::create_dir(&dir.0).unwrap();
+    let input = dir.0.join("input.neoil");
+    fs::write(
+        &input,
+        r#".module ConstructorRoots
+.type Payload
+.field Text String
+.method instance byref .ctor(Int32 fail) -> noresult
+ldarg this
+ldstr "ready"
+stfld 0
+pop
+ldarg fail
+brfalse Done
+ldc.i4 1
+ldc.i4 0
+div
+pop
+Done:
+ret
+.end
+.end
+.function Main(Int32 fail) -> Int32
+ldarg fail
+newobj.ctor instance Payload::.ctor(Int32)
+pop
+ldc.i4 42
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let object = dir.0.join("app.o");
+    let r = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        .arg(input)
+        .arg("Main")
+        .arg(&object)
+        .args(["--fault-details", "--probe-stack-roots"])
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let host = dir.0.join("host.c");
+    fs::write(&host, r#"
+#include "root-probe.h"
+#include "fault-details.h"
+#include <string.h>
+#include <stdlib.h>
+static neoclr_probe_frame *head;
+static unsigned before, after;
+static int ready(const neoclr_probe_storage *s) {
+    const neoclr_aot_text *text = *(const neoclr_aot_text *const *)s->address;
+    return text && text->length == 5 && !memcmp(text->bytes, "ready", 5);
+}
+void neoclr_probe_enter_v3(neoclr_probe_frame *f, const void *ctx, uint32_t fn,
+    const neoclr_probe_storage *s, uint32_t n, const char *p, uint32_t len) {
+    memset(f, 0, sizeof(*f)); f->previous = head; f->context = ctx; f->function = fn;
+    f->storage = s; f->storage_count = n; f->storage_plan = p; f->storage_length = len; head = f;
+}
+void neoclr_probe_leave_v1(neoclr_probe_frame *f) {
+    if (head != f) abort();
+    if (f->previous && (f->previous->transient_phase != 1 || !ready(f->previous->transient))) abort();
+    head = f->previous;
+}
+void neoclr_probe_stack_roots_v2(neoclr_probe_frame *f, uint32_t pc, const uint64_t *s,
+    uint32_t n, const char *p, uint32_t len) {
+    f->instruction = pc; f->lanes = s; f->lane_count = n; f->plan = p; f->length = len;
+    f->transient = NULL; f->transient_phase = 0; f->transient_count = 0;
+}
+void neoclr_probe_transient_v1(neoclr_probe_frame *f, uint32_t phase,
+    const neoclr_probe_storage *s, uint32_t n, const char *p, uint32_t len) {
+    if (head != f || n != 1 || s->read_bytes != 8 || !p || strlen(p) != len) abort();
+    if (phase == 1) { if (*(const uint64_t *)s->address) abort(); before++; }
+    else if (phase == 2) { if (!ready(s)) abort(); after++; }
+    else abort();
+    f->transient = s; f->transient_count = n; f->transient_phase = phase;
+}
+int main(void) {
+    neoclr_aot_fault fault = {0};
+    for (int i = 0; i < 2; i++) {
+        int32_t result = -99;
+        int status = neoclr_entry_v3(i, &result, &fault);
+        if (head || status != i || (i ? result != -99 : result != 42)) return 1;
+    }
+    return before == 2 && after == 1 ? 0 : 2;
+}
+"#).unwrap();
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    let binary = dir.0.join("host");
+    let r = Command::new("clang")
+        .args([
+            "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
+        ])
+        .arg(base.join("aot-console"))
+        .arg("-I")
+        .arg(base.join("aot-fault-details"))
+        .arg(host)
+        .arg(object)
         .arg("-o")
         .arg(&binary)
         .output()

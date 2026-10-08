@@ -1,7 +1,7 @@
 //! Opt-in diagnostic frame chain. Incomplete roots: collection remains forbidden.
 use super::{
     Error, gc_layout, gc_points,
-    profile::{Profile, Stacks},
+    profile::{Profile, Stacks, Ty},
 };
 use cranelift_codegen::cursor::{Cursor, FuncCursor};
 use cranelift_codegen::ir::{self, AbiParam, InstBuilder, StackSlot, types};
@@ -15,6 +15,11 @@ struct Storage {
     length: usize,
     lanes: Vec<(bool, usize, usize, u32, u32)>,
 }
+struct Transient {
+    data: DataId,
+    length: usize,
+    lanes: Vec<(usize, u32)>,
+}
 struct Point {
     data: DataId,
     length: usize,
@@ -27,6 +32,8 @@ pub(super) struct Probes {
     leave: FuncId,
     points: HashMap<(usize, usize), Point>,
     storage: HashMap<usize, Storage>,
+    transient: HashMap<(usize, usize, u32), Transient>,
+    publish: FuncId,
 }
 impl Probes {
     pub fn prepare(
@@ -63,11 +70,26 @@ impl Probes {
             .map(AbiParam::new),
         );
         let enter =
-            module.declare_function("neoclr_probe_enter_v2", Linkage::Import, &enter_sig)?;
+            module.declare_function("neoclr_probe_enter_v3", Linkage::Import, &enter_sig)?;
         let mut leave_sig = module.make_signature();
         leave_sig.params.push(AbiParam::new(types::I64));
         let leave =
             module.declare_function("neoclr_probe_leave_v1", Linkage::Import, &leave_sig)?;
+        let mut sig = module.make_signature();
+        sig.params.extend(
+            [
+                types::I64,
+                types::I32,
+                types::I64,
+                types::I32,
+                types::I64,
+                types::I32,
+            ]
+            .map(AbiParam::new),
+        );
+        let publish =
+            module.declare_function("neoclr_probe_transient_v1", Linkage::Import, &sig)?;
+        let mut transient = HashMap::new();
         let mut points = HashMap::new();
         let mut storage = HashMap::new();
         for (i, f) in p.input.functions.iter().enumerate() {
@@ -123,6 +145,45 @@ impl Probes {
                 let Some(plan) = gc_points::point(p, op, stack)? else {
                     continue;
                 };
+                use neoclr::metadata::Instruction as Op;
+                let phases: Vec<(u32, Ty)> = match op {
+                    Op::Construct(target) => {
+                        let ty = p.ty(target.owner.as_ref().unwrap())?;
+                        vec![(1, ty.clone()), (2, ty)]
+                    }
+                    Op::Call(target) | Op::CallVirtual(target) => p.results[p.callee(target)?]
+                        .clone()
+                        .map(|t| vec![(2, t)])
+                        .unwrap_or_default(),
+                    _ => vec![],
+                };
+                for (phase, ty) in phases {
+                    let mut bytes = serde_json::to_vec(&gc_layout::layout(p, &ty))?;
+                    let length = bytes.len();
+                    bytes.push(0);
+                    let data = module.declare_data(
+                        &format!("neoclr_transient_{i}_{pc}_{phase}"),
+                        Linkage::Local,
+                        false,
+                        false,
+                    )?;
+                    let mut description = DataDescription::new();
+                    description.define(bytes.into_boxed_slice());
+                    module.define_data(data, &description)?;
+                    let wide = p.pointer_lanes(&ty);
+                    let lanes = gc_layout::seed_lanes(p, &ty)
+                        .into_iter()
+                        .map(|lane| (lane, if wide[lane] { 8 } else { 4 }))
+                        .collect();
+                    transient.insert(
+                        (i, pc, phase),
+                        Transient {
+                            data,
+                            length,
+                            lanes,
+                        },
+                    );
+                }
                 let mut bytes = serde_json::to_vec(&plan)?;
                 let length = bytes.len();
                 bytes.push(0);
@@ -157,6 +218,8 @@ impl Probes {
             leave,
             points,
             storage,
+            transient,
+            publish,
         })
     }
     pub fn enter(
@@ -212,6 +275,44 @@ impl Probes {
             let address = cursor.ins().stack_addr(types::I64, frame, 0);
             cursor.ins().call(leave, &[address]);
         }
+    }
+    pub fn transient_bytes(&self, function: usize) -> Option<u32> {
+        self.transient
+            .iter()
+            .filter(|((i, _, _), _)| *i == function)
+            .map(|(_, t)| (t.lanes.len().max(1) * 16) as u32)
+            .max()
+    }
+    pub fn publish(
+        &self,
+        module: &mut ObjectModule,
+        b: &mut FunctionBuilder<'_>,
+        function: usize,
+        pc: usize,
+        phase: u32,
+        frame: StackSlot,
+        table: StackSlot,
+        storage: ir::Value,
+    ) {
+        let t = &self.transient[&(function, pc, phase)];
+        for (index, &(lane, width)) in t.lanes.iter().enumerate() {
+            let pointer = b.ins().iadd_imm(storage, (lane * 8) as i64);
+            b.ins().stack_store(pointer, table, (index * 16) as i32);
+            let size = b.ins().iconst(types::I32, width as i64);
+            let flag = b.ins().iconst(types::I32, i64::from(width == 4));
+            b.ins().stack_store(size, table, (index * 16 + 8) as i32);
+            b.ins().stack_store(flag, table, (index * 16 + 12) as i32);
+        }
+        let frame = b.ins().stack_addr(types::I64, frame, 0);
+        let phase = b.ins().iconst(types::I32, phase as i64);
+        let table = b.ins().stack_addr(types::I64, table, 0);
+        let count = b.ins().iconst(types::I32, t.lanes.len() as i64);
+        let data = module.declare_data_in_func(t.data, b.func);
+        let plan = b.ins().global_value(types::I64, data);
+        let length = b.ins().iconst(types::I32, t.length as i64);
+        let callback = module.declare_func_in_func(self.publish, b.func);
+        b.ins()
+            .call(callback, &[frame, phase, table, count, plan, length]);
     }
     pub fn table_bytes(&self, function: usize) -> u32 {
         (self.storage[&function].lanes.len().max(1) * 16) as u32
