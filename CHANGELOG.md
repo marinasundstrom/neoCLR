@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add a real RoutePattern workload covering eight repeated routing outcomes, pattern
+  errors and capture retention. Measure native arena growth from 2,433 bytes before
+  requests to 117,507 bytes at 128 requests; a fixed 64 KiB invocation faults without
+  publishing a result. Interpreter diagnostics demonstrate reclamation during the same
+  source workload. Record typed native roots/descriptors and nonmoving tracing as the
+  next integration work; no native collector or public API is added by this slice.
+
 - Add experimental ARM64 AOT String-array storage, discovered by compiling the real
   RoutePattern library consumer. Preserve aliases, immutable String owners, default
   nulls, checked reservation state and source faults; allocation failure publishes no

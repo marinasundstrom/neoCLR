@@ -457,3 +457,45 @@ Initial acceptance is a repeatable, honest baseline that identifies bottlenecks,
 not a required win over .NET. Use measured findings to prioritize optimizations;
 add focused regression checks only after a metric and meaningful tolerance are
 established. Select and verify benchmarking tools when the experiment is scheduled.
+
+## HTTP-driven native reclamation requirement (2026-10-08)
+
+The [RoutePattern lifetime consumer](experiments/aot-console/README.md#route-outcomes-and-sustained-allocation-2026-10-08)
+now runs ordinary library routing across repeated requests, retaining a pattern and an
+earlier capture. The native invocation arena accumulates 117,507 bytes by 128 requests
+and exhausts a 64 KiB budget. The interpreted 16-request entry performs eight pressure
+collections while preserving those live references. Object counts and native arena bytes
+measure different quantities; no throughput or representation-efficiency claim follows.
+
+This provides the first concrete workload for the existing proposed nonmoving native
+tracer. The author's HTTP-driven direction includes GC integration when required;
+scoped demonstrations do not constrain the HTTP API to arena lifetimes. Per-request
+resets cannot preserve the references retained by this consumer.
+
+The next implementation sequence is provisional and remains within that earlier direction:
+
+1. Define typed allocation descriptors and root categories independently of native lane
+   width. Objects need reference-bearing field layouts; inline unions/records and erased
+   payloads need their actual discriminants/layouts. Strings/Chars may point into immutable
+   image data or allocated text, Object views may carry the private String tag, and reserved
+   String arrays expose only initialized slots. Integers that occupy pointer-sized ABI
+   lanes must not accidentally become roots.
+2. Establish explicit native roots at allocating calls for arguments, initialized locals,
+   live evaluation-stack values, pending allocations/results and managed interior borrows.
+   Include interface aliases and fault messages; preserve roots on success and fault exits.
+   Validate root registration before allowing allocation pressure to reclaim anything.
+3. Integrate single-threaded nonmoving tracing and reuse of unreachable storage. Start with
+   the existing supported native shapes and reject unsupported root/storage categories.
+   Preserve cycle/alias semantics and distinguish genuine live-budget exhaustion from
+   cumulative allocation. Write barriers depend on the eventual collector/concurrency
+   policy; a nonmoving collector alone does not settle those requirements.
+4. Re-run the same fixed-budget workload over increasing request counts, checking retained
+   pattern/capture contents, unreachable cycles, interior references, faults, and host roots.
+   Then follow remaining HTTP library/service dependencies, including scheduler and network
+   resource ownership. Native GC service bindings and stable hosting metadata remain separate
+   contracts to validate; linking a collector into the image is compatible with standalone AOT.
+
+This is a test-driven integration sequence, not a claim that descriptors, native safepoints
+or tracing have shipped. Reuse the CLR/GC comparisons and sources above; measure collector
+costs once collection exists rather than substituting an arena-size comparison for a GC
+benchmark.

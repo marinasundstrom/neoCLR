@@ -1,0 +1,94 @@
+import System.*
+import System.Result.*
+import System.Option.*
+import System.Web.Http.*
+
+func CheckRequest(pattern: RoutePattern, index: int) -> int {
+    let mode = index % 8
+    let target = if mode == 0 { "/items/%34%32?detail=1" }
+        else if mode == 1 { "/missing" }
+        else if mode == 2 { "/items/2147483648" }
+        else if mode == 3 { "/elsewhere/%ZZ" }
+        else if mode == 4 { "/items/Caf%C3%A9" }
+        else if mode == 5 { "/items/%252F" }
+        else if mode == 6 { "/items/%2F" }
+        else { "/items/42/" }
+    let result = pattern.Match(target)
+    if mode == 3 || mode == 6 {
+        if let Error(_) = result {
+            return 0
+        }
+        return 10
+    }
+    let Ok(option) = result else {
+        return 11
+    }
+    if mode == 1 || mode == 7 {
+        if let None = option {
+            return 0
+        }
+        return 12
+    }
+    let Some(parameters) = option else {
+        return 13
+    }
+    if let Ok(_) = parameters.Get("missing") {
+        return 14
+    }
+    if mode == 0 {
+        let Ok(id) = parameters.GetInt32("id") else {
+            return 15
+        }
+        return if id == 42 { 0 } else { 16 }
+    }
+    if mode == 2 {
+        if let Error(_) = parameters.GetInt32("id") {
+            return 0
+        }
+        return 17
+    }
+    let Ok(text) = parameters.Get("id") else {
+        return 18
+    }
+    let expected = if mode == 4 { "Café" } else { "%2F" }
+    return if text == expected { 0 } else { 19 }
+}
+
+func Run(requests: int) -> int {
+    let Ok(pattern) = RoutePattern.Parse("/items/{id}") else {
+        return 1
+    }
+    let Ok(retainedOption) = pattern.Match("/items/7") else {
+        return 2
+    }
+    let Some(retained) = retainedOption else {
+        return 3
+    }
+    if let Ok(_) = RoutePattern.Parse("/{id}/{id}") {
+        return 4
+    }
+    if let Ok(_) = RoutePattern.Parse("relative") {
+        return 5
+    }
+    var index = 0
+    while index < requests {
+        let status = CheckRequest(pattern, index)
+        if status != 0 {
+            return status
+        }
+        index += 1
+    }
+    // A pattern and an earlier capture stay reachable across later requests.
+    let Ok(id) = retained.GetInt32("id") else {
+        return 6
+    }
+    if id != 7 {
+        return 7
+    }
+    Console.WriteLine(requests)
+    return 0
+}
+
+func Main() -> int {
+    return Run(16)
+}

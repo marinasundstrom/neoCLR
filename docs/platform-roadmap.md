@@ -186,8 +186,13 @@ only two GET routes, not a server or complete HTTP grammar. The real RoutePatter
 consumer then exposed ArrayList<string> storage as its first native blocker. String-array
 storage now supports that path: Parse/Match/GetInt32 runs standalone with exact output
 and fault parity ([evidence](experiments/aot-console/route-pattern-validation.json)).
-Expand route outcomes and repeated-request lifetimes next to discover the remaining HTTP
-and GC integration needs. Borrowed String interface receivers remain unsupported.
+Eight routing outcomes and retained captures now pass repeated-request validation
+([evidence](experiments/aot-console/route-lifetime-validation.json)). Native arena usage
+grows to 117,507 bytes at 128 requests and exhausts a fixed 64 KiB budget; the interpreter
+reclaims temporary objects during the same source workload. Establish typed native roots
+and allocation descriptors next, then nonmoving tracing/reclamation before qualifying
+sustained HTTP execution. This is planned integration work, not an implemented native
+collector. Borrowed String interface receivers remain unsupported.
 The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

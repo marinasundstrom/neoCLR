@@ -310,10 +310,13 @@ with an application union and ordinal String predicates, preserving exact output
 faults across 18 input streams. It has no socket, header/body or general HTTP parsing
 support; the predicates extend the experimental UTF-8 binding without allocation.
 The existing RoutePattern.Parse/Match/GetInt32 path now also runs standalone after adding
-String-array storage for its ArrayList<string> dependencies. Broader routing and repeated
-request lifetimes remain unqualified. The HTTP API drives further native/runtime work,
-including garbage collection if required; the bounded arena is a temporary experiment,
-not a final server memory policy.
+String-array storage for its ArrayList<string> dependencies. A repeated-request consumer
+now checks eight routing outcomes and a retained capture. Its native arena reaches
+117,507 bytes at 128 requests and exhausts a fixed 64 KiB budget, while interpreter
+diagnostics show temporary objects being reclaimed. Native typed roots and tracing
+descriptors are the next foundation for collection; no native collector is implemented
+yet. The HTTP API drives this work, and sustained server execution remains unqualified.
+The bounded arena is a temporary experiment, not a final server memory policy.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

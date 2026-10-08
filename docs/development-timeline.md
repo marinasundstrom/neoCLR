@@ -11803,3 +11803,13 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
   libSystem dynamically linked ([evidence](experiments/aot-console/route-pattern-validation.json)).
   This qualifies that path, not the complete HTTP API; broader route outcomes and
   repeated-request lifetime checks remain next steps.
+
+- **Follow-through:** The assistant expanded the real-library consumer to eight route
+  outcomes and a capture retained across requests. Native arena usage reaches 117,507
+  bytes at 128 requests and faults under a fixed 64 KiB budget; interpreter diagnostics
+  show eight pressure collections preserving the retained references. This establishes
+  a concrete reclamation requirement, not a throughput comparison. The assistant records
+  typed roots/allocation descriptors followed by nonmoving tracing as provisional next
+  slices; no native collector is implemented here. See the
+  [lifetime evidence](experiments/aot-console/route-lifetime-validation.json) and
+  [integration plan](native-execution-investigation.md#http-driven-native-reclamation-requirement-2026-10-08).

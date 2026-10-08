@@ -1482,3 +1482,77 @@ parity. The executable runs alone with an empty environment and only libSystem d
 linked. Both library and tooling identities are hashed; the sample remains within the
 existing 64 KiB host arena. Native dependencies are recorded separately from the supplied
 managed load set; these are input libraries, not deployment dependencies.
+
+## Route outcomes and sustained allocation (2026-10-08)
+
+[The lifetime consumer](route-lifetime.rvn) reuses one RoutePattern across requests.
+It checks decoded numeric capture with a query, normal no-match, Int32 overflow,
+malformed escapes on an otherwise mismatching target, UTF-8 capture, one-time percent
+decoding, rejection of decoded separators, and trailing-slash distinction. It also
+checks missing captures and invalid/duplicate-parameter patterns. A capture made before
+the loop is read afterward to exercise a reference that must survive later allocations.
+Each temporary request runs in a separate CheckRequest call, so its local capture and
+intermediate collections are no longer needed after return.
+
+`verify_route_lifetime.py` runs the normal Main → Run(16) entry under interpretation
+and native code, checking output and exact broken-pipe traces with the same managed
+frames. It also emits Run(Int32) as a separate diagnostic export, resolving its identity
+from Main's verified call target. That export varies request count without recompiling
+or adding a guest measurement API. Its host records charged arena bytes after an
+invocation, validates the output sentinel/fault contract and checks an allocation canary.
+No guest buffers or patterns are reset between requests.
+
+The measured invocation arena grows as follows (bytes include retained live storage,
+unreachable allocations and padding; this is not live-heap size or process RSS):
+
+| Requests in one invocation | Arena bytes charged |
+| --- | ---: |
+| 0 | 2,433 |
+| 1 | 3,457 |
+| 8 | 9,625 |
+| 16 | 16,818 |
+| 32 | 31,202 |
+| 64 | 59,970 |
+| 128 | 117,507 |
+
+The 1 MiB buffer used for successful measurement runs is diagnostic headroom, not a
+proposed server configuration or fix. With a fixed 64 KiB budget, 128 requests fault
+with NativeMemoryLimitExceeded at 65,484 charged bytes, without publishing a result.
+It is expected that these resource outcomes differ from a collecting interpreter;
+normal routing and managed fault semantics remain the parity requirements.
+
+For the same 16-request source entry, interpreter diagnostics report 439 tracked
+allocations, peak 64 objects, eight allocation-pressure collections, and one final
+collection. Pressure collections reclaim 45–54 objects apiece while the pattern and
+retained capture survive. Final live count is zero. These are interpreter object
+counts, not comparable byte totals: they establish actual reclamation during execution,
+not an allocation-size or throughput advantage over the native representation.
+
+This makes native reclamation the next requirement exposed by the HTTP dependency path.
+Increasing the arena or resetting it per request would leave the unresolved lifetime
+contract hidden; the latter would invalidate a retained pattern/capture in this model.
+Follow the existing nonmoving tracing direction and validate native roots before enabling
+reclamation. The next bounded backend slice should establish typed allocation descriptors
+and root reporting for the currently admitted objects, arrays, Strings and managed borrows.
+The current `Profile::pointer_lanes` is ABI-width information: it also marks Int64/UInt64
+and native integers as 64-bit lanes. It must not be used as a GC reference map.
+
+The existing [.NET and native GC comparison](../../native-execution-investigation.md)
+and [interpreter collection contract](../../garbage-collection.md) remain the baseline:
+automatic lifetime management must retain aliases and cycles without guest retain/release.
+A first nonmoving collector avoids pointer relocation but still needs roots and tracing;
+fragmentation, collection latency and throughput remain validation questions. This slice
+implements the workload and allocation diagnostics, not a native collector or GC API.
+
+[Recorded lifetime validation](route-lifetime-validation.json) includes input hashes,
+compiler/link commands, interpreter collection events, native allocation measurements,
+and exact broken-pipe fault parity. Both native artifacts run in an executable-only
+directory with an empty environment and link dynamically only to libSystem.
+Reproduce with a fresh output directory and a matching compiler/native bundle:
+
+```sh
+SDKROOT="$(xcrun --show-sdk-path)" python3 docs/experiments/aot-console/verify_route_lifetime.py \
+  --compiler /path/to/rvnc.dll --runtime target/debug/neoclr \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --bundle /path/to/neoclr-native-poc --output target/aot-route-lifetime
+```
