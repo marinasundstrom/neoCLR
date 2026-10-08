@@ -2037,3 +2037,14 @@ fn selected_value_type_budget_accepts_256_and_rejects_257() {
         }
     }
 }
+
+#[test]
+fn ordinary_int32_borrow_is_not_authorized_by_a_primitive_like_name() {
+    let source = ".module BorrowedInput\n.function System.Int32.ToString(Int32& value) -> Int32\nldarg value\nldobj Int32\nret\n.end\n.function Main() -> Int32\n.local Int32 value\nldc.i4 42\nstloc value\nldloca value\ncall System.Int32.ToString(Int32&)\nret\n.end\n";
+    let module = neoclr::assemble(source).unwrap();
+    let temp = Temp::new();
+    let result = compile_mode(&neoclr::metadata_container::write_module(&module).unwrap(), &temp, "Main", true);
+    assert!(!result.status.success());
+    assert!(String::from_utf8_lossy(&result.stderr).contains("explicit borrowed parameters require an output contract"));
+    assert!(!temp.0.join("value.o").exists());
+}

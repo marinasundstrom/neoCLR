@@ -234,3 +234,10 @@ by-reference value-override projection. Run `verify_callbacks.py --case ValueDis
 [evidence](value-display-validation.json) records parity, sanitizers and standalone
 linkage. See [the bounded contract](../../docs/experiments/aot-console/value-display.md).
 The full server next reaches primitive member-owner admission.
+
+The extended ValueDisplay also passes borrowed Int32 ToString/Equals and nested
+HTTP status/content diagnostics. [Primitive-wrapper evidence](primitive-display-validation.json)
+records signed extremes, zero and status 599 in both modes. Arbitrary input borrows
+remain unsupported; the private projection preserves verified receiver storage.
+The full server now reaches SocketConnectResult, moving the immediate dependency
+work to task dispatch, native host roots and asynchronous socket completion.

@@ -10,7 +10,7 @@ mod gc_points;
 mod gc_probe;
 
 pub(super) fn trace_layout(input: &neoclr::Module, details: Option<&crate::fault_details::Options>) -> Result<serde_json::Value, Error> {
-    let p = Profile::new(input, details.is_some_and(|d| d.reference_arena), details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch))?;
+    let p = Profile::new(input, details.is_some_and(|d| d.reference_arena), details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.int32_receivers.as_slice()))?;
     let mut report = gc_layout::report(&p);
     report["preOperationPlans"] = gc_points::report(&p, details)?;
     Ok(report)
@@ -203,7 +203,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     if details.is_some_and(|d| d.native_gc && (!d.reference_arena || !d.probe_stack_roots)) {
         return Err("native GC requires an admitted reference-arena profile and published roots".into());
     }
-    let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch))?;
+    let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.int32_receivers.as_slice()))?;
     let root = p.root(root)?;
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))

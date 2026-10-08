@@ -27,3 +27,23 @@ artifact passes interpreted and native execution, sanitized adapters and standal
 libSystem-only linkage. [Evidence](../../../benchmarks/native-web/value-display-validation.json)
 records the full server advancing to a primitive member-owner admission failure.
 Native HTTP remains unqualified. No formatting performance claim is made.
+
+## Borrowed Int32 wrappers
+
+Under --reference-arena, public ordinary nonvirtual Int32 instance wrappers now
+project to private free functions with an explicit Int32& receiver. The original
+CIL argument indices and body are retained; metadata parameter annotations are
+adjusted for the inserted receiver. The internal selection report authorizes only
+that projected receiver in the backend. Arbitrary borrowed input parameters remain
+unsupported, including a free function with a primitive-looking name. Constructors,
+readonly receivers, virtual members and generic wrappers are not admitted here.
+
+This follows the existing primitive ownership/borrow contract rather than adding a
+second formatting implementation or copying the receiver. Int32.ToString uses the
+existing explicitly bound formatting service. ValueDisplay now checks minimum and
+maximum signed values, zero, Equals and nested HttpError Content/UnsuccessfulStatus
+rendering. [Evidence](../../../benchmarks/native-web/primitive-display-validation.json)
+records interpreter/native parity and standalone linkage. Nine root-layout/selection
+unit checks and the negative arbitrary-borrow consumer pass. The full server now
+reaches the unbound asynchronous SocketConnectResult service; HTTP execution still
+requires task/host-root/socket completion integration.

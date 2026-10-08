@@ -42,6 +42,7 @@ pub struct Options {
     pub object_base: Option<usize>,
     pub array_backing: Option<usize>,
     pub string_dispatch: HashMap<usize, usize>,
+    pub int32_receivers: Vec<usize>,
     pub string_interfaces: Option<Vec<usize>>,
     pub object_display: HashMap<usize, Vec<(usize, usize)>>,
     pub frame_names: HashMap<usize, String>,
@@ -49,6 +50,8 @@ pub struct Options {
 impl Options {
     pub fn from_report(report: Option<&serde_json::Value>) -> Self {
         Self {
+            int32_receivers: report.and_then(|r| r["int32InstanceProjections"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             probe_stack_roots: false,
             native_gc: false,
             string_dispatch: report.and_then(|r| r["stringInterfaceDispatch"].as_array()).into_iter().flatten()

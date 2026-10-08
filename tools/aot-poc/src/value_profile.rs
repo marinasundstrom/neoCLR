@@ -70,7 +70,7 @@ fn object_base_shape(t: &neoclr::metadata::TypeDef) -> bool {
 }
 
 impl<'a> Profile<'a> {
-    pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>, object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>, string_dispatch: Option<&HashMap<usize, usize>>) -> Result<Self, Error> {
+    pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>, object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>, string_dispatch: Option<&HashMap<usize, usize>>, primitive_receivers: Option<&[usize]>) -> Result<Self, Error> {
         if input.name == "System" || input.types.len() > crate::limits::TYPES || input.functions.len() > crate::limits::FUNCTIONS {
             return Err(
                 "value profile requires an application with at most 256 types and 1024 functions"
@@ -215,7 +215,7 @@ impl<'a> Profile<'a> {
                 } else {
                     let ty = p.ty(owner)?;
                     if !matches!(ty, Ty::Record(_) | Ty::Reference(_) | Ty::Interface(_)) {
-                        return Err("value member requires a local record owner".into());
+                        return Err(format!("{}: value member requires a local record owner ({owner:?})", f.name).into());
                     }
                     if f.instance {
                         match ty {
@@ -232,7 +232,9 @@ impl<'a> Profile<'a> {
             }
             for (index, t) in f.parameters.iter().enumerate() {
                 if let Type::ByRef(target) = t {
-                    if !f.out_parameters.contains(&index) {
+                    let projected_receiver = index == 0 && **target == Type::Int32
+                        && primitive_receivers.is_some_and(|indices| indices.contains(&i));
+                    if !f.out_parameters.contains(&index) && !projected_receiver {
                         return Err(
                             "explicit borrowed parameters require an output contract".into()
                         );

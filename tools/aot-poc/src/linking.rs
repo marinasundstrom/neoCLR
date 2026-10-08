@@ -340,6 +340,45 @@ pub fn prepare(
             }
         }
     }
+    // Preserve borrowed intrinsic Int32 storage when moving verified instance
+    // wrappers to private free functions. No receiver copy or formatting shortcut.
+    let integer_members: std::collections::BTreeSet<_> = selected.functions.iter().enumerate()
+        .filter(|(_, f)| f.owner == Some(neoclr::metadata::Type::Int32) && f.instance)
+        .map(|(i, _)| i).collect();
+    for &i in &integer_members {
+        let f = &selected.functions[i];
+        if !reference_arena || !f.receiver_byref || f.receiver_readonly || f.is_virtual || f.is_override || f.is_abstract
+            || f.impl_flags != 0 || f.pinvoke.is_some() || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || f.visibility != neoclr::metadata::Visibility::Public || f.name.ends_with("..ctor") {
+            return Err("Int32 instance projection requires public nonvirtual ordinary byref wrappers and --reference-arena".into());
+        }
+    }
+    for (i, f) in selected.functions.iter_mut().enumerate() {
+        if integer_members.contains(&i) {
+            f.owner = None;
+            f.instance = false;
+            f.receiver_byref = false;
+            f.parameters.insert(0, neoclr::metadata::Type::ByRef(Box::new(neoclr::metadata::Type::Int32)));
+            if !f.parameter_names.is_empty() { f.parameter_names.insert(0, None); }
+            for index in &mut f.out_parameters { *index += 1; }
+            for index in &mut f.readonly_parameters { *index += 1; }
+            for index in &mut f.out_when_true { *index += 1; }
+            if let Some(origin) = &mut f.origin { origin.parameter_tokens.insert(0, 0); origin.nullable_annotations.clear(); }
+        }
+        for op in &mut f.body {
+            if let Op::Call(target) = op {
+                if target.definition.as_ref().is_some_and(|id| integer_members.contains(&(id.index as usize))) {
+                    target.owner = None;
+                    target.instance = false;
+                    target.parameters.insert(0, neoclr::metadata::Type::ByRef(Box::new(neoclr::metadata::Type::Int32)));
+                }
+            }
+        }
+    }
+    report["int32InstanceProjections"] = json!(integer_members.iter().map(|i| json!({"compiledIndex":i,
+        "policy":"verified public nonvirtual Int32 wrapper; explicit borrowed receiver, unchanged CIL"})).collect::<Vec<_>>());
     // The original load set owns its String methods. The backend's bundled String
     // cannot be redeclared; lower verified public nonvirtual instance wrappers to
     // free functions with an explicit receiver, preserving the original CIL body.

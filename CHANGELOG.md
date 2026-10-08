@@ -27,7 +27,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   nulls and distinct equal-content strings. The full server next reaches the
   StreamError.ToString value-member contract; admit verified direct byref value
   ToString overrides in the private native projection and validate real StreamError
-  descriptions in both modes. Primitive member-owner admission is the next boundary.
+  descriptions in both modes. Project ordinary Int32 instance wrappers with verified
+  explicit borrowed receivers; keep arbitrary input borrows unsupported. Validate
+  signed-extreme formatting, equality and nested HTTP diagnostics. The full server
+  now reaches asynchronous socket-result binding.
 
 - Add development System.Text.StringBuilder with fluent append, atomic byte-limit
   faults, LF line append, clear/reuse and cached immutable snapshots. Add separator-aware

@@ -1,5 +1,6 @@
 import System.*
 import System.IO.*
+import System.Web.Http.*
 
 func Main() -> int {
     let closed = StreamError.Closed
@@ -13,6 +14,20 @@ func Main() -> int {
     let failure = StreamError.IoFailure
     if failure.ToString() != "IoFailure" {
         return 3
+    }
+    let negative = -2147483648
+    let maximum = 2147483647
+    let zero = 0
+    if negative.ToString() != "-2147483648" || maximum.ToString() != "2147483647" || zero.ToString() != "0" {
+        return 4
+    }
+    if !negative.Equals(-2147483648) || maximum.Equals(negative) {
+        return 5
+    }
+    let content = HttpError.Content(closed)
+    let status = HttpError.UnsuccessfulStatus((HttpStatusCode)599)
+    if content.ToString() != "Closed" || status.ToString() != "HTTP status 599" {
+        return 6
     }
     return 0
 }
