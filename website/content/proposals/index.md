@@ -288,7 +288,9 @@ Object display now run standalone with bounded invocation storage. String Object
 also enable mixed integer interpolation while preserving text identity, null/cast faults
 and exact output-fault traces. Char-to-String conversion now preserves fresh identities
 when observable; character Console output and interpolation run together across Unicode
-graphemes and NUL. String interfaces, wider boxing and general Object metadata remain open.
+graphemes and NUL. Verified String interface views now preserve casts and identity through closed generic
+contracts. String interface method dispatch, wider boxing and general Object metadata
+remain open.
 An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked

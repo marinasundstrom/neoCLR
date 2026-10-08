@@ -1185,3 +1185,47 @@ storage. The cost is bounded copying/allocation when observable; there is no per
 claim or change to the platform's text semantics. Arena exhaustion remains a POC resource
 policy; general reclamation and escaping native references remain future work. No public
 API, compiler, metadata, Runtime Contract, adapter signature or ABI layout changes.
+
+## Verified String interface views (2026-10-08)
+
+The next bounded slice admits String interface casts and identity without claiming
+String interface method dispatch. Before the private projection removes primitive
+metadata and erases generic arguments, AOT records which selected closed interfaces
+String implements in the verified load set. The table maps to private compiled type
+indices and includes inherited interface relationships. It is build evidence, not a
+runtime metadata sidecar or stable ABI. Unknown/unverified conformance still rejects.
+
+String-to-interface and Object-to-interface casts use that table. Matching views retain
+the same tagged String owner; unrelated interfaces and mismatched generic arguments
+produce null for isinst or the interpreter's RuntimeError for castclass. Views round-trip
+through Object and String without wrapper allocation or identity changes. Null guards
+remain unchanged. The old blanket rejection of programs combining String identity and
+interface casts is removed. Any selected interface instance method supported by String
+still rejects when text identity is observable, until native String interface dispatch
+is implemented; no placeholder method or fabricated default result executes.
+
+The [metadata consumer](string-interface-views.neoil) and focused tests cover inherited
+View<String>/Root<String>, rejected Root<Int32>, unrelated interfaces, repeated literal
+identity, aliases, String round trips, null calls, invalid casts and arena faults. A
+valid String interface-call program verifies in the interpreter but rejects native
+compilation before publishing an object file. All 48 Console AOT tests pass.
+
+The [Raven consumer](string-interface-views.rvn) uses the real EquatableTo<string>
+contract, casts its view to Object, narrows back to String and prints Unicode/NUL and
+empty text. [Fresh validation](string-interface-views-validation.json) records retained
+closed conformance, tool/bundle hashes, standalone interpreter/native output parity,
+exact broken-pipe fault parity, executable-only/empty-environment execution and only
+libSystem linked dynamically. Run the existing driver with `--sample string-interface-views`
+to reproduce this slice; its default now qualifies five consumers.
+
+This reuses the [Object/CLR comparison](../../object-model-review.md) and existing
+[interface model](../../class-semantics.md). Like the CLR, a view preserves reference
+identity and depends on actual closed interface conformance rather than a name match.
+The POC stores only the selected conformance facts; full metadata and dispatch would
+support more programs at higher implementation cost. Keeping the original conformance
+snapshot avoids treating erased arguments or absent private metadata as proof that
+String does not implement an interface. Compilation uses additional bounded temporary
+storage; casts allocate no wrappers. No performance improvement is claimed. General
+String interface dispatch is the next gap, naturally driven by EquatableTo<string>.Equals.
+Raven/compiler configuration, metadata format, public APIs and the private context ABI
+are unchanged; this is native-backend work consuming existing emitted contracts.

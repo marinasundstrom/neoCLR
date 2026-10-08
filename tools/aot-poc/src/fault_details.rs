@@ -31,12 +31,15 @@ pub struct Options {
     pub empty_record_boxes: HashMap<usize, usize>,
     pub object_base: Option<usize>,
     pub array_backing: Option<usize>,
+    pub string_interfaces: Option<Vec<usize>>,
     pub object_display: HashMap<usize, Vec<(usize, usize)>>,
     pub frame_names: HashMap<usize, String>,
 }
 impl Options {
     pub fn from_report(report: Option<&serde_json::Value>) -> Self {
         Self {
+            string_interfaces: report.and_then(|r| r["stringInterfaceViews"].as_array())
+                .map(|rows| rows.iter().filter_map(|i| i.as_u64().map(|i| i as usize)).collect()),
             object_display: report.and_then(|r| r["objectDisplayDispatch"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["contractCompiledIndex"].as_u64()? as usize, r["targets"].as_array()?.iter()
                     .filter_map(|t| Some((t["typeCompiledIndex"].as_u64()? as usize, t["functionCompiledIndex"].as_u64()? as usize))).collect()))).collect(),

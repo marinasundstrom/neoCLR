@@ -156,11 +156,21 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             _ => false,
         }
     }));
-    if text_identity && input.functions.iter().any(|f| f.body.iter().any(|op| {
-        matches!(op, Op::CastClass(t) | Op::IsInstance(t) if matches!(p.ty(t), Ok(Ty::Interface(_))))
-    })) {
-        return Err("String Object views with interface casts require String interface metadata support".into());
+    let string_interfaces = details.and_then(|d| d.string_interfaces.as_ref());
+    if text_identity {
+        let interface_casts = input.functions.iter().any(|f| f.body.iter().any(|op| {
+            matches!(op, Op::CastClass(t) | Op::IsInstance(t) if matches!(p.ty(t), Ok(Ty::Interface(_))))
+        }));
+        if interface_casts && string_interfaces.is_none() {
+            return Err("String interface views require verified load-set conformance".into());
+        }
+        if input.functions.iter().any(|f| f.instance && f.owner.as_ref().is_some_and(|t|
+            matches!(p.ty(t), Ok(Ty::Interface(i)) if string_interfaces.is_some_and(|indices| indices.contains(&i))))) {
+            return Err("String interface method dispatch requires a later native receiver profile".into());
+        }
     }
+    let string_view = |ty: &Ty| p.is_object_base(ty)
+        || matches!(ty, Ty::Interface(i) if string_interfaces.is_some_and(|indices| indices.contains(i)));
     // The backend's narrow shape analysis is additional admission, not a replacement
     // for type/member identity, accessibility, initialization or byref lifetime checks.
     neoclr::LoadedProgram::new(input).and_then(|v| v.verify()).map_err(|e| e.to_string())?;
@@ -694,7 +704,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let zero = b.ins().iconst(types::I64, 0);
                         let target_ty = p.ty(target)?;
                         let cast = if *top() == Ty::Literal {
-                            if p.is_object_base(&target_ty) { text_object_view(&mut b, value) } else { zero }
+                            if string_view(&target_ty) { text_object_view(&mut b, value) } else { zero }
                         } else {
                             let text = b.create_block();
                             let object = b.create_block();
@@ -704,7 +714,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             b.ins().brif(tagged, text, &[], object, &[]);
                             b.switch_to_block(text);
                             let result = if target_ty == Ty::Literal { b.ins().band_imm(value, -2) }
-                                else if p.is_object_base(&target_ty) { value } else { zero };
+                                else if string_view(&target_ty) { value } else { zero };
                             b.ins().jump(merged, &[result.into()]);
                             b.switch_to_block(object);
                             let result = if target_ty == Ty::Literal { zero } else {

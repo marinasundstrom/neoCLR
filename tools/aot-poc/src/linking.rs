@@ -165,6 +165,7 @@ pub fn prepare(
     // Conformance was verified in original scopes. Metadata-only relationships
     // must not consume executable specialization shapes (Option and Result share
     // Propagatable with different arguments, including metadata-only Void).
+    let source_conformance = joined.clone();
     let relationships: Vec<_> = joined
         .types
         .iter_mut()
@@ -193,6 +194,25 @@ pub fn prepare(
     };
     let input = specialized.as_ref().map_or(&joined, |(module, _)| module);
     let (mut selected, mut report) = super::selection::select_inventory(input, root, false)?;
+    // Retain original closed String conformance before private specialization
+    // erases interface arguments and primitive declarations leave the inventory.
+    let mut string_interfaces = vec![];
+    for row in report["types"].as_array().unwrap() {
+        let source = row["sourceIndex"].as_u64().unwrap() as usize;
+        if input.types[source].representation != neoclr::metadata::Representation::Interface { continue; }
+        let shape = specialized.as_ref().and_then(|(_, data)| data["types"].as_array())
+            .and_then(|rows| rows.iter().find(|r| r["expandedIndex"] == source));
+        let target = if let Some(shape) = shape {
+            neoclr::metadata::Type::Constructed {
+                definition: shape["name"].as_str().ok_or("invalid String interface shape")?.to_owned(),
+                arguments: serde_json::from_value(shape["arguments"].clone())?,
+            }
+        } else { neoclr::metadata::Type::Named(input.types[source].name.clone()) };
+        if super::selection::implements_interface(&source_conformance, &neoclr::metadata::Type::String, &target) {
+            string_interfaces.push(row["compiledIndex"].clone());
+        }
+    }
+    report["stringInterfaceViews"] = json!(string_interfaces);
     if let Some((_, mut specialization)) = specialized {
         for row in specialization["types"].as_array_mut().unwrap() {
             row["definition"] = json!(types[row["sourceIndex"].as_u64().unwrap() as usize]);

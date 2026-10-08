@@ -6738,3 +6738,12 @@ removes that producer restriction without compiler or target-contract changes. N
 Console character wrappers and integer interpolation now run together through the same
 pinned Raven producer and bundle. Identity-observable CharText calls materialize fresh
 arena text; String interface casts remain unsupported. No CLI bridge encoding is added.
+
+
+The next [String interface-view slice](experiments/aot-console/README.md#verified-string-interface-views-2026-10-08)
+retains verified closed String conformance before private native projection. The existing
+EquatableTo<string> contract round-trips through Object and String in a standalone
+consumer; no Raven option, compiler lowering, temporary CLI encoding or metadata schema
+changes. String interface method calls remain explicitly rejected by AOT until receiver
+dispatch is implemented. The same integration compiler and bundle are recorded in the
+fresh consumer evidence; no public API snapshot changes.

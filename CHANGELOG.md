@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Admit verified String interface views in experimental ARM64 AOT. Retain original
+  closed conformance before private projection, including inherited generic interfaces;
+  preserve String/Object identity and null/cast behavior. Validate 48 Console AOT tests
+  and a standalone Raven EquatableTo<string> round-trip with exact output/fault parity.
+  String interface method dispatch still rejects before object publication. No compiler,
+  public API, metadata format or context ABI change.
+
 - Preserve fresh Char-to-String identity in experimental ARM64 AOT when String
   identity is observable. Reuse bounded arena copying while keeping unobservable
   conversions allocation-free. Validate 47 Console AOT tests, exact allocation/cast/null

@@ -1,0 +1,17 @@
+import System.*
+
+func Show(text: string) {
+    let view: EquatableTo<string> = text
+    let value: object = view
+    if value is string restored {
+        Console.WriteLine(restored)
+    } else {
+        Console.WriteLine("Unexpected type")
+    }
+}
+
+func Main() -> int {
+    Show("hé😀\u0000z")
+    Show("")
+    return 0
+}

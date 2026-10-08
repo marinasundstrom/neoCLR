@@ -2327,20 +2327,6 @@ int main(int argc,char **argv) {
     assert!(String::from_utf8_lossy(&r.stderr).contains("boxed Int32 display requires --bind-int32-to-string"),"{r:?}");
 }
 
-#[test]
-fn string_object_views_reject_unadapted_interfaces() {
-    let seed=neoclr::assemble(&format!("{OBJECT_DISPLAY_SEED}\n{CHARACTER_SEED}\n.function neoCLR.Runtime.WriteLine(String) -> Void\n.methodimpl InternalCall\n.end\n")).unwrap();
-    let source=include_str!("../../../docs/experiments/aot-console/string-object-views.neoil");
-    for (source,message) in [
-        (source.replace(".type class Other", ".interface Other"), "String interface metadata support"),
-    ] {
-        let app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)],&seed).unwrap().remove(0);
-        let dir=Temp::new();
-        let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena","--bind-int32-to-string","--bind-console-write-line","--bind-character-text"]);
-        assert!(!r.status.success() && !dir.0.join("app.o").exists(),"{r:?}");
-        assert!(String::from_utf8_lossy(&r.stderr).contains(message),"{r:?}");
-    }
-}
 
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
@@ -2399,4 +2385,92 @@ int main(int argc,char **argv) {
     let r=compile_linked_module(&reject,&seed,&app,&["--compile-system","--reference-arena","--bind-console-write-line"]);
     assert!(!r.status.success() && !reject.0.join("app.o").exists());
     assert!(String::from_utf8_lossy(&r.stderr).contains("boxed Int32 display requires --bind-int32-to-string"),"{r:?}");
+}
+
+const STRING_VIEW_SEED: &str = r#"
+.interface Root<T>
+.end
+.interface View<T>
+.implements Root<T>
+.end
+.type System.String
+.implements View<String>
+.end
+"#;
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn string_interface_views_preserve_closed_conformance_identity_and_faults() {
+    let seed=neoclr::assemble(&format!("{OBJECT_DISPLAY_SEED}\n{STRING_VIEW_SEED}\n.function neoCLR.Runtime.WriteLine(String) -> Void\n.methodimpl InternalCall\n.end\n")).unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/string-interface-views.neoil");
+    let app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)],&seed).unwrap().remove(0);
+    let dir=Temp::new();
+    let flags=["--compile-system","--reference-arena","--bind-int32-to-string","--bind-console-write-line"];
+    let r=compile_linked_module(&dir,&seed,&app,&flags);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let report:serde_json::Value=serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["int32Boxes"].as_array().unwrap().len(),1);
+    assert_eq!(report["boxedInt32Display"],true);
+    assert_eq!(report["stringInterfaceViews"].as_array().unwrap().len(),2);
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc,char **argv) {
+    uint64_t storage[33]={0};storage[32]=UINT64_C(0xa5a5a5a5a5a5a5a5);
+    int32_t value=argc>1?(int32_t)strtol(argv[1],NULL,10):0;
+    unsigned capacity=argc>2?(unsigned)strtoul(argv[2],NULL,10):256;
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,capacity,0}};
+    int32_t result=-99;int status=neoclr_entry_v4(value,&result,&ctx);
+    if(storage[32]!=UINT64_C(0xa5a5a5a5a5a5a5a5) || ctx.text.used>capacity)return 93;
+    if(status){if(result!=-99)return 92;neoclr_aot_render_fault(stderr,&ctx.fault);return 1;}
+    return result;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-fault-details/render.c")).arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-console/console.c")).arg(base.join("aot-scalar/console.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for value in [0] {
+        let expected=method.invoke(vec![neoclr::Value::Int32(value)],neoclr::Limits::default()).unwrap();
+        assert_eq!(expected.value,neoclr::Value::Int32(0));
+        let r=Command::new(dir.0.join("app")).arg(value.to_string()).env_clear().output().unwrap();
+        assert_eq!(r.status.code(),Some(0),"{r:?}");
+        assert_eq!(r.stdout,"hé😀\0z\n".as_bytes());
+        assert_eq!(r.stdout,expected.stdout);assert!(r.stderr.is_empty());
+    }
+    for mode in [1,2,3] {
+        let expected=method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default()).unwrap_err();
+        let r=Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        assert_eq!(r.status.code(),Some(1),"{r:?}");assert!(r.stdout.is_empty());
+        assert_eq!(String::from_utf8_lossy(&r.stderr),expected.diagnostic().to_string());
+    }
+    let r=Command::new(dir.0.join("app")).args(["0","7"]).env_clear().output().unwrap();
+    assert_eq!(r.status.code(),Some(1),"{r:?}");assert!(r.stdout.is_empty());
+    assert_eq!(String::from_utf8_lossy(&r.stderr),"NativeMemoryLimitExceeded: Native memory limit exceeded\n   at Fresh [instruction 0]\n   at Calculate [instruction 0]\n");
+    let reject=Temp::new();
+    let r=compile_linked_module(&reject,&seed,&app,&["--compile-system","--reference-arena","--bind-console-write-line"]);
+    assert!(!r.status.success() && !reject.0.join("app.o").exists());
+    assert!(String::from_utf8_lossy(&r.stderr).contains("boxed Int32 display requires --bind-int32-to-string"),"{r:?}");
+}
+
+
+#[test]
+fn string_interface_calls_reject_before_native_publication() {
+    let views=STRING_VIEW_SEED.replace(".interface Root<T>\n.end", ".interface Root<T>\n.method instance Get() -> T\n.end\n.end")
+        .replace(".implements View<String>\n.end", ".implements View<String>\n.method instance readonly byref Get() -> String\nldarg 0\nldobj String\nret\n.end\n.end");
+    let seed=neoclr::assemble(&format!("{OBJECT_DISPLAY_SEED}\n{views}\n.function neoCLR.Runtime.WriteLine(String) -> Void\n.methodimpl InternalCall\n.end\n")).unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/string-interface-views.neoil")
+        .replace("ldstr \"hé😀\\u0000z\"\nret", "ldstr \"hé😀\\u0000z\"\ncastclass Root<String>\ncallvirt instance Root<String>::Get()\nret");
+    let app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)],&seed).unwrap().remove(0);
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    program.verify().unwrap();
+    let dir=Temp::new();
+    let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena","--bind-int32-to-string","--bind-console-write-line"]);
+    assert!(!r.status.success() && !dir.0.join("app.o").exists(),"{r:?}");
+    assert!(String::from_utf8_lossy(&r.stderr).contains("String interface method dispatch requires a later native receiver profile"),"{r:?}");
 }

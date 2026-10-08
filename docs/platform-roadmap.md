@@ -159,7 +159,10 @@ parity ([evidence](experiments/aot-console/string-object-views-validation.json))
 Fresh CharText identity also qualifies ordinary character Console output alongside
 interpolation across seven grapheme/NUL cases
 ([evidence](experiments/aot-console/character-text-identity-validation.json)).
-String interface views remain a bounded follow-up.
+Verified closed String interface views now preserve casts and identity, including
+inherited generic contracts; EquatableTo<string> round-trips run standalone
+([evidence](experiments/aot-console/string-interface-views-validation.json)).
+String interface method dispatch remains the next bounded gap.
 The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
