@@ -94,6 +94,57 @@ impl Query {
         }
     }
 }
+// Source-built runtime facades have real origins, unlike the legacy System adapter.
+// Skip only the known contiguous query wrappers in the same source module; ordinary
+// runtime-library callers and similarly named methods in other assemblies still count.
+pub(crate) fn executing_assembly<'a>(
+    module: &Module,
+    frames: impl Iterator<Item = &'a crate::metadata::Function>,
+) -> Option<String> {
+    let mut facade_scope: Option<(&str, &str)> = None;
+    for function in frames {
+        if let Some(origin) = &function.origin {
+            let owner = function
+                .owner
+                .as_ref()
+                .and_then(|ty| module.type_definition(ty))
+                .and_then(|ty| ty.origin.as_ref());
+            let facade = owner.is_some_and(|owner| {
+                owner.assembly == origin.assembly
+                    && owner.module == origin.module
+                    && function.parameters.is_empty()
+                    && matches!(
+                        (owner.name.as_str(), origin.name.as_str()),
+                        (
+                            "System.Runtime.CompilerServices.IntrospectionRuntimeServices",
+                            "ExecutingAssembly"
+                        ) | ("System.Runtime.RuntimeContext", "get_ExecutingAssembly")
+                    )
+            });
+            let scope = (origin.assembly.as_str(), origin.module.as_str());
+            if facade && facade_scope.is_none_or(|expected| expected == scope) {
+                facade_scope = Some(scope);
+                continue;
+            }
+            return Some(origin.assembly.clone());
+        }
+        let Some(id) = &function.definition else {
+            continue;
+        };
+        if id.module == "System" {
+            continue; // Legacy library facade and generated adapters lack source origins.
+        }
+        if let Some(assembly) = module
+            .assemblies
+            .iter()
+            .find(|a| a.modules.contains(&id.module))
+        {
+            return Some(assembly.full_name.clone());
+        }
+    }
+    None
+}
+
 pub(crate) fn lookup<'a>(
     module: &'a Module,
     identity: &str,
@@ -128,5 +179,65 @@ fn belongs(
         definition.definition.as_ref().is_some_and(|id| {
             assembly.modules.contains(&id.module) && selected_module.is_none_or(|m| m == id.module)
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::metadata::Function;
+
+    fn origin(assembly: &str, name: &str) -> crate::metadata_origin::MetadataOrigin {
+        serde_json::from_value(serde_json::json!({
+            "assembly": assembly, "module": "Shared.dll", "name": name, "token": 1
+        }))
+        .unwrap()
+    }
+
+    #[test]
+    fn executing_assembly_skips_scoped_source_facades_not_real_library_callers() {
+        let mut module = crate::assemble(".module App\n.type Service\n.end\n.type Context\n.end\n.type ForeignContext\n.end\n.function Stub() -> Int32\nldc.i4 0\nret\n.end").unwrap();
+        module.types[0].origin = Some(origin(
+            "Runtime",
+            "System.Runtime.CompilerServices.IntrospectionRuntimeServices",
+        ));
+        module.types[1].origin = Some(origin("Runtime", "System.Runtime.RuntimeContext"));
+        module.types[2].origin = Some(origin("Other", "System.Runtime.RuntimeContext"));
+        let make = |owner: Option<&str>, assembly: &str, name: &str| {
+            let mut f: Function = module.functions[0].clone();
+            f.owner = owner.map(Type::from_name);
+            f.origin = Some(origin(assembly, name));
+            f
+        };
+        let service = make(Some("Service"), "Runtime", "ExecutingAssembly");
+        let getter = make(Some("Context"), "Runtime", "get_ExecutingAssembly");
+        let app = make(None, "Application", "Main");
+        let dependency = make(None, "Dependency", "ReadContext");
+        let runtime_caller = make(None, "Runtime", "OrdinaryLibraryFunction");
+        for (caller, expected) in [
+            (&app, "Application"),
+            (&dependency, "Dependency"),
+            (&runtime_caller, "Runtime"),
+        ] {
+            assert_eq!(
+                executing_assembly(&module, [&service, &getter, caller, &app].into_iter())
+                    .as_deref(),
+                Some(expected)
+            );
+        }
+        // A similarly named caller in another assembly cannot be swallowed by the facade scan.
+        let foreign = make(Some("ForeignContext"), "Other", "get_ExecutingAssembly");
+        assert_eq!(
+            executing_assembly(&module, [&service, &foreign, &app].into_iter()).as_deref(),
+            Some("Other")
+        );
+        assert_eq!(
+            executing_assembly(&module, [&app].into_iter()).as_deref(),
+            Some("Application")
+        );
+        assert_eq!(
+            executing_assembly(&module, [&service, &getter].into_iter()),
+            None
+        );
     }
 }

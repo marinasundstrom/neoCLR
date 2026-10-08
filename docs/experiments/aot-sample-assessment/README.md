@@ -450,3 +450,17 @@ including expected output and cleanup. [Validation](../../../benchmarks/native-w
 and [contract/limits](../../path.md#native-compilation-poc-2026-10-08) retain the evidence.
 The table above remains the pre-fix assessment. File text services, Math lookup,
 introspection and jagged arrays remain separate work; no full corpus rerun is claimed.
+
+## Source-built introspection caller correction (2026-10-08)
+
+Both unexpected interpreter failures are now fixed: the same library-assembly-info
+and library-introspection-tour samples complete and report their application assembly.
+The root cause was ExecutingAssembly stopping at a source-origin-bearing runtime
+wrapper. The corrected walk skips only the scoped query facade chain, retaining real
+library/dependency callers. Missing references remain explicit faults.
+[Focused two-sample recheck](introspection-fixed.json) includes compiler/bundle/runtime
+hashes and commands. AOT still rejects RuntimeTypeHandle; this removes an interpreter
+regression, not the native reflection boundary. The historical survey is unchanged.
+The [Double slice](../aot-double/README.md) also closes the Math constants blocker.
+Next bounded AOT candidates remain explicit file services or jagged-array storage;
+bootstrap qualification remains a separate release gate.

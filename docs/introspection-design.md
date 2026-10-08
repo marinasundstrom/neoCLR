@@ -695,3 +695,31 @@ new origin fields. General method invocation and field assignment remain future 
 The 2026-09-27 development slice adds `ConstructorInfo` and declared-constructor
 queries to the descriptive model. Execution remains in separate Reflection
 extensions; see [the current member contract](reflection-members.md).
+
+### Source-built ExecutingAssembly correction — 2026-10-08
+
+The source-built library gives the runtime query wrappers real source origins.
+The interpreter previously selected the innermost wrapper's System.Runtime origin,
+rather than the application/dependency caller, then attempted to enumerate the
+runtime library's unavailable bootstrap reference. Both library-assembly-info and
+library-introspection-tour failed as a consequence.
+
+The frame walk now recognizes the scoped IntrospectionRuntimeServices.ExecutingAssembly
+and RuntimeContext.get_ExecutingAssembly wrappers by declaring-type/member origins,
+and skips the contiguous wrappers from that same assembly/module. It retains ordinary
+runtime-library callers, dependency callers and foreign assemblies with similarly
+named members. The existing originless System-adapter fallback remains. This restores
+the documented caller contract; it adds no loading operation, name-only dependency
+resolution, or new assembly identity rule. The .NET executing-versus-entry-assembly
+comparison above remains the baseline. This bounded wrapper recognition must be
+revisited if future runtime suspension/inlining changes the logical caller frames.
+
+Both unchanged samples now complete interpreted; [focused evidence](experiments/aot-sample-assessment/introspection-fixed.json)
+retains exact inputs and commands. AOT still rejects RuntimeTypeHandle before emitting
+an object. Shared source provenance remains useful to future backends, but native
+introspection is not implemented or claimed here. Missing catalog references still
+fault explicitly under the current loaded-catalog API contract.
+
+Validation also retains two legacy executing-assembly controls and the loaded-catalog
+missing-reference/array-limit control. The scoped-frame test covers application,
+dependency, ordinary runtime-library and foreign same-name callers. All pass.

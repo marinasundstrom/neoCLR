@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Correct interpreted ExecutingAssembly for source-built runtime facades: skip the
+  scoped query wrappers and report the nearest real source caller, including callers
+  in dependency/runtime assemblies. The two previously failing assembly/introspection
+  samples now complete. Legacy discovery and missing-reference faults remain; AOT
+  introspection still rejects RuntimeTypeHandle and is not added by this fix.
+
 - Lower a bounded Double instruction profile in ARM64 AOT: literals, typed storage,
   calls, add/sub/mul/div and ordered/unordered comparisons and branches. Preserve
   binary64 lanes, signed zero and NaN behavior; Double values are not GC roots.

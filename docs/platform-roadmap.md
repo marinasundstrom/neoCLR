@@ -27,12 +27,13 @@ now preserves the exact backing specialization independently of discovery order,
 does not imply general array views or covariance. Following the [next-fix reassessment](experiments/aot-sample-assessment/README.md#reassessment-after-reference-array-views-2026-10-08),
 [lexical path bindings](path.md#native-compilation-poc-2026-10-08) now pass the unchanged
 Raven sample in all three modes. [Math target lookup](math.md#source-runtime-bootstrap-ownership-2026-10-08)
-is corrected by removing competing bootstrap declarations; shared introspection faults
-remain a next priority, and bootstrap remains a release gate. Author-requested [Math constants](math.md#assembly-level-constants-development-2026-10-08)
+is corrected by removing competing bootstrap declarations. The [source-facade caller fix](introspection-design.md#source-built-executingassembly-correction--2026-10-08)
+now closes both unexpected interpreter introspection failures; bootstrap remains a release gate. Author-requested [Math constants](math.md#assembly-level-constants-development-2026-10-08)
 now use finite Double assembly-level metadata and compile-time inlining. Their interpreter
 consumer and native/standalone runs now pass after [bounded Double lowering](experiments/aot-double/README.md).
-Remaining floating instructions and Math services are explicit gaps; shared introspection
-faults and bootstrap qualification remain the next release priorities.
+Remaining floating instructions and Math services are explicit gaps. Bootstrap qualification
+remains a release priority; the next sample-driven AOT candidates are file services and
+jagged arrays, while RuntimeTypeHandle introspection remains excluded.
 The wider audit also found the handwritten legacy union bridge's `IUnion`; it now
 uses `UnionValue`, with regenerated fragments and executable union/time checks. This does not change the bootstrap release gate or promise
 runtime suspension, JIT, reflection or stable callback ABI support.

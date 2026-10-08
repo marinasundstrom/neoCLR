@@ -211,3 +211,8 @@ Single, conversions and floating Math services remain gaps. The
 [tested sample](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/raven-target/samples/library-math-constants.rvn)
 uses qualified and wildcard imports. Assembly-level constant metadata currently supports
 finite Double values; rebuild compiler/runtime bundles together. This remains work in progress.
+
+The two unexpected interpreter introspection failures in the development sample
+assessment are fixed: source-built runtime wrappers now preserve the application
+caller for ExecutingAssembly. Native RuntimeTypeHandle/introspection support remains
+outside this bounded AOT baseline.

@@ -2509,20 +2509,10 @@ fn interpret_instructions_with_dispatch(
 
         let executing_assembly = if matches!(op, Op::Call(target) if target.name == "neoCLR.Runtime.ExecutingAssembly")
         {
-            frames.iter().rev().find_map(|frame| {
-                if let Some(origin) = &frame.function.origin {
-                    return Some(origin.assembly.clone());
-                }
-                let id = frame.function.definition.as_ref()?;
-                if id.module == "System" {
-                    return None; // Skip the library facade and its generated adapters.
-                }
-                module
-                    .assemblies
-                    .iter()
-                    .find(|a| a.modules.contains(&id.module))
-                    .map(|a| a.full_name.clone())
-            })
+            crate::assembly_info::executing_assembly(
+                module,
+                frames.iter().rev().map(|frame| frame.function.as_ref()),
+            )
         } else {
             None
         };
