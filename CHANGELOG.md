@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add private bounded native GC host root handles with explicit replacement/release,
+  context/thread lookup and entry-reset guards. Validate retention, reclamation, stale
+  handles, quotas and compiled entry behavior. GC-enabled native objects require the
+  matching entry-check helper; asynchronous callback/socket execution remains WIP.
+
 - Record a future HttpMethod abstraction proposal, including custom-token validation,
   case semantics and migration questions. No public API or HTTP capability changes.
 

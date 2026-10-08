@@ -1,5 +1,6 @@
 #include "native-gc.h"
 #include <string.h>
+#include <stdatomic.h>
 /* Allocation descriptors live in the same bounded buffer as payloads. Free
  * blocks coalesce; payload addresses never move. Object words are conservative
  * candidates; text/byte payloads are atomic, String arrays have explicit slots. */
@@ -23,6 +24,77 @@ static int blocks_valid(const neoclr_aot_text_arena *a) {
         at += b->span;
     }
     return 1;
+}
+typedef struct host_root {
+    neoclr_aot_context *context;
+    void *value;
+    uint64_t handle;
+    struct host_root *previous, *next;
+} host_root;
+static _Thread_local host_root host_roots[NEOCLR_GC_HOST_ROOT_LIMIT];
+static _Thread_local host_root *host_head;
+static _Atomic uint64_t next_host_handle = 1;
+static int live_base(const neoclr_aot_text_arena *arena, const void *value) {
+    if (!value) return 1;
+    for (uint64_t at = 0; at < arena->used;) {
+        const block *b = (const void *)(arena->data + at);
+        if ((b->state & ALLOCATED) && value == (const void *)(b + 1)) return 1;
+        at += b->span;
+    }
+    return 0;
+}
+static host_root *find_host_root(neoclr_aot_context *context, uint64_t handle) {
+    if (!context || !handle) return NULL;
+    for (host_root *root = host_head; root; root = root->next)
+        if (root->context == context && root->handle == handle) return root;
+    return NULL;
+}
+int32_t neoclr_gc_host_root_create_v1(neoclr_aot_context *context, void *value, uint64_t *output) {
+    if (!context || !output || !blocks_valid(&context->text) || !live_base(&context->text, value))
+        return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    host_root *available = NULL;
+    for (uint32_t i = 0; i < NEOCLR_GC_HOST_ROOT_LIMIT; i++)
+        if (!host_roots[i].context) { available = &host_roots[i]; break; }
+    if (!available) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    uint64_t handle = atomic_load_explicit(&next_host_handle, memory_order_relaxed);
+    do {
+        if (handle == UINT64_MAX) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    } while (!atomic_compare_exchange_weak_explicit(&next_host_handle, &handle, handle + 1,
+                memory_order_relaxed, memory_order_relaxed));
+    *available = (host_root){context, value, handle, NULL, host_head};
+    if (host_head) host_head->previous = available;
+    host_head = available;
+    *output = handle;
+    return 0;
+}
+int32_t neoclr_gc_host_root_replace_v1(neoclr_aot_context *context, uint64_t handle, void *value) {
+    host_root *root = find_host_root(context, handle);
+    if (!root || !blocks_valid(&context->text) || !live_base(&context->text, value)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    root->value = value;
+    return 0;
+}
+int32_t neoclr_gc_host_root_read_v1(neoclr_aot_context *context, uint64_t handle, void **output) {
+    host_root *root = find_host_root(context, handle);
+    if (!root || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    *output = root->value;
+    return 0;
+}
+int32_t neoclr_gc_host_root_release_v1(neoclr_aot_context *context, uint64_t handle) {
+    host_root *root = find_host_root(context, handle);
+    if (!root) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (root->previous) root->previous->next = root->next;
+    else host_head = root->next;
+    if (root->next) root->next->previous = root->previous;
+    *root = (host_root){0};
+    return 0;
+}
+int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context) {
+    if (!context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    for (host_root *root = host_head; root; root = root->next)
+        if (root->context == context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    for (const neoclr_probe_frame *frame = neoclr_root_probe_head_v1(); frame; frame = frame->previous)
+        if (frame->context == context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    return 0;
 }
 int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
                              uint32_t kind, void **output) {
@@ -82,6 +154,8 @@ static void mark_slots(neoclr_aot_text_arena *a, const neoclr_probe_storage *slo
 int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head) {
     if (!context || !blocks_valid(&context->text)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     neoclr_aot_text_arena *a = &context->text;
+    for (host_root *root = host_head; root; root = root->next)
+        if (root->context == context && !live_base(a, root->value)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     neoclr_probe_storage fault[65];
     int32_t count = neoclr_probe_fault_roots_v1(context, fault, 65);
     if (count < 0) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -90,6 +164,8 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
     }
     block *pending = NULL;
     mark_slots(a, fault, (uint32_t)count, &pending);
+    for (host_root *root = host_head; root; root = root->next)
+        if (root->context == context) mark(a, (uintptr_t)root->value, &pending);
     for (const neoclr_probe_frame *f = head; f; f = f->previous) {
         if (f->context != context) continue;
         mark_slots(a, f->storage, f->storage_count, &pending);

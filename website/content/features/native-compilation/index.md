@@ -96,7 +96,9 @@ an advantage over it; useful comparisons require equivalent behavior and measure
   socket accept/read/write paths still need admission and native service support. Interpreter API availability does not imply AOT availability.
 - **Memory:** the opt-in collector is nonmoving and conservatively scans object payloads.
   It can retain extra objects, fragment its bounded buffer and collect too frequently.
-  Precise maps, pressure scheduling and general host root handles remain open.
+  Private host root handles now retain allocations across guest frame returns, with
+  explicit release and entry-reset checks. Async callback dispatch remains open, as
+  do precise maps, pressure scheduling and general hosting handles.
 - **Faults:** tested paths preserve fault codes, messages and managed stack traces.
   This does not yet qualify every server disconnect, cancellation or cleanup path.
 - **Deployment:** required support is linked into tested images, but OS dependencies

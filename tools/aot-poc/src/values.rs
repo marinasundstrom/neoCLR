@@ -1531,6 +1531,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         }
         module.define_function(ids[i], &mut context)?;
     }
+    let entry_check = if details.is_some_and(|d| d.native_gc) {
+        let mut signature = module.make_signature();
+        signature.params.push(AbiParam::new(types::I64));
+        signature.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_gc_entry_check_v1", Linkage::Import, &signature)?)
+    } else { None };
     // Only the stable experiment C entry is exported. Private aggregate signatures
     // are intentionally not a public ARM64 struct ABI.
     let mut context = module.make_context();
@@ -1552,6 +1558,19 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         b.switch_to_block(entry);
         let params = b.block_params(entry).to_vec();
         if details.is_some() { crate::fault_details::reset(&mut b, params[2]); }
+        if let Some(check) = entry_check {
+            let check = module.declare_func_in_func(check, b.func);
+            let call = b.ins().call(check, &[params[2]]);
+            let status = b.inst_results(call)[0];
+            let rejected = b.create_block();
+            let admitted = b.create_block();
+            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+            b.ins().brif(failed, rejected, &[], admitted, &[]);
+            b.switch_to_block(rejected);
+            b.ins().store(MemFlags::new(), status, params[2], 0);
+            b.ins().return_(&[status]);
+            b.switch_to_block(admitted);
+        }
         if text_arena {
             // Reset only the cursor; capacity/data belong to the host. Previous
             // dynamic text, including fault messages, expires on this next call.

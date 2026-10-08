@@ -180,3 +180,55 @@ needs allocation-size/pressure information at safe boundaries: skipping collecti
 because no allocation happened since the previous one can miss newly dead roots and cause
 avoidable exhaustion. Allocation services still must not collect with unpublished temporary
 references. Precise object maps and pressure scheduling remain the next contract work.
+
+## Host-held strong roots (2026-10-08)
+
+The private C hosting experiment now provides create/replace/read/release operations
+for strong roots, ahead of asynchronous socket completion. A host can retain an
+allocation after its submitting guest frame leaves; the collector traces that allocation
+and its reachable graph. Replacing or releasing a handle removes that edge for the next
+collection. Null is allowed and still requires explicit release. This does not yet
+provide callback invocation, task pumping or asynchronous socket services.
+
+The comparison is .NET's [normal GCHandle](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.gchandletype?view=net-10.0)
+(reviewed 2026-10-08), which retains an object held only by unmanaged code. The current
+neoCLR heap does not move, so these private handles can return an allocation address;
+this is not a pinning API or a stable ABI promise for a future moving collector. Keeping
+roots in expired guest stack frames is invalid. A host registry makes ownership explicit
+at the cost of required cleanup and possible retention leaks. No interpreter GC change
+is needed for this native-host prerequisite.
+
+The bounded contract is intentionally narrow:
+
+- 256 handles per native thread, shared by its contexts; no malloc. IDs come from a
+  process-wide monotonic atomic counter and are never reused. Quota/ID exhaustion returns
+  NativeMemoryLimit (5). Invalid handles/arguments return RuntimeError (3).
+- Only null or a live, untagged allocation base from that context is accepted. Interior
+  addresses, tagged String views and image literals are rejected. Operations neither
+  allocate nor collect; failure leaves output parameters unchanged.
+- Handle lookup checks context and the creating thread's registry. This is not general
+  context thread-ownership enforcement: callers must not transfer a context/buffer to
+  another thread or destroy them while handles exist. Worker threads must post completion
+  tokens back to the owning thread; they cannot execute guest code or collect its heap.
+- Native GC entry checks run before heap reset, rejecting live handles (including null
+  handles) or active guest frames for that context. Rejection sets fault code 3 without
+  publishing a result or clearing the heap; ordinary entry fault reset still occurs.
+  Release all handles before another entry. Context/result/buffer and host output storage
+  must obey the existing non-overlap/lifetime requirements.
+
+Registration validates the heap and scans allocation bases. Lookup and collection visit
+an active linked list, avoiding a 256-slot scan on each collection when no handles exist.
+Address validation/marking remains linear in heap blocks per root; the registry is not a
+performance optimization. Measure populated-root cost when the asynchronous consumer
+establishes a representative workload. General weak/pinned handles, teardown automation,
+thread transfer and moving-collector integration remain open.
+
+Focused validation on macOS ARM64 with the explicit Xcode SDK: all five `native_gc`
+integration tests pass, including sanitized `host-roots-test.c`; the compiled
+`native_gc_entry_rejects_live_host_handles_before_heap_reset` test and existing
+`native_reference_arrays_preserve_identity_owners_and_faults` test pass. Coverage includes
+parent/child retention with no guest frames, replacement/reclamation, null handles,
+invalid/interior/freed pointers, stale/wrong-context/foreign-thread handles, globally
+distinct tokens, pool exhaustion, out-of-order release, entry reset and buffer canaries.
+These are correctness checks, not HTTP benchmark results. Generated GC-enabled objects
+now require the matching `neoclr_gc_entry_check_v1` C helper when linking.

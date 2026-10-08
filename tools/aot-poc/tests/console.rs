@@ -3620,3 +3620,52 @@ fn native_reference_arrays_reject_default_creation_borrows_and_wrong_elements() 
         assert!(message.contains("unsupported value instruction") || message.contains("element borrows") || message.contains("Fault:"), "{message}");
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_gc_entry_rejects_live_host_handles_before_heap_reset() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = ".module App\n.function Calculate() -> Int32\nldc.i4 42\nret\n.end";
+    let r = compile_source(&dir, &seed, source,
+        &["--compile-system", "--reference-arena", "--native-gc"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+#define CHECK(x) do { if (!(x)) return __LINE__; } while (0)
+int main(void) {
+    uint64_t buffer[129] = {0}; buffer[128] = 1234567;
+    neoclr_aot_context ctx = {.text = {(unsigned char *)buffer, 1024, 0}};
+    void *object = NULL, *read = NULL;
+    CHECK(!neoclr_gc_allocate_v1(&ctx.text, 16, NEOCLR_GC_OBJECT, &object));
+    ((uint64_t *)object)[1] = 77;
+    uint64_t handle = 0, used = ctx.text.used;
+    CHECK(!neoclr_gc_host_root_create_v1(&ctx, object, &handle));
+    int32_t result = -99;
+    CHECK(neoclr_entry_v4(0, &result, &ctx) == 3);
+    CHECK(result == -99 && ctx.fault.code == 3 && ctx.text.used == used);
+    CHECK(!neoclr_gc_host_root_read_v1(&ctx, handle, &read) && read == object);
+    CHECK(!neoclr_gc_collect_v1(&ctx, NULL) && ((uint64_t *)object)[1] == 77);
+    CHECK(!neoclr_gc_host_root_release_v1(&ctx, handle));
+    CHECK(!neoclr_entry_v4(0, &result, &ctx) && result == 42 && !ctx.fault.code);
+    CHECK(!ctx.text.used && !neoclr_root_probe_depth_v1());
+    CHECK(!neoclr_gc_host_root_create_v1(&ctx, NULL, &handle));
+    result = -99;
+    CHECK(neoclr_entry_v4(0, &result, &ctx) == 3 && result == -99);
+    CHECK(!neoclr_gc_host_root_release_v1(&ctx, handle));
+    CHECK(!neoclr_entry_v4(0, &result, &ctx) && result == 42 && !ctx.fault.code);
+    CHECK(buffer[128] == 1234567);
+    return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(dir.0.join("host.c"))
+        .arg(base.join("root-probe.c")).arg(base.join("native-gc.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host"))
+        .output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
+    assert!(r.status.success(), "{r:?}");
+}

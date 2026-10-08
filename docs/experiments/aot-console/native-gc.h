@@ -8,6 +8,19 @@ enum { NEOCLR_GC_TEXT = 1, NEOCLR_GC_OBJECT = 2, NEOCLR_GC_BYTES = 3, NEOCLR_GC_
 typedef struct {
     uint64_t collections, allocations, reclaimed_allocations, reclaimed_bytes;
 } neoclr_gc_statistics;
+/* Private thread-affine strong handles for future host-held callbacks/buffers.
+ * Context, buffer and creating thread must remain alive until every handle is released.
+ * Only null or an untagged live allocation base in that context is admitted.
+ * No allocation/collection/reentry occurs in these operations; outputs are atomic on failure.
+ * Limits are per native thread, shared across contexts. Handles are never reused.
+ * This does not permit cross-thread context use or extend an entry/arena lifetime. */
+#define NEOCLR_GC_HOST_ROOT_LIMIT 256
+int32_t neoclr_gc_host_root_create_v1(neoclr_aot_context *context, void *value, uint64_t *output);
+int32_t neoclr_gc_host_root_replace_v1(neoclr_aot_context *context, uint64_t handle, void *value);
+int32_t neoclr_gc_host_root_read_v1(neoclr_aot_context *context, uint64_t handle, void **output);
+int32_t neoclr_gc_host_root_release_v1(neoclr_aot_context *context, uint64_t handle);
+/* Entry reset is forbidden while this thread holds roots or guest frames for the context. */
+int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context);
 /* Allocation never collects; output is published only on success. */
 int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *arena, uint64_t bytes,
                              uint32_t kind, void **output);
