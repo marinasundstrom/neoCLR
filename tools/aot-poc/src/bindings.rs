@@ -416,6 +416,10 @@ pub fn socket_transfer(input: &mut neoclr::Module, selection: &Value) -> Result<
             Some("neoCLR.Runtime.SocketReceive") => (vec![Type::Int64, Type::ArrayRef(Box::new(Type::Byte)), Type::Int32, Type::Int32, neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature")], Type::Value, "socket-receive-v1", "neoclr_socket_receive_v1"),
             Some("neoCLR.Runtime.SocketSend") => (vec![Type::Int64, Type::ArrayRef(Box::new(Type::Byte)), Type::Int32, Type::Int32, neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature")], Type::Value, "socket-send-v1", "neoclr_socket_send_v1"),
             Some("neoCLR.Runtime.SocketTransferResult") => (vec![Type::Int64], Type::Value, "socket-transfer-result-v1", "neoclr_socket_transfer_result_v1"),
+            Some("neoCLR.Runtime.SocketDeadlineAfter") => (vec![Type::Int32], Type::Int64, "socket-deadline-after-v1", "neoclr_socket_deadline_after_v1"),
+            Some("neoCLR.Runtime.SocketDeadlineExpired") => (vec![Type::Int64], Type::Boolean, "socket-deadline-expired-v1", "neoclr_socket_deadline_expired_v1"),
+            Some("neoCLR.Runtime.SocketReceiveUntil") => (vec![Type::Int64, Type::ArrayRef(Box::new(Type::Byte)), Type::Int32, Type::Int32, Type::Int64, neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature")], Type::Value, "socket-receive-until-v1", "neoclr_socket_receive_until_v1"),
+            Some("neoCLR.Runtime.SocketSendUntil") => (vec![Type::Int64, Type::ArrayRef(Box::new(Type::Byte)), Type::Int32, Type::Int32, Type::Int64, neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature")], Type::Value, "socket-send-until-v1", "neoclr_socket_send_until_v1"),
             _ => continue,
         };
         let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
@@ -430,6 +434,7 @@ pub fn socket_transfer(input: &mut neoclr::Module, selection: &Value) -> Result<
         { return Err("native socket transfer binding requires exact reserved Receive/Send/TransferResult InternalCall contract".into()); }
         f.impl_flags = 0;
         f.body = if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
+            else if result == Type::Int64 { vec![Op::Int64(0), Op::Return] }
             else { vec![Op::Void, Op::PackValue(Type::Void), Op::Return] };
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
             "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
@@ -488,5 +493,35 @@ mod identity_tests {
         assert_eq!(object_reference_equals(&mut source, &inventory).unwrap().len(), 1);
         assert_eq!(source.functions[0].impl_flags, 0);
         assert!(matches!(source.functions[0].body[2], Op::ReferenceEqual));
+    }
+}
+
+#[cfg(test)]
+mod deadline_tests {
+    use super::*;
+    #[test]
+    fn deadlines_require_exact_reserved_signatures_and_internal_bodies() {
+        for (name, signature) in [
+            ("SocketDeadlineAfter", "Int32 milliseconds) -> Int64"),
+            ("SocketDeadlineExpired", "Int64 deadline) -> Boolean"),
+            ("SocketReceiveUntil", "Int64 socket, arrayref<Byte> buffer, Int32 offset, Int32 count, Int64 deadline, fn<Void> callback) -> Value"),
+            ("SocketSendUntil", "Int64 socket, arrayref<Byte> buffer, Int32 offset, Int32 count, Int64 deadline, fn<Void> callback) -> Value"),
+        ] {
+            let source = neoclr::assemble(&format!(".module Contract\n.function neoCLR.Runtime.{name}({signature}\n.methodimpl InternalCall\n.end")).unwrap();
+            let inventory = json!({"functions":[{"name":format!("neoCLR.Runtime.{name}"),"compiledIndex":0}]});
+            for change in 0..6 {
+                let mut input = source.clone();
+                match change {
+                    0 => input.functions[0].impl_flags = 0,
+                    1 => input.functions[0].body = vec![Op::Void, Op::Return],
+                    2 => input.functions[0].parameters[0] = Type::String,
+                    3 => input.functions[0].returns = Type::Void,
+                    4 => input.functions[0].no_result = true,
+                    _ => input.functions[0].out_parameters = vec![0],
+                }
+                assert!(socket_transfer(&mut input, &inventory).is_err(), "{name}: mutation {change}");
+            }
+            assert_eq!(socket_transfer(&mut source.clone(), &inventory).unwrap().len(), 1);
+        }
     }
 }

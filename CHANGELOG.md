@@ -14,7 +14,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   neoclr_socket_poll_v1 and require the matching text adapter. Sanitized kernel and
   compiled-accept regressions pass. Bind exact CIL transfer services and validate a
   callback-driven native echo with GC between completions; full Raven Server admission
-  next reaches SocketDeadlineAfter. Public HTTP execution remains incomplete.
+  next reaches SocketDeadlineAfter. Add exact shared-deadline bindings with monotonic
+  stamps, expiry-before-submission and no budget refresh across transfers; validate
+  native kernel and compiled echo paths. Admission now reaches StringCompareOrdinal.
+  Public HTTP execution remains incomplete.
 
 - Add a private nonblocking native accept kernel with retained completion roots,
   deferred single delivery, cancellation/result consumption and scope cleanup. Validate

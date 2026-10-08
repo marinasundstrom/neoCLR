@@ -24,6 +24,11 @@ pub struct Options {
     pub socket_cancel: Vec<usize>,
     pub socket_receive: Vec<usize>,
     pub socket_send: Vec<usize>,
+    pub socket_deadline_after: Vec<usize>,
+    pub socket_deadline_expired: Vec<usize>,
+    pub socket_receive_until: Vec<usize>,
+    pub socket_send_until: Vec<usize>,
+
     pub socket_transfer_result: Vec<usize>,
     pub parse_int32: Vec<usize>,
     pub int32_to_string: Vec<usize>,
@@ -94,6 +99,18 @@ impl Options {
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             socket_cancel: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "socket-cancel-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            socket_deadline_after: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-deadline-after-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            socket_deadline_expired: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-deadline-expired-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            socket_receive_until: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-receive-until-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            socket_send_until: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-send-until-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             socket_receive: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "socket-receive-v1")

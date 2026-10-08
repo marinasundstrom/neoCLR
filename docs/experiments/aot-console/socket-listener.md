@@ -179,3 +179,28 @@ The focused binding test rejects missing/duplicate/GC-less options and managed i
 for all three services. This is an executable CIL consumer, not yet the Raven Socket or
 HttpServer public API. Full Server admission next reaches SocketDeadlineAfter;
 [recorded admission](../../../benchmarks/native-web/transfer-admission.json).
+
+## Shared deadline bindings — 2026-10-08
+
+The transfer opt-in also binds exact DeadlineAfter, DeadlineExpired, ReceiveUntil and
+SendUntil services. Stamps use process-local monotonic milliseconds from a lazily
+initialized shared origin, with upward rounding when creating a budget. They are not
+wall-clock timestamps, persisted IDs or values transferable to another executable.
+Creation admits 1..60,000 milliseconds, as in the interpreter. Stamp zero is expired;
+negative and native nanosecond-overflowing stamps fault atomically. The native adapter's
+finite nanosecond representation is a temporary bound, not a public time contract.
+
+A shared request deadline is never refreshed by a new transfer: each operation takes
+the earlier of that deadline and its own five-second limit. An already-expired request
+rejects submission, including empty transfers, before reading send contents. Once an
+outcome is committed, delayed delivery does not change it. This preserves the existing
+HTTP request-budget design instead of introducing a separate timeout for each packet.
+No new public timeout API or scheduling policy is selected.
+
+Focused validation covers range/negative/overflow and unchanged outputs, zero expiry,
+expired empty and uninitialized-send submission, identical effective deadlines across
+receive/send using one stamp, and a compiled echo through all four bindings. Exact
+contract unit tests reject signature/body/flag/output mismatches. The echo test validates
+marshalling; the kernel test checks shared-budget identity and expiry without sleeps.
+Full Server now passes deadline services and reaches the linked StringCompareOrdinal
+service; [admission evidence](../../../benchmarks/native-web/deadline-admission.json).

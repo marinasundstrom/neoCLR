@@ -41,6 +41,12 @@ int32_t neoclr_socket_receive_v1(uint64_t socket, void *buffer, int32_t offset, 
 int32_t neoclr_socket_send_v1(uint64_t socket, void *buffer, int32_t offset, int32_t count,
     void *callback, neoclr_aot_context *context, void *output);
 int32_t neoclr_socket_transfer_result_v1(uint64_t operation, neoclr_aot_context *context, void *output);
+int32_t neoclr_socket_deadline_after_v1(int32_t milliseconds, neoclr_aot_context *context, int64_t *output);
+int32_t neoclr_socket_deadline_expired_v1(int64_t stamp, neoclr_aot_context *context, int32_t *output);
+int32_t neoclr_socket_receive_until_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
+    int64_t stamp, void *callback, neoclr_aot_context *context, void *output);
+int32_t neoclr_socket_send_until_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
+    int64_t stamp, void *callback, neoclr_aot_context *context, void *output);
 /* Quiescent owner-thread poll: 0 no ready work, 1 publishes one retained callback
  * handle, -3 host misuse. Never invokes guest code. Consume result during dispatch;
  * scope teardown releases abandoned operations, roots and accepted sockets. */

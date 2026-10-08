@@ -1,0 +1,50 @@
+{
+  "baseRevision": "937a2b3eeb8c480b3e67d4543c2468af02d511f9",
+  "scope": "Raven Server native admission only",
+  "command": [
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+    "--inspect",
+    "/Users/robert/Projects/neoclr/target/native-host-callback-validation/Server.dll",
+    "@entry",
+    "--closed-world",
+    "--system",
+    "/private/tmp/string-builder-native1008d/System.runtime.neox",
+    "--module",
+    "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+    "--module",
+    "/private/tmp/string-builder-native1008d/System.Web.dll",
+    "--module",
+    "/private/tmp/string-builder-native1008d/System.Networking.dll",
+    "--module",
+    "/private/tmp/string-builder-native1008d/System.Data.dll",
+    "--object-root",
+    "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+    "--compile-system",
+    "--bind-user-fault",
+    "--reference-arena",
+    "--native-gc",
+    "--bind-int32-to-string",
+    "--bind-utf8-text",
+    "--bind-socket-listener",
+    "--bind-console-write-line",
+    "--bind-integer-text",
+    "--bind-socket-accept",
+    "--bind-socket-transfer"
+  ],
+  "admission": {
+    "accepted": false,
+    "firstError": "$aot_linked_342: unsupported value member contract",
+    "phase": "compilation"
+  },
+  "blockedFunction": {
+    "compiledIndex": 342,
+    "compiledName": "$aot_linked_342",
+    "definition": {
+      "index": 9,
+      "module": "System"
+    },
+    "name": "neoCLR.Runtime.StringCompareOrdinal",
+    "sourceIndex": 2699
+  },
+  "aotSha256": "aa690fad2a657885aad253fbb7f2a9a10e87c3b6d00de50a815ffd00109cbeaf"
+}

@@ -31,6 +31,43 @@ static uint64_t monotonic_ns(void) {
     if (clock_gettime(CLOCK_MONOTONIC, &now)) return 0;
     return (uint64_t)now.tv_sec * UINT64_C(1000000000) + (uint64_t)now.tv_nsec;
 }
+static _Atomic uint64_t network_origin;
+static uint64_t get_network_origin(uint64_t now) {
+    uint64_t origin = atomic_load_explicit(&network_origin, memory_order_relaxed);
+    if (!origin) {
+        atomic_compare_exchange_strong_explicit(&network_origin, &origin, now,
+            memory_order_relaxed, memory_order_relaxed);
+        if (!origin) origin = now;
+    }
+    return origin;
+}
+static int32_t deadline_ns(int64_t stamp, uint64_t *output) {
+    uint64_t now = monotonic_ns();
+    if (stamp < 0 || !now) return 3;
+    uint64_t origin = get_network_origin(now);
+    if ((uint64_t)stamp > (UINT64_MAX - origin) / UINT64_C(1000000)) return 3;
+    *output = origin + (uint64_t)stamp * UINT64_C(1000000);
+    return 0;
+}
+int32_t neoclr_socket_deadline_after_v1(int32_t milliseconds, neoclr_aot_context *context, int64_t *output) {
+    if (!context || !output || milliseconds < 1 || milliseconds > 60000) return 3;
+    uint64_t now = monotonic_ns();
+    if (!now) return 3;
+    uint64_t origin = get_network_origin(now);
+    now = monotonic_ns(); /* Origin may have been published by a later-sampling thread. */
+    if (!now || now < origin) return 3;
+    uint64_t elapsed = now - origin;
+    *output = (int64_t)(elapsed / UINT64_C(1000000) + (elapsed % UINT64_C(1000000) != 0) + (uint64_t)milliseconds);
+    return 0;
+}
+int32_t neoclr_socket_deadline_expired_v1(int64_t stamp, neoclr_aot_context *context, int32_t *output) {
+    uint64_t deadline;
+    if (!context || !output || deadline_ns(stamp, &deadline)) return 3;
+    uint64_t now = monotonic_ns();
+    if (!now) return 3;
+    *output = now >= deadline;
+    return 0;
+}
 #endif
 static neoclr_socket_scope *find_scope(neoclr_aot_context *context) {
     for (neoclr_socket_scope *s = head; s; s = s->previous) if (s->context == context) return s;
@@ -223,7 +260,7 @@ int32_t neoclr_socket_connect_result_v1(uint64_t operation, neoclr_aot_context *
 int32_t neoclr_socket_transfer_result_v1(uint64_t operation, neoclr_aot_context *context, void *output) {
     return take_result(operation, context, output, 0);
 }
-static int32_t transfer(int sending, uint64_t socket, void *array, int32_t offset, int32_t count,
+static int32_t transfer(int sending, uint64_t until, uint64_t socket, void *array, int32_t offset, int32_t count,
     void *callback, neoclr_aot_context *context, void *output) {
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !array || !callback || !output) return 3;
@@ -243,9 +280,10 @@ static int32_t transfer(int sending, uint64_t socket, void *array, int32_t offse
         return publish(output, 2, 3);
     while (op < 64 && scope->operations[op].state) op++;
     if (op == 64 || (uint64_t)count > UINT64_C(262144) - scope->transfer_bytes) return publish(output, 2, 4);
-    if (sending && neoclr_check_bytes_initialized_v1(array, offset, count)) return 3;
     uint64_t now = monotonic_ns(), id = new_operation_id(), root = 0, destination = 0;
     if (!now) return 3;
+    if (until && now >= until) return publish(output, 2, 10);
+    if (sending && neoclr_check_bytes_initialized_v1(array, offset, count)) return 3;
     if (!id) return publish(output, 2, 4);
     unsigned char *copy = count ? malloc((size_t)count) : NULL;
     if (count && !copy) return publish(output, 2, 4);
@@ -261,16 +299,29 @@ static int32_t transfer(int sending, uint64_t socket, void *array, int32_t offse
     scope->operations[op].state = 1; scope->operations[op].kind = kind;
     scope->operations[op].offset = (uint32_t)offset; scope->operations[op].count = (uint32_t)count;
     scope->operations[op].buffer = copy; scope->operations[op].deadline = now + UINT64_C(5000000000);
+    if (until && until < scope->operations[op].deadline) scope->operations[op].deadline = until;
     scope->transfer_bytes += (uint64_t)count;
     return publish(output, 5, id);
 }
 int32_t neoclr_socket_receive_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
     void *callback, neoclr_aot_context *context, void *output) {
-    return transfer(0, socket, array, offset, count, callback, context, output);
+    return transfer(0, 0, socket, array, offset, count, callback, context, output);
 }
 int32_t neoclr_socket_send_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
     void *callback, neoclr_aot_context *context, void *output) {
-    return transfer(1, socket, array, offset, count, callback, context, output);
+    return transfer(1, 0, socket, array, offset, count, callback, context, output);
+}
+int32_t neoclr_socket_receive_until_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
+    int64_t stamp, void *callback, neoclr_aot_context *context, void *output) {
+    uint64_t deadline;
+    if (deadline_ns(stamp, &deadline)) return 3;
+    return transfer(0, deadline, socket, array, offset, count, callback, context, output);
+}
+int32_t neoclr_socket_send_until_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
+    int64_t stamp, void *callback, neoclr_aot_context *context, void *output) {
+    uint64_t deadline;
+    if (deadline_ns(stamp, &deadline)) return 3;
+    return transfer(1, deadline, socket, array, offset, count, callback, context, output);
 }
 int32_t neoclr_socket_poll_v1(neoclr_aot_context *context, uint64_t *callback) {
     neoclr_socket_scope *scope = find_scope(context);

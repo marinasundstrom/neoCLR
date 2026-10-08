@@ -306,6 +306,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     let mut socket_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
+            (&d.socket_deadline_after, "neoclr_socket_deadline_after_v1", vec![types::I32, types::I64, types::I64]),
+            (&d.socket_deadline_expired, "neoclr_socket_deadline_expired_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.socket_receive_until, "neoclr_socket_receive_until_v1", vec![types::I64, types::I64, types::I32, types::I32, types::I64, types::I64, types::I64, types::I64]),
+            (&d.socket_send_until, "neoclr_socket_send_until_v1", vec![types::I64, types::I64, types::I32, types::I32, types::I64, types::I64, types::I64, types::I64]),
             (&d.socket_receive, "neoclr_socket_receive_v1", vec![types::I64, types::I64, types::I32, types::I32, types::I64, types::I64, types::I64]),
             (&d.socket_send, "neoclr_socket_send_v1", vec![types::I64, types::I64, types::I32, types::I32, types::I64, types::I64, types::I64]),
             (&d.socket_transfer_result, "neoclr_socket_transfer_result_v1", vec![types::I64, types::I64, types::I64]),
