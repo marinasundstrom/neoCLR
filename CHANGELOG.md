@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Allow native core PE/#Neo producers to reference their own core declarations with
+  local TypeDef handles instead of failing on an external self-dependency. Require
+  an authored Object root and reject missing local projection declarations; retain
+  executable CLI and foreign-identity guards. Add writer checks and a native-only
+  Raven core probe; compiler semantic initialization remains blocked at RAVT004,
+  so this is a bootstrap prerequisite, not a completed no-bridge target.
+
 - Record the supplied first-class module proposal verbatim and assess the author's
   clarifications that modules become namespaces and RuntimeContext should center on
   modules rather than assemblies. Separate exploratory ownership,

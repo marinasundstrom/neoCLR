@@ -14,7 +14,7 @@ public sealed partial class AssemblyBuilder
     private readonly Guid mvid = Guid.NewGuid();
     /// <summary>Creates an assembly builder with explicit core-library identity.</summary>
     /// <param name="identity">Unsigned assembly identity with no flags.</param>
-    /// <param name="coreLibrary">Core assembly supplying System.Object; no host core library is inferred.</param>
+    /// <param name="coreLibrary">Core assembly supplying System.Object; no host core library is inferred. May equal identity for native reference emission with an authored Object root and required local core declarations.</param>
     /// <exception cref="ArgumentNullException">Either identity is null.</exception>
     /// <exception cref="ArgumentException">Output identity requires signing or flags.</exception>
     public AssemblyBuilder(AssemblyIdentity identity, AssemblyIdentity coreLibrary)
@@ -345,6 +345,8 @@ public sealed partial class AssemblyBuilder
         if (!referenceOnly && assemblyConstants.Count != 0)
             throw new InvalidDataException("assembly-level constants require native emission");
         var methods = ValidateGraph(validateBodies: !referenceOnly);
+        if (CoreLibrary.Equals(Identity) && (!referenceOnly || NativeObjectRoot is null))
+            throw new InvalidDataException("self-owned core requires native reference emission with an authored Object root");
         if (!referenceOnly && (ExternalObjectRoot is not null || types.Any(t => t.Definition.IsNativeObjectRoot)))
             throw new InvalidDataException("native Object root requires native emission; CLI projection is reference-only");
         if (!referenceOnly && types.Any(t => t.IsClosedHierarchy))
@@ -371,19 +373,27 @@ public sealed partial class AssemblyBuilder
             }
             return handle;
         }
-        var enumBase = types.Any(t => t.IsEnum) ? metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("Enum")) : default;
-        var valueBase = types.Any(t => t.IsValueType) ? metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("ValueType")) : default;
-        var objectType = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("Object"));
+        var typeHandles = types.Select((type, index) => (type, handle: MetadataTokens.TypeDefinitionHandle(index + 2))).ToDictionary(p => p.type, p => p.handle);
+        EntityHandle CoreType(string ns, string name)
+        {
+            if (!CoreLibrary.Equals(Identity))
+                return metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString(ns), metadata.GetOrAddString(name));
+            var local = types.SingleOrDefault(t => t.Definition.DeclaringType is null && t.Namespace == ns && t.Name == name)
+                ?? throw new InvalidDataException("self-owned core requires local declaration: " + ns + "." + name);
+            return typeHandles[local];
+        }
+        var enumBase = types.Any(t => t.IsEnum) ? CoreType("System", "Enum") : default;
+        var valueBase = types.Any(t => t.IsValueType) ? CoreType("System", "ValueType") : default;
+        var objectType = CoreType("System", "Object");
         if (referenceOnly)
         {
-            var attributeType = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System.Runtime.CompilerServices"), metadata.GetOrAddString("ReferenceAssemblyAttribute"));
+            var attributeType = CoreType("System.Runtime.CompilerServices", "ReferenceAssemblyAttribute");
             var constructor = metadata.AddMemberReference(attributeType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 }));
             metadata.AddCustomAttribute(MetadataTokens.EntityHandle(0x20000001), constructor, metadata.GetOrAddBlob(new byte[] { 1, 0, 0, 0 }));
         }
         var handles = methods.Select((method, index) => (method, handle: MetadataTokens.MethodDefinitionHandle(index + 1))).ToDictionary(pair => pair.method, pair => pair.handle);
         var importedTypes = new Dictionary<TypeBuilder, TypeReferenceHandle>();
         var importedMethods = new Dictionary<MethodBuilder, MemberReferenceHandle>();
-        var typeHandles = types.Select((type, index) => (type, handle: MetadataTokens.TypeDefinitionHandle(index + 2))).ToDictionary(p => p.type, p => p.handle);
         var externalTypeHandles = new Dictionary<(AssemblyIdentity, string, string, ImportedTypeReference?), TypeReferenceHandle>();
         EntityHandle ImportedTypeHandle(ImportedTypeReference type)
         {
@@ -405,20 +415,20 @@ public sealed partial class AssemblyBuilder
             }
             return handle;
         }
-        var functionCarriers = new Dictionary<(int, bool), TypeReferenceHandle>();
-        TypeReferenceHandle FunctionCarrier(FunctionSignature shape)
+        var functionCarriers = new Dictionary<(int, bool), EntityHandle>();
+        EntityHandle FunctionCarrier(FunctionSignature shape)
         {
             int arity = shape.ParameterTypes.Count + (shape.NoResult ? 0 : 1);
             var key = (arity, shape.NoResult);
             if (!functionCarriers.TryGetValue(key, out var handle))
             {
                 var name = (shape.NoResult ? "Action" : "Func") + (arity == 0 ? "" : "`" + arity);
-                handle = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString(name));
+                handle = CoreType("System", name);
                 functionCarriers.Add(key, handle);
             }
             return handle;
         }
-        var primitiveTokens = new Dictionary<PrimitiveType, TypeReferenceHandle>();
+        var primitiveTokens = new Dictionary<PrimitiveType, EntityHandle>();
         var elementSpecs = new Dictionary<SignatureType, TypeSpecificationHandle>();
         int ElementToken(SignatureType type)
         {
@@ -436,12 +446,12 @@ public sealed partial class AssemblyBuilder
             var primitive = type.Primitive!.Value;
             if (!primitiveTokens.TryGetValue(primitive, out var handle))
             {
-                handle = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString(primitive.ToString()));
+                handle = CoreType("System", primitive.ToString());
                 primitiveTokens.Add(primitive, handle);
             }
             return MetadataTokens.GetToken(handle);
         }
-        TypeReferenceHandle selfMarker = default;
+        EntityHandle selfMarker = default;
         void EncodeType(SignatureTypeEncoder encoder, SignatureType type)
         {
             if (type.PointerElement is { } pointer)
@@ -453,7 +463,7 @@ public sealed partial class AssemblyBuilder
             if (type.IsSelf)
             {
                 if (!referenceOnly) throw new InvalidDataException("Self requires native emission; CLI projection is reference-only");
-                if (selfMarker.IsNil) selfMarker = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System.Runtime.CompilerServices"), metadata.GetOrAddString("Self"));
+                if (selfMarker.IsNil) selfMarker = CoreType("System.Runtime.CompilerServices", "Self");
                 encoder.Type(selfMarker, isValueType: true);
                 return;
             }

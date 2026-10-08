@@ -7889,3 +7889,25 @@ constants. Unlike GetTypes, the new GetMembers view excludes nested types becaus
 they keep a declaring-type owner. This makes ownership explicit to metadata tools;
 the cost is an additional view object per enumerated member and a bounded single-module
 implementation. No performance or complete CLR-reflection compatibility claim is made.
+
+
+## Self-owned native core emission (development, 2026-10-08)
+
+`AssemblyBuilder(identity, coreLibrary)` may now use the same identity for both when
+emitting a native PE/#Neo reference container through the builder overloads of
+`RuntimeAssemblyContainer.WriteBinary` or `WriteLibraryBinary`. Author an explicit
+`AddNativeObjectRoot()` and the core declarations required by the projection:
+`System.ValueType` for value types, `System.Enum` for enums, and
+`System.Runtime.CompilerServices.ReferenceAssemblyAttribute` for its reference marker.
+Callable carriers and Self signatures require their corresponding local declarations
+when used. The marker's parameterless constructor and valid base chain should be
+provided as in the [tested producer](../docs/experiments/native-core-bootstrap/Program.cs).
+
+Physical core references use local TypeDef handles, not an AssemblyRef to the output.
+Missing referenced local declarations or an absent native Object root raise
+`InvalidDataException`. `Write()` remains unsupported for this native core profile;
+ordinary external-core emission retains its existing contract. General foreign
+references colliding with output identity still reject. This is producer support,
+not a complete core profile validator, compiler bootstrap or executable CLI core.
+Raven's native-only consumer still stops at semantic initialization; see the
+[frontier and validation](../docs/experiments/native-core-bootstrap/README.md).

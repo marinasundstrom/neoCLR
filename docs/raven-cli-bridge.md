@@ -6986,3 +6986,17 @@ Validated compiler: Raven `codex/source-object-metadata-resolution` commit
 namespace/direct-member and portable-emitter prerequisites are not on Raven main;
 no new general main-line defect was demonstrated. The six independent modern-.NET
 namespace tests pass; no .NET Framework/NanoFramework execution was tested.
+
+
+## Native-only primitive-core frontier (2026-10-08)
+
+The [reduced native-core experiment](experiments/native-core-bootstrap/README.md)
+authors a core directly in native metadata, with local core references in the PE/#Neo
+reference projection. The metadata writer owns this correction; native semantics
+retain Object and primitive ownership without a translated C# declaration assembly.
+Raven `bc3c500e6` still initializes a DotNetMetadataSession before native references:
+a consumer supplied only NeoClrMetadataReference fails RAVT004. No CLI fallback was
+added and no consumer execution is claimed. A native semantic initialization contract,
+then catalog/driver/project integration, must replace this target bridge. Existing
+CLI Core.dll development bundles and their source-runtime checks remain applicable;
+they do not satisfy the no-bridge release gate. Compiler host .NET use is separate.

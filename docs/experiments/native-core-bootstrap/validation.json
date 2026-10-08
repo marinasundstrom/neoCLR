@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-08",
+  "scope": "Native self-core producer correction; compiler-only probe has an expected failure, no interpreter/AOT consumer execution.",
+  "compilerTestedRevision": "bc3c500e60d0ca2c3e3e36cc408260098e846cdb",
+  "compilerDocumentationRevision": "235f489f1",
+  "platform": "Darwin arm64",
+  "checks": [
+    {
+      "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --native-core",
+      "exitCode": 0,
+      "result": "PASS native self-core local definitions, primitive ownership, marker, deterministic output and rejection controls"
+    },
+    {
+      "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --no-build -- --object-roots",
+      "exitCode": 0,
+      "result": "PASS native Object root contracts"
+    },
+    {
+      "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --no-build",
+      "exitCode": 0,
+      "result": "165/165 existing C# metadata contract tests passed; dedicated new test passed separately and subsequently registered in the default suite."
+    },
+    {
+      "command": "python3 scripts/build-api-docs.py --check",
+      "exitCode": 0,
+      "result": "Checked RavenDoc reference assembly and source fingerprints"
+    },
+    {
+      "command": "dotnet run --project docs/experiments/native-core-bootstrap/Probe.csproj -p:RavenRoot=/Users/robert/Projects/Raven -p:NeoClrMetadataProject=/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj -p:WarningLevel=0 -- /tmp/native-core-1008d",
+      "exitCode": 2,
+      "result": "Native core artifact written; RAVT004: Cannot initialize compilation target. DotNetMetadataSession cannot load the native-only NeoCLR.CoreProbe reference. No consumer artifact produced."
+    }
+  ],
+  "sourceSha256": {
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AssemblyBuilder.cs": "893ac48f9e2e6fd003f3fae47f8d644c459f4d7f382fc5ca9aa09e8c9386314c",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/NativeCoreChecks.cs": "b548b9dd94f1b39472d0df5a0cd3c89948fc9f6da35ff2dd133c89141b293511",
+    "docs/experiments/native-core-bootstrap/Program.cs": "fb345a063e5d1aeb950f9fd054f7091b62e173565baf2c7a8b6927772912d5f7",
+    "docs/experiments/native-core-bootstrap/Probe.csproj": "a3245fbbe443ae4345480794b23b59fff797e6da5cee9c1eb54ce0063cc37063"
+  },
+  "artifactSha256": {
+    "NativeCore.dll": "cca3f5532469b13a30262f23d8f432f2f6e09971dfb07d347f2bd71cbf45a405"
+  },
+  "limits": [
+    "No bridge-free compiler target",
+    "No full primitive or source-library core",
+    "No runtime or AOT consumer execution",
+    "No performance claim",
+    "No Windows/editor qualification"
+  ]
+}

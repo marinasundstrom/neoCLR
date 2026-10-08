@@ -334,6 +334,11 @@ may support development evidence, but does not alone qualify the release target.
 Audit and remove those remaining target dependencies and rerun the matched source-build,
 application, project/editor and platform gates. Native runtime seed metadata remains a
 separate runtime-service contract; do not confuse it with a .NET semantic bridge.
+A [reduced native-core probe](experiments/native-core-bootstrap/README.md) now closes
+one writer blocker: native core containers can reference their own local core types.
+Raven still reports RAVT004 when given only this native semantic core; its .NET metadata
+session initialization is the next isolated compiler boundary. This is not bootstrap
+qualification or a replacement for the source-library/application/editor gates.
 Compiler host tooling and compiler self-hosting are separate scope questions; this
 clarification specifically concerns the compiler target and emitted execution path.
 The HTTP native image already needs no installed .NET runtime, but that deployment

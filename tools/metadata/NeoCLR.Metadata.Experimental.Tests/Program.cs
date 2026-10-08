@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--native-core"]) { NativeCoreChecks.Run(); return 0; }
+
 if (args is ["--assembly-constants"]) { AssemblyConstantChecks.Run(); return 0; }
 
 if (args is ["--external-object-consumer", var externalLibrary, var externalCore, var externalOutput])
@@ -422,6 +424,7 @@ var tests = new (string Name, Action Body)[]
     ("Owned Object overrides", OwnedObjectOverrideChecks.Run),
     ("Native Object root slots", ObjectSlotChecks.Run),
     ("Native Object root authoring", ObjectRootChecks.Run),
+    ("Self-owned native core references", NativeCoreChecks.Run),
     ("Method visibility and reference projection", MethodVisibilityChecks.Run),
     ("Integer shifts and count width validation", ShiftChecks.Run),
     ("Integer bitwise operations and operand validation", BitOperationChecks.Run),
