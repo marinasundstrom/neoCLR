@@ -1338,3 +1338,14 @@ needed assembly-level function/constant documentation ID and comment fixes.
 The historical bundle explicitly uses a CLI primitive bootstrap. Keep the complete
 current snapshot until semantic member coverage, comments and routes are compared;
 384 versus 346 projected type names alone cannot establish lost APIs or equivalence.
+
+
+### Integrated development preview (2026-10-09)
+
+The audit's themed mode now integrates native pages at normal `/docs/api/` routes
+in the local website. It restores reviewed XML by exact native member IDs and records
+all mappings. Unmatched legacy pages retain truthful owners and a migration-gap
+notice (136 pages after rebuilding the bundle; Math constants are now native).
+Publishing remains unchanged; regenerate a matching production bundle, sidecars and
+full coverage inventory before the upcoming release. See the audit README for the
+explicit local integration command and its complete HTML/link checks.

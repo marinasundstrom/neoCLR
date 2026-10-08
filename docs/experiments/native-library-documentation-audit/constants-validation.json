@@ -1,0 +1,37 @@
+[
+  {
+    "assembly": "System.Runtime",
+    "constants": [
+      {
+        "Namespace": "System.Math",
+        "Name": "Pi",
+        "Value": 3.141592653589793,
+        "visibility": "Public"
+      },
+      {
+        "Namespace": "System.Math",
+        "Name": "E",
+        "Value": 2.718281828459045,
+        "visibility": "Public"
+      },
+      {
+        "Namespace": "System.Math",
+        "Name": "Tau",
+        "Value": 6.283185307179586,
+        "visibility": "Public"
+      }
+    ]
+  },
+  {
+    "assembly": "System.Data",
+    "constants": []
+  },
+  {
+    "assembly": "System.Networking",
+    "constants": []
+  },
+  {
+    "assembly": "System.Web",
+    "constants": []
+  }
+]

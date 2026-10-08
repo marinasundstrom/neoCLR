@@ -3044,3 +3044,12 @@ after assembly-member documentation fixes. The 1,632-page audit demonstrates rea
 owner identities, not coverage parity or native-only bootstrap. Preserve the full
 reference while comparing public members, documentation and routes.
 [Evidence and remaining gates](experiments/native-library-documentation-audit/README.md).
+
+
+The author clarified that the updated neoCLR website belongs to the upcoming release.
+Native documentation must use canonical assembly-member IDs, retain XML help and
+sidebar entries, resolve Object/member links, omit nonexistent CLR containers, and
+work at normal API URLs. The local integrated preview exercises these; production
+coverage and no-bridge qualification remain open. A fresh bundle closes the old
+bundle's missing Math constants; an intermittent HttpContext metadata validation
+failure seen on the first build still needs investigation. See the documentation audit's integration procedure.

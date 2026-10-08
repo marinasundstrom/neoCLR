@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Integrate the native API migration preview into the local neoCLR website shell,
+  at the normal API URLs, including branding, navigation, authored API additions
+  and search. Recover matching reviewed XML comments using canonical native IDs;
+  preserve unmatched old pages with explicit migration-gap notices. Normalize
+  mislabeled XML comments in a private input copy and rebuild native libraries so Math Pi/E/Tau appear with canonical IDs and values.
+  Validate Object links, function overload groups and sidebar entries before commit;
+  remaining coverage migration is required for the upcoming release.
+
 - Audit real Runtime/Data/Networking/Web metadata through RavenDoc after fixing
   assembly-level function/constant documentation in Raven. The migration preview
   renders 1,632 pages with actual declaring libraries and no CoreProbe owner label.

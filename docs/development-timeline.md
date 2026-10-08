@@ -12263,3 +12263,38 @@ claim follows from these focused checks.
   Native core production and semantic member/comment/route parity remain open;
   the complete website has not been replaced by the smaller audit.
   [Evidence](experiments/native-library-documentation-audit/README.md).
+
+
+## 2026-10-09 — Native reference belongs in the neoCLR website
+
+- **Author correction:** the standalone RavenDoc preview did not look like the
+  neoCLR website. The author requested the changes on the neoCLR page and clarified:
+  “The updated website is part of the future release”.
+- **Assistant action:** added an integrated local preview using neoCLR's site theme,
+  navigation and search, linked from existing reference pages. Preserve the complete
+  reference while qualifying native metadata coverage. A private copy normalizes
+  historical XML comments mislabeled as Markdown; producer correction remains open.
+- **Scope:** this is local development visibility for the future release, not a
+  publication or completion of the no-bridge/documentation-coverage gates.
+
+- **Further author corrections:** verify broken Object links, restore XML doc text,
+  emit correct IDs for neoCLR assembly-level members, include these members in the
+  sidebar, remove CLR-container notes from native pages, use normal API URLs, and
+  check the website before committing.
+- **Actions:** fixed target-specific ID generation, selected-library enumeration
+  (bootstrap deduplication intermittently hid Object), native member navigation,
+  and assembly-function overload grouping. Recovered 1,482 reviewed XML entries
+  against real native declarations for the historical bundle preview. Updated
+  canonical local routes with compatibility redirects for the earlier preview.
+- **Remaining release work:** historical bundle lacks some current declarations,
+  including Math constants; 139 legacy pages are retained with explicit notices.
+  Regenerate production native metadata/sidecars and qualify coverage before release.
+
+- **Author follow-up:** also fix constants not showing up. A fresh Runtime artifact
+  contains Pi/E/Tau and canonical XML IDs; rebuilding all four native libraries
+  brings their pages and navigation into the website. This closes the constants
+  gap above. The final integrated validation covers 3,483 pages, 136 retained
+  legacy pages, 43 focused compiler/renderer tests and native fixture checks.
+- **Build limitation:** the first fresh bundle attempt hit NEOMETA003 in
+  HttpContext's constructor. A direct Web retry and a subsequent full bundle build
+  passed; the intermittent metadata-type comparison failure is not claimed fixed.
