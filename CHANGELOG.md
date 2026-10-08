@@ -87,6 +87,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and reject invalid host counts. Admit inhabited unit storage for Result<unit,...>,
   distinct from no-result methods. Validate ordinary output-stream interfaces,
   handled broken-pipe errors, adapter boundaries and unit/adjacent-field copies.
+  Specialize closed generic reference classes/interfaces with distinct object tags
+  and exact closed member signatures. Preserve inherited interface dispatch and
+  identity-preserving upcasts; verify original contracts before generic projection.
+  Validate two generic class shapes, mutations and exact null/cast fault parity.
+  ArrayList backing reservations and String-valued erased services remain pending.
 
 ### 2026-10-07
 

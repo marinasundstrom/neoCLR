@@ -1,0 +1,79 @@
+.module GenericViews
+.interface Read<T>
+.method instance Get() -> T
+.end
+.end
+.interface Mutable<T>
+.implements Read<T>
+.method instance Set(T value) -> noresult
+.end
+.end
+.type class Cell<T>
+.implements Mutable<T>
+.field Value T
+.method instance .ctor(T value) -> noresult
+ldarg 0
+ldarg value
+stfld 0
+ret
+.end
+.method instance Get() -> T
+ldarg 0
+ldfld 0
+ret
+.end
+.method instance Set(T value) -> noresult
+ldarg 0
+ldarg value
+stfld 0
+ret
+.end
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Cell<Int32> number
+.local Cell<Byte> octet
+.local Mutable<Int32> view
+.local Read<Int32> read
+ldc.i4 42
+newobj.ctor instance Cell<Int32>::.ctor(Int32)
+stloc number
+ldc.i4 255
+conv.u1
+newobj.ctor instance Cell<Byte>::.ctor(Byte)
+stloc octet
+ldarg mode
+ldc.i4 1
+beq Byte
+ldarg mode
+ldc.i4 2
+beq Invalid
+ldarg mode
+ldc.i4 3
+beq Null
+ldloc number
+castclass Mutable<Int32>
+stloc view
+ldloc view
+ldc.i4 99
+callvirt instance Mutable<Int32>::Set(Int32)
+ldloc view
+callvirt instance Read<Int32>::Get()
+ret
+Byte:
+ldloc octet
+castclass Read<Byte>
+callvirt instance Read<Byte>::Get()
+conv.i4
+ret
+Invalid:
+ldloc octet
+castclass Read<Int32>
+callvirt instance Read<Int32>::Get()
+ret
+Null:
+ldloca read
+initobj Read<Int32>
+ldloc read
+callvirt instance Read<Int32>::Get()
+ret
+.end

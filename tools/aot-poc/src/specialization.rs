@@ -67,11 +67,7 @@ impl Specializer<'_> {
         };
         let i = self.type_index(name)?;
         let definition = &self.source.types[i];
-        if definition.representation == neoclr::metadata::Representation::Interface && !definition.generic_parameters.is_empty() {
-            return Err("interface views require nongeneric source contracts".into());
-        }
-        if (definition.is_reference_type && !definition.generic_parameters.is_empty())
-            || !definition.generic_constraints.is_empty()
+        if !definition.generic_constraints.is_empty()
             || definition.generic_parameters.len() != arguments.len()
         {
             return Err(format!("unsupported generic type category, arity or constraints: {name}; reference={}, arity={}/{}, constraints={:?}", definition.is_reference_type, arguments.len(), definition.generic_parameters.len(), definition.generic_constraints).into());
@@ -161,7 +157,7 @@ impl Specializer<'_> {
             .any(|t| !matches!(t, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void))
         {
             return Err(
-                "generic method arguments require primitive Int32/small-integer/Boolean/Void shapes".into(),
+                format!("generic method arguments require primitive Int32/small-integer/Boolean/Void shapes: {} {:?}", target.name, target.generic_arguments).into(),
             );
         }
         let arguments = match &target.owner {
@@ -441,11 +437,33 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
             }
             expanded.functions[instance.row] = function;
         }
-        let reached = context.instances.iter().map(|v| v.source).collect();
-        for &contract in &reached {
-            for (_, target) in super::selection::dispatch_targets(input, contract, &reached)? {
-                let f = &input.functions[target];
-                let reference = FunctionRef { definition: f.definition.clone(), name: f.name.clone(), owner: f.owner.clone(), instance: f.instance, generic_arguments: vec![], parameters: f.parameters.clone() };
+        // Recover closed source contracts before erasing their owner arguments.
+        // Dispatch may discover new constructors and further closed interfaces.
+        let mut constructed = vec![];
+        let mut contracts = vec![];
+        for instance in &context.instances {
+            let original = &input.functions[instance.source];
+            if super::selection::interface_contract(input, original) {
+                if !original.instance || original.receiver_byref || !original.body.is_empty() || !original.generic_parameters.is_empty() {
+                    return Err("interface dispatch requires a bodyless nongeneric instance contract".into());
+                }
+                contracts.push(super::selection::closed_signature(original, &instance.types)?);
+            }
+            for op in &original.body {
+                if let Op::Construct(target) = op {
+                    let owner = substitute(target.owner.as_ref().ok_or("constructor requires owner")?, &instance.types, &instance.methods).map_err(|e| e.to_string())?;
+                    if !constructed.contains(&owner) { constructed.push(owner); }
+                }
+            }
+        }
+        for contract in contracts {
+            for owner in &constructed {
+                if !super::selection::implements_interface(input, owner, contract.owner.as_ref().unwrap()) { continue; }
+                let definition = input.type_definition(owner).ok_or("constructed interface implementor requires local definition")?;
+                if !definition.is_reference_type || definition.representation != neoclr::metadata::Representation::Record {
+                    return Err("interface dispatch requires constructed classes".into());
+                }
+                let (_, reference) = super::selection::implicit_implementation(input, owner, &contract)?;
                 let instance = context.resolve(&reference)?;
                 if !visited.contains(&instance.row) { pending.push(instance); }
             }
@@ -490,7 +508,7 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
         }
         expanded.types[shape.row] = t;
     }
-    let report = json!({"policy":"up to 64 closed value shapes; primitive static generic methods and closed owner methods, at most 32 function clones and 128 selected functions; no constraints",
+    let report = json!({"policy":"up to 64 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 32 function clones and 128 selected functions; no constraints",
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
     Ok((expanded, report))

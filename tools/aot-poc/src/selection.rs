@@ -30,7 +30,8 @@ pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Va
             .any(|f| !f.generic_parameters.is_empty())
     {
         let (expanded, specialization) = super::specialization::expand(input, root)?;
-        if specialization["methods"].as_array().unwrap().iter().any(|m| !m["arguments"].as_array().unwrap().is_empty())
+        if input.types.iter().any(|t| (t.is_reference_type || t.representation == neoclr::metadata::Representation::Interface) && !t.generic_parameters.is_empty())
+            || specialization["methods"].as_array().unwrap().iter().any(|m| !m["arguments"].as_array().unwrap().is_empty())
             || specialization["types"].as_array().unwrap().iter().any(|t| t["expandedIndex"].as_u64().unwrap() as usize >= input.types.len()) {
             // Cloning assigns private origin tokens. Verify originals first so this
             // cannot repair invalid source metadata or bypass generic contracts.
@@ -75,6 +76,55 @@ pub(super) fn interface_contract(input: &neoclr::Module, f: &neoclr::metadata::F
         .is_some_and(|t| t.representation == neoclr::metadata::Representation::Interface)
 }
 
+/// Traverse verified interface inheritance with closed owner arguments. Class base
+/// inheritance remains outside this profile; Object contributes no interfaces.
+pub(super) fn implements_interface(input: &neoclr::Module, concrete: &Type, target: &Type) -> bool {
+    let mut pending = vec![concrete.clone()];
+    let mut seen = vec![];
+    while let Some(current) = pending.pop() {
+        if &current == target { return true; }
+        if seen.contains(&current) { continue; }
+        if seen.len() >= 1024 { return false; }
+        seen.push(current.clone());
+        let Some(definition) = input.type_definition(&current) else { continue; };
+        let arguments = match &current { Type::Constructed { arguments, .. } => arguments.as_slice(), _ => &[] };
+        for interface in &definition.implements {
+            if let Ok(closed) = interface.substitute_type_parameters(arguments) { pending.push(closed); }
+        }
+    }
+    false
+}
+
+pub(super) fn closed_signature(function: &neoclr::metadata::Function, arguments: &[Type]) -> Result<neoclr::metadata::Function, Error> {
+    let mut result = function.clone();
+    result.owner = function.owner.as_ref().map(|ty| ty.substitute_type_parameters(arguments)).transpose().map_err(|e| e.to_string())?;
+    result.parameters = function.parameters.iter().map(|ty| ty.substitute_type_parameters(arguments)).collect::<Result<_, _>>().map_err(|e| e.to_string())?;
+    result.returns = function.returns.substitute_type_parameters(arguments).map_err(|e| e.to_string())?;
+    Ok(result)
+}
+
+pub(super) fn implicit_implementation(input: &neoclr::Module, concrete: &Type, contract: &neoclr::metadata::Function) -> Result<(usize, FunctionRef), Error> {
+    let arguments = match concrete { Type::Constructed { arguments, .. } => arguments.as_slice(), _ => &[] };
+    let member_name = |m: &neoclr::metadata::Function| m.origin.as_ref().map(|o| o.name.clone())
+        .unwrap_or_else(|| m.name.rsplit('.').next().unwrap().to_owned());
+    let name = member_name(contract);
+    let mut candidates = vec![];
+    for (index, method) in input.functions.iter().enumerate() {
+        if method.owner.as_ref().and_then(Type::definition_name) != concrete.definition_name()
+            || member_name(method) != name { continue; }
+        let method = closed_signature(method, arguments)?;
+        if method.owner.as_ref() == Some(concrete) && method.instance == contract.instance
+            && method.parameters == contract.parameters && method.returns == contract.returns
+            && method.no_result == contract.no_result && method.out_parameters == contract.out_parameters
+            && method.visibility == neoclr::metadata::Visibility::Public && method.interface_implementations.is_empty()
+            && method.generic_parameters.is_empty() {
+            candidates.push((index, FunctionRef { definition: method.definition.clone(), name: method.name.clone(), owner: method.owner.clone(), instance: method.instance, generic_arguments: vec![], parameters: method.parameters.clone() }));
+        }
+    }
+    let [target] = candidates.as_slice() else { return Err(format!("interface implementation is missing or ambiguous: {} on {concrete:?}", contract.name).into()); };
+    Ok(target.clone())
+}
+
 /// Exact implicit implementations for classes constructed by the reachable program.
 /// Original conformance is verified before private projection; this is not a binder.
 pub(super) fn dispatch_targets(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>) -> Result<Vec<(usize, usize)>, Error> {
@@ -91,23 +141,14 @@ pub(super) fn dispatch_targets(input: &neoclr::Module, contract: usize, reached:
             }
         }
     }
-    let member_name = |m: &neoclr::metadata::Function| m.origin.as_ref().map(|o| o.name.clone())
-        .unwrap_or_else(|| m.name.rsplit('.').next().unwrap().to_owned());
-    let name = member_name(f);
     let mut targets = vec![];
     for (ti, t) in input.types.iter().enumerate() {
-        if !constructed.contains(t.name.as_str()) || !t.implements.iter().any(|v| Some(v) == f.owner.as_ref()) { continue; }
+        if !constructed.contains(t.name.as_str()) || !implements_interface(input, &Type::Named(t.name.clone()), f.owner.as_ref().unwrap()) { continue; }
         if !t.is_reference_type || !t.generic_parameters.is_empty() || t.representation != neoclr::metadata::Representation::Record {
             return Err("interface dispatch requires nongeneric constructed classes".into());
         }
-        let candidates: Vec<_> = input.functions.iter().enumerate().filter(|(_, m)|
-            m.owner == Some(Type::Named(t.name.clone())) && member_name(m) == name
-            && m.instance == f.instance && m.parameters == f.parameters && m.returns == f.returns
-            && m.no_result == f.no_result && m.out_parameters == f.out_parameters
-            && m.visibility == neoclr::metadata::Visibility::Public && m.interface_implementations.is_empty()
-        ).map(|(i, _)| i).collect();
-        let [target] = candidates.as_slice() else { return Err(format!("interface implementation is missing or ambiguous: {} on {}", f.name, t.name).into()); };
-        targets.push((ti, *target));
+        let (target, _) = implicit_implementation(input, &Type::Named(t.name.clone()), f)?;
+        targets.push((ti, target));
     }
     Ok(targets)
 }

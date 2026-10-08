@@ -264,7 +264,9 @@ one Console input/output app. Nongeneric interface views and the verified empty
 Object base now support the three standard-stream factories in a standalone sample.
 Bounded implicit interface dispatch now supports standard-input Read/Close, byte
 buffers and stream-result unions. Explicit raw output/flush services also compile
-stdout/stderr streams with recoverable I/O results. General collection, text writers
+stdout/stderr streams with recoverable I/O results. Closed generic reference classes
+and inherited interface dispatch are also tested; checked collection backing storage,
+text writers
 and ReadLine remain future work. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked

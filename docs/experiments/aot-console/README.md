@@ -525,3 +525,32 @@ Console and forty-three value tests pass, including service opt-in/impostor reje
 33 adapter-status cases, null fault parity, range/limit/channel checks and broken
 pipe checks for line output, stderr and explicit flush. Full text Console.Write,
 Out/Error writers and ReadLine remain the next dependencies to compile.
+
+
+## Closed reference types and inherited interfaces (2026-10-08)
+
+The explicit reference-arena profile now specializes bounded closed generic classes
+and interfaces alongside value shapes. Each closed class keeps its own object tag,
+field layout and member bodies. Implicit interface dispatch resolves exact closed
+source signatures before private generic erasure; interface inheritance, safe class/
+interface upcasts and inherited member calls retain the same underlying pointer.
+Original source conformance/access verification remains required, including single-
+module generic reference inputs. Constraints, generic instance methods, explicit
+implementations, class inheritance beyond the empty Object base and class virtual
+slots remain unsupported. All existing shape/function/frame limits remain.
+
+`generic-views.neoil` exercises Cell<Int32>/Cell<Byte>, inherited Read/Mutable views,
+mutation, narrow return values, invalid cross-instantiation casts and null callvirt.
+Native output and exact fault diagnostics match the interpreter. The full focused
+set passes (22 Console, 18 linking and 43 value tests); the inherited-call test also
+passes after adding implicit parent-interface argument compatibility.
+
+As with CLR generics/interfaces, closed instances remain nominally distinct and
+upcasts preserve identity. This POC specializes bodies rather than sharing generic
+code, trading a simple private layout/dispatch model for larger native images and
+explicit discovery limits. It remains invocation-region storage, not CLR-style GC.
+
+The real ArrayList<byte>/Sequence<byte> Console consumer exposed `array.reserve`
+as the next dependency after generic admission. It must retain checked unreadable
+slots rather than silently substituting zero-initialized newarr. Full Console.Write
+also reaches String-valued erased runtime services; those are later slices.

@@ -72,10 +72,10 @@ impl<'a> Profile<'a> {
         }
         for (index, t) in input.types.iter().enumerate() {
             if references && t.representation == Representation::Interface {
-                if !t.fields.is_empty() || t.base.is_some() || !t.implements.is_empty()
+                if !t.fields.is_empty() || t.base.is_some() || t.implements.iter().any(|parent| input.type_definition(parent).is_none_or(|p| p.representation != Representation::Interface))
                     || !t.generic_parameters.is_empty() || !t.generic_constraints.is_empty()
                     || t.enum_info.is_some() || t.packing.is_some() || t.minimum_size.is_some() {
-                    return Err("interface views require fieldless nongeneric contracts without inheritance".into());
+                    return Err("interface views require fieldless closed interface contracts".into());
                 }
                 continue;
             }
@@ -358,6 +358,8 @@ impl<'a> Profile<'a> {
     }
     fn reference_assignable(&self, actual: &Ty, expected: &Ty) -> bool {
         match (actual, expected) {
+            (Ty::Reference(actual) | Ty::Interface(actual), Ty::Interface(expected)) =>
+                crate::selection::implements_interface(self.input, &Type::Named(self.input.types[*actual].name.clone()), &Type::Named(self.input.types[*expected].name.clone())),
             (Ty::Reference(actual), Ty::Reference(expected)) if self.object_base == Some(*expected) =>
                 self.input.types[*actual].base.as_ref().is_some_and(|t| *t == Type::Named(self.input.types[*expected].name.clone())),
             _ => false,
@@ -372,7 +374,7 @@ impl<'a> Profile<'a> {
             Ty::Interface(i) => {
                 let target = Type::Named(self.input.types[*i].name.clone());
                 self.input.types.iter().enumerate()
-                    .filter(|(_, t)| t.is_reference_type && t.representation == Representation::Record && t.implements.contains(&target))
+                    .filter(|(_, t)| t.is_reference_type && t.representation == Representation::Record && crate::selection::implements_interface(self.input, &Type::Named(t.name.clone()), &target))
                     .map(|(i, _)| i).collect()
             }
             _ => unreachable!("admitted reference target"),
@@ -836,7 +838,8 @@ impl<'a> Profile<'a> {
                 Op::SetField(n) => {
                     let value = pop(&mut stack)?;
                     let owner = pop(&mut stack)?;
-                    if Self::stack_type(&self.field(&owner, *n)?) != value {
+                    let expected = Self::stack_type(&self.field(&owner, *n)?);
+                    if expected != value && !self.reference_assignable(&value, &expected) {
                         return Err(fail(pc, "field store type mismatch"));
                     }
                     if !matches!(owner, Ty::Reference(_)) {
