@@ -6764,3 +6764,10 @@ contract/target dispatch table replace the previous AOT rejection; borrowed Stri
 receivers remain unsupported. Runtime Contract options, Raven emission, CLI encoding,
 metadata schema and API documentation snapshots are unchanged. Fresh standalone evidence
 records the same compiler/bundle, exact UTF-8 equality output and output-fault parity.
+
+The [interactive parsing slice](experiments/aot-console/README.md#interactive-int32-parsing-2026-10-08)
+adds an opt-in native implementation of the existing ParseInt32 service and privately
+projects static Int32 wrappers. Public Parse/Result code remains ordinary native CIL;
+there is no Raven emission, Runtime Contract option, CLI encoding, public API or schema
+change. The same integration compiler and bundle compile the repeated-input/union sample.
+Whole-text ASCII grammar, error precedence and null faults match the interpreter.

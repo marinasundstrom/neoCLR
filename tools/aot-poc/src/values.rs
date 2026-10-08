@@ -289,6 +289,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     let mut utf8_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
+            (&d.parse_int32, "neoclr_parse_int32_v1", vec![types::I64, types::I64]),
             (&d.utf8_encode, "neoclr_utf8_encode_v1", vec![types::I64, types::I64, types::I64]),
             (&d.utf8_decode, "neoclr_utf8_decode_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_concat, "neoclr_string_concat_v1", vec![types::I64, types::I64, types::I64, types::I64]),

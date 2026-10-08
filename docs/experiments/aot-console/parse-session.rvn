@@ -1,0 +1,32 @@
+import System.*
+import System.Result.*
+import System.Option.*
+
+func Main() -> int {
+    var count = 0
+    while count < 3 {
+        Console.WriteLine("Integer (or quit):")
+        let Ok(option) = Console.ReadLine(32) else {
+            Console.WriteLine("Read failed")
+            return 1
+        }
+        let Some(line) = option else {
+            Console.WriteLine("EOF")
+            return 0
+        }
+        if line == "quit" {
+            Console.WriteLine("Bye")
+            return 0
+        }
+        let parsed = Int32.Parse(line)
+        if let Ok(value) = parsed {
+            Console.WriteLine(value)
+        } else if let Error(NumberParseError.Overflow) = parsed {
+            Console.WriteLine("Overflow")
+        } else {
+            Console.WriteLine("Invalid format")
+        }
+        count = count + 1
+    }
+    return 0
+}

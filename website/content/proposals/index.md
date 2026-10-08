@@ -301,7 +301,11 @@ renderer and standalone exit-1 failure app are validated. Interpreter CLI execut
 faults use the same message/trace format and exit convention. Explicit `fault` instructions now
 return UserFault status through native calls without publishing a result; message/stack
 diagnostics are available through opt-in ABI v3 and String-based System.Fail now has an
-explicit native binding. Native line-oriented text input remains pending.
+explicit native binding. Native line-oriented text input has bounded standalone coverage. A three-read interactive
+sample now combines Int32.Parse with Result/Option patterns, preserving parse outcomes,
+EOF, read errors and fault traces in a standalone executable. Allocation-free Int32
+parsing is opt-in through the experimental integer-text binding; other numeric parsers
+remain native-backend work.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

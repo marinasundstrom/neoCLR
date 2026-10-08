@@ -220,3 +220,36 @@ int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_te
     *output = text;
     return NEOCLR_AOT_FAULT_NONE;
 }
+
+
+int32_t neoclr_parse_int32_v1(const neoclr_aot_text *text, void *output) {
+    if (!text || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t start = 0;
+    int negative = text->length && text->bytes[0] == '-';
+    if (text->length && (negative || text->bytes[0] == '+')) start = 1;
+    uint64_t tag = 2, payload = 1; /* malformed, including empty/sign-only */
+    if (start < text->length) {
+        uint32_t magnitude = 0;
+        uint32_t limit = negative ? UINT32_C(2147483648) : UINT32_C(2147483647);
+        int overflow = 0;
+        for (uint64_t i = start; i < text->length; ++i) {
+            unsigned char ch = text->bytes[i];
+            if (ch < '0' || ch > '9') goto publish;
+            uint32_t digit = ch - '0';
+            if (!overflow) {
+                if (magnitude > (limit - digit) / 10) overflow = 1;
+                else magnitude = magnitude * 10 + digit;
+            }
+        }
+        if (overflow) payload = 2;
+        else {
+            tag = 1;
+            /* Unsigned arithmetic preserves INT32_MIN without signed overflow. */
+            payload = negative ? UINT32_C(0) - magnitude : magnitude;
+        }
+    }
+publish:;
+    uint64_t lanes[2] = {tag, payload};
+    memcpy(output, lanes, sizeof(lanes));
+    return NEOCLR_AOT_FAULT_NONE;
+}

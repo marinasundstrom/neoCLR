@@ -1305,5 +1305,58 @@ See the existing [text model](../../text-model.md) and [Object review](../../obj
 
 No Raven emission, Runtime Contract configuration, CLI bridge encoding, public API,
 metadata format or native context ABI changes. This remains experimental backend work.
-The next sample should drive line-oriented Console input and parse outcomes toward the
-interactive union scenario; this slice does not implement native ReadLine.
+Line-oriented input already has standalone coverage in the reader/session slices above.
+The next consumer combines repeated reads with parsing and union outcomes.
+
+## Interactive Int32 parsing (2026-10-08)
+
+The [parse session](parse-session.rvn) combines the existing Console.ReadLine path
+with ordinary Int32.Parse, numeric output, String equality and union patterns. It reads
+at most three 32-byte lines, accepts `quit`, and handles EOF, read errors, parsed values,
+InvalidFormat and Overflow. Both `let <pattern> else` and `if let <pattern>` are exercised.
+This closes the next integration gap; line input itself was already implemented above.
+
+`--bind-integer-text` now also binds the exact verified reserved
+`neoCLR.Runtime.ParseInt32(String) -> Value` InternalCall. Only that service maps to
+`neoclr_parse_int32_v1`; the public Int32.Parse wrapper and its Result construction stay
+compiled from CIL. Static Int32 methods use the same private owner-free projection
+already used for static String/Char wrappers. No metadata, public API, Raven emitter,
+Runtime Contract configuration or native context ABI changes are introduced.
+
+The allocation-free adapter scans the explicit UTF-8 length, including embedded NUL,
+accepting only `[+-]?[0-9]+`. It continues grammar validation after detecting overflow,
+so malformed text wins over range errors. Unsigned magnitude arithmetic handles
+-2147483648 without signed overflow. Success returns an erased Int32; malformed/range
+errors return Byte(1)/Byte(2) for the managed wrapper. Null input faults without
+publishing output. Ordinary same-named methods and missing opt-in cannot acquire the
+binding. The adapter is linked into the executable, not loaded from a shared framework.
+
+This reuses the existing [numeric contract comparison](../../design/numeric-contracts.md):
+.NET Parse/TryParse is the ergonomic baseline, while neoCLR's existing Result API and
+whole-text ASCII grammar remain authoritative. A locale-dependent C parser or .NET-like
+implicit whitespace policy would change that contract. A small bounded-integer adapter
+was chosen over adding a second parsing policy; the cost is maintaining parity between
+interpreter and native implementations. No throughput advantage is claimed. Other
+numeric parsers remain separate native work.
+
+Focused checks cover 154 native/interpreter comparisons: both endpoints, sign/zero forms,
+long leading zeros, overflow, invalid syntax, Unicode digits, embedded NUL, every ASCII
+suffix after an overflowing prefix, and null-fault diagnostics. The caller supplies zero
+arena capacity during parsing to verify allocation independence. The Console suite has
+52 passing tests, including exact-binding rejection.
+
+Run `verify_interactive.py --parse-session` with the usual compiler/runtime/bundle/output
+arguments. The session host retains its 64 KiB invocation arena; the three-line limit is
+sample policy, not a replacement for eventual native reclamation or execution budgets.
+The next useful consumer is a bounded request-line/route parser fed through Console,
+so text parsing can drive the path toward HTTP before adding socket lifetime and I/O.
+
+[Standalone evidence](parse-session-validation.json) qualifies 11 input streams against
+explicit expected output and the interpreter: limits, signs/zeros, overflow versus
+malformed syntax, whitespace/NUL/Unicode, quit, EOF, final unterminated input, CRLF,
+invalid UTF-8 and excessive line length. Native stdout/stderr/exit and the broken-pipe
+fault trace match exactly. The executable runs alone with an empty environment and only
+libSystem dynamically linked. The final run reuses the first run's successful fresh
+Raven compilation after producer/source hash checks, then rebuilds the native image.
+The evidence embeds the producer command and artifact hash; no compiler fix or source
+relocation was needed. The supplied bundle and compiler binaries are identified by hash.

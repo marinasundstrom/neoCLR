@@ -60,4 +60,9 @@ int32_t neoclr_utf8_decode_v1(const void *array, neoclr_aot_text_arena *arena, v
 /* Immutable concatenation; null inputs fault. No output/cursor publication on failure. */
 int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_text *right,
                                neoclr_aot_text_arena *arena, const neoclr_aot_text **output);
+
+/* Exact ASCII [+-]?[0-9]+; complete grammar validation precedes range.
+ * Publishes erased Int32 or Byte(1=InvalidFormat, 2=Overflow), no allocation.
+ * Null arguments fault without publishing output. */
+int32_t neoclr_parse_int32_v1(const neoclr_aot_text *text, void *output);
 #endif

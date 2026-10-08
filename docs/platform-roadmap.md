@@ -168,8 +168,12 @@ Raven equality and inequality without comparison allocations
 interface implementations now compile through ordinary receiver projection, including
 standalone EquatableTo<string>.Equals with Unicode/NUL/dynamic text and output-fault
 parity ([evidence](experiments/aot-console/string-interface-equality-validation.json)).
-The next consumer should exercise line-oriented Console input and parse outcomes;
-native line input remains a gap. Borrowed String interface receivers remain unsupported.
+Line-oriented Console input already has standalone coverage. A bounded repeated-input
+consumer now combines Int32.Parse with Result/Option patterns and Console output across
+11 input streams ([evidence](experiments/aot-console/parse-session-validation.json)). The
+native parser preserves whole-text ASCII grammar and malformed-before-overflow precedence
+without allocating. A bounded request-line/route parser is the next proposed consumer
+on the path toward HTTP. Borrowed String interface receivers remain unsupported.
 The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

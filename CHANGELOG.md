@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Extend experimental ARM64 AOT integer-text binding with exact Int32 parsing and
+  static Int32 wrapper projection. Preserve whole-text ASCII grammar, malformed-before-
+  overflow precedence, allocation-free parsing and null-fault diagnostics. Add a bounded
+  repeated Console input sample using Parse/Result/Option patterns; validate 52 Console
+  tests, including 154 parser comparisons, and 11 standalone input streams with exact
+  output/fault parity and no shared managed framework. Correct the latest roadmap/proposal notes:
+  line-oriented native Console input already had standalone coverage. Public APIs,
+  compiler contracts, metadata and native context ABI are unchanged.
+
 - Compile typed String ceq in experimental ARM64 AOT with exact UTF-8 content and
   null comparison, distinct from reference identity. Equality allocates no storage;
   ordinary Raven ==/!= wrappers compile unchanged. Compile verified String interface

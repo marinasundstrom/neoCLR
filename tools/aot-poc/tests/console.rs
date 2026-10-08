@@ -2615,3 +2615,81 @@ int main(int argc, char **argv) {
     assert!(String::from_utf8_lossy(&r.stderr).contains("recursive calls require a native stack-budget contract"), "{r:?}");
 
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn int32_parsing_preserves_grammar_range_precedence_and_null_faults() {
+    let seed = neoclr::assemble(".module System\n.references ()\n.function neoCLR.Runtime.ParseInt32(String) -> Value\n.methodimpl InternalCall\n.end").unwrap();
+    let mut cases: Vec<String> = ["", "+", "-", "0", "+0", "-0", "42", "-42", "2147483647", "-2147483648",
+        "2147483648", "-2147483649", "999999999999999999999", "999999999999999999999x",
+        "0000000000000000000000000000001", " 1", "1 ", "1\n", "1\0", "é", "１２", "++1", "--1", "+-1", "0x10"]
+        .into_iter().map(str::to_owned).collect();
+    for byte in 0..128u8 { cases.push(format!("999999999999999{}", char::from(byte))); }
+    let mut source = String::from(".module Parse\n.function Calculate(Int32 mode) -> Int32\n.local String absent\n");
+    for (i, _) in cases.iter().enumerate() {
+        source.push_str(&format!("ldarg mode\nldc.i4 {i}\nceq\nbrtrue Case{i}\n"));
+    }
+    source.push_str("ldloca absent\ninitobj String\nldloc absent\nbr Parse\n");
+    for (i, text) in cases.iter().enumerate() {
+        let literal = serde_json::to_string(text).unwrap();
+        source.push_str(&format!("Case{i}:\nldstr {literal}\nbr Parse\n"));
+    }
+    source.push_str("Parse:\ncall neoCLR.Runtime.ParseInt32(String)\ndup\nvalue.is Int32\nbrtrue Good\nvalue.unpack Byte\nconv.i4\nldc.i4 100\nadd\nret\nGood:\nvalue.unpack Int32\nret\n.end\n");
+    let dir = Temp::new();
+    let denied = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
+    assert!(!denied.status.success() && !dir.0.join("app.o").exists());
+    let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena", "--bind-integer-text"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert!(report["nativeBindings"].as_array().unwrap().iter().any(|row| row["implementation"] == "parse-int32-v1"));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"), r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc, char **argv) {
+    neoclr_aot_context ctx = {0};
+    int32_t result = -99;
+    int status = neoclr_entry_v4(argc > 1 ? atoi(argv[1]) : 0, &result, &ctx);
+    if (ctx.text.used) return 93;
+    if (status) {
+        if (result != -99 || ctx.fault.code != (uint32_t)status) return 92;
+        neoclr_aot_render_fault(stderr, &ctx.fault);
+        return 1;
+    }
+    printf("%d\n", result);
+    return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let app = neoclr::assemble(&source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in 0..=cases.len() {
+        let reference = method.invoke(vec![neoclr::Value::Int32(mode as i32)], neoclr::Limits::default());
+        let r = Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        if mode == cases.len() {
+            let fault = reference.unwrap_err();
+            assert_eq!(r.status.code(), Some(1), "{r:?}");
+            assert_eq!(String::from_utf8_lossy(&r.stderr), fault.diagnostic().to_string());
+        } else {
+            let neoclr::Value::Int32(value) = reference.unwrap().value else { panic!("unexpected result") };
+            assert_eq!(r.status.code(), Some(0), "{mode}: {r:?}");
+            assert_eq!(String::from_utf8_lossy(&r.stdout), format!("{value}\n"), "input {:?}", cases[mode]);
+            assert!(r.stderr.is_empty());
+        }
+    }
+}
+
+#[test]
+fn int32_parsing_rejects_ordinary_same_named_methods() {
+    let seed = neoclr::assemble(".module System\n.references ()\n.function neoCLR.Runtime.ParseInt32(String) -> Value\nldc.i4 42\nvalue.pack Int32\nret\n.end").unwrap();
+    let dir = Temp::new();
+    let source = ".module Parse\n.function Calculate() -> Int32\nldstr \"1\"\ncall neoCLR.Runtime.ParseInt32(String)\nvalue.unpack Int32\nret\n.end";
+    let r = compile_source(&dir, &seed, source, &["--compile-system", "--bind-integer-text"], false);
+    assert!(!r.status.success() && !dir.0.join("app.o").exists(), "{r:?}");
+    assert!(String::from_utf8_lossy(&r.stderr).contains("exact reserved Int32 parsing"), "{r:?}");
+}
