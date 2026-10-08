@@ -60,6 +60,44 @@ runtime merely to describe an exported interface. Start a future experiment with
 scalar export and an independently compiled consumer, including mismatch rejection.
 No ABI improvement or performance advantage is established yet.
 
+## IL-free metadata for AOT reflection and interop (author proposal, 2026-10-08)
+
+The author proposes placing a metadata file with IL stripped out beside a native
+binary, converging future AOT reflection with the metadata-based interop direction
+above. This is a future exploration, not an implemented capability or a requirement
+for every sample in the initial stable baseline.
+
+Separate metadata-only inspection (names, signatures, attributes and relationships)
+from execution (constructors, method invocation and field access). Inspection needs
+retained descriptions; execution also needs retained compiled bodies, closed generic
+instantiations, layout facts, marshalling/ownership rules and generated invocation
+adapters. Metadata alone cannot restore stripped code or generate a missing generic
+specialization in an AOT-only application. Describe an inspectable member separately
+from an invocable export; missing execution support should produce an explicit result.
+
+.NET Native AOT already distinguishes retained reflection from dynamic code generation
+and requires trimming analysis; its documented limitations include dynamic assembly
+loading and Reflection.Emit. Its native exports use explicit UnmanagedCallersOnly
+entry points. These are shipped comparison points, not evidence of an external
+metadata-sidecar contract identical to this proposal. Primary sources reviewed
+2026-10-08: [Native AOT overview](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
+and [native interop](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/interop).
+
+A shared metadata schema could benefit offline inspection and binding generation
+without IL distribution or a shared managed runtime. Costs are retained metadata/code
+size, invocation stubs, ABI evolution and deployment pairing. A sidecar is convenient
+for tools but can be missing or mismatched; embedded metadata avoids a separate file
+at the cost of image-format coupling. Keep a stable exported identity separate from
+row numbers, symbol spelling and private AOT function indices. Pair metadata with an
+image identity, architecture and ABI version; validate offsets/signatures before use.
+Trimming must retain invocation roots independently from description roots.
+
+A future bounded experiment could inspect one type and call one scalar export through
+its descriptor, test a missing/mismatched sidecar, and prove that description-only
+members cannot be invoked. Neither a stable ABI nor a metadata loader/trimmer is
+selected here. The immediate author direction remains fixing easy and urgent native
+compilation issues found by sample execution.
+
 ## Reference counting as an early native experiment (2026-10-07)
 
 The author asks whether reference types should initially use reference counting,

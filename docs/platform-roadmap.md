@@ -322,6 +322,24 @@ linked separately. Feature pages explain behavior and limits; history belongs in
 changelog. Raven must be accessible from the main navigation, including links to its
 language website and playground.
 
+## Stable execution baseline assessment (author direction, 2026-10-08)
+
+The author requests running samples in interpreted/native modes to prioritize release
+work, then clarifies that a stable baseline does **not** require all samples in all
+modes. Keep the no-bridge compiler-target bootstrap gate above; do not silently expand
+AOT scope to universal API parity. The [104-case executed survey](experiments/aot-sample-assessment/README.md)
+records 68 emitted artifacts, 12 matched native successes and 56 first AOT rejections;
+primitive arrays account for 39. The interpreter has 63 successful zero exits, three
+intentional exit/fault controls and two introspection failures. Four focused callback/
+queue/Result consumers and the HTTP baseline pass separately. The author subsequently
+directs fixing easy and urgent native issues: assess bounded primitive arrays next,
+then rerun selected consumers rather than treating all 104 as release blockers.
+
+The author proposes future AOT reflection using IL-free sidecar metadata, converging
+with metadata-based interop. [Design questions](native-execution-investigation.md#il-free-metadata-for-aot-reflection-and-interop-author-proposal-2026-10-08)
+separate inspection from retained native invocation, ABI/pairing and trimming. This is
+not implemented and is not a new prerequisite for the initial stable AOT baseline.
+
 ## Source-built System bootstrap frontier (2026-10-07)
 
 **The native source-owned orders gate passes.** The 197-input aggregate library is

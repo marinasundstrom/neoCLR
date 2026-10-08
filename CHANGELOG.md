@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Assess 104 Raven samples with same-artifact interpreted/native execution, recording
+  emission and AOT blockers separately. Preserve a focused callback/HTTP baseline;
+  prioritize primitive arrays while keeping universal sample parity out of the release
+  gate. Record no-bridge bootstrap probes and future IL-free reflection/interop metadata.
+
 - Index native GC allocation ranges per collection, preserving interior roots and
   payload bounds without changing the heap ABI or collection policy. Ten kernel
   tests and HTTP checks pass; same-object native HTTP measurements improve from

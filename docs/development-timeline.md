@@ -12019,3 +12019,29 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
   HTTP compiler commands use Core.dll; this is remaining target qualification work.
   Treat compiler hosting/self-hosting as separate from the stated compiler-target
   requirement, without assuming an additional compiler-host migration.
+
+
+## 2026-10-08 — Sample-driven native baseline and release priorities
+
+- **Author request:** Run the samples in interpreted and native modes, assess missing
+  native coverage and identify release priorities.
+- **Assistant response/action:** Inventory 98 Raven API samples and six additional
+  async/JSON consumers through emission, interpreter execution, AOT, linking and native
+  execution. Record first blockers separately from runtime failures and reuse explicit
+  HTTP/GC evidence. The assessment and raw results are linked from the roadmap.
+- **Author clarification:** “Our goal is having a stable baseline” does not mean every
+  sample works in all modes; neoCLR will continue changing.
+- **Assistant response:** Define supported, tested scenarios and explicit exclusions.
+  A survey failure is a prioritization signal, not automatically a release blocker.
+  Preserve the explicit no-.NET-bridge target bootstrap requirement and existing
+  tooling/platform gates; do not silently expand these to universal AOT parity.
+- **Author proposal:** Future AOT reflection could use an IL-free metadata file beside
+  the binary, converging with metadata as an interop mechanism.
+- **Assistant response/action:** Record that [future exploration](native-execution-investigation.md#il-free-metadata-for-aot-reflection-and-interop-author-proposal-2026-10-08).
+  Distinguish metadata inspection from retained native invocation, with pairing,
+  stable ABI and trimming questions still open. No implementation is claimed.
+- **Author subsequent direction:** Fix the easiest and urgent native compilation
+  issues. **Assistant proposal:** Assess primitive arrays first because they recur
+  as the first AOT blocker in otherwise-interpretable collections/async consumers;
+  confirm layout and lifetime requirements before admission. Broader reflection and
+  green-thread changes remain future work.

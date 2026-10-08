@@ -1,0 +1,102 @@
+{
+  "scope": "Diagnostic native-only core probes, not a proposed replacement bootstrap",
+  "commands": [
+    {
+      "name": "native-runtime-as-core",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--core-reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-bootstrap-survey/native-runtime-as-core.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/raven-target/samples/application-constructor-arguments.rvn"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "neoCLR: Duplicate input path: /private/tmp/string-builder-native1008d/System.Runtime.dll\n",
+      "published": false
+    },
+    {
+      "name": "omit-cli-core",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-bootstrap-survey/omit-cli-core.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/raven-target/samples/application-constructor-arguments.rvn"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "neoCLR: --runtime-seed requires --core-reference, a distinct output and no legacy --system-symbols selection.\n",
+      "published": false
+    },
+    {
+      "name": "native-runtime-as-core-without-duplicate-reference",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--core-reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-bootstrap-survey/native-runtime-as-core.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/raven-target/samples/application-constructor-arguments.rvn"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "neoCLR: Metadata input exceeds its image limit: /private/tmp/string-builder-native1008d/System.Runtime.dll\n"
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "68f1dc42182526786b1f66e0fd89a4d840a5712d696cd8b3f96e914e27117766",
+    "/Users/robert/Projects/neoclr/docs/experiments/raven-target/samples/application-constructor-arguments.rvn": "839869f191510c19a23b1daf2c86e5fec7602c81f1c12edccbe8b481c2adb31c",
+    "/private/tmp/string-builder-native1008d/System.Runtime.dll": "29186a4a01a2cfdad8826e7bf3d0583566aecf5bb99ae06e47f86825c8d89e74",
+    "/private/tmp/string-builder-native1008d/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208"
+  }
+}

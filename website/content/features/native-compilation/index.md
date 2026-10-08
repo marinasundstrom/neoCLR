@@ -158,3 +158,18 @@ Correctness and native cleanup checks pass. This short local adapter comparison 
 not rerun the interpreter or establish a .NET comparison. Collection still runs at
 every native boundary; production GC policy remains future work.
 See the checked-in `benchmarks/native-web/gc-index-validation.json` for raw evidence.
+
+
+### Coverage baseline
+
+A development survey of 104 Raven samples emitted 68 artifacts; 12 ran successfully
+with matching interpreted/native output and 56 reached an AOT rejection. Primitive
+arrays were the first blocker in 39 cases. This is an inventory of older API samples,
+not the full native test suite or a requirement that every sample work in every mode.
+The focused callback, Result-list, queue/fault and HTTP consumers also pass. The release
+aims for a stable, documented subset while the compiler-target bootstrap still needs
+to remove its temporary CLI Core dependency.
+
+Future reflection may use IL-free metadata beside the executable, sharing descriptions
+with native interop. Invocation would additionally require retained native code and
+calling conventions. This is a proposal, not current support.
