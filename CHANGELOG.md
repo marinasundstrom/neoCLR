@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Extend AOT erased transport and closed specialization with Int64/UInt64, preserving
+  high bits and exact type tags through generic calls. Admit full-width equality;
+  mismatched unpack retains RuntimeError/no-result-publication behavior. Add Raven
+  socket-handle and listener probes: the former runs in both modes, while the listener
+  advances from UnpackValue<long> rejection to unbound native socket services. Report
+  the unsupported generic shape explicitly for the full HTTP app. No interpreter or
+  public library/bridge contract changes.
+
 - Add a native-web benchmark workbench with a checked-in Raven routing workload,
   same-artifact interpreted/native process measurements, provenance and HTTP server
   admission reporting. Add an ASP.NET Core greeting comparison candidate; matched

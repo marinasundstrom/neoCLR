@@ -1946,3 +1946,24 @@ with bounded stack work, but supplies neither GC handles nor runtime-owned excep
 General host root registration, borrowed ownership/initialization and native service
 internals still need contracts before a collector can use the roots. Collection remains
 disabled, and this slice does not change fault codes, standardized messages or exit status.
+
+
+## HTTP socket-handle prerequisite — 2026-10-08
+
+Native erased pack/test/unpack now admits Int64 and UInt64, preserving all 64 payload
+bits and signed/unsigned nominal tags through locals and generic call/return paths.
+Wrong-tag unpack returns RuntimeError without publishing the caller result. Closed
+method/type specialization admits these scalar arguments, and 64-bit equality compares
+all bits. Private tags 5/6 extend the experimental representation; String remains tag 4
+and the two-lane erased layout/root rule is unchanged. This is not a stable public ABI.
+The interpreter already supports these types; this aligns native observable behavior
+with it and ordinary .NET signed/unsigned boxed-type distinctions, without adopting
+.NET's object layout.
+
+The Raven [socket-handle probe](../../../benchmarks/native-web/SocketHandle.rvn) runs
+in both modes. The actual Socket.Listen/GetLocalPort/Close consumer now reaches native
+service admission instead of rejecting UnpackValue<long>; SocketClose is its first
+unbound contract. The full HTTP app additionally needs function-valued generic support.
+[Focused validation](../../../benchmarks/native-web/handle-validation.json) includes
+boundary values, high-bit inequality, mismatch faults and existing native GC tests.
+No Raven compiler/CLI bridge or public library signature changes are involved.

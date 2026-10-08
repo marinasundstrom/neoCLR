@@ -55,6 +55,20 @@ not HTTP timings; loading, verification and differing GC policies remain in scop
 [Raw samples and provenance](routing-validation.json) also record the server's current
 selection rejection and a successful .NET greeting correctness check (JIT, no timings).
 
+## Socket-handle prerequisite
+
+`SocketHandle.rvn` now runs in both modes with full-width signed/unsigned generic
+values. Native erased values also admit Int64 and UInt64 with distinct private tags;
+IL tests cover exact high bits, copies, calls and mismatched unpack faults. The
+interpreter already supports this behavior, so no interpreter change was needed.
+`Listen.rvn` isolates Socket.Listen/GetLocalPort/Close and passes interpreter execution.
+Its AOT selection now reaches the unbound native SocketClose contract, after removing
+the earlier UnpackValue<long> specialization blocker. This does not enable native
+networking yet. The complete HTTP server also reaches a function-valued generic
+argument, which remains unsupported. [Commands and evidence](handle-validation.json).
+This is correctness/admission work, not a performance optimization; the routing
+benchmark is unaffected and was not rerun for a speed claim.
+
 ## HTTP comparison contract and next slices
 
 1. Unblock AOT admission of the existing server dependency graph, then statically link

@@ -1,0 +1,15 @@
+import System.*
+import System.Result.*
+import System.Networking.Sockets.*
+
+func Main() -> int {
+    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 4) else {
+        return 1
+    }
+    let port = listener.GetLocalPort()
+    listener.Close()
+    let Ok(value) = port else {
+        return 2
+    }
+    return if value > 0 { 0 } else { 3 }
+}

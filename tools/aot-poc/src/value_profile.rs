@@ -53,7 +53,9 @@ pub(super) fn erased_tag(ty: &Type) -> Result<i64, Error> {
         Type::Byte => Ok(2),
         Type::Boolean => Ok(3),
         Type::String => Ok(4),
-        _ => Err("erased payload requires Int32, Byte, Boolean, Void or String".into()),
+        Type::Int64 => Ok(5),
+        Type::UInt64 => Ok(6),
+        _ => Err("erased payload requires Int32, Int64, UInt64, Byte, Boolean, Void or String".into()),
     }
 }
 
@@ -971,8 +973,8 @@ impl<'a> Profile<'a> {
                 }
                 Op::Equal => {
                     let t = pop(&mut stack)?;
-                    if !matches!(t, Ty::Int | Ty::Bool | Ty::Literal) {
-                        return Err(fail(pc, "equality requires Int32, Boolean or String"));
+                    if !matches!(t, Ty::Int | Ty::Wide | Ty::Bool | Ty::Literal) {
+                        return Err(fail(pc, "equality requires Int32, Int64/UInt64, Boolean or String"));
                     }
                     take(&mut stack, &t)?;
                     stack.push(Ty::Bool);

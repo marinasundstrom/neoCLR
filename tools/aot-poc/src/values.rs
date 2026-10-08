@@ -949,7 +949,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     Op::PackValue(t) => {
                         let payload = pop(&mut stack);
                         let payload = normalize(&mut b, &p, &p.ty(t)?, &[payload])[0];
-                        let payload = if *t == neoclr::metadata::Type::String { payload } else { b.ins().uextend(types::I64, payload) };
+                        let payload = if matches!(p.ty(t)?, Ty::Literal | Ty::Wide) { payload } else { b.ins().uextend(types::I64, payload) };
                         stack.push(b.ins().iconst(types::I32, profile::erased_tag(t)?));
                         stack.push(payload);
                     }
@@ -963,7 +963,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             let wrong = b.ins().icmp_imm(IntCC::Equal, matches, 0);
                             let status = b.ins().iconst(types::I32, 3); // RuntimeError
                             return_if_detailed(&mut b, wrong, status, site.as_ref());
-                            stack.push(if *t == neoclr::metadata::Type::String { payload } else { b.ins().ireduce(types::I32, payload) });
+                            stack.push(if matches!(p.ty(t)?, Ty::Literal | Ty::Wide) { payload } else { b.ins().ireduce(types::I32, payload) });
                         }
                     }
                     Op::Arg(n) | Op::Load(n) => {

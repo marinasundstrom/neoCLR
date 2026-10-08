@@ -1963,3 +1963,45 @@ fn thirty_two_lane_nested_record_crosses_call_boundary() {
     let m=neoclr::assemble(&source).unwrap();
     native_mode(&neoclr::metadata_container::write_module(&m).unwrap(),0,0,16,"Main",true);
 }
+
+#[test]
+fn erased_wide_integers_preserve_bits_and_nominal_tags_through_generic_calls() {
+    let mut source = String::from(".module ErasedWide\n.entry Main\n.type Box<T>\n.field Item T\n.end\n.function Copy<T>(!!0 value) -> !!0\nldarg value\nret\n.end\n.function Unpack<T>(Value value) -> !!0\nldarg value\nvalue.unpack !!0\nret\n.end\n.function Main() -> Int32\n.local Value item\n");
+    for (kind, bits) in [("Int64", i64::MIN), ("Int64", i64::MAX), ("Int64", 0x1234567887654321), ("UInt64", -1), ("UInt64", i64::MIN), ("UInt64", 0)] {
+        let conversion = if kind == "UInt64" { "conv.u8\n" } else { "" };
+        source += &format!("ldc.i8 {bits}\n{conversion}call Copy<{kind}>({kind})\nnewobj Box<{kind}>\nldfld 0\nvalue.pack {kind}\nstloc item\n");
+        for target in ["Int32", "Int64", "UInt64", "String"] {
+            source += &format!("ldloc item\nvalue.is {target}\n{} fail\n", if kind == target { "brfalse" } else { "brtrue" });
+        }
+        source += &format!("ldloc item\ncall Unpack<{kind}>(Value)\nldc.i8 {bits}\n{conversion}ceq\nbrfalse fail\n");
+        // Differences only above bit 31 must not disappear during erased transport.
+        let different = bits ^ (1_i64 << 40);
+        source += &format!("ldloc item\ncall Unpack<{kind}>(Value)\nldc.i8 {different}\n{conversion}ceq\nbrtrue fail\n");
+    }
+    source += "ldc.i4 42\nret\nfail:\nldc.i4 -1\nret\n.end\n";
+    let m = neoclr::assemble(&source).unwrap();
+    assert_eq!(neoclr::LoadedProgram::new(&m).unwrap().run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+    let temp = Temp::new();
+    let compiled = compile_mode(&bytes, &temp, "@entry", true);
+    assert!(compiled.status.success(), "{}", String::from_utf8_lossy(&compiled.stderr));
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    native_mode(&bytes, 0, 0, 42, "@entry", true);
+}
+
+#[test]
+fn erased_wide_integer_mismatch_faults_without_publishing_result() {
+    for (packed, unpacked) in [("Int64", "UInt64"), ("UInt64", "Int64"), ("Int64", "Int32")] {
+        let conversion = if packed == "UInt64" { "conv.u8\n" } else { "" };
+        let source = format!(".module WrongWide\n.entry Main\n.function Main() -> Int32\nldc.i8 -1\n{conversion}value.pack {packed}\nvalue.unpack {unpacked}\npop\nldc.i4 42\nret\n.end");
+        let m = neoclr::assemble(&source).unwrap();
+        let error = neoclr::LoadedProgram::new(&m).unwrap().run(neoclr::Limits::default()).unwrap_err();
+        assert!(error.to_string().contains("erased value contains"), "{error}");
+        let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+        let temp = Temp::new();
+        let compiled = compile_mode(&bytes, &temp, "@entry", true);
+        assert!(compiled.status.success(), "{}", String::from_utf8_lossy(&compiled.stderr));
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        native_mode(&bytes, 0, 3, 12345, "@entry", true);
+    }
+}

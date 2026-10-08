@@ -1,0 +1,21 @@
+import System.*
+
+// Exercise wide generic values needed by socket-handle transport.
+// Erased pack/unpack and mismatch paths have separate IL contract tests.
+static class Handles {
+    static func Copy<T>(value: T) -> T {
+        return value
+    }
+}
+
+func Main() -> int {
+    let signed = Handles.Copy<long>(4294967297L)
+    let unsigned = Handles.Copy<ulong>((ulong)-1L)
+    if signed != 4294967297L || signed == 1L {
+        return 1
+    }
+    if unsigned != (ulong)-1L {
+        return 2
+    }
+    return 0
+}

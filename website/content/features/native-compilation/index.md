@@ -38,7 +38,9 @@ listen on a socket or measure HTTP throughput.
 
 [Web and HTTP](../web/) explains the existing application APIs and server case.
 The server source compiles to neoCLR metadata, but its native dependency selection
-currently rejects unsupported generic arguments. Socket/task integration and sustained
+currently rejects function-valued generic arguments. Wide socket-handle values now
+compile, but the isolated listener still needs native socket service bindings. Task
+integration and sustained
 server execution are not yet qualified in AOT.
 
 ## Measurements and comparisons

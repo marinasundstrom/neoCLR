@@ -159,10 +159,10 @@ impl Specializer<'_> {
         if target
             .generic_arguments
             .iter()
-            .any(|t| !matches!(t, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String))
+            .any(|t| !matches!(t, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String | Type::Int64 | Type::UInt64))
         {
             return Err(
-                format!("generic method arguments require primitive Int32/small-integer/Boolean/Void/String shapes: {} {:?}", target.name, target.generic_arguments).into(),
+                format!("generic method arguments require primitive Int32/Int64/UInt64/small-integer/Boolean/Void/String shapes: {} {:?}", target.name, target.generic_arguments).into(),
             );
         }
         let arguments = match &target.owner {
@@ -365,14 +365,14 @@ fn validate_argument(ty: &Type, depth: usize) -> Result<(), Error> {
         return Err("generic argument nesting exceeds 16".into());
     }
     match ty {
-        Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String | Type::Named(_) => Ok(()),
+        Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String | Type::Int64 | Type::UInt64 | Type::Named(_) => Ok(()),
         Type::Constructed { arguments, .. } => {
             for arg in arguments {
                 validate_argument(arg, depth + 1)?;
             }
             Ok(())
         }
-        _ => Err("generic arguments must be closed value types".into()),
+        _ => Err(format!("unsupported closed generic argument: {ty:?}").into()),
     }
 }
 

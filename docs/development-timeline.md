@@ -11882,3 +11882,11 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
   [Recorded inputs and samples](../benchmarks/native-web/routing-validation.json).
 - **Open:** Native server support and full HTTP measurements; no cross-platform speed
   ranking or production readiness is claimed. See the [workbench](../benchmarks/native-web/README.md).
+
+
+- **HTTP follow-through:** Isolating listener creation exposed the missing native
+  UnpackValue<long> path. Add exact Int64/UInt64 erased transport, generic scalar
+  specialization and equality, with ten focused tests and a Raven wide-value consumer.
+  The listener passes interpreted execution and now reaches unbound socket services;
+  the full server independently reaches function-valued generic arguments. The author
+  directs “Continue and don't stop”; continue implementation slices toward the HTTP app.
