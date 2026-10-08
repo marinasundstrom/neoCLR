@@ -32,8 +32,9 @@ now closes both unexpected interpreter introspection failures; bootstrap remains
 now use finite Double assembly-level metadata and compile-time inlining. Their interpreter
 consumer and native/standalone runs now pass after [bounded Double lowering](experiments/aot-double/README.md).
 Remaining floating instructions and Math services are explicit gaps. Bootstrap qualification
-remains a release priority; the next sample-driven AOT candidates are file services and
-jagged arrays, while RuntimeTypeHandle introspection remains excluded.
+remains a release priority. [Native file output](file-output.md#native-compilation-development-2026-10-08)
+now passes a bounded Raven consumer; file input is the next combined-file-sample gap.
+Jagged arrays and RuntimeTypeHandle introspection remain excluded.
 The wider audit also found the handwritten legacy union bridge's `IUnion`; it now
 uses `UnionValue`, with regenerated fragments and executable union/time checks. This does not change the bootstrap release gate or promise
 runtime suspension, JIT, reflection or stable callback ABI support.

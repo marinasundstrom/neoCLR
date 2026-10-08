@@ -4797,3 +4797,105 @@ int main(int argc, char **argv) {
         }
     }
 }
+
+const FILE_OUTPUT_SEED: &str = ".module System\n.references ()\n.function neoCLR.Runtime.WriteAllText(String, String, Int32) -> Int32\n.methodimpl InternalCall\n.end";
+
+#[test]
+fn file_output_requires_exact_opt_in_contract() {
+    let source = ".module FileOutput\n.function Calculate(Int32 mode) -> Int32\nldstr \"unused\"\nldstr \"text\"\nldc.i4 4\ncall neoCLR.Runtime.WriteAllText(String, String, Int32)\nret\n.end";
+    let seed = neoclr::assemble(FILE_OUTPUT_SEED).unwrap();
+    for flags in [vec!["--compile-system", "--reference-arena"], vec!["--bind-file-output"],
+        vec!["--compile-system", "--bind-file-output"],
+        vec!["--compile-system", "--reference-arena", "--bind-file-output", "--bind-file-output"]] {
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, source, &flags, false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists(), "{r:?}");
+    }
+    let mut impostor = seed.clone();
+    impostor.functions[0].impl_flags = 0;
+    impostor.functions[0].body = vec![neoclr::metadata::Instruction::Int(0), neoclr::metadata::Instruction::Return];
+    let dir = Temp::new();
+    let r = compile_source(&dir, &impostor, source, &["--compile-system", "--reference-arena", "--bind-file-output"], false);
+    assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    assert!(String::from_utf8_lossy(&r.stderr).contains("native file output requires exact"));
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn file_output_matches_interpreter_and_preserves_preflight_files() {
+    let dir = Temp::new();
+    let destination = dir.0.join("世界.txt");
+    let symlink = dir.0.join("link.txt");
+    std::os::unix::fs::symlink(&destination, &symlink).unwrap();
+    let regular = destination.to_str().unwrap();
+    let missing = dir.0.join("missing/leaf.txt");
+    let cases = [
+        (regular, "Hello, värld!", 14, 0, "Hello, värld!"),
+        (regular, "a\0b", 3, 0, "a\0b"),
+        (regular, "", 0, 0, ""),
+        (regular, "replacement", 2, 7, "original"),
+        (regular, "", -1, 1, "original"),
+        ("", "", -1, 1, "original"),
+        ("", "", 0, 2, "original"),
+        ("bad\0path", "", 0, 2, "original"),
+        (missing.to_str().unwrap(), "x", 1, 3, "original"),
+        (dir.0.to_str().unwrap(), "x", 1, 5, "original"),
+        (symlink.to_str().unwrap(), "followed", 8, 0, "followed"),
+    ];
+    let mut source = String::from(".module FileOutput\n.function Calculate(Int32 mode) -> Int32\n");
+    for i in 0..cases.len() { source += &format!("ldarg mode\nldc.i4 {i}\nbeq Case{i}\n"); }
+    source += "ldc.i4 -1\nret\n";
+    for (i, (path, text, limit, _, _)) in cases.iter().enumerate() {
+        source += &format!("Case{i}:\nldstr {}\nldstr {}\nldc.i4 {limit}\ncall neoCLR.Runtime.WriteAllText(String, String, Int32)\nret\n", serde_json::to_string(path).unwrap(), serde_json::to_string(text).unwrap());
+    }
+    source += ".end\n";
+    let seed = neoclr::assemble(FILE_OUTPUT_SEED).unwrap();
+    let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena", "--native-gc", "--bind-file-output"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+#include "file-output.h"
+#include <stdlib.h>
+#include <fcntl.h>
+static int open_count(void) {
+    int count = 0;
+    for (int fd = 0; fd < 256; fd++) if (fcntl(fd, F_GETFD) >= 0) count++;
+    return count;
+}
+int main(int argc, char **argv) {
+    uint64_t storage[257]; storage[256] = UINT64_C(0x1122334455667788);
+    neoclr_aot_context ctx = {.text = {(unsigned char *)storage, 2048, 0}};
+    int32_t result = -99;
+    if (neoclr_file_write_utf8_v1(NULL, NULL, 0, &result) != 3 || result != -99) return 91;
+    int descriptors = open_count();
+    int status = neoclr_entry_v4(argc > 1 ? atoi(argv[1]) : 0, &result, &ctx);
+    if (open_count() != descriptors) return 96;
+    if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 92;
+    if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used) return 93;
+    if (storage[256] != UINT64_C(0x1122334455667788)) return 94;
+    if (status) { neoclr_aot_render_fault(stderr, &ctx.fault); return 1; }
+    printf("%d\n", result); return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(dir.0.join("host.c")).arg(base.join("file-output.c")).arg(base.join("text-arena.c"))
+        .arg(base.join("native-gc.c")).arg(base.join("root-probe.c"))
+        .arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+        .arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let app = neoclr::assemble(&source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for (i, (_, _, _, status, expected)) in cases.iter().enumerate() {
+        fs::write(&destination, "original").unwrap();
+        assert_eq!(method.invoke(vec![neoclr::Value::Int32(i as i32)], neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(*status), "case {i}");
+        assert_eq!(fs::read(&destination).unwrap(), expected.as_bytes());
+        fs::write(&destination, "original").unwrap();
+        let r = Command::new(dir.0.join("host")).arg(i.to_string()).env_clear().output().unwrap();
+        assert_eq!(r.status.code(), Some(0), "case {i}: {r:?}");
+        assert_eq!(r.stdout, format!("{status}\n").as_bytes()); assert!(r.stderr.is_empty());
+        assert_eq!(fs::read(&destination).unwrap(), expected.as_bytes());
+    }
+}

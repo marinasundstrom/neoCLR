@@ -339,6 +339,30 @@ pub fn paths(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>
     Ok(bindings)
 }
 
+/// Explicit bounded file-output service; Result construction remains managed CIL.
+pub fn file_output(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        if row["name"] != "neoCLR.Runtime.WriteAllText" { continue; }
+        let name = "neoCLR.Runtime.WriteAllText";
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != name || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != vec![Type::String, Type::String, Type::Int32] || f.returns != Type::Int32 || f.no_result
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty() || !f.locals.is_empty()
+            || f.is_virtual || f.is_override || f.is_abstract || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+            return Err("native file output requires exact WriteAllText(String, String, Int32) -> Int32 InternalCall contract".into());
+        }
+        f.impl_flags = 0;
+        f.body = vec![Op::Int(0), Op::Return];
+        bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],
+            "implementation":"file-write-utf8-v1","symbol":"neoclr_file_write_utf8_v1","semantics":"bounded blocking UTF-8 file output; ordinary host permissions; preflight before open"}));
+    }
+    Ok(bindings)
+}
+
 pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {

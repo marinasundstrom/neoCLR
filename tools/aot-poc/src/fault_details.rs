@@ -40,6 +40,7 @@ pub struct Options {
     pub parse_int32: Vec<usize>,
     pub int32_to_string: Vec<usize>,
     pub string_compare_ordinal: Vec<usize>,
+    pub file_output: Vec<usize>,
     pub path_combine: Vec<usize>,
     pub path_file_name: Vec<usize>,
     pub string_contains_ordinal: Vec<usize>,
@@ -188,6 +189,9 @@ impl Options {
                 .filter(|r| r["implementation"] == "utf8-encode-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
+            file_output: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "file-write-utf8-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             path_combine: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "path-combine-unix-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
