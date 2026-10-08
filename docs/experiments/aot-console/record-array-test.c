@@ -81,5 +81,37 @@ int main(void) {
     CHECK(neoclr_gc_statistics_v1().reclaimed_allocations == reclaimed_before + 2);
 #endif
     CHECK(wide_buffer[256] == UINT64_C(0x8877665544332211));
+    uint64_t default_buffer[129] = {0};
+    default_buffer[128] = UINT64_C(0x1234567887654321);
+    neoclr_aot_context defaults = {.text = {(unsigned char *)default_buffer, 1024, 0}};
+    void *references = (void *)(uintptr_t)123;
+    CHECK(neoclr_allocate_references_v1(&defaults.text, -1, &references) == 3);
+    CHECK(neoclr_allocate_references_v1(&defaults.text, 65537, &references) == 7);
+    CHECK(neoclr_allocate_references_v1(&defaults.text, 65536, &references) == 5);
+    CHECK(neoclr_allocate_references_v1(&defaults.text, 1, NULL) == 3);
+    CHECK(neoclr_allocate_references_v1(NULL, 1, &references) == 3);
+    CHECK(references == (void *)(uintptr_t)123 && !defaults.text.used);
+    CHECK(!neoclr_allocate_references_v1(&defaults.text, 0, &references));
+    CHECK(((uint64_t *)references)[1] == 0);
+    CHECK(!neoclr_allocate_references_v1(&defaults.text, 2, &references));
+    uint64_t *slots = references;
+    CHECK(slots[1] == 2 && slots[2] == 1 && !slots[3] && !slots[4]);
+    CHECK(((unsigned char *)slots)[40] == 1 && ((unsigned char *)slots)[41] == 1);
+#ifdef NEOCLR_NATIVE_GC
+    void *child;
+    CHECK(!neoclr_gc_allocate_v1(&defaults.text, 16, NEOCLR_GC_OBJECT, &child));
+    slots[3] = (uintptr_t)child;
+    uint64_t array_root = (uintptr_t)slots;
+    neoclr_probe_storage array_slot = {&array_root, 8, 0};
+    neoclr_probe_frame array_frame = {.context = &defaults, .storage = &array_slot, .storage_count = 1};
+    CHECK(!neoclr_gc_collect_v1(&defaults, &array_frame));
+    uint64_t before_clear = neoclr_gc_statistics_v1().reclaimed_allocations;
+    slots[3] = 0;
+    CHECK(!neoclr_gc_collect_v1(&defaults, &array_frame));
+    CHECK(neoclr_gc_statistics_v1().reclaimed_allocations == before_clear + 1);
+    array_root = 0;
+    CHECK(!neoclr_gc_collect_v1(&defaults, &array_frame) && !defaults.text.used);
+#endif
+    CHECK(default_buffer[128] == UINT64_C(0x1234567887654321));
     return buffer[128] == UINT64_C(0x1122334455667788) ? 0 : 1;
 }

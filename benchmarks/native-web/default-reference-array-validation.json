@@ -1,0 +1,654 @@
+{
+  "revision": "1557820780b2f9d7ced832aa075db5da03cb1454",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/verify_callbacks.py": "d77339a76ee6a1cb9221af5d0f304be8d8b0cfdafa12b246abcb970c1da1d918",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "fa7a759a1730e7a4495261b16a411a59014da3be77807a740e30457a3e6054f9",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "1dce6941418f7a32fff61e5cc9a8083aec687cd1e3ef9541910c7b3801149be2",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "ce12c39700e0809f49c0064ec1a0e81e47ad2c171dab6fb3d5211f2a12604ff4",
+    "/private/tmp/native-interface-names1008b/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/native-interface-names1008b/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/native-interface-names1008b/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/private/tmp/native-interface-names1008b/System.Runtime.dll": "5962383158a6482b659607c37afeac5e31e3e713d616caaf82cb72d3a1c7c930",
+    "/private/tmp/native-interface-names1008b/System.Web.dll": "620e60578cf3e570ecd872f32375bdb8a81cc66738fef1b90926b4b9f4652594",
+    "/private/tmp/native-interface-names1008b/System.Networking.dll": "f50dc44dfb42a78583aa22557d1146e07576d847b5fdca879b7347320751d639",
+    "/private/tmp/native-interface-names1008b/System.Data.dll": "579c7bbd3f23bb0fe34b2d039ecdef244ed74a8d88fe93985b31c687f23edee2",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue-host.c": "d710811ab31d662ad99fdad39c149f304a2e756f64f5efa6dfb8541bfd1bb76a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "c9284a4ae603e65f3b3db0a916bd5406d9ea7a0787150b83c6c0002599eb6f85",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c": "142d94033765ab413ab01f9616c47a03c1cde4e8ac1c6244baf9d356011954f8",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c": "e0d472372663f9c15b131144a83a451ef321342a397f93b61f4db8125e703502",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "5aa8bf1ae2755d7a39bcdeda051041f2f4585e90a82765e176d6625432dd99fe",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "a44d027c8bc0f34b1125aa99506c2a9f5955b0488c4ca4a369f04a91a730774f",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/flow.rs": "bf87fc1a01e7ce015ecc1a17b34fc931953e84e10d68610647ce523c0aae7d8d",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/boxing.rs": "6e862a8840c07e92f60748f9e4e0d5590bbdda5fa04ff5099b6b44bd776c09ec",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_layout.rs": "5268376ffb96bc2b0e570958d0197c92d2c13ebd4377db28b3b6d47a3e23bf0e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/fault_details.rs": "758c51cd1090938c6200bf4d35a58c89c036190d75c67ca63c5d053395f38f76",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/compiler.rs": "be3a2474be26f42d835e99b33ac62922df5a056b77ee9d1d1ca418ed2d4717c3",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_probe.rs": "a162c14ac728cc1433e1fe79eb3deb35bf5a5014e27ea75aa98b6168dd3e2e78",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/values.rs": "a4d71b26f75c0a51505e66f8207f0f5d573fd8d86e9cc61be7a02d2c6bb476b9",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/limits.rs": "ea7a3f45884246b945b9ffad28fb0b735a99a1ebe35d921489ecef89f214dfd0",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/specialization.rs": "d28ae4d06e9b861bd1a55db1899d31a10c77d0740b74af24c065155448bdab07",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_points.rs": "f48d894a17e8d95c36bddfc338d796609c8dc6f3dd8fe3218703310bb9a680a6",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/value_profile.rs": "514186b7cf09cdd1ebebeef46aba936853ea64e4edc952caa2281122255cf41f",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/selection.rs": "9c132f5ae0b8be8e4ac478f18cb5ec9ea3b01fdde8af2b13db940f3506a88c4f",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/main.rs": "8a5fefaf319778c9f5bdb788c1630f4561bf7b96a8d40c0e2b56cbfd023032cf",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/linking.rs": "54c63fea85184bff43c76ebbd62183905f7b0de73281607ec74139629bac3e7e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/bindings.rs": "929ceaebd976b3bccbe472b34a038f5389d9995031210b568c7283ebd56715a4",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/inspection.rs": "29336902e21a86b602262b2d1d1ffae85e14dd157c5551283f1de74dd5effca4",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "c09fec95a830bcec3e75d0a158a112c8b7d3831ae61807a0aade5537695be672",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.h": "7bbbb18bea726a2f9c8e1a5cbc9b01c8b5f02ffaf7f5cb3487d3f0e3e20ff5c2",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": "d2644b95bb3241e12533399d7b90e038635b96ce0217ba6d2d7ed8f94208d546",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "112e954b1b47ba3a3fd01200316a10a1c06baa8e9c1e0f3f6ea4bf7bbeefec35",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "7f18a49c61470e92708d0066ca9b90b1bffe6161ef6ee6973cfc6b6c651b4ebd",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "26ea46ca8a29153547692b417b66bc0941c286306d014fce7dc658b2a8d40455",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "d9944d1c120aa83f8d91798eaf0c4d050753e717a384c759890bd012eb95dbd7",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "954bdc52f38a35797a8072161bf7f096719739dc9e50c841cb744d2d61c258d4",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "664a662e35a536cbbcb0ec903987fdeb9cfcf4dfac93dcc8a1edf99c27d3d556",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "1747320cb6eb7556f22be8dcc5cbc32b5df02ca6ed0064bcebee58b2e54e54a6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "971ef9c16b39495db915d86fd9df6453bc575bf9f9d5fde9edef3b0a6678a5bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.Core.dll": "55af901264be2597f2233594e2143038b058ff52548dceb9bf96ede74101a53a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/ReferenceArrays.rvn": "e9d73f7743c3a20fa2e0eec7a3c14b66334433138fabf3631daa369c973d1521",
+    "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays.dll": "3f13e343b055a24b4b49f7f257b8c6c42ea5c96c2a6e360f0b0d44fc1d80e0bc",
+    "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays.o": "7ef8839d09227743581eb3c01f178fc711725ef1fe76a23929302f20c8978d53",
+    "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays-standalone": "5998a135f888d7b039867cc407251f3c8472b3b4b0ee30c3e2baffdbb84a438a",
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/ReferenceList.rvn": "eba4e4c5446e261cd3cc9c33fdef6ec10a19120a5e603c49fe2575e9e8e2cc3c",
+    "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList.dll": "104b4909f1672d54db9c314e4814658b847bd0afac58463749ed3a59f1b93d22",
+    "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList.o": "11c96a5841cb88d181fa748f37aa0c457b879828b9abe1834da79b92f0711e97",
+    "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList-standalone": "860e11b71249e9de1fc1f531c8f8d48500e758641892c0d67dc45de2002366b9",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-server/Server.rvn": "a76485f804065ddec7d5903a83aa9e8cf4bca2aaafc9dcbb30178276324d715c"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/native-interface-names1008b/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/native-interface-names1008b/System.runtime.neox",
+        "--reference",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/native-interface-names1008b/System.Web.dll",
+        "--reference",
+        "/private/tmp/native-interface-names1008b/System.Networking.dll",
+        "--reference",
+        "/private/tmp/native-interface-names1008b/System.Data.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/native-interface-names1008b/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays.dll",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/ReferenceArrays.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays.dll",
+        "--system",
+        "/private/tmp/native-interface-names1008b/System.runtime.neox",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Web.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Networking.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Data.dll",
+        "--object-root",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/native-interface-names1008b/System.runtime.neox",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Web.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Networking.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Data.dll",
+        "--object-root",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-task-queue",
+        "--native-stack-budget",
+        "--bind-console-write-line"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "3106afb66752ec736d9dd5a3e37746d3e63912685acdbfacbc2b457c83e14229"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays.o",
+        "--system",
+        "/private/tmp/native-interface-names1008b/System.runtime.neox",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Web.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Networking.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Data.dll",
+        "--object-root",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-task-queue",
+        "--native-stack-budget",
+        "--bind-console-write-line"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "73aeecb0afa8c0491df3e739013d3d281844fdf17bc1357b18122503d025f50e"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays-standalone"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceArrays-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/native-interface-names1008b/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/native-interface-names1008b/System.runtime.neox",
+        "--reference",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/native-interface-names1008b/System.Web.dll",
+        "--reference",
+        "/private/tmp/native-interface-names1008b/System.Networking.dll",
+        "--reference",
+        "/private/tmp/native-interface-names1008b/System.Data.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/native-interface-names1008b/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList.dll",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/ReferenceList.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList.dll",
+        "--system",
+        "/private/tmp/native-interface-names1008b/System.runtime.neox",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Web.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Networking.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Data.dll",
+        "--object-root",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/native-interface-names1008b/System.runtime.neox",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Web.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Networking.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Data.dll",
+        "--object-root",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-task-queue",
+        "--native-stack-budget",
+        "--bind-console-write-line"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "c3dba1266e85888746222ace1a0eba8ebdf3f5cc77bbf2d7cf875bf5a25fb897"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList.o",
+        "--system",
+        "/private/tmp/native-interface-names1008b/System.runtime.neox",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Web.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Networking.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Data.dll",
+        "--object-root",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-task-queue",
+        "--native-stack-budget",
+        "--bind-console-write-line"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "04c3380cfd4781d4577d1aad7c0cb06d32cabb9d616d74654c2d37e8c8a66f7f"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList-standalone"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/ReferenceList-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/native-interface-names1008b/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/native-interface-names1008b/System.runtime.neox",
+        "--reference",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/native-interface-names1008b/System.Web.dll",
+        "--reference",
+        "/private/tmp/native-interface-names1008b/System.Networking.dll",
+        "--reference",
+        "/private/tmp/native-interface-names1008b/System.Data.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/native-interface-names1008b/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/Server.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/http-server/Server.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/native-default-reference-arrays1008/Server.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/native-interface-names1008b/System.runtime.neox",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Web.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Networking.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Data.dll",
+        "--object-root",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-task-queue",
+        "--native-stack-budget",
+        "--bind-console-write-line",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-integer-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "29a2e788d33050de887bfb9988a65b30041dec7344da840e118ba98a5f9fa2f5"
+      },
+      "stderr": ""
+    }
+  ],
+  "cases": {
+    "ReferenceArrays": {
+      "status": 0,
+      "output": "",
+      "fault": "",
+      "heapCapacity": 65536,
+      "bindings": [
+        {
+          "compiledIndex": 3,
+          "definition": {
+            "index": 2,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "implementation": "object-reference-equals-intrinsic-v1",
+          "name": "neoCLR.Runtime.ObjectReferenceEquals",
+          "semantics": "reference identity including null; no content comparison or allocation"
+        }
+      ]
+    },
+    "ReferenceList": {
+      "status": 0,
+      "output": "",
+      "fault": "",
+      "heapCapacity": 65536,
+      "bindings": [
+        {
+          "compiledIndex": 5,
+          "definition": {
+            "index": 127,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        },
+        {
+          "compiledIndex": 18,
+          "definition": {
+            "index": 2,
+            "module": "System"
+          },
+          "implementation": "string-concat-v1",
+          "name": "neoCLR.Runtime.StringConcat",
+          "symbol": "neoclr_string_concat_v1"
+        },
+        {
+          "compiledIndex": 3,
+          "definition": {
+            "index": 2,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "implementation": "object-reference-equals-intrinsic-v1",
+          "name": "neoCLR.Runtime.ObjectReferenceEquals",
+          "semantics": "reference identity including null; no content comparison or allocation"
+        }
+      ]
+    }
+  },
+  "serverAdmission": {
+    "accepted": true
+  },
+  "scope": "Ordinary null-initialized nominal class-reference arrays and reserved-list regression; behavioral parity, not a benchmark",
+  "inputsUnchanged": true,
+  "focusedChecks": [
+    {
+      "command": "cargo test --manifest-path tools/aot-poc/Cargo.toml --test console reference_arrays",
+      "passed": 3,
+      "referenceArrayComparisons": 10,
+      "checks": "Default/null and reserved/unwritten reads, identity, 1000 replacements, fault trace/output parity, bounds/lengths, cleanup, borrows and wrong element rejection"
+    },
+    {
+      "command": "cargo test --manifest-path tools/aot-poc/Cargo.toml --test console native_record_arrays",
+      "passed": 2,
+      "checks": "Existing value-record runtime regression and default/borrow rejection"
+    },
+    {
+      "command": "cargo test --manifest-path tools/aot-poc/Cargo.toml --test native_gc reserved_record_array_kernel_validates_extents_and_traces_initialized_elements",
+      "passed": 1,
+      "checks": "Sanitized arena and GC variants: default markers, empty arrays, limits, exhaustion, atomic output, retention/reclamation and canaries"
+    }
+  ],
+  "focusedInputs": {
+    "tools/aot-poc/tests/console.rs": "831f26bec0b3b1c458a164529b0ed2c00d4486cddc474fa64494dbdf48b49d63",
+    "tools/aot-poc/tests/native_gc.rs": "9517d3059b37890e84746ae027a8ece585ac79170aaa38eff715c5914c94912d",
+    "docs/experiments/aot-console/record-array-test.c": "9dc0dfeb6cd2f95896fdb90ef9da811c8acbff435e272c3036075f4ffaedeeb0",
+    "docs/experiments/aot-console/reference-arrays.neoil": "130036314ef8ffd3c8f54e25c8ae52b154bebf0b061af69b9124e60e51ece1f4"
+  }
+}

@@ -177,7 +177,9 @@ calling conventions. This is a proposal, not current support.
 
 The first coverage follow-up adds bounded integer, Boolean and Void arrays, including
 checked reserved storage and atomic GC payloads. The ordinary Raven array sample now
-runs in both modes. Nine other selected samples advance to further metadata, primitive
+runs in both modes. Ordinary arrays of class references now also have null-initialized
+slots, with identity and GC checks. Array-to-interface views and value-record default
+arrays remain unsupported. Nine other selected samples advance to further metadata, primitive
 wrapper, callback and service gaps; broad Tasks/await parity is not yet claimed.
 
 

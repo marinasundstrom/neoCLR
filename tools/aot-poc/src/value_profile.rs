@@ -23,7 +23,7 @@ pub(super) enum Ty {
     ByteValues, // Immutable native-produced value-array snapshot; no element addresses.
     Size,
     Wide,
-    ReferenceArray(usize), // Checked reserved slots retaining nominal object identity.
+    ReferenceArray(usize), // Default-null or reserved slots retaining nominal object identity.
     RecordArray(usize), // Checked reserved snapshots of a closed value record.
     ScalarArray(Type), // Atomic one-lane slots; exact element identity retained.
     CallableArray(Type), // Initialized/reserved pointer slots of one exact Function shape.
@@ -842,6 +842,8 @@ impl<'a> Profile<'a> {
                 Op::NewArray(t) | Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
                     if self.references && matches!(t, Type::Function(_)) => { self.ty(t)?; },
                 Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte) | Op::ArrayElement(Type::Byte) | Op::StoreArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) | Op::ArrayLength if self.references => (),
+                Op::NewArray(t) if self.references && matches!(t, Type::Named(_))
+                    && matches!(self.ty(t)?, Ty::Reference(_)) => (),
                 Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
                     if self.references && matches!(t, Type::Named(_)) && matches!(self.ty(t)?, Ty::Record(_) | Ty::Reference(_)) => (),
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
@@ -970,7 +972,7 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
-                Op::ReserveArray(t) if matches!(t, Type::Named(_)) => {
+                Op::NewArray(t) | Op::ReserveArray(t) if matches!(t, Type::Named(_)) => {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }

@@ -417,6 +417,13 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_allocate_scalars_v1", Linkage::Import, &sig)?)
     } else { None };
+    let default_reference_array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op|
+        matches!(op, Op::NewArray(neoclr::metadata::Type::Named(_))))) {
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64, types::I32, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_allocate_references_v1", Linkage::Import, &sig)?)
+    } else { None };
     let record_array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op|
         matches!(op, Op::ReserveArray(neoclr::metadata::Type::Named(_))))) {
         let mut sig = module.make_signature();
@@ -1195,6 +1202,17 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let reserved = b.ins().iconst(types::I32, i64::from(matches!(op, Op::ReserveArray(_))));
                         let service = module.declare_func_in_func(scalar_array_service.unwrap(), b.func);
                         let call = b.ins().call(service, &[arena, count, reserved, output]);
+                        let status = b.inst_results(call)[0];
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        return_if_detailed(&mut b, failed, status, site.as_ref());
+                        stack.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
+                    }
+                    Op::NewArray(t) if matches!(t, neoclr::metadata::Type::Named(_)) => {
+                        let count = pop(&mut stack);
+                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        let output = b.ins().stack_addr(types::I64, call_result, 0);
+                        let service = module.declare_func_in_func(default_reference_array_service.unwrap(), b.func);
+                        let call = b.ins().call(service, &[arena, count, output]);
                         let status = b.inst_results(call)[0];
                         let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                         return_if_detailed(&mut b, failed, status, site.as_ref());

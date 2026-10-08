@@ -3574,11 +3574,39 @@ fn enum_layout_and_nominal_identity_are_verified_before_native_projection() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_reference_arrays_preserve_identity_owners_and_faults() {
+    check_reference_arrays(false);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_default_reference_arrays_preserve_nulls_identity_and_faults() {
+    check_reference_arrays(true);
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_reference_arrays(default_initialized: bool) {
     let dir = Temp::new();
-    let source = include_str!("../../../docs/experiments/aot-console/reference-arrays.neoil");
+    let mut source = include_str!("../../../docs/experiments/aot-console/reference-arrays.neoil").to_owned();
+    if default_initialized {
+        source = source.replace("ldc.i4 2\narray.reserve Counter", r#"ldarg mode
+ldc.i4 4
+beq Negative
+ldarg mode
+ldc.i4 5
+beq Limit
+ldc.i4 2
+br Allocate
+Negative:
+ldc.i4 -1
+br Allocate
+Limit:
+ldc.i4 65537
+Allocate:
+newarr Counter"#);
+    }
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let flags = ["--compile-system", "--reference-arena", "--native-gc"];
-    let r = compile_source(&dir, &seed, source, &flags, false);
+    let r = compile_source(&dir, &seed, &source, &flags, false);
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     fs::write(dir.0.join("host.c"), r#"
@@ -3587,14 +3615,15 @@ int main(void) {
     uint64_t buffer[257];
     buffer[256] = UINT64_C(0x1122334455667788);
     neoclr_aot_context ctx = {.text = {(unsigned char *)buffer, 2048, 0}};
-    for (int mode = 0; mode < 4; mode++) {
+    const int expected[] = {0, UNWRITTEN_FAULT, 8, 6, 3, 7};
+    for (int mode = 0; mode < MODE_COUNT; mode++) {
         int32_t result = -99;
         int status = neoclr_entry_v4(mode, &result, &ctx);
         if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 1;
         if (!mode) {
             if (status || result != 42 || ctx.fault.code) return 2;
         } else {
-            if (status != (mode == 1 ? 3 : mode == 2 ? 8 : 6) || result != -99 || ctx.fault.code != (uint32_t)status) return 3;
+            if (status != expected[mode] || result != -99 || ctx.fault.code != (uint32_t)status) return 3;
             if (neoclr_aot_render_fault(stderr, &ctx.fault)) return 4;
         }
         if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used) return 5;
@@ -3603,7 +3632,8 @@ int main(void) {
     if (stats.collections < 1000 || stats.reclaimed_allocations < 1000) return 6;
     return buffer[256] == UINT64_C(0x1122334455667788) ? 0 : 7;
 }
-"#).unwrap();
+"#.replace("MODE_COUNT", if default_initialized { "6" } else { "4" })
+        .replace("UNWRITTEN_FAULT", if default_initialized { "6" } else { "3" })).unwrap();
     let r = Command::new("clang")
         .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
         .arg(&base).arg(dir.0.join("host.c"))
@@ -3614,12 +3644,12 @@ int main(void) {
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
     assert!(r.status.success(), "{r:?}");
-    let app = neoclr::assemble(source).unwrap();
+    let app = neoclr::assemble(&source).unwrap();
     let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
     let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
     assert_eq!(method.invoke(vec![neoclr::Value::Int32(0)], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
     let mut faults = String::new();
-    for mode in 1..4 {
+    for mode in 1..if default_initialized { 6 } else { 4 } {
         let fault = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default()).unwrap_err();
         faults.push_str(&fault.diagnostic().to_string());
     }
@@ -3627,11 +3657,12 @@ int main(void) {
 }
 
 #[test]
-fn native_reference_arrays_reject_default_creation_borrows_and_wrong_elements() {
+fn native_reference_arrays_reject_borrows_and_wrong_elements() {
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let flags = ["--compile-system", "--reference-arena", "--native-gc"];
     for body in [
-        "ldc.i4 1\nnewarr Cell\npop",
+        "ldc.i4 1\nnewarr Cell\nldc.i4 0\nldelema Cell\npop",
+        "ldc.i4 1\nnewarr Cell\nldc.i4 0\nldloca other\ninitobj Other\nldloc other\nstelem Cell",
         "ldc.i4 1\narray.reserve Cell\nldc.i4 0\nldelema Cell\npop",
         "ldc.i4 1\narray.reserve Cell\nldc.i4 0\nldloca other\ninitobj Other\nldloc other\nstelem Cell",
     ] {

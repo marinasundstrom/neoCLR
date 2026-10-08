@@ -104,8 +104,8 @@ is one strong pointer slot, with its existing initialization marker. The origina
 runtime verifier checks the declared element identity; no array covariance or
 interface-element admission is added. Unwritten reads fault, whereas an explicitly
 stored null is initialized and reads successfully (dereferencing it then faults).
-Default newarr, element borrows, array identity and nominal array/interface views
-remain unsupported in this bounded native slice.
+At this first slice, default newarr, element borrows, array identity and nominal
+array/interface views remained unsupported. Default creation is added below.
 
 As with .NET List<T> for reference types, copying the container copies references:
 mutating an object through either copy is visible through both, and replacing one
@@ -117,7 +117,8 @@ is claimed; the interpreter already has these semantics.
 
 `reference-arrays.neoil` verifies array-only owner retention, shared mutations,
 1,000 replacements in a 2 KiB heap, unwritten/bounds/null fault parity, and canaries.
-Negative tests reject default creation, element borrows and wrong nominal elements.
+The original negative tests rejected default creation, element borrows and wrong
+nominal elements; the default-creation restriction is superseded below.
 [ReferenceList.rvn](../../../benchmarks/native-web/ReferenceList.rvn) exercises the real
 Raven ArrayList<Counter> growth/copy/replacement path in both modes with sanitized
 adapters, 64 KiB GC and libSystem-only standalone linkage. [Evidence](../../../benchmarks/native-web/reference-array-validation.json)
@@ -140,3 +141,37 @@ and separately allocated equal-content strings. [Evidence](../../../benchmarks/n
 records interpreter/native parity and standalone linkage. Exact-contract rejection
 has focused coverage. General Equals/GetHashCode dispatch is not implied. The HTTP
 server now reaches the value-type StreamError.ToString member contract boundary.
+
+
+### Default-null reference arrays (2026-10-08)
+
+Ordinary `newarr` now admits closed nominal class-reference elements. Each slot starts
+as initialized null, matching the interpreter and .NET reference-array behavior. The
+new private allocation entry reuses one-lane record storage and its GC scanner, marks
+all slots initialized before publishing the array, and keeps failure outputs unchanged.
+`array.reserve` still creates unwritten slots whose reads fault; default creation of
+value-record arrays, element borrows, covariance and array-to-interface casts are not
+added. This is existing semantic parity, not a new runtime/library API.
+
+Reusing the layout keeps one pointer lane, an initialization byte per slot and a
+24-byte header, even for fully initialized arrays. It avoids a second tracing format
+but does not claim .NET array compactness, precise tracing or a performance improvement.
+The interpreter already supplies null defaults and needs no implementation change.
+
+Focused executable checks cover null versus unwritten reads, object identity/mutation,
+1,000 replacements with a 2 KiB heap, negative/excessive lengths, bounds and null faults,
+unchanged fault result slots, frame cleanup and canaries. The sanitized C kernel also
+checks zero length, allocation exhaustion, null arguments, default markers, child
+retention and reclamation. Value-record default creation and reference-element borrow/
+nominal-type rejection controls remain in place.
+
+The Raven [ReferenceArrays consumer](../../../benchmarks/native-web/ReferenceArrays.rvn)
+checks array literals, aliases, copied references, null elements, empty arrays and
+replacement through collection. `application-order-collections` advances from its
+`newarr Order` rejection to `Order[]` → `Iterable<Order>` casting; that source array
+view requires separate verified dispatch support.
+
+[Recorded validation](../../../benchmarks/native-web/default-reference-array-validation.json)
+includes both Raven consumers passing interpreter, sanitized native and standalone
+execution, exact output/exit parity, libSystem-only linkage and cleanup. HTTP compiler
+admission remains accepted; existing HTTP request/timing evidence is reused.

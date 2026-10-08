@@ -164,8 +164,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   256 clones, with counted diagnostics and boundary tests. The full server now clears
   selection (208 shapes/570 functions/213 clones). Add checked reference-class array
   slots with nominal typing, strong GC retention, shared-copy identity and distinct
-  unwritten/null faults. The real Raven ArrayList<Counter> consumer passes both modes;
-  bind the exact ObjectReferenceEquals service to native identity comparison, including
+  unwritten/null faults. The real Raven ArrayList<Counter> consumer passes both modes.
+  Extend this storage to ordinary null-initialized class arrays; six focused tests and
+  two Raven consumers cover defaults, identity, GC, limits and fault parity. The order
+  sample advances to its array-to-Iterable cast; value-record defaults, element borrows
+  and covariance remain unsupported. No public API or metadata format changes.
+  Bind the exact ObjectReferenceEquals service to native identity comparison, including
   nulls and distinct equal-content strings. The full server next reaches the
   StreamError.ToString value-member contract; admit verified direct byref value
   ToString overrides in the private native projection and validate real StreamError

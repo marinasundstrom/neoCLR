@@ -352,3 +352,12 @@ addition to its existing sanitized comparison and standalone dependency check.
 
 [Discarded-await validation](discard-await-validation.json) records the corrected
 Raven compiler, three matching consumers and the unchanged HTTP admission result.
+
+
+`verify_callbacks.py --case ReferenceArrays --case ReferenceList` checks ordinary
+class-reference array literals alongside the existing reserved ArrayList storage.
+The new consumer verifies aliases, null elements, empty arrays and retained objects
+through replacement/GC. These are behavioral comparisons, not benchmarks.
+
+[Default reference-array evidence](default-reference-array-validation.json) records
+both consumers, focused fault/GC checks and successful HTTP compiler admission.

@@ -396,6 +396,19 @@ int32_t neoclr_reserve_records_v1(neoclr_aot_text_arena *arena, int32_t length,
     return NEOCLR_AOT_FAULT_NONE;
 }
 
+/* Ordinary nominal reference arrays use the same traced one-lane record layout.
+ * Mark null slots initialized before publication; reservation remains unchanged. */
+int32_t neoclr_allocate_references_v1(neoclr_aot_text_arena *arena, int32_t length,
+                                    void **output) {
+    if (!output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    void *storage;
+    int32_t status = neoclr_reserve_records_v1(arena, length, 1, &storage);
+    if (status) return status;
+    memset((unsigned char *)storage + 24 + (size_t)length * 8, 1, (size_t)length);
+    *output = storage;
+    return NEOCLR_AOT_FAULT_NONE;
+}
+
 int32_t neoclr_allocate_scalars_v1(neoclr_aot_text_arena *arena, int32_t length,
                                  int32_t reserved, void **output) {
     if (length < 0 || !arena || !output || (reserved != 0 && reserved != 1))

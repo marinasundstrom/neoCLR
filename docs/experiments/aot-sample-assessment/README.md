@@ -343,3 +343,24 @@ The four .NET controls also pass independently on Raven main `d0a115dcf` with no
 implementation change. This confirms the integration portable-emitter gap without
 misclassifying it as a main .NET regression. The temporary control file was removed
 and the Raven integration checkout restored after the comparison.
+
+## Default-null nominal reference arrays (2026-10-08)
+
+Native `newarr` now initializes nominal class-reference slots to null using the existing
+traced array storage. Reservation markers, exact element types, bounds and fault
+behavior remain intact. The [contract and tests](../aot-console/record-arrays.md#default-null-reference-arrays-2026-10-08)
+cover this narrow addition; value-record defaults, element borrows, covariance and
+array-to-interface views remain unsupported.
+
+`application-order-collections` still runs successfully interpreted. Native compilation
+now passes `newarr Order` at instruction 7 and reaches instruction 208, the cast from
+`Order[]` to `Iterable<Order>`. This exposes the next array-view/dispatch boundary; it
+is not an unsupported collection query algorithm or an executable parity result for
+the whole sample. The historical 104-case matrix remains unchanged.
+
+[Focused order follow-up](reference-array-followup.json) retains the source, artifact,
+commands and exact next rejection. [Native array evidence](../../../benchmarks/native-web/default-reference-array-validation.json)
+records two successful Raven consumers in interpreted, sanitized native and standalone
+modes, six focused tests and retained HTTP compiler admission. Standalone images link
+only libSystem. The survey and consumer checks ran concurrently; their elapsed times
+are not benchmark measurements.
