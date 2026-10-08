@@ -11777,3 +11777,29 @@ nongeneric class objects, preserving aliases and reclaiming cycles at reset. The
 assistant tested reference copies, null faults and a Raven class/Console consumer.
 General collection, interface dispatch, arrays and stream support remain open. This Console direction does
 not establish a new permanent roadmap priority outside the author-directed AOT work.
+
+## 2026-10-08 — Let the HTTP API expose native execution requirements
+
+- **Author:** “The idea is that by working towards the HTTP API we discover what we
+  need to run it. Even if it will require integrating a garbage collector”. This
+  clarifies the purpose of the progression through Console, request-line parsing
+  and the existing RoutePattern library.
+- **Assistant response:** Follow the actual HTTP API's dependencies, including GC
+  if required for correct execution. The bounded invocation arena is a temporary
+  sample mechanism, not a choice of memory management for a long-running server.
+- **Actions:** Compiled a direct RoutePattern.Parse/Match/GetInt32 consumer against
+  the supplied Runtime/Web/Networking/Data libraries. Its first AOT admission failure
+  was `ArrayRef(String)` during specialization. Implemented a bounded String-array
+  storage foundation and added a repeatable interpreter/admission probe. See the
+  [native Console experiment](experiments/aot-console/README.md).
+- **Open:** Full native RoutePattern/HTTP execution, native roots and tracing,
+  reclamation policy and network ownership remain work to discover and implement.
+  The author did not select a collector algorithm or request replacing the existing
+  interpreter collector. Small consumers remain validation steps, not substitutes
+  for getting the existing HTTP API running.
+
+- **Observed outcome:** the storage slice was enough for the small real-library
+  Parse/Match/GetInt32 consumer to run standalone with matching output/faults and only
+  libSystem dynamically linked ([evidence](experiments/aot-console/route-pattern-validation.json)).
+  This qualifies that path, not the complete HTTP API; broader route outcomes and
+  repeated-request lifetime checks remain next steps.

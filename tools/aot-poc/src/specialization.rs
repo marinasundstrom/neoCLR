@@ -53,6 +53,7 @@ impl Specializer<'_> {
             }
             Type::ByRef(t) => return Ok(Type::ByRef(Box::new(self.lower(t)?))),
             Type::Array(t) if **t == Type::Byte => return Ok(ty.clone()),
+            Type::ArrayRef(t) if **t == Type::String => return Ok(ty.clone()),
             Type::ArrayRef(t) if **t == Type::Byte => {
                 if let Some(owner) = super::selection::byte_array_owner(self.source) { self.lower(&owner)?; }
                 return Ok(ty.clone());

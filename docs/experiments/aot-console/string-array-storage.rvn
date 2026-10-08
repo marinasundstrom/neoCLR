@@ -1,0 +1,11 @@
+import System.*
+
+func Main() -> int {
+    let values: string[] = ["first", "hé😀\u0000z"]
+    let alias = values
+    alias[0] = values[1]
+    values[1] = "replacement"
+    Console.WriteLine(values[0])
+    Console.WriteLine(alias[1])
+    return 0
+}

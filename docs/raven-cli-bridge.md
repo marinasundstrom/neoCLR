@@ -6780,3 +6780,13 @@ services; their ordinary public wrappers and emitted union/control-flow code rem
 unchanged. There is no compiler-affecting or Runtime Contract configuration change,
 new CLI encoding, public API or metadata schema. The consumer is a parsing experiment,
 not the HttpServer implementation or a replacement route contract.
+
+The [RoutePattern-driven String-array slice](experiments/aot-console/README.md#string-array-storage-discovered-by-routepattern-2026-10-08)
+compiles existing newarr/array.reserve/ldelem/stelem String instructions and privately
+represents their owner slots in the invocation arena. ArrayList<string> bodies and
+RoutePattern/RouteMatch logic stay ordinary CIL. Compiler flags, Runtime Contract,
+reservation bridge encoding, metadata schema and public APIs are unchanged; no Raven
+compiler fix is needed. The consumer supplies Runtime/Web/Networking/Data modules.
+Native tracing/reclamation remains a future integration requirement, not a restriction
+imposed on the HTTP API by the temporary arena. Element borrows and nominal String-array
+views remain excluded from the current backend profile.

@@ -19,6 +19,7 @@ pub(super) enum Ty {
     Reference(usize),
     Interface(usize),
     ByteArray,
+    StringArray, // Invocation-owned pointer slots; nominal/interface views remain excluded.
     ByteValues, // Immutable native-produced value-array snapshot; no element addresses.
     Size,
     Wide,
@@ -114,7 +115,7 @@ impl<'a> Profile<'a> {
                 || t.fields.iter().any(|f| {
                     f.deferred
                         || !(matches!(f.ty, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::Void | Type::String | Type::Named(_))
-                            || (references && matches!(&f.ty, Type::ArrayRef(t) if **t == Type::Byte)))
+                            || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String))))
                 })
             {
                 return Err(format!("{}: value profile requires nongeneric records with at most sixteen Int32/small-integer/Boolean/String/local-record fields", t.name).into());
@@ -338,6 +339,7 @@ impl<'a> Profile<'a> {
             Type::Int64 | Type::UInt64 => Ty::Wide,
             Type::Array(t) if **t == Type::Byte && self.references => Ty::ByteValues,
             Type::ArrayRef(t) if **t == Type::Byte && self.references => Ty::ByteArray,
+            Type::ArrayRef(t) if **t == Type::String && self.references => Ty::StringArray,
             Type::Named(name) => {
                 let i = self
                     .input
@@ -384,7 +386,7 @@ impl<'a> Profile<'a> {
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
             Ty::Erased => vec![false, true],
-            Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::ByteValues | Ty::Size | Ty::Wide => vec![true],
+            Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray | Ty::ByteValues | Ty::Size | Ty::Wide => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
             _ => vec![false; self.lanes(t)],
@@ -747,6 +749,7 @@ impl<'a> Profile<'a> {
                 }
                 Op::IsInstance(t) | Op::CastClass(t) if self.references && (matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_))
                     || (self.array_backing.is_some() && self.ty(t)? == Ty::ByteArray)) => (),
+                Op::NewArray(Type::String) | Op::ReserveArray(Type::String) | Op::ArrayElement(Type::String) | Op::StoreArrayElement(Type::String) if self.references => (),
                 Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte) | Op::ArrayElement(Type::Byte) | Op::StoreArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) | Op::ArrayLength if self.references => (),
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
@@ -854,7 +857,7 @@ impl<'a> Profile<'a> {
                     stack.push(self.ty(t)?);
                 }
                 Op::ReferenceIsNull => {
-                    if !matches!(pop(&mut stack)?, Ty::Literal | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray) {
+                    if !matches!(pop(&mut stack)?, Ty::Literal | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray) {
                         return Err(fail(pc, "null test requires text or reference"));
                     }
                     stack.push(Ty::Bool);
@@ -862,18 +865,32 @@ impl<'a> Profile<'a> {
                 Op::ReferenceEqual => {
                     for _ in 0..2 {
                         let ty = pop(&mut stack)?;
-                        if !matches!(ty, Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray) && !(ty == Ty::Literal && self.references) {
+                        if !matches!(ty, Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray) && !(ty == Ty::Literal && self.references) {
                             return Err(fail(pc, "identity requires managed references; text requires --reference-arena"));
                         }
                     }
                     stack.push(Ty::Bool);
+                }
+                Op::NewArray(Type::String) | Op::ReserveArray(Type::String) => {
+                    take(&mut stack, &Ty::Int)?;
+                    stack.push(Ty::StringArray);
+                }
+                Op::ArrayElement(Type::String) => {
+                    take(&mut stack, &Ty::Int)?;
+                    take(&mut stack, &Ty::StringArray)?;
+                    stack.push(Ty::Literal);
+                }
+                Op::StoreArrayElement(Type::String) => {
+                    take(&mut stack, &Ty::Literal)?;
+                    take(&mut stack, &Ty::Int)?;
+                    take(&mut stack, &Ty::StringArray)?;
                 }
                 Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte) => {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(Ty::ByteArray);
                 }
                 Op::ArrayLength => {
-                    if !matches!(pop(&mut stack)?, Ty::ByteArray | Ty::ByteValues) {
+                    if !matches!(pop(&mut stack)?, Ty::ByteArray | Ty::StringArray | Ty::ByteValues) {
                         return Err(fail(pc, "array length requires a byte array or immutable byte values"));
                     }
                     stack.push(Ty::Size);

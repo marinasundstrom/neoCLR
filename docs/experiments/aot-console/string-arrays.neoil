@@ -1,0 +1,137 @@
+.module StringArrays
+.function Calculate(Int32 mode) -> Int32
+.local arrayref<String> values
+.local arrayref<String> alias
+.local String absent
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Null
+ldarg mode
+ldc.i4 4
+ceq
+brtrue Negative
+ldarg mode
+ldc.i4 5
+ceq
+brtrue Oversized
+ldarg mode
+ldc.i4 6
+ceq
+brtrue Default
+ldarg mode
+ldc.i4 8
+ceq
+brtrue Empty
+ldc.i4 2
+array.reserve String
+stloc values
+ldloc values
+stloc alias
+ldloc values
+ldloc alias
+ref.eq
+brfalse Failed
+ldloc values
+ldc.i4 0
+ldstr "hé😀\u0000z"
+stelem String
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Unreadable
+ldarg mode
+ldc.i4 3
+ceq
+brtrue Outside
+ldloca absent
+initobj String
+ldloc alias
+ldc.i4 1
+ldloc absent
+stelem String
+ldloc values
+ldc.i4 1
+ldelem String
+ref.isnull
+brfalse Failed
+ldloc values
+ldc.i4 0
+ldelem String
+ldstr "hé😀\u0000z"
+ceq
+brfalse Failed
+ldloc alias
+ldc.i4 1
+ldloc values
+ldc.i4 0
+ldelem String
+stelem String
+ldloc values
+ldc.i4 0
+ldelem String
+ldloc values
+ldc.i4 1
+ldelem String
+ref.eq
+brfalse Failed
+ldloc alias
+ldc.i4 0
+ldstr "replacement"
+stelem String
+ldloc values
+ldc.i4 1
+ldelem String
+ldstr "hé😀\u0000z"
+ceq
+brfalse Failed
+ldc.i4 0
+ret
+Unreadable:
+ldloc values
+ldc.i4 1
+ldelem String
+pop
+br Failed
+Outside:
+ldloc values
+ldc.i4 2
+ldelem String
+pop
+br Failed
+Null:
+ldloca values
+initobj arrayref<String>
+ldloc values
+ldlen
+pop
+br Failed
+Negative:
+ldc.i4 -1
+newarr String
+pop
+br Failed
+Oversized:
+ldc.i4 65537
+array.reserve String
+pop
+br Failed
+Default:
+ldc.i4 1
+newarr String
+ldc.i4 0
+ldelem String
+ref.isnull
+brfalse Failed
+ldc.i4 0
+ret
+Empty:
+ldc.i4 0
+array.reserve String
+ldlen
+conv.i4
+ret
+Failed:
+ldc.i4 91
+ret
+.end

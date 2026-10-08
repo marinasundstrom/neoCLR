@@ -337,17 +337,24 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_allocate_object_v1", Linkage::Import, &sig)?)
     } else { None };
-    let array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::NewArray(_)))) {
+    let array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::NewArray(neoclr::metadata::Type::Byte)))) {
         let mut sig = module.make_signature();
         sig.params.extend([AbiParam::new(types::I64), AbiParam::new(types::I32), AbiParam::new(types::I64)]);
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_allocate_bytes_v1", Linkage::Import, &sig)?)
     } else { None };
-    let reserve_service = if references && reservations {
+    let reserve_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ReserveArray(neoclr::metadata::Type::Byte)))) {
         let mut sig = module.make_signature();
         sig.params.extend([types::I64, types::I32, types::I64].map(AbiParam::new));
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_reserve_bytes_v1", Linkage::Import, &sig)?)
+    } else { None };
+    let string_array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op|
+        matches!(op, Op::NewArray(neoclr::metadata::Type::String) | Op::ReserveArray(neoclr::metadata::Type::String)))) {
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64, types::I32, types::I32, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_allocate_strings_v1", Linkage::Import, &sig)?)
     } else { None };
     let initialized_service = if reservations && details.is_some_and(|d| !d.console_write_bytes.is_empty()) {
         let mut sig = module.make_signature();
@@ -937,6 +944,18 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let value = stack.split_off(stack.len() - p.lanes(&ty));
                         stack.extend(normalize(&mut b, &p, &ty, &value));
                     }
+                    Op::NewArray(neoclr::metadata::Type::String) | Op::ReserveArray(neoclr::metadata::Type::String) => {
+                        let count = pop(&mut stack);
+                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        let output = b.ins().stack_addr(types::I64, call_result, 0);
+                        let reserved = b.ins().iconst(types::I32, i64::from(matches!(op, Op::ReserveArray(_))));
+                        let service = module.declare_func_in_func(string_array_service.unwrap(), b.func);
+                        let call = b.ins().call(service, &[arena, count, reserved, output]);
+                        let status = b.inst_results(call)[0];
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        return_if_detailed(&mut b, failed, status, site.as_ref());
+                        stack.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
+                    }
                     Op::NewArray(neoclr::metadata::Type::Byte) | Op::ReserveArray(neoclr::metadata::Type::Byte) => {
                         let count = pop(&mut stack);
                         let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
@@ -953,7 +972,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         null_reference(&mut b, array, site.as_ref());
                         stack.push(b.ins().load(types::I64, MemFlags::new(), array, 8));
                     }
-                    Op::ArrayElement(neoclr::metadata::Type::Byte) | Op::ArrayAddress(neoclr::metadata::Type::Byte) | Op::StoreArrayElement(neoclr::metadata::Type::Byte) => {
+                    Op::ArrayElement(neoclr::metadata::Type::String) | Op::StoreArrayElement(neoclr::metadata::Type::String)
+                    | Op::ArrayElement(neoclr::metadata::Type::Byte) | Op::ArrayAddress(neoclr::metadata::Type::Byte) | Op::StoreArrayElement(neoclr::metadata::Type::Byte) => {
+                        let strings = matches!(op, Op::ArrayElement(neoclr::metadata::Type::String) | Op::StoreArrayElement(neoclr::metadata::Type::String));
                         let value = if matches!(op, Op::StoreArrayElement(_)) { Some(pop(&mut stack)) } else { None };
                         let index = pop(&mut stack);
                         let array = pop(&mut stack);
@@ -963,17 +984,23 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let status = b.ins().iconst(types::I32, 8);
                         return_if_detailed(&mut b, outside, status, site.as_ref());
                         let offset = b.ins().uextend(types::I64, index);
+                        let offset = if strings { b.ins().ishl_imm(offset, 3) } else { offset };
                         let data = b.ins().iadd_imm(array, 16);
                         let address = b.ins().iadd(data, offset);
                         if reservations {
                             let kind = b.ins().load(types::I64, MemFlags::new(), array, 0);
-                            let reserved = b.ins().icmp_imm(IntCC::Equal, kind, 0x80000002);
+                            let reserved = b.ins().icmp_imm(IntCC::Equal, kind, if strings { 0x80000004 } else { 0x80000002 });
                             let check = b.create_block();
                             let ready = b.create_block();
                             b.ins().brif(reserved, check, &[], ready, &[]);
                             b.switch_to_block(check);
                             let length = b.ins().uextend(types::I64, length);
-                            let marker = b.ins().iadd(address, length);
+                            let marker = if strings {
+                                let bytes = b.ins().ishl_imm(length, 3);
+                                let markers = b.ins().iadd(data, bytes);
+                                let index = b.ins().uextend(types::I64, index);
+                                b.ins().iadd(markers, index)
+                            } else { b.ins().iadd(address, length) };
                             if value.is_some() {
                                 let initialized = b.ins().iconst(types::I8, 1);
                                 b.ins().store(MemFlags::new(), initialized, marker, 0);
@@ -987,13 +1014,13 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             b.switch_to_block(ready);
                         }
                         if let Some(value) = value {
-                            let byte = b.ins().ireduce(types::I8, value);
-                            b.ins().store(MemFlags::new(), byte, address, 0);
+                            let value = if strings { value } else { b.ins().ireduce(types::I8, value) };
+                            b.ins().store(MemFlags::new(), value, address, 0);
                         } else if matches!(op, Op::ArrayAddress(_)) {
                             stack.push(address);
                         } else {
-                            let byte = b.ins().load(types::I8, MemFlags::new(), address, 0);
-                            stack.push(b.ins().uextend(types::I32, byte));
+                            let value = b.ins().load(if strings { types::I64 } else { types::I8 }, MemFlags::new(), address, 0);
+                            stack.push(if strings { value } else { b.ins().uextend(types::I32, value) });
                         }
                     }
                     Op::Field(n) | Op::FieldAddress(n) => {

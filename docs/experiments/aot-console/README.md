@@ -1419,3 +1419,66 @@ and the byte limit. Exact broken-pipe fault diagnostics also match. The freshly 
 Raven artifact records 217 functions and 97 types in its selection inventory; the
 inspection inventory and producer/bundle hashes are recorded in the evidence. The
 executable runs alone with an empty environment and only libSystem dynamically linked.
+
+## String-array storage discovered by RoutePattern (2026-10-08)
+
+The next consumer uses the existing library: [RoutePattern.Parse, Match and GetInt32](route-pattern.rvn)
+against `/items/{id}` and `/items/42?detail=1`. It references the supplied Runtime,
+Web, Networking and Data modules; importing only Runtime does not expose the Web API.
+Original load-set verification runs before native selection. The first native blocker
+was `specialization requires closed reference-free local value types: ArrayRef(String)`.
+ArrayList<string> uses those slots for route segments, parameter names and captures.
+
+This slice admits `arrayref<String>` locals, parameters and fields, ordinary newarr,
+checked array.reserve, length, indexed loads/stores, null tests and reference identity.
+The private allocator stores aligned String-owner pointers; ordinary arrays start with
+null slots, reservations have separate initialization markers. Reads of unwritten slots
+fault, while explicitly storing null makes a slot readable. Assignments retain array
+identity; copying an element preserves its String owner. Replacing one slot does not
+change another slot pointing at the previous immutable String. Null/bounds/length faults
+retain source instruction/stack information, and allocation failure publishes neither
+an array nor a changed cursor. The invocation arena retains all referenced storage.
+
+[The focused metadata fixture](string-arrays.neoil) compares nine native/interpreter
+executions, covering aliases, Unicode/NUL content, String-owner identity, replacement,
+unwritten reads, explicit null, default null, empty arrays and range/length faults.
+Canaries and a zero-capacity host exercise exhaustion without output/cursor publication.
+All 54 Console and 45 value tests pass. String element borrows, value arrays and nominal
+array/interface casts remain outside this profile; ArrayList<string>'s own class/interface
+dispatch can use the supported raw storage without needing those array views.
+
+[The Raven storage consumer](string-array-storage.rvn) runs standalone with aliased
+String arrays and mutation. [Evidence](string-array-storage-validation.json) records
+exact output/fault parity, producer/bundle hashes and executable-only deployment.
+Run `verify_interpolation.py --sample string-array-storage`; the default now covers
+eight consumers. No new runtime service binding or guest API was needed: the private
+allocator is a backend implementation of the existing array instructions.
+
+This extends the existing [managed array contract](../../managed-arrays.md) and
+[checked reservation design](../../reserved-array-capacity.md). Like .NET reference
+arrays, assignment shares identity and ordinary slots start null. neoCLR's checked
+reservation additionally distinguishes an unwritten slot from a stored null. The native
+experiment uses eight bytes per slot plus one marker byte per reserved slot; the
+interpreter uses its own managed representation. No space or speed advantage is claimed.
+The private 65536-element and invocation-byte limits still apply.
+
+The author clarifies that the existing HTTP API drives dependency discovery, including
+GC integration if needed. This arena does not reclaim overwritten owners or unreachable
+arrays during an invocation, and it is not a long-running server memory policy. Collector
+integration must account for native roots, array element tracing and any required store
+barriers, following the [existing GC contracts](../../runtime-gc.md). No collector or
+stable object/array ABI is selected by this storage slice.
+
+The same RoutePattern consumer now passes native admission. `verify_route_pattern.py`
+compiles it fresh, checks interpreter output, emits/links a standalone image and checks
+native output plus exact broken-pipe fault parity. It records admission failures when
+new dependencies arise. This is a small real-library execution check, not qualification
+of every RoutePattern operation or the HTTP server. Expand route outcomes and repeated
+request/lifetime coverage next, then follow the HTTP library's actual dependencies.
+
+[Real-library standalone evidence](route-pattern-validation.json) records fresh compilation
+and `42` output through the public Parse/Match/GetInt32 path, plus exact output-fault
+parity. The executable runs alone with an empty environment and only libSystem dynamically
+linked. Both library and tooling identities are hashed; the sample remains within the
+existing 64 KiB host arena. Native dependencies are recorded separately from the supplied
+managed load set; these are input libraries, not deployment dependencies.

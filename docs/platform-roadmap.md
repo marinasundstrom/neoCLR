@@ -28,6 +28,13 @@ The next slice completes [native Hello World](experiments/aot-hello/README.md):
 UTF-8 literal output with startup and console code linked into an executable that
 runs independently of a shared managed framework/runtime.
 
+**HTTP-driven dependency discovery (author clarification, 2026-10-08):** work toward
+running the existing HTTP API to discover the native backend and runtime capabilities
+it needs, including garbage collector integration if required. Bounded arenas and
+small consumers are intermediate validation mechanisms, not constraints that the HTTP
+API must fit or a final server memory policy. Collector choice, native root reporting
+and reclamation remain open; pursue these when the real dependency chain requires them.
+
 **Author clarification:** build the CIL-to-native, self-contained executable foundation
 early, and extend it alongside platform evolution. **Hello World is the first executable
 milestone**, followed by increasingly complex samples until HTTP Server. The author clarifies that the input is **neoCLR CIL**, produced by Raven
@@ -175,9 +182,12 @@ native parser preserves whole-text ASCII grammar and malformed-before-overflow p
 without allocating. A bounded request-line/route consumer now runs standalone across
 18 input streams, using an application union, Int32 IDs and newly bound ordinal String
 predicates ([evidence](experiments/aot-console/request-line-validation.json)). It covers
-only two GET routes, not a server or complete HTTP grammar. Trying the existing
-RoutePattern API in memory is the next proposed step before network I/O. Borrowed
-String interface receivers remain unsupported.
+only two GET routes, not a server or complete HTTP grammar. The real RoutePattern
+consumer then exposed ArrayList<string> storage as its first native blocker. String-array
+storage now supports that path: Parse/Match/GetInt32 runs standalone with exact output
+and fault parity ([evidence](experiments/aot-console/route-pattern-validation.json)).
+Expand route outcomes and repeated-request lifetimes next to discover the remaining HTTP
+and GC integration needs. Borrowed String interface receivers remain unsupported.
 The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

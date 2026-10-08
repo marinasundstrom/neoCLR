@@ -2777,3 +2777,60 @@ int main(int argc, char **argv) {
         assert!(String::from_utf8_lossy(&r.stderr).contains("native UTF-8 binding requires exact"), "{r:?}");
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn string_array_slots_preserve_owners_initialization_aliases_and_faults() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/string-arrays.neoil");
+    let dir = Temp::new();
+    let r = compile_source(&dir, &seed, source, &["--compile-system", "--reference-arena"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"), r#"
+#include "text-arena.h"
+#include <stdlib.h>
+#include <string.h>
+int main(int argc, char **argv) {
+    uint64_t storage[129]; memset(storage, 0xa5, sizeof(storage));
+    unsigned capacity = argc > 2 ? (unsigned)atoi(argv[2]) : 1024;
+    neoclr_aot_context ctx = {.text = {(unsigned char*)storage, capacity, 0}};
+    int32_t result = -99;
+    int status = neoclr_entry_v4(argc > 1 ? atoi(argv[1]) : 0, &result, &ctx);
+    if (ctx.text.used > capacity || storage[128] != UINT64_C(0xa5a5a5a5a5a5a5a5)) return 93;
+    if (status) {
+        if (result != -99 || ctx.fault.code != (uint32_t)status) return 92;
+        if (!capacity && (ctx.text.used || storage[0] != UINT64_C(0xa5a5a5a5a5a5a5a5))) return 94;
+        neoclr_aot_render_fault(stderr, &ctx.fault);
+        return 1;
+    }
+    return result;
+}
+"#).unwrap();
+    let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in 0..9 {
+        let reference = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default());
+        let r = Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        match reference {
+            Ok(value) => {
+                assert_eq!(value.value, neoclr::Value::Int32(0), "{mode}");
+                assert_eq!(r.status.code(), Some(0), "{mode}: {r:?}");
+                assert!(r.stdout.is_empty() && r.stderr.is_empty());
+            }
+            Err(fault) => {
+                assert_eq!(r.status.code(), Some(1), "{mode}: {r:?}");
+                assert_eq!(String::from_utf8_lossy(&r.stderr), fault.diagnostic().to_string(), "{mode}");
+            }
+        }
+    }
+    let r = Command::new(dir.0.join("app")).args(["0", "0"]).output().unwrap();
+    assert_eq!(r.status.code(), Some(1), "{r:?}");
+    assert!(String::from_utf8_lossy(&r.stderr).starts_with("NativeMemoryLimitExceeded:"), "{r:?}");
+}

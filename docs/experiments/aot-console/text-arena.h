@@ -70,4 +70,8 @@ int32_t neoclr_parse_int32_v1(const neoclr_aot_text *text, void *output);
 int32_t neoclr_string_contains_ordinal_v1(const neoclr_aot_text *text, const neoclr_aot_text *pattern, int32_t *output);
 int32_t neoclr_string_starts_with_ordinal_v1(const neoclr_aot_text *text, const neoclr_aot_text *pattern, int32_t *output);
 int32_t neoclr_string_ends_with_ordinal_v1(const neoclr_aot_text *text, const neoclr_aot_text *pattern, int32_t *output);
+/* Private String-owner slots, default-null or checked uninitialized reservation.
+ * Arena retains owners for the entire invocation; no per-slot retain/release. */
+int32_t neoclr_allocate_strings_v1(neoclr_aot_text_arena *arena, int32_t length,
+                                  int32_t reserved, void **output);
 #endif

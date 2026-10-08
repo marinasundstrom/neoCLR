@@ -309,6 +309,11 @@ remain native-backend work. A bounded two-route GET request-line sample now comp
 with an application union and ordinal String predicates, preserving exact output and
 faults across 18 input streams. It has no socket, header/body or general HTTP parsing
 support; the predicates extend the experimental UTF-8 binding without allocation.
+The existing RoutePattern.Parse/Match/GetInt32 path now also runs standalone after adding
+String-array storage for its ArrayList<string> dependencies. Broader routing and repeated
+request lifetimes remain unqualified. The HTTP API drives further native/runtime work,
+including garbage collection if required; the bounded arena is a temporary experiment,
+not a final server memory policy.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

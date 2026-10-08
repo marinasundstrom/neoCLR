@@ -1,0 +1,21 @@
+import System.*
+import System.Result.*
+import System.Option.*
+import System.Web.Http.*
+
+func Main() -> int {
+    let Ok(pattern) = RoutePattern.Parse("/items/{id}") else {
+        return 1
+    }
+    let Ok(option) = pattern.Match("/items/42?detail=1") else {
+        return 2
+    }
+    let Some(parameters) = option else {
+        return 3
+    }
+    let Ok(id) = parameters.GetInt32("id") else {
+        return 4
+    }
+    Console.WriteLine(id)
+    return 0
+}

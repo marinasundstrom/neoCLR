@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add experimental ARM64 AOT String-array storage, discovered by compiling the real
+  RoutePattern library consumer. Preserve aliases, immutable String owners, default
+  nulls, checked reservation state and source faults; allocation failure publishes no
+  result. Validate 54 Console and 45 value tests, a standalone Raven array consumer,
+  and the real RoutePattern.Parse/Match/GetInt32 path with exact output/fault parity.
+  Executables retain only libSystem as a dynamic dependency.
+  Keep element borrows, value arrays and nominal String-array views excluded. Record
+  the author's HTTP-driven dependency direction, including GC integration if needed;
+  the invocation arena is not a final server memory policy. No compiler, public API,
+  metadata or native context ABI change.
+
 - Extend experimental ARM64 AOT UTF-8 bindings with exact String ContainsOrdinal,
   StartsWithOrdinal and EndsWithOrdinal predicates. Preserve empty-pattern, Unicode,
   embedded-NUL and null-fault behavior without allocation. Add a bounded Console

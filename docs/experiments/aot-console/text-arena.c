@@ -287,3 +287,25 @@ int32_t neoclr_string_contains_ordinal_v1(const neoclr_aot_text *text,
     *output = found;
     return NEOCLR_AOT_FAULT_NONE;
 }
+
+
+int32_t neoclr_allocate_strings_v1(neoclr_aot_text_arena *arena, int32_t length,
+                                  int32_t reserved, void **output) {
+    if (length < 0) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (length > 65536) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
+    if (!arena || !output || (reserved != 0 && reserved != 1) ||
+        arena->used > arena->capacity || (arena->capacity && !arena->data) ||
+        ((uintptr_t)arena->data & 7)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t padding = (8 - (arena->used & 7)) & 7;
+    uint64_t needed = padding + 16 + (uint64_t)length * (reserved ? 9 : 8);
+    if (needed > arena->capacity - arena->used) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    unsigned char *array = arena->data + arena->used + padding;
+    uint64_t kind = reserved ? UINT64_C(0x80000004) : UINT64_C(0x80000003);
+    uint64_t count = (uint64_t)length;
+    memcpy(array, &kind, 8);
+    memcpy(array + 8, &count, 8);
+    memset(array + 16, 0, (size_t)length * (reserved ? 9 : 8));
+    arena->used += needed;
+    *output = array;
+    return NEOCLR_AOT_FAULT_NONE;
+}
