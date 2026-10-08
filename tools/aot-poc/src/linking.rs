@@ -173,7 +173,7 @@ pub fn prepare(
             let relationships = ty.implements.clone();
             // Reference objects need their verified interface views at runtime.
             // Value-only conformance remains metadata-only in this profile.
-            if !context.is_some_and(|c| c.reference_arena) || (!ty.is_reference_type && ty.representation != neoclr::metadata::Representation::Interface) {
+            if !context.is_some_and(|c| c.reference_arena) || (!ty.is_reference_type && ty.name != "System.String" && ty.representation != neoclr::metadata::Representation::Interface) {
                 ty.implements.clear();
             }
             relationships

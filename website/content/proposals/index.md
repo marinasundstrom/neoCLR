@@ -290,7 +290,9 @@ and exact output-fault traces. Char-to-String conversion now preserves fresh ide
 when observable; character Console output and interpolation run together across Unicode
 graphemes and NUL. Verified String interface views now preserve casts and identity through closed generic
 contracts. Native String content equality now supports ordinary equality/inequality,
-including Unicode, embedded NUL and dynamic text. String interface method dispatch,
+including Unicode, embedded NUL and dynamic text. Verified ordinary String interface
+methods now dispatch to compiled bodies; a standalone Raven EquatableTo<string>.Equals
+consumer matches interpreter output and faults. Borrowed String interface receivers,
 wider boxing and general Object metadata remain open.
 An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter

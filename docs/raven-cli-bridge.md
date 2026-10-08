@@ -6755,3 +6755,12 @@ compiler/bundle emits the consumer; native UTF-8 byte comparison preserves conte
 null semantics without new bridge encoding or service binding. String interface method
 dispatch remains unsupported; equality operators and interface dispatch are distinct
 capabilities. No compiler configuration, metadata schema or public API snapshot changes.
+
+
+The subsequent [String interface method slice](experiments/aot-console/README.md#string-interface-method-dispatch-2026-10-08)
+now compiles EquatableTo<string>.Equals through verified closed conformance and the
+existing ordinary String method body. The private native receiver projection and
+contract/target dispatch table replace the previous AOT rejection; borrowed String
+receivers remain unsupported. Runtime Contract options, Raven emission, CLI encoding,
+metadata schema and API documentation snapshots are unchanged. Fresh standalone evidence
+records the same compiler/bundle, exact UTF-8 equality output and output-fault parity.

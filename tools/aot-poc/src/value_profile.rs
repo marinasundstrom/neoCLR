@@ -63,7 +63,7 @@ fn object_base_shape(t: &neoclr::metadata::TypeDef) -> bool {
 }
 
 impl<'a> Profile<'a> {
-    pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>, object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>) -> Result<Self, Error> {
+    pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>, object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>, string_dispatch: Option<&HashMap<usize, usize>>) -> Result<Self, Error> {
         if input.name == "System" || input.types.len() > 128 || input.functions.len() > 512 {
             return Err(
                 "value profile requires an application with at most 128 types and 512 functions"
@@ -292,6 +292,15 @@ impl<'a> Profile<'a> {
         }
         for (&contract, targets) in &p.dispatch {
             edges[contract].extend(targets.iter().map(|(_, target)| *target));
+        }
+        for (&contract, &target) in string_dispatch.into_iter().flatten() {
+            let f = &input.functions[target];
+            let expected = std::iter::once(Ty::Literal).chain(p.args[contract].iter().skip(1).cloned()).collect::<Vec<_>>();
+            if !p.dispatch.contains_key(&contract) || f.instance || f.owner.is_some()
+                || p.args[target] != expected || p.results[target] != p.results[contract] {
+                return Err("String interface target must preserve the projected receiver and contract signature".into());
+            }
+            edges[contract].push(target);
         }
         fn visit(i: usize, edges: &[Vec<usize>], states: &mut [u8]) -> Result<(), Error> {
             if states[i] == 1 {

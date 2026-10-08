@@ -475,6 +475,12 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
             }
         }
         for contract in contracts {
+            if !super::selection::object_display_contract(&contract)
+                && super::selection::implements_interface(input, &Type::String, contract.owner.as_ref().unwrap()) {
+                let (_, reference) = super::selection::implicit_implementation(input, &Type::String, &contract)?;
+                let instance = context.resolve(&reference)?;
+                if !visited.contains(&instance.row) { pending.push(instance); }
+            }
             for owner in &constructed {
                 if !super::selection::object_display_contract(&contract) && !super::selection::implements_interface(input, owner, contract.owner.as_ref().unwrap()) { continue; }
                 let definition = input.type_definition(owner).ok_or("constructed interface implementor requires local definition")?;
@@ -527,6 +533,18 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
             expanded.types.push(input.types[shape.source].clone());
         }
         expanded.types[shape.row] = t;
+    }
+    // String is an intrinsic reference, so it never consumes a nominal shape.
+    // Retain only its proven, reached closed interface views after argument erasure.
+    if let Some(string) = expanded.types.iter_mut().find(|t| t.name == "System.String") {
+        string.implements = context.shapes.iter().filter_map(|shape| {
+            let original = &input.types[shape.source];
+            if original.representation != neoclr::metadata::Representation::Interface { return None; }
+            let target = if shape.arguments.is_empty() { Type::Named(original.name.clone()) }
+                else { Type::Constructed { definition: original.name.clone(), arguments: shape.arguments.clone() } };
+            super::selection::implements_interface(input, &Type::String, &target)
+                .then(|| Type::Named(shape.name.clone()))
+        }).collect();
     }
     let report = json!({"policy":"up to 128 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 128 function clones and 512 selected functions; no constraints",
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),

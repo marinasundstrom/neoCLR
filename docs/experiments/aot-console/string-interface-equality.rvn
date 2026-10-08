@@ -1,0 +1,23 @@
+import System.*
+
+func Compare(left: string, right: string) {
+    let view: EquatableTo<string> = left
+    Console.WriteLine(view.Equals(right))
+}
+
+func Join(left: string, right: string) -> string {
+    return left + right
+}
+
+func Main() -> int {
+    Compare("", "")
+    Compare("", "x")
+    Compare("hé😀", "hé😀")
+    Compare("a\u0000x", "a\u0000y")
+    Compare("a\u0000x", "a\u0000x")
+    Compare("é", "é")
+    Compare("same", "Same")
+    let text = Join("hé", "😀")
+    Compare(text, "hé😀")
+    return 0
+}

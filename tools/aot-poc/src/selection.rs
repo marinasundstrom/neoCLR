@@ -180,6 +180,14 @@ pub(super) fn byte_array_owner(input: &neoclr::Module) -> Option<Type> {
     }
 }
 
+/// Intrinsic String dispatch uses verified conformance, not a nominal object tag.
+fn string_dispatch_target(input: &neoclr::Module, contract: usize) -> Result<Option<usize>, Error> {
+    let f = &input.functions[contract];
+    if !interface_contract(input, f)
+        || !implements_interface(input, &Type::String, f.owner.as_ref().unwrap()) { return Ok(None); }
+    Ok(Some(implicit_implementation(input, &Type::String, f)?.0))
+}
+
 /// Exact implicit implementations for classes constructed by the reachable program.
 /// Original conformance is verified before private projection; this is not a binder.
 pub(super) fn dispatch_targets(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>) -> Result<Vec<(usize, usize)>, Error> {
@@ -315,6 +323,9 @@ pub(super) fn select_inventory(
             }
         }
         for &contract in &functions {
+            if let Some(target) = string_dispatch_target(input, contract)? {
+                if !functions.contains(&target) { pending.push(target); }
+            }
             for (_, target) in dispatch_targets(input, contract, &functions)? {
                 if !functions.contains(&target) { pending.push(target); }
             }
@@ -458,7 +469,11 @@ pub(super) fn select_inventory(
     }
     let mut dispatch = vec![];
     let mut object_dispatch = vec![];
+    let mut string_dispatch = vec![];
     for (compiled, source) in rows.iter().enumerate() {
+        if let Some(target) = string_dispatch_target(input, *source)? {
+            string_dispatch.push(json!({"contractCompiledIndex":compiled,"functionCompiledIndex":rows.binary_search(&target).unwrap()}));
+        }
         let display = object_display_contract(&input.functions[*source]);
         if interface_contract(input, &input.functions[*source]) || display {
             let targets = dispatch_targets(input, *source, &functions)?;
@@ -472,7 +487,7 @@ pub(super) fn select_inventory(
             "policy":"verified nominal byte-array backing; identity-preserving views and intrinsic storage field"})));
     let report = json!({"schema":"neoclr-aot-selection-v1", "module":input.name, "root":root,
         "policy":"explicit closed world with constructed-class implicit interface dispatch; ordinary selected bodies retained; verified Object.ToString override dispatch replaces its private slot body; no reflection, dynamic loading or general class virtual dispatch",
-        "interfaceDispatch":dispatch, "objectDisplayDispatch":object_dispatch, "arrayBackingProjection":array_backing,
+        "stringInterfaceDispatch":string_dispatch, "interfaceDispatch":dispatch, "objectDisplayDispatch":object_dispatch, "arrayBackingProjection":array_backing,
         "metadataPolicy":"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
         "functions": rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.functions[*old].definition,"name":input.functions[*old].name})).collect::<Vec<_>>(),
         "types": type_rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.types[*old].definition,"name":input.types[*old].name})).collect::<Vec<_>>(),

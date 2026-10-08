@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[3]
 parser = argparse.ArgumentParser(description=__doc__)
 for name in ("compiler", "runtime", "aot", "bundle", "output"):
     parser.add_argument("--" + name, type=Path, required=True)
-parser.add_argument("--sample", action="append", choices=["interpolation", "interpolation-text", "boxed-int32", "character-text-identity", "string-interface-views", "string-equality"],
+parser.add_argument("--sample", action="append", choices=["interpolation", "interpolation-text", "boxed-int32", "character-text-identity", "string-interface-views", "string-equality", "string-interface-equality"],
                     help="Qualify only selected samples; default qualifies all.")
 args = parser.parse_args()
 compiler, runtime, aot, bundle, output = (
@@ -63,7 +63,7 @@ context = ["--system", seed, "--module", library, "--object-root", library]
 flags = context + ["--compile-system", "--bind-user-fault", "--bind-console-write-line",
                    "--bind-utf8-text", "--bind-int32-to-string", "--reference-arena"]
 expected_numeric = "".join(f"Value: {value}\n{value}\nValue: {value}\n" for value in (42, -2147483648, 2147483647)) + "Null: \n"
-cases = [("string-equality", "".join("True\nFalse\n" if value else "False\nTrue\n" for value in [True,False,True,False,True,False,False,True])), ("string-interface-views", "hé😀\0z\n\n"), ("interpolation", expected_numeric), ("interpolation-text", "Text: hé😀/z\x00end\n"),
+cases = [("string-interface-equality", "True\nFalse\nTrue\nFalse\nTrue\nFalse\nFalse\nTrue\n"), ("string-equality", "".join("True\nFalse\n" if value else "False\nTrue\n" for value in [True,False,True,False,True,False,False,True])), ("string-interface-views", "hé😀\0z\n\n"), ("interpolation", expected_numeric), ("interpolation-text", "Text: hé😀/z\x00end\n"),
          ("boxed-int32", "-2147483648\n-1\n0\n1\n42\n2147483647\n"),
          ("character-text-identity", "".join(f"Item: {i}\n{char}\n" for i, char in enumerate(["A", "å", "😀", "é", "👨‍👩‍👧‍👦", "🇸🇪", "\0"])))]
 for stem, expected_text in cases:
@@ -89,8 +89,11 @@ for stem, expected_text in cases:
     obj = output / (stem + ".o")
     report[stem] = dict(assemblySha256=sha(assembly), stdout=expected_text, admission=inspection["admission"])
     assert inspection["admission"]["accepted"]
-    if stem == "string-interface-views":
+    if stem in ("string-interface-views", "string-interface-equality"):
         selected = inspection["selection"]
+        if stem == "string-interface-equality":
+            assert selected["stringInterfaceDispatch"]
+            report[stem]["stringInterfaceDispatch"] = selected["stringInterfaceDispatch"]
         interfaces = selected["stringInterfaceViews"]
         assert interfaces, "String conformance was not retained"
         report[stem]["stringInterfaceViews"] = [row for row in selected["types"] if row["compiledIndex"] in interfaces]
@@ -115,7 +118,7 @@ for stem, expected_text in cases:
         shutil.copy2(binary, installed)
         native = subprocess.run([installed], cwd=directory, env={}, capture_output=True, timeout=10)
         assert (native.returncode, native.stdout, native.stderr) == (0, interpreted.stdout, b"")
-    if stem in ("interpolation", "character-text-identity", "string-interface-views", "string-equality"):
+    if stem in ("interpolation", "character-text-identity", "string-interface-views", "string-equality", "string-interface-equality"):
         read_end, write_end = os.pipe()
         os.close(read_end)
         try:

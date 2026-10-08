@@ -1,0 +1,94 @@
+.module StringInterfaceDispatch
+.type class Other
+.implements Root<String>
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance Equals(String other) -> Boolean
+ldc.bool false
+ret
+.end
+.end
+.function Compare(Root<String> value, String other) -> Boolean
+ldarg value
+ldarg other
+callvirt instance Root<String>::Equals(String)
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local String absent
+.local Root<String> view
+ldarg mode
+ldc.i4 3
+ceq
+brtrue NullReceiver
+ldarg mode
+ldc.i4 4
+ceq
+brtrue ClassReceiver
+ldarg mode
+ldc.i4 5
+ceq
+brtrue CalleeFault
+ldstr "hé😀\u0000x"
+castclass View<String>
+castclass Root<String>
+stloc view
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Different
+ldarg mode
+ldc.i4 2
+ceq
+brtrue NullArgument
+ldloc view
+ldstr "hé😀\u0000x"
+call Compare(Root<String>, String)
+brfalse Failed
+ldc.i4 0
+ret
+Different:
+ldloc view
+ldstr "hé😀\u0000y"
+call Compare(Root<String>, String)
+brtrue Failed
+ldc.i4 0
+ret
+NullArgument:
+ldloca absent
+initobj String
+ldloc view
+ldloc absent
+call Compare(Root<String>, String)
+brtrue Failed
+ldc.i4 0
+ret
+NullReceiver:
+ldloca absent
+initobj String
+ldloc absent
+castclass Root<String>
+ldstr "x"
+call Compare(Root<String>, String)
+pop
+br Failed
+ClassReceiver:
+newobj.ctor instance Other::.ctor()
+castclass Root<String>
+ldstr "x"
+call Compare(Root<String>, String)
+brtrue Failed
+ldc.i4 0
+ret
+CalleeFault:
+ldstr "fault"
+castclass Root<String>
+ldstr "x"
+call Compare(Root<String>, String)
+pop
+br Failed
+Failed:
+ldc.i4 91
+ret
+.end

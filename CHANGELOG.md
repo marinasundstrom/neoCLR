@@ -10,16 +10,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Compile typed String ceq in experimental ARM64 AOT with exact UTF-8 content and
   null comparison, distinct from reference identity. Equality allocates no storage;
-  ordinary Raven ==/!= wrappers compile unchanged. Validate 49 Console and 45 value
-  tests plus standalone Unicode/NUL/dynamic-text equality and exact output-fault
-  parity. This is a prerequisite for String interface Equals, whose method dispatch
-  remains unsupported. No new service binding, compiler contract or ABI change.
+  ordinary Raven ==/!= wrappers compile unchanged. Compile verified String interface
+  implementations, including EquatableTo<string>.Equals, through an explicit raw
+  receiver projection. Keep class dispatch and Object display separate, preserve
+  callee/null fault traces, and include implicit targets in recursion admission.
+  Validate 50 Console and 45 value tests plus standalone Unicode/NUL/dynamic-text
+  equality and interface equality with exact output-fault parity. Borrowed receivers
+  remain unsupported. No new service binding, compiler contract or ABI change.
 
 - Admit verified String interface views in experimental ARM64 AOT. Retain original
   closed conformance before private projection, including inherited generic interfaces;
   preserve String/Object identity and null/cast behavior. Validate 48 Console AOT tests
   and a standalone Raven EquatableTo<string> round-trip with exact output/fault parity.
-  String interface method dispatch still rejects before object publication. No compiler,
+  Ordinary String interface method dispatch is covered by the follow-up above. No compiler,
   public API, metadata format or context ABI change.
 
 - Preserve fresh Char-to-String identity in experimental ARM64 AOT when String

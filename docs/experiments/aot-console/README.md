@@ -1263,3 +1263,47 @@ be considered only with a relevant benchmark. String interface method dispatch r
 explicitly rejected: receiver projection and dispatch must still be implemented before
 EquatableTo<string>.Equals calls become supported. No Raven compiler, Runtime Contract,
 metadata format or public API change is introduced by this prerequisite.
+
+
+## String interface method dispatch (2026-10-08)
+
+The next slice closes the interface-call gap above. Closed-world discovery retains
+verified String conformance, resolves the exact public implicit implementation of each
+reached closed contract, and selects its ordinary CIL body and dependencies. After
+specialization, only proven reached interface shapes remain on the private String
+metadata. The native dispatcher distinguishes tagged String owners from class headers,
+removes the private tag, and calls the projected String body with an explicit receiver.
+Object.ToString's text/boxed-Int32 shortcuts now apply only to that exact display contract.
+The private inspection report records `stringInterfaceDispatch` contract/target rows;
+these targets participate in signature checks and recursion rejection.
+
+The [metadata consumer](string-interface-dispatch.neoil) tests inherited generic views,
+equal and unequal Unicode/NUL text, a null argument, a null receiver, a class implementing
+the same contract, and a fault thrown inside the String implementation. Native diagnostics
+match interpreter messages and frames exactly, without an extra dispatcher frame. A
+recursive implementation rejects before publication, as does a borrowed String receiver.
+All 50 Console and 45 value tests pass.
+
+The [Raven consumer](string-interface-equality.rvn) calls EquatableTo<string>.Equals on
+empty, Unicode, embedded-NUL, case/normalization-different and dynamically concatenated
+Strings. [Fresh evidence](string-interface-equality-validation.json) records matching
+interpreter/native output, exact broken-pipe faults, and standalone ARM64 execution with
+only libSystem dynamically linked. Use `verify_interpolation.py --sample
+string-interface-equality` with the usual compiler/runtime/bundle/output arguments;
+the default now covers seven consumers. The compiler remains Raven integration revision
+2acfd40ec (shared compiler code 9d2f6ae4e); exact binaries and bundle hashes are recorded.
+
+The ergonomic comparison is .NET String's IEquatable<string> use: consumers call the
+ordinary equality contract through an interface. Implementation uses neoCLR's existing
+UTF-8 content semantics and verified CIL body, plus a bounded private tagged receiver
+instead of claiming CLR object layout or dispatch machinery. No allocation is needed
+for an interface wrapper, but this profile still materializes identity-observable literals
+in its invocation arena; no performance improvement is claimed. Conformance discovery
+conservatively selects String implementations of reached contracts. Unsupported bodies,
+borrowed receivers, explicit implementations and general virtual dispatch still reject.
+See the existing [text model](../../text-model.md) and [Object review](../../object-model-review.md).
+
+No Raven emission, Runtime Contract configuration, CLI bridge encoding, public API,
+metadata format or native context ABI changes. This remains experimental backend work.
+The next sample should drive line-oriented Console input and parse outcomes toward the
+interactive union scenario; this slice does not implement native ReadLine.

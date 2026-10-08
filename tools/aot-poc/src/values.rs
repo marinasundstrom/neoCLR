@@ -186,7 +186,7 @@ fn check_byte_value_replacement(b: &mut FunctionBuilder<'_>, address: ir::Value,
 pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
     let reservations = input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ReserveArray(_))));
     let references = details.is_some_and(|d| d.reference_arena);
-    let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display))?;
+    let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch))?;
     let root = p.root(root)?;
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))
@@ -207,10 +207,6 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         }));
         if interface_casts && string_interfaces.is_none() {
             return Err("String interface views require verified load-set conformance".into());
-        }
-        if input.functions.iter().any(|f| f.instance && f.owner.as_ref().is_some_and(|t|
-            matches!(p.ty(t), Ok(Ty::Interface(i)) if string_interfaces.is_some_and(|indices| indices.contains(&i))))) {
-            return Err("String interface method dispatch requires a later native receiver profile".into());
         }
     }
     let string_view = |ty: &Ty| p.is_object_base(ty)
@@ -412,6 +408,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             if let Some(targets) = p.dispatch.get(&i) {
                 // Caller checks null. Forward the original receiver, result slot and
                 // context; no synthetic interface frame enters the managed trace.
+                let display = details.is_some_and(|d| d.object_display.contains_key(&i));
+                let string_target = details.and_then(|d| d.string_dispatch.get(&i));
                 if text_identity {
                     let text = b.create_block();
                     let object = b.create_block();
@@ -419,13 +417,30 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     b.ins().brif(tagged, text, &[], object, &[]);
                     b.switch_to_block(text);
                     let pointer = b.ins().band_imm(parameters[0], -2);
-                    write(&mut b, output, &[pointer]);
-                    let zero = b.ins().iconst(types::I32, 0);
-                    b.ins().return_(&[zero]);
+                    if let Some(&target) = string_target {
+                        let mut args = parameters.clone();
+                        args[0] = pointer;
+                        let target = module.declare_func_in_func(ids[target], b.func);
+                        let call = b.ins().call(target, &args);
+                        let status = b.inst_results(call)[0];
+                        b.ins().return_(&[status]);
+                    } else if display {
+                        write(&mut b, output, &[pointer]);
+                        let zero = b.ins().iconst(types::I32, 0);
+                        b.ins().return_(&[zero]);
+                    } else {
+                        let status = b.ins().iconst(types::I32, 3);
+                        if let Some(d) = &diagnostic_data {
+                            let mut site = d.site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                            site.capture_frame = false;
+                            site.record(&mut b, status);
+                        }
+                        b.ins().return_(&[status]);
+                    }
                     b.switch_to_block(object);
                 }
                 let tag = b.ins().load(types::I64, MemFlags::new(), parameters[0], 0);
-                if details.is_some_and(|d| d.boxed_int32_display) {
+                if display && details.is_some_and(|d| d.boxed_int32_display) {
                     for &type_index in details.unwrap().int32_boxes.values() {
                         let matched = b.create_block();
                         let next = b.create_block();

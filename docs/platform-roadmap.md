@@ -164,8 +164,12 @@ inherited generic contracts; EquatableTo<string> round-trips run standalone
 ([evidence](experiments/aot-console/string-interface-views-validation.json)).
 String content ceq is now compiled with exact UTF-8/null semantics, enabling ordinary
 Raven equality and inequality without comparison allocations
-([evidence](experiments/aot-console/string-equality-validation.json)). This is a
-prerequisite; String interface method dispatch remains the next bounded gap.
+([evidence](experiments/aot-console/string-equality-validation.json)). Verified String
+interface implementations now compile through ordinary receiver projection, including
+standalone EquatableTo<string>.Equals with Unicode/NUL/dynamic text and output-fault
+parity ([evidence](experiments/aot-console/string-interface-equality-validation.json)).
+The next consumer should exercise line-oriented Console input and parse outcomes;
+native line input remains a gap. Borrowed String interface receivers remain unsupported.
 The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
