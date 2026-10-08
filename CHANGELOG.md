@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Preserve the selected native API preview across ordinary local website rebuilds.
+  Apply and validate it before replacing the served website; fail without replacing
+  the visible site when the selected audit is missing or fails validation. Selection
+  is local and explicit; publication inputs and marked legacy coverage gaps remain
+  unchanged.
+
 - Move date/time values, clocks, timezone mappings/errors and calendar policies to
   System.Time; rename the civil Time struct to TimeOfDay. LocalDateTime.Time keeps
   its property name. Update source/native ownership, CLI bridge catalogs, generated

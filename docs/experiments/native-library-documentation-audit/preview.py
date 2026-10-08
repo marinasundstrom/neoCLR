@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[3]
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('audit', type=Path, help='Audit output generated with the repository-root argument')
+    parser.add_argument('--site', type=Path, help='Integrate into a build staging directory without changing the selected preview')
     args = parser.parse_args()
     source = args.audit.resolve() / 'site/docs/api'
     if not (source / 'System/BooleanParseError/index.html').is_file():
@@ -33,7 +34,7 @@ def main():
         assert f'field_{constant}.html' in navigation
     overloads = (source / 'System/Math/method_Abs.html').read_text()
     assert 'Abs(value: int)' in overloads and 'Abs(value: double)' in overloads
-    destination = ROOT / 'target/website'
+    destination = args.site.resolve() if args.site else ROOT / 'target/website'
     if not (destination / 'docs/index.html').is_file():
         parser.error('Build the complete website first with scripts/build-website.py')
     with tempfile.TemporaryDirectory(prefix='native-website-', dir=ROOT / 'target') as temporary:
@@ -88,6 +89,11 @@ def main():
         # Update only after the integrated copy passes the same local-link checks.
         shutil.copytree(staging, destination, dirs_exist_ok=True)
         (args.audit / 'website-validation.json').write_text(json.dumps({'checkedPages': len(pages), 'legacyCoverageGaps': gaps, 'result': 'PASS HTML, local links, Math XML, native ownership, Object member route and assembly-member navigation'}, indent=2) + '\n')
+        if args.site is None:
+            selection = ROOT / 'target/native-api-preview.json'
+            pending = selection.with_suffix('.json.tmp')
+            pending.write_text(json.dumps({'audit': str(args.audit.resolve())}) + '\n')
+            pending.replace(selection)
         print(f'Integrated native preview; checked {len(pages)} neoCLR website pages; {len(gaps)} legacy pages retained')
 
 

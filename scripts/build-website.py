@@ -15,6 +15,7 @@ from urllib.parse import urlsplit, urlunsplit, unquote
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'website'
 OUTPUT = ROOT / 'target/website'
+NATIVE_PREVIEW = ROOT / 'target/native-api-preview.json'
 
 
 def excerpt(path, start, end, include_end=True):
@@ -233,9 +234,28 @@ def write_legacy_routes():
             + json.dumps(target) + ');</script></body></html>')
 
 
+def selected_native_preview():
+    if not NATIVE_PREVIEW.exists():
+        return None
+    audit = Path(json.loads(NATIVE_PREVIEW.read_text())['audit'])
+    if not audit.is_absolute() or not (audit / 'site/docs/api').is_dir():
+        raise ValueError(f'Selected native API audit is missing: {audit}. Regenerate it or remove {NATIVE_PREVIEW} to use the legacy snapshot.')
+    return audit
+
+
+def publish_site(staging, destination, audit):
+    # Finish the selected reference before exposing any pages to the local server.
+    if audit is not None:
+        subprocess.run([sys.executable, str(ROOT / 'docs/experiments/native-library-documentation-audit/preview.py'),
+                        str(audit), '--site', str(staging)], check=True)
+    shutil.rmtree(destination, ignore_errors=True)
+    staging.rename(destination)
+
+
 def main():
     global OUTPUT
     publish_destination = OUTPUT
+    audit = selected_native_preview()
     subprocess.run([sys.executable, str(ROOT / 'scripts/build-api-docs.py'), '--check'], check=True)
     OUTPUT = publish_destination.with_name(publish_destination.name + '-next')
     if OUTPUT.exists():
@@ -504,10 +524,9 @@ def main():
     for path, check in pages.items():
         check.check(path, pages)
     (OUTPUT / '.nojekyll').touch()
-    shutil.rmtree(publish_destination, ignore_errors=True)
-    OUTPUT.rename(publish_destination)
+    publish_site(OUTPUT, publish_destination, audit)
     OUTPUT = publish_destination
-    print(f'Built and checked {len(pages)} RavenDoc pages:', OUTPUT)
+    print(f'Built and checked {sum(1 for _ in OUTPUT.rglob("*.html"))} RavenDoc pages:', OUTPUT)
 
 
 if __name__ == '__main__':

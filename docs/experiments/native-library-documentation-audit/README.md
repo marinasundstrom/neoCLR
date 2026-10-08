@@ -60,8 +60,13 @@ This reuses `website/site.json` branding and `website/api-content`, integrates t
 reference at the normal `/docs/api/` URLs, redirects the earlier `/docs/native-api/` URLs and
 refreshes site-wide search. It validates HTML and all local links on a staged copy
 before updating `target/website`. This is a local preview operation; the publishing
-pipeline is unchanged; unmatched old pages remain with a migration-gap notice. Rebuilding the normal site
-removes this optional preview.
+pipeline is unchanged; unmatched old pages remain with a migration-gap notice. The selection is saved locally in ignored `target/native-api-preview.json`.
+Ordinary `scripts/build-website.py` rebuilds integrate and validate that selected audit
+before replacing the visible website, so the legacy CoreProbe pages do not briefly
+replace native pages. A missing selected audit fails the build and preserves the
+visible site; regenerate/reselect the audit after API changes. Delete the selection
+file and rebuild to explicitly return to the legacy snapshot. Clean checkouts and
+publication inputs remain unchanged; selection does not regenerate native metadata.
 
 The historical bundle contains XML documentation blocks mislabeled as Markdown.
 For this audit only, the themed mode copies the bundle and converts simple complete
@@ -86,7 +91,10 @@ The integrated site checks 3,483 pages (including compatibility redirects), reta
 and [actual constant declarations](constants-validation.json) record the result.
 The first bundle build failed in HttpContext's constructor with an intermittent
 NEOMETA003 stack-type comparison; a direct retry and complete second bundle build
-passed. That failure remains a separate investigation, not a resolved compiler bug.
+passed. Subsequent investigation resolved the failure in Raven `92a593ff7`:
+inhabited Void inside generic constructor signatures selected inconsistent library
+owners. A reduced regression reproduces the old failure; both unit spellings and
+the complete native bundle pass with the explicit unit-owner correction.
 
 Raven implementation: `502d1f19d`. Browser review before commit verified Math XML,
 Pi/E/Tau navigation, both Abs overloads and the CancellationToken → GetHashCode →

@@ -3,6 +3,9 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
+import json
+import subprocess
 
 spec = importlib.util.spec_from_file_location('website_build', Path(__file__).with_name('build-website.py'))
 build = importlib.util.module_from_spec(spec)
@@ -328,6 +331,50 @@ class PublicMetadataInventory(unittest.TestCase):
                      'System.Option.Some`1', 'System.Runtime.CompilerServices.IsReadOnlyAttribute'):
             self.assertIn(name, actual)
         self.assertNotIn('System.Introspection.RuntimeTypeInfo', actual)
+
+
+class NativePreviewPublication(unittest.TestCase):
+    def test_selection_is_optional_but_missing_selected_audit_is_an_error(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            with patch.object(build, 'NATIVE_PREVIEW', root / 'selection.json'):
+                self.assertIsNone(build.selected_native_preview())
+                build.NATIVE_PREVIEW.write_text(json.dumps({'audit': str(root / 'audit')}))
+                with self.assertRaisesRegex(ValueError, 'Selected native API audit is missing'):
+                    build.selected_native_preview()
+                (root / 'audit/site/docs/api').mkdir(parents=True)
+                self.assertEqual(root / 'audit', build.selected_native_preview())
+
+    def test_native_overlay_completes_before_publication(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            destination, staging = root / 'website', root / 'website-next'
+            destination.mkdir()
+            staging.mkdir()
+            (destination / 'owner').write_text('native previous')
+            (staging / 'owner').write_text('legacy')
+
+            def integrate(command, check):
+                self.assertTrue(check)
+                self.assertEqual(command[-2:], ['--site', str(staging)])
+                self.assertEqual((destination / 'owner').read_text(), 'native previous')
+                (staging / 'owner').write_text('native updated')
+
+            with patch.object(build.subprocess, 'run', side_effect=integrate):
+                build.publish_site(staging, destination, root / 'audit')
+            self.assertEqual((destination / 'owner').read_text(), 'native updated')
+
+    def test_failed_overlay_preserves_visible_site(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            destination, staging = root / 'website', root / 'website-next'
+            destination.mkdir()
+            staging.mkdir()
+            (destination / 'owner').write_text('native previous')
+            with patch.object(build.subprocess, 'run', side_effect=subprocess.CalledProcessError(1, 'preview')):
+                with self.assertRaises(subprocess.CalledProcessError):
+                    build.publish_site(staging, destination, root / 'audit')
+            self.assertEqual((destination / 'owner').read_text(), 'native previous')
 
 
 if __name__ == '__main__':
