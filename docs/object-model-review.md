@@ -1103,3 +1103,17 @@ Focused tests compare casts and reference unboxing, reject incompatible types,
 exercise generic class casts across collections, and force String upcast collection
 with a small heap. This closes a correctness gap; no performance improvement or
 complete CLR instruction conformance is claimed.
+
+### String reference instruction consistency — 2026-10-08
+
+Standalone AOT String views exposed an interpreter discrepancy: the verifier admitted
+String `ref.eq`, but execution rejected direct text and compared separate String
+Object wrapper locations. The instruction now reuses the existing shared-text owner
+identity path used by Object.ReferenceEquals. Direct aliases, independent wrappers
+of an alias and mixed String/Object views compare identical; separately evaluated
+equal literals remain distinct, and non-null text differs from null. Other object,
+byref and Function identity behavior is unchanged. This restores the existing String
+identity contract above, not a new interning or CLR compatibility claim. In particular,
+neoCLR literal evaluation remains fresh; no implicit interning is introduced.
+The focused regression fails before the fix; six ownership/GC/conversion tests cover
+this instruction and retained identity across the existing VM ownership paths.

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Align interpreted String `ref.eq` with the existing shared-owner identity contract:
+  accept direct Strings and preserve identity through separate Object wrappers.
+  Distinct equal literal evaluations remain distinct; null comparisons stay false
+  against non-null text. Add a failing-before regression and run six String ownership,
+  conversion and GC tests. No interning, metadata or public API changes.
+
 - Extend experimental ARM64 AOT with distinct copied Int32 boxes and verified
   Object.ToString dispatch through the explicit Int32 formatter binding. Preserve
   Object views, identity, result publication and exact managed fault sites under

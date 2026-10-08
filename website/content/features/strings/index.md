@@ -112,7 +112,8 @@ unchanged text. Comparison does not normalize Unicode or apply culture rules.
 
 The current runtime wraps shared immutable UTF-8 text when converting it to Object.
 String is a reference type: ReferenceEquals compares the shared text owner, even
-through separate Object/interface wrappers. An alias is identical; a separately
+through separate Object/interface wrappers. In development, the low-level `ref.eq`
+instruction also preserves this identity for direct String and Object views. An alias is identical; a separately
 constructed equal string has equal contents but a different identity. Explicit String.Intern shares text within one execution; literals are not
 automatically interned. Virtual GetHashCode remains content-based; explicit Object base hashing
 uses identity.

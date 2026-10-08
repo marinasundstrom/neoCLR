@@ -3197,7 +3197,10 @@ fn interpret_instructions_with_dispatch(
                         .iter()
                         .rev()
                         .take(2)
-                        .any(|v| matches!(v, Value::Function(_)))
+                        // String Object wrappers retain the text owner's identity,
+                        // not the incidental allocation of the wrapper itself.
+                        .any(|v| matches!(v, Value::Function(_) | Value::String(_))
+                            || matches!(v, Value::ObjectReference(object) if object.concrete_type() == Type::String))
                     {
                         let right = frame.pop()?;
                         let left = frame.pop()?;
