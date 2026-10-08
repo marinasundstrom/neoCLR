@@ -1,0 +1,55 @@
+{
+  "runtimeSha256": "5b1b12b1a61afbb035924763810cf9561385e71d49f74a2ced599ca068304b91",
+  "cases": [
+    {
+      "name": "library-assembly-info",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-next-priorities1008/library-assembly-info/sample.dll",
+        "--system",
+        "/private/tmp/native-interface-names1008b/System.runtime.neox",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Data.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Networking.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Web.dll",
+        "--object-root",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 1,
+      "stdout": "System.Runtime\n",
+      "stderr": "RuntimeError: Runtime error\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_496E74726F7370656374696F6E52756E74696D655365727669636573.M_417373656D626C795265666572656E636573 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E496E74726F7370656374696F6E_52756E74696D65417373656D626C79496E666F.M_6765745F5265666572656E636564417373656D626C696573 [instruction 2]\n   at NeoMetadata_F2DDAB56BCC44860E2BDDE50FBE233C9FAC8DE1D700F77D951BBB402C92026E4.F_4D61696E [instruction 10]\n"
+    },
+    {
+      "name": "library-introspection-tour",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-next-priorities1008/library-introspection-tour/sample.dll",
+        "--system",
+        "/private/tmp/native-interface-names1008b/System.runtime.neox",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Data.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Networking.dll",
+        "--module",
+        "/private/tmp/native-interface-names1008b/System.Web.dll",
+        "--object-root",
+        "/private/tmp/native-interface-names1008b/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 1,
+      "stdout": "Instance and declared type agree\nSystem.Runtime\n",
+      "stderr": "RuntimeError: Runtime error\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_496E74726F7370656374696F6E52756E74696D655365727669636573.M_417373656D626C795265666572656E636573 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E496E74726F7370656374696F6E_52756E74696D65417373656D626C79496E666F.M_6765745F5265666572656E636564417373656D626C696573 [instruction 2]\n   at NeoMetadata_F2DDAB56BCC44860E2BDDE50FBE233C9FAC8DE1D700F77D951BBB402C92026E4.F_4D61696E [instruction 22]\n"
+    }
+  ]
+}

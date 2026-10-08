@@ -24,7 +24,9 @@ admits ordinary null-initialized class arrays. [Exact reference-array views](exp
 now run the order sample through array-to-Iterable dispatch with matching interpreted/native output. The [byte-view prerequisite correction](experiments/aot-console/README.md#console-text-writers-and-nominal-byte-array-views-2026-10-08)
 now preserves the exact backing specialization independently of discovery order, with
 30 native/interpreter comparisons and closed-backing construction rejection. This
-does not imply general array views or covariance.
+does not imply general array views or covariance. The [next-fix reassessment](experiments/aot-sample-assessment/README.md#reassessment-after-reference-array-views-2026-10-08)
+selects lexical path bindings as the next small native slice; Math target lookup and
+shared introspection faults remain distinct priorities, and bootstrap remains a release gate.
 The wider audit also found the handwritten legacy union bridge's `IUnion`; it now
 uses `UnionValue`, with regenerated fragments and executable union/time checks. This does not change the bootstrap release gate or promise
 runtime suspension, JIT, reflection or stable callback ABI support.

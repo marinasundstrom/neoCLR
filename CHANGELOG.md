@@ -61,9 +61,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Element borrows, jagged arrays and nominal/interface views remain unsupported.
 
 - Assess 104 Raven samples with same-artifact interpreted/native execution, recording
-  emission and AOT blockers separately. Preserve a focused callback/HTTP baseline;
-  prioritize primitive arrays while keeping universal sample parity out of the release
-  gate. Record no-bridge bootstrap probes and future IL-free reflection/interop metadata.
+  emission and AOT blockers separately. Reassess seven consumers after the array-view
+  work: async propagation now matches, path/file blockers map to exact native services,
+  and Math lookup, jagged arrays and interpreter introspection remain separate work.
+  Record a final-runtime recheck of both introspection faults and prioritize lexical
+  path bindings without changing the no-bridge release gate. Preserve a focused callback/HTTP baseline;
+  the initial primitive-array priority is now implemented. Keep universal sample parity
+  out of the release gate. Record no-bridge bootstrap probes and future IL-free reflection/interop metadata.
 
 - Index native GC allocation ranges per collection, preserving interior roots and
   payload bounds without changing the heap ABI or collection policy. Ten kernel

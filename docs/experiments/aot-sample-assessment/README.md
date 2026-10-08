@@ -379,3 +379,63 @@ pass interpreted, sanitized native and standalone execution with GC cleanup and
 libSystem-only linkage. Focused checks cover wrong-element casts and retained exact
 array identity. This supersedes the order-sample rejection above; it is not a new
 104-case census or a performance comparison.
+
+
+## Reassessment after reference-array views (2026-10-08)
+
+The author asks what to fix next and clarifies that .NET/CLI instruction behavior is
+the default unless neoCLR deliberately diverges. Cross-mode parity is necessary but
+is not sufficient: the array `isinst` investigation found and corrected an interpreter
+mismatch rather than making that mismatch the native contract. Keep failed type tests,
+explicit casts and platform-specific invariance separate in future validation.
+
+A [seven-consumer follow-up](next-priorities-followup.json) ran during the array-view
+slice, before the shared `isinst` correction. It is a targeted reassessment, not a new
+104-case census or benchmark. Source/producer/bundle hashes and commands are retained.
+The correction does not implement any of the rejected emission/storage/services below.
+Both unexpected interpreter failures were then reproduced with the rebuilt runtime:
+[final interpreter recheck](introspection-recheck.json).
+
+| Consumer | Interpreter | Remaining boundary |
+| --- | --- | --- |
+| native-async-propagation | Success | Native execution now matches; remove the old callback blocker from its active todo |
+| library-strings | Not emitted | Raven resolves `System.Math.Sign` to a missing/ambiguous native type |
+| library-paths | Success | Unbound `neoCLR.Runtime.PathCombine` |
+| library-files | Success | Unbound `neoCLR.Runtime.WriteAllText` |
+| library-array-unified | Success | Jagged `Int32[][]` specialization/storage |
+| library-assembly-info | Runtime fault | Interpreter AssemblyReferences failure; AOT separately rejects RuntimeTypeHandle |
+| library-introspection-tour | Runtime fault | Same first interpreter service failure; AOT separately rejects RuntimeTypeHandle |
+
+The [service mapping](service-blockers.json) resolves the generic `$aot_linked_*`
+admission errors to original definitions; those errors alone should not be interpreted
+as evidence that the public wrappers need rewriting.
+
+Recommended next bounded work:
+
+1. **Lexical native path services.** Add exact bindings for PathCombine and
+   PathGetFileName, preserving the existing platform-separator/UTF-8 contracts and
+   checking allocation failure and GC ownership. These are pure text operations,
+   without filesystem handles, and are a smaller AOT slice than file I/O. Keep the
+   Raven sample unchanged and use its interpreter output plus edge-case controls.
+2. **Raven Math target resolution.** `System.Math.Sign` is present in
+   `runtime/raven/src/System/Math/Functions.rvn`; the emitted diagnostic does not prove
+   a missing runtime API. Trace target namespace/function lookup versus the host
+   System.Math class and compare with ordinary .NET compilation/main before choosing
+   a compiler fix. Avoid renaming the API or hand-patching this sample to hide lookup.
+3. **Shared interpreter introspection correctness.** Diagnose the two AssemblyReferences
+   faults against the exact source-built bundle. The observed frames identify the
+   first failure, not its root cause. Loaded descriptive metadata should be assessed
+   independently of future native RuntimeTypeHandle/sidecar support. Do not treat
+   these as merely unsupported AOT samples.
+4. **Then choose one larger scenario.** File text I/O needs status/error mapping,
+   byte limits and filesystem ownership checks. Jagged arrays need nested element
+   identities and tracing. Neither should be admitted by relaxing a guard alone.
+   General reflection, virtual dispatch and native host-I/O async entry waiting remain
+   separately scoped work rather than prerequisites for the current HTTP teaser.
+
+Retain the no-bridge compiler-target bootstrap as the author's release gate; the
+working native samples still use the narrow Core.dll producer bridge. The bounded
+path slice does not reprioritize or satisfy that gate. Keep the demonstrated HTTP,
+union, queue/fault and collection cases as acceptance controls. Compare changed IL
+semantics against CLI/.NET as well as the interpreter, record deliberate divergences,
+and benchmark only when a changed workload or performance question warrants it.

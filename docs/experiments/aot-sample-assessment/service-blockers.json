@@ -1,0 +1,43 @@
+{
+  "aotSha256": "0e295f73c7aab42a8669731e141c02c7d04c4a4c48fa00c4e22fc75b6effd4f4",
+  "cases": [
+    {
+      "sample": "library-paths",
+      "admission": {
+        "accepted": false,
+        "firstError": "$aot_linked_1: unsupported value member contract",
+        "phase": "compilation"
+      },
+      "sourceFunction": {
+        "compiledIndex": 1,
+        "compiledName": "$aot_linked_1",
+        "definition": {
+          "index": 19,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "neoCLR.Runtime.PathCombine",
+        "sourceIndex": 20
+      }
+    },
+    {
+      "sample": "library-files",
+      "admission": {
+        "accepted": false,
+        "firstError": "$aot_linked_8: unsupported value member contract",
+        "phase": "compilation"
+      },
+      "sourceFunction": {
+        "compiledIndex": 8,
+        "compiledName": "$aot_linked_8",
+        "definition": {
+          "index": 17,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "name": "neoCLR.Runtime.WriteAllText",
+        "sourceIndex": 22
+      }
+    }
+  ]
+}
