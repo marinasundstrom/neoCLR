@@ -213,7 +213,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_is_single_grapheme_v1", Linkage::Import, &sig)?)
     } else { None };
-    let object_service = if references && input.types.iter().any(|t| t.is_reference_type && !crate::selection::static_owner(t)) {
+    let object_service = if references && (input.types.iter().any(|t| t.is_reference_type && !crate::selection::static_owner(t)) || details.is_some_and(|d| !d.empty_record_boxes.is_empty())) {
         let mut sig = module.make_signature();
         sig.params.extend([AbiParam::new(types::I64), AbiParam::new(types::I32), AbiParam::new(types::I32), AbiParam::new(types::I64)]);
         sig.returns.push(AbiParam::new(types::I32));
@@ -265,6 +265,27 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             let parameters = b.block_params(entry).to_vec();
             let output = parameters[parameters.len() - 1 - usize::from(details.is_some())];
             let fault_context = details.map(|_| *parameters.last().unwrap());
+            if let Some(&record) = details.and_then(|d| d.empty_record_boxes.get(&i)) {
+                let service = module.declare_func_in_func(object_service.unwrap(), b.func);
+                let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                let tag = b.ins().iconst(types::I32, record as i64);
+                let bytes = b.ins().iconst(types::I32, 8);
+                let call = b.ins().call(service, &[arena, tag, bytes, output]);
+                let raw = b.inst_results(call)[0];
+                let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                let memory = b.ins().iconst(types::I32, 5);
+                let runtime = b.ins().iconst(types::I32, 3);
+                let status = b.ins().select(exhausted, memory, runtime);
+                let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                site.capture_frame = false;
+                return_if_detailed(&mut b, failed, status, Some(&site));
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks(); b.finalize();
+                module.define_function(ids[i], &mut context)?;
+                continue;
+            }
             if let Some(targets) = p.dispatch.get(&i) {
                 // Caller checks null. Forward the original receiver, result slot and
                 // context; no synthetic interface frame enters the managed trace.

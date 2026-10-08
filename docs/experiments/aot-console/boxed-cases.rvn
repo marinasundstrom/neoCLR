@@ -1,0 +1,12 @@
+import System.*
+import System.Text.*
+
+func Main() -> int {
+    let ready = EncoderState.Ready
+    let pending = EncoderState.NeedsOutput
+    let finished = EncoderState.Finished
+    Console.WriteLine(ready.HasValue)
+    Console.WriteLine(pending.HasValue)
+    Console.WriteLine(finished.HasValue)
+    return 0
+}

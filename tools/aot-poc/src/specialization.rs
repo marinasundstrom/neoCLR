@@ -322,7 +322,7 @@ impl Specializer<'_> {
                 | Op::StoreObject(t)
                 | Op::PackValue(t)
                 | Op::IsValue(t)
-                | Op::UnpackValue(t) | Op::IsInstance(t) | Op::CastClass(t)
+                | Op::UnpackValue(t) | Op::BoxValue(t) | Op::IsInstance(t) | Op::CastClass(t)
                 | Op::NewArray(t) | Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t) | Op::ArrayAddress(t) => {
                     *t =
                         self.lower(&substitute(t, arguments, methods).map_err(|e| e.to_string())?)?

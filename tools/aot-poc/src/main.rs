@@ -1,4 +1,5 @@
 mod bindings;
+mod boxing;
 mod compiler;
 mod fault_details;
 mod inspection;

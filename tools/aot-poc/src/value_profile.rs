@@ -376,7 +376,7 @@ impl<'a> Profile<'a> {
     pub fn cast_targets(&self, target: &Ty) -> Vec<usize> {
         match target {
             Ty::Reference(i) if self.object_base == Some(*i) => self.input.types.iter().enumerate()
-                .filter(|(_, t)| t.is_reference_type && t.representation == Representation::Record && !t.is_abstract)
+                .filter(|(_, t)| t.representation == Representation::Record && !t.is_abstract)
                 .map(|(i, _)| i).collect(),
             Ty::Reference(i) => vec![*i],
             Ty::Interface(i) => {

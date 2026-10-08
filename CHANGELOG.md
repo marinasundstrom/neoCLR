@@ -114,7 +114,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   projection, retaining bodies and fault identities. Validate a standalone Raven
   byte-count/slice Result consumer and null argument behavior. Extend measured
   selection budgets to 256 functions/128 shapes/64 clones with boundary rejection
-  tests; boxed union cases and array dispatch remain Console.Write dependencies.
+  tests. Add bounded empty-record boxing with distinct reference identity, Object
+  views and original allocation-fault sites; generated helpers count toward budgets.
+  Validate ordinary EncoderState.HasValue through a fresh standalone Raven Console
+  consumer, exact broken-pipe diagnostics and focused identity/resource checks.
+  Payload boxing/unboxing and nominal array dispatch remain outside the profile.
 
 ### 2026-10-07
 

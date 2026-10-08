@@ -1692,3 +1692,81 @@ int main(int argc,char **argv) {
         }
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn boxed_empty_records_keep_identity_root_views_and_fault_sites() {
+    let dir=Temp::new();
+    let seed=neoclr::assemble(".module System\n.references ()\n.type class abstract System.Object\n.end\n").unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/boxed-empty.neoil");
+    let app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)],&seed).unwrap().remove(0);
+    let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena"]);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let report:serde_json::Value=serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["emptyRecordBoxes"].as_array().unwrap().len(),1);
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc,char **argv) {
+    uint64_t storage[3]={0,0,UINT64_C(0xa5a5a5a5a5a5a5a5)};
+    int mode=argc>1?atoi(argv[1]):0;
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,mode==9?7:16,0}};
+    int32_t result=-99;int status=neoclr_entry_v4(mode,&result,&ctx);
+    if(storage[2]!=UINT64_C(0xa5a5a5a5a5a5a5a5))return 93;
+    if(status){if(result!=-99)return 92;neoclr_aot_render_fault(stderr,&ctx.fault);return 1;}
+    if(ctx.text.used!=(mode==0?16:8))return 94;
+    printf("%d\n",result);return 0;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-fault-details/render.c")).arg(base.join("aot-console/text-arena.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in 0..4 {
+        let expected=method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default());
+        let r=Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        match expected {
+            Ok(_)=>{assert_eq!(r.status.code(),Some(0),"{r:?}");assert_eq!(r.stdout,b"1\n");assert!(r.stderr.is_empty());}
+            Err(fault)=>{assert_eq!(r.status.code(),Some(1));assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string());}
+        }
+    }
+    let r=Command::new(dir.0.join("app")).arg("9").env_clear().output().unwrap();
+    assert_eq!(r.status.code(),Some(1));
+    assert_eq!(String::from_utf8_lossy(&r.stderr),"NativeMemoryLimitExceeded: Native memory limit exceeded\n   at Box [instruction 3]\n   at Calculate [instruction 0]\n");
+}
+
+fn compile_linked_module(dir:&Temp, seed:&neoclr::Module, app:&neoclr::Module, flags:&[&str]) -> std::process::Output {
+    fs::write(dir.0.join("app.neox"),neoclr::metadata_container::write_module(app).unwrap()).unwrap();
+    fs::write(dir.0.join("seed.neox"),neoclr::metadata_container::write_module(seed).unwrap()).unwrap();
+    fs::write(dir.0.join("empty.neoil"),".module Empty\n.references ()\n").unwrap();
+    Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc")).arg("--closed-world")
+        .arg(dir.0.join("app.neox")).arg("Calculate").arg(dir.0.join("app.o"))
+        .arg("--system").arg(dir.0.join("seed.neox")).arg("--module").arg(dir.0.join("empty.neoil"))
+        .args(flags).output().unwrap()
+}
+
+#[test]
+fn boxed_empty_profile_rejects_other_shapes_and_counts_generated_helpers() {
+    let seed=neoclr::assemble(".module System\n.references ()\n.type class abstract System.Object\n.end\n").unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/boxed-empty.neoil");
+    for (source,flags,message) in [
+        (source.to_string(),vec!["--compile-system"],"requires --reference-arena"),
+        (source.replace(".type Marker<T>",".type Marker<T>\n.field Value T"),vec!["--compile-system","--reference-arena"],"requires empty value records"),
+    ] {
+        let app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)],&seed).unwrap().remove(0);
+        let dir=Temp::new();let r=compile_linked_module(&dir,&seed,&app,&flags);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+        assert!(String::from_utf8_lossy(&r.stderr).contains(message),"{r:?}");
+    }
+    let calls=(0..254).map(|n| format!("call F{n}()\npop\n")).collect::<String>();
+    let mut large=source.replacen("call Box()",&format!("{calls}call Box()"),1);
+    for n in 0..254 {large.push_str(&format!(".function F{n}() -> Int32\nldc.i4 0\nret\n.end\n"));}
+    let app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&large)],&seed).unwrap().remove(0);
+    let dir=Temp::new();let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena"]);
+    assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    assert!(String::from_utf8_lossy(&r.stderr).contains("boxing helpers exceed"),"{r:?}");
+}

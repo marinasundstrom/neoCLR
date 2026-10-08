@@ -257,13 +257,14 @@ pub(super) fn select_inventory(
         pending_types.extend(f.parameters.iter().chain(&f.locals).cloned());
         pending_types.push(f.returns.clone());
         for op in &f.body {
+            if matches!(op, Op::BoxValue(_)) { pending_types.push(Type::Named("System.Object".into())); }
             if let Op::New(t)
             | Op::InitializeObject(t)
             | Op::LoadObject(t)
             | Op::StoreObject(t)
             | Op::PackValue(t)
             | Op::IsValue(t)
-            | Op::UnpackValue(t) | Op::IsInstance(t) | Op::CastClass(t)
+            | Op::UnpackValue(t) | Op::BoxValue(t) | Op::IsInstance(t) | Op::CastClass(t)
             | Op::NewArray(t) | Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t) | Op::ArrayAddress(t) = op
             {
                 pending_types.push(t.clone());

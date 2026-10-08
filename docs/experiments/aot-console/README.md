@@ -710,5 +710,33 @@ POC limits, not neoCLR platform promises. Like ordinary .NET instance methods, w
 logic stays managed compiler input; the private projection is a temporary bootstrap
 verification detail, not a public calling convention.
 
-Full Console.Write next reaches boxed empty union cases, String pattern casts and
-managed-array interface dispatch. ReadLine follows the writer path.
+Full Console.Write next reaches boxed empty union cases and managed-array interface
+dispatch. Exact String pattern casts were already admitted. ReadLine follows the writer path.
+
+
+## Boxed empty union cases (2026-10-08)
+
+The reference-arena profile now lowers `box` for closed empty value records, including
+specialized generic records. Each operation allocates a distinct eight-byte header
+with the record's private type tag. Aliases preserve reference identity, separate
+boxing operations remain distinct, Object views succeed, and unrelated class casts
+retain the interpreter's fault behavior. The original boxing instruction is lowered
+to a private helper after full source verification; helpers count toward the function
+budget and are reported separately in `emptyRecordBoxes`/`emptyRecordBoxSites`.
+Resource failures retain the original box/caller instruction frames, omitting the
+synthetic helper. The native entry never publishes a result on failure.
+
+This admits the generated EncoderState.Value/HasValue bodies without replacing union
+logic. [The Raven sample](boxed-cases.rvn) prints HasValue for Ready, NeedsOutput and
+Finished through ordinary Console.WriteLine. Its [fresh-producer validation](boxed-cases-validation.json)
+records standalone interpreter/native output and exact broken-pipe diagnostics,
+executable-only deployment and libSystem as the sole dynamic dependency. Focused
+native tests cover generic empty records, identity, Object views, invalid casts,
+exact-fit/exhaustion, canaries and original fault sites; negative tests reject payload
+records, missing arena capability and helper-budget overflow.
+
+Like CLR boxing, each admitted value gets distinct reference identity. This bounded
+implementation supports only empty records and invocation lifetimes: payload boxing,
+unboxing, boxed value interface dispatch, virtual Object methods and GC remain future
+work. The cost is a small arena allocation retained until invocation reset. The
+writer graph now reaches the nominal byte-array-to-Sequence<byte> interface boundary.

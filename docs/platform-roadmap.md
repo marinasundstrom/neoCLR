@@ -128,8 +128,10 @@ value snapshots, preserving fixed-extent replacement and the bridge's ordinary c
 loop. Ordinary String instance bodies now run in a standalone Raven slice/count
 consumer with Result patterns and exact interpreter fault parity. Measured selection
 budgets expand to 256 functions/128 types/64 clones (Console.Write already selects
-151/68/37 before array dispatch). Boxed union cases, String pattern casts and array
-interface dispatch remain the next writer dependencies. The author adds a console-input sample after unions, exercising input and
+151/68/37 before array dispatch). Empty-record boxing now supports generated
+EncoderState.Value/HasValue with distinct object identity, bounded lifetime and exact
+fault sites; a fresh Raven Console consumer passes standalone validation. Nominal
+byte-array interface dispatch remains the next writer boundary. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

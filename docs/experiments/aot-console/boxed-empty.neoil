@@ -1,0 +1,65 @@
+.module BoxedEmpty
+.type Marker<T>
+.end
+.type class Other
+.end
+.function Box() -> System.Object
+.local Marker<Int32> value
+ldloca value
+initobj Marker<Int32>
+ldloc value
+box Marker<Int32>
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local System.Object first
+.local System.Object second
+call Box()
+stloc first
+ldarg mode
+ldc.i4 0
+ceq
+brtrue Distinct
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Alias
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Root
+ldloc first
+castclass Other
+pop
+ldc.i4 -1
+ret
+Distinct:
+call Box()
+stloc second
+ldloc first
+ldloc second
+ref.eq
+ldc.bool false
+ceq
+br Result
+Alias:
+ldloc first
+stloc second
+ldloc first
+ldloc second
+ref.eq
+br Result
+Root:
+ldloc first
+isinst System.Object
+ref.isnull
+ldc.bool false
+ceq
+Result:
+brfalse Failed
+ldc.i4 1
+ret
+Failed:
+ldc.i4 0
+ret
+.end

@@ -351,6 +351,7 @@ pub fn prepare(
             }
         }
     }
+    super::boxing::project(&mut selected, &mut report)?;
     let system_type_names: std::collections::BTreeSet<_> = neoclr::library::system()
         .map_err(|e| e.to_string())?.types.iter().map(|t| t.name.as_str()).collect();
     let mut static_projections = vec![];
