@@ -14,7 +14,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Reject recursive/borrowed/output callback paths and excessive dispatch candidates.
   Add native/interpretive Raven callback samples and sanitized GC/fault tests. The HTTP
   app advances to Function-array admission; task/socket completion and server timings
-  remain work in progress. No public API, Raven compiler or bridge contract changes.
+  remain work in progress. Follow with typed callback-array storage and Function method
+  specialization: preserve checked initialization, receiver retention, replacement and
+  ArrayList growth/copy behavior. Native/interpreter container and fault checks pass;
+  the HTTP app next requires arrays of task-result values. No public API, Raven compiler
+  or bridge contract changes.
 
 - Extend AOT erased transport and closed specialization with Int64/UInt64, preserving
   high bits and exact type tags through generic calls. Admit full-width equality;

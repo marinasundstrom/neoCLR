@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
+p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList'))
 a = p.parse_args()
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
@@ -39,7 +40,7 @@ def run(command, status=0):
 for f in [Path(__file__), compiler, runtime, aot, core, seed, ownership, *libs, *adapters,
           *ROOT.joinpath('tools/aot-poc/src').glob('*.rs'), *base.glob('*.h'), *base.parent.joinpath('aot-fault-details').glob('*.h'), *compiler.parent.glob('*.dll')]:
     report['inputs'][str(f)] = hashlib.sha256(f.read_bytes()).hexdigest()
-for name in ('Callbacks', 'CallbackFault'):
+for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList')):
     source = Path(__file__).with_name(name + '.rvn')
     report['inputs'][str(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
     assembly, obj, native = (output / (name + suffix) for suffix in ('.dll', '.o', ''))

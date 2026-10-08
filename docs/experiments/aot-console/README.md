@@ -1981,5 +1981,6 @@ Async accept/read/write and the full HTTP app remain work in progress.
 
 The reference profile now executes bounded static/bound Function callbacks with managed
 receiver retention and exact interpreter fault parity. See [the callback experiment](callbacks.md)
-and its Raven consumers. Function arrays and asynchronous host completion remain open;
+and its Raven consumers. Function arrays now support real ArrayList growth/copy/replacement;
+general value arrays and asynchronous host completion remain open;
 this does not yet make the HTTP app executable natively.

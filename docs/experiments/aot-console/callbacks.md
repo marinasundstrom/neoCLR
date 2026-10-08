@@ -23,7 +23,7 @@ not addresses, stable symbols or an external ABI. At most 32 possible targets pe
 shape are admitted. Recursive call graphs, including conservative possible callback
 edges, remain rejected pending a native stack budget; this can reject a program whose
 actual dynamic path is acyclic. Borrowed/output signatures, callback operations inside
-output-parameter methods, virtual/interface-bound receivers, Function arrays, equality,
+output-parameter methods, virtual/interface-bound receivers, Function equality,
 Object views and introspection remain outside this profile. Ordinary no-result calls
 remain distinct from inhabited Void results.
 
@@ -65,6 +65,48 @@ The [Raven callback samples](../../../benchmarks/native-web/README.md) compile t
 PE/#Neo, run in both modes, and compare exact success/fault output. The standalone image
 links only libSystem; the GC and fault adapters are included. See the reproduction script
 and [recorded evidence](../../../benchmarks/native-web/callback-validation.json).
-The full HTTP app advances to a Function-array selection rejection. Callback containers,
-task dispatch, asynchronous socket completion and host-held GC roots remain necessary
-before the real HTTP server can run natively or be benchmarked.
+The initial callback slice advanced the full HTTP app to Function-array rejection.
+The container follow-up below advances it again. Task dispatch, asynchronous socket
+completion and host-held GC roots remain necessary before native HTTP benchmarking.
+
+## Callback arrays and ArrayList (2026-10-08 follow-up)
+
+The reference profile now carries exact Function shapes in managed arrays, generic
+method specialization and closed ArrayList owners. Ordinary newarr initializes nulls;
+array.reserve uses checked initialization markers. Indexed reads/stores, array length,
+and callback/array null tests are supported. Function element borrows, nominal array
+views, array/function equality and general value-record arrays remain unadmitted.
+A callback of a different structural signature cannot be stored by treating both
+values as machine pointers: original metadata verification and typed stack analysis
+still enforce the exact element type.
+
+The backend reuses the existing private String-array allocator and collector's initialized
+pointer-slot layout. The historical C symbol `neoclr_allocate_strings_v1` and storage kind
+name remain unchanged; they contain no String-specific dereference. Typed diagnostic
+roots separately label `callable-array`. Each initialized slot traces its descriptor,
+then its receiver. Overwriting a slot drops that edge at the next collection. Unwritten
+reserved slots remain unreadable and are not traced; explicitly stored null is readable.
+The layout costs eight bytes per pointer plus one byte per reserved initialization marker,
+with the existing 65,536-element and caller heap-byte bounds. It is private image storage,
+not a guest-visible ABI or a claim of .NET array covariance.
+
+This extends the [managed array](../../managed-arrays.md) and
+[checked reservation](../../reserved-array-capacity.md) designs and their .NET comparison.
+Like copying elements of .NET reference arrays, copying these entries shares callbacks
+and receivers; it does not clone receiver state. neoCLR additionally distinguishes
+unwritten reserved slots from null. Reusing the current pointer-slot collector avoids
+another array ABI and tracing kernel; the cost is historical internal naming and continued
+conservative retention. No new language/compiler/library contract or performance claim
+is introduced. The interpreter already implements this behavior.
+
+`callback-arrays.neoil` holds a callback receiver solely through an array and repeatedly
+replaces/clears another slot 1,000 times within 2 KiB. Native/interpreter checks compare
+unwritten-slot, negative-index and default-null invocation faults. Negative tests reject
+element borrows and incompatible Function shapes. `CallbackList.rvn` exercises the real
+library's growth to 20 entries, Copy, mutation through shared callbacks, replacement,
+1,000 discarded receivers and the surviving copied entries. The sanitized and standalone
+native consumer matches the interpreter and links only libSystem.
+[Container evidence](../../../benchmarks/native-web/callback-array-validation.json) records
+reproduction and the next server boundary: arrays of `Result<Void, HttpError>` used by
+its task state. General value-array storage is the next prerequisite; the HTTP server
+itself has not yet run natively.

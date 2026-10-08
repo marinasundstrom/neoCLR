@@ -46,8 +46,9 @@ has its own feature page and homepage entry. Any next-release POC remains explic
 specialization and equality. The isolated listener now runs in both modes with exact native service bindings and
 explicit host-scope cleanup, including guest fault exits. [Stored native callbacks](experiments/aot-console/callbacks.md)
 now retain receivers through collection and preserve fault traces in real Raven consumers.
-The full server advances to Function-array admission. Next address callback containers,
-task dispatch, host-root ownership and asynchronous socket services. Component benchmarks do not
+Function arrays and the real ArrayList callback consumer now support growth, copies,
+replacement and collection. The full server advances to arrays of Result<Void, HttpError>.
+Next address value-array storage, task dispatch, host-root ownership and asynchronous socket services. Component benchmarks do not
 qualify a server.
 
 **Author clarification:** build the CIL-to-native, self-contained executable foundation

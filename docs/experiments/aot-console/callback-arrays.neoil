@@ -1,0 +1,147 @@
+.module Callbacks
+.type class Counter
+.field Number Int32
+.method instance .ctor(Int32 number) -> noresult
+ldarg 0
+ldarg number
+stfld Counter::Number
+ret
+.end
+.method instance Add(Int32 delta) -> Int32
+ldarg 0
+ldarg 0
+ldfld Counter::Number
+ldarg delta
+add
+stfld Counter::Number
+ldarg 0
+ldfld Counter::Number
+ret
+.end
+.end
+.type class Holder
+.field Callback fn<Int32,Int32>
+.method instance .ctor(fn<Int32,Int32> callback) -> noresult
+ldarg 0
+ldarg callback
+stfld Holder::Callback
+ret
+.end
+.end
+.function Make() -> fn<Int32,Int32>
+ldc.i4 40
+newobj.ctor instance Counter::.ctor(Int32)
+function.bind fn<Int32,Int32> = instance Counter::Add(Int32)
+ret
+.end
+.function Static(Int32 number) -> Int32
+ldarg number
+ldc.i4 2
+add
+ret
+.end
+.function Fail(Int32 number) -> Int32
+ldarg number
+ldc.i4 0
+div
+ret
+.end
+.function NewCounter() -> Counter
+ldc.i4 42
+newobj.ctor instance Counter::.ctor(Int32)
+ret
+.end
+.function Empty() -> noresult
+ret
+.end
+.function Unit() -> Void
+ldvoid
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local arrayref<fn<Int32,Int32>> callbacks
+.local fn<Int32,Int32> empty
+.local Int32 count
+ldloca empty
+initobj fn<Int32,Int32>
+ldc.i4 2
+array.reserve fn<Int32,Int32>
+stloc callbacks
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Uninitialized
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Bounds
+ldarg mode
+ldc.i4 3
+ceq
+brtrue Default
+ldloc callbacks
+ldc.i4 1
+call Make()
+stelem fn<Int32,Int32>
+ldc.i4 0
+stloc count
+Loop:
+ldloc callbacks
+ldc.i4 0
+call Make()
+stelem fn<Int32,Int32>
+ldloc callbacks
+ldc.i4 0
+ldloc empty
+stelem fn<Int32,Int32>
+ldloc count
+ldc.i4 1
+add
+stloc count
+ldloc count
+ldc.i4 1000
+clt
+brtrue Loop
+ldloc callbacks
+ldc.i4 0
+ldelem fn<Int32,Int32>
+ref.isnull
+brfalse Bad
+ldloc callbacks
+ldc.i4 1
+ldelem fn<Int32,Int32>
+ldc.i4 1
+callvirt instance fn<Int32,Int32>::Invoke(Int32)
+pop
+ldloc callbacks
+ldc.i4 1
+ldelem fn<Int32,Int32>
+ldc.i4 1
+callvirt instance fn<Int32,Int32>::Invoke(Int32)
+ret
+Uninitialized:
+ldloc callbacks
+ldc.i4 0
+ldelem fn<Int32,Int32>
+pop
+ldc.i4 0
+ret
+Bounds:
+ldloc callbacks
+ldc.i4 -1
+ldelem fn<Int32,Int32>
+pop
+ldc.i4 0
+ret
+Default:
+ldc.i4 1
+newarr fn<Int32,Int32>
+ldc.i4 0
+ldelem fn<Int32,Int32>
+ldc.i4 0
+callvirt instance fn<Int32,Int32>::Invoke(Int32)
+ret
+Bad:
+ldc.i4 -1
+ret
+.end

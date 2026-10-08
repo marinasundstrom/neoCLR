@@ -38,7 +38,7 @@ listen on a socket or measure HTTP throughput.
 
 [Web and HTTP](../web/) explains the existing application APIs and server case.
 The server source compiles to neoCLR metadata, but its native dependency selection
-currently rejects callback-array storage. Stored callbacks now execute natively with receiver retention and matching fault traces. The ordinary Raven socket listener now runs in both modes,
+currently reaches unsupported task-result array storage. Stored callbacks and their ArrayList containers now execute natively with receiver retention, growth/copy/replacement and matching fault traces. The ordinary Raven socket listener now runs in both modes,
 including local-port lookup, typed errors, close and host cleanup on faults. Async
 accept/read/write, task integration and sustained
 server execution are not yet qualified in AOT.

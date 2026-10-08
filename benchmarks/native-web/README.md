@@ -65,7 +65,7 @@ interpreter already supports this behavior, so no interpreter change was needed.
 invalid addresses/ranges, duplicate binding, idempotent close, stale handles and port
 reuse. `ListenFault.rvn` leaves a listener open before a user fault; the native host
 releases it and matches interpreter fault output. The complete HTTP server still
-advances through stored callback support to Function-array admission and still needs
+advances through stored callbacks and their ArrayList storage to value-array admission and still needs
 asynchronous socket/task support.
 [Wide-value evidence](handle-validation.json) records the earlier admission boundary;
 [current listener evidence](listener-validation.json) records the completed lifecycle.
@@ -167,3 +167,10 @@ standalone dependencies and the next HTTP admission boundary (Function arrays).
 [Implementation and provisional limits](../../docs/experiments/aot-console/callbacks.md)
 explain dispatch, ownership and the .NET comparison. No public API/bridge change or
 interpreter modification is required for this native implementation slice.
+
+`CallbackList.rvn` extends this consumer through the real ArrayList growth/Copy/indexed
+replacement path, including shared receiver mutations and 1,000 discarded bound methods.
+Run the same command with `--case CallbackList` for the focused container check; without
+`--case` the script runs all three callback samples. [Container evidence](callback-array-validation.json)
+records matching interpreter/native results and the next HTTP rejection: arrays of
+`Result<Void, HttpError>`. Historical callback evidence retains its earlier admission boundary.

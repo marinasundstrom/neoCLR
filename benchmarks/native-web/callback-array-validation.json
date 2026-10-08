@@ -1,0 +1,344 @@
+{
+  "revision": "10da59f9b87bcd500a28e32c5bcba94b067ddcf1",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/verify_callbacks.py": "2cf4a998dc6160a76471c3927f52690e3a0b7118a914e5f6c04af41df707e353",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "c59a935b707df3e6df0aa948ff77d7ff651e4994dec21c2b0f3169a5d22db2d7",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "c20e58223ba42bf0495010ddb87f20564191d7bbf727124bcdcefa470631d651",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "5928dc13d3ae16e10012fdb8effafc4e51d0b43744f920347dae6fe1fcbfb55a",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll": "2ceee479056bca82e9752f81d84881db118dc106af5efa8cf121c345ea94ce7b",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll": "7c33d97e0e65a23876e300fdddc069b03fad6bc87ffb7c1bea4333f21f0e9ea2",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll": "fdf3c7866a8cae147578bc315a2c6b72eea4edb08d2a496a6134c662c8aa12df",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c": "4657f547a492d51a3caf9f9dfc36e153cb5f3b094828de382780737a353e9e62",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "a5251579303ff2df8ac857a44dc6d3cd0f6dc0d7f14847db1d82ffe7a1155979",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "7202d4e33a14991a5261a5fcc25c4af11f67c48f3fe21c7e10b97be482942300",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "245abec593a1adc54b7469f7e44a0ef43a1997f4a3591040f791cfacad360c84",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "abc5c07f84e1b4f505bdd92b5d924acf10db2624ad0b348168567f1ee93a6dd0",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/flow.rs": "bf87fc1a01e7ce015ecc1a17b34fc931953e84e10d68610647ce523c0aae7d8d",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/boxing.rs": "82b2a08f99dfcd929cac7455c761eee000a661ada0e9c088f0d23413e4294b53",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_layout.rs": "931d459530ffab03d7fc3651c4bbc6a837048314230703dbe68fbe8708d4ea1c",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/fault_details.rs": "7141611ab4fe6130da5ad8cba1d6439df0a029ecc01bce3c6625be7a15754a17",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/compiler.rs": "fb3414de0cdc17edc84409d8b3711dff1c22203b377cc2a7306a3a0b4db00559",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_probe.rs": "a162c14ac728cc1433e1fe79eb3deb35bf5a5014e27ea75aa98b6168dd3e2e78",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/values.rs": "4459ada2537642f2a7d3dc9b2556067d4654801759f09df532678308a936c5fa",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/specialization.rs": "fdd4a4cb0729392c1ee88d42e5032a62f76fd7e680da5aa9eea58616767b3688",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_points.rs": "719628717d73351f154e90b74f7ea5adfd6329a5677d6c60f5ea3831f4642a24",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/value_profile.rs": "534a790c00d614f0c74aeadc48db7c09296dfdce4ddbaa25580ad60b0b0290d5",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/selection.rs": "200b10ec01d6feaac230ea86529de02fb734f91e4ebf0635c9a2dd207a339e9c",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/main.rs": "ac6d3c409bf0f946ad597ba4b85f055d762d6d4e95aeb43dcdea6badab186cdd",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/linking.rs": "c0bbee31f8725fa8317646133155c12ee16507a52e98152dff2253233d10acd0",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/bindings.rs": "73f715f8db6cef18d2d07a2f7ced592dbc9e5ad5c19da87e7d808b18db3d0258",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/inspection.rs": "c3c07130675b2c58b1c9103249e5ae64b592660074ffa714b3b78cba1f66430f",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "9310c81673b991cac85e291bf68756f7d5c5467e732bb2d4aa012af2eeebe43b",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "500d75a89e44477c684b9da5a635755d47d0b563878c35979fe7128435a3cbb7",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "858ec6a53c8ff173487717129976c8c4bfd68f727dc3a0083ced1a55c2503e8d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "86320e78fcb471c164c55d7850cd75e3eb12beaab3e6115bdf0aa79720b58eb8",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "6ca8ab4df3f3f57be16d971c56101ef83511f6ad151945cd7854174d85fb318c",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "ac7efe36e95e2c848d81c7bef37fe8e270146f8222ea91cf4866c4348f043234",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "eec237e8a924743fbf56ac9c24932cab0a92fbc35c9e2cc23d0a2fe4a5a9fc24",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "428f0709baf84634025e0d6387a5726edffb1bcc7c18d28795317705e5fb43de",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "bfbfda2f336a73059418c84899787d4f8cc680f27d4864d70785692b048d0382",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/CallbackList.rvn": "785f9856c842d1cb25ea202feb467e9bfe5502d11ef06c2bc2ad12003c0b658a",
+    "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList.dll": "5d3a4d4a713aa3b682ecfcf14e2e00810061040949c331a48140565a1140a270",
+    "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList.o": "bcd2e82d194cab3c21561b7765506bea2a5c5a036314be1efa4dc6a9ba9aee38",
+    "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList-standalone": "76ecb7245f6cd126bb1a6ff8e9eca799f5ff7506f000d269c0373da0c5f4e28f",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-server/Server.rvn": "a76485f804065ddec7d5903a83aa9e8cf4bca2aaafc9dcbb30178276324d715c"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList.dll",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/CallbackList.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "9d3e5b7ca9b280a034cdb0f14a9d7a6e00f3dcba5b6de555ce3ea13703ffc7c4"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "ea71972b2f8bbe841cd0f50d8e811f68778412329d0a0e4f3c24cdf8f3725931"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/callback-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList-standalone"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/CallbackList-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/Server.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/http-server/Server.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/native-callback-array-validation/Server.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-socket-listener",
+        "--bind-console-write-line",
+        "--bind-integer-text",
+        "--bind-int32-to-string",
+        "--bind-utf8-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "600cd003e45b44dbcbfccf4b8b56eb593103751a6f9d2895d11ecc6dfcb6a7f6"
+      },
+      "stderr": ""
+    }
+  ],
+  "cases": {
+    "CallbackList": {
+      "status": 0,
+      "output": "",
+      "fault": "",
+      "heapCapacity": 65536,
+      "bindings": [
+        {
+          "compiledIndex": 5,
+          "definition": {
+            "index": 64,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        }
+      ]
+    }
+  },
+  "serverAdmission": {
+    "accepted": false,
+    "firstError": "specialization requires closed reference-free local value types: ArrayRef(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032\", arguments: [Void, Named(\"NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_487474704572726F72\")] })",
+    "phase": "selection"
+  }
+}
