@@ -65,7 +65,9 @@ runtime is needed. This is separate from the public `System.Runtime.GC` API abov
 is not yet bound in AOT builds.
 
 The initial collector scans object payloads conservatively and collects at every published
-operation boundary. Those choices can retain extra objects and perform excessive work;
-precise maps and pressure scheduling remain next. General host handles, concurrent
+operation boundary. Conservative scanning can retain extra objects, and frequent collection
+can perform excessive work; precise maps and pressure scheduling remain next. An in-header
+mark worklist avoids repeated heap traversal passes. Local measurements improve an adverse
+graph but show no material routing speedup. General host handles, concurrent
 collection and full HTTP-server qualification remain open.
 [Experimental contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-console/native-gc.md).

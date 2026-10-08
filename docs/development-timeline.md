@@ -11839,3 +11839,21 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
   this completed basic GC from remaining precise maps, pressure scheduling, host handles
   and full HTTP server work. AddressSanitizer was unavailable on this host due to startup
   deadlock; undefined-behavior/bounds sanitizers and executable guards passed.
+
+
+## 2026-10-08 — Evolve the native POC with measurements and interpreter feedback
+
+- **Author:** Continue toward an improvable POC, benchmark when relevant during native
+  compilation implementation, and examine improvements portable to interpreter mode.
+- **Assistant proposal and action:** Compare existing traversal/scheduling policies, then
+  replace native repeated heap passes with an intrusive worklist. The interpreter already
+  uses a worklist, so this is a transfer from interpreter to native. No interpreter or
+  Raven compiler change is required by this slice.
+- **Measured outcome:** Seven paired samples after warm-ups show about 2.9× faster
+  collection of an adverse reverse-linked graph; real Raven routing is effectively
+  unchanged. Counts/output/budget checks agree. Focused kernel, compiled lifetime/fault
+  and interface-dispatch tests pass. See [method and evidence](experiments/aot-console/native-gc.md#measured-worklist-slice--2026-10-08).
+- **Open:** Safe pressure scheduling, precise object tracing and full HTTP-server
+  qualification. Interpreter scratch-buffer reuse is a measurement candidate, not an
+  implemented improvement. Benchmark relevant performance changes, not every routine API
+  change; eventual .NET comparisons need matched workloads and explicit timing scopes.

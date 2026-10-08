@@ -218,7 +218,11 @@ to complete compiler boundaries. It recovers heap-borrow owners, relies on publi
 owning storage for stack borrows and never collects inside native allocation services.
 The real routing workload completes 1,024 requests within 64 KiB, with retained captures
 and output/fault parity ([validation](experiments/aot-console/route-native-gc-validation.json)).
-Basic native GC is implemented for this bounded profile. Conservative object candidates
+Basic native GC is implemented for this bounded profile. A measured in-header worklist
+now replaces repeated mark passes, reusing the interpreter's traversal approach;
+[paired benchmarks](experiments/aot-console/native-gc-worklist-validation.json) show a
+reverse-chain improvement without a material routing gain. Continue relevant performance
+measurements and review improvements for both execution modes as the POC evolves. Conservative object candidates
 can over-retain, and the current stress policy collects at every boundary. Next add precise
 object maps and measured pressure scheduling, then continue the HTTP service dependencies;
 full server execution remains unqualified. General host handles, concurrent collection

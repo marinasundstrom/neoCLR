@@ -26,8 +26,11 @@ it cannot move objects or provide precise liveness. Initialized erased payloads 
 also over-retain. Descriptors exclude headers/padding, bound all scans and distinguish
 atomic byte values from String arrays even when their existing payload kind tags overlap.
 
-A bounded fixed-point mark pass avoids recursion and external mark-stack allocation.
-This is intentionally simple and can take quadratic or worse work as the heap grows.
+An intrusive mark worklist uses aligned header pointers in the existing state word.
+Each reachable allocation is queued once, without recursion or external allocation.
+Failure clears temporary links before returning; no sweep occurs on an invalid array
+descriptor. Payload lookup still walks allocation ranges linearly, so graph tracing
+can remain quadratic as the heap grows.
 There are no generations, compaction, concurrent collection, finalizers or weak handles.
 Fragmentation or a large live set can still exhaust the buffer. Thread-local counters
 are cumulative diagnostics, not shared heap state; contexts and buffers remain isolated.
@@ -127,3 +130,53 @@ Next: replace conservative object candidates with precise type maps, introduce a
 allocation-pressure policy, and continue through the actual HTTP service's dependencies.
 A production runtime also needs host handles, concurrency/transition contracts and stronger
 fragmentation policy. Generated code now collects and reuses storage within this bounded experimental profile.
+
+
+## Measured worklist slice — 2026-10-08
+
+The author asks to evolve the POC through relevant benchmarks and examine improvements
+for interpreter mode. The first measured change replaces repeated whole-heap mark
+passes with a worklist, retaining the 32-byte header and existing collection schedule.
+The interpreter already uses a pending-object vector (`src/gc.rs`); this slice transfers
+that algorithmic approach into native mode with storage appropriate to a bounded heap.
+It does not change interpreter behavior. Unlike .NET's generational/compacting collector,
+this remains a whole-heap nonmoving collector; the benchmark is not a .NET comparison.
+
+[Recorded samples and provenance](native-gc-worklist-validation.json) compare baseline
+`9bb27be6` with identical Clang `-O2` adapters and the same generated routing object.
+Two warm-up pairs precede seven measured pairs with alternating execution order:
+
+| Workload | Baseline median | Worklist median | Interpretation |
+| --- | ---: | ---: | --- |
+| 100 collections, 1,024 reverse-linked nodes | 316.6 ms | 109.7 ms | 2.89× in an intentionally adverse graph; construction excluded |
+| Raven routing, 1,024 requests, 64 KiB | 391.4 ms | 386.0 ms | About 1.4%; treat as effectively unchanged, not a demonstrated application gain |
+
+Routing timings include process startup and captured output. Allocation, collection,
+reclamation counts and final heap extent match; the graph harness verifies every link
+and then complete reclamation. These are local ARM64 observations, not release performance
+guarantees. Compile/startup versus execution, peak memory and pause distributions need
+separate measurements before broader platform comparisons.
+
+Reproduce after generating the routing object with `verify_route_lifetime.py --native-gc`
+(using its compiler, runtime, AOT and bundle arguments):
+
+```sh
+SDKROOT=$(xcrun --show-sdk-path) python3 docs/experiments/aot-console/benchmark_native_gc.py \
+  --baseline 9bb27be6 --route-object target/aot-route-gc-final/route.o \
+  --output target/gc-worklist-rerun
+```
+
+The output directory must be new. Retain raw samples and input hashes for later slices.
+Benchmark changes to tracing, allocation, scheduling and hot native services; keep routine
+API validation focused when no performance question exists. Recheck output/fault and
+memory-budget behavior alongside timings rather than accepting a speed-only result.
+
+Interpreter portability review: its worklist and survivor-based allocation threshold
+already cover these algorithmic ideas. Native header-pointer packing cannot be copied
+into the interpreter's identity-indexed heap. Reusing interpreter tracing scratch buffers
+is a possible future experiment, requiring allocation/pause measurements first. Shared
+lifetime fixtures and workload inputs are useful across both modes now. Native scheduling
+needs allocation-size/pressure information at safe boundaries: skipping collection merely
+because no allocation happened since the previous one can miss newly dead roots and cause
+avoidable exhaustion. Allocation services still must not collect with unpublished temporary
+references. Precise object maps and pressure scheduling remain the next contract work.

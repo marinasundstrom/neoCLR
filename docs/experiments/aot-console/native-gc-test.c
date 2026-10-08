@@ -55,6 +55,22 @@ int main(void) {
     CHECK(neoclr_gc_allocate_v1(&c.text, 8, NEOCLR_GC_TEXT, &output) == 5);
     interior = 0;
     CHECK(!neoclr_gc_collect_v1(&c, &frame) && !c.text.used);
+    /* A malformed descriptor may interrupt traversal with other objects queued. */
+    uint64_t *owner = allocate(&c, 24, NEOCLR_GC_OBJECT);
+    uint64_t *queued = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    uint64_t *bad = allocate(&c, 16, NEOCLR_GC_STRINGS);
+    CHECK(owner && queued && bad);
+    owner[1] = (uintptr_t)queued; owner[2] = (uintptr_t)bad;
+    interior = (uintptr_t)owner;
+    uint64_t collections = neoclr_gc_statistics_v1().collections;
+    CHECK(neoclr_gc_collect_v1(&c, &frame) == 3);
+    CHECK(neoclr_gc_statistics_v1().collections == collections);
+    CHECK(allocate(&c, 8, NEOCLR_GC_BYTES)); /* queue links were cleared on failure */
+    bad[0] = UINT64_C(0x80000003); bad[1] = 0;
+    CHECK(!neoclr_gc_collect_v1(&c, &frame));
+    CHECK(owner[1] == (uintptr_t)queued && owner[2] == (uintptr_t)bad);
+    interior = 0;
+    CHECK(!neoclr_gc_collect_v1(&c, &frame) && !c.text.used);
     CHECK(buffer[128] == UINT64_C(0x1122334455667788));
     return 0;
 }

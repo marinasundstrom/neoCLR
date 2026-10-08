@@ -1,0 +1,127 @@
+{
+  "baseline": "9bb27be6e0149e3c85c74efcbcc63ed8aadc18ff",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "flags": [
+    "clang",
+    "-arch",
+    "arm64",
+    "-std=c11",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-I",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console"
+  ],
+  "routeRequests": 1024,
+  "routeCapacity": 65536,
+  "timing": "graph: 100 collections of 1024 reverse-linked nodes, excludes construction; route: process wall time including startup and captured output",
+  "inputs": {
+    "target/aot-route-gc-final/route.o": "773e0296ebe95099a917195c14bc32e5cd506bc28cf1b71de118307ca525f2ce",
+    "target/gc-worklist-results/baseline.c": "02386b92daa9dac4649e32e46f50c06575d940f10318fab22b00564612c0aaba",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "7202d4e33a14991a5261a5fcc25c4af11f67c48f3fe21c7e10b97be482942300",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-bench.c": "07f2a598f0bbe546615b17ac6da64136e98e0bf90f2a753ff067dadb0030a8f1",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/route-lifetime-host.c": "d78e99837aafb032c2e362ed18b44bbfb4433f5e8fb40476daa21b988d1bea53",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "abc5c07f84e1b4f505bdd92b5d924acf10db2624ad0b348168567f1ee93a6dd0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "245abec593a1adc54b7469f7e44a0ef43a1997f4a3591040f791cfacad360c84",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "a5251579303ff2df8ac857a44dc6d3cd0f6dc0d7f14847db1d82ffe7a1155979",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "500d75a89e44477c684b9da5a635755d47d0b563878c35979fe7128435a3cbb7",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "858ec6a53c8ff173487717129976c8c4bfd68f727dc3a0083ced1a55c2503e8d",
+    "docs/experiments/aot-console/benchmark_native_gc.py": "dca6f626a3b4d4f12a1b325e12f4e7576b5bec4d91656013dcc1a1b259333685"
+  },
+  "samplesSeconds": {
+    "graph": {
+      "baseline": [
+        0.318031,
+        0.317358,
+        0.316043,
+        0.316587,
+        0.316631,
+        0.318352,
+        0.316242
+      ],
+      "worklist": [
+        0.110311,
+        0.109692,
+        0.109825,
+        0.109723,
+        0.109079,
+        0.109961,
+        0.109166
+      ]
+    },
+    "route": {
+      "baseline": [
+        0.3920750419999992,
+        0.39140212499999905,
+        0.3932632920000003,
+        0.3891855839999998,
+        0.3939714169999995,
+        0.3898819590000002,
+        0.3901688339999989
+      ],
+      "worklist": [
+        0.38834137500000043,
+        0.38476520799999925,
+        0.38603029199999916,
+        0.38552800000000076,
+        0.38759458400000035,
+        0.38563162500000026,
+        0.3969854169999998
+      ]
+    }
+  },
+  "graph": {
+    "medianSeconds": {
+      "baseline": 0.316631,
+      "worklist": 0.109723
+    },
+    "baselineOverWorklist": 2.8857304302653044
+  },
+  "baselineRouteAudit": {
+    "NATIVE_GC": {
+      "collections": 278666,
+      "allocations": 33628,
+      "reclaimedAllocations": 33613,
+      "reclaimedBytes": 853648
+    },
+    "AOT_MEASURE": {
+      "requests": 1024,
+      "capacity": 65536,
+      "used": 1648,
+      "status": 0,
+      "result": 0
+    }
+  },
+  "worklistRouteAudit": {
+    "NATIVE_GC": {
+      "collections": 278666,
+      "allocations": 33628,
+      "reclaimedAllocations": 33613,
+      "reclaimedBytes": 853648
+    },
+    "AOT_MEASURE": {
+      "requests": 1024,
+      "capacity": 65536,
+      "used": 1648,
+      "status": 0,
+      "result": 0
+    }
+  },
+  "route": {
+    "medianSeconds": {
+      "baseline": 0.39140212499999905,
+      "worklist": 0.38603029199999916
+    },
+    "baselineOverWorklist": 1.0139155737550252
+  },
+  "date": "2026-10-08",
+  "command": "SDKROOT=$(xcrun --show-sdk-path) python3 docs/experiments/aot-console/benchmark_native_gc.py --route-object target/aot-route-gc-final/route.o --output target/gc-worklist-results",
+  "routeObjectProvenance": "route-native-gc-validation.json: finalCompilerVerification; unchanged generated object, relinked adapters only",
+  "validation": "Four unique focused Rust tests passed: both native_gc tests, console native_gc_preserves_borrowed_owners_erased_results_and_fault_messages, and string_interface_dispatch_calls_verified_bodies_and_preserves_faults. C kernel and compiled GC fixture use undefined-behavior/bounds sanitizers. Benchmark harness checks retained chain and complete reclamation; route audits match."
+}

@@ -54,7 +54,7 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
     statistics.allocations++;
     return 0;
 }
-static void mark(neoclr_aot_text_arena *a, uint64_t word) {
+static void mark(neoclr_aot_text_arena *a, uint64_t word, block **pending) {
     uintptr_t base = (uintptr_t)a->data;
     if (word < base || word - base >= a->used) return;
     for (uint64_t at = 0; at < a->used;) {
@@ -62,16 +62,21 @@ static void mark(neoclr_aot_text_arena *a, uint64_t word) {
         uint64_t begin = at + sizeof(block);
         /* Includes interior addresses and low-bit tagged String object views. */
         if (b->state && word - base >= begin && word - base - begin < b->bytes) {
-            b->state |= MARKED;
+            if (!(b->state & MARKED)) {
+                /* Aligned header pointers share the state word with low-bit flags.
+                 * No allocation, recursion or additional per-object storage. */
+                b->state = (uint64_t)(uintptr_t)*pending | ALLOCATED | MARKED;
+                *pending = b;
+            }
             return;
         }
         at += b->span;
     }
 }
-static void mark_slots(neoclr_aot_text_arena *a, const neoclr_probe_storage *slots, uint32_t count) {
+static void mark_slots(neoclr_aot_text_arena *a, const neoclr_probe_storage *slots, uint32_t count, block **pending) {
     for (uint32_t i = 0; i < count; i++) {
         if (slots[i].read_bytes != 8) continue; /* 32-bit discriminators are not pointers. */
-        uint64_t word; memcpy(&word, slots[i].address, 8); mark(a, word);
+        uint64_t word; memcpy(&word, slots[i].address, 8); mark(a, word, pending);
     }
 }
 int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head) {
@@ -83,43 +88,38 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
     for (uint64_t at = 0; at < a->used;) {
         block *b = (void *)(a->data + at); b->state &= ALLOCATED; at += b->span;
     }
-    mark_slots(a, fault, (uint32_t)count);
+    block *pending = NULL;
+    mark_slots(a, fault, (uint32_t)count, &pending);
     for (const neoclr_probe_frame *f = head; f; f = f->previous) {
         if (f->context != context) continue;
-        mark_slots(a, f->storage, f->storage_count);
-        mark_slots(a, f->transient, f->transient_count);
-        for (uint32_t i = 0; i < f->lane_count; i++) mark(a, f->lanes[i]);
+        mark_slots(a, f->storage, f->storage_count, &pending);
+        mark_slots(a, f->transient, f->transient_count, &pending);
+        for (uint32_t i = 0; i < f->lane_count; i++) mark(a, f->lanes[i], &pending);
     }
-    /* Bounded fixed-point traversal avoids recursion or an external mark stack.
-     * Every pass processes at least one previously unscanned marked allocation. */
-    int progress;
-    do {
-        progress = 0;
-        for (uint64_t at = 0; at < a->used;) {
-            block *b = (void *)(a->data + at);
-            if (b->state == (ALLOCATED | MARKED)) {
-                b->state |= SCANNED; progress = 1;
-                const unsigned char *data = (const void *)(b + 1);
-                if (b->kind == NEOCLR_GC_OBJECT) {
-                    for (uint64_t offset = 8; offset + 8 <= b->bytes; offset += 8) {
-                        uint64_t word; memcpy(&word, data + offset, 8); mark(a, word);
-                    }
-                } else if (b->kind == NEOCLR_GC_STRINGS) {
-                    uint64_t kind, length;
-                    if (b->bytes < 16) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-                    memcpy(&kind, data, 8); memcpy(&length, data + 8, 8);
-                    int reserved = kind == UINT64_C(0x80000004);
-                    if ((!reserved && kind != UINT64_C(0x80000003)) ||
-                        length > (b->bytes - 16) / (reserved ? 9 : 8)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-                    for (uint64_t i = 0; i < length; i++) {
-                        if (reserved && !data[16 + 8 * length + i]) continue;
-                        uint64_t word; memcpy(&word, data + 16 + 8 * i, 8); mark(a, word);
-                    }
-                }
+    /* Each newly marked allocation enters the intrusive worklist exactly once.
+     * Address lookup remains linear; this removes repeated whole-heap scan passes. */
+    while (pending) {
+        block *b = pending;
+        pending = (block *)(uintptr_t)(b->state & ~UINT64_C(7));
+        b->state = ALLOCATED | MARKED | SCANNED;
+        const unsigned char *data = (const void *)(b + 1);
+        if (b->kind == NEOCLR_GC_OBJECT) {
+            for (uint64_t offset = 8; offset + 8 <= b->bytes; offset += 8) {
+                uint64_t word; memcpy(&word, data + offset, 8); mark(a, word, &pending);
             }
-            at += b->span;
+        } else if (b->kind == NEOCLR_GC_STRINGS) {
+            uint64_t kind, length;
+            if (b->bytes < 16) goto invalid_descriptor;
+            memcpy(&kind, data, 8); memcpy(&length, data + 8, 8);
+            int reserved = kind == UINT64_C(0x80000004);
+            if ((!reserved && kind != UINT64_C(0x80000003)) ||
+                length > (b->bytes - 16) / (reserved ? 9 : 8)) goto invalid_descriptor;
+            for (uint64_t i = 0; i < length; i++) {
+                if (reserved && !data[16 + 8 * length + i]) continue;
+                uint64_t word; memcpy(&word, data + 16 + 8 * i, 8); mark(a, word, &pending);
+            }
         }
-    } while (progress);
+    }
     for (uint64_t at = 0; at < a->used;) {
         block *b = (void *)(a->data + at);
         if (b->state && !(b->state & MARKED)) {
@@ -144,5 +144,12 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
     }
     statistics.collections++;
     return 0;
+invalid_descriptor:
+    /* Do not leave private queue links in public quiescent heap state on failure.
+     * Nothing has been swept; a repaired descriptor can be collected again. */
+    for (uint64_t at = 0; at < a->used;) {
+        block *b = (void *)(a->data + at); b->state &= ALLOCATED; at += b->span;
+    }
+    return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
 }
 neoclr_gc_statistics neoclr_gc_statistics_v1(void) { return statistics; }

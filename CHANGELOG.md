@@ -21,6 +21,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   matching interpreter output/faults. Default arena/diagnostic modes remain unchanged.
   This is conservative, nonmoving, synchronous experimental GC with collection at every
   boundary; precise object maps, pressure scheduling and general host handles remain open.
+  Replace repeated heap marking passes with an in-header worklist, preserving the memory
+  budget and clearing temporary links on descriptor failure. Add a reproducible paired
+  benchmark: reverse-chain marking improves about 2.9× locally; Raven routing is effectively
+  unchanged. Interpreter tracing already uses a worklist; no interpreter change is needed.
 
 - Add private typed tracing-layout diagnostics to AOT inspection for admitted value
   profiles: distinguish managed references from native-width integers, preserve nested
