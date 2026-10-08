@@ -1,0 +1,110 @@
+{
+  "scope": "Uncommitted guarded-stack source on de07afd8, 2026-10-08; macOS ARM64; no HTTP execution or performance claim",
+  "toolchain": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "sourceHashes": {
+    "tools/aot-poc/src/flow.rs": "bf87fc1a01e7ce015ecc1a17b34fc931953e84e10d68610647ce523c0aae7d8d",
+    "tools/aot-poc/src/boxing.rs": "6e862a8840c07e92f60748f9e4e0d5590bbdda5fa04ff5099b6b44bd776c09ec",
+    "tools/aot-poc/src/gc_layout.rs": "1be465aca8890f035c2209d3d0c43d70d1dec5a4835a129e3ddeb6ca6e80bc06",
+    "tools/aot-poc/src/fault_details.rs": "fde4516150cfcc908188d3c6a1f46957117901ce45658bf0ae48e81adee18a8b",
+    "tools/aot-poc/src/compiler.rs": "fb3414de0cdc17edc84409d8b3711dff1c22203b377cc2a7306a3a0b4db00559",
+    "tools/aot-poc/src/gc_probe.rs": "a162c14ac728cc1433e1fe79eb3deb35bf5a5014e27ea75aa98b6168dd3e2e78",
+    "tools/aot-poc/src/values.rs": "2edc71589e0ad25ff75bc11451db868e9eeb076b0001268b93258895796b4a20",
+    "tools/aot-poc/src/limits.rs": "ea7a3f45884246b945b9ffad28fb0b735a99a1ebe35d921489ecef89f214dfd0",
+    "tools/aot-poc/src/specialization.rs": "5c7bc88bc6b44fce6444a8d4488cb5e50c28bee10d036e548673c78af0b4b4c0",
+    "tools/aot-poc/src/gc_points.rs": "5e42ad63cdc4be627873acf21fe3fe2a76f30d4f257b8caee08263ffeffda787",
+    "tools/aot-poc/src/value_profile.rs": "1782e98990ad3ba6cfcf87ddebaee28992e6f3b3d94686d44fb1fdb7408d4cc5",
+    "tools/aot-poc/src/selection.rs": "4a49e2bbd16c250d0f61fc0d3ae0b1f2ac4f29bd386afc846a5a242bfcdc57c2",
+    "tools/aot-poc/src/main.rs": "f9319eba71f108dcbfb713486ab7b2406ee3d06679b3198a719a59eb1e0819ad",
+    "tools/aot-poc/src/linking.rs": "ea3e9fac2e31923b25ec0ecc183d623b7523af4d942fb93ff57e184e53c68a85",
+    "tools/aot-poc/src/bindings.rs": "186ab840ebf1f2a4735c85f8b715d3033cd1911bc0c63892ceea8eb0d16abd6b",
+    "tools/aot-poc/src/inspection.rs": "29336902e21a86b602262b2d1d1ffae85e14dd157c5551283f1de74dd5effca4",
+    "docs/experiments/aot-console/native-stack.c": "e0d472372663f9c15b131144a83a451ef321342a397f93b61f4db8125e703502",
+    "docs/experiments/aot-console/native-stack.h": "d2644b95bb3241e12533399d7b90e038635b96ce0217ba6d2d7ed8f94208d546",
+    "docs/experiments/aot-console/native-stack-test.c": "2c1c0cffd431612f8db359bd1ee04470ff7d62b471d66d57dc9121fc5d08fb86",
+    "docs/experiments/aot-console/native-stack.neoil": "80c63ec2163a07ab8d848dd29869d14a390900b449bb54710fefb168cceb9094",
+    "docs/experiments/aot-console/native-gc.c": "3ea09f933073c638b13a6522a98bf00cf6c27c42593fe29ac24bf61a2d89b127",
+    "docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+    "docs/experiments/aot-console/text-arena.c": "4594a134d25f980e06c338ac155162a17d9faa9fe7ca5c8d355fdb6d9b64f904",
+    "docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "docs/experiments/aot-console/socket-listener.c": "02ccc4c8cd9cac2d79ac0686edb0884a2fe2f47cc3879e91af15c8a24837f370",
+    "docs/experiments/aot-console/task-queue.c": "5503fb22d0678e0168cda2268e4d098147e766a765c82e8feee8b0d9ac6729a4"
+  },
+  "adapterStackAudit": [
+    {
+      "optimization": "-O0",
+      "sumAllStaticFrames": 41904,
+      "largestFrames": [
+        {
+          "function": "neoclr_gc_collect_v1",
+          "bytes": 5040,
+          "kind": "static"
+        },
+        {
+          "function": "neoclr_socket_poll_v1",
+          "bytes": 4448,
+          "kind": "static"
+        },
+        {
+          "function": "transfer",
+          "bytes": 2240,
+          "kind": "static"
+        },
+        {
+          "function": "neoclr_gc_stack_roots_v1",
+          "bytes": 1792,
+          "kind": "static"
+        },
+        {
+          "function": "neoclr_socket_accept_v1",
+          "bytes": 1504,
+          "kind": "static"
+        }
+      ],
+      "dynamicFrames": []
+    },
+    {
+      "optimization": "-O2",
+      "sumAllStaticFrames": 13856,
+      "largestFrames": [
+        {
+          "function": "neoclr_gc_collect_v1",
+          "bytes": 1216,
+          "kind": "static"
+        },
+        {
+          "function": "observe_fault",
+          "bytes": 1120,
+          "kind": "static"
+        },
+        {
+          "function": "neoclr_socket_poll_v1",
+          "bytes": 272,
+          "kind": "static"
+        },
+        {
+          "function": "transfer",
+          "bytes": 224,
+          "kind": "static"
+        },
+        {
+          "function": "neoclr_socket_accept_v1",
+          "bytes": 208,
+          "kind": "static"
+        }
+      ],
+      "dynamicFrames": []
+    }
+  ],
+  "validation": [
+    "sanitized native stack helper -O0/-O2",
+    "compiled direct and Function recursion; finite results; StackOverflow message/code; truncated traces; GC unlink; retained host callback; small-stack entry and callback rejection; reuse",
+    "default recursive graph rejection",
+    "flag requirements",
+    "seven root layout/publication tests"
+  ],
+  "serverAdmission": {
+    "accepted": false,
+    "firstError": "value root must be static () -> Int32 or (Int32) -> Int32",
+    "phase": "compilation"
+  }
+}

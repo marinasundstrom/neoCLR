@@ -23,6 +23,8 @@ fn bounded_nonmoving_heap_reclaims_cycles_and_preserves_interior_and_fault_roots
 #[test]
 fn native_gc_requires_explicit_heap_contract_and_distinct_mode() {
     for flags in [
+        vec!["--native-stack-budget"],
+        vec!["--native-stack-budget", "--native-stack-budget"],
         vec!["--native-gc"],
         vec!["--native-gc", "--native-gc"],
         vec!["--native-gc", "--probe-stack-roots"],

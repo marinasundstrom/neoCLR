@@ -115,3 +115,8 @@ an advantage over it; useful comparisons require equivalent behavior and measure
 
 See [garbage collection](../gc/) for lifetime behavior and
 [direction and proposals](../../proposals/) for the broader execution roadmap.
+
+The development backend now has an opt-in macOS ARM64 stack guard for recursive calls,
+with bounded fault traces and GC-frame cleanup. This is a private POC adapter; native
+HTTP still needs no-result entry adaptation and automatic queue pumping. Runtime async
+suspension and green threads remain separate design work.

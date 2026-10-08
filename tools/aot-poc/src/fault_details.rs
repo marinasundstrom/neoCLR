@@ -11,6 +11,7 @@ type Error = Box<dyn std::error::Error>;
 pub struct Options {
     pub probe_stack_roots: bool,
     pub native_gc: bool,
+    pub native_stack_budget: bool,
     pub user_faults: Vec<usize>,
     pub console_read_byte: Vec<usize>,
     pub console_write_line: Vec<usize>,
@@ -71,6 +72,7 @@ impl Options {
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             probe_stack_roots: false,
             native_gc: false,
+            native_stack_budget: false,
             string_dispatch: report.and_then(|r| r["stringInterfaceDispatch"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["contractCompiledIndex"].as_u64()? as usize, r["functionCompiledIndex"].as_u64()? as usize))).collect(),
             string_interfaces: report.and_then(|r| r["stringInterfaceViews"].as_array())
@@ -268,7 +270,7 @@ impl Options {
 pub struct Data {
     frames: Vec<DataId>,
     messages: HashMap<(usize, usize), DataId>,
-    defaults: [DataId; 7],
+    defaults: [DataId; 8],
 }
 fn literal(module: &mut ObjectModule, name: &str, text: &str) -> Result<DataId, Error> {
     let id = module.declare_data(name, Linkage::Local, false, false)?;
@@ -326,6 +328,7 @@ impl Data {
             literal(module, "fault_null_reference", neoclr::FaultCode::NullReference.standard_message().unwrap())?,
             literal(module, "fault_array_limit", neoclr::FaultCode::ArrayLimitExceeded.standard_message().unwrap())?,
             literal(module, "fault_index", neoclr::FaultCode::IndexOutOfRange.standard_message().unwrap())?,
+            literal(module, "fault_stack", neoclr::FaultCode::StackOverflow.standard_message().unwrap())?,
         ];
         Ok(Self {
             frames,
@@ -362,7 +365,7 @@ pub struct Site {
     context: ir::Value,
     frame: ir::Value,
     pc: usize,
-    defaults: [ir::Value; 7],
+    defaults: [ir::Value; 8],
     pub message: Option<ir::Value>,
     pub capture_frame: bool,
 }
@@ -389,7 +392,9 @@ impl Site {
             let array = b.ins().icmp_imm(IntCC::Equal, status, 7);
             let message = b.ins().select(array, self.defaults[5], message);
             let index = b.ins().icmp_imm(IntCC::Equal, status, 8);
-            b.ins().select(index, self.defaults[6], message)
+            let message = b.ins().select(index, self.defaults[6], message);
+            let stack = b.ins().icmp_imm(IntCC::Equal, status, 9);
+            b.ins().select(stack, self.defaults[7], message)
         };
         b.ins().store(MemFlags::new(), status, self.context, 0);
         b.ins().store(MemFlags::new(), message, self.context, 8);
@@ -398,8 +403,7 @@ impl Site {
         if !self.capture_frame {
             return;
         }
-        // The acyclic 128-function profile bounds live frames. Retain a bounds guard
-        // as a second line of defense at the native storage boundary.
+        // Fault capture is bounded independently of the live native call stack.
         let room = b.ins().icmp_imm(
             IntCC::UnsignedLessThan,
             count,

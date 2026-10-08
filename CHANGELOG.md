@@ -10,8 +10,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Add a private macOS ARM64 remaining-stack probe and sanitized worker-stack/unwind
   checks at two optimization levels. Record the required compiler/frame/host-entry
-  contract and comparison with .NET sufficient-stack checks; recursive native CIL
-  admission remains disabled until that integration is validated.
+  contract and comparison with .NET sufficient-stack checks. Add opt-in guarded
+  recursion with final machine/linkage/call-argument bounds and standardized
+  StackOverflow faults; validate direct/Function recursion, host callback roots,
+  truncated traces, small-stack rejection and reuse after unwind. Default recursion
+  rejection remains. Full Server next reaches its unsupported no-result entry.
 
 - Add a private native TaskQueue scope and exact closed service bindings. Retain the
   default queue and preserve active explicit Run/Drain receiver lookup; validate a real

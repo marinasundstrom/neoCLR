@@ -10,7 +10,7 @@ mod gc_points;
 mod gc_probe;
 
 pub(super) fn trace_layout(input: &neoclr::Module, details: Option<&crate::fault_details::Options>) -> Result<serde_json::Value, Error> {
-    let p = Profile::new(input, details.is_some_and(|d| d.reference_arena), details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.int32_receivers.as_slice()))?;
+    let p = Profile::new(input, details.is_some_and(|d| d.reference_arena), details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.int32_receivers.as_slice()), details.is_some_and(|d| d.native_stack_budget))?;
     let mut report = gc_layout::report(&p);
     report["preOperationPlans"] = gc_points::report(&p, details)?;
     Ok(report)
@@ -203,7 +203,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     if details.is_some_and(|d| d.native_gc && (!d.reference_arena || !d.probe_stack_roots)) {
         return Err("native GC requires an admitted reference-arena profile and published roots".into());
     }
-    let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.int32_receivers.as_slice()))?;
+    let stack_budget = details.is_some_and(|d| d.native_stack_budget);
+    if stack_budget && !details.is_some_and(|d| d.native_gc) {
+        return Err("native stack budget requires GC frame publication".into());
+    }
+    let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.int32_receivers.as_slice()), details.is_some_and(|d| d.native_stack_budget))?;
     let root = p.root(root)?;
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))
@@ -428,6 +432,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32)); // Fault status, same as scalar profile
         ids.push(module.declare_function(&format!("neoclr_value_{i}"), Linkage::Local, &sig)?);
     }
+    let stack_check = if stack_budget {
+        let mut sig = module.make_signature();
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_native_stack_check_v1", Linkage::Import, &sig)?)
+    } else { None };
     let root_probes = if details.is_some_and(|d| d.probe_stack_roots) {
         Some(gc_probe::Probes::prepare(&mut module, &p, &flows, details)?)
     } else { None };
@@ -471,6 +480,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     let table = slot(&mut b, table_bytes);
                     probes.enter(&mut module, &mut b, frame, fault_context.unwrap(), i, table, &arguments, &[]);
                     probe_frame = Some(frame);
+                    emit_stack_check(&mut module, &mut b, stack_check, diagnostic_data.as_ref(), fault_context.unwrap(), i, false);
                 }
             }
             if let Some(&record) = details.and_then(|d| d.empty_record_boxes.get(&i).or_else(|| d.int32_boxes.get(&i))) {
@@ -499,7 +509,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                     probes.finish(&mut module, &mut context.func, frame);
                 }
-                module.define_function(ids[i], &mut context)?;
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
                 continue;
             }
             if let Some(targets) = p.dispatch.get(&i) {
@@ -586,7 +596,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                     probes.finish(&mut module, &mut context.func, frame);
                 }
-                module.define_function(ids[i], &mut context)?;
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
                 continue;
             }
             if let Some(service) = socket_services.get(&i) {
@@ -615,7 +625,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                     probes.finish(&mut module, &mut context.func, frame);
                 }
-                module.define_function(ids[i], &mut context)?;
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
                 continue;
             }
             if let Some(service) = stream_services.get(&i) {
@@ -667,7 +677,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                     probes.finish(&mut module, &mut context.func, frame);
                 }
-                module.define_function(ids[i], &mut context)?;
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
                 continue;
             }
             if details.is_some_and(|d| d.console_read_byte.contains(&i)) {
@@ -694,7 +704,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                     probes.finish(&mut module, &mut context.func, frame);
                 }
-                module.define_function(ids[i], &mut context)?;
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
                 continue;
             }
             if details.is_some_and(|d| d.console_write_line.contains(&i)) {
@@ -723,7 +733,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                     probes.finish(&mut module, &mut context.func, frame);
                 }
-                module.define_function(ids[i], &mut context)?;
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
                 continue;
             }
             if details.is_some_and(|d| d.char_from_string.contains(&i) || d.char_text.contains(&i)) {
@@ -755,7 +765,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                     probes.finish(&mut module, &mut context.func, frame);
                 }
-                module.define_function(ids[i], &mut context)?;
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
                 continue;
             }
             if details.is_some_and(|d| d.native_integer_to64.contains(&i)) {
@@ -767,7 +777,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                     probes.finish(&mut module, &mut context.func, frame);
                 }
-                module.define_function(ids[i], &mut context)?;
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
                 continue;
             }
             if let Some(service) = utf8_services.get(&i) {
@@ -811,7 +821,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                     probes.finish(&mut module, &mut context.func, frame);
                 }
-                module.define_function(ids[i], &mut context)?;
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
                 continue;
             }
             if details.is_some_and(|d| d.int32_to_string.contains(&i)) || wide_format_services.contains_key(&i) {
@@ -836,7 +846,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                     probes.finish(&mut module, &mut context.func, frame);
                 }
-                module.define_function(ids[i], &mut context)?;
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
                 continue;
             }
             let call_result_bytes = p.call_result_bytes();
@@ -897,6 +907,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             }
             if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                 probes.enter(&mut module, &mut b, frame, fault_context.unwrap(), i, storage_table.unwrap(), &arguments, &locals);
+                emit_stack_check(&mut module, &mut b, stack_check, diagnostic_data.as_ref(), fault_context.unwrap(), i, true);
             }
             let blocks: Vec<_> = f.body.iter().map(|_| b.create_block()).collect();
             for (pc, stack) in flows[i].iter().enumerate() {
@@ -1553,7 +1564,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
             probes.finish(&mut module, &mut context.func, frame);
         }
-        module.define_function(ids[i], &mut context)?;
+        define_checked(&mut module, ids[i], &mut context, stack_budget)?;
     }
     let entry_check = if details.is_some_and(|d| d.native_gc) {
         let mut signature = module.make_signature();
@@ -1595,6 +1606,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             b.ins().return_(&[status]);
             b.switch_to_block(admitted);
         }
+        if stack_budget {
+            emit_stack_check(&mut module, &mut b, stack_check, diagnostic_data.as_ref(), params[2], root, false);
+        }
         if text_arena {
             // Reset only the cursor; capacity/data belong to the host. Previous
             // dynamic text, including fault messages, expires on this next call.
@@ -1612,16 +1626,16 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         b.seal_all_blocks();
         b.finalize();
     }
-    module.define_function(export, &mut context)?;
+    define_checked(&mut module, export, &mut context, stack_budget)?;
     if details.is_some_and(|d| d.native_gc) {
-        compile_host_callbacks(&mut module, &p, &ids)?;
+        compile_host_callbacks(&mut module, &p, &ids, stack_check, diagnostic_data.as_ref())?;
     }
     super::finish(module)
 }
 
 // Quiescent host entry for the existing inhabited-Void callback shape. The strong
 // handle keeps the descriptor/receiver alive across the callee's collection points.
-fn compile_host_callbacks(module: &mut ObjectModule, p: &Profile<'_>, ids: &[cranelift_module::FuncId]) -> Result<(), Error> {
+fn compile_host_callbacks(module: &mut ObjectModule, p: &Profile<'_>, ids: &[cranelift_module::FuncId], stack_check: Option<cranelift_module::FuncId>, diagnostic_data: Option<&crate::fault_details::Data>) -> Result<(), Error> {
     use neoclr::metadata::{FunctionType, Type};
     let shape = Type::Function(Box::new(FunctionType {
         parameters: vec![], returns: Type::Void, no_result: false,
@@ -1669,6 +1683,7 @@ fn compile_host_callbacks(module: &mut ObjectModule, p: &Profile<'_>, ids: &[cra
                 args.push(b.ins().load(types::I64, MemFlags::new(), descriptor, 16));
             }
             args.extend([result, params[1]]);
+            emit_stack_check(module, &mut b, stack_check, diagnostic_data, params[1], c, false);
             let callee = module.declare_func_in_func(ids[c], b.func);
             let call = b.ins().call(callee, &args);
             let status = b.inst_results(call)[0];
@@ -1683,6 +1698,40 @@ fn compile_host_callbacks(module: &mut ObjectModule, p: &Profile<'_>, ids: &[cra
         b.seal_all_blocks();
         b.finalize();
     }
-    module.define_function(export, &mut context)?;
+    define_checked(module, export, &mut context, stack_check.is_some())?;
+    Ok(())
+}
+
+// Guard after publishing the current frame, before executing guest operations.
+// All returns use the existing frame unlink instrumentation, including this fault.
+fn emit_stack_check(module: &mut ObjectModule, b: &mut FunctionBuilder<'_>,
+    check: Option<cranelift_module::FuncId>, data: Option<&crate::fault_details::Data>,
+    context: ir::Value, function: usize, capture_frame: bool) {
+    let Some(check) = check else { return; };
+    let check = module.declare_func_in_func(check, b.func);
+    let call = b.ins().call(check, &[]);
+    let status = b.inst_results(call)[0];
+    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+    let mut site = data.unwrap().site(module, b, context, function, 0);
+    site.message = None;
+    site.capture_frame = capture_frame;
+    return_if_detailed(b, failed, status, Some(&site));
+}
+fn define_checked(module: &mut ObjectModule, id: cranelift_module::FuncId,
+    context: &mut cranelift_codegen::Context, stack_budget: bool) -> Result<(), Error> {
+    module.define_function(id, context)?;
+    if stack_budget {
+        // Cranelift 0.121.2 frame_size excludes FP/LR and ephemeral outgoing args.
+        // This backend uses fixed I32/I64 arguments only: charge eight bytes for
+        // every argument (including register args) and round to the ARM64 alignment.
+        let outgoing = context.func.dfg.signatures.values()
+            .map(|sig| sig.params.len() as u64 * 8).max().unwrap_or(0);
+        let outgoing = (outgoing + 15) & !15;
+        let bytes = u64::from(context.compiled_code().ok_or("missing final machine frame")?.frame_size)
+            + 16 + outgoing;
+        if bytes > 65536 {
+            return Err("native stack budget requires final machine frames including call arguments at most 64 KiB".into());
+        }
+    }
     Ok(())
 }

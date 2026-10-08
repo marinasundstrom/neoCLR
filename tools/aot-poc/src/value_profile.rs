@@ -70,7 +70,7 @@ fn object_base_shape(t: &neoclr::metadata::TypeDef) -> bool {
 }
 
 impl<'a> Profile<'a> {
-    pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>, object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>, string_dispatch: Option<&HashMap<usize, usize>>, primitive_receivers: Option<&[usize]>) -> Result<Self, Error> {
+    pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>, object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>, string_dispatch: Option<&HashMap<usize, usize>>, primitive_receivers: Option<&[usize]>, native_stack_budget: bool) -> Result<Self, Error> {
         if input.name == "System" || input.types.len() > crate::limits::TYPES || input.functions.len() > crate::limits::FUNCTIONS {
             return Err(
                 "value profile requires an application with at most 256 types and 1024 functions"
@@ -352,7 +352,9 @@ impl<'a> Profile<'a> {
             Ok(())
         }
         let mut states = vec![0; edges.len()];
-        for i in 0..edges.len() { visit(i, &edges, &mut states, &mut vec![], input)?; }
+        if !native_stack_budget {
+            for i in 0..edges.len() { visit(i, &edges, &mut states, &mut vec![], input)?; }
+        }
         Ok(p)
     }
     pub fn callable_targets(&self, shape: &Type) -> Result<Vec<usize>, Error> {

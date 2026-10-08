@@ -11,6 +11,7 @@
 #define NEOCLR_AOT_FAULT_ARITHMETIC_OVERFLOW 2
 #define NEOCLR_AOT_FAULT_RUNTIME_ERROR 3
 #define NEOCLR_AOT_FAULT_USER_FAULT 4
+#define NEOCLR_AOT_FAULT_STACK_OVERFLOW 9
 typedef struct { uint64_t length; unsigned char bytes[]; } neoclr_aot_text;
 typedef struct {
     const neoclr_aot_text *function;

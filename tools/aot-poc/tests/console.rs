@@ -4063,3 +4063,113 @@ const DEADLINE_SERVICES: &str = r#"
 .methodimpl InternalCall
 .end
 "#;
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_stack_budget_faults_unwinds_and_preserves_host_callback_roots() {
+    for indirect in [false, true] {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/native-stack.neoil");
+    let source = if indirect {
+        source.replace("ldarg depth\nldc.i4 1\nsub\ncall Recurse(Int32)",
+            "function.bind fn<Int32,Int32> = Recurse(Int32)\nldarg depth\nldc.i4 1\nsub\ncall instance fn<Int32,Int32>::Invoke(Int32)")
+    } else { source.to_owned() };
+    let source = source.as_str();
+    let flags = ["--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget"];
+    let r = compile_source(&dir, &seed, source, &flags, false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+#include "native-stack.h"
+#include <assert.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <string.h>
+extern int32_t neoclr_invoke_void_callback_v1(uint64_t, neoclr_aot_context *);
+static void check_fault(neoclr_aot_context *ctx, int traced) {
+    assert(ctx->fault.code == 9 && ctx->fault.message);
+    const char *message = "Call stack limit exceeded";
+    assert(ctx->fault.message->length == strlen(message));
+    assert(!memcmp(ctx->fault.message->bytes, message, strlen(message)));
+    assert(!neoclr_root_probe_head_v1() && !neoclr_root_probe_depth_v1());
+    assert(ctx->fault.frame_count == (traced ? 64u : 0u));
+    assert(ctx->fault.truncated == (unsigned)traced);
+    assert(!neoclr_aot_render_fault(stderr, &ctx->fault));
+}
+__attribute__((noinline)) static int32_t enter_callback_near_limit(uint64_t handle, neoclr_aot_context *ctx) {
+    volatile unsigned char storage[16384]; storage[0] = 17;
+    int32_t status = neoclr_native_stack_check_v1() == 0
+        ? enter_callback_near_limit(handle, ctx)
+        : neoclr_invoke_void_callback_v1(handle, ctx);
+    assert(storage[0] == 17);
+    return status;
+}
+static void *run(void *small) {
+    uint64_t *heap = calloc(8193, sizeof(uint64_t)); assert(heap);
+    heap[8192] = 1234567;
+    neoclr_aot_context ctx = {.text = {(unsigned char *)heap, 65536, 0}};
+    int32_t result = -99;
+    if (small) {
+        assert(neoclr_entry_v4(0, &result, &ctx) == 9 && result == -99);
+        check_fault(&ctx, 0);
+    } else {
+        assert(!neoclr_entry_v4(5, &result, &ctx) && result == 42);
+        result = -99;
+        assert(neoclr_entry_v4(-1, &result, &ctx) == 9 && result == -99);
+        check_fault(&ctx, 1);
+        assert(!neoclr_gc_collect_v1(&ctx, NULL) && !ctx.text.used);
+        assert(!neoclr_entry_v4(-2, &result, &ctx) && result == 0);
+        void *callback = (unsigned char *)heap + 32;
+        assert(*(uint64_t *)callback == UINT32_MAX);
+        uint64_t handle = 0;
+        assert(!neoclr_gc_host_root_create_v1(&ctx, callback, &handle));
+        assert(neoclr_invoke_void_callback_v1(handle, &ctx) == 9);
+        check_fault(&ctx, 1);
+        assert(!neoclr_gc_collect_v1(&ctx, NULL) && ctx.text.used);
+        void *retained = NULL;
+        assert(!neoclr_gc_host_root_read_v1(&ctx, handle, &retained) && retained == callback);
+        memset(&ctx.fault, 0, sizeof(ctx.fault));
+        assert(enter_callback_near_limit(handle, &ctx) == 9);
+        check_fault(&ctx, 0);
+        assert(!neoclr_gc_host_root_read_v1(&ctx, handle, &retained) && retained == callback);
+        assert(!neoclr_gc_host_root_release_v1(&ctx, handle));
+        assert(!neoclr_gc_collect_v1(&ctx, NULL) && !ctx.text.used);
+        assert(!neoclr_entry_v4(5, &result, &ctx) && result == 42 && !ctx.fault.code);
+    }
+    assert(heap[8192] == 1234567);
+    free(heap);
+    return NULL;
+}
+int main(void) {
+    pthread_attr_t attr; pthread_t thread;
+    assert(!pthread_attr_init(&attr));
+    assert(!pthread_attr_setstacksize(&attr, 512 * 1024));
+    assert(!pthread_create(&thread, &attr, run, NULL));
+    assert(!pthread_join(thread, NULL));
+    assert(!pthread_attr_setstacksize(&attr, 128 * 1024));
+    assert(!pthread_create(&thread, &attr, run, (void *)1));
+    assert(!pthread_join(thread, NULL));
+    assert(!pthread_attr_destroy(&attr));
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(dir.0.join("host.c"))
+        .arg(base.join("root-probe.c")).arg(base.join("native-gc.c")).arg(base.join("text-arena.c"))
+        .arg(base.join("native-stack.c")).arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+        .arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
+    assert!(r.status.success(), "{r:?}");
+    assert!(String::from_utf8_lossy(&r.stderr).contains("StackOverflow: Call stack limit exceeded"));
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    assert_eq!(method.invoke(vec![neoclr::Value::Int32(5)], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    let fault = method.invoke(vec![neoclr::Value::Int32(-1)], neoclr::Limits {frames: 128, ..Default::default()}).unwrap_err();
+    assert_eq!(fault.code, neoclr::FaultCode::StackOverflow);
+    assert!(fault.diagnostic().to_string().contains("Call stack limit exceeded"));
+}
+}

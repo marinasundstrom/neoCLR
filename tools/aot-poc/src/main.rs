@@ -28,6 +28,11 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let gc_count = args.iter().filter(|a| *a == "--native-gc").count();
     if gc_count > 1 { return Err("duplicate --native-gc option".into()); }
     let native_gc = gc_count == 1;
+    let stack_count = args.iter().filter(|a| *a == "--native-stack-budget").count();
+    if stack_count > 1 { return Err("duplicate --native-stack-budget option".into()); }
+    let native_stack_budget = stack_count == 1;
+    if native_stack_budget && !native_gc { return Err("--native-stack-budget requires --native-gc".into()); }
+    args.retain(|a| a != "--native-stack-budget");
     if native_gc && probe_count != 0 { return Err("--native-gc and --probe-stack-roots are distinct modes".into()); }
     args.retain(|a| a != "--native-gc");
     let probe_stack_roots = probe_count == 1 || native_gc;
@@ -273,7 +278,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 context.as_ref(),
                 fault_details,
                 probe_stack_roots,
-                native_gc
+                native_gc,
+                native_stack_budget
             ))?
         );
         return Ok(());
@@ -289,7 +295,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     };
     let compile_input = selection.as_ref().map_or(&input, |(module, _)| module);
     let details = fault_details.then(|| fault_details::Options::from_report(selection.as_ref().map(|(_, r)| r)));
-    let details = details.map(|mut d| { d.probe_stack_roots = probe_stack_roots; d.native_gc = native_gc; d });
+    let details = details.map(|mut d| { d.probe_stack_roots = probe_stack_roots; d.native_gc = native_gc; d.native_stack_budget = native_stack_budget; d });
     let object = compiler::compile(compile_input, root, !closed && args.len() == 4, details.as_ref())?;
     // Do not clobber an existing artifact, including on failed compilation.
     let mut output = fs::OpenOptions::new()
