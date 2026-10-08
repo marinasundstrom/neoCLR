@@ -5,6 +5,22 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
+## Native-only compiler-target readiness — 2026-10-09
+
+The module foundation is followed by native-only project core selection on Raven
+`67cd4da476f9bd8115567f3730c504ff62a63d1a`, integration branch
+`codex/source-object-metadata-resolution`. The [project check](../experiments/native-core-bootstrap/project-execution-validation.json)
+passes module binding, build/run and interpreter/ARM64 native result 42.
+Native-only project-provider checks reject nine invalid configurations; legacy
+bridge-backed project controls still pass. The shared provider watches the native
+core, but this is not installed VS Code qualification.
+
+Release remains gated on complete production source-runtime bootstrap without the
+CLI semantic bridge, matching SDK/editor/native artifacts and extracted-package
+acceptance. Next qualify core completeness with production sources; do not expand
+optional AOT features or label the fixture as a production System.Runtime.
+The HTTP teaser remains supported by its existing scoped evidence, not rerun here.
+
 ## Pre-release assessment — 2026-09-27
 
 **Author-selected stabilization pass.** Assess main `a79d0b34` before selecting a

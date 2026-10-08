@@ -7133,3 +7133,19 @@ document/workspace symbols, including legacy namespace spelling. Ordinary .NET
 namespace presentation remains the default. Focused language-server tests validate
 the presentation and syntax-only outline path; an installed VS Code extension was
 not exercised for this slice.
+
+## Native-only project core selection (2026-10-09)
+
+Raven's shared project provider now accepts RavenNeoClrNativeCoreReference instead
+of RavenNeoClrCoreReference for an explicitly NeoCLR-format project. Native semantic
+snapshots supply the core/dependency graph; there is no CLI target bridge in this
+mode. Object and System.Void ownership follow the native core. Optional runtime seeds
+are execution-only, and the project runner includes the core as a dependency/root.
+The core participates in file watching and mixed bridge configuration rejects.
+
+The direct-native catalog owns validation; the project provider owns selection,
+compiler options and immutable snapshots; the driver owns publication/run arguments.
+The old bridge-backed project path remains for the incomplete production core.
+Bootstrap ownership/intrinsic/source-root/object-library/async-library switches
+cannot combine with this bounded native-only mode. Installed editor acceptance
+and complete library replacement remain open. See the [project evidence and checks](experiments/native-core-bootstrap/README.md#native-only-project-qualification-2026-10-09).

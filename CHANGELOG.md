@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Qualify Raven's native-only project core selection through a module consumer,
+  project build/run and interpreter/ARM64 native parity. Reject mixed bridge/core
+  configuration without replacing published output. The shared project provider
+  watches native core metadata; complete production core bootstrap and installed
+  editor/package qualification remain open.
+
 - Add the native declaration-module foundation: a versioned manifest table,
   scoped authoring and reader/discovery APIs, explicit assembly ownership, empty
   modules and validation in the runtime. Older metadata exposes marked namespace

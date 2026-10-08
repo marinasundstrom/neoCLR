@@ -87,9 +87,15 @@ The driver now exposes this path with `--native-core-reference Core.dll`, repeat
 run the result in both modes. [Driver evidence](driver-execution-validation.json)
 records parity and rejection of mixed bridge flags without output publication.
 
-This remains bounded: project/editor configuration and complete
-source-runtime bootstrapping still use the CLI core path. Next wire project/editor
-selection and test native core declaration completeness before changing the full bundle. RavenDoc now has an explicit native input provider reusing the same catalog. Build it
+The bounded project path is now implemented (2026-10-09): select
+`RavenNeoClrNativeCoreReference` instead of RavenNeoClrCoreReference, with
+RavenTargetPlatform=NeoCLR and RavenMetadataFormat=NeoCLR. The shared project
+provider uses native semantic references and watches the core input. The native
+core supplies Object and unit ownership; optional RavenNeoClrRuntimeSeed is only
+an execution input. Mixed bridge settings reject. Complete source-runtime
+bootstrapping still uses the CLI core path; next test native core declaration
+completeness before changing the full bundle. Installed VS Code is not qualified
+by the project provider checks. RavenDoc now has an explicit native input provider reusing the same catalog. Build it
 with the metadata project property and use `--native-core-reference` plus explicit
 `--reference` dependencies, or `apiInputs`/`nativeCoreReference` in site configuration.
 The [documentation qualification](ravendoc-validation.json) uses two native libraries
@@ -111,4 +117,19 @@ dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --nati
 dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --object-roots
 ```
 
-Full source-library bootstrap, editor and Windows qualification remain pending. The module-system proposal does not alter this work.
+Full source-library bootstrap, editor and Windows qualification remain pending. The module foundation does not satisfy these bootstrap gates.
+
+## Native-only project qualification (2026-10-09)
+
+Pass `--driver /path/to/rvnc.dll --project` to the executable verifier above.
+It writes a project with relative core/library/seed paths, compiles it, runs it
+through the project driver and independently compares interpreter/native result 42.
+It checks that a mixed native/CLI core selection leaves the published output intact.
+The [project evidence](project-execution-validation.json) records exact inputs.
+
+Raven's `NeoClrMetadataProbe --native-core-project CORE LIBRARY OUTPUT` additionally
+checks native-only semantic references, module binding, emission, watched core,
+runtime paths and nine invalid configurations. Existing bridge-backed project
+controls also pass. This is a compiler-target prerequisite, not full core/library,
+editor packaging or release qualification. No new IL semantics or performance
+claim is introduced. The native catalog research and alternatives above still apply.

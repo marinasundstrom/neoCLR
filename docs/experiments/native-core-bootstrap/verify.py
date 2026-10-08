@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
@@ -15,7 +16,10 @@ def main():
     for name in ('raven', 'runtime', 'aot', 'output'):
         parser.add_argument('--' + name, required=True, type=Path)
     parser.add_argument('--driver', type=Path, help='Optional native-enabled rvnc.dll; compile through the driver too.')
+    parser.add_argument('--project', action='store_true', help='Validate native-only project selection; requires --driver.')
     args = parser.parse_args()
+    if args.project and not args.driver:
+        parser.error('--project requires --driver')
     output = args.output.resolve()
     if output.exists():
         raise FileExistsError(output)
@@ -41,7 +45,7 @@ def main():
     core = artifacts / 'NativeCore.dll'
     library = artifacts / 'Input.dll'
     consumer = artifacts / 'Consumer.dll'
-    if args.driver:
+    if args.driver and not args.project:
         driver = args.driver.resolve()
         consumer = artifacts / 'DriverConsumer.dll'
         command = ['dotnet', driver, 'neoclr', '--native-core-reference', core, '--reference', library]
@@ -61,6 +65,38 @@ def main():
             raise AssertionError('Driver overwrote existing output')
     seed = artifacts / 'System.neox'
     run([runtime, 'assemble', HERE / 'System.neoil', seed, '--format', 'neox'])
+    if args.project:
+        directory = artifacts / 'project'
+        directory.mkdir()
+        (directory / 'Main.rvn').write_text('module Example.App\n' + (HERE / 'consumer.rvn').read_text())
+        project = directory / 'App.rvnproj'
+        root = ET.Element('Project', Sdk='Microsoft.NET.Sdk')
+        group = ET.SubElement(root, 'PropertyGroup')
+        for name, value in {
+            'TargetFramework': 'net10.0', 'OutputType': 'Exe',
+            'RavenTargetPlatform': 'NeoCLR', 'RavenMetadataFormat': 'NeoCLR',
+            'RavenMetadataCoreAssemblyName': 'NativeCore',
+            'RavenNeoClrNativeCoreReference': '../NativeCore.dll',
+            'RavenNeoClrRuntimeSeed': '../System.neox',
+        }.items():
+            ET.SubElement(group, name).text = value
+        reference = ET.SubElement(ET.SubElement(root, 'ItemGroup'), 'Reference', Include='Input')
+        ET.SubElement(reference, 'HintPath').text = '../Input.dll'
+        ET.ElementTree(root).write(project, encoding='unicode')
+        command = ['dotnet', args.driver.resolve(), 'neoclr', '--project', project]
+        run(command)
+        consumer = directory / 'bin/neoclr/App.dll'
+        run([*command, '--run', runtime], expected=42)
+        before = consumer.read_bytes()
+        invalid = ET.SubElement(group, 'RavenNeoClrCoreReference')
+        invalid.text = '../NativeCore.dll'
+        ET.ElementTree(root).write(project, encoding='unicode')
+        run(command, expected=1)
+        if consumer.read_bytes() != before:
+            raise AssertionError('Rejected mixed project changed its published output')
+        group.remove(invalid)
+        ET.ElementTree(root).write(project, encoding='unicode')
+        report['project'] = {'nativeOnly': True, 'runExit': 42, 'mixedSelectionPreservedOutput': True}
     dependencies = ['--module', core, '--module', library, '--system', seed, '--object-root', core]
     interpreted = run([runtime, 'run', consumer, *dependencies, '--show-result'], expected=42, include_stderr=True)
     if interpreted.strip() != '=> Int32(42)':
@@ -81,6 +117,10 @@ def main():
     inputs = [runtime, aot, *[p for p in HERE.iterdir() if p.suffix in ('.cs', '.csproj', '.rvn', '.neoil', '.c', '.py')]]
     inputs += list((HERE / 'bin/Debug/net10.0').glob('*.dll'))
     inputs += [core, library, consumer, seed, artifacts / 'consumer']
+    if args.driver:
+        inputs += list(args.driver.resolve().parent.glob('*.dll'))
+    if args.project:
+        inputs += [project, directory / 'Main.rvn']
     report['sha256'] = {str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs}
     (output / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')
     print('PASS native-only core consumer: interpreter=42, native=42, libSystem only')

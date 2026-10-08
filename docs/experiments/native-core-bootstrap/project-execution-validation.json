@@ -1,0 +1,218 @@
+{
+  "scope": "Native-only catalog core and separate-library integer consumer; explicit fixture Object and empty runtime seed.",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/Probe.csproj",
+        "-p:RavenRoot=/Users/robert/Projects/Raven",
+        "-p:NeoClrMetadataProject=/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj",
+        "-p:WarningLevel=0",
+        "--",
+        "/private/tmp/native-project-final1009/artifacts"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS native-only core symbols, consumer emission, missing-core/identity rejection and CLI output guard\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "assemble",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/System.neoil",
+        "/private/tmp/native-project-final1009/artifacts/System.neox",
+        "--format",
+        "neox"
+      ],
+      "exitCode": 0,
+      "stdout": "Assembled System -> /private/tmp/native-project-final1009/artifacts/System.neox\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/tmp/native-project-final1009/artifacts/project/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /private/tmp/native-project-final1009/artifacts/project/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/tmp/native-project-final1009/artifacts/project/App.rvnproj",
+        "--run",
+        "/Users/robert/Projects/neoclr/target/debug/neoclr"
+      ],
+      "exitCode": 42,
+      "stdout": "Native build output: /private/tmp/native-project-final1009/artifacts/project/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/tmp/native-project-final1009/artifacts/project/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR project: Select exactly one of RavenNeoClrCoreReference or RavenNeoClrNativeCoreReference.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/native-project-final1009/artifacts/project/bin/neoclr/App.dll",
+        "--module",
+        "/private/tmp/native-project-final1009/artifacts/NativeCore.dll",
+        "--module",
+        "/private/tmp/native-project-final1009/artifacts/Input.dll",
+        "--system",
+        "/private/tmp/native-project-final1009/artifacts/System.neox",
+        "--object-root",
+        "/private/tmp/native-project-final1009/artifacts/NativeCore.dll",
+        "--show-result"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": "=> Int32(42)\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/private/tmp/native-project-final1009/artifacts/project/bin/neoclr/App.dll",
+        "@entry",
+        "/private/tmp/native-project-final1009/artifacts/consumer.o",
+        "--module",
+        "/private/tmp/native-project-final1009/artifacts/NativeCore.dll",
+        "--module",
+        "/private/tmp/native-project-final1009/artifacts/Input.dll",
+        "--system",
+        "/private/tmp/native-project-final1009/artifacts/System.neox",
+        "--object-root",
+        "/private/tmp/native-project-final1009/artifacts/NativeCore.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "{\n  \"arrayBackingProjection\": null,\n  \"boxedInt32Display\": false,\n  \"excludedFunctions\": [\n    {\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.Object..ctor\",\n      \"sourceIndex\": 1\n    },\n    {\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.Object.ToString\",\n      \"sourceIndex\": 2\n    },\n    {\n      \"definition\": {\n        \"index\": 2,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.Object.GetHashCode\",\n      \"sourceIndex\": 3\n    },\n    {\n      \"definition\": {\n        \"index\": 3,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.Object.Equals\",\n      \"sourceIndex\": 4\n    },\n    {\n      \"definition\": {\n        \"index\": 4,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33.T_53797374656D_417474726962757465..ctor\",\n      \"sourceIndex\": 5\n    },\n    {\n      \"definition\": {\n        \"index\": 5,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_5265666572656E6365417373656D626C79417474726962757465..ctor\",\n      \"sourceIndex\": 6\n    }\n  ],\n  \"excludedTypes\": [\n    {\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.Object\",\n      \"sourceIndex\": 0\n    },\n    {\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33.T_53797374656D_56616C756554797065\",\n      \"sourceIndex\": 1\n    },\n    {\n      \"definition\": {\n        \"index\": 2,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33.T_53797374656D_417474726962757465\",\n      \"sourceIndex\": 2\n    },\n    {\n      \"definition\": {\n        \"index\": 3,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_5265666572656E6365417373656D626C79417474726962757465\",\n      \"sourceIndex\": 3\n    },\n    {\n      \"definition\": {\n        \"index\": 4,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.Int32\",\n      \"sourceIndex\": 4\n    },\n    {\n      \"definition\": {\n        \"index\": 5,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.Int64\",\n      \"sourceIndex\": 5\n    },\n    {\n      \"definition\": {\n        \"index\": 6,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.Double\",\n      \"sourceIndex\": 6\n    },\n    {\n      \"definition\": {\n        \"index\": 7,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.Boolean\",\n      \"sourceIndex\": 7\n    },\n    {\n      \"definition\": {\n        \"index\": 8,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.Void\",\n      \"sourceIndex\": 8\n    },\n    {\n      \"definition\": {\n        \"index\": 9,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.String\",\n      \"sourceIndex\": 9\n    }\n  ],\n  \"functions\": [\n    {\n      \"compiledIndex\": 0,\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_3C4E656F46756E6374696F6E3E343537383631364437303643363532453431373037305F3444363136393645\",\n      \"sourceIndex\": 0\n    },\n    {\n      \"compiledIndex\": 1,\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_9080C07945C8E9DD7EFCE2B78E8964C27180A418EF2E3A5F538CC11455E41551\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_9080C07945C8E9DD7EFCE2B78E8964C27180A418EF2E3A5F538CC11455E41551.T_4578616D706C65_496E707574.M_56616C7565\",\n      \"sourceIndex\": 7\n    }\n  ],\n  \"hostRoots\": [],\n  \"int32InstanceProjections\": [],\n  \"interfaceDispatch\": [],\n  \"interfacePolicy\": \"original load-set conformance verified; value relationships omitted from private projection; reference-arena class interface views and constructed-class implicit dispatch retained; explicit implementations unsupported\",\n  \"loadSet\": {\n    \"limits\": \"up to 128 closed value/reference/interface shapes and 128 function clones; primitive static generic methods; one to eight explicit dependencies; no dynamic loading\",\n    \"modules\": [\n      {\n        \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      {\n        \"name\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      {\n        \"name\": \"NeoMetadata_9080C07945C8E9DD7EFCE2B78E8964C27180A418EF2E3A5F538CC11455E41551\",\n        \"revision\": \"1.0.0.0\"\n      }\n    ],\n    \"runtimeContext\": {\n      \"bindCharacterText\": false,\n      \"bindConsoleReadByte\": false,\n      \"bindConsoleStreamOutput\": false,\n      \"bindConsoleWriteLine\": false,\n      \"bindFileInput\": false,\n      \"bindFileOutput\": false,\n      \"bindInt32ToString\": false,\n      \"bindIntegerText\": false,\n      \"bindPaths\": false,\n      \"bindSocketAccept\": false,\n      \"bindSocketListener\": false,\n      \"bindSocketTransfer\": false,\n      \"bindTaskQueue\": false,\n      \"bindUserFault\": false,\n      \"bindUtf8Text\": false,\n      \"compileSystem\": false,\n      \"explicit\": true,\n      \"objectRoot\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"referenceArena\": false,\n      \"revision\": null,\n      \"scope\": \"validation only; System seed bodies are not compilation inputs\",\n      \"system\": \"System\"\n    },\n    \"validation\": \"all original bodies verified with runtime binder before private canonical projection\"\n  },\n  \"metadataPolicy\": \"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted\",\n  \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n  \"nativeAbi\": \"no-text-arena\",\n  \"nativeBindings\": [],\n  \"objectDisplayDispatch\": [],\n  \"policy\": \"explicit closed world with constructed-class implicit interface dispatch; ordinary selected bodies retained; verified Object.ToString override dispatch replaces its private slot body; no reflection, dynamic loading or general class virtual dispatch\",\n  \"primitiveInstanceProjections\": [],\n  \"referenceArena\": false,\n  \"referenceArrayBackingProjections\": [],\n  \"root\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_3C4E656F46756E6374696F6E3E343537383631364437303643363532453431373037305F3444363136393645\",\n  \"schema\": \"neoclr-aot-selection-v1\",\n  \"sealedMemberProjections\": [],\n  \"staticOwnerProjections\": [],\n  \"staticPrimitiveOwners\": [],\n  \"stringInstanceProjections\": [],\n  \"stringInterfaceDispatch\": [],\n  \"stringInterfaceViews\": [],\n  \"types\": [\n    {\n      \"compiledIndex\": 0,\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_9080C07945C8E9DD7EFCE2B78E8964C27180A418EF2E3A5F538CC11455E41551\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_9080C07945C8E9DD7EFCE2B78E8964C27180A418EF2E3A5F538CC11455E41551.T_4578616D706C65_496E707574\",\n      \"sourceIndex\": 10\n    }\n  ],\n  \"valueDisplayProjections\": [],\n  \"verifiedInterfaceRelationships\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/host.c",
+        "/private/tmp/native-project-final1009/artifacts/consumer.o",
+        "-o",
+        "/private/tmp/native-project-final1009/artifacts/consumer"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/native-project-final1009/artifacts/consumer"
+      ],
+      "exitCode": 0,
+      "stdout": "42\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/private/tmp/native-project-final1009/artifacts/consumer"
+      ],
+      "exitCode": 0,
+      "stdout": "/private/tmp/native-project-final1009/artifacts/consumer:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "project": {
+    "nativeOnly": true,
+    "runExit": 42,
+    "mixedSelectionPreservedOutput": true
+  },
+  "result": {
+    "interpreter": 42,
+    "native": 42,
+    "nativeLibraries": [
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "revisions": {
+    "neoclr": "2ac9ca1b6c7e962b3dffd9d000cd31a0a1da3fc9",
+    "raven": "67cd4da476f9bd8115567f3730c504ff62a63d1a"
+  },
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "87cea9a7faa1ccd2736a2b1262db8de39aaa508f8bf8936fba85064bf0490baf",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "9bb7bc14dd0456633aff0c02f4e6f1e159689f936af757a0ee4797c89c5a7010",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/Probe.csproj": "cf09824cb0bcd58274d1bbca54b7c783fb01e4c67091cac2d4eb6d1ce014f8b5",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/consumer.rvn": "7d54cf6354ec7f0c5844d4db7a68152079d7c11a60673621c0f6fb494488613d",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/System.neoil": "21d712f0e32ab594d2e6bfb5b509cfe5ee7ffcfefa349fb1e12c70b6db17b9bf",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/host.c": "60768b664a8ba7b77cb963895e3df6bbf3f2fdf6e928b3f2c66428db10ae4f44",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/verify.py": "8b1cb5bb588472ea4132a1e8fd1bc4556242effe17745344368ee36555d35698",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/Program.cs": "1a2799dc5a01903325bf92507c87701799f26b91a8cae3c2728719a5cc142772",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "2571313433ffa0c155462ed28c859a814e575c2e1f53f13caefb8429858c6128",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/bin/Debug/net10.0/Probe.dll": "b40a3c7ea1a98d1248a31ad8efbb45eba079fe417b6ee222e046688d55e74ad7",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "0e072da93227acf0f33b46f2b89a761a007fd5e693825c106ed6b390001ad93e",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "b6b748028ce851f27cb34b12420f03a166ce7ce5948e2f2cb82b0a7ba77eb6ba",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-core-bootstrap/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/private/tmp/native-project-final1009/artifacts/NativeCore.dll": "6e59ec040471a544d14294bc03352cf1299cf53865fbb4808dcd37d64e5aae96",
+    "/private/tmp/native-project-final1009/artifacts/Input.dll": "60d5683514bbc5ab5035d0e6162b04a22eb22147fb429e9f371623c79cf6ccb6",
+    "/private/tmp/native-project-final1009/artifacts/project/bin/neoclr/App.dll": "b47c69d925db642573c9c195240f58f5b4c779fbd598d5ca6104e0eba9e513b4",
+    "/private/tmp/native-project-final1009/artifacts/System.neox": "ffeb28eefd8e74baeede19208a692cacb7780deff7086cbe978a46c603db606a",
+    "/private/tmp/native-project-final1009/artifacts/consumer": "f4b7772fefe7663fe083537981249043d8494c021a5d292d82628883ae4e09a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "307d94420498e833d49fbcc7c17e323c5afe24773626bfe6672f5a8772e9c158",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "9a54315fe3b8685a3e5351ee4cabfe42bb9e905a4fcab81ad1fa339a13103cf5",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "2571313433ffa0c155462ed28c859a814e575c2e1f53f13caefb8429858c6128",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "502697c5343b6ef538ae63b80f0af53e9f2fb93f8f254f3282290a80d5208706",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "00aa420444d0683c4dce36410130ddc7d7d8e4dcd8e3df23c109429e2c0ab65a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "4cab23b05aef3abb4e6296e00cc2b4dd3c8b32c0bfb6c70ad8f66501154a0664",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/private/tmp/native-project-final1009/artifacts/project/App.rvnproj": "cc31354f444e7c2bb4ea334c299779eaa8e3a2e7e1b63794ea0ad5984fa68a65",
+    "/private/tmp/native-project-final1009/artifacts/project/Main.rvn": "371162500d7fecf5e8f5c159de32f768d57f88d8b405fc6e0566c571a7729999"
+  },
+  "qualificationNotes": [
+    "Fixture native core only; complete production source-runtime bootstrap remains open.",
+    "No installed VS Code or release package qualification."
+  ],
+  "projectProviderChecks": {
+    "nativeOnly": "PASS native-only project references, module binding, watched core, emission, execution paths and nine rejected configurations\n",
+    "legacyControl": "PASS native XML type/member documentation and malformed optional sidecar\nPASS reference catalog snapshot reuse, replacement, native semantic import/emission, invalid inputs and seed ownership\nPASS evaluated native project references, semantic binding, missing-adapter rejection and transactional failure\n/tmp/bridge-project-control1009/project/App.rvnproj\n"
+  }
+}

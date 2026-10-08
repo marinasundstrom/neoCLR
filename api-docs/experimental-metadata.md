@@ -7935,3 +7935,21 @@ not a complete core profile validator, compiler bootstrap or executable CLI core
 Raven's opt-in compiler API native-only consumer now emits and executes integer arithmetic;
 full source-library/core qualification remains pending. See the
 [frontier and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-core-bootstrap/README.md).
+
+### Native-only project selection (development, 2026-10-09)
+
+`NeoClrProjectMetadataProvider.Load` accepts the project-relative
+`RavenNeoClrNativeCoreReference` property, mutually exclusive with the legacy
+`RavenNeoClrCoreReference`. With NeoCLR target/metadata format, it returns only
+native references and configures native core Object/unit ownership.
+`GetInputPaths` includes that core for watching. The resulting configuration's
+`ReferencePaths` includes the core, `ObjectRootPath` selects it, and
+`CreateEmissionBackend` consumes the native catalog without a CLI bootstrap.
+
+An optional RavenNeoClrRuntimeSeed must exist and differ from semantic inputs;
+it is execution-only. Mixed bootstrap ownership/intrinsic/source-root/object-library/
+async-library settings and mismatched core identity reject with InvalidDataException.
+Missing native inputs retain the catalog's I/O errors. Failed loading does not replace
+the last successful configuration. This bounded path does not establish full core
+completeness or installed-editor qualification. See the
+[executable project check](https://github.com/marinasundstrom/neoclr/blob/main/docs/experiments/native-core-bootstrap/README.md#native-only-project-qualification-2026-10-09).

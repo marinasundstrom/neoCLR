@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+**Release bootstrap prerequisite (2026-10-09):** Raven project mode now accepts
+native-only core metadata through RavenNeoClrNativeCoreReference. A module consumer
+passes project build/run, interpreter and ARM64 native execution with no CLI semantic
+references; mixed configuration preserves existing output. See the
+[project qualification](experiments/native-core-bootstrap/README.md#native-only-project-qualification-2026-10-09).
+This closes project selection, not the release's full source-runtime bootstrap gate.
+Next qualify native primitive/core completeness against the production library;
+installed editor and extracted-package acceptance remain separate gates.
+
 **Author-directed module foundation (2026-10-09):** implement logical modules as
 declaration containers, retaining assembly deployment identity. The
 [module contract](declaration-modules.md) records the format/API foundation. Raven
