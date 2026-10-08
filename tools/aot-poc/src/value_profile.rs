@@ -349,6 +349,9 @@ impl<'a> Profile<'a> {
             }
         })
     }
+    pub fn is_object_base(&self, t: &Ty) -> bool {
+        matches!(t, Ty::Reference(i) if self.object_base == Some(*i))
+    }
     fn stored(&self, t: &Type) -> Result<Ty, Error> {
         self.ty(t)
     }
@@ -828,12 +831,15 @@ impl<'a> Profile<'a> {
                     stack.push(t);
                 }
                 Op::IsInstance(Type::String) | Op::CastClass(Type::String) => {
-                    take(&mut stack, &Ty::Literal)?;
+                    let source = pop(&mut stack)?;
+                    if source != Ty::Literal && !(self.references && matches!(source, Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray)) {
+                        return Err(fail(pc, "String casts require text or managed references"));
+                    }
                     stack.push(Ty::Literal);
                 }
                 Op::IsInstance(t) | Op::CastClass(t) => {
                     let source = pop(&mut stack)?;
-                    if !matches!(source, Ty::Reference(_) | Ty::Interface(_)) && !(source == Ty::ByteArray && self.array_backing.is_some()) {
+                    if !matches!(source, Ty::Reference(_) | Ty::Interface(_)) && !(source == Ty::Literal && self.references) && !(source == Ty::ByteArray && self.array_backing.is_some()) {
                         return Err(fail(pc, "reference casts require a class, interface or verified array view"));
                     }
                     stack.push(self.ty(t)?);
@@ -845,9 +851,12 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::Bool);
                 }
                 Op::ReferenceEqual => {
-                    let ty = pop(&mut stack)?;
-                    if !matches!(ty, Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray) { return Err(fail(pc, "identity requires same reference type")); }
-                    take(&mut stack, &ty)?;
+                    for _ in 0..2 {
+                        let ty = pop(&mut stack)?;
+                        if !matches!(ty, Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray) && !(ty == Ty::Literal && self.references) {
+                            return Err(fail(pc, "identity requires managed references; text requires --reference-arena"));
+                        }
+                    }
                     stack.push(Ty::Bool);
                 }
                 Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte) => {

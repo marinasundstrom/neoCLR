@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add private String Object views to experimental ARM64 AOT. Preserve aliases,
+  distinct literal evaluations, Object display, String round trips, nulls and invalid
+  cast diagnostics. Materialize literals in the invocation arena when text identity
+  is observable; upcasts reuse storage. Validate 46 Console AOT tests and fresh Raven
+  mixed interpolation with exact standalone output and broken-pipe fault parity.
+  Keep String interface casts and CharText identity producers explicitly unsupported;
+  context ABI, adapter signatures, Raven configuration and public APIs are unchanged.
+
 - Align interpreted String `ref.eq` with the existing shared-owner identity contract:
   accept direct Strings and preserve identity through separate Object wrappers.
   Distinct equal literal evaluations remain distinct; null comparisons stay false

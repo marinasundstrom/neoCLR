@@ -152,8 +152,11 @@ conversion fixes also unblock integer/null interpolation in native CIL. String-o
 interpolation runs standalone
 ([evidence](experiments/aot-console/interpolation-validation.json)). The next bounded
 slice supports copied Int32 boxes and Object display through the existing formatter;
-six endpoint/ordinary cases run standalone. Mixed interpolation still requires
-String-to-Object views ([evidence](experiments/aot-console/boxed-int32-validation.json)).
+six endpoint/ordinary cases run standalone
+([evidence](experiments/aot-console/boxed-int32-validation.json)). String Object views
+now unblock mixed integer interpolation with identity, null/cast and output-fault
+parity ([evidence](experiments/aot-console/string-object-views-validation.json)).
+String interface views and fresh CharText identity remain bounded follow-ups.
 The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

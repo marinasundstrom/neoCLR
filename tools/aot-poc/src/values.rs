@@ -86,6 +86,14 @@ fn matches_type(b: &mut FunctionBuilder<'_>, p: &Profile<'_>, tag: ir::Value, in
     } else { b.ins().icmp_imm(IntCC::Equal, tag, index as i64) }
 }
 
+// Private Object views use the low bit of aligned text pointers. Null stays zero.
+// Every dereference of a dynamically typed receiver must distinguish this view first.
+fn text_object_view(b: &mut FunctionBuilder<'_>, value: ir::Value) -> ir::Value {
+    let present = b.ins().icmp_imm(IntCC::NotEqual, value, 0);
+    let tagged = b.ins().bor_imm(value, 1);
+    b.ins().select(present, tagged, value)
+}
+
 fn null_reference(b: &mut FunctionBuilder<'_>, pointer: ir::Value, site: Option<&crate::fault_details::Site>) {
     let null = b.ins().icmp_imm(IntCC::Equal, pointer, 0);
     let status = b.ins().iconst(types::I32, 6);
@@ -118,6 +126,25 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))
         .collect::<Result<_, _>>()?;
+    let text_identity = input.functions.iter().enumerate().any(|(i, f)| f.body.iter().enumerate().any(|(pc, op)| {
+        let Some(shape) = flows[i].get(pc).and_then(Option::as_ref) else { return false; };
+        match op {
+            Op::CastClass(t) | Op::IsInstance(t) => shape.last() == Some(&Ty::Literal) && *t != neoclr::metadata::Type::String
+                || *t == neoclr::metadata::Type::String && shape.last() != Some(&Ty::Literal),
+            Op::ReferenceEqual => shape.iter().rev().take(2).any(|t| *t == Ty::Literal),
+            _ => false,
+        }
+    }));
+    if text_identity && input.functions.iter().any(|f| f.body.iter().any(|op| {
+        matches!(op, Op::CastClass(t) | Op::IsInstance(t) if matches!(p.ty(t), Ok(Ty::Interface(_))))
+    })) {
+        return Err("String Object views with interface casts require String interface metadata support".into());
+    }
+    // CharText currently shares a value-representation pointer; its fresh String
+    // identity requires a separate producer adaptation before exposing it here.
+    if text_identity && details.is_some_and(|d| !d.char_text.is_empty()) {
+        return Err("String identity with CharText requires a fresh text producer".into());
+    }
     // The backend's narrow shape analysis is additional admission, not a replacement
     // for type/member identity, accessibility, initialization or byref lifetime checks.
     neoclr::LoadedProgram::new(input).and_then(|v| v.verify()).map_err(|e| e.to_string())?;
@@ -131,8 +158,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         cranelift_module::default_libcall_names(),
     )?);
     // Immutable length-prefixed UTF-8. Strings originate from these image literals
-    // or explicit, bounded invocation-arena producers. No arbitrary host String,
-    // null/default, erasure, object storage or escaping export is admitted.
+    // or explicit, bounded invocation-arena producers. When identity is observable,
+    // literal evaluations receive fresh arena storage; image data remains a template.
+    // String Object views retain that pointer; no arbitrary host/escaping String is admitted.
     // A default neoCLR Char is the single NUL grapheme, never a null pointer.
     let default_character = module.declare_data("neoclr_default_character", Linkage::Local, false, false)?;
     let mut character_data = DataDescription::new();
@@ -156,6 +184,16 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             }
         }
     }
+    let text_copy = if text_identity {
+        let id = module.declare_data("neoclr_identity_empty", Linkage::Local, false, false)?;
+        let mut data = DataDescription::new();
+        data.define(vec![0; 8].into_boxed_slice()); data.set_align(8);
+        module.define_data(id, &data)?;
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64; 4].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some((module.declare_function("neoclr_string_concat_v1", Linkage::Import, &sig)?, id))
+    } else { None };
     let diagnostic_data = details.map(|options| crate::fault_details::Data::new(&mut module, input, options)).transpose()?;
     let input_service = if details.is_some_and(|d| !d.console_read_byte.is_empty()) {
         let mut sig = module.make_signature();
@@ -304,6 +342,18 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             if let Some(targets) = p.dispatch.get(&i) {
                 // Caller checks null. Forward the original receiver, result slot and
                 // context; no synthetic interface frame enters the managed trace.
+                if text_identity {
+                    let text = b.create_block();
+                    let object = b.create_block();
+                    let tagged = b.ins().band_imm(parameters[0], 1);
+                    b.ins().brif(tagged, text, &[], object, &[]);
+                    b.switch_to_block(text);
+                    let pointer = b.ins().band_imm(parameters[0], -2);
+                    write(&mut b, output, &[pointer]);
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.switch_to_block(object);
+                }
                 let tag = b.ins().load(types::I64, MemFlags::new(), parameters[0], 0);
                 if details.is_some_and(|d| d.boxed_int32_display) {
                     for &type_index in details.unwrap().int32_boxes.values() {
@@ -605,9 +655,26 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     Op::Int64(v) => stack.push(b.ins().iconst(types::I64, *v)),
                     Op::String(_) => {
                         let data = module.declare_data_in_func(literals[&(i, pc)], b.func);
-                        stack.push(b.ins().global_value(types::I64, data));
+                        let pointer = b.ins().global_value(types::I64, data);
+                        if let Some((service, empty)) = text_copy {
+                            let service = module.declare_func_in_func(service, b.func);
+                            let empty = module.declare_data_in_func(empty, b.func);
+                            let empty = b.ins().global_value(types::I64, empty);
+                            let storage = slot(&mut b, 8);
+                            let output = b.ins().stack_addr(types::I64, storage, 0);
+                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                            let call = b.ins().call(service, &[pointer, empty, arena, output]);
+                            let raw = b.inst_results(call)[0];
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                            let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                            let memory = b.ins().iconst(types::I32, 5);
+                            let runtime = b.ins().iconst(types::I32, 3);
+                            let status = b.ins().select(exhausted, memory, runtime);
+                            return_if_detailed(&mut b, failed, status, site.as_ref());
+                            stack.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
+                        } else { stack.push(pointer); }
                     }
-                    Op::IsInstance(neoclr::metadata::Type::String) | Op::CastClass(neoclr::metadata::Type::String) => (),
+                    Op::IsInstance(neoclr::metadata::Type::String) | Op::CastClass(neoclr::metadata::Type::String) if *top() == Ty::Literal => (),
                     Op::IsInstance(target) | Op::CastClass(target) => {
                         let value = pop(&mut stack);
                         let probe = b.create_block();
@@ -616,14 +683,35 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let null = b.ins().icmp_imm(IntCC::Equal, value, 0);
                         b.ins().brif(null, joined, &[value.into()], probe, &[]);
                         b.switch_to_block(probe);
-                        let tag = b.ins().load(types::I64, MemFlags::new(), value, 0);
-                        let mut matches = b.ins().iconst(types::I8, 0);
-                        for index in p.cast_targets(&p.ty(target)?) {
-                            let matched = matches_type(&mut b, &p, tag, index);
-                            matches = b.ins().bor(matches, matched);
-                        }
                         let zero = b.ins().iconst(types::I64, 0);
-                        let cast = b.ins().select(matches, value, zero);
+                        let target_ty = p.ty(target)?;
+                        let cast = if *top() == Ty::Literal {
+                            if p.is_object_base(&target_ty) { text_object_view(&mut b, value) } else { zero }
+                        } else {
+                            let text = b.create_block();
+                            let object = b.create_block();
+                            let merged = b.create_block();
+                            b.append_block_param(merged, types::I64);
+                            let tagged = b.ins().band_imm(value, 1);
+                            b.ins().brif(tagged, text, &[], object, &[]);
+                            b.switch_to_block(text);
+                            let result = if target_ty == Ty::Literal { b.ins().band_imm(value, -2) }
+                                else if p.is_object_base(&target_ty) { value } else { zero };
+                            b.ins().jump(merged, &[result.into()]);
+                            b.switch_to_block(object);
+                            let result = if target_ty == Ty::Literal { zero } else {
+                                let tag = b.ins().load(types::I64, MemFlags::new(), value, 0);
+                                let mut matches = b.ins().iconst(types::I8, 0);
+                                for index in p.cast_targets(&target_ty) {
+                                    let matched = matches_type(&mut b, &p, tag, index);
+                                    matches = b.ins().bor(matches, matched);
+                                }
+                                b.ins().select(matches, value, zero)
+                            };
+                            b.ins().jump(merged, &[result.into()]);
+                            b.switch_to_block(merged);
+                            b.block_params(merged)[0]
+                        };
                         b.ins().jump(joined, &[cast.into()]);
                         b.switch_to_block(joined);
                         let result = b.block_params(joined)[0];
@@ -642,8 +730,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         stack.push(b.ins().uextend(types::I32, is_null));
                     }
                     Op::ReferenceEqual => {
-                        let right = pop(&mut stack);
-                        let left = pop(&mut stack);
+                        let mut right = pop(&mut stack);
+                        let mut left = pop(&mut stack);
+                        if shape[shape.len()-1] == Ty::Literal { right = text_object_view(&mut b, right); }
+                        if shape[shape.len()-2] == Ty::Literal { left = text_object_view(&mut b, left); }
                         let equal = b.ins().icmp(IntCC::Equal, left, right);
                         stack.push(b.ins().uextend(types::I32, equal));
                     }

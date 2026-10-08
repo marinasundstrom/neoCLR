@@ -1092,3 +1092,60 @@ preserving Object views. That is the next bounded step. Arrays and non-Int32 box
 combined with Object display still reject. No Raven compiler or Runtime Contract
 change is needed for this slice; the producer is the previously fixed integration
 branch, with its general binder fixes already on Raven main.
+
+## String Object views and mixed interpolation (2026-10-08)
+
+The next slice closes the String-to-Object boundary for the bounded reference-arena
+profile. [interpolation.rvn](interpolation.rvn) now compiles into a standalone ARM64
+executable: integer endpoints, value-only interpolation, string addition and null
+text match native CIL interpretation. The ordinary String.Concat(Object, Object),
+Object.ToString and Console wrappers remain in the compiled call graph. The updated
+[driver](verify_interpolation.py) also reruns String-only interpolation and boxed Int32
+controls. [Evidence](string-object-views-validation.json) records fresh compiler/bundle
+hashes, isolated execution, libSystem-only dynamic linkage, and exact output-fault
+message/trace/exit parity on a broken pipe. Earlier rejection evidence is historical.
+
+Private String Object views tag the low bit of an aligned immutable UTF-8 pointer.
+Null remains zero; converting back to String removes the tag, and Object.ToString
+returns the original text. Casts distinguish text before reading an object header.
+Failed type tests produce null; invalid casts and null virtual calls keep the
+interpreter's fault codes and caller traces. Reference equality normalizes String
+and Object views to the same identity. This is an internal compiled representation,
+not a stable external object layout, metadata sidecar or public API change. Host
+adapters continue receiving ordinary untagged text pointers; ABI v4 context layout
+and existing native adapter signatures are unchanged.
+
+Identity requires fresh storage for separately evaluated literals. When the selected
+program exposes text identity through casts or ref.eq, every executed ldstr copies
+its image template into the invocation arena using the existing private concat
+adapter with empty text. Aliases reuse that storage, so repeated upcasts do not allocate
+wrappers. Programs without observable text identity retain the previous image-literal
+path. Exhaustion during materialization reports NativeMemoryLimitExceeded at the ldstr
+caller site and leaves the entry result untouched. This can increase arena use for
+loops and string-heavy programs; there is no collection or reclamation in this POC.
+
+The metadata consumer [string-object-views.neoil](string-object-views.neoil) checks
+repeated execution of the same literal, distinct equal text, repeated Object upcasts,
+mixed-view identity, downcasts, wrong-class/boxed-value tests, nulls and Unicode/NUL
+output. It compares invalid-cast and null-call diagnostics exactly with interpretation,
+and checks literal-allocation exhaustion and caller storage. Forty-six Console AOT
+tests pass, including rejection without object publication for String interface casts
+and CharText producers in the identity-observable profile. Those paths need native
+interface metadata and fresh Char-to-String ownership respectively. Wider boxed
+formatting, general Object methods and escaping native references remain unsupported.
+
+The comparison reuses [String shared-owner identity](../../string-storage-design.md#shared-owner-identity--development-2026-09-24)
+and the [Object model review](../../object-model-review.md): .NET-like reference identity
+is the ergonomic target, while neoCLR retains UTF-8 and non-interned literal evaluation.
+Allocating an Object wrapper on every cast would require extra arena storage and
+special equality handling; returning the image literal directly would incorrectly
+merge repeated evaluations. The tagged view preserves current identity without wrapper
+allocation, at the cost of alignment/tag handling and identity-sensitive literal
+materialization. This is a provisional internal implementation, not a measured
+performance improvement. String interfaces and CharText identity are the next bounded
+representation gaps; a mixed input/Result/formatting sample can drive their selection.
+
+The comparison also found and fixed interpreter String ref.eq inconsistency in
+`8027ec93`, independently covered by six ownership/GC/conversion tests. Raven compiler
+behavior, the explicit target configuration, metadata encoding and native bundle
+libraries are unchanged by either slice.

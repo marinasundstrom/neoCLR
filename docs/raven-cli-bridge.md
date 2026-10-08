@@ -6722,3 +6722,12 @@ preserves copied Int32 boxes and Object display; mixed interpolation reaches the
 remaining String-to-Object view boundary. No temporary CLI encoding, new guest API or
 metadata schema is introduced. The private box representation belongs to AOT codegen
 and does not replace native metadata identity or commit a stable external ABI.
+
+
+The [String Object-view slice](experiments/aot-console/README.md#string-object-views-and-mixed-interpolation-2026-10-08)
+subsequently qualifies that same mixed interpolation as a standalone ARM64 executable.
+It consumes existing native CIL casts/boxing and compiler conversions without new Raven
+configuration, temporary CLI representation or metadata encoding. Native tagged views
+and fresh literal identity are backend-owned; String interfaces and CharText identity
+still reject in this bounded profile. Interpreter ref.eq was separately corrected to
+match the existing shared-owner String contract. No public API snapshot change.
