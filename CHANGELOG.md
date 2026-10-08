@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Qualify RavenDoc's explicit native library loader using the full existing renderer:
+  grouped navigation, real declaring identities, XML/Markdown and namespace comments,
+  member signatures, generics, inheritance/extensions, source/API content, search and
+  cross-library links. Preserve the current complete website reference until the
+  production bundle has matching coverage; no CoreProbe relabeling or reduced replacement.
+
 - Exercise Raven's explicit native-only metadata mode with an authored native core:
   compile an integer consumer without CLI semantic references and run it interpreted
   and ARM64 native with result 42. Extend the probe through Raven’s explicit native

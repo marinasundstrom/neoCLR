@@ -342,6 +342,9 @@ The explicit native core/library catalog API also passes a separate-library cons
 in both modes, including explicit `rvnc --native-core-reference` selection.
 Project/editor integration and complete source-runtime core remain pending. This
 is not full bootstrap qualification or a replacement for the application/editor gates.
+Author-directed RavenDoc loader work now reuses the native catalog and existing full
+renderer, with [focused reference coverage](experiments/native-core-bootstrap/ravendoc-validation.json).
+The actual documentation bundle still requires migration and a public-API inventory check.
 Compiler host tooling and compiler self-hosting are separate scope questions; this
 clarification specifically concerns the compiler target and emitted execution path.
 The HTTP native image already needs no installed .NET runtime, but that deployment

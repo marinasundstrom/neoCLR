@@ -1,0 +1,148 @@
+{
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net10.0/RavenDoc.dll",
+        "/private/tmp/native-doc-rich-fixture1008/Library.dll",
+        "--native-core-reference",
+        "/private/tmp/native-catalog-execution1008/artifacts/NativeCore.dll",
+        "--reference",
+        "/private/tmp/native-doc-rich-fixture1008/Renamed.dll",
+        "-o",
+        "/private/tmp/native-doc-final1008/direct"
+      ],
+      "exitCode": 0,
+      "stdout": "RavenDoc wrote /private/tmp/native-doc-final1008/direct\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net10.0/RavenDoc.dll",
+        "--site",
+        "/private/tmp/native-doc-final1008/site.json"
+      ],
+      "exitCode": 0,
+      "stdout": "RavenDoc wrote /private/tmp/native-doc-final1008/site\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net10.0/RavenDoc.dll",
+        "--site",
+        "/private/tmp/native-doc-final1008/site.json"
+      ],
+      "exitCode": 0,
+      "stdout": "RavenDoc wrote /private/tmp/native-doc-final1008/grouped\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net10.0/RavenDoc.dll",
+        "/private/tmp/native-doc-rich-fixture1008/Library.dll",
+        "--native-core-reference",
+        "/private/tmp/native-catalog-execution1008/artifacts/NativeCore.dll",
+        "-o",
+        "/private/tmp/native-doc-final1008/direct"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RavenDoc failed: System.IO.InvalidDataException: error RAVT003: Target core configuration cannot be used: missing or mismatched native dependency: Models.\n   at NativeDocumentationInput.Generate(IReadOnlyList`1 inputs, String output, String corePath, IReadOnlyList`1 dependencies, DocumentationSiteOptions options) in /Users/robert/Projects/Raven/src/RavenDoc/NativeDocumentationInput.cs:line 35\n   at RavenDocCommand.GenerateFromAssemblies(IReadOnlyList`1 assemblyPaths, String outputPath, String targetFramework, DocumentationSiteOptions siteOptions, String nativeCoreReference, IReadOnlyList`1 referencePaths) in /Users/robert/Projects/Raven/src/RavenDoc/Program.cs:line 154\n   at RavenDocCommand.GenerateFromAssembly(String assemblyPath, String outputPath, String targetFramework, DocumentationSiteOptions siteOptions, String nativeCoreReference, IReadOnlyList`1 referencePaths) in /Users/robert/Projects/Raven/src/RavenDoc/Program.cs:line 142\n   at RavenDocCommand.Run(String[] args) in /Users/robert/Projects/Raven/src/RavenDoc/Program.cs:line 55\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net10.0/RavenDoc.dll",
+        "/private/tmp/native-doc-rich-fixture1008/Library.dll",
+        "--native-core-reference",
+        "/private/tmp/native-catalog-execution1008/artifacts/NativeCore.dll",
+        "--reference",
+        "/private/tmp/native-doc-rich-fixture1008/Poison.dll",
+        "-o",
+        "/private/tmp/native-doc-final1008/direct"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RavenDoc failed: System.IO.InvalidDataException: invalid DOS signature\n   at NeoCLR.Metadata.Experimental.MetadataArtifactReader.ContainerMetadata(Byte[] image) in /Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/MetadataArtifactReader.cs:line 124\n   at NeoCLR.Metadata.Experimental.MetadataArtifactReader.ReadEnvelope(ReadOnlySpan`1 image, Boolean expectedExtended, Int32 maxImageSize) in /Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/MetadataArtifactReader.cs:line 38\n   at NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.Read(ReadOnlySpan`1 image) in /Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/RuntimeAssemblyContainer.cs:line 149\n   at Raven.CodeAnalysis.NeoClr.NeoClrReferenceCatalog.ReadNative(String corePath, IEnumerable`1 nativeReferencePaths) in /Users/robert/Projects/Raven/src/Raven.CodeAnalysis.NeoClr/NeoClrReferenceCatalog.cs:line 117\n   at NativeDocumentationInput.Generate(IReadOnlyList`1 inputs, String output, String corePath, IReadOnlyList`1 dependencies, DocumentationSiteOptions options) in /Users/robert/Projects/Raven/src/RavenDoc/NativeDocumentationInput.cs:line 24\n   at RavenDocCommand.GenerateFromAssemblies(IReadOnlyList`1 assemblyPaths, String outputPath, String targetFramework, DocumentationSiteOptions siteOptions, String nativeCoreReference, IReadOnlyList`1 referencePaths) in /Users/robert/Projects/Raven/src/RavenDoc/Program.cs:line 154\n   at RavenDocCommand.GenerateFromAssembly(String assemblyPath, String outputPath, String targetFramework, DocumentationSiteOptions siteOptions, String nativeCoreReference, IReadOnlyList`1 referencePaths) in /Users/robert/Projects/Raven/src/RavenDoc/Program.cs:line 142\n   at RavenDocCommand.Run(String[] args) in /Users/robert/Projects/Raven/src/RavenDoc/Program.cs:line 55\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net10.0/RavenDoc.dll",
+        "--site",
+        "/private/tmp/native-doc-final1008/site.json"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RavenDoc failed: Duplicate native assembly identity: Models\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net10.0/RavenDoc.dll",
+        "--site",
+        "/private/tmp/native-doc-final1008/site.json"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RavenDoc failed: Conflicting native documentation type: Example.Book\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net10.0/RavenDoc.dll",
+        "/private/tmp/native-doc-rich-fixture1008/Renamed.dll",
+        "--native-core-reference",
+        "/private/tmp/native-catalog-execution1008/artifacts/NativeCore.dll",
+        "-o",
+        "/private/tmp/native-doc-rich-fixture1008"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RavenDoc failed: System.ArgumentException: Native documentation output must not contain metadata inputs.\n   at NativeDocumentationInput.Generate(IReadOnlyList`1 inputs, String output, String corePath, IReadOnlyList`1 dependencies, DocumentationSiteOptions options) in /Users/robert/Projects/Raven/src/RavenDoc/NativeDocumentationInput.cs:line 23\n   at RavenDocCommand.GenerateFromAssemblies(IReadOnlyList`1 assemblyPaths, String outputPath, String targetFramework, DocumentationSiteOptions siteOptions, String nativeCoreReference, IReadOnlyList`1 referencePaths) in /Users/robert/Projects/Raven/src/RavenDoc/Program.cs:line 154\n   at RavenDocCommand.GenerateFromAssembly(String assemblyPath, String outputPath, String targetFramework, DocumentationSiteOptions siteOptions, String nativeCoreReference, IReadOnlyList`1 referencePaths) in /Users/robert/Projects/Raven/src/RavenDoc/Program.cs:line 142\n   at RavenDocCommand.Run(String[] args) in /Users/robert/Projects/Raven/src/RavenDoc/Program.cs:line 55\n"
+    }
+  ],
+  "result": "PASS native docs: grouped navigation, XML/Markdown, namespace comments, overloads, generics, fields/properties, inheritance/extensions, API content/source links, search, ownership, local links and input/output guards",
+  "date": "2026-10-08",
+  "ravenImplementationCommit": "962f178a016d5b0689d7078b9142bdffd3cace9d",
+  "branch": "codex/source-object-metadata-resolution",
+  "scope": "Explicit native RavenDoc loader using existing renderer; production API bundle remains unchanged.",
+  "dotnetControl": {
+    "filter": "FullyQualifiedName~RavenDocGenerationTests|FullyQualifiedName~DocumentationSiteBuilderTests",
+    "framework": "net11.0",
+    "baselinePassed": 63,
+    "postChangePassed": 63
+  },
+  "sourcesAndInputsSha256": {
+    "/tmp/native-doc-rich-fixture1008/Renamed.dll": "3ae52a38343a210ea66e16ddb2789f4cddabbf670da42676f9c6eb334d3f5d7b",
+    "/tmp/native-doc-rich-fixture1008/Conflict.dll": "366a321a30faa144124faab2f56fa14f039e35fb48670978d5604670eb1acdfe",
+    "/tmp/native-doc-rich-fixture1008/Poison.dll": "e3a0e6dcaa5c8197d837c5f8b4d26be57cd6983e2937815a149e56dffcb14a57",
+    "/tmp/native-doc-rich-fixture1008/Copied.dll": "3ae52a38343a210ea66e16ddb2789f4cddabbf670da42676f9c6eb334d3f5d7b",
+    "/tmp/native-doc-rich-fixture1008/Library.dll": "383e0b1e9b920f7530bd971b87921d95eb085092255a5e85333c2dd46b8a0487",
+    "/tmp/native-catalog-execution1008/artifacts/NativeCore.dll": "02797cacb2c345da8b89559bacd198edac920a5a87762af799e27a679124b564",
+    "/Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net10.0/RavenDoc.dll": "b7d39db1fdd4a66e91f7bc5c6de8fe7446e8ed93869915a097cdc90d6dcfd3d8",
+    "/Users/robert/Projects/Raven/tools/NeoClrMetadataProbe/native-doc-checks.py": "9cea4c27d8c2b4537bb209c7a0d34152e907477c78a06610e41a4d24af23fed6"
+  },
+  "reproduce": [
+    "Build native-enabled RavenDoc with NeoClrMetadataProject pointing at this repository metadata project.",
+    "Generate NativeCore.dll using docs/experiments/native-core-bootstrap/Probe.csproj.",
+    "Run tools/NeoClrMetadataProbe --native-doc-fixture <NativeCore.dll> <fixture-directory> with matching metadata project.",
+    "Run tools/NeoClrMetadataProbe/native-doc-checks.py --ravendoc <native-enabled RavenDoc.dll> --core <NativeCore.dll> --fixtures <fixture-directory> --output <fresh-directory>."
+  ],
+  "disabledAdapterCheck": {
+    "command": [
+      "dotnet",
+      "/Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net11.0/RavenDoc.dll",
+      "/tmp/native-doc-rich-fixture1008/Library.dll",
+      "--native-core-reference",
+      "/tmp/native-catalog-execution1008/artifacts/NativeCore.dll",
+      "-o",
+      "/tmp/native-doc-disabled1008"
+    ],
+    "exitCode": 1,
+    "result": "Explicit unsupported-mode error; no output created"
+  }
+}

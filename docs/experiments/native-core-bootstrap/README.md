@@ -89,8 +89,14 @@ records parity and rejection of mixed bridge flags without output publication.
 
 This remains bounded: project/editor configuration and complete
 source-runtime bootstrapping still use the CLI core path. Next wire project/editor
-selection and test native core declaration completeness before changing the full bundle. RavenDoc likewise needs its own native input provider;
-changing semantic initialization does not automatically migrate documentation inputs.
+selection and test native core declaration completeness before changing the full bundle. RavenDoc now has an explicit native input provider reusing the same catalog. Build it
+with the metadata project property and use `--native-core-reference` plus explicit
+`--reference` dependencies, or `apiInputs`/`nativeCoreReference` in site configuration.
+The [documentation qualification](ravendoc-validation.json) uses two native libraries
+with actual declaring identities, existing member rendering, sidecars, navigation/search
+and input rejection. This closes the loader issue, not the complete production bundle
+migration. The website keeps its full existing API reference until native inputs pass
+its public-API coverage checks.
 
 ## Validation
 

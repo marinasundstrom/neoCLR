@@ -12227,3 +12227,22 @@ claim follows from these focused checks.
   Windows/editor qualification and RavenDoc's native provider. The prior RavenDoc
   release deferral remains history; the new observation is recorded as the intended
   migration outcome, not assumed approval for a rewrite or changed release scope.
+
+
+## 2026-10-08 — Explicit RavenDoc loader priority and API experience
+
+- **Author direction:** “Continue until you have solved the RavenDoc loader issue”,
+  followed by “We still want the full experience in RavenDoc. It shouldn't have
+  degraded when it comes to API reference.” This explicitly brings loader work
+  forward from the earlier deferral; it does not request a RavenDoc rewrite.
+- **Assistant response:** finish the bounded native-core driver slice, then reuse the
+  native catalog in RavenDoc's existing rendering pipeline. Check documentation,
+  ownership, cross-library links and grouped navigation, then broaden member coverage
+  rather than treating successful loading alone as API-reference parity.
+- **Actions:** driver selection committed in Raven `47cf49a9b`, with interpreted/AOT
+  execution evidence in neoCLR `ea2de81d`. Native-loader implementation and expanded
+  qualification now pass, including a fix for missing native namespace comments.
+  The existing 63 .NET generation/site controls pass. Raven implementation: `962f178a0`;
+  [native reference evidence](experiments/native-core-bootstrap/ravendoc-validation.json).
+  The aggregate website snapshot still uses its CLI
+  bridge and must not have ownership labels rewritten without changing inputs.

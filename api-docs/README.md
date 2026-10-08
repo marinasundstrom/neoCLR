@@ -65,13 +65,25 @@ extension members should retain their declaration provenance rather than acquire
 viewed type's assembly. Never guess ownership from a namespace.
 
 Current rendering still uses the aggregate `NeoCLR.CoreProbe.dll` documentation bridge.
-That displayed assembly is a bridge identity, not evidence of a Runtime/Data production
-owner. The native multi-assembly reference migration remains work ahead. RavenDoc's
-current `apis` configuration generates per-API groups; do not configure one such group
-per split class-library DLL. The migration needs one combined documentation model over
-explicit native inputs, retaining actual declaration identities, one canonical page
-per type, merged namespaces, cross-assembly links and conflict diagnostics. Keep
-source links and documentation associated with their original declarations.
+That displayed assembly is its real bridge identity, not a Runtime/Data production owner.
+Development (2026-10-08): RavenDoc now supports an explicit native loader through
+`--native-core-reference` or site `nativeCoreReference`, with `apiInputs` grouping
+native libraries into one namespace/type tree and `references` supplying dependencies.
+It shares the existing renderer, sidecar reader, navigation, search and source-link
+configuration. Native identity/type-name conflicts and missing dependencies reject.
+A compiler build with `NeoClrMetadataProject` enables this provider; ordinary .NET
+loading remains the default. See the [native loader validation](../docs/experiments/native-core-bootstrap/ravendoc-validation.json).
+
+The author explicitly requires the full API reference experience to remain intact.
+The native fixture validates XML/Markdown and namespace comments, overloads, generic
+classes/interfaces, fields/properties, inheritance/extensions, cross-library links,
+authored API content, configured source links, search and local link integrity.
+The existing .NET generation/site suite remains green (63 checks). This does not prove
+all production signatures or replace the current complete documentation bundle with
+a reduced fixture. Migrate actual library inputs and validate their public-API inventory
+before changing the published snapshot. Do not relabel CoreProbe or create one `apis`
+group per split class-library DLL. The fixture's native owner labels come from metadata,
+even when the file has a different name.
 
 Acceptance for that migration: Runtime/Data/Networking/Web share one namespace tree;
 a cross-assembly member type links to its unique type page; declaration ownership is
@@ -86,7 +98,8 @@ a list of assemblies presented as one API structure. This is a documentation gro
 not a merged assembly. Resolve symbols using assembly-qualified identities before
 combining navigation, search and cross-references. Retain each input's documentation
 and source provenance, including inputs from different repositories or revisions.
-Configuration syntax and implementation remain future RavenDoc work.
+The native loader now accepts such a group through `apiInputs`; richer per-input
+source provenance remains future RavenDoc work.
 
 Source links must identify the actual file and declaration location for a type or
 member on GitHub, for both .NET and NeoCLR inputs. Repository links or namespace-based

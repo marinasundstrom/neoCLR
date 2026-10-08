@@ -7052,3 +7052,23 @@ is outside this bounded consumer path. Project/editor migration remains pending.
 The [driver verifier](experiments/native-core-bootstrap/driver-execution-validation.json)
 records a separate-library consumer returning 42 interpreted and ARM64 native, existing
 output preservation and invalid-option rejection. No runtime or IL contract changed.
+
+
+### RavenDoc native metadata provider (2026-10-08)
+
+The author explicitly requested resolving the loader while retaining the full API
+reference experience. RavenDoc now uses ReadNative for `--native-core-reference` or
+site `nativeCoreReference`; documented inputs and dependency references are distinct.
+It adds no framework/adjacent DLL references and consumes no CLI projection. Native
+namespace symbols now forward their sidecar comments through the same reader as types.
+One `apiInputs` group retains the existing renderer, merged navigation and declaring
+ownership. This is an optional compiler build integration through NeoClrMetadataProject;
+ordinary .NET remains default. Raven owns loading/rendering and neoCLR owns native inputs.
+
+[Qualification](experiments/native-core-bootstrap/ravendoc-validation.json) covers
+member signatures, XML/Markdown, namespace comments, overloads, generics, properties,
+inheritance/extensions, API content/source links, cross-library links, search and
+rejection without overwriting existing output. All 63 .NET generation/site controls
+pass. The full aggregate documentation snapshot remains on its CLI bridge until the
+native production bundle meets the same public-API inventory. This preserves its current
+experience rather than publishing fewer APIs or changing ownership labels speculatively.
