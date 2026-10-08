@@ -625,3 +625,28 @@ it avoids native managed-object boxing allocation for these admitted payloads at
 the cost of excluding general erasure and GC lifetimes. Full Console.Write now
 reaches the selected-function/clone budget, which needs a measured extension before
 its remaining text services can be admitted.
+
+
+## UTF-8 byte counts and slices (2026-10-08)
+
+`--bind-utf8-text` (with `--compile-system --reference-arena`) now admits the exact
+reserved StringByteCount and StringSliceUtf8 InternalCalls. Ordinary String and
+encoder wrappers remain compiled CIL. Counts use UTF-8 bytes; slices preserve bytes,
+including NUL, and require scalar boundaries. Negative/out-of-range requests return
+an erased Byte(1), invalid boundaries Byte(2), and successful slices an erased String.
+Range validation precedes boundary checks, and recoverable errors allocate nothing.
+Null native text arguments fault with RuntimeError. Successful slices occupy the
+caller-owned invocation arena; exhaustion reports NativeMemoryLimitExceeded without
+publishing a result or advancing its cursor. These helpers add no shared runtime.
+
+The focused `utf8-text.neoil` consumer compares 135 native/interpreter executions,
+including exact dynamic fault messages for successful slices, UTF-8/NUL data, nulls,
+empty slices and both invalid index classes. Adapter tests cover exact fit, exhaustion,
+canaries, large indices/counts and failure publication. Exact-service admission and
+missing/duplicate capability options are tested. Unlike CLR String.Substring's UTF-16
+indexing, this follows neoCLR's existing UTF-8 API: byte offsets avoid transcoding in
+stream encoders but callers must respect scalar boundaries. This is existing platform
+semantics, not a new claim of superiority or a stable native ABI.
+
+The full Console.Write graph still needs byte-value-array encoding and managed byte
+array interface views, followed by a measured extension of selection budgets.

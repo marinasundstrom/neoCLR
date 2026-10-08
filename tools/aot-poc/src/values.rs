@@ -156,6 +156,20 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             for index in indices { stream_services.insert(*index, service); }
         }
     }
+    let mut utf8_services = std::collections::HashMap::new();
+    if let Some(d) = details {
+        for (indices, symbol, parameters) in [
+            (&d.string_byte_count, "neoclr_string_byte_count_v1", vec![types::I64, types::I64]),
+            (&d.string_slice_utf8, "neoclr_string_slice_utf8_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
+        ] {
+            if indices.is_empty() { continue; }
+            let mut sig = module.make_signature();
+            sig.params.extend(parameters.into_iter().map(AbiParam::new));
+            sig.returns.push(AbiParam::new(types::I32));
+            let service = module.declare_function(symbol, Linkage::Import, &sig)?;
+            for index in indices { utf8_services.insert(*index, service); }
+        }
+    }
     let text_arena = references || details.is_some_and(|d| !d.int32_to_string.is_empty() || !d.int64_to_string.is_empty() || !d.uint64_to_string.is_empty());
     let format_service = if details.is_some_and(|d| !d.int32_to_string.is_empty()) {
         let mut sig = module.make_signature();
@@ -389,6 +403,28 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
+                module.define_function(ids[i], &mut context)?;
+                continue;
+            }
+            if let Some(service) = utf8_services.get(&i) {
+                let service = module.declare_func_in_func(*service, b.func);
+                let args = if details.unwrap().string_slice_utf8.contains(&i) {
+                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                    vec![parameters[0], parameters[1], parameters[2], arena, output]
+                } else { vec![parameters[0], output] };
+                let call = b.ins().call(service, &args);
+                let raw = b.inst_results(call)[0];
+                let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                let memory = b.ins().iconst(types::I32, 5);
+                let runtime = b.ins().iconst(types::I32, 3);
+                let status = b.ins().select(exhausted, memory, runtime);
+                let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                site.capture_frame = false;
+                return_if_detailed(&mut b, failed, status, Some(&site));
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks(); b.finalize();
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }

@@ -13,6 +13,7 @@ pub struct RuntimeContext {
     pub bind_console_write_line: bool,
     pub bind_console_stream_output: bool,
     pub bind_int32_to_string: bool,
+    pub bind_utf8_text: bool,
     pub bind_character_text: bool,
     pub bind_integer_text: bool,
     pub reference_arena: bool,
@@ -255,6 +256,11 @@ pub fn prepare(
         let rows = super::bindings::int32_to_string(&mut selected, &report)?;
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
     }
+    let bind_utf8_text = context.is_some_and(|c| c.bind_utf8_text);
+    if bind_utf8_text {
+        let rows = super::bindings::utf8_text(&mut selected, &report)?;
+        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+    }
     let bind_character_text = context.is_some_and(|c| c.bind_character_text);
     if bind_character_text {
         let rows = super::bindings::character_text(&mut selected, &report)?;
@@ -358,7 +364,7 @@ pub fn prepare(
     }
     report["loadSet"] = json!({"modules": inputs.iter().map(|m| json!({"name": m.name, "revision": m.revision})).collect::<Vec<_>>(),
         "validation": "all original bodies verified with runtime binder before private canonical projection",
-        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "bindConsoleWriteLine": bind_console_write_line, "bindConsoleStreamOutput": bind_console_stream_output, "bindInt32ToString": bind_int32_to_string, "bindCharacterText": bind_character_text, "bindIntegerText": bind_integer_text, "referenceArena": reference_arena, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
+        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "bindConsoleWriteLine": bind_console_write_line, "bindConsoleStreamOutput": bind_console_stream_output, "bindInt32ToString": bind_int32_to_string, "bindUtf8Text": bind_utf8_text, "bindCharacterText": bind_character_text, "bindIntegerText": bind_integer_text, "referenceArena": reference_arena, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
         "limits": "up to 64 closed value/reference/interface shapes and 32 function clones; primitive static generic methods; one to eight explicit dependencies; no dynamic loading"});
     Ok((selected, report))
 }

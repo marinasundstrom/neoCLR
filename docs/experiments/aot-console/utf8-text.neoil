@@ -1,0 +1,68 @@
+.module Utf8Text
+.function Calculate(Int32) -> Int32
+.local String text
+.local Int32 start
+.local Int32 count
+ldarg 0
+ldc.i4 -1
+ceq
+brtrue Count
+ldarg 0
+ldc.i4 -2
+ceq
+brtrue NullCount
+ldarg 0
+ldc.i4 -3
+ceq
+brtrue NullSlice
+ldarg 0
+ldc.i4 11
+div
+ldc.i4 1
+sub
+stloc start
+ldarg 0
+ldc.i4 11
+rem
+ldc.i4 1
+sub
+stloc count
+ldstr "aé😀\u0000z"
+ldloc start
+ldloc count
+call neoCLR.Runtime.StringSliceUtf8(String, Int32, Int32)
+dup
+value.is Byte
+brtrue Error
+value.unpack String
+call neoCLR.Runtime.Fault(String)
+pop
+ldc.i4 0
+ret
+Error:
+value.unpack Byte
+conv.i4
+ldc.i4 100
+add
+ret
+Count:
+ldstr "aé😀\u0000z"
+call neoCLR.Runtime.StringByteCount(String)
+ret
+NullCount:
+ldloca text
+initobj String
+ldloc text
+call neoCLR.Runtime.StringByteCount(String)
+ret
+NullSlice:
+ldloca text
+initobj String
+ldloc text
+ldc.i4 0
+ldc.i4 0
+call neoCLR.Runtime.StringSliceUtf8(String, Int32, Int32)
+pop
+ldc.i4 0
+ret
+.end

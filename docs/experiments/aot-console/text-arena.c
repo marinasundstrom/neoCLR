@@ -97,3 +97,36 @@ int32_t neoclr_check_bytes_initialized_v1(const void *array, int32_t offset, int
     }
     return NEOCLR_AOT_FAULT_NONE;
 }
+
+int32_t neoclr_string_byte_count_v1(const neoclr_aot_text *text, int32_t *output) {
+    if (!text || text->length > INT32_MAX) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    *output = (int32_t)text->length;
+    return NEOCLR_AOT_FAULT_NONE;
+}
+
+int32_t neoclr_string_slice_utf8_v1(const neoclr_aot_text *text, int32_t start, int32_t length,
+                                   neoclr_aot_text_arena *arena, void *output) {
+    if (!text) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint32_t tag = 2; /* private erased Byte */
+    uint64_t payload;
+    if (start < 0 || length < 0 || (uint64_t)start > text->length ||
+        (uint64_t)length > text->length - (uint64_t)start) {
+        payload = 1; /* OutOfRange takes precedence over boundary validation. */
+    } else {
+        uint64_t end = (uint64_t)start + (uint64_t)length;
+        /* Every input String is valid UTF-8. Continuation bytes cannot start/end a slice. */
+        if (((uint64_t)start < text->length && (text->bytes[start] & 0xc0) == 0x80) ||
+            (end < text->length && (text->bytes[end] & 0xc0) == 0x80)) {
+            payload = 2; /* InvalidBoundary */
+        } else {
+            const neoclr_aot_text *slice;
+            int32_t status = store_text((const char *)text->bytes + start, (size_t)length, arena, &slice);
+            if (status) return status;
+            tag = 4; /* private erased String; preserve full pointer width */
+            payload = (uint64_t)(uintptr_t)slice;
+        }
+    }
+    memcpy(output, &tag, sizeof(tag));
+    memcpy((unsigned char *)output + 8, &payload, sizeof(payload));
+    return NEOCLR_AOT_FAULT_NONE;
+}

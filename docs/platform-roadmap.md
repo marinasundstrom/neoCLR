@@ -122,7 +122,9 @@ ArrayList<byte> dependency now compiles with checked byte reservations, growth a
 interface aliasing. Unwritten reads and output validation preserve interpreter faults;
 reserved-array element borrows remain rejected. String-valued erased transport and
 static generic String helpers now preserve pointer width/lifetime and exact fault
-parity. Console.Write next reaches function/clone budgets before text services. The author adds a console-input sample after unions, exercising input and
+parity. Explicit UTF-8 byte-count/slice bindings now preserve interpreter range/boundary
+results and exact dynamic fault messages. Console.Write still requires byte-value
+encoding, array interface views and a measured function/clone budget extension. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

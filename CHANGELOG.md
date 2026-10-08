@@ -102,8 +102,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   erased-value transport to I64 payloads for String pointers while preserving
   primitive normalization, exact tags and mismatch faults. Admit String static
   generic helpers; validate UTF-8/NUL, null/empty and arena-backed payloads through
-  output copies and fault messages. General object erasure and text operations
-  remain pending; internal native bodies must be rebuilt together.
+  output copies and fault messages. Add exact opt-in UTF-8 byte-count/slice services,
+  preserving range/boundary results, null faults, embedded NUL and invocation-owned
+  slice lifetimes. Validate 135 interpreter/native cases and allocation bounds,
+  failure publication and canaries. General object erasure and text writer array
+  dependencies remain pending; internal native bodies must be rebuilt together.
 
 ### 2026-10-07
 

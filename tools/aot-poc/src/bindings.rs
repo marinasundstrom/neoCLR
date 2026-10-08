@@ -306,3 +306,31 @@ pub fn console_stream_output(input: &mut neoclr::Module, selection: &Value) -> R
     }
     Ok(bindings)
 }
+
+/// UTF-8-native byte counts and immutable slices; ordinary String wrappers remain CIL.
+pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        let name = row["name"].as_str().unwrap();
+        let (parameters, result, implementation, symbol) = match name {
+            "neoCLR.Runtime.StringByteCount" => (vec![Type::String], Type::Int32, "string-byte-count-v1", "neoclr_string_byte_count_v1"),
+            "neoCLR.Runtime.StringSliceUtf8" => (vec![Type::String, Type::Int32, Type::Int32], Type::Value, "string-slice-utf8-v1", "neoclr_string_slice_utf8_v1"),
+            _ => continue,
+        };
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != name || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != parameters || f.returns != result || f.no_result
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty() || !f.locals.is_empty()
+            || f.is_virtual || f.is_override || f.is_abstract || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+            return Err("native UTF-8 binding requires exact StringByteCount(String) -> Int32 or StringSliceUtf8(String, Int32, Int32) -> Value InternalCall contract".into());
+        }
+        f.impl_flags = 0;
+        f.body = if result == Type::Value { vec![Op::String(String::new()), Op::PackValue(Type::String), Op::Return] }
+            else { vec![Op::Int(0), Op::Return] };
+        bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],"implementation":implementation,"symbol":symbol}));
+    }
+    Ok(bindings)
+}
