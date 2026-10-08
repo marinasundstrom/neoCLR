@@ -39,7 +39,7 @@ def main():
     context = ['--system', seed, *[x for f in refs for x in ('--module', f)], '--object-root', refs[0]]
     flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
              '--native-stack-budget', '--bind-console-read-byte', '--bind-console-write-line',
-             '--bind-console-stream-output', '--bind-int32-to-string', '--bind-utf8-text',
+             '--bind-console-stream-output', '--bind-int32-to-string', '--bind-utf8-text', '--bind-paths',
              '--bind-character-text', '--bind-integer-text', '--bind-task-queue',
              '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer']
     adapters = [base / n for n in ('root-probe.c', 'native-gc.c', 'native-stack.c', 'task-queue.c',

@@ -436,3 +436,35 @@ int32_t neoclr_string_compare_ordinal_v1(const neoclr_aot_text *left,
         left->length < right->length ? -1 : left->length > right->length ? 1 : 0;
     return NEOCLR_AOT_FAULT_NONE;
 }
+
+
+int32_t neoclr_path_combine_unix_v1(const neoclr_aot_text *left, const neoclr_aot_text *right,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    if (!left || !right || !arena || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (!left->length || (right->length && right->bytes[0] == '/'))
+        return store_text((const char *)right->bytes, (size_t)right->length, arena, output);
+    if (!right->length)
+        return store_text((const char *)left->bytes, (size_t)left->length, arena, output);
+    if (left->length > UINT64_MAX - 9 || right->length > UINT64_MAX - 9 - left->length)
+        return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    int separator = left->bytes[left->length - 1] != '/';
+    uint64_t length = left->length + right->length + (uint64_t)separator;
+    void *storage;
+    int32_t status = reserve_storage(arena, 8 + length, TEXT_STORAGE, &storage);
+    if (status) return status;
+    neoclr_aot_text *text = storage;
+    text->length = length;
+    memcpy(text->bytes, left->bytes, (size_t)left->length);
+    if (separator) text->bytes[left->length] = '/';
+    memcpy(text->bytes + left->length + separator, right->bytes, (size_t)right->length);
+    *output = text;
+    return NEOCLR_AOT_FAULT_NONE;
+}
+
+int32_t neoclr_path_file_name_unix_v1(const neoclr_aot_text *path,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    if (!path || !arena || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t start = path->length;
+    while (start && path->bytes[start - 1] != '/') start--;
+    return store_text((const char *)path->bytes + start, (size_t)(path->length - start), arena, output);
+}

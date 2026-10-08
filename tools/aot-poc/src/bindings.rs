@@ -312,6 +312,33 @@ pub fn console_stream_output(input: &mut neoclr::Module, selection: &Value) -> R
 }
 
 /// UTF-8-native text operations; ordinary String wrappers remain CIL.
+/// Lexical paths for the current Unix native target; no filesystem access.
+pub fn paths(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        let (name, arity, implementation, symbol) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.PathCombine") => ("neoCLR.Runtime.PathCombine", 2, "path-combine-unix-v1", "neoclr_path_combine_unix_v1"),
+            Some("neoCLR.Runtime.PathGetFileName") => ("neoCLR.Runtime.PathGetFileName", 1, "path-file-name-unix-v1", "neoclr_path_file_name_unix_v1"),
+            _ => continue,
+        };
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != name || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != vec![Type::String; arity] || f.returns != Type::String || f.no_result
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty() || !f.locals.is_empty()
+            || f.is_virtual || f.is_override || f.is_abstract || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+            return Err("native paths require exact PathCombine(String, String) -> String or PathGetFileName(String) -> String InternalCall contracts".into());
+        }
+        f.impl_flags = 0;
+        f.body = vec![Op::String(String::new()), Op::Return];
+        bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],
+            "implementation":implementation,"symbol":symbol,"semantics":"lexical UTF-8, Unix separators; no normalization or filesystem access"}));
+    }
+    Ok(bindings)
+}
+
 pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {

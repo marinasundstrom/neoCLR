@@ -182,7 +182,9 @@ slots, with identity and GC checks. Verified class-reference array views now sup
 collection interfaces; the checked-in order-collections sample runs Filter/Map/ToList
 with matching interpreted/native output. Exact element identity and mutable-array
 invariance remain enforced. Other array-view categories and value-record default
-arrays remain unsupported. Nine other selected samples advance to further metadata, primitive
+arrays remain unsupported. The ordinary lexical Path.Combine/GetFileName sample also
+passes both modes with explicit native path bindings on macOS ARM64; filesystem I/O
+and native Windows path behavior are not included. Nine other selected samples advance to further metadata, primitive
 wrapper, callback and service gaps; broad Tasks/await parity is not yet claimed.
 
 

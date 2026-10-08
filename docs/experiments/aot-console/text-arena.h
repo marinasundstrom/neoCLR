@@ -91,6 +91,14 @@ int32_t neoclr_allocate_references_v1(neoclr_aot_text_arena *arena, int32_t leng
 /* Atomic scalar snapshots: one padded lane and initialization byte per element. */
 int32_t neoclr_allocate_scalars_v1(neoclr_aot_text_arena *arena, int32_t length,
                                  int32_t reserved, void **output);
+/* Lexical Unix paths over immutable UTF-8: slash only, no normalization or I/O.
+ * Always copy into owned text storage, including empty/unchanged results.
+ * Null inputs fault (3); overflow/exhaustion returns 5. Failure leaves output intact.
+ * No collection/reentry; inputs must describe readable immutable payloads. */
+int32_t neoclr_path_combine_unix_v1(const neoclr_aot_text *left, const neoclr_aot_text *right,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output);
+int32_t neoclr_path_file_name_unix_v1(const neoclr_aot_text *path,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output);
 int32_t neoclr_string_compare_ordinal_v1(const neoclr_aot_text *left,
     const neoclr_aot_text *right, int32_t *output);
 #endif

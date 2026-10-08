@@ -439,3 +439,14 @@ path slice does not reprioritize or satisfy that gate. Keep the demonstrated HTT
 union, queue/fault and collection cases as acceptance controls. Compare changed IL
 semantics against CLI/.NET as well as the interpreter, record deliberate divergences,
 and benchmark only when a changed workload or performance question warrants it.
+
+
+### Lexical path follow-through
+
+The first recommendation above is implemented: exact opt-in native PathCombine and
+PathGetFileName bindings preserve the interpreter's Unix lexical results. The unchanged
+library-paths consumer now passes interpreted, sanitized native and standalone checks,
+including expected output and cleanup. [Validation](../../../benchmarks/native-web/path-validation.json)
+and [contract/limits](../../path.md#native-compilation-poc-2026-10-08) retain the evidence.
+The table above remains the pre-fix assessment. File text services, Math lookup,
+introspection and jagged arrays remain separate work; no full corpus rerun is claimed.

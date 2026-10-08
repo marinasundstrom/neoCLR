@@ -34,6 +34,8 @@ pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fau
                 &d.socket_receive_until,
                 &d.socket_send_until,
                 &d.string_compare_ordinal,
+                &d.path_combine,
+                &d.path_file_name,
                 &d.socket_listen,
                 &d.socket_local_port,
                 &d.socket_close,

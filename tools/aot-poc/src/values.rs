@@ -350,6 +350,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     let mut utf8_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
+            (&d.path_combine, "neoclr_path_combine_unix_v1", vec![types::I64, types::I64, types::I64, types::I64]),
+            (&d.path_file_name, "neoclr_path_file_name_unix_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_compare_ordinal, "neoclr_string_compare_ordinal_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_contains_ordinal, "neoclr_string_contains_ordinal_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_starts_with_ordinal, "neoclr_string_starts_with_ordinal_v1", vec![types::I64, types::I64, types::I64]),
@@ -864,10 +866,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 } else if details.unwrap().string_slice_utf8.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], parameters[2], arena, output]
-                } else if details.unwrap().string_concat.contains(&i) {
+                } else if details.unwrap().string_concat.contains(&i) || details.unwrap().path_combine.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], arena, output]
-                } else if details.unwrap().utf8_encode.contains(&i) || details.unwrap().utf8_decode.contains(&i) {
+                } else if details.unwrap().utf8_encode.contains(&i) || details.unwrap().utf8_decode.contains(&i) || details.unwrap().path_file_name.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], arena, output]
                 } else if details.unwrap().string_compare_ordinal.contains(&i)

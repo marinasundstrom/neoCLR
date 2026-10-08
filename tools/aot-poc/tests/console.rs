@@ -4677,3 +4677,123 @@ int main(int argc, char **argv) {
         }
     }
 }
+
+const PATH_SEED: &str = r#"
+.module System
+.references ()
+.function neoCLR.Runtime.PathCombine(String, String) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.PathGetFileName(String) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringCompareOrdinal(String, String) -> Int32
+.methodimpl InternalCall
+.end
+"#;
+
+#[test]
+fn lexical_paths_require_exact_opt_in_contracts() {
+    let source = ".module Paths\n.function Calculate(Int32 mode) -> Int32\nldstr \"left\"\nldstr \"right\"\ncall neoCLR.Runtime.PathCombine(String, String)\ncall neoCLR.Runtime.PathGetFileName(String)\npop\nldc.i4 0\nret\n.end";
+    let seed = neoclr::assemble(PATH_SEED).unwrap();
+    for flags in [
+        vec!["--compile-system", "--reference-arena"],
+        vec!["--bind-paths"],
+        vec!["--compile-system", "--bind-paths"],
+        vec!["--compile-system", "--reference-arena", "--bind-paths", "--bind-paths"],
+    ] {
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, source, &flags, false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists(), "{r:?}");
+    }
+    for index in 0..2 {
+        let mut impostor = seed.clone();
+        impostor.functions[index].impl_flags = 0;
+        impostor.functions[index].body = vec![neoclr::metadata::Instruction::String("managed".into()), neoclr::metadata::Instruction::Return];
+        let dir = Temp::new();
+        let r = compile_source(&dir, &impostor, source, &["--compile-system", "--reference-arena", "--bind-paths"], false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+        assert!(String::from_utf8_lossy(&r.stderr).contains("native paths require exact"), "{r:?}");
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn lexical_paths_match_interpreter_bytes_faults_and_gc_ownership() {
+    let combined = [
+        ("", "", ""), ("", "leaf", "leaf"), ("left", "", "left"),
+        ("left", "leaf", "left/leaf"), ("left/", "leaf", "left/leaf"),
+        ("left//", "leaf", "left//leaf"), ("left", "/leaf", "/leaf"),
+        ("left", "//leaf", "//leaf"), ("/", "leaf", "/leaf"),
+        ("reports/..", "leaf", "reports/../leaf"), (".", "..", "./.."),
+        ("資料", "世界.txt", "資料/世界.txt"), ("a\0b", "c\0d", "a\0b/c\0d"),
+        ("a\\b", "c\\d", "a\\b/c\\d"), ("left", "C:\\leaf", "left/C:\\leaf"),
+    ];
+    let names = [
+        ("", ""), ("leaf", "leaf"), ("reports/leaf", "leaf"),
+        ("reports/", ""), ("/", ""), ("//", ""), ("/leaf", "leaf"),
+        ("a//leaf", "leaf"), ("a/..", ".."), ("a/.", "."),
+        ("資料/世界.txt", "世界.txt"), ("a/\0b", "\0b"),
+        ("a\\b", "a\\b"), ("C:leaf", "C:leaf"),
+    ];
+    let literal = |text: &str| format!("ldstr {}\n", serde_json::to_string(text).unwrap());
+    let mut cases = vec![];
+    for (left, right, expected) in combined {
+        cases.push(format!("{}{}call neoCLR.Runtime.PathCombine(String, String)\n{}call neoCLR.Runtime.StringCompareOrdinal(String, String)\nret\n", literal(left), literal(right), literal(expected)));
+    }
+    for (path, expected) in names {
+        cases.push(format!("{}call neoCLR.Runtime.PathGetFileName(String)\n{}call neoCLR.Runtime.StringCompareOrdinal(String, String)\nret\n", literal(path), literal(expected)));
+    }
+    cases.push("ldstr \"reports\"\nldstr \"nested\"\ncall neoCLR.Runtime.PathCombine(String, String)\nldstr \"leaf\"\ncall neoCLR.Runtime.PathCombine(String, String)\ncall neoCLR.Runtime.PathGetFileName(String)\nldstr \"leaf\"\ncall neoCLR.Runtime.StringCompareOrdinal(String, String)\nret\n".into());
+    let successes = cases.len();
+    cases.push("ldloca empty\ninitobj String\nldloc empty\ncall neoCLR.Runtime.PathGetFileName(String)\npop\nldc.i4 -1\nret\n".into());
+    cases.push("ldloca empty\ninitobj String\nldloc empty\nldstr \"leaf\"\ncall neoCLR.Runtime.PathCombine(String, String)\npop\nldc.i4 -1\nret\n".into());
+    cases.push("ldloca empty\ninitobj String\nldstr \"left\"\nldloc empty\ncall neoCLR.Runtime.PathCombine(String, String)\npop\nldc.i4 -1\nret\n".into());
+    let mut source = String::from(".module Paths\n.function Calculate(Int32 mode) -> Int32\n.local String empty\n");
+    for i in 0..cases.len() { source += &format!("ldarg mode\nldc.i4 {i}\nbeq Case{i}\n"); }
+    source += "ldc.i4 -1\nret\n";
+    for (i, body) in cases.iter().enumerate() { source += &format!("Case{i}:\n{body}"); }
+    source += ".end\n";
+    let dir = Temp::new();
+    let seed = neoclr::assemble(PATH_SEED).unwrap();
+    let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena", "--native-gc", "--bind-paths", "--bind-utf8-text"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+#include <stdlib.h>
+int main(int argc, char **argv) {
+    uint64_t storage[257]; storage[256] = UINT64_C(0x1122334455667788);
+    neoclr_aot_context ctx = {.text = {(unsigned char *)storage, 2048, 0}};
+    int32_t result = -99;
+    int status = neoclr_entry_v4(argc > 1 ? atoi(argv[1]) : 0, &result, &ctx);
+    if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 92;
+    if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used) return 93;
+    if (storage[256] != UINT64_C(0x1122334455667788)) return 94;
+    if (status) { if (result != -99) return 95; neoclr_aot_render_fault(stderr, &ctx.fault); return 1; }
+    printf("%d\n", result); return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(dir.0.join("host.c")).arg(base.join("text-arena.c"))
+        .arg(base.join("native-gc.c")).arg(base.join("root-probe.c"))
+        .arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+        .arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let app = neoclr::assemble(&source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for i in 0..cases.len() {
+        let expected = method.invoke(vec![neoclr::Value::Int32(i as i32)], neoclr::Limits::default());
+        let r = Command::new(dir.0.join("host")).arg(i.to_string()).env_clear().output().unwrap();
+        if i < successes {
+            assert_eq!(expected.unwrap().value, neoclr::Value::Int32(0), "case {i}");
+            assert_eq!(r.status.code(), Some(0), "case {i}: {r:?}");
+            assert_eq!(r.stdout, b"0\n"); assert!(r.stderr.is_empty());
+        } else {
+            let fault = expected.unwrap_err();
+            assert_eq!(r.status.code(), Some(1), "case {i}: {r:?}");
+            assert_eq!(String::from_utf8_lossy(&r.stderr), fault.diagnostic().to_string());
+        }
+    }
+}

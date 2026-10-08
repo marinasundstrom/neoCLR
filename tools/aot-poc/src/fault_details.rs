@@ -40,6 +40,8 @@ pub struct Options {
     pub parse_int32: Vec<usize>,
     pub int32_to_string: Vec<usize>,
     pub string_compare_ordinal: Vec<usize>,
+    pub path_combine: Vec<usize>,
+    pub path_file_name: Vec<usize>,
     pub string_contains_ordinal: Vec<usize>,
     pub string_starts_with_ordinal: Vec<usize>,
     pub string_ends_with_ordinal: Vec<usize>,
@@ -186,6 +188,12 @@ impl Options {
                 .filter(|r| r["implementation"] == "utf8-encode-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
+            path_combine: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "path-combine-unix-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            path_file_name: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "path-file-name-unix-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             string_compare_ordinal: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "string-compare-ordinal-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),

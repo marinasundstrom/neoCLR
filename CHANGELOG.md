@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Bind exact native PathCombine and PathGetFileName services with explicit
+  --bind-paths opt-in on macOS ARM64. Preserve Unix lexical UTF-8 behavior, immutable
+  owned results, GC roots and unchanged outputs on failure; no filesystem access or
+  public API changes. Add 33 interpreter/native comparisons, contract and sanitized
+  allocation/ownership checks. The unchanged Raven path sample now passes interpreted,
+  sanitized native and standalone execution; HTTP compiler admission remains accepted.
+
 - Fix Raven portable emission of discarded awaits by retaining statement-boundary
   control flow. Add a native success consumer and remove the named-local workaround
   from the async callback-fault sample. Nested expressions retain their operand guard;
