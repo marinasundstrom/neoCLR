@@ -9,11 +9,11 @@ static neoclr_task_scope *find(neoclr_aot_context *context) {
 int32_t neoclr_task_scope_enter_v1(neoclr_task_scope *scope, neoclr_aot_context *context) {
     if (!scope || !context || find(context)) return 3;
     for (neoclr_task_scope *s = head; s; s = s->previous) if (s == scope) return 3;
-    *scope = (neoclr_task_scope){context, head, 0}; head = scope;
+    *scope = (neoclr_task_scope){.context = context, .previous = head}; head = scope;
     return 0;
 }
 int32_t neoclr_task_scope_leave_v1(neoclr_task_scope *scope) {
-    if (!scope || head != scope) return 3;
+    if (!scope || head != scope || scope->entry_draining) return 3;
     for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
         if (f->context == scope->context) return 3;
     if (scope->default_root && neoclr_gc_host_root_release_v1(scope->context, scope->default_root)) return 3;
@@ -52,4 +52,25 @@ int32_t neoclr_task_queue_host_read_v1(neoclr_aot_context *context, void **outpu
     for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
         if (f->context == context) return 3;
     return neoclr_task_queue_default_v1(context, output);
+}
+
+int32_t neoclr_entry_tasks_begin_v1(neoclr_aot_context *context, int32_t entry,
+    int32_t run, int32_t drain, void **output) {
+    neoclr_task_scope *scope = find(context);
+    if (!scope || !context || context->fault.code || !output || scope->entry_draining || entry < 0) return 3;
+    int startup = 0;
+    for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous) {
+        if (f->context != context) continue;
+        if ((run >= 0 && f->function == (uint32_t)run) ||
+            (drain >= 0 && f->function == (uint32_t)drain)) return 3;
+        if (f->function == (uint32_t)entry) startup = 1;
+    }
+    if (!startup) return 3;
+    int32_t status = neoclr_task_queue_default_v1(context, output);
+    if (!status) scope->entry_draining = 1;
+    return status;
+}
+void neoclr_entry_tasks_end_v1(neoclr_aot_context *context) {
+    neoclr_task_scope *scope = find(context);
+    if (scope) scope->entry_draining = 0;
 }

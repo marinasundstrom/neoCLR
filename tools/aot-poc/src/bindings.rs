@@ -572,6 +572,33 @@ pub fn task_queue(input: &mut neoclr::Module, selection: &Value, source: &neoclr
         rows.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],
             "implementation":implementation,"symbol":symbol,"queueType":ty}));
     }
+    for row in selection["functions"].as_array().unwrap() {
+        if row["name"] != "neoCLR.Runtime.DrainEntryTasks" { continue; }
+        // Queue-only entry draining must not pretend to await host completions.
+        if selection["functions"].as_array().unwrap().iter().any(|r|
+            r["name"].as_str().is_some_and(|n| n.starts_with("neoCLR.Runtime.Socket")
+                && !matches!(n, "neoCLR.Runtime.SocketListen" | "neoCLR.Runtime.SocketLocalPort"
+                    | "neoCLR.Runtime.SocketClose" | "neoCLR.Runtime.SocketDeadlineAfter"
+                    | "neoCLR.Runtime.SocketDeadlineExpired"))) {
+            return Err("native DrainEntryTasks supports queued work only; host I/O completion pumping is not supported".into());
+        }
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != "neoCLR.Runtime.DrainEntryTasks"
+            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || !f.parameters.is_empty() || f.returns != Type::Void || f.no_result
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
+            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
+            || row["methodArguments"].as_array().is_some_and(|a| !a.is_empty()) {
+            return Err("native entry drain binding requires exact DrainEntryTasks() -> Void InternalCall contract".into());
+        }
+        f.impl_flags = 0;
+        f.body = vec![Op::Void, Op::Return];
+        rows.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],
+            "implementation":"entry-task-drain-v1"}));
+    }
     let mut frames = json!({});
     if let Some(ty) = queue_type {
         for (index, f) in input.functions.iter().enumerate() {
@@ -589,6 +616,34 @@ pub fn task_queue(input: &mut neoclr::Module, selection: &Value, source: &neoclr
 #[cfg(test)]
 mod task_queue_tests {
     use super::*;
+    #[test]
+    fn entry_drain_requires_exact_service_and_excludes_host_completion_work() {
+        let mut source = neoclr::assemble(".module System\n.references ()\n.function neoCLR.Runtime.DrainEntryTasks() -> Void\nldvoid\nret\n.end").unwrap();
+        source.functions[0].impl_flags = 0x1000;
+        source.functions[0].body.clear();
+        let inventory = json!({"functions":[{"name":"neoCLR.Runtime.DrainEntryTasks","compiledIndex":0}]});
+        let (rows, _) = task_queue(&mut source.clone(), &inventory, &source).unwrap();
+        assert_eq!(rows[0]["implementation"], "entry-task-drain-v1");
+        for change in 0..8 {
+            let mut input = source.clone();
+            match change {
+                0 => input.functions[0].impl_flags = 0,
+                1 => input.functions[0].body = vec![Op::Void, Op::Return],
+                2 => input.functions[0].parameters.push(Type::Int32),
+                3 => input.functions[0].returns = Type::Int32,
+                4 => input.functions[0].no_result = true,
+                5 => input.functions[0].receiver_readonly = true,
+                6 => input.functions[0].generic_arguments.push(Type::Int32),
+                _ => input.functions[0].out_parameters.push(0),
+            }
+            assert!(task_queue(&mut input, &inventory, &source).is_err(), "mutation {change}");
+        }
+        for service in ["SocketAccept", "SocketReceive", "SocketSend", "SocketReceiveUntil", "SocketSendUntil", "SocketConnectResult"] {
+            let mut selected = inventory.clone();
+            selected["functions"].as_array_mut().unwrap().push(json!({"name":format!("neoCLR.Runtime.{service}")}));
+            assert!(task_queue(&mut source.clone(), &selected, &source).unwrap_err().to_string().contains("host I/O"));
+        }
+    }
     #[test]
     fn queue_binding_preserves_closed_source_ownership_and_rejects_impostors() {
         for service in ["RegisterTaskQueue", "GetDefaultTaskQueue", "GetCurrentTaskQueue"] {

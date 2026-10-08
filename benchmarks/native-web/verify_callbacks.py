@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
-p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault', 'PrimitiveMembers'))
+p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault', 'PrimitiveMembers', 'AsyncEntry', 'AsyncEntryFault', 'AsyncEntryPending', 'AsyncEntryCancelled'))
 a = p.parse_args()
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
@@ -42,13 +42,17 @@ for f in [Path(__file__), compiler, runtime, aot, core, seed, ownership, *libs, 
           *ROOT.joinpath('tools/aot-poc/src').glob('*.rs'), *base.glob('*.h'), *base.parent.joinpath('aot-fault-details').glob('*.h'), *compiler.parent.glob('*.dll')]:
     report['inputs'][str(f)] = hashlib.sha256(f.read_bytes()).hexdigest()
 for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList')):
-    source = Path(__file__).with_name(name + '.rvn')
+    source = {
+        'AsyncEntry': ROOT / 'docs/experiments/raven-target/samples/library-async.rvn',
+        'AsyncEntryPending': ROOT / 'docs/experiments/extended-cli-metadata/bootstrap/native-async-entry-pending.rvn',
+        'AsyncEntryCancelled': ROOT / 'docs/experiments/extended-cli-metadata/bootstrap/native-async-entry-cancelled.rvn',
+    }.get(name, Path(__file__).with_name(name + '.rvn'))
     report['inputs'][str(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
     assembly, obj, native = (output / (name + suffix) for suffix in ('.dll', '.o', ''))
     run(['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
          *[x for lib in libs for x in ('--reference', lib)], '--bootstrap-intrinsics', '--bootstrap-ownership',
-         ownership, '--object-library', 'System.Runtime', '-o', assembly, source])
-    expected = 1 if name in ('CallbackFault', 'QueuePumpFault') else 0
+         ownership, '--object-library', 'System.Runtime', '--async-library', 'System.Runtime', '-o', assembly, source])
+    expected = 1 if name in ('CallbackFault', 'QueuePumpFault', 'AsyncEntryFault', 'AsyncEntryPending', 'AsyncEntryCancelled') else 0
     host_flags = ['-DNEOCLR_HOST_TASK_PUMP'] if name in ('TaskQueue', 'QueuePump', 'QueuePumpFault') else []
     interpreted = run([runtime, 'run', assembly, *context, '--instructions', '100000000'], expected)
     case_flags = flags + (['--bind-integer-text'] if name == 'PrimitiveMembers' else [])
@@ -59,6 +63,10 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultLis
     run(['clang', '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
          '-fsanitize=undefined,bounds', '-DNEOCLR_NATIVE_GC', *host_flags, *adapters, obj, '-o', native])
     executed = run([native], expected)
+    if name == 'AsyncEntry':
+        assert executed.stdout == 'Suspended\n42\n'
+    if name == 'AsyncEntryFault':
+        assert 'Async entry callback fault' in executed.stderr
     if name == 'PrimitiveMembers':
         assert executed.stdout == '1\n-1\n0\n-9223372036854775808\n9223372036854775807\n-1\n1\n0\n1\n-1\n0\n1\n42\n'
         report['primitiveInstanceProjections'] = inspection['selection']['primitiveInstanceProjections']
@@ -83,7 +91,7 @@ report['inputs'][str(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
 assembly = output / 'Server.dll'
 run(['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
      *[x for lib in libs for x in ('--reference', lib)], '--bootstrap-intrinsics', '--bootstrap-ownership',
-     ownership, '--object-library', 'System.Runtime', '-o', assembly, source])
+     ownership, '--object-library', 'System.Runtime', '--async-library', 'System.Runtime', '-o', assembly, source])
 inspection = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world', *flags,
                             '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-integer-text']).stdout)
 report['serverAdmission'] = inspection['admission']

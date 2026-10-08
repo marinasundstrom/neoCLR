@@ -328,3 +328,19 @@ checks compiler/source/library hashes and reuses its assembly/object while rebui
 adapters. In persistent mode, `--native-baseline <validated-directory> --rounds 3`
 compares the old standalone image against the new one, requiring identical assembly
 and object hashes. Without that option, comparison remains interpreter versus native.
+
+## Queue-only async entry checks
+
+`verify_callbacks.py` accepts `--case AsyncEntry`, `--case AsyncEntryFault`,
+`--case AsyncEntryPending` and `--case AsyncEntryCancelled`. It selects the explicit
+`System.Runtime` async provider and checks the same emitted artifact in interpreter,
+sanitized native and standalone native modes (libSystem only). The success sample is
+`library-async.rvn`; the fault sample exercises a queued callback fault before Main's
+task completes. Existing pending/cancelled entry samples check their terminal faults.
+The host checks frame/canary integrity, result atomicity and heap cleanup on faults as
+well as success. These are behavioral checks, not throughput measurements. Entry
+pumping with host I/O remains rejected; ordinary callback-driven HTTP is unchanged.
+
+[Recorded five-case validation](async-entry-validation.json) includes the existing
+`QueuePumpFault` regression, exact standalone output/fault comparisons and successful
+HTTP compiler admission. All recorded inputs were unchanged during that run.

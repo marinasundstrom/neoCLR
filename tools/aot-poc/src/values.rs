@@ -307,6 +307,16 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             for index in indices { stream_services.insert(*index, service); }
         }
     }
+    let entry_drain_services = if details.is_some_and(|d| !d.entry_task_drain.is_empty()) {
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64, types::I32, types::I32, types::I32, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        let begin = module.declare_function("neoclr_entry_tasks_begin_v1", Linkage::Import, &sig)?;
+        sig.params.truncate(1);
+        sig.returns.clear();
+        let end = module.declare_function("neoclr_entry_tasks_end_v1", Linkage::Import, &sig)?;
+        Some((begin, end))
+    } else { None };
     let mut socket_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
@@ -600,6 +610,56 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[status]);
                 b.seal_all_blocks();
                 b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                continue;
+            }
+            if details.is_some_and(|d| d.entry_task_drain.contains(&i)) {
+                let d = details.unwrap();
+                let ctx = fault_context.unwrap();
+                let (begin, end) = entry_drain_services.unwrap();
+                let begin = module.declare_func_in_func(begin, b.func);
+                let end = module.declare_func_in_func(end, b.func);
+                let entry = b.ins().iconst(types::I32, root as i64);
+                let run = b.ins().iconst(types::I32, d.task_queue_run.map_or(-1, |i| i as i64));
+                let drain = b.ins().iconst(types::I32, d.task_queue_drain.map_or(-1, |i| i as i64));
+                let storage = slot(&mut b, 16);
+                let queue_output = b.ins().stack_addr(types::I64, storage, 0);
+                let call = b.ins().call(begin, &[ctx, entry, run, drain, queue_output]);
+                let status = b.inst_results(call)[0];
+                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, ctx, i, 0);
+                site.capture_frame = false;
+                return_if_detailed(&mut b, failed, status, Some(&site));
+                let done = b.create_block();
+                b.append_block_param(done, types::I32);
+                let zero = b.ins().iconst(types::I32, 0);
+                if let Some(drain) = d.task_queue_drain {
+                    let queue = b.ins().load(types::I64, MemFlags::new(), queue_output, 0);
+                    let absent = b.ins().icmp_imm(IntCC::Equal, queue, 0);
+                    let work = b.create_block();
+                    b.ins().brif(absent, done, &[zero.into()], work, &[]);
+                    b.switch_to_block(work);
+                    // Queue is strongly rooted by the task scope. Startup roots stay
+                    // published; the ordinary Drain frame checks its own stack budget.
+                    let result = b.ins().stack_addr(types::I64, storage, 8);
+                    let callee = module.declare_func_in_func(ids[drain], b.func);
+                    let call = b.ins().call(callee, &[queue, result, ctx]);
+                    let status = b.inst_results(call)[0];
+                    b.ins().jump(done, &[status.into()]);
+                } else {
+                    b.ins().jump(done, &[zero.into()]);
+                }
+                b.switch_to_block(done);
+                let status = b.block_params(done)[0];
+                b.ins().call(end, &[ctx]);
+                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                return_if_detailed(&mut b, failed, status, None);
+                b.ins().store(MemFlags::new(), zero, output, 0);
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks(); b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                     probes.finish(&mut module, &mut context.func, frame);
                 }

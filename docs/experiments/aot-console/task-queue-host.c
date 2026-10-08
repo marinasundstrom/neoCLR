@@ -16,9 +16,9 @@ int main(void) {
     if (neoclr_task_scope_leave_v1(&tasks)) return 2;
     if (status) {
         if ((entry_status && result != -99) || context.fault.code != (uint32_t)status) return 2;
-        neoclr_aot_render_fault(stderr, &context.fault);
-        return 1;
+        if (neoclr_aot_render_fault(stderr, &context.fault)) return 2;
+        context.fault = (neoclr_aot_fault){0};
     }
     if (neoclr_gc_collect_v1(&context, NULL) || context.text.used) return 2;
-    return result;
+    return status ? 1 : result;
 }

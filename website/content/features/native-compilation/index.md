@@ -192,6 +192,7 @@ not implied.
 
 A further development slice admits callbacks bound through closed class interfaces.
 Three async samples now match interpreter/native output, including cancellation and
-task results; async entry draining remains unsupported. The runtime protocol uses
+task results. Queue-only async entry draining now keeps startup roots live while
+callbacks run; async entry waiting for host I/O remains unsupported. The runtime protocol uses
 `AsyncStateMachine` and `TaskAwaiter`, with matching Raven target mappings. Old
 artifacts need recompilation. These coverage checks are not new benchmark results.

@@ -8,6 +8,7 @@ typedef struct neoclr_task_scope {
     neoclr_aot_context *context;
     struct neoclr_task_scope *previous;
     uint64_t default_root;
+    int entry_draining;
 } neoclr_task_scope;
 int32_t neoclr_task_scope_enter_v1(neoclr_task_scope *scope, neoclr_aot_context *context);
 int32_t neoclr_task_scope_leave_v1(neoclr_task_scope *scope);
@@ -20,4 +21,10 @@ int32_t neoclr_task_queue_current_v1(neoclr_aot_context *context, int32_t run, i
  * Misuse returns 3 without replacing an existing guest fault. */
 int32_t neoclr_task_queue_host_read_v1(neoclr_aot_context *context, void **output);
 int32_t neoclr_drain_default_queue_v1(neoclr_aot_context *context);
+/* Queue-only entry lifecycle: startup stays on the published native frame stack.
+ * Begin rejects nesting, queue callbacks and calls outside the selected entry.
+ * End must run on both success and guest fault before returning from the wrapper. */
+int32_t neoclr_entry_tasks_begin_v1(neoclr_aot_context *context, int32_t entry,
+    int32_t run, int32_t drain, void **output);
+void neoclr_entry_tasks_end_v1(neoclr_aot_context *context);
 #endif

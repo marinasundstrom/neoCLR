@@ -109,3 +109,40 @@ native HTTP request is the next check.
 This is explicitly a compatibility service adapter. The author reiterates a future
 runtime Scheduler for green threads and [cross-cutting services](../../runtime-scheduling-design.md#cross-cutting-runtime-services--author-clarification-2026-10-08)
 across interpreter/AOT/JIT. TaskQueue layout and this export do not define that future ABI.
+
+## Queue-only async entry drain (2026-10-08)
+
+`--bind-task-queue` also admits the exact `neoCLR.Runtime.DrainEntryTasks() -> Void`
+service. The generated wrapper invokes the retained source `TaskQueue.Drain` while
+startup remains on the published native frame stack. This is a distinct entry lifecycle
+path; the quiescent host export retains its existing restrictions. Missing queues are
+successful no-ops. The private task scope rejects nested entry draining, calls from
+active Run/Drain callbacks, and calls outside the selected entry. Its guard is released
+on both successful return and guest fault, preserving output atomicity and fault frames.
+Startup locals and the default queue remain roots throughout callback collections.
+
+This first path supports queued work only. Images selecting entry draining together
+with socket completion services are rejected with an explicit host-I/O diagnostic.
+They must not read an entry task's result before its host completion arrives. Native
+host waiting/resumption, fairness, cancellation budgets and a future Scheduler remain
+separate work; this change neither adds a blocking wait nor relaxes host callback entry.
+
+Compared with .NET's async entry wrapper, the ergonomic goal is still an entry that
+returns only after its task completes. neoCLR currently achieves queue-only progress
+by running its explicit queue and then using its existing result/fault contract. An
+unresolved promise faults; it is not an implicit indefinite wait. This reuses the
+interpreter's entry-drain lifecycle described in the existing
+[scheduling research](../../runtime-scheduling-design.md), with a narrower native
+admission boundary. Native code keeps live C frames, so this is not the future green
+thread or stackless suspension representation. No public API or compiler mapping changes.
+
+Focused validation includes exact service admission/rejection, sanitized scope/root
+and guard cleanup checks, and executable comparisons in the
+[native-web workbench](../../../benchmarks/native-web/README.md).
+
+All four async entry cases and the existing post-entry queue-fault regression pass
+interpreter, sanitized native and standalone native execution, with exact fault/output
+comparison and libSystem-only standalone dependencies.
+[Commands, hashes and outcomes](../../../benchmarks/native-web/async-entry-validation.json).
+Rebuild matched native images and C adapters together; the task scope and generated
+entry helpers remain private experimental ABI.

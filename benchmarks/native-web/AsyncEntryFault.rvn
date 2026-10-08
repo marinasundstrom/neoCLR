@@ -1,0 +1,12 @@
+import System.*
+import System.Tasks.*
+
+async func Main() -> Task<unit> {
+    let result = Promise<int>()
+    TaskQueue.Default.Post(() => {
+        System.Fail("Async entry callback fault")
+    })
+    let value = await result.Task
+    System.Console.WriteLine(value)
+    return ()
+}

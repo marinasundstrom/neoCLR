@@ -17,6 +17,7 @@ pub struct Options {
     pub console_write_line: Vec<usize>,
     pub console_write_bytes: Vec<usize>,
     pub console_flush: Vec<usize>,
+    pub entry_task_drain: Vec<usize>,
     pub task_queue_register: Vec<usize>,
     pub task_queue_default: Vec<usize>,
     pub task_queue_current: Vec<usize>,
@@ -128,6 +129,9 @@ impl Options {
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             socket_send: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "socket-send-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            entry_task_drain: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "entry-task-drain-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             task_queue_register: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "task-queue-register-v1")

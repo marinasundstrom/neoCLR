@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add bounded native `DrainEntryTasks` support for queue-only async entry points.
+  Keep startup roots live through callbacks, release the entry-drain guard on faults,
+  and reject entry pumping with host socket completions. The separate quiescent host
+  pump and callback-driven HTTP path retain their existing contracts. Add focused
+  lifecycle/contract checks and five executable comparisons, including success,
+  pending/cancelled entry faults and callback faults with GC cleanup. This is development support,
+  not native host waiting, runtime suspension or a general Scheduler.
+
 - Replace the legacy union interface `IUnion` with `UnionValue`, coordinated with
   Raven `be58723fb` and completing the
   unprefixed runtime interface audit across Raven source and neoIL. Regenerate 27
@@ -24,7 +32,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   identities change. Refresh the async bridge fragments and API snapshot, and guard
   all runtime source interfaces against the `I` prefix. Native closed class-interface
   callbacks retain receivers through GC and preserve fault frames; state, cancellation
-  and task-result samples now match interpreted execution. Entry task draining remains
+  and task-result samples now match interpreted execution. Host-backed entry task draining remains
   unsupported in AOT. Validation and limitations are recorded in the sample assessment.
 
 - Admit native 64-bit division/remainder with operand-width overflow guards and

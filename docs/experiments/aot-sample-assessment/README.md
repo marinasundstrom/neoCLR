@@ -285,8 +285,8 @@ the actual object. No borrowed receiver capture or state-machine copy is introdu
 The [four-case follow-up](interface-followup.json) recompiles against the renamed
 native Runtime/Data/Networking/Web bundle. `native-async-state`,
 `library-async-cancellation` and `library-task-result` match interpreter output and
-exit status. `library-async` still rejects `neoCLR.Runtime.DrainEntryTasks`; its entry
-lifecycle needs a real scheduling contract. These are sequential coverage checks,
+exit status. That follow-up still rejected `library-async` at
+`neoCLR.Runtime.DrainEntryTasks`; the subsequent queue-only entry slice is recorded below. These are sequential coverage checks,
 not benchmark measurements. The original 104-case survey is historical and has not
 been rerun wholesale. The CLI core bootstrap still exists.
 
@@ -297,3 +297,26 @@ protocol. Regenerated legacy union outputs now clear on failed extraction, follo
 Raven's already-shared body contract. This corrects a stale bridge snapshot, not a
 new native capability. The general source-lookup cache fix is independently tested
 on Raven main as `d0a115dcf`.
+
+## Queue-only async entry lifecycle (2026-10-08)
+
+The native profile now implements exact `DrainEntryTasks` for queued work while the
+startup frame remains rooted. It drains the source queue before the generated entry
+wrapper reads the task result. Socket completion services combined with this entry
+service remain explicitly rejected: the existing quiescent HTTP host pump cannot be
+used as an in-guest wait. See the [private lifecycle contract](../aot-console/task-queue.md#queue-only-async-entry-drain-2026-10-08).
+
+A new callback-fault consumer initially used `_ = await result.Task` and reached
+Raven's `value block cannot exit its enclosing expression` native-emission diagnostic.
+Changing that statement to a named awaited local followed by `WriteLine` emitted
+successfully with the same compiler/bundle. This is a deferred Raven lowering/emission
+candidate, not an AOT runtime failure; no fix or general .NET comparison is claimed.
+The callback faults before the write, so the final consumer isolates runtime fault
+propagation without relying on the unsupported discarded-await shape.
+
+[Five-case executable evidence](../../../benchmarks/native-web/async-entry-validation.json)
+records exact exit/output/fault parity for async success, callback fault, pending and
+cancelled entries, plus the existing post-entry queue fault. All pass sanitized and
+standalone native execution with libSystem-only linkage and cleanup checks. The HTTP
+server still passes compiler admission; its request/throughput evidence is reused,
+not rerun or remeasured by this slice. The original 104-case survey remains historical.
