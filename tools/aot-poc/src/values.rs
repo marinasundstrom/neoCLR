@@ -306,6 +306,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     let mut socket_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
+            (&d.task_queue_register, "neoclr_task_queue_register_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.task_queue_default, "neoclr_task_queue_default_v1", vec![types::I64, types::I64]),
+            (&d.task_queue_current, "neoclr_task_queue_current_v1", vec![types::I64, types::I32, types::I32, types::I64]),
             (&d.socket_deadline_after, "neoclr_socket_deadline_after_v1", vec![types::I32, types::I64, types::I64]),
             (&d.socket_deadline_expired, "neoclr_socket_deadline_expired_v1", vec![types::I64, types::I64, types::I64]),
             (&d.socket_receive_until, "neoclr_socket_receive_until_v1", vec![types::I64, types::I64, types::I32, types::I32, types::I64, types::I64, types::I64, types::I64]),
@@ -589,7 +592,13 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             if let Some(service) = socket_services.get(&i) {
                 let service = module.declare_func_in_func(*service, b.func);
                 let mut args = parameters[..p.args[i].len()].to_vec();
-                args.extend([fault_context.unwrap(), output]);
+                args.push(fault_context.unwrap());
+                if details.unwrap().task_queue_current.contains(&i) {
+                    let run = b.ins().iconst(types::I32, details.unwrap().task_queue_run.map_or(-1, |i| i as i64));
+                    let drain = b.ins().iconst(types::I32, details.unwrap().task_queue_drain.map_or(-1, |i| i as i64));
+                    args.extend([run, drain]);
+                }
+                args.push(output);
                 let call = b.ins().call(service, &args);
                 let raw = b.inst_results(call)[0];
                 let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);

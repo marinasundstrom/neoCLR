@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add a private native TaskQueue scope and exact closed service bindings. Retain the
+  default queue and preserve active explicit Run/Drain receiver lookup; validate a real
+  Raven Promise/queue consumer in both modes plus scope/contract checks. Align native
+  wrapper root reporting with the recent socket/text bindings. Full Server now reaches
+  the recursive-call guard; automatic queue pumping remains unfinished.
+
 - Extend the private native socket kernel with bounded send snapshots and rooted receive
   copy-back, partial/EOF results, five-second deadlines and terminal scratch cleanup.
   Share operation slots/polling with accept; rename the private poll helper to

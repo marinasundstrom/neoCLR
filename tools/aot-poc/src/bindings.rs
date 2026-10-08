@@ -526,3 +526,105 @@ mod deadline_tests {
         }
     }
 }
+
+/// Match verified closed instantiations while retaining the source-owned queue contract.
+pub fn task_queue(input: &mut neoclr::Module, selection: &Value, source: &neoclr::Module) -> Result<(Vec<Value>, Value), Error> {
+    let mut rows = vec![];
+    let mut queue_type = None;
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        let (register, implementation, symbol) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.RegisterTaskQueue") => (true, "task-queue-register-v1", "neoclr_task_queue_register_v1"),
+            Some("neoCLR.Runtime.GetDefaultTaskQueue") => (false, "task-queue-default-v1", "neoclr_task_queue_default_v1"),
+            Some("neoCLR.Runtime.GetCurrentTaskQueue") => (false, "task-queue-current-v1", "neoclr_task_queue_current_v1"),
+            _ => continue,
+        };
+        let arguments: Vec<Type> = serde_json::from_value(row["methodArguments"].clone())?;
+        let [ty] = arguments.as_slice() else { return Err("task queue binding requires one closed type argument".into()); };
+        let definition = source.type_definition(ty).ok_or("missing source TaskQueue declaration")?;
+        let is_queue = definition.origin.as_ref().is_some_and(|o| o.name == "System.Tasks.TaskQueue")
+            || (definition.name == "System.Tasks.TaskQueue" && (definition.definition.as_ref().is_some_and(|d| d.module == "System")
+                || selection["types"].as_array().is_some_and(|types| types.iter().any(|row|
+                    row["name"] == definition.name && row["definition"]["module"] == "System"))));
+        if !is_queue || !definition.is_reference_type || !definition.generic_parameters.is_empty()
+            || queue_type.as_ref().is_some_and(|other| other != ty) {
+            return Err("native task queue binding requires one source-owned TaskQueue type".into());
+        }
+        let member = |f: &neoclr::metadata::Function| f.origin.as_ref().map_or_else(|| f.name.rsplit('.').next().unwrap_or(""), |o| o.name.as_str()).to_owned();
+        if source.functions.iter().filter(|f| f.owner.as_ref() == Some(ty) && f.instance && f.no_result
+            && f.parameters.is_empty() && f.generic_parameters.is_empty() && member(f) == "Drain").count() != 1 {
+            return Err("native task queue binding requires unique source Drain contract".into());
+        }
+        queue_type = Some(ty.clone());
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != row["compiledName"].as_str().ok_or("missing compiled service name")?
+            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != if register { vec![ty.clone()] } else { vec![] }
+            || f.returns != if register { Type::Void } else { ty.clone() }
+            || f.no_result || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
+            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+            return Err("native task queue binding requires exact closed InternalCall contract".into());
+        }
+        f.impl_flags = 0;
+        f.body = if register { vec![Op::Void, Op::Return] } else { vec![Op::Branch(0)] };
+        rows.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],
+            "implementation":implementation,"symbol":symbol,"queueType":ty}));
+    }
+    let mut frames = json!({});
+    if let Some(ty) = queue_type {
+        for (index, f) in input.functions.iter().enumerate() {
+            if f.owner.as_ref() != Some(&ty) || !f.instance || !f.no_result || !f.generic_parameters.is_empty() { continue; }
+            let name = f.origin.as_ref().map_or_else(|| f.name.rsplit('.').next().unwrap_or(""), |o| o.name.as_str());
+            if (name == "Drain" && f.parameters.is_empty()) || (name == "Run" && f.parameters == [neoclr::assembler::parse_type("fn<Void>").expect("fixed signature")]) {
+                if !frames[name].is_null() { return Err("ambiguous TaskQueue execution member".into()); }
+                frames[name] = json!(index);
+            }
+        }
+    }
+    Ok((rows, frames))
+}
+
+#[cfg(test)]
+mod task_queue_tests {
+    use super::*;
+    #[test]
+    fn queue_binding_preserves_closed_source_ownership_and_rejects_impostors() {
+        for service in ["RegisterTaskQueue", "GetDefaultTaskQueue", "GetCurrentTaskQueue"] {
+            let register = service == "RegisterTaskQueue";
+            let parameters = if register { "System.Tasks.TaskQueue queue" } else { "" };
+            let returns = if register { "Void" } else { "System.Tasks.TaskQueue" };
+            let compiled = format!("neoCLR.Runtime.{service}$aot_method_1");
+            let mut source = neoclr::assemble(&format!(".module System\n.references ()\n.type class System.Tasks.TaskQueue\n.method instance Drain() -> noresult\nret\n.end\n.end\n.function Stub({parameters}) -> {returns}\nAgain:\nbr Again\n.end")).unwrap();
+            source.functions[1].name = compiled.clone();
+            source.functions[1].impl_flags = 0x1000;
+            source.functions[1].body.clear();
+            let inventory = json!({"functions":[{"name":format!("neoCLR.Runtime.{service}"),"compiledName":compiled,"compiledIndex":1,"methodArguments":[Type::Named("System.Tasks.TaskQueue".into())]}]});
+            let (rows, frames) = task_queue(&mut source.clone(), &inventory, &source).unwrap();
+            assert_eq!(rows.len(), 1);
+            assert_eq!(frames["Drain"], 0);
+            for change in 0..6 {
+                let mut input = source.clone();
+                match change {
+                    0 => input.functions[1].impl_flags = 0,
+                    1 => input.functions[1].body = vec![Op::Void, Op::Return],
+                    2 => input.functions[1].parameters.push(Type::Int32),
+                    3 => input.functions[1].returns = Type::Int32,
+                    4 => input.functions[1].no_result = true,
+                    _ => input.functions[1].readonly_parameters = vec![0],
+                }
+                assert!(task_queue(&mut input, &inventory, &source).is_err());
+            }
+            let mut missing_drain = source.clone();
+            missing_drain.functions[0].name = "Different".into();
+            assert!(task_queue(&mut source.clone(), &inventory, &missing_drain).is_err());
+            let mut wrong_owner = source.clone();
+            wrong_owner.types[0].is_reference_type = false;
+            assert!(task_queue(&mut source.clone(), &inventory, &wrong_owner).is_err());
+            let mut no_argument = inventory.clone();
+            no_argument["functions"][0]["methodArguments"] = json!([]);
+            assert!(task_queue(&mut source.clone(), &no_argument, &source).is_err());
+        }
+    }
+}

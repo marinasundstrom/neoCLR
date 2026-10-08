@@ -349,3 +349,9 @@ scan cost, allocation rate and scheduler latency measurements; benchmark green-t
 alternatives only once implementations exist. Review these boundaries at each scheduler,
 Function, GC, metadata/ABI or async-lowering change, without blocking the current POC on
 a general suspension implementation.
+
+The first AOT [TaskQueue scope adapter](experiments/aot-console/task-queue.md) now
+preserves existing default and active explicit-queue behavior in a Raven consumer.
+It uses a private published-frame convention and does not implement host queue pumping
+or runtime suspension. Its passing affinity test preserves current behavior, not a
+permanent choice of producer-queue affinity or scheduler API.

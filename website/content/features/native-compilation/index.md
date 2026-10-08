@@ -102,7 +102,8 @@ an advantage over it; useful comparisons require equivalent behavior and measure
   loopback completion/cancellation tests, including compiled CIL callbacks. Transfer
   kernels also pass snapshot/copy-back, cancellation and EOF tests. A compiled CIL echo
   chains accept/receive/send across collections, including deadline-service calls.
-  Full-server service bindings and task-queue integration remain open, along with
+  A Raven TaskQueue/Promise consumer preserves default and explicit queue behavior.
+  Full-server recursive-call admission and automatic queue pumping remain open, along with
   precise maps, pressure scheduling and general hosting handles remain open.
 - **Faults:** tested paths preserve fault codes, messages and managed stack traces.
   This does not yet qualify every server disconnect, cancellation or cleanup path.

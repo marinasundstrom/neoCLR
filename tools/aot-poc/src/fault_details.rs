@@ -16,6 +16,11 @@ pub struct Options {
     pub console_write_line: Vec<usize>,
     pub console_write_bytes: Vec<usize>,
     pub console_flush: Vec<usize>,
+    pub task_queue_register: Vec<usize>,
+    pub task_queue_default: Vec<usize>,
+    pub task_queue_current: Vec<usize>,
+    pub task_queue_run: Option<usize>,
+    pub task_queue_drain: Option<usize>,
     pub socket_listen: Vec<usize>,
     pub socket_local_port: Vec<usize>,
     pub socket_close: Vec<usize>,
@@ -122,6 +127,17 @@ impl Options {
             socket_send: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "socket-send-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            task_queue_register: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "task-queue-register-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            task_queue_default: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "task-queue-default-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            task_queue_current: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "task-queue-current-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            task_queue_run: report.and_then(|r| r["taskQueueFrames"]["Run"].as_u64()).map(|i| i as usize),
+            task_queue_drain: report.and_then(|r| r["taskQueueFrames"]["Drain"].as_u64()).map(|i| i as usize),
             socket_listen: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "socket-listen-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),

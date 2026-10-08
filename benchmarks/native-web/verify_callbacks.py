@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
-p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay'))
+p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue'))
 a = p.parse_args()
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
@@ -20,9 +20,9 @@ library = bundle / 'lib' if (bundle / 'lib').is_dir() else bundle
 seed, core, ownership = (library / n for n in ('System.runtime.neox', 'Core.dll', 'ownership.json'))
 libs = [library / n for n in ('System.Runtime.dll', 'System.Web.dll', 'System.Networking.dll', 'System.Data.dll')]
 context = ['--system', seed, *[x for lib in libs for x in ('--module', lib)], '--object-root', libs[0]]
-flags = [*context, '--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc', '--bind-int32-to-string', '--bind-utf8-text']
-adapters = [base / 'callback-host.c', base / 'root-probe.c', base / 'native-gc.c',
-            base / 'text-arena.c', base.parent / 'aot-fault-details/render.c']
+flags = [*context, '--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc', '--bind-int32-to-string', '--bind-utf8-text', '--bind-task-queue']
+adapters = [base / 'task-queue-host.c', base / 'root-probe.c', base / 'native-gc.c',
+            base / 'task-queue.c', base / 'text-arena.c', base.parent / 'aot-fault-details/render.c']
 report = {'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
           'SDKROOT': os.environ.get('SDKROOT'), 'inputs': {}, 'commands': [], 'cases': {}}
 
@@ -80,7 +80,7 @@ run(['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', s
      *[x for lib in libs for x in ('--reference', lib)], '--bootstrap-intrinsics', '--bootstrap-ownership',
      ownership, '--object-library', 'System.Runtime', '-o', assembly, source])
 inspection = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world', *flags,
-                            '--bind-socket-listener', '--bind-console-write-line', '--bind-integer-text']).stdout)
+                            '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-console-write-line', '--bind-integer-text']).stdout)
 report['serverAdmission'] = inspection['admission']
 if hashlib.sha256(aot.read_bytes()).hexdigest() != report['inputs'][str(aot)]:
     raise RuntimeError('AOT executable changed during validation; rerun with a stable build')

@@ -1,0 +1,36 @@
+import System.*
+import System.Tasks.*
+
+class Counter {
+    private var number: int = 0
+
+    val Value: int => number
+
+    func Add(delta: int) {
+        number += delta
+    }
+}
+
+func Main() -> int {
+    let defaultQueue = TaskQueue.Default
+    let explicitQueue = TaskQueue()
+    let counter = Counter()
+    defaultQueue.Post(() => {
+        counter.Add(1)
+    })
+    explicitQueue.Run(() => {
+        let source = Promise<Counter>()
+        source.Task.OnCompleted(() => {
+            counter.Add(10)
+        })
+        _ = source.Complete(counter)
+    })
+    if counter.Value != 10 {
+        System.Fail("Explicit queue continuation ran on the wrong queue")
+    }
+    defaultQueue.Drain()
+    if counter.Value != 11 || !Object.ReferenceEquals(defaultQueue, TaskQueue.Default) {
+        System.Fail("Default queue identity or delivery changed")
+    }
+    return 0
+}
