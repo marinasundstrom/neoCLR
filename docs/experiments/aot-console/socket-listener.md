@@ -162,3 +162,20 @@ EOF and fault teardown with pending receive. Compiled accept and existing listen
 lifecycle tests also pass. These are kernel tests; CIL transfer binding and the real
 HTTP application remain unfinished. Socket GC builds now also link text-arena.c for
 initialized-byte validation.
+
+## Compiled echo consumer — 2026-10-08
+
+`--bind-socket-transfer` binds exact reserved Receive/Send/TransferResult InternalCalls
+with native GC required. It retains arrayref<Byte>, offset/count and fn<Void> signature
+checks; it does not admit arbitrary native methods with a matching name. The compiled
+`socket-echo.neoil` stateful receiver submits accept, then receive, then send, consuming
+each prior result during callback execution. Each successor operation roots its new
+callback before the submitting guest call returns. The host only polls and dispatches.
+
+`compiled_socket_echo_chains_accept_receive_send_and_reclaims_receivers` passes a
+sanitized real one-byte loopback echo with collection between completions, exactly
+three callback stages, guest socket close, cleared operations/scratch and an empty heap.
+The focused binding test rejects missing/duplicate/GC-less options and managed impostors
+for all three services. This is an executable CIL consumer, not yet the Raven Socket or
+HttpServer public API. Full Server admission next reaches SocketDeadlineAfter;
+[recorded admission](../../../benchmarks/native-web/transfer-admission.json).

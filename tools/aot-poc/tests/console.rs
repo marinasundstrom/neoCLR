@@ -3856,3 +3856,107 @@ fn socket_accept_binding_requires_gc_and_exact_internal_services() {
         assert!(String::from_utf8_lossy(&r.stderr).contains("exact reserved Accept/ConnectResult/Cancel"), "{}", String::from_utf8_lossy(&r.stderr));
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn compiled_socket_echo_chains_accept_receive_send_and_reclaims_receivers() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(SOCKET_SEED).unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/socket-echo.neoil");
+    let flags = ["--compile-system", "--reference-arena", "--native-gc", "--bind-socket-listener", "--bind-socket-accept", "--bind-socket-transfer"];
+    let r = compile_source(&dir, &seed, source, &flags, false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "socket-listener.h"
+#include "native-gc.h"
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#define CHECK(x) do { if (!(x)) return __LINE__; } while (0)
+int main(void) {
+    uint64_t buffer[513] = {0}; buffer[512] = 1234567;
+    neoclr_aot_context c = {.text = {(unsigned char *)buffer, 4096, 0}};
+    for (int cancel = 0; cancel < 1; cancel++) {
+        neoclr_socket_scope scope;
+        CHECK(!neoclr_socket_scope_enter_v1(&scope, &c));
+        int32_t port = -1;
+        CHECK(!neoclr_entry_v4(cancel, &port, &c) && port > 0);
+        CHECK(!neoclr_gc_collect_v1(&c, NULL));
+        uint64_t root = 999;
+        int peer = -1;
+        if (!cancel) {
+            CHECK(!neoclr_socket_poll_v1(&c, &root) && root == 999);
+            struct sockaddr_in endpoint = {0};
+            endpoint.sin_family = AF_INET; endpoint.sin_port = htons((uint16_t)port);
+            endpoint.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+            peer = socket(AF_INET, SOCK_STREAM, 0);
+            CHECK(peer >= 0 && !connect(peer, (const void *)&endpoint, sizeof(endpoint)));
+        }
+        int ready = 0;
+        for (unsigned retry = 0; retry < 1000 && !ready; retry++) ready = neoclr_socket_poll_v1(&c, &root);
+        CHECK(ready == 1);
+        CHECK(!neoclr_invoke_void_callback_v1(root, &c) && !c.fault.code);
+        CHECK(send(peer, "x", 1, 0) == 1);
+        for (unsigned stage = 0; stage < 2; stage++) {
+            CHECK(!neoclr_gc_collect_v1(&c, NULL));
+            ready = 0;
+            for (unsigned retry = 0; retry < 1000 && !ready; retry++) ready = neoclr_socket_poll_v1(&c, &root);
+            CHECK(ready == 1 && !neoclr_invoke_void_callback_v1(root, &c) && !c.fault.code);
+        }
+        char echoed = 0;
+        CHECK(recv(peer, &echoed, 1, 0) == 1 && echoed == 'x');
+        CHECK(!neoclr_root_probe_depth_v1() && !neoclr_socket_poll_v1(&c, &root));
+        CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+        unsigned sockets = 0;
+        for (unsigned i = 0; i < 64; i++) {
+            CHECK(!scope.operations[i].state);
+            sockets += scope.slots[i].id != 0;
+        }
+        CHECK(sockets == 1); /* Guest callback closed accepted connection. */
+        CHECK(!neoclr_socket_scope_leave_v1(&scope));
+        if (peer >= 0) close(peer);
+    }
+    CHECK(buffer[512] == 1234567);
+    return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(dir.0.join("host.c"))
+        .arg(base.join("socket-listener.c")).arg(base.join("root-probe.c"))
+        .arg(base.join("native-gc.c")).arg(base.join("text-arena.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host"))
+        .output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
+    assert!(r.status.success(), "{r:?}");
+}
+
+#[test]
+fn socket_transfer_binding_requires_gc_and_exact_internal_services() {
+    let seed = neoclr::assemble(SOCKET_SEED).unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/socket-echo.neoil");
+    for flags in [
+        vec!["--bind-socket-transfer"],
+        vec!["--compile-system", "--reference-arena", "--bind-socket-transfer"],
+        vec!["--compile-system", "--reference-arena", "--native-gc", "--bind-socket-listener"],
+        vec!["--bind-socket-transfer", "--bind-socket-transfer"],
+    ] {
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, source, &flags, false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    }
+    for service in ["SocketReceive", "SocketSend", "SocketTransferResult"] {
+        let mut changed = source.to_owned();
+        let start = changed.find(&format!(".function neoCLR.Runtime.{service}")).unwrap();
+        let at = start + changed[start..].find(".methodimpl InternalCall").unwrap();
+        changed.replace_range(at..at + ".methodimpl InternalCall".len(),
+            "ldvoid\nvalue.pack Void\nret");
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, &changed,
+            &["--compile-system", "--reference-arena", "--native-gc", "--bind-socket-listener", "--bind-socket-accept", "--bind-socket-transfer"], false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+        assert!(String::from_utf8_lossy(&r.stderr).contains("exact reserved Receive/Send/TransferResult"), "{}", String::from_utf8_lossy(&r.stderr));
+    }
+}

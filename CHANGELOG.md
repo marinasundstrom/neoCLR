@@ -12,7 +12,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   copy-back, partial/EOF results, five-second deadlines and terminal scratch cleanup.
   Share operation slots/polling with accept; rename the private poll helper to
   neoclr_socket_poll_v1 and require the matching text adapter. Sanitized kernel and
-  compiled-accept regressions pass; CIL transfer bindings and HTTP execution remain open.
+  compiled-accept regressions pass. Bind exact CIL transfer services and validate a
+  callback-driven native echo with GC between completions; full Raven Server admission
+  next reaches SocketDeadlineAfter. Public HTTP execution remains incomplete.
 
 - Add a private nonblocking native accept kernel with retained completion roots,
   deferred single delivery, cancellation/result consumption and scope cleanup. Validate

@@ -409,6 +409,35 @@ pub fn socket_accept(input: &mut neoclr::Module, selection: &Value) -> Result<Ve
     Ok(bindings)
 }
 
+pub fn socket_transfer(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        let (parameters, result, implementation, symbol) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.SocketReceive") => (vec![Type::Int64, Type::ArrayRef(Box::new(Type::Byte)), Type::Int32, Type::Int32, neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature")], Type::Value, "socket-receive-v1", "neoclr_socket_receive_v1"),
+            Some("neoCLR.Runtime.SocketSend") => (vec![Type::Int64, Type::ArrayRef(Box::new(Type::Byte)), Type::Int32, Type::Int32, neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature")], Type::Value, "socket-send-v1", "neoclr_socket_send_v1"),
+            Some("neoCLR.Runtime.SocketTransferResult") => (vec![Type::Int64], Type::Value, "socket-transfer-result-v1", "neoclr_socket_transfer_result_v1"),
+            _ => continue,
+        };
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != row["name"].as_str().unwrap()
+            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != parameters || f.returns != result || f.no_result
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
+            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
+        { return Err("native socket transfer binding requires exact reserved Receive/Send/TransferResult InternalCall contract".into()); }
+        f.impl_flags = 0;
+        f.body = if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
+            else { vec![Op::Void, Op::PackValue(Type::Void), Op::Return] };
+        bindings.push(json!({"definition": row["definition"], "name": row["name"],
+            "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
+            "storage": "explicit host socket scope; 64 shared socket operations; rooted callbacks; owner-thread deferred polling"}));
+    }
+    Ok(bindings)
+}
+
 /// Reference-arena identity uses the same verified primitive as CIL ref.equal.
 pub fn object_reference_equals(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];

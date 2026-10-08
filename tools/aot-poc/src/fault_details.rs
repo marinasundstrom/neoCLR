@@ -22,6 +22,9 @@ pub struct Options {
     pub socket_accept: Vec<usize>,
     pub socket_connect_result: Vec<usize>,
     pub socket_cancel: Vec<usize>,
+    pub socket_receive: Vec<usize>,
+    pub socket_send: Vec<usize>,
+    pub socket_transfer_result: Vec<usize>,
     pub parse_int32: Vec<usize>,
     pub int32_to_string: Vec<usize>,
     pub string_contains_ordinal: Vec<usize>,
@@ -91,6 +94,15 @@ impl Options {
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             socket_cancel: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "socket-cancel-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            socket_receive: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-receive-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            socket_transfer_result: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-transfer-result-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            socket_send: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-send-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             socket_listen: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "socket-listen-v1")

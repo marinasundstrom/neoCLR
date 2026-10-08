@@ -1,0 +1,145 @@
+.module NativeAccept
+.type class Completion
+.field Operation Int64
+.field Socket Int64
+.field Buffer arrayref<Byte>
+.field Phase Int32
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance Complete() -> Void
+.local Int32 count
+ldarg 0
+ldfld Completion::Phase
+ldc.i4 1
+ceq
+brtrue Received
+ldarg 0
+ldfld Completion::Phase
+ldc.i4 2
+ceq
+brtrue Sent
+ldarg 0
+ldarg 0
+ldfld Completion::Operation
+call neoCLR.Runtime.SocketConnectResult(Int64)
+value.unpack Int64
+stfld Completion::Socket
+ldarg 0
+ldc.i4 4
+array.reserve Byte
+stfld Completion::Buffer
+ldarg 0
+ldarg 0
+ldfld Completion::Socket
+ldarg 0
+ldfld Completion::Buffer
+ldc.i4 0
+ldc.i4 4
+ldarg 0
+function.bind fn<Void> = instance Completion::Complete()
+call neoCLR.Runtime.SocketReceive(Int64, arrayref<Byte>, Int32, Int32, fn<Void>)
+value.unpack Int64
+stfld Completion::Operation
+ldarg 0
+ldc.i4 1
+stfld Completion::Phase
+ldvoid
+ret
+Received:
+ldarg 0
+ldfld Completion::Operation
+call neoCLR.Runtime.SocketTransferResult(Int64)
+value.unpack Int32
+stloc count
+ldarg 0
+ldarg 0
+ldfld Completion::Socket
+ldarg 0
+ldfld Completion::Buffer
+ldc.i4 0
+ldloc count
+ldarg 0
+function.bind fn<Void> = instance Completion::Complete()
+call neoCLR.Runtime.SocketSend(Int64, arrayref<Byte>, Int32, Int32, fn<Void>)
+value.unpack Int64
+stfld Completion::Operation
+ldarg 0
+ldc.i4 2
+stfld Completion::Phase
+ldvoid
+ret
+Sent:
+ldarg 0
+ldfld Completion::Operation
+call neoCLR.Runtime.SocketTransferResult(Int64)
+value.unpack Int32
+pop
+ldarg 0
+ldfld Completion::Socket
+call neoCLR.Runtime.SocketClose(Int64)
+pop
+ldvoid
+ret
+.end
+.end
+.function Calculate(Int32 cancel) -> Int32
+.local Int64 listener
+.local Completion completion
+ldstr "127.0.0.1"
+ldc.i4 0
+ldc.i4 4
+call neoCLR.Runtime.SocketListen(String, Int32, Int32)
+value.unpack Int64
+stloc listener
+newobj.ctor instance Completion::.ctor()
+stloc completion
+ldloc completion
+ldloc listener
+ldloc completion
+function.bind fn<Void> = instance Completion::Complete()
+call neoCLR.Runtime.SocketAccept(Int64, fn<Void>)
+value.unpack Int64
+stfld Completion::Operation
+ldarg cancel
+brfalse Port
+ldloc completion
+ldfld Completion::Operation
+call neoCLR.Runtime.SocketCancel(Int64)
+pop
+Port:
+ldloc listener
+call neoCLR.Runtime.SocketLocalPort(Int64)
+value.unpack Int32
+ret
+.end
+
+.function neoCLR.Runtime.SocketListen(String address,Int32 port,Int32 backlog) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketLocalPort(Int64 handle) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketClose(Int64 handle) -> Value
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.SocketAccept(Int64 listener, fn<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketConnectResult(Int64 operation) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketCancel(Int64 operation) -> Boolean
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.SocketReceive(Int64 socket, arrayref<Byte> buffer, Int32 offset, Int32 count, fn<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketSend(Int64 socket, arrayref<Byte> buffer, Int32 offset, Int32 count, fn<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketTransferResult(Int64 operation) -> Value
+.methodimpl InternalCall
+.end
