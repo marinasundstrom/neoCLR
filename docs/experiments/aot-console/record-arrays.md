@@ -122,3 +122,21 @@ Negative tests reject default creation, element borrows and wrong nominal elemen
 Raven ArrayList<Counter> growth/copy/replacement path in both modes with sanitized
 adapters, 64 KiB GC and libSystem-only standalone linkage. [Evidence](../../../benchmarks/native-web/reference-array-validation.json)
 records the full-server's next missing binding: neoCLR.Runtime.ObjectReferenceEquals.
+
+### Object identity service (2026-10-08)
+
+Reference-arena compilation now binds the exact reserved
+neoCLR.Runtime.ObjectReferenceEquals(Object,Object) -> Boolean InternalCall to the
+existing native reference-equality instruction. The public Raven wrapper remains
+ordinary CIL. Managed bodies, altered signatures and unrelated declarations are not
+substituted. This is reported as object-reference-equals-intrinsic-v1 in the binding
+inventory; no external symbol, allocation or hash algorithm is introduced.
+
+The [object-model review](../../object-model-review.md) records the .NET baseline:
+reference identity is separate from value/content equality, including null/null.
+The native adapter preserves the existing interpreter contract rather than changing
+it. ReferenceList now checks aliases, replaced objects, null in either position,
+and separately allocated equal-content strings. [Evidence](../../../benchmarks/native-web/object-identity-validation.json)
+records interpreter/native parity and standalone linkage. Exact-contract rejection
+has focused coverage. General Equals/GetHashCode dispatch is not implied. The HTTP
+server now reaches the value-type StreamError.ToString member contract boundary.

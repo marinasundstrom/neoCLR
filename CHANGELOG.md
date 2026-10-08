@@ -23,7 +23,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   selection (208 shapes/570 functions/213 clones). Add checked reference-class array
   slots with nominal typing, strong GC retention, shared-copy identity and distinct
   unwritten/null faults. The real Raven ArrayList<Counter> consumer passes both modes;
-  the full server next needs the ObjectReferenceEquals native binding.
+  bind the exact ObjectReferenceEquals service to native identity comparison, including
+  nulls and distinct equal-content strings. The full server next reaches the
+  StreamError.ToString value-member contract boundary.
 
 - Add development System.Text.StringBuilder with fluent append, atomic byte-limit
   faults, LF line append, clear/reuse and cached immutable snapshots. Add separator-aware

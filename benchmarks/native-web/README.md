@@ -222,3 +222,9 @@ Run `verify_callbacks.py --case ReferenceList`; [evidence](reference-array-valid
 records matching interpreter/native results, sanitized GC and standalone dependencies.
 The full server now reaches the unbound ObjectReferenceEquals service. See the
 [reference-array contract and limits](../../docs/experiments/aot-console/record-arrays.md#reserved-reference-arrays-2026-10-08).
+
+The following [identity binding evidence](object-identity-validation.json) extends
+ReferenceList with public Object.ReferenceEquals alias, null and text-owner checks.
+The reserved service lowers under --reference-arena to native identity comparison;
+ordinary methods are not replaced. The full server next reaches StreamError.ToString's
+value-member contract. No Equals/GetHashCode dispatch or server execution is claimed.

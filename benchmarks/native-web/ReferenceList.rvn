@@ -36,6 +36,19 @@ func Main() -> int {
         values[0] = Counter(index)
         index += 1
     }
+    if !Object.ReferenceEquals(copy[0], copy[0]) || Object.ReferenceEquals(copy[0], values[0]) {
+        return 3
+    }
+    let absent: Object? = null
+    if !Object.ReferenceEquals(absent, null) || Object.ReferenceEquals(copy[0], absent)
+        || Object.ReferenceEquals(absent, copy[0]) {
+        return 4
+    }
+    let text = String.Concat("same ", "text")
+    let otherText = String.Concat("same ", "text")
+    if !Object.ReferenceEquals(text, text) || Object.ReferenceEquals(text, otherText) || text != otherText {
+        return 5
+    }
     index = 0
     while index < 20 {
         if copy[index].Add(1) != index + 2 {
