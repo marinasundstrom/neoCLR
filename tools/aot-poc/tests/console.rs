@@ -1770,3 +1770,78 @@ fn boxed_empty_profile_rejects_other_shapes_and_counts_generated_helpers() {
     assert!(!r.status.success() && !dir.0.join("app.o").exists());
     assert!(String::from_utf8_lossy(&r.stderr).contains("boxing helpers exceed"),"{r:?}");
 }
+
+fn array_views_module() -> neoclr::Module {
+    let mut app=neoclr::assemble(include_str!("../../../docs/experiments/aot-console/array-views.neoil")).unwrap();
+    let index=app.types.iter().position(|t|t.name=="Storage").unwrap();
+    let id=neoclr::metadata::TypeDefId{module:app.name.clone(),revision:app.revision.clone(),index:index as u32};
+    app.types[index].definition=Some(id.clone());
+    app.types[index].origin=Some(serde_json::from_value(serde_json::json!({
+        "assembly":"ArrayViews","module":"ArrayViews.neox","name":"Storage`1","token":33554433,
+        "publicly_visible":true,"field_tokens":[67108865],"field_access":["Private"],"field_readonly":[false]
+    })).unwrap());
+    app.assemblies=vec![serde_json::from_value(serde_json::json!({
+        "name":"ArrayViews","full_name":"ArrayViews","modules":["ArrayViews.neox"],"references":[],"array_backing":id
+    })).unwrap()];
+    app
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn nominal_byte_array_views_preserve_aliases_dispatch_and_initialization() {
+    let dir=Temp::new();let app=array_views_module();
+    let seed=neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();program.verify().unwrap();
+    let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena"]);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let report:serde_json::Value=serde_json::from_slice(&r.stdout).unwrap();
+    assert!(report["arrayBackingProjection"]["compiledIndex"].is_number());
+    assert_eq!(report["interfaceDispatch"].as_array().unwrap().len(),3);
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc,char **argv) {
+    uint64_t storage[16];neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    int32_t result=-99;int status=neoclr_entry_v4(argc>1?atoi(argv[1]):0,&result,&ctx);
+    if(status){if(result!=-99)return 92;neoclr_aot_render_fault(stderr,&ctx.fault);return 1;}
+    printf("%d\n",result);return 0;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-fault-details/render.c")).arg(base.join("aot-console/text-arena.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in 0..10 {
+        let expected=method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default());
+        let r=Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        match expected {
+            Ok(value)=>{let neoclr::Value::Int32(value)=value.value else{panic!("expected Int32")};
+                assert_eq!(r.status.code(),Some(0),"{mode}: {r:?}");assert_eq!(r.stdout,format!("{value}\n").as_bytes());assert!(r.stderr.is_empty());}
+            Err(fault)=>{assert_eq!(r.status.code(),Some(1));assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(),"{mode}");}
+        }
+    }
+}
+
+#[test]
+fn nominal_byte_array_views_require_verified_backing_and_reject_class_allocation() {
+    let seed=neoclr::assemble(".module System\n.references ()\n").unwrap();
+    for mode in 0..3 {
+        let mut app=array_views_module();
+        match mode {
+            0=>app.assemblies[0].array_backing=None,
+            1=>app.types.iter_mut().find(|t|t.name=="Storage").unwrap().origin.as_mut().unwrap().field_access=vec![neoclr::metadata_origin::SourceAccess::Public],
+            _=>{
+                let root=app.functions.iter_mut().find(|f|f.name=="Calculate").unwrap();
+                root.body=vec![neoclr::metadata::Instruction::Construct(neoclr::assembler::parse_function_ref("instance Storage<Byte>::.ctor()").unwrap()),
+                    neoclr::metadata::Instruction::Pop,neoclr::metadata::Instruction::Int(0),neoclr::metadata::Instruction::Return];
+            }
+        }
+        let dir=Temp::new();let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena"]);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists(),"mode {mode}: {r:?}");
+        let message=String::from_utf8_lossy(&r.stderr);
+        assert!(message.contains(match mode {0=>"verified backing",1=>"invalid nominal array backing",_=>"not class construction"}),"{r:?}");
+    }
+}

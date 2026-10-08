@@ -272,8 +272,9 @@ now preserve range/boundary results and invocation-owned text. UTF-8 encoding pr
 immutable byte values for the ordinary managed-array copy loop. Ordinary String
 instance wrappers also run in a standalone Raven count/slice Result sample. Empty
 union-case boxing now supports ordinary EncoderState.HasValue with preserved identity.
-Text writers and ReadLine
-remain future work. An explicit failure binding now preserves
+Verified nominal byte-array views now complete the ordinary Console.Write and
+standard-error text-writer path, including UTF-8/NUL and broken-pipe fault parity.
+ReadLine remains in progress. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked
 renderer and standalone exit-1 failure app are validated. Interpreter CLI execution

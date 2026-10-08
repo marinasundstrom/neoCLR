@@ -130,8 +130,11 @@ consumer with Result patterns and exact interpreter fault parity. Measured selec
 budgets expand to 256 functions/128 types/64 clones (Console.Write already selects
 151/68/37 before array dispatch). Empty-record boxing now supports generated
 EncoderState.Value/HasValue with distinct object identity, bounded lifetime and exact
-fault sites; a fresh Raven Console consumer passes standalone validation. Nominal
-byte-array interface dispatch remains the next writer boundary. The author adds a console-input sample after unions, exercising input and
+fault sites; a fresh Raven Console consumer passes standalone validation. Verified
+nominal byte-array interface dispatch now runs ordinary backing methods, completing
+the Console.Write(string/int) and standard-error text-writer sample with exact
+interpreter/native output and broken-pipe user-fault parity. Console.ReadLine is next;
+its combined writer/reader graph first exceeds the current function/clone budgets. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

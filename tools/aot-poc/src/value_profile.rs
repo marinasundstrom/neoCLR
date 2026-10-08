@@ -33,6 +33,7 @@ pub(super) struct Profile<'a> {
     pub input: &'a neoclr::Module,
     references: bool,
     object_base: Option<usize>,
+    pub array_backing: Option<usize>,
     layouts: Vec<Vec<usize>>,
     widths: Vec<usize>,
     names: HashMap<&'a str, Vec<usize>>,
@@ -62,7 +63,7 @@ fn object_base_shape(t: &neoclr::metadata::TypeDef) -> bool {
 }
 
 impl<'a> Profile<'a> {
-    pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>) -> Result<Self, Error> {
+    pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>) -> Result<Self, Error> {
         if input.name == "System" || input.types.len() > 128 || input.functions.len() > 256 {
             return Err(
                 "value profile requires an application with at most 128 types and 256 functions"
@@ -75,6 +76,11 @@ impl<'a> Profile<'a> {
         }
         if object_base.is_some_and(|i| !references || input.types.get(i).is_none_or(|t| !object_base_shape(t))) {
             return Err("invalid private Object base projection".into());
+        }
+        if array_backing.is_some_and(|i| !references || input.types.get(i).is_none_or(|t|
+            !t.is_reference_type || t.representation != Representation::Record || t.fields.len()!=1
+            || t.fields[0].ty != Type::ArrayRef(Box::new(Type::Byte)) || !t.generic_parameters.is_empty())) {
+            return Err("invalid private byte-array backing projection".into());
         }
         for (index, t) in input.types.iter().enumerate() {
             if references && t.representation == Representation::Interface {
@@ -118,6 +124,7 @@ impl<'a> Profile<'a> {
             input,
             references,
             object_base,
+            array_backing,
             layouts: vec![vec![]; input.types.len()],
             widths: vec![0; input.types.len()],
             names: HashMap::new(),
@@ -162,7 +169,7 @@ impl<'a> Profile<'a> {
             let interface = references && crate::selection::interface_contract(input, f);
             if interface {
                 let reached = (0..input.functions.len()).collect();
-                p.dispatch.insert(i, crate::selection::dispatch_targets(input, i, &reached)?);
+                p.dispatch.insert(i, crate::selection::dispatch_targets_with_array(input, i, &reached, array_backing)?);
             }
             if ((f.is_virtual || f.is_abstract) && !interface)
                 || f.is_override
@@ -256,6 +263,9 @@ impl<'a> Profile<'a> {
                     }
                     if matches!(op, Op::Construct(_)) {
                         let c = &input.functions[callee];
+                        if c.owner.as_ref().is_some_and(|owner| array_backing.is_some_and(|i| *owner == Type::Named(input.types[i].name.clone()))) {
+                            return Err("nominal arrays require newarr/array.reserve, not class construction".into());
+                        }
                         if !c.instance || !c.name.ends_with("..ctor") || !c.no_result {
                             return Err("newobj.ctor requires a no-result value constructor".into());
                         }
@@ -366,6 +376,8 @@ impl<'a> Profile<'a> {
     }
     fn reference_assignable(&self, actual: &Ty, expected: &Ty) -> bool {
         match (actual, expected) {
+            (Ty::ByteArray, Ty::Reference(i)) if self.array_backing == Some(*i) => true,
+            (Ty::ByteArray, _) if self.array_backing.is_some() => self.reference_assignable(&Ty::Reference(self.array_backing.unwrap()), expected),
             (Ty::Reference(actual) | Ty::Interface(actual), Ty::Interface(expected)) =>
                 crate::selection::implements_interface(self.input, &Type::Named(self.input.types[*actual].name.clone()), &Type::Named(self.input.types[*expected].name.clone())),
             (Ty::Reference(actual), Ty::Reference(expected)) if self.object_base == Some(*expected) =>
@@ -375,6 +387,7 @@ impl<'a> Profile<'a> {
     }
     pub fn cast_targets(&self, target: &Ty) -> Vec<usize> {
         match target {
+            Ty::ByteArray => self.array_backing.into_iter().collect(),
             Ty::Reference(i) if self.object_base == Some(*i) => self.input.types.iter().enumerate()
                 .filter(|(_, t)| t.representation == Representation::Record && !t.is_abstract)
                 .map(|(i, _)| i).collect(),
@@ -701,7 +714,11 @@ impl<'a> Profile<'a> {
                 | Op::Remainder
                 | Op::RemainderUnsigned => (),
                 Op::IsInstance(Type::String) | Op::CastClass(Type::String) | Op::ReferenceIsNull | Op::ReferenceEqual => (),
-                Op::IsInstance(t) | Op::CastClass(t) if self.references && matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_)) => (),
+                Op::IsInstance(Type::ArrayRef(_)) | Op::CastClass(Type::ArrayRef(_)) if self.array_backing.is_none() => {
+                    return Err(fail(pc, "byte-array casts require verified backing"));
+                }
+                Op::IsInstance(t) | Op::CastClass(t) if self.references && (matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_))
+                    || (self.array_backing.is_some() && self.ty(t)? == Ty::ByteArray)) => (),
                 Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte) | Op::ArrayElement(Type::Byte) | Op::StoreArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) | Op::ArrayLength if self.references => (),
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
@@ -799,8 +816,9 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::Literal);
                 }
                 Op::IsInstance(t) | Op::CastClass(t) => {
-                    if !matches!(pop(&mut stack)?, Ty::Reference(_) | Ty::Interface(_)) {
-                        return Err(fail(pc, "reference casts require a class or interface view"));
+                    let source = pop(&mut stack)?;
+                    if !matches!(source, Ty::Reference(_) | Ty::Interface(_)) && !(source == Ty::ByteArray && self.array_backing.is_some()) {
+                        return Err(fail(pc, "reference casts require a class, interface or verified array view"));
                     }
                     stack.push(self.ty(t)?);
                 }
@@ -842,6 +860,9 @@ impl<'a> Profile<'a> {
                 Op::Field(n) | Op::FieldAddress(n) => {
                     let owner = pop(&mut stack)?;
                     let t = self.field(&owner, *n)?;
+                    if matches!(owner, Ty::Reference(i) if self.array_backing == Some(i)) && matches!(op, Op::FieldAddress(_)) {
+                        return Err(fail(pc, "nominal array storage field cannot be borrowed"));
+                    }
                     if matches!(op, Op::FieldAddress(_)) {
                         if !matches!(owner, Ty::Address(_) | Ty::Reference(_)) {
                             return Err(fail(pc, "field address requires a borrowed record"));
@@ -854,6 +875,9 @@ impl<'a> Profile<'a> {
                 Op::SetField(n) => {
                     let value = pop(&mut stack)?;
                     let owner = pop(&mut stack)?;
+                    if matches!(owner, Ty::Reference(i) if self.array_backing == Some(i)) {
+                        return Err(fail(pc, "nominal array storage field cannot be replaced"));
+                    }
                     let expected = Self::stack_type(&self.field(&owner, *n)?);
                     if expected != value && !self.reference_assignable(&value, &expected) {
                         return Err(fail(pc, "field store type mismatch"));

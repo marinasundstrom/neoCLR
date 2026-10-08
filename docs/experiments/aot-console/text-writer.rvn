@@ -1,0 +1,26 @@
+import System.*
+import System.Result.*
+
+func Main() -> int {
+    Console.Write("Hello, ")
+    Console.WriteLine("native Console")
+    Console.Write(42)
+    Console.WriteLine()
+    Console.Write("UTF-8: aé😀\u0000z")
+    Console.WriteLine()
+    // The emoji crosses the encoder's 256-byte chunk boundary.
+    Console.Write("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx😀z")
+    Console.WriteLine()
+    Console.Write("")
+    let error = Console.Error
+    let Ok(written) = error.Write("stderr: λ\n") else {
+        return 2
+    }
+    if written != 11 {
+        return 3
+    }
+    let Ok(_) = error.Flush() else {
+        return 4
+    }
+    return 0
+}

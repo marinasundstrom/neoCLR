@@ -118,7 +118,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   views and original allocation-fault sites; generated helpers count toward budgets.
   Validate ordinary EncoderState.HasValue through a fresh standalone Raven Console
   consumer, exact broken-pipe diagnostics and focused identity/resource checks.
-  Payload boxing/unboxing and nominal array dispatch remain outside the profile.
+  Payload boxing/unboxing remain outside the profile. Preserve verified nominal
+  byte-array backing identities through specialization and interface dispatch;
+  ordinary Count/indexer/iterator bodies keep aliasing and reserved initialization.
+  Compile Console.Write and standard-error text writers with UTF-8/NUL and ordinary
+  encoder loops; validate standalone output and broken-pipe user-fault parity.
+  Reject corrupt backing metadata and class-style array allocation. Line input
+  remains the next Console dependency path.
 
 ### 2026-10-07
 

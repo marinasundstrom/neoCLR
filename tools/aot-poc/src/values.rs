@@ -78,6 +78,14 @@ fn args(values: &[ir::Value]) -> Vec<ir::BlockArg> {
     values.iter().copied().map(Into::into).collect()
 }
 
+fn matches_type(b: &mut FunctionBuilder<'_>, p: &Profile<'_>, tag: ir::Value, index: usize) -> ir::Value {
+    if p.array_backing == Some(index) {
+        let ordinary = b.ins().icmp_imm(IntCC::Equal, tag, 0x80000001);
+        let reserved = b.ins().icmp_imm(IntCC::Equal, tag, 0x80000002);
+        b.ins().bor(ordinary, reserved)
+    } else { b.ins().icmp_imm(IntCC::Equal, tag, index as i64) }
+}
+
 fn null_reference(b: &mut FunctionBuilder<'_>, pointer: ir::Value, site: Option<&crate::fault_details::Site>) {
     let null = b.ins().icmp_imm(IntCC::Equal, pointer, 0);
     let status = b.ins().iconst(types::I32, 6);
@@ -105,7 +113,7 @@ fn check_byte_value_replacement(b: &mut FunctionBuilder<'_>, address: ir::Value,
 pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
     let reservations = input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ReserveArray(_))));
     let references = details.is_some_and(|d| d.reference_arena);
-    let p = Profile::new(input, references, details.and_then(|d| d.object_base))?;
+    let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing))?;
     let root = p.root(root)?;
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))
@@ -293,7 +301,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 for &(type_index, target) in targets {
                     let matched = b.create_block();
                     let next = b.create_block();
-                    let equal = b.ins().icmp_imm(IntCC::Equal, tag, type_index as i64);
+                    let equal = matches_type(&mut b, &p, tag, type_index);
                     b.ins().brif(equal, matched, &[], next, &[]);
                     b.switch_to_block(matched);
                     let target = module.declare_func_in_func(ids[target], b.func);
@@ -576,7 +584,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let tag = b.ins().load(types::I64, MemFlags::new(), value, 0);
                         let mut matches = b.ins().iconst(types::I8, 0);
                         for index in p.cast_targets(&p.ty(target)?) {
-                            let matched = b.ins().icmp_imm(IntCC::Equal, tag, index as i64);
+                            let matched = matches_type(&mut b, &p, tag, index);
                             matches = b.ins().bor(matches, matched);
                         }
                         let zero = b.ins().iconst(types::I64, 0);
@@ -788,7 +796,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                                 8
                             } else { 0 };
                             let address = b.ins().iadd_imm(owner, (header + offset * 8) as i64);
-                            if matches!(op, Op::FieldAddress(_)) {
+                            if matches!(top(), Ty::Reference(i) if p.array_backing == Some(*i)) {
+                                // The verified backing's sole field denotes this same array,
+                                // not storage at the length-header offset.
+                                stack.push(owner);
+                            } else if matches!(op, Op::FieldAddress(_)) {
                                 stack.push(address);
                             } else {
                                 stack.extend(read(&mut b, &p, &field, address));

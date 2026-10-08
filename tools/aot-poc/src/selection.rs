@@ -125,17 +125,37 @@ pub(super) fn implicit_implementation(input: &neoclr::Module, concrete: &Type, c
     Ok(target.clone())
 }
 
+/// The load set's verified nominal backing, closed over this profile's byte element.
+/// During specialization the selected first shape retains the backing definition row.
+pub(super) fn byte_array_owner(input: &neoclr::Module) -> Option<Type> {
+    let id = input.assemblies.iter().find_map(|a| a.array_backing.as_ref())?;
+    let t = input.types.iter().find(|t| t.definition.as_ref() == Some(id))?;
+    match t.generic_parameters.len() {
+        1 => Some(Type::Constructed { definition:t.name.clone(),arguments:vec![Type::Byte] }),
+        0 => Some(Type::Named(t.name.clone())),
+        _ => None,
+    }
+}
+
 /// Exact implicit implementations for classes constructed by the reachable program.
 /// Original conformance is verified before private projection; this is not a binder.
 pub(super) fn dispatch_targets(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>) -> Result<Vec<(usize, usize)>, Error> {
+    dispatch_targets_with_array(input, contract, reached, None)
+}
+
+pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>, array_backing: Option<usize>) -> Result<Vec<(usize, usize)>, Error> {
     let f = &input.functions[contract];
     if !interface_contract(input, f) { return Ok(vec![]); }
     if !f.instance || f.receiver_byref || !f.body.is_empty() || !f.generic_parameters.is_empty() {
         return Err("interface dispatch requires a bodyless nongeneric instance contract".into());
     }
     let mut constructed = BTreeSet::new();
+    let array_owner = array_backing.map(|i| Type::Named(input.types[i].name.clone())).or_else(|| byte_array_owner(input));
     for &i in reached {
         for op in &input.functions[i].body {
+            if matches!(op, Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte)) {
+                if let Some(Type::Named(name)) = &array_owner { constructed.insert(name.as_str()); }
+            }
             if let Op::Construct(target) = op {
                 if let Some(Type::Named(name)) = &target.owner { constructed.insert(name.as_str()); }
             }
@@ -310,7 +330,10 @@ pub(super) fn select_inventory(
                 }
             }
             Type::ByRef(t) => pending_types.push(*t),
-            Type::Array(t) | Type::ArrayRef(t) if *t == Type::Byte => (),
+            Type::Array(t) if *t == Type::Byte => (),
+            Type::ArrayRef(t) if *t == Type::Byte => {
+                if let Some(owner) = byte_array_owner(input) { pending_types.push(owner); }
+            },
             Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr => (),
             _ => {
                 return Err(
@@ -385,9 +408,12 @@ pub(super) fn select_inventory(
                 "targets":targets.iter().map(|(ty, method)| json!({"typeCompiledIndex":type_rows.binary_search(ty).unwrap(),"functionCompiledIndex":rows.binary_search(method).unwrap()})).collect::<Vec<_>>() }));
         }
     }
+    let array_backing = byte_array_owner(input).and_then(|owner| input.types.iter().position(|t| owner == Type::Named(t.name.clone())))
+        .and_then(|source| type_rows.binary_search(&source).ok().map(|compiled| json!({"sourceIndex":source,"compiledIndex":compiled,
+            "policy":"verified nominal byte-array backing; identity-preserving views and intrinsic storage field"})));
     let report = json!({"schema":"neoclr-aot-selection-v1", "module":input.name, "root":root,
         "policy":"explicit closed world with constructed-class implicit interface dispatch; every opcode of selected bodies retained; no reflection, dynamic loading or class virtual dispatch",
-        "interfaceDispatch":dispatch,
+        "interfaceDispatch":dispatch, "arrayBackingProjection":array_backing,
         "metadataPolicy":"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
         "functions": rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.functions[*old].definition,"name":input.functions[*old].name})).collect::<Vec<_>>(),
         "types": type_rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.types[*old].definition,"name":input.types[*old].name})).collect::<Vec<_>>(),

@@ -52,7 +52,11 @@ impl Specializer<'_> {
                 return Ok(ty.clone());
             }
             Type::ByRef(t) => return Ok(Type::ByRef(Box::new(self.lower(t)?))),
-            Type::Array(t) | Type::ArrayRef(t) if **t == Type::Byte => return Ok(ty.clone()),
+            Type::Array(t) if **t == Type::Byte => return Ok(ty.clone()),
+            Type::ArrayRef(t) if **t == Type::Byte => {
+                if let Some(owner) = super::selection::byte_array_owner(self.source) { self.lower(&owner)?; }
+                return Ok(ty.clone());
+            },
             Type::Named(name) => (name, vec![]),
             Type::Constructed {
                 definition,
@@ -450,6 +454,11 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
                 contracts.push(super::selection::closed_signature(original, &instance.types)?);
             }
             for op in &original.body {
+                if matches!(op, Op::NewArray(_) | Op::ReserveArray(_)) {
+                    if let Some(owner) = super::selection::byte_array_owner(input) {
+                        if !constructed.contains(&owner) { constructed.push(owner); }
+                    }
+                }
                 if let Op::Construct(target) = op {
                     let owner = substitute(target.owner.as_ref().ok_or("constructor requires owner")?, &instance.types, &instance.methods).map_err(|e| e.to_string())?;
                     if !constructed.contains(&owner) { constructed.push(owner); }

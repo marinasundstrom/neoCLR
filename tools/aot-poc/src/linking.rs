@@ -154,6 +154,14 @@ pub fn prepare(
             ty.declaring_type = Some(type_id(i));
         }
     }
+    // Retain the verified array-backing identity while canonicalizing the load set.
+    for assembly in &mut joined.assemblies {
+        if let Some(id) = &assembly.array_backing {
+            let index = types.iter().position(|candidate| candidate == id)
+                .ok_or("array backing targets an unsupplied definition")?;
+            assembly.array_backing = Some(type_id(index));
+        }
+    }
     // Conformance was verified in original scopes. Metadata-only relationships
     // must not consume executable specialization shapes (Option and Result share
     // Propagatable with different arguments, including metadata-only Void).
@@ -203,6 +211,12 @@ pub fn prepare(
     for key in ["types", "excludedTypes"] {
         for row in report[key].as_array_mut().unwrap() {
             row["definition"] = json!(types[row["sourceIndex"].as_u64().unwrap() as usize]);
+        }
+    }
+    if let Some(index) = report["arrayBackingProjection"]["compiledIndex"].as_u64() {
+        if let Some(row) = report["types"].as_array().unwrap().iter().find(|r| r["compiledIndex"] == index).cloned() {
+            report["arrayBackingProjection"]["definition"] = row["definition"].clone();
+            report["arrayBackingProjection"]["sourceName"] = row["name"].clone();
         }
     }
     let mut verified_relationships = vec![];

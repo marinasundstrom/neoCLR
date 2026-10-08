@@ -740,3 +740,39 @@ implementation supports only empty records and invocation lifetimes: payload box
 unboxing, boxed value interface dispatch, virtual Object methods and GC remain future
 work. The cost is a small arena allocation retained until invocation reset. The
 writer graph now reaches the nominal byte-array-to-Sequence<byte> interface boundary.
+
+
+## Console text writers and nominal byte-array views (2026-10-08)
+
+Managed byte arrays now keep their verified nominal backing identity during closed
+specialization and dispatch selection. Array/interface/nominal views share the same
+pointer: Count, indexed access and iterator implementations execute the ordinary
+backing type's CIL. Its single intrinsic storage field denotes the array itself;
+there is no separately allocated wrapper. Ordinary and reserved byte-array headers
+both participate in dispatch, while reserved initialization checks remain active.
+No interface is inferred from a class name or field shape: original assembly backing
+metadata and conformance must verify before this private projection. Backing field
+replacement/borrowing and ordinary class allocation of an array remain rejected.
+Reports include the source backing definition and compiled type index.
+
+The Raven `text-writer.rvn` app now compiles ordinary Console.Write(string/int),
+Console.Error and StreamWriter.Write/Flush, including their encoders, Result branches,
+ArrayList buffers and nominal array views. It exercises empty writes, UTF-8/NUL,
+stdout/stderr and a multibyte character across the 256-byte encoder boundary.
+`verify_interactive.py --text-writer` checks exact interpreter/native output and
+broken-pipe faults, object imports and executable-only deployment with libSystem as
+the sole dynamic dependency. [Validation](text-writer-validation.json) records the
+successful fresh producer run and the native artifacts. The pinned producer also
+returned its known intermittent missing-Console-member diagnostics in runs 3/4;
+run 5 succeeded with the identical source/producer inputs, without source workarounds. This reaches the requested ordinary text-writing path;
+Console.ReadLine is the next sample-driven step.
+
+Focused array-view tests compare ten native/interpreter executions covering ordinary
+and reserved arrays, mutation through an interface, alias identity, nominal views,
+empty/null arrays, unwritten slots, bounds and unrelated interface casts. Negative
+tests reject missing/corrupt backing contracts and attempted class allocation.
+Like CLR arrays, these arrays expose shared identity through collection interfaces.
+neoCLR's existing contract expresses that relationship with verified library backing
+metadata and ordinary CIL methods; the private header/field lowering is backend
+implementation detail. The bounded cost remains invocation-retained arrays and
+closed dispatch targets; this is not general array covariance or GC support.

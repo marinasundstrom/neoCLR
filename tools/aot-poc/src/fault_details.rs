@@ -26,6 +26,7 @@ pub struct Options {
     pub reference_arena: bool,
     pub empty_record_boxes: HashMap<usize, usize>,
     pub object_base: Option<usize>,
+    pub array_backing: Option<usize>,
     pub frame_names: HashMap<usize, String>,
 }
 impl Options {
@@ -34,6 +35,7 @@ impl Options {
             empty_record_boxes: report.and_then(|r| r["emptyRecordBoxes"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),
             reference_arena: report.is_some_and(|r| r["referenceArena"] == true),
+            array_backing: report.and_then(|r| r["arrayBackingProjection"]["compiledIndex"].as_u64()).map(|i| i as usize),
             object_base: report.and_then(|r| r["objectBaseProjection"]["compiledIndex"].as_u64()).map(|i| i as usize),
             frame_names: report
                 .and_then(|r| r["functions"].as_array())
