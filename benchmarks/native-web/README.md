@@ -278,3 +278,38 @@ shutdown or disconnect race. Runtime Scheduler/green-thread design remains separ
 Each process serves one request, so this evidence is **not HTTP throughput**. Next use
 one long-lived process and repeated equivalent requests, with startup recorded
 separately. Keep .NET comparisons provisional until workloads and load settings match.
+
+## Repeated requests and first local HTTP measurements
+
+`PersistentServer.rvn` serves exactly 32 sequential `/greeting` requests in one process.
+Its callback chain starts the next ServeOne after completion, then closes the server.
+This exercises `let ... else`, `if let`, task completion and reclamation across exchanges.
+The same artifact passes interpreter, sanitized native and standalone execution.
+
+Add `--persistent` to `verify_server.py` for correctness/cleanup only, or
+`--persistent --rounds 3` for at least three measured pairs. The harness first qualifies
+all three modes, then alternates interpreter/standalone execution order. Every response
+is checked; the first eight requests warm each process and the remaining 24 are timed.
+No HTTP keep-alive, concurrency or external-platform result is implied.
+
+On Apple M1/macOS ARM64, 2026-10-08, three local pairs produced:
+
+| Mode | Median requests/s | Median of per-run request medians | Warm process launch to port |
+| --- | ---: | ---: | ---: |
+| Release interpreter | 3.08 | 324.40 ms | 1,868.40 ms |
+| ARM64 native standalone | 20.09 | 49.65 ms | 3.54 ms |
+
+[Raw per-request samples, commands and hashes](persistent-http-validation.json) retain
+all runs. Throughput is 24 divided by the sum of those 24 request times, then the median
+across runs. Latency includes connection establishment through response EOF on the same
+machine. Startup is reported separately after warmup, not as a cold-machine measurement.
+Native C adapters use -O2; the current Cranelift CIL backend uses its default unoptimized
+setting. The interpreter uses its Release binary. GC/host scheduling policies differ;
+native uses a fixed 1 MiB nonmoving heap and a private one-millisecond idle poll.
+These short runs are a development baseline, not capacity planning or reliable tail
+latency estimates. No .NET ranking is available. Profile before selecting an optimization.
+
+The next-release teaser is this native execution path with reproducible samples and WIP
+limits. Full Raven compiler-target bootstrap through neoCLR metadata without the .NET
+bridge remains a separate release requirement; the development Core.dll input does not
+satisfy that gate merely because the resulting executable has no .NET dependency.

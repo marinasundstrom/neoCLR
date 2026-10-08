@@ -8,6 +8,8 @@ import json
 import os
 from pathlib import Path
 import select
+import statistics
+import platform
 import socket
 import subprocess
 import time
@@ -16,7 +18,11 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
+p.add_argument('--persistent', action='store_true', help='Serve 32 sequential requests per process')
+p.add_argument('--rounds', type=int, default=0, help='Persistent mode: at least three measured interpreter/native pairs; zero validates only')
 a = p.parse_args()
+if a.rounds and (not a.persistent or a.rounds < 3):
+    p.error('--rounds requires --persistent and at least three pairs')
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
 base = ROOT / 'docs/experiments/aot-console'
@@ -28,7 +34,7 @@ flags = [*context, '--compile-system', '--bind-user-fault', '--reference-arena',
          '--native-stack-budget', '--bind-int32-to-string', '--bind-utf8-text', '--bind-task-queue',
          '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer',
          '--bind-console-write-line', '--bind-integer-text']
-source = ROOT / 'docs/experiments/http-server/Server.rvn'
+source = Path(__file__).with_name('PersistentServer.rvn') if a.persistent else ROOT / 'docs/experiments/http-server/Server.rvn'
 adapters = [Path(__file__).with_name('http-host.c'),
             *[base / n for n in ('root-probe.c', 'native-gc.c', 'native-stack.c', 'task-queue.c',
                                 'socket-listener.c', 'text-arena.c', 'console.c')],
@@ -36,7 +42,9 @@ adapters = [Path(__file__).with_name('http-host.c'),
 report = {'scope': 'One-request HTTP correctness, not throughput or release qualification',
           'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
           'SDKROOT': os.environ.get('SDKROOT'), 'managedHeapCapacity': 1048576,
-          'inputs': {}, 'commands': [], 'cases': {}}
+          'inputs': {}, 'commands': [], 'cases': {}, 'host': platform.platform()}
+if a.persistent:
+    report.update(scope='32 sequential HTTP/1.1 connection-close requests per process; first 8 warm requests, then 24 measured; startup separate; experimental host/GC policies differ', requestsPerProcess=32, warmRequests=8, measuredRequests=24, measuredPairs=a.rounds)
 
 def save():
     (output / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -47,7 +55,7 @@ def digest(path):
 def run(command):
     result = subprocess.run(list(map(str, command)), cwd=ROOT, capture_output=True, text=True, timeout=300)
     report['commands'].append({'command': result.args, 'exit': result.returncode,
-                              'stdout': result.stdout, 'stderr': result.stderr})
+                              'stdout': result.stdout if len(result.stdout) < 4000 else {'sha256': hashlib.sha256(result.stdout.encode()).hexdigest(), 'bytes': len(result.stdout.encode())}, 'stderr': result.stderr})
     save()
     if result.returncode:
         raise RuntimeError(f'{result.args}: {result.stderr}')
@@ -117,20 +125,82 @@ def serve(command, request, fragmented):
             process.kill()
             process.communicate()
 
-for case, request, fragmented, error in cases:
-    results = report['cases'][case] = {}
+def serve_many(command):
+    launched = time.perf_counter_ns()
+    process = subprocess.Popen(list(map(str, command)), cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    latencies = []
+    try:
+        if not select.select([process.stdout], [], [], 30)[0]:
+            raise RuntimeError('Persistent server did not report its port')
+        line = process.stdout.readline()
+        if not line.strip().isdigit():
+            raise RuntimeError(f'Expected port, received {line!r}')
+        startup = (time.perf_counter_ns() - launched) / 1e6
+        for index in range(32):
+            started = time.perf_counter_ns()
+            response = b''
+            with socket.create_connection(('127.0.0.1', int(line)), timeout=10) as peer:
+                peer.sendall(valid)
+                peer.shutdown(socket.SHUT_WR)
+                while True:
+                    part = peer.recv(4096)
+                    if not part:
+                        break
+                    response += part
+                    if len(response) > 8192:
+                        raise RuntimeError('Unexpected response size')
+            elapsed = (time.perf_counter_ns() - started) / 1e6
+            assert response == expected_response, (index, response)
+            latencies.append(elapsed)
+        stdout, stderr = process.communicate(timeout=20)
+        assert process.returncode == 0 and not stderr, (process.returncode, stdout, stderr)
+        assert stdout == b'Served 32 requests; server closed\n', stdout
+        measured = latencies[8:]
+        return {'startupMs': startup, 'requestMs': latencies, 'measuredRequestsPerSecond': 24000 / sum(measured),
+                'measuredMedianMs': statistics.median(measured), 'exit': process.returncode, 'stdout': stdout.decode()}
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.communicate()
+
+if a.persistent:
+    report['warmupAndQualification'] = {}
     for mode, command in commands.items():
-        result = results[mode] = serve(command, request, fragmented)
+        report['warmupAndQualification'][mode] = serve_many(command)
         save()
-        expected_output = 'Other work runs while HTTP accept is pending\n'
-        expected_output += 'Served greeting; server closed\n' if error is None else 'Server error: ' + error + '\n'
-        assert result['exit'] == 0 and result['stderr'] == '', result
-        assert result['stdout'] == expected_output, result
-        assert bytes.fromhex(result['responseHex']) == (expected_response if error is None else b''), result
-        assert result == results['interpreter'], (case, mode, result, results['interpreter'])
-        print(case, mode, 'passed', flush=True)
+        print(mode, '32 requests and cleanup passed', flush=True)
+    report['measured'] = {'interpreter': [], 'native-standalone': []}
+    for index in range(a.rounds):
+        order = ['interpreter', 'native-standalone']
+        if index % 2:
+            order.reverse()
+        for mode in order:
+            result = serve_many(commands[mode])
+            report['measured'][mode].append(result)
+            save()
+            print('pair', index + 1, mode, result['measuredRequestsPerSecond'], 'requests/s', flush=True)
+    if a.rounds:
+        report['summary'] = {mode: {
+            'medianRequestsPerSecond': statistics.median(row['measuredRequestsPerSecond'] for row in rows),
+            'medianStartupMs': statistics.median(row['startupMs'] for row in rows),
+            'medianOfRequestMediansMs': statistics.median(row['measuredMedianMs'] for row in rows),
+        } for mode, rows in report['measured'].items()}
+        print(json.dumps(report['summary'], indent=2), flush=True)
+else:
+    for case, request, fragmented, error in cases:
+        results = report['cases'][case] = {}
+        for mode, command in commands.items():
+            result = results[mode] = serve(command, request, fragmented)
+            save()
+            expected_output = 'Other work runs while HTTP accept is pending\n'
+            expected_output += 'Served greeting; server closed\n' if error is None else 'Server error: ' + error + '\n'
+            assert result['exit'] == 0 and result['stderr'] == '', result
+            assert result['stdout'] == expected_output, result
+            assert bytes.fromhex(result['responseHex']) == (expected_response if error is None else b''), result
+            assert result == results['interpreter'], (case, mode, result, results['interpreter'])
+            print(case, mode, 'passed', flush=True)
 if digest(aot) != report['inputs'][str(aot)]:
     raise RuntimeError('AOT executable changed during verification')
 report['passed'] = True
 save()
-print('All matched one-request HTTP cases passed; no throughput claim.', flush=True)
+print('Persistent HTTP validation complete.' if a.persistent else 'All matched one-request HTTP cases passed; no throughput claim.', flush=True)

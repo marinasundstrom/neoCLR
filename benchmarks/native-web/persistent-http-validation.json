@@ -1,11 +1,11 @@
 {
-  "scope": "One-request HTTP correctness, not throughput or release qualification",
-  "revision": "9dfc32eaf37927c283f15bf60237648d602f8b19",
+  "scope": "32 sequential HTTP/1.1 connection-close requests per process; first 8 warm requests, then 24 measured; startup separate; experimental host/GC policies differ",
+  "revision": "0b4d27e20efaeb690e0dc5391aec604cede7503e",
   "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
   "managedHeapCapacity": 1048576,
   "inputs": {
-    "/Users/robert/Projects/neoclr/benchmarks/native-web/verify_server.py": "a4cc269b9a255dcb6456badfba1c181c65d66276a1d7ca087afd334c7c274aa5",
-    "/Users/robert/Projects/neoclr/docs/experiments/http-server/Server.rvn": "a76485f804065ddec7d5903a83aa9e8cf4bca2aaafc9dcbb30178276324d715c",
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/verify_server.py": "fa1e30e743204933d3c93fbd2e1d9a577b1d1b967c8b18d0bb6c26775102c29a",
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/PersistentServer.rvn": "218328420886943438c40ead0c870e763fbcb9278281ba83bbe454780e753f9d",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "68f1dc42182526786b1f66e0fd89a4d840a5712d696cd8b3f96e914e27117766",
     "/Users/robert/Projects/neoclr/target/release/neoclr": "1dce6941418f7a32fff61e5cc9a8083aec687cd1e3ef9541910c7b3801149be2",
     "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "5e8ecab8904f306f23a57a25036063b9a0f39c8a7939500bce5a175dc3a47b04",
@@ -94,8 +94,8 @@
         "--object-library",
         "System.Runtime",
         "-o",
-        "/Users/robert/Projects/neoclr/target/native-http-validation/Server.dll",
-        "/Users/robert/Projects/neoclr/docs/experiments/http-server/Server.rvn"
+        "/Users/robert/Projects/neoclr/target/native-persistent-validation/Server.dll",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/PersistentServer.rvn"
       ],
       "exit": 0,
       "stdout": "",
@@ -105,9 +105,9 @@
       "command": [
         "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/native-http-validation/Server.dll",
+        "/Users/robert/Projects/neoclr/target/native-persistent-validation/Server.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/native-http-validation/Server.o",
+        "/Users/robert/Projects/neoclr/target/native-persistent-validation/Server.o",
         "--system",
         "/private/tmp/string-builder-native1008d/System.runtime.neox",
         "--module",
@@ -136,8 +136,8 @@
       ],
       "exit": 0,
       "stdout": {
-        "sha256": "f79ec77905112d40d7298214410e7f5f578c3edb31037a8d46aa92fc510711b1",
-        "bytes": 2133562
+        "sha256": "1e359f219ae8f36d69f42349e3253ce14024889a2c4ef965733d9ea642970a9b",
+        "bytes": 2130745
       },
       "stderr": ""
     },
@@ -165,9 +165,9 @@
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
-        "/Users/robert/Projects/neoclr/target/native-http-validation/Server.o",
+        "/Users/robert/Projects/neoclr/target/native-persistent-validation/Server.o",
         "-o",
-        "/Users/robert/Projects/neoclr/target/native-http-validation/native-sanitized"
+        "/Users/robert/Projects/neoclr/target/native-persistent-validation/native-sanitized"
       ],
       "exit": 0,
       "stdout": "",
@@ -196,9 +196,9 @@
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
-        "/Users/robert/Projects/neoclr/target/native-http-validation/Server.o",
+        "/Users/robert/Projects/neoclr/target/native-persistent-validation/Server.o",
         "-o",
-        "/Users/robert/Projects/neoclr/target/native-http-validation/native-standalone"
+        "/Users/robert/Projects/neoclr/target/native-persistent-validation/native-standalone"
       ],
       "exit": 0,
       "stdout": "",
@@ -208,105 +208,432 @@
       "command": [
         "otool",
         "-L",
-        "/Users/robert/Projects/neoclr/target/native-http-validation/native-standalone"
+        "/Users/robert/Projects/neoclr/target/native-persistent-validation/native-standalone"
       ],
       "exit": 0,
-      "stdout": "/Users/robert/Projects/neoclr/target/native-http-validation/native-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stdout": "/Users/robert/Projects/neoclr/target/native-persistent-validation/native-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
       "stderr": ""
     }
   ],
-  "cases": {
-    "greeting": {
-      "interpreter": {
-        "exit": 0,
-        "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
-        "stderr": "",
-        "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
-      },
-      "native-sanitized": {
-        "exit": 0,
-        "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
-        "stderr": "",
-        "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
-      },
-      "native-standalone": {
-        "exit": 0,
-        "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
-        "stderr": "",
-        "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
-      }
-    },
-    "fragmented": {
-      "interpreter": {
-        "exit": 0,
-        "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
-        "stderr": "",
-        "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
-      },
-      "native-sanitized": {
-        "exit": 0,
-        "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
-        "stderr": "",
-        "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
-      },
-      "native-standalone": {
-        "exit": 0,
-        "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
-        "stderr": "",
-        "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
-      }
-    },
-    "duplicate-length": {
-      "interpreter": {
-        "exit": 0,
-        "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
-        "stderr": "",
-        "responseHex": ""
-      },
-      "native-sanitized": {
-        "exit": 0,
-        "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
-        "stderr": "",
-        "responseHex": ""
-      },
-      "native-standalone": {
-        "exit": 0,
-        "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
-        "stderr": "",
-        "responseHex": ""
-      }
-    },
-    "handler-error": {
-      "interpreter": {
-        "exit": 0,
-        "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
-        "stderr": "",
-        "responseHex": ""
-      },
-      "native-sanitized": {
-        "exit": 0,
-        "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
-        "stderr": "",
-        "responseHex": ""
-      },
-      "native-standalone": {
-        "exit": 0,
-        "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
-        "stderr": "",
-        "responseHex": ""
-      }
-    }
-  },
+  "cases": {},
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "requestsPerProcess": 32,
+  "warmRequests": 8,
+  "measuredRequests": 24,
+  "measuredPairs": 3,
   "artifact": {
-    "assemblySha256": "3484fb437caf4598f493745fd3eed5a8ab4bee0a30d8ff05d22a97184e99d3c4",
-    "objectSha256": "93633e624d4aac091689eab41cd339968a560edcc5de62f34ed2ef8f657ede80"
+    "assemblySha256": "78db6f560f121d16d28fa5f9d855b9f26ee708d837cd68e6ef6ccea2634a4a17",
+    "objectSha256": "b54d51a8ffebb855a6c4e4a4ceea44a2f0e26984bff8355e2b30f7f02ffdf8fb"
   },
   "standalone": {
-    "bytes": 5248480,
-    "sha256": "51aaaa4e1353fa68a7371f6ac2dbf25b8bcb69e42aac4bf74ce6e59622eac169",
+    "bytes": 5231056,
+    "sha256": "7c4a49ee4cb3c9fa1aef5403a5ed889dde30aa7abe5ceb54bc9db02bf687ef95",
     "dependencies": [
       "\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)"
     ]
   },
-  "passed": true
+  "warmupAndQualification": {
+    "interpreter": {
+      "startupMs": 1881.865916,
+      "requestMs": [
+        307.064959,
+        322.439709,
+        324.44975,
+        323.92275,
+        323.374875,
+        322.41475,
+        323.905041,
+        324.222917,
+        323.698167,
+        323.610833,
+        323.203792,
+        323.058334,
+        322.360334,
+        324.649667,
+        323.881625,
+        322.759,
+        323.720791,
+        322.796459,
+        326.018083,
+        325.512584,
+        324.246958,
+        323.337333,
+        323.694708,
+        323.355458,
+        323.749791,
+        325.913791,
+        322.682375,
+        322.570916,
+        323.416083,
+        324.319875,
+        322.737209,
+        322.350875
+      ],
+      "measuredRequestsPerSecond": 3.0897395379578594,
+      "measuredMedianMs": 323.513458,
+      "exit": 0,
+      "stdout": "Served 32 requests; server closed\n"
+    },
+    "native-sanitized": {
+      "startupMs": 321.316625,
+      "requestMs": [
+        114.8855,
+        76.862334,
+        77.07575,
+        78.415917,
+        78.023667,
+        77.518542,
+        76.473958,
+        77.369167,
+        78.470791,
+        77.100417,
+        79.521542,
+        92.480042,
+        83.518875,
+        78.545,
+        77.866875,
+        77.810667,
+        77.391875,
+        77.469416,
+        78.716667,
+        78.327125,
+        77.890209,
+        78.754542,
+        77.96275,
+        77.680459,
+        78.786625,
+        78.263041,
+        77.867834,
+        77.70725,
+        78.722042,
+        77.412583,
+        78.756459,
+        78.107541
+      ],
+      "measuredRequestsPerSecond": 12.664034688728611,
+      "measuredMedianMs": 78.185291,
+      "exit": 0,
+      "stdout": "Served 32 requests; server closed\n"
+    },
+    "native-standalone": {
+      "startupMs": 234.350208,
+      "requestMs": [
+        90.511333,
+        49.796417,
+        49.249041,
+        50.2235,
+        49.685542,
+        48.7465,
+        48.086583,
+        49.099,
+        49.722292,
+        49.093833,
+        49.067541,
+        49.313083,
+        50.438833,
+        50.536542,
+        49.911667,
+        49.543083,
+        49.229875,
+        49.581333,
+        51.518583,
+        50.347125,
+        49.927625,
+        49.510417,
+        49.431417,
+        49.359917,
+        56.070125,
+        51.244,
+        49.893625,
+        49.759292,
+        49.417167,
+        49.227083,
+        50.273041,
+        50.144875
+      ],
+      "measuredRequestsPerSecond": 19.95738476347839,
+      "measuredMedianMs": 49.740792,
+      "exit": 0,
+      "stdout": "Served 32 requests; server closed\n"
+    }
+  },
+  "measured": {
+    "interpreter": [
+      {
+        "startupMs": 1868.401208,
+        "requestMs": [
+          309.706084,
+          323.443459,
+          324.455667,
+          342.583542,
+          340.819584,
+          327.535583,
+          335.337541,
+          329.693209,
+          324.129625,
+          327.201667,
+          326.836583,
+          324.344375,
+          322.657417,
+          327.075666,
+          325.5875,
+          330.158292,
+          325.877,
+          327.951417,
+          325.179917,
+          325.66825,
+          324.652708,
+          323.752333,
+          324.563041,
+          326.35375,
+          325.190458,
+          340.17475,
+          373.424375,
+          323.815834,
+          326.368334,
+          326.191375,
+          323.734708,
+          324.206917
+        ],
+        "measuredRequestsPerSecond": 3.047581783143484,
+        "measuredMedianMs": 325.627875,
+        "exit": 0,
+        "stdout": "Served 32 requests; server closed\n"
+      },
+      {
+        "startupMs": 1862.310333,
+        "requestMs": [
+          323.561125,
+          324.06225,
+          325.024583,
+          340.376916,
+          337.177541,
+          327.27675,
+          326.694709,
+          323.253542,
+          323.1285,
+          323.688292,
+          325.629,
+          325.676375,
+          325.002125,
+          327.274125,
+          324.03425,
+          324.580333,
+          322.725791,
+          324.350916,
+          325.386541,
+          325.781708,
+          323.686458,
+          324.429583,
+          323.940708,
+          327.114458,
+          327.737875,
+          326.50175,
+          323.423667,
+          323.270083,
+          323.089125,
+          323.298834,
+          324.370125,
+          329.064375
+        ],
+        "measuredRequestsPerSecond": 3.0780339326608384,
+        "measuredMedianMs": 324.399854,
+        "exit": 0,
+        "stdout": "Served 32 requests; server closed\n"
+      },
+      {
+        "startupMs": 1875.350084,
+        "requestMs": [
+          313.422208,
+          323.4685,
+          329.969125,
+          323.912583,
+          325.17275,
+          324.46675,
+          325.670542,
+          324.183584,
+          323.663833,
+          324.014458,
+          323.843833,
+          323.9045,
+          328.476542,
+          324.252458,
+          322.699042,
+          322.303625,
+          322.669833,
+          323.113042,
+          326.599625,
+          324.91,
+          324.056375,
+          322.363834,
+          325.4705,
+          325.595958,
+          324.976083,
+          326.647542,
+          322.986291,
+          323.664042,
+          323.173958,
+          326.425459,
+          324.327542,
+          326.81775
+        ],
+        "measuredRequestsPerSecond": 3.0820772089556363,
+        "measuredMedianMs": 324.0354165,
+        "exit": 0,
+        "stdout": "Served 32 requests; server closed\n"
+      }
+    ],
+    "native-standalone": [
+      {
+        "startupMs": 3.317375,
+        "requestMs": [
+          50.686584,
+          48.834375,
+          49.503708,
+          50.230334,
+          49.473125,
+          48.80525,
+          48.27,
+          49.027208,
+          49.49625,
+          49.399208,
+          49.250375,
+          49.348625,
+          50.028833,
+          50.275834,
+          49.7325,
+          49.436208,
+          49.66775,
+          49.463084,
+          50.612959,
+          50.418875,
+          49.759042,
+          49.372875,
+          49.999042,
+          50.148708,
+          50.187333,
+          50.241125,
+          49.497417,
+          49.470541,
+          49.254208,
+          49.354458,
+          50.18425,
+          50.365125
+        ],
+        "measuredRequestsPerSecond": 20.084276553374952,
+        "measuredMedianMs": 49.700125,
+        "exit": 0,
+        "stdout": "Served 32 requests; server closed\n"
+      },
+      {
+        "startupMs": 3.542291,
+        "requestMs": [
+          50.37825,
+          48.699666,
+          49.288583,
+          55.4985,
+          68.066667,
+          49.5845,
+          51.535042,
+          49.699792,
+          49.679083,
+          49.314,
+          49.219833,
+          49.407,
+          50.069041,
+          50.532417,
+          49.670583,
+          49.566708,
+          49.517542,
+          49.453208,
+          50.115917,
+          50.527667,
+          49.775208,
+          49.45,
+          49.34875,
+          49.236791,
+          49.932042,
+          50.090583,
+          49.985375,
+          49.573917,
+          49.164459,
+          49.114333,
+          51.265917,
+          50.4785
+        ],
+        "measuredRequestsPerSecond": 20.09227588669863,
+        "measuredMedianMs": 49.62225,
+        "exit": 0,
+        "stdout": "Served 32 requests; server closed\n"
+      },
+      {
+        "startupMs": 9.819083,
+        "requestMs": [
+          60.8575,
+          48.599875,
+          49.498,
+          49.988459,
+          50.092,
+          48.579833,
+          48.28025,
+          49.327625,
+          49.919625,
+          49.428417,
+          49.50775,
+          49.979875,
+          50.129292,
+          50.161416,
+          49.685125,
+          49.572,
+          49.232708,
+          49.476834,
+          50.16175,
+          50.421916,
+          49.711125,
+          49.398209,
+          49.245875,
+          49.439917,
+          50.162833,
+          50.548792,
+          49.608458,
+          49.621167,
+          49.159417,
+          49.288292,
+          50.252666,
+          50.284625
+        ],
+        "measuredRequestsPerSecond": 20.093803164540237,
+        "measuredMedianMs": 49.653146,
+        "exit": 0,
+        "stdout": "Served 32 requests; server closed\n"
+      }
+    ]
+  },
+  "summary": {
+    "interpreter": {
+      "medianRequestsPerSecond": 3.0780339326608384,
+      "medianStartupMs": 1868.401208,
+      "medianOfRequestMediansMs": 324.399854
+    },
+    "native-standalone": {
+      "medianRequestsPerSecond": 20.09227588669863,
+      "medianStartupMs": 3.542291,
+      "medianOfRequestMediansMs": 49.653146
+    }
+  },
+  "passed": true,
+  "postRunEnvironment": {
+    "cpu": "Apple M1",
+    "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+    "ravenRevision": "23688425e38e95fc7b36d8646342c991e1e9eda0",
+    "cilOptimization": "Cranelift 0.121.2 default opt_level=none; C adapters built -O2",
+    "limitations": [
+      "one macOS ARM64 machine, three short pairs, no .NET result",
+      "32 sequential connection-close requests per process, first eight excluded",
+      "startup samples follow warmup; not cold-machine startup",
+      "interpreter Release build; native standalone excludes sanitizers",
+      "different collector and host scheduling policies; native nonmoving heap capacity 1 MiB",
+      "client and server share the machine; each latency includes connection establishment and response read"
+    ]
+  }
 }

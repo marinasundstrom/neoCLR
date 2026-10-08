@@ -1,0 +1,58 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Tasks.*
+import System.Text.*
+import System.Web.Http.*
+
+func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    let source = Promise<Result<HttpResponse, HttpError>>()
+    if request.Method != "GET" || request.Target != "/greeting" || request.Headers.Count == 0 {
+        _ = source.Complete(Error(HttpError.Handler("Unexpected request")))
+        return source.Task
+    }
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
+    _ = source.Complete(Ok(HttpResponse(200, headers, Utf8.Encode("Café 🌍"))))
+    return source.Task
+}
+
+// Fixed request count keeps the first benchmark driver reproducible.
+class RequestLoop {
+    private val server: HttpServer
+    private var remaining: int = 32
+
+    init(server: HttpServer) {
+        self.server = server
+    }
+
+    func Next() {
+        let serving = server.ServeOne(Respond)
+        serving.OnCompleted(() => {
+            let result = serving.GetResult()
+            if let Error(error) = result {
+                server.Close()
+                System.Fail(error.ToString())
+            }
+            remaining -= 1
+            if remaining == 0 {
+                server.Close()
+                Console.WriteLine("Served 32 requests; server closed")
+            } else {
+                Next()
+            }
+        })
+    }
+}
+
+func Main() {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fail("Listen failed")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        server.Close()
+        System.Fail("Local port unavailable")
+    }
+    Console.WriteLine(port)
+    RequestLoop(server).Next()
+}

@@ -11995,3 +11995,27 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
   matched load measurement. These one-request results are correctness evidence, not
   throughput results or a production-readiness claim. Runtime Scheduler work remains
   guided by the author's cross-cutting-services clarification above.
+
+
+## 2026-10-08 — Native compilation as the next-release teaser
+
+- **Author direction:** Have something to show in the next release as a teaser:
+  “Native compilation is what brings value to the platform we are building”.
+- **Assistant response:** Focus on the checked-in Raven HTTP app producing a standalone
+  ARM64 executable, a reproducible demo and explicit WIP limits. Build on the first
+  working request with repeated requests, cleanup under sustained use and an honest
+  interpreter/native comparison for the Native compilation page. Keep future Scheduler
+  and cross-cutting service design as foundations, not prerequisites for the teaser.
+- **Current evidence/open work:** The four-case same-artifact HTTP consumer passes;
+  repeated-request validation and load measurements are being developed. No release
+  version/date or production guarantee is inferred from this direction.
+
+- **Author release clarification:** The target release has “full Raven compiler-target
+  bootstrap (no .NETbridge)” through neoCLR metadata, interpreted or compiled natively
+  by neoCLR.
+- **Assistant response/action:** Record that as a release requirement, distinguishing
+  the current HTTP execution proof from a qualified release build path. Existing
+  preparation documentation still permits a generated CLI Core bootstrap and current
+  HTTP compiler commands use Core.dll; this is remaining target qualification work.
+  Treat compiler hosting/self-hosting as separate from the stated compiler-target
+  requirement, without assuming an additional compiler-host migration.

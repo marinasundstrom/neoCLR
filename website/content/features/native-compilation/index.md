@@ -45,8 +45,8 @@ and response bytes match. The native host checks frame/root cleanup and reclaims
 
 [Reproduction and evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/native-web)
 include sanitized and standalone executions. Required GC, queue, socket and fault
-support is linked into the image. This is a one-request correctness POC; sustained
-serving, HTTP load measurements and broad failure-path qualification remain next steps.
+support is linked into the image. A repeated-request sample also serves 32 sequential connections in one process.
+Long-running load, concurrency and broad failure-path qualification remain next steps.
 [Web and HTTP](../web/) describes the application APIs.
 
 ## Measurements and comparisons
@@ -80,8 +80,24 @@ check; it is not a server or cross-platform performance claim.
 are checked into the repository. The ASP.NET Core greeting sample is an initial comparison
 candidate. No HTTP performance ranking against .NET or another platform is available yet.
 
-With the one-request POC working, extend it to a persistent process and compare
-interpreted and native neoCLR first, then ASP.NET
+A first local HTTP comparison now uses one persistent process for 32 sequential
+connection-close requests, excluding the first eight requests from request timing.
+Three alternating pairs on Apple M1/macOS ARM64 (2026-10-08) produced:
+
+| Same Raven HTTP artifact | Median requests/s | Median request latency |
+| --- | ---: | ---: |
+| Release interpreter | 3.08 | 324.40 ms |
+| ARM64 native standalone | 20.09 | 49.65 ms |
+
+Each response is validated. Latency is the median of per-run medians and includes
+connection establishment and response reading by a client on the same machine.
+The short runs use different GC/host scheduling policies; native adapters use -O2,
+while native CIL currently uses Cranelift's default unoptimized setting. These are
+POC baselines, not capacity or tail-latency claims. Startup is measured separately.
+[Raw samples, tool hashes and full method](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/native-web/persistent-http-validation.json)
+make the comparison reviewable.
+
+Extend the short repeated-request comparison to longer matched loads, then ASP.NET
 Core JIT and Native AOT with matching successful requests and responses. Start with
 HTTP/1.1, identical UTF-8 payloads, connection-close behavior and concurrency one.
 Measure startup separately from steady-state throughput, latency percentiles, errors,
@@ -97,7 +113,10 @@ an advantage over it; useful comparisons require equivalent behavior and measure
 
 - **Target and toolchain:** ARM64 is the primary target; executable evidence currently
   comes from macOS ARM64. Use the matching development Raven/compiler/library bundle.
-  This is not a general-purpose native publishing command for every neoCLR app.
+  The development compiler target still uses a temporary CLI core bootstrap; full
+  native-metadata compiler-target bootstrap without the .NET bridge is a release
+  requirement. A standalone output image does not by itself establish that build-path
+  qualification. This is not a general-purpose publishing command for every neoCLR app.
 - **Library coverage:** Hello World, unions, console/text operations and selected routing
   paths work, along with the tested HTTP accept/read/write and task-completion path.
   Broader generics, library coverage and sustained server behavior still need qualification.

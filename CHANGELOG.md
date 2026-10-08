@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add a Raven HTTP consumer serving 32 sequential requests per process and a matched
+  interpreter/native validation and measurement mode. Record three short pairs, raw
+  request/startup samples and limitations; all responses and native cleanup checks pass.
+  Compact oversized command output in HTTP evidence to its hash. Reaffirm the next-release
+  native teaser and full compiler-target bootstrap without the .NET bridge as distinct
+  requirements; current development Core.dll remains an explicit qualification gap.
+
 - Run the existing Raven HttpServer app natively through a private queue/socket host.
   Check in a same-artifact interpreter/native verifier: greeting, fragmented input,
   duplicate Content-Length and handler rejection match across interpreter, sanitized
