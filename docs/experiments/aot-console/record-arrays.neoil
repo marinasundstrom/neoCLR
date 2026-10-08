@@ -1,0 +1,157 @@
+.module Callbacks
+.type class Counter
+.field Number Int32
+.method instance .ctor(Int32 number) -> noresult
+ldarg 0
+ldarg number
+stfld Counter::Number
+ret
+.end
+.method instance Add(Int32 delta) -> Int32
+ldarg 0
+ldarg 0
+ldfld Counter::Number
+ldarg delta
+add
+stfld Counter::Number
+ldarg 0
+ldfld Counter::Number
+ret
+.end
+.end
+.type class Holder
+.field Callback fn<Int32,Int32>
+.method instance .ctor(fn<Int32,Int32> callback) -> noresult
+ldarg 0
+ldarg callback
+stfld Holder::Callback
+ret
+.end
+.end
+.function Make() -> fn<Int32,Int32>
+ldc.i4 40
+newobj.ctor instance Counter::.ctor(Int32)
+function.bind fn<Int32,Int32> = instance Counter::Add(Int32)
+ret
+.end
+.function Static(Int32 number) -> Int32
+ldarg number
+ldc.i4 2
+add
+ret
+.end
+.function Fail(Int32 number) -> Int32
+ldarg number
+ldc.i4 0
+div
+ret
+.end
+.function NewCounter() -> Counter
+ldc.i4 42
+newobj.ctor instance Counter::.ctor(Int32)
+ret
+.end
+.function Empty() -> noresult
+ret
+.end
+.function Unit() -> Void
+ldvoid
+ret
+.end
+.type Cell
+.field Callback fn<Int32,Int32>
+.field Number Int32
+.field Text String
+.end
+.function Calculate(Int32 mode) -> Int32
+.local arrayref<Cell> cells
+.local Cell snapshot
+.local fn<Int32,Int32> empty
+.local Int32 count
+ldc.i4 2
+array.reserve Cell
+stloc cells
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Uninitialized
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Bounds
+ldloc cells
+ldc.i4 1
+call Make()
+ldc.i4 7
+ldstr "kept"
+newobj Cell
+stelem Cell
+ldloc cells
+ldc.i4 1
+ldelem Cell
+stloc snapshot
+ldloca snapshot
+ldc.i4 8
+stfld Cell::Number
+pop
+ldloca empty
+initobj fn<Int32,Int32>
+ldloca snapshot
+ldloc empty
+stfld Cell::Callback
+pop
+ldc.i4 0
+stloc count
+Loop:
+ldloc cells
+ldc.i4 0
+call Make()
+ldloc count
+ldstr "discarded"
+newobj Cell
+stelem Cell
+ldloc count
+ldc.i4 1
+add
+stloc count
+ldloc count
+ldc.i4 1000
+clt
+brtrue Loop
+ldloc cells
+ldc.i4 1
+ldelem Cell
+ldfld Cell::Number
+ldc.i4 7
+ceq
+brfalse Bad
+ldloc snapshot
+ldfld Cell::Number
+ldc.i4 8
+ceq
+brfalse Bad
+ldloc cells
+ldc.i4 1
+ldelem Cell
+ldfld Cell::Callback
+ldc.i4 2
+callvirt instance fn<Int32,Int32>::Invoke(Int32)
+ret
+Uninitialized:
+ldloc cells
+ldc.i4 0
+ldelem Cell
+pop
+ldc.i4 0
+ret
+Bounds:
+ldloc cells
+ldc.i4 -1
+ldelem Cell
+pop
+ldc.i4 0
+ret
+Bad:
+ldc.i4 -1
+ret
+.end

@@ -108,5 +108,5 @@ library's growth to 20 entries, Copy, mutation through shared callbacks, replace
 native consumer matches the interpreter and links only libSystem.
 [Container evidence](../../../benchmarks/native-web/callback-array-validation.json) records
 reproduction and the next server boundary: arrays of `Result<Void, HttpError>` used by
-its task state. General value-array storage is the next prerequisite; the HTTP server
-itself has not yet run natively.
+its task state. [Reserved value-array storage](record-arrays.md) now handles admitted records; bounded
+full-server selection and HTTP enum storage are next. The HTTP server itself has not yet run natively.

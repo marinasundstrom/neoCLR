@@ -17,8 +17,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   remain work in progress. Follow with typed callback-array storage and Function method
   specialization: preserve checked initialization, receiver retention, replacement and
   ArrayList growth/copy behavior. Native/interpreter container and fault checks pass;
-  the HTTP app next requires arrays of task-result values. No public API, Raven compiler
-  or bridge contract changes.
+  the HTTP app next requires arrays of task-result values. Add checked reserved value-array
+  snapshots, initialized-element GC tracing and closed nominal method specialization.
+  Validate real ArrayList<Result<int,string>> growth/copy/replacement and union patterns
+  in both modes. The full server now reaches the 128-type specialization budget; HTTP
+  enum storage and task/socket completion remain open. No public API, Raven compiler
+  or bridge contract changes. Record the StringBuilder discussion and existing deferred
+  prototype evidence; no public builder or change in roadmap priority is introduced.
 
 - Extend AOT erased transport and closed specialization with Int64/UInt64, preserving
   high bits and exact type tags through generic calls. Admit full-width equality;

@@ -1,0 +1,29 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Web.Http.*
+
+func Main() -> int {
+    let results = ArrayList<Result<System.Void, HttpError>>()
+    var index = 0
+    while index < 20 {
+        results.Add(Error(HttpError.Handler("retained error")))
+        index += 1
+    }
+    let copy = results.Copy()
+    index = 0
+    while index < 1000 {
+        results[0] = Error(HttpError.Handler(String.Concat("discarded", " payload")))
+        index += 1
+    }
+    let Error(HttpError.Handler(message)) = copy[0] else {
+        return 1
+    }
+    if message != "retained error" {
+        return 2
+    }
+    let Error(HttpError.Handler(latest)) = results[0] else {
+        return 3
+    }
+    return if latest == "discarded payload" { 0 } else { 4 }
+}

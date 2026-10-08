@@ -19,14 +19,14 @@ static int blocks_valid(const neoclr_aot_text_arena *a) {
         if (b->span < sizeof(block) + 8 || (b->span & 7) || b->span > a->used - at ||
             b->state > 7 || (b->state && !(b->state & ALLOCATED)) ||
             (b->state && (!b->bytes || b->bytes > b->span - sizeof(block) ||
-                          b->kind < NEOCLR_GC_TEXT || b->kind > NEOCLR_GC_STRINGS))) return 0;
+                          b->kind < NEOCLR_GC_TEXT || b->kind > NEOCLR_GC_RECORDS))) return 0;
         at += b->span;
     }
     return 1;
 }
 int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
                              uint32_t kind, void **output) {
-    if (!output || !blocks_valid(a) || !bytes || kind < NEOCLR_GC_TEXT || kind > NEOCLR_GC_STRINGS)
+    if (!output || !blocks_valid(a) || !bytes || kind < NEOCLR_GC_TEXT || kind > NEOCLR_GC_RECORDS)
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (bytes > UINT64_MAX - sizeof(block) - 7) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
     uint64_t needed = sizeof(block) + ((bytes + 7) & ~UINT64_C(7));
@@ -106,6 +106,20 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
         if (b->kind == NEOCLR_GC_OBJECT) {
             for (uint64_t offset = 8; offset + 8 <= b->bytes; offset += 8) {
                 uint64_t word; memcpy(&word, data + offset, 8); mark(a, word, &pending);
+            }
+        } else if (b->kind == NEOCLR_GC_RECORDS) {
+            uint64_t kind, length, lanes;
+            if (b->bytes < 24) goto invalid_descriptor;
+            memcpy(&kind, data, 8); memcpy(&length, data + 8, 8); memcpy(&lanes, data + 16, 8);
+            if (kind != UINT64_C(0x80000005) || !lanes || lanes > 32 ||
+                length > 65536 || length > (b->bytes - 24) / (lanes * 8 + 1)) goto invalid_descriptor;
+            uint64_t markers = 24 + length * lanes * 8;
+            for (uint64_t i = 0; i < length; i++) {
+                if (!data[markers + i]) continue;
+                for (uint64_t lane = 0; lane < lanes; lane++) {
+                    uint64_t word; memcpy(&word, data + 24 + (i * lanes + lane) * 8, 8);
+                    mark(a, word, &pending);
+                }
             }
         } else if (b->kind == NEOCLR_GC_STRINGS) {
             uint64_t kind, length;

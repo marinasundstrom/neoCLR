@@ -1,0 +1,35 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+
+func Main() -> int {
+    let results = ArrayList<Result<int, string>>()
+    var index = 0
+    while index < 20 {
+        results.Add(Error("retained error"))
+        index += 1
+    }
+    let copy = results.Copy()
+    index = 0
+    while index < 1000 {
+        results[0] = Error(String.Concat("discarded", " payload"))
+        results[1] = Ok(index)
+        index += 1
+    }
+    let Error(message) = copy[0] else {
+        return 1
+    }
+    if message != "retained error" {
+        return 2
+    }
+    let Error(latest) = results[0] else {
+        return 3
+    }
+    if latest != "discarded payload" {
+        return 4
+    }
+    if let Ok(value) = results[1] {
+        return if value == 999 { 0 } else { 5 }
+    }
+    return 6
+}

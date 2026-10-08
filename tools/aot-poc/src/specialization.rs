@@ -60,7 +60,7 @@ impl Specializer<'_> {
             Type::ByRef(t) => return Ok(Type::ByRef(Box::new(self.lower(t)?))),
             Type::Array(t) if **t == Type::Byte => return Ok(ty.clone()),
             Type::ArrayRef(t) if **t == Type::String => return Ok(ty.clone()),
-            Type::ArrayRef(t) if matches!(**t, Type::Function(_)) => return Ok(Type::ArrayRef(Box::new(self.lower(t)?))),
+            Type::ArrayRef(t) if matches!(**t, Type::Function(_) | Type::Named(_) | Type::Constructed { .. }) => return Ok(Type::ArrayRef(Box::new(self.lower(t)?))),
             Type::ArrayRef(t) if **t == Type::Byte => {
                 if let Some(owner) = super::selection::byte_array_owner(self.source) { self.lower(&owner)?; }
                 return Ok(ty.clone());
@@ -166,10 +166,10 @@ impl Specializer<'_> {
         if target
             .generic_arguments
             .iter()
-            .any(|t| !matches!(t, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String | Type::Int64 | Type::UInt64 | Type::Function(_)))
+            .any(|t| !matches!(t, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String | Type::Int64 | Type::UInt64 | Type::Function(_) | Type::Named(_) | Type::Constructed { .. }))
         {
             return Err(
-                format!("generic method arguments require primitive or Function shapes: {} {:?}", target.name, target.generic_arguments).into(),
+                format!("generic method arguments require primitive, Function or closed nominal shapes: {} {:?}", target.name, target.generic_arguments).into(),
             );
         }
         let arguments = match &target.owner {

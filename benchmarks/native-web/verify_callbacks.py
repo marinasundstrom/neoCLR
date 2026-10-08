@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
-p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList'))
+p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList'))
 a = p.parse_args()
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
@@ -19,7 +19,7 @@ base = ROOT / 'docs/experiments/aot-console'
 seed, core, ownership = (bundle / 'lib' / n for n in ('System.runtime.neox', 'Core.dll', 'ownership.json'))
 libs = [bundle / 'lib' / n for n in ('System.Runtime.dll', 'System.Web.dll', 'System.Networking.dll', 'System.Data.dll')]
 context = ['--system', seed, *[x for lib in libs for x in ('--module', lib)], '--object-root', libs[0]]
-flags = [*context, '--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc']
+flags = [*context, '--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc', '--bind-int32-to-string', '--bind-utf8-text']
 adapters = [base / 'callback-host.c', base / 'root-probe.c', base / 'native-gc.c',
             base / 'text-arena.c', base.parent / 'aot-fault-details/render.c']
 report = {'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
@@ -40,7 +40,7 @@ def run(command, status=0):
 for f in [Path(__file__), compiler, runtime, aot, core, seed, ownership, *libs, *adapters,
           *ROOT.joinpath('tools/aot-poc/src').glob('*.rs'), *base.glob('*.h'), *base.parent.joinpath('aot-fault-details').glob('*.h'), *compiler.parent.glob('*.dll')]:
     report['inputs'][str(f)] = hashlib.sha256(f.read_bytes()).hexdigest()
-for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList')):
+for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList')):
     source = Path(__file__).with_name(name + '.rvn')
     report['inputs'][str(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
     assembly, obj, native = (output / (name + suffix) for suffix in ('.dll', '.o', ''))
@@ -48,7 +48,7 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList')):
          *[x for lib in libs for x in ('--reference', lib)], '--bootstrap-intrinsics', '--bootstrap-ownership',
          ownership, '--object-library', 'System.Runtime', '-o', assembly, source])
     expected = 1 if name == 'CallbackFault' else 0
-    interpreted = run([runtime, 'run', assembly, *context], expected)
+    interpreted = run([runtime, 'run', assembly, *context, '--instructions', '100000000'], expected)
     inspection = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world', *flags]).stdout)
     if not inspection['admission']['accepted']:
         raise RuntimeError(inspection['admission'])
@@ -79,8 +79,7 @@ run(['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', s
      *[x for lib in libs for x in ('--reference', lib)], '--bootstrap-intrinsics', '--bootstrap-ownership',
      ownership, '--object-library', 'System.Runtime', '-o', assembly, source])
 inspection = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world', *flags,
-                            '--bind-socket-listener', '--bind-console-write-line', '--bind-integer-text',
-                            '--bind-int32-to-string', '--bind-utf8-text']).stdout)
+                            '--bind-socket-listener', '--bind-console-write-line', '--bind-integer-text']).stdout)
 report['serverAdmission'] = inspection['admission']
 if hashlib.sha256(aot.read_bytes()).hexdigest() != report['inputs'][str(aot)]:
     raise RuntimeError('AOT executable changed during validation; rerun with a stable build')

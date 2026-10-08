@@ -5,10 +5,10 @@
 #ifdef NEOCLR_NATIVE_GC
 #include "native-gc.h"
 #endif
-enum { TEXT_STORAGE = 1, OBJECT_STORAGE = 2, BYTES_STORAGE = 3, STRINGS_STORAGE = 4 };
+enum { TEXT_STORAGE = 1, OBJECT_STORAGE = 2, BYTES_STORAGE = 3, STRINGS_STORAGE = 4, RECORDS_STORAGE = 5 };
 #ifdef NEOCLR_NATIVE_GC
 _Static_assert((int)TEXT_STORAGE == (int)NEOCLR_GC_TEXT && (int)OBJECT_STORAGE == (int)NEOCLR_GC_OBJECT &&
-               (int)BYTES_STORAGE == (int)NEOCLR_GC_BYTES && (int)STRINGS_STORAGE == (int)NEOCLR_GC_STRINGS,
+               (int)BYTES_STORAGE == (int)NEOCLR_GC_BYTES && (int)STRINGS_STORAGE == (int)NEOCLR_GC_STRINGS && (int)RECORDS_STORAGE == (int)NEOCLR_GC_RECORDS,
                "allocation kind contract");
 #endif
 static int32_t reserve_storage(neoclr_aot_text_arena *arena, uint64_t bytes,
@@ -329,5 +329,23 @@ int32_t neoclr_allocate_strings_v1(neoclr_aot_text_arena *arena, int32_t length,
     memcpy(array + 8, &count, 8);
     memset(array + 16, 0, (size_t)length * (reserved ? 9 : 8));
     *output = array;
+    return NEOCLR_AOT_FAULT_NONE;
+}
+
+/* Private checked value-array storage: header, length, padded lane count, snapshots,
+ * then one initialization byte per element. No collection occurs inside allocation. */
+int32_t neoclr_reserve_records_v1(neoclr_aot_text_arena *arena, int32_t length,
+                                uint32_t lanes, void **output) {
+    if (length < 0) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (length > 65536) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
+    if (!arena || !output || !lanes || lanes > 32) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    void *storage;
+    uint64_t bytes = 24 + (uint64_t)length * (8 * lanes + 1);
+    int32_t status = reserve_storage(arena, bytes, RECORDS_STORAGE, &storage);
+    if (status) return status;
+    uint64_t header[] = {UINT64_C(0x80000005), (uint64_t)length, lanes};
+    memcpy(storage, header, sizeof(header));
+    memset((unsigned char *)storage + 24, 0, (size_t)bytes - 24);
+    *output = storage;
     return NEOCLR_AOT_FAULT_NONE;
 }

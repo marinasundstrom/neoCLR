@@ -47,8 +47,11 @@ specialization and equality. The isolated listener now runs in both modes with e
 explicit host-scope cleanup, including guest fault exits. [Stored native callbacks](experiments/aot-console/callbacks.md)
 now retain receivers through collection and preserve fault traces in real Raven consumers.
 Function arrays and the real ArrayList callback consumer now support growth, copies,
-replacement and collection. The full server advances to arrays of Result<Void, HttpError>.
-Next address value-array storage, task dispatch, host-root ownership and asynchronous socket services. Component benchmarks do not
+replacement and collection. [Reserved value arrays](experiments/aot-console/record-arrays.md)
+now execute the real ArrayList<Result<int,string>> growth/copy/replacement path with nested
+reference tracing. The full server reaches the 128-type specialization budget; the narrower
+HTTP result shape also exposes enum storage. Next address bounded selection and enum admission,
+then task dispatch, host-root ownership and asynchronous socket services. Component benchmarks do not
 qualify a server.
 
 **Author clarification:** build the CIL-to-native, self-contained executable foundation

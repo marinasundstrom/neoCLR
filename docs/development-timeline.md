@@ -11890,3 +11890,22 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
   The listener passes interpreted execution and now reaches unbound socket services;
   the full server independently reaches function-valued generic arguments. The author
   directs “Continue and don't stop”; continue implementation slices toward the HTTP app.
+
+## 2026-10-08 — StringBuilder question during native HTTP work
+
+- **Author question:** “Does neoCLR also need a StringBuilder class?”
+- **Assistant assessment:** A small UTF-8 builder is a useful library candidate for
+  incremental text construction, including the existing HTTP header concatenation loop.
+  It is not a prerequisite for the current native-execution foundation. Response-body
+  streaming remains a separate need; a builder should not require buffering entire bodies.
+- **Existing evidence reviewed:** The [ReportTextBuilder experiment](design/text-abstraction.md)
+  has explicit byte quotas and immutable snapshots but was slower than concatenation in
+  its interpreter report workload. The existing decision to defer public promotion remains.
+  No claim is made that its earlier timings predict the native HTTP workload.
+- **Assistant proposal:** Revisit a minimal Append/AppendLine/Clear/materialization API
+  with explicit UTF-8 byte units and snapshot guarantees when the HTTP consumer justifies
+  it. Compare an append buffer or one-pass join with existing concatenation, measuring both
+  execution modes. ToString naming was suggested, not adopted; the prototype uses Build.
+- **Action and open status:** Inspect current source and research; record this exchange.
+  No public builder was implemented or reprioritized by this question, and no author
+  decision approving its API or implementation is available. Continue the authorized AOT work.

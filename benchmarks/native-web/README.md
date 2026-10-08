@@ -66,7 +66,8 @@ invalid addresses/ranges, duplicate binding, idempotent close, stale handles and
 reuse. `ListenFault.rvn` leaves a listener open before a user fault; the native host
 releases it and matches interpreter fault output. The complete HTTP server still
 advances through stored callbacks and their ArrayList storage to value-array admission and still needs
-asynchronous socket/task support.
+asynchronous socket/task support. Reserved value-array storage now passes its own consumer;
+the full HTTP app reaches the current specialization budget.
 [Wide-value evidence](handle-validation.json) records the earlier admission boundary;
 [current listener evidence](listener-validation.json) records the completed lifecycle.
 This is correctness/admission work, not a performance optimization; the routing
@@ -171,6 +172,22 @@ interpreter modification is required for this native implementation slice.
 `CallbackList.rvn` extends this consumer through the real ArrayList growth/Copy/indexed
 replacement path, including shared receiver mutations and 1,000 discarded bound methods.
 Run the same command with `--case CallbackList` for the focused container check; without
-`--case` the script runs all three callback samples. [Container evidence](callback-array-validation.json)
+`--case` the script runs all callback and value-storage samples. [Container evidence](callback-array-validation.json)
 records matching interpreter/native results and the next HTTP rejection: arrays of
 `Result<Void, HttpError>`. Historical callback evidence retains its earlier admission boundary.
+
+## Reserved value-array prerequisite
+
+`ResultList.rvn` exercises the real ArrayList<Result<int,string>> path, including growth,
+Copy, Error/Ok replacement, let-pattern and if-let matching, and 1,000 transient strings.
+Use `verify_callbacks.py --case ResultList` with the same required path arguments for its
+focused interpreted/native correctness run. The script allows 100 million interpreter
+instructions; it does not claim equal execution budgets or measure performance.
+[Value-array evidence](record-array-validation.json) records matching outputs, native GC
+and standalone dependencies. [The implementation notes](../../docs/experiments/aot-console/record-arrays.md)
+describe initialized snapshots, conservative tracing and unsupported operations.
+
+The full HTTP driver next exceeds the current 128-specialized-type budget. `TaskResultList.rvn`
+is a narrower admission probe for Result<Void,HttpError>; native success is not yet
+claimed because HttpStatusCode enum metadata remains unsupported. The source is checked
+in to drive that next step, rather than hiding the wider HTTP dependency.

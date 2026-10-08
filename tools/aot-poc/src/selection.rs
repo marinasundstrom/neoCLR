@@ -405,7 +405,7 @@ pub(super) fn select_inventory(
             Type::ByRef(t) => pending_types.push(*t),
             Type::Array(t) if *t == Type::Byte => (),
             Type::ArrayRef(t) if *t == Type::String => (),
-            Type::ArrayRef(t) if matches!(*t, Type::Function(_)) => pending_types.push(*t),
+            Type::ArrayRef(t) if matches!(*t, Type::Function(_) | Type::Named(_)) => pending_types.push(*t),
             Type::ArrayRef(t) if *t == Type::Byte => {
                 if let Some(owner) = byte_array_owner(input) { pending_types.push(owner); }
             },
