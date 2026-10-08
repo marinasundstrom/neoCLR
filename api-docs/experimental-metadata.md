@@ -7909,5 +7909,6 @@ Missing referenced local declarations or an absent native Object root raise
 ordinary external-core emission retains its existing contract. General foreign
 references colliding with output identity still reject. This is producer support,
 not a complete core profile validator, compiler bootstrap or executable CLI core.
-Raven's native-only consumer still stops at semantic initialization; see the
+Raven's opt-in compiler API native-only consumer now emits and executes integer arithmetic;
+full source-library/core qualification remains pending. See the
 [frontier and validation](../docs/experiments/native-core-bootstrap/README.md).

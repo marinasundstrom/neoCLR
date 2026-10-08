@@ -8,12 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Exercise Raven's explicit native-only metadata mode with an authored native core:
+  compile an integer consumer without CLI semantic references and run it interpreted
+  and ARM64 native with result 42. Check missing cores, exact identity mismatch and
+  CLI emission refusal; standalone output links only libSystem. Full source-runtime
+  and driver/editor bootstrap remain pending. Record RavenDoc's separate native-input
+  migration so eventual ownership labels come from real library metadata.
+
 - Allow native core PE/#Neo producers to reference their own core declarations with
   local TypeDef handles instead of failing on an external self-dependency. Require
   an authored Object root and reject missing local projection declarations; retain
   executable CLI and foreign-identity guards. Add writer checks and a native-only
-  Raven core probe; compiler semantic initialization remains blocked at RAVT004,
-  so this is a bootstrap prerequisite, not a completed no-bridge target.
+  Raven core probe, which exposed the initialization failure closed by the explicit
+  compiler API mode above. Full no-bridge target qualification remains pending.
 
 - Record the supplied first-class module proposal verbatim and assess the author's
   clarifications that modules become namespaces and RuntimeContext should center on

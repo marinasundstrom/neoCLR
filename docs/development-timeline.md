@@ -12209,3 +12209,21 @@ claim follows from these focused checks.
   Raven syntax, artifact names, implementation experiment or release reprioritization
   has been adopted. The assistant's bounded experiment is a suggestion, not performed
   work. Cross-assembly imports, identity migration and runtime enforcement remain open.
+
+
+## 2026-10-08 — Native core bootstrap and RavenDoc provenance
+
+- **Author direction:** after recording the module proposal, resume main development;
+  subsequently continue. During the native-core work, the author observed: “I imagine
+  getting rid of the importer will also affect RavenDoc so it doesn't mention Probe.dll.”
+- **Assistant response:** retire the temporary CLI projection input path while retaining
+  native metadata reading. RavenDoc should use actual library ownership; changing
+  labels alone would misrepresent its inputs. Its separate loader needs migration.
+- **Work:** fixed self-owned native core production in `19cc3558`, then introduced an
+  explicit Raven compiler API native-only semantic mode. A bounded integer consumer
+  emits and runs interpreted and ARM64 native with result 42, using native metadata
+  inputs and an empty native System seed. [Evidence](experiments/native-core-bootstrap/README.md).
+- **Remaining:** native catalog/driver/project integration, a complete source-built core,
+  Windows/editor qualification and RavenDoc's native provider. The prior RavenDoc
+  release deferral remains history; the new observation is recorded as the intended
+  migration outcome, not assumed approval for a rewrite or changed release scope.

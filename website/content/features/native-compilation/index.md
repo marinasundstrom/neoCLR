@@ -117,7 +117,9 @@ an advantage over it; useful comparisons require equivalent behavior and measure
   native-metadata compiler-target bootstrap without the .NET bridge is a release
   requirement. A standalone output image does not by itself establish that build-path
   qualification. A [reduced core probe](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-core-bootstrap/README.md)
-  now passes native core writing but still stops at compiler semantic initialization.
+  now compiles through the explicit native-only compiler API and returns the same result
+  interpreted and native. The complete runtime-library and driver/editor path still
+  requires migration.
   This is not a general-purpose publishing command for every neoCLR app.
 - **Library coverage:** Hello World, unions, console/text operations and selected routing
   paths work, along with the tested HTTP accept/read/write and task-completion path.

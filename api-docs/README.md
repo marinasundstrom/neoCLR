@@ -1283,3 +1283,21 @@ AssemblyMemberDefinition, AssemblyMemberInfo, both GetMembers methods and consta
 ownership/FullName properties have [manual API coverage](experimental-metadata.md#assembly-level-member-model-development-2026-10-08).
 They are host metadata APIs, outside the guest RavenDoc assembly. The renamed constant
 APIs and assembly manifest key require rebuilding earlier same-day prototype artifacts.
+
+
+### RavenDoc consequence of native-only core work (2026-10-08)
+
+The author notes that retiring the importer should also remove Probe artifact names
+from RavenDoc. The temporary CLI projection/import path is the part to retire; native
+metadata reading and symbol resolution remain necessary. `Probe.dll` is generator
+tooling, while `NeoCLR.CoreProbe.dll` is the aggregate documentation reference whose
+identity currently appears in generated ownership. The inspected loader still builds
+portable references and adds framework references; the renderer uses declaring symbols.
+
+The new compiler API native-only metadata mode is a prerequisite, not an automatic
+RavenDoc migration. Reuse the [native-provider plan](../docs/experiments/extended-cli-metadata/native-documentation-provider-2026-10-07.md)
+with actual native core/library inputs and canonical documentation identity. Preserve
+route/coverage checks and ordinary .NET documentation as controls. The earlier explicit
+release deferral remains recorded; this follow-up confirms the desired outcome without
+selecting a renderer rewrite or silently establishing a new release gate. Existing
+reference snapshots and truthful owner labels remain until the input migration works.

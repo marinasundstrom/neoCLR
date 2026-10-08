@@ -2,8 +2,8 @@
 
 The release requires a compiler target that consumes neoCLR metadata without a
 .NET semantic bridge. Native output and a standalone executable are not sufficient
-proof. This reduced experiment addresses the first producer boundary and records
-the next compiler boundary; it is not a complete runtime library or executable demo.
+proof. This reduced experiment addresses native core production and compiler initialization,
+then executes a small consumer; it is not a complete runtime library or release demo.
 
 ## Writer correction
 
@@ -30,10 +30,8 @@ cannot satisfy the author's no-bridge target gate on its own.
 it exclusively as `NeoClrMetadataReference`, and tries to compile an integer consumer.
 No C# reference assembly is generated or passed to Raven. The .NET process hosts the
 compiler and metadata tools; compiler hosting is separate from target bootstrapping.
-The core deliberately uses the currently required `NeoCLR.CoreProbe` identity so the
-probe reaches semantic initialization instead of failing the earlier CLI profile
-name guard. It includes Object, ValueType, attribute support and three primitives;
-it is not a full primitive/core contract.
+The current core uses the explicit `NativeCore` identity and remains deliberately
+incomplete. It is not a full primitive/core contract.
 
 ```sh
 dotnet run --project docs/experiments/native-core-bootstrap/Probe.csproj \
@@ -42,20 +40,48 @@ dotnet run --project docs/experiments/native-core-bootstrap/Probe.csproj \
   -p:WarningLevel=0 -- /tmp/fresh-native-core-probe
 ```
 
-At Raven `bc3c500e6`, the core artifact is written, then diagnostics report **RAVT004**:
-the .NET MetadataLoadContext cannot find NeoCLR.CoreProbe. The probe exits 2 and does
-not produce a consumer. `DotNetCompilationTarget.InitializeSemanticData` still
-creates a .NET session from portable references before native semantic references
-are initialized. Adding a CLI reference projection would hide the failure and would
-not close this gate. Next evaluate a native-only semantic initialization path behind
-an explicit target contract, then catalog/driver/project support and a complete
-source-runtime core. Preserve ordinary .NET and temporary CLI profiles as controls.
-No Raven compiler implementation change is included here.
+### Initial failure and native-only follow-through
+
+At Raven `bc3c500e6`, the original three-primitive probe wrote its core artifact but
+reported **RAVT004** during .NET metadata-session initialization. The
+[initial evidence](validation.json) remains historical. It exposed a compiler
+composition requirement rather than a failure to decode native metadata.
+
+Raven commit `10dce0c3b` adds the explicit compiler API mode
+`MetadataImportOptions.WithNativeMetadata()`, which now
+bypasses that session. The current fixture uses its own `NativeCore` identity,
+explicit unit/Object contracts and native semantic references only. It includes
+Int32, Int64, Boolean, Void and String plus minimal Object slots and attribute support.
+These are test fixtures; constant hash/display/Equals bodies are not production Object
+behavior. `consumer.rvn` only exercises integer arithmetic and return. No fixture
+Object method is selected by the AOT closure.
+
+The probe checks symbols, emission, missing-core rejection, exact core-version
+mismatch and default CLI emission refusal. A separate executable verifier assembles
+an empty native System seed to avoid a competing default Object, then runs the consumer
+in the interpreter and ARM64 native code. Both produce integer 42; the CLI interpreter
+returns process exit 42. The C harness checks the native result/status and exits zero.
+The executable links only macOS libSystem.
+
+```sh
+python3 docs/experiments/native-core-bootstrap/verify.py \
+  --raven /absolute/path/to/Raven \
+  --runtime target/release/neoclr \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --output /tmp/fresh-native-core-execution
+```
+
+[Execution evidence](execution-validation.json) records commands and artifact hashes.
+This is an API-level prerequisite: `NeoClrReferenceCatalog`, rvnc/project/editor
+configuration and complete source-runtime bootstrapping still use the CLI core path.
+Next extend the explicit catalog contract and test native core declaration completeness
+before changing the full bundle. RavenDoc likewise needs its own native input provider;
+changing semantic initialization does not automatically migrate documentation inputs.
 
 ## Validation
 
 [Recorded evidence](validation.json) distinguishes the successful writer checks from
-the expected compiler frontier. The dedicated `--native-core` test checks local bases,
+the original compiler frontier; the new execution report records its bounded resolution. The dedicated `--native-core` test checks local bases,
 reference marker ownership, no external/self references, native primitive roundtrip,
 determinism and missing-declaration/root rejection. Existing Object-root controls
 exercise external-core output. API snapshot checking is independent of target execution.
@@ -65,5 +91,4 @@ dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --nati
 dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --object-roots
 ```
 
-Interpreter/AOT consumer execution, full source-library bootstrap, editor and Windows
-qualification remain pending. The module-system proposal does not alter this work.
+Full source-library bootstrap, editor and Windows qualification remain pending. The module-system proposal does not alter this work.

@@ -7000,3 +7000,22 @@ added and no consumer execution is claimed. A native semantic initialization con
 then catalog/driver/project integration, must replace this target bridge. Existing
 CLI Core.dll development bundles and their source-runtime checks remain applicable;
 they do not satisfy the no-bridge release gate. Compiler host .NET use is separate.
+
+
+### Native-only core compiler API and execution (2026-10-08)
+
+The previous RAVT004 frontier is closed for the explicit compiler API selection
+`MetadataImportOptions.WithNativeMetadata()`: native semantic references load without
+creating a .NET metadata session. Native primitive/unit emission checks use full core
+artifact identity; portable references, wrong targets, missing cores and mismatched
+versions reject. Default .NET/CLI profiles remain unchanged. No target CLI projection
+is supplied to the [current probe](experiments/native-core-bootstrap/README.md).
+The .NET process still hosts the compiler and metadata writer; that is outside the
+author's target-path gate. The current primitive consumer returns 42 interpreted and
+ARM64 native; its C harness links only libSystem. Minimal Object fixture slots and an
+empty native System seed do not establish full runtime-library semantics.
+
+Catalog/driver/MSBuild/editor, complete source-runtime ownership and platform gates
+remain pending. RavenDoc's separate portable-reference loader must also gain a native
+provider before its public pages can derive real library ownership instead of CoreProbe.
+That documentation migration remains future work, rather than relabeling existing inputs.

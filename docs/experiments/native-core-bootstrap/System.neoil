@@ -1,0 +1,4 @@
+; No runtime services are needed by the integer consumer.
+; Explicit seed prevents the default bootstrap from introducing a competing Object.
+.module System
+.references ()
