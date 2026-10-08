@@ -567,10 +567,10 @@ impl<'a> Profile<'a> {
         let i = *i;
         let f = &self.input.functions[i];
         if f.instance
-            || self.results[i] != Some(Ty::Int)
+            || !matches!(self.results[i], None | Some(Ty::Int | Ty::Unit))
             || !(self.args[i].is_empty() || self.args[i] == [Ty::Int])
         {
-            return Err("value root must be static () -> Int32 or (Int32) -> Int32".into());
+            return Err("value root must be static with zero arguments or one Int32 argument and Int32, Void or no result".into());
         }
         Ok(i)
     }

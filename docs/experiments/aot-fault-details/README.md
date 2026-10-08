@@ -99,3 +99,18 @@ failure propagation avoids an OS unwinder and debug-symbol requirement; it requi
 backend to preserve the same frame and first-fault rules. Shared code messages and parity
 tests keep those implementations aligned. The interpreter CLI now uses this presentation for execution faults, with exit 1.
 Native input binding is the next slice; broad legacy host/debugger migration remains explicit.
+
+## Entry and stack follow-up (2026-10-08)
+
+Value-profile entry points now admit Int32, inhabited Void and no-result returns,
+with zero arguments or one Int32 argument. The latter two map to process result zero
+only on success; faults preserve the caller's result. A private scratch slot keeps
+the guest result separate from the host result. This follows the existing success/
+unhandled-fault exit policy without changing Void's metadata meaning or requiring
+an application wrapper just to return zero. Scalar-only profiles remain separate.
+
+The opt-in [stack budget](../aot-console/native-stack.md) adds native status 9 for
+StackOverflow, using the shared standardized message. The default acyclic profile
+is retained. Focused sanitized tests cover both unit entry forms, both argument forms,
+fault atomicity, GC cleanup and stack-guard regression. Full Raven Server passes
+compiler admission with the explicit stack guard; this does not prove HTTP execution.

@@ -4173,3 +4173,46 @@ int main(void) {
     assert!(fault.diagnostic().to_string().contains("Call stack limit exceeded"));
 }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_unit_entry_returns_zero_only_on_success() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    for (result_type, result_instruction) in [("noresult", ""), ("Void", "ldvoid") ] {
+        for arguments in [false, true] {
+            let dir = Temp::new();
+            let source = format!(".module Entry\n.function Calculate({}) -> {result_type}\n{}\n{result_instruction}\nret\n.end", if arguments { "Int32 mode" } else { "" },
+                if arguments { "ldc.i4 42\nldarg mode\ndiv\npop" } else { "" });
+            let r = compile_source(&dir, &seed, &source,
+                &["--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget"], false);
+            assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+            fs::write(dir.0.join("host.c"), format!(r#"
+#include "native-gc.h"
+#include <assert.h>
+int main(void) {{
+    uint64_t heap[129]; heap[128] = 1234567;
+    neoclr_aot_context ctx = {{.text = {{(unsigned char *)heap, 1024, 0}}}};
+    int32_t result = -99;
+    assert(!neoclr_entry_v4(1, &result, &ctx) && result == 0);
+    result = -99;
+    int status = neoclr_entry_v4(0, &result, &ctx);
+    assert(status == {status} && result == {result});
+    assert(ctx.fault.code == {status});
+    assert(!neoclr_root_probe_head_v1() && !neoclr_root_probe_depth_v1());
+    assert(!neoclr_gc_collect_v1(&ctx, NULL) && !ctx.text.used);
+    assert(heap[128] == 1234567);
+}}
+"#, status=if arguments {1} else {0}, result=if arguments {-99} else {0})).unwrap();
+            let r = Command::new("clang")
+                .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+                .arg(&base).arg(dir.0.join("host.c"))
+                .arg(base.join("root-probe.c")).arg(base.join("native-gc.c")).arg(base.join("text-arena.c"))
+                .arg(base.join("native-stack.c")).arg(dir.0.join("app.o"))
+                .arg("-o").arg(dir.0.join("host")).output().unwrap();
+            assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+            let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
+            assert!(r.status.success(), "{r:?}");
+        }
+    }
+}

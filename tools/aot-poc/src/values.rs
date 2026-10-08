@@ -1615,13 +1615,28 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             let zero = b.ins().iconst(types::I64, 0);
             b.ins().store(MemFlags::new(), zero, params[2], 1064);
         }
-        let call_args = if p.args[root].is_empty() {
-            &params[1..]
-        } else {
-            &params[..]
-        };
-        let call = b.ins().call(target, call_args);
+        let mut call_args = vec![];
+        if !p.args[root].is_empty() { call_args.push(params[0]); }
+        let unit_result = p.results[root] != Some(Ty::Int);
+        let result = if unit_result {
+            let storage = slot(&mut b, 8);
+            b.ins().stack_addr(types::I64, storage, 0)
+        } else { params[1] };
+        call_args.push(result);
+        if details.is_some() { call_args.push(params[2]); }
+        let call = b.ins().call(target, &call_args);
         let status = b.inst_results(call)[0];
+        if unit_result {
+            let success = b.create_block();
+            let done = b.create_block();
+            let ok = b.ins().icmp_imm(IntCC::Equal, status, 0);
+            b.ins().brif(ok, success, &[], done, &[]);
+            b.switch_to_block(success);
+            let zero = b.ins().iconst(types::I32, 0);
+            b.ins().store(MemFlags::new(), zero, params[1], 0);
+            b.ins().jump(done, &[]);
+            b.switch_to_block(done);
+        }
         b.ins().return_(&[status]);
         b.seal_all_blocks();
         b.finalize();

@@ -1,0 +1,19 @@
+{
+  "scope": "Uncommitted unit-entry follow-up on 69e7cd51; no native HTTP execution",
+  "admission": {
+    "accepted": true
+  },
+  "capabilities": {
+    "console": false,
+    "faultDetails": true,
+    "nativeGC": true,
+    "nativeStackBudget": true,
+    "stackRootProbes": true
+  },
+  "inputs": {
+    "tools/aot-poc/src/values.rs": "e61688f70139d9f6766cf8e7273a29a3c8a7c74572630b8d82fe1d363cb5904b",
+    "tools/aot-poc/src/value_profile.rs": "6afc11ea88c704c1d3c5423e38dfdb2414feb80a2912bcb094ff35fd56d86fde",
+    "target/native-task-queue-validation3/Server.dll": "c0fd550fde75aa65684bcf00a3dc1e0fdf98115f233a72be80b526975d88b725"
+  },
+  "validation": "Four sanitized entry shapes (no-result/Void, zero/one Int32 argument), success/fault result atomicity and cleanup; recursive-stack regression"
+}

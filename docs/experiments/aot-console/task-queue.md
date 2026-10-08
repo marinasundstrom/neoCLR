@@ -73,3 +73,8 @@ bound. Admission remains unchanged: removing the guard requires either sounder
 receiver/target analysis or a native stack-budget contract. The focused callback
 rejection test checks the repeated member and cycle separator; the full Server
 inspection supplies the integration witness. No native HTTP execution is claimed.
+
+The guarded-stack and unit-entry follow-ups now allow full Server compiler admission.
+The cycle above remains useful evidence about conservative dispatch. Default admission
+still rejects recursion; `--native-stack-budget` provides the guarded path. Automatic
+host queue draining and a real native HTTP request remain unvalidated.

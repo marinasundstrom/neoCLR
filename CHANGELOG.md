@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Adapt native value-profile no-result and inhabited-Void entry points to result
+  zero on success, preserving caller storage on faults. Validate both entry shapes
+  with zero/one Int32 argument. With the explicit stack guard, full Raven Server
+  now passes compiler admission; native host queue pumping is still required.
+
 - Add a private macOS ARM64 remaining-stack probe and sanitized worker-stack/unwind
   checks at two optimization levels. Record the required compiler/frame/host-entry
   contract and comparison with .NET sufficient-stack checks. Add opt-in guarded

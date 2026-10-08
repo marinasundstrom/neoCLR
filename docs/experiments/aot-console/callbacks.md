@@ -20,9 +20,9 @@ invocation-owned heap to a native scheduler or host handle in this slice.
 Invocation emits a bounded dispatch chain over selected bindings of the exact Function
 shape, followed by an ordinary typed native call. Target IDs are private to the image,
 not addresses, stable symbols or an external ABI. At most 32 possible targets per invoked
-shape are admitted. Recursive call graphs, including conservative possible callback
-edges, remain rejected pending a native stack budget; this can reject a program whose
-actual dynamic path is acyclic. Borrowed/output signatures, callback operations inside
+shape are admitted. The default profile rejects recursive call graphs, including conservative callback
+edges; this can reject an acyclic dynamic path. The explicit
+[native stack budget](native-stack.md) now admits guarded recursion. Borrowed/output signatures, callback operations inside
 output-parameter methods, virtual/interface-bound receivers, Function equality,
 Object views and introspection remain outside this profile. Ordinary no-result calls
 remain distinct from inhabited Void results.
