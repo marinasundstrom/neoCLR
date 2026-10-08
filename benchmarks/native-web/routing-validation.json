@@ -1,0 +1,360 @@
+{
+  "revision": "112d383a30ab07e6a5c9c480245e4e66bbf30cb3",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "scope": "process wall time: startup, metadata loading/verification (interpreter), routing and output; no network or build time",
+  "requests": 1024,
+  "warmupPairs": 1,
+  "measuredPairs": 5,
+  "commands": [
+    {
+      "command": [
+        "clang",
+        "--version"
+      ],
+      "exit": 0,
+      "stdout": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "--version"
+      ],
+      "exit": 0,
+      "stdout": "11.0.100-rc.1.26425.128\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-web-comparison/Routing.dll",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/Routing.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-web-comparison/Routing.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-web-comparison/routing.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-write-line",
+        "--bind-utf8-text",
+        "--bind-integer-text",
+        "--bind-int32-to-string",
+        "--reference-arena",
+        "--native-gc"
+      ],
+      "exit": 0,
+      "stdout": {
+        "bytes": 1452895,
+        "sha256": "4f616a6dd065eb24d0afc063c31515e8d108612cd7c3c97fb7cabeecca8c8bca"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_ROOT_PROBES",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/route-lifetime-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/target/native-web-comparison/routing.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-web-comparison/routing"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/native-web-comparison/routing"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/native-web-comparison/routing:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-web-comparison/Routing.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000",
+        "--gc-stats"
+      ],
+      "exit": 0,
+      "stdout": "1024\n",
+      "stderr": "GC: allocated=24001 live=0 peak=64 collections=513 reclaimed=24001\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-web-comparison/routing",
+        "1024",
+        "65536",
+        "audit"
+      ],
+      "exit": 0,
+      "stdout": "1024\n",
+      "stderr": "ROOT_PROBES 278667\nNATIVE_GC {\"collections\":278667,\"allocations\":33628,\"reclaimedAllocations\":33613,\"reclaimedBytes\":853648}\nAOT_MEASURE {\"requests\":1024,\"capacity\":65536,\"used\":1648,\"status\":0,\"result\":0}\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-web-comparison/Server.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/http-server/Server.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/native-web-comparison/Server.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-write-line",
+        "--bind-utf8-text",
+        "--bind-integer-text",
+        "--bind-int32-to-string",
+        "--reference-arena",
+        "--native-gc"
+      ],
+      "exit": 0,
+      "stdout": {
+        "bytes": 59010,
+        "sha256": "15c119a2fcb1353e0a3a339c428fe36e67784147c47b237bcc8d5871fde28121"
+      },
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/compare.py": "ce88868dbc6e238041939438c7ba98c80cdb5df7232c0909963c0bca5d5701ce",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "c59a935b707df3e6df0aa948ff77d7ff651e4994dec21c2b0f3169a5d22db2d7",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "c20e58223ba42bf0495010ddb87f20564191d7bbf727124bcdcefa470631d651",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "0d6fae389a8008191b052840a1c0f9a7c82971929cd9f0fc2fc6aef82cd73f4c",
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/Routing.rvn": "1e48c6e2a2180d307a42db22db0ba4e96bc34116b45ad74789b01ca9649c1079",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll": "2ceee479056bca82e9752f81d84881db118dc106af5efa8cf121c345ea94ce7b",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll": "7c33d97e0e65a23876e300fdddc069b03fad6bc87ffb7c1bea4333f21f0e9ea2",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll": "fdf3c7866a8cae147578bc315a2c6b72eea4edb08d2a496a6134c662c8aa12df",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "6ca8ab4df3f3f57be16d971c56101ef83511f6ad151945cd7854174d85fb318c",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "ac7efe36e95e2c848d81c7bef37fe8e270146f8222ea91cf4866c4348f043234",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "eec237e8a924743fbf56ac9c24932cab0a92fbc35c9e2cc23d0a2fe4a5a9fc24",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "428f0709baf84634025e0d6387a5726edffb1bcc7c18d28795317705e5fb43de",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "bfbfda2f336a73059418c84899787d4f8cc680f27d4864d70785692b048d0382",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.deps.json": "8439a508ae1b5e7d33490958bfef66338c921292adf5a2eb3f22784cb5fb9ce0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.deps.json": "c02d34dc57e38be4c1ad97a24aeea0a41f87ce4208e77072f6c5cdb4d7599832",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.runtimeconfig.json": "d093ce9035033b5e5815db98bc0e0fe667311b1109bfeff2ffa2394ef059290d",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/Users/robert/Projects/neoclr/target/native-web-comparison/Routing.dll": "e4a3e6cbdfac14aec8c57686fcc757a229c5d8f208ad415ff70575701992b900",
+    "/Users/robert/Projects/neoclr/target/native-web-comparison/routing.o": "3d5a0b1cab5a0fb03978b81809b51ec0be5569e7d0e303e649d64410db5df928",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/route-lifetime-host.c": "d78e99837aafb032c2e362ed18b44bbfb4433f5e8fb40476daa21b988d1bea53",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "abc5c07f84e1b4f505bdd92b5d924acf10db2624ad0b348168567f1ee93a6dd0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "245abec593a1adc54b7469f7e44a0ef43a1997f4a3591040f791cfacad360c84",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "a5251579303ff2df8ac857a44dc6d3cd0f6dc0d7f14847db1d82ffe7a1155979",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "7202d4e33a14991a5261a5fcc25c4af11f67c48f3fe21c7e10b97be482942300",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "500d75a89e44477c684b9da5a635755d47d0b563878c35979fe7128435a3cbb7",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "858ec6a53c8ff173487717129976c8c4bfd68f727dc3a0083ced1a55c2503e8d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "86320e78fcb471c164c55d7850cd75e3eb12beaab3e6115bdf0aa79720b58eb8",
+    "/Users/robert/Projects/neoclr/target/native-web-comparison/routing": "91970322f612b0d7e1089b6ddc8e523c90627e9e8ff6a2b9d1dcfc12b4e54b54",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-server/Server.rvn": "a76485f804065ddec7d5903a83aa9e8cf4bca2aaafc9dcbb30178276324d715c",
+    "/Users/robert/Projects/neoclr/target/native-web-comparison/Server.dll": "8b990a91027f0f10976ffff61c66c108794d47c00c7a191fb3af3c27736c1762",
+    "benchmarks/native-web/check_greeting.py": "a8f6a9c8196fa267fe420a60240e3e94478321167da0f840449b5a50f9b30c72",
+    "benchmarks/native-web/dotnet/Program.cs": "6d3401363bba1a454ae6789b760a8b9bc00833261318e26c03bf8e94b981366f",
+    "benchmarks/native-web/dotnet/Greeting.csproj": "0604dcf47da324610ad52333a4385797c49dfe1865e0be5f0626ccd4a24a2d0d"
+  },
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "dotnet": "11.0.100-rc.1.26425.128\n",
+  "nativeImageBytes": 770552,
+  "nativeDependencies": [
+    "\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)"
+  ],
+  "interpretedAudit": "GC: allocated=24001 live=0 peak=64 collections=513 reclaimed=24001\n",
+  "nativeAudit": "ROOT_PROBES 278667\nNATIVE_GC {\"collections\":278667,\"allocations\":33628,\"reclaimedAllocations\":33613,\"reclaimedBytes\":853648}\nAOT_MEASURE {\"requests\":1024,\"capacity\":65536,\"used\":1648,\"status\":0,\"result\":0}\n",
+  "samplesSeconds": {
+    "interpreted": [
+      31.368332249999995,
+      28.703499167000018,
+      28.672737291000004,
+      29.446893707999976,
+      31.551822583000018
+    ],
+    "native": [
+      0.4664871660000074,
+      0.39486416599999075,
+      0.3890740420000043,
+      0.3915424169999824,
+      0.39155066699998997
+    ]
+  },
+  "medianSeconds": {
+    "interpreted": 29.446893707999976,
+    "native": 0.39155066699998997
+  },
+  "serverAdmission": {
+    "accepted": false,
+    "firstError": "generic arguments must be closed value types",
+    "phase": "selection"
+  },
+  "rawReportSha256": "59e3424ad7bae3c2c14bf3ff3ddc5f55ba16739650b04ca3b4687ede73a5f1c0",
+  "date": "2026-10-08",
+  "interpreterBuild": "cargo build --release --bin neoclr; current source at revision, optimized; AOT tool build speed excluded from timings",
+  "dotnetGreetingCheck": {
+    "command": [
+      "dotnet",
+      "benchmarks/native-web/dotnet/bin/Release/net10.0/Greeting.dll",
+      "--urls",
+      "http://127.0.0.1:0"
+    ],
+    "protocol": "HTTP/1.1",
+    "status": 200,
+    "headers": [
+      [
+        "Content-Length",
+        "10"
+      ],
+      [
+        "Connection",
+        "close"
+      ],
+      [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+      ],
+      [
+        "Date",
+        "Thu, 08 Oct 2026 12:06:38 GMT"
+      ],
+      [
+        "Server",
+        "Kestrel"
+      ]
+    ],
+    "bodyUtf8": "Caf\u00e9 \ud83c\udf0d",
+    "scope": "one successful exchange only; no timing or malformed-request parity"
+  },
+  "dotnetGreetingBuild": "dotnet build benchmarks/native-web/dotnet/Greeting.csproj -c Release; 0 warnings, 0 errors; JIT only"
+}

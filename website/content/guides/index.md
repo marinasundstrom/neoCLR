@@ -36,6 +36,7 @@ They need only enough application context to explain the choices and results.
 
 | Guide | What you’ll learn |
 | --- | --- |
+| [Native compilation](../features/native-compilation/) | Standalone ARM64 POC, interpreted/native comparisons and development caveats |
 | [Tasks and async](../features/tasks/) | Await results, complete promises and understand isolated workers |
 | [Files and Storage](../features/files/) | Resolve storage items and use byte/text streams |
 | [Console and standard streams](../features/console/) | Handle input, output, end-of-input and typed errors |

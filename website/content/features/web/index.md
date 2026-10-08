@@ -7,6 +7,10 @@ Raven client and server applications exchange UTF-8 content through neoCLR TCP s
 with DNS on the client. HttpClient, HttpServer, request/response types, content and
 handlers live in System.Web.Http. Applications can use callbacks or async functions.
 
+For native execution status and the benchmark workbench, see
+[Native compilation](../native-compilation/). The server AOT path remains work in progress;
+API availability here does not imply native-backend support.
+
 ## HttpClient: call an HTTP service
 
 Use HttpClient on its own to call a service. This example sets a base address and

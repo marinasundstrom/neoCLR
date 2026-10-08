@@ -11857,3 +11857,28 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
   qualification. Interpreter scratch-buffer reuse is a measurement candidate, not an
   implemented improvement. Benchmark relevant performance changes, not every routine API
   change; eventual .NET comparisons need matched workloads and explicit timing scopes.
+
+
+## 2026-10-08 — Benchmarkable HTTP app and Native compilation feature page
+
+- **Author:** Work toward a web server app to benchmark against other platforms and
+  present results on a “Native compilation” feature page with a homepage box.
+- **Clarifications:** Compare interpreted and native modes first, then equivalents on
+  other platforms; check in samples. List development caveats, and mark even a POC
+  included in the next release as work in progress. Continue toward the HTTP test app
+  after this slice.
+- **Assistant action:** Add a same-artifact routing comparison harness, checked-in Raven
+  workload and ASP.NET Core greeting comparison candidate. Compile the existing Raven
+  server as an admission driver; its native selection rejects unsupported generic
+  arguments. This is a component benchmark and server dependency checkpoint, not a
+  native server result. Add the requested feature page, homepage box and navigation.
+- **Comparison contract:** qualify the same Raven server in both modes, then match other
+  platforms' requests/responses and protocol settings. Separate startup, steady-state
+  latency/throughput, errors, memory and deployment size. Preserve raw samples, versions
+  and caveats. A C-hosted Raven handler would require a separate mixed-stack label.
+- **Validation:** Five measured routing pairs produced 29.447 s interpreted / 0.392 s
+  native median process times with matching output, not server throughput. The .NET
+  candidate passes a successful greeting exchange check; it has no performance result.
+  [Recorded inputs and samples](../benchmarks/native-web/routing-validation.json).
+- **Open:** Native server support and full HTTP measurements; no cross-platform speed
+  ranking or production readiness is claimed. See the [workbench](../benchmarks/native-web/README.md).

@@ -35,6 +35,16 @@ small consumers are intermediate validation mechanisms, not constraints that the
 API must fit or a final server memory policy. Collector choice, native root reporting
 and reclamation remain open; pursue these when the real dependency chain requires them.
 
+**Benchmarkable web app (author direction, 2026-10-08):** use the same checked-in
+Raven workload for interpreted/native comparisons first, then equivalent apps on other
+platforms. The [native-web workbench](../benchmarks/native-web/README.md) starts with
+routing component measurements and admission of the existing HTTP server. Progress to
+one persistent server process, correctness/cleanup tests and matched HTTP load before
+publishing server comparisons. [Native compilation](../website/content/features/native-compilation/index.md)
+has its own feature page and homepage entry. Any next-release POC remains explicitly
+**work in progress**, with limitations and timing scope next to results. Next unblock
+the server's selected dependency graph; component benchmarks do not qualify a server.
+
 **Author clarification:** build the CIL-to-native, self-contained executable foundation
 early, and extend it alongside platform evolution. **Hello World is the first executable
 milestone**, followed by increasingly complex samples until HTTP Server. The author clarifies that the input is **neoCLR CIL**, produced by Raven

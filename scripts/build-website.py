@@ -312,6 +312,7 @@ def main():
         'UTF8_ROUNDTRIP': (raven + 'library-utf8.rvn', 'func RoundTrip', '\n}', True),
     })
     samples.update({
+        'NATIVE_ROUTING_SAMPLE': ('docs/experiments/aot-console/route-pattern.rvn', 'func Main()', '\n}', True),
         'GC_SAMPLE': ('docs/experiments/runtime-gc/Main.rvn', '    let retained =', '    Check(GC.PeakHeapObjectCount', False),
         'UNION_CONSTRUCTION_SAMPLE': ('docs/experiments/union-construction/Main.rvn', '    func Create(id:', '\n    }', True),
         'REFLECTION_CONSTRUCTION_SAMPLE': ('docs/experiments/reflection-members/Main.rvn', '    let model =', '    let _ = Field', False),

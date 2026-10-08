@@ -265,7 +265,7 @@ Object base now support the three standard-stream factories in a standalone samp
 Bounded implicit interface dispatch now supports standard-input Read/Close, byte
 buffers and stream-result unions. Explicit raw output/flush services also compile
 stdout/stderr streams with recoverable I/O results. Closed generic reference classes
-and inherited interface dispatch now support ArrayList<byte> growth with checked
+and inherited interface dispatch now support `ArrayList<byte>` growth with checked
 reserved capacity and a standalone Console consumer. String-valued erased transport
 preserves native pointers and managed fault behavior. UTF-8 byte counts and slices
 now preserve range/boundary results and invocation-owned text. UTF-8 encoding produces
@@ -291,7 +291,7 @@ when observable; character Console output and interpolation run together across 
 graphemes and NUL. Verified String interface views now preserve casts and identity through closed generic
 contracts. Native String content equality now supports ordinary equality/inequality,
 including Unicode, embedded NUL and dynamic text. Verified ordinary String interface
-methods now dispatch to compiled bodies; a standalone Raven EquatableTo<string>.Equals
+methods now dispatch to compiled bodies; a standalone Raven `EquatableTo<string>.Equals`
 consumer matches interpreter output and faults. Borrowed String interface receivers,
 wider boxing and general Object metadata remain open.
 An explicit failure binding now preserves
@@ -310,7 +310,7 @@ with an application union and ordinal String predicates, preserving exact output
 faults across 18 input streams. It has no socket, header/body or general HTTP parsing
 support; the predicates extend the experimental UTF-8 binding without allocation.
 The existing RoutePattern.Parse/Match/GetInt32 path now also runs standalone after adding
-String-array storage for its ArrayList<string> dependencies. A repeated-request consumer
+String-array storage for its `ArrayList<string>` dependencies. A repeated-request consumer
 now checks eight routing outcomes and a retained capture. Its native arena reaches
 117,507 bytes at 128 requests and exhausts a fixed 64 KiB budget, while interpreter
 diagnostics show temporary objects being reclaimed. AOT inspection now reports typed
@@ -332,6 +332,8 @@ captures and interpreter fault/output parity. Conservative object scanning and c
 at every boundary are initial policies; precise maps, pressure scheduling and host handles
 remain future work. The HTTP API drives this work, and sustained server execution remains unqualified.
 The bounded arena is a temporary experiment, not a final server memory policy.
+The [Native compilation feature page](../features/native-compilation/) presents current
+work-in-progress behavior, benchmark scope and the server comparison direction.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

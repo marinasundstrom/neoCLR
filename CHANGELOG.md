@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add a native-web benchmark workbench with a checked-in Raven routing workload,
+  same-artifact interpreted/native process measurements, provenance and HTTP server
+  admission reporting. Add an ASP.NET Core greeting comparison candidate; matched
+  persistent-server performance comparisons remain future work. Add a “Native
+  compilation” feature page, homepage box and guide navigation, explicitly marking
+  the POC as work in progress, including in a future release, with benchmark and
+  native API/GC/deployment caveats. Correct existing proposal type formatting and
+  fault-guide experiment links exposed by website validation.
+
 - Add a bounded nonmoving native mark-and-sweep kernel with in-buffer allocation
   descriptors, free-block reuse/coalescing, interior-owner retention, conservative
   object scanning, atomic text/bytes and initialized String-array tracing. Sanitized

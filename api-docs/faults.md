@@ -164,7 +164,7 @@ eprint!("{diagnostic}");
 Legacy Fault fields and Display remain compatible, including site-specific runtime
 messages. The common view is the backend-neutral presentation contract. Native AOT's
 experimental caller-owned equivalent and C renderer are documented in the
-[fault capture experiment](../docs/experiments/aot-fault-details/README.md). Its text is
+[fault capture experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-fault-details/README.md). Its text is
 image-owned; Rust's view borrows the Fault/trace. Neither lifetime implies guest-managed
 ownership. Standalone adapters exit 1 on an unhandled fault; embedding hosts choose their
 own recovery/exit policy. No stable native ABI or new guest exception API is introduced.
@@ -178,7 +178,7 @@ UserFault messages may point into the invocation buffer: render/read them before
 next entry call or releasing that buffer. Frame names and runtime messages remain
 image-owned. Each concurrent invocation needs distinct context and buffer storage.
 This is an experimental C hosting contract, not a Raven guest API or stable native ABI.
-See the [full contract and header](../docs/experiments/aot-console/README.md#numeric-output-and-text-lifetime-2026-10-08).
+See the [full contract and header](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-console/README.md#numeric-output-and-text-lifetime-2026-10-08).
 
 The optional reference-arena profile uses the same ABI v4 context for bounded object
 storage. Status 6 denotes NullReference with the shared standard message; native
