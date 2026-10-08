@@ -1867,3 +1867,39 @@ allocate or reenter. The existing CLR comparison applies: caller-owned pending s
 simplifies lifetime continuity but adds initialization and retains values conservatively;
 it is not precise liveness metadata or a performance claim. The current exported root
 returns only Int32; a future reference-returning host entry needs its own ownership contract.
+
+
+### Native wrapper argument frames (2026-10-08)
+
+With `--probe-stack-roots`, native service and interface-dispatch wrappers now join the
+same diagnostic frame chain as ordinary functions. Before wrapper logic executes, their
+arguments are copied into typed stack storage and the traceable lane addresses are
+published. The wrapped IL body's locals are excluded: replacement bodies never initialize
+that storage. Numeric-only arguments produce no root entries. The existing 64 KiB
+per-function frame-storage limit includes the diagnostic frame, table and argument copies.
+
+Every generated return unlinks the wrapper frame, including null checks before service
+invocation, failed services, dispatch failures and successful forwarding. These are
+private diagnostic frames, separate from the managed fault stack: synthetic wrappers
+still do not appear in rendered guest faults. Caller-owned pending results continue to
+provide the output-slot view established by the preceding slice.
+
+Inspection keeps native bodies marked as requiring separate internal plans, with additive
+`diagnosticFrame: typed-arguments-only` and `serviceInternalRoots: uncovered` fields.
+The 104-byte frame and callback versions remain unchanged. Default emission still has
+no probe calls. Diagnostic consumers must tolerate wrapper frames with an argument table
+and no IL snapshot; the callback count continues to count IL snapshots only.
+
+An ARM64 contract test observes the actual String argument from inside the Console output
+service, with the wrapper linked above its caller and the same context identity. It checks
+success, service failure, null before service invocation, frame removal and subsequent
+reentry. The interface-dispatch consumer also runs with probes through its six normal/fault
+modes and retains exact interpreter fault parity. Together with the existing 16 focused
+root/inspection/fault checks, 18 tests pass. [Routing evidence](route-wrapper-root-validation.json)
+records standalone output/fault parity and empty frame chains after host return.
+
+As with the existing CLR root-map comparison, stack copies make boundary references
+observable but add diagnostic work and conservative retention. Service-internal temporary
+references, borrowed pointee ownership/initialization and host/fault roots remain open;
+this does not authorize collection, mutation, allocation or reentry from probe hooks.
+No stable hosting ABI, native GC or performance improvement is claimed.

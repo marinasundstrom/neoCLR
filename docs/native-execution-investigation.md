@@ -557,3 +557,13 @@ activates the returned-result phase. [Contract and validation](experiments/aot-c
 record exact pending/handoff counts and the private transient-v2 migration. This closes
 that diagnostic lifetime gap without resolving native adapter internals, borrowed
 pointees or host/fault roots, and does not enable collection.
+
+
+Native wrapper diagnostic frames (2026-10-08) now preserve typed argument copies across
+bound service calls and interface dispatch. Early/null/service faults and normal returns
+unlink these frames, while guest fault traces continue to omit synthetic wrappers.
+[Contract and validation](experiments/aot-console/README.md#native-wrapper-argument-frames-2026-10-08)
+cover live service-side observation and the routing consumer. This reuses the CLR root-map
+comparison above: explicit argument storage makes boundary lifetime observable at the cost
+of extra stack copies/hooks. It is not a complete native transition/handle protocol;
+service temporaries, borrowed pointees and host/fault roots still block collection.

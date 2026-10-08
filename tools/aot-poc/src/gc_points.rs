@@ -104,7 +104,8 @@ pub(super) fn report(
     let mut functions = vec![];
     for (i, f) in p.input.functions.iter().enumerate() {
         if native_body(p, i, details) {
-            functions.push(json!({"index": i, "name": f.name, "coverage": "native-body-requires-separate-plan"}));
+            functions.push(json!({"index": i, "name": f.name, "coverage": "native-body-requires-separate-plan",
+                "diagnosticFrame": "typed-arguments-only", "serviceInternalRoots": "uncovered"}));
             continue;
         }
         let shapes = p.analyze(i)?;
@@ -122,7 +123,7 @@ pub(super) fn report(
     }
     Ok(
         json!({"schema": "neoclr-pre-operation-roots-v1", "functions": functions,
-        "notice": "Conservative reachable IL boundaries, not native safepoints. Argument/local layouts are separate; native adapter internals, result publication, borrow initialization, spills and root registration remain pending."}),
+        "notice": "Conservative reachable IL boundaries, not native safepoints. Opt-in diagnostic frames expose typed storage and call-result handoff; native wrappers expose arguments only. Native service temporaries, borrowed pointees and host/fault roots remain incomplete. Collection is forbidden."}),
     )
 }
 

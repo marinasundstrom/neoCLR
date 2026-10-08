@@ -321,7 +321,9 @@ Opt-in probes now emit stack snapshots for a read-only diagnostic callback. Pers
 diagnostic frames retain caller snapshots, expose typed argument/local storage and clean
 up on normal/fault returns. Constructor storage and successful call results have explicit
 diagnostic activation phases. Caller-owned pending result slots preserve observation
-through callee frame removal. Borrowed pointees and native adapter roots remain uncovered.
+through callee frame removal. Native service/dispatch wrappers now expose typed argument
+copies and clean up on every return without adding guest fault frames. Borrowed pointees,
+service-internal temporaries and host/fault roots remain uncovered.
 Complete root coverage and emitted allocation descriptors remain the next foundation; no native collector is
 implemented yet. The HTTP API drives this work, and sustained server execution remains unqualified.
 The bounded arena is a temporary experiment, not a final server memory policy.

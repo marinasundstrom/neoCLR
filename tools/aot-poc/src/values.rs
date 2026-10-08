@@ -408,6 +408,31 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             let parameters = b.block_params(entry).to_vec();
             let output = parameters[parameters.len() - 1 - usize::from(details.is_some())];
             let fault_context = details.map(|_| *parameters.last().unwrap());
+            if gc_points::native_body(&p, i, details) {
+                if let Some(probes) = &root_probes {
+                    // Native wrappers keep typed argument copies visible across service
+                    // calls/dispatch. These frames do not enter the guest fault trace.
+                    let table_bytes = probes.table_bytes(i);
+                    let mut frame_bytes = 104 + 7 + table_bytes as usize + 7;
+                    let mut arguments = vec![];
+                    let mut at = 0;
+                    for t in &p.args[i] {
+                        let storage = slot(&mut b, p.bytes(t));
+                        frame_bytes += p.bytes(t) as usize + 7;
+                        let address = b.ins().stack_addr(types::I64, storage, 0);
+                        write_typed(&mut b, &p, t, address, &parameters[at..at + p.lanes(t)]);
+                        arguments.push(storage);
+                        at += p.lanes(t);
+                    }
+                    if frame_bytes > 65536 {
+                        return Err("native probe frame storage exceeds 64 KiB".into());
+                    }
+                    let frame = slot(&mut b, 104);
+                    let table = slot(&mut b, table_bytes);
+                    probes.enter(&mut module, &mut b, frame, fault_context.unwrap(), i, table, &arguments, &[]);
+                    probe_frame = Some(frame);
+                }
+            }
             if let Some(&record) = details.and_then(|d| d.empty_record_boxes.get(&i).or_else(|| d.int32_boxes.get(&i))) {
                 let service = module.declare_func_in_func(object_service.unwrap(), b.func);
                 let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
@@ -431,6 +456,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks(); b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
@@ -515,6 +543,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[status]);
                 b.seal_all_blocks();
                 b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
@@ -564,6 +595,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
@@ -588,6 +622,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
@@ -614,6 +651,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
@@ -643,6 +683,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
@@ -652,6 +695,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
@@ -689,6 +735,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks(); b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
@@ -711,6 +760,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }

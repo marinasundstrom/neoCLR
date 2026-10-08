@@ -41,7 +41,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   seeding and registering caller-owned traceable result lanes before invocation, keeping
   the callee's output writes visible during frame removal. Pending scratch is distinct
   from successful guest-result publication; faults never activate the success phase.
-  The private transient callback advances to v2 for the new pending phase.
+  The private transient callback advances to v2 for the new pending phase. Extend
+  diagnostic frames to native service and dispatch wrappers, publishing typed argument
+  copies and unlinking on every generated return, including early faults. Synthetic
+  frames stay out of guest fault traces. Service-internal temporaries remain uncovered;
+  frame/callback ABI and default uninstrumented emission are unchanged.
 
 - Add a real RoutePattern workload covering eight repeated routing outcomes, pattern
   errors and capture retention. Measure native arena growth from 2,433 bytes before

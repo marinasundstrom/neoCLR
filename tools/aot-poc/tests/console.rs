@@ -2553,7 +2553,7 @@ ret
     let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
     program.verify().unwrap();
     let dir = Temp::new();
-    let r = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena", "--bind-user-fault"]);
+    let r = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena", "--bind-user-fault", "--probe-stack-roots"]);
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
     assert_eq!(report["stringInterfaceDispatch"].as_array().unwrap().len(), 1);
@@ -2561,12 +2561,14 @@ ret
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
     fs::write(dir.0.join("host.c"), r#"
 #include "text-arena.h"
+#include "root-probe.h"
 #include <stdlib.h>
 int main(int argc, char **argv) {
     uint64_t storage[128];
     neoclr_aot_context ctx = {.text = {(unsigned char*)storage, sizeof(storage), 0}};
     int32_t result = -99;
     int status = neoclr_entry_v4(argc > 1 ? atoi(argv[1]) : 0, &result, &ctx);
+    if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 93;
     if (status) {
         if (result != -99 || ctx.fault.code != (uint32_t)status) return 92;
         neoclr_aot_render_fault(stderr, &ctx.fault);
@@ -2577,7 +2579,7 @@ int main(int argc, char **argv) {
 "#).unwrap();
     let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I"])
         .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
-        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(base.join("aot-console/root-probe.c")).arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
         .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
@@ -2610,7 +2612,7 @@ int main(int argc, char **argv) {
         neoclr::metadata::Instruction::Return,
     ];
     let reject = Temp::new();
-    let r = compile_linked_module(&reject, &recursive, &app, &["--compile-system", "--reference-arena", "--bind-user-fault"]);
+    let r = compile_linked_module(&reject, &recursive, &app, &["--compile-system", "--reference-arena", "--bind-user-fault", "--probe-stack-roots"]);
     assert!(!r.status.success() && !reject.0.join("app.o").exists(), "{r:?}");
     assert!(String::from_utf8_lossy(&r.stderr).contains("recursive calls require a native stack-budget contract"), "{r:?}");
 
@@ -2833,4 +2835,78 @@ int main(int argc, char **argv) {
     let r = Command::new(dir.0.join("app")).args(["0", "0"]).output().unwrap();
     assert_eq!(r.status.code(), Some(1), "{r:?}");
     assert!(String::from_utf8_lossy(&r.stderr).starts_with("NativeMemoryLimitExceeded:"), "{r:?}");
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_wrapper_probes_keep_arguments_live_and_unlink_on_early_faults() {
+    let dir = Temp::new();
+    let source = r#".module WrapperRoots
+.function Calculate(Int32 mode) -> Int32
+.local String absent
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Null
+ldstr "native boundary"
+br Write
+Null:
+ldloca absent
+initobj String
+ldloc absent
+Write:
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldc.i4 42
+ret
+.end
+"#;
+    let seed = neoclr::assemble(OUTPUT_SEED).unwrap();
+    let r = compile_source(&dir, &seed, source,
+        &["--compile-system", "--bind-console-write-line", "--probe-stack-roots"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"), r#"
+#include "root-probe.h"
+#include "fault-details.h"
+#include <stdlib.h>
+#include <string.h>
+static unsigned calls;
+static int failure;
+int32_t neoclr_console_write_line_utf8_v1(const uint8_t *bytes, size_t length) {
+    const neoclr_probe_frame *f = neoclr_root_probe_head_v1();
+    if (!f || !f->previous || f->previous->previous || neoclr_root_probe_depth_v1() != 2 ||
+        f->context != f->previous->context || f->storage_count != 1 || f->lane_count ||
+        f->storage[0].read_bytes != 8 || f->storage[0].flags ||
+        !strstr(f->storage_plan, "\"argument\":true")) abort();
+    const neoclr_aot_text *text = *(const neoclr_aot_text *const *)f->storage[0].address;
+    if (!text || text->bytes != bytes || text->length != length || length != 15 ||
+        memcmp(bytes, "native boundary", length)) abort();
+    calls++;
+    return failure;
+}
+int main(void) {
+    neoclr_aot_fault fault = {0};
+    /* Success, service failure, null before service invocation, then reentry. */
+    for (int mode = 0; mode < 4; mode++) {
+        int32_t result = -99;
+        failure = mode == 1;
+        int status = neoclr_entry_v3(mode, &result, &fault);
+        if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 1;
+        if (mode == 1 || mode == 2) {
+            if (status != 3 || result != -99 || fault.code != 3 || fault.frame_count != 1) return 2;
+        } else if (status || result != 42 || fault.code || fault.frame_count) return 3;
+    }
+    return calls == 3 ? 0 : 4;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I"])
+        .arg(base.join("aot-console")).arg("-I").arg(base.join("aot-fault-details"))
+        .arg(dir.0.join("host.c")).arg(base.join("aot-console/root-probe.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host"))
+        .output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
+    assert!(r.status.success(), "{r:?}");
 }

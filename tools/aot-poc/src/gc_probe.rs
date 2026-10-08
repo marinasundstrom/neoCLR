@@ -93,12 +93,14 @@ impl Probes {
         let mut points = HashMap::new();
         let mut storage = HashMap::new();
         for (i, f) in p.input.functions.iter().enumerate() {
-            if gc_points::native_body(p, i, details) {
-                continue;
-            }
+            let native = gc_points::native_body(p, i, details);
             let mut lanes = vec![];
             let mut entries = vec![];
             for (argument, types) in [(true, &p.args[i]), (false, &p.locals[i])] {
+                // Replacement native bodies never initialize the IL body's locals.
+                if native && !argument {
+                    continue;
+                }
                 for (index, ty) in types.iter().enumerate() {
                     let wide = p.pointer_lanes(ty);
                     for lane in gc_layout::seed_lanes(p, ty) {
@@ -138,6 +140,9 @@ impl Probes {
                     lanes,
                 },
             );
+            if native {
+                continue;
+            }
             for (pc, op) in f.body.iter().enumerate() {
                 let Some(stack) = &flows[i][pc] else {
                     continue;

@@ -207,7 +207,10 @@ Initialized constructor storage and successful call results now have phased diag
 publication ([validation](experiments/aot-console/route-transient-root-validation.json)).
 Ordinary-call result handoff now uses seeded caller-owned pending storage observable at
 callee removal ([validation](experiments/aot-console/route-result-handoff-validation.json)).
-Borrowed pointees, adapter internals and host/fault roots remain incomplete.
+Native service/dispatch wrappers now publish typed argument copies in diagnostic frames
+and unlink on all return paths without adding guest fault frames
+([validation](experiments/aot-console/route-wrapper-root-validation.json)).
+Borrowed pointees, service-internal temporaries and host/fault roots remain incomplete.
 Extend that coverage next, then add allocation descriptors and nonmoving tracing/reclamation
 before qualifying
 sustained HTTP execution. This is planned integration work, not an implemented native
