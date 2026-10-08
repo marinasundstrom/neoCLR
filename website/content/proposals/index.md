@@ -314,7 +314,8 @@ String-array storage for its ArrayList<string> dependencies. A repeated-request 
 now checks eight routing outcomes and a retained capture. Its native arena reaches
 117,507 bytes at 128 requests and exhausts a fixed 64 KiB budget, while interpreter
 diagnostics show temporary objects being reclaimed. AOT inspection now reports typed
-storage layouts that distinguish reference slots from integers. Safepoint roots and
+storage layouts that distinguish reference slots from integers, and ordinary native
+function prologues clear traceable local storage. Safepoint root registration and
 emitted allocation descriptors are the next foundation; no native collector is
 implemented yet. The HTTP API drives this work, and sustained server execution remains unqualified.
 The bounded arena is a temporary experiment, not a final server memory policy.

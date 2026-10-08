@@ -723,10 +723,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 })
                 .collect();
             for (ty, local) in p.locals[i].iter().zip(&locals) {
-                if *ty == Ty::ByteValues {
-                    // Zero is an internal unassigned marker, never an exposed Byte[] value.
+                // Keep not-yet-assigned reference storage safe for future root
+                // registration. The verifier still rejects guest reads before assignment.
+                // This includes ByteValues' existing internal unassigned marker.
+                for lane in gc_layout::seed_lanes(&p, ty) {
                     let zero = b.ins().iconst(types::I64, 0);
-                    b.ins().stack_store(zero, *local, 0);
+                    b.ins().stack_store(zero, *local, (lane * 8) as i32);
                 }
             }
             // All profile return values fit in thirty-two padded scalar lanes; snapshots are read

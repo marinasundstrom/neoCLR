@@ -191,9 +191,11 @@ Eight routing outcomes and retained captures now pass repeated-request validatio
 grows to 117,507 bytes at 128 requests and exhausts a fixed 64 KiB budget; the interpreter
 reclaims temporary objects during the same source workload. Private typed storage-layout
 diagnostics now distinguish reference slots, conditional erased payloads and managed
-borrows ([evidence](experiments/aot-console/route-trace-layout-validation.json)). Establish
-initialized native roots at allocating calls and emitted allocation descriptors next,
-then nonmoving tracing/reclamation before qualifying
+borrows ([evidence](experiments/aot-console/route-trace-layout-validation.json)). Ordinary
+native prologues now clear traceable local lanes and erased tags without changing guest
+assignment rules ([validation](experiments/aot-console/route-root-seed-validation.json)).
+This prepares storage only; establish native root registration at allocating calls and
+emitted allocation descriptors next, then nonmoving tracing/reclamation before qualifying
 sustained HTTP execution. This is planned integration work, not an implemented native
 collector. Borrowed String interface receivers remain unsupported.
 The author adds a console-input sample after unions, exercising input and

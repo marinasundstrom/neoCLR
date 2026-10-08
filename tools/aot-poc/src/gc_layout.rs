@@ -66,6 +66,20 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
     };
     vec![Slot { lane: 0, trace }]
 }
+// Clear both the pointer and its discriminator before the local can appear in a
+// future root frame. This does not mark the guest local definitely assigned.
+pub(super) fn seed_lanes(p: &Profile<'_>, ty: &Ty) -> Vec<usize> {
+    let mut lanes = vec![];
+    for slot in slots(p, ty) {
+        lanes.push(slot.lane);
+        if let Trace::ErasedText { tag_lane } = slot.trace {
+            lanes.push(tag_lane);
+        }
+    }
+    lanes.sort_unstable();
+    lanes.dedup();
+    lanes
+}
 fn encode(slots: Vec<Slot>) -> Vec<Value> {
     slots.into_iter().map(|slot| {
         let recipe = match slot.trace {
@@ -121,6 +135,7 @@ pub(super) fn report(p: &Profile<'_>) -> Value {
             json!({"index": i, "name": f.name,
             "arguments": p.args[i].iter().map(|t| layout(p, t)).collect::<Vec<_>>(),
             "locals": p.locals[i].iter().map(|t| layout(p, t)).collect::<Vec<_>>(),
+            "localSeedLanes": p.locals[i].iter().map(|t| seed_lanes(p, t)).collect::<Vec<_>>(),
             "result": p.results[i].as_ref().map(|t| layout(p, t))})
         })
         .collect();
@@ -251,5 +266,25 @@ mod tests {
             slots(&p, &Ty::ByteValues)[0].trace,
             Trace::ByteValues
         ));
+    }
+    #[test]
+    fn local_seeding_clears_erased_tags_and_roots_but_not_integer_lanes() {
+        let mut module = module();
+        let mut record = module.types[0].clone();
+        let mut field = record.fields[0].clone();
+        field.ty = neoclr::metadata::Type::UInt64;
+        record.fields = vec![field.clone()];
+        field.ty = neoclr::metadata::Type::String;
+        record.fields.push(field);
+        module.types = vec![record];
+        module.functions.clear();
+        let p = profile(&module);
+        assert_eq!(seed_lanes(&p, &Ty::Record(0)), vec![1]);
+        assert_eq!(seed_lanes(&p, &Ty::Erased), vec![0, 1]);
+        assert_eq!(seed_lanes(&p, &Ty::ByteValues), vec![0]);
+        assert_eq!(seed_lanes(&p, &Ty::Int.address()), vec![0]);
+        for ty in [Ty::Wide, Ty::Size, Ty::Int, Ty::Unit] {
+            assert!(seed_lanes(&p, &ty).is_empty());
+        }
     }
 }

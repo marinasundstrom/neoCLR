@@ -507,3 +507,10 @@ cover integer exclusion, nested offsets, cyclic edges, erased String tags, manag
 and nominal byte-array views. This completes only the static classification portion of
 step 1: dynamic allocation descriptors, initialized/live roots and emitted registration
 remain open. It does not change the proposed collector or the existing CLR comparison.
+
+A subsequent slice seeds traceable local storage and erased discriminators at ordinary
+native function entry. It retains guest definite-assignment checks and exposes selected
+lanes in inspection. This prepares part of step 2 without registering roots or safepoints;
+arguments, evaluation stacks, scratch results, initialization through managed borrows and
+host/fault roots still need a complete scanning contract. Optimizers may eliminate stores
+until root publication makes them observable, so this is not a collector-readiness claim.

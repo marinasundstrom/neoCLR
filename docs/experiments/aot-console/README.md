@@ -1591,3 +1591,38 @@ Prior standalone routing/lifetime results remain the execution baseline because 
 slice changes diagnostics only. Reusing the existing CLR/native GC comparison, typed
 storage information supplies one input a precise collector needs; it does not provide
 CLR-style safepoint/liveness metadata or establish a performance advantage.
+
+## Preparing native local root storage (2026-10-08)
+
+Ordinary value-profile function prologues now clear the local lanes identified by typed
+tracing recipes. Reference slots and managed-borrow slots start at zero; erased values
+clear both their discriminator and payload. Nested inline records clear only their
+traceable lanes, leaving integer-only lanes alone. This subsumes the earlier ByteValues
+unassigned-marker initialization. `traceLayout.functions[].localSeedLanes` exposes the
+per-local, zero-based lane selection; these are eight-byte storage lanes, not source
+field indices. Native service/dispatch wrappers do not allocate these managed locals.
+
+This is internal storage preparation. Zeroed bytes do not assign a guest variable or
+produce a valid default String/Char/ByteValues value. The ordinary verifier still rejects
+unassigned reads and invalid erased defaults. A borrow slot starts at null; a later
+non-null borrow still requires owner recovery and safe pointee tracing. Arguments,
+evaluation-stack values, constructor/call-result scratch, host roots and fault messages
+are not covered by this local initialization step.
+
+The added stores make source lowering explicit about a safe initial reference state.
+Until root registration makes those stores observable to a collector, optimizer retention
+is not a GC guarantee. No root frame is registered, no allocation point scans these slots,
+and no storage is reclaimed. Future safepoint code must publish the relevant storage and
+preserve stores/spills before collection, then unregister roots on success and fault paths.
+
+Compared with the existing CLR/root-map baseline, clearing reference slots is only one
+part of making locals safe to scan: CLR-style liveness/safepoint information remains open.
+Seeding adds prologue stores and may retain assigned but dead references once scanning
+exists; it is a correctness foundation, not an allocation or throughput optimization.
+
+[Local-storage validation](route-root-seed-validation.json) records five layout tests,
+54 Console tests, five inspection tests and 45 value tests, including rejection of
+unassigned reads. The freshly compiled standalone routing consumer retains exact output
+and broken-pipe fault parity, retained captures, libSystem-only dependencies and unchanged
+arena measurements (117,507 bytes at 128 requests; clean failure with a 64 KiB budget).
+No collector or reduced-memory claim follows from these initialization checks.

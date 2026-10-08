@@ -13,7 +13,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   field offsets, identify conditional erased String payloads and owner-dependent borrows,
   and describe reference-object payloads. Validate cycles and nominal byte-array aliases.
   These are storage recipes only; emitted descriptors, safepoint roots and native
-  reclamation remain future work. Native code generation and runtime ABI are unchanged.
+  reclamation remain future work. Follow up by clearing traceable local storage and
+  erased discriminators in ordinary native function prologues, while retaining verifier
+  rejection of unassigned reads. Inspection reports the selected local seed lanes.
+  This adds initialization stores, not root registration or collection; runtime ABI
+  and scalar-only local initialization are unchanged.
 
 - Add a real RoutePattern workload covering eight repeated routing outcomes, pattern
   errors and capture retention. Measure native arena growth from 2,433 bytes before
