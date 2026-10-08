@@ -52,3 +52,17 @@ The unchanged library-booleans and library-generic-collections samples now also 
 Calendar advances to a wide arithmetic rejection, which remains deferred.
 [Raw follow-up and test hashes](../aot-sample-assessment/primitive-member-followup.json).
 No performance benchmark is needed or speedup claimed for this admission/correctness fix.
+
+
+## Division/remainder follow-up
+
+The next calendar boundary now admits matching Int32 or Int64/UInt64 operands for
+signed/unsigned division and remainder. The shared emitter chooses the signed minimum
+from the machine operand width before checking minimum/-1, preserving the interpreter's
+overflow fault for both division and remainder. Zero checks precede machine operations;
+checked add/subtract/multiply remain at their prior admission scope. This reuses the
+integer research above and preserves the existing neoCLR behavior rather than adopting
+an independent AOT arithmetic policy. Seventy-two cross-mode cases pass with sanitized
+native adapters, atomic fault results and frame/heap cleanup. The Raven calendar
+consumer passes; [time-sample follow-up](../aot-sample-assessment/division-followup.json)
+records remaining limits. No performance change is claimed.

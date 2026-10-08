@@ -4486,3 +4486,90 @@ fn primitive_instance_projection_preserves_borrowed_storage() {
         assert_eq!(entry.invoke(vec![], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
     }
 }
+
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_wide_division_preserves_results_and_faults_at_both_widths() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    for wide in [false, true] {
+        let (ty, load, min, max) = if wide { ("Int64", "ldc.i8", i64::MIN, i64::MAX) }
+            else { ("Int32", "ldc.i4", i32::MIN as i64, i32::MAX as i64) };
+        let mut source = String::from(".module Division\n");
+        let mut modes = vec![];
+        for (left, right) in [(min, -1), (min, 0), (-1, 2), (0, 0), (max, 1),
+                              (i32::MIN as i64, -1), (-7, 3), (7, -3), (min, max)] {
+            for op in ["div", "div.un", "rem", "rem.un"] {
+                let expected = if wide {
+                    match op {
+                        "div" => left.checked_div(right), "rem" => left.checked_rem(right),
+                        "div.un" => (left as u64).checked_div(right as u64).map(|v| v as i64),
+                        _ => (left as u64).checked_rem(right as u64).map(|v| v as i64),
+                    }
+                } else {
+                    match op {
+                        "div" => (left as i32).checked_div(right as i32).map(i64::from),
+                        "rem" => (left as i32).checked_rem(right as i32).map(i64::from),
+                        "div.un" => (left as u32).checked_div(right as u32).map(|v| v as i32 as i64),
+                        _ => (left as u32).checked_rem(right as u32).map(|v| v as i32 as i64),
+                    }
+                };
+                let n = modes.len();
+                source.push_str(&format!(".function Case{n}() -> {ty}\n{load} {left}\n{load} {right}\n{op}\nret\n.end\n"));
+                modes.push(expected);
+            }
+        }
+        source.push_str(".function Calculate(Int32 mode) -> Int32\n");
+        for n in 0..modes.len() {
+            source.push_str(&format!("ldarg mode\nldc.i4 {n}\nceq\nbrtrue Test{n}\n"));
+        }
+        source.push_str("ldc.i4 99\nret\n");
+        for (n, expected) in modes.iter().enumerate() {
+            source.push_str(&format!("Test{n}:\ncall Case{n}()\n{load} {}\nceq\nbrfalse Bad\nldc.i4 42\nret\n", expected.unwrap_or(0)));
+        }
+        source.push_str("Bad:\nldc.i4 99\nret\n.end\n");
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena", "--native-gc"], false);
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+#include <stdlib.h>
+int main(int argc, char **argv) {
+    uint64_t buffer[128];
+    neoclr_aot_context ctx = {.text = {(unsigned char *)buffer, sizeof(buffer), 0}};
+    int32_t result = -99;
+    int status = neoclr_entry_v4(argc > 1 ? atoi(argv[1]) : 0, &result, &ctx);
+    if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 90;
+    if (status) {
+        if (result != -99 || ctx.fault.code != (uint32_t)status) return 91;
+        if (neoclr_aot_render_fault(stderr, &ctx.fault)) return 92;
+    }
+    if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used) return 93;
+    return status ? 1 : result;
+}
+"#).unwrap();
+        let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-fsanitize=undefined,bounds", "-DNEOCLR_NATIVE_GC", "-I"])
+            .arg(&base).arg(dir.0.join("host.c")).arg(base.join("root-probe.c"))
+            .arg(base.join("native-gc.c")).arg(base.join("text-arena.c"))
+            .arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+            .arg("-o").arg(dir.0.join("host")).output().unwrap();
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let app = neoclr::assemble(&source).unwrap();
+        let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+        let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+        for (n, expected) in modes.iter().enumerate() {
+            let vm = method.invoke(vec![neoclr::Value::Int32(n as i32)], neoclr::Limits::default());
+            let native = Command::new(dir.0.join("host")).arg(n.to_string()).output().unwrap();
+            assert!(native.stdout.is_empty());
+            if expected.is_some() {
+                assert_eq!(vm.unwrap().value, neoclr::Value::Int32(42));
+                assert_eq!(native.status.code(), Some(42), "{ty} mode {n}: {native:?}");
+                assert!(native.stderr.is_empty());
+            } else {
+                assert_eq!(native.status.code(), Some(1), "{ty} mode {n}: {native:?}");
+                assert_eq!(String::from_utf8_lossy(&native.stderr), vm.unwrap_err().diagnostic().to_string());
+            }
+        }
+    }
+}

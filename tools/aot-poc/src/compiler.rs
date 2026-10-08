@@ -495,9 +495,14 @@ fn checked_arithmetic(
         let zero_status = builder.ins().iconst(types::I32, 1);
         return_if_detailed(builder, zero, zero_status, site);
         if matches!(op, Op::Divide | Op::Remainder) {
+            let minimum = if builder.func.dfg.value_type(left) == types::I64 {
+                i64::MIN
+            } else {
+                i64::from(i32::MIN)
+            };
             let min = builder
                 .ins()
-                .icmp_imm(IntCC::Equal, left, i64::from(i32::MIN));
+                .icmp_imm(IntCC::Equal, left, minimum);
             let negative_one = builder.ins().icmp_imm(IntCC::Equal, right, -1);
             let overflow = builder.ins().band(min, negative_one);
             return_if_detailed(builder, overflow, overflow_status, site);

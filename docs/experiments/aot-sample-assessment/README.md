@@ -151,6 +151,16 @@ rerun wholesale, and its historical counts above are not presented as a fresh ce
 Next distinguish small arithmetic gaps from Tasks entry lifecycle/value-receiver
 callback work; preserve the release's explicit bootstrap and baseline priorities.
 
+## Third implemented follow-up: wide division and remainder
+
+Signed/unsigned 64-bit division and remainder now use width-correct zero/overflow
+checks before native operations. Seventy-two cases across Int32 and Int64 match the
+interpreter, including minimum/-1, zero divisors, high-bit unsigned operands and the
+valid Int64 case Int32.MinValue/-1. Fault outputs remain atomic and frames unwind.
+`library-calendar` now passes both modes; time-contracts and time-zones advance to
+other separately recorded blockers. [Evidence](division-followup.json).
+This restores existing numeric semantics, not a new public API or performance claim.
+
 ## Per-sample matrix
 
 `Emission blocked` means neither mode was run. Interpreter `expected 1/23` identifies

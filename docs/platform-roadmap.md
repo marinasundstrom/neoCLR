@@ -2973,3 +2973,11 @@ This advances the author-directed editor gate only. Next: native reference refre
 without CLI substitution, declaration navigation, source-built System/async ownership
 configuration, then shared native project build/run and VS Code acceptance. None of
 those remaining gates is implied by the small library fixture.
+
+
+### Native arithmetic sample follow-up (2026-10-08)
+
+Wide division/remainder now pass 72 interpreted/native cases with width-correct fault
+checks. `library-calendar` joins the passing sample baseline; time-contracts/time-zones
+still expose other boundaries. [Evidence](experiments/aot-sample-assessment/division-followup.json).
+Continue bounded fixes without making universal sample parity a release requirement.

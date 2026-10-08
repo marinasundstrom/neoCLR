@@ -1105,6 +1105,14 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &t)?;
                     stack.push(t);
                 }
+                Op::Divide | Op::DivideUnsigned | Op::Remainder | Op::RemainderUnsigned => {
+                    let t = pop(&mut stack)?;
+                    if !matches!(t, Ty::Int | Ty::Wide) {
+                        return Err(fail(pc, "division requires matching Int32 or Int64/UInt64 operands"));
+                    }
+                    take(&mut stack, &t)?;
+                    stack.push(t);
+                }
                 Op::Equal => {
                     let t = pop(&mut stack)?;
                     if !matches!(t, Ty::Int | Ty::Wide | Ty::Bool | Ty::Literal) {

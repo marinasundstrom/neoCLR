@@ -184,3 +184,8 @@ wrapper, callback and service gaps; broad Tasks/await parity is not yet claimed.
 A further fix enables ordinary Boolean/Int64/UInt64 wrappers and 64-bit ordering.
 The Boolean and generic-collection samples now also match interpreted execution.
 General virtual dispatch, Tasks entry lifecycle and reflection remain separate gaps.
+
+
+Wide division/remainder now preserve interpreter results and faults, with 72 boundary
+comparisons. The calendar sample also passes; complete time-zone/service coverage is
+not implied.

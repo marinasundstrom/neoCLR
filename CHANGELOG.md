@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Admit native 64-bit division/remainder with operand-width overflow guards and
+  unchanged zero/overflow fault behavior. Verify 72 native/interpreter cases and
+  calendar sample parity; record the remaining time-contract/time-zone boundaries.
+
 - Extend verified native primitive wrappers to Boolean, Int64 and UInt64 with exact
   borrowed receivers, and admit existing 64-bit ordering/branch lowering. Boolean and
   generic-collection Raven samples now match interpreted execution; 56 comparison
