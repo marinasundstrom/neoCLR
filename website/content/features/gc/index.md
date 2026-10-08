@@ -54,3 +54,18 @@ neoCLR's current API exposes its supported object counters under `System.Runtime
 Generations, byte accounting, finalizers, tuning and no-GC regions are future work.
 
 [API guide](../../docs/gc.html) · [GC reference](xref:System.Runtime.GC)
+
+
+## Native compilation experiment
+
+Development ARM64 AOT builds can opt into `--native-gc`, which links a basic nonmoving
+collector into the executable. The tested Raven routing workload completes 1,024 requests
+within 64 KiB while preserving a pattern and captures across requests. No shared managed
+runtime is needed. This is separate from the public `System.Runtime.GC` API above, which
+is not yet bound in AOT builds.
+
+The initial collector scans object payloads conservatively and collects at every published
+operation boundary. Those choices can retain extra objects and perform excessive work;
+precise maps and pressure scheduling remain next. General host handles, concurrent
+collection and full HTTP-server qualification remain open.
+[Experimental contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-console/native-gc.md).

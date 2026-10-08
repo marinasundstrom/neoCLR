@@ -1,0 +1,86 @@
+.module NativeGC
+.type class Node
+.field Next Node
+.field Text String
+.method instance .ctor(String text) -> noresult
+ldarg 0
+ldarg text
+stfld 1
+ret
+.end
+.end
+.function Make(String text) -> Node
+ldarg text
+newobj.ctor instance Node::.ctor(String)
+dup
+dup
+stfld 0
+ret
+.end
+.function Garbage() -> noresult
+ldstr "garbage"
+call Make(String)
+pop
+ret
+.end
+.function Echo(Value value) -> Value
+call Garbage()
+ldarg value
+ret
+.end
+.function Churn(out String& text,Int32 fail) -> Int32
+.local Int32 count
+.local Value retained
+ldarg text
+ldc.i4 12345
+call neoCLR.Runtime.Int32ToString(Int32)
+stobj String
+ldarg text
+ldobj String
+value.pack String
+call Echo(Value)
+stloc retained
+ldc.i4 0
+stloc count
+Loop:
+call Garbage()
+ldloc count
+ldc.i4 1
+add
+stloc count
+ldloc count
+ldc.i4 512
+clt
+brtrue Loop
+ldarg fail
+brfalse Check
+ldarg text
+ldobj String
+call System.Fail(String)
+Check:
+ldarg text
+ldobj String
+ldloc retained
+value.unpack String
+ceq
+brfalse Bad
+ldc.i4 42
+ret
+Bad:
+ldc.i4 -1
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Node owner
+ldc.i4 12345
+call neoCLR.Runtime.Int32ToString(Int32)
+call Make(String)
+stloc owner
+ldloc owner
+ldflda 1
+ldloca owner
+initobj Node
+ldarg mode
+call Churn(String&,Int32)
+ret
+.end

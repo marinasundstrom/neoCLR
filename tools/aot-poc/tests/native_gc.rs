@@ -18,3 +18,20 @@ fn bounded_nonmoving_heap_reclaims_cycles_and_preserves_interior_and_fault_roots
     assert!(r.status.success(), "{r:?}");
     fs::remove_dir_all(dir).unwrap();
 }
+
+
+#[test]
+fn native_gc_requires_explicit_heap_contract_and_distinct_mode() {
+    for flags in [
+        vec!["--native-gc"],
+        vec!["--native-gc", "--native-gc"],
+        vec!["--native-gc", "--probe-stack-roots"],
+        vec!["--native-gc", "--reference-arena"],
+    ] {
+        let r = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+            .args(flags).output().unwrap();
+        assert!(!r.status.success());
+        let error = String::from_utf8_lossy(&r.stderr);
+        assert!(error.contains("requires") || error.contains("duplicate") || error.contains("distinct modes"), "{error}");
+    }
+}

@@ -5,6 +5,9 @@
 #include <inttypes.h>
 #ifdef NEOCLR_ROOT_PROBES
 #include "root-probe.h"
+#ifdef NEOCLR_NATIVE_GC
+#include "native-gc.h"
+#endif
 #endif
 
 /* Diagnostic harness: capacity is a measurement variable, not server policy. */
@@ -38,6 +41,14 @@ int main(int argc, char **argv) {
         fprintf(stderr, "ROOT_PROBES %" PRIu64 "\n", neoclr_root_probe_count_v1());
 #endif
     }
+#ifdef NEOCLR_NATIVE_GC
+    if (audit) {
+        neoclr_gc_statistics gc = neoclr_gc_statistics_v1();
+        fprintf(stderr, "NATIVE_GC {\"collections\":%" PRIu64 ",\"allocations\":%" PRIu64
+            ",\"reclaimedAllocations\":%" PRIu64 ",\"reclaimedBytes\":%" PRIu64 "}\n",
+            gc.collections, gc.allocations, gc.reclaimed_allocations, gc.reclaimed_bytes);
+    }
+#endif
     if (audit) fprintf(stderr, "AOT_MEASURE {\"requests\":%d,\"capacity\":%zu,\"used\":%" PRIu64 ",\"status\":%d,\"result\":%d}\n",
                        requests, capacity, context.text.used, status, result);
     free(storage);

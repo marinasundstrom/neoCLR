@@ -15,6 +15,17 @@ It traces heap-backed T& references, including interior fields and interface vie
 Frame and heap references use the same ByRef feature; heap.new returns T& directly,
 without boxing or an ownership wrapper. See [heap references](heap-references.md).
 
+## Native compilation (development experiment)
+
+The ARM64 AOT experiment now supports basic nonmoving collection with `--native-gc`.
+It traces published storage and reuses blocks in a bounded host buffer; allocation
+services do not collect while constructing results. The real Raven routing consumer
+completes 1,024 requests in 64 KiB with retained pattern/captures. This is an experimental
+backend contract, separate from the interpreter behavior and public GC APIs below:
+object payload scanning is conservative, collection runs at every published boundary,
+and exported entrypoints remain Int32-only. General host handles and concurrency are
+unsupported. See [native GC contracts, .NET comparison and validation](experiments/aot-console/native-gc.md).
+
 ## Roots and collection boundaries
 
 Before a heap.new instruction reaches an allocation threshold, the runtime traces

@@ -10,6 +10,7 @@ type Error = Box<dyn std::error::Error>;
 #[derive(Default)]
 pub struct Options {
     pub probe_stack_roots: bool,
+    pub native_gc: bool,
     pub user_faults: Vec<usize>,
     pub console_read_byte: Vec<usize>,
     pub console_write_line: Vec<usize>,
@@ -45,6 +46,7 @@ impl Options {
     pub fn from_report(report: Option<&serde_json::Value>) -> Self {
         Self {
             probe_stack_roots: false,
+            native_gc: false,
             string_dispatch: report.and_then(|r| r["stringInterfaceDispatch"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["contractCompiledIndex"].as_u64()? as usize, r["functionCompiledIndex"].as_u64()? as usize))).collect(),
             string_interfaces: report.and_then(|r| r["stringInterfaceViews"].as_array())

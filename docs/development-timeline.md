@@ -11829,3 +11829,13 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
 - **Actions so far:** add an in-buffer descriptor/mark-sweep kernel and sanitized contract
   test. Generated-code integration and fixed-budget acceptance remain open in this slice.
   See [design and evidence](experiments/aot-console/native-gc.md).
+
+- **Follow-through:** The assistant committed the collector kernel, then connected an
+  explicit native-GC mode to compiler-published pre-operation boundaries. The generated
+  ARM64 lifetime fixture passes with a 2 KiB heap, including interior-only ownership,
+  repeated discarded cycles, erased returns and fault retention. The Raven route sample
+  completes 1,024 requests in 64 KiB and preserves interpreter output/fault behavior.
+  [Recorded evidence](experiments/aot-console/route-native-gc-validation.json) distinguishes
+  this completed basic GC from remaining precise maps, pressure scheduling, host handles
+  and full HTTP server work. AddressSanitizer was unavailable on this host due to startup
+  deadlock; undefined-behavior/bounds sanitizers and executable guards passed.

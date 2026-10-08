@@ -2,17 +2,43 @@
 #include <inttypes.h>
 #include <string.h>
 
+#ifdef NEOCLR_NATIVE_GC
+#include "native-gc.h"
+#endif
+enum { TEXT_STORAGE = 1, OBJECT_STORAGE = 2, BYTES_STORAGE = 3, STRINGS_STORAGE = 4 };
+#ifdef NEOCLR_NATIVE_GC
+_Static_assert((int)TEXT_STORAGE == (int)NEOCLR_GC_TEXT && (int)OBJECT_STORAGE == (int)NEOCLR_GC_OBJECT &&
+               (int)BYTES_STORAGE == (int)NEOCLR_GC_BYTES && (int)STRINGS_STORAGE == (int)NEOCLR_GC_STRINGS,
+               "allocation kind contract");
+#endif
+static int32_t reserve_storage(neoclr_aot_text_arena *arena, uint64_t bytes,
+                               uint32_t kind, void **output) {
+#ifdef NEOCLR_NATIVE_GC
+    return neoclr_gc_allocate_v1(arena, bytes, kind, output);
+#else
+    (void)kind;
+    if (!arena || !output || arena->used > arena->capacity || (arena->capacity && !arena->data) ||
+        ((uintptr_t)arena->data & 7)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t padding = (8 - (arena->used & 7)) & 7;
+    uint64_t available = arena->capacity - arena->used;
+    if (padding > available || bytes > available - padding) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    *output = arena->data + arena->used + padding;
+    arena->used += padding + bytes;
+    return 0;
+#endif
+}
+
 static int32_t store_text(const char *buffer, size_t length,
                           neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
     if (arena->used > arena->capacity || (arena->capacity && !arena->data) ||
         ((uintptr_t)arena->data & 7)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    uint64_t padding = (8 - (arena->used & 7)) & 7;
-    uint64_t needed = padding + sizeof(uint64_t) + (uint64_t)length;
-    if (needed > arena->capacity - arena->used) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
-    neoclr_aot_text *text = (neoclr_aot_text *)(arena->data + arena->used + padding);
+    if (length > UINT64_MAX - 8) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    void *storage;
+    int32_t status = reserve_storage(arena, 8 + (uint64_t)length, TEXT_STORAGE, &storage);
+    if (status) return status;
+    neoclr_aot_text *text = storage;
     text->length = (uint64_t)length;
     memcpy(text->bytes, buffer, length);
-    arena->used += needed;
     *output = text;
     return NEOCLR_AOT_FAULT_NONE;
 }
@@ -46,14 +72,13 @@ int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
     if (arena->used > arena->capacity || (arena->capacity && !arena->data) ||
         ((uintptr_t)arena->data & 7) || bytes < 8 || bytes > 264 || (bytes & 7))
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    uint64_t padding = (8 - (arena->used & 7)) & 7;
-    uint64_t needed = padding + bytes;
-    if (needed > arena->capacity - arena->used) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
-    unsigned char *object = arena->data + arena->used + padding;
+    void *storage;
+    int32_t status = reserve_storage(arena, bytes, OBJECT_STORAGE, &storage);
+    if (status) return status;
+    unsigned char *object = storage;
     uint64_t identity = type;
     memcpy(object, &identity, sizeof(identity));
     memset(object + 8, 0, bytes - 8);
-    arena->used += needed;
     *output = object;
     return NEOCLR_AOT_FAULT_NONE;
 }
@@ -63,15 +88,14 @@ static int32_t allocate_bytes(neoclr_aot_text_arena *arena, int32_t length, int 
     if (length > 65536) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
     if (arena->used > arena->capacity || (arena->capacity && !arena->data) ||
         ((uintptr_t)arena->data & 7)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    uint64_t padding = (8 - (arena->used & 7)) & 7;
-    uint64_t needed = padding + 16 + (uint64_t)length * (reserved ? 2 : 1);
-    if (needed > arena->capacity - arena->used) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
-    unsigned char *array = arena->data + arena->used + padding;
+    void *storage;
+    int32_t status = reserve_storage(arena, 16 + (uint64_t)length * (reserved ? 2 : 1), BYTES_STORAGE, &storage);
+    if (status) return status;
+    unsigned char *array = storage;
     uint64_t kind = reserved ? UINT64_C(0x80000002) : UINT64_C(0x80000001), count = (uint64_t)length;
     memcpy(array, &kind, 8);
     memcpy(array + 8, &count, 8);
     memset(array + 16, 0, (size_t)length * (reserved ? 2 : 1));
-    arena->used += needed;
     *output = array;
     return NEOCLR_AOT_FAULT_NONE;
 }
@@ -208,15 +232,14 @@ int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_te
     /* Preserve the runtime's size-overflow fault before applying the native budget. */
     if (right->length > UINT64_MAX - left->length) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     uint64_t length = left->length + right->length;
-    uint64_t padding = (8 - (arena->used & 7)) & 7;
-    uint64_t available = arena->capacity - arena->used;
-    if (padding > available || 8 > available - padding || length > available - padding - 8)
-        return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
-    neoclr_aot_text *text = (neoclr_aot_text *)(arena->data + arena->used + padding);
+    if (length > UINT64_MAX - 8) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    void *storage;
+    int32_t status = reserve_storage(arena, 8 + length, TEXT_STORAGE, &storage);
+    if (status) return status;
+    neoclr_aot_text *text = storage;
     text->length = length;
     memcpy(text->bytes, left->bytes, (size_t)left->length);
     memcpy(text->bytes + left->length, right->bytes, (size_t)right->length);
-    arena->used += padding + 8 + length;
     *output = text;
     return NEOCLR_AOT_FAULT_NONE;
 }
@@ -296,16 +319,15 @@ int32_t neoclr_allocate_strings_v1(neoclr_aot_text_arena *arena, int32_t length,
     if (!arena || !output || (reserved != 0 && reserved != 1) ||
         arena->used > arena->capacity || (arena->capacity && !arena->data) ||
         ((uintptr_t)arena->data & 7)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    uint64_t padding = (8 - (arena->used & 7)) & 7;
-    uint64_t needed = padding + 16 + (uint64_t)length * (reserved ? 9 : 8);
-    if (needed > arena->capacity - arena->used) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
-    unsigned char *array = arena->data + arena->used + padding;
+    void *storage;
+    int32_t status = reserve_storage(arena, 16 + (uint64_t)length * (reserved ? 9 : 8), STRINGS_STORAGE, &storage);
+    if (status) return status;
+    unsigned char *array = storage;
     uint64_t kind = reserved ? UINT64_C(0x80000004) : UINT64_C(0x80000003);
     uint64_t count = (uint64_t)length;
     memcpy(array, &kind, 8);
     memcpy(array + 8, &count, 8);
     memset(array + 16, 0, (size_t)length * (reserved ? 9 : 8));
-    arena->used += needed;
     *output = array;
     return NEOCLR_AOT_FAULT_NONE;
 }

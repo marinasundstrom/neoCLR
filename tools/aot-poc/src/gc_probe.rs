@@ -1,4 +1,4 @@
-//! Opt-in diagnostic frame chain. Incomplete roots: collection remains forbidden.
+//! Published frames for diagnostic observation or explicit nonmoving GC boundaries.
 use super::{
     Error, gc_layout, gc_points,
     profile::{Profile, Stacks, Ty},
@@ -42,6 +42,7 @@ impl Probes {
         flows: &[Stacks],
         details: Option<&crate::fault_details::Options>,
     ) -> Result<Self, Error> {
+        let gc = details.is_some_and(|d| d.native_gc);
         let mut sig = module.make_signature();
         sig.params.extend(
             [
@@ -55,7 +56,7 @@ impl Probes {
             .map(AbiParam::new),
         );
         let callback =
-            module.declare_function("neoclr_probe_stack_roots_v2", Linkage::Import, &sig)?;
+            module.declare_function(if gc { "neoclr_gc_stack_roots_v1" } else { "neoclr_probe_stack_roots_v2" }, Linkage::Import, &sig)?;
         let mut enter_sig = module.make_signature();
         enter_sig.params.extend(
             [
@@ -70,11 +71,11 @@ impl Probes {
             .map(AbiParam::new),
         );
         let enter =
-            module.declare_function("neoclr_probe_enter_v3", Linkage::Import, &enter_sig)?;
+            module.declare_function(if gc { "neoclr_gc_enter_v1" } else { "neoclr_probe_enter_v3" }, Linkage::Import, &enter_sig)?;
         let mut leave_sig = module.make_signature();
         leave_sig.params.push(AbiParam::new(types::I64));
         let leave =
-            module.declare_function("neoclr_probe_leave_v1", Linkage::Import, &leave_sig)?;
+            module.declare_function(if gc { "neoclr_gc_leave_v1" } else { "neoclr_probe_leave_v1" }, Linkage::Import, &leave_sig)?;
         let mut sig = module.make_signature();
         sig.params.extend(
             [
@@ -88,7 +89,7 @@ impl Probes {
             .map(AbiParam::new),
         );
         let publish =
-            module.declare_function("neoclr_probe_transient_v2", Linkage::Import, &sig)?;
+            module.declare_function(if gc { "neoclr_gc_transient_v1" } else { "neoclr_probe_transient_v2" }, Linkage::Import, &sig)?;
         let mut transient = HashMap::new();
         let mut points = HashMap::new();
         let mut storage = HashMap::new();

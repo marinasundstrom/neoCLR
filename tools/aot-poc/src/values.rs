@@ -200,6 +200,9 @@ fn check_byte_value_replacement(b: &mut FunctionBuilder<'_>, address: ir::Value,
 pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
     let reservations = input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ReserveArray(_))));
     let references = details.is_some_and(|d| d.reference_arena);
+    if details.is_some_and(|d| d.native_gc && (!d.reference_arena || !d.probe_stack_roots)) {
+        return Err("native GC requires an admitted reference-arena profile and published roots".into());
+    }
     let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch))?;
     let root = p.root(root)?;
     let flows: Vec<_> = (0..input.functions.len())

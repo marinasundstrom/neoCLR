@@ -213,12 +213,16 @@ and unlink on all return paths without adding guest fault frames
 Fault-context message/frame-name slots now have bounded diagnostic enumeration during
 unwinding and after host return; successful reentry retires the prior view
 ([validation](experiments/aot-console/route-fault-root-validation.json)).
-Borrowed pointees, service-internal temporaries and general host root registration remain incomplete.
-A [bounded native collector kernel](experiments/aot-console/native-gc.md) now has sanitized
-contract coverage for cycles, interior roots and reuse. Next connect it only at complete
-compiler boundaries and qualify repeated routing within a fixed budget before qualifying
-sustained HTTP execution. This is planned integration work, not an implemented native
-collector. Borrowed String interface receivers remain unsupported.
+An explicit `--native-gc` mode now connects the [bounded nonmoving collector](experiments/aot-console/native-gc.md)
+to complete compiler boundaries. It recovers heap-borrow owners, relies on published
+owning storage for stack borrows and never collects inside native allocation services.
+The real routing workload completes 1,024 requests within 64 KiB, with retained captures
+and output/fault parity ([validation](experiments/aot-console/route-native-gc-validation.json)).
+Basic native GC is implemented for this bounded profile. Conservative object candidates
+can over-retain, and the current stress policy collects at every boundary. Next add precise
+object maps and measured pressure scheduling, then continue the HTTP service dependencies;
+full server execution remains unqualified. General host handles, concurrent collection
+and borrowed String interface receivers remain unsupported.
 The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

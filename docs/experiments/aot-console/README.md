@@ -1,5 +1,9 @@
 # Native Console progression (development, 2026-10-08)
 
+Latest lifetime checkpoint: [basic native GC](native-gc.md) now runs the repeated Raven
+routing workload within a fixed 64 KiB heap. The sections below record the progression;
+diagnostic-only collection restrictions do not describe the explicit `--native-gc` mode.
+
 The ordinary Raven `Console.ReadByte` wrapper now compiles to ARM64 together with
 its Result/Option construction, generic seed helpers and failure path. Enable
 `--compile-system --bind-user-fault --bind-console-read-byte` with an explicit

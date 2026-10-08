@@ -2,12 +2,21 @@
 #define NEOCLR_AOT_ROOT_PROBE_H
 #include <stdint.h>
 #include <stddef.h>
-/* Private diagnostic chain, not complete GC roots or a stable hosting ABI.
- * Frame storage belongs to the active native function. No allocation, reentry,
- * pointer mutation or collection is permitted in these callbacks. Ancestor snapshots
+#ifdef NEOCLR_NATIVE_GC
+#define neoclr_probe_enter_v3 neoclr_gc_enter_v1
+#define neoclr_probe_leave_v1 neoclr_gc_leave_v1
+#define neoclr_probe_stack_roots_v2 neoclr_gc_stack_roots_v1
+#define neoclr_probe_transient_v2 neoclr_gc_transient_v1
+#endif
+/* Private published frame chain, not a stable hosting ABI.
+ * Frame storage belongs to the active native function. Diagnostic mode forbids
+ * allocation, reentry, pointer mutation and collection in all callbacks.
+ * NEOCLR_NATIVE_GC selects distinct hooks: only the completed stack snapshot hook
+ * collects, using the nonmoving heap contract. Enter/leave/transient never collect.
+ * Ancestor snapshots
  * represent suspended pre-operation stacks, not all locals/arguments/results.
  * JSON belongs to the image; numeric holes are zero. Output-borrow pointees may be
- * uninitialized. Never scan the chain as complete roots or retain frames after leave.
+ * uninitialized. Never follow stack borrow pointees or retain frames after leave.
  */
 typedef struct {
     const void *address;

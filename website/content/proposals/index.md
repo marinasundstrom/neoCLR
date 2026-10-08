@@ -324,10 +324,13 @@ diagnostic activation phases. Caller-owned pending result slots preserve observa
 through callee frame removal. Native service/dispatch wrappers now expose typed argument
 copies and clean up on every return without adding guest fault frames. Fault-context
 message and frame-name slots now remain available to diagnostics after unwinding, until
-reset or context release. Borrowed pointees, service-internal temporaries and general
-host root registration remain incomplete.
-A bounded nonmoving collector kernel now has sanitized contract coverage; connecting it
-to compiled execution and qualifying fixed-budget routing are the next steps. The HTTP API drives this work, and sustained server execution remains unqualified.
+reset or context release. General host root registration and collection inside native
+services remain outside the supported contract.
+Explicit `--native-gc` now connects a bounded nonmoving collector to compiled ARM64
+execution. The Raven routing sample completes 1,024 requests in 64 KiB with retained
+captures and interpreter fault/output parity. Conservative object scanning and collection
+at every boundary are initial policies; precise maps, pressure scheduling and host handles
+remain future work. The HTTP API drives this work, and sustained server execution remains unqualified.
 The bounded arena is a temporary experiment, not a final server memory policy.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future

@@ -576,3 +576,17 @@ entry reset retires prior fault slots. [Contract and validation](experiments/aot
 include exact interpreter rendering parity. The CLR comparison still distinguishes this
 read-only slot view from registered hosting handles and runtime-owned exception objects:
 the host continues to own context/arena lifetime, with no reclamation or lifetime extension.
+
+
+## Basic compiled GC checkpoint (2026-10-08)
+
+The author directs continuation until native compilation has basic GC. That checkpoint
+now uses explicit `--native-gc` emission and a statically linked nonmoving collector.
+The [contract and comparison](experiments/aot-console/native-gc.md) explain allocation
+kinds, conservative object candidates, interior-owner recovery and why services do not
+collect internally. This scopes the previously open native-temporary/borrow problem to
+complete operation boundaries without claiming general native transition or host handles.
+The [real Raven routing consumer](experiments/aot-console/route-native-gc-validation.json)
+completes 1,024 requests within a fixed 64 KiB buffer, with retained captures and exact
+fault/output parity; the arena-only predecessor failed that budget at 128 requests.
+Precise maps, measured pressure scheduling and full HTTP service integration remain next.

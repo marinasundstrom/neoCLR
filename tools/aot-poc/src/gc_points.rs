@@ -123,7 +123,12 @@ pub(super) fn report(
     }
     Ok(
         json!({"schema": "neoclr-pre-operation-roots-v1", "functions": functions,
-        "notice": "Conservative reachable IL boundaries, not native safepoints. Opt-in diagnostic frames expose typed storage and call-result handoff; native wrappers expose arguments only. Native service temporaries, borrowed pointees and host/fault roots remain incomplete. Collection is forbidden."}),
+        "collection": if details.is_some_and(|d| d.native_gc) { "nonmoving-conservative-pre-operation" } else { "disabled" },
+        "notice": if details.is_some_and(|d| d.native_gc) {
+            "Collection runs only at published pre-operation boundaries; allocation services never collect. In-buffer descriptors recover interior owners, caller storage covers stack borrows, and fault contexts retain messages. Conservative candidates can over-retain. General host handles and concurrent collection are unsupported."
+        } else {
+            "Conservative reachable IL boundaries, not native safepoints. Opt-in diagnostic frames expose typed storage and call-result handoff; native wrappers expose arguments only. This diagnostic-only mode forbids collection."
+        }}),
     )
 }
 

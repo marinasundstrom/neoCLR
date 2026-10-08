@@ -12,7 +12,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   descriptors, free-block reuse/coalescing, interior-owner retention, conservative
   object scanning, atomic text/bytes and initialized String-array tracing. Sanitized
   contract coverage exercises cycles, aliases, fault roots and live-set exhaustion.
-  This first slice is a kernel foundation; generated-code collection is not yet enabled.
+  Enable it in generated ARM64 code with explicit `--native-gc --reference-arena`,
+  distinct GC hooks and matching statically linked adapters. Collection occurs at complete
+  pre-operation boundaries, never inside allocation services. Validate an interior-only
+  owner, erased return handoff, 512 discarded cycles, fault retention/reentry and live-set
+  exhaustion. The real Raven routing workload now completes 1,024 requests in a fixed
+  64 KiB buffer (arena-only previously failed at 128), retaining patterns/captures and
+  matching interpreter output/faults. Default arena/diagnostic modes remain unchanged.
+  This is conservative, nonmoving, synchronous experimental GC with collection at every
+  boundary; precise object maps, pressure scheduling and general host handles remain open.
 
 - Add private typed tracing-layout diagnostics to AOT inspection for admitted value
   profiles: distinguish managed references from native-width integers, preserve nested

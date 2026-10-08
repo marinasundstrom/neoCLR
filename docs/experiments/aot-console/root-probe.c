@@ -2,6 +2,9 @@
 #include "../aot-fault-details/fault-details.h"
 #include <stdlib.h>
 #include <string.h>
+#ifdef NEOCLR_NATIVE_GC
+#include "native-gc.h"
+#endif
 static _Thread_local uint64_t calls;
 static _Thread_local uint32_t depth;
 static _Thread_local neoclr_probe_frame *head;
@@ -78,6 +81,10 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
     }
     (void)value;
     calls++;
+#ifdef NEOCLR_NATIVE_GC
+    /* Full initialized snapshot is published. Allocation services never collect. */
+    if (neoclr_gc_collect_v1((neoclr_aot_context *)frame->context, head)) abort();
+#endif
 }
 void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
