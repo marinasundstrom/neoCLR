@@ -63,7 +63,7 @@ fn object_base_shape(t: &neoclr::metadata::TypeDef) -> bool {
 }
 
 impl<'a> Profile<'a> {
-    pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>) -> Result<Self, Error> {
+    pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>, object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>) -> Result<Self, Error> {
         if input.name == "System" || input.types.len() > 128 || input.functions.len() > 512 {
             return Err(
                 "value profile requires an application with at most 128 types and 512 functions"
@@ -131,7 +131,7 @@ impl<'a> Profile<'a> {
             args: vec![],
             locals: vec![],
             results: vec![],
-            dispatch: HashMap::new(),
+            dispatch: object_display.cloned().unwrap_or_default(),
         };
         // Compute bounded inline layouts before using any storage or call signatures.
         // A visiting node is an illegal inline cycle, including otherwise unused types.
@@ -250,9 +250,25 @@ impl<'a> Profile<'a> {
         // Resolve all calls (even dead ones) and reject recursive native call graphs.
         let mut edges = vec![vec![]; input.functions.len()];
         for (i, f) in input.functions.iter().enumerate() {
-            for op in &f.body {
+            let owner = f.owner.as_ref().and_then(|t| input.type_definition(t));
+            let reference_constructor = f.instance && f.name.ends_with("..ctor") && owner.is_some_and(|t| t.is_reference_type);
+            if reference_constructor && owner.unwrap().base.is_some() {
+                let base = owner.unwrap().base.as_ref().unwrap();
+                if !matches!(f.body.as_slice(), [Op::Arg(0), Op::Call(target), ..]
+                    if target.instance && target.owner.as_ref() == Some(base) && target.name.ends_with("..ctor") && target.parameters.is_empty()) {
+                    return Err("reference constructor requires an unconditional leading Object base constructor call".into());
+                }
+            }
+            for (pc, op) in f.body.iter().enumerate() {
                 if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
                     let callee = p.callee(target)?;
+                    let c = &input.functions[callee];
+                    if !matches!(op, Op::Construct(_)) && c.instance && c.name.ends_with("..ctor")
+                        && c.owner.as_ref().and_then(|t| input.type_definition(t)).is_some_and(|t| t.is_reference_type)
+                        && !(matches!(op, Op::Call(_)) && reference_constructor && pc == 1
+                            && matches!(f.body.first(), Some(Op::Arg(0))) && owner.unwrap().base == c.owner) {
+                        return Err("reference constructor calls require newobj.ctor or the single leading base initializer".into());
+                    }
                     if p.dispatch.contains_key(&callee) && !matches!(op, Op::CallVirtual(_)) {
                         return Err("interface contracts require callvirt".into());
                     }

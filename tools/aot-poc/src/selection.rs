@@ -23,6 +23,9 @@ pub(crate) fn static_owner(t: &neoclr::metadata::TypeDef) -> bool {
 /// Shared preparation for native emission and read-only admission inspection.
 pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Value), Error> {
     validate_source(input, true)?;
+    if input.functions.iter().any(object_display_contract) {
+        neoclr::LoadedProgram::new(input).and_then(|p| p.verify()).map_err(|e| e.to_string())?;
+    }
     if input.types.iter().any(|t| !t.generic_parameters.is_empty())
         || input
             .functions
@@ -74,6 +77,46 @@ fn resolve(input: &neoclr::Module, target: &FunctionRef) -> Result<usize, Error>
 pub(super) fn interface_contract(input: &neoclr::Module, f: &neoclr::metadata::Function) -> bool {
     f.owner.as_ref().and_then(|t| input.type_definition(t))
         .is_some_and(|t| t.representation == neoclr::metadata::Representation::Interface)
+}
+
+/// Narrow class-virtual slice used by Console.WriteLine(Object). Original load-set
+/// verification supplies slot ancestry; a same-named ordinary member is never enough.
+pub(super) fn object_display_contract(f: &neoclr::metadata::Function) -> bool {
+    f.name == "System.Object.ToString" && f.owner == Some(Type::Named("System.Object".into()))
+        && f.instance && f.is_virtual && !f.is_override && !f.is_abstract
+        && !f.receiver_byref && !f.receiver_readonly && f.parameters.is_empty()
+        && f.returns == Type::String && !f.no_result && f.impl_flags == 0
+        && f.generic_parameters.is_empty() && f.generic_constraints.is_empty()
+}
+
+pub(super) fn display_override(input: &neoclr::Module, concrete: &Type, contract: &neoclr::metadata::Function) -> Result<(usize, FunctionRef), Error> {
+    let definition = input.type_definition(concrete).ok_or("Object display requires a local class")?;
+    if !definition.is_reference_type || definition.base.as_ref().is_some_and(|base| *base != Type::Named("System.Object".into())) {
+        return Err(format!("Object display requires a rootless or direct Object-derived class with a ToString override; default display and deeper inheritance are unsupported: {concrete:?}, base {:?}", definition.base).into());
+    }
+    // Object slots use native member names, unlike CLI-origin interface member
+    // matching. An origin display name must never redirect a virtual slot.
+    let arguments = match concrete { Type::Constructed { arguments, .. } => arguments.as_slice(), _ => &[] };
+    let mut candidates = vec![];
+    for (index, method) in input.functions.iter().enumerate() {
+        if method.owner.as_ref().and_then(Type::definition_name) != concrete.definition_name()
+            || method.name.rsplit('.').next() != contract.name.rsplit('.').next() { continue; }
+        let method = closed_signature(method, arguments)?;
+        if method.owner.as_ref() == Some(concrete) && method.instance && !method.receiver_byref
+            && method.parameters == contract.parameters && method.returns == contract.returns
+            && method.no_result == contract.no_result && method.generic_parameters.is_empty() {
+            candidates.push((index, FunctionRef { definition:method.definition.clone(), name:method.name.clone(),
+                owner:method.owner.clone(), instance:true, generic_arguments:vec![], parameters:method.parameters.clone() }));
+        }
+    }
+    let [candidate] = candidates.as_slice() else {
+        return Err("Object display requires an explicit ToString override; default display requires metadata support".into());
+    };
+    let (index, reference) = candidate.clone();
+    if !input.functions[index].is_override || input.functions[index].is_abstract {
+        return Err("Object display requires a verified concrete override".into());
+    }
+    Ok((index, reference))
 }
 
 /// Traverse verified interface inheritance with closed owner arguments. Class base
@@ -145,14 +188,18 @@ pub(super) fn dispatch_targets(input: &neoclr::Module, contract: usize, reached:
 
 pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>, array_backing: Option<usize>) -> Result<Vec<(usize, usize)>, Error> {
     let f = &input.functions[contract];
-    if !interface_contract(input, f) { return Ok(vec![]); }
-    if !f.instance || f.receiver_byref || !f.body.is_empty() || !f.generic_parameters.is_empty() {
+    let display = object_display_contract(f);
+    if !interface_contract(input, f) && !display { return Ok(vec![]); }
+    if !f.instance || f.receiver_byref || (!display && !f.body.is_empty()) || !f.generic_parameters.is_empty() {
         return Err("interface dispatch requires a bodyless nongeneric instance contract".into());
     }
     let mut constructed = BTreeSet::new();
     let array_owner = array_backing.map(|i| Type::Named(input.types[i].name.clone())).or_else(|| byte_array_owner(input));
     for &i in reached {
         for op in &input.functions[i].body {
+            if display && matches!(op, Op::BoxValue(_) | Op::NewArray(_) | Op::ReserveArray(_)) {
+                return Err("Object display with boxing or arrays requires a later receiver/metadata profile".into());
+            }
             if matches!(op, Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte)) {
                 if let Some(Type::Named(name)) = &array_owner { constructed.insert(name.as_str()); }
             }
@@ -163,11 +210,12 @@ pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usiz
     }
     let mut targets = vec![];
     for (ti, t) in input.types.iter().enumerate() {
-        if !constructed.contains(t.name.as_str()) || !implements_interface(input, &Type::Named(t.name.clone()), f.owner.as_ref().unwrap()) { continue; }
+        if !constructed.contains(t.name.as_str()) || (!display && !implements_interface(input, &Type::Named(t.name.clone()), f.owner.as_ref().unwrap())) { continue; }
         if !t.is_reference_type || !t.generic_parameters.is_empty() || t.representation != neoclr::metadata::Representation::Record {
             return Err("interface dispatch requires nongeneric constructed classes".into());
         }
-        let (target, _) = implicit_implementation(input, &Type::Named(t.name.clone()), f)?;
+        let (target, _) = if display { display_override(input, &Type::Named(t.name.clone()), f)? }
+            else { implicit_implementation(input, &Type::Named(t.name.clone()), f)? };
         targets.push((ti, target));
     }
     Ok(targets)
@@ -248,13 +296,17 @@ pub(super) fn select_inventory(
             if functions.len() > 512 {
                 return Err("selected functions exceed the value profile limit".into());
             }
+            if object_display_contract(&input.functions[i]) { continue; }
             for op in &input.functions[i].body {
                 match op {
                     Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                         let callee = resolve(input, target)?;
                         let f = &input.functions[callee];
-                        if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && (f.is_virtual || f.is_abstract || f.is_override) {
+                        if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && !object_display_contract(f) && (f.is_virtual || f.is_abstract || f.is_override) {
                             return Err("virtual calls requiring dispatch need a later selection profile".into());
+                        }
+                        if matches!(op, Op::Call(_)) && object_display_contract(f) {
+                            return Err("direct Object.ToString calls require default display metadata support".into());
                         }
                         pending.push(callee);
                     }
@@ -365,6 +417,10 @@ pub(super) fn select_inventory(
         String::new()
     };
     for (i, f) in projected.functions.iter_mut().enumerate() {
+        if object_display_contract(f) {
+            f.body = vec![Op::String(String::new()), Op::Return];
+            f.locals.clear(); f.local_names.clear();
+        }
         f.custom_attributes.clear();
         f.definition = Some(MemberId {
             module: input.name.clone(),
@@ -401,10 +457,13 @@ pub(super) fn select_inventory(
         }
     }
     let mut dispatch = vec![];
+    let mut object_dispatch = vec![];
     for (compiled, source) in rows.iter().enumerate() {
-        if interface_contract(input, &input.functions[*source]) {
+        let display = object_display_contract(&input.functions[*source]);
+        if interface_contract(input, &input.functions[*source]) || display {
             let targets = dispatch_targets(input, *source, &functions)?;
-            dispatch.push(json!({"contractCompiledIndex":compiled,"contractSourceIndex":source,
+            let inventory = if display { &mut object_dispatch } else { &mut dispatch };
+            inventory.push(json!({"contractCompiledIndex":compiled,"contractSourceIndex":source,
                 "targets":targets.iter().map(|(ty, method)| json!({"typeCompiledIndex":type_rows.binary_search(ty).unwrap(),"functionCompiledIndex":rows.binary_search(method).unwrap()})).collect::<Vec<_>>() }));
         }
     }
@@ -412,8 +471,8 @@ pub(super) fn select_inventory(
         .and_then(|source| type_rows.binary_search(&source).ok().map(|compiled| json!({"sourceIndex":source,"compiledIndex":compiled,
             "policy":"verified nominal byte-array backing; identity-preserving views and intrinsic storage field"})));
     let report = json!({"schema":"neoclr-aot-selection-v1", "module":input.name, "root":root,
-        "policy":"explicit closed world with constructed-class implicit interface dispatch; every opcode of selected bodies retained; no reflection, dynamic loading or class virtual dispatch",
-        "interfaceDispatch":dispatch, "arrayBackingProjection":array_backing,
+        "policy":"explicit closed world with constructed-class implicit interface dispatch; ordinary selected bodies retained; verified Object.ToString override dispatch replaces its private slot body; no reflection, dynamic loading or general class virtual dispatch",
+        "interfaceDispatch":dispatch, "objectDisplayDispatch":object_dispatch, "arrayBackingProjection":array_backing,
         "metadataPolicy":"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
         "functions": rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.functions[*old].definition,"name":input.functions[*old].name})).collect::<Vec<_>>(),
         "types": type_rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.types[*old].definition,"name":input.types[*old].name})).collect::<Vec<_>>(),

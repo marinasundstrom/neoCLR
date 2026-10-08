@@ -849,3 +849,78 @@ the diagnostics. The cause remains unresolved: this is producer evidence, not a 
 that source relocation fixes the compiler. Default and bounded line input now have
 standalone coverage. The remaining object WriteLine path needs virtual Object display
 and, for its fallback implementation, runtime type metadata.
+
+## Object Console output through verified overrides (2026-10-08)
+
+The [object writer](object-writer.rvn) uses `Console.WriteLine(object?)` for an
+application class with an explicit `ToString` override and for null. Closed selection
+now discovers concrete override targets for the verified `System.Object.ToString`
+slot, including classes constructed inside selected override bodies. It accepts
+rootless classes with the interpreter's verified implicit Object contract, or direct
+Object-derived classes. Same-named non-overrides do not qualify.
+
+Only this closed slot is projected to a private dispatcher. Override bodies remain
+ordinary CIL, receiver identity is preserved, and existing callvirt checks fault on
+null at the caller. The dispatcher adds no synthetic managed frame. Original load-set
+verification runs before projection; private virtual flags are cleared only for the
+reported slot and its targets; the private slot gets a collision-free name to
+avoid creating a nonvirtual hiding relationship under a declared Object base. The `objectDisplayDispatch` inventory records exact
+compiled type/method targets. No new reserved runtime service or public API is added.
+
+This reuses the [.NET/Object comparison](../../object-model-review.md) and the current
+interpreter's override validation in `src/inheritance.rs`. Like CLR virtual calls,
+Object-view calls select the concrete override and preserve a different meaning for
+a direct base call. A closed native type-tag dispatcher was chosen over a new public
+formatting service or a vtable ABI: it keeps ordinary method bodies and the existing
+private header, at the cost of a target test per candidate. No speed advantage is
+claimed. Stable vtables and metadata remain future design work.
+
+The bound is deliberately conservative: every constructed class in this selected
+program must have a qualifying override when the Object display slot is used.
+Default Object display and explicit base calls still require type metadata; deeper
+class inheritance, array display and boxed receiver display are not admitted here.
+Programs that combine this slot with boxing/array construction are rejected rather
+than silently dispatching those receivers incorrectly. Focused tests compare dynamic
+UTF-8/NUL text, null faults and faults inside overrides with the interpreter; negative
+cases cover missing overrides, non-overrides, private invalid overrides, direct base
+calls and missing arena capability.
+
+Declared-base tests also exposed a pre-existing constructor admission gap: without
+its base initializer the interpreter faults at constructor return, while the earlier
+native lowering could succeed. The profile now requires a derived reference
+constructor to start with `ldarg 0; call Base::.ctor()`. Direct reference-constructor
+calls are restricted to that single initializer; other allocations use `newobj.ctor`.
+Conditional/missing/repeated initialization and constructor chaining are outside this
+bounded native profile. The positive tests exercise both verified rootless overrides
+and explicit Object bases with initialization; negative cases prevent the previously
+admitted mismatch. A future construction-state analysis can admit more CIL shapes.
+
+## Current Console coverage
+
+These are development AOT capabilities, exercised by the linked samples and focused
+contract tests. They are not a claim that the whole runtime library compiles.
+
+| Console path | Native coverage |
+| --- | --- |
+| ReadByte | Byte/EOF/error union outcomes |
+| WriteLine | String, blank line, Boolean, Char and integer overloads |
+| Write | String and Int32 through ordinary text writers |
+| OpenStandardInput/Output/Error | Non-owning stream construction and supported Read/Write/Flush/Close calls |
+| In / Out / Error | Text-reader line input and text-writer Write/Flush, with non-owning Close |
+| ReadLine / ReadLine(maxUtf8Bytes) | UTF-8 lines, EOF, typed errors, default/explicit limits and consecutive reads |
+| WriteLine(object?) | Null and qualifying explicit class ToString overrides; no default metadata formatting or boxed/array receiver support |
+
+The next sample should combine parsing and repeated console interaction within an
+explicit host lifetime budget. Before calling this general Console support, address
+default Object display/type metadata, broader receiver dispatch and long-lived
+allocation reclamation. `TextReader.ReadToEnd` is not established by ReadLine coverage.
+The pinned Raven producer's source-path/member-lookup issue also remains a separate
+integration limitation. Trimming, stable external ABI and HTTP stay later steps.
+
+[Object writer validation](object-writer-validation.json) records exact native/interpreter
+output for the override and null, matching broken-pipe frames and exit 1, and the
+standalone dependency check. It reuses the [observed producer command](object-writer-producer.json)
+with a byte-identical `/tmp` input after the checked-in-path attempt reported missing
+WriteLine overloads. The final validation records the compiler build containing both
+the private slot rename and tightened constructor admission. Focused dispatch tests
+also vary source-origin display names: the native slot name controls override choice.

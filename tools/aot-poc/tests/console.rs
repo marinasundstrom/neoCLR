@@ -1947,3 +1947,150 @@ fn utf8_decoder_rejects_unbound_or_noncontract_services() {
         if mode!=0 {assert!(String::from_utf8_lossy(&r.stderr).contains(if mode==1 {"exact StringByteCount"} else {"runtime binding return type mismatch"}),"{mode}: {r:?}");}
     }
 }
+
+const OBJECT_DISPLAY_SEED: &str = r#"
+.module System
+.references ()
+.type class abstract System.Object
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance virtual ToString() -> String
+ldstr "default"
+ret
+.end
+.method instance virtual Equals(System.Object other) -> Boolean
+ldc.bool false
+ret
+.end
+.method instance virtual GetHashCode() -> Int32
+ldc.i4 -1
+ret
+.end
+.end
+.function neoCLR.Runtime.Fault(String) -> Void
+.methodimpl InternalCall
+.end
+"#;
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn object_display_dispatch_preserves_overrides_null_and_fault_frames() {
+    let seed=neoclr::assemble(OBJECT_DISPLAY_SEED).unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/object-display.neoil");
+    for declared_base in [false,true] {
+    let mut app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)],&seed).unwrap().remove(0);
+    app.assemblies=vec![serde_json::from_value(serde_json::json!({
+        "name":"ObjectDisplay","full_name":"ObjectDisplay","modules":["ObjectDisplay.neox"],"references":[]
+    })).unwrap()];
+    app.functions.iter_mut().find(|f|f.name=="A.ToString").unwrap().origin=Some(serde_json::from_value(serde_json::json!({
+        "assembly":"ObjectDisplay","module":"ObjectDisplay.neox","name":"SourceDisplayName","token":100663297,"member_access":"Public"
+    })).unwrap());
+    if declared_base {
+        for ty in &mut app.types {ty.base=Some(neoclr::metadata::Type::Named("System.Object".into()));}
+        for f in &mut app.functions {
+            if f.name.ends_with("..ctor") {
+                f.body.splice(0..0,[neoclr::metadata::Instruction::Arg(0),neoclr::metadata::Instruction::Call(neoclr::assembler::parse_function_ref("instance System.Object::.ctor()").unwrap())]);
+            }
+        }
+    }
+    let dir=Temp::new();
+    let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena","--bind-user-fault"]);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let report:serde_json::Value=serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["objectDisplayDispatch"][0]["targets"].as_array().unwrap().len(),3);
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc,char **argv) {
+    uint64_t storage[32];neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    int32_t result=-99;int status=neoclr_entry_v4(argc>1?atoi(argv[1]):0,&result,&ctx);
+    if (!status || result!=-99) return 92;
+    neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in 0..3 {
+        let fault=method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default()).unwrap_err();
+        let r=Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        assert_eq!(r.status.code(),Some(1));assert!(r.stdout.is_empty());
+        assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(),"{mode}");
+    }
+    }
+}
+
+#[test]
+fn object_display_rejects_fallback_base_calls_and_unverified_overrides() {
+    let seed=neoclr::assemble(OBJECT_DISPLAY_SEED).unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/object-display.neoil");
+    let original=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)],&seed).unwrap().remove(0);
+    for mode in 0..9 {
+        let mut app=original.clone();
+        match mode {
+            0=>app.functions.retain(|f| f.name!="B.ToString"),
+            1=>{
+                let root=app.functions.iter_mut().find(|f|f.name=="Calculate").unwrap();
+                for op in &mut root.body {
+                    if let neoclr::metadata::Instruction::CallVirtual(target)=op {
+                        *op=neoclr::metadata::Instruction::Call(target.clone());
+                    }
+                }
+            }
+            2=>app.functions.iter_mut().find(|f|f.name=="B.ToString").unwrap().is_override=false,
+            3=>app.functions.iter_mut().find(|f|f.name=="B.ToString").unwrap().visibility=neoclr::metadata::Visibility::Private,
+            5=>{
+                let root=app.functions.iter_mut().find(|f|f.name=="Calculate").unwrap();
+                root.body.splice(0..0,[neoclr::metadata::Instruction::Int(0),neoclr::metadata::Instruction::NewArray(neoclr::metadata::Type::Byte),neoclr::metadata::Instruction::Pop]);
+            }
+            6=>{
+                let mut marker=neoclr::assemble(".module Marker\n.type Marker\n.end").unwrap().types[0].clone();
+                marker.definition=None;
+                app.types.push(marker);
+                let root=app.functions.iter_mut().find(|f|f.name=="Calculate").unwrap();
+                let ty=neoclr::metadata::Type::Named("Marker".into());
+                root.body.splice(0..0,[neoclr::metadata::Instruction::New(ty.clone()),neoclr::metadata::Instruction::BoxValue(ty),neoclr::metadata::Instruction::Pop]);
+            }
+            7=>{
+                for ty in &mut app.types {ty.base=Some(neoclr::metadata::Type::Named("System.Object".into()));}
+            }
+            8=>{
+                for ty in &mut app.types {ty.base=Some(neoclr::metadata::Type::Named("System.Object".into()));}
+                for f in &mut app.functions {
+                    if f.name.ends_with("..ctor") {
+                        let call=neoclr::metadata::Instruction::Call(neoclr::assembler::parse_function_ref("instance System.Object::.ctor()").unwrap());
+                        f.body.splice(0..0,[neoclr::metadata::Instruction::Arg(0),call.clone(),neoclr::metadata::Instruction::Arg(0),call]);
+                    }
+                }
+            }
+            _=>(),
+        }
+        if matches!(mode,5|6) {
+            for op in &mut app.functions.iter_mut().find(|f|f.name=="Calculate").unwrap().body {
+                if let neoclr::metadata::Instruction::Branch(pc) | neoclr::metadata::Instruction::BranchTrue(pc)=op {*pc+=3;}
+            }
+        }
+        // Removing a function requires fresh local row identities before encoding.
+        for f in &mut app.functions {f.definition=None;}
+        let dir=Temp::new();let flags=if mode==4 {vec!["--compile-system","--bind-user-fault"]}
+            else {vec!["--compile-system","--reference-arena","--bind-user-fault"]};
+        let r=compile_linked_module(&dir,&seed,&app,&flags);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists(),"{mode}: {r:?}");
+        let error=String::from_utf8_lossy(&r.stderr);
+        assert!(!error.contains("panicked"),"{mode}: {r:?}");
+        if mode==0 {assert!(error.contains("default display"),"{r:?}");}
+        if mode==1 {assert!(error.contains("direct Object.ToString"),"{r:?}");}
+        if mode==2 {assert!(error.contains("verified concrete override"),"{r:?}");}
+        if mode==3 {assert!(error.contains("Fault:"),"source validation must reject before projection: {r:?}");}
+        if matches!(mode,5|6) {assert!(error.contains("boxing or arrays"),"{r:?}");}
+        if mode==7 {assert!(error.contains("leading Object base"),"{r:?}");}
+        if mode==8 {assert!(error.contains("single leading base initializer"),"{r:?}");}
+        if mode==4 {assert!(error.contains("requires --reference-arena"),"{r:?}");}
+    }
+}

@@ -24,17 +24,18 @@ mode.add_argument('--boxed-cases',action='store_true',help='Validate boxed empty
 mode.add_argument('--text-writer',action='store_true',help='Validate ordinary Console.Write and standard-error text writer')
 mode.add_argument('--text-reader',action='store_true',help='Validate Console.ReadLine and UTF-8 input')
 mode.add_argument('--console-session',action='store_true',help='Validate default and consecutive reads and wrapper close behavior')
+mode.add_argument('--object-writer',action='store_true',help='Validate Console.WriteLine(object) override dispatch and null output')
 a=p.parse_args()
 text_reader=a.text_reader or a.console_session
 compiler,runtime,aot,bundle,output=(getattr(a,k).resolve() for k in ('compiler','runtime','aot','bundle','output'))
 output.mkdir(parents=True,exist_ok=False)
 base=ROOT/'docs/experiments/aot-console';faults=base.parent/'aot-fault-details'
-source=base/('console-session.rvn' if a.console_session else 'text-reader.rvn' if text_reader else 'text-writer.rvn' if a.text_writer else 'boxed-cases.rvn' if a.boxed_cases else 'utf8-text.rvn' if a.utf8_text else 'collections.rvn' if a.collections else 'output-stream.rvn' if a.output_stream else 'input-stream.rvn' if a.input_stream else 'stream-views.rvn' if a.stream_views else 'multiple-values.rvn' if a.multi_values else 'wide-integers.rvn' if a.wide_integers else 'small-integers.rvn' if a.small_integers else 'characters.rvn' if a.characters else 'bytes.rvn' if a.arrays else 'reference-cell.rvn' if a.references else 'numbers.rvn' if a.numeric else 'text-values.rvn' if a.text_values else 'interactive.rvn')
-uses_arena=text_reader or a.text_writer or a.boxed_cases or a.utf8_text or a.collections or a.output_stream or a.input_stream or a.stream_views or a.numeric or a.multi_values or a.references or a.arrays or a.small_integers or a.wide_integers
+source=base/('object-writer.rvn' if a.object_writer else 'console-session.rvn' if a.console_session else 'text-reader.rvn' if text_reader else 'text-writer.rvn' if a.text_writer else 'boxed-cases.rvn' if a.boxed_cases else 'utf8-text.rvn' if a.utf8_text else 'collections.rvn' if a.collections else 'output-stream.rvn' if a.output_stream else 'input-stream.rvn' if a.input_stream else 'stream-views.rvn' if a.stream_views else 'multiple-values.rvn' if a.multi_values else 'wide-integers.rvn' if a.wide_integers else 'small-integers.rvn' if a.small_integers else 'characters.rvn' if a.characters else 'bytes.rvn' if a.arrays else 'reference-cell.rvn' if a.references else 'numbers.rvn' if a.numeric else 'text-values.rvn' if a.text_values else 'interactive.rvn')
+uses_arena=a.object_writer or text_reader or a.text_writer or a.boxed_cases or a.utf8_text or a.collections or a.output_stream or a.input_stream or a.stream_views or a.numeric or a.multi_values or a.references or a.arrays or a.small_integers or a.wide_integers
 host=base/'text-host.c' if uses_arena else faults/'host.c'
 core,seed,library,ownership=(bundle/'lib'/n for n in ('Core.dll','System.runtime.neox','System.Runtime.dll','ownership.json'))
 sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
-report=dict(profile='aot-console-session-v1' if a.console_session else 'aot-console-text-reader-v1' if text_reader else 'aot-console-text-writer-v1' if a.text_writer else 'aot-console-boxed-cases-v1' if a.boxed_cases else 'aot-console-utf8-text-v1' if a.utf8_text else 'aot-console-collections-v1' if a.collections else 'aot-console-output-stream-v1' if a.output_stream else 'aot-console-input-stream-v1' if a.input_stream else 'aot-console-stream-views-v1' if a.stream_views else 'aot-console-multiple-values-v1' if a.multi_values else 'aot-console-wide-integers-v1' if a.wide_integers else 'aot-console-small-integers-v1' if a.small_integers else 'aot-console-characters-v1' if a.characters else 'aot-console-byte-arrays-v1' if a.arrays else 'aot-console-references-v1' if a.references else 'aot-console-numeric-v1' if a.numeric else 'aot-console-text-values-v1' if a.text_values else 'aot-console-interactive-v1',baseRevision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),SDKROOT=os.environ.get('SDKROOT'),inputs={str(p):sha(p) for p in (compiler,runtime,aot,core,seed,library,ownership,source,base/'console.c',base.parent/'aot-scalar/console.c',host,faults/'render.c',base/'text-arena.h',base/'text-arena.c')},commands=[])
+report=dict(profile='aot-console-object-writer-v1' if a.object_writer else 'aot-console-session-v1' if a.console_session else 'aot-console-text-reader-v1' if text_reader else 'aot-console-text-writer-v1' if a.text_writer else 'aot-console-boxed-cases-v1' if a.boxed_cases else 'aot-console-utf8-text-v1' if a.utf8_text else 'aot-console-collections-v1' if a.collections else 'aot-console-output-stream-v1' if a.output_stream else 'aot-console-input-stream-v1' if a.input_stream else 'aot-console-stream-views-v1' if a.stream_views else 'aot-console-multiple-values-v1' if a.multi_values else 'aot-console-wide-integers-v1' if a.wide_integers else 'aot-console-small-integers-v1' if a.small_integers else 'aot-console-characters-v1' if a.characters else 'aot-console-byte-arrays-v1' if a.arrays else 'aot-console-references-v1' if a.references else 'aot-console-numeric-v1' if a.numeric else 'aot-console-text-values-v1' if a.text_values else 'aot-console-interactive-v1',baseRevision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),SDKROOT=os.environ.get('SDKROOT'),inputs={str(p):sha(p) for p in (compiler,runtime,aot,core,seed,library,ownership,source,base/'console.c',base.parent/'aot-scalar/console.c',host,faults/'render.c',base/'text-arena.h',base/'text-arena.c')},commands=[])
 def save(): (output/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 def run(args,expected=0,**kwargs):
     r=subprocess.run(list(map(str,args)),cwd=ROOT,capture_output=True,timeout=120,**kwargs)
@@ -56,7 +57,7 @@ else:
     run(['dotnet',compiler,'neoclr','--core-reference',core,'--runtime-seed',seed,'--reference',library,'--bootstrap-intrinsics','--bootstrap-ownership',ownership,'--object-library','System.Runtime','-o',assembly,source])
 context=['--system',seed,'--module',library,'--object-root',library]
 cases=[(b'*',0),(b'A',0 if a.numeric or a.multi_values or a.input_stream else 2),(b'',0)]
-if a.text_values or a.references or a.arrays or a.characters or a.small_integers or a.wide_integers or a.stream_views or a.output_stream or a.collections or a.utf8_text or a.boxed_cases or a.text_writer: cases=[(b'',0)]
+if a.object_writer or a.text_values or a.references or a.arrays or a.characters or a.small_integers or a.wide_integers or a.stream_views or a.output_stream or a.collections or a.utf8_text or a.boxed_cases or a.text_writer: cases=[(b'',0)]
 if a.numeric or a.input_stream: cases += [(b'\x00',0),(b'\xff',0)]
 if text_reader: cases=[(b'Raven\n',0),('é😀\r\n'.encode(),0),(b'a\x00z\n',0),(b'\n',0),(b'',0),(b'last',0),(b'first\nsecond\n',0),(b'\xff\n',1),(b'\xf0\x9f',1),(b'x'*129+b'\n',1)]
 if a.console_session: cases=[(b'one\ntwo\nthree\n',0),('é\r\n😀\nlast'.encode(),0),(b'\n\n\n',0),(b'',0),(b'first\n',0),(b'\xff\n',4)]
@@ -71,12 +72,12 @@ if a.utf8_text or a.text_writer or text_reader: flags += ['--bind-utf8-text']
 if a.wide_integers: flags += ['--bind-integer-text']
 if a.characters: flags += ['--bind-character-text']
 if uses_arena: flags += ['--bind-int32-to-string']
-if a.references or a.arrays or a.stream_views or a.input_stream or a.output_stream or a.collections or a.utf8_text or a.boxed_cases or a.text_writer or text_reader: flags += ['--reference-arena']
+if a.references or a.arrays or a.stream_views or a.input_stream or a.output_stream or a.collections or a.utf8_text or a.boxed_cases or a.text_writer or text_reader or a.object_writer: flags += ['--reference-arena']
 inspection=json.loads(run([aot,'--inspect',assembly,'@entry','--closed-world']+flags).stdout)
 assert inspection['admission']['accepted'] is True,inspection['admission']
 selection=json.loads(run([aot,'--closed-world',assembly,'@entry',obj]+flags).stdout)
 assert inspection['selection']==selection
-report['selection']={k:selection[k] for k in ('loadSet','functions','nativeBindings','types','specialization','verifiedInterfaceRelationships','staticPrimitiveOwners','objectBaseProjection','interfaceDispatch','staticOwnerProjections','stringInstanceProjections','emptyRecordBoxes','emptyRecordBoxSites','arrayBackingProjection') if k in selection}
+report['selection']={k:selection[k] for k in ('loadSet','functions','nativeBindings','types','specialization','verifiedInterfaceRelationships','staticPrimitiveOwners','objectBaseProjection','interfaceDispatch','staticOwnerProjections','stringInstanceProjections','emptyRecordBoxes','emptyRecordBoxSites','arrayBackingProjection','objectDisplayDispatch') if k in selection}
 native_text=[]
 if a.characters:
     manifest=ROOT/'tools/aot-native-text/Cargo.toml'
@@ -85,12 +86,12 @@ if a.characters:
     for path in [manifest,manifest.parent/'Cargo.lock',manifest.parent/'src/lib.rs',*native_text]: report['inputs'][str(path)]=sha(path)
 run(['clang','-arch','arm64','-std=c11','-Wall','-Wextra','-Werror',host,faults/'render.c',base/'console.c',base.parent/'aot-scalar/console.c',*([base/'text-arena.c'] if uses_arena else []),obj,*native_text,'-o',binary])
 imports={'_neoclr_console_read_byte_v1','_neoclr_console_write_line_utf8_v1'}
-if a.text_values or a.references or a.arrays or a.characters or a.small_integers or a.wide_integers or a.stream_views or a.output_stream or a.collections or a.utf8_text or a.boxed_cases or a.text_writer: imports.remove('_neoclr_console_read_byte_v1')
+if a.object_writer or a.text_values or a.references or a.arrays or a.characters or a.small_integers or a.wide_integers or a.stream_views or a.output_stream or a.collections or a.utf8_text or a.boxed_cases or a.text_writer: imports.remove('_neoclr_console_read_byte_v1')
 if a.utf8_text or a.text_writer or text_reader: imports.update(['_neoclr_string_byte_count_v1','_neoclr_string_slice_utf8_v1'])
 if a.characters: imports.add('_neoclr_is_single_grapheme_v1')
-if uses_arena and not (a.wide_integers or a.stream_views or a.output_stream or a.boxed_cases): imports.add('_neoclr_int32_to_string_v1')
+if uses_arena and not (a.wide_integers or a.stream_views or a.output_stream or a.boxed_cases or a.object_writer): imports.add('_neoclr_int32_to_string_v1')
 if a.wide_integers: imports.update(['_neoclr_int64_to_string_v1', '_neoclr_uint64_to_string_v1'])
-if a.references or a.stream_views or a.input_stream or a.output_stream or a.collections or a.boxed_cases or a.text_writer or text_reader: imports.add('_neoclr_allocate_object_v1')
+if a.references or a.stream_views or a.input_stream or a.output_stream or a.collections or a.boxed_cases or a.text_writer or text_reader or a.object_writer: imports.add('_neoclr_allocate_object_v1')
 if a.arrays or a.input_stream or a.output_stream or a.text_writer or text_reader: imports.add('_neoclr_allocate_bytes_v1')
 if a.collections or a.text_writer or text_reader: imports.add('_neoclr_reserve_bytes_v1')
 if a.output_stream or a.text_writer or text_reader: imports.update(['_neoclr_console_write_bytes_v1','_neoclr_console_flush_v1'])

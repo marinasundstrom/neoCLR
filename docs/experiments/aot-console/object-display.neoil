@@ -1,0 +1,70 @@
+.module ObjectDisplay
+.type class A
+.field Text String
+.method instance .ctor(String text) -> noresult
+ldarg 0
+ldarg text
+stfld 0
+ret
+.end
+.method instance override ToString() -> String
+newobj.ctor instance Later::.ctor()
+pop
+ldarg 0
+ldfld 0
+ret
+.end
+.end
+.type class B
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance override ToString() -> String
+ldc.i4 1
+ldc.i4 0
+div
+pop
+ldstr "unreachable"
+ret
+.end
+.end
+.type class Later
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance override ToString() -> String
+ldstr "later"
+ret
+.end
+.end
+.function Calculate(Int32 mode) -> Int32
+.local System.Object value
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Null
+ldarg mode
+ldc.i4 1
+ceq
+brtrue B
+ldstr "aé😀\u0000z"
+newobj.ctor instance A::.ctor(String)
+castclass System.Object
+stloc value
+br Display
+B:
+newobj.ctor instance B::.ctor()
+castclass System.Object
+stloc value
+br Display
+Null:
+ldloca value
+initobj System.Object
+Display:
+ldloc value
+callvirt instance System.Object::ToString()
+call neoCLR.Runtime.Fault(String)
+pop
+ldc.i4 0
+ret
+.end

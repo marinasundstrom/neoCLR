@@ -251,6 +251,10 @@ impl Specializer<'_> {
             );
         }
         let mut result = f.clone();
+        if super::selection::object_display_contract(f) {
+            result.body = vec![Op::String(String::new()), Op::Return];
+            result.locals.clear(); result.local_names.clear();
+        }
         result.generic_parameters.clear();
         result.owner = f
             .owner
@@ -294,8 +298,11 @@ impl Specializer<'_> {
                         .map_err(|e| e.to_string())?;
                     let instance = self.resolve(&closed)?;
                     let callee = &self.source.functions[instance.source];
-                    if virtual_call && !super::selection::interface_contract(self.source, callee) && (callee.is_virtual || callee.is_abstract || callee.is_override) {
+                    if virtual_call && !super::selection::interface_contract(self.source, callee) && !super::selection::object_display_contract(callee) && (callee.is_virtual || callee.is_abstract || callee.is_override) {
                         return Err("virtual calls requiring dispatch need a later specialization profile".into());
+                    }
+                    if !virtual_call && super::selection::object_display_contract(callee) {
+                        return Err("direct Object.ToString calls require default display metadata support".into());
                     }
                     target.definition = Some(neoclr::metadata::MemberId {
                         module: self.source.name.clone(),
@@ -447,12 +454,14 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
         let mut contracts = vec![];
         for instance in &context.instances {
             let original = &input.functions[instance.source];
-            if super::selection::interface_contract(input, original) {
-                if !original.instance || original.receiver_byref || !original.body.is_empty() || !original.generic_parameters.is_empty() {
+            let display = super::selection::object_display_contract(original);
+            if super::selection::interface_contract(input, original) || display {
+                if !original.instance || original.receiver_byref || (!display && !original.body.is_empty()) || !original.generic_parameters.is_empty() {
                     return Err("interface dispatch requires a bodyless nongeneric instance contract".into());
                 }
                 contracts.push(super::selection::closed_signature(original, &instance.types)?);
             }
+            if display { continue; }
             for op in &original.body {
                 if matches!(op, Op::NewArray(_) | Op::ReserveArray(_)) {
                     if let Some(owner) = super::selection::byte_array_owner(input) {
@@ -467,12 +476,14 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
         }
         for contract in contracts {
             for owner in &constructed {
-                if !super::selection::implements_interface(input, owner, contract.owner.as_ref().unwrap()) { continue; }
+                if !super::selection::object_display_contract(&contract) && !super::selection::implements_interface(input, owner, contract.owner.as_ref().unwrap()) { continue; }
                 let definition = input.type_definition(owner).ok_or("constructed interface implementor requires local definition")?;
                 if !definition.is_reference_type || definition.representation != neoclr::metadata::Representation::Record {
                     return Err("interface dispatch requires constructed classes".into());
                 }
-                let (_, reference) = super::selection::implicit_implementation(input, owner, &contract)?;
+                let (_, reference) = if super::selection::object_display_contract(&contract) {
+                    super::selection::display_override(input, owner, &contract)?
+                } else { super::selection::implicit_implementation(input, owner, &contract)? };
                 let instance = context.resolve(&reference)?;
                 if !visited.contains(&instance.row) { pending.push(instance); }
             }

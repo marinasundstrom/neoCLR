@@ -135,6 +135,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and non-owning reader close behavior with six standalone session inputs. Preserve
   successful producer command/hash evidence and report unresolved source-path
   missing-member diagnostics separately.
+  Add bounded virtual Object.ToString dispatch for Console.WriteLine(object?)
+  on classes with verified explicit overrides. Preserve receiver identity, null
+  checks and original override fault frames; expose exact dispatch targets in the
+  compilation report. Keep default/base display, deeper inheritance, arrays and
+  boxed receivers outside this slice and reject unsupported combinations. Reject
+  native reference constructors without a leading base initializer and direct
+  constructor calls outside that initializer, preventing an interpreter/native
+  construction-fault mismatch. Validate standalone override/null Console output,
+  exact output-fault parity, rootless/declared-base dispatch and source-name
+  independence. Retain the producer lookup limitation in the evidence.
 
 ### 2026-10-07
 

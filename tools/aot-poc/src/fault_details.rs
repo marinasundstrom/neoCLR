@@ -28,11 +28,15 @@ pub struct Options {
     pub empty_record_boxes: HashMap<usize, usize>,
     pub object_base: Option<usize>,
     pub array_backing: Option<usize>,
+    pub object_display: HashMap<usize, Vec<(usize, usize)>>,
     pub frame_names: HashMap<usize, String>,
 }
 impl Options {
     pub fn from_report(report: Option<&serde_json::Value>) -> Self {
         Self {
+            object_display: report.and_then(|r| r["objectDisplayDispatch"].as_array()).into_iter().flatten()
+                .filter_map(|r| Some((r["contractCompiledIndex"].as_u64()? as usize, r["targets"].as_array()?.iter()
+                    .filter_map(|t| Some((t["typeCompiledIndex"].as_u64()? as usize, t["functionCompiledIndex"].as_u64()? as usize))).collect()))).collect(),
             empty_record_boxes: report.and_then(|r| r["emptyRecordBoxes"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),
             reference_arena: report.is_some_and(|r| r["referenceArena"] == true),

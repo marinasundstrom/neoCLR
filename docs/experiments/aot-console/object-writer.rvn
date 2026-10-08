@@ -1,0 +1,13 @@
+import System.*
+
+class Message {
+    override func ToString() -> string => "native object"
+}
+
+func Main() -> int {
+    let value: object = Message()
+    System.Console.WriteLine(value)
+    let absent: object? = null
+    System.Console.WriteLine(absent)
+    return 0
+}

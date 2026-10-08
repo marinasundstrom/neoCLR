@@ -365,6 +365,37 @@ pub fn prepare(
             }
         }
     }
+    if let Some(rows) = report["objectDisplayDispatch"].as_array() {
+        if !rows.is_empty() && !reference_arena { return Err("Object display dispatch requires --reference-arena".into()); }
+        for row in rows {
+            let contract = row["contractCompiledIndex"].as_u64().ok_or("invalid Object display contract")? as usize;
+            // The original virtual slot and overrides were verified in the full
+            // load set. Keep instance calling conventions and callvirt null checks;
+            // native dispatch replaces only this private placeholder body.
+            let mut suffix = format!("$aot_ObjectDisplay_{contract}");
+            while selected.functions.iter().any(|f| f.name.rsplit('.').next() == Some(suffix.as_str())) { suffix.push('_'); }
+            let name = format!("{}.{}", selected.functions[contract].owner.as_ref().unwrap().definition_name().unwrap(), suffix);
+            for f in &mut selected.functions {
+                for op in &mut f.body {
+                    if let Op::CallVirtual(target) = op {
+                        if target.definition.as_ref().is_some_and(|id| id.index as usize == contract) { target.name = name.clone(); }
+                    }
+                }
+            }
+            let f = &mut selected.functions[contract];
+            // A distinct private slot name avoids creating a nonvirtual hiding
+            // relationship when the original owner is a declared Object base.
+            f.name = name;
+            f.is_virtual = false; f.is_override = false;
+            f.body = vec![Op::String(String::new()), Op::Return];
+            f.locals.clear(); f.local_names.clear();
+            for target in row["targets"].as_array().ok_or("invalid Object display targets")? {
+                let i = target["functionCompiledIndex"].as_u64().ok_or("invalid Object display target")? as usize;
+                selected.functions[i].is_virtual = false;
+                selected.functions[i].is_override = false;
+            }
+        }
+    }
     super::boxing::project(&mut selected, &mut report)?;
     let system_type_names: std::collections::BTreeSet<_> = neoclr::library::system()
         .map_err(|e| e.to_string())?.types.iter().map(|t| t.name.as_str()).collect();
