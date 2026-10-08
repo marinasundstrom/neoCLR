@@ -168,7 +168,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Extend this storage to ordinary null-initialized class arrays; six focused tests and
   two Raven consumers cover defaults, identity, GC, limits and fault parity. The order
   sample advances to its array-to-Iterable cast; value-record defaults, element borrows
-  and covariance remain unsupported. No public API or metadata format changes.
+  and covariance remain unsupported. Correct byte-array backing selection when another
+  element specialization is discovered first; 30 native/interpreter comparisons cover
+  mutation, identity, initialization and fault parity, including wrong-element interface
+  casts. Reject ordinary class construction for all closed array backings before
+  erasure. No public API or metadata format changes.
   Bind the exact ObjectReferenceEquals service to native identity comparison, including
   nulls and distinct equal-content strings. The full server next reaches the
   StreamError.ToString value-member contract; admit verified direct byref value

@@ -195,7 +195,7 @@ pub(super) fn implicit_implementation(input: &neoclr::Module, concrete: &Type, c
 }
 
 /// The load set's verified nominal backing, closed over this profile's byte element.
-/// During specialization the selected first shape retains the backing definition row.
+/// Specialization relocates the private backing identity to the exact Byte shape.
 pub(super) fn byte_array_owner(input: &neoclr::Module) -> Option<Type> {
     let id = input.assemblies.iter().find_map(|a| a.array_backing.as_ref())?;
     let t = input.types.iter().find(|t| t.definition.as_ref() == Some(id))?;

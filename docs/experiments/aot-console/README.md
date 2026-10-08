@@ -759,6 +759,12 @@ metadata and conformance must verify before this private projection. Backing fie
 replacement/borrowing and ordinary class allocation of an array remain rejected.
 Reports include the source backing definition and compiled type index.
 
+The private projection now follows the exact `Array<Byte>` specialization even when
+a different `Array<T>` reuses the generic declaration row first. It uses verified
+source identity and recorded type arguments, rather than discovery order or names.
+Ordinary class construction is rejected for every closed array backing before
+erasure. Source metadata, array layouts and interpreter semantics are unchanged.
+
 The Raven `text-writer.rvn` app now compiles ordinary Console.Write(string/int),
 Console.Error and StreamWriter.Write/Flush, including their encoders, Result branches,
 ArrayList buffers and nominal array views. It exercises empty writes, UTF-8/NUL,
@@ -774,7 +780,15 @@ Console.ReadLine is the next sample-driven step.
 Focused array-view tests compare ten native/interpreter executions covering ordinary
 and reserved arrays, mutation through an interface, alias identity, nominal views,
 empty/null arrays, unwritten slots, bounds and unrelated interface casts. Negative
-tests reject missing/corrupt backing contracts and attempted class allocation.
+tests reject missing/corrupt backing contracts and attempted class allocation of
+both Byte and Int32 backings. Twenty additional native/interpreter executions vary
+Byte/Int32 specialization order and check that byte arrays never match `Read<Int32>`,
+while preserving the same values, aliases and fault diagnostics. The regression
+failed with `invalid private byte-array backing projection` before the correction.
+The [Raven consumer rerun](../../../benchmarks/native-web/array-backing-validation.json)
+passes interpreted, sanitized native and standalone reference-array execution, with
+cleanup checks, libSystem-only linkage and HTTP compiler admission. This is
+correctness validation; no new performance or HTTP execution result is claimed.
 Like CLR arrays, these arrays expose shared identity through collection interfaces.
 neoCLR's existing contract expresses that relationship with verified library backing
 metadata and ordinary CIL methods; the private header/field lowering is backend

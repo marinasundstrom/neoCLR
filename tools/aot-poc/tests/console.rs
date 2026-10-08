@@ -1790,7 +1790,11 @@ fn boxed_empty_profile_rejects_other_shapes_and_counts_generated_helpers() {
 }
 
 fn array_views_module() -> neoclr::Module {
-    let mut app=neoclr::assemble(include_str!("../../../docs/experiments/aot-console/array-views.neoil")).unwrap();
+    array_views_source(include_str!("../../../docs/experiments/aot-console/array-views.neoil"))
+}
+
+fn array_views_source(source: &str) -> neoclr::Module {
+    let mut app=neoclr::assemble(source).unwrap();
     let index=app.types.iter().position(|t|t.name=="Storage").unwrap();
     let id=neoclr::metadata::TypeDefId{module:app.name.clone(),revision:app.revision.clone(),index:index as u32};
     app.types[index].definition=Some(id.clone());
@@ -1807,7 +1811,29 @@ fn array_views_module() -> neoclr::Module {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn nominal_byte_array_views_preserve_aliases_dispatch_and_initialization() {
-    let dir=Temp::new();let app=array_views_module();
+    check_array_views(array_views_module());
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn nominal_byte_array_views_keep_exact_element_identity_across_specialization_order() {
+    let source = include_str!("../../../docs/experiments/aot-console/array-views.neoil");
+    for first in [true, false] {
+        let locals = if first {
+            ".local Storage<Int32> other\n.local arrayref<Byte> bytes"
+        } else {
+            ".local arrayref<Byte> bytes\n.local Storage<Int32> other"
+        };
+        let source = source.replace(".local arrayref<Byte> bytes", locals)
+            .replace("isinst Other", "isinst Read<Int32>")
+            .replace("castclass Other", "castclass Read<Int32>");
+        check_array_views(array_views_source(&source));
+    }
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_array_views(app: neoclr::Module) {
+    let dir=Temp::new();
     let seed=neoclr::assemble(".module System\n.references ()\n").unwrap();
     let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();program.verify().unwrap();
     let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena"]);
@@ -1846,14 +1872,14 @@ int main(int argc,char **argv) {
 #[test]
 fn nominal_byte_array_views_require_verified_backing_and_reject_class_allocation() {
     let seed=neoclr::assemble(".module System\n.references ()\n").unwrap();
-    for mode in 0..3 {
+    for mode in 0..4 {
         let mut app=array_views_module();
         match mode {
             0=>app.assemblies[0].array_backing=None,
             1=>app.types.iter_mut().find(|t|t.name=="Storage").unwrap().origin.as_mut().unwrap().field_access=vec![neoclr::metadata_origin::SourceAccess::Public],
             _=>{
                 let root=app.functions.iter_mut().find(|f|f.name=="Calculate").unwrap();
-                root.body=vec![neoclr::metadata::Instruction::Construct(neoclr::assembler::parse_function_ref("instance Storage<Byte>::.ctor()").unwrap()),
+                root.body=vec![neoclr::metadata::Instruction::Construct(neoclr::assembler::parse_function_ref(if mode == 2 { "instance Storage<Byte>::.ctor()" } else { "instance Storage<Int32>::.ctor()" }).unwrap()),
                     neoclr::metadata::Instruction::Pop,neoclr::metadata::Instruction::Int(0),neoclr::metadata::Instruction::Return];
             }
         }

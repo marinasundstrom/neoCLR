@@ -14,7 +14,10 @@ cover the corrected source form. This is a compiler correction, not new scheduli
 or metadata capability. The portable planner is not yet on Raven main.
 A subsequent [reference-array slice](experiments/aot-console/record-arrays.md#default-null-reference-arrays-2026-10-08)
 admits ordinary null-initialized class arrays; the order sample next needs array-to-Iterable
-dispatch. This does not imply general array views or covariance.
+dispatch. The [byte-view prerequisite correction](experiments/aot-console/README.md#console-text-writers-and-nominal-byte-array-views-2026-10-08)
+now preserves the exact backing specialization independently of discovery order, with
+30 native/interpreter comparisons and closed-backing construction rejection. This
+does not imply general array views or covariance.
 The wider audit also found the handwritten legacy union bridge's `IUnion`; it now
 uses `UnionValue`, with regenerated fragments and executable union/time checks. This does not change the bootstrap release gate or promise
 runtime suspension, JIT, reflection or stable callback ABI support.

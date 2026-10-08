@@ -283,6 +283,13 @@ impl Specializer<'_> {
             *t = self.lower(&substitute(t, arguments, methods).map_err(|e| e.to_string())?)?;
         }
         for op in &mut result.body {
+            if let Op::Construct(target) = op {
+                let definition = target.owner.as_ref().and_then(|owner| self.source.type_definition(owner))
+                    .and_then(|ty| ty.definition.as_ref());
+                if definition.is_some_and(|id| self.source.assemblies.iter().any(|a| a.array_backing.as_ref() == Some(id))) {
+                    return Err("array backing requires array allocation, not class construction".into());
+                }
+            }
             if let Op::BindFunction { function_type, .. } = op {
                 *function_type = self.lower(&substitute(function_type, arguments, methods).map_err(|e| e.to_string())?)?;
             }
@@ -569,6 +576,19 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
             expanded.types.push(input.types[shape.source].clone());
         }
         expanded.types[shape.row] = t;
+    }
+    // The source backing identifies the generic declaration, not whichever closed
+    // shape happened to reuse its row first. This private profile only projects
+    // Byte views; carry that exact instantiation through row erasure. The original
+    // module and its general array-backing contract remain unchanged.
+    for assembly in &mut expanded.assemblies {
+        if let Some(backing) = &assembly.array_backing {
+            let source = input.types.iter().position(|t| t.definition.as_ref() == Some(backing))
+                .ok_or("array backing requires a verified source definition")?;
+            assembly.array_backing = context.shapes.iter()
+                .find(|shape| shape.source == source && shape.arguments == [Type::Byte])
+                .and_then(|shape| expanded.types[shape.row].definition.clone());
+        }
     }
     // String is an intrinsic reference, so it never consumes a nominal shape.
     // Retain only its proven, reached closed interface views after argument erasure.
