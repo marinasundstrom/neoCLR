@@ -61,7 +61,13 @@ impl Specializer<'_> {
             Type::ByRef(t) => return Ok(Type::ByRef(Box::new(self.lower(t)?))),
             Type::Array(t) if **t == Type::Byte => return Ok(ty.clone()),
             Type::ArrayRef(t) if **t == Type::String || super::selection::scalar_array_element(t) => return Ok(ty.clone()),
-            Type::ArrayRef(t) if matches!(**t, Type::Function(_) | Type::Named(_) | Type::Constructed { .. }) => return Ok(Type::ArrayRef(Box::new(self.lower(t)?))),
+            Type::ArrayRef(t) if matches!(**t, Type::Function(_) | Type::Named(_) | Type::Constructed { .. }) => {
+                let lowered = self.lower(t)?;
+                if self.source.type_definition(t).is_some_and(|t| t.is_reference_type && t.representation == neoclr::metadata::Representation::Record) {
+                    if let Some(owner) = super::selection::array_owner(self.source, t) { self.lower(&owner)?; }
+                }
+                return Ok(Type::ArrayRef(Box::new(lowered)));
+            },
             Type::ArrayRef(t) if **t == Type::Byte => {
                 if let Some(owner) = super::selection::byte_array_owner(self.source) { self.lower(&owner)?; }
                 return Ok(ty.clone());
@@ -506,8 +512,9 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
             }
             if display { continue; }
             for op in &original.body {
-                if matches!(op, Op::NewArray(_) | Op::ReserveArray(_)) {
-                    if let Some(owner) = super::selection::byte_array_owner(input) {
+                if let Op::NewArray(element) | Op::ReserveArray(element) = op {
+                    let element = substitute(element, &instance.types, &instance.methods).map_err(|e| e.to_string())?;
+                    if let Some(owner) = super::selection::array_owner(input, &element).filter(|_| element == Type::Byte || input.type_definition(&element).is_some_and(|t| t.is_reference_type && t.representation == neoclr::metadata::Representation::Record)) {
                         if !constructed.contains(&owner) { constructed.push(owner); }
                     }
                 }
@@ -602,7 +609,12 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
                 .then(|| Type::Named(shape.name.clone()))
         }).collect();
     }
-    let report = json!({"policy":"up to 256 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 256 function clones and 1024 selected functions; no constraints",
+    let reference_backings: Vec<_> = context.shapes.iter().filter(|shape|
+        input.assemblies.iter().any(|a| a.array_backing.as_ref().is_some_and(|id| input.types[shape.source].definition.as_ref() == Some(id)))
+        && shape.arguments.len() == 1
+        && input.type_definition(&shape.arguments[0]).is_some_and(|t| t.is_reference_type && t.representation == neoclr::metadata::Representation::Record))
+        .map(|shape| shape.row).collect();
+    let report = json!({"referenceArrayBackings":reference_backings,"policy":"up to 256 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 256 function clones and 1024 selected functions; no constraints",
         "typeCount": context.shapes.len(), "functionCount": context.instances.len(), "functionCloneCount": context.clones,
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});

@@ -175,3 +175,54 @@ view requires separate verified dispatch support.
 includes both Raven consumers passing interpreter, sanitized native and standalone
 execution, exact output/exit parity, libSystem-only linkage and cleanup. HTTP compiler
 admission remains accepted; existing HTTP request/timing evidence is reused.
+
+
+### Exact nominal reference-array views (2026-10-08)
+
+Closed class-reference arrays now support their verified nominal `Array<T>` and
+collection-interface views. The backing's ordinary CIL performs indexing, mutation
+and iteration; casts retain the original allocation and element identities. This
+unblocks `Order[]` → `Iterable<Order>` in the existing order-collections sample,
+including its Filter/Map/ToList path. Both execution modes produce the same output.
+
+Specialization records each backing from the verified source declaration and exact
+closed element argument. Selection relocates those identities into the private
+image and reports `referenceArrayBackingProjections`; unrelated classes or matching
+field shapes do not establish array conformance. Each admitted class-reference array
+stores `(compiledBackingIndex + 1)` in the upper 32 bits of its private header tag.
+The lower 32 bits remain the record-array storage kind. Byte-array tags are unchanged.
+No wrapper, copied array or new public metadata encoding is introduced.
+
+The GC still traces initialized pointer slots through its record-array descriptor.
+It accepts the bounded type tag only for one-lane storage, validates its range and
+rejects malformed descriptors before tracing. Untagged record storage remains valid.
+Native objects and C adapters must be rebuilt together; these tags are a private POC
+layout, not a stable ABI or a sidecar metadata contract. Retaining extra closed backing
+shapes uses the existing bounded type budget and adds one header store per allocation.
+No performance improvement is claimed.
+
+This extends the existing [managed-array contract](../../managed-arrays.md) and
+[mutable-array invariance comparison with CLR](../../array-variance.md). Identity
+through collection views is the ergonomic baseline. neoCLR's existing exact mutable
+array rule remains stricter than CLR covariance: an explicit wrong-element array cast
+through an interface faults. A failed `isinst` returns null, following CLI type-test
+semantics; the shared verifier/interpreter correction and native tests preserve that
+distinction without producing a widened mutable view. Generalizing byte-only tags without element identity would
+misdispatch another class's array; wrapper allocation would require additional
+identity/lifetime rules. Exact private tags avoid both at the cost of closed-world
+layout bookkeeping. Runtime/JIT metadata and stable ABI design remain separate work.
+
+Fifteen sanitized native/interpreter cases cover two same-layout element classes,
+ordinary/reserved/empty/null arrays, interface dispatch, mutation, alias round trips,
+wrong interface/array casts, unwritten slots, default nulls and bounds. Storage-field
+replacement and borrowing remain rejected. GC kernel checks exercise tag bounds,
+malformed storage kinds/lanes, initialized child retention and reclamation. Thirty
+existing byte-view comparisons and the GC layout/root tests remain passing.
+
+The [Raven consumer evidence](../../../benchmarks/native-web/reference-array-views-validation.json)
+records the full order sample and the 1,000-replacement reference-array sample in
+interpreted, sanitized native and standalone modes, with output/fault equality,
+cleanup checks and libSystem-only linkage. HTTP compiler admission is checked again;
+this does not claim a new HTTP execution or timing result. Value-record/default arrays,
+non-byte scalar/interface/String array views, jagged arrays, element borrows and
+array-backed bound callbacks remain outside this slice.

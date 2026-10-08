@@ -33,7 +33,7 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
         Ty::RecordArray(i) => Trace::RecordArray(*i),
         Ty::ScalarArray(t) => Trace::ScalarArray(t.clone()),
         Ty::Literal | Ty::Character => Trace::Text,
-        Ty::Reference(i) if p.array_backing == Some(*i) => Trace::ByteArray,
+        Ty::Reference(i) if p.is_array_backing(*i) => return slots(p, &p.ty(&p.input.types[*i].fields[0].ty).expect("verified array backing")),
         Ty::Reference(i) => Trace::Object(*i),
         Ty::Interface(i) => Trace::Interface(*i),
         Ty::ByteArray => Trace::ByteArray,
@@ -130,7 +130,7 @@ pub(super) fn report(p: &Profile<'_>) -> Value {
         .iter()
         .enumerate()
         .filter(|(i, t)| {
-            p.array_backing != Some(*i)
+            !p.is_array_backing(*i)
                 && !t.is_abstract
                 && t.is_reference_type
                 && t.representation == neoclr::metadata::Representation::Record
@@ -162,7 +162,7 @@ pub(super) fn report(p: &Profile<'_>) -> Value {
 mod tests {
     use super::*;
     fn profile(module: &neoclr::Module) -> Profile<'_> {
-        Profile::new(module, true, None, None, None, None, None, false).unwrap()
+        Profile::new(module, true, None, None, &[], None, None, None, false).unwrap()
     }
     fn module() -> neoclr::Module {
         neoclr::metadata_container::decode(include_bytes!(
@@ -251,9 +251,19 @@ mod tests {
             neoclr::metadata::Type::ArrayRef(Box::new(neoclr::metadata::Type::Byte));
         module.types = vec![backing];
         module.functions.clear();
-        let p = Profile::new(&module, true, None, Some(0), None, None, None, false).unwrap();
+        let p = Profile::new(&module, true, None, Some(0), &[], None, None, None, false).unwrap();
         assert_eq!(slots(&p, &Ty::Reference(0)), slots(&p, &Ty::ByteArray));
         assert!(report(&p)["objects"].as_array().unwrap().is_empty());
+        let mut element = module.types[0].clone();
+        element.name = "Element".into();
+        element.fields.clear();
+        module.types[0].fields[0].ty = neoclr::metadata::Type::ArrayRef(Box::new(neoclr::metadata::Type::Named(element.name.clone())));
+        module.types.push(element);
+        let p = Profile::new(&module, true, None, None, &[0], None, None, None, false).unwrap();
+        assert_eq!(slots(&p, &Ty::Reference(0)), slots(&p, &Ty::ReferenceArray(1)));
+        let objects = report(&p)["objects"].as_array().unwrap().clone();
+        assert_eq!(objects.len(), 1);
+        assert_eq!(objects[0]["typeIndex"], 1);
     }
     #[test]
     fn cyclic_objects_describe_edges_without_recursive_expansion() {

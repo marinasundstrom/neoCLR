@@ -125,3 +125,10 @@ fn array_interface_is_invariant_and_null_dispatch_faults() {
         );
     }
 }
+
+#[test]
+fn array_isinst_through_interface_returns_null_for_wrong_element_type() {
+    let (m, library) = module(".function Main() -> Boolean\nldc.i4 0\nnewarr Int32\ncastclass System.Collections.Iterable<Int32>\nisinst arrayref<String>\nref.isnull\nret\n.end");
+    verify_with_library(&m, &library).unwrap();
+    assert_eq!(run_with_library(&m, &library, Limits::default()).unwrap().value, Value::Boolean(true));
+}

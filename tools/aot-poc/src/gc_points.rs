@@ -204,7 +204,7 @@ ret
             ..Default::default()
         };
         super::super::compile(&module, "Main", Some(&details)).unwrap();
-        let p = Profile::new(&module, true, None, None, None, None, None, false).unwrap();
+        let p = Profile::new(&module, true, None, None, &[], None, None, None, false).unwrap();
         let report = report(&p, Some(&details)).unwrap();
         let functions = report["functions"].as_array().unwrap();
         let main = functions.iter().find(|f| f["name"] == "Main").unwrap();
@@ -249,7 +249,7 @@ ret
         let module =
             neoclr::assemble(".module Spill\n.function Main() -> Int32\nldc.i4 0\nret\n.end")
                 .unwrap();
-        let p = Profile::new(&module, false, None, None, None, None, None, false).unwrap();
+        let p = Profile::new(&module, false, None, None, &[], None, None, None, false).unwrap();
         let plan = point(
             &p,
             &Op::String("next".into()),

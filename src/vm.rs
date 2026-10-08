@@ -3296,7 +3296,8 @@ fn interpret_instructions_with_dispatch(
                         }
                         _ => return Err(Fault::new("isinst requires an object reference")),
                     };
-                    crate::arrays::check_cast(&concrete, target)?;
+                    // Incompatible arrays fail this type test with null. The exact
+                    // assignment rules still prevent mutable-array covariance.
                     if concrete == *target
                         || *target == Type::Named("System.Object".into())
                         || module.reference_assignable(&concrete, target)

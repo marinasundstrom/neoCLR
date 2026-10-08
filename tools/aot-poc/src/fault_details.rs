@@ -60,6 +60,7 @@ pub struct Options {
     pub empty_record_boxes: HashMap<usize, usize>,
     pub object_base: Option<usize>,
     pub array_backing: Option<usize>,
+    pub reference_array_backings: Vec<usize>,
     pub string_dispatch: HashMap<usize, usize>,
     pub primitive_receivers: Vec<usize>,
     pub string_interfaces: Option<Vec<usize>>,
@@ -87,6 +88,8 @@ impl Options {
             empty_record_boxes: report.and_then(|r| r["emptyRecordBoxes"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),
             reference_arena: report.is_some_and(|r| r["referenceArena"] == true),
+            reference_array_backings: report.and_then(|r| r["referenceArrayBackingProjections"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             array_backing: report.and_then(|r| r["arrayBackingProjection"]["compiledIndex"].as_u64()).map(|i| i as usize),
             object_base: report.and_then(|r| r["objectBaseProjection"]["compiledIndex"].as_u64()).map(|i| i as usize),
             frame_names: report

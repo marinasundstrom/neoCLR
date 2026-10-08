@@ -197,7 +197,8 @@ pub fn prepare(
         None
     };
     let input = specialized.as_ref().map_or(&joined, |(module, _)| module);
-    let (mut selected, mut report) = super::selection::select_inventory(input, root, false)?;
+    let reference_backings = specialized.as_ref().map(|(_, r)| super::selection::reference_array_backings(r)).unwrap_or_default();
+    let (mut selected, mut report) = super::selection::select_inventory_with_host_roots(input, root, false, &[], &reference_backings)?;
     if context.is_some_and(|c| c.bind_task_queue) {
         // Host pumping is an explicit additional reachability root, never a fake
         // call inserted into guest CIL. Only the verified source-owned queue type
@@ -223,7 +224,7 @@ pub fn prepare(
         if !host_roots.is_empty() {
             specialized = Some(super::specialization::expand_with_host_roots(&joined, root, &host_roots)?);
             let expanded = &specialized.as_ref().unwrap().0;
-            (selected, report) = super::selection::select_inventory_with_host_roots(expanded, root, false, &host_roots)?;
+            (selected, report) = super::selection::select_inventory_with_host_roots(expanded, root, false, &host_roots, &super::selection::reference_array_backings(&specialized.as_ref().unwrap().1))?;
         }
     }
     let input = specialized.as_ref().map_or(&joined, |(module, _)| module);
@@ -270,6 +271,13 @@ pub fn prepare(
         if let Some(row) = report["types"].as_array().unwrap().iter().find(|r| r["compiledIndex"] == index).cloned() {
             report["arrayBackingProjection"]["definition"] = row["definition"].clone();
             report["arrayBackingProjection"]["sourceName"] = row["name"].clone();
+        }
+    }
+    for (at, backing) in report["referenceArrayBackingProjections"].as_array().cloned().unwrap_or_default().iter().enumerate() {
+        if let Some(row) = report["types"].as_array().unwrap().iter().find(|r| r["compiledIndex"] == backing["compiledIndex"]).cloned() {
+            report["referenceArrayBackingProjections"][at]["definition"] = row["definition"].clone();
+            report["referenceArrayBackingProjections"][at]["sourceName"] = row["name"].clone();
+            report["referenceArrayBackingProjections"][at]["typeArguments"] = row["typeArguments"].clone();
         }
     }
     let mut verified_relationships = vec![];

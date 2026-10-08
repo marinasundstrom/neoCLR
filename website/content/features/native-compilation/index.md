@@ -178,7 +178,10 @@ calling conventions. This is a proposal, not current support.
 The first coverage follow-up adds bounded integer, Boolean and Void arrays, including
 checked reserved storage and atomic GC payloads. The ordinary Raven array sample now
 runs in both modes. Ordinary arrays of class references now also have null-initialized
-slots, with identity and GC checks. Array-to-interface views and value-record default
+slots, with identity and GC checks. Verified class-reference array views now support
+collection interfaces; the checked-in order-collections sample runs Filter/Map/ToList
+with matching interpreted/native output. Exact element identity and mutable-array
+invariance remain enforced. Other array-view categories and value-record default
 arrays remain unsupported. Nine other selected samples advance to further metadata, primitive
 wrapper, callback and service gaps; broad Tasks/await parity is not yet claimed.
 

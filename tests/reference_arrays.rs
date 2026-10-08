@@ -442,3 +442,28 @@ fn mutable_arrays_are_invariant_even_for_reference_elements_and_typed_nulls() {
         assert!(run(&m, Limits::default()).is_err());
     }
 }
+
+#[test]
+fn array_isinst_returns_null_for_mismatches_without_weakening_invariance() {
+    let types = ".type class Base\n.end\n.type class Foo\n.extends Base\n.end\n";
+    for (source, target) in [
+        ("Foo", "Foo"),
+        ("Foo", "Base"),
+        ("Base", "Foo"),
+        ("Int32", "Boolean"),
+        ("arrayref<Foo>", "arrayref<Base>"),
+    ] {
+        for null in [false, true] {
+            let create = if null {
+                format!(".local arrayref<{source}> data\nldloca data\ninitobj arrayref<{source}>\nldloc data")
+            } else {
+                format!("ldc.i4 0\nnewarr {source}")
+            };
+            let m = module(&format!(
+                "{types}\n.function Main() -> Boolean\n{create}\nisinst arrayref<{target}>\nref.isnull\nret\n.end"
+            ));
+            verify(&m).unwrap();
+            assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Boolean(null || source != target));
+        }
+    }
+}

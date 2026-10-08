@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**IL semantics (author clarification, 2026-10-08):** use .NET/CLI instruction behavior
+as the default across interpreter, AOT and eventual JIT. Document deliberate platform
+divergences explicitly; cross-mode agreement alone does not establish correctness.
+The [isinst correction](array-variance.md#type-tests-retain-cli-semantics-2026-10-08)
+restores failed array tests to null while preserving deliberate mutable-array invariance.
+This is a baseline requirement, not a claim that every instruction has been audited.
+
 ## Interface naming and async callback follow-up (2026-10-08)
 
 Author direction: neoCLR interfaces must not use the .NET `I` prefix; Raven's neoCLR
@@ -13,8 +20,8 @@ The portable Raven emitter now also preserves statement context for discarded aw
 cover the corrected source form. This is a compiler correction, not new scheduling
 or metadata capability. The portable planner is not yet on Raven main.
 A subsequent [reference-array slice](experiments/aot-console/record-arrays.md#default-null-reference-arrays-2026-10-08)
-admits ordinary null-initialized class arrays; the order sample next needs array-to-Iterable
-dispatch. The [byte-view prerequisite correction](experiments/aot-console/README.md#console-text-writers-and-nominal-byte-array-views-2026-10-08)
+admits ordinary null-initialized class arrays. [Exact reference-array views](experiments/aot-console/record-arrays.md#exact-nominal-reference-array-views-2026-10-08)
+now run the order sample through array-to-Iterable dispatch with matching interpreted/native output. The [byte-view prerequisite correction](experiments/aot-console/README.md#console-text-writers-and-nominal-byte-array-views-2026-10-08)
 now preserves the exact backing specialization independently of discovery order, with
 30 native/interpreter comparisons and closed-backing construction rejection. This
 does not imply general array views or covariance.

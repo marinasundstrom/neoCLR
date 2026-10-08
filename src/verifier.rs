@@ -1036,7 +1036,7 @@ fn typed_effect(
                     && module.is_object_reference_type(target),
                 "isinst requires object-reference types",
             )?;
-            crate::arrays::check_cast(exact(&values[0])?, target)?;
+            // A failed type test returns null; it does not create a widened array view.
             one(target.clone())
         }
         ReferenceIsNull => {

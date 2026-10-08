@@ -22,7 +22,7 @@ all runtime write checks can be removed.
 
 ## Enforcement and language projection
 
-The verifier and interpreter reject casts between statically different array types,
+The verifier and interpreter reject explicit `castclass` conversions between statically different array types,
 including typed nulls. The interpreter additionally checks the concrete allocation
 when casting an interface view back to an array. Ordinary assignment, parameter and
 return validation continue to require the same array type. The Raven importer rejects
@@ -94,3 +94,27 @@ or choose a library collection hierarchy. The audit identifies variance metadata
 constructed-interface dispatch and Iterable's legacy byref return as prerequisites.
 Collection/enumerable naming and readonly/immutable/frozen contracts remain a separate
 review; the author's suggested capability split is recorded as a candidate only.
+
+
+## Type tests retain CLI semantics (2026-10-08)
+
+`isinst` tests compatibility; it does not demand a conversion. For incompatible mutable
+array element types it now returns null, including direct array operands and values
+held through interface views. Null input returns null and an exact successful test
+preserves identity. The verifier accepts these tests. This corrects the earlier
+shared cast guard, which rejected direct tests or faulted at runtime through an
+interface. Consumers that expected an `isinst` mismatch to fault must use an explicit
+cast if they require failure. Mutable-array assignment and `castclass` invariance
+remain deliberate neoCLR divergences; this change does not admit widened writes.
+
+Primary reference, consulted 2026-10-08: .NET 10 [OpCodes.Isinst](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.isinst?view=net-10.0)
+documents null for a failed type test and for null input. A local .NET 10.0.0
+[checked-in DynamicMethod control](experiments/aot-console/isinst-cli-control/Program.cs)
+emitted `ldarg.0; isinst; ret` and passed exact identity,
+unrelated class arrays, primitive-array mismatch and null checks. The neoCLR tests
+also retain the explicit divergence that Foo[] does not match Base[]. Tests in
+`tests/reference_arrays.rs`, `tests/array_iterable.rs` and the native reference-array
+view fixture cover both static and dynamic views. This is a shared semantic
+correction, not an AOT-only interpretation or a change to metadata encoding.
+
+Run the CLI control with `dotnet run --project docs/experiments/aot-console/isinst-cli-control/Control.csproj -c Release`. It uses .NET solely as a semantic reference, not as a native application dependency.

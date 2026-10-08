@@ -50,7 +50,8 @@ pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Va
                 .and_then(|p| p.verify())
                 .map_err(|e| e.to_string())?;
         }
-        let (selected, mut report) = select(&expanded, root)?;
+        let backings = reference_array_backings(&specialization);
+        let (selected, mut report) = select_inventory_with_host_roots(&expanded, root, true, &[], &backings)?;
         super::specialization::restore_methods(&mut report, &specialization);
         report["specialization"] = specialization;
         Ok((selected, report))
@@ -197,10 +198,14 @@ pub(super) fn implicit_implementation(input: &neoclr::Module, concrete: &Type, c
 /// The load set's verified nominal backing, closed over this profile's byte element.
 /// Specialization relocates the private backing identity to the exact Byte shape.
 pub(super) fn byte_array_owner(input: &neoclr::Module) -> Option<Type> {
+    array_owner(input, &Type::Byte)
+}
+
+pub(super) fn array_owner(input: &neoclr::Module, element: &Type) -> Option<Type> {
     let id = input.assemblies.iter().find_map(|a| a.array_backing.as_ref())?;
     let t = input.types.iter().find(|t| t.definition.as_ref() == Some(id))?;
     match t.generic_parameters.len() {
-        1 => Some(Type::Constructed { definition:t.name.clone(),arguments:vec![Type::Byte] }),
+        1 => Some(Type::Constructed { definition:t.name.clone(),arguments:vec![element.clone()] }),
         0 => Some(Type::Named(t.name.clone())),
         _ => None,
     }
@@ -216,11 +221,7 @@ fn string_dispatch_target(input: &neoclr::Module, contract: usize) -> Result<Opt
 
 /// Exact implicit implementations for classes constructed by the reachable program.
 /// Original conformance is verified before private projection; this is not a binder.
-pub(super) fn dispatch_targets(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>) -> Result<Vec<(usize, usize)>, Error> {
-    dispatch_targets_with_array(input, contract, reached, None)
-}
-
-pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>, array_backing: Option<usize>) -> Result<Vec<(usize, usize)>, Error> {
+pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>, array_backing: Option<usize>, reference_backings: &[usize]) -> Result<Vec<(usize, usize)>, Error> {
     let f = &input.functions[contract];
     let display = object_display_contract(f);
     if !interface_contract(input, f) && !display { return Ok(vec![]); }
@@ -236,6 +237,14 @@ pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usiz
             }
             if matches!(op, Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte)) {
                 if let Some(Type::Named(name)) = &array_owner { constructed.insert(name.as_str()); }
+            }
+            if let Op::NewArray(element) | Op::ReserveArray(element) = op {
+                for &index in reference_backings {
+                    let ty = &input.types[index];
+                    if ty.fields.first().is_some_and(|f| f.ty == Type::ArrayRef(Box::new(element.clone()))) {
+                        constructed.insert(ty.name.as_str());
+                    }
+                }
             }
             if let Op::Construct(target) = op {
                 if let Some(Type::Named(name)) = &target.owner { constructed.insert(name.as_str()); }
@@ -309,10 +318,10 @@ pub(super) fn select_inventory(
     root: &str,
     single_assembly: bool,
 ) -> Result<(neoclr::Module, Value), Error> {
-    select_inventory_with_host_roots(input, root, single_assembly, &[])
+    select_inventory_with_host_roots(input, root, single_assembly, &[], &[])
 }
 pub(super) fn select_inventory_with_host_roots(
-    input: &neoclr::Module, root: &str, single_assembly: bool, host_roots: &[usize],
+    input: &neoclr::Module, root: &str, single_assembly: bool, host_roots: &[usize], reference_backings: &[usize],
 ) -> Result<(neoclr::Module, Value), Error> {
     validate_source(input, single_assembly)?;
     if host_roots.iter().any(|i| *i >= input.functions.len()) { return Err("host root index out of range".into()); }
@@ -360,14 +369,14 @@ pub(super) fn select_inventory_with_host_roots(
             if let Some(target) = string_dispatch_target(input, contract)? {
                 if !functions.contains(&target) { pending.push(target); }
             }
-            for (_, target) in dispatch_targets(input, contract, &functions)? {
+            for (_, target) in dispatch_targets_with_array(input, contract, &functions, None, reference_backings)? {
                 if !functions.contains(&target) { pending.push(target); }
             }
         }
         if pending.is_empty() { break; }
     }
     let mut types = BTreeSet::new();
-    let mut pending_types = vec![];
+    let mut pending_types = reference_backings.iter().map(|i| Type::Named(input.types[*i].name.clone())).collect::<Vec<_>>();
     for &i in &functions {
         let f = &input.functions[i];
         pending_types.extend(f.owner.iter().cloned());
@@ -515,7 +524,7 @@ pub(super) fn select_inventory_with_host_roots(
         }
         let display = object_display_contract(&input.functions[*source]);
         if interface_contract(input, &input.functions[*source]) || display {
-            let targets = dispatch_targets(input, *source, &functions)?;
+            let targets = dispatch_targets_with_array(input, *source, &functions, None, reference_backings)?;
             let inventory = if display { &mut object_dispatch } else { &mut dispatch };
             inventory.push(json!({"contractCompiledIndex":compiled,"contractSourceIndex":source,
                 "targets":targets.iter().map(|(ty, method)| json!({"typeCompiledIndex":type_rows.binary_search(ty).unwrap(),"functionCompiledIndex":rows.binary_search(method).unwrap()})).collect::<Vec<_>>() }));
@@ -528,10 +537,17 @@ pub(super) fn select_inventory_with_host_roots(
         "hostRoots": host_roots.iter().map(|i| json!({"sourceIndex":i,"compiledIndex":rows.binary_search(i).unwrap(),"name":input.functions[*i].name,"reason":"explicit runtime adapter"})).collect::<Vec<_>>(),
         "policy":"explicit closed world with constructed-class implicit interface dispatch; ordinary selected bodies retained; verified Object.ToString override dispatch replaces its private slot body; no reflection, dynamic loading or general class virtual dispatch",
         "stringInterfaceDispatch":string_dispatch, "interfaceDispatch":dispatch, "objectDisplayDispatch":object_dispatch, "arrayBackingProjection":array_backing,
+        "referenceArrayBackingProjections": reference_backings.iter().filter_map(|source| type_rows.binary_search(source).ok().map(|compiled| json!({"sourceIndex":source,"compiledIndex":compiled}))).collect::<Vec<_>>(),
         "metadataPolicy":"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
         "functions": rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.functions[*old].definition,"name":input.functions[*old].name})).collect::<Vec<_>>(),
         "types": type_rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.types[*old].definition,"name":input.types[*old].name})).collect::<Vec<_>>(),
         "excludedFunctions": input.functions.iter().enumerate().filter(|(i,_)| !functions.contains(i)).map(|(i,f)| json!({"sourceIndex":i,"definition":f.definition,"name":f.name})).collect::<Vec<_>>(),
         "excludedTypes": input.types.iter().enumerate().filter(|(i,_)| !types.contains(i)).map(|(i,t)| json!({"sourceIndex":i,"definition":t.definition,"name":t.name})).collect::<Vec<_>>()});
     Ok((projected, report))
+}
+
+/// Private verified specialization evidence, never inferred from names or field shapes.
+pub(super) fn reference_array_backings(report: &Value) -> Vec<usize> {
+    report["referenceArrayBackings"].as_array().into_iter().flatten()
+        .filter_map(|r| r.as_u64().map(|i| i as usize)).collect()
 }

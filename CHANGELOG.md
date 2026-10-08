@@ -172,7 +172,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   element specialization is discovered first; 30 native/interpreter comparisons cover
   mutation, identity, initialization and fault parity, including wrong-element interface
   casts. Reject ordinary class construction for all closed array backings before
-  erasure. No public API or metadata format changes.
+  erasure. Extend verified nominal/interface views to closed class-reference arrays
+  with exact private type tags and GC validation; the order-collections sample now
+  matches interpreted execution. Preserve explicit wrong-element mutable-array cast
+  faults and field borrow/replacement restrictions. Correct isinst in the shared
+  verifier/interpreter to return null on incompatible array tests, matching CLI semantics
+  without admitting covariance. Previously these tests could fail verification or fault.
+  Add 15 differential cases, malformed-tag/retention controls and Raven standalone
+  checks. No public API or metadata format changes.
   Bind the exact ObjectReferenceEquals service to native identity comparison, including
   nulls and distinct equal-content strings. The full server next reaches the
   StreamError.ToString value-member contract; admit verified direct byref value

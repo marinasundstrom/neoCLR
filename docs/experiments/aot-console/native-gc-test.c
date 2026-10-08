@@ -55,6 +55,36 @@ int main(void) {
     CHECK(neoclr_gc_allocate_v1(&c.text, 8, NEOCLR_GC_TEXT, &output) == 5);
     interior = 0;
     CHECK(!neoclr_gc_collect_v1(&c, &frame) && !c.text.used);
+    /* Typed reference-array tags preserve storage tracing and reject malformed
+     * type indices or multi-lane records disguised as reference arrays. */
+    uint64_t *references = allocate(&c, 42, NEOCLR_GC_RECORDS);
+    uint64_t *child = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    dead = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    CHECK(references && child && dead);
+    references[0] = (UINT64_C(256) << 32) | UINT64_C(0x80000005);
+    references[1] = 2; references[2] = 1;
+    references[3] = (uintptr_t)child; references[4] = (uintptr_t)dead;
+    ((unsigned char *)references)[40] = 1;
+    interior = (uintptr_t)references;
+    uint64_t reclaimed = neoclr_gc_statistics_v1().reclaimed_allocations;
+    CHECK(!neoclr_gc_collect_v1(&c, &frame));
+    CHECK(neoclr_gc_statistics_v1().reclaimed_allocations == reclaimed + 1);
+    child[1] = 42;
+    for (uint64_t type = 1; type <= 256; type += 255) {
+        references[0] = (type << 32) | UINT64_C(0x80000005);
+        CHECK(!neoclr_gc_collect_v1(&c, &frame) && child[1] == 42);
+    }
+    references[0] = (UINT64_C(257) << 32) | UINT64_C(0x80000005);
+    CHECK(neoclr_gc_collect_v1(&c, &frame) == 3);
+    references[0] = (UINT64_C(1) << 32) | UINT64_C(0x80000006);
+    CHECK(neoclr_gc_collect_v1(&c, &frame) == 3);
+    references[0] = (UINT64_C(1) << 32) | UINT64_C(0x80000005);
+    references[1] = 0; references[2] = 2;
+    CHECK(neoclr_gc_collect_v1(&c, &frame) == 3);
+    references[1] = 2; references[2] = 1;
+    CHECK(!neoclr_gc_collect_v1(&c, &frame) && child[1] == 42);
+    interior = 0;
+    CHECK(!neoclr_gc_collect_v1(&c, &frame) && !c.text.used);
     /* A malformed descriptor may interrupt traversal with other objects queued. */
     uint64_t *owner = allocate(&c, 24, NEOCLR_GC_OBJECT);
     uint64_t *queued = allocate(&c, 16, NEOCLR_GC_OBJECT);

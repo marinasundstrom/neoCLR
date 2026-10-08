@@ -1811,7 +1811,7 @@ fn array_views_source(source: &str) -> neoclr::Module {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn nominal_byte_array_views_preserve_aliases_dispatch_and_initialization() {
-    check_array_views(array_views_module());
+    check_array_views(array_views_module(), false);
 }
 
 #[test]
@@ -1827,44 +1827,76 @@ fn nominal_byte_array_views_keep_exact_element_identity_across_specialization_or
         let source = source.replace(".local arrayref<Byte> bytes", locals)
             .replace("isinst Other", "isinst Read<Int32>")
             .replace("castclass Other", "castclass Read<Int32>");
-        check_array_views(array_views_source(&source));
+        check_array_views(array_views_source(&source), false);
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn nominal_reference_array_views_preserve_exact_dispatch_aliases_and_faults() {
+    let source = include_str!("../../../docs/experiments/aot-console/reference-array-views.neoil");
+    check_array_views(array_views_source(source), true);
+}
+
+#[test]
+fn nominal_reference_array_views_reject_storage_borrows_and_replacement() {
+    let source = include_str!("../../../docs/experiments/aot-console/reference-array-views.neoil");
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    for (body, message) in [
+        ("ldarg 0\nldflda 0\npop\nldc.i4 0\nret", "storage field cannot be borrowed"),
+        ("ldarg 0\nldc.i4 0\nnewarr T\nstfld 0\nldc.i4 0\nret", "storage field cannot be replaced"),
+    ] {
+        let source = source.replace("ldarg 0\nldfld 0\nldlen\nconv.i4\nret", body);
+        let app = array_views_source(&source);
+        let dir = Temp::new();
+        let r = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena"]);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists(), "{r:?}");
+        assert!(String::from_utf8_lossy(&r.stderr).contains(message), "{r:?}");
     }
 }
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-fn check_array_views(app: neoclr::Module) {
+fn check_array_views(app: neoclr::Module, gc: bool) {
     let dir=Temp::new();
     let seed=neoclr::assemble(".module System\n.references ()\n").unwrap();
     let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();program.verify().unwrap();
-    let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena"]);
+    let flags = if gc { vec!["--compile-system", "--reference-arena", "--native-gc"] } else { vec!["--compile-system", "--reference-arena"] };
+    let r=compile_linked_module(&dir,&seed,&app,&flags);
     assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
     let report:serde_json::Value=serde_json::from_slice(&r.stdout).unwrap();
-    assert!(report["arrayBackingProjection"]["compiledIndex"].is_number());
-    assert_eq!(report["interfaceDispatch"].as_array().unwrap().len(),3);
+    if gc { assert_eq!(report["referenceArrayBackingProjections"].as_array().unwrap().len(), 2); }
+    else { assert!(report["arrayBackingProjection"]["compiledIndex"].is_number()); }
+    assert_eq!(report["interfaceDispatch"].as_array().unwrap().len(), if gc {4} else {3});
     let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
     fs::write(dir.0.join("host.c"),r#"
-#include "text-arena.h"
+#include "native-gc.h"
 #include <stdlib.h>
 int main(int argc,char **argv) {
-    uint64_t storage[16];neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    uint64_t storage[512];neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
     int32_t result=-99;int status=neoclr_entry_v4(argc>1?atoi(argv[1]):0,&result,&ctx);
+#ifdef NEOCLR_NATIVE_GC
+    if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 93;
+    if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used) return 94;
+#endif
     if(status){if(result!=-99)return 92;neoclr_aot_render_fault(stderr,&ctx.fault);return 1;}
     printf("%d\n",result);return 0;
 }
 "#).unwrap();
-    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+    let mut command = Command::new("clang");
+    if gc { command.args(["-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds"]).arg(base.join("aot-console/native-gc.c")).arg(base.join("aot-console/root-probe.c")); }
+    let r=command.args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
         .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
         .arg(base.join("aot-fault-details/render.c")).arg(base.join("aot-console/text-arena.c"))
         .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
     assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
     let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
-    for mode in 0..10 {
+    for mode in 0..if gc {15} else {10} {
         let expected=method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default());
         let r=Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
         match expected {
             Ok(value)=>{let neoclr::Value::Int32(value)=value.value else{panic!("expected Int32")};
                 assert_eq!(r.status.code(),Some(0),"{mode}: {r:?}");assert_eq!(r.stdout,format!("{value}\n").as_bytes());assert!(r.stderr.is_empty());}
-            Err(fault)=>{assert_eq!(r.status.code(),Some(1));assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(),"{mode}");}
+            Err(fault)=>{assert_eq!(r.status.code(),Some(1), "mode {mode}: native {r:?}; interpreter {fault:?}");assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(),"{mode}");}
         }
     }
 }

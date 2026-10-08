@@ -364,3 +364,18 @@ records two successful Raven consumers in interpreted, sanitized native and stan
 modes, six focused tests and retained HTTP compiler admission. Standalone images link
 only libSystem. The survey and consumer checks ran concurrently; their elapsed times
 are not benchmark measurements.
+
+
+## Exact reference-array dispatch follow-up (2026-10-08)
+
+The [reference-array view slice](../aot-console/record-arrays.md#exact-nominal-reference-array-views-2026-10-08)
+removes the order sample's instruction-208 boundary. Its ordinary Array<T> methods
+and iterator now compile for the exact reference element type; interface views share
+the same allocation. The existing sample's full output now matches interpreted
+execution, including the Filter/Map/ToList path and shared order identities.
+
+[Two Raven consumers](../../../benchmarks/native-web/reference-array-views-validation.json)
+pass interpreted, sanitized native and standalone execution with GC cleanup and
+libSystem-only linkage. Focused checks cover wrong-element casts and retained exact
+array identity. This supersedes the order-sample rejection above; it is not a new
+104-case census or a performance comparison.

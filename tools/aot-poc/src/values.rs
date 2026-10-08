@@ -10,7 +10,7 @@ mod gc_points;
 mod gc_probe;
 
 pub(super) fn trace_layout(input: &neoclr::Module, details: Option<&crate::fault_details::Options>) -> Result<serde_json::Value, Error> {
-    let p = Profile::new(input, details.is_some_and(|d| d.reference_arena), details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.primitive_receivers.as_slice()), details.is_some_and(|d| d.native_stack_budget))?;
+    let p = Profile::new(input, details.is_some_and(|d| d.reference_arena), details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map_or(&[], |d| d.reference_array_backings.as_slice()), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.primitive_receivers.as_slice()), details.is_some_and(|d| d.native_stack_budget))?;
     let mut report = gc_layout::report(&p);
     report["preOperationPlans"] = gc_points::report(&p, details)?;
     Ok(report)
@@ -97,6 +97,8 @@ fn matches_type(b: &mut FunctionBuilder<'_>, p: &Profile<'_>, tag: ir::Value, in
         let ordinary = b.ins().icmp_imm(IntCC::Equal, tag, 0x80000001);
         let reserved = b.ins().icmp_imm(IntCC::Equal, tag, 0x80000002);
         b.ins().bor(ordinary, reserved)
+    } else if p.reference_array_backings.contains(&index) {
+        b.ins().icmp_imm(IntCC::Equal, tag, (((index as u64 + 1) << 32) | 0x80000005) as i64)
     } else { b.ins().icmp_imm(IntCC::Equal, tag, index as i64) }
 }
 
@@ -207,7 +209,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     if stack_budget && !details.is_some_and(|d| d.native_gc) {
         return Err("native stack budget requires GC frame publication".into());
     }
-    let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.primitive_receivers.as_slice()), details.is_some_and(|d| d.native_stack_budget))?;
+    let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map_or(&[], |d| d.reference_array_backings.as_slice()), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.primitive_receivers.as_slice()), details.is_some_and(|d| d.native_stack_budget))?;
     let root = p.root(root)?;
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))
@@ -1216,7 +1218,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let status = b.inst_results(call)[0];
                         let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                         return_if_detailed(&mut b, failed, status, site.as_ref());
-                        stack.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
+                        let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                        if let Some(index) = p.backing_for_array(&p.ty(&neoclr::metadata::Type::ArrayRef(Box::new(t.clone())))?) {
+                            let tag = b.ins().iconst(types::I64, (((index as u64 + 1) << 32) | 0x80000005) as i64);
+                            b.ins().store(MemFlags::new(), tag, array, 0);
+                        }
+                        stack.push(array);
                     }
                     Op::ReserveArray(t) if matches!(t, neoclr::metadata::Type::Named(_)) => {
                         let count = pop(&mut stack);
@@ -1228,7 +1235,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let status = b.inst_results(call)[0];
                         let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                         return_if_detailed(&mut b, failed, status, site.as_ref());
-                        stack.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
+                        let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                        if let Some(index) = p.backing_for_array(&p.ty(&neoclr::metadata::Type::ArrayRef(Box::new(t.clone())))?) {
+                            let tag = b.ins().iconst(types::I64, (((index as u64 + 1) << 32) | 0x80000005) as i64);
+                            b.ins().store(MemFlags::new(), tag, array, 0);
+                        }
+                        stack.push(array);
                     }
                     Op::NewArray(t) | Op::ReserveArray(t) if matches!(t, neoclr::metadata::Type::String | neoclr::metadata::Type::Function(_)) => {
                         let count = pop(&mut stack);
@@ -1353,7 +1365,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                                 8
                             } else { 0 };
                             let address = b.ins().iadd_imm(owner, (header + offset * 8) as i64);
-                            if matches!(top(), Ty::Reference(i) if p.array_backing == Some(*i)) {
+                            if matches!(top(), Ty::Reference(i) if p.is_array_backing(*i)) {
                                 // The verified backing's sole field denotes this same array,
                                 // not storage at the length-header offset.
                                 stack.push(owner);

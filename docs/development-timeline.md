@@ -12091,3 +12091,26 @@ in target metadata during CLI emission, including the explicit legacy probe-core
 profile. All 16 focused profile/emission/.NET controls pass and the CLI async
 sample executes suspension and result `42`. The native-enabled compiler rebuild
 succeeds. No runtime Raven/neoIL interface declaration retains the `I` prefix.
+
+
+## 2026-10-08 — Cross-mode parity and CLI instruction semantics
+
+**Author:** Reaffirmed that interpreted mode and native compilation should yield the
+same behavior. After directing continued work on array views, asked for an assessment
+of the next fixes. Then clarified: “Another requirement is that we should follow .NET
+semantics in IL unless we diverge. So most if not all instructions right now should
+work the same way as in .NET.”
+
+**Assistant investigation:** Native class-reference array views exposed an existing
+interpreter behavior: `isinst` with a different mutable-array element type faulted.
+The first implementation preserved that behavior for parity. On the author's CLI
+clarification, the assistant checked .NET's instruction documentation and emitted a
+DynamicMethod control. The recorded September array decision requires invariance,
+not a fault for a failed type test. The initial parity-only approach was revised.
+
+**Action:** Correct the shared verifier/interpreter and native slice so incompatible
+array type tests return null while explicit casts remain subject to the documented
+invariance rule. The [contract and validation](array-variance.md#type-tests-retain-cli-semantics-2026-10-08)
+distinguish this correction from a new divergence. Keep the existing array-view work
+and sample-driven release assessment in scope; no full IL audit or universal parity
+claim follows from these focused checks.
