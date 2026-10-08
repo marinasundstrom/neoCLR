@@ -214,8 +214,9 @@ Fault-context message/frame-name slots now have bounded diagnostic enumeration d
 unwinding and after host return; successful reentry retires the prior view
 ([validation](experiments/aot-console/route-fault-root-validation.json)).
 Borrowed pointees, service-internal temporaries and general host root registration remain incomplete.
-Extend that coverage next, then add allocation descriptors and nonmoving tracing/reclamation
-before qualifying
+A [bounded native collector kernel](experiments/aot-console/native-gc.md) now has sanitized
+contract coverage for cycles, interior roots and reuse. Next connect it only at complete
+compiler boundaries and qualify repeated routing within a fixed budget before qualifying
 sustained HTTP execution. This is planned integration work, not an implemented native
 collector. Borrowed String interface receivers remain unsupported.
 The author adds a console-input sample after unions, exercising input and

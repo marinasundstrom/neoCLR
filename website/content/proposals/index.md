@@ -326,8 +326,8 @@ copies and clean up on every return without adding guest fault frames. Fault-con
 message and frame-name slots now remain available to diagnostics after unwinding, until
 reset or context release. Borrowed pointees, service-internal temporaries and general
 host root registration remain incomplete.
-Complete root coverage and emitted allocation descriptors remain the next foundation; no native collector is
-implemented yet. The HTTP API drives this work, and sustained server execution remains unqualified.
+A bounded nonmoving collector kernel now has sanitized contract coverage; connecting it
+to compiled execution and qualifying fixed-budget routing are the next steps. The HTTP API drives this work, and sustained server execution remains unqualified.
 The bounded arena is a temporary experiment, not a final server memory policy.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future

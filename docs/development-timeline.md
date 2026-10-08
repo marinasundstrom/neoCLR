@@ -11813,3 +11813,19 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
   slices; no native collector is implemented here. See the
   [lifetime evidence](experiments/aot-console/route-lifetime-validation.json) and
   [integration plan](native-execution-investigation.md#http-driven-native-reclamation-requirement-2026-10-08).
+
+
+## 2026-10-08 — Continue through basic native GC
+
+- **Author:** “Continue until you have basic GC support even for native compilation.”
+- **Assistant response:** Continue across implementation slices rather than stop at
+  another diagnostic root checkpoint. Use the repeated routing workload within a fixed
+  budget, retained patterns/captures and clean live-set exhaustion as acceptance evidence.
+- **Provisional implementation choice:** nonmoving mark-and-sweep with collection only
+  at compiler-published operation boundaries. Conservative object-word candidates trade
+  possible extra retention for a smaller first implementation; native allocation services
+  do not collect while internal temporary data is live. This does not replace interpreter
+  GC or select the eventual production collector.
+- **Actions so far:** add an in-buffer descriptor/mark-sweep kernel and sanitized contract
+  test. Generated-code integration and fixed-budget acceptance remain open in this slice.
+  See [design and evidence](experiments/aot-console/native-gc.md).

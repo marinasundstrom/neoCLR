@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add a bounded nonmoving native mark-and-sweep kernel with in-buffer allocation
+  descriptors, free-block reuse/coalescing, interior-owner retention, conservative
+  object scanning, atomic text/bytes and initialized String-array tracing. Sanitized
+  contract coverage exercises cycles, aliases, fault roots and live-set exhaustion.
+  This first slice is a kernel foundation; generated-code collection is not yet enabled.
+
 - Add private typed tracing-layout diagnostics to AOT inspection for admitted value
   profiles: distinguish managed references from native-width integers, preserve nested
   field offsets, identify conditional erased String payloads and owner-dependent borrows,
