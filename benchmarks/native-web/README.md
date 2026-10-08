@@ -228,3 +228,9 @@ ReferenceList with public Object.ReferenceEquals alias, null and text-owner chec
 The reserved service lowers under --reference-arena to native identity comparison;
 ordinary methods are not replaced. The full server next reaches StreamError.ToString's
 value-member contract. No Equals/GetHashCode dispatch or server execution is claimed.
+
+`ValueDisplay.rvn` passes real StreamError.ToString descriptions through a verified
+by-reference value-override projection. Run `verify_callbacks.py --case ValueDisplay`;
+[evidence](value-display-validation.json) records parity, sanitizers and standalone
+linkage. See [the bounded contract](../../docs/experiments/aot-console/value-display.md).
+The full server next reaches primitive member-owner admission.

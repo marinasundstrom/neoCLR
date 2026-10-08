@@ -426,6 +426,25 @@ pub fn prepare(
             }
         }
     }
+    // Value receivers have no derived allocation type. Original-scope verification
+    // has checked their Object.ToString override contract; retain its borrowed body.
+    let value_display: Vec<_> = selected.functions.iter().enumerate()
+        .filter(|(_, f)| f.instance && f.receiver_byref && !f.receiver_readonly
+            && f.is_virtual && f.is_override && !f.is_abstract && f.impl_flags == 0
+            && f.name.rsplit('.').next() == Some("ToString") && f.parameters.is_empty()
+            && f.returns == neoclr::metadata::Type::String && !f.no_result
+            && f.generic_parameters.is_empty() && f.generic_arguments.is_empty()
+            && f.generic_constraints.is_empty() && f.interface_implementations.is_empty()
+            && f.owner.as_ref().and_then(|t| selected.type_definition(t)).is_some_and(|t|
+                !t.is_reference_type && t.representation == neoclr::metadata::Representation::Record
+                && t.base.is_none() && t.generic_parameters.is_empty()))
+        .map(|(i, _)| i).collect();
+    for &i in &value_display {
+        selected.functions[i].is_virtual = false;
+        selected.functions[i].is_override = false;
+    }
+    report["valueDisplayProjections"] = json!(value_display.iter().map(|i| json!({"compiledIndex":i,
+        "policy":"verified value ToString override; preserve direct by-reference receiver and original CIL"})).collect::<Vec<_>>());
     let sealed_members: Vec<_> = selected.functions.iter().enumerate()
         .filter(|(_, f)| (f.is_virtual || f.is_override) && super::selection::sealed_member(&selected, f))
         .map(|(i, _)| i).collect();

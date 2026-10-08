@@ -1,0 +1,18 @@
+import System.*
+import System.IO.*
+
+func Main() -> int {
+    let closed = StreamError.Closed
+    if closed.ToString() != "Closed" {
+        return 1
+    }
+    let invalid = StreamError.InvalidEncoding
+    if invalid.ToString() != "InvalidEncoding" {
+        return 2
+    }
+    let failure = StreamError.IoFailure
+    if failure.ToString() != "IoFailure" {
+        return 3
+    }
+    return 0
+}

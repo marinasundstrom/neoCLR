@@ -25,7 +25,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   unwritten/null faults. The real Raven ArrayList<Counter> consumer passes both modes;
   bind the exact ObjectReferenceEquals service to native identity comparison, including
   nulls and distinct equal-content strings. The full server next reaches the
-  StreamError.ToString value-member contract boundary.
+  StreamError.ToString value-member contract; admit verified direct byref value
+  ToString overrides in the private native projection and validate real StreamError
+  descriptions in both modes. Primitive member-owner admission is the next boundary.
 
 - Add development System.Text.StringBuilder with fluent append, atomic byte-limit
   faults, LF line append, clear/reuse and cached immutable snapshots. Add separator-aware
