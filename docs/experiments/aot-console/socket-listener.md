@@ -67,3 +67,42 @@ and close-on-exec flags. Generated-code tests cover missing host scope, normal c
 forgotten close and fault unwinding with GC frames. Negative binding tests retain
 exact-contract and opt-in enforcement. This slice measures correctness, not speed;
 server throughput benchmarks must wait for the remaining HTTP path.
+
+## Native accept kernel — 2026-10-08
+
+The GC build now has a private accept-operation adapter ahead of CIL binding. Submission
+retains the verified fn<Void> callback with a strong host root and returns an opaque
+Int64 operation token. Owner-thread polling performs nonblocking accept and publishes
+one retained callback handle without invoking guest code. Result consumption releases
+the root. A rotating cursor prevents a fixed slot from always being selected first;
+this is not a fairness or latency guarantee for a complete scheduler.
+
+There are 64 operation slots and 64 socket slots per invocation scope. Pending accepts
+count toward admission's socket budget, and allocation checks again when adopting a
+connection. A second pending accept on one listener yields Busy. Accepted sockets are
+nonblocking/close-on-exec and remain independent of listener closure. Cancellation wins
+only before an outcome is committed; close settles pending accepts as Closed. Accept
+has no connect-style timeout, matching the current interpreter. Once polling delivers
+an operation, it cannot deliver it again. Results require delivery and are consumed
+once. Scope teardown releases abandoned roots and all sockets, including on faults.
+
+The callback/operation state is private; the host scheduler owns dispatch and may later
+replace callback invocation with activation resumption. Polling rejects an active guest
+frame or pending fault for the context. Native callers must supply a verified callback;
+this kernel is not a public untrusted-pointer ABI. Network errors remain erased Byte
+SocketError outcomes; native misuse faults return status 3 without publishing output.
+
+This follows the existing socket/.NET comparison and the
+[runtime scheduling review](../../runtime-scheduling-design.md#cross-runtime-reassessment--author-direction-2026-10-08).
+A nonblocking kernel plus explicit completion handoff allows the existing Task/Promise
+surface to evolve independently of the suspension representation. It adds bounded root
+and operation storage, linear slot scans and explicit cleanup; no throughput advantage
+is claimed. Compiler bindings, queue pumping, receive/send and native HTTP remain open.
+
+The sanitized `native_accept_defers_delivery_and_releases_completion_roots` test uses
+real loopback TCP to check deferred and single delivery, GC retention, result consumption,
+Busy/InvalidOperation outcomes, cancellation before/after completion, close with pending
+accept, independent accepted-socket lifetime and abandoned-operation cleanup on fault.
+The existing native listener lifecycle fixture passes with its GC dependencies linked;
+the non-GC listener kernel also passes separately. GC-enabled users of socket-listener.c
+must now link native-gc.c and root-probe.c even when only synchronous methods are used.

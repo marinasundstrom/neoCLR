@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add a private nonblocking native accept kernel with retained completion roots,
+  deferred single delivery, cancellation/result consumption and scope cleanup. Validate
+  real loopback TCP and listener compatibility. GC socket builds now link the GC/root
+  helpers; CIL bindings, task pumping and native HTTP remain incomplete.
+
 - Add experimental native host dispatch for rooted zero-argument Void callbacks.
   Preserve receivers, heap contents and guest fault traces; reject invalid handles,
   wrong shapes and active-context reentry. This private image-local adapter does not

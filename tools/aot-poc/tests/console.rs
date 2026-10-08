@@ -3127,7 +3127,7 @@ int main(void) {
 "#).unwrap();
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     for (name, inputs) in [
-        ("kernel", vec![base.join("socket-listener-test.c"), base.join("socket-listener.c")]),
+        ("kernel", vec![base.join("socket-listener-test.c"), base.join("socket-listener.c"), base.join("root-probe.c"), base.join("native-gc.c")]),
         ("compiled", vec![dir.0.join("host.c"), dir.0.join("app.o"), base.join("socket-listener.c"), base.join("root-probe.c"), base.join("native-gc.c"), base.join("text-arena.c")]),
     ] {
         let binary = dir.0.join(name);
