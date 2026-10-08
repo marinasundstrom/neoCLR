@@ -179,3 +179,38 @@ fn callable_nullable_annotations_roundtrip_without_runtime_semantics() {
         );
     }
 }
+
+#[test]
+fn namespace_constants_preserve_bits_and_reject_invalid_contracts() {
+    let mut module = assemble(&source()).unwrap();
+    let constant = neoclr::metadata_origin::NamespaceConstant {
+        namespace: "System.Math".into(),
+        name: "Pi".into(),
+        ty: "Double".into(),
+        bits: "400921fb54442d18".into(),
+        visibility: "public".into(),
+    };
+    module.assemblies[0]
+        .namespace_constants
+        .push(constant.clone());
+    let json = serde_json::to_string(&module).unwrap();
+    let roundtrip = load(&json).unwrap();
+    assert_eq!(
+        roundtrip.assemblies[0].namespace_constants,
+        [constant.clone()]
+    );
+    for (field, value) in [
+        ("bits", "7ff0000000000000"),
+        ("bits", "XYZ"),
+        ("namespace", "A..B"),
+        ("name", ""),
+        ("type", "Single"),
+        ("visibility", "private"),
+    ] {
+        let mut invalid = serde_json::to_value(&module).unwrap();
+        invalid["assemblies"][0]["namespace_constants"][0][field] = value.into();
+        assert!(load(&invalid.to_string()).is_err(), "{field}: {value}");
+    }
+    module.assemblies[0].namespace_constants.push(constant);
+    assert!(load(&serde_json::to_string(&module).unwrap()).is_err());
+}

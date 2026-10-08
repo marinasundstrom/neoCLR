@@ -1347,6 +1347,7 @@ impl Module {
                     native_module_bindings: vec![],
                     native_type_bindings: vec![],
                     array_backing: None,
+                    namespace_constants: vec![],
                     name: identity.to_owned(),
                     full_name: identity.to_owned(),
                     modules: vec![self.name.clone()],

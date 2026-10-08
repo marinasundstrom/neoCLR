@@ -1,0 +1,23 @@
+import System.*
+import System.Console.*
+import System.Math.*
+
+func Check(value: bool) {
+    if !value {
+        Fail("Math constant mismatch")
+    }
+}
+
+func Main() {
+    Check(Math.Pi == 3.14159265358979323846)
+    Check(Math.E == 2.7182818284590452354)
+    Check(Math.Tau == 6.283185307179586476925)
+    Check(Pi == Math.Pi)
+    Check(E == Math.E)
+    Check(Tau == Math.Tau)
+    Check(Tau == Pi * 2.0)
+    Check(Math.Sign(-2147483648) == -1)
+    Check(Sign(0) == 0)
+    Check(Sign(2147483647) == 1)
+    WriteLine("Math constants passed")
+}

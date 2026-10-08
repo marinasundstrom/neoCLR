@@ -28,8 +28,9 @@ does not imply general array views or covariance. Following the [next-fix reasse
 [lexical path bindings](path.md#native-compilation-poc-2026-10-08) now pass the unchanged
 Raven sample in all three modes. [Math target lookup](math.md#source-runtime-bootstrap-ownership-2026-10-08)
 is corrected by removing competing bootstrap declarations; shared introspection faults
-remain a next priority, and bootstrap remains a release gate. Author-requested Math
-constants require a separate native namespace-constant metadata/emitter slice.
+remain a next priority, and bootstrap remains a release gate. Author-requested [Math constants](math.md#namespace-constants-development-2026-10-08)
+now use finite Double namespace metadata and compile-time inlining. Their interpreter
+consumer passes; Double instruction lowering remains the immediate AOT gap.
 The wider audit also found the handwritten legacy union bridge's `IUnion`; it now
 uses `UnionValue`, with regenerated fragments and executable union/time checks. This does not change the bootstrap release gate or promise
 runtime suspension, JIT, reflection or stable callback ABI support.

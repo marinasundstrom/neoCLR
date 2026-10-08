@@ -68,7 +68,7 @@ Primary sources consulted 2026-09-08, targeting .NET 10:
 preserve that responsibility split at prototype scale; a future JIT can specialize
 ordinary calls after checking the same contracts. No performance improvement is
 asserted. Decimal, MathF, broader integer overloads, Double Clamp/Sign, rounding
-modes, constants and additional transcendental functions remain future extensions.
+modes and additional transcendental functions remain future extensions.
 Double Sign needs an explicit NaN failure contract before implementation.
 
 ## Neo projection and validation
@@ -110,3 +110,54 @@ emitter/metadata task; they are not part of this lookup correction.
 The unchanged `library-strings.rvn` exercises negative, zero and positive Sign results
 with exact expected text in the interpreter, sanitized native and standalone runs.
 See [validation](../benchmarks/native-web/math-lookup-validation.json).
+
+## Namespace constants (development, 2026-10-08)
+
+`System.Math` now declares `public const Pi: double`, `E: double` and `Tau: double`.
+Pi is the circumference-to-diameter ratio, E is the base of natural logarithms,
+and Tau is a full turn in radians. Their binary64 bits match .NET 10 Math.PI,
+Math.E and Math.Tau: `400921fb54442d18`, `4005bf0a8b145769` and `401921fb54442d18`.
+The spelling Pi follows the platform's PascalCase style rather than .NET's PI.
+These are rounded floating-point constants, not arbitrary-precision numbers.
+
+Both `Math.Pi` with `import System.*` and `Pi` with `import System.Math.*` are
+supported using the rebuilt native bundle. Values are inlined into consumers;
+no initialization, managed allocation or runtime Math service is required. As in
+.NET, changing a compile-time constant requires recompiling dependent applications.
+The [checked-in sample](experiments/raven-target/samples/library-math-constants.rvn)
+checks all three values, qualified and wildcard access, Tau = 2 * Pi, and Sign.
+
+Compared with .NET's literal fields on a static class, native metadata retains
+namespace constants directly in an optional assembly manifest list. The initial
+contract is bounded to finite Double values and public/internal visibility, with
+exact hexadecimal binary64 bits. Invalid/duplicate definitions reject; older readers
+reject this added field, so refresh compiler, metadata tools and runtime together.
+This avoids inventing a nominal class or executable getter; the cost is new metadata
+reader support. General constant types and runtime reflection over constants remain
+future work. The CLI bootstrap remains; this is not bridge-free compilation.
+
+Primary reference: [.NET 10 Math declarations](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Math.cs).
+[Native-metadata interpreter/AOT assessment](../benchmarks/native-web/math-constants-validation.json).
+
+**AOT limitation:** the sample currently passes interpreted execution, but native
+admission rejects its Double literal at the first instruction. The AOT backend does
+not yet lower Double instructions. Metadata emission/inlining is in place; native
+execution of this sample is not supported yet. Double instruction support is the
+next bounded task, separately from floating Math service bindings.
+
+Reproduce the admission assessment with `verify_math_constants.py` and the visibility/
+emission controls with `verify_namespace_constants.py` in
+`docs/experiments/extended-cli-metadata/`, using the same compiler and bundle.
+The former requires `--compiler`, `--bundle`, `--runtime`, `--aot`, `--output`;
+the latter requires `--compiler`, `--bundle`, `--output`. Outputs must be fresh directories.
+Metadata round trips and rejection controls run with
+`dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --namespace-constants`;
+runtime validation runs with `cargo test --test metadata_origin`.
+
+Validation: six focused Raven namespace/.NET controls, ten runtime metadata-origin
+checks, metadata-tool round trips and invalid-contract checks, and six compiler
+emission/visibility controls pass. The .NET executable control also reads the refreshed
+documentation DLL and verifies all three literal values, avoiding drift between the
+handwritten temporary CLI declarations and the source Math API. Run it with
+`dotnet run --project docs/experiments/math-dotnet -- api-docs/reference/NeoCLR.CoreProbe.dll`.
+[Compiler control evidence](experiments/extended-cli-metadata/namespace-constants-validation.json).

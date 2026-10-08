@@ -6961,3 +6961,28 @@ comparison with main found only unrelated union-companion abstraction in ImportB
 No shared Raven lookup fix was needed. Native core ownership will eventually remove
 the entire temporary CLI input; this slice does not meet the no-bridge release gate.
 [Evidence](../benchmarks/native-web/math-lookup-validation.json).
+
+### Native namespace constants — 2026-10-08
+
+Native intent: namespace Double constants are descriptive metadata and inline at
+compile time, with no nominal carrier, storage or initialization. Raven's native
+adapter emits public/internal finite Double declarations and imports exact values
+as namespace field symbols from the native assembly snapshot. The shared portable
+body planner loads Double constant fields directly. No Runtime Contract option changes.
+Ordinary .NET still emits CLI literal fields on Raven's namespace-member carrier.
+
+neoCLR metadata tools and runtime own the optional namespace_constants assembly list;
+Raven owns declaration/semantic import and inlining. The native PE's incidental CLI
+reference envelope omits these constants; it is not authoritative and cannot be used
+as a standalone constant-bearing .NET reference. Explicit standalone CLI projection
+rejects instead of silently losing values. The documentation bridge separately exposes
+Pi/E/Tau as namespace carrier literal fields. All artifacts must be rebuilt together.
+The native contract currently supports finite Double only; other constant types and
+runtime reflection remain future slices. Full native core ownership replaces the
+remaining CLI bootstrap independently. [Contracts and evidence](math.md#namespace-constants-development-2026-10-08).
+
+Validated compiler: Raven `codex/source-object-metadata-resolution` commit
+`c3dcf4f5f` (with the same built artifacts used by the recorded checks). Its native
+namespace/direct-member and portable-emitter prerequisites are not on Raven main;
+no new general main-line defect was demonstrated. The six independent modern-.NET
+namespace tests pass; no .NET Framework/NanoFramework execution was tested.

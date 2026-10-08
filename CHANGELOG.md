@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add development System.Math namespace constants Pi, E and Tau with .NET-equivalent
+  Double bits. Native namespace constants retain exact values across separate
+  compilation and interpreted execution without runtime storage. AOT admission still
+  rejects Double instructions; native execution is pending. The initial
+  public/internal finite-Double metadata contract rejects malformed/duplicate values;
+  older readers require matching updated compiler/runtime bundles. Constants inline
+  into consumers, which must be recompiled if values change. Refresh API coverage;
+  standalone CLI projection remains unsupported and rejects explicitly.
+
 - Remove the competing System.Math placeholder from the explicit source-runtime
   bootstrap. Rebuilt native bundles resolve qualified/wildcard Math calls without
   changing Raven/.NET lookup precedence. The unchanged string sample passes

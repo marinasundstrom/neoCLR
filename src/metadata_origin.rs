@@ -22,6 +22,20 @@ pub struct AssemblyMetadata {
     /// Explicit nominal descriptor backing managed vector storage.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub array_backing: Option<crate::metadata::TypeDefId>,
+    /// Compile-time namespace literals, with exact binary64 bits and no execution storage.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub namespace_constants: Vec<NamespaceConstant>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NamespaceConstant {
+    pub namespace: String,
+    pub name: String,
+    #[serde(rename = "type")]
+    pub ty: String,
+    pub bits: String,
+    pub visibility: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -149,6 +163,31 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
     }
     let mut assemblies = HashSet::new();
     for assembly in &module.assemblies {
+        let mut constants = HashSet::new();
+        let name = |s: &str| {
+            !s.trim().is_empty()
+                && s.chars().count() <= 1024
+                && !s.chars().any(|c| c.is_control() || c == '.')
+        };
+        for constant in &assembly.namespace_constants {
+            if assembly.namespace_constants.len() > 4096
+                || !name(&constant.name)
+                || constant.namespace.chars().count() > 1024
+                || (!constant.namespace.is_empty() && !constant.namespace.split('.').all(name))
+                || !constants.insert((&constant.namespace, &constant.name))
+                || constant.ty != "Double"
+                || !matches!(constant.visibility.as_str(), "public" | "internal")
+                || constant.bits.len() != 16
+                || !constant
+                    .bits
+                    .bytes()
+                    .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+                || !u64::from_str_radix(&constant.bits, 16)
+                    .is_ok_and(|bits| f64::from_bits(bits).is_finite())
+            {
+                return Err(Fault::new("invalid or duplicate namespace constant"));
+            }
+        }
         if !text(&assembly.name)
             || !text(&assembly.full_name)
             || !assemblies.insert(&assembly.full_name)

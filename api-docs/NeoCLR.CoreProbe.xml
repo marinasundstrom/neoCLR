@@ -1290,7 +1290,10 @@
 
     <member name="P:System.AttributeUsageAttribute.AllowMultiple"><summary>Gets or sets whether the attribute permits repeated applications.</summary></member>
     <member name="P:System.AttributeUsageAttribute.Inherited"><summary>Gets or sets whether attribute metadata is inherited.</summary></member>
-    <member name="T:System.Math.NamespaceMembers"><summary>Namespace functions for integer and floating-point mathematics.</summary></member>
+    <member name="T:System.Math.NamespaceMembers"><summary>Namespace functions and constants for integer and floating-point mathematics.</summary></member>
+    <member name="F:System.Math.NamespaceMembers.Pi"><summary>The circle circumference-to-diameter ratio, rounded to Double precision.</summary><remarks>Development API. Equivalent to .NET Math.PI; named Pi using neoCLR casing. Compile-time constant: consumers inline its value.</remarks></member>
+    <member name="F:System.Math.NamespaceMembers.E"><summary>Euler's number, the base of natural logarithms, rounded to Double precision.</summary><remarks>Development compile-time constant equivalent to .NET Math.E.</remarks></member>
+    <member name="F:System.Math.NamespaceMembers.Tau"><summary>One full turn in radians, equal to twice Pi at Double precision.</summary><remarks>Development compile-time constant equivalent to .NET Math.Tau.</remarks></member>
     <member name="M:System.Math.NamespaceMembers.Abs(System.Double)"><summary>Returns the absolute value; the Int32 overload returns OverflowError for the minimum signed value.</summary><param name="value">The value on which this operation acts.</param></member>
 
     <member name="M:System.Math.NamespaceMembers.Sqrt(System.Double)"><summary>Returns the floating-point square root.</summary><param name="value">The value on which this operation acts.</param></member>

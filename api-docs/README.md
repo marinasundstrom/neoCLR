@@ -1268,3 +1268,12 @@ and `42`. Native-enabled compiler rebuild succeeds. This is tested on
 `codex/source-object-metadata-resolution`; the general cache fix is independently
 on Raven main as `d0a115dcf`. No bridge-free bootstrap or general native async
 entry-draining support is claimed.
+
+### Math namespace constants (2026-10-08 development)
+
+Pi, E and Tau are literal Double members on the already selected System.Math namespace
+container. Their XML descriptions and matching reference/snapshot are refreshed together.
+The native library stores them directly as namespace metadata; the CLI carrier here is
+only the documentation bridge. The new host NamespaceConstantDefinition,
+AssemblyBuilder.AddNamespaceConstant and ModuleDefinition.NamespaceConstants APIs are
+covered in [the manual metadata reference](experimental-metadata.md#native-namespace-double-constants-development-2026-10-08), not silently omitted guest APIs.

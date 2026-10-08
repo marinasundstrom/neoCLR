@@ -9,7 +9,9 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
 public sealed partial class NativeAssemblyDefinition
 {
-    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType) { internal (string Name, int Value)[]? EnumMembers { get; init; }
+    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType)
+    {
+        internal (string Name, int Value)[]? EnumMembers { get; init; }
         internal bool IsClosedHierarchy { get; init; }
         internal bool IsObjectRoot { get; init; }
         internal bool IsSealedClass { get; init; }
@@ -19,7 +21,8 @@ public sealed partial class NativeAssemblyDefinition
         internal int BaseIndex { get; set; } = -1;
         internal PrimitiveType? NativePrimitive { get; init; }
         internal bool NativeGrapheme { get; init; }
-        internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
+        internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = [];
+    }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
@@ -30,6 +33,7 @@ public sealed partial class NativeAssemblyDefinition
     private readonly PropertyRow[] properties;
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
+    private NamespaceConstantDefinition[] namespaceConstants = [];
     private readonly uint entryPointToken;
     private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, PropertyRow[] properties, AssemblyIdentity[] references, HashSet<string> valueTypeReferences, Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases, uint entryPointToken)
     { this.entryPointToken = entryPointToken; this.nativeTypeAliases = nativeTypeAliases; this.valueTypeReferences = valueTypeReferences; Identity = identity; this.types = types; this.methods = methods; this.properties = properties; References = System.Array.AsReadOnly(references); }
@@ -95,6 +99,23 @@ public sealed partial class NativeAssemblyDefinition
                 }
             }
             if (manifest.TryGetProperty("array_backing", out _)) manifestFields.Add("array_backing");
+            var constants = new List<NamespaceConstantDefinition>();
+            if (manifest.TryGetProperty("namespace_constants", out _))
+            {
+                manifestFields.Add("namespace_constants");
+                var names = new HashSet<(string, string)>();
+                foreach (var row in Array(manifest, "namespace_constants", 4096))
+                {
+                    Shape(row, "namespace", "name", "type", "bits", "visibility");
+                    var ns = row.GetProperty("namespace").GetString(); var name = Text(row, "name"); var bits = Text(row, "bits");
+                    Require(ns is not null && NamespaceConstantDefinition.ValidNamespace(ns) && NamespaceConstantDefinition.ValidName(name) && names.Add((ns, name)), "invalid or duplicate namespace constant");
+                    Require(Text(row, "type") == "Double" && bits.Length == 16 && bits.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f'), "unsupported namespace constant encoding");
+                    var value = BitConverter.Int64BitsToDouble(unchecked((long)ulong.Parse(bits, NumberStyles.HexNumber, CultureInfo.InvariantCulture)));
+                    Require(double.IsFinite(value), "nonfinite namespace constant");
+                    var visibility = Text(row, "visibility") switch { "public" => MethodVisibility.Public, "internal" => MethodVisibility.Internal, _ => throw new InvalidDataException("invalid namespace constant visibility") };
+                    constants.Add(new(ns!, name, value, visibility));
+                }
+            }
             Shape(manifest, manifestFields.ToArray());
             var identityText = Text(manifest, "full_name");
             var identity = ReadIdentity(identityText);
@@ -798,7 +819,7 @@ public sealed partial class NativeAssemblyDefinition
                 Require(candidates.Length == 1, "invalid native entry point");
                 entryPointToken = 0x06000001u + (uint)candidates[0].index;
             }
-            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences, nativeTypeAliases, entryPointToken);
+            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences, nativeTypeAliases, entryPointToken) { namespaceConstants = constants.ToArray() };
         }
         catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException or OverflowException)
         { throw new InvalidDataException("invalid native metadata", error); }
@@ -813,6 +834,8 @@ public sealed partial class NativeAssemblyDefinition
     /// This is compiler reference metadata, never an executable replacement for the native artifact. Per-call MVIDs may differ.</remarks>
     public byte[] CreateReferenceAssembly(AssemblyIdentity coreLibrary)
     {
+        if (namespaceConstants.Length != 0)
+            throw new NotSupportedException("standalone CLI projection of namespace constants is not implemented");
         if (types.Any(type => type.BaseName is not null))
             throw new NotSupportedException("class inheritance reference projection is not implemented");
 

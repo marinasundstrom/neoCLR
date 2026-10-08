@@ -117,6 +117,7 @@ public sealed partial class NativeAssemblyDefinition
                     : new InterfaceImplementation(owner.ReferencedType!);
                 return new ExplicitInterfaceImplementation(relationship, mapping.Name);
             }));
+        result.MainModule.SetNamespaceConstants(namespaceConstants);
         return result;
     }
 }

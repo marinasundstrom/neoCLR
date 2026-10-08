@@ -1,7 +1,7 @@
 {
-  "assemblySha256": "aa7c81ce78adce0476a8f8f4fa5799481e570b6d495daa5672decbf382e5c008",
+  "assemblySha256": "ba1b3749e5c1471e7a6cc11cd9bfb15086395454468d2414f74a6c68b20a6d2b",
   "inputs": {
-    "api-docs/NeoCLR.CoreProbe.xml": "1d041b661c1838e2a9df01b42db04638b2135c376a6ca7fae0b11ed3048423a6",
+    "api-docs/NeoCLR.CoreProbe.xml": "ce8e01e44c658fee8e610d6bab5cb9d5637db10466a17867c9b4b17a1d744fab",
     "api-docs/exclusions.json": "dfbbab53935ec02fec642d8b5281a5bb01f12ff30d27d2fe47900430c26e642a",
     "api-docs/manual-members.json": "8c9bce210fd2d822bf7ff2e28d776dca14e30427f61ac51e34c13064e262bcb0",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
@@ -31,7 +31,7 @@
     "docs/experiments/raven-target/ComparerChecks.cs": "a3717753f277a5ec4a11b7593a49d425ddfa86a00c98e74a943ee1ea2e1a8cda",
     "docs/experiments/raven-target/ConditionalOutputChecks.cs": "e6fc8f4369348cb9bf1c7980350aa0ddf653a8a1e7f88229b93cbac772144959",
     "docs/experiments/raven-target/ConstructionBindingChecks.cs": "785616703f5226f6de6fa4cdab43475af536cbf56e95d5d4c2fcd2f088464f82",
-    "docs/experiments/raven-target/CoreDeclarations.cs": "53a284446a6fbe26221ca25a14d4a444b82397d3a2856ccffdd1416754227a53",
+    "docs/experiments/raven-target/CoreDeclarations.cs": "4446728639f638e677e661b922e9d9b625ccc3d1bf668508d421c1e33135fad9",
     "docs/experiments/raven-target/DescriptorLibrary.cs": "325ebedb5e8345c3f460fc83a29df7d947b5eab92e3147919a2f7c86f68bd21c",
     "docs/experiments/raven-target/DoubleBindings.cs": "ca3ac375b5ad59ef3eac75a11f5592691333c95b79c10c46e3dd0e2059010240",
     "docs/experiments/raven-target/EmptyLibrary.cs": "94063d95f47320072221ad3f2564018544e20f063b6849e31f0003dd68757fc0",
@@ -229,7 +229,7 @@
     "runtime/raven/src/System/Linq/SingleError.rvn": "bb496ec19e71b91857388b0499efd86c7a60612e1d533662c280165284b217d4",
     "runtime/raven/src/System/LocalDateTime.rvn": "e78f3213dfc1b574b38171cdedf71e761db669873a40960718a12eaa2775f885",
     "runtime/raven/src/System/LocalTimeMapping.rvn": "5d38e9baa2795e3d4e2208b5f19f4a457f39c0075a9458152a3b6bf7658647b9",
-    "runtime/raven/src/System/Math/Functions.rvn": "7c6b80a8c549c2b1c91735bb7a325ab75472d112e81ae913d77b916ea5e22de0",
+    "runtime/raven/src/System/Math/Functions.rvn": "cbce121f535b196ee6044d4a44300e98593dba33c4ab5b2fa2fff81e4938bead",
     "runtime/raven/src/System/Networking/Dns.rvn": "9cf2bb408a5e999488fe88c2909ec6c06550e35590dc701462bff3b99848b0f5",
     "runtime/raven/src/System/Networking/DnsError.rvn": "3d29e8b2008d54270cb35a581f4ba38e6d0672f4576b334100fc72d8f729a7bd",
     "runtime/raven/src/System/Networking/IPAddress.rvn": "6e52cb1cb054215aa89c27caf87dac2c52e6e7c449e663012a3d31ac25523997",

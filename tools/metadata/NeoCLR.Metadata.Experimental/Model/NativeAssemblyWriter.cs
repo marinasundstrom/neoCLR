@@ -354,6 +354,14 @@ public sealed partial class AssemblyBuilder
         }).ToArray();
         if (typeBindings.Length != 0) manifest["native_type_bindings"] = typeBindings;
         var importedValues = importedNominalTypes.Values.Where(t => t.IsValueType && AuthoredPrimitiveOwner(t) is null or PrimitiveType.Void or PrimitiveType.Value).Select(ExternalName).Order().ToArray();
+        if (namespaceConstants.Count != 0) manifest["namespace_constants"] = namespaceConstants.Select(c => new
+        {
+            @namespace = c.Namespace,
+            name = c.Name,
+            type = "Double",
+            bits = c.Bits,
+            visibility = c.Visibility.ToString().ToLowerInvariant()
+        }).ToArray();
         if (importedValues.Length != 0) manifest["value_type_references"] = importedValues;
         var artifact = new
         {

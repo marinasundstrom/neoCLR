@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--namespace-constants"]) { NamespaceConstantChecks.Run(); return 0; }
+
 if (args is ["--external-object-consumer", var externalLibrary, var externalCore, var externalOutput])
 {
     ObjectRootChecks.WriteExternalConsumer(externalLibrary, externalCore, externalOutput); return 0;

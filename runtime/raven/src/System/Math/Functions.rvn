@@ -6,6 +6,15 @@ import System.OverflowError
 import System.InvalidRangeError
 import System.Result.*
 
+/// The ratio of a circle's circumference to its diameter, rounded to Double precision.
+public const Pi: double = 3.14159265358979323846
+
+/// Euler's number, the base of natural logarithms, rounded to Double precision.
+public const E: double = 2.7182818284590452354
+
+/// One full turn in radians (twice Pi), rounded to Double precision.
+public const Tau: double = 6.283185307179586476925
+
 public func Abs(value: int) -> System.Result<int, OverflowError> {
     if value == -2147483648 {
         return Error(OverflowError())

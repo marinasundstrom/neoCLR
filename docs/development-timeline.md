@@ -12130,3 +12130,22 @@ claim follows from these focused checks.
 - **Open:** implement and validate namespace constants through separate compilation,
   both execution modes and the API reference. The proposed constants are not yet
   shipped by this lookup slice. [Lookup evidence](../benchmarks/native-web/math-lookup-validation.json).
+
+- **Follow-up implementation:** adds Pi/E/Tau as finite Double namespace constants,
+  with native metadata snapshots, compiler inlining and matching API documentation.
+  The separate consumer first exposed that qualified namespace lookup collected only
+  direct native methods, not constants; Raven now includes direct constant symbols
+  and permits their receiverless binding. Ordinary CLI namespace carriers remain.
+  Native metadata/consumer evidence is linked from [Math](math.md#namespace-constants-development-2026-10-08).
+
+- **Validation boundary:** the constant consumer passes the interpreter, but AOT
+  rejects its first Double literal. The assistant records this gap explicitly and
+  identifies Double instruction lowering as the next native task, rather than
+  claiming parity or disguising constants behind a different API. The current
+  constant slice does not add native floating execution or floating Math services.
+
+- **Recorded outcome:** Raven implementation committed as `c3dcf4f5f` on its native
+  integration branch. Six Raven controls, ten runtime metadata checks, metadata
+  round-trip/rejection checks, six emission/visibility controls and the .NET literal-bit
+  reference check pass. The Math constant sample is deliberately recorded as
+  interpreter-passed/AOT-blocked, not universal execution parity.

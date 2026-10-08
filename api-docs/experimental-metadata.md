@@ -7810,3 +7810,29 @@ nonvirtual `GetType`; it remains an ordinary instance call. Only
 CLI member scopes are retained; no dependency is opened by authoring. A C# regression
 checks canonical names and ordinary-call classification, and the API fixture executes
 GetType against the actual source-built Runtime. This closes a JSON mapping link failure.
+
+## Native namespace Double constants (development, 2026-10-08)
+
+`NeoCLR.Metadata.Experimental.Model.NamespaceConstantDefinition(string namespace,
+string name, double value, MethodVisibility visibility = Public)` describes a
+compile-time constant. Read-only `Namespace`, `Name`, `Value`, `Visibility` properties
+return its exact declaration; `AssemblyBuilder.AddNamespaceConstant(definition)`
+adds it, and `ModuleDefinition.NamespaceConstants` reads authored/native snapshots.
+These host APIs are documented manually here, outside the guest RavenDoc selection.
+
+Namespace/name are at most 1024 characters; namespace may be global/empty, otherwise
+its dot-separated segments and the simple name must be nonblank and control-free.
+Simple names contain no dot. Values must be finite Double, visibility Public or
+Internal. Invalid declarations and duplicate namespace/name pairs throw
+ArgumentException; null definitions throw ArgumentNullException. At most 4096
+constants per assembly. Returned collections are read-only; loaded editing is absent.
+Values are inlined by the compiler, with no field address/storage or runtime initializer.
+
+Native JSON/NEOX/PE retains exact 16-digit lowercase binary64 bit strings in
+`assemblies[].namespace_constants`, including negative zero. Native readers reject
+unsupported types, malformed bits, nonfinite values, unknown members and duplicates.
+Older readers reject the extension. Ordinary CLI reads expose no native constants;
+standalone CLI writing/projection explicitly rejects a graph containing them.
+The nonauthoritative CLI envelope accompanying a native PE does not project these
+constants; native readers must use #Neo. No native execution or guest reflection API
+is implied by this descriptive metadata. See [Math contracts](../docs/math.md).
