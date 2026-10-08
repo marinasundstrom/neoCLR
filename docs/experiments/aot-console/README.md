@@ -776,3 +776,51 @@ neoCLR's existing contract expresses that relationship with verified library bac
 metadata and ordinary CIL methods; the private header/field lowering is backend
 implementation detail. The bounded cost remains invocation-retained arrays and
 closed dispatch targets; this is not general array covariance or GC support.
+
+## Console line input and strict UTF-8 decoding (2026-10-08)
+
+The ordinary `Console.ReadLine(128)` → `TextReader` → `StreamReader` → decoder
+path now compiles alongside the prompt writer. The [Raven reader](text-reader.rvn)
+uses `let Ok(...) else` and `if let Some(...)` to distinguish read errors, a line,
+and end of input. The only new native binding is exact reserved
+`neoCLR.Runtime.Utf8Decode(arrayref<Byte>) -> Value`, under `--bind-utf8-text`;
+public reader bodies, buffering, line limits and union branches remain ordinary CIL.
+
+Decoding validates every initialized array slot before checking strict scalar UTF-8.
+Malformed sequences return the existing erased Byte error; valid text is copied to
+invocation-owned immutable storage. Embedded NUL is retained. Null/unwritten inputs
+fault, while exhaustion publishes neither a result nor an advanced arena cursor.
+The focused tests compare all 256 single-byte inputs and scalar boundary, overlong,
+surrogate, out-of-range, truncated and misplaced continuation sequences with the
+interpreter. Direct adapter tests cover empty/exact-fit storage, canaries, exhaustion,
+invalid-input allocation avoidance and unread-slot precedence.
+
+The combined reader/writer graph selects 268 functions, 110 types and 73 clones
+before empty-record boxing helpers. Private limits are now 512 functions (including
+helpers), 128 types and 128 clones. Nested values permit 32 flattened lanes while
+retaining the 16 direct-field bound. Matching call-result storage is 256 bytes and
+reference allocation allows up to 264 bytes including its header. Boundary tests
+cover call returns, object allocation/canaries, function/clone ceilings and oversized
+layouts. This is a bounded experimental backend contract, not a public stable ABI.
+
+`verify_interactive.py --text-reader` compares ASCII, UTF-8, NUL, LF/CRLF, empty
+lines, EOF, final unterminated lines, malformed input and overlong lines, plus exact
+broken-pipe fault diagnostics. Its interpreter budget is explicitly ten million
+instructions: the default budget expires inside the managed decoder before the
+129-byte line reaches the sample's limit. Native execution has no instruction fuel
+counter. The sample host still retains allocations in a 64 KiB invocation arena;
+it does not promise the public 65536-byte maximum fits that host resource budget.
+
+Compared with .NET Console.ReadLine, neoCLR preserves its existing explicit
+`Result<Option<string>, TextReadError>` and UTF-8 byte-limit contract. The AOT path
+reuses that behavior rather than introducing another reader implementation. Its
+current cost is invocation-retained decoder buffers and copied immutable text;
+long-running input needs a managed lifetime policy or suitable host invocation
+boundaries. No throughput or allocation advantage is claimed.
+
+[Standalone reader evidence](text-reader-validation.json) records ten matching input
+cases, exact broken-pipe traces/exit status, executable-only deployment and only
+libSystem dynamically linked. It reuses the successful fresh compilation from run 1
+with matching source/producer hashes; run 2 raises the interpreter instruction budget
+to test the actual line-limit result. Default-limit and consecutive-read coverage
+remain the next slice.

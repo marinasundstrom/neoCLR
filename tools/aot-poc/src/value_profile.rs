@@ -64,9 +64,9 @@ fn object_base_shape(t: &neoclr::metadata::TypeDef) -> bool {
 
 impl<'a> Profile<'a> {
     pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>) -> Result<Self, Error> {
-        if input.name == "System" || input.types.len() > 128 || input.functions.len() > 256 {
+        if input.name == "System" || input.types.len() > 128 || input.functions.len() > 512 {
             return Err(
-                "value profile requires an application with at most 128 types and 256 functions"
+                "value profile requires an application with at most 128 types and 512 functions"
                     .into(),
             );
         }
@@ -152,8 +152,8 @@ impl<'a> Profile<'a> {
                 }
                 p.layouts[i].push(width);
                 width += p.lanes(&ty);
-                if width > 16 {
-                    return Err("value layout exceeds sixteen flattened lanes".into());
+                if width > 32 {
+                    return Err(format!("{}: value layout exceeds thirty-two flattened lanes ({width})", p.input.types[i].name).into());
                 }
             }
             p.widths[i] = width.max(1);

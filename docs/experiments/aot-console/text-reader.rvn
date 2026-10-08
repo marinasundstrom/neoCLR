@@ -1,0 +1,17 @@
+import System.*
+import System.Result.*
+import System.Option.*
+
+func Main() -> int {
+    Console.Write("Name: ")
+    let Ok(option) = Console.ReadLine(128) else {
+        Console.WriteLine("Read failed")
+        return 1
+    }
+    if let Some(line) = option {
+        Console.WriteLine(line)
+    } else {
+        Console.WriteLine("End of input")
+    }
+    return 0
+}

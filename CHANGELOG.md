@@ -123,8 +123,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   ordinary Count/indexer/iterator bodies keep aliasing and reserved initialization.
   Compile Console.Write and standard-error text writers with UTF-8/NUL and ordinary
   encoder loops; validate standalone output and broken-pipe user-fault parity.
-  Reject corrupt backing metadata and class-style array allocation. Line input
-  remains the next Console dependency path.
+  Reject corrupt backing metadata and class-style array allocation.
+  Compile Console.ReadLine with strict UTF-8 decoding through its existing reader,
+  decoder and Result/Option CIL. Preserve malformed-input outcomes, initialized-slot
+  fault precedence, NUL text and allocation-failure publication. Extend measured
+  private bounds to 512 functions/128 clones and 32 flattened value lanes, with
+  matching 256-byte call results and 264-byte object allocation; retain 128 types
+  and 16 direct fields. Validate decoder parity and storage/selection boundaries,
+  plus ten standalone reader inputs and exact broken-pipe fault/exit parity.
 
 ### 2026-10-07
 

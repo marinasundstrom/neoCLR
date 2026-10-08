@@ -42,7 +42,7 @@ int32_t neoclr_string_slice_utf8_v1(const neoclr_aot_text *text, int32_t start, 
 int32_t neoclr_utf8_encode_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
                              const void **output);
 /* Internal object allocation for the explicit reference-arena profile. Header is
- * a private type index; bytes includes header and padded payload (8..136 bytes).
+ * a private type index; bytes includes header and padded payload (8..264 bytes).
  * The arena owns objects and cycles until the next entry/reset, just like text.
  */
 int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
@@ -54,4 +54,7 @@ int32_t neoclr_allocate_bytes_v1(neoclr_aot_text_arena *arena, int32_t length, v
  * Indexed stores publish slots; unchecked interior borrows remain unsupported. */
 int32_t neoclr_reserve_bytes_v1(neoclr_aot_text_arena *arena, int32_t length, void **output);
 int32_t neoclr_check_bytes_initialized_v1(const void *array, int32_t offset, int32_t count);
+/* Strict UTF-8 from initialized managed bytes; erased String or Byte(1).
+ * Valid text uses arena storage; invalid encoding allocates nothing. */
+int32_t neoclr_utf8_decode_v1(const void *array, neoclr_aot_text_arena *arena, void *output);
 #endif

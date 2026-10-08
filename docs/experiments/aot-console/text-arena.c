@@ -44,7 +44,7 @@ int32_t neoclr_uint64_to_string_v1(uint64_t value, neoclr_aot_text_arena *arena,
 int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
                                 uint32_t bytes, void **output) {
     if (arena->used > arena->capacity || (arena->capacity && !arena->data) ||
-        ((uintptr_t)arena->data & 7) || bytes < 8 || bytes > 136 || (bytes & 7))
+        ((uintptr_t)arena->data & 7) || bytes < 8 || bytes > 264 || (bytes & 7))
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     uint64_t padding = (8 - (arena->used & 7)) & 7;
     uint64_t needed = padding + bytes;
@@ -144,5 +144,58 @@ int32_t neoclr_utf8_encode_v1(const neoclr_aot_text *text, neoclr_aot_text_arena
     memcpy(array, &kind, 8);
     memcpy((unsigned char *)array + 16, text->bytes, (size_t)text->length);
     *output = array;
+    return NEOCLR_AOT_FAULT_NONE;
+}
+
+/* Strict scalar UTF-8, matching the interpreter's String::from_utf8 contract. */
+static int valid_utf8(const unsigned char *bytes, size_t length) {
+    size_t i = 0;
+    while (i < length) {
+        unsigned char first = bytes[i++];
+        if (first < 0x80) continue;
+        size_t count;
+        unsigned char low = 0x80, high = 0xbf;
+        if (first >= 0xc2 && first <= 0xdf) count = 1;
+        else if (first >= 0xe0 && first <= 0xef) {
+            count = 2;
+            if (first == 0xe0) low = 0xa0;
+            if (first == 0xed) high = 0x9f;
+        } else if (first >= 0xf0 && first <= 0xf4) {
+            count = 3;
+            if (first == 0xf0) low = 0x90;
+            if (first == 0xf4) high = 0x8f;
+        } else return 0;
+        if (count > length - i || bytes[i] < low || bytes[i] > high) return 0;
+        i++;
+        while (--count) {
+            if ((bytes[i++] & 0xc0) != 0x80) return 0;
+        }
+    }
+    return 1;
+}
+
+int32_t neoclr_utf8_decode_v1(const void *array, neoclr_aot_text_arena *arena, void *output) {
+    if (!array) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t kind, length;
+    memcpy(&kind, array, 8);
+    memcpy(&length, (const unsigned char *)array + 8, 8);
+    if ((kind != UINT64_C(0x80000001) && kind != UINT64_C(0x80000002)) || length > 65536)
+        return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    /* The interpreter reads every slot before checking UTF-8, even after an
+     * invalid leading byte. Preserve that failure precedence. */
+    int32_t status = neoclr_check_bytes_initialized_v1(array, 0, (int32_t)length);
+    if (status) return status;
+    const unsigned char *bytes = (const unsigned char *)array + 16;
+    uint32_t tag = 2;
+    uint64_t payload = 1;
+    if (valid_utf8(bytes, (size_t)length)) {
+        const neoclr_aot_text *text;
+        status = store_text((const char *)bytes, (size_t)length, arena, &text);
+        if (status) return status;
+        tag = 4;
+        payload = (uint64_t)(uintptr_t)text;
+    }
+    memcpy(output, &tag, sizeof(tag));
+    memcpy((unsigned char *)output + 8, &payload, sizeof(payload));
     return NEOCLR_AOT_FAULT_NONE;
 }

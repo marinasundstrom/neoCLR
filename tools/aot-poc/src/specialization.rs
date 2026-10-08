@@ -213,10 +213,10 @@ impl Specializer<'_> {
         }) {
             return Ok(instance.clone());
         }
-        if self.instances.len() >= 256
-            || (self.clones >= 64 && (!target.generic_arguments.is_empty() || self.instances.iter().any(|v| v.source == i)))
+        if self.instances.len() >= 512
+            || (self.clones >= 128 && (!target.generic_arguments.is_empty() || self.instances.iter().any(|v| v.source == i)))
         {
-            return Err("method specialization exceeds 256 selected functions or 64 clones".into());
+            return Err("method specialization exceeds 512 selected functions or 128 clones".into());
         }
         let row = if target.generic_arguments.is_empty() && !self.instances.iter().any(|v| v.source == i) {
             i
@@ -517,7 +517,7 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
         }
         expanded.types[shape.row] = t;
     }
-    let report = json!({"policy":"up to 128 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 64 function clones and 256 selected functions; no constraints",
+    let report = json!({"policy":"up to 128 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 128 function clones and 512 selected functions; no constraints",
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
     Ok((expanded, report))

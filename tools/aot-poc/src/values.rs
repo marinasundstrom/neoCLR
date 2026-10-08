@@ -186,6 +186,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
             (&d.utf8_encode, "neoclr_utf8_encode_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.utf8_decode, "neoclr_utf8_decode_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_byte_count, "neoclr_string_byte_count_v1", vec![types::I64, types::I64]),
             (&d.string_slice_utf8, "neoclr_string_slice_utf8_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
         ] {
@@ -459,7 +460,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let args = if details.unwrap().string_slice_utf8.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], parameters[2], arena, output]
-                } else if details.unwrap().utf8_encode.contains(&i) {
+                } else if details.unwrap().utf8_encode.contains(&i) || details.unwrap().utf8_decode.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], arena, output]
                 } else { vec![parameters[0], output] };
@@ -506,7 +507,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 module.define_function(ids[i], &mut context)?;
                 continue;
             }
-            let mut frame_bytes = 128usize;
+            let mut frame_bytes = 256usize;
             let mut arguments = vec![];
             let mut at = 0;
             for t in &p.args[i] {
@@ -531,9 +532,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     b.ins().stack_store(zero, *local, 0);
                 }
             }
-            // All profile return values fit in sixteen padded scalar lanes; snapshots are read
+            // All profile return values fit in thirty-two padded scalar lanes; snapshots are read
             // immediately after each successful call, before this storage can be reused.
-            let call_result = slot(&mut b, 128);
+            let call_result = slot(&mut b, 256);
             let mut constructors = std::collections::HashMap::new();
             for (pc, op) in f.body.iter().enumerate() {
                 if let Op::Construct(target) = op {

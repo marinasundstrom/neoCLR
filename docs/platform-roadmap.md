@@ -133,8 +133,11 @@ EncoderState.Value/HasValue with distinct object identity, bounded lifetime and 
 fault sites; a fresh Raven Console consumer passes standalone validation. Verified
 nominal byte-array interface dispatch now runs ordinary backing methods, completing
 the Console.Write(string/int) and standard-error text-writer sample with exact
-interpreter/native output and broken-pipe user-fault parity. Console.ReadLine is next;
-its combined writer/reader graph first exceeds the current function/clone budgets. The author adds a console-input sample after unions, exercising input and
+interpreter/native output and broken-pipe user-fault parity. Console.ReadLine now compiles its ordinary reader/decoder graph with strict UTF-8
+decoding. Its measured 268-function/110-type/73-clone graph extends bounded selection
+to 512 functions/128 clones and nested values to 32 lanes, with matching call and
+object storage. Standalone line-input validation covers ten input cases and exact output-fault
+parity. Default-limit and consecutive-read coverage is next. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

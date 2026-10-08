@@ -26,7 +26,7 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
             return Err("record boxing currently requires empty value records".into());
         }
         let helper = if let Some(&helper) = helpers.get(&index) { helper } else {
-            if input.functions.len() >= 256 { return Err("boxing helpers exceed the selected function limit".into()); }
+            if input.functions.len() >= 512 { return Err("boxing helpers exceed the selected function limit".into()); }
             let helper = input.functions.len();
             let mut name = format!("$aot_box_empty_{index}");
             while input.functions.iter().any(|f| f.name == name) { name.push('_'); }

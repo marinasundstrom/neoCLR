@@ -245,7 +245,7 @@ pub(super) fn select_inventory(
             if !functions.insert(i) {
                 continue;
             }
-            if functions.len() > 256 {
+            if functions.len() > 512 {
                 return Err("selected functions exceed the value profile limit".into());
             }
             for op in &input.functions[i].body {

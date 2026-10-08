@@ -591,8 +591,8 @@ fn cyclic_unknown_and_oversized_inline_layouts_never_emit() {
         ),
         (".type A\n.field Child Int32\n.end", "local named record"),
         (
-            ".type A\n.field X Int32\n.field Y Int32\n.field Z Int32\n.end\n.type B\n.field X A\n.field Y A\n.field Z A\n.field U A\n.field V A\n.field W A\n.end",
-            "sixteen flattened lanes",
+            ".type A\n.field X Int32\n.field Y Int32\n.field Z Int32\n.end\n.type B\n.field X A\n.field Y A\n.field Z A\n.field U A\n.field V A\n.field W A\n.field A0 A\n.field A1 A\n.field A2 A\n.field A3 A\n.field A4 A\n.end",
+            "thirty-two flattened lanes",
         ),
     ] {
         let source = format!(
@@ -1621,7 +1621,7 @@ fn raven_generic_methods_compile_from_pe_and_neox_with_original_tokens_reported(
 
 #[test]
 fn generic_method_clones_are_bounded_and_keep_plain_callees_at_the_limit() {
-    for count in [64, 65] {
+    for count in [128, 129] {
         let mut source =
             String::from(".module MethodLimit\n.entry Main\n.function Main() -> Int32\n");
         for i in 0..count {
@@ -1641,12 +1641,12 @@ fn generic_method_clones_are_bounded_and_keep_plain_callees_at_the_limit() {
         );
         assert_eq!(
             result.status.success(),
-            count == 64,
+            count == 128,
             "{}",
             String::from_utf8_lossy(&result.stderr)
         );
-        if count == 65 {
-            assert!(String::from_utf8_lossy(&result.stderr).contains("64 clones"));
+        if count == 129 {
+            assert!(String::from_utf8_lossy(&result.stderr).contains("128 clones"));
             assert!(!temp.0.join("value.o").exists());
         }
     }
@@ -1936,8 +1936,8 @@ ret
 }
 
 #[test]
-fn expanded_value_function_budget_accepts_256_and_rejects_257() {
-    for count in [256,257] {
+fn expanded_value_function_budget_accepts_512_and_rejects_513() {
+    for count in [512,513] {
         let mut source=String::from(".module FunctionBudget\n.function Main() -> Int32\n");
         for n in 1..count { source.push_str(&format!("call F{n}()\npop\n")); }
         source.push_str("ldc.i4 42\nret\n.end\n");
@@ -1946,10 +1946,20 @@ fn expanded_value_function_budget_accepts_256_and_rejects_257() {
         let module=neoclr::assemble(&source).unwrap();
         let temp=Temp::new();
         let r=compile_mode(&neoclr::metadata_container::write_module(&module).unwrap(),&temp,"Main",true);
-        assert_eq!(r.status.success(),count==256,"{}",String::from_utf8_lossy(&r.stderr));
-        if count==257 {
+        assert_eq!(r.status.success(),count==512,"{}",String::from_utf8_lossy(&r.stderr));
+        if count==513 {
             assert!(!temp.0.join("value.o").exists());
             assert!(String::from_utf8_lossy(&r.stderr).contains("selected functions exceed"));
         }
     }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn thirty_two_lane_nested_record_crosses_call_boundary() {
+    let fields=(0..16).map(|i| format!(".field F{i} Pair\n")).collect::<String>();
+    let values=(0..16).map(|i| format!("ldc.i4 {i}\nldc.i4 {}\nnewobj Pair\n",i+1)).collect::<String>();
+    let source=format!(".module Wide\n.type Pair\n.field X Int32\n.field Y Int32\n.end\n.type Wide\n{fields}.end\n.function Echo(Wide value) -> Wide\nldarg value\nret\n.end\n.function Main() -> Int32\n{values}newobj Wide\ncall Echo(Wide)\nldfld 15\nldfld 1\nret\n.end\n");
+    let m=neoclr::assemble(&source).unwrap();
+    native_mode(&neoclr::metadata_container::write_module(&m).unwrap(),0,0,16,"Main",true);
 }
