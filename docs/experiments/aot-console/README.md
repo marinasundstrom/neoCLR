@@ -1149,3 +1149,39 @@ The comparison also found and fixed interpreter String ref.eq inconsistency in
 `8027ec93`, independently covered by six ownership/GC/conversion tests. Raven compiler
 behavior, the explicit target configuration, metadata encoding and native bundle
 libraries are unchanged by either slice.
+
+## Fresh Char-to-String identity (2026-10-08)
+
+The CharText restriction above is now closed for the bounded reference-arena profile.
+When text identity is observable, the existing explicit `--bind-character-text`
+binding copies Char's immutable grapheme bytes into a fresh String owner on each
+conversion. It reuses the same private arena-copy path as identity-sensitive literal
+evaluation. Copying/aliasing the resulting String preserves identity; independently
+converting the same Char produces distinct identities. Without observable identity,
+the previous allocation-free representation remains valid and unchanged. CharFromString
+validation still uses the pinned grapheme adapter, and no boxed Char dispatch is added.
+
+The [metadata consumer](character-text-identity.neoil) checks two conversions of a
+default NUL Char, fresh identities, repeated String/Object aliases, downcasts, invalid
+casts and null faults against the interpreter. Arena exhaustion leaves the caller's
+result untouched and reports the original CharText call site with no synthetic frame.
+All 47 Console AOT tests pass, including existing grapheme validation, argument binding,
+String identity and reference-profile coverage. String interface casts still reject.
+
+The [Raven consumer](character-text-identity.rvn) combines ordinary Console.WriteLine(char)
+wrappers with integer interpolation. Seven cases cover ASCII, å, emoji, a combining
+sequence, a family ZWJ sequence, a flag and NUL. [Fresh validation](character-text-identity-validation.json)
+compares interpreter/standalone output and exact broken-pipe faults, runs the ARM64
+executable alone with an empty environment, and checks that only libSystem is dynamically
+linked. The grapheme library is statically linked and included in the recorded hashes.
+Reproduce with the previous driver arguments plus `--sample character-text-identity`;
+repeat `--sample` to select several consumers, or omit it to qualify all four.
+
+This extends the [existing String ownership comparison](../../string-storage-design.md#shared-owner-identity--development-2026-09-24)
+and [text model](../../text-model.md). .NET Char is a UTF-16 code unit; neoCLR Char is
+an extended grapheme with UTF-8 text. The native path preserves neoCLR's existing
+fresh String conversion semantics instead of merging identities through shared Char
+storage. The cost is bounded copying/allocation when observable; there is no performance
+claim or change to the platform's text semantics. Arena exhaustion remains a POC resource
+policy; general reclamation and escaping native references remain future work. No public
+API, compiler, metadata, Runtime Contract, adapter signature or ABI layout changes.

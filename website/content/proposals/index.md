@@ -286,8 +286,9 @@ producer staging or artifact reuse. Shared concat conversion fixes unblock integ
 interpolation in native CIL; String-only interpolation runs standalone. Int32 boxing and
 Object display now run standalone with bounded invocation storage. String Object views
 also enable mixed integer interpolation while preserving text identity, null/cast faults
-and exact output-fault traces. String interfaces, CharText identity, wider boxing and
-general Object metadata remain open.
+and exact output-fault traces. Char-to-String conversion now preserves fresh identities
+when observable; character Console output and interpolation run together across Unicode
+graphemes and NUL. String interfaces, wider boxing and general Object metadata remain open.
 An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked

@@ -6731,3 +6731,10 @@ configuration, temporary CLI representation or metadata encoding. Native tagged 
 and fresh literal identity are backend-owned; String interfaces and CharText identity
 still reject in this bounded profile. Interpreter ref.eq was separately corrected to
 match the existing shared-owner String contract. No public API snapshot change.
+
+
+The following [CharText identity slice](experiments/aot-console/README.md#fresh-char-to-string-identity-2026-10-08)
+removes that producer restriction without compiler or target-contract changes. Native
+Console character wrappers and integer interpolation now run together through the same
+pinned Raven producer and bundle. Identity-observable CharText calls materialize fresh
+arena text; String interface casts remain unsupported. No CLI bridge encoding is added.

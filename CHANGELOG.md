@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Preserve fresh Char-to-String identity in experimental ARM64 AOT when String
+  identity is observable. Reuse bounded arena copying while keeping unobservable
+  conversions allocation-free. Validate 47 Console AOT tests, exact allocation/cast/null
+  fault sites, and standalone Raven character output with integer interpolation across
+  seven Unicode/NUL cases and broken-pipe fault parity. String interfaces remain
+  unsupported; compiler, target configuration, public APIs and ABI layout are unchanged.
+
 - Add private String Object views to experimental ARM64 AOT. Preserve aliases,
   distinct literal evaluations, Object display, String round trips, nulls and invalid
   cast diagnostics. Materialize literals in the invocation arena when text identity

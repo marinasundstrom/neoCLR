@@ -1,0 +1,104 @@
+.module CharacterTextIdentity
+.type class Other
+.end
+.function Fresh() -> String
+.local Char c
+ldloca c
+initobj Char
+ldloc c
+call neoCLR.Runtime.CharText(Char)
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local String first
+.local String second
+.local String absent
+.local System.Object view
+.local System.Object alias
+call Fresh()
+stloc first
+call Fresh()
+stloc second
+ldloc first
+ldloc second
+ref.eq
+brtrue Failed
+ldloc first
+castclass System.Object
+stloc view
+ldloc first
+castclass System.Object
+stloc alias
+ldloc view
+ldloc alias
+ref.eq
+brfalse Failed
+ldloc view
+ldloc first
+ref.eq
+brfalse Failed
+ldloc view
+castclass String
+ldloc first
+ref.eq
+brfalse Failed
+ldloc view
+isinst Other
+ref.isnull
+brfalse Failed
+ldarg mode
+ldc.i4 1
+ceq
+brtrue BadClass
+ldarg mode
+ldc.i4 2
+ceq
+brtrue BadString
+ldarg mode
+ldc.i4 3
+ceq
+brtrue NullCall
+ldloca absent
+initobj String
+ldloc absent
+castclass System.Object
+castclass String
+ref.isnull
+brfalse Failed
+ldc.i4 42
+box Int32
+isinst String
+ref.isnull
+brfalse Failed
+ldloc view
+callvirt instance System.Object::ToString()
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldc.i4 0
+ret
+BadClass:
+ldloc view
+castclass Other
+pop
+ldc.i4 92
+ret
+BadString:
+ldc.i4 42
+box Int32
+castclass String
+pop
+ldc.i4 93
+ret
+NullCall:
+ldloca absent
+initobj String
+ldloc absent
+castclass System.Object
+callvirt instance System.Object::ToString()
+pop
+ldc.i4 94
+ret
+Failed:
+ldc.i4 91
+ret
+.end

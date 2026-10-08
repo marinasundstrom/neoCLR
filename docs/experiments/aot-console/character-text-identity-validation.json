@@ -1,0 +1,256 @@
+{
+  "profile": "raven-character-text-identity-v1",
+  "baseRevision": "a07f3883d6c7829ffa673c6d5fe5b4b36ec4ca07",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "inputs": {
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "eec237e8a924743fbf56ac9c24932cab0a92fbc35c9e2cc23d0a2fe4a5a9fc24",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "ac7efe36e95e2c848d81c7bef37fe8e270146f8222ea91cf4866c4348f043234",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "428f0709baf84634025e0d6387a5726edffb1bcc7c18d28795317705e5fb43de",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "bfbfda2f336a73059418c84899787d4f8cc680f27d4864d70785692b048d0382",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.deps.json": "c02d34dc57e38be4c1ad97a24aeea0a41f87ce4208e77072f6c5cdb4d7599832",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "6ca8ab4df3f3f57be16d971c56101ef83511f6ad151945cd7854174d85fb318c",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.deps.json": "8439a508ae1b5e7d33490958bfef66338c921292adf5a2eb3f22784cb5fb9ce0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "c59a935b707df3e6df0aa948ff77d7ff651e4994dec21c2b0f3169a5d22db2d7",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.runtimeconfig.json": "d093ce9035033b5e5815db98bc0e0fe667311b1109bfeff2ffa2394ef059290d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "af2354b2cf1154e0156295a18c1ec6adee23c0e5345a50907fb986512ea7d812",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "b3e0ee18fe6fcd81275b9f11867c48b2a86e8483963507b17414a73a9fca5012",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-host.c": "34db6501003bce9d6aa58e625aad2fad947d44721af1122625eef0bfc523419a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/verify_interpolation.py": "5e173b666e29c7a6da10f9f02fb22a7ac0b30e3b5b30e1961329a66093321d25",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "abc5c07f84e1b4f505bdd92b5d924acf10db2624ad0b348168567f1ee93a6dd0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "fdbc030dc54e16c71f9f915bb4785a7713cd93256bf9b049cc39f2fa4a00afad",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "3879e76fdbc6c093d08d863fa89ae81d47d67a1828202cd0f01c53a4e7a2bb46",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/Users/robert/Projects/neoclr/tools/aot-native-text/Cargo.toml": "90fa4fcf42f341cb55bdf284cae19cca4b5e3fc02475f5b11d5854689dec4d8f",
+    "/Users/robert/Projects/neoclr/tools/aot-native-text/Cargo.lock": "7b08d8d77dde6b320d690218447b41ff543749149b1443ac0789b6f53492b0e9",
+    "/Users/robert/Projects/neoclr/tools/aot-native-text/src/lib.rs": "9039e3909b4975995be94ccf91ef683c79046e4bbcb435d088a33585da9bc541",
+    "/Users/robert/Projects/neoclr/tools/aot-native-text/target/release/libneoclr_aot_native_text.a": "eff688a54ba1e2b816aee69274dd5806512161a6e53bf4beee036bf9ed80401e",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/character-text-identity.rvn": "c76a8ef33469aed6fc54ea653bfa4c68d8ffcb4be9ac9b409c4fbb802c7f5933"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/Cargo.toml"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": "    Finished `release` profile [optimized] target(s) in 0.06s\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--reference",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/character-text-identity.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "NeoMetadata_40F06379484B22DD865791EFFDEC8A238AD5C70F544AC7A940E4BAA32DB46193: typed-stack/control-flow verification passed (1755 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 0,
+      "stdout": "Item: 0\nA\nItem: 1\n\u00e5\nItem: 2\n\ud83d\ude00\nItem: 3\ne\u0301\nItem: 4\n\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66\nItem: 5\n\ud83c\uddf8\ud83c\uddea\nItem: 6\n\u0000\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-write-line",
+        "--bind-utf8-text",
+        "--bind-int32-to-string",
+        "--reference-arena",
+        "--bind-character-text"
+      ],
+      "exit": 0,
+      "stdout": "{\"schema\": \"neoclr-aot-inspection-v1\", \"admission\": {\"accepted\": true}, \"notice\": \"Build diagnostics only. Not a deployable metadata sidecar, stable ABI or export manifest.\"}",
+      "stderr": "",
+      "stdoutSha256": "6215566c77df7182aab8dbf757adef6b7c104d957a68846e7d47e778651ab082",
+      "stdoutOriginalBytes": 963862
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity.o",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-console-write-line",
+        "--bind-utf8-text",
+        "--bind-int32-to-string",
+        "--reference-arena",
+        "--bind-character-text"
+      ],
+      "exit": 0,
+      "stdout": "\": {\n        \"index\": 33,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"implementation\": \"console-write-line-v1\",\n      \"name\": \"neoCLR.Runtime.WriteLine\",\n      \"symbol\": \"neoclr_console_write_line_utf8_v1\"\n    },\n    {\n      \"compiledIndex\": 9,\n      \"definition\": {\n        \"index\": 2,\n        \"module\": \"System\"\n      },\n      \"implementation\": \"string-concat-v1\",\n      \"name\": \"neoCLR.Runtime.StringConcat\",\n      \"symbol\": \"neoclr_string_concat_v1\"\n    },\n    {\n      \"compiledIndex\": 10,\n      \"definition\": {\n        \"index\": 14,\n        \"module\": \"System\"\n      },\n      \"implementation\": \"char-text-v1\",\n      \"name\": \"neoCLR.Runtime.CharText\",\n      \"storage\": \"borrowed immutable image or invocation text; no allocation\",\n      \"validationSymbol\": null\n    },\n    {\n      \"compiledIndex\": 14,\n      \"definition\": {\n        \"index\": 92,\n        \"module\": \"System\"\n      },\n      \"implementation\": \"char-from-string-v1\",\n      \"name\": \"neoCLR.Runtime.CharFromString\",\n      \"storage\": \"borrowed immutable image or invocation text; no allocation\",\n      \"validationSymbol\": \"neoclr_is_single_grapheme_v1\"\n    }\n  ],\n  \"objectBaseProjection\": {\n    \"compiledIndex\": 0,\n    \"compiledName\": \"$aot_ObjectBase\",\n    \"policy\": \"verified empty Object base/ordinary constructor; private nominal base, no virtual Object slots\",\n    \"sourceName\": \"System.Object\"\n  },\n  \"objectDisplayDispatch\": [\n    {\n      \"contractCompiledIndex\": 4,\n      \"contractSourceIndex\": 174,\n      \"targets\": []\n    }\n  ],\n  \"policy\": \"explicit closed world with constructed-class implicit interface dispatch; ordinary selected bodies retained; verified Object.ToString override dispatch replaces its private slot body; no reflection, dynamic loading or general class virtual dispatch\",\n  \"referenceArena\": true,\n  \"root\": \"NeoMetadata_40F06379484B22DD865791EFFDEC8A238AD5C70F544AC7A940E4BAA32DB46193.F_4D61696E\",\n  \"schema\": \"neoclr-aot-selection-v1\",\n  \"specialization\": {\n    \"methods\": [],\n    \"policy\": \"up to 128 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 128 function clones and 512 selected functions; no constraints\",\n    \"types\": []\n  },\n  \"staticOwnerProjections\": [],\n  \"staticPrimitiveOwners\": [\n    {\n      \"compiledIndex\": 3,\n      \"lowering\": \"verified static wrapper to private free function\",\n      \"owner\": \"Char\"\n    },\n    {\n      \"compiledIndex\": 8,\n      \"lowering\": \"verified static wrapper to private free function\",\n      \"owner\": \"String\"\n    }\n  ],\n  \"stringInstanceProjections\": [],\n  \"types\": [\n    {\n      \"compiledIndex\": 0,\n      \"compiledName\": \"$aot_ObjectBase\",\n      \"definition\": {\n        \"index\": 8,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.Object\",\n      \"sourceIndex\": 8\n    },\n    {\n      \"compiledIndex\": 1,\n      \"definition\": {\n        \"index\": 208,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65\",\n      \"sourceIndex\": 208\n    },\n    {\n      \"compiledIndex\": 2,\n      \"definition\": {\n        \"index\": 221,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573\",\n      \"sourceIndex\": 221\n    },\n    {\n      \"compiledIndex\": 3,\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"System\"\n      },\n      \"name\": \"System.Runtime.CompilerServices.RuntimeServices\",\n      \"sourceIndex\": 335\n    }\n  ],\n  \"verifiedInterfaceRelationships\": []\n}\n",
+      "stderr": "",
+      "stdoutSha256": "49270cd45e8c94a397c1002a19518eb209aeb2a53d97befd3c5a47c423bd047f",
+      "stdoutOriginalBytes": 910755
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity.o",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/release/libneoclr_aot_native_text.a",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity.o"
+      ],
+      "exit": 0,
+      "stdout": "_neoclr_allocate_object_v1\n_neoclr_console_write_line_utf8_v1\n_neoclr_int32_to_string_v1\n_neoclr_is_single_grapheme_v1\n_neoclr_string_concat_v1\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity.dll",
+        "--system",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+        "--object-root",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "RuntimeError: Runtime error\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573.M_57726974654C696E65 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65.M_57726974654C696E65 [instruction 1]\n   at NeoMetadata_40F06379484B22DD865791EFFDEC8A238AD5C70F544AC7A940E4BAA32DB46193.F_4563686F [instruction 5]\n   at NeoMetadata_40F06379484B22DD865791EFFDEC8A238AD5C70F544AC7A940E4BAA32DB46193.F_4D61696E [instruction 3]\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/aot-console-character-text-identity/character-text-identity"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "RuntimeError: Runtime error\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573.M_57726974654C696E65 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65.M_57726974654C696E65 [instruction 1]\n   at NeoMetadata_40F06379484B22DD865791EFFDEC8A238AD5C70F544AC7A940E4BAA32DB46193.F_4563686F [instruction 5]\n   at NeoMetadata_40F06379484B22DD865791EFFDEC8A238AD5C70F544AC7A940E4BAA32DB46193.F_4D61696E [instruction 3]\n"
+    }
+  ],
+  "character-text-identity": {
+    "assemblySha256": "3284aa6739dc669dcc7b00dafedb5aabc953e805c35a1a3f08f20d13970939ab",
+    "stdout": "Item: 0\nA\nItem: 1\n\u00e5\nItem: 2\n\ud83d\ude00\nItem: 3\ne\u0301\nItem: 4\n\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66\nItem: 5\n\ud83c\uddf8\ud83c\uddea\nItem: 6\n\u0000\n",
+    "admission": {
+      "accepted": true
+    },
+    "brokenPipeFaultParity": "RuntimeError: Runtime error\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573.M_57726974654C696E65 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65.M_57726974654C696E65 [instruction 1]\n   at NeoMetadata_40F06379484B22DD865791EFFDEC8A238AD5C70F544AC7A940E4BAA32DB46193.F_4563686F [instruction 5]\n   at NeoMetadata_40F06379484B22DD865791EFFDEC8A238AD5C70F544AC7A940E4BAA32DB46193.F_4D61696E [instruction 3]\n",
+    "executableSha256": "058863cc407625bdafe5dc296046d4fb7980293d6577b9ae3f98ff06483aea32",
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ],
+    "executableOnlyDirectory": true,
+    "emptyEnvironment": true,
+    "nativeMatchesInterpreter": true
+  }
+}

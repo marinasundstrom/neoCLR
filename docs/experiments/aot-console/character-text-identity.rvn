@@ -1,0 +1,17 @@
+import System.*
+
+func Echo(value: char, index: int) {
+    Console.WriteLine("Item: $index")
+    Console.WriteLine(value)
+}
+
+func Main() -> int {
+    Echo('A', 0)
+    Echo('å', 1)
+    Echo('😀', 2)
+    Echo(Char.FromString("é"), 3)
+    Echo(Char.FromString("👨‍👩‍👧‍👦"), 4)
+    Echo(Char.FromString("🇸🇪"), 5)
+    Echo('\0', 6)
+    return 0
+}

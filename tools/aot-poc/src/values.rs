@@ -94,6 +94,27 @@ fn text_object_view(b: &mut FunctionBuilder<'_>, value: ir::Value) -> ir::Value 
     b.ins().select(present, tagged, value)
 }
 
+// Copy immutable bytes into a fresh String owner when identity is observable.
+fn copy_text(module: &mut ObjectModule, b: &mut FunctionBuilder<'_>,
+    binding: (cranelift_module::FuncId, cranelift_module::DataId), pointer: ir::Value,
+    context: ir::Value, site: Option<&crate::fault_details::Site>) -> ir::Value {
+    let service = module.declare_func_in_func(binding.0, b.func);
+    let empty = module.declare_data_in_func(binding.1, b.func);
+    let empty = b.ins().global_value(types::I64, empty);
+    let storage = slot(b, 8);
+    let output = b.ins().stack_addr(types::I64, storage, 0);
+    let arena = b.ins().iadd_imm(context, 1048);
+    let call = b.ins().call(service, &[pointer, empty, arena, output]);
+    let raw = b.inst_results(call)[0];
+    let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+    let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+    let memory = b.ins().iconst(types::I32, 5);
+    let runtime = b.ins().iconst(types::I32, 3);
+    let status = b.ins().select(exhausted, memory, runtime);
+    return_if_detailed(b, failed, status, site);
+    b.ins().load(types::I64, MemFlags::new(), output, 0)
+}
+
 fn null_reference(b: &mut FunctionBuilder<'_>, pointer: ir::Value, site: Option<&crate::fault_details::Site>) {
     let null = b.ins().icmp_imm(IntCC::Equal, pointer, 0);
     let status = b.ins().iconst(types::I32, 6);
@@ -139,11 +160,6 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         matches!(op, Op::CastClass(t) | Op::IsInstance(t) if matches!(p.ty(t), Ok(Ty::Interface(_))))
     })) {
         return Err("String Object views with interface casts require String interface metadata support".into());
-    }
-    // CharText currently shares a value-representation pointer; its fresh String
-    // identity requires a separate producer adaptation before exposing it here.
-    if text_identity && details.is_some_and(|d| !d.char_text.is_empty()) {
-        return Err("String identity with CharText requires a fresh text producer".into());
     }
     // The backend's narrow shape analysis is additional admission, not a replacement
     // for type/member identity, accessibility, initialization or byref lifetime checks.
@@ -519,6 +535,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     let invalid = b.ins().icmp_imm(IntCC::NotEqual, valid, 1);
                     return_if_detailed(&mut b, invalid, status, Some(&site));
                 }
+                let pointer = if details.unwrap().char_text.contains(&i) {
+                    if let Some(binding) = text_copy {
+                        copy_text(&mut module, &mut b, binding, pointer, fault_context.unwrap(), Some(&site))
+                    } else { pointer }
+                } else { pointer };
                 write(&mut b, output, &[pointer]);
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
@@ -656,22 +677,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     Op::String(_) => {
                         let data = module.declare_data_in_func(literals[&(i, pc)], b.func);
                         let pointer = b.ins().global_value(types::I64, data);
-                        if let Some((service, empty)) = text_copy {
-                            let service = module.declare_func_in_func(service, b.func);
-                            let empty = module.declare_data_in_func(empty, b.func);
-                            let empty = b.ins().global_value(types::I64, empty);
-                            let storage = slot(&mut b, 8);
-                            let output = b.ins().stack_addr(types::I64, storage, 0);
-                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                            let call = b.ins().call(service, &[pointer, empty, arena, output]);
-                            let raw = b.inst_results(call)[0];
-                            let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                            let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
-                            let memory = b.ins().iconst(types::I32, 5);
-                            let runtime = b.ins().iconst(types::I32, 3);
-                            let status = b.ins().select(exhausted, memory, runtime);
-                            return_if_detailed(&mut b, failed, status, site.as_ref());
-                            stack.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
+                        if let Some(binding) = text_copy {
+                            let owned = copy_text(&mut module, &mut b, binding, pointer, fault_context.unwrap(), site.as_ref());
+                            stack.push(owned);
                         } else { stack.push(pointer); }
                     }
                     Op::IsInstance(neoclr::metadata::Type::String) | Op::CastClass(neoclr::metadata::Type::String) if *top() == Ty::Literal => (),
