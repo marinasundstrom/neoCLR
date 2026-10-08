@@ -1,0 +1,51 @@
+.module SocketLifecycle
+.function Calculate(Int32 mode) -> Int32
+.local Int64 handle
+ldstr "127.0.0.1"
+ldc.i4 0
+ldc.i4 4
+call neoCLR.Runtime.SocketListen(String,Int32,Int32)
+value.unpack Int64
+stloc handle
+ldarg mode
+ldc.i4 1
+beq Fault
+ldarg mode
+ldc.i4 2
+beq Forgotten
+ldloc handle
+call neoCLR.Runtime.SocketLocalPort(Int64)
+value.unpack Int32
+ldc.i4 0
+cgt
+brfalse Failed
+ldloc handle
+call neoCLR.Runtime.SocketClose(Int64)
+pop
+ldloc handle
+call neoCLR.Runtime.SocketClose(Int64)
+pop
+ldloc handle
+call neoCLR.Runtime.SocketLocalPort(Int64)
+value.unpack Byte
+ldc.i4 1
+ceq
+brfalse Failed
+Forgotten:
+ldc.i4 42
+ret
+Fault:
+fault "socket fault"
+Failed:
+ldc.i4 -1
+ret
+.end
+.function neoCLR.Runtime.SocketListen(String address,Int32 port,Int32 backlog) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketLocalPort(Int64 handle) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketClose(Int64 handle) -> Value
+.methodimpl InternalCall
+.end

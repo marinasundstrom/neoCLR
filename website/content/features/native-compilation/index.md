@@ -38,9 +38,9 @@ listen on a socket or measure HTTP throughput.
 
 [Web and HTTP](../web/) explains the existing application APIs and server case.
 The server source compiles to neoCLR metadata, but its native dependency selection
-currently rejects function-valued generic arguments. Wide socket-handle values now
-compile, but the isolated listener still needs native socket service bindings. Task
-integration and sustained
+currently rejects function-valued generic arguments. The ordinary Raven socket listener now runs in both modes,
+including local-port lookup, typed errors, close and host cleanup on faults. Async
+accept/read/write, task integration and sustained
 server execution are not yet qualified in AOT.
 
 ## Measurements and comparisons
@@ -92,8 +92,8 @@ an advantage over it; useful comparisons require equivalent behavior and measure
   comes from macOS ARM64. Use the matching development Raven/compiler/library bundle.
   This is not a general-purpose native publishing command for every neoCLR app.
 - **Library coverage:** Hello World, unions, console/text operations and selected routing
-  paths work. Broader generics, async/task and socket paths still need admission and
-  native service support. Interpreter API availability does not imply AOT availability.
+  paths work. Listener creation and cleanup also work. Broader generics, async/task and
+  socket accept/read/write paths still need admission and native service support. Interpreter API availability does not imply AOT availability.
 - **Memory:** the opt-in collector is nonmoving and conservatively scans object payloads.
   It can retain extra objects, fragment its bounded buffer and collect too frequently.
   Precise maps, pressure scheduling and general host root handles remain open.

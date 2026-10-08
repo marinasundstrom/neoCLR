@@ -14,7 +14,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   socket-handle and listener probes: the former runs in both modes, while the listener
   advances from UnpackValue<long> rejection to unbound native socket services. Report
   the unsupported generic shape explicitly for the full HTTP app. No interpreter or
-  public library/bridge contract changes.
+  public library/bridge contract changes. Follow with explicit `--bind-socket-listener`
+  support for the ordinary Raven Listen/GetLocalPort/Close path. A bounded host scope
+  owns opaque handles and closes outstanding listeners after guest success or faults;
+  validate typed errors, stale/foreign handles, resource limits and exact fault parity.
+  Standalone macOS ARM64 listener samples pass; async sockets/tasks and HTTP remain open.
 
 - Add a native-web benchmark workbench with a checked-in Raven routing workload,
   same-artifact interpreted/native process measurements, provenance and HTTP server

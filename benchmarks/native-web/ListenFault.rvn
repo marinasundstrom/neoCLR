@@ -1,0 +1,12 @@
+import System.*
+import System.Result.*
+import System.Networking.Sockets.*
+
+func Main() -> int {
+    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 4) else {
+        return 1
+    }
+    // Deliberately skip Close: the host must release the descriptor on this fault.
+    System.Fail("socket fault")
+    return 0
+}

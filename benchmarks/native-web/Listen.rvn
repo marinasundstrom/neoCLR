@@ -3,13 +3,34 @@ import System.Result.*
 import System.Networking.Sockets.*
 
 func Main() -> int {
-    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 4) else {
+    let Error(SocketError.InvalidAddress) = Socket.Listen("127.00.0.1", 0, 4) else {
         return 1
     }
-    let port = listener.GetLocalPort()
-    listener.Close()
-    let Ok(value) = port else {
+    let Error(SocketError.InvalidRange) = Socket.Listen("127.0.0.1", -1, 4) else {
         return 2
     }
-    return if value > 0 { 0 } else { 3 }
+    let Error(SocketError.InvalidRange) = Socket.Listen("127.0.0.1", 0, 0) else {
+        return 3
+    }
+    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 4) else {
+        return 4
+    }
+    let Ok(port) = listener.GetLocalPort() else {
+        listener.Close()
+        return 5
+    }
+    let Error(SocketError.AddressInUse) = Socket.Listen("127.0.0.1", port, 4) else {
+        listener.Close()
+        return 6
+    }
+    listener.Close()
+    listener.Close()
+    let Error(SocketError.Closed) = listener.GetLocalPort() else {
+        return 7
+    }
+    let Ok(reopened) = Socket.Listen("127.0.0.1", port, 4) else {
+        return 8
+    }
+    reopened.Close()
+    return if port > 0 { 0 } else { 9 }
 }

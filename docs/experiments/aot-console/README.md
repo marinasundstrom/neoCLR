@@ -1967,3 +1967,12 @@ unbound contract. The full HTTP app additionally needs function-valued generic s
 [Focused validation](../../../benchmarks/native-web/handle-validation.json) includes
 boundary values, high-bit inequality, mismatch faults and existing native GC tests.
 No Raven compiler/CLI bridge or public library signature changes are involved.
+
+
+## Native listener lifecycle — 2026-10-08
+
+`--bind-socket-listener` now compiles the ordinary Raven Socket.Listen/GetLocalPort/Close
+path with statically linked POSIX adapters and an explicit host-owned cleanup scope.
+Typed errors and fault output match interpreter execution; outstanding listeners close
+even when guest code faults. See the [contract, limits and validation](socket-listener.md).
+Async accept/read/write and the full HTTP app remain work in progress.

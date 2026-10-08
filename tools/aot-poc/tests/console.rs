@@ -3064,3 +3064,76 @@ int main(void) {
     let fault = method.invoke(vec![neoclr::Value::Int32(1)], neoclr::Limits::default()).unwrap_err();
     assert_eq!(String::from_utf8_lossy(&r.stderr), fault.diagnostic().to_string());
 }
+
+const SOCKET_SEED: &str = ".module System\n.references ()\n";
+
+#[test]
+fn socket_listener_binding_requires_explicit_exact_contracts() {
+    let source = include_str!("../../../docs/experiments/aot-console/socket-listener.neoil");
+    let seed = neoclr::assemble(SOCKET_SEED).unwrap();
+    for flags in [vec![], vec!["--bind-socket-listener"], vec!["--compile-system", "--bind-socket-listener"], vec!["--compile-system", "--reference-arena"], vec!["--compile-system", "--reference-arena", "--bind-socket-listener", "--bind-socket-listener"]] {
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, source, &flags, false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    }
+    for index in 0..3 {
+        let mut changed = source.to_owned();
+        let at = changed.match_indices(".methodimpl InternalCall").nth(index).unwrap().0;
+        changed.replace_range(at..at + ".methodimpl InternalCall".len(), "ldvoid\nvalue.pack Void\nret");
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, &changed, &["--compile-system", "--reference-arena", "--bind-socket-listener"], false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists());
+        assert!(String::from_utf8_lossy(&r.stderr).contains("exact reserved Socket"), "{}", String::from_utf8_lossy(&r.stderr));
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_socket_listener_lifecycle_cleans_faults_and_unclosed_handles() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(SOCKET_SEED).unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/socket-listener.neoil");
+    let flags = ["--compile-system", "--reference-arena", "--bind-socket-listener", "--native-gc"];
+    let r = compile_source(&dir, &seed, source, &flags, true);
+    let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["admission"]["accepted"], true, "{report}");
+    assert_eq!(report["selection"]["nativeBindings"].as_array().unwrap().len(), 3);
+    let r = compile_source(&dir, &seed, source, &flags, false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    assert_eq!(serde_json::from_slice::<serde_json::Value>(&r.stdout).unwrap(), report["selection"]);
+    fs::write(dir.0.join("host.c"), r#"
+#include "socket-listener.h"
+#include "root-probe.h"
+#include <errno.h>
+#include <fcntl.h>
+int main(void) {
+    uint64_t storage[8192];
+    neoclr_aot_context c = {.text = {(unsigned char *)storage, sizeof(storage), 0}};
+    int32_t result = -99;
+    if (neoclr_entry_v4(0, &result, &c) != 3 || result != -99 || c.fault.code != 3 || neoclr_root_probe_head_v1()) return 1;
+    for (int i = 0; i < 3; i++) {
+        neoclr_socket_scope scope;
+        if (neoclr_socket_scope_enter_v1(&scope, &c)) return 2;
+        result = -99;
+        int status = neoclr_entry_v4(i, &result, &c);
+        if (status != (i == 1 ? 4 : 0) || result != (i == 1 ? -99 : 42) || neoclr_root_probe_head_v1()) return 3;
+        int count = 0, descriptor = -1;
+        for (int j = 0; j < 64; j++) if (scope.slots[j].id) { count++; descriptor = scope.slots[j].descriptor; }
+        if (count != (i == 0 ? 0 : 1) || neoclr_socket_scope_leave_v1(&scope)) return 4;
+        if (count && (fcntl(descriptor, F_GETFD) != -1 || errno != EBADF)) return 5;
+    }
+    return 0;
+}
+"#).unwrap();
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    for (name, inputs) in [
+        ("kernel", vec![base.join("socket-listener-test.c"), base.join("socket-listener.c")]),
+        ("compiled", vec![dir.0.join("host.c"), dir.0.join("app.o"), base.join("socket-listener.c"), base.join("root-probe.c"), base.join("native-gc.c"), base.join("text-arena.c")]),
+    ] {
+        let binary = dir.0.join(name);
+        let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds", "-DNEOCLR_NATIVE_GC", "-I"]).arg(&base).args(inputs).arg("-o").arg(&binary).output().unwrap();
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let r = Command::new(binary).output().unwrap();
+        assert!(r.status.success(), "{r:?}");
+    }
+}

@@ -303,6 +303,21 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             for index in indices { stream_services.insert(*index, service); }
         }
     }
+    let mut socket_services = std::collections::HashMap::new();
+    if let Some(d) = details {
+        for (indices, symbol, parameters) in [
+            (&d.socket_listen, "neoclr_socket_listen_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
+            (&d.socket_local_port, "neoclr_socket_local_port_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.socket_close, "neoclr_socket_close_v1", vec![types::I64, types::I64, types::I64]),
+        ] {
+            if indices.is_empty() { continue; }
+            let mut sig = module.make_signature();
+            sig.params.extend(parameters.into_iter().map(AbiParam::new));
+            sig.returns.push(AbiParam::new(types::I32));
+            let service = module.declare_function(symbol, Linkage::Import, &sig)?;
+            for index in indices { socket_services.insert(*index, service); }
+        }
+    }
     let mut utf8_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
@@ -546,6 +561,26 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[status]);
                 b.seal_all_blocks();
                 b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
+                module.define_function(ids[i], &mut context)?;
+                continue;
+            }
+            if let Some(service) = socket_services.get(&i) {
+                let service = module.declare_func_in_func(*service, b.func);
+                let mut args = parameters[..p.args[i].len()].to_vec();
+                args.extend([fault_context.unwrap(), output]);
+                let call = b.ins().call(service, &args);
+                let raw = b.inst_results(call)[0];
+                let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                let status = b.ins().iconst(types::I32, 3);
+                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                site.capture_frame = false;
+                return_if_detailed(&mut b, failed, status, Some(&site));
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks(); b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
                     probes.finish(&mut module, &mut context.func, frame);
                 }

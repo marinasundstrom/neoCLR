@@ -95,10 +95,18 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if bind_integer_text && !compile_system {
         return Err("--bind-integer-text requires --compile-system".into());
     }
+    let socket_count = args.iter().filter(|a| *a == "--bind-socket-listener").count();
+    if socket_count > 1 { return Err("duplicate --bind-socket-listener option".into()); }
+    let bind_socket_listener = socket_count == 1;
+    args.retain(|a| a != "--bind-socket-listener");
+    if bind_socket_listener && !compile_system {
+        return Err("--bind-socket-listener requires --compile-system".into());
+    }
     let reference_count = args.iter().filter(|a| *a == "--reference-arena").count();
     if reference_count > 1 { return Err("duplicate --reference-arena option".into()); }
     let reference_arena = reference_count == 1;
     args.retain(|a| a != "--reference-arena");
+    if bind_socket_listener && !reference_arena { return Err("--bind-socket-listener requires --reference-arena".into()); }
     if native_gc && !reference_arena { return Err("--native-gc requires --reference-arena".into()); }
     if reference_arena && !compile_system {
         return Err("--reference-arena requires --compile-system".into());
@@ -149,7 +157,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
     {
         return Err(
-            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-utf8-text binds UTF-8 encoding/decoding, concatenation, ordinal predicates, byte counts and scalar-boundary slices with --reference-arena; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds Int32 parsing, signed/unsigned 64-bit formatting and native-width conversion services; --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics; --probe-stack-roots adds a read-only pre-operation spill callback (requires a context-enabled profile, not a collector); --native-gc enables experimental nonmoving collection with --reference-arena and a matching statically linked GC adapter"
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-utf8-text binds UTF-8 encoding/decoding, concatenation, ordinal predicates, byte counts and scalar-boundary slices with --reference-arena; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds Int32 parsing, signed/unsigned 64-bit formatting and native-width conversion services; --bind-socket-listener binds Listen/LocalPort/Close to an explicit host socket scope (requires --reference-arena); --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics; --probe-stack-roots adds a read-only pre-operation spill callback (requires a context-enabled profile, not a collector); --native-gc enables experimental nonmoving collection with --reference-arena and a matching statically linked GC adapter"
                 .into(),
         );
     }
@@ -220,6 +228,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 bind_utf8_text,
                 bind_character_text,
                 bind_integer_text,
+                bind_socket_listener,
                 reference_arena,
             })
         })

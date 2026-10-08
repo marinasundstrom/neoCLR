@@ -43,10 +43,10 @@ one persistent server process, correctness/cleanup tests and matched HTTP load b
 publishing server comparisons. [Native compilation](../website/content/features/native-compilation/index.md)
 has its own feature page and homepage entry. Any next-release POC remains explicitly
 **work in progress**, with limitations and timing scope next to results. A socket-handle prerequisite now adds exact Int64/UInt64 erased transport, generic
-specialization and equality. The isolated listener passes interpreter execution and
-reaches unbound native socket services; the full server additionally reaches unsupported
-function-valued generic arguments. Next bind the listener lifecycle with explicit
-host cleanup, then address async/callback dependencies. Component benchmarks do not
+specialization and equality. The isolated listener now runs in both modes with exact native service bindings and
+explicit host-scope cleanup, including guest fault exits. The full server still reaches
+unsupported function-valued generic arguments. Next address callback representation,
+root ownership and asynchronous socket/task services. Component benchmarks do not
 qualify a server.
 
 **Author clarification:** build the CIL-to-native, self-contained executable foundation

@@ -61,18 +61,22 @@ selection rejection and a successful .NET greeting correctness check (JIT, no ti
 values. Native erased values also admit Int64 and UInt64 with distinct private tags;
 IL tests cover exact high bits, copies, calls and mismatched unpack faults. The
 interpreter already supports this behavior, so no interpreter change was needed.
-`Listen.rvn` isolates Socket.Listen/GetLocalPort/Close and passes interpreter execution.
-Its AOT selection now reaches the unbound native SocketClose contract, after removing
-the earlier UnpackValue<long> specialization blocker. This does not enable native
-networking yet. The complete HTTP server also reaches a function-valued generic
-argument, which remains unsupported. [Commands and evidence](handle-validation.json).
+`Listen.rvn` now executes Socket.Listen/GetLocalPort/Close in both modes, including
+invalid addresses/ranges, duplicate binding, idempotent close, stale handles and port
+reuse. `ListenFault.rvn` leaves a listener open before a user fault; the native host
+releases it and matches interpreter fault output. The complete HTTP server still
+reaches a function-valued generic argument and needs asynchronous socket/task support.
+[Wide-value evidence](handle-validation.json) records the earlier admission boundary;
+[current listener evidence](listener-validation.json) records the completed lifecycle.
 This is correctness/admission work, not a performance optimization; the routing
 benchmark is unaffected and was not rerun for a speed claim.
 
 ## HTTP comparison contract and next slices
 
-1. Unblock AOT admission of the existing server dependency graph, then statically link
-   native socket/task services with complete GC roots and fault/cleanup behavior.
+1. Listener creation/local port/close now work with `--bind-socket-listener` and an
+   explicit host resource scope. Continue with function-valued dependencies, callback
+   ownership and async accept/read/write; the existing server must compile and retain
+   pending callbacks safely across collections.
 2. Extend the Raven app to serve a controlled number of requests in one process. Run
    the **same** source/artifact in interpreted and native modes with the same listener,
    handler and response. Check bytes, UTF-8 Content-Length, connection closure,
@@ -124,3 +128,19 @@ and [Native AOT deployment contract](https://learn.microsoft.com/en-us/dotnet/co
 this workbench does not yet claim that validation. neoCLR similarly links runtime
 support into its image; an OS library dependency remains. Its bounded GC/API coverage
 is much smaller. No performance advantage follows from that difference alone.
+
+
+## Reproduce listener lifecycle validation
+
+```sh
+SDKROOT=$(xcrun --show-sdk-path) python3 benchmarks/native-web/verify_listener.py \
+  --compiler /path/to/rvnc.dll --runtime target/release/neoclr \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --bundle /path/to/neoclr-native-poc --output target/native-listener-rerun
+```
+
+This opens only test loopback listeners, closes them on success/fault and compares
+Raven interpreter/native output. It checks opt-in admission, sanitized adapters and
+standalone dependency lists. No requests are accepted and no throughput is measured.
+The [private native hosting contract](../../docs/experiments/aot-console/socket-listener.md)
+requires entering/leaving a socket scope for every invocation; GC is not descriptor cleanup.

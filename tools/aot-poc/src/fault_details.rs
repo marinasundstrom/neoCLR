@@ -16,6 +16,9 @@ pub struct Options {
     pub console_write_line: Vec<usize>,
     pub console_write_bytes: Vec<usize>,
     pub console_flush: Vec<usize>,
+    pub socket_listen: Vec<usize>,
+    pub socket_local_port: Vec<usize>,
+    pub socket_close: Vec<usize>,
     pub parse_int32: Vec<usize>,
     pub int32_to_string: Vec<usize>,
     pub string_contains_ordinal: Vec<usize>,
@@ -73,6 +76,15 @@ impl Options {
                     ))
                 })
                 .collect(),
+            socket_listen: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-listen-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            socket_local_port: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-local-port-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            socket_close: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-close-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             console_write_line: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter().flatten()

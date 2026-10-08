@@ -349,3 +349,32 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
     }
     Ok(bindings)
 }
+
+/// Bounded synchronous listener lifecycle, with resources owned by a host scope.
+pub fn socket_listener(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        let (parameters, implementation, symbol) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.SocketListen") => (vec![Type::String, Type::Int32, Type::Int32], "socket-listen-v1", "neoclr_socket_listen_v1"),
+            Some("neoCLR.Runtime.SocketLocalPort") => (vec![Type::Int64], "socket-local-port-v1", "neoclr_socket_local_port_v1"),
+            Some("neoCLR.Runtime.SocketClose") => (vec![Type::Int64], "socket-close-v1", "neoclr_socket_close_v1"),
+            _ => continue,
+        };
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != row["name"].as_str().unwrap()
+            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != parameters || f.returns != Type::Value || f.no_result
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
+            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
+        { return Err("native socket listener binding requires exact reserved SocketListen/SocketLocalPort/SocketClose InternalCall contract".into()); }
+        f.impl_flags = 0;
+        f.body = vec![Op::Void, Op::PackValue(Type::Void), Op::Return];
+        bindings.push(json!({"definition": row["definition"], "name": row["name"],
+            "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
+            "storage": "explicit host socket scope; 64 listeners; no guest references or callbacks retained"}));
+    }
+    Ok(bindings)
+}
