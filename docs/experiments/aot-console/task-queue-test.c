@@ -9,6 +9,7 @@ int main(void) {
     CHECK(!neoclr_task_scope_enter_v1(&scope, &c));
     CHECK(neoclr_task_scope_enter_v1(&nested, &c) == 3);
     CHECK(!neoclr_task_queue_default_v1(&c, &read) && !read);
+    CHECK(!neoclr_task_queue_host_read_v1(&c, &read) && !read);
     CHECK(!neoclr_gc_allocate_v1(&c.text, 16, NEOCLR_GC_OBJECT, &queue));
     int32_t unit = -99;
     CHECK(neoclr_task_queue_register_v1(NULL, &c, &unit) == 3 && unit == -99);
@@ -25,6 +26,8 @@ int main(void) {
     CHECK(!neoclr_task_queue_current_v1(&c, 42, -1, &read) && read == explicit_queue);
     CHECK(!neoclr_task_queue_current_v1(&c, -1, 42, &read) && read == explicit_queue);
     CHECK(!neoclr_task_queue_default_v1(&c, &read) && read == queue);
+    read = (void *)(uintptr_t)123;
+    CHECK(neoclr_task_queue_host_read_v1(&c, &read) == 3 && read == (void *)(uintptr_t)123);
     CHECK(neoclr_task_scope_leave_v1(&scope) == 3);
     CHECK(!neoclr_task_scope_enter_v1(&nested, &other));
     CHECK(!neoclr_task_queue_current_v1(&other, 42, -1, &read) && !read);
@@ -32,6 +35,10 @@ int main(void) {
     CHECK(!neoclr_task_scope_leave_v1(&nested));
     neoclr_probe_leave_v1(&frame);
     CHECK(!neoclr_task_queue_current_v1(&c, 42, -1, &read) && read == queue);
+    CHECK(!neoclr_task_queue_host_read_v1(&c, &read) && read == queue);
+    c.fault.code = 9; read = (void *)(uintptr_t)123;
+    CHECK(neoclr_task_queue_host_read_v1(&c, &read) == 3 && read == (void *)(uintptr_t)123 && c.fault.code == 9);
+    c.fault.code = 0;
     CHECK(!neoclr_task_scope_leave_v1(&scope));
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used && !neoclr_gc_entry_check_v1(&c));
     CHECK(buffer[128] == 1234567);

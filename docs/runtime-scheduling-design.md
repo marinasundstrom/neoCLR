@@ -355,3 +355,42 @@ preserves existing default and active explicit-queue behavior in a Raven consume
 It uses a private published-frame convention and does not implement host queue pumping
 or runtime suspension. Its passing affinity test preserves current behavior, not a
 permanent choice of producer-queue affinity or scheduler API.
+
+### Scheduler clarification — author follow-up, 2026-10-08
+
+The author reiterates that TaskQueue may be replaced by a Scheduler, with the runtime
+eventually scheduling green threads. Treat that as the direction to investigate,
+not a commitment to preserve the current library queue as the scheduler abstraction.
+The native host Drain entry is a compatibility adapter for today's library implementation.
+It must not become a public scheduler ABI or encode TaskQueue fields into native hosts.
+
+The proposed runtime Scheduler owns runnable/suspended activation state, admission,
+wakeup/cancellation transitions and activation roots. A Function describes callable
+work; invoking one can start work but does not make that object a green thread. I/O
+completion should signal readiness through an adapter, leaving the scheduler to choose
+when an activation runs. Task/Promise completion and application queue-affinity policy
+remain distinct questions. TaskQueue could later become a facade, a serial executor,
+or a deprecated API; that migration is still open. The native pthread stack probe and
+TLS roots must be replaced or adapted for owned green-thread stacks/activations.
+
+No stackful/stackless model, public Scheduler API, preemption or carrier-migration
+policy is selected by this clarification. Continue the HTTP POC using current APIs,
+then use workload evidence to evaluate scheduling and suspension implementations.
+
+### Cross-cutting runtime services — author clarification, 2026-10-08
+
+The author explicitly asks that native-compilation work benefit interpreted execution
+and eventually JIT, summarizing the intended architecture as “cross-cutting runtime
+services”. Use that as the design direction: shared service contracts for scheduling,
+activation lifecycle, I/O readiness/cancellation, root ownership and logical fault
+reporting, with execution-specific adapters. It does not require identical storage or
+machine code across backends. Interpreter frames, native stack guards and future JIT
+stack maps are backend mechanisms; their observable lifecycle and fault contracts
+must remain compatible.
+
+For each slice, identify shared invariants and reusable cross-mode consumer tests,
+then identify the backend mechanism and its replacement boundary. Port a fix or
+optimization to the interpreter when it applies and validate it there; do not claim
+that a native-only adapter automatically improves interpreter performance. The current
+Raven queue success/fault consumers exercise the same artifact in both modes. They
+can later qualify a Scheduler adapter, while host Drain exports remain private.

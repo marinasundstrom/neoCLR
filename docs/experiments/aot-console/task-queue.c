@@ -47,3 +47,9 @@ int32_t neoclr_task_queue_current_v1(neoclr_aot_context *context, int32_t run, i
     }
     return neoclr_task_queue_default_v1(context, output);
 }
+int32_t neoclr_task_queue_host_read_v1(neoclr_aot_context *context, void **output) {
+    if (!context || context->fault.code || !output || !find(context)) return 3;
+    for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
+        if (f->context == context) return 3;
+    return neoclr_task_queue_default_v1(context, output);
+}

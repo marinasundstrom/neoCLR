@@ -301,7 +301,13 @@ pub(super) fn select_inventory(
     root: &str,
     single_assembly: bool,
 ) -> Result<(neoclr::Module, Value), Error> {
+    select_inventory_with_host_roots(input, root, single_assembly, &[])
+}
+pub(super) fn select_inventory_with_host_roots(
+    input: &neoclr::Module, root: &str, single_assembly: bool, host_roots: &[usize],
+) -> Result<(neoclr::Module, Value), Error> {
     validate_source(input, single_assembly)?;
+    if host_roots.iter().any(|i| *i >= input.functions.len()) { return Err("host root index out of range".into()); }
     let roots: Vec<_> = input
         .functions
         .iter()
@@ -314,6 +320,7 @@ pub(super) fn select_inventory(
     };
     let mut functions = BTreeSet::new();
     let mut pending = vec![*root_index];
+    pending.extend_from_slice(host_roots);
     loop {
         while let Some(i) = pending.pop() {
             if !functions.insert(i) {
@@ -510,6 +517,7 @@ pub(super) fn select_inventory(
         .and_then(|source| type_rows.binary_search(&source).ok().map(|compiled| json!({"sourceIndex":source,"compiledIndex":compiled,
             "policy":"verified nominal byte-array backing; identity-preserving views and intrinsic storage field"})));
     let report = json!({"schema":"neoclr-aot-selection-v1", "module":input.name, "root":root,
+        "hostRoots": host_roots.iter().map(|i| json!({"sourceIndex":i,"compiledIndex":rows.binary_search(i).unwrap(),"name":input.functions[*i].name,"reason":"explicit runtime adapter"})).collect::<Vec<_>>(),
         "policy":"explicit closed world with constructed-class implicit interface dispatch; ordinary selected bodies retained; verified Object.ToString override dispatch replaces its private slot body; no reflection, dynamic loading or general class virtual dispatch",
         "stringInterfaceDispatch":string_dispatch, "interfaceDispatch":dispatch, "objectDisplayDispatch":object_dispatch, "arrayBackingProjection":array_backing,
         "metadataPolicy":"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",

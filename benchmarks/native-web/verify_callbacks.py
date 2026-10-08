@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
-p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue'))
+p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault'))
 a = p.parse_args()
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
@@ -20,9 +20,9 @@ library = bundle / 'lib' if (bundle / 'lib').is_dir() else bundle
 seed, core, ownership = (library / n for n in ('System.runtime.neox', 'Core.dll', 'ownership.json'))
 libs = [library / n for n in ('System.Runtime.dll', 'System.Web.dll', 'System.Networking.dll', 'System.Data.dll')]
 context = ['--system', seed, *[x for lib in libs for x in ('--module', lib)], '--object-root', libs[0]]
-flags = [*context, '--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc', '--bind-int32-to-string', '--bind-utf8-text', '--bind-task-queue']
+flags = [*context, '--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc', '--bind-int32-to-string', '--bind-utf8-text', '--bind-task-queue', '--native-stack-budget', '--bind-console-write-line']
 adapters = [base / 'task-queue-host.c', base / 'root-probe.c', base / 'native-gc.c',
-            base / 'task-queue.c', base / 'text-arena.c', base.parent / 'aot-fault-details/render.c']
+            base / 'task-queue.c', base / 'native-stack.c', base / 'console.c', base.parent / 'aot-scalar/console.c', base / 'text-arena.c', base.parent / 'aot-fault-details/render.c']
 report = {'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
           'SDKROOT': os.environ.get('SDKROOT'), 'inputs': {}, 'commands': [], 'cases': {}}
 
@@ -48,14 +48,15 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultLis
     run(['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
          *[x for lib in libs for x in ('--reference', lib)], '--bootstrap-intrinsics', '--bootstrap-ownership',
          ownership, '--object-library', 'System.Runtime', '-o', assembly, source])
-    expected = 1 if name == 'CallbackFault' else 0
+    expected = 1 if name in ('CallbackFault', 'QueuePumpFault') else 0
+    host_flags = ['-DNEOCLR_HOST_TASK_PUMP'] if name in ('TaskQueue', 'QueuePump', 'QueuePumpFault') else []
     interpreted = run([runtime, 'run', assembly, *context, '--instructions', '100000000'], expected)
     inspection = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world', *flags]).stdout)
     if not inspection['admission']['accepted']:
         raise RuntimeError(inspection['admission'])
     run([aot, '--closed-world', assembly, '@entry', obj, *flags])
     run(['clang', '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
-         '-fsanitize=undefined,bounds', '-DNEOCLR_NATIVE_GC', *adapters, obj, '-o', native])
+         '-fsanitize=undefined,bounds', '-DNEOCLR_NATIVE_GC', *host_flags, *adapters, obj, '-o', native])
     executed = run([native], expected)
     if executed.stdout != interpreted.stdout or executed.stderr != interpreted.stderr:
         raise RuntimeError(f'Output/fault mismatch: {executed} vs {interpreted}')
@@ -64,7 +65,7 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultLis
                              'bindings': inspection['selection']['nativeBindings']}
     # Check the distributable binary separately from sanitizer runtime linkage.
     plain = output / (name + '-standalone')
-    run(['clang', '-arch', 'arm64', '-std=c11', '-O2', '-DNEOCLR_NATIVE_GC', *adapters, obj, '-o', plain])
+    run(['clang', '-arch', 'arm64', '-std=c11', '-O2', '-DNEOCLR_NATIVE_GC', *host_flags, *adapters, obj, '-o', plain])
     dependencies = run(['otool', '-L', plain]).stdout.splitlines()[1:]
     if [line.split()[0] for line in dependencies] != ['/usr/lib/libSystem.B.dylib']:
         raise RuntimeError(dependencies)
@@ -80,7 +81,7 @@ run(['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', s
      *[x for lib in libs for x in ('--reference', lib)], '--bootstrap-intrinsics', '--bootstrap-ownership',
      ownership, '--object-library', 'System.Runtime', '-o', assembly, source])
 inspection = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world', *flags,
-                            '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-console-write-line', '--bind-integer-text']).stdout)
+                            '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-integer-text']).stdout)
 report['serverAdmission'] = inspection['admission']
 if hashlib.sha256(aot.read_bytes()).hexdigest() != report['inputs'][str(aot)]:
     raise RuntimeError('AOT executable changed during validation; rerun with a stable build')

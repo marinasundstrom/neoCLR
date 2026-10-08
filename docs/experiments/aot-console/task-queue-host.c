@@ -8,10 +8,14 @@ int main(void) {
     if (neoclr_task_scope_enter_v1(&tasks, &context)) return 2;
     int32_t result = -99;
     int32_t status = neoclr_entry_v4(0, &result, &context);
+    int32_t entry_status = status;
+#ifdef NEOCLR_HOST_TASK_PUMP
+    if (!status) status = neoclr_drain_default_queue_v1(&context);
+#endif
     if (neoclr_root_probe_head_v1() || buffer[8192] != UINT64_C(0x1122334455667788)) return 2;
     if (neoclr_task_scope_leave_v1(&tasks)) return 2;
     if (status) {
-        if (result != -99 || context.fault.code != (uint32_t)status) return 2;
+        if ((entry_status && result != -99) || context.fault.code != (uint32_t)status) return 2;
         neoclr_aot_render_fault(stderr, &context.fault);
         return 1;
     }

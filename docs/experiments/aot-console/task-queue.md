@@ -78,3 +78,34 @@ The guarded-stack and unit-entry follow-ups now allow full Server compiler admis
 The cycle above remains useful evidence about conservative dispatch. Default admission
 still rejects recursion; `--native-stack-budget` provides the guarded path. Automatic
 host queue draining and a real native HTTP request remain unvalidated.
+
+## Private host Drain entry (2026-10-08)
+
+With --bind-task-queue, a source-owned TaskQueue already selected by the application
+retains its unique ordinary instance Drain() as an explicit host reachability root.
+Specialization and closed-world selection include its body/dependencies; no fake call
+is inserted into guest CIL. The inspection inventory records hostRoots. Generic,
+ambiguous or nonordinary Drain contracts are rejected. Original scope verification
+still precedes this private host projection.
+
+The generated `neoclr_drain_default_queue_v1(context)` invokes that selected body
+without resetting the heap. A missing default queue is a successful no-op. The C reader
+requires a live task scope, no existing fault and no active guest frame for that
+context. The registered queue's host handle roots it across collection. Stack-budget
+images guard this entry too. Guest faults use ordinary capture; host misuse returns
+3 and preserves any prior fault. Hosts drain after entry and after completion dispatch,
+then release the task scope on terminal success/fault. This does not add a scheduler,
+fairness, preemption or an instruction budget for an endlessly self-posting callback.
+
+QueuePump posts work that posts more work without calling Drain in guest source;
+QueuePumpFault faults after Main returns. The same Raven artifacts pass interpreter,
+sanitized native and standalone native execution, including exact output/fault parity
+and task-root/frame cleanup. The task-scope kernel checks quiescence, missing queues
+and prior-fault rejection. [Evidence](../../../benchmarks/native-web/queue-pump-validation.json)
+records a repaired duplicate inspection flag separately from passing consumers.
+The full Server also passes compiler admission with the retained Drain body; an actual
+native HTTP request is the next check.
+
+This is explicitly a compatibility service adapter. The author reiterates a future
+runtime Scheduler for green threads and [cross-cutting services](../../runtime-scheduling-design.md#cross-cutting-runtime-services--author-clarification-2026-10-08)
+across interpreter/AOT/JIT. TaskQueue layout and this export do not define that future ABI.

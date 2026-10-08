@@ -241,3 +241,11 @@ records signed extremes, zero and status 599 in both modes. Arbitrary input borr
 remain unsupported; the private projection preserves verified receiver storage.
 The full server now reaches SocketConnectResult, moving the immediate dependency
 work to task dispatch, native host roots and asynchronous socket completion.
+
+`QueuePump.rvn` and `QueuePumpFault.rvn` exercise post-entry queue work, nested posting
+and faults from queued callbacks. Run `verify_callbacks.py --case QueuePump --case
+QueuePumpFault` with the usual compiler/runtime/AOT/bundle/output arguments. The private
+native host pumps the existing Drain body; the same artifacts run under interpreter
+implicit pumping. [Evidence](queue-pump-validation.json) records exact output/fault
+parity, sanitized cleanup and standalone libSystem-only linkage. This is behavior
+validation, not a Scheduler implementation or HTTP throughput benchmark.

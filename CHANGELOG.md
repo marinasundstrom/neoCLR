@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Retain verified TaskQueue.Drain as an explicit host compilation root and export a
+  private quiescent drain adapter. Validate real Raven nested posting and post-entry
+  faults in interpreter/native modes, with root cleanup and standalone linkage.
+  Record the author's future Scheduler/green-thread direction and cross-cutting runtime
+  services across interpreter, AOT and eventual JIT; this adapter remains provisional.
+
 - Adapt native value-profile no-result and inhabited-Void entry points to result
   zero on success, preserving caller storage on faults. Validate both entry shapes
   with zero/one Int32 argument. With the explicit stack guard, full Raven Server

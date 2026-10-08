@@ -398,6 +398,9 @@ fn validate_argument(ty: &Type, depth: usize) -> Result<(), Error> {
 }
 
 pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Value), Error> {
+    expand_with_host_roots(input, root, &[])
+}
+pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[usize]) -> Result<(neoclr::Module, Value), Error> {
     if input.types.len() > 1024 || input.functions.len() > 4096 {
         return Err("specialization input exceeds metadata limits".into());
     }
@@ -425,6 +428,17 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
         clones: 0,
     };
     let mut pending = vec![root_instance];
+    for &index in host_roots {
+        let f = input.functions.get(index).ok_or("host root index out of range")?;
+        if !f.generic_parameters.is_empty() || f.owner.as_ref().is_some_and(|owner|
+            input.type_definition(owner).is_none_or(|t| !t.generic_parameters.is_empty())) {
+            return Err("host roots require closed nongeneric declarations".into());
+        }
+        if context.instances.iter().any(|instance| instance.source == index) { continue; }
+        let instance = Instance { source: index, types: vec![], methods: vec![], row: index };
+        context.instances.push(instance.clone());
+        pending.push(instance);
+    }
     let mut visited = std::collections::HashSet::new();
     let mut expanded = input.clone();
     loop {

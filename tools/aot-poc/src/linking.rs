@@ -183,7 +183,7 @@ pub fn prepare(
             relationships
         })
         .collect();
-    let specialized = if joined
+    let mut specialized = if joined
         .types
         .iter()
         .any(|t| !t.generic_parameters.is_empty())
@@ -198,6 +198,35 @@ pub fn prepare(
     };
     let input = specialized.as_ref().map_or(&joined, |(module, _)| module);
     let (mut selected, mut report) = super::selection::select_inventory(input, root, false)?;
+    if context.is_some_and(|c| c.bind_task_queue) {
+        // Host pumping is an explicit additional reachability root, never a fake
+        // call inserted into guest CIL. Only the verified source-owned queue type
+        // already needed by the application may add this root.
+        let mut host_roots = vec![];
+        for (index, ty) in joined.types.iter().enumerate() {
+            let source_queue = ty.origin.as_ref().is_some_and(|o| o.name == "System.Tasks.TaskQueue")
+                || (ty.name == "System.Tasks.TaskQueue" && types[index].module == "System");
+            if !source_queue || !selected.types.iter().any(|t| t.name == ty.name) { continue; }
+            if !ty.is_reference_type || !ty.generic_parameters.is_empty() { return Err("host queue requires nongeneric source reference type".into()); }
+            let members: Vec<_> = joined.functions.iter().enumerate().filter(|(_, f)|
+                f.owner.as_ref() == Some(&neoclr::metadata::Type::Named(ty.name.clone()))
+                && f.origin.as_ref().map_or_else(|| f.name.rsplit('.').next().unwrap_or(""), |o| o.name.as_str()) == "Drain")
+                .collect();
+            let [(method, f)] = members.as_slice() else { return Err("host queue requires unique Drain member".into()); };
+            if !f.instance || !f.no_result || !f.parameters.is_empty() || !f.generic_parameters.is_empty()
+                || f.impl_flags != 0 || f.is_abstract || f.is_virtual || f.is_override {
+                return Err("host queue requires ordinary instance Drain() with no result".into());
+            }
+            host_roots.push(*method);
+        }
+        if host_roots.len() > 1 { return Err("host queue requires one TaskQueue type".into()); }
+        if !host_roots.is_empty() {
+            specialized = Some(super::specialization::expand_with_host_roots(&joined, root, &host_roots)?);
+            let expanded = &specialized.as_ref().unwrap().0;
+            (selected, report) = super::selection::select_inventory_with_host_roots(expanded, root, false, &host_roots)?;
+        }
+    }
+    let input = specialized.as_ref().map_or(&joined, |(module, _)| module);
     // Retain original closed String conformance before private specialization
     // erases interface arguments and primitive declarations leave the inventory.
     let mut string_interfaces = vec![];

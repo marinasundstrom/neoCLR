@@ -11959,3 +11959,22 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
 - **Open:** No green-thread stack model, public scheduler API, callable semantic change
   or implementation schedule is selected. Native callback dispatch is being developed;
   this discussion is not evidence of completed runtime suspension.
+
+- **Author follow-up:** “We might change from a TaskQueue to a Scheduler” and “the
+  Runtime eventually schedules green threads”, recalling earlier scheduler discussion.
+- **Assistant response:** Agree that a runtime-owned Scheduler is the direction to
+  investigate; today's native TaskQueue/Drain integration is a compatibility layer.
+  Keep callable identity distinct from runnable/suspended activations, roots and
+  resumption. Do not infer that TaskQueue will remain the future scheduling contract.
+- **Action/outcome:** Record the [clarification](runtime-scheduling-design.md#scheduler-clarification--author-follow-up-2026-10-08).
+  Guarded native recursion and unit entry adaptation are committed; host queue-drain
+  integration is under validation. Green threads remain unimplemented by this work.
+
+- **Author clarification:** Work motivated by native compilation should benefit
+  interpreted mode and eventually JIT: “So cross-cutting runtime services”.
+- **Assistant response/action:** Record shared service contracts with backend adapters
+  as the design direction. Scheduling/activation lifecycle, I/O cancellation/completion,
+  roots and logical fault reporting are the cross-cutting boundaries; native stack
+  probes and interpreter frame storage remain implementation mechanisms. Require
+  applicable fixes and cross-mode tests to inform interpreter work, without claiming
+  an unmeasured performance improvement or an implemented JIT.

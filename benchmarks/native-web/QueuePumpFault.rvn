@@ -1,0 +1,8 @@
+import System.*
+import System.Tasks.*
+
+func Main() {
+    TaskQueue.Default.Post(() => {
+        System.Fail("Queued callback fault")
+    })
+}

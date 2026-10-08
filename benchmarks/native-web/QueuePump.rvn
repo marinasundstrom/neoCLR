@@ -1,0 +1,13 @@
+import System.*
+import System.Tasks.*
+
+func Main() {
+    let queue = TaskQueue.Default
+    queue.Post(() => {
+        Console.WriteLine("First completion")
+        queue.Post(() => {
+            Console.WriteLine("Nested completion")
+        })
+    })
+    Console.WriteLine("Entry returned")
+}

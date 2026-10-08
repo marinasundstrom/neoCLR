@@ -1644,6 +1644,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     define_checked(&mut module, export, &mut context, stack_budget)?;
     if details.is_some_and(|d| d.native_gc) {
         compile_host_callbacks(&mut module, &p, &ids, stack_check, diagnostic_data.as_ref())?;
+        if let Some(drain) = details.and_then(|d| d.task_queue_drain) {
+            compile_host_queue(&mut module, ids[drain], drain, stack_check, diagnostic_data.as_ref().unwrap())?;
+        }
     }
     super::finish(module)
 }
@@ -1749,4 +1752,48 @@ fn define_checked(module: &mut ObjectModule, id: cranelift_module::FuncId,
         }
     }
     Ok(())
+}
+
+fn compile_host_queue(module: &mut ObjectModule, target: cranelift_module::FuncId,
+    drain: usize, stack_check: Option<cranelift_module::FuncId>, data: &crate::fault_details::Data) -> Result<(), Error> {
+    let mut sig = module.make_signature();
+    sig.params.extend([types::I64, types::I64].map(AbiParam::new));
+    sig.returns.push(AbiParam::new(types::I32));
+    let reader = module.declare_function("neoclr_task_queue_host_read_v1", Linkage::Import, &sig)?;
+    sig.params.pop();
+    let export = module.declare_function("neoclr_drain_default_queue_v1", Linkage::Export, &sig)?;
+    let mut context = module.make_context();
+    context.func.signature = sig;
+    let mut fb = FunctionBuilderContext::new();
+    {
+        let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+        let entry = b.create_block();
+        b.append_block_params_for_function_params(entry);
+        b.switch_to_block(entry);
+        let ctx = b.block_params(entry)[0];
+        let storage = slot(&mut b, 16);
+        let output = b.ins().stack_addr(types::I64, storage, 0);
+        let reader = module.declare_func_in_func(reader, b.func);
+        let call = b.ins().call(reader, &[ctx, output]);
+        let status = b.inst_results(call)[0];
+        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+        return_if_detailed(&mut b, failed, status, None);
+        let queue = b.ins().load(types::I64, MemFlags::new(), output, 0);
+        let empty = b.create_block();
+        let work = b.create_block();
+        let absent = b.ins().icmp_imm(IntCC::Equal, queue, 0);
+        b.ins().brif(absent, empty, &[], work, &[]);
+        b.switch_to_block(empty);
+        let zero = b.ins().iconst(types::I32, 0);
+        b.ins().return_(&[zero]);
+        b.switch_to_block(work);
+        emit_stack_check(module, &mut b, stack_check, Some(data), ctx, drain, false);
+        let result = b.ins().stack_addr(types::I64, storage, 8);
+        let callee = module.declare_func_in_func(target, b.func);
+        let call = b.ins().call(callee, &[queue, result, ctx]);
+        let status = b.inst_results(call)[0];
+        b.ins().return_(&[status]);
+        b.seal_all_blocks(); b.finalize();
+    }
+    define_checked(module, export, &mut context, stack_check.is_some())
 }

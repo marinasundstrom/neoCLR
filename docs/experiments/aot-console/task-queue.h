@@ -15,4 +15,9 @@ int32_t neoclr_task_queue_register_v1(void *queue, neoclr_aot_context *context, 
 int32_t neoclr_task_queue_default_v1(neoclr_aot_context *context, void **output);
 /* run/drain are verified image-local method indices, or -1 when absent. */
 int32_t neoclr_task_queue_current_v1(neoclr_aot_context *context, int32_t run, int32_t drain, void **output);
+/* Quiescent, fault-free host reader; no default queue is a successful null result.
+ * Generated drain entry retains heap/fault state and invokes the ordinary CIL body.
+ * Misuse returns 3 without replacing an existing guest fault. */
+int32_t neoclr_task_queue_host_read_v1(neoclr_aot_context *context, void **output);
+int32_t neoclr_drain_default_queue_v1(neoclr_aot_context *context);
 #endif

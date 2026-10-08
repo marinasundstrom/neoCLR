@@ -1,0 +1,711 @@
+{
+  "revision": "07ec3ee6303f10fed87e1aaf02061d8fd4a883f0",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/verify_callbacks.py": "cd45f5b053ea7e4cca205d7672f84a8bd63183b639a29408072f07d0becbf352",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "68f1dc42182526786b1f66e0fd89a4d840a5712d696cd8b3f96e914e27117766",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "1dce6941418f7a32fff61e5cc9a8083aec687cd1e3ef9541910c7b3801149be2",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "5e8ecab8904f306f23a57a25036063b9a0f39c8a7939500bce5a175dc3a47b04",
+    "/private/tmp/string-builder-native1008d/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/string-builder-native1008d/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/string-builder-native1008d/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/private/tmp/string-builder-native1008d/System.Runtime.dll": "29186a4a01a2cfdad8826e7bf3d0583566aecf5bb99ae06e47f86825c8d89e74",
+    "/private/tmp/string-builder-native1008d/System.Web.dll": "75a38da367f79aef0e0113b8426aa982893294871bbd6c4999abcdaa4e601750",
+    "/private/tmp/string-builder-native1008d/System.Networking.dll": "f4e6be74166b198ec11acabea569ea43fc233a9e0186287c673a6b63aab267e7",
+    "/private/tmp/string-builder-native1008d/System.Data.dll": "f8f7a34aae012a7c623003bddb225a0f46995a338502d6e9e77a4707a5930af6",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue-host.c": "6c78b7361f72c48a89c18eb831b3ba37aefeb9ff58d485afd7ffc897b82b8d91",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "3ea09f933073c638b13a6522a98bf00cf6c27c42593fe29ac24bf61a2d89b127",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c": "70c95499cbf61a0a2a6e2f97661a8558b90dd97c25241ae6cde099201eb7a7fe",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c": "e0d472372663f9c15b131144a83a451ef321342a397f93b61f4db8125e703502",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "4594a134d25f980e06c338ac155162a17d9faa9fe7ca5c8d355fdb6d9b64f904",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "a44d027c8bc0f34b1125aa99506c2a9f5955b0488c4ca4a369f04a91a730774f",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/flow.rs": "bf87fc1a01e7ce015ecc1a17b34fc931953e84e10d68610647ce523c0aae7d8d",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/boxing.rs": "6e862a8840c07e92f60748f9e4e0d5590bbdda5fa04ff5099b6b44bd776c09ec",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_layout.rs": "1be465aca8890f035c2209d3d0c43d70d1dec5a4835a129e3ddeb6ca6e80bc06",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/fault_details.rs": "fde4516150cfcc908188d3c6a1f46957117901ce45658bf0ae48e81adee18a8b",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/compiler.rs": "fb3414de0cdc17edc84409d8b3711dff1c22203b377cc2a7306a3a0b4db00559",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_probe.rs": "a162c14ac728cc1433e1fe79eb3deb35bf5a5014e27ea75aa98b6168dd3e2e78",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/values.rs": "d3f8ee456f56f961a9d9fdb082b7ee5a6da63f6ea0fe591fea5e19339ed91608",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/limits.rs": "ea7a3f45884246b945b9ffad28fb0b735a99a1ebe35d921489ecef89f214dfd0",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/specialization.rs": "9ac21220b87d7c17a4b9ff804a6f8e757fec46a786d21e4028398a1826378789",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_points.rs": "5e42ad63cdc4be627873acf21fe3fe2a76f30d4f257b8caee08263ffeffda787",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/value_profile.rs": "6afc11ea88c704c1d3c5423e38dfdb2414feb80a2912bcb094ff35fd56d86fde",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/selection.rs": "87c22d9a07ed64d45e3eeab8b90f8b54893e1f63813a207860f7730f6d482a2b",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/main.rs": "8a5fefaf319778c9f5bdb788c1630f4561bf7b96a8d40c0e2b56cbfd023032cf",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/linking.rs": "673355040d8f45986e3d1cf3feb80258c8bb993a6f035252ddff916cd2e0a950",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/bindings.rs": "186ab840ebf1f2a4735c85f8b715d3033cd1911bc0c63892ceea8eb0d16abd6b",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/inspection.rs": "29336902e21a86b602262b2d1d1ffae85e14dd157c5551283f1de74dd5effca4",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "c09fec95a830bcec3e75d0a158a112c8b7d3831ae61807a0aade5537695be672",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.h": "48f1ff12991f82ab7d0a5772a0e33f93afc0a2bacbbc82fda218dd996dbde11e",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": "d2644b95bb3241e12533399d7b90e038635b96ce0217ba6d2d7ed8f94208d546",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "112e954b1b47ba3a3fd01200316a10a1c06baa8e9c1e0f3f6ea4bf7bbeefec35",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "460506783d644c64d8a053b860233e6f763014ae370eaa2d3e6e43a3ef5b9bc0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "26ea46ca8a29153547692b417b66bc0941c286306d014fce7dc658b2a8d40455",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "0d53aa2d30c0dfb581b4fde824b5aa0c63305bd7f9e866e1cc161cec6847e162",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "b01242e42280d6cf921ff3613746672192771b41534ab4f893c8e9f976ffbcf0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "23ff54fc833555df8217835f50511f154019eaf4e7b09668126d5226a5839a2f",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "4e0848eeb502bc2f4076824748c8dfb2f96b34666af06eb347e48101e6dc9ad7",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "76c5deb6afda1e9ca973a0ccf855db671f789da1908d4614477bbacbb36c5619",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.Core.dll": "395c52f5e8b082b64108478d3cb2c857246f8c77a136318d15d346a44bb3bee3",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/QueuePump.rvn": "a25f6324c9e0f0e678c661d471af9a5739cc58bc89555bbc0367bacb404e08c6",
+    "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump.dll": "185e58f7bb1b20b735b438ed31d3530f049dcb7443ff093130b99585c14c62ff",
+    "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump.o": "e396c713cf2d86804b7cfa8c82b0d6f846207019848b19dae2def4d222263072",
+    "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump-standalone": "abcf7cd6caecbb1db6ff5aa22743edba652666d820bebc7086e1b3ada0454c48",
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/QueuePumpFault.rvn": "19ab30c3f9c2db0b7e7efab0d5bce08aecdd2d4ae77fde01c9a20195a745c238",
+    "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault.dll": "2737119f5e56f11a2c8bcbe59efa51b9b4884b5731113f03dcc1659ec9fa5791",
+    "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault.o": "6e0a7d7535cd6baf76cb92cedf3fcf83db7967f79bdb2df76feb5a90db66803f",
+    "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault-standalone": "9a4e0025d06c5489c48890f172788a96aa4b1ef4e08986e3c2922ad381ee4d56",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-server/Server.rvn": "a76485f804065ddec7d5903a83aa9e8cf4bca2aaafc9dcbb30178276324d715c"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/string-builder-native1008d/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump.dll",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/QueuePump.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 0,
+      "stdout": "Entry returned\nFirst completion\nNested completion\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-task-queue",
+        "--native-stack-budget",
+        "--bind-console-write-line"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "bb4a001441fe2cf0d981e83a8c6effa865d346d30b61fd2222f9a319fcdc6289"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump.o",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-task-queue",
+        "--native-stack-budget",
+        "--bind-console-write-line"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "888accbaadab4e11d1c087134c8c193a82655b16e99c4edafc65d2c715002038"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_HOST_TASK_PUMP",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump"
+      ],
+      "exit": 0,
+      "stdout": "Entry returned\nFirst completion\nNested completion\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_HOST_TASK_PUMP",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump-standalone"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePump-standalone"
+      ],
+      "exit": 0,
+      "stdout": "Entry returned\nFirst completion\nNested completion\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/string-builder-native1008d/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault.dll",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/QueuePumpFault.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault.dll",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: Queued callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_D6FA882A5ABD88C98A6DFE9F280E9FE2FFB0FA61306EE00206679AE5A948C401.F_2466756E6374696F6E2431 [instruction 1]\n   at NeoMetadata_D6FA882A5ABD88C98A6DFE9F280E9FE2FFB0FA61306EE00206679AE5A948C401.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-task-queue",
+        "--native-stack-budget",
+        "--bind-console-write-line"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "b5088da86a98683c6622582b52705f0452c8948627b2e72e782d0ba0bd3600b3"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault.o",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-task-queue",
+        "--native-stack-budget",
+        "--bind-console-write-line"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "e43e4dbcfeae7007f8e567abc69292827a6950ba8b2942cfcac97b1676a71015"
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_HOST_TASK_PUMP",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: Queued callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_D6FA882A5ABD88C98A6DFE9F280E9FE2FFB0FA61306EE00206679AE5A948C401.F_2466756E6374696F6E2431 [instruction 1]\n   at NeoMetadata_D6FA882A5ABD88C98A6DFE9F280E9FE2FFB0FA61306EE00206679AE5A948C401.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n"
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_HOST_TASK_PUMP",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault-standalone"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault-standalone"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault-standalone:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/QueuePumpFault-standalone"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "UserFault: Queued callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_D6FA882A5ABD88C98A6DFE9F280E9FE2FFB0FA61306EE00206679AE5A948C401.F_2466756E6374696F6E2431 [instruction 1]\n   at NeoMetadata_D6FA882A5ABD88C98A6DFE9F280E9FE2FFB0FA61306EE00206679AE5A948C401.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/string-builder-native1008d/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--reference",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/string-builder-native1008d/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/Server.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/http-server/Server.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/Server.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-task-queue",
+        "--native-stack-budget",
+        "--bind-console-write-line",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-console-write-line",
+        "--bind-integer-text"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "aot-poc: duplicate --bind-console-write-line option\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/native-queue-pump-validation2/Server.dll",
+        "@entry",
+        "--closed-world",
+        "--system",
+        "/private/tmp/string-builder-native1008d/System.runtime.neox",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Web.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Networking.dll",
+        "--module",
+        "/private/tmp/string-builder-native1008d/System.Data.dll",
+        "--object-root",
+        "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-task-queue",
+        "--native-stack-budget",
+        "--bind-console-write-line",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-integer-text"
+      ],
+      "exit": 0,
+      "stdout": {
+        "sha256": "d2fd3bb79d7799d5e8c87d074af1ff5f8d1e149774e18f525417b56b82914595"
+      },
+      "stderr": "",
+      "note": "Retry admission only after removing duplicate console binding option; prior case evidence unchanged."
+    }
+  ],
+  "cases": {
+    "QueuePump": {
+      "status": 0,
+      "output": "Entry returned\nFirst completion\nNested completion\n",
+      "fault": "",
+      "heapCapacity": 65536,
+      "bindings": [
+        {
+          "compiledIndex": 8,
+          "definition": {
+            "index": 60,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        },
+        {
+          "compiledIndex": 7,
+          "definition": {
+            "index": 50,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "implementation": "console-write-line-v1",
+          "name": "neoCLR.Runtime.WriteLine",
+          "symbol": "neoclr_console_write_line_utf8_v1"
+        },
+        {
+          "compiledIndex": 29,
+          "definition": {
+            "index": 133,
+            "module": "System"
+          },
+          "implementation": "task-queue-register-v1",
+          "name": "neoCLR.Runtime.RegisterTaskQueue",
+          "queueType": {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+          },
+          "symbol": "neoclr_task_queue_register_v1"
+        },
+        {
+          "compiledIndex": 30,
+          "definition": {
+            "index": 131,
+            "module": "System"
+          },
+          "implementation": "task-queue-default-v1",
+          "name": "neoCLR.Runtime.GetDefaultTaskQueue",
+          "queueType": {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+          },
+          "symbol": "neoclr_task_queue_default_v1"
+        }
+      ]
+    },
+    "QueuePumpFault": {
+      "status": 1,
+      "output": "",
+      "fault": "UserFault: Queued callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_D6FA882A5ABD88C98A6DFE9F280E9FE2FFB0FA61306EE00206679AE5A948C401.F_2466756E6374696F6E2431 [instruction 1]\n   at NeoMetadata_D6FA882A5ABD88C98A6DFE9F280E9FE2FFB0FA61306EE00206679AE5A948C401.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n",
+      "heapCapacity": 65536,
+      "bindings": [
+        {
+          "compiledIndex": 5,
+          "definition": {
+            "index": 60,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        },
+        {
+          "compiledIndex": 24,
+          "definition": {
+            "index": 133,
+            "module": "System"
+          },
+          "implementation": "task-queue-register-v1",
+          "name": "neoCLR.Runtime.RegisterTaskQueue",
+          "queueType": {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+          },
+          "symbol": "neoclr_task_queue_register_v1"
+        },
+        {
+          "compiledIndex": 25,
+          "definition": {
+            "index": 131,
+            "module": "System"
+          },
+          "implementation": "task-queue-default-v1",
+          "name": "neoCLR.Runtime.GetDefaultTaskQueue",
+          "queueType": {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+          },
+          "symbol": "neoclr_task_queue_default_v1"
+        }
+      ]
+    }
+  },
+  "serverAdmission": {
+    "accepted": true
+  },
+  "repairNote": "QueuePump and QueuePumpFault fully passed before the final inspection command failed on a duplicate option. That command alone was corrected and retried.",
+  "reproductionScriptAfterRepairSha256": "508aee1f4a2db17c3a8d766809453b1f836a560c89626f7feb8f6f28fa5d65c6",
+  "aotStableAfterRetry": true
+}
