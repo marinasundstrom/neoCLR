@@ -98,8 +98,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   ArrayList<byte> growth and inherited Sequence views in a Console consumer. Privately
   rename verified static/empty seed Console owners to avoid backend seed collisions,
   preserving their shapes and source diagnostics. Align the object allocator with
-  sixteen-field admission and test exact-fit/exhaustion/canaries. String-valued
-  erased services and broader text operations remain pending.
+  sixteen-field admission and test exact-fit/exhaustion/canaries. Extend private
+  erased-value transport to I64 payloads for String pointers while preserving
+  primitive normalization, exact tags and mismatch faults. Admit String static
+  generic helpers; validate UTF-8/NUL, null/empty and arena-backed payloads through
+  output copies and fault messages. General object erasure and text operations
+  remain pending; internal native bodies must be rebuilt together.
 
 ### 2026-10-07
 

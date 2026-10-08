@@ -596,3 +596,32 @@ Focused tests cover uninitialized/initialized and alias reads, null/range/limit 
 zero capacity, arena exhaustion, ordinary default arrays, native output validation
 order and early borrow rejection. Full Console.Write still requires String-bearing
 erased services and text operations; the collection dependency now compiles normally.
+
+
+## String-valued erased services (2026-10-08)
+
+The private System.Value transport now pairs its I32 discriminant with an I64
+payload lane, admitting exact String packing, type tests and recovery alongside
+Int32/Byte/Boolean/unit. Literal and invocation-arena pointers retain all address
+bits through locals, calls and output borrows; null String remains a String-tagged
+null. Primitive payloads normalize before widening and narrow on recovery. Wrong
+payload extraction still reports RuntimeError at the original instruction, and
+System.Value still has no default initialization. Character, object, array and
+aggregate erasure remain unsupported.
+
+Static generic helpers may now specialize String arguments, enabling the ordinary
+RuntimeServices.IsValue<String>/UnpackValue<String> bridge helpers. The internal
+payload representation is not a stable interop ABI: rebuild related native bodies
+together. The exported Int32 entry and caller-owned context layout remain ABI v4.
+All String lifetimes remain unchanged: render any dynamic fault message before
+resetting or releasing its invocation region.
+
+`erased-text.neoil` tests UTF-8/NUL literal payloads, minimum-Int32 formatted text,
+closed generic identity, output copying, empty and null strings, and both directions
+of invalid extraction against interpreter results and exact fault diagnostics.
+Existing primitive erased-value and native input/output adapter tests also pass.
+This is a bounded tagged transport, unlike the CLR's general boxing/object model;
+it avoids native managed-object boxing allocation for these admitted payloads at
+the cost of excluding general erasure and GC lifetimes. Full Console.Write now
+reaches the selected-function/clone budget, which needs a measured extension before
+its remaining text services can be admitted.

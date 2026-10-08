@@ -1,0 +1,83 @@
+.module ErasedText
+.function Echo<T>(T value) -> T
+ldarg value
+ret
+.end
+.function Copy(Value source, out Value& target) -> noresult
+ldarg target
+ldarg source
+stobj Value
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Value original
+.local Value copy
+.local String text
+ldarg mode
+ldc.i4 1
+beq Dynamic
+ldarg mode
+ldc.i4 2
+beq Null
+ldarg mode
+ldc.i4 3
+beq WrongString
+ldarg mode
+ldc.i4 4
+beq WrongInt
+ldarg mode
+ldc.i4 5
+beq Empty
+ldstr "erased café 🌍\u0000end"
+br Pack
+Dynamic:
+ldc.i4 -2147483648
+call neoCLR.Runtime.Int32ToString(Int32)
+call Echo<String>(String)
+br Pack
+Empty:
+ldstr ""
+Pack:
+value.pack String
+stloc original
+ldloc original
+ldloca copy
+call Copy(Value, Value&)
+ldloc copy
+value.is String
+brfalse Failed
+ldloc copy
+value.unpack String
+call System.Fail(String)
+ldc.i4 -1
+ret
+Null:
+ldloca text
+initobj String
+ldloc text
+value.pack String
+stloc original
+ldloc original
+value.is String
+brfalse Failed
+ldloc original
+value.unpack String
+ref.isnull
+brfalse Failed
+ldc.i4 1
+ret
+WrongString:
+ldc.i4 -1
+value.pack Int32
+value.unpack String
+pop
+br Failed
+WrongInt:
+ldstr "payload"
+value.pack String
+value.unpack Int32
+pop
+Failed:
+ldc.i4 -1
+ret
+.end

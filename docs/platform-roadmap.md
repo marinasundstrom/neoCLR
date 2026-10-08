@@ -120,8 +120,9 @@ reader/writer dependencies behind Write/ReadLine remain open. Closed generic cla
 and inherited interface dispatch now pass nominal-shape and fault tests; the real
 ArrayList<byte> dependency now compiles with checked byte reservations, growth and
 interface aliasing. Unwritten reads and output validation preserve interpreter faults;
-reserved-array element borrows remain rejected. String-bearing erased services and
-text operations remain the next Console.Write dependencies. The author adds a console-input sample after unions, exercising input and
+reserved-array element borrows remain rejected. String-valued erased transport and
+static generic String helpers now preserve pointer width/lifetime and exact fault
+parity. Console.Write next reaches function/clone budgets before text services. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

@@ -49,7 +49,8 @@ pub(super) fn erased_tag(ty: &Type) -> Result<i64, Error> {
         Type::Int32 => Ok(1),
         Type::Byte => Ok(2),
         Type::Boolean => Ok(3),
-        _ => Err("erased payload requires Int32, Byte, Boolean or Void".into()),
+        Type::String => Ok(4),
+        _ => Err("erased payload requires Int32, Byte, Boolean, Void or String".into()),
     }
 }
 
@@ -342,6 +343,7 @@ impl<'a> Profile<'a> {
     }
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
+            Ty::Erased => vec![false, true],
             Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::Size | Ty::Wide => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),

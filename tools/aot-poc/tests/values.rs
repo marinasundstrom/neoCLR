@@ -1551,7 +1551,7 @@ fn erased_profile_rejects_defaults_uninitialized_slots_and_unsupported_payloads(
             "ldloca item\ninitobj Value\nldc.i4 0\nret",
         ),
         (".local Value item\n", "ldloc item\nvalue.unpack Int32\nret"),
-        ("", "ldc.i4 0\nret\nvalue.pack String"),
+        ("", "ldc.i4 0\nret\nvalue.pack Char"),
         ("", "ldc.i4 0\nret\nvalue.is Value"),
         ("", "ldc.i4 0\nret\nvalue.unpack Int32&"),
         ("", "ldc.i4 42\nvalue.is Int32\npop\nldc.i4 0\nret"),
@@ -1771,10 +1771,9 @@ fn raven_literal_transport_compiles_from_pe_and_neox() {
 }
 
 #[test]
-fn text_profile_rejects_erasure_and_uninitialized_copies() {
+fn text_profile_rejects_uninitialized_and_mistyped_copies() {
     for (declarations, body) in [
         (".local String text", "ldloc text\npop\nldc.i4 0\nret"),
-        ("", "ldstr \"no erasure\"\nvalue.pack String\npop\nldc.i4 0\nret"),
         (".local String text", "ldc.i4 0\nstloc text\nldc.i4 0\nret"),
     ] {
         let m = neoclr::assemble(&format!(".module InvalidLiteral\n.function Main() -> Int32\n{declarations}\n{body}\n.end")).unwrap();

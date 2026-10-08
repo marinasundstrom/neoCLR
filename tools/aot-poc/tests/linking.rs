@@ -783,7 +783,7 @@ fn generic_method_specialization_rejects_bad_identity_access_and_shapes() {
             })
             .unwrap();
         match case {
-            0 => call.generic_arguments[0] = neoclr::metadata::Type::String,
+            0 => call.generic_arguments[0] = neoclr::metadata::Type::Char,
             1 => call.generic_arguments.push(neoclr::metadata::Type::Int32),
             2 => call.parameters[0] = neoclr::metadata::Type::Int32,
             3 => {

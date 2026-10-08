@@ -154,10 +154,10 @@ impl Specializer<'_> {
         if target
             .generic_arguments
             .iter()
-            .any(|t| !matches!(t, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void))
+            .any(|t| !matches!(t, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String))
         {
             return Err(
-                format!("generic method arguments require primitive Int32/small-integer/Boolean/Void shapes: {} {:?}", target.name, target.generic_arguments).into(),
+                format!("generic method arguments require primitive Int32/small-integer/Boolean/Void/String shapes: {} {:?}", target.name, target.generic_arguments).into(),
             );
         }
         let arguments = match &target.owner {
