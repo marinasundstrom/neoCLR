@@ -6,6 +6,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-09
+
+- Audit real Runtime/Data/Networking/Web metadata through RavenDoc after fixing
+  assembly-level function/constant documentation in Raven. The migration preview
+  renders 1,632 pages with actual declaring libraries and no CoreProbe owner label.
+  Preserve the complete website while public member/comment/route coverage is
+  qualified. This audit explicitly retains the historical bundle's CLI primitive
+  bootstrap; it does not satisfy the no-bridge release gate. Extend the reduced
+  native core with Double for constant documentation checks; native execution still
+  returns 42 in both modes.
+
 ### 2026-10-08
 
 - Qualify RavenDoc's explicit native library loader using the full existing renderer:

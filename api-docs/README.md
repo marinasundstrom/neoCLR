@@ -1327,3 +1327,14 @@ The separate native-core fixture already qualifies the loader and renderer; it c
 stand in for production Runtime/Data/Networking/Web coverage. Next produce a matching
 native core and rebuild those libraries, then compare public types/members, documentation
 and routes before switching website inputs.
+
+
+### Declaring-library migration audit (2026-10-09)
+
+Actual split native libraries render 1,632 pages with System.Runtime.dll ownership
+on BooleanParseError and CancellationTokenSource and no CoreProbe labels. Raven
+needed assembly-level function/constant documentation ID and comment fixes.
+[Audit and evidence](../docs/experiments/native-library-documentation-audit/README.md).
+The historical bundle explicitly uses a CLI primitive bootstrap. Keep the complete
+current snapshot until semantic member coverage, comments and routes are compared;
+384 versus 346 projected type names alone cannot establish lost APIs or equivalence.

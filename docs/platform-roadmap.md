@@ -3035,3 +3035,12 @@ Wide division/remainder now pass 72 interpreted/native cases with width-correct 
 checks. `library-calendar` joins the passing sample baseline; time-contracts/time-zones
 still expose other boundaries. [Evidence](experiments/aot-sample-assessment/division-followup.json).
 Continue bounded fixes without making universal sample parity a release requirement.
+
+
+### Declaring-library documentation follow-up (2026-10-09)
+
+Author-directed RavenDoc migration now renders Runtime/Data/Networking/Web metadata
+after assembly-member documentation fixes. The 1,632-page audit demonstrates real
+owner identities, not coverage parity or native-only bootstrap. Preserve the full
+reference while comparing public members, documentation and routes.
+[Evidence and remaining gates](experiments/native-library-documentation-audit/README.md).

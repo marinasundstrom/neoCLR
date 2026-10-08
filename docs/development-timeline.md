@@ -12246,3 +12246,20 @@ claim follows from these focused checks.
   [native reference evidence](experiments/native-core-bootstrap/ravendoc-validation.json).
   The aggregate website snapshot still uses its CLI
   bridge and must not have ownership labels rewritten without changing inputs.
+
+
+## 2026-10-09 — Replace aggregate documentation ownership
+
+- **Author:** “We want to move away from: Assembly: NeoCLR.CoreProbe.dll”, while
+  viewing BooleanParseError in the complete local API reference.
+- **Assistant response:** use actual declaring-library symbols instead of relabeling
+  aggregate input; preserve the full API experience during migration.
+- **Actions/outcome:** the historical split native bundle exposed a null declaring-type
+  assumption for assembly-level functions. Raven fixes now render these members and
+  preserve their comments and constant comments. The preview contains 1,632 pages;
+  BooleanParseError and CancellationTokenSource identify System.Runtime.dll. All 68
+  focused .NET controls and reduced native documentation checks pass.
+- **Remaining:** this audit explicitly uses the bundle's CLI primitive bootstrap.
+  Native core production and semantic member/comment/route parity remain open;
+  the complete website has not been replaced by the smaller audit.
+  [Evidence](experiments/native-library-documentation-audit/README.md).

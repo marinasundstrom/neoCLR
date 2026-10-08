@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-09",
+  "scope": "Historical split native bundle with explicit CLI bootstrap; not published reference replacement or no-bridge qualification",
+  "inputsSha256": {
+    "Core.dll": "c6323692f045acdad6a8391661f819ba7cd76e0206935b90ee59c3e5c597aac8",
+    "System.Runtime.dll": "b771d6df9fd4d66c32e7f414bdaaab0029f656127100124f0b817b37b8a70d3a",
+    "System.Data.dll": "75f44b18003b97180586dcd468992d10d3c52714638459c5a24dea39f1edf566",
+    "System.Networking.dll": "97988648c2641b6e1329f69506c5d70fe0553450d2dcd3ce94fa01e35cd2c448",
+    "System.Web.dll": "18808c624442dc559a00881f79091d7bf59fd0c8dde9f6dd8d0cc09c64144d73",
+    "System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da"
+  },
+  "htmlPages": 1632,
+  "checkedOwners": {
+    "System/BooleanParseError/index.html": "System.Runtime.dll",
+    "System/Concurrency/CancellationTokenSource/index.html": "System.Runtime.dll"
+  },
+  "coreProbeLabelOccurrences": 0,
+  "dotnetDocumentationTests": {
+    "passed": 68,
+    "failed": 0
+  },
+  "remaining": [
+    "Production native core bootstrap",
+    "Semantic public member coverage and authored documentation comparison",
+    "Route compatibility and full website input migration"
+  ],
+  "ravenCommit": "11825b08e",
+  "neoClrBaseCommit": "beb8e7b5"
+}

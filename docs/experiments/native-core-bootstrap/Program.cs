@@ -34,7 +34,7 @@ var markerCtor = core.AddClass("System.Runtime.CompilerServices", "ReferenceAsse
 markerCtor.GetILGenerator().LoadArgument(0);
 markerCtor.GetILGenerator().Call(attributeCtor);
 markerCtor.GetILGenerator().Return();
-foreach (var primitive in new[] { PrimitiveType.Int32, PrimitiveType.Int64, PrimitiveType.Boolean, PrimitiveType.Void })
+foreach (var primitive in new[] { PrimitiveType.Int32, PrimitiveType.Int64, PrimitiveType.Double, PrimitiveType.Boolean, PrimitiveType.Void })
     core.AddValueType("System", primitive.ToString()).SetNativePrimitive(primitive);
 core.AddClass("System", "String", root).SetNativePrimitive(PrimitiveType.String);
 var bytes = RuntimeAssemblyContainer.WriteLibraryBinary(core);
