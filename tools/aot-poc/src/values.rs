@@ -378,6 +378,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     let mut utf8_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
+            (&d.file_input, "neoclr_file_read_utf8_v1", vec![types::I64, types::I32, types::I64, types::I64]),
             (&d.file_output, "neoclr_file_write_utf8_v1", vec![types::I64, types::I64, types::I32, types::I64]),
             (&d.path_combine, "neoclr_path_combine_unix_v1", vec![types::I64, types::I64, types::I64, types::I64]),
             (&d.path_file_name, "neoclr_path_file_name_unix_v1", vec![types::I64, types::I64, types::I64]),
@@ -889,7 +890,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             }
             if let Some(service) = utf8_services.get(&i) {
                 let service = module.declare_func_in_func(*service, b.func);
-                let args = if details.unwrap().file_output.contains(&i) {
+                let args = if details.unwrap().file_input.contains(&i) {
+                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                    vec![parameters[0], parameters[1], arena, output]
+                } else if details.unwrap().file_output.contains(&i) {
                     vec![parameters[0], parameters[1], parameters[2], output]
                 } else if details.unwrap().string_join_parts.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);

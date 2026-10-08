@@ -464,3 +464,16 @@ regression, not the native reflection boundary. The historical survey is unchang
 The [Double slice](../aot-double/README.md) also closes the Math constants blocker.
 Next bounded AOT candidates remain explicit file services or jagged-array storage;
 bootstrap qualification remains a separate release gate.
+
+## Native file text follow-up (2026-10-08)
+
+Explicit bounded file output/input bindings now let the unchanged library-files
+sample run interpreted, sanitized native and standalone. The verifier isolates each
+mode in a fresh directory and compares both output and final bytes; oversized writes
+preserve the original file and bounded reads report TooLarge. [Evidence](../../../benchmarks/native-web/files-validation.json)
+includes retained HTTP admission. Low-level tests cover 11 write and 18 read cases,
+including UTF-8/error ordering, descriptor cleanup and native allocation failure.
+This does not add general stream/provider services, asynchronous I/O or Windows support.
+The remaining assessed array sample requires jagged-array identities and tracing;
+RuntimeTypeHandle introspection remains outside the native baseline. No full survey
+or performance rerun is claimed, and the no-bridge bootstrap gate remains open.

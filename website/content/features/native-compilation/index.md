@@ -184,8 +184,9 @@ with matching interpreted/native output. Exact element identity and mutable-arra
 invariance remain enforced. Other array-view categories and value-record default
 arrays remain unsupported. The ordinary lexical Path.Combine/GetFileName sample also
 passes both modes with explicit native path bindings on macOS ARM64. Bounded UTF-8
-file output also has an explicit binding and a tested Result-pattern consumer; file
-input and native Windows path behavior remain unsupported. Nine other selected samples advance to further metadata, primitive
+file input/output also have explicit bindings, with the unchanged read/write sample
+passing both modes. Limits, UTF-8 errors and preflight file preservation are checked.
+Native Windows path behavior remains unsupported. Nine other selected samples advance to further metadata, primitive
 wrapper, callback and service gaps; broad Tasks/await parity is not yet claimed.
 
 

@@ -33,7 +33,8 @@ now use finite Double assembly-level metadata and compile-time inlining. Their i
 consumer and native/standalone runs now pass after [bounded Double lowering](experiments/aot-double/README.md).
 Remaining floating instructions and Math services are explicit gaps. Bootstrap qualification
 remains a release priority. [Native file output](file-output.md#native-compilation-development-2026-10-08)
-now passes a bounded Raven consumer; file input is the next combined-file-sample gap.
+and [input](file-input.md#native-compilation-development-2026-10-08) now pass the unchanged
+combined file sample in interpreted, sanitized native and standalone modes.
 Jagged arrays and RuntimeTypeHandle introspection remain excluded.
 The wider audit also found the handwritten legacy union bridge's `IUnion`; it now
 uses `UnionValue`, with regenerated fragments and executable union/time checks. This does not change the bootstrap release gate or promise

@@ -54,5 +54,6 @@ Single, floating conversions, negation, remainder, ckfinite, floating arrays/box
 indirect floating opcodes, Math service bindings and formatting remain unsupported
 in AOT. Supported typed ldobj/stobj are distinct from the still unsupported ldind.r8/
 stind.r8 spellings. This is a bounded release baseline, not complete floating CLI coverage.
-The next priorities remain shared introspection faults and bootstrap qualification;
-expand floating coverage when a release consumer requires it.
+The subsequent [source-caller correction](../../introspection-design.md#source-built-executingassembly-correction--2026-10-08)
+closes the shared introspection faults. Bootstrap qualification remains open; expand
+floating coverage when a release consumer requires it.

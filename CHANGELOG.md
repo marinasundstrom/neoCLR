@@ -8,12 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
-- Bind exact native WriteAllText with explicit --bind-file-output on macOS ARM64.
-  Preserve UTF-8 bytes, preflight limits/path checks before open, regular-file checks
-  before truncation, host error statuses and handle cleanup. Eleven interpreter/native
-  cases and a Raven let-pattern consumer pass, including sanitized and standalone
-  execution. ReadAllText remains the next file-sample boundary; blocking writes are
-  not atomic or durable saves, and partial writes can remain after I/O failure.
+- Bind exact native ReadAllText/WriteAllText with explicit --bind-file-input and
+  --bind-file-output on macOS ARM64. Preserve UTF-8 bytes, preflight limits/path checks,
+  regular-file checks before truncation, error statuses and handle cleanup. Reads probe
+  actual bytes before strict decoding and close handles before managed allocation;
+  terminal allocation failure leaves outputs unchanged. Eighteen read and eleven write
+  comparisons, existing UTF-8 controls, a let-pattern consumer and the unchanged file
+  sample pass interpreted, sanitized native and standalone execution. Blocking writes
+  are not atomic/durable saves and may leave partial output after I/O failure.
 
 - Correct interpreted ExecutingAssembly for source-built runtime facades: skip the
   scoped query wrappers and report the nearest real source caller, including callers

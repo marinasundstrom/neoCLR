@@ -105,8 +105,9 @@ RavenDoc includes this unit-valued Result signature in the generated reference;
 this entry explains its write and error contract.
 
 Development native coverage: FileText.WriteAllText is available through the ARM64
-POC's explicit file-output binding. Its byte-bound, preflight preservation and Result
-contract are unchanged; native ReadAllText remains pending in this slice.
+POC's explicit file-output binding. FileText.ReadAllText also has a bounded strict
+UTF-8 binding. Byte bounds, preflight preservation and Result contracts are unchanged;
+these are synchronous host operations, not a general stream/provider backend.
 [Native validation and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/file-output.md#native-compilation-development-2026-10-08).
 
 ## Design comparison

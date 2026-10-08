@@ -210,11 +210,18 @@ int32_t neoclr_utf8_decode_v1(const void *array, neoclr_aot_text_arena *arena, v
     int32_t status = neoclr_check_bytes_initialized_v1(array, 0, (int32_t)length);
     if (status) return status;
     const unsigned char *bytes = (const unsigned char *)array + 16;
+    return neoclr_text_decode_utf8_bytes_v1(bytes, length, arena, output);
+}
+
+int32_t neoclr_text_decode_utf8_bytes_v1(const unsigned char *bytes, uint64_t length,
+    neoclr_aot_text_arena *arena, void *output) {
+    if ((!bytes && length) || !arena || !output || length > SIZE_MAX)
+        return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     uint32_t tag = 2;
     uint64_t payload = 1;
     if (valid_utf8(bytes, (size_t)length)) {
         const neoclr_aot_text *text;
-        status = store_text((const char *)bytes, (size_t)length, arena, &text);
+        int32_t status = store_text(bytes ? (const char *)bytes : "", (size_t)length, arena, &text);
         if (status) return status;
         tag = 4;
         payload = (uint64_t)(uintptr_t)text;

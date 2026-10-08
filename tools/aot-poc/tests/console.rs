@@ -4899,3 +4899,129 @@ int main(int argc, char **argv) {
         assert_eq!(fs::read(&destination).unwrap(), expected.as_bytes());
     }
 }
+
+const FILE_INPUT_SEED: &str = ".module System\n.references ()\n.function neoCLR.Runtime.ReadAllText(String, Int32) -> Value\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.StringCompareOrdinal(String, String) -> Int32\n.methodimpl InternalCall\n.end";
+
+#[test]
+fn file_input_requires_exact_opt_in_contract() {
+    let source = ".module FileInput\n.function Calculate(Int32 mode) -> Int32\nldstr \"unused\"\nldc.i4 4\ncall neoCLR.Runtime.ReadAllText(String, Int32)\npop\nldc.i4 0\nret\n.end";
+    let seed = neoclr::assemble(FILE_INPUT_SEED).unwrap();
+    for flags in [vec!["--compile-system", "--reference-arena"], vec!["--bind-file-input"],
+        vec!["--compile-system", "--bind-file-input"],
+        vec!["--compile-system", "--reference-arena", "--bind-file-input", "--bind-file-input"]] {
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, source, &flags, false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists(), "{r:?}");
+    }
+    let mut impostor = seed.clone();
+    impostor.functions[0].impl_flags = 0;
+    impostor.functions[0].body = vec![neoclr::metadata::Instruction::Void, neoclr::metadata::Instruction::PackValue(neoclr::metadata::Type::Void), neoclr::metadata::Instruction::Return];
+    let dir = Temp::new();
+    let r = compile_source(&dir, &impostor, source, &["--compile-system", "--reference-arena", "--bind-file-input"], false);
+    assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    assert!(String::from_utf8_lossy(&r.stderr).contains("native file input requires exact"));
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn file_input_matches_interpreter_limits_utf8_and_cleanup() {
+    let dir = Temp::new();
+    let path = |name: &str| dir.0.join(name).to_str().unwrap().to_owned();
+    fs::write(path("text"), "Hello, värld!").unwrap();
+    fs::write(path("empty"), "").unwrap();
+    fs::write(path("nul"), b"a\0b").unwrap();
+    fs::write(path("bom"), "\u{feff}text\r\n").unwrap();
+    fs::write(path("invalid"), [0xff, 0x61]).unwrap();
+    fs::write(path("surrogate"), [0xed, 0xa0, 0x80]).unwrap();
+    fs::write(path("large"), "x".repeat(9000)).unwrap();
+    std::os::unix::fs::symlink(path("text"), path("link")).unwrap();
+    let cases = vec![
+        (path("text"), 14, "Hello, värld!".to_owned(), 0),
+        (path("link"), 14, "Hello, värld!".to_owned(), 0),
+        (path("empty"), 0, "".to_owned(), 0),
+        (path("nul"), 3, "a\0b".to_owned(), 0),
+        (path("bom"), 9, "\u{feff}text\r\n".to_owned(), 0),
+        (path("invalid"), 2, "".to_owned(), 8),
+        (path("surrogate"), 3, "".to_owned(), 8),
+        (path("invalid"), 1, "".to_owned(), 7),
+        (path("text"), 0, "".to_owned(), 7),
+        (path("text"), 13, "".to_owned(), 7),
+        (path("text"), -1, "".to_owned(), 1),
+        ("".to_owned(), -1, "".to_owned(), 1),
+        ("".to_owned(), 0, "".to_owned(), 2),
+        ("bad\0path".to_owned(), 0, "".to_owned(), 2),
+        (path("missing"), 10, "".to_owned(), 3),
+        (dir.0.to_str().unwrap().to_owned(), 10, "".to_owned(), 5),
+        (path("large"), 9000, "x".repeat(9000), 0),
+        (path("large"), 8999, "".to_owned(), 7),
+    ];
+    let mut source = String::from(".module FileInput\n.function Calculate(Int32 mode) -> Int32\n");
+    for i in 0..cases.len() { source += &format!("ldarg mode\nldc.i4 {i}\nbeq Case{i}\n"); }
+    source += "ldc.i4 -1\nret\n";
+    for (i, (path, limit, text, _)) in cases.iter().enumerate() {
+        source += &format!("Case{i}:\nldstr {}\nldc.i4 {limit}\ncall neoCLR.Runtime.ReadAllText(String, Int32)\ndup\nvalue.is Byte\nbrtrue Error{i}\nvalue.unpack String\nldstr {}\ncall neoCLR.Runtime.StringCompareOrdinal(String, String)\nret\nError{i}:\nvalue.unpack Byte\nconv.i4\nret\n", serde_json::to_string(path).unwrap(), serde_json::to_string(text).unwrap());
+    }
+    source += ".end\n";
+    let seed = neoclr::assemble(FILE_INPUT_SEED).unwrap();
+    let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena", "--native-gc", "--bind-file-input", "--bind-utf8-text"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+#include "file-input.h"
+#include <stdlib.h>
+#include <fcntl.h>
+#include <string.h>
+static int open_count(void) {
+    int count = 0;
+    for (int fd = 0; fd < 256; fd++) if (fcntl(fd, F_GETFD) >= 0) count++;
+    return count;
+}
+int main(int argc, char **argv) {
+    uint64_t storage[8193]; storage[8192] = UINT64_C(0x1122334455667788);
+    neoclr_aot_context ctx = {.text = {(unsigned char *)storage, 65536, 0}};
+    if (argc > 2) {
+        size_t length = strlen(argv[2]);
+        neoclr_aot_text *path = malloc(8 + length);
+        if (!path) return 97;
+        path->length = length;
+        memcpy(path->bytes, argv[2], length);
+        neoclr_aot_context tiny = {0};
+        uint64_t result[2] = {77, 88};
+        int descriptors = open_count();
+        int32_t status = neoclr_file_read_utf8_v1(path, 64, &tiny.text, result);
+        free(path);
+        if (status != 5 || result[0] != 77 || result[1] != 88 || open_count() != descriptors) return 98;
+        return 0;
+    }
+    int32_t result = -99;
+    int descriptors = open_count();
+    int status = neoclr_entry_v4(argc > 1 ? atoi(argv[1]) : 0, &result, &ctx);
+    if (open_count() != descriptors) return 96;
+    if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 92;
+    if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used) return 93;
+    if (storage[8192] != UINT64_C(0x1122334455667788)) return 94;
+    if (status) { neoclr_aot_render_fault(stderr, &ctx.fault); return 1; }
+    printf("%d\n", result); return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(dir.0.join("host.c")).arg(base.join("file-input.c")).arg(base.join("text-arena.c"))
+        .arg(base.join("native-gc.c")).arg(base.join("root-probe.c"))
+        .arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+        .arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let app = neoclr::assemble(&source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for (i, (_, _, _, status)) in cases.iter().enumerate() {
+        assert_eq!(method.invoke(vec![neoclr::Value::Int32(i as i32)], neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(*status), "case {i}");
+        let r = Command::new(dir.0.join("host")).arg(i.to_string()).env_clear().output().unwrap();
+        assert_eq!(r.status.code(), Some(0), "case {i}: {r:?}");
+        assert_eq!(r.stdout, format!("{status}\n").as_bytes()); assert!(r.stderr.is_empty());
+    }
+    let exhausted = Command::new(dir.0.join("host")).arg("0").arg(path("text")).env_clear().output().unwrap();
+    assert!(exhausted.status.success(), "native arena exhaustion must preserve output/close file: {exhausted:?}");
+
+}

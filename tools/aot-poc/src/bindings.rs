@@ -363,6 +363,30 @@ pub fn file_output(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<
     Ok(bindings)
 }
 
+/// Explicit bounded file input; decoding and public Result construction remain separate.
+pub fn file_input(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        if row["name"] != "neoCLR.Runtime.ReadAllText" { continue; }
+        let name = "neoCLR.Runtime.ReadAllText";
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != name || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != vec![Type::String, Type::Int32] || f.returns != Type::Value || f.no_result
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty() || !f.locals.is_empty()
+            || f.is_virtual || f.is_override || f.is_abstract || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+            return Err("native file input requires exact ReadAllText(String, Int32) -> Value InternalCall contract".into());
+        }
+        f.impl_flags = 0;
+        f.body = vec![Op::String(String::new()), Op::PackValue(Type::String), Op::Return];
+        bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],
+            "implementation":"file-read-utf8-v1","symbol":"neoclr_file_read_utf8_v1","semantics":"bounded blocking UTF-8 file input; ordinary host permissions; preflight before open"}));
+    }
+    Ok(bindings)
+}
+
 pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {

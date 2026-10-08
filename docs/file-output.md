@@ -100,5 +100,6 @@ sanitized native, standalone/libSystem-only execution and retained HTTP admissio
 Reproduce with `benchmarks/native-web/verify_callbacks.py --case FileOutput` and the
 usual compiler/runtime/AOT/bundle/output arguments. This is not a performance benchmark.
 
-ReadAllText is still unbound in this slice, so the original combined file sample is
-not yet supported natively. The CLI Core.dll bootstrap remains a release gate.
+The following [native file-input slice](file-input.md#native-compilation-development-2026-10-08)
+now also binds ReadAllText and runs the original combined sample in both modes.
+The CLI Core.dll bootstrap remains a release gate.

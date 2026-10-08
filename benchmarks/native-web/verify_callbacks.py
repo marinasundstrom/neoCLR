@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
-p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault', 'PrimitiveMembers', 'AsyncEntry', 'AsyncEntryFault', 'AsyncEntryPending', 'AsyncEntryCancelled', 'AsyncEntryDiscard', 'ReferenceArrays', 'OrderCollections', 'Paths', 'Strings', 'MathConstants', 'FileOutput'))
+p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault', 'PrimitiveMembers', 'AsyncEntry', 'AsyncEntryFault', 'AsyncEntryPending', 'AsyncEntryCancelled', 'AsyncEntryDiscard', 'ReferenceArrays', 'OrderCollections', 'Paths', 'Strings', 'MathConstants', 'FileOutput', 'Files'))
 a = p.parse_args()
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
@@ -21,7 +21,7 @@ seed, core, ownership = (library / n for n in ('System.runtime.neox', 'Core.dll'
 libs = [library / n for n in ('System.Runtime.dll', 'System.Web.dll', 'System.Networking.dll', 'System.Data.dll')]
 context = ['--system', seed, *[x for lib in libs for x in ('--module', lib)], '--object-root', libs[0]]
 flags = [*context, '--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc', '--bind-int32-to-string', '--bind-utf8-text', '--bind-task-queue', '--native-stack-budget', '--bind-console-write-line']
-adapters = [base / 'file-output.c', base / 'task-queue-host.c', base / 'root-probe.c', base / 'native-gc.c',
+adapters = [base / 'file-input.c', base / 'file-output.c', base / 'task-queue-host.c', base / 'root-probe.c', base / 'native-gc.c',
             base / 'task-queue.c', base / 'native-stack.c', base / 'console.c', base.parent / 'aot-scalar/console.c', base / 'text-arena.c', base.parent / 'aot-fault-details/render.c']
 report = {'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
           'SDKROOT': os.environ.get('SDKROOT'), 'inputs': {}, 'commands': [], 'cases': {}}
@@ -43,6 +43,7 @@ for f in [Path(__file__), compiler, runtime, aot, core, seed, ownership, *libs, 
     report['inputs'][str(f)] = hashlib.sha256(f.read_bytes()).hexdigest()
 for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList')):
     source = {
+        'Files': ROOT / 'docs/experiments/raven-target/samples/library-files.rvn',
         'FileOutput': ROOT / 'docs/experiments/raven-target/samples/native-file-output.rvn',
         'MathConstants': ROOT / 'docs/experiments/raven-target/samples/library-math-constants.rvn',
         'Strings': ROOT / 'docs/experiments/raven-target/samples/library-strings.rvn',
@@ -60,12 +61,12 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultLis
     expected = 1 if name in ('CallbackFault', 'QueuePumpFault', 'AsyncEntryFault', 'AsyncEntryPending', 'AsyncEntryCancelled') else 0
     host_flags = ['-DNEOCLR_HOST_TASK_PUMP'] if name in ('TaskQueue', 'QueuePump', 'QueuePumpFault') else []
     workdirs = [ROOT] * 3
-    if name == 'FileOutput':
+    if name in ('FileOutput', 'Files'):
         workdirs = [output / (name + '-' + mode) for mode in ('vm-files', 'native-files', 'standalone-files')]
         for directory in workdirs:
             directory.mkdir()
     interpreted = run([runtime, 'run', assembly, *context, '--instructions', '100000000'], expected, cwd=workdirs[0])
-    case_flags = flags + (['--bind-integer-text'] if name == 'PrimitiveMembers' else []) + (['--bind-paths'] if name == 'Paths' else []) + (['--bind-file-output'] if name == 'FileOutput' else [])
+    case_flags = flags + (['--bind-integer-text'] if name == 'PrimitiveMembers' else []) + (['--bind-paths'] if name == 'Paths' else []) + (['--bind-file-output'] if name in ('FileOutput', 'Files') else []) + (['--bind-file-input'] if name == 'Files' else [])
     inspection = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world', *case_flags]).stdout)
     if not inspection['admission']['accepted']:
         raise RuntimeError(inspection['admission'])
@@ -73,6 +74,8 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultLis
     run(['clang', '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
          '-fsanitize=undefined,bounds', '-DNEOCLR_NATIVE_GC', *host_flags, *adapters, obj, '-o', native])
     executed = run([native], expected, cwd=workdirs[1])
+    if name == 'Files':
+        assert executed.stdout == 'Written\nCompleted\nHello, värld!\nWrite too large\nHello, värld!\nRead too large\n'
     if name == 'FileOutput':
         assert executed.stdout == 'File output passed\n'
     if name == 'MathConstants':
@@ -102,9 +105,10 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultLis
     if [line.split()[0] for line in dependencies] != ['/usr/lib/libSystem.B.dylib']:
         raise RuntimeError(dependencies)
     standalone = run([plain], expected, cwd=workdirs[2])
-    if name == 'FileOutput':
+    if name in ('FileOutput', 'Files'):
+        filename = 'output.txt' if name == 'FileOutput' else 'neoclr-file-demo.txt'
         for directory in workdirs:
-            assert (directory / 'output.txt').read_bytes() == 'Hello, värld!'.encode('utf-8')
+            assert (directory / filename).read_bytes() == 'Hello, värld!'.encode('utf-8')
     if standalone.stdout != interpreted.stdout or standalone.stderr != interpreted.stderr:
         raise RuntimeError(f'Standalone output/fault mismatch: {standalone} vs {interpreted}')
     for f in (assembly, obj, plain):

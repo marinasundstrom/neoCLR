@@ -56,6 +56,10 @@ int32_t neoclr_reserve_bytes_v1(neoclr_aot_text_arena *arena, int32_t length, vo
 int32_t neoclr_check_bytes_initialized_v1(const void *array, int32_t offset, int32_t count);
 /* Strict UTF-8 from initialized managed bytes; erased String or Byte(1).
  * Valid text uses arena storage; invalid encoding allocates nothing. */
+/* Strict decode from borrowed host bytes; String or Byte(1) erased result.
+ * Host storage stays valid across allocation/collection and is never retained. */
+int32_t neoclr_text_decode_utf8_bytes_v1(const unsigned char *bytes, uint64_t length,
+    neoclr_aot_text_arena *arena, void *output);
 int32_t neoclr_utf8_decode_v1(const void *array, neoclr_aot_text_arena *arena, void *output);
 /* Immutable concatenation; null inputs fault. No output/cursor publication on failure. */
 int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_text *right,

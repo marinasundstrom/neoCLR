@@ -114,3 +114,45 @@ public error parameter and native payload protocol.
 
 The experimental [Raven projection](raven-file-api.md) documents admitted calls,
 propagation, conditional-output checks and remaining API gaps.
+
+## Native compilation (development, 2026-10-08)
+
+The macOS ARM64 POC now binds exact ReadAllText(String, Int32) -> Value with
+`--bind-file-input`, requiring `--compile-system` and `--reference-arena`. The flag
+selects a linked POSIX service, not a permission sandbox. FileText's public Result
+construction and pattern matching remain ordinary managed CIL. No new Raven mapping,
+metadata encoding or guest API is introduced. Reuse the .NET comparison and bounded
+UTF-8 contract above; this fills native coverage without claiming new semantics.
+
+The adapter reads chunks into temporary host storage capped by maxBytes and probes
+one extra byte before decoding. It ignores reported file length for limit enforcement.
+The strict byte decoder is shared with the native UTF-8 array service, without
+inventing a managed array around host memory. Successful text is copied into owned
+GC/arena storage. Every opened descriptor is closed before decoding/managed allocation;
+temporary buffers are freed on success, error and native allocation failure. The
+caller output stays unchanged on terminal native failure. Ordinary FileReadError
+results retain their existing Byte payload protocol. GC roots use the normal native
+call boundary; Double support is unrelated to this service.
+
+Compared with reading directly into a managed buffer, temporary host storage keeps
+file-handle lifetime independent of collection and avoids publishing incomplete text.
+The cost is a second copy and transient host-plus-managed memory; maxBytes bounds input,
+not total process memory. Native arena exhaustion yields the existing native memory
+limit fault. Allocation policy differs from the interpreter's host allocator. No
+performance improvement is claimed. Blocking opens/reads cannot be interrupted by
+cooperative cancellation, symlinks follow host rules, and concurrent writes are not
+an atomic snapshot. Windows behavior, deterministic permission/disk failure injection
+and asynchronous I/O remain outside this POC.
+
+Eighteen native/interpreter comparisons cover exact/zero/negative limits, one-byte
+and multi-chunk overflow, invalid UTF-8 (including surrogate encodings), overflow before
+decoding, BOM/NUL preservation, missing paths, directories and symlinks. Native tests
+also check descriptor counts, arena canaries/root cleanup and unmodified result slots
+on allocation failure. Ten existing UTF-8-related tests pass after extracting the
+shared byte decoder. The [unchanged file sample](experiments/raven-target/samples/library-files.rvn)
+now passes interpreted, sanitized native and standalone/libSystem-only execution,
+including preserving old bytes after an oversized write.
+[Consumer evidence](../benchmarks/native-web/files-validation.json) also records HTTP
+admission. Reproduce with `benchmarks/native-web/verify_callbacks.py --case Files`
+and the usual compiler/runtime/AOT/bundle/output arguments. Each execution mode uses
+its own fresh working directory. This is correctness validation, not a benchmark.
