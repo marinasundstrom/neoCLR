@@ -1,0 +1,39 @@
+{
+  "baseRevision": "faac5c488236bffa9030fd0abdfe67a4cff1901d",
+  "scope": "Raven Server native admission only; uncommitted ordinal binding source at inspection",
+  "command": [
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+    "--inspect",
+    "/Users/robert/Projects/neoclr/target/native-host-callback-validation/Server.dll",
+    "@entry",
+    "--closed-world",
+    "--system",
+    "/private/tmp/string-builder-native1008d/System.runtime.neox",
+    "--module",
+    "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+    "--module",
+    "/private/tmp/string-builder-native1008d/System.Web.dll",
+    "--module",
+    "/private/tmp/string-builder-native1008d/System.Networking.dll",
+    "--module",
+    "/private/tmp/string-builder-native1008d/System.Data.dll",
+    "--object-root",
+    "/private/tmp/string-builder-native1008d/System.Runtime.dll",
+    "--compile-system",
+    "--bind-user-fault",
+    "--reference-arena",
+    "--native-gc",
+    "--bind-int32-to-string",
+    "--bind-utf8-text",
+    "--bind-socket-listener",
+    "--bind-console-write-line",
+    "--bind-integer-text",
+    "--bind-socket-accept",
+    "--bind-socket-transfer"
+  ],
+  "admission": {
+    "accepted": false,
+    "firstError": "neoCLR.Runtime.RegisterTaskQueue$aot_method_2837: unsupported value member contract",
+    "phase": "compilation"
+  }
+}

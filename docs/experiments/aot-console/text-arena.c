@@ -395,3 +395,13 @@ int32_t neoclr_reserve_records_v1(neoclr_aot_text_arena *arena, int32_t length,
     *output = storage;
     return NEOCLR_AOT_FAULT_NONE;
 }
+
+int32_t neoclr_string_compare_ordinal_v1(const neoclr_aot_text *left,
+        const neoclr_aot_text *right, int32_t *output) {
+    if (!left || !right || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t length = left->length < right->length ? left->length : right->length;
+    int order = memcmp(left->bytes, right->bytes, (size_t)length);
+    *output = order < 0 ? -1 : order > 0 ? 1 :
+        left->length < right->length ? -1 : left->length > right->length ? 1 : 0;
+    return NEOCLR_AOT_FAULT_NONE;
+}

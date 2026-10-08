@@ -152,3 +152,18 @@ standalone native execution after this change; the standalone binary links only
 libSystem. [Recorded inputs and results](../../../benchmarks/native-web/host-callback-validation.json).
 This consumer exercises existing guest invocation; host invocation is covered by the
 focused fixture above. Full Server admission still stops at SocketConnectResult.
+
+## HTTP ordinal-comparison prerequisite — 2026-10-08
+
+The existing UTF-8 binding opt-in now includes exact StringCompareOrdinal(String,
+String) -> Int32. The native helper compares bytes and normalizes the result to -1/0/1,
+without allocation. For valid neoCLR text this is Unicode scalar ordering, preserving
+[the existing String contract](../../raven-string-api.md); it deliberately differs from
+.NET UTF-16 ordinal ordering for some supplementary/BMP pairs. No case folding or
+normalization is introduced. Null input faults leave the result unpublished.
+
+The expanded sanitized ordinal fixture compares 88 text/null cases against the
+interpreter, including empty/prefix/embedded-NUL strings, composed/decomposed text and
+U+10000 versus U+E000. It also rejects ordinary same-named methods with matching result
+types. Full Server admission now reaches the specialized RegisterTaskQueue service.
+This closes a missing binding, not a compiler lookup or guest text-semantics change.

@@ -317,6 +317,7 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
         let name = row["name"].as_str().unwrap();
         let (parameters, result, implementation, symbol) = match name {
+            "neoCLR.Runtime.StringCompareOrdinal" => (vec![Type::String, Type::String], Type::Int32, "string-compare-ordinal-v1", "neoclr_string_compare_ordinal_v1"),
             "neoCLR.Runtime.StringContainsOrdinal" => (vec![Type::String, Type::String], Type::Boolean, "string-contains-ordinal-v1", "neoclr_string_contains_ordinal_v1"),
             "neoCLR.Runtime.StringStartsWithOrdinal" => (vec![Type::String, Type::String], Type::Boolean, "string-starts-with-ordinal-v1", "neoclr_string_starts_with_ordinal_v1"),
             "neoCLR.Runtime.StringEndsWithOrdinal" => (vec![Type::String, Type::String], Type::Boolean, "string-ends-with-ordinal-v1", "neoclr_string_ends_with_ordinal_v1"),
@@ -336,7 +337,7 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
             || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
             || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
             || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
-            return Err("native UTF-8 binding requires exact StringByteCount(String) -> Int32 or StringSliceUtf8(String, Int32, Int32) -> Value or Utf8Encode(String) -> Byte[] or Utf8Decode(arrayref<Byte>) -> Value or StringConcat(String, String) -> String or ordinal String predicates(String, String) -> Boolean InternalCall contract".into());
+            return Err("native UTF-8 binding requires exact StringByteCount(String) -> Int32 or StringSliceUtf8(String, Int32, Int32) -> Value or Utf8Encode(String) -> Byte[] or Utf8Decode(arrayref<Byte>) -> Value or StringConcat(String, String) -> String or StringCompareOrdinal(String, String) -> Int32 or ordinal String predicates(String, String) -> Boolean InternalCall contract".into());
         }
         f.impl_flags = 0;
         // A verifier-valid nonreturning placeholder needs no unsupported array

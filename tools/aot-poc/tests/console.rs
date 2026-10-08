@@ -2708,30 +2708,33 @@ fn int32_parsing_rejects_ordinary_same_named_methods() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn ordinal_string_predicates_preserve_utf8_nulls_and_allocation_independence() {
-    let names = ["StringContainsOrdinal", "StringStartsWithOrdinal", "StringEndsWithOrdinal"];
+    let names = ["StringContainsOrdinal", "StringStartsWithOrdinal", "StringEndsWithOrdinal", "StringCompareOrdinal"];
     let mut seed_source = String::from(".module System\n.references ()\n");
     for name in names {
-        seed_source.push_str(&format!(".function neoCLR.Runtime.{name}(String, String) -> Boolean\n.methodimpl InternalCall\n.end\n"));
+        let returns = if name == "StringCompareOrdinal" { "Int32" } else { "Boolean" };
+        seed_source.push_str(&format!(".function neoCLR.Runtime.{name}(String, String) -> {returns}\n.methodimpl InternalCall\n.end\n"));
     }
     let seed = neoclr::assemble(&seed_source).unwrap();
     let cases = [("", ""), ("abc", ""), ("", "a"), ("abc", "a"), ("abc", "b"), ("abc", "c"),
         ("abc", "abc"), ("abc", "abcd"), ("abc", "A"), ("aaaaab", "aaab"), ("hé😀z", "é😀"),
         ("hé😀z", "😀z"), ("é😀", "é"), ("é", "é"), ("a\0b", "\0"), ("a\0b", "a\0"),
-        ("a\0b", "\0b"), ("a\0b", "a\0c")];
+        ("a\0b", "\0b"), ("a\0b", "a\0c"), ("\u{10000}", "\u{e000}"), ("b", "a")];
     let mut source = String::from(".module Predicates\n.function Calculate(Int32 mode) -> Int32\n.local String absent\n");
-    for i in 0..cases.len()*3+6 {
+    for i in 0..cases.len()*4+8 {
         source.push_str(&format!("ldarg mode\nldc.i4 {i}\nceq\nbrtrue Case{i}\n"));
     }
     source.push_str("ldc.i4 -1\nret\n");
     for (i, (text, pattern)) in cases.iter().enumerate() {
         for (j, name) in names.iter().enumerate() {
-            source.push_str(&format!("Case{}:\nldstr {}\nldstr {}\ncall neoCLR.Runtime.{name}(String, String)\nbrtrue Yes\nldc.i4 0\nret\n", i*3+j, serde_json::to_string(text).unwrap(), serde_json::to_string(pattern).unwrap()));
+            let end = if j == 3 { "ret\n" } else { "brtrue Yes\nldc.i4 0\nret\n" };
+            source.push_str(&format!("Case{}:\nldstr {}\nldstr {}\ncall neoCLR.Runtime.{name}(String, String)\n{end}", i*4+j, serde_json::to_string(text).unwrap(), serde_json::to_string(pattern).unwrap()));
         }
     }
-    for j in 0..6 {
-        source.push_str(&format!("Case{}:\nldloca absent\ninitobj String\n", cases.len()*3+j));
-        source.push_str(if j<3 { "ldloc absent\nldstr \"\"\n" } else { "ldstr \"\"\nldloc absent\n" });
-        source.push_str(&format!("call neoCLR.Runtime.{}(String, String)\nbrtrue Yes\nldc.i4 0\nret\n", names[j%3]));
+    for j in 0..8 {
+        source.push_str(&format!("Case{}:\nldloca absent\ninitobj String\n", cases.len()*4+j));
+        source.push_str(if j<4 { "ldloc absent\nldstr \"\"\n" } else { "ldstr \"\"\nldloc absent\n" });
+        let end = if j%4 == 3 { "ret\n" } else { "brtrue Yes\nldc.i4 0\nret\n" };
+        source.push_str(&format!("call neoCLR.Runtime.{}(String, String)\n{end}", names[j%4]));
     }
     source.push_str("Yes:\nldc.i4 1\nret\n.end\n");
     let dir = Temp::new();
@@ -2757,7 +2760,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 "#).unwrap();
-    let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I"])
+    let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds", "-I"])
         .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
         .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
         .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
@@ -2765,10 +2768,10 @@ int main(int argc, char **argv) {
     let app = neoclr::assemble(&source).unwrap();
     let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
     let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
-    for mode in 0..cases.len()*3+6 {
+    for mode in 0..cases.len()*4+8 {
         let reference = method.invoke(vec![neoclr::Value::Int32(mode as i32)], neoclr::Limits::default());
         let r = Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
-        if mode >= cases.len()*3 {
+        if mode >= cases.len()*4 {
             let fault = reference.unwrap_err();
             assert_eq!(r.status.code(), Some(1), "{r:?}");
             assert_eq!(String::from_utf8_lossy(&r.stderr), fault.diagnostic().to_string());
@@ -2780,7 +2783,8 @@ int main(int argc, char **argv) {
         }
     }
     for name in names {
-        let ordinary = neoclr::assemble(&format!(".module System\n.references ()\n.function neoCLR.Runtime.{name}(String, String) -> Boolean\nldc.bool false\nret\n.end\n")).unwrap();
+        let (returns, body) = if name == "StringCompareOrdinal" { ("Int32", "ldc.i4 0") } else { ("Boolean", "ldc.bool false") };
+        let ordinary = neoclr::assemble(&format!(".module System\n.references ()\n.function neoCLR.Runtime.{name}(String, String) -> {returns}\n{body}\nret\n.end\n")).unwrap();
         let source = format!(".module Bad\n.function Calculate() -> Int32\nldstr \"a\"\nldstr \"a\"\ncall neoCLR.Runtime.{name}(String, String)\npop\nldc.i4 0\nret\n.end");
         let reject = Temp::new();
         let r = compile_source(&reject, &ordinary, &source, &["--compile-system", "--reference-arena", "--bind-utf8-text"], false);

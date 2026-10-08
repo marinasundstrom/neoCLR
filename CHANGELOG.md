@@ -17,6 +17,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   next reaches SocketDeadlineAfter. Add exact shared-deadline bindings with monotonic
   stamps, expiry-before-submission and no budget refresh across transfers; validate
   native kernel and compiled echo paths. Admission now reaches StringCompareOrdinal.
+  Bind StringCompareOrdinal with UTF-8/scalar ordering and validate 88 native/interpreter
+  text/null cases; full Server now reaches specialized RegisterTaskQueue.
   Public HTTP execution remains incomplete.
 
 - Add a private nonblocking native accept kernel with retained completion roots,
