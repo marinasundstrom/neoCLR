@@ -189,8 +189,11 @@ and fault parity ([evidence](experiments/aot-console/route-pattern-validation.js
 Eight routing outcomes and retained captures now pass repeated-request validation
 ([evidence](experiments/aot-console/route-lifetime-validation.json)). Native arena usage
 grows to 117,507 bytes at 128 requests and exhausts a fixed 64 KiB budget; the interpreter
-reclaims temporary objects during the same source workload. Establish typed native roots
-and allocation descriptors next, then nonmoving tracing/reclamation before qualifying
+reclaims temporary objects during the same source workload. Private typed storage-layout
+diagnostics now distinguish reference slots, conditional erased payloads and managed
+borrows ([evidence](experiments/aot-console/route-trace-layout-validation.json)). Establish
+initialized native roots at allocating calls and emitted allocation descriptors next,
+then nonmoving tracing/reclamation before qualifying
 sustained HTTP execution. This is planned integration work, not an implemented native
 collector. Borrowed String interface receivers remain unsupported.
 The author adds a console-input sample after unions, exercising input and

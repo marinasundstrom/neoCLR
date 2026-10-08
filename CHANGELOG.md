@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add private typed tracing-layout diagnostics to AOT inspection for admitted value
+  profiles: distinguish managed references from native-width integers, preserve nested
+  field offsets, identify conditional erased String payloads and owner-dependent borrows,
+  and describe reference-object payloads. Validate cycles and nominal byte-array aliases.
+  These are storage recipes only; emitted descriptors, safepoint roots and native
+  reclamation remain future work. Native code generation and runtime ABI are unchanged.
+
 - Add a real RoutePattern workload covering eight repeated routing outcomes, pattern
   errors and capture retention. Measure native arena growth from 2,433 bytes before
   requests to 117,507 bytes at 128 requests; a fixed 64 KiB invocation faults without

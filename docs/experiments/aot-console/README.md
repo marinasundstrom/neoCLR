@@ -1556,3 +1556,38 @@ SDKROOT="$(xcrun --show-sdk-path)" python3 docs/experiments/aot-console/verify_r
   --aot tools/aot-poc/target/debug/neoclr-aot-poc \
   --bundle /path/to/neoclr-native-poc --output target/aot-route-lifetime
 ```
+
+## Typed native tracing layouts (2026-10-08)
+
+AOT `--inspect` now includes `traceLayout` for successfully admitted value profiles,
+computed from the same prepared module and profile used by native lowering. Indices
+refer to that selected module, not the original all-declarations inventory. The private
+`neoclr-native-trace-layout-v1` report describes each function's arguments, locals and
+result, plus concrete reference-object payloads. Rejected programs have a null layout;
+an admitted scalar profile outside the value profile reports an explicit unavailability
+reason. Inspection remains read-only and does not execute generated code.
+
+Layouts contain sparse typed slots, independent of ABI integer width. Int64/UInt64 and
+native integers have no trace slots. String/Char slots distinguish image-or-arena text;
+object/interface views identify the private tagged-String convention. Erased payloads
+trace only String tag 4. Inline records flatten reference offsets, reference edges stop
+recursive expansion, and String arrays require tracing initialized text slots. Nominal
+byte-array backing views refer to the array itself. A managed borrow requires its owner
+to survive even when the pointee is an integer; pointee tracing alone is insufficient.
+
+Byte offsets use padded eight-byte storage lanes. Object payload offsets start after
+the separately reported eight-byte header. Function layouts describe possible storage,
+not stack-frame locations or currently initialized/live roots. They must not be scanned
+as root maps: evaluation stacks, initialization, safepoint spills, pending allocation
+inputs/results, dynamic array descriptors, host/fault roots and borrow owner recovery
+still need implementation. No descriptors are emitted into object files and no GC runs.
+This is the first typed-layout foundation, not completion of the reclamation plan.
+
+[RoutePattern layout evidence](route-trace-layout-validation.json) records the real
+lifetime consumer's admission and descriptors. Four focused layout tests and five
+inspection tests cover integer exclusion, nested offsets, owner-dependent borrows,
+cycles, array aliases, rejected admission and deterministic read-only inspection.
+Prior standalone routing/lifetime results remain the execution baseline because this
+slice changes diagnostics only. Reusing the existing CLR/native GC comparison, typed
+storage information supplies one input a precise collector needs; it does not provide
+CLR-style safepoint/liveness metadata or establish a performance advantage.

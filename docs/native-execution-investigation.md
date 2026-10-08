@@ -499,3 +499,11 @@ This is a test-driven integration sequence, not a claim that descriptors, native
 or tracing have shipped. Reuse the CLR/GC comparisons and sources above; measure collector
 costs once collection exists rather than substituting an arena-size comparison for a GC
 benchmark.
+
+The first implementation slice now exposes private typed storage recipes through AOT
+inspection, including reference-object payloads and argument/local/result layouts.
+[Contract and evidence](experiments/aot-console/README.md#typed-native-tracing-layouts-2026-10-08)
+cover integer exclusion, nested offsets, cyclic edges, erased String tags, managed borrows
+and nominal byte-array views. This completes only the static classification portion of
+step 1: dynamic allocation descriptors, initialized/live roots and emitted registration
+remain open. It does not change the proposed collector or the existing CLR comparison.

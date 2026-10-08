@@ -1,0 +1,1326 @@
+{
+  "baseRevision": "e4c3c06dd59fa4d63400c431d7c94b5e2c911866",
+  "command": [
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+    "--inspect",
+    "/Users/robert/Projects/neoclr/target/aot-route-lifetime-4/Route.dll",
+    "@entry",
+    "--closed-world",
+    "--system",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox",
+    "--module",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+    "--module",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll",
+    "--module",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll",
+    "--module",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll",
+    "--object-root",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll",
+    "--compile-system",
+    "--bind-user-fault",
+    "--bind-console-write-line",
+    "--bind-utf8-text",
+    "--bind-integer-text",
+    "--bind-int32-to-string",
+    "--reference-arena"
+  ],
+  "inputs": {
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "eec237e8a924743fbf56ac9c24932cab0a92fbc35c9e2cc23d0a2fe4a5a9fc24",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "ac7efe36e95e2c848d81c7bef37fe8e270146f8222ea91cf4866c4348f043234",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "428f0709baf84634025e0d6387a5726edffb1bcc7c18d28795317705e5fb43de",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "bfbfda2f336a73059418c84899787d4f8cc680f27d4864d70785692b048d0382",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.deps.json": "c02d34dc57e38be4c1ad97a24aeea0a41f87ce4208e77072f6c5cdb4d7599832",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "6ca8ab4df3f3f57be16d971c56101ef83511f6ad151945cd7854174d85fb318c",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.deps.json": "8439a508ae1b5e7d33490958bfef66338c921292adf5a2eb3f22784cb5fb9ce0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "c59a935b707df3e6df0aa948ff77d7ff651e4994dec21c2b0f3169a5d22db2d7",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.runtimeconfig.json": "d093ce9035033b5e5815db98bc0e0fe667311b1109bfeff2ffa2394ef059290d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/route-lifetime.rvn": "d9370ab0573130d5305a42561f09f679a2fdbde92bdfef7da536855f55641b0c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/verify_route_lifetime.py": "326b2561a7e71524ef49097c649da942736fa8889c87cd90c7f6052c106a4a5b",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "fdbc030dc54e16c71f9f915bb4785a7713cd93256bf9b049cc39f2fa4a00afad",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "60ac1f438858ac2cb891cf8fd959e1dd70e6a24c78cb3e4c570a5e3025c7e8dd",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/Core.dll": "1c3f7c19c983d2ed457d1a02fe0ac6cfee40d165d966ceebea19712f7d666208",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Data.dll": "fdf3c7866a8cae147578bc315a2c6b72eea4edb08d2a496a6134c662c8aa12df",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Networking.dll": "7c33d97e0e65a23876e300fdddc069b03fad6bc87ffb7c1bea4333f21f0e9ea2",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Runtime.dll": "7560a447377650539c5f40872a2e71ca9ed7c15b2672319c04b07447808aa2ea",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.Web.dll": "2ceee479056bca82e9752f81d84881db118dc106af5efa8cf121c345ea94ce7b",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/lib/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "858ec6a53c8ff173487717129976c8c4bfd68f727dc3a0083ced1a55c2503e8d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/route-lifetime-host.c": "860b34759517c83f66191ab114095c1c655a7959149e24cac2873a99bee103a7",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "abc5c07f84e1b4f505bdd92b5d924acf10db2624ad0b348168567f1ee93a6dd0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "02983fe29eb39c84d2818f70ad0e9315cdd22a9e2f4ced11d0b55dc7efbfd86d",
+    "/Users/robert/Projects/neoclr/target/aot-route-lifetime-4/Route.dll": "765080136d1cc566a6be8f2c0c21c1a18fe9edb27176db559e87ab60887f3c7a",
+    "tools/aot-poc/src/gc_layout.rs": "75f96bd34425404a7f2351ed152aa74c3379a7391b915b840fb4dedfe5cae94e",
+    "tools/aot-poc/src/inspection.rs": "bb5dfc6bcf0f94960b7ec37edfa90c2ee1c7673d34b2d0a66b97ddaa0f9a7f44",
+    "tools/aot-poc/src/compiler.rs": "fb3414de0cdc17edc84409d8b3711dff1c22203b377cc2a7306a3a0b4db00559",
+    "tools/aot-poc/src/values.rs": "8ed3603b242462869868d2db1d2008bdc3b6556faaf06014e118aadefc5f4511"
+  },
+  "admission": {
+    "accepted": true
+  },
+  "reportSha256": "9bae339b81b8a7e546b3221e77602d93ab486af3fb6669dd543a0583366f562e",
+  "validation": "4 typed-layout unit tests and 5 inspection tests passed; real RoutePattern lifetime consumer admitted. Prior runtime/lifetime execution evidence is reused; no native emission or collector behavior changed.",
+  "traceLayoutSummary": {
+    "schema": "neoclr-native-trace-layout-v1",
+    "functionCount": 145,
+    "objectCount": 7,
+    "topLevelSlotKinds": {
+      "byte-array": 16,
+      "byte-values": 2,
+      "conditional-text": 14,
+      "interface-view": 51,
+      "managed-borrow": 79,
+      "object-view": 103,
+      "string-array": 6,
+      "text": 167
+    },
+    "notice": "Private storage recipes only; not initialized/live root maps, safepoints, emitted descriptors or a collector."
+  },
+  "traceLayoutExcerpt": {
+    "types": [
+      {
+        "index": 0,
+        "name": "$aot_ObjectBase",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 1,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_496E76616C6964557466384572726F72",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 2,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_55746638",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 3,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 4,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973744974657261746F726031",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 5,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4F7074696F6E6031",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 6,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4F7074696F6E",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 7,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4F7074696F6E.N_536F6D656031",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 8,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4F7074696F6E.N_4E6F6E65",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 9,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4E756D62657250617273654572726F72",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 10,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4E756D62657250617273654572726F72.N_496E76616C6964466F726D6174",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 11,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_4E756D62657250617273654572726F72.N_4F766572666C6F77",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 12,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 13,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 14,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 15,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 16,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 17,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 18,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 19,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_55746638536C6963654572726F72",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 20,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_55746638536C6963654572726F72.N_4F75744F6652616E6765",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 21,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_55746638536C6963654572726F72.N_496E76616C6964426F756E64617279",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 22,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_41727261796031",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 23,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_41727261794974657261746F726031",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 24,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_4974657261626C656031",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 25,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_4974657261746F726031",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 26,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_53657175656E63656031",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 27,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_4D757461626C6553657175656E63656031",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 28,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_436F6C6C656374696F6E6031",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 29,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_4C6973746031",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 30,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_446973706F7361626C65",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 31,
+        "name": "NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_526F7574654D61746368",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 32,
+        "name": "NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_526F7574655061747465726E",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 33,
+        "name": "System.Runtime.CompilerServices.RuntimeServices",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 34,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_448",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 35,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031$aot_shape_449",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 36,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_450",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 37,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031$aot_shape_451",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 38,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_452",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 39,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031$aot_shape_453",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 40,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_454",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 41,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031$aot_shape_455",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 42,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_53657175656E63656031$aot_shape_456",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 43,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_436F6C6C656374696F6E6031$aot_shape_457",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 44,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_4974657261626C656031$aot_shape_458",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 45,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_459",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 46,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4F6B6031$aot_shape_460",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 47,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031$aot_shape_461",
+        "referenceType": true,
+        "representation": "Record"
+      },
+      {
+        "index": 48,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_4D757461626C6553657175656E63656031$aot_shape_462",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 49,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_4C6973746031$aot_shape_463",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 50,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_464",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 51,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031$aot_shape_465",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 52,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C746032$aot_shape_466",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 53,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_526573756C74.N_4572726F726031$aot_shape_467",
+        "referenceType": false,
+        "representation": "Record"
+      },
+      {
+        "index": 54,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_4974657261746F726031$aot_shape_468",
+        "referenceType": false,
+        "representation": "Interface"
+      },
+      {
+        "index": 55,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973744974657261746F726031$aot_shape_469",
+        "referenceType": true,
+        "representation": "Record"
+      }
+    ],
+    "objects": [
+      {
+        "allocationBytes": 24,
+        "headerBytes": 8,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031",
+        "payload": {
+          "lanes": 2,
+          "storageBytes": 16,
+          "traceSlots": [
+            {
+              "byteOffset": 0,
+              "lane": 0,
+              "trace": {
+                "elements": "initialized-text-slots",
+                "kind": "string-array"
+              }
+            }
+          ]
+        },
+        "typeIndex": 3
+      },
+      {
+        "allocationBytes": 32,
+        "headerBytes": 8,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973744974657261746F726031",
+        "payload": {
+          "lanes": 3,
+          "storageBytes": 24,
+          "traceSlots": [
+            {
+              "byteOffset": 0,
+              "lane": 0,
+              "trace": {
+                "kind": "byte-array"
+              }
+            }
+          ]
+        },
+        "typeIndex": 4
+      },
+      {
+        "allocationBytes": 24,
+        "headerBytes": 8,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_41727261794974657261746F726031",
+        "payload": {
+          "lanes": 2,
+          "storageBytes": 16,
+          "traceSlots": [
+            {
+              "byteOffset": 0,
+              "lane": 0,
+              "trace": {
+                "kind": "byte-array"
+              }
+            }
+          ]
+        },
+        "typeIndex": 23
+      },
+      {
+        "allocationBytes": 24,
+        "headerBytes": 8,
+        "name": "NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_526F7574654D61746368",
+        "payload": {
+          "lanes": 2,
+          "storageBytes": 16,
+          "traceSlots": [
+            {
+              "byteOffset": 0,
+              "lane": 0,
+              "trace": {
+                "kind": "interface-view",
+                "stringTagMask": 1,
+                "typeIndex": 26
+              }
+            },
+            {
+              "byteOffset": 8,
+              "lane": 1,
+              "trace": {
+                "kind": "interface-view",
+                "stringTagMask": 1,
+                "typeIndex": 26
+              }
+            }
+          ]
+        },
+        "typeIndex": 31
+      },
+      {
+        "allocationBytes": 24,
+        "headerBytes": 8,
+        "name": "NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_526F7574655061747465726E",
+        "payload": {
+          "lanes": 2,
+          "storageBytes": 16,
+          "traceSlots": [
+            {
+              "byteOffset": 0,
+              "lane": 0,
+              "trace": {
+                "kind": "interface-view",
+                "stringTagMask": 1,
+                "typeIndex": 26
+              }
+            },
+            {
+              "byteOffset": 8,
+              "lane": 1,
+              "trace": {
+                "kind": "interface-view",
+                "stringTagMask": 1,
+                "typeIndex": 26
+              }
+            }
+          ]
+        },
+        "typeIndex": 32
+      },
+      {
+        "allocationBytes": 24,
+        "headerBytes": 8,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031$aot_shape_461",
+        "payload": {
+          "lanes": 2,
+          "storageBytes": 16,
+          "traceSlots": [
+            {
+              "byteOffset": 0,
+              "lane": 0,
+              "trace": {
+                "kind": "byte-array"
+              }
+            }
+          ]
+        },
+        "typeIndex": 47
+      },
+      {
+        "allocationBytes": 32,
+        "headerBytes": 8,
+        "name": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973744974657261746F726031$aot_shape_469",
+        "payload": {
+          "lanes": 3,
+          "storageBytes": 24,
+          "traceSlots": [
+            {
+              "byteOffset": 0,
+              "lane": 0,
+              "trace": {
+                "elements": "initialized-text-slots",
+                "kind": "string-array"
+              }
+            }
+          ]
+        },
+        "typeIndex": 55
+      }
+    ],
+    "functions": [
+      {
+        "arguments": [
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 32
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": []
+          }
+        ],
+        "index": 0,
+        "locals": [
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": []
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 5,
+            "storageBytes": 40,
+            "traceSlots": [
+              {
+                "byteOffset": 16,
+                "lane": 2,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              },
+              {
+                "byteOffset": 32,
+                "lane": 4,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 5,
+            "storageBytes": 40,
+            "traceSlots": [
+              {
+                "byteOffset": 16,
+                "lane": 2,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              },
+              {
+                "byteOffset": 32,
+                "lane": 4,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 5,
+            "storageBytes": 40,
+            "traceSlots": [
+              {
+                "byteOffset": 16,
+                "lane": 2,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              },
+              {
+                "byteOffset": 32,
+                "lane": 4,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 8,
+                "lane": 1,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 8,
+                "lane": 1,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 8,
+                "lane": 1,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 8,
+                "lane": 1,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 8,
+                "lane": 1,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              },
+              {
+                "byteOffset": 16,
+                "lane": 2,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 16,
+                "lane": 2,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": []
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": []
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 16,
+                "lane": 2,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 8,
+                "lane": 1,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              },
+              {
+                "byteOffset": 16,
+                "lane": 2,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          }
+        ],
+        "name": "NeoMetadata_F36FEB1B50009672E7B642339321E13F1E5D26699DACA29C76820FC3194F2A92.F_436865636B52657175657374",
+        "result": {
+          "lanes": 1,
+          "storageBytes": 8,
+          "traceSlots": []
+        }
+      },
+      {
+        "arguments": [
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": []
+          }
+        ],
+        "index": 1,
+        "locals": [
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 8,
+                "lane": 1,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 32
+                }
+              },
+              {
+                "byteOffset": 16,
+                "lane": 2,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 32
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 32
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 32
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 5,
+            "storageBytes": 40,
+            "traceSlots": [
+              {
+                "byteOffset": 16,
+                "lane": 2,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              },
+              {
+                "byteOffset": 32,
+                "lane": 4,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 8,
+                "lane": 1,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 8,
+                "lane": 1,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 8,
+                "lane": 1,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 31
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 8,
+                "lane": 1,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 32
+                }
+              },
+              {
+                "byteOffset": 16,
+                "lane": 2,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 32
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 8,
+                "lane": 1,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 32
+                }
+              },
+              {
+                "byteOffset": 16,
+                "lane": 2,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": [
+              {
+                "byteOffset": 0,
+                "lane": 0,
+                "trace": {
+                  "kind": "object-view",
+                  "stringTagMask": 1,
+                  "typeIndex": 32
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": []
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": []
+          },
+          {
+            "lanes": 3,
+            "storageBytes": 24,
+            "traceSlots": [
+              {
+                "byteOffset": 16,
+                "lane": 2,
+                "trace": {
+                  "kind": "text",
+                  "storage": "image-or-arena"
+                }
+              }
+            ]
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": []
+          },
+          {
+            "lanes": 1,
+            "storageBytes": 8,
+            "traceSlots": []
+          }
+        ],
+        "name": "NeoMetadata_F36FEB1B50009672E7B642339321E13F1E5D26699DACA29C76820FC3194F2A92.F_52756E",
+        "result": {
+          "lanes": 1,
+          "storageBytes": 8,
+          "traceSlots": []
+        }
+      },
+      {
+        "arguments": [],
+        "index": 2,
+        "locals": [],
+        "name": "NeoMetadata_F36FEB1B50009672E7B642339321E13F1E5D26699DACA29C76820FC3194F2A92.F_4D61696E",
+        "result": {
+          "lanes": 1,
+          "storageBytes": 8,
+          "traceSlots": []
+        }
+      }
+    ],
+    "scope": "All type identities/object payloads; function storage excerpts for CheckRequest, Run and Main. Full report is reproducible with the recorded command."
+  }
+}

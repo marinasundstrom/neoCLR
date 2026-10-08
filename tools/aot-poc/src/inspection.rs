@@ -50,9 +50,10 @@ pub fn report(
     } else {
         Ok(None)
     };
-    let (admission, selection) = match prepared {
+    let (admission, selection, trace_layout) = match prepared {
         Err(e) => (
             json!({"accepted": false, "phase": "selection", "firstError": e.to_string()}),
+            Value::Null,
             Value::Null,
         ),
         Ok(prepared) => {
@@ -64,16 +65,23 @@ pub fn report(
                     json!({"accepted": false, "phase": "compilation", "firstError": e.to_string()})
                 }
             };
+            let trace_layout = if admission["accepted"] == true {
+                match super::compiler::trace_layout(module, details.as_ref()) {
+                    Ok(layout) => layout,
+                    Err(error) => json!({"unavailable": error.to_string()}),
+                }
+            } else { Value::Null };
             (
                 admission,
                 prepared.map_or(Value::Null, |(_, report)| report),
+                trace_layout,
             )
         }
     };
     json!({"schema": "neoclr-aot-inspection-v1", "module": input.name, "root": root,
         "scope": "inventory includes all declarations; admission uses admissionMode",
         "admissionMode": if closed { "closed-world" } else { "whole-module" },
-        "selection": selection, "capabilities": {"console": false, "faultDetails": fault_details}, "admission": admission,
+        "traceLayout": trace_layout, "selection": selection, "capabilities": {"console": false, "faultDetails": fault_details}, "admission": admission,
         "assemblies": input.assemblies, "types": input.types, "functions": functions, "opcodes": histogram,
         "notice": "Build diagnostics only. Not a deployable metadata sidecar, stable ABI or export manifest."})
 }

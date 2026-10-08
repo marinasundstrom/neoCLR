@@ -52,6 +52,8 @@ fn admitted_values_report_exact_overload_identity_without_artifacts() {
     let bytes = include_bytes!("../../../docs/experiments/aot-values/Overloads.pe");
     let report = inspect(bytes);
     assert_eq!(report["admission"]["accepted"], true);
+    assert_eq!(report["traceLayout"]["schema"], "neoclr-native-trace-layout-v1");
+    assert!(!report["traceLayout"]["functions"].as_array().unwrap().is_empty());
     assert_eq!(report, inspect(bytes), "report must be deterministic");
     let original = neoclr::metadata_container::decode(bytes).unwrap();
     assert_eq!(
@@ -80,6 +82,7 @@ fn generated_union_inventory_retains_unsupported_types_and_calls() {
         "../../../docs/experiments/aot-values/Choice.pe"
     ));
     assert_eq!(report["admission"]["accepted"], false);
+    assert!(report["traceLayout"].is_null());
     assert!(
         report["admission"]["firstError"]
             .as_str()

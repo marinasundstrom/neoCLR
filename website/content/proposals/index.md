@@ -313,9 +313,10 @@ The existing RoutePattern.Parse/Match/GetInt32 path now also runs standalone aft
 String-array storage for its ArrayList<string> dependencies. A repeated-request consumer
 now checks eight routing outcomes and a retained capture. Its native arena reaches
 117,507 bytes at 128 requests and exhausts a fixed 64 KiB budget, while interpreter
-diagnostics show temporary objects being reclaimed. Native typed roots and tracing
-descriptors are the next foundation for collection; no native collector is implemented
-yet. The HTTP API drives this work, and sustained server execution remains unqualified.
+diagnostics show temporary objects being reclaimed. AOT inspection now reports typed
+storage layouts that distinguish reference slots from integers. Safepoint roots and
+emitted allocation descriptors are the next foundation; no native collector is
+implemented yet. The HTTP API drives this work, and sustained server execution remains unqualified.
 The bounded arena is a temporary experiment, not a final server memory policy.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future

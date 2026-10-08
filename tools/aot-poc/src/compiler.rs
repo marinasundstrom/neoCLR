@@ -18,6 +18,11 @@ use std::collections::{HashMap, HashSet};
 
 type Error = Box<dyn std::error::Error>;
 
+pub(super) fn trace_layout(input: &neoclr::Module, details: Option<&crate::fault_details::Options>) -> Result<serde_json::Value, Error> {
+    values::trace_layout(input, details)
+}
+
+
 pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
     if details.is_some() || !input.types.is_empty()
         || input.functions.iter().any(|f| {
