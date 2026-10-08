@@ -81,8 +81,14 @@ cover immutable snapshots, replacement, optional XML, dependency emission, missi
 dependencies, duplicate identities/paths and CLI/malformed input rejection; the old
 CLI-bootstrap catalog remains supported and its regression probe passes.
 
-This is an API-level prerequisite: rvnc/project/editor configuration and complete
-source-runtime bootstrapping still use the CLI core path. Next wire explicit host
+The driver now exposes this path with `--native-core-reference Core.dll`, repeated
+`--reference Library.dll`, and the usual output/source arguments. Pass optional
+`--driver /absolute/path/to/rvnc.dll` to verify.py to compile through that command and
+run the result in both modes. [Driver evidence](driver-execution-validation.json)
+records parity and rejection of mixed bridge flags without output publication.
+
+This remains bounded: project/editor configuration and complete
+source-runtime bootstrapping still use the CLI core path. Next wire project/editor
 selection and test native core declaration completeness before changing the full bundle. RavenDoc likewise needs its own native input provider;
 changing semantic initialization does not automatically migrate documentation inputs.
 

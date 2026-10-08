@@ -7039,3 +7039,16 @@ metadata producer and execution. Native PE/#Neo remains the transport, without u
 its CLI projection for semantics. Seeds are separate runtime inputs, not translated
 core implementations. This is a loading API change with no IL-semantic or performance
 claim; it does not establish complete core declarations or migrate existing hosts.
+
+
+### Explicit native-core driver (2026-10-08)
+
+`rvnc neoclr --native-core-reference Core.dll --reference Library.dll -o App.dll App.rvn`
+now selects the native catalog and native semantics directly. Raven configures the
+selected core's Object/unit contracts and no implicit typeof service. Runtime seeds
+remain execution inputs. Existing CLI core selection is unchanged; mixed core or
+bridge options reject. Source-root/bootstrap-intrinsic/ownership-manifest production
+is outside this bounded consumer path. Project/editor migration remains pending.
+The [driver verifier](experiments/native-core-bootstrap/driver-execution-validation.json)
+records a separate-library consumer returning 42 interpreted and ARM64 native, existing
+output preservation and invalid-option rejection. No runtime or IL contract changed.

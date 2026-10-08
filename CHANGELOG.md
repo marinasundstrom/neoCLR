@@ -14,7 +14,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   reference catalog to call a separate native library with the same result. Check
   immutable catalog snapshots, CLI-input rejection, missing cores, exact identity mismatch and
   CLI emission refusal; standalone output links only libSystem. Full source-runtime
-  and driver/editor bootstrap remain pending. Record RavenDoc's separate native-input
+  and project/editor bootstrap remain pending. The explicit rvnc --native-core-reference
+  driver path also passes the separate-library consumer and conflicting-option/output
+  guards. Record RavenDoc's separate native-input
   migration so eventual ownership labels come from real library metadata.
 
 - Allow native core PE/#Neo producers to reference their own core declarations with

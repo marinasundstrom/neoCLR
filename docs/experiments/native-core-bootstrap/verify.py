@@ -14,6 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('raven', 'runtime', 'aot', 'output'):
         parser.add_argument('--' + name, required=True, type=Path)
+    parser.add_argument('--driver', type=Path, help='Optional native-enabled rvnc.dll; compile through the driver too.')
     args = parser.parse_args()
     output = args.output.resolve()
     if output.exists():
@@ -40,6 +41,24 @@ def main():
     core = artifacts / 'NativeCore.dll'
     library = artifacts / 'Input.dll'
     consumer = artifacts / 'Consumer.dll'
+    if args.driver:
+        driver = args.driver.resolve()
+        consumer = artifacts / 'DriverConsumer.dll'
+        command = ['dotnet', driver, 'neoclr', '--native-core-reference', core, '--reference', library]
+        run([*command, '-o', consumer, HERE / 'consumer.rvn'])
+        for index, flags in enumerate([
+            ['--core-reference', core], ['--native-core-reference', core],
+            ['--runtime-seed', artifacts / 'System.neox'], ['--bootstrap-intrinsics'],
+            ['--system-method', 'System.Math.Min/2'],
+        ]):
+            rejected = artifacts / f'rejected-{index}.dll'
+            run([*command, *flags, '-o', rejected, HERE / 'consumer.rvn'], expected=1)
+            if rejected.exists():
+                raise AssertionError('Rejected driver invocation published output')
+        before = consumer.read_bytes()
+        run([*command, '-o', consumer, HERE / 'consumer.rvn'], expected=1)
+        if consumer.read_bytes() != before:
+            raise AssertionError('Driver overwrote existing output')
     seed = artifacts / 'System.neox'
     run([runtime, 'assemble', HERE / 'System.neoil', seed, '--format', 'neox'])
     dependencies = ['--module', core, '--module', library, '--system', seed, '--object-root', core]
