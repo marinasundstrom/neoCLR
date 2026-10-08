@@ -12,7 +12,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   identity through calls and reserved array snapshots. Add explicit enum storage
   conversion and Int32 bitwise operations; validate signed extremes and real Raven
   HTTP status/flags collections in both modes. The full server remains blocked by
-  the specialization budget; the nested HTTP-result probe exposes a Void import gap.
+  the specialization budget. Fix explicit-core inhabited Void imports without requiring
+  a nominal seed declaration; preserve value/no-result distinctions and reject wrong
+  core bindings. The nested HTTP-result probe now compiles and runs interpreted,
+  then reaches the native 32-lane layout limit (HttpError needs 40).
 
 - Add development System.Text.StringBuilder with fluent append, atomic byte-limit
   faults, LF line append, clear/reuse and cached immutable snapshots. Add separator-aware

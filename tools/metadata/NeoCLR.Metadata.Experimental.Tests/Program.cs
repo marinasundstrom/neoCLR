@@ -91,6 +91,10 @@ if (args.Length == 3 && args[0] == "--native-service-bindings")
 {
     NativeServiceBindingChecks.Run(args[1], args[2]); return 0;
 }
+if (args.Length == 3 && args[0] == "--native-void-value")
+{
+    NativeVoidBindingChecks.Run(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--native-erased-value")
 {
     NativeErasedValueChecks.Run(args[1], args[2]); return 0;

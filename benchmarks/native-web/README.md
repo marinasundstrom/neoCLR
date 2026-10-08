@@ -188,8 +188,10 @@ and standalone dependencies. [The implementation notes](../../docs/experiments/a
 describe initialized snapshots, conservative tracing and unsupported operations.
 
 The full HTTP driver next exceeds the current 128-specialized-type budget. `TaskResultList.rvn`
-is a narrower admission probe for Result<Void,HttpError>; the current compiler reports
-a System.Void native import error, so its execution remains unclaimed.
+is a narrower admission probe for Result<Void,HttpError>; the explicit-core System.Void import fix now lets it compile and run interpreted.
+Native admission next rejects HttpError's 40-lane layout against the 32-lane cap.
+[Admission evidence](http-result-admission.json) records the successful interpreter
+run and explicit native rejection; it is not native execution evidence.
 
 `EnumValues.rvn` now passes in both modes with HttpStatusCode named/unnamed values,
 BindingFlags masks and ArrayList growth/copy isolation. Run `verify_callbacks.py

@@ -28,7 +28,8 @@ linkage. Run verify_callbacks.py --case EnumValues with the documented tool path
 
 The full HTTP driver still exceeds the 128-type specialization budget. The narrower
 TaskResultList source now includes an unnamed status inside a nested union, but its
-current compiler run fails with NEOMETA003: native type missing or ambiguous:
-System.Void. That import issue is the next integration task; this document does not
-claim that consumer or the HTTP server executes natively. No benchmark was added:
+initial compiler run failed with NEOMETA003 for System.Void. The explicit-core import
+fix now lets it compile and execute interpreted; native admission next rejects
+HttpError's 40-lane layout against the 32-lane cap. This document does not claim
+that consumer or the HTTP server executes natively. No benchmark was added:
 this slice restores enum semantics and does not propose a performance improvement.

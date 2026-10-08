@@ -124,7 +124,12 @@ public sealed partial class AssemblyBuilder
             definition.Namespace == "System" && definition.Name == "Value" && definition.IsValueType &&
             definition.GenericArity == 0 && definition.DeclaringType is null && definition.Fields.Count == 0 &&
             types.Any(t => t.NativePrimitive == PrimitiveType.Value);
-        if (!sourceValueAlias) NativeBindingFor(identity)?.ValidateType(definition);
+        // Inhabited Void is primitive native storage, not a nominal seed type.
+        // Keep the exception confined to the explicit core's empty value facade.
+        bool inhabitedVoidAlias = identity.Equals(CoreLibrary) && NativeBindingFor(identity)?.Library.ModuleName == "System" &&
+            definition.Namespace == "System" && definition.Name == "Void" && definition.IsValueType &&
+            definition.GenericArity == 0 && definition.DeclaringType is null && definition.Fields.Count == 0;
+        if (!sourceValueAlias && !inhabitedVoidAlias) NativeBindingFor(identity)?.ValidateType(definition);
         if (importedGraphs.TryGetValue(identity, out var prior) && prior.Snapshot != definition.Module.Assembly.ImportSnapshotIdentity) throw new InvalidDataException("conflicting dependency module snapshots");
         var result = ImportTypeIdentity(identity, definition.Namespace, definition.Name, definition.GenericArity, definition.IsValueType, ImportDeclaringScope(definition.DeclaringType, dependencyCoreLibrary));
         if (!importedGraphs.ContainsKey(identity)) importedGraphs.Add(identity, (definition.Module.Assembly.ImportSnapshotIdentity, new AssemblyBuilder(identity, dependencyCoreLibrary)));
