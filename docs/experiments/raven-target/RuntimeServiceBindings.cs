@@ -49,7 +49,7 @@ static partial class RuntimeServiceBindings
             ("RequestWorkerCancellation", ["Int32"], "Boolean"),
             ("JoinWorkerResult", ["Int32"], "Value"),
             ("NotifyWorker", ["Int32", "fn<Void>"], "noresult"),
-            ("LocalDateTime", ["Int64"], "System.LocalDateTime"),
+            ("LocalDateTime", ["Int64"], "System.Time.LocalDateTime"),
             ("TimeZoneExists", ["String"], "Boolean"),
             ("TimeZoneOffset", ["String", "Int64"], "Int32"),
             ("TimeZoneMapLocal", ["String", "Int64"], "arrayref<Int64>"),
@@ -265,7 +265,7 @@ static partial class RuntimeServiceBindings
         if (reference.Name is "IntPtrToInt64" or "UIntPtrToUInt64")
             return new("", args, result, Instruction: reference.Name == "IntPtrToInt64" ? "conv.i8" : "conv.u8");
         if (reference.Name == "LocalDateTime")
-            return new("System.LocalDateTime::FromUnixTimeTicks", args, result);
+            return new("System.Time.LocalDateTime::FromUnixTimeTicks", args, result);
         if (reference.Name == "TypeInfo")
             return new("System.Introspection.RuntimeTypeInfo::FromHandle", args, result);
         if (result.StartsWith("arrayref<"))

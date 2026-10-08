@@ -1,34 +1,34 @@
-; Generated from runtime/raven/src/System/Time.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Time.RuntimeDurationget_Ticks(System.Duration& source) -> Int64
+; Generated from runtime/raven/src/System/Time/TimeOfDay.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Time.TimeOfDay.RuntimeDurationget_Ticks(System.Time.Duration& source) -> Int64
 ldarg source
-call instance System.Duration::get_Ticks()
+call instance System.Time.Duration::get_Ticks()
 ret
 .end
-.function neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew() -> System.InvalidTimeError
-newobj instance System.InvalidTimeError::.ctor()
+.function neoCLR.Library.System.Time.TimeOfDay.RuntimeErrorSystemTimeInvalidTimeErrorNew() -> System.Time.InvalidTimeError
+newobj instance System.Time.InvalidTimeError::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Time.RuntimeUnion0(System.InvalidTimeError arg0) -> System.Result.Error<System.InvalidTimeError>
+.function neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion0(System.Time.InvalidTimeError arg0) -> System.Result.Error<System.Time.InvalidTimeError>
 ldarg arg0
-newobj instance System.Result.Error<System.InvalidTimeError>::.ctor(System.InvalidTimeError)
+newobj instance System.Result.Error<System.Time.InvalidTimeError>::.ctor(System.Time.InvalidTimeError)
 ret
 .end
-.function neoCLR.Library.System.Time.RuntimeUnion1(System.Result.Error<System.InvalidTimeError> arg0) -> System.Result<System.Time,System.InvalidTimeError>
+.function neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Error<System.Time.InvalidTimeError> arg0) -> System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>
 ldarg arg0
-newobj instance System.Result<System.Time,System.InvalidTimeError>::.ctor(System.Result.Error<System.InvalidTimeError>)
+newobj instance System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>::.ctor(System.Result.Error<System.Time.InvalidTimeError>)
 ret
 .end
-.function neoCLR.Library.System.Time.RuntimeUnion2(System.Time arg0) -> System.Result.Ok<System.Time>
+.function neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion2(System.Time.TimeOfDay arg0) -> System.Result.Ok<System.Time.TimeOfDay>
 ldarg arg0
-newobj instance System.Result.Ok<System.Time>::.ctor(System.Time)
+newobj instance System.Result.Ok<System.Time.TimeOfDay>::.ctor(System.Time.TimeOfDay)
 ret
 .end
-.function neoCLR.Library.System.Time.RuntimeUnion3(System.Result.Ok<System.Time> arg0) -> System.Result<System.Time,System.InvalidTimeError>
+.function neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion3(System.Result.Ok<System.Time.TimeOfDay> arg0) -> System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>
 ldarg arg0
-newobj instance System.Result<System.Time,System.InvalidTimeError>::.ctor(System.Result.Ok<System.Time>)
+newobj instance System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>::.ctor(System.Result.Ok<System.Time.TimeOfDay>)
 ret
 .end
-.function neoCLR.Library.System.Time.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+.function neoCLR.Library.System.Time.TimeOfDay.RuntimeBooleanFromInt32(Int32 value) -> Boolean
     ldarg value
     ldc.i4 0
     beq False
@@ -43,7 +43,7 @@ True:
     ldc.bool true
     ret
 .end
-.function neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean value) -> Int32
+.function neoCLR.Library.System.Time.TimeOfDay.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False
     ldc.i4 1

@@ -58,6 +58,7 @@ The development Raven toolchain accepts a no-result entry with a string array:
 
 ```raven
 import System.*
+import System.Time.*
 
 func Main(arguments: string[]) {
     for argument in arguments {

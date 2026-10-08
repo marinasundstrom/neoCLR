@@ -1,5 +1,7 @@
 namespace System.Globalization
 
+import System.Time.*
+
 internal class DateTimeFormatDigits {
     func Pad(value: int, width: int) -> string {
         var text = value.ToString()
@@ -9,7 +11,7 @@ internal class DateTimeFormatDigits {
         return text
     }
 
-    func FormatTime(time: System.Time, separator: string) -> string {
+    func FormatTime(time: System.Time.TimeOfDay, separator: string) -> string {
         return Pad(time.Hour, 2) + ":" + Pad(time.Minute, 2) + ":" + Pad(time.Second, 2) + separator + Pad(time.FractionTicks, 7)
     }
 }

@@ -291,7 +291,8 @@ See the [proposal](reflection-model-review.md).
 Follow with the existing Date, Time, LocalDateTime, Instant, Duration, Clock and
 SystemClock family under the proposed System.Time namespace. Resolve the existing
 System.Time type versus proposed namespace collision explicitly; the eventual
-time-of-day type would be System.Time.Time. Finish remaining neoIL library bodies
+time-of-day type would be System.Time.Time. The 2026-10-09 author-directed migration
+now uses System.Time.TimeOfDay instead; see [the naming decision](date-time-design.md#systemtime-namespace-2026-10-09-development). Finish remaining neoIL library bodies
 alongside that migration. Globalization, stream capabilities, runtime async and
 dynamic reflection introduce new functionality and need their own implementation
 slices; they are not prerequisites for porting existing APIs.

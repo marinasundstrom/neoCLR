@@ -1,3 +1,4 @@
+import System.Time.*
 import System.*
 import System.Globalization.*
 import System.Result.*
@@ -123,20 +124,20 @@ func Main() {
         .Error(_) => { }
         .Ok(_) => System.Fail("Invalid month accepted")
     }
-    let Ok(time) = Time.Create(12, 34, 56, 1234567) else {
+    let Ok(time) = TimeOfDay.Create(12, 34, 56, 1234567) else {
         System.Fail("Expected valid time")
     }
     let local = LocalDateTime.Create(leap, time)
     Check(local.Date.Equals(leap))
     Check(local.Time.Equals(time))
     Check(Text(format.FormatLocalDateTime(local)).Equals("2024-02-29T12:34:56.1234567"))
-    let Ok(midnight) = Time.FromTicks(0L) else {
+    let Ok(midnight) = TimeOfDay.FromTicks(0L) else {
         System.Fail("Expected midnight")
     }
-    let Ok(tick) = Time.FromTicks(1L) else {
+    let Ok(tick) = TimeOfDay.FromTicks(1L) else {
         System.Fail("Expected one tick")
     }
-    let Ok(endOfDay) = Time.FromTicks(863999999999L) else {
+    let Ok(endOfDay) = TimeOfDay.FromTicks(863999999999L) else {
         System.Fail("Expected last tick")
     }
     Check(format.FormatTime(midnight).Equals("00:00:00.0000000"))

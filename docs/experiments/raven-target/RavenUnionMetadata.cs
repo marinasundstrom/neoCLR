@@ -41,13 +41,13 @@ static class RavenUnionMetadata
     // nested generated cases; validate the ordinary constructor/extractor ABI.
     public static bool IsDateTimeUnion(TypeDefinition type)
     {
-        if (type.FullName != "System.DateTime" || !type.IsValueType || !type.IsPublic
+        if (type.FullName != "System.Time.DateTime" || !type.IsValueType || !type.IsPublic
             || !type.IsSealed || !type.IsSequentialLayout || type.HasNestedTypes
             || type.HasGenericParameters || type.HasEvents || Cases(type).Length != 0
             || !type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
                 && RuntimeSignatures.IsCore(a.AttributeType.Scope))
             || type.Fields.Count != 3 || type.Fields.Any(f => !f.IsPrivate || f.IsStatic || f.HasMarshalInfo)) return false;
-        var variants = new[] { "System.LocalDateTime", "System.ZonedDateTime" };
+        var variants = new[] { "System.Time.LocalDateTime", "System.Time.ZonedDateTime" };
         var tag = type.Fields.SingleOrDefault(f => f.Name == "<Tag>");
         if (tag?.FieldType.MetadataType != MetadataType.Byte
             || !type.Fields.Where(f => f != tag).Select(f => f.FieldType.FullName).Order().SequenceEqual(variants.Order())

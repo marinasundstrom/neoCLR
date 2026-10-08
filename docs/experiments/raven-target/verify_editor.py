@@ -212,11 +212,11 @@ try:
         results['Char'] = labels
     if calendar:
         for version, expression, expected in (
-            (16, 'System.Date.', ('Create', 'FromDayNumber')),
-            (17, 'System.Time.', ('Create', 'FromTicks')),
+            (16, 'System.Time.Date.', ('Create', 'FromDayNumber')),
+            (17, 'System.Time.TimeOfDay.', ('Create', 'FromTicks')),
             (18, 'clock.', ('Now',)),
             (19, 'now.', ('Date', 'Time'))):
-            text = 'func Main() {\n    let clock: System.Clock = System.SystemClock()\n    let now = clock.Now.ToLocalDateTime()\n    ' + expression + '\n}'
+            text = 'func Main() {\n    let clock: System.Time.Clock = System.Time.SystemClock()\n    let now = clock.Now.ToLocalDateTime()\n    ' + expression + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
                 'position': {'line': 3, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
@@ -538,12 +538,12 @@ try:
                 *[(88 + i, expression, {'Count', 'GetIterator'}, {'Length', 'Add', 'Clear'})
                   for i, expression in enumerate((
                       'typeof(int).GetFields().', 'typeof(int).GetMethods().',
-                      'typeof(System.Date).GetProperties().',
+                      'typeof(System.Time.Date).GetProperties().',
                       'typeof(System.Option<int>).GetGenericArguments().',
                       'typeof(int).GetInterfaces().',
                       'typeof(System.Introspection.BindingFlags).GetEnumNames().',
                       'typeof(int).GetMethods()[0].GetParameters().',
-                      'typeof(System.Date).GetProperties()[0].GetIndexParameters().'))],
+                      'typeof(System.Time.Date).GetProperties()[0].GetIndexParameters().'))],
                 (96, 'typeof(int).DeclaringType.', {'IsSome', 'IsNone'}, {'Name', 'Module'})):
             text = f'func Main() {{\n    {access}\n}}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},

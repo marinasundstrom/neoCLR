@@ -6,7 +6,7 @@ using Raven.CodeAnalysis.Syntax;
 // seed is never shipped: both bootstrap and consumer cores receive the same projection.
 static class SourceUnionReferences
 {
-    static readonly string[] Owners = ["System.TimeZoneError", "System.DateTime", "System.LocalTimeMapping", "System.Networking.IPAddressError", "System.Networking.Sockets.SocketError", "System.Networking.DnsError", "System.UriError",
+    static readonly string[] Owners = ["System.Time.TimeZoneError", "System.Time.DateTime", "System.Time.LocalTimeMapping", "System.Networking.IPAddressError", "System.Networking.Sockets.SocketError", "System.Networking.DnsError", "System.UriError",
         "System.Storage.StorageLookupError",
         "System.Text.EncodingError",
         "System.Text.EncoderState",

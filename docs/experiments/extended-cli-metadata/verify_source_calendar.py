@@ -21,11 +21,11 @@ def main():
     common = ['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
               '--bootstrap-intrinsics', '--bootstrap-ownership', ownership, '--reference', library]
     sources = [ROOT / path for path in (
-        'runtime/raven/src/System/TimeZone.rvn',
-        'runtime/raven/src/System/TimeZoneError.rvn',
-        'runtime/raven/src/System/ZonedDateTime.rvn',
-        'runtime/raven/src/System/LocalTimeMapping.rvn',
-        'runtime/raven/src/System/DateTime.rvn',
+        'runtime/raven/src/System/Time/TimeZone.rvn',
+        'runtime/raven/src/System/Time/TimeZoneError.rvn',
+        'runtime/raven/src/System/Time/ZonedDateTime.rvn',
+        'runtime/raven/src/System/Time/LocalTimeMapping.rvn',
+        'runtime/raven/src/System/Time/DateTime.rvn',
         'runtime/raven/native/RuntimeTimeZoneCalls.rvn',
         'runtime/raven/native/RuntimeTimeZoneServices.rvn')]
     sample = Path(__file__).resolve().parent / 'bootstrap/calendar-consumer.rvn'

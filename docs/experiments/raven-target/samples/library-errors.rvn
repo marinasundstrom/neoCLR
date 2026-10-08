@@ -1,3 +1,4 @@
+import System.Time.*
 import System.*
 import System.Console.*
 // Exercise case construction, carrier copying and generated case patterns.

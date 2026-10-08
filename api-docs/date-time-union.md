@@ -12,10 +12,10 @@ type is excluded from the generated reference.
 public union DateTime(LocalDateTime | ZonedDateTime)
 ```
 
-[LocalDateTime](xref:System.LocalDateTime) carries civil Date and Time without a zone.
-[ZonedDateTime](xref:System.ZonedDateTime) retains an Instant, named TimeZone, civil
+[LocalDateTime](xref:System.Time.LocalDateTime) carries civil Date and Time without a zone.
+[ZonedDateTime](xref:System.Time.ZonedDateTime) retains an Instant, named TimeZone, civil
 projection and actual TimeOffset. Values of either type implicitly convert to
-[DateTime](xref:System.DateTime). There are no nested Local/Offset wrapper cases.
+[DateTime](xref:System.Time.DateTime). There are no nested Local/Offset wrapper cases.
 
 | Member | Contract |
 | --- | --- |

@@ -1,4 +1,6 @@
-namespace System
+namespace System.Time
+
+import System.*
 
 /// A civil time can identify zero, one or two instants in a named zone.
 public union LocalTimeMapping {

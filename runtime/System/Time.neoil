@@ -1,18 +1,18 @@
-.type System.Time
-    .implements System.EquatableTo<System.Time>
-    .implements System.ComparableTo<System.Time>
+.type System.Time.TimeOfDay
+    .implements System.EquatableTo<System.Time.TimeOfDay>
+    .implements System.ComparableTo<System.Time.TimeOfDay>
     .field private StoredTicks Int64
 
-    .method static Create(Int32 hour, Int32 minute, Int32 second) -> System.Result<System.Time,System.InvalidTimeError>
+    .method static Create(Int32 hour, Int32 minute, Int32 second) -> System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>
         ldarg hour
         ldarg minute
         ldarg second
         ldc.i4 0
-        call System.Time::Create(Int32,Int32,Int32,Int32)
+        call System.Time.TimeOfDay::Create(Int32,Int32,Int32,Int32)
         ret
     .end
 
-    .method static Create(Int32 hour, Int32 minute, Int32 second, Int32 fractionTicks) -> System.Result<System.Time,System.InvalidTimeError>
+    .method static Create(Int32 hour, Int32 minute, Int32 second, Int32 fractionTicks) -> System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>
         ldarg hour
         ldc.i4 0
         blt Invalid
@@ -52,18 +52,18 @@
         ldarg fractionTicks
         conv.i8
         add
-        newobj System.Time
-        newobj instance System.Result.Ok<System.Time>::.ctor(System.Time)
-        newobj instance System.Result<System.Time,System.InvalidTimeError>::.ctor(System.Result.Ok<System.Time>)
+        newobj System.Time.TimeOfDay
+        newobj instance System.Result.Ok<System.Time.TimeOfDay>::.ctor(System.Time.TimeOfDay)
+        newobj instance System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>::.ctor(System.Result.Ok<System.Time.TimeOfDay>)
         ret
         Invalid:
-        newobj instance System.InvalidTimeError::.ctor()
-        newobj instance System.Result.Error<System.InvalidTimeError>::.ctor(System.InvalidTimeError)
-        newobj instance System.Result<System.Time,System.InvalidTimeError>::.ctor(System.Result.Error<System.InvalidTimeError>)
+        newobj instance System.Time.InvalidTimeError::.ctor()
+        newobj instance System.Result.Error<System.Time.InvalidTimeError>::.ctor(System.Time.InvalidTimeError)
+        newobj instance System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>::.ctor(System.Result.Error<System.Time.InvalidTimeError>)
         ret
     .end
 
-    .method static FromTicks(Int64 ticks) -> System.Result<System.Time,System.InvalidTimeError>
+    .method static FromTicks(Int64 ticks) -> System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>
         ldarg ticks
         ldc.i8 0
         blt Invalid
@@ -71,19 +71,19 @@
         ldc.i8 863999999999
         bgt Invalid
         ldarg ticks
-        newobj System.Time
-        newobj instance System.Result.Ok<System.Time>::.ctor(System.Time)
-        newobj instance System.Result<System.Time,System.InvalidTimeError>::.ctor(System.Result.Ok<System.Time>)
+        newobj System.Time.TimeOfDay
+        newobj instance System.Result.Ok<System.Time.TimeOfDay>::.ctor(System.Time.TimeOfDay)
+        newobj instance System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>::.ctor(System.Result.Ok<System.Time.TimeOfDay>)
         ret
         Invalid:
-        newobj instance System.InvalidTimeError::.ctor()
-        newobj instance System.Result.Error<System.InvalidTimeError>::.ctor(System.InvalidTimeError)
-        newobj instance System.Result<System.Time,System.InvalidTimeError>::.ctor(System.Result.Error<System.InvalidTimeError>)
+        newobj instance System.Time.InvalidTimeError::.ctor()
+        newobj instance System.Result.Error<System.Time.InvalidTimeError>::.ctor(System.Time.InvalidTimeError)
+        newobj instance System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>::.ctor(System.Result.Error<System.Time.InvalidTimeError>)
         ret
     .end
 
     .property instance Ticks() -> Int64
-        .get instance System.Time::get_Ticks()
+        .get instance System.Time.TimeOfDay::get_Ticks()
     .end
     .method instance readonly byref get_Ticks() -> Int64
         ldarg this
@@ -92,7 +92,7 @@
     .end
 
     .property instance Hour() -> Int32
-        .get instance System.Time::get_Hour()
+        .get instance System.Time.TimeOfDay::get_Hour()
     .end
     .method instance readonly byref get_Hour() -> Int32
         ldarg this
@@ -104,7 +104,7 @@
     .end
 
     .property instance Minute() -> Int32
-        .get instance System.Time::get_Minute()
+        .get instance System.Time.TimeOfDay::get_Minute()
     .end
     .method instance readonly byref get_Minute() -> Int32
         ldarg this
@@ -118,7 +118,7 @@
     .end
 
     .property instance Second() -> Int32
-        .get instance System.Time::get_Second()
+        .get instance System.Time.TimeOfDay::get_Second()
     .end
     .method instance readonly byref get_Second() -> Int32
         ldarg this
@@ -132,7 +132,7 @@
     .end
 
     .property instance Millisecond() -> Int32
-        .get instance System.Time::get_Millisecond()
+        .get instance System.Time.TimeOfDay::get_Millisecond()
     .end
     .method instance readonly byref get_Millisecond() -> Int32
         ldarg this
@@ -146,7 +146,7 @@
     .end
 
     .property instance FractionTicks() -> Int32
-        .get instance System.Time::get_FractionTicks()
+        .get instance System.Time.TimeOfDay::get_FractionTicks()
     .end
     .method instance readonly byref get_FractionTicks() -> Int32
         ldarg this
@@ -157,7 +157,7 @@
         ret
     .end
 
-    .method instance readonly byref Equals(System.Time other) -> Boolean
+    .method instance readonly byref Equals(System.Time.TimeOfDay other) -> Boolean
         ldarg this
         ldfld 0
         ldarg other
@@ -166,7 +166,7 @@
         ret
     .end
 
-    .method instance readonly byref CompareTo(System.Time other) -> Int32
+    .method instance readonly byref CompareTo(System.Time.TimeOfDay other) -> Int32
         ldarg this
         ldfld 0
         ldarg other

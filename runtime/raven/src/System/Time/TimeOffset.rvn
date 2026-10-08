@@ -1,4 +1,6 @@
-namespace System
+namespace System.Time
+
+import System.*
 
 import System.Result.*
 
@@ -38,7 +40,7 @@ public struct TimeOffset : EquatableTo<TimeOffset>, ComparableTo<TimeOffset> {
         let Ok(date) = Date.FromDayNumber((int)(local / 864000000000L)) else {
             return Error(InvalidDateError())
         }
-        let Ok(time) = Time.FromTicks(local % 864000000000L) else {
+        let Ok(time) = TimeOfDay.FromTicks(local % 864000000000L) else {
             return Error(InvalidDateError())
         }
         return Ok(LocalDateTime.Create(date, time))

@@ -28,7 +28,7 @@
         "runtime/raven/src/System/StringComparer.rvn",
         "runtime/raven/src/System/ComparableTo.rvn",
         "runtime/raven/src/System/EquatableTo.rvn",
-        "runtime/raven/src/System/Duration.rvn"
+        "runtime/raven/src/System/Time/Duration.rvn"
       ],
       "types": [
         "System.Disposable",
@@ -71,7 +71,7 @@
         "System.StringComparer",
         "System.ComparableTo`1",
         "System.EquatableTo`1",
-        "System.Duration"
+        "System.Time.Duration"
       ]
     }
   ],

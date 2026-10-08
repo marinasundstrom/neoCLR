@@ -1,21 +1,21 @@
-; Generated from runtime/raven/src/System/LocalDateTime.rvn. Regenerate with build_runtime_library.py.
-.type System.LocalDateTime
+; Generated from runtime/raven/src/System/Time/LocalDateTime.rvn. Regenerate with build_runtime_library.py.
+.type System.Time.LocalDateTime
 .sealed
-.field private StoredDate System.Date
-.field private StoredTime System.Time
-.property instance Date() -> System.Date
-.get instance System.LocalDateTime::get_Date()
+.field private StoredDate System.Time.Date
+.field private StoredTime System.Time.TimeOfDay
+.property instance Date() -> System.Time.Date
+.get instance System.Time.LocalDateTime::get_Date()
 .end
-.property instance Time() -> System.Time
-.get instance System.LocalDateTime::get_Time()
+.property instance Time() -> System.Time.TimeOfDay
+.get instance System.Time.LocalDateTime::get_Time()
 .end
-.method private instance byref .ctor(System.Date date,System.Time time) -> Void
-.local System.Date local0
-.local System.Time local1
+.method private instance byref .ctor(System.Time.Date date,System.Time.TimeOfDay time) -> Void
+.local System.Time.Date local0
+.local System.Time.TimeOfDay local1
 ldloca local0
-initobj System.Date
+initobj System.Time.Date
 ldloca local1
-initobj System.Time
+initobj System.Time.TimeOfDay
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -31,7 +31,7 @@ ldarg 0
 M00000001_IL_000b:
 ldloc local0
 M00000001_IL_000c:
-stfld System.LocalDateTime::StoredDate
+stfld System.Time.LocalDateTime::StoredDate
 pop
 M00000001_IL_0011:
 M00000001_IL_0012:
@@ -43,13 +43,13 @@ ldarg 0
 M00000001_IL_0015:
 ldloc local1
 M00000001_IL_0016:
-stfld System.LocalDateTime::StoredTime
+stfld System.Time.LocalDateTime::StoredTime
 pop
 M00000001_IL_001b:
 ldvoid
 ret
 .end
-.method static Create(System.Date date,System.Time time) -> System.LocalDateTime
+.method static Create(System.Time.Date date,System.Time.TimeOfDay time) -> System.Time.LocalDateTime
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
@@ -57,38 +57,38 @@ ldarg 0
 M00000002_IL_0003:
 ldarg 1
 M00000002_IL_0004:
-newobj instance System.LocalDateTime::.ctor(System.Date,System.Time)
+newobj instance System.Time.LocalDateTime::.ctor(System.Time.Date,System.Time.TimeOfDay)
 M00000002_IL_0009:
 ret
 .end
-.method internal static FromUnixTimeTicks(Int64 ticks) -> System.LocalDateTime
+.method internal static FromUnixTimeTicks(Int64 ticks) -> System.Time.LocalDateTime
 .local arrayref<Int32> local0
-.local System.Date local1
-.local System.Time local2
-.local System.Result<System.Date,System.InvalidDateError> local3
-.local System.Result.Ok<System.Date> local4
-.local System.Result<System.Time,System.InvalidTimeError> local5
-.local System.Result.Ok<System.Time> local6
+.local System.Time.Date local1
+.local System.Time.TimeOfDay local2
+.local System.Result<System.Time.Date,System.Time.InvalidDateError> local3
+.local System.Result.Ok<System.Time.Date> local4
+.local System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError> local5
+.local System.Result.Ok<System.Time.TimeOfDay> local6
 ldloca local0
 initobj arrayref<Int32>
 ldloca local1
-initobj System.Date
+initobj System.Time.Date
 ldloca local2
-initobj System.Time
+initobj System.Time.TimeOfDay
 ldloca local3
-initobj System.Result<System.Date,System.InvalidDateError>
+initobj System.Result<System.Time.Date,System.Time.InvalidDateError>
 ldloca local4
-initobj System.Result.Ok<System.Date>
+initobj System.Result.Ok<System.Time.Date>
 ldloca local5
-initobj System.Result<System.Time,System.InvalidTimeError>
+initobj System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>
 ldloca local6
-initobj System.Result.Ok<System.Time>
+initobj System.Result.Ok<System.Time.TimeOfDay>
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
 ldarg 0
 M00000003_IL_0003:
-call neoCLR.Library.System.LocalDateTime.RuntimeServiceUnixTimeToLocal(Int64)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeServiceUnixTimeToLocal(Int64)
 M00000003_IL_0008:
 stloc local0
 M00000003_IL_0009:
@@ -111,25 +111,25 @@ ldc.i4 2
 M00000003_IL_0012:
 ldelem Int32
 M00000003_IL_0013:
-call System.Date::Create(Int32,Int32,Int32)
+call System.Time.Date::Create(Int32,Int32,Int32)
 M00000003_IL_0018:
 stloc local3
 M00000003_IL_0019:
 ldloca local4
 M00000003_IL_001b:
-initobj System.Result.Ok<System.Date>
+initobj System.Result.Ok<System.Time.Date>
 M00000003_IL_0021:
 ldloca local3
 M00000003_IL_0023:
 ldloca local4
 M00000003_IL_0025:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>&,System.Result.Ok<System.Date>&)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion0(System.Result<System.Time.Date,System.Time.InvalidDateError>&,System.Result.Ok<System.Time.Date>&)
 M00000003_IL_002a:
 brfalse M00000003_IL_0043
 M00000003_IL_002f:
 ldloca local4
 M00000003_IL_0031:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion1(System.Result.Ok<System.Date>&)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion1(System.Result.Ok<System.Time.Date>&)
 M00000003_IL_0036:
 stloc local1
 M00000003_IL_0037:
@@ -172,25 +172,25 @@ ldc.i4 6
 M00000003_IL_0066:
 ldelem Int32
 M00000003_IL_0067:
-call System.Time::Create(Int32,Int32,Int32,Int32)
+call System.Time.TimeOfDay::Create(Int32,Int32,Int32,Int32)
 M00000003_IL_006c:
 stloc local5
 M00000003_IL_006e:
 ldloca local6
 M00000003_IL_0070:
-initobj System.Result.Ok<System.Time>
+initobj System.Result.Ok<System.Time.TimeOfDay>
 M00000003_IL_0076:
 ldloca local5
 M00000003_IL_0078:
 ldloca local6
 M00000003_IL_007a:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion2(System.Result<System.Time,System.InvalidTimeError>&,System.Result.Ok<System.Time>&)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion2(System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>&,System.Result.Ok<System.Time.TimeOfDay>&)
 M00000003_IL_007f:
 brfalse M00000003_IL_0098
 M00000003_IL_0084:
 ldloca local6
 M00000003_IL_0086:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion3(System.Result.Ok<System.Time>&)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion3(System.Result.Ok<System.Time.TimeOfDay>&)
 M00000003_IL_008b:
 stloc local2
 M00000003_IL_008c:
@@ -213,23 +213,23 @@ ldloc local1
 M00000003_IL_00b1:
 ldloc local2
 M00000003_IL_00b2:
-newobj instance System.LocalDateTime::.ctor(System.Date,System.Time)
+newobj instance System.Time.LocalDateTime::.ctor(System.Time.Date,System.Time.TimeOfDay)
 M00000003_IL_00b7:
 ret
 .end
-.method instance readonly byref Add(System.Duration duration) -> System.Result<System.LocalDateTime,System.InvalidDateError>
+.method instance readonly byref Add(System.Time.Duration duration) -> System.Result<System.Time.LocalDateTime,System.Time.InvalidDateError>
 .local Int64 local0
 .local Int64 local1
 .local Int64 local2
-.local System.Result<System.Date,System.InvalidDateError> local3
-.local System.Date local4
-.local System.InvalidDateError local5
-.local System.Date local6
-.local System.Time local7
-.local System.Time local8
-.local System.Date local9
-.local System.Result<System.Time,System.InvalidTimeError> local10
-.local System.Result.Ok<System.Time> local11
+.local System.Result<System.Time.Date,System.Time.InvalidDateError> local3
+.local System.Time.Date local4
+.local System.Time.InvalidDateError local5
+.local System.Time.Date local6
+.local System.Time.TimeOfDay local7
+.local System.Time.TimeOfDay local8
+.local System.Time.Date local9
+.local System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError> local10
+.local System.Result.Ok<System.Time.TimeOfDay> local11
 ldc.i8 0
 stloc local0
 ldc.i8 0
@@ -237,29 +237,29 @@ stloc local1
 ldc.i8 0
 stloc local2
 ldloca local3
-initobj System.Result<System.Date,System.InvalidDateError>
+initobj System.Result<System.Time.Date,System.Time.InvalidDateError>
 ldloca local4
-initobj System.Date
-newobj System.InvalidDateError
+initobj System.Time.Date
+newobj System.Time.InvalidDateError
 stloc local5
 ldloca local6
-initobj System.Date
+initobj System.Time.Date
 ldloca local7
-initobj System.Time
+initobj System.Time.TimeOfDay
 ldloca local8
-initobj System.Time
+initobj System.Time.TimeOfDay
 ldloca local9
-initobj System.Date
+initobj System.Time.Date
 ldloca local10
-initobj System.Result<System.Time,System.InvalidTimeError>
+initobj System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>
 ldloca local11
-initobj System.Result.Ok<System.Time>
+initobj System.Result.Ok<System.Time.TimeOfDay>
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
 ldarga 1
 M00000004_IL_0004:
-call neoCLR.Library.System.LocalDateTime.RuntimeDurationget_Ticks(System.Duration&)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeDurationget_Ticks(System.Time.Duration&)
 M00000004_IL_0009:
 ldc.i8 864000000000
 M00000004_IL_0012:
@@ -270,17 +270,17 @@ M00000004_IL_0014:
 M00000004_IL_0015:
 ldarg 0
 M00000004_IL_0016:
-ldfld System.LocalDateTime::StoredTime
+ldfld System.Time.LocalDateTime::StoredTime
 M00000004_IL_001b:
 stloc local8
 M00000004_IL_001d:
 ldloca local8
 M00000004_IL_001f:
-call neoCLR.Library.System.LocalDateTime.RuntimeTimeget_Ticks(System.Time&)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeTimeOfDayget_Ticks(System.Time.TimeOfDay&)
 M00000004_IL_0024:
 ldarga 1
 M00000004_IL_0026:
-call neoCLR.Library.System.LocalDateTime.RuntimeDurationget_Ticks(System.Duration&)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeDurationget_Ticks(System.Time.Duration&)
 M00000004_IL_002b:
 ldc.i8 864000000000
 M00000004_IL_0034:
@@ -293,13 +293,13 @@ M00000004_IL_0037:
 M00000004_IL_0038:
 ldarg 0
 M00000004_IL_0039:
-ldfld System.LocalDateTime::StoredDate
+ldfld System.Time.LocalDateTime::StoredDate
 M00000004_IL_003e:
 stloc local9
 M00000004_IL_0040:
 ldloca local9
 M00000004_IL_0042:
-call neoCLR.Library.System.LocalDateTime.RuntimeDateget_DayNumber(System.Date&)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeDateget_DayNumber(System.Time.Date&)
 M00000004_IL_0047:
 conv.i8
 M00000004_IL_0048:
@@ -315,7 +315,7 @@ M00000004_IL_004d:
 ldc.i8 0
 M00000004_IL_0056:
 clt
-call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_0058:
 brtrue M00000004_IL_0062
 M00000004_IL_005d:
@@ -346,12 +346,12 @@ M00000004_IL_007f:
 ldc.i8 864000000000
 M00000004_IL_0088:
 clt
-call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_008a:
 ldc.i4 0
 M00000004_IL_008b:
 ceq
-call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_008d:
 brtrue M00000004_IL_0097
 M00000004_IL_0092:
@@ -382,17 +382,17 @@ M00000004_IL_00b4:
 ldc.i8 0
 M00000004_IL_00bd:
 clt
-call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_00bf:
 brtrue M00000004_IL_00c9
 M00000004_IL_00c4:
 br M00000004_IL_00d9
 M00000004_IL_00c9:
-call neoCLR.Library.System.LocalDateTime.RuntimeErrorSystemInvalidDateErrorNew()
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeErrorSystemTimeInvalidDateErrorNew()
 M00000004_IL_00ce:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion4(System.InvalidDateError)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion4(System.Time.InvalidDateError)
 M00000004_IL_00d3:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion5(System.Result.Error<System.InvalidDateError>)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion5(System.Result.Error<System.Time.InvalidDateError>)
 M00000004_IL_00d8:
 ret
 M00000004_IL_00d9:
@@ -403,17 +403,17 @@ M00000004_IL_00dc:
 ldc.i8 3652058
 M00000004_IL_00e5:
 cgt
-call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_00e7:
 brtrue M00000004_IL_00f1
 M00000004_IL_00ec:
 br M00000004_IL_0101
 M00000004_IL_00f1:
-call neoCLR.Library.System.LocalDateTime.RuntimeErrorSystemInvalidDateErrorNew()
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeErrorSystemTimeInvalidDateErrorNew()
 M00000004_IL_00f6:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion4(System.InvalidDateError)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion4(System.Time.InvalidDateError)
 M00000004_IL_00fb:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion5(System.Result.Error<System.InvalidDateError>)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion5(System.Result.Error<System.Time.InvalidDateError>)
 M00000004_IL_0100:
 ret
 M00000004_IL_0101:
@@ -423,20 +423,20 @@ ldloc local2
 M00000004_IL_0104:
 conv.i4
 M00000004_IL_0105:
-call System.Date::FromDayNumber(Int32)
+call System.Time.Date::FromDayNumber(Int32)
 M00000004_IL_010a:
 stloc local3
 M00000004_IL_010b:
 ldloca local4
 M00000004_IL_010d:
-initobj System.Date
+initobj System.Time.Date
 M00000004_IL_0113:
 ldloca local3
 M00000004_IL_0115:
 ldloca local4
 M00000004_IL_0117:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion6(System.Result<System.Date,System.InvalidDateError>&,System.Date&)
-call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion6(System.Result<System.Time.Date,System.Time.InvalidDateError>&,System.Time.Date&)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_011c:
 brfalse M00000004_IL_0126
 M00000004_IL_0121:
@@ -444,21 +444,21 @@ br M00000004_IL_0148
 M00000004_IL_0126:
 ldloca local5
 M00000004_IL_0128:
-newobj System.InvalidDateError
-stobj System.InvalidDateError
+newobj System.Time.InvalidDateError
+stobj System.Time.InvalidDateError
 M00000004_IL_012e:
 ldloca local3
 M00000004_IL_0130:
 ldloca local5
 M00000004_IL_0132:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion7(System.Result<System.Date,System.InvalidDateError>&,System.InvalidDateError&)
-call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion7(System.Result<System.Time.Date,System.Time.InvalidDateError>&,System.Time.InvalidDateError&)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_0137:
 brfalse M00000004_IL_0144
 M00000004_IL_013c:
 ldloc local5
 M00000004_IL_013e:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion8(System.InvalidDateError)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion8(System.Time.InvalidDateError)
 M00000004_IL_0143:
 ret
 M00000004_IL_0144:
@@ -475,25 +475,25 @@ M00000004_IL_014d:
 M00000004_IL_014e:
 ldloc local1
 M00000004_IL_014f:
-call System.Time::FromTicks(Int64)
+call System.Time.TimeOfDay::FromTicks(Int64)
 M00000004_IL_0154:
 stloc local10
 M00000004_IL_0156:
 ldloca local11
 M00000004_IL_0158:
-initobj System.Result.Ok<System.Time>
+initobj System.Result.Ok<System.Time.TimeOfDay>
 M00000004_IL_015e:
 ldloca local10
 M00000004_IL_0160:
 ldloca local11
 M00000004_IL_0162:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion2(System.Result<System.Time,System.InvalidTimeError>&,System.Result.Ok<System.Time>&)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion2(System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>&,System.Result.Ok<System.Time.TimeOfDay>&)
 M00000004_IL_0167:
 brfalse M00000004_IL_0181
 M00000004_IL_016c:
 ldloca local11
 M00000004_IL_016e:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion3(System.Result.Ok<System.Time>&)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion3(System.Result.Ok<System.Time.TimeOfDay>&)
 M00000004_IL_0173:
 stloc local7
 M00000004_IL_0175:
@@ -505,11 +505,11 @@ M00000004_IL_0186:
 br M00000004_IL_019c
 M00000004_IL_018b:
 M00000004_IL_018c:
-call neoCLR.Library.System.LocalDateTime.RuntimeErrorSystemInvalidDateErrorNew()
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeErrorSystemTimeInvalidDateErrorNew()
 M00000004_IL_0191:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion4(System.InvalidDateError)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion4(System.Time.InvalidDateError)
 M00000004_IL_0196:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion5(System.Result.Error<System.InvalidDateError>)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion5(System.Result.Error<System.Time.InvalidDateError>)
 M00000004_IL_019b:
 ret
 M00000004_IL_019c:
@@ -519,31 +519,31 @@ ldloc local6
 M00000004_IL_01a0:
 ldloc local7
 M00000004_IL_01a2:
-newobj instance System.LocalDateTime::.ctor(System.Date,System.Time)
+newobj instance System.Time.LocalDateTime::.ctor(System.Time.Date,System.Time.TimeOfDay)
 M00000004_IL_01a7:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion9(System.LocalDateTime)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion9(System.Time.LocalDateTime)
 M00000004_IL_01ac:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion10(System.Result.Ok<System.LocalDateTime>)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion10(System.Result.Ok<System.Time.LocalDateTime>)
 M00000004_IL_01b1:
 ret
 .end
-.method instance readonly byref get_Date() -> System.Date
+.method instance readonly byref get_Date() -> System.Time.Date
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
 ldarg 0
 M00000005_IL_0003:
-ldfld System.LocalDateTime::StoredDate
+ldfld System.Time.LocalDateTime::StoredDate
 M00000005_IL_0008:
 ret
 .end
-.method instance readonly byref get_Time() -> System.Time
+.method instance readonly byref get_Time() -> System.Time.TimeOfDay
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
 ldarg 0
 M00000006_IL_0003:
-ldfld System.LocalDateTime::StoredTime
+ldfld System.Time.LocalDateTime::StoredTime
 M00000006_IL_0008:
 ret
 .end

@@ -1,11 +1,16 @@
 # Dates, times and time zones
 
-Date and Time describe civil fields. Instant identifies a point on the timeline,
+Date and TimeOfDay describe civil fields. Instant identifies a point on the timeline,
 Duration an elapsed amount, and Clock supplies Now. **The named-zone APIs below are provisional Preview 11 APIs.**
+
+The development API groups these constructs in `System.Time`: use
+`import System.Time.*`. `TimeOfDay` replaces the former `System.Time` struct.
+Rebuild consumers against the matching library bundle. Formatting policies remain
+in `System.Globalization`.
 
 ## Choose a specific type
 
-Prefer Date for a calendar date, Time for a time of day, LocalDateTime for civil
+Prefer Date for a calendar date, TimeOfDay for a time of day, LocalDateTime for civil
 fields without a zone, and Instant for a point on the timeline. Use ZonedDateTime
 when a value must retain its Instant, Zone, LocalDateTime and Offset.
 TimeOffset is a fixed whole-second displacement from UTC; TimeZone contains rules
@@ -29,12 +34,12 @@ TimeZone.AtInstant converts in the other direction without ambiguity.
 
 ## Arithmetic and display
 
-Time.Add(Duration) wraps modulo one day. LocalDateTime.Add carries into the date,
+TimeOfDay.Add(Duration) wraps modulo one day. LocalDateTime.Add carries into the date,
 returning an error outside years 1–9999. Instant.Add advances elapsed ticks and checks
 overflow. Adding 24 elapsed hours can produce a different local hour across DST;
 civil addition does not apply zone rules.
 
-Time.ToString uses the current culture; an explicit culture gives repeatable output.
+TimeOfDay.ToString uses the current culture; an explicit culture gives repeatable output.
 [Globalization](../globalization/) covers culture, calendar selection and Hebrew/Latin
 rendering. Format a zoned value's LocalDateTime through those same formatters.
 The DateTime union's generated ToString is diagnostic, not a serialization format.

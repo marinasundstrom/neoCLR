@@ -608,7 +608,7 @@ fn property_tokens_are_definition_rows_scoped_to_the_declaring_module() {
 .entry Main
 .function Main() -> Int32
 call System.Runtime.RuntimeContext::get_Current()
-ldtoken System.Date
+ldtoken System.Time.Date
 call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 callvirt instance System.Introspection.TypeInfo::GetProperties()
 ldc.i4 0

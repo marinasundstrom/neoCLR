@@ -45,7 +45,7 @@ fn call(program: &LoadedProgram, name: &str, args: &[i32]) -> i32 {
 #[test]
 fn hebrew_calendar_matches_dotnet_complete_years() {
     let mut source = String::from(".module CalendarComparison\n");
-    source.push_str(".function Create(Int32 year,Int32 month,Int32 day) -> Int32\n.local System.Result<System.Date,System.InvalidDateError> result\n.local System.Date date\ncall System.Calendar::get_Hebrew()\nldarg year\nldarg month\nldarg day\ncall instance System.Calendar::CreateDate(Int32,Int32,Int32)\nstloc result\nldloca result\nldloca date\ncall instance System.Result<System.Date,System.InvalidDateError>::TryGetOutput(System.Date&)\nbrfalse failed\nldloca date\ncall instance System.Date::get_DayNumber()\nret\nfailed:\nldc.i4 -1\nret\n.end\n");
+    source.push_str(".function Create(Int32 year,Int32 month,Int32 day) -> Int32\n.local System.Result<System.Time.Date,System.Time.InvalidDateError> result\n.local System.Time.Date date\ncall System.Time.Calendar::get_Hebrew()\nldarg year\nldarg month\nldarg day\ncall instance System.Time.Calendar::CreateDate(Int32,Int32,Int32)\nstloc result\nldloca result\nldloca date\ncall instance System.Result<System.Time.Date,System.Time.InvalidDateError>::TryGetOutput(System.Time.Date&)\nbrfalse failed\nldloca date\ncall instance System.Time.Date::get_DayNumber()\nret\nfailed:\nldc.i4 -1\nret\n.end\n");
     for (name, parameters, arguments) in [
         (
             "GetDaysInMonth",
@@ -59,10 +59,10 @@ fn hebrew_calendar_matches_dotnet_complete_years() {
         } else {
             "Int32"
         };
-        source.push_str(&format!(".function {name}({parameters}) -> Int32\n.local System.Result<Int32,System.InvalidDateError> result\n.local Int32 value\ncall System.Calendar::get_Hebrew()\n{arguments}\ncall instance System.Calendar::{name}({sig})\nstloc result\nldloca result\nldloca value\ncall instance System.Result<Int32,System.InvalidDateError>::TryGetOutput(Int32&)\nbrfalse failed\nldloc value\nret\nfailed:\nldc.i4 -1\nret\n.end\n"));
+        source.push_str(&format!(".function {name}({parameters}) -> Int32\n.local System.Result<Int32,System.Time.InvalidDateError> result\n.local Int32 value\ncall System.Time.Calendar::get_Hebrew()\n{arguments}\ncall instance System.Time.Calendar::{name}({sig})\nstloc result\nldloca result\nldloca value\ncall instance System.Result<Int32,System.Time.InvalidDateError>::TryGetOutput(Int32&)\nbrfalse failed\nldloc value\nret\nfailed:\nldc.i4 -1\nret\n.end\n"));
     }
     for name in ["GetYear", "GetMonth", "GetDay"] {
-        source.push_str(&format!(".function {name}(Int32 number) -> Int32\n.local System.Result<System.Date,System.InvalidDateError> created\n.local System.Date date\n.local System.Result<Int32,System.InvalidDateError> result\n.local Int32 value\nldarg number\ncall System.Date::FromDayNumber(Int32)\nstloc created\nldloca created\nldloca date\ncall instance System.Result<System.Date,System.InvalidDateError>::TryGetOutput(System.Date&)\npop\ncall System.Calendar::get_Hebrew()\nldloc date\ncall instance System.Calendar::{name}(System.Date)\nstloc result\nldloca result\nldloca value\ncall instance System.Result<Int32,System.InvalidDateError>::TryGetOutput(Int32&)\nbrfalse failed\nldloc value\nret\nfailed:\nldc.i4 -1\nret\n.end\n"));
+        source.push_str(&format!(".function {name}(Int32 number) -> Int32\n.local System.Result<System.Time.Date,System.Time.InvalidDateError> created\n.local System.Time.Date date\n.local System.Result<Int32,System.Time.InvalidDateError> result\n.local Int32 value\nldarg number\ncall System.Time.Date::FromDayNumber(Int32)\nstloc created\nldloca created\nldloca date\ncall instance System.Result<System.Time.Date,System.Time.InvalidDateError>::TryGetOutput(System.Time.Date&)\npop\ncall System.Time.Calendar::get_Hebrew()\nldloc date\ncall instance System.Time.Calendar::{name}(System.Time.Date)\nstloc result\nldloca result\nldloca value\ncall instance System.Result<Int32,System.Time.InvalidDateError>::TryGetOutput(Int32&)\nbrfalse failed\nldloc value\nret\nfailed:\nldc.i4 -1\nret\n.end\n"));
     }
     source.push_str(
         r#"

@@ -47,23 +47,23 @@
     "output": "docs/json-error-payloads.html#httpjsonerror-json-reason",
     "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
   },
-  "P:System.LocalTimeMapping.Unique.Value": {
+  "P:System.Time.LocalTimeMapping.Unique.Value": {
     "output": "docs/time-zone-mappings.html#unique-value",
     "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
   },
-  "P:System.LocalTimeMapping.Ambiguous.Earlier": {
+  "P:System.Time.LocalTimeMapping.Ambiguous.Earlier": {
     "output": "docs/time-zone-mappings.html#ambiguous-earlier",
     "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
   },
-  "P:System.LocalTimeMapping.Ambiguous.Later": {
+  "P:System.Time.LocalTimeMapping.Ambiguous.Later": {
     "output": "docs/time-zone-mappings.html#ambiguous-later",
     "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
   },
-  "M:System.LocalTimeMapping.Unique.Deconstruct": {
+  "M:System.Time.LocalTimeMapping.Unique.Deconstruct": {
     "output": "docs/time-zone-mappings.html#unique-deconstruct",
     "reason": "RavenDoc renders union cases inline but omits their Deconstruct member pages; the manual entry records the public out-parameter signature."
   },
-  "M:System.LocalTimeMapping.Ambiguous.Deconstruct": {
+  "M:System.Time.LocalTimeMapping.Ambiguous.Deconstruct": {
     "output": "docs/time-zone-mappings.html#ambiguous-deconstruct",
     "reason": "RavenDoc renders union cases inline but omits their Deconstruct member pages; the manual entry records the public out-parameter signature."
   },

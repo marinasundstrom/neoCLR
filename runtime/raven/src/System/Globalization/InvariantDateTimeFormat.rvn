@@ -1,5 +1,7 @@
 namespace System.Globalization
 
+import System.Time.*
+
 // Bounded numeric conventions; not a general CLDR pattern interpreter.
 internal class InvariantDateTimeFormat : DateTimeFormatRules {
     private var digits: DateTimeFormatDigits = DateTimeFormatDigits()
@@ -9,7 +11,7 @@ internal class InvariantDateTimeFormat : DateTimeFormatRules {
         return digits.Pad(year, 4) + "-" + digits.Pad(month, 2) + "-" + digits.Pad(day, 2)
     }
 
-    func FormatTime(time: System.Time) -> string {
+    func FormatTime(time: System.Time.TimeOfDay) -> string {
         return digits.FormatTime(time, ".")
     }
 }

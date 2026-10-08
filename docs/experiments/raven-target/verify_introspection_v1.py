@@ -67,7 +67,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-introspection-v1-') as temporary
     # establish a new naming or type-equality policy.
     assert result.stdout.strip().splitlines() == [
         'System.Int32', 'System', 'System.String', 'System',
-        'StoredDayNumber', 'System.Date', 'System', 'System.Int32', 'System',
+        'StoredDayNumber', 'System.Time.Date', 'System', 'System.Int32', 'System',
         'Private instance field', '0', '0', '1'], result.stdout
 
     main = (source / 'Main.rvn').read_text()

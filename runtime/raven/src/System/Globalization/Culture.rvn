@@ -1,5 +1,7 @@
 namespace System.Globalization
 
+import System.Time.*
+
 /// Immutable, bounded date/time conventions; no ambient culture or locale resolver.
 public class Culture {
     private var kind: int
@@ -37,6 +39,6 @@ public class Culture {
     /// Resolves a fresh snapshot of the host preference with invariant fallback.
     static val Current: Culture => SystemCultureProvider().Current
 
-    val DefaultCalendar: System.Calendar => System.Calendar.Gregorian
+    val DefaultCalendar: System.Time.Calendar => System.Time.Calendar.Gregorian
     val DateTimeFormat: DateTimeFormat => System.Globalization.DateTimeFormat.Create(self, DefaultCalendar)
 }

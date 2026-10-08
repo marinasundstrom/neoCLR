@@ -31,7 +31,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-interface-library-') as temporar
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    source = (ROOT / 'runtime/raven/src/System/Clock.rvn').read_text()
+    source = (ROOT / 'runtime/raven/src/System/Time/Clock.rvn').read_text()
     unsupported = 'Unsupported library interface contract'
     mismatch = 'Library interface does not match reference contract'
     cases = [
@@ -57,15 +57,15 @@ with tempfile.TemporaryDirectory(prefix='neoclr-interface-library-') as temporar
         run(['dotnet', args.compiler.resolve(), project, '--no-project-restore', '-o', folder / 'bin'])
         output = folder / 'imported'
         run(['dotnet', args.bridge.resolve(), '--library-implementation', folder / 'bin' / (name + '.dll'),
-             core, 'System.Clock', output], diagnostic)
+             core, 'System.Time.Clock', output], diagnostic)
         if diagnostic:
             assert not (output / 'Implementation.neoil').exists()
         else:
             result = (output / 'Implementation.neoil').read_text()
-            assert '.interface System.Clock' in result
-            assert '.property instance Now() -> System.Instant' in result
-            assert '.method instance get_Now() -> System.Instant' in result
-            assert '.method instance get_Now() -> System.Instant\n.end' in result
+            assert '.interface System.Time.Clock' in result
+            assert '.property instance Now() -> System.Time.Instant' in result
+            assert '.method instance get_Now() -> System.Time.Instant' in result
+            assert '.method instance get_Now() -> System.Time.Instant\n.end' in result
 
     # Exercise both a user implementation and SystemClock through the regenerated
     # runtime-library contract, not only the reference metadata used for compilation.

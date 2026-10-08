@@ -95,7 +95,7 @@
     <Compile Include="src/System/Storage/StorageItems.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Clock'">
-    <Compile Include="src/System/Clock.rvn" />
+    <Compile Include="src/System/Time/Clock.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ArrayList'">
     <Compile Include="src/System/Collections/ArrayList.rvn" />
@@ -104,10 +104,10 @@
     <Compile Include="src/System/Collections/HashMap.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Time'">
-    <Compile Include="src/System/Time.rvn" />
+    <Compile Include="src/System/Time/TimeOfDay.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Date'">
-    <Compile Include="src/System/Date.rvn" />
+    <Compile Include="src/System/Time/Date.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int64'">
     <Compile Include="src/System/Int64.rvn" />
@@ -155,16 +155,16 @@
     <Compile Include="src/System/Introspection/ParameterInfo.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Instant'">
-    <Compile Include="src/System/Instant.rvn" />
+    <Compile Include="src/System/Time/Instant.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Duration'">
-    <Compile Include="src/System/Duration.rvn" />
+    <Compile Include="src/System/Time/Duration.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SystemClock'">
-    <Compile Include="src/System/SystemClock.rvn" />
+    <Compile Include="src/System/Time/SystemClock.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'LocalDateTime'">
-    <Compile Include="src/System/LocalDateTime.rvn" />
+    <Compile Include="src/System/Time/LocalDateTime.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Disposable'">
     <Compile Include="src/System/Disposable.rvn" />
@@ -234,10 +234,10 @@
     <Compile Include="src/System/InvalidRangeError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidDateError'">
-    <Compile Include="src/System/InvalidDateError.rvn" />
+    <Compile Include="src/System/Time/InvalidDateError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidTimeError'">
-    <Compile Include="src/System/InvalidTimeError.rvn" />
+    <Compile Include="src/System/Time/InvalidTimeError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'OverflowError'">
     <Compile Include="src/System/OverflowError.rvn" />
@@ -399,9 +399,9 @@
     <Compile Include="src/System/StringComparer.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Calendar'">
-    <Compile Include="src/System/Calendar.rvn" />
-    <Compile Include="src/System/GregorianCalendar.rvn" />
-    <Compile Include="src/System/HebrewCalendar.rvn" />
+    <Compile Include="src/System/Time/Calendar.rvn" />
+    <Compile Include="src/System/Time/GregorianCalendar.rvn" />
+    <Compile Include="src/System/Time/HebrewCalendar.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Culture'">
     <Compile Include="src/System/Globalization/Culture.rvn" />
@@ -426,22 +426,22 @@
     <Compile Include="src/System/Globalization/SystemCultureProvider.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TimeOffset'">
-    <Compile Include="src/System/TimeOffset.rvn" />
+    <Compile Include="src/System/Time/TimeOffset.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TimeZone'">
-    <Compile Include="src/System/TimeZone.rvn" />
+    <Compile Include="src/System/Time/TimeZone.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TimeZoneError'">
-    <Compile Include="src/System/TimeZoneError.rvn" />
+    <Compile Include="src/System/Time/TimeZoneError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'LocalTimeMapping'">
-    <Compile Include="src/System/LocalTimeMapping.rvn" />
+    <Compile Include="src/System/Time/LocalTimeMapping.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ZonedDateTime'">
-    <Compile Include="src/System/ZonedDateTime.rvn" />
+    <Compile Include="src/System/Time/ZonedDateTime.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DateTime'">
-    <Compile Include="src/System/DateTime.rvn" />
+    <Compile Include="src/System/Time/DateTime.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Encoding'">
     <Compile Include="src/System/Text/Encoding.rvn" />

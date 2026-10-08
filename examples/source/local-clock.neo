@@ -1,5 +1,5 @@
 func Main() -> int {
-    let now = System.Clock.GetLocalNow()
+    let now = System.Time.Clock.GetLocalNow()
     let date = now.Date
     let time = now.Time
     System.Console.WriteLine("Local system date: year, month, day")

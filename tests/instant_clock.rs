@@ -7,22 +7,22 @@ fn program() -> LoadedProgram {
 .module InstantTest
 .entry Now
 .function Now() -> Int64
-.local System.Instant instant
-newobj instance System.SystemClock::.ctor()
-castclass System.Clock
-callvirt instance System.Clock::get_Now()
+.local System.Time.Instant instant
+newobj instance System.Time.SystemClock::.ctor()
+castclass System.Time.Clock
+callvirt instance System.Time.Clock::get_Now()
 stloc instant
 ldloca instant
-call instance System.Instant::get_UnixTimeTicks()
+call instance System.Time.Instant::get_UnixTimeTicks()
 ret
 .end
-.function LocalAt(Int64 ticks) -> System.LocalDateTime
-.local System.Instant instant
+.function LocalAt(Int64 ticks) -> System.Time.LocalDateTime
+.local System.Time.Instant instant
 ldarg ticks
-call System.Instant::FromUnixTimeTicks(Int64)
+call System.Time.Instant::FromUnixTimeTicks(Int64)
 stloc instant
 ldloca instant
-call instance System.Instant::ToLocalDateTime()
+call instance System.Time.Instant::ToLocalDateTime()
 ret
 .end
 "#,

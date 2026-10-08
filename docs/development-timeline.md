@@ -12298,3 +12298,28 @@ claim follows from these focused checks.
 - **Build limitation:** the first fresh bundle attempt hit NEOMETA003 in
   HttpContext's constructor. A direct Web retry and a subsequent full bundle build
   passed; the intermittent metadata-type comparison failure is not claimed fixed.
+
+## 2026-10-09 — Group time APIs and isolate the HttpContext fix
+
+- **Author:** requested moving time-related constructs from System into System.Time
+  and reconsidering the Time struct's name.
+- **Assistant:** selected TimeOfDay because the type represents a time within a day,
+  without date or timezone. Proposed moving dates, clocks, durations, instants,
+  calendars, zone mappings and their errors together, keeping formatting in
+  System.Globalization and keeping LocalDateTime.Time as a property.
+- **Actions:** migrated Raven sources, explicit native ownership and temporary CLI
+  catalogs, generated affected implementations, updated consumers and API documents.
+  [Naming and compatibility](date-time-design.md#systemtime-namespace-2026-10-09-development)
+  records the .NET TimeOnly comparison and rebuild requirement.
+- **Author follow-up:** “Fix the `HttpContext` metdata error also, but commit separately”.
+  The assistant traced it to nested Void arguments with different declaring owners,
+  not a verifier tolerance issue. Raven `92a593ff7` normalizes the selected core unit
+  to RuntimeUnitContract; neoCLR `5007c251` records that separate integration fix.
+  A reduced constructor fails without the fix and both explicit Void/unit spellings
+  compile with it; the complete native bundle builds.
+- **Validation/outstanding:** the calendar sample matches interpreted/native output.
+  Timezone samples compile and execute in the interpreter, while existing native
+  timezone service and nonempty record-boxing limits remain. The native API preview
+  was checked in the browser for System.Time navigation, TimeOfDay summaries and
+  System.Runtime ownership. This does not qualify every time API for AOT or publish
+  the website.

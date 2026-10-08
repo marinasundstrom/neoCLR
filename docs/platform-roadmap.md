@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Author-directed API organization (2026-10-09):** group date/time values, clocks,
+calendars and timezone APIs under `System.Time`; rename the old `Time` value to
+`TimeOfDay`. This is an implemented development identity migration, with unchanged
+representation/arithmetic and a rebuild requirement, not a module-system milestone
+or a claim of complete time-service AOT support. See the
+[naming decision](date-time-design.md#systemtime-namespace-2026-10-09-development).
+
 **IL semantics (author clarification, 2026-10-08):** use .NET/CLI instruction behavior
 as the default across interpreter, AOT and eventual JIT. Document deliberate platform
 divergences explicitly; cross-mode agreement alone does not establish correctness.

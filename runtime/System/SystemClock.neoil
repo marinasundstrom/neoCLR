@@ -1,14 +1,14 @@
-.type class System.SystemClock
-    .implements System.Clock
+.type class System.Time.SystemClock
+    .implements System.Time.Clock
     .method instance .ctor() -> void
         ret
     .end
-    .property instance Now() -> System.Instant
-        .get instance System.SystemClock::get_Now()
+    .property instance Now() -> System.Time.Instant
+        .get instance System.Time.SystemClock::get_Now()
     .end
-    .method instance get_Now() -> System.Instant
+    .method instance get_Now() -> System.Time.Instant
         call neoCLR.Runtime.UnixTimeTicks()
-        call System.Instant::FromUnixTimeTicks(Int64)
+        call System.Time.Instant::FromUnixTimeTicks(Int64)
         ret
     .end
 .end

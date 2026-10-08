@@ -1,19 +1,21 @@
-namespace System
+namespace System.Time
+
+import System.*
 
 import System.Result.*
 
-public struct Time : ComparableTo<Time>, EquatableTo<Time> {
+public struct TimeOfDay : ComparableTo<TimeOfDay>, EquatableTo<TimeOfDay> {
     private field StoredTicks: long
 
     private init(ticks: long) {
         StoredTicks = ticks
     }
 
-    static func Create(hour: int, minute: int, second: int) -> Result<Time, InvalidTimeError> {
+    static func Create(hour: int, minute: int, second: int) -> Result<TimeOfDay, InvalidTimeError> {
         return Create(hour, minute, second, 0)
     }
 
-    static func Create(hour: int, minute: int, second: int, fractionTicks: int) -> Result<Time, InvalidTimeError> {
+    static func Create(hour: int, minute: int, second: int, fractionTicks: int) -> Result<TimeOfDay, InvalidTimeError> {
         if hour < 0 {
             return Error(InvalidTimeError())
         }
@@ -39,21 +41,21 @@ public struct Time : ComparableTo<Time>, EquatableTo<Time> {
             return Error(InvalidTimeError())
         }
         let seconds: long = (hour * 60 + minute) * 60 + second
-        return Ok(Time(seconds * 10000000L + fractionTicks))
+        return Ok(TimeOfDay(seconds * 10000000L + fractionTicks))
     }
 
-    static func FromTicks(ticks: long) -> Result<Time, InvalidTimeError> {
+    static func FromTicks(ticks: long) -> Result<TimeOfDay, InvalidTimeError> {
         if ticks < 0L {
             return Error(InvalidTimeError())
         }
         if ticks > 863999999999L {
             return Error(InvalidTimeError())
         }
-        return Ok(Time(ticks))
+        return Ok(TimeOfDay(ticks))
     }
 
     /// Adds elapsed ticks modulo one day. Use LocalDateTime.Add to retain the date carry.
-    func Add(duration: Duration) -> Time {
+    func Add(duration: Duration) -> TimeOfDay {
         var ticks = StoredTicks + duration.Ticks % 864000000000L
         if ticks < 0L {
             ticks = ticks + 864000000000L
@@ -61,7 +63,7 @@ public struct Time : ComparableTo<Time>, EquatableTo<Time> {
         if ticks >= 864000000000L {
             ticks = ticks - 864000000000L
         }
-        return Time(ticks)
+        return TimeOfDay(ticks)
     }
 
     override func ToString() -> string {
@@ -79,11 +81,11 @@ public struct Time : ComparableTo<Time>, EquatableTo<Time> {
     val Millisecond: int => (int)(StoredTicks / 10000L % 1000L)
     val FractionTicks: int => (int)(StoredTicks % 10000000L)
 
-    func Equals(other: Time) -> bool {
+    func Equals(other: TimeOfDay) -> bool {
         return StoredTicks == other.StoredTicks
     }
 
-    func CompareTo(other: Time) -> int {
+    func CompareTo(other: TimeOfDay) -> int {
         if StoredTicks < other.StoredTicks {
             return -1
         }

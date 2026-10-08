@@ -1,6 +1,7 @@
 # Date and Time core values
 
-Implemented 2026-09-08: separate System.Date and System.Time value-default types,
+The core was implemented 2026-09-08; the 2026-10-09 development migration names
+the separate values `System.Time.Date` and `System.Time.TimeOfDay`,
 with validated factories, readonly components and value equality/ordering. This
 core establishes representation and construction; parsing, formatting,
 arithmetic, durations and timezone mapping remain planned. The
@@ -18,11 +19,11 @@ Date represents a proleptic Gregorian calendar date from 0001-01-01 through
 | Date.Create(Int32 year, Int32 month, Int32 day) | Result<Date,InvalidDateError>; validates all components and leap years |
 | Date.FromDayNumber(Int32 dayNumber) | Same Result; validates the representable range |
 | Date.Year / Month / Day / DayOfYear / DayNumber | Readonly Int32 components; DayOfYear starts at 1 |
-| Time.Create(Int32 hour, Int32 minute, Int32 second) | Result<Time,InvalidTimeError>; whole seconds |
-| Time.Create(Int32 hour, Int32 minute, Int32 second, Int32 fractionTicks) | Same Result; fractionTicks is 0–9999999 within the second |
-| Time.FromTicks(Int64 ticks) | Same Result; validates the time-of-day range |
-| Time.Hour / Minute / Second / Millisecond / FractionTicks | Readonly Int32 components; Millisecond truncates smaller fractions |
-| Time.Ticks | Readonly Int64 total ticks since midnight |
+| TimeOfDay.Create(Int32 hour, Int32 minute, Int32 second) | Result<TimeOfDay,InvalidTimeError>; whole seconds |
+| TimeOfDay.Create(Int32 hour, Int32 minute, Int32 second, Int32 fractionTicks) | Same Result; fractionTicks is 0–9999999 within the second |
+| TimeOfDay.FromTicks(Int64 ticks) | Same Result; validates the time-of-day range |
+| TimeOfDay.Hour / Minute / Second / Millisecond / FractionTicks | Readonly Int32 components; Millisecond truncates smaller fractions |
+| TimeOfDay.Ticks | Readonly Int64 total ticks since midnight |
 | Equals(T other) / CompareTo(T other) | EquatableTo<T>/ComparableTo<T>, readonly managed receiver and owned input |
 
 Hours are 0–23, minutes and seconds 0–59. Leap-second input 60 and 24:00 are rejected.
@@ -31,8 +32,8 @@ invalid time, not each bad component; their ToString returns InvalidDate/Invalid
 All factory failures are ordinary Result values, not runtime faults. There are no
 public component constructors, setters or references to internal storage.
 
-`default(System.Date)` and initobj yield 0001-01-01. `default(System.Time)` yields
-midnight. These are real values, not null or absence. Use Option<Date>/Option<Time>
+`default(System.Time.Date)` and initobj yield 0001-01-01. `default(System.Time.TimeOfDay)` yields
+midnight. These are real values, not null or absence. Use Option<Date>/Option<TimeOfDay>
 for optionality. Copying and default construction use existing runtime mechanisms.
 
 ## .NET baseline and decisions
@@ -42,9 +43,9 @@ Primary sources consulted 2026-09-08:
 [DateOnly.DayNumber](https://learn.microsoft.com/en-us/dotnet/api/system.dateonly.daynumber?view=net-10.0)
 and [TimeOnly.Ticks](https://learn.microsoft.com/en-us/dotnet/api/system.timeonly.ticks?view=net-10.0),
 plus the [date/time design comparison](date-time-design.md).
-Reuse the familiar ranges, Gregorian model and tick precision. Date/Time are the
-chosen preview names: shorter primary concepts, with a naming migration cost for
-DateOnly/TimeOnly users. Values do not require Object or ValueType ancestry.
+Reuse the familiar ranges, Gregorian model and tick precision. Date and TimeOfDay retain the separate concepts. TimeOfDay makes the meaning
+explicit inside System.Time; DateOnly/TimeOnly remain the .NET comparison. The
+namespace/type rename requires updating imports and rebuilding consumers. Values do not require Object or ValueType ancestry.
 
 Storing separate year/month/day fields would use more components and require more
 cross-field invariant checks. A day number gives a valid zero representation and

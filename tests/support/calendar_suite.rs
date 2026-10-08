@@ -11,12 +11,12 @@ fn program() -> LoadedProgram {
         ),
         ("Date", "FromDayNumber", "Int32 number", "ldarg number"),
         (
-            "Time",
+            "TimeOfDay",
             "Create",
             "Int32 hour, Int32 minute, Int32 second, Int32 fractionTicks",
             "ldarg hour\nldarg minute\nldarg second\nldarg fractionTicks",
         ),
-        ("Time", "FromTicks", "Int64 ticks", "ldarg ticks"),
+        ("TimeOfDay", "FromTicks", "Int64 ticks", "ldarg ticks"),
     ] {
         let sig = params
             .split(',')
@@ -24,7 +24,7 @@ fn program() -> LoadedProgram {
             .collect::<Vec<_>>()
             .join(",");
         let (locals, unwrap) = unwrap_calendar_result(name);
-        source.push_str(&format!(".function {name}{constructor}({params}) -> System.{name}\n{locals}{args}\ncall System.{name}::{constructor}({sig})\n{unwrap}\nret\n.end\n"));
+        source.push_str(&format!(".function {name}{constructor}({params}) -> System.Time.{name}\n{locals}{args}\ncall System.Time.{name}::{constructor}({sig})\n{unwrap}\nret\n.end\n"));
     }
     for (name, properties) in [
         (
@@ -32,7 +32,7 @@ fn program() -> LoadedProgram {
             vec!["Year", "Month", "Day", "DayNumber", "DayOfYear"],
         ),
         (
-            "Time",
+            "TimeOfDay",
             vec![
                 "Hour",
                 "Minute",
@@ -49,10 +49,10 @@ fn program() -> LoadedProgram {
             } else {
                 "Int32"
             };
-            source.push_str(&format!(".function {name}{property}(System.{name} value) -> {ty}\nldarga value\ncall instance System.{name}::get_{property}()\nret\n.end\n"));
+            source.push_str(&format!(".function {name}{property}(System.Time.{name} value) -> {ty}\nldarga value\ncall instance System.Time.{name}::get_{property}()\nret\n.end\n"));
         }
         for (method, ret) in [("CompareTo", "Int32"), ("Equals", "Boolean")] {
-            source.push_str(&format!(".function {name}{method}(System.{name} left, System.{name} right) -> {ret}\nldarga left\nldarg right\ncall instance System.{name}::{method}(System.{name})\nret\n.end\n"));
+            source.push_str(&format!(".function {name}{method}(System.Time.{name} left, System.Time.{name} right) -> {ret}\nldarga left\nldarg right\ncall instance System.Time.{name}::{method}(System.Time.{name})\nret\n.end\n"));
         }
     }
     let p = load_calendar_program(&source);
@@ -92,7 +92,7 @@ fn gregorian_components_match_pinned_dotnet_cases() {
             assert_eq!(
                 call(
                     &p,
-                    &format!("Date{property}(System.Date)"),
+                    &format!("Date{property}(System.Time.Date)"),
                     vec![date.clone()]
                 ),
                 Value::Int32(expected),
@@ -112,17 +112,17 @@ fn time_ticks_preserve_fraction_and_day_boundaries() {
         (452_961_234_567, 12, 34, 56, 1_234_567),
         (863_999_999_999, 23, 59, 59, 9_999_999),
     ] {
-        let time = call(&p, "TimeFromTicks(Int64)", vec![Value::Int64(ticks)]);
+        let time = call(&p, "TimeOfDayFromTicks(Int64)", vec![Value::Int64(ticks)]);
         assert_eq!(
             time,
             call(
                 &p,
-                "TimeCreate(Int32,Int32,Int32,Int32)",
+                "TimeOfDayCreate(Int32,Int32,Int32,Int32)",
                 ints(&[hour, minute, second, fraction])
             )
         );
         assert_eq!(
-            call(&p, "TimeTicks(System.Time)", vec![time.clone()]),
+            call(&p, "TimeOfDayTicks(System.Time.TimeOfDay)", vec![time.clone()]),
             Value::Int64(ticks)
         );
         for (property, expected) in [
@@ -135,7 +135,7 @@ fn time_ticks_preserve_fraction_and_day_boundaries() {
             assert_eq!(
                 call(
                     &p,
-                    &format!("Time{property}(System.Time)"),
+                    &format!("TimeOfDay{property}(System.Time.TimeOfDay)"),
                     vec![time.clone()]
                 ),
                 Value::Int32(expected)
@@ -148,7 +148,7 @@ fn invalid_components_are_results_and_comparison_is_value_based() {
     let p = program();
     for (sig, cases) in [
         (
-            "System.Date::Create(Int32,Int32,Int32)",
+            "System.Time.Date::Create(Int32,Int32,Int32)",
             vec![
                 vec![0, 1, 1],
                 vec![10000, 1, 1],
@@ -162,7 +162,7 @@ fn invalid_components_are_results_and_comparison_is_value_based() {
             ],
         ),
         (
-            "System.Time::Create(Int32,Int32,Int32,Int32)",
+            "System.Time.TimeOfDay::Create(Int32,Int32,Int32,Int32)",
             vec![
                 vec![24, 0, 0, 0],
                 vec![-1, 0, 0, 0],
@@ -173,7 +173,7 @@ fn invalid_components_are_results_and_comparison_is_value_based() {
             ],
         ),
         (
-            "System.Date::FromDayNumber(Int32)",
+            "System.Time.Date::FromDayNumber(Int32)",
             vec![vec![-1], vec![3652059]],
         ),
     ] {
@@ -187,7 +187,7 @@ fn invalid_components_are_results_and_comparison_is_value_based() {
             "{:?}",
             call(
                 &p,
-                "System.Time::FromTicks(Int64)",
+                "System.Time.TimeOfDay::FromTicks(Int64)",
                 vec![Value::Int64(ticks)]
             )
         )
@@ -201,8 +201,8 @@ fn invalid_components_are_results_and_comparison_is_value_based() {
             Value::Int32(3652058),
         ),
         (
-            "Time",
-            "TimeFromTicks(Int64)",
+            "TimeOfDay",
+            "TimeOfDayFromTicks(Int64)",
             Value::Int64(0),
             Value::Int64(863999999999),
         ),
@@ -212,7 +212,7 @@ fn invalid_components_are_results_and_comparison_is_value_based() {
         assert_eq!(
             call(
                 &p,
-                &format!("{name}CompareTo(System.{name},System.{name})"),
+                &format!("{name}CompareTo(System.Time.{name},System.Time.{name})"),
                 vec![a.clone(), b.clone()]
             ),
             Value::Int32(-1)
@@ -220,7 +220,7 @@ fn invalid_components_are_results_and_comparison_is_value_based() {
         assert_eq!(
             call(
                 &p,
-                &format!("{name}CompareTo(System.{name},System.{name})"),
+                &format!("{name}CompareTo(System.Time.{name},System.Time.{name})"),
                 vec![b, a.clone()]
             ),
             Value::Int32(1)
@@ -228,7 +228,7 @@ fn invalid_components_are_results_and_comparison_is_value_based() {
         assert_eq!(
             call(
                 &p,
-                &format!("{name}Equals(System.{name},System.{name})"),
+                &format!("{name}Equals(System.Time.{name},System.Time.{name})"),
                 vec![a.clone(), a]
             ),
             Value::Boolean(true)

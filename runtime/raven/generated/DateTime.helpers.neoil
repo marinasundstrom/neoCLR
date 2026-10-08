@@ -1,5 +1,5 @@
-; Generated from runtime/raven/src/System/DateTime.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.DateTime.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+; Generated from runtime/raven/src/System/Time/DateTime.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Time.DateTime.RuntimeBooleanFromInt32(Int32 value) -> Boolean
     ldarg value
     ldc.i4 0
     beq False
@@ -14,7 +14,7 @@ True:
     ldc.bool true
     ret
 .end
-.function neoCLR.Library.System.DateTime.RuntimeBooleanToInt32(Boolean value) -> Int32
+.function neoCLR.Library.System.Time.DateTime.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False
     ldc.i4 1
@@ -23,19 +23,19 @@ False:
     ldc.i4 0
     ret
 .end
-.function neoCLR.Library.System.DateTime.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
+.function neoCLR.Library.System.Time.DateTime.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
 ldarg arg0
 callvirt instance System.Object::ToString()
 ret
 .end
-.function neoCLR.Library.System.DateTime.DefaultReference53797374656D2E5A6F6E65644461746554696D65() -> System.ZonedDateTime
-.local System.ZonedDateTime value
+.function neoCLR.Library.System.Time.DateTime.DefaultReference53797374656D2E54696D652E5A6F6E65644461746554696D65() -> System.Time.ZonedDateTime
+.local System.Time.ZonedDateTime value
 ldloca value
-initobj System.ZonedDateTime
+initobj System.Time.ZonedDateTime
 ldloc value
 ret
 .end
-.function neoCLR.Library.System.DateTime.DefaultReference53797374656D2E4F626A656374() -> System.Object
+.function neoCLR.Library.System.Time.DateTime.DefaultReference53797374656D2E4F626A656374() -> System.Object
 .local System.Object value
 ldloca value
 initobj System.Object

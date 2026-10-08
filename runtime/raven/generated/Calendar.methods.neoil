@@ -1,23 +1,23 @@
-; Generated from runtime/raven/src/System/Calendar.rvn. Regenerate with build_runtime_library.py.
-.type class System.Calendar
+; Generated from runtime/raven/src/System/Time/Calendar.rvn. Regenerate with build_runtime_library.py.
+.type class System.Time.Calendar
 .sealed
-.field private rules neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573
-.property static Gregorian() -> System.Calendar
-.get System.Calendar::get_Gregorian()
+.field private rules neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573
+.property static Gregorian() -> System.Time.Calendar
+.get System.Time.Calendar::get_Gregorian()
 .end
-.property static Hebrew() -> System.Calendar
-.get System.Calendar::get_Hebrew()
+.property static Hebrew() -> System.Time.Calendar
+.get System.Time.Calendar::get_Hebrew()
 .end
 .property instance Id() -> String
-.get instance System.Calendar::get_Id()
+.get instance System.Time.Calendar::get_Id()
 .end
 .property instance MinYear() -> Int32
-.get instance System.Calendar::get_MinYear()
+.get instance System.Time.Calendar::get_MinYear()
 .end
 .property instance MaxYear() -> Int32
-.get instance System.Calendar::get_MaxYear()
+.get instance System.Time.Calendar::get_MaxYear()
 .end
-.method private instance .ctor(neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573 rules) -> noresult
+.method private instance .ctor(neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573 rules) -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -29,41 +29,41 @@ ldarg 0
 M00000001_IL_0009:
 ldarg 1
 M00000001_IL_000a:
-stfld System.Calendar::rules
+stfld System.Time.Calendar::rules
 M00000001_IL_000f:
 ret
 .end
-.method static get_Gregorian() -> System.Calendar
-.local neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573 local0
+.method static get_Gregorian() -> System.Time.Calendar
+.local neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573 local0
 ldloca local0
-initobj neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573
+initobj neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573
 M00000002_IL_0000:
 M00000002_IL_0001:
-newobj instance neoCLR.Library.System.Calendar.Type_53797374656D2E477265676F7269616E43616C656E646172::.ctor()
+newobj instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E477265676F7269616E43616C656E646172::.ctor()
 M00000002_IL_0006:
 stloc local0
 M00000002_IL_0007:
 M00000002_IL_0008:
 ldloc local0
 M00000002_IL_0009:
-newobj instance System.Calendar::.ctor(neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573)
+newobj instance System.Time.Calendar::.ctor(neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573)
 M00000002_IL_000e:
 ret
 .end
-.method static get_Hebrew() -> System.Calendar
-.local neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573 local0
+.method static get_Hebrew() -> System.Time.Calendar
+.local neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573 local0
 ldloca local0
-initobj neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573
+initobj neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573
 M00000003_IL_0000:
 M00000003_IL_0001:
-newobj instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::.ctor()
+newobj instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E48656272657743616C656E646172::.ctor()
 M00000003_IL_0006:
 stloc local0
 M00000003_IL_0007:
 M00000003_IL_0008:
 ldloc local0
 M00000003_IL_0009:
-newobj instance System.Calendar::.ctor(neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573)
+newobj instance System.Time.Calendar::.ctor(neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573)
 M00000003_IL_000e:
 ret
 .end
@@ -73,9 +73,9 @@ M00000004_IL_0001:
 M00000004_IL_0002:
 ldarg 0
 M00000004_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M00000004_IL_0008:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::get_Id()
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::get_Id()
 M00000004_IL_000d:
 ret
 .end
@@ -85,9 +85,9 @@ M00000005_IL_0001:
 M00000005_IL_0002:
 ldarg 0
 M00000005_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M00000005_IL_0008:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::get_MinYear()
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::get_MinYear()
 M00000005_IL_000d:
 ret
 .end
@@ -97,19 +97,19 @@ M00000006_IL_0001:
 M00000006_IL_0002:
 ldarg 0
 M00000006_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M00000006_IL_0008:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::get_MaxYear()
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::get_MaxYear()
 M00000006_IL_000d:
 ret
 .end
-.method instance CreateDate(Int32 year,Int32 month,Int32 day) -> System.Result<System.Date,System.InvalidDateError>
+.method instance CreateDate(Int32 year,Int32 month,Int32 day) -> System.Result<System.Time.Date,System.Time.InvalidDateError>
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
 ldarg 0
 M00000007_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M00000007_IL_0008:
 ldarg 1
 M00000007_IL_0009:
@@ -117,141 +117,141 @@ ldarg 2
 M00000007_IL_000a:
 ldarg 3
 M00000007_IL_000b:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::CreateDate(Int32,Int32,Int32)
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::CreateDate(Int32,Int32,Int32)
 M00000007_IL_0010:
 ret
 .end
-.method instance IsLeapYear(Int32 year) -> System.Result<Boolean,System.InvalidDateError>
+.method instance IsLeapYear(Int32 year) -> System.Result<Boolean,System.Time.InvalidDateError>
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
 ldarg 0
 M00000008_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M00000008_IL_0008:
 ldarg 1
 M00000008_IL_0009:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::IsLeapYear(Int32)
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::IsLeapYear(Int32)
 M00000008_IL_000e:
 ret
 .end
-.method instance GetMonthsInYear(Int32 year) -> System.Result<Int32,System.InvalidDateError>
+.method instance GetMonthsInYear(Int32 year) -> System.Result<Int32,System.Time.InvalidDateError>
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
 ldarg 0
 M00000009_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M00000009_IL_0008:
 ldarg 1
 M00000009_IL_0009:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::GetMonthsInYear(Int32)
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::GetMonthsInYear(Int32)
 M00000009_IL_000e:
 ret
 .end
-.method instance GetDaysInMonth(Int32 year,Int32 month) -> System.Result<Int32,System.InvalidDateError>
+.method instance GetDaysInMonth(Int32 year,Int32 month) -> System.Result<Int32,System.Time.InvalidDateError>
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 M0000000a_IL_0002:
 ldarg 0
 M0000000a_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M0000000a_IL_0008:
 ldarg 1
 M0000000a_IL_0009:
 ldarg 2
 M0000000a_IL_000a:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::GetDaysInMonth(Int32,Int32)
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::GetDaysInMonth(Int32,Int32)
 M0000000a_IL_000f:
 ret
 .end
-.method instance GetYear(System.Date date) -> System.Result<Int32,System.InvalidDateError>
+.method instance GetYear(System.Time.Date date) -> System.Result<Int32,System.Time.InvalidDateError>
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:
 ldarg 0
 M0000000b_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M0000000b_IL_0008:
 ldarg 1
 M0000000b_IL_0009:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::GetYear(System.Date)
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::GetYear(System.Time.Date)
 M0000000b_IL_000e:
 ret
 .end
-.method instance GetMonth(System.Date date) -> System.Result<Int32,System.InvalidDateError>
+.method instance GetMonth(System.Time.Date date) -> System.Result<Int32,System.Time.InvalidDateError>
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:
 ldarg 0
 M0000000c_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M0000000c_IL_0008:
 ldarg 1
 M0000000c_IL_0009:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::GetMonth(System.Date)
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::GetMonth(System.Time.Date)
 M0000000c_IL_000e:
 ret
 .end
-.method instance GetDay(System.Date date) -> System.Result<Int32,System.InvalidDateError>
+.method instance GetDay(System.Time.Date date) -> System.Result<Int32,System.Time.InvalidDateError>
 M0000000d_IL_0000:
 M0000000d_IL_0001:
 M0000000d_IL_0002:
 ldarg 0
 M0000000d_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M0000000d_IL_0008:
 ldarg 1
 M0000000d_IL_0009:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::GetDay(System.Date)
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::GetDay(System.Time.Date)
 M0000000d_IL_000e:
 ret
 .end
-.method instance AddDays(System.Date date,Int32 days) -> System.Result<System.Date,System.InvalidDateError>
+.method instance AddDays(System.Time.Date date,Int32 days) -> System.Result<System.Time.Date,System.Time.InvalidDateError>
 M0000000e_IL_0000:
 M0000000e_IL_0001:
 M0000000e_IL_0002:
 ldarg 0
 M0000000e_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M0000000e_IL_0008:
 ldarg 1
 M0000000e_IL_0009:
 ldarg 2
 M0000000e_IL_000a:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::AddDays(System.Date,Int32)
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::AddDays(System.Time.Date,Int32)
 M0000000e_IL_000f:
 ret
 .end
-.method instance AddMonths(System.Date date,Int32 months) -> System.Result<System.Date,System.InvalidDateError>
+.method instance AddMonths(System.Time.Date date,Int32 months) -> System.Result<System.Time.Date,System.Time.InvalidDateError>
 M0000000f_IL_0000:
 M0000000f_IL_0001:
 M0000000f_IL_0002:
 ldarg 0
 M0000000f_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M0000000f_IL_0008:
 ldarg 1
 M0000000f_IL_0009:
 ldarg 2
 M0000000f_IL_000a:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::AddMonths(System.Date,Int32)
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::AddMonths(System.Time.Date,Int32)
 M0000000f_IL_000f:
 ret
 .end
-.method instance AddYears(System.Date date,Int32 years) -> System.Result<System.Date,System.InvalidDateError>
+.method instance AddYears(System.Time.Date date,Int32 years) -> System.Result<System.Time.Date,System.Time.InvalidDateError>
 M00000010_IL_0000:
 M00000010_IL_0001:
 M00000010_IL_0002:
 ldarg 0
 M00000010_IL_0003:
-ldfld System.Calendar::rules
+ldfld System.Time.Calendar::rules
 M00000010_IL_0008:
 ldarg 1
 M00000010_IL_0009:
 ldarg 2
 M00000010_IL_000a:
-callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::AddYears(System.Date,Int32)
+callvirt instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573::AddYears(System.Time.Date,Int32)
 M00000010_IL_000f:
 ret
 .end

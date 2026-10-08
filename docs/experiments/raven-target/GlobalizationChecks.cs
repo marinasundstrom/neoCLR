@@ -47,8 +47,8 @@ static class GlobalizationChecks
         calendar.IsSealed = false;
         Reject("Calendar rejects extensible contract", () => GlobalizationBindings.Bind(Reference(project), project));
         calendar.IsSealed = true;
-        foreach (var name in new[] { "Date", "Time", "Instant", "LocalDateTime", "TimeOffset" }) {
-            var type = module.GetType("System." + name);
+        foreach (var name in new[] { "Date", "TimeOfDay", "Instant", "LocalDateTime", "TimeOffset" }) {
+            var type = module.GetType("System.Time." + name);
             foreach (var method in type.Methods.Where(m => m.IsPublic && !m.IsConstructor))
                 Check(name + " " + method.FullName, CalendarBindings.Bind(Reference(method), method) is not null);
         }
@@ -57,17 +57,17 @@ static class GlobalizationChecks
         var wrongMapping = Reference(mapping);
         wrongMapping.ReturnType = module.TypeSystem.String;
         Reject("TimeZone rejects wrong mapping result", () => GlobalizationBindings.Bind(wrongMapping, mapping));
-        var offsetFactory = module.GetType("System.TimeOffset").Methods.Single(m => m.Name == "FromSeconds");
+        var offsetFactory = module.GetType("System.Time.TimeOffset").Methods.Single(m => m.Name == "FromSeconds");
         var badFactory = Reference(offsetFactory);
         badFactory.HasThis = true;
         Reject("TimeOffset rejects instance factory", () => CalendarBindings.Bind(badFactory, offsetFactory));
-        var dateTime = module.GetType("System.DateTime");
+        var dateTime = module.GetType("System.Time.DateTime");
         Check("DateTime is the exact parenthesized union", RavenUnionMetadata.IsDateTimeUnion(dateTime));
         foreach (var extractor in dateTime.Methods.Where(m => m.Name == "TryGetValue"))
             Check("DateTime conditional extraction " + extractor.FullName, ApplicationTypes.IsConditionalUnionOutput(extractor));
         var variantConstructor = dateTime.Methods.First(m => m.IsConstructor && m.IsPublic);
         var originalVariant = variantConstructor.Parameters[0].ParameterType;
-        variantConstructor.Parameters[0].ParameterType = module.GetType("System.Time");
+        variantConstructor.Parameters[0].ParameterType = module.GetType("System.Time.TimeOfDay");
         Check("DateTime rejects a foreign variant", !RavenUnionMetadata.IsDateTimeUnion(dateTime));
         variantConstructor.Parameters[0].ParameterType = originalVariant;
         Check("Implementation policies are not public reference types", module.Types.All(t => t.Name is not ("CalendarRules" or "GregorianCalendar" or "HebrewCalendar" or "HebrewDateTimeFormat")));

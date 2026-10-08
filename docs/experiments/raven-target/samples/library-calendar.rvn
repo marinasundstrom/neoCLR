@@ -1,3 +1,4 @@
+import System.Time.*
 import System.Result.*
 import System.*
 import System.Console.*
@@ -26,7 +27,7 @@ func CheckDate(result: Result<Date, InvalidDateError>) {
     }
 }
 
-func ShowTime(value: Time) {
+func ShowTime(value: TimeOfDay) {
     WriteLine(value.Hour)
     WriteLine(value.Minute)
     WriteLine(value.Second)
@@ -40,15 +41,15 @@ func ShowTime(value: Time) {
     }
 }
 
-func ReadTime(result: Result<Time, InvalidTimeError>) -> Result<Time, InvalidTimeError> {
+func ReadTime(result: Result<TimeOfDay, InvalidTimeError>) -> Result<TimeOfDay, InvalidTimeError> {
     let value = result?
     ShowTime(value)
     return Ok(value)
 }
 
-func CheckTime(result: Result<Time, InvalidTimeError>) {
+func CheckTime(result: Result<TimeOfDay, InvalidTimeError>) {
     match ReadTime(result) {
-        .Ok(let ok) => WriteLine("Time accepted")
+        .Ok(let ok) => WriteLine("TimeOfDay accepted")
         .Error(let error) => WriteLine("Invalid time")
     }
 }
@@ -58,9 +59,9 @@ func Main() {
     CheckDate(Date.FromDayNumber(dayNumber: 0))
     CheckDate(Date.Create(2023, 2, 29))
     CheckDate(Date.FromDayNumber(-1))
-    CheckTime(Time.Create(hour: 12, minute: 34, second: 56, fractionTicks: 7890123))
-    CheckTime(Time.FromTicks(ticks: 452967890123L))
-    CheckTime(Time.Create(hour: 0, minute: 0, second: 0))
-    CheckTime(Time.Create(24, 0, 0))
-    CheckTime(Time.FromTicks(-1L))
+    CheckTime(TimeOfDay.Create(hour: 12, minute: 34, second: 56, fractionTicks: 7890123))
+    CheckTime(TimeOfDay.FromTicks(ticks: 452967890123L))
+    CheckTime(TimeOfDay.Create(hour: 0, minute: 0, second: 0))
+    CheckTime(TimeOfDay.Create(24, 0, 0))
+    CheckTime(TimeOfDay.FromTicks(-1L))
 }

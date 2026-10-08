@@ -1,6 +1,6 @@
-# Time, offsets and named zones
+# TimeOfDay, offsets and named zones
 
-Prefer specific types: Date, Time, LocalDateTime, Instant and ZonedDateTime express
+Prefer specific types: Date, TimeOfDay, LocalDateTime, Instant and ZonedDateTime express
 the information an API needs. DateTime is an optional union for contracts that
 intentionally accept either a local or a zoned value.
 
@@ -8,8 +8,8 @@ intentionally accept either a local or a zoned value.
 
 | Type | Meaning and implemented operations |
 | --- | --- |
-| Time | Validated 100 ns ticks within one day; Add(Duration) wraps modulo a day; ToString() uses current culture and ToString(Culture) is explicit |
-| LocalDateTime | Civil Date plus Time; Add(Duration) carries the date and returns InvalidDateError outside years 1–9999; it does not apply zone rules |
+| TimeOfDay | Validated 100 ns ticks within one day; Add(Duration) wraps modulo a day; ToString() uses current culture and ToString(Culture) is explicit |
+| LocalDateTime | Civil Date plus TimeOfDay; Add(Duration) carries the date and returns InvalidDateError outside years 1–9999; it does not apply zone rules |
 | Instant | Signed Unix 100 ns ticks; Add(Duration) returns OverflowError on Int64 overflow |
 | TimeOffset | Fixed whole-second UTC displacement from -18h through +18h; Zero and zero default; FromSeconds returns InvalidTimeError for invalid offsets; Seconds, Equals and CompareTo |
 | ZonedDateTime | Immutable reference value retaining Instant, Zone, LocalDateTime and Offset; Create(instant,zone) validates the projection; no custom equality or singleton identity contract |

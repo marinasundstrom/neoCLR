@@ -1,14 +1,16 @@
 namespace System.Globalization
 
+import System.Time.*
+
 import System.Result.*
 
 /// Provisional explicit civil formatting with independent culture and calendar.
 public class DateTimeFormat {
     private var culture: Culture
-    private var calendar: System.Calendar
+    private var calendar: System.Time.Calendar
     private var rules: DateTimeFormatRules
 
-    private init(culture: Culture, calendar: System.Calendar) {
+    private init(culture: Culture, calendar: System.Time.Calendar) {
         self.culture = culture
         self.calendar = calendar
         if culture.Name.Equals("he-IL") {
@@ -23,24 +25,24 @@ public class DateTimeFormat {
     static val Invariant: DateTimeFormat {
         get {
             let selectedCulture = System.Globalization.Culture.Invariant
-            let selectedCalendar = System.Calendar.Gregorian
+            let selectedCalendar = System.Time.Calendar.Gregorian
             return DateTimeFormat(selectedCulture, selectedCalendar)
         }
     }
     val Culture: Culture => culture
-    val Calendar: System.Calendar => calendar
+    val Calendar: System.Time.Calendar => calendar
 
     /// Selects culture and calendar independently. Both supported calendars are accepted.
-    static func Create(culture: Culture, calendar: System.Calendar) -> DateTimeFormat {
+    static func Create(culture: Culture, calendar: System.Time.Calendar) -> DateTimeFormat {
         return DateTimeFormat(culture, calendar)
     }
 
-    func WithCalendar(calendar: System.Calendar) -> DateTimeFormat {
+    func WithCalendar(calendar: System.Time.Calendar) -> DateTimeFormat {
         return DateTimeFormat(culture, calendar)
     }
 
     /// Formats calendar fields using the selected culture; Hebrew-calendar he-IL uses Hebrew letters.
-    func FormatDate(date: System.Date) -> System.Result<string, System.InvalidDateError> {
+    func FormatDate(date: System.Time.Date) -> System.Result<string, System.Time.InvalidDateError> {
         let year = calendar.GetYear(date)?
         let month = calendar.GetMonth(date)?
         let day = calendar.GetDay(date)?
@@ -48,12 +50,12 @@ public class DateTimeFormat {
     }
 
     /// Formats HH:mm:ss.fffffff; Swedish uses a comma before fractional seconds.
-    func FormatTime(time: System.Time) -> string {
+    func FormatTime(time: System.Time.TimeOfDay) -> string {
         return rules.FormatTime(time)
     }
 
     /// Invariant uses T; named cultures use a space. No offset or timezone is implied.
-    func FormatLocalDateTime(value: System.LocalDateTime) -> System.Result<string, System.InvalidDateError> {
+    func FormatLocalDateTime(value: System.Time.LocalDateTime) -> System.Result<string, System.Time.InvalidDateError> {
         let date = FormatDate(value.Date)?
         return Ok(date + rules.DateTimeSeparator + FormatTime(value.Time))
     }
@@ -62,5 +64,5 @@ public class DateTimeFormat {
 internal interface DateTimeFormatRules {
     val DateTimeSeparator: string { get; }
     func FormatDate(year: int, month: int, day: int) -> string
-    func FormatTime(time: System.Time) -> string
+    func FormatTime(time: System.Time.TimeOfDay) -> string
 }

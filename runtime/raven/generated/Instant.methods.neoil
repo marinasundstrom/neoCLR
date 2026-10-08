@@ -1,11 +1,11 @@
-; Generated from runtime/raven/src/System/Instant.rvn. Regenerate with build_runtime_library.py.
-.type System.Instant
+; Generated from runtime/raven/src/System/Time/Instant.rvn. Regenerate with build_runtime_library.py.
+.type System.Time.Instant
 .sealed
-.implements System.ComparableTo<System.Instant>
-.implements System.EquatableTo<System.Instant>
+.implements System.ComparableTo<System.Time.Instant>
+.implements System.EquatableTo<System.Time.Instant>
 .field private StoredTicks Int64
 .property instance UnixTimeTicks() -> Int64
-.get instance System.Instant::get_UnixTimeTicks()
+.get instance System.Time.Instant::get_UnixTimeTicks()
 .end
 .method private instance byref .ctor(Int64 ticks) -> Void
 .local Int64 local0
@@ -26,35 +26,35 @@ ldarg 0
 M00000001_IL_000b:
 ldloc local0
 M00000001_IL_000c:
-stfld System.Instant::StoredTicks
+stfld System.Time.Instant::StoredTicks
 pop
 M00000001_IL_0011:
 ldvoid
 ret
 .end
-.method static FromUnixTimeTicks(Int64 ticks) -> System.Instant
+.method static FromUnixTimeTicks(Int64 ticks) -> System.Time.Instant
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
 ldarg 0
 M00000002_IL_0003:
-newobj instance System.Instant::.ctor(Int64)
+newobj instance System.Time.Instant::.ctor(Int64)
 M00000002_IL_0008:
 ret
 .end
-.method instance readonly byref ToLocalDateTime() -> System.LocalDateTime
+.method instance readonly byref ToLocalDateTime() -> System.Time.LocalDateTime
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
 ldarg 0
 M00000003_IL_0003:
-ldfld System.Instant::StoredTicks
+ldfld System.Time.Instant::StoredTicks
 M00000003_IL_0008:
-call System.LocalDateTime::FromUnixTimeTicks(Int64)
+call System.Time.LocalDateTime::FromUnixTimeTicks(Int64)
 M00000003_IL_000d:
 ret
 .end
-.method instance readonly byref Add(System.Duration duration) -> System.Result<System.Instant,System.OverflowError>
+.method instance readonly byref Add(System.Time.Duration duration) -> System.Result<System.Time.Instant,System.OverflowError>
 .local Int64 local0
 ldc.i8 0
 stloc local0
@@ -63,7 +63,7 @@ M00000004_IL_0001:
 M00000004_IL_0002:
 ldarga 1
 M00000004_IL_0004:
-call neoCLR.Library.System.Instant.RuntimeDurationget_Ticks(System.Duration&)
+call neoCLR.Library.System.Time.Instant.RuntimeDurationget_Ticks(System.Time.Duration&)
 M00000004_IL_0009:
 stloc local0
 M00000004_IL_000a:
@@ -73,7 +73,7 @@ M00000004_IL_000c:
 ldc.i8 0
 M00000004_IL_0015:
 cgt
-call neoCLR.Library.System.Instant.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.Instant.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_0017:
 brtrue M00000004_IL_0021
 M00000004_IL_001c:
@@ -82,7 +82,7 @@ M00000004_IL_0021:
 M00000004_IL_0022:
 ldarg 0
 M00000004_IL_0023:
-ldfld System.Instant::StoredTicks
+ldfld System.Time.Instant::StoredTicks
 M00000004_IL_0028:
 ldc.i8 9223372036854775807
 M00000004_IL_0031:
@@ -91,17 +91,17 @@ M00000004_IL_0032:
 sub
 M00000004_IL_0033:
 cgt
-call neoCLR.Library.System.Instant.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.Instant.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_0035:
 brtrue M00000004_IL_003f
 M00000004_IL_003a:
 br M00000004_IL_004f
 M00000004_IL_003f:
-call neoCLR.Library.System.Instant.RuntimeErrorSystemOverflowErrorNew()
+call neoCLR.Library.System.Time.Instant.RuntimeErrorSystemOverflowErrorNew()
 M00000004_IL_0044:
-call neoCLR.Library.System.Instant.RuntimeUnion0(System.OverflowError)
+call neoCLR.Library.System.Time.Instant.RuntimeUnion0(System.OverflowError)
 M00000004_IL_0049:
-call neoCLR.Library.System.Instant.RuntimeUnion1(System.Result.Error<System.OverflowError>)
+call neoCLR.Library.System.Time.Instant.RuntimeUnion1(System.Result.Error<System.OverflowError>)
 M00000004_IL_004e:
 ret
 M00000004_IL_004f:
@@ -113,7 +113,7 @@ M00000004_IL_0053:
 ldc.i8 0
 M00000004_IL_005c:
 clt
-call neoCLR.Library.System.Instant.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.Instant.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_005e:
 brtrue M00000004_IL_0068
 M00000004_IL_0063:
@@ -122,7 +122,7 @@ M00000004_IL_0068:
 M00000004_IL_0069:
 ldarg 0
 M00000004_IL_006a:
-ldfld System.Instant::StoredTicks
+ldfld System.Time.Instant::StoredTicks
 M00000004_IL_006f:
 ldc.i8 -9223372036854775808
 M00000004_IL_0078:
@@ -131,17 +131,17 @@ M00000004_IL_0079:
 sub
 M00000004_IL_007a:
 clt
-call neoCLR.Library.System.Instant.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.Instant.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_007c:
 brtrue M00000004_IL_0086
 M00000004_IL_0081:
 br M00000004_IL_0096
 M00000004_IL_0086:
-call neoCLR.Library.System.Instant.RuntimeErrorSystemOverflowErrorNew()
+call neoCLR.Library.System.Time.Instant.RuntimeErrorSystemOverflowErrorNew()
 M00000004_IL_008b:
-call neoCLR.Library.System.Instant.RuntimeUnion0(System.OverflowError)
+call neoCLR.Library.System.Time.Instant.RuntimeUnion0(System.OverflowError)
 M00000004_IL_0090:
-call neoCLR.Library.System.Instant.RuntimeUnion1(System.Result.Error<System.OverflowError>)
+call neoCLR.Library.System.Time.Instant.RuntimeUnion1(System.Result.Error<System.OverflowError>)
 M00000004_IL_0095:
 ret
 M00000004_IL_0096:
@@ -150,17 +150,17 @@ M00000004_IL_0098:
 M00000004_IL_0099:
 ldarg 0
 M00000004_IL_009a:
-ldfld System.Instant::StoredTicks
+ldfld System.Time.Instant::StoredTicks
 M00000004_IL_009f:
 ldloc local0
 M00000004_IL_00a0:
 add
 M00000004_IL_00a1:
-newobj instance System.Instant::.ctor(Int64)
+newobj instance System.Time.Instant::.ctor(Int64)
 M00000004_IL_00a6:
-call neoCLR.Library.System.Instant.RuntimeUnion2(System.Instant)
+call neoCLR.Library.System.Time.Instant.RuntimeUnion2(System.Time.Instant)
 M00000004_IL_00ab:
-call neoCLR.Library.System.Instant.RuntimeUnion3(System.Result.Ok<System.Instant>)
+call neoCLR.Library.System.Time.Instant.RuntimeUnion3(System.Result.Ok<System.Time.Instant>)
 M00000004_IL_00b0:
 ret
 .end
@@ -170,42 +170,42 @@ M00000005_IL_0001:
 M00000005_IL_0002:
 ldarg 0
 M00000005_IL_0003:
-ldfld System.Instant::StoredTicks
+ldfld System.Time.Instant::StoredTicks
 M00000005_IL_0008:
 ret
 .end
-.method instance readonly byref Equals(System.Instant other) -> Boolean
+.method instance readonly byref Equals(System.Time.Instant other) -> Boolean
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
 ldarg 0
 M00000006_IL_0003:
-ldfld System.Instant::StoredTicks
+ldfld System.Time.Instant::StoredTicks
 M00000006_IL_0008:
 ldarga 1
 M00000006_IL_000a:
-ldfld System.Instant::StoredTicks
+ldfld System.Time.Instant::StoredTicks
 M00000006_IL_000f:
 ceq
-call neoCLR.Library.System.Instant.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.Instant.RuntimeBooleanToInt32(Boolean)
 M00000006_IL_0011:
-call neoCLR.Library.System.Instant.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.Time.Instant.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance readonly byref CompareTo(System.Instant other) -> Int32
+.method instance readonly byref CompareTo(System.Time.Instant other) -> Int32
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
 ldarg 0
 M00000007_IL_0003:
-ldfld System.Instant::StoredTicks
+ldfld System.Time.Instant::StoredTicks
 M00000007_IL_0008:
 ldarga 1
 M00000007_IL_000a:
-ldfld System.Instant::StoredTicks
+ldfld System.Time.Instant::StoredTicks
 M00000007_IL_000f:
 clt
-call neoCLR.Library.System.Instant.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.Instant.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_0011:
 brtrue M00000007_IL_001b
 M00000007_IL_0016:
@@ -220,14 +220,14 @@ M00000007_IL_001f:
 M00000007_IL_0020:
 ldarg 0
 M00000007_IL_0021:
-ldfld System.Instant::StoredTicks
+ldfld System.Time.Instant::StoredTicks
 M00000007_IL_0026:
 ldarga 1
 M00000007_IL_0028:
-ldfld System.Instant::StoredTicks
+ldfld System.Time.Instant::StoredTicks
 M00000007_IL_002d:
 cgt
-call neoCLR.Library.System.Instant.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.Instant.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_002f:
 brtrue M00000007_IL_0039
 M00000007_IL_0034:

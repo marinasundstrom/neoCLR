@@ -33,51 +33,51 @@ ldarg source
 call instance System.Char::ToString()
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_Hour(System.Time& source) -> Int32
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeOfDayget_Hour(System.Time.TimeOfDay& source) -> Int32
 ldarg source
-call instance System.Time::get_Hour()
+call instance System.Time.TimeOfDay::get_Hour()
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_Minute(System.Time& source) -> Int32
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeOfDayget_Minute(System.Time.TimeOfDay& source) -> Int32
 ldarg source
-call instance System.Time::get_Minute()
+call instance System.Time.TimeOfDay::get_Minute()
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_Second(System.Time& source) -> Int32
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeOfDayget_Second(System.Time.TimeOfDay& source) -> Int32
 ldarg source
-call instance System.Time::get_Second()
+call instance System.Time.TimeOfDay::get_Second()
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_FractionTicks(System.Time& source) -> Int32
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeOfDayget_FractionTicks(System.Time.TimeOfDay& source) -> Int32
 ldarg source
-call instance System.Time::get_FractionTicks()
+call instance System.Time.TimeOfDay::get_FractionTicks()
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeLocalDateTimeget_Date(System.LocalDateTime& source) -> System.Date
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeLocalDateTimeget_Date(System.Time.LocalDateTime& source) -> System.Time.Date
 ldarg source
-call instance System.LocalDateTime::get_Date()
+call instance System.Time.LocalDateTime::get_Date()
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeLocalDateTimeget_Time(System.LocalDateTime& source) -> System.Time
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeLocalDateTimeget_Time(System.Time.LocalDateTime& source) -> System.Time.TimeOfDay
 ldarg source
-call instance System.LocalDateTime::get_Time()
+call instance System.Time.LocalDateTime::get_Time()
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion0(System.Result<Int32,System.InvalidDateError>& arg0,out Int32& arg1) -> Boolean
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion0(System.Result<Int32,System.Time.InvalidDateError>& arg0,out Int32& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<Int32,System.InvalidDateError>::TryGetOutput(Int32&)
+call instance System.Result<Int32,System.Time.InvalidDateError>::TryGetOutput(Int32&)
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion1(System.Result<Int32,System.InvalidDateError>& arg0,out System.InvalidDateError& arg1) -> Boolean
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion1(System.Result<Int32,System.Time.InvalidDateError>& arg0,out System.Time.InvalidDateError& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<Int32,System.InvalidDateError>::TryGetResidual(System.InvalidDateError&)
+call instance System.Result<Int32,System.Time.InvalidDateError>::TryGetResidual(System.Time.InvalidDateError&)
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion2(System.InvalidDateError arg0) -> System.Result<String,System.InvalidDateError>
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion2(System.Time.InvalidDateError arg0) -> System.Result<String,System.Time.InvalidDateError>
 ldarg arg0
-call System.Result<String,System.InvalidDateError>::FromResidual(System.InvalidDateError)
+call System.Result<String,System.Time.InvalidDateError>::FromResidual(System.Time.InvalidDateError)
 ret
 .end
 .function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion3(String arg0) -> System.Result.Ok<String>
@@ -85,27 +85,27 @@ ldarg arg0
 newobj instance System.Result.Ok<String>::.ctor(String)
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion4(System.Result.Ok<String> arg0) -> System.Result<String,System.InvalidDateError>
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion4(System.Result.Ok<String> arg0) -> System.Result<String,System.Time.InvalidDateError>
 ldarg arg0
-newobj instance System.Result<String,System.InvalidDateError>::.ctor(System.Result.Ok<String>)
+newobj instance System.Result<String,System.Time.InvalidDateError>::.ctor(System.Result.Ok<String>)
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion5(System.Result<String,System.InvalidDateError>& arg0,out String& arg1) -> Boolean
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion5(System.Result<String,System.Time.InvalidDateError>& arg0,out String& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<String,System.InvalidDateError>::TryGetOutput(String&)
+call instance System.Result<String,System.Time.InvalidDateError>::TryGetOutput(String&)
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion6(System.Result<String,System.InvalidDateError>& arg0,out System.InvalidDateError& arg1) -> Boolean
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion6(System.Result<String,System.Time.InvalidDateError>& arg0,out System.Time.InvalidDateError& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<String,System.InvalidDateError>::TryGetResidual(System.InvalidDateError&)
+call instance System.Result<String,System.Time.InvalidDateError>::TryGetResidual(System.Time.InvalidDateError&)
 ret
 .end
-.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion7(System.Result<Int32,System.InvalidDateError>& arg0,out(true) System.Result.Ok<Int32>& arg1) -> Boolean
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion7(System.Result<Int32,System.Time.InvalidDateError>& arg0,out(true) System.Result.Ok<Int32>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<Int32,System.InvalidDateError>::TryGetValue(System.Result.Ok<Int32>&)
+call instance System.Result<Int32,System.Time.InvalidDateError>::TryGetValue(System.Result.Ok<Int32>&)
 ret
 .end
 .function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion8(System.Result.Ok<Int32>& arg0) -> Int32
@@ -126,11 +126,11 @@ False:
 .sealed
 .implements neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D617452756C6573
 .field private digits neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473
-.field private calendar System.Calendar
+.field private calendar System.Time.Calendar
 .property instance DateTimeSeparator() -> String
 .get instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::get_DateTimeSeparator()
 .end
-.method instance .ctor(System.Calendar calendar) -> noresult
+.method instance .ctor(System.Time.Calendar calendar) -> noresult
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 ldarg 0
@@ -818,7 +818,7 @@ ret
 .local Int32 local0
 .local arrayref<String> local1
 .local arrayref<String> local2
-.local System.Result<Int32,System.InvalidDateError> local3
+.local System.Result<Int32,System.Time.InvalidDateError> local3
 .local System.Result.Ok<Int32> local4
 ldc.i4 0
 stloc local0
@@ -827,7 +827,7 @@ initobj arrayref<String>
 ldloca local2
 initobj arrayref<String>
 ldloca local3
-initobj System.Result<Int32,System.InvalidDateError>
+initobj System.Result<Int32,System.Time.InvalidDateError>
 ldloca local4
 initobj System.Result.Ok<Int32>
 M0000000f_IL_0000:
@@ -839,7 +839,7 @@ ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C
 M0000000f_IL_0008:
 ldarg 1
 M0000000f_IL_0009:
-call instance System.Calendar::GetMonthsInYear(Int32)
+call instance System.Time.Calendar::GetMonthsInYear(Int32)
 M0000000f_IL_000e:
 stloc local3
 M0000000f_IL_000f:
@@ -851,7 +851,7 @@ ldloca local3
 M0000000f_IL_0019:
 ldloca local4
 M0000000f_IL_001b:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion7(System.Result<Int32,System.InvalidDateError>&,System.Result.Ok<Int32>&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion7(System.Result<Int32,System.Time.InvalidDateError>&,System.Result.Ok<Int32>&)
 M0000000f_IL_0020:
 brfalse M0000000f_IL_0039
 M0000000f_IL_0025:
@@ -1136,7 +1136,7 @@ ldarg 0
 M00000010_IL_0003:
 ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::calendar
 M00000010_IL_0008:
-call instance System.Calendar::get_Id()
+call instance System.Time.Calendar::get_Id()
 M00000010_IL_000d:
 ldstr "hebrew"
 M00000010_IL_0012:
@@ -1232,7 +1232,7 @@ call System.String::Concat(String,String)
 M00000010_IL_00a4:
 ret
 .end
-.method instance FormatTime(System.Time time) -> String
+.method instance FormatTime(System.Time.TimeOfDay time) -> String
 M00000011_IL_0000:
 M00000011_IL_0001:
 M00000011_IL_0002:
@@ -1244,7 +1244,7 @@ ldarg 1
 M00000011_IL_0009:
 ldstr "."
 M00000011_IL_000e:
-callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::FormatTime(System.Time,String)
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::FormatTime(System.Time.TimeOfDay,String)
 M00000011_IL_0013:
 ret
 .end
@@ -1254,7 +1254,7 @@ ret
 .end
 .method instance FormatDate(Int32 year,Int32 month,Int32 day) -> String
 .end
-.method instance FormatTime(System.Time time) -> String
+.method instance FormatTime(System.Time.TimeOfDay time) -> String
 .end
 .property instance DateTimeSeparator() -> String
 .get instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D617452756C6573::get_DateTimeSeparator()
@@ -1339,7 +1339,7 @@ call System.String::Concat(String,String)
 M00000013_IL_0047:
 ret
 .end
-.method instance FormatTime(System.Time time) -> String
+.method instance FormatTime(System.Time.TimeOfDay time) -> String
 M00000014_IL_0000:
 M00000014_IL_0001:
 M00000014_IL_0002:
@@ -1351,7 +1351,7 @@ ldarg 1
 M00000014_IL_0009:
 ldstr ","
 M00000014_IL_000e:
-callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::FormatTime(System.Time,String)
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::FormatTime(System.Time.TimeOfDay,String)
 M00000014_IL_0013:
 ret
 .end
@@ -1435,7 +1435,7 @@ call System.String::Concat(String,String)
 M00000016_IL_0047:
 ret
 .end
-.method instance FormatTime(System.Time time) -> String
+.method instance FormatTime(System.Time.TimeOfDay time) -> String
 M00000017_IL_0000:
 M00000017_IL_0001:
 M00000017_IL_0002:
@@ -1447,7 +1447,7 @@ ldarg 1
 M00000017_IL_0009:
 ldstr "."
 M00000017_IL_000e:
-callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::FormatTime(System.Time,String)
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::FormatTime(System.Time.TimeOfDay,String)
 M00000017_IL_0013:
 ret
 .end
@@ -1497,7 +1497,7 @@ ldloc local0
 M00000018_IL_0034:
 ret
 .end
-.method instance FormatTime(System.Time time,String separator) -> String
+.method instance FormatTime(System.Time.TimeOfDay time,String separator) -> String
 M00000019_IL_0000:
 M00000019_IL_0001:
 M00000019_IL_0002:
@@ -1505,7 +1505,7 @@ ldarg 0
 M00000019_IL_0003:
 ldarga 1
 M00000019_IL_0005:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_Hour(System.Time&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeOfDayget_Hour(System.Time.TimeOfDay&)
 M00000019_IL_000a:
 ldc.i4 2
 M00000019_IL_000b:
@@ -1519,7 +1519,7 @@ ldarg 0
 M00000019_IL_001b:
 ldarga 1
 M00000019_IL_001d:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_Minute(System.Time&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeOfDayget_Minute(System.Time.TimeOfDay&)
 M00000019_IL_0022:
 ldc.i4 2
 M00000019_IL_0023:
@@ -1535,7 +1535,7 @@ ldarg 0
 M00000019_IL_0038:
 ldarga 1
 M00000019_IL_003a:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_Second(System.Time&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeOfDayget_Second(System.Time.TimeOfDay&)
 M00000019_IL_003f:
 ldc.i4 2
 M00000019_IL_0040:
@@ -1551,7 +1551,7 @@ ldarg 0
 M00000019_IL_0051:
 ldarga 1
 M00000019_IL_0053:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_FractionTicks(System.Time&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeOfDayget_FractionTicks(System.Time.TimeOfDay&)
 M00000019_IL_0058:
 ldc.i4 7
 M00000019_IL_0059:

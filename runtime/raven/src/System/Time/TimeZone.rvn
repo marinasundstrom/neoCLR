@@ -1,4 +1,6 @@
-namespace System
+namespace System.Time
+
+import System.*
 
 import System.Result.*
 import System.Runtime.CompilerServices.RuntimeServices

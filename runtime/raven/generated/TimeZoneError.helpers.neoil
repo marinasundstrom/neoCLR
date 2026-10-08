@@ -1,5 +1,5 @@
-; Generated from runtime/raven/src/System/TimeZoneError.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.TimeZoneError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+; Generated from runtime/raven/src/System/Time/TimeZoneError.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
     ldarg value
     ldc.i4 0
     beq False
@@ -14,7 +14,7 @@ True:
     ldc.bool true
     ret
 .end
-.function neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean value) -> Int32
+.function neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False
     ldc.i4 1
@@ -23,19 +23,19 @@ False:
     ldc.i4 0
     ret
 .end
-.function neoCLR.Library.System.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
+.function neoCLR.Library.System.Time.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
 ldarg arg0
 callvirt instance System.Object::ToString()
 ret
 .end
-.function neoCLR.Library.System.TimeZoneError.DefaultReference53797374656D2E4F626A656374() -> System.Object
+.function neoCLR.Library.System.Time.TimeZoneError.DefaultReference53797374656D2E4F626A656374() -> System.Object
 .local System.Object value
 ldloca value
 initobj System.Object
 ldloc value
 ret
 .end
-.type System.TimeZoneError.UnknownZone
+.type System.Time.TimeZoneError.UnknownZone
 .sealed
 .method instance byref .ctor() -> Void
 M0000000b_IL_0000:
@@ -67,7 +67,7 @@ ldarg 0
 M0000000d_IL_0001:
 M0000000d_IL_0002:
 ref.isnull
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M0000000d_IL_0004:
 brtrue M0000000d_IL_000e
 M0000000d_IL_0009:
@@ -86,7 +86,7 @@ M0000000d_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M0000000d_IL_001e:
 brtrue M0000000d_IL_0028
 M0000000d_IL_0023:
@@ -136,7 +136,7 @@ ldstr "\u0027"
 M0000000d_IL_006d:
 ldarg 0
 M0000000d_IL_006e:
-call neoCLR.Library.System.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
 M0000000d_IL_0073:
 call System.String::Concat(String,String)
 M0000000d_IL_0078:
@@ -149,12 +149,12 @@ M0000000d_IL_0083:
 M0000000d_IL_0084:
 ldarg 0
 M0000000d_IL_0085:
-call neoCLR.Library.System.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
 M0000000d_IL_008a:
 ret
 .end
 .end
-.type System.TimeZoneError.OutOfRange
+.type System.Time.TimeZoneError.OutOfRange
 .sealed
 .method instance byref .ctor() -> Void
 M0000000e_IL_0000:
@@ -186,7 +186,7 @@ ldarg 0
 M00000010_IL_0001:
 M00000010_IL_0002:
 ref.isnull
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M00000010_IL_0004:
 brtrue M00000010_IL_000e
 M00000010_IL_0009:
@@ -205,7 +205,7 @@ M00000010_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M00000010_IL_001e:
 brtrue M00000010_IL_0028
 M00000010_IL_0023:
@@ -255,7 +255,7 @@ ldstr "\u0027"
 M00000010_IL_006d:
 ldarg 0
 M00000010_IL_006e:
-call neoCLR.Library.System.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
 M00000010_IL_0073:
 call System.String::Concat(String,String)
 M00000010_IL_0078:
@@ -268,12 +268,12 @@ M00000010_IL_0083:
 M00000010_IL_0084:
 ldarg 0
 M00000010_IL_0085:
-call neoCLR.Library.System.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
 M00000010_IL_008a:
 ret
 .end
 .end
-.type System.TimeZoneError.SystemZoneUnavailable
+.type System.Time.TimeZoneError.SystemZoneUnavailable
 .sealed
 .method instance byref .ctor() -> Void
 M00000011_IL_0000:
@@ -305,7 +305,7 @@ ldarg 0
 M00000013_IL_0001:
 M00000013_IL_0002:
 ref.isnull
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M00000013_IL_0004:
 brtrue M00000013_IL_000e
 M00000013_IL_0009:
@@ -324,7 +324,7 @@ M00000013_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M00000013_IL_001e:
 brtrue M00000013_IL_0028
 M00000013_IL_0023:
@@ -374,7 +374,7 @@ ldstr "\u0027"
 M00000013_IL_006d:
 ldarg 0
 M00000013_IL_006e:
-call neoCLR.Library.System.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
 M00000013_IL_0073:
 call System.String::Concat(String,String)
 M00000013_IL_0078:
@@ -387,7 +387,7 @@ M00000013_IL_0083:
 M00000013_IL_0084:
 ldarg 0
 M00000013_IL_0085:
-call neoCLR.Library.System.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
 M00000013_IL_008a:
 ret
 .end

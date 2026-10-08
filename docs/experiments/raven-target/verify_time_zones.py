@@ -53,7 +53,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-time-zones-') as directory:
         ('immutable-zone', 'TimeZone.Utc.Id = "Europe/Stockholm"'),
         ('immutable-offset', 'TimeOffset.Zero.Seconds = 3'),
     ]:
-        compile_case(name, 'import System.*\nimport System.Globalization.*\nfunc Main() {\n    ' + statement + '\n}\n', False)
+        compile_case(name, 'import System.*\nimport System.Time.*\nimport System.Globalization.*\nfunc Main() {\n    ' + statement + '\n}\n', False)
         results[name] = 'rejected'
 print(json.dumps(results, indent=2, ensure_ascii=False))
 if args.output:

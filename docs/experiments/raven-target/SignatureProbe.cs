@@ -450,10 +450,10 @@ static class SignatureProbe
         Check("Char factory returns grapheme storage", PrimitiveBindings.Bind(factoryCall, factory)?.Result == "Char");
         factoryCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("Char factory does not accept integers", () => PrimitiveBindings.Bind(factoryCall, factory));
-        var dateType = module.GetType("System.Date");
+        var dateType = module.GetType("System.Time.Date");
         var createDate = dateType.Methods.Single(m => m.Name == "Create");
         Check("Date factory Result mapping", CalendarBindings.Bind(Reference(createDate, dateType), createDate)?.Result == CalendarBindings.DateResult);
-        var timeType = module.GetType("System.Time");
+        var timeType = module.GetType("System.Time.TimeOfDay");
         var fromTicks = timeType.Methods.Single(m => m.Name == "FromTicks");
         var ticksCall = Reference(fromTicks, timeType);
         Check("Time ticks stay Int64", CalendarBindings.Bind(ticksCall, fromTicks)?.Arguments.SequenceEqual(new[] { "Int64" }) == true);
@@ -463,7 +463,7 @@ static class SignatureProbe
         var notFound = readError.NestedTypes.Single(t => t.Name == "NotFound");
         var notFoundConstructor = notFound.Methods.Single(m => m.IsConstructor);
         Check("Error case constructor mapping", ErrorBindings.Construct(Reference(notFoundConstructor, notFound), notFoundConstructor)?.Result == "System.Storage.FileReadError.NotFound");
-        Check("Empty errors differ from union carriers", ErrorBindings.IsEmpty("System.InvalidDateError") && !ErrorBindings.IsEmpty("System.NumberParseError"));
+        Check("Empty errors differ from union carriers", ErrorBindings.IsEmpty("System.Time.InvalidDateError") && !ErrorBindings.IsEmpty("System.NumberParseError"));
         ErrorBindings.Reset(module);
         foreach (var httpOwner in new[] { "System.Web.Http.HttpClient", "System.Web.Http.HttpRequest" })
             foreach (var get in module.GetType(httpOwner).Methods.Where(m => m.Name == "Get"))

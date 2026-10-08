@@ -1,3 +1,4 @@
+import System.Time.*
 import System.Option.*
 import System.*
 import System.Collections.*

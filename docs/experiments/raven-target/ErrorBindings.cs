@@ -9,7 +9,7 @@ static class ErrorBindings
         ["System.Networking.IPAddressError"] = ["InvalidFormat", "UnsupportedScope"],
         ["System.Networking.DnsError"] = ["InvalidName", "LimitExceeded", "NoAddress", "TimedOut", "Cancelled", "LookupFailed"],
         ["System.Networking.Sockets.SocketError"] = ["Closed", "Busy", "InvalidRange", "LimitExceeded", "Cancelled", "InvalidAddress", "ConnectionRefused", "ConnectionReset", "AccessDenied", "TimedOut", "IoFailure", "InvalidOperation", "AddressInUse", "UnsupportedAddressFamily"],
-        ["System.TimeZoneError"] = ["UnknownZone", "OutOfRange", "SystemZoneUnavailable"],
+        ["System.Time.TimeZoneError"] = ["UnknownZone", "OutOfRange", "SystemZoneUnavailable"],
         ["System.UriError"] = ["InvalidFormat", "UnsupportedAuthority", "TooLong", "BaseNotAbsolute"],
         ["System.Storage.InvalidPathError"] = [],
         ["System.Storage.StorageLookupError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "IoFailure", "InvalidRange", "LimitExceeded"],
@@ -26,8 +26,8 @@ static class ErrorBindings
         ["System.BooleanParseError"] = ["InvalidFormat"],
         ["System.Linq.SingleError"] = ["Empty", "Multiple"],
         ["System.IntegerDivisionError"] = ["DivisionByZero", "Overflow"],
-        ["System.InvalidRangeError"] = [], ["System.InvalidDateError"] = [],
-        ["System.InvalidTimeError"] = [], ["System.OverflowError"] = [], ["System.EnvironmentError"] = []
+        ["System.InvalidRangeError"] = [], ["System.Time.InvalidDateError"] = [],
+        ["System.Time.InvalidTimeError"] = [], ["System.OverflowError"] = [], ["System.EnvironmentError"] = []
     };
     static readonly HashSet<string> Standard = new();
     public static bool IsStandard(string type) => Standard.Contains(type) || PayloadUnionBindings.IsType(type);

@@ -1,4 +1,6 @@
-namespace System
+namespace System.Time
+
+import System.*
 
 /// Immutable calendar selection. Values retain Date's absolute day identity.
 public class Calendar {

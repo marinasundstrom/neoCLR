@@ -1,68 +1,68 @@
-; Generated from runtime/raven/src/System/ZonedDateTime.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.ZonedDateTime.RuntimeTimeOffsetAtInstant(System.TimeOffset& source,System.Instant arg0) -> System.Result<System.LocalDateTime,System.InvalidDateError>
+; Generated from runtime/raven/src/System/Time/ZonedDateTime.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeTimeOffsetAtInstant(System.Time.TimeOffset& source,System.Time.Instant arg0) -> System.Result<System.Time.LocalDateTime,System.Time.InvalidDateError>
 ldarg source
 ldarg arg0
-call instance System.TimeOffset::AtInstant(System.Instant)
+call instance System.Time.TimeOffset::AtInstant(System.Time.Instant)
 ret
 .end
-.function neoCLR.Library.System.ZonedDateTime.RuntimeErrorSystemTimeZoneErrorNewSystemTimeZoneErrorOutOfRange(System.TimeZoneError.OutOfRange value) -> System.TimeZoneError
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeErrorSystemTimeTimeZoneErrorNewSystemTimeTimeZoneErrorOutOfRange(System.Time.TimeZoneError.OutOfRange value) -> System.Time.TimeZoneError
 ldarg value
-newobj instance System.TimeZoneError::.ctor(System.TimeZoneError.OutOfRange)
+newobj instance System.Time.TimeZoneError::.ctor(System.Time.TimeZoneError.OutOfRange)
 ret
 .end
-.function neoCLR.Library.System.ZonedDateTime.RuntimeErrorSystemTimeZoneErrorOutOfRangeNew() -> System.TimeZoneError.OutOfRange
-newobj instance System.TimeZoneError.OutOfRange::.ctor()
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeErrorSystemTimeTimeZoneErrorOutOfRangeNew() -> System.Time.TimeZoneError.OutOfRange
+newobj instance System.Time.TimeZoneError.OutOfRange::.ctor()
 ret
 .end
-.function neoCLR.Library.System.ZonedDateTime.RuntimeUnion0(System.Result<System.TimeOffset,System.TimeZoneError>& arg0,out System.TimeOffset& arg1) -> Boolean
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion0(System.Result<System.Time.TimeOffset,System.Time.TimeZoneError>& arg0,out System.Time.TimeOffset& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<System.TimeOffset,System.TimeZoneError>::TryGetOutput(System.TimeOffset&)
+call instance System.Result<System.Time.TimeOffset,System.Time.TimeZoneError>::TryGetOutput(System.Time.TimeOffset&)
 ret
 .end
-.function neoCLR.Library.System.ZonedDateTime.RuntimeUnion1(System.Result<System.TimeOffset,System.TimeZoneError>& arg0,out System.TimeZoneError& arg1) -> Boolean
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion1(System.Result<System.Time.TimeOffset,System.Time.TimeZoneError>& arg0,out System.Time.TimeZoneError& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<System.TimeOffset,System.TimeZoneError>::TryGetResidual(System.TimeZoneError&)
+call instance System.Result<System.Time.TimeOffset,System.Time.TimeZoneError>::TryGetResidual(System.Time.TimeZoneError&)
 ret
 .end
-.function neoCLR.Library.System.ZonedDateTime.RuntimeUnion2(System.TimeZoneError arg0) -> System.Result<System.ZonedDateTime,System.TimeZoneError>
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion2(System.Time.TimeZoneError arg0) -> System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>
 ldarg arg0
-call System.Result<System.ZonedDateTime,System.TimeZoneError>::FromResidual(System.TimeZoneError)
+call System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>::FromResidual(System.Time.TimeZoneError)
 ret
 .end
-.function neoCLR.Library.System.ZonedDateTime.RuntimeUnion3(System.Result<System.LocalDateTime,System.InvalidDateError>& arg0,out(true) System.Result.Ok<System.LocalDateTime>& arg1) -> Boolean
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion3(System.Result<System.Time.LocalDateTime,System.Time.InvalidDateError>& arg0,out(true) System.Result.Ok<System.Time.LocalDateTime>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<System.LocalDateTime,System.InvalidDateError>::TryGetValue(System.Result.Ok<System.LocalDateTime>&)
+call instance System.Result<System.Time.LocalDateTime,System.Time.InvalidDateError>::TryGetValue(System.Result.Ok<System.Time.LocalDateTime>&)
 ret
 .end
-.function neoCLR.Library.System.ZonedDateTime.RuntimeUnion4(System.Result.Ok<System.LocalDateTime>& arg0) -> System.LocalDateTime
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion4(System.Result.Ok<System.Time.LocalDateTime>& arg0) -> System.Time.LocalDateTime
 ldarg arg0
-call instance System.Result.Ok<System.LocalDateTime>::get_Value()
+call instance System.Result.Ok<System.Time.LocalDateTime>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.ZonedDateTime.RuntimeUnion5(System.TimeZoneError arg0) -> System.Result.Error<System.TimeZoneError>
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion5(System.Time.TimeZoneError arg0) -> System.Result.Error<System.Time.TimeZoneError>
 ldarg arg0
-newobj instance System.Result.Error<System.TimeZoneError>::.ctor(System.TimeZoneError)
+newobj instance System.Result.Error<System.Time.TimeZoneError>::.ctor(System.Time.TimeZoneError)
 ret
 .end
-.function neoCLR.Library.System.ZonedDateTime.RuntimeUnion6(System.Result.Error<System.TimeZoneError> arg0) -> System.Result<System.ZonedDateTime,System.TimeZoneError>
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion6(System.Result.Error<System.Time.TimeZoneError> arg0) -> System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>
 ldarg arg0
-newobj instance System.Result<System.ZonedDateTime,System.TimeZoneError>::.ctor(System.Result.Error<System.TimeZoneError>)
+newobj instance System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>::.ctor(System.Result.Error<System.Time.TimeZoneError>)
 ret
 .end
-.function neoCLR.Library.System.ZonedDateTime.RuntimeUnion7(System.ZonedDateTime arg0) -> System.Result.Ok<System.ZonedDateTime>
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion7(System.Time.ZonedDateTime arg0) -> System.Result.Ok<System.Time.ZonedDateTime>
 ldarg arg0
-newobj instance System.Result.Ok<System.ZonedDateTime>::.ctor(System.ZonedDateTime)
+newobj instance System.Result.Ok<System.Time.ZonedDateTime>::.ctor(System.Time.ZonedDateTime)
 ret
 .end
-.function neoCLR.Library.System.ZonedDateTime.RuntimeUnion8(System.Result.Ok<System.ZonedDateTime> arg0) -> System.Result<System.ZonedDateTime,System.TimeZoneError>
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion8(System.Result.Ok<System.Time.ZonedDateTime> arg0) -> System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>
 ldarg arg0
-newobj instance System.Result<System.ZonedDateTime,System.TimeZoneError>::.ctor(System.Result.Ok<System.ZonedDateTime>)
+newobj instance System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>::.ctor(System.Result.Ok<System.Time.ZonedDateTime>)
 ret
 .end
-.function neoCLR.Library.System.ZonedDateTime.RuntimeBooleanToInt32(Boolean value) -> Int32
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False
     ldc.i4 1

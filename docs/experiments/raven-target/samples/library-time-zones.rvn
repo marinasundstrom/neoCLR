@@ -1,6 +1,7 @@
+import System.Time.*
 import System.*
 import System.Result.*
-import System.LocalTimeMapping.*
+import System.Time.LocalTimeMapping.*
 import System.Globalization.*
 import System.Console.*
 
@@ -27,7 +28,7 @@ func Main() {
     let Ok(date) = Date.Create(2024, 10, 27) else {
         System.Fail("Invalid date")
     }
-    let Ok(time) = Time.Create(2, 30, 0) else {
+    let Ok(time) = TimeOfDay.Create(2, 30, 0) else {
         System.Fail("Invalid time")
     }
     let local = LocalDateTime.Create(date, time)

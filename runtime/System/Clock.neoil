@@ -1,7 +1,7 @@
-.interface System.Clock
-    .property instance Now() -> System.Instant
-        .get instance System.Clock::get_Now()
+.interface System.Time.Clock
+    .property instance Now() -> System.Time.Instant
+        .get instance System.Time.Clock::get_Now()
     .end
-    .method instance get_Now() -> System.Instant
+    .method instance get_Now() -> System.Time.Instant
     .end
 .end

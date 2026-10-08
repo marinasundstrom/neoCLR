@@ -1,3 +1,4 @@
+import System.Time.*
 import System.*
 import System.Introspection.*
 import System.Collections.*

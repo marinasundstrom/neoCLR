@@ -2,7 +2,7 @@
 .type class System.Globalization.DateTimeFormat
 .sealed
 .field private culture System.Globalization.Culture
-.field private calendar System.Calendar
+.field private calendar System.Time.Calendar
 .field private rules neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D617452756C6573
 .property static Invariant() -> System.Globalization.DateTimeFormat
 .get System.Globalization.DateTimeFormat::get_Invariant()
@@ -10,10 +10,10 @@
 .property instance Culture() -> System.Globalization.Culture
 .get instance System.Globalization.DateTimeFormat::get_Culture()
 .end
-.property instance Calendar() -> System.Calendar
+.property instance Calendar() -> System.Time.Calendar
 .get instance System.Globalization.DateTimeFormat::get_Calendar()
 .end
-.method private instance .ctor(System.Globalization.Culture culture,System.Calendar calendar) -> noresult
+.method private instance .ctor(System.Globalization.Culture culture,System.Time.Calendar calendar) -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -53,7 +53,7 @@ ldarg 0
 M00000001_IL_0034:
 ldarg 2
 M00000001_IL_0035:
-newobj instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::.ctor(System.Calendar)
+newobj instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::.ctor(System.Time.Calendar)
 M00000001_IL_003a:
 stfld System.Globalization.DateTimeFormat::rules
 M00000001_IL_003f:
@@ -94,11 +94,11 @@ ret
 .end
 .method static get_Invariant() -> System.Globalization.DateTimeFormat
 .local System.Globalization.Culture local0
-.local System.Calendar local1
+.local System.Time.Calendar local1
 ldloca local0
 initobj System.Globalization.Culture
 ldloca local1
-initobj System.Calendar
+initobj System.Time.Calendar
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
@@ -107,7 +107,7 @@ M00000002_IL_0007:
 stloc local0
 M00000002_IL_0008:
 M00000002_IL_0009:
-call System.Calendar::get_Gregorian()
+call System.Time.Calendar::get_Gregorian()
 M00000002_IL_000e:
 stloc local1
 M00000002_IL_000f:
@@ -116,7 +116,7 @@ ldloc local0
 M00000002_IL_0011:
 ldloc local1
 M00000002_IL_0012:
-newobj instance System.Globalization.DateTimeFormat::.ctor(System.Globalization.Culture,System.Calendar)
+newobj instance System.Globalization.DateTimeFormat::.ctor(System.Globalization.Culture,System.Time.Calendar)
 M00000002_IL_0017:
 ret
 .end
@@ -130,7 +130,7 @@ ldfld System.Globalization.DateTimeFormat::culture
 M00000003_IL_0008:
 ret
 .end
-.method instance get_Calendar() -> System.Calendar
+.method instance get_Calendar() -> System.Time.Calendar
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
@@ -140,7 +140,7 @@ ldfld System.Globalization.DateTimeFormat::calendar
 M00000004_IL_0008:
 ret
 .end
-.method static Create(System.Globalization.Culture culture,System.Calendar calendar) -> System.Globalization.DateTimeFormat
+.method static Create(System.Globalization.Culture culture,System.Time.Calendar calendar) -> System.Globalization.DateTimeFormat
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -148,11 +148,11 @@ ldarg 0
 M00000005_IL_0003:
 ldarg 1
 M00000005_IL_0004:
-newobj instance System.Globalization.DateTimeFormat::.ctor(System.Globalization.Culture,System.Calendar)
+newobj instance System.Globalization.DateTimeFormat::.ctor(System.Globalization.Culture,System.Time.Calendar)
 M00000005_IL_0009:
 ret
 .end
-.method instance WithCalendar(System.Calendar calendar) -> System.Globalization.DateTimeFormat
+.method instance WithCalendar(System.Time.Calendar calendar) -> System.Globalization.DateTimeFormat
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -162,44 +162,44 @@ ldfld System.Globalization.DateTimeFormat::culture
 M00000006_IL_0008:
 ldarg 1
 M00000006_IL_0009:
-newobj instance System.Globalization.DateTimeFormat::.ctor(System.Globalization.Culture,System.Calendar)
+newobj instance System.Globalization.DateTimeFormat::.ctor(System.Globalization.Culture,System.Time.Calendar)
 M00000006_IL_000e:
 ret
 .end
-.method instance FormatDate(System.Date date) -> System.Result<String,System.InvalidDateError>
-.local System.Result<Int32,System.InvalidDateError> local0
+.method instance FormatDate(System.Time.Date date) -> System.Result<String,System.Time.InvalidDateError>
+.local System.Result<Int32,System.Time.InvalidDateError> local0
 .local Int32 local1
-.local System.InvalidDateError local2
+.local System.Time.InvalidDateError local2
 .local Int32 local3
-.local System.Result<Int32,System.InvalidDateError> local4
+.local System.Result<Int32,System.Time.InvalidDateError> local4
 .local Int32 local5
-.local System.InvalidDateError local6
+.local System.Time.InvalidDateError local6
 .local Int32 local7
-.local System.Result<Int32,System.InvalidDateError> local8
+.local System.Result<Int32,System.Time.InvalidDateError> local8
 .local Int32 local9
-.local System.InvalidDateError local10
+.local System.Time.InvalidDateError local10
 .local Int32 local11
 ldloca local0
-initobj System.Result<Int32,System.InvalidDateError>
+initobj System.Result<Int32,System.Time.InvalidDateError>
 ldc.i4 0
 stloc local1
-newobj System.InvalidDateError
+newobj System.Time.InvalidDateError
 stloc local2
 ldc.i4 0
 stloc local3
 ldloca local4
-initobj System.Result<Int32,System.InvalidDateError>
+initobj System.Result<Int32,System.Time.InvalidDateError>
 ldc.i4 0
 stloc local5
-newobj System.InvalidDateError
+newobj System.Time.InvalidDateError
 stloc local6
 ldc.i4 0
 stloc local7
 ldloca local8
-initobj System.Result<Int32,System.InvalidDateError>
+initobj System.Result<Int32,System.Time.InvalidDateError>
 ldc.i4 0
 stloc local9
-newobj System.InvalidDateError
+newobj System.Time.InvalidDateError
 stloc local10
 ldc.i4 0
 stloc local11
@@ -212,7 +212,7 @@ ldfld System.Globalization.DateTimeFormat::calendar
 M00000007_IL_0008:
 ldarg 1
 M00000007_IL_0009:
-call instance System.Calendar::GetYear(System.Date)
+call instance System.Time.Calendar::GetYear(System.Time.Date)
 M00000007_IL_000e:
 stloc local0
 M00000007_IL_000f:
@@ -225,7 +225,7 @@ ldloca local0
 M00000007_IL_0019:
 ldloca local1
 M00000007_IL_001b:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion0(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion0(System.Result<Int32,System.Time.InvalidDateError>&,Int32&)
 call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_0020:
 brfalse M00000007_IL_002a
@@ -234,21 +234,21 @@ br M00000007_IL_004b
 M00000007_IL_002a:
 ldloca local2
 M00000007_IL_002c:
-newobj System.InvalidDateError
-stobj System.InvalidDateError
+newobj System.Time.InvalidDateError
+stobj System.Time.InvalidDateError
 M00000007_IL_0032:
 ldloca local0
 M00000007_IL_0034:
 ldloca local2
 M00000007_IL_0036:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion1(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion1(System.Result<Int32,System.Time.InvalidDateError>&,System.Time.InvalidDateError&)
 call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_003b:
 brfalse M00000007_IL_0047
 M00000007_IL_0040:
 ldloc local2
 M00000007_IL_0041:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion2(System.InvalidDateError)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion2(System.Time.InvalidDateError)
 M00000007_IL_0046:
 ret
 M00000007_IL_0047:
@@ -269,7 +269,7 @@ ldfld System.Globalization.DateTimeFormat::calendar
 M00000007_IL_0055:
 ldarg 1
 M00000007_IL_0056:
-call instance System.Calendar::GetMonth(System.Date)
+call instance System.Time.Calendar::GetMonth(System.Time.Date)
 M00000007_IL_005b:
 stloc local4
 M00000007_IL_005d:
@@ -282,7 +282,7 @@ ldloca local4
 M00000007_IL_0067:
 ldloca local5
 M00000007_IL_0069:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion0(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion0(System.Result<Int32,System.Time.InvalidDateError>&,Int32&)
 call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_006e:
 brfalse M00000007_IL_0078
@@ -291,21 +291,21 @@ br M00000007_IL_009a
 M00000007_IL_0078:
 ldloca local6
 M00000007_IL_007a:
-newobj System.InvalidDateError
-stobj System.InvalidDateError
+newobj System.Time.InvalidDateError
+stobj System.Time.InvalidDateError
 M00000007_IL_0080:
 ldloca local4
 M00000007_IL_0082:
 ldloca local6
 M00000007_IL_0084:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion1(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion1(System.Result<Int32,System.Time.InvalidDateError>&,System.Time.InvalidDateError&)
 call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_0089:
 brfalse M00000007_IL_0096
 M00000007_IL_008e:
 ldloc local6
 M00000007_IL_0090:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion2(System.InvalidDateError)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion2(System.Time.InvalidDateError)
 M00000007_IL_0095:
 ret
 M00000007_IL_0096:
@@ -326,7 +326,7 @@ ldfld System.Globalization.DateTimeFormat::calendar
 M00000007_IL_00a6:
 ldarg 1
 M00000007_IL_00a7:
-call instance System.Calendar::GetDay(System.Date)
+call instance System.Time.Calendar::GetDay(System.Time.Date)
 M00000007_IL_00ac:
 stloc local8
 M00000007_IL_00ae:
@@ -339,7 +339,7 @@ ldloca local8
 M00000007_IL_00b8:
 ldloca local9
 M00000007_IL_00ba:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion0(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion0(System.Result<Int32,System.Time.InvalidDateError>&,Int32&)
 call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_00bf:
 brfalse M00000007_IL_00c9
@@ -348,21 +348,21 @@ br M00000007_IL_00eb
 M00000007_IL_00c9:
 ldloca local10
 M00000007_IL_00cb:
-newobj System.InvalidDateError
-stobj System.InvalidDateError
+newobj System.Time.InvalidDateError
+stobj System.Time.InvalidDateError
 M00000007_IL_00d1:
 ldloca local8
 M00000007_IL_00d3:
 ldloca local10
 M00000007_IL_00d5:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion1(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion1(System.Result<Int32,System.Time.InvalidDateError>&,System.Time.InvalidDateError&)
 call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_00da:
 brfalse M00000007_IL_00e7
 M00000007_IL_00df:
 ldloc local10
 M00000007_IL_00e1:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion2(System.InvalidDateError)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion2(System.Time.InvalidDateError)
 M00000007_IL_00e6:
 ret
 M00000007_IL_00e7:
@@ -395,7 +395,7 @@ call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion4(System.Res
 M00000007_IL_010b:
 ret
 .end
-.method instance FormatTime(System.Time time) -> String
+.method instance FormatTime(System.Time.TimeOfDay time) -> String
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
@@ -405,18 +405,18 @@ ldfld System.Globalization.DateTimeFormat::rules
 M00000008_IL_0008:
 ldarg 1
 M00000008_IL_0009:
-callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D617452756C6573::FormatTime(System.Time)
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D617452756C6573::FormatTime(System.Time.TimeOfDay)
 M00000008_IL_000e:
 ret
 .end
-.method instance FormatLocalDateTime(System.LocalDateTime value) -> System.Result<String,System.InvalidDateError>
-.local System.Result<String,System.InvalidDateError> local0
+.method instance FormatLocalDateTime(System.Time.LocalDateTime value) -> System.Result<String,System.Time.InvalidDateError>
+.local System.Result<String,System.Time.InvalidDateError> local0
 .local String local1
-.local System.InvalidDateError local2
+.local System.Time.InvalidDateError local2
 .local String local3
 ldloca local0
-initobj System.Result<String,System.InvalidDateError>
-newobj System.InvalidDateError
+initobj System.Result<String,System.Time.InvalidDateError>
+newobj System.Time.InvalidDateError
 stloc local2
 M00000009_IL_0000:
 M00000009_IL_0001:
@@ -425,9 +425,9 @@ ldarg 0
 M00000009_IL_0003:
 ldarga 1
 M00000009_IL_0005:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeLocalDateTimeget_Date(System.LocalDateTime&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeLocalDateTimeget_Date(System.Time.LocalDateTime&)
 M00000009_IL_000a:
-callvirt instance System.Globalization.DateTimeFormat::FormatDate(System.Date)
+callvirt instance System.Globalization.DateTimeFormat::FormatDate(System.Time.Date)
 M00000009_IL_000f:
 stloc local0
 M00000009_IL_0010:
@@ -435,7 +435,7 @@ ldloca local0
 M00000009_IL_0012:
 ldloca local1
 M00000009_IL_0014:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion5(System.Result<String,System.InvalidDateError>&,String&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion5(System.Result<String,System.Time.InvalidDateError>&,String&)
 call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_0019:
 brfalse M00000009_IL_0023
@@ -444,21 +444,21 @@ br M00000009_IL_0044
 M00000009_IL_0023:
 ldloca local2
 M00000009_IL_0025:
-newobj System.InvalidDateError
-stobj System.InvalidDateError
+newobj System.Time.InvalidDateError
+stobj System.Time.InvalidDateError
 M00000009_IL_002b:
 ldloca local0
 M00000009_IL_002d:
 ldloca local2
 M00000009_IL_002f:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion6(System.Result<String,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion6(System.Result<String,System.Time.InvalidDateError>&,System.Time.InvalidDateError&)
 call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_0034:
 brfalse M00000009_IL_0040
 M00000009_IL_0039:
 ldloc local2
 M00000009_IL_003a:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion2(System.InvalidDateError)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion2(System.Time.InvalidDateError)
 M00000009_IL_003f:
 ret
 M00000009_IL_0040:
@@ -487,9 +487,9 @@ ldarg 0
 M00000009_IL_005a:
 ldarga 1
 M00000009_IL_005c:
-call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeLocalDateTimeget_Time(System.LocalDateTime&)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeLocalDateTimeget_Time(System.Time.LocalDateTime&)
 M00000009_IL_0061:
-callvirt instance System.Globalization.DateTimeFormat::FormatTime(System.Time)
+callvirt instance System.Globalization.DateTimeFormat::FormatTime(System.Time.TimeOfDay)
 M00000009_IL_0066:
 call System.String::Concat(String,String)
 M00000009_IL_006b:

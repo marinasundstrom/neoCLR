@@ -3,9 +3,9 @@ using Mono.Cecil;
 // Bounded immutable Gregorian/invariant policies; ordinary library classes.
 static class GlobalizationBindings
 {
-    public const string Zoned = "System.ZonedDateTime";
-    public const string Zone = "System.TimeZone";
-    public const string Calendar = "System.Calendar";
+    public const string Zoned = "System.Time.ZonedDateTime";
+    public const string Zone = "System.Time.TimeZone";
+    public const string Calendar = "System.Time.Calendar";
     public const string Culture = "System.Globalization.Culture";
     public const string Format = "System.Globalization.DateTimeFormat";
     public const string Language = "System.Globalization.Language";
@@ -17,6 +17,7 @@ static class GlobalizationBindings
     public static bool IsName(string name) => name is Zoned or Zone or Calendar or Culture or Format or Language or Provider or FixedProvider or SystemProvider;
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public const string Declarations = """
+        namespace Time {
         public struct DateTime { }
         public struct LocalTimeMapping { public struct Unique { } public struct Ambiguous { } public struct Skipped { } }
         public sealed class ZonedDateTime {
@@ -58,7 +59,9 @@ static class GlobalizationBindings
             public Result<Date,InvalidDateError> AddMonths(Date date, int months) => default;
             public Result<Date,InvalidDateError> AddYears(Date date, int years) => default;
         }
+        }
         namespace Globalization {
+            using System.Time;
             public sealed class Language {
                 private Language() { }
                 public static Language Undetermined => default;
@@ -86,18 +89,18 @@ static class GlobalizationBindings
                 public string Name => default;
                 public Language Language => default;
                 public static Culture Current => default;
-                public System.Calendar DefaultCalendar => default;
+                public System.Time.Calendar DefaultCalendar => default;
                 public DateTimeFormat DateTimeFormat => default;
             }
             public sealed class DateTimeFormat {
                 private DateTimeFormat() { }
                 public static DateTimeFormat Invariant => default;
-                public System.Calendar Calendar => default;
+                public System.Time.Calendar Calendar => default;
                 public Culture Culture => default;
-                public static DateTimeFormat Create(Culture culture, System.Calendar calendar) => default;
-                public DateTimeFormat WithCalendar(System.Calendar calendar) => default;
+                public static DateTimeFormat Create(Culture culture, System.Time.Calendar calendar) => default;
+                public DateTimeFormat WithCalendar(System.Time.Calendar calendar) => default;
                 public Result<string,InvalidDateError> FormatDate(Date date) => default;
-                public string FormatTime(Time time) => default;
+                public string FormatTime(TimeOfDay time) => default;
                 public Result<string,InvalidDateError> FormatLocalDateTime(LocalDateTime value) => default;
             }
         }
@@ -124,29 +127,29 @@ static class GlobalizationBindings
             (SystemProvider, "FromPreference") => ("String", SystemProvider, true),
             (SystemProvider, "get_PreferredCultureName") => ("", "String", false),
             (SystemProvider, "get_IsFallback") => ("", "Boolean", false),
-            (Zoned, "Create") => ("System.Instant,System.TimeZone", "System.Result<System.ZonedDateTime,System.TimeZoneError>", true),
-            (Zoned, "get_Instant") => ("", "System.Instant", false),
+            (Zoned, "Create") => ("System.Time.Instant,System.Time.TimeZone", "System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>", true),
+            (Zoned, "get_Instant") => ("", "System.Time.Instant", false),
             (Zoned, "get_Zone") => ("", Zone, false),
-            (Zoned, "get_LocalDateTime") => ("", "System.LocalDateTime", false),
-            (Zoned, "get_Offset") => ("", "System.TimeOffset", false),
+            (Zoned, "get_LocalDateTime") => ("", "System.Time.LocalDateTime", false),
+            (Zoned, "get_Offset") => ("", "System.Time.TimeOffset", false),
             (Zone, "get_Utc") => ("", Zone, true),
             (Zone, "get_DatabaseVersion") => ("", "String", true),
             (Zone, "get_Id") => ("", "String", false),
             (Zone, "get_MinYear" or "get_MaxYear") => ("", "Int32", false),
-            (Zone, "Find") => ("String", "System.Result<System.TimeZone,System.TimeZoneError>", true),
-            (Zone, "GetSystem") => ("", "System.Result<System.TimeZone,System.TimeZoneError>", true),
-            (Zone, "GetUtcOffset") => ("System.Instant", "System.Result<System.TimeOffset,System.TimeZoneError>", false),
-            (Zone, "AtInstant") => ("System.Instant", "System.Result<System.ZonedDateTime,System.TimeZoneError>", false),
-            (Zone, "MapLocal") => ("System.LocalDateTime", "System.Result<System.LocalTimeMapping,System.TimeZoneError>", false),
+            (Zone, "Find") => ("String", "System.Result<System.Time.TimeZone,System.Time.TimeZoneError>", true),
+            (Zone, "GetSystem") => ("", "System.Result<System.Time.TimeZone,System.Time.TimeZoneError>", true),
+            (Zone, "GetUtcOffset") => ("System.Time.Instant", "System.Result<System.Time.TimeOffset,System.Time.TimeZoneError>", false),
+            (Zone, "AtInstant") => ("System.Time.Instant", "System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>", false),
+            (Zone, "MapLocal") => ("System.Time.LocalDateTime", "System.Result<System.Time.LocalTimeMapping,System.Time.TimeZoneError>", false),
             (Calendar, "get_Gregorian" or "get_Hebrew") => ("", Calendar, true),
             (Calendar, "get_Id") or (Culture, "get_Name") => ("", "String", false),
             (Calendar, "get_MinYear" or "get_MaxYear") => ("", "Int32", false),
-            (Calendar, "GetYear" or "GetMonth" or "GetDay") => ("System.Date", "System.Result<Int32,System.InvalidDateError>", false),
-            (Calendar, "GetMonthsInYear") => ("Int32", "System.Result<Int32,System.InvalidDateError>", false),
+            (Calendar, "GetYear" or "GetMonth" or "GetDay") => ("System.Time.Date", "System.Result<Int32,System.Time.InvalidDateError>", false),
+            (Calendar, "GetMonthsInYear") => ("Int32", "System.Result<Int32,System.Time.InvalidDateError>", false),
             (Calendar, "CreateDate") => ("Int32,Int32,Int32", CalendarBindings.DateResult, false),
-            (Calendar, "IsLeapYear") => ("Int32", "System.Result<Boolean,System.InvalidDateError>", false),
-            (Calendar, "GetDaysInMonth") => ("Int32,Int32", "System.Result<Int32,System.InvalidDateError>", false),
-            (Calendar, "AddDays" or "AddMonths" or "AddYears") => ("System.Date,Int32", CalendarBindings.DateResult, false),
+            (Calendar, "IsLeapYear") => ("Int32", "System.Result<Boolean,System.Time.InvalidDateError>", false),
+            (Calendar, "GetDaysInMonth") => ("Int32,Int32", "System.Result<Int32,System.Time.InvalidDateError>", false),
+            (Calendar, "AddDays" or "AddMonths" or "AddYears") => ("System.Time.Date,Int32", CalendarBindings.DateResult, false),
             (Culture, "get_Invariant" or "get_SwedishSweden" or "get_HebrewIsrael") => ("", Culture, true),
             (Culture, "get_DefaultCalendar") or (Format, "get_Calendar") => ("", Calendar, false),
             (Culture, "get_DateTimeFormat") => ("", Format, false),
@@ -154,9 +157,9 @@ static class GlobalizationBindings
             (Format, "get_Culture") => ("", Culture, false),
             (Format, "Create") => ($"{Culture},{Calendar}", Format, true),
             (Format, "WithCalendar") => (Calendar, Format, false),
-            (Format, "FormatDate") => ("System.Date", "System.Result<String,System.InvalidDateError>", false),
-            (Format, "FormatTime") => ("System.Time", "String", false),
-            (Format, "FormatLocalDateTime") => ("System.LocalDateTime", "System.Result<String,System.InvalidDateError>", false),
+            (Format, "FormatDate") => ("System.Time.Date", "System.Result<String,System.Time.InvalidDateError>", false),
+            (Format, "FormatTime") => ("System.Time.TimeOfDay", "String", false),
+            (Format, "FormatLocalDateTime") => ("System.Time.LocalDateTime", "System.Result<String,System.Time.InvalidDateError>", false),
             _ => throw new InvalidDataException("Unsupported globalization member: " + reference.FullName)
         };
         var contract = owner == Provider;

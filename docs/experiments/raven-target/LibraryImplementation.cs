@@ -21,6 +21,13 @@ static class LibraryImplementation
         // Bootstrap compilation can call cross-slice deadline helpers. Restore the
         // ordinary internal contract before validating or importing any bodies.
         SocketBindings.Project(core);
+        // Bootstrap slices compile separately; restore the real internal factory
+        // before validating imported implementations and consumer access.
+        if (core.GetType("System.Time.LocalDateTime")?.Methods.SingleOrDefault(m => m.Name == "FromUnixTimeTicks") is { } localFactory)
+        {
+            localFactory.IsPublic = false;
+            localFactory.IsAssembly = true;
+        }
         if (owner != "System" && !Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
         if (owner == CancellationBindings.Source) {
@@ -271,7 +278,7 @@ static class LibraryImplementation
                         && !TupleBindings.IsDefinition(type)
                         && !CancellationBindings.IsTokenLayout(type)
                         && !(ErrorCarrierLibrary.IsCarrier(type) && p.First.FieldType.FullName == "System.Value" && RuntimeSignatures.IsCore(p.First.FieldType.Scope))
-                        && !(owner == "System.LocalDateTime" && p.First.FieldType.FullName is "System.Date" or "System.Time"
+                        && !(owner == "System.Time.LocalDateTime" && p.First.FieldType.FullName is "System.Time.Date" or "System.Time.TimeOfDay"
                             && RuntimeSignatures.IsCore(p.First.FieldType.Scope)))))
                 throw new InvalidDataException($"Unsupported or mismatched value library layout: source sequential={type.IsSequentialLayout}, pack={type.PackingSize}, size={type.ClassSize}, fields={string.Join(',', type.Fields.Select(f => f.Name + ":" + f.FieldType.FullName))}; reference sequential={contract.IsSequentialLayout}, pack={contract.PackingSize}, size={contract.ClassSize}, fields={string.Join(',', contract.Fields.Select(f => f.Name + ":" + f.FieldType.FullName))}.");
         }

@@ -7,8 +7,8 @@ fn zone_and_offset_storage_cannot_be_forged_by_guest_il() {
     assert!(output.status.success());
     let library = neoclr::assemble(&String::from_utf8(output.stdout).unwrap()).unwrap();
     for body in [
-        "ldstr \"Invented/Zone\"\nnewobj instance System.TimeZone::.ctor(String)\npop",
-        ".local System.TimeOffset value\nldloca value\ninitobj System.TimeOffset\nldloc value\nldc.i4 999999\nstfld System.TimeOffset::StoredSeconds\npop",
+        "ldstr \"Invented/Zone\"\nnewobj instance System.Time.TimeZone::.ctor(String)\npop",
+        ".local System.Time.TimeOffset value\nldloca value\ninitobj System.Time.TimeOffset\nldloc value\nldc.i4 999999\nstfld System.Time.TimeOffset::StoredSeconds\npop",
     ] {
         let source =
             format!(".module ForgedTime\n.function Main() -> noresult\n{body}\nret\n.end\n");

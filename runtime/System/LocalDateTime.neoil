@@ -1,13 +1,13 @@
-.type System.LocalDateTime
-    .field private StoredDate System.Date
-    .field private StoredTime System.Time
-    .method internal static FromUnixTimeTicks(Int64 ticks) -> System.LocalDateTime
+.type System.Time.LocalDateTime
+    .field private StoredDate System.Time.Date
+    .field private StoredTime System.Time.TimeOfDay
+    .method internal static FromUnixTimeTicks(Int64 ticks) -> System.Time.LocalDateTime
         ldarg ticks
         call neoCLR.Runtime.UnixTimeToLocal(Int64)
-        call System.LocalDateTime::FromParts(Int32[])
+        call System.Time.LocalDateTime::FromParts(Int32[])
         ret
     .end
-    .method private static FromParts(Int32[] parts) -> System.LocalDateTime
+    .method private static FromParts(Int32[] parts) -> System.Time.LocalDateTime
         ldarg parts
         ldc.i4 0
         ldelem Int32
@@ -17,9 +17,9 @@
         ldarg parts
         ldc.i4 2
         ldelem Int32
-        call System.Date::Create(Int32,Int32,Int32)
-        call instance System.Result<System.Date,System.InvalidDateError>::GetOkCase()
-        call instance System.Result.Ok<System.Date>::get_Value()
+        call System.Time.Date::Create(Int32,Int32,Int32)
+        call instance System.Result<System.Time.Date,System.Time.InvalidDateError>::GetOkCase()
+        call instance System.Result.Ok<System.Time.Date>::get_Value()
         ldarg parts
         ldc.i4 3
         ldelem Int32
@@ -32,24 +32,24 @@
         ldarg parts
         ldc.i4 6
         ldelem Int32
-        call System.Time::Create(Int32,Int32,Int32,Int32)
-        call instance System.Result<System.Time,System.InvalidTimeError>::GetOkCase()
-        call instance System.Result.Ok<System.Time>::get_Value()
-        newobj System.LocalDateTime
+        call System.Time.TimeOfDay::Create(Int32,Int32,Int32,Int32)
+        call instance System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>::GetOkCase()
+        call instance System.Result.Ok<System.Time.TimeOfDay>::get_Value()
+        newobj System.Time.LocalDateTime
         ret
     .end
-    .property instance Date() -> System.Date
-        .get instance System.LocalDateTime::get_Date()
+    .property instance Date() -> System.Time.Date
+        .get instance System.Time.LocalDateTime::get_Date()
     .end
-    .method instance readonly byref get_Date() -> System.Date
+    .method instance readonly byref get_Date() -> System.Time.Date
         ldarg this
         ldfld 0
         ret
     .end
-    .property instance Time() -> System.Time
-        .get instance System.LocalDateTime::get_Time()
+    .property instance Time() -> System.Time.TimeOfDay
+        .get instance System.Time.LocalDateTime::get_Time()
     .end
-    .method instance readonly byref get_Time() -> System.Time
+    .method instance readonly byref get_Time() -> System.Time.TimeOfDay
         ldarg this
         ldfld 1
         ret

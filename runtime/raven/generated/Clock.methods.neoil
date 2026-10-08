@@ -1,8 +1,8 @@
-; Generated from runtime/raven/src/System/Clock.rvn. Regenerate with build_runtime_library.py.
-.interface System.Clock
-.method instance get_Now() -> System.Instant
+; Generated from runtime/raven/src/System/Time/Clock.rvn. Regenerate with build_runtime_library.py.
+.interface System.Time.Clock
+.method instance get_Now() -> System.Time.Instant
 .end
-.property instance Now() -> System.Instant
-.get instance System.Clock::get_Now()
+.property instance Now() -> System.Time.Instant
+.get instance System.Time.Clock::get_Now()
 .end
 .end

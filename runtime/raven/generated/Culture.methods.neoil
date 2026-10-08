@@ -20,7 +20,7 @@
 .property static Current() -> System.Globalization.Culture
 .get System.Globalization.Culture::get_Current()
 .end
-.property instance DefaultCalendar() -> System.Calendar
+.property instance DefaultCalendar() -> System.Time.Calendar
 .get instance System.Globalization.Culture::get_DefaultCalendar()
 .end
 .property instance DateTimeFormat() -> System.Globalization.DateTimeFormat
@@ -174,11 +174,11 @@ callvirt instance System.Globalization.SystemCultureProvider::get_Current()
 M00000007_IL_000b:
 ret
 .end
-.method instance get_DefaultCalendar() -> System.Calendar
+.method instance get_DefaultCalendar() -> System.Time.Calendar
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
-call System.Calendar::get_Gregorian()
+call System.Time.Calendar::get_Gregorian()
 M00000008_IL_0007:
 ret
 .end
@@ -192,7 +192,7 @@ ldarg 0
 M00000009_IL_0004:
 callvirt instance System.Globalization.Culture::get_DefaultCalendar()
 M00000009_IL_0009:
-call System.Globalization.DateTimeFormat::Create(System.Globalization.Culture,System.Calendar)
+call System.Globalization.DateTimeFormat::Create(System.Globalization.Culture,System.Time.Calendar)
 M00000009_IL_000e:
 ret
 .end

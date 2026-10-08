@@ -4,17 +4,17 @@
 > `Clock.GetLocalNow` and `LocalDateTime.UtcOffsetSeconds` are no longer current APIs.
 > The description below records the earlier implementation. New samples use Raven.
 
-Implemented 2026-09-08. `System.Clock.GetLocalNow()` reads the host clock and returns
-an owned `System.LocalDateTime` snapshot with readonly properties:
+Implemented 2026-09-08. `System.Time.Clock.GetLocalNow()` reads the host clock and returns
+an owned `System.Time.LocalDateTime` snapshot with readonly properties:
 
 | Property | Type | Meaning |
 | --- | --- | --- |
-| Date | System.Date | Local Gregorian calendar date |
-| Time | System.Time | Local time of day, in 100 ns ticks |
+| Date | System.Time.Date | Local Gregorian calendar date |
+| Time | System.Time.TimeOfDay | Local time of day, in 100 ns ticks |
 | UtcOffsetSeconds | Int32 | Local time minus UTC, in seconds at capture |
 
 ```swift
-let now = System.Clock.GetLocalNow()
+let now = System.Time.Clock.GetLocalNow()
 let date = now.Date
 let time = now.Time
 System.Console.WriteLine(date.Year)
@@ -37,7 +37,7 @@ injection and general timezone conversion are deferred.
 .NET's shipped [TimeProvider.GetLocalNow](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider.getlocalnow?view=net-10.0)
 returns DateTimeOffset using the provider's UTC reading and local timezone offset.
 NeoCLR preserves the single local reading with its offset, but uses a static Clock
-and a composition of Date and Time. This keeps the preview small and exposes the
+and a composition of Date and TimeOfDay. This keeps the preview small and exposes the
 components directly; the cost is no interchangeable clock provider, duration type,
 or DateTimeOffset arithmetic yet. The naming and snapshot contract are provisional.
 

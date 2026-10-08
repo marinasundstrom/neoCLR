@@ -32,7 +32,7 @@ static class ApplicationTypes
         if (type is null || type.Module != LibraryModule || type.IsPublic || LibraryNames.ContainsKey(type)) return;
         // The calendar/formatter strategies use closed, internal interfaces. They
         // are admitted only in their owning library slice, never as guest core APIs.
-        var privatePolicy = LibraryScope == "System.Calendar" && type.FullName == "System.CalendarRules"
+        var privatePolicy = LibraryScope == "System.Time.Calendar" && type.FullName == "System.Time.CalendarRules"
             || LibraryScope == "System.Globalization.DateTimeFormat" && type.FullName == "System.Globalization.DateTimeFormatRules";
         if (privatePolicy)
         {

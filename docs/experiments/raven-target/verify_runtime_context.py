@@ -75,7 +75,7 @@ class IdentitySource {
     run([runtime, 'verify', artifact, '--system', system])
     result = run([runtime, 'run', artifact, '--system', system])
     assert result.stdout.strip().splitlines() == [
-        'System.Date', 'System', 'StoredDayNumber', 'System.Int32', 'System.Date'], result.stdout
+        'System.Time.Date', 'System', 'StoredDayNumber', 'System.Int32', 'System.Time.Date'], result.stdout
     print(result.stdout, end='')
     mapping = json.loads((output / 'App.neoil.map.json').read_text())
     names = {entry['MetadataName']: entry['RuntimeName'] for entry in mapping['TypeIdentities']}

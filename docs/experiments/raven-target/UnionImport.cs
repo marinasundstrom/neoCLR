@@ -944,7 +944,7 @@ static class UnionImport
                                     throw new InvalidDataException("Unassigned conditional output must return false immediately.");
                                 code.AppendLine("pop"); break;
                             }
-                            var runtimeService = libraryOwner is null ? null : RuntimeFailureBindings.Bind(reference, targetMethod, t => ProfileType(t)) ?? NativeAllocationBindings.Bind(reference, targetMethod, t => ProfileType(t)) ?? ParameterSnapshotBindings.Bind(reference, targetMethod, t => ProfileType(t)) ?? RuntimeServiceBindings.Bind(reference, targetMethod) ?? ValueStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
+                            var runtimeService = libraryOwner is null ? null : CalendarBindings.BindInternal(reference, targetMethod, libraryOwner) ?? RuntimeFailureBindings.Bind(reference, targetMethod, t => ProfileType(t)) ?? NativeAllocationBindings.Bind(reference, targetMethod, t => ProfileType(t)) ?? ParameterSnapshotBindings.Bind(reference, targetMethod, t => ProfileType(t)) ?? RuntimeServiceBindings.Bind(reference, targetMethod) ?? ValueStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
                             var checkedStorage = libraryOwner is null ? null : CheckedStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
                             var pathCall = GlobalizationBindings.Bind(reference, targetMethod) ?? ComparerBindings.Bind(reference, targetMethod) ?? HashCodeBindings.Bind(reference, targetMethod) ?? IPAddressBindings.Bind(reference, targetMethod) ?? UriBindings.Bind(reference, targetMethod) ?? PathBindings.Bind(reference, targetMethod);
                             var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
@@ -1375,12 +1375,12 @@ static class UnionImport
             if (shape.Args.Length != 0 || shape.Result != "noresult") throw new InvalidDataException("Unsupported HashCode constructor.");
             return new("RuntimeNewHashCode", [], HashCodeBindings.Owner);
         }
-        if (RuntimeSignatures.IsCore(reference.DeclaringType.Scope) && reference.DeclaringType.FullName == "System.SystemClock")
+        if (RuntimeSignatures.IsCore(reference.DeclaringType.Scope) && reference.DeclaringType.FullName == "System.Time.SystemClock")
         {
             var shape = RuntimeSignatures.Match(reference, definition, CalendarBindings.Type);
             if (shape.Args.Length != 0 || shape.Result != "noresult")
                 throw new InvalidDataException("Unsupported SystemClock constructor.");
-            return new("RuntimeNewSystemClock", [], "System.SystemClock");
+            return new("RuntimeNewSystemClock", [], "System.Time.SystemClock");
         }
         var file = GenericUnionBindings.Construct(reference, definition) ?? ErrorBindings.Construct(reference, definition) ?? ResultBindings.Construct(reference, definition);
         if (file is not null) return new(file.Name, file.Arguments, file.Result, Instruction: file.Instruction);

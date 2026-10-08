@@ -219,3 +219,23 @@ second alternative retains a zone ID, the implemented union is
 position while preserving it as design history. It is not .NET DateTime.Kind.
 No OffsetDateTime, Period, parser or scheduler is introduced. See the guide for pinned
 data, supported ranges and tested boundary behavior.
+
+## System.Time namespace (2026-10-09 development)
+
+The author requested grouping time-related constructs under `System.Time` and
+reconsidering the `Time` struct name. The implementation uses `TimeOfDay`: its
+meaning is a civil time within one day, with no date or timezone. Compared with
+.NET's TimeOnly, the name emphasizes that meaning without referring to a combined
+DateTime type; the cost is reduced naming familiarity and a source/metadata breaking
+change for existing neoCLR consumers. Existing range and 100 ns precision are unchanged.
+
+Date, TimeOfDay, Duration, Instant, Clock/SystemClock, LocalDateTime, DateTime,
+TimeOffset, TimeZone, ZonedDateTime, LocalTimeMapping, calendar policies and their
+time/date errors now belong to this namespace. Formatting and culture policies stay
+in System.Globalization. LocalDateTime.Time keeps its property name and returns
+TimeOfDay. No compatibility type named System.Time can coexist with the new namespace;
+update imports and rebuild matching consumers and libraries. Earlier naming choices
+above remain as design history. This grouping does not introduce a module system.
+
+[Migration validation](experiments/extended-cli-metadata/time-namespace-2026-10-09.json)
+records focused interpreter/native comparisons, bridge checks and remaining AOT limits.

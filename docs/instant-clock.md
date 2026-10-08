@@ -5,6 +5,7 @@ complete calendar or scheduling API.
 
 ```raven
 import System.*
+import System.Time.*
 
 let clock: Clock = SystemClock()
 let instant = clock.Now
@@ -29,7 +30,7 @@ are rounded down, including before the epoch. Leap seconds are not modeled.
 
 `Instant.ToLocalDateTime()` converts that specific instant using the host system's
 local time-zone rules and the existing Gregorian Date/Time representation. It returns
-Date and Time together, without retaining an offset or zone. It does not read the current clock again.
+Date and TimeOfDay together, without retaining an offset or zone. It does not read the current clock again.
 The existing calendar supports years 1–9999; conversion outside that range faults.
 A future calendar API should make such range failures explicit recoverable results.
 Formatting, selectable calendars and zones, duration arithmetic, timers, and monotonic

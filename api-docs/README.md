@@ -1349,3 +1349,18 @@ notice (136 pages after rebuilding the bundle; Math constants are now native).
 Publishing remains unchanged; regenerate a matching production bundle, sidecars and
 full coverage inventory before the upcoming release. See the audit README for the
 explicit local integration command and its complete HTML/link checks.
+
+### System.Time identity migration (2026-10-09)
+
+Date/time values, calendars, clocks, zones and their errors now appear under
+`System.Time`, including `TimeOfDay` (formerly the System.Time struct). The
+reference producer, selected type inventory, XML member IDs and native library
+ownership are updated together. LocalDateTime.Time returns TimeOfDay.
+Formatting types stay under System.Globalization. Recompile previous consumers;
+there is no same-name compatibility type at the new namespace root.
+
+The local integrated native preview includes the renamed family with actual
+System.Runtime.dll owners, summaries, generic interfaces and member links. The
+normal publishing path still uses the checked bridge snapshot until the wider
+native documentation migration is qualified. See the explicit native audit preview
+procedure above; no deployment is implied by local website validation.

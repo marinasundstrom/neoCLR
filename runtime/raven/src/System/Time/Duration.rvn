@@ -1,4 +1,6 @@
-namespace System
+namespace System.Time
+
+import System.*
 
 public struct Duration : ComparableTo<Duration>, EquatableTo<Duration> {
     private field StoredTicks: long

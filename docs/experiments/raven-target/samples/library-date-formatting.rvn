@@ -1,3 +1,4 @@
+import System.Time.*
 import System.*
 import System.Globalization.*
 import System.Result.*
@@ -7,7 +8,7 @@ func Main() {
     let Ok(date) = Calendar.Hebrew.CreateDate(5784, 1, 1) else {
         System.Fail("Invalid Hebrew date")
     }
-    let Ok(time) = Time.Create(12, 34, 56) else {
+    let Ok(time) = TimeOfDay.Create(12, 34, 56) else {
         System.Fail("Invalid time")
     }
     let value = LocalDateTime.Create(date, time)

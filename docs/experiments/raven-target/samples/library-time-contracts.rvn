@@ -1,7 +1,8 @@
+import System.Time.*
 import System.*
 import System.Globalization.*
 import System.Result.*
-import System.LocalTimeMapping.*
+import System.Time.LocalTimeMapping.*
 import System.Console.*
 
 func Check(condition: bool) {
@@ -14,7 +15,7 @@ func Civil(year: int, month: int, day: int, hour: int, minute: int) -> LocalDate
     let Ok(date) = Date.Create(year, month, day) else {
         System.Fail("Invalid test date")
     }
-    let Ok(time) = Time.Create(hour, minute, 0) else {
+    let Ok(time) = TimeOfDay.Create(hour, minute, 0) else {
         System.Fail("Invalid test time")
     }
     return LocalDateTime.Create(date, time)

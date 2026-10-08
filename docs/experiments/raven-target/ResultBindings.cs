@@ -16,7 +16,7 @@ static class ResultBindings
     {
         public string Type => $"System.Result<{Output},{Error}>";
     }
-    static readonly Carrier[] Carriers = [new("String", ReadError), new("Void", WriteError), new("String", SliceError), new("Int32", ParseError), new("Int32", DivisionError), new("Int32", RangeError), new("System.Date", "System.InvalidDateError"), new("System.Time", "System.InvalidTimeError")];
+    static readonly Carrier[] Carriers = [new("String", ReadError), new("Void", WriteError), new("String", SliceError), new("Int32", ParseError), new("Int32", DivisionError), new("Int32", RangeError), new("System.Time.Date", "System.Time.InvalidDateError"), new("System.Time.TimeOfDay", "System.Time.InvalidTimeError")];
     static IEnumerable<(string Case, string Value)> Successes => Carriers.Select(c => c.Output).Distinct().Where(t => t is not ("Void" or "Int32")).Select(t => ($"System.Result.Ok<{t}>", t));
     static IEnumerable<string> Errors => ErrorBindings.Errors;
     public static string Declarations => ErrorBindings.Declarations;

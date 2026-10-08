@@ -1,17 +1,17 @@
-; Generated from runtime/raven/src/System/TimeZoneError.rvn. Regenerate with build_runtime_library.py.
-.type System.TimeZoneError
+; Generated from runtime/raven/src/System/Time/TimeZoneError.rvn. Regenerate with build_runtime_library.py.
+.type System.Time.TimeZoneError
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .implements System.Runtime.CompilerServices.UnionValue
 .field private Metadata_V1_3C5461673E Byte
-.field private Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E System.TimeZoneError.UnknownZone
-.field private Metadata_V1_3C4F75744F6652616E67655061796C6F61643E System.TimeZoneError.OutOfRange
-.field private Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E System.TimeZoneError.SystemZoneUnavailable
+.field private Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E System.Time.TimeZoneError.UnknownZone
+.field private Metadata_V1_3C4F75744F6652616E67655061796C6F61643E System.Time.TimeZoneError.OutOfRange
+.field private Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E System.Time.TimeZoneError.SystemZoneUnavailable
 .property instance Value() -> System.Object
-.get instance System.TimeZoneError::get_Value()
+.get instance System.Time.TimeZoneError::get_Value()
 .end
 .property instance HasValue() -> Boolean
-.get instance System.TimeZoneError::get_HasValue()
+.get instance System.Time.TimeZoneError::get_HasValue()
 .end
 .method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
 M00000001_IL_0000:
@@ -19,7 +19,7 @@ ldarg 0
 M00000001_IL_0001:
 M00000001_IL_0002:
 ref.isnull
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M00000001_IL_0004:
 brtrue M00000001_IL_000e
 M00000001_IL_0009:
@@ -38,7 +38,7 @@ M00000001_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M00000001_IL_001e:
 brtrue M00000001_IL_0028
 M00000001_IL_0023:
@@ -88,7 +88,7 @@ ldstr "\u0027"
 M00000001_IL_006d:
 ldarg 0
 M00000001_IL_006e:
-call neoCLR.Library.System.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
 M00000001_IL_0073:
 call System.String::Concat(String,String)
 M00000001_IL_0078:
@@ -101,25 +101,25 @@ M00000001_IL_0083:
 M00000001_IL_0084:
 ldarg 0
 M00000001_IL_0085:
-call neoCLR.Library.System.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeReflection936F30A1978F475D(System.Object)
 M00000001_IL_008a:
 ret
 .end
-.method instance byref .ctor(System.TimeZoneError.UnknownZone value) -> Void
+.method instance byref .ctor(System.Time.TimeZoneError.UnknownZone value) -> Void
 .local Byte local0
-.local System.TimeZoneError.UnknownZone local1
+.local System.Time.TimeZoneError.UnknownZone local1
 .local Byte unionDefault1_0
-.local System.TimeZoneError.UnknownZone unionDefault1_1
-.local System.TimeZoneError.OutOfRange unionDefault1_2
-.local System.TimeZoneError.SystemZoneUnavailable unionDefault1_3
+.local System.Time.TimeZoneError.UnknownZone unionDefault1_1
+.local System.Time.TimeZoneError.OutOfRange unionDefault1_2
+.local System.Time.TimeZoneError.SystemZoneUnavailable unionDefault1_3
 .local Byte unionFieldDefault4
-.local System.TimeZoneError.UnknownZone unionFieldDefault7
-.local System.TimeZoneError.OutOfRange unionFieldDefault10
-.local System.TimeZoneError.SystemZoneUnavailable unionFieldDefault13
+.local System.Time.TimeZoneError.UnknownZone unionFieldDefault7
+.local System.Time.TimeZoneError.OutOfRange unionFieldDefault10
+.local System.Time.TimeZoneError.SystemZoneUnavailable unionFieldDefault13
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.TimeZoneError.UnknownZone
+initobj System.Time.TimeZoneError.UnknownZone
 M00000002_IL_0000:
 ldarg 0
 M00000002_IL_0001:
@@ -128,25 +128,25 @@ ldloca unionDefault1_0
 initobj Byte
 ldarg 0
 ldloc unionDefault1_0
-stfld System.TimeZoneError::Metadata_V1_3C5461673E
+stfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 pop
 ldloca unionDefault1_1
-initobj System.TimeZoneError.UnknownZone
+initobj System.Time.TimeZoneError.UnknownZone
 ldarg 0
 ldloc unionDefault1_1
-stfld System.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
 pop
 ldloca unionDefault1_2
-initobj System.TimeZoneError.OutOfRange
+initobj System.Time.TimeZoneError.OutOfRange
 ldarg 0
 ldloc unionDefault1_2
-stfld System.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
 pop
 ldloca unionDefault1_3
-initobj System.TimeZoneError.SystemZoneUnavailable
+initobj System.Time.TimeZoneError.SystemZoneUnavailable
 ldarg 0
 ldloc unionDefault1_3
-stfld System.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
 pop
 M00000002_IL_0007:
 ldarg 0
@@ -155,34 +155,34 @@ M00000002_IL_000d:
 ldloca unionFieldDefault4
 initobj Byte
 ldloc unionFieldDefault4
-stfld System.TimeZoneError::Metadata_V1_3C5461673E
+stfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 pop
 M00000002_IL_0013:
 ldarg 0
 M00000002_IL_0014:
 M00000002_IL_0019:
 ldloca unionFieldDefault7
-initobj System.TimeZoneError.UnknownZone
+initobj System.Time.TimeZoneError.UnknownZone
 ldloc unionFieldDefault7
-stfld System.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
 pop
 M00000002_IL_001f:
 ldarg 0
 M00000002_IL_0020:
 M00000002_IL_0025:
 ldloca unionFieldDefault10
-initobj System.TimeZoneError.OutOfRange
+initobj System.Time.TimeZoneError.OutOfRange
 ldloc unionFieldDefault10
-stfld System.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
 pop
 M00000002_IL_002b:
 ldarg 0
 M00000002_IL_002c:
 M00000002_IL_0031:
 ldloca unionFieldDefault13
-initobj System.TimeZoneError.SystemZoneUnavailable
+initobj System.Time.TimeZoneError.SystemZoneUnavailable
 ldloc unionFieldDefault13
-stfld System.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
 pop
 M00000002_IL_0037:
 ldc.i4 1
@@ -195,7 +195,7 @@ ldloc local0
 M00000002_IL_003b:
 conv.u1
 M00000002_IL_003c:
-stfld System.TimeZoneError::Metadata_V1_3C5461673E
+stfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 pop
 M00000002_IL_0041:
 ldarg 1
@@ -206,30 +206,30 @@ ldarg 0
 M00000002_IL_0044:
 ldloc local1
 M00000002_IL_0045:
-stfld System.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
 pop
 M00000002_IL_004a:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.TimeZoneError.UnknownZone& value) -> Boolean
-.local System.TimeZoneError.UnknownZone local0
+.method instance byref TryGetValue(out(true) System.Time.TimeZoneError.UnknownZone& value) -> Boolean
+.local System.Time.TimeZoneError.UnknownZone local0
 ldloca local0
-initobj System.TimeZoneError.UnknownZone
+initobj System.Time.TimeZoneError.UnknownZone
 M00000003_IL_0000:
 ldarg 1
 M00000003_IL_0001:
 ldloca local0
 M00000003_IL_0003:
-initobj System.TimeZoneError.UnknownZone
+initobj System.Time.TimeZoneError.UnknownZone
 M00000003_IL_0009:
 ldloc local0
 M00000003_IL_000a:
-stobj System.TimeZoneError.UnknownZone
+stobj System.Time.TimeZoneError.UnknownZone
 M00000003_IL_000f:
 ldarg 0
 M00000003_IL_0010:
-ldfld System.TimeZoneError::Metadata_V1_3C5461673E
+ldfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 M00000003_IL_0015:
 conv.i4
 M00000003_IL_0016:
@@ -238,7 +238,7 @@ M00000003_IL_0017:
 conv.i4
 M00000003_IL_0018:
 ceq
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M00000003_IL_001a:
 brtrue M00000003_IL_0024
 M00000003_IL_001f:
@@ -248,9 +248,9 @@ ldarg 1
 M00000003_IL_0025:
 ldarg 0
 M00000003_IL_0026:
-ldfld System.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
+ldfld System.Time.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
 M00000003_IL_002b:
-stobj System.TimeZoneError.UnknownZone
+stobj System.Time.TimeZoneError.UnknownZone
 M00000003_IL_0030:
 ldc.bool true
 M00000003_IL_0031:
@@ -261,21 +261,21 @@ ldc.bool false
 M00000003_IL_0034:
 ret
 .end
-.method instance byref .ctor(System.TimeZoneError.OutOfRange value) -> Void
+.method instance byref .ctor(System.Time.TimeZoneError.OutOfRange value) -> Void
 .local Byte local0
-.local System.TimeZoneError.OutOfRange local1
+.local System.Time.TimeZoneError.OutOfRange local1
 .local Byte unionDefault1_0
-.local System.TimeZoneError.UnknownZone unionDefault1_1
-.local System.TimeZoneError.OutOfRange unionDefault1_2
-.local System.TimeZoneError.SystemZoneUnavailable unionDefault1_3
+.local System.Time.TimeZoneError.UnknownZone unionDefault1_1
+.local System.Time.TimeZoneError.OutOfRange unionDefault1_2
+.local System.Time.TimeZoneError.SystemZoneUnavailable unionDefault1_3
 .local Byte unionFieldDefault4
-.local System.TimeZoneError.UnknownZone unionFieldDefault7
-.local System.TimeZoneError.OutOfRange unionFieldDefault10
-.local System.TimeZoneError.SystemZoneUnavailable unionFieldDefault13
+.local System.Time.TimeZoneError.UnknownZone unionFieldDefault7
+.local System.Time.TimeZoneError.OutOfRange unionFieldDefault10
+.local System.Time.TimeZoneError.SystemZoneUnavailable unionFieldDefault13
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.TimeZoneError.OutOfRange
+initobj System.Time.TimeZoneError.OutOfRange
 M00000004_IL_0000:
 ldarg 0
 M00000004_IL_0001:
@@ -284,25 +284,25 @@ ldloca unionDefault1_0
 initobj Byte
 ldarg 0
 ldloc unionDefault1_0
-stfld System.TimeZoneError::Metadata_V1_3C5461673E
+stfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 pop
 ldloca unionDefault1_1
-initobj System.TimeZoneError.UnknownZone
+initobj System.Time.TimeZoneError.UnknownZone
 ldarg 0
 ldloc unionDefault1_1
-stfld System.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
 pop
 ldloca unionDefault1_2
-initobj System.TimeZoneError.OutOfRange
+initobj System.Time.TimeZoneError.OutOfRange
 ldarg 0
 ldloc unionDefault1_2
-stfld System.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
 pop
 ldloca unionDefault1_3
-initobj System.TimeZoneError.SystemZoneUnavailable
+initobj System.Time.TimeZoneError.SystemZoneUnavailable
 ldarg 0
 ldloc unionDefault1_3
-stfld System.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
 pop
 M00000004_IL_0007:
 ldarg 0
@@ -311,34 +311,34 @@ M00000004_IL_000d:
 ldloca unionFieldDefault4
 initobj Byte
 ldloc unionFieldDefault4
-stfld System.TimeZoneError::Metadata_V1_3C5461673E
+stfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 pop
 M00000004_IL_0013:
 ldarg 0
 M00000004_IL_0014:
 M00000004_IL_0019:
 ldloca unionFieldDefault7
-initobj System.TimeZoneError.UnknownZone
+initobj System.Time.TimeZoneError.UnknownZone
 ldloc unionFieldDefault7
-stfld System.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
 pop
 M00000004_IL_001f:
 ldarg 0
 M00000004_IL_0020:
 M00000004_IL_0025:
 ldloca unionFieldDefault10
-initobj System.TimeZoneError.OutOfRange
+initobj System.Time.TimeZoneError.OutOfRange
 ldloc unionFieldDefault10
-stfld System.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
 pop
 M00000004_IL_002b:
 ldarg 0
 M00000004_IL_002c:
 M00000004_IL_0031:
 ldloca unionFieldDefault13
-initobj System.TimeZoneError.SystemZoneUnavailable
+initobj System.Time.TimeZoneError.SystemZoneUnavailable
 ldloc unionFieldDefault13
-stfld System.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
 pop
 M00000004_IL_0037:
 ldc.i4 2
@@ -351,7 +351,7 @@ ldloc local0
 M00000004_IL_003b:
 conv.u1
 M00000004_IL_003c:
-stfld System.TimeZoneError::Metadata_V1_3C5461673E
+stfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 pop
 M00000004_IL_0041:
 ldarg 1
@@ -362,30 +362,30 @@ ldarg 0
 M00000004_IL_0044:
 ldloc local1
 M00000004_IL_0045:
-stfld System.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
 pop
 M00000004_IL_004a:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.TimeZoneError.OutOfRange& value) -> Boolean
-.local System.TimeZoneError.OutOfRange local0
+.method instance byref TryGetValue(out(true) System.Time.TimeZoneError.OutOfRange& value) -> Boolean
+.local System.Time.TimeZoneError.OutOfRange local0
 ldloca local0
-initobj System.TimeZoneError.OutOfRange
+initobj System.Time.TimeZoneError.OutOfRange
 M00000005_IL_0000:
 ldarg 1
 M00000005_IL_0001:
 ldloca local0
 M00000005_IL_0003:
-initobj System.TimeZoneError.OutOfRange
+initobj System.Time.TimeZoneError.OutOfRange
 M00000005_IL_0009:
 ldloc local0
 M00000005_IL_000a:
-stobj System.TimeZoneError.OutOfRange
+stobj System.Time.TimeZoneError.OutOfRange
 M00000005_IL_000f:
 ldarg 0
 M00000005_IL_0010:
-ldfld System.TimeZoneError::Metadata_V1_3C5461673E
+ldfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 M00000005_IL_0015:
 conv.i4
 M00000005_IL_0016:
@@ -394,7 +394,7 @@ M00000005_IL_0017:
 conv.i4
 M00000005_IL_0018:
 ceq
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M00000005_IL_001a:
 brtrue M00000005_IL_0024
 M00000005_IL_001f:
@@ -404,9 +404,9 @@ ldarg 1
 M00000005_IL_0025:
 ldarg 0
 M00000005_IL_0026:
-ldfld System.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+ldfld System.Time.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
 M00000005_IL_002b:
-stobj System.TimeZoneError.OutOfRange
+stobj System.Time.TimeZoneError.OutOfRange
 M00000005_IL_0030:
 ldc.bool true
 M00000005_IL_0031:
@@ -417,21 +417,21 @@ ldc.bool false
 M00000005_IL_0034:
 ret
 .end
-.method instance byref .ctor(System.TimeZoneError.SystemZoneUnavailable value) -> Void
+.method instance byref .ctor(System.Time.TimeZoneError.SystemZoneUnavailable value) -> Void
 .local Byte local0
-.local System.TimeZoneError.SystemZoneUnavailable local1
+.local System.Time.TimeZoneError.SystemZoneUnavailable local1
 .local Byte unionDefault1_0
-.local System.TimeZoneError.UnknownZone unionDefault1_1
-.local System.TimeZoneError.OutOfRange unionDefault1_2
-.local System.TimeZoneError.SystemZoneUnavailable unionDefault1_3
+.local System.Time.TimeZoneError.UnknownZone unionDefault1_1
+.local System.Time.TimeZoneError.OutOfRange unionDefault1_2
+.local System.Time.TimeZoneError.SystemZoneUnavailable unionDefault1_3
 .local Byte unionFieldDefault4
-.local System.TimeZoneError.UnknownZone unionFieldDefault7
-.local System.TimeZoneError.OutOfRange unionFieldDefault10
-.local System.TimeZoneError.SystemZoneUnavailable unionFieldDefault13
+.local System.Time.TimeZoneError.UnknownZone unionFieldDefault7
+.local System.Time.TimeZoneError.OutOfRange unionFieldDefault10
+.local System.Time.TimeZoneError.SystemZoneUnavailable unionFieldDefault13
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.TimeZoneError.SystemZoneUnavailable
+initobj System.Time.TimeZoneError.SystemZoneUnavailable
 M00000006_IL_0000:
 ldarg 0
 M00000006_IL_0001:
@@ -440,25 +440,25 @@ ldloca unionDefault1_0
 initobj Byte
 ldarg 0
 ldloc unionDefault1_0
-stfld System.TimeZoneError::Metadata_V1_3C5461673E
+stfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 pop
 ldloca unionDefault1_1
-initobj System.TimeZoneError.UnknownZone
+initobj System.Time.TimeZoneError.UnknownZone
 ldarg 0
 ldloc unionDefault1_1
-stfld System.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
 pop
 ldloca unionDefault1_2
-initobj System.TimeZoneError.OutOfRange
+initobj System.Time.TimeZoneError.OutOfRange
 ldarg 0
 ldloc unionDefault1_2
-stfld System.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
 pop
 ldloca unionDefault1_3
-initobj System.TimeZoneError.SystemZoneUnavailable
+initobj System.Time.TimeZoneError.SystemZoneUnavailable
 ldarg 0
 ldloc unionDefault1_3
-stfld System.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
 pop
 M00000006_IL_0007:
 ldarg 0
@@ -467,34 +467,34 @@ M00000006_IL_000d:
 ldloca unionFieldDefault4
 initobj Byte
 ldloc unionFieldDefault4
-stfld System.TimeZoneError::Metadata_V1_3C5461673E
+stfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 pop
 M00000006_IL_0013:
 ldarg 0
 M00000006_IL_0014:
 M00000006_IL_0019:
 ldloca unionFieldDefault7
-initobj System.TimeZoneError.UnknownZone
+initobj System.Time.TimeZoneError.UnknownZone
 ldloc unionFieldDefault7
-stfld System.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
 pop
 M00000006_IL_001f:
 ldarg 0
 M00000006_IL_0020:
 M00000006_IL_0025:
 ldloca unionFieldDefault10
-initobj System.TimeZoneError.OutOfRange
+initobj System.Time.TimeZoneError.OutOfRange
 ldloc unionFieldDefault10
-stfld System.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
 pop
 M00000006_IL_002b:
 ldarg 0
 M00000006_IL_002c:
 M00000006_IL_0031:
 ldloca unionFieldDefault13
-initobj System.TimeZoneError.SystemZoneUnavailable
+initobj System.Time.TimeZoneError.SystemZoneUnavailable
 ldloc unionFieldDefault13
-stfld System.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
 pop
 M00000006_IL_0037:
 ldc.i4 3
@@ -507,7 +507,7 @@ ldloc local0
 M00000006_IL_003b:
 conv.u1
 M00000006_IL_003c:
-stfld System.TimeZoneError::Metadata_V1_3C5461673E
+stfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 pop
 M00000006_IL_0041:
 ldarg 1
@@ -518,30 +518,30 @@ ldarg 0
 M00000006_IL_0044:
 ldloc local1
 M00000006_IL_0045:
-stfld System.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
+stfld System.Time.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
 pop
 M00000006_IL_004a:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.TimeZoneError.SystemZoneUnavailable& value) -> Boolean
-.local System.TimeZoneError.SystemZoneUnavailable local0
+.method instance byref TryGetValue(out(true) System.Time.TimeZoneError.SystemZoneUnavailable& value) -> Boolean
+.local System.Time.TimeZoneError.SystemZoneUnavailable local0
 ldloca local0
-initobj System.TimeZoneError.SystemZoneUnavailable
+initobj System.Time.TimeZoneError.SystemZoneUnavailable
 M00000007_IL_0000:
 ldarg 1
 M00000007_IL_0001:
 ldloca local0
 M00000007_IL_0003:
-initobj System.TimeZoneError.SystemZoneUnavailable
+initobj System.Time.TimeZoneError.SystemZoneUnavailable
 M00000007_IL_0009:
 ldloc local0
 M00000007_IL_000a:
-stobj System.TimeZoneError.SystemZoneUnavailable
+stobj System.Time.TimeZoneError.SystemZoneUnavailable
 M00000007_IL_000f:
 ldarg 0
 M00000007_IL_0010:
-ldfld System.TimeZoneError::Metadata_V1_3C5461673E
+ldfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 M00000007_IL_0015:
 conv.i4
 M00000007_IL_0016:
@@ -550,7 +550,7 @@ M00000007_IL_0017:
 conv.i4
 M00000007_IL_0018:
 ceq
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_001a:
 brtrue M00000007_IL_0024
 M00000007_IL_001f:
@@ -560,9 +560,9 @@ ldarg 1
 M00000007_IL_0025:
 ldarg 0
 M00000007_IL_0026:
-ldfld System.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
+ldfld System.Time.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
 M00000007_IL_002b:
-stobj System.TimeZoneError.SystemZoneUnavailable
+stobj System.Time.TimeZoneError.SystemZoneUnavailable
 M00000007_IL_0030:
 ldc.bool true
 M00000007_IL_0031:
@@ -574,35 +574,35 @@ M00000007_IL_0034:
 ret
 .end
 .method instance override byref ToString() -> String
-.local System.TimeZoneError local0
+.local System.Time.TimeZoneError local0
 .local String local1
-.local System.TimeZoneError local2
-.local System.TimeZoneError.UnknownZone local3
-.local System.TimeZoneError local4
-.local System.TimeZoneError.OutOfRange local5
-.local System.TimeZoneError local6
-.local System.TimeZoneError.SystemZoneUnavailable local7
+.local System.Time.TimeZoneError local2
+.local System.Time.TimeZoneError.UnknownZone local3
+.local System.Time.TimeZoneError local4
+.local System.Time.TimeZoneError.OutOfRange local5
+.local System.Time.TimeZoneError local6
+.local System.Time.TimeZoneError.SystemZoneUnavailable local7
 ldloca local0
-initobj System.TimeZoneError
+initobj System.Time.TimeZoneError
 ldloca local2
-initobj System.TimeZoneError
+initobj System.Time.TimeZoneError
 ldloca local3
-initobj System.TimeZoneError.UnknownZone
+initobj System.Time.TimeZoneError.UnknownZone
 ldloca local4
-initobj System.TimeZoneError
+initobj System.Time.TimeZoneError
 ldloca local5
-initobj System.TimeZoneError.OutOfRange
+initobj System.Time.TimeZoneError.OutOfRange
 ldloca local6
-initobj System.TimeZoneError
+initobj System.Time.TimeZoneError
 ldloca local7
-initobj System.TimeZoneError.SystemZoneUnavailable
+initobj System.Time.TimeZoneError.SystemZoneUnavailable
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
 M00000008_IL_0003:
 ldarg 0
 M00000008_IL_0004:
-ldobj System.TimeZoneError
+ldobj System.Time.TimeZoneError
 M00000008_IL_0009:
 stloc local0
 M00000008_IL_000a:
@@ -612,13 +612,13 @@ stloc local2
 M00000008_IL_000c:
 ldloca local3
 M00000008_IL_000e:
-initobj System.TimeZoneError.UnknownZone
+initobj System.Time.TimeZoneError.UnknownZone
 M00000008_IL_0014:
 ldloca local2
 M00000008_IL_0016:
 ldloca local3
 M00000008_IL_0018:
-call instance System.TimeZoneError::TryGetValue(System.TimeZoneError.UnknownZone&)
+call instance System.Time.TimeZoneError::TryGetValue(System.Time.TimeZoneError.UnknownZone&)
 M00000008_IL_001d:
 brfalse M00000008_IL_003a
 M00000008_IL_0022:
@@ -639,13 +639,13 @@ stloc local4
 M00000008_IL_003e:
 ldloca local5
 M00000008_IL_0040:
-initobj System.TimeZoneError.OutOfRange
+initobj System.Time.TimeZoneError.OutOfRange
 M00000008_IL_0046:
 ldloca local4
 M00000008_IL_0048:
 ldloca local5
 M00000008_IL_004a:
-call instance System.TimeZoneError::TryGetValue(System.TimeZoneError.OutOfRange&)
+call instance System.Time.TimeZoneError::TryGetValue(System.Time.TimeZoneError.OutOfRange&)
 M00000008_IL_004f:
 brfalse M00000008_IL_006c
 M00000008_IL_0054:
@@ -666,13 +666,13 @@ stloc local6
 M00000008_IL_0070:
 ldloca local7
 M00000008_IL_0072:
-initobj System.TimeZoneError.SystemZoneUnavailable
+initobj System.Time.TimeZoneError.SystemZoneUnavailable
 M00000008_IL_0078:
 ldloca local6
 M00000008_IL_007a:
 ldloca local7
 M00000008_IL_007c:
-call instance System.TimeZoneError::TryGetValue(System.TimeZoneError.SystemZoneUnavailable&)
+call instance System.Time.TimeZoneError::TryGetValue(System.Time.TimeZoneError.SystemZoneUnavailable&)
 M00000008_IL_0081:
 brfalse M00000008_IL_009d
 M00000008_IL_0086:
@@ -716,7 +716,7 @@ ret
 M00000009_IL_0000:
 ldarg 0
 M00000009_IL_0001:
-ldfld System.TimeZoneError::Metadata_V1_3C5461673E
+ldfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 M00000009_IL_0006:
 conv.i4
 M00000009_IL_0007:
@@ -725,7 +725,7 @@ M00000009_IL_0008:
 conv.i4
 M00000009_IL_0009:
 ceq
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_000b:
 brtrue M00000009_IL_0015
 M00000009_IL_0010:
@@ -733,16 +733,16 @@ br M00000009_IL_0021
 M00000009_IL_0015:
 ldarg 0
 M00000009_IL_0016:
-ldfld System.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
+ldfld System.Time.TimeZoneError::Metadata_V1_3C556E6B6E6F776E5A6F6E655061796C6F61643E
 M00000009_IL_001b:
-box System.TimeZoneError.UnknownZone
+box System.Time.TimeZoneError.UnknownZone
 M00000009_IL_0020:
 ret
 M00000009_IL_0021:
 M00000009_IL_0022:
 ldarg 0
 M00000009_IL_0023:
-ldfld System.TimeZoneError::Metadata_V1_3C5461673E
+ldfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 M00000009_IL_0028:
 conv.i4
 M00000009_IL_0029:
@@ -751,7 +751,7 @@ M00000009_IL_002a:
 conv.i4
 M00000009_IL_002b:
 ceq
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_002d:
 brtrue M00000009_IL_0037
 M00000009_IL_0032:
@@ -759,16 +759,16 @@ br M00000009_IL_0043
 M00000009_IL_0037:
 ldarg 0
 M00000009_IL_0038:
-ldfld System.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+ldfld System.Time.TimeZoneError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
 M00000009_IL_003d:
-box System.TimeZoneError.OutOfRange
+box System.Time.TimeZoneError.OutOfRange
 M00000009_IL_0042:
 ret
 M00000009_IL_0043:
 M00000009_IL_0044:
 ldarg 0
 M00000009_IL_0045:
-ldfld System.TimeZoneError::Metadata_V1_3C5461673E
+ldfld System.Time.TimeZoneError::Metadata_V1_3C5461673E
 M00000009_IL_004a:
 conv.i4
 M00000009_IL_004b:
@@ -777,7 +777,7 @@ M00000009_IL_004c:
 conv.i4
 M00000009_IL_004d:
 ceq
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_004f:
 brtrue M00000009_IL_0059
 M00000009_IL_0054:
@@ -785,33 +785,33 @@ br M00000009_IL_0065
 M00000009_IL_0059:
 ldarg 0
 M00000009_IL_005a:
-ldfld System.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
+ldfld System.Time.TimeZoneError::Metadata_V1_3C53797374656D5A6F6E65556E617661696C61626C655061796C6F61643E
 M00000009_IL_005f:
-box System.TimeZoneError.SystemZoneUnavailable
+box System.Time.TimeZoneError.SystemZoneUnavailable
 M00000009_IL_0064:
 ret
 M00000009_IL_0065:
 M00000009_IL_0066:
 M00000009_IL_0067:
-call neoCLR.Library.System.TimeZoneError.DefaultReference53797374656D2E4F626A656374()
+call neoCLR.Library.System.Time.TimeZoneError.DefaultReference53797374656D2E4F626A656374()
 ret
 .end
 .method instance byref get_HasValue() -> Boolean
 M0000000a_IL_0000:
 ldarg 0
 M0000000a_IL_0001:
-call instance System.TimeZoneError::get_Value()
+call instance System.Time.TimeZoneError::get_Value()
 M0000000a_IL_0006:
 M0000000a_IL_0007:
 ref.isnull
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M0000000a_IL_0009:
 ldc.i4 0
 M0000000a_IL_000a:
 ceq
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanToInt32(Boolean)
 M0000000a_IL_000c:
-call neoCLR.Library.System.TimeZoneError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.Time.TimeZoneError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .end

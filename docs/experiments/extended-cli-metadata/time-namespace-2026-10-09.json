@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-09",
+  "ravenCompilerFix": "92a593ff7",
+  "ravenMigrationDocumentation": "b876de8cb",
+  "publicTypes": [
+    "System.Time.Calendar",
+    "System.Time.Clock",
+    "System.Time.Date",
+    "System.Time.DateTime",
+    "System.Time.Duration",
+    "System.Time.Instant",
+    "System.Time.InvalidDateError",
+    "System.Time.InvalidTimeError",
+    "System.Time.LocalDateTime",
+    "System.Time.LocalTimeMapping",
+    "System.Time.SystemClock",
+    "System.Time.TimeOfDay",
+    "System.Time.TimeOffset",
+    "System.Time.TimeZone",
+    "System.Time.TimeZoneError",
+    "System.Time.ZonedDateTime"
+  ],
+  "representation": "unchanged: civil time within one day at 100 ns precision",
+  "checks": {
+    "rustDateTimeClockAccessTests": 13,
+    "calendarGlobalizationSignatureChecks": 122,
+    "localLayoutAccessCases": [
+      "Local",
+      "Reordered",
+      "ExtraStorage",
+      "PublicFactory"
+    ],
+    "regeneratedSlices": 18,
+    "sliceInputOutputHashes": "PASS",
+    "apiSnapshot": "PASS",
+    "nativeLibraryBundle": "Runtime/Data/Networking/Web PASS",
+    "calendarNativeOutputMatchesInterpreter": true,
+    "timezoneLegacyChecks": {
+      "library-time-zones": [
+        "This local time occurs twice:",
+        "2024-10-27T02:30:00.0000000",
+        "7200",
+        "17299890000000000",
+        "2024-10-27T02:30:00.0000000",
+        "3600",
+        "17299926000000000"
+      ],
+      "library-time-contracts": [
+        "Europe/Stockholm",
+        "Time and timezone checks passed"
+      ],
+      "managed-object-statistics": "allocated=43 live=0 peak=43 collections=1 reclaimed=43",
+      "private-zone-construction": "rejected",
+      "private-zoned-construction": "rejected",
+      "immutable-zone": "rejected",
+      "immutable-offset": "rejected"
+    },
+    "browser": [
+      "System.Time sidebar lists the family",
+      "TimeOfDay summary, interfaces and System.Runtime.dll owner",
+      "LocalDateTime.Time returns TimeOfDay; member link works"
+    ],
+    "integratedWebsitePages": 3485
+  },
+  "limitations": [
+    "Timezone AOT service neoCLR.Runtime.TimeZoneExists remains unsupported.",
+    "The broader time-contract sample still hits nonempty record boxing in AOT.",
+    "The all-slice legacy hash audit remains stale outside these 18 regenerated slices (first reported slice: Tuple); no full snapshot qualification is claimed.",
+    "The broad legacy foundation script hit an unrelated negative-case expectation; all four local-time layout/access cases pass independently.",
+    "Native documentation preview still has 136 legacy coverage routes and a temporary CLI primitive bootstrap."
+  ],
+  "nativeLinkEnvironment": {
+    "link": 0,
+    "exit": 0,
+    "matchesInterpreter": true,
+    "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+  },
+  "nativeBundleSha256": "66fd9df973fcb31a2e94ea14a0e7ac1bfc44d92147240ebcc8ebef6e3089756f"
+}

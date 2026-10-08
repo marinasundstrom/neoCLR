@@ -6,15 +6,16 @@ two named cultures, and separate calendar/formatter implementations.
 
 ## Selected contract
 
-`System.Date` remains a compact absolute day number with Gregorian convenience
+`System.Time.Date` remains a compact absolute day number with Gregorian convenience
 properties, years 1–9999 and the existing zero default. `Calendar.Gregorian` and
 `Calendar.Hebrew` interpret that same day. `CreateDate` converts calendar fields to
 `Date`; `GetYear`, `GetMonth` and `GetDay` project it back. A Hebrew-created Date's
 own `Year`, `Month`, `Day` remain Gregorian. Equality and ordering compare the day,
 not the representation. No culture, calendar object, zone or offset is stored in Date.
 
-The namespace remains `System`: moving these types to the proposed `System.Time`
-namespace would conflict with the existing `System.Time` type and require migration.
+The 2026-10-09 development migration places date/time and calendar types in
+`System.Time` and renames the old `Time` struct to `TimeOfDay`. Culture and
+formatting policies remain in `System.Globalization`.
 
 | Calendar | Id | Supported calendar years | Numbering |
 | --- | --- | --- | --- |

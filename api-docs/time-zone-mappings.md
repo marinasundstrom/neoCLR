@@ -8,21 +8,21 @@ members until renderer support is available.
 
 <a id="unique-value"></a>
 
-**Property value:** [ZonedDateTime](xref:System.ZonedDateTime). The sole instant
+**Property value:** [ZonedDateTime](xref:System.Time.ZonedDateTime). The sole instant
 with the requested local civil fields.
 
 ## Ambiguous.Earlier
 
 <a id="ambiguous-earlier"></a>
 
-**Property value:** [ZonedDateTime](xref:System.ZonedDateTime). The chronologically
+**Property value:** [ZonedDateTime](xref:System.Time.ZonedDateTime). The chronologically
 earlier instant, with its actual offset and named zone.
 
 ## Ambiguous.Later
 
 <a id="ambiguous-later"></a>
 
-**Property value:** [ZonedDateTime](xref:System.ZonedDateTime). The chronologically
+**Property value:** [ZonedDateTime](xref:System.Time.ZonedDateTime). The chronologically
 later instant, with the same local fields and its own actual offset.
 
 Skipped has no payload. Default LocalTimeMapping is inactive. Successful MapLocal

@@ -1,32 +1,32 @@
-; Generated from runtime/raven/src/System/LocalTimeMapping.rvn. Regenerate with build_runtime_library.py.
-.type System.LocalTimeMapping
+; Generated from runtime/raven/src/System/Time/LocalTimeMapping.rvn. Regenerate with build_runtime_library.py.
+.type System.Time.LocalTimeMapping
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .implements System.Runtime.CompilerServices.UnionValue
 .field private Metadata_V1_3C5461673E Byte
-.field private Metadata_V1_3C556E697175655061796C6F61643E System.LocalTimeMapping.Unique
-.field private Metadata_V1_3C416D626967756F75735061796C6F61643E System.LocalTimeMapping.Ambiguous
-.field private Metadata_V1_3C536B69707065645061796C6F61643E System.LocalTimeMapping.Skipped
+.field private Metadata_V1_3C556E697175655061796C6F61643E System.Time.LocalTimeMapping.Unique
+.field private Metadata_V1_3C416D626967756F75735061796C6F61643E System.Time.LocalTimeMapping.Ambiguous
+.field private Metadata_V1_3C536B69707065645061796C6F61643E System.Time.LocalTimeMapping.Skipped
 .property instance Value() -> System.Object
-.get instance System.LocalTimeMapping::get_Value()
+.get instance System.Time.LocalTimeMapping::get_Value()
 .end
 .property instance HasValue() -> Boolean
-.get instance System.LocalTimeMapping::get_HasValue()
+.get instance System.Time.LocalTimeMapping::get_HasValue()
 .end
 .method instance override byref ToString() -> String
-.local System.LocalTimeMapping.Unique local0
-.local System.LocalTimeMapping.Ambiguous local1
-.local System.LocalTimeMapping.Ambiguous local2
+.local System.Time.LocalTimeMapping.Unique local0
+.local System.Time.LocalTimeMapping.Ambiguous local1
+.local System.Time.LocalTimeMapping.Ambiguous local2
 ldloca local0
-initobj System.LocalTimeMapping.Unique
+initobj System.Time.LocalTimeMapping.Unique
 ldloca local1
-initobj System.LocalTimeMapping.Ambiguous
+initobj System.Time.LocalTimeMapping.Ambiguous
 ldloca local2
-initobj System.LocalTimeMapping.Ambiguous
+initobj System.Time.LocalTimeMapping.Ambiguous
 M00000001_IL_0000:
 ldarg 0
 M00000001_IL_0001:
-ldfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 M00000001_IL_0006:
 conv.i4
 M00000001_IL_0007:
@@ -35,7 +35,7 @@ M00000001_IL_0008:
 conv.i4
 M00000001_IL_0009:
 ceq
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M00000001_IL_000b:
 brtrue M00000001_IL_0015
 M00000001_IL_0010:
@@ -57,16 +57,16 @@ call System.String::Concat(String,String)
 M00000001_IL_0038:
 ldarg 0
 M00000001_IL_0039:
-ldfld System.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
 M00000001_IL_003e:
 stloc local0
 M00000001_IL_003f:
 ldloca local0
 M00000001_IL_0041:
-call instance System.LocalTimeMapping.Unique::get_Value()
+call instance System.Time.LocalTimeMapping.Unique::get_Value()
 M00000001_IL_0046:
 castclass System.Object
-call System.LocalTimeMapping::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+call System.Time.LocalTimeMapping::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
 M00000001_IL_004b:
 call System.String::Concat(String,String)
 M00000001_IL_0050:
@@ -79,7 +79,7 @@ M00000001_IL_005b:
 M00000001_IL_005c:
 ldarg 0
 M00000001_IL_005d:
-ldfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 M00000001_IL_0062:
 conv.i4
 M00000001_IL_0063:
@@ -88,7 +88,7 @@ M00000001_IL_0064:
 conv.i4
 M00000001_IL_0065:
 ceq
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M00000001_IL_0067:
 brtrue M00000001_IL_0071
 M00000001_IL_006c:
@@ -118,16 +118,16 @@ call System.String::Concat(String,String)
 M00000001_IL_00a8:
 ldarg 0
 M00000001_IL_00a9:
-ldfld System.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
 M00000001_IL_00ae:
 stloc local1
 M00000001_IL_00af:
 ldloca local1
 M00000001_IL_00b1:
-call instance System.LocalTimeMapping.Ambiguous::get_Earlier()
+call instance System.Time.LocalTimeMapping.Ambiguous::get_Earlier()
 M00000001_IL_00b6:
 castclass System.Object
-call System.LocalTimeMapping::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+call System.Time.LocalTimeMapping::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
 M00000001_IL_00bb:
 call System.String::Concat(String,String)
 M00000001_IL_00c0:
@@ -145,16 +145,16 @@ call System.String::Concat(String,String)
 M00000001_IL_00de:
 ldarg 0
 M00000001_IL_00df:
-ldfld System.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
 M00000001_IL_00e4:
 stloc local2
 M00000001_IL_00e5:
 ldloca local2
 M00000001_IL_00e7:
-call instance System.LocalTimeMapping.Ambiguous::get_Later()
+call instance System.Time.LocalTimeMapping.Ambiguous::get_Later()
 M00000001_IL_00ec:
 castclass System.Object
-call System.LocalTimeMapping::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+call System.Time.LocalTimeMapping::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
 M00000001_IL_00f1:
 call System.String::Concat(String,String)
 M00000001_IL_00f6:
@@ -167,7 +167,7 @@ M00000001_IL_0101:
 M00000001_IL_0102:
 ldarg 0
 M00000001_IL_0103:
-ldfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 M00000001_IL_0108:
 conv.i4
 M00000001_IL_0109:
@@ -176,7 +176,7 @@ M00000001_IL_010a:
 conv.i4
 M00000001_IL_010b:
 ceq
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M00000001_IL_010d:
 brtrue M00000001_IL_0117
 M00000001_IL_0112:
@@ -205,7 +205,7 @@ ldarg 0
 M00000002_IL_0001:
 M00000002_IL_0002:
 ref.isnull
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M00000002_IL_0004:
 brtrue M00000002_IL_000e
 M00000002_IL_0009:
@@ -224,7 +224,7 @@ M00000002_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M00000002_IL_001e:
 brtrue M00000002_IL_0028
 M00000002_IL_0023:
@@ -274,7 +274,7 @@ ldstr "\u0027"
 M00000002_IL_006d:
 ldarg 0
 M00000002_IL_006e:
-call neoCLR.Library.System.LocalTimeMapping.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeReflection936F30A1978F475D(System.Object)
 M00000002_IL_0073:
 call System.String::Concat(String,String)
 M00000002_IL_0078:
@@ -287,25 +287,25 @@ M00000002_IL_0083:
 M00000002_IL_0084:
 ldarg 0
 M00000002_IL_0085:
-call neoCLR.Library.System.LocalTimeMapping.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeReflection936F30A1978F475D(System.Object)
 M00000002_IL_008a:
 ret
 .end
-.method instance byref .ctor(System.LocalTimeMapping.Unique value) -> Void
+.method instance byref .ctor(System.Time.LocalTimeMapping.Unique value) -> Void
 .local Byte local0
-.local System.LocalTimeMapping.Unique local1
+.local System.Time.LocalTimeMapping.Unique local1
 .local Byte unionDefault1_0
-.local System.LocalTimeMapping.Unique unionDefault1_1
-.local System.LocalTimeMapping.Ambiguous unionDefault1_2
-.local System.LocalTimeMapping.Skipped unionDefault1_3
+.local System.Time.LocalTimeMapping.Unique unionDefault1_1
+.local System.Time.LocalTimeMapping.Ambiguous unionDefault1_2
+.local System.Time.LocalTimeMapping.Skipped unionDefault1_3
 .local Byte unionFieldDefault4
-.local System.LocalTimeMapping.Unique unionFieldDefault7
-.local System.LocalTimeMapping.Ambiguous unionFieldDefault10
-.local System.LocalTimeMapping.Skipped unionFieldDefault13
+.local System.Time.LocalTimeMapping.Unique unionFieldDefault7
+.local System.Time.LocalTimeMapping.Ambiguous unionFieldDefault10
+.local System.Time.LocalTimeMapping.Skipped unionFieldDefault13
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.LocalTimeMapping.Unique
+initobj System.Time.LocalTimeMapping.Unique
 M00000003_IL_0000:
 ldarg 0
 M00000003_IL_0001:
@@ -314,25 +314,25 @@ ldloca unionDefault1_0
 initobj Byte
 ldarg 0
 ldloc unionDefault1_0
-stfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 pop
 ldloca unionDefault1_1
-initobj System.LocalTimeMapping.Unique
+initobj System.Time.LocalTimeMapping.Unique
 ldarg 0
 ldloc unionDefault1_1
-stfld System.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
 pop
 ldloca unionDefault1_2
-initobj System.LocalTimeMapping.Ambiguous
+initobj System.Time.LocalTimeMapping.Ambiguous
 ldarg 0
 ldloc unionDefault1_2
-stfld System.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
 pop
 ldloca unionDefault1_3
-initobj System.LocalTimeMapping.Skipped
+initobj System.Time.LocalTimeMapping.Skipped
 ldarg 0
 ldloc unionDefault1_3
-stfld System.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
 pop
 M00000003_IL_0007:
 ldarg 0
@@ -341,34 +341,34 @@ M00000003_IL_000d:
 ldloca unionFieldDefault4
 initobj Byte
 ldloc unionFieldDefault4
-stfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 pop
 M00000003_IL_0013:
 ldarg 0
 M00000003_IL_0014:
 M00000003_IL_0019:
 ldloca unionFieldDefault7
-initobj System.LocalTimeMapping.Unique
+initobj System.Time.LocalTimeMapping.Unique
 ldloc unionFieldDefault7
-stfld System.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
 pop
 M00000003_IL_001f:
 ldarg 0
 M00000003_IL_0020:
 M00000003_IL_0025:
 ldloca unionFieldDefault10
-initobj System.LocalTimeMapping.Ambiguous
+initobj System.Time.LocalTimeMapping.Ambiguous
 ldloc unionFieldDefault10
-stfld System.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
 pop
 M00000003_IL_002b:
 ldarg 0
 M00000003_IL_002c:
 M00000003_IL_0031:
 ldloca unionFieldDefault13
-initobj System.LocalTimeMapping.Skipped
+initobj System.Time.LocalTimeMapping.Skipped
 ldloc unionFieldDefault13
-stfld System.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
 pop
 M00000003_IL_0037:
 ldc.i4 1
@@ -381,7 +381,7 @@ ldloc local0
 M00000003_IL_003b:
 conv.u1
 M00000003_IL_003c:
-stfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 pop
 M00000003_IL_0041:
 ldarg 1
@@ -392,30 +392,30 @@ ldarg 0
 M00000003_IL_0044:
 ldloc local1
 M00000003_IL_0045:
-stfld System.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
 pop
 M00000003_IL_004a:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.LocalTimeMapping.Unique& value) -> Boolean
-.local System.LocalTimeMapping.Unique local0
+.method instance byref TryGetValue(out(true) System.Time.LocalTimeMapping.Unique& value) -> Boolean
+.local System.Time.LocalTimeMapping.Unique local0
 ldloca local0
-initobj System.LocalTimeMapping.Unique
+initobj System.Time.LocalTimeMapping.Unique
 M00000004_IL_0000:
 ldarg 1
 M00000004_IL_0001:
 ldloca local0
 M00000004_IL_0003:
-initobj System.LocalTimeMapping.Unique
+initobj System.Time.LocalTimeMapping.Unique
 M00000004_IL_0009:
 ldloc local0
 M00000004_IL_000a:
-stobj System.LocalTimeMapping.Unique
+stobj System.Time.LocalTimeMapping.Unique
 M00000004_IL_000f:
 ldarg 0
 M00000004_IL_0010:
-ldfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 M00000004_IL_0015:
 conv.i4
 M00000004_IL_0016:
@@ -424,7 +424,7 @@ M00000004_IL_0017:
 conv.i4
 M00000004_IL_0018:
 ceq
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_001a:
 brtrue M00000004_IL_0024
 M00000004_IL_001f:
@@ -434,9 +434,9 @@ ldarg 1
 M00000004_IL_0025:
 ldarg 0
 M00000004_IL_0026:
-ldfld System.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
 M00000004_IL_002b:
-stobj System.LocalTimeMapping.Unique
+stobj System.Time.LocalTimeMapping.Unique
 M00000004_IL_0030:
 ldc.bool true
 M00000004_IL_0031:
@@ -447,21 +447,21 @@ ldc.bool false
 M00000004_IL_0034:
 ret
 .end
-.method instance byref .ctor(System.LocalTimeMapping.Ambiguous value) -> Void
+.method instance byref .ctor(System.Time.LocalTimeMapping.Ambiguous value) -> Void
 .local Byte local0
-.local System.LocalTimeMapping.Ambiguous local1
+.local System.Time.LocalTimeMapping.Ambiguous local1
 .local Byte unionDefault1_0
-.local System.LocalTimeMapping.Unique unionDefault1_1
-.local System.LocalTimeMapping.Ambiguous unionDefault1_2
-.local System.LocalTimeMapping.Skipped unionDefault1_3
+.local System.Time.LocalTimeMapping.Unique unionDefault1_1
+.local System.Time.LocalTimeMapping.Ambiguous unionDefault1_2
+.local System.Time.LocalTimeMapping.Skipped unionDefault1_3
 .local Byte unionFieldDefault4
-.local System.LocalTimeMapping.Unique unionFieldDefault7
-.local System.LocalTimeMapping.Ambiguous unionFieldDefault10
-.local System.LocalTimeMapping.Skipped unionFieldDefault13
+.local System.Time.LocalTimeMapping.Unique unionFieldDefault7
+.local System.Time.LocalTimeMapping.Ambiguous unionFieldDefault10
+.local System.Time.LocalTimeMapping.Skipped unionFieldDefault13
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.LocalTimeMapping.Ambiguous
+initobj System.Time.LocalTimeMapping.Ambiguous
 M00000005_IL_0000:
 ldarg 0
 M00000005_IL_0001:
@@ -470,25 +470,25 @@ ldloca unionDefault1_0
 initobj Byte
 ldarg 0
 ldloc unionDefault1_0
-stfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 pop
 ldloca unionDefault1_1
-initobj System.LocalTimeMapping.Unique
+initobj System.Time.LocalTimeMapping.Unique
 ldarg 0
 ldloc unionDefault1_1
-stfld System.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
 pop
 ldloca unionDefault1_2
-initobj System.LocalTimeMapping.Ambiguous
+initobj System.Time.LocalTimeMapping.Ambiguous
 ldarg 0
 ldloc unionDefault1_2
-stfld System.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
 pop
 ldloca unionDefault1_3
-initobj System.LocalTimeMapping.Skipped
+initobj System.Time.LocalTimeMapping.Skipped
 ldarg 0
 ldloc unionDefault1_3
-stfld System.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
 pop
 M00000005_IL_0007:
 ldarg 0
@@ -497,34 +497,34 @@ M00000005_IL_000d:
 ldloca unionFieldDefault4
 initobj Byte
 ldloc unionFieldDefault4
-stfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 pop
 M00000005_IL_0013:
 ldarg 0
 M00000005_IL_0014:
 M00000005_IL_0019:
 ldloca unionFieldDefault7
-initobj System.LocalTimeMapping.Unique
+initobj System.Time.LocalTimeMapping.Unique
 ldloc unionFieldDefault7
-stfld System.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
 pop
 M00000005_IL_001f:
 ldarg 0
 M00000005_IL_0020:
 M00000005_IL_0025:
 ldloca unionFieldDefault10
-initobj System.LocalTimeMapping.Ambiguous
+initobj System.Time.LocalTimeMapping.Ambiguous
 ldloc unionFieldDefault10
-stfld System.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
 pop
 M00000005_IL_002b:
 ldarg 0
 M00000005_IL_002c:
 M00000005_IL_0031:
 ldloca unionFieldDefault13
-initobj System.LocalTimeMapping.Skipped
+initobj System.Time.LocalTimeMapping.Skipped
 ldloc unionFieldDefault13
-stfld System.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
 pop
 M00000005_IL_0037:
 ldc.i4 2
@@ -537,7 +537,7 @@ ldloc local0
 M00000005_IL_003b:
 conv.u1
 M00000005_IL_003c:
-stfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 pop
 M00000005_IL_0041:
 ldarg 1
@@ -548,30 +548,30 @@ ldarg 0
 M00000005_IL_0044:
 ldloc local1
 M00000005_IL_0045:
-stfld System.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
 pop
 M00000005_IL_004a:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.LocalTimeMapping.Ambiguous& value) -> Boolean
-.local System.LocalTimeMapping.Ambiguous local0
+.method instance byref TryGetValue(out(true) System.Time.LocalTimeMapping.Ambiguous& value) -> Boolean
+.local System.Time.LocalTimeMapping.Ambiguous local0
 ldloca local0
-initobj System.LocalTimeMapping.Ambiguous
+initobj System.Time.LocalTimeMapping.Ambiguous
 M00000006_IL_0000:
 ldarg 1
 M00000006_IL_0001:
 ldloca local0
 M00000006_IL_0003:
-initobj System.LocalTimeMapping.Ambiguous
+initobj System.Time.LocalTimeMapping.Ambiguous
 M00000006_IL_0009:
 ldloc local0
 M00000006_IL_000a:
-stobj System.LocalTimeMapping.Ambiguous
+stobj System.Time.LocalTimeMapping.Ambiguous
 M00000006_IL_000f:
 ldarg 0
 M00000006_IL_0010:
-ldfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 M00000006_IL_0015:
 conv.i4
 M00000006_IL_0016:
@@ -580,7 +580,7 @@ M00000006_IL_0017:
 conv.i4
 M00000006_IL_0018:
 ceq
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M00000006_IL_001a:
 brtrue M00000006_IL_0024
 M00000006_IL_001f:
@@ -590,9 +590,9 @@ ldarg 1
 M00000006_IL_0025:
 ldarg 0
 M00000006_IL_0026:
-ldfld System.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
 M00000006_IL_002b:
-stobj System.LocalTimeMapping.Ambiguous
+stobj System.Time.LocalTimeMapping.Ambiguous
 M00000006_IL_0030:
 ldc.bool true
 M00000006_IL_0031:
@@ -603,21 +603,21 @@ ldc.bool false
 M00000006_IL_0034:
 ret
 .end
-.method instance byref .ctor(System.LocalTimeMapping.Skipped value) -> Void
+.method instance byref .ctor(System.Time.LocalTimeMapping.Skipped value) -> Void
 .local Byte local0
-.local System.LocalTimeMapping.Skipped local1
+.local System.Time.LocalTimeMapping.Skipped local1
 .local Byte unionDefault1_0
-.local System.LocalTimeMapping.Unique unionDefault1_1
-.local System.LocalTimeMapping.Ambiguous unionDefault1_2
-.local System.LocalTimeMapping.Skipped unionDefault1_3
+.local System.Time.LocalTimeMapping.Unique unionDefault1_1
+.local System.Time.LocalTimeMapping.Ambiguous unionDefault1_2
+.local System.Time.LocalTimeMapping.Skipped unionDefault1_3
 .local Byte unionFieldDefault4
-.local System.LocalTimeMapping.Unique unionFieldDefault7
-.local System.LocalTimeMapping.Ambiguous unionFieldDefault10
-.local System.LocalTimeMapping.Skipped unionFieldDefault13
+.local System.Time.LocalTimeMapping.Unique unionFieldDefault7
+.local System.Time.LocalTimeMapping.Ambiguous unionFieldDefault10
+.local System.Time.LocalTimeMapping.Skipped unionFieldDefault13
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.LocalTimeMapping.Skipped
+initobj System.Time.LocalTimeMapping.Skipped
 M00000007_IL_0000:
 ldarg 0
 M00000007_IL_0001:
@@ -626,25 +626,25 @@ ldloca unionDefault1_0
 initobj Byte
 ldarg 0
 ldloc unionDefault1_0
-stfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 pop
 ldloca unionDefault1_1
-initobj System.LocalTimeMapping.Unique
+initobj System.Time.LocalTimeMapping.Unique
 ldarg 0
 ldloc unionDefault1_1
-stfld System.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
 pop
 ldloca unionDefault1_2
-initobj System.LocalTimeMapping.Ambiguous
+initobj System.Time.LocalTimeMapping.Ambiguous
 ldarg 0
 ldloc unionDefault1_2
-stfld System.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
 pop
 ldloca unionDefault1_3
-initobj System.LocalTimeMapping.Skipped
+initobj System.Time.LocalTimeMapping.Skipped
 ldarg 0
 ldloc unionDefault1_3
-stfld System.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
 pop
 M00000007_IL_0007:
 ldarg 0
@@ -653,34 +653,34 @@ M00000007_IL_000d:
 ldloca unionFieldDefault4
 initobj Byte
 ldloc unionFieldDefault4
-stfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 pop
 M00000007_IL_0013:
 ldarg 0
 M00000007_IL_0014:
 M00000007_IL_0019:
 ldloca unionFieldDefault7
-initobj System.LocalTimeMapping.Unique
+initobj System.Time.LocalTimeMapping.Unique
 ldloc unionFieldDefault7
-stfld System.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
 pop
 M00000007_IL_001f:
 ldarg 0
 M00000007_IL_0020:
 M00000007_IL_0025:
 ldloca unionFieldDefault10
-initobj System.LocalTimeMapping.Ambiguous
+initobj System.Time.LocalTimeMapping.Ambiguous
 ldloc unionFieldDefault10
-stfld System.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
 pop
 M00000007_IL_002b:
 ldarg 0
 M00000007_IL_002c:
 M00000007_IL_0031:
 ldloca unionFieldDefault13
-initobj System.LocalTimeMapping.Skipped
+initobj System.Time.LocalTimeMapping.Skipped
 ldloc unionFieldDefault13
-stfld System.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
 pop
 M00000007_IL_0037:
 ldc.i4 3
@@ -693,7 +693,7 @@ ldloc local0
 M00000007_IL_003b:
 conv.u1
 M00000007_IL_003c:
-stfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 pop
 M00000007_IL_0041:
 ldarg 1
@@ -704,30 +704,30 @@ ldarg 0
 M00000007_IL_0044:
 ldloc local1
 M00000007_IL_0045:
-stfld System.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
+stfld System.Time.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
 pop
 M00000007_IL_004a:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.LocalTimeMapping.Skipped& value) -> Boolean
-.local System.LocalTimeMapping.Skipped local0
+.method instance byref TryGetValue(out(true) System.Time.LocalTimeMapping.Skipped& value) -> Boolean
+.local System.Time.LocalTimeMapping.Skipped local0
 ldloca local0
-initobj System.LocalTimeMapping.Skipped
+initobj System.Time.LocalTimeMapping.Skipped
 M00000008_IL_0000:
 ldarg 1
 M00000008_IL_0001:
 ldloca local0
 M00000008_IL_0003:
-initobj System.LocalTimeMapping.Skipped
+initobj System.Time.LocalTimeMapping.Skipped
 M00000008_IL_0009:
 ldloc local0
 M00000008_IL_000a:
-stobj System.LocalTimeMapping.Skipped
+stobj System.Time.LocalTimeMapping.Skipped
 M00000008_IL_000f:
 ldarg 0
 M00000008_IL_0010:
-ldfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 M00000008_IL_0015:
 conv.i4
 M00000008_IL_0016:
@@ -736,7 +736,7 @@ M00000008_IL_0017:
 conv.i4
 M00000008_IL_0018:
 ceq
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M00000008_IL_001a:
 brtrue M00000008_IL_0024
 M00000008_IL_001f:
@@ -746,9 +746,9 @@ ldarg 1
 M00000008_IL_0025:
 ldarg 0
 M00000008_IL_0026:
-ldfld System.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
 M00000008_IL_002b:
-stobj System.LocalTimeMapping.Skipped
+stobj System.Time.LocalTimeMapping.Skipped
 M00000008_IL_0030:
 ldc.bool true
 M00000008_IL_0031:
@@ -763,7 +763,7 @@ ret
 M00000009_IL_0000:
 ldarg 0
 M00000009_IL_0001:
-ldfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 M00000009_IL_0006:
 conv.i4
 M00000009_IL_0007:
@@ -772,7 +772,7 @@ M00000009_IL_0008:
 conv.i4
 M00000009_IL_0009:
 ceq
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_000b:
 brtrue M00000009_IL_0015
 M00000009_IL_0010:
@@ -780,16 +780,16 @@ br M00000009_IL_0021
 M00000009_IL_0015:
 ldarg 0
 M00000009_IL_0016:
-ldfld System.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C556E697175655061796C6F61643E
 M00000009_IL_001b:
-box System.LocalTimeMapping.Unique
+box System.Time.LocalTimeMapping.Unique
 M00000009_IL_0020:
 ret
 M00000009_IL_0021:
 M00000009_IL_0022:
 ldarg 0
 M00000009_IL_0023:
-ldfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 M00000009_IL_0028:
 conv.i4
 M00000009_IL_0029:
@@ -798,7 +798,7 @@ M00000009_IL_002a:
 conv.i4
 M00000009_IL_002b:
 ceq
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_002d:
 brtrue M00000009_IL_0037
 M00000009_IL_0032:
@@ -806,16 +806,16 @@ br M00000009_IL_0043
 M00000009_IL_0037:
 ldarg 0
 M00000009_IL_0038:
-ldfld System.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C416D626967756F75735061796C6F61643E
 M00000009_IL_003d:
-box System.LocalTimeMapping.Ambiguous
+box System.Time.LocalTimeMapping.Ambiguous
 M00000009_IL_0042:
 ret
 M00000009_IL_0043:
 M00000009_IL_0044:
 ldarg 0
 M00000009_IL_0045:
-ldfld System.LocalTimeMapping::Metadata_V1_3C5461673E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C5461673E
 M00000009_IL_004a:
 conv.i4
 M00000009_IL_004b:
@@ -824,7 +824,7 @@ M00000009_IL_004c:
 conv.i4
 M00000009_IL_004d:
 ceq
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_004f:
 brtrue M00000009_IL_0059
 M00000009_IL_0054:
@@ -832,33 +832,33 @@ br M00000009_IL_0065
 M00000009_IL_0059:
 ldarg 0
 M00000009_IL_005a:
-ldfld System.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
+ldfld System.Time.LocalTimeMapping::Metadata_V1_3C536B69707065645061796C6F61643E
 M00000009_IL_005f:
-box System.LocalTimeMapping.Skipped
+box System.Time.LocalTimeMapping.Skipped
 M00000009_IL_0064:
 ret
 M00000009_IL_0065:
 M00000009_IL_0066:
 M00000009_IL_0067:
-call neoCLR.Library.System.LocalTimeMapping.DefaultReference53797374656D2E4F626A656374()
+call neoCLR.Library.System.Time.LocalTimeMapping.DefaultReference53797374656D2E4F626A656374()
 ret
 .end
 .method instance byref get_HasValue() -> Boolean
 M0000000a_IL_0000:
 ldarg 0
 M0000000a_IL_0001:
-call instance System.LocalTimeMapping::get_Value()
+call instance System.Time.LocalTimeMapping::get_Value()
 M0000000a_IL_0006:
 M0000000a_IL_0007:
 ref.isnull
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M0000000a_IL_0009:
 ldc.i4 0
 M0000000a_IL_000a:
 ceq
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
 M0000000a_IL_000c:
-call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.Time.LocalTimeMapping.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .end

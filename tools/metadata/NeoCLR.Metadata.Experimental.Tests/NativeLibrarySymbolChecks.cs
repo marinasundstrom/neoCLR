@@ -8,17 +8,17 @@ internal static class NativeLibrarySymbolChecks
     internal static void Run()
     {
         const string source = """
-            {"format":5,"name":"System","entry":"","types":[{"name":"System.Date","fields":[]}],"functions":[
-            {"name":"System.Date.Count","owner":{"Named":"System.Date"},"parameters":["Int32"],"returns":"Int32","body":[]},
-            {"name":"System.Date.Result","owner":{"Named":"System.Date"},"parameters":["Int32"],"returns":{"Named":"System.Result"},"body":[]},
-            {"name":"System.Date.Instance","owner":{"Named":"System.Date"},"instance":true,"parameters":[],"returns":"Int32","body":[]}]}
+            {"format":5,"name":"System","entry":"","types":[{"name":"System.Time.Date","fields":[]}],"functions":[
+            {"name":"System.Time.Date.Count","owner":{"Named":"System.Time.Date"},"parameters":["Int32"],"returns":"Int32","body":[]},
+            {"name":"System.Time.Date.Result","owner":{"Named":"System.Time.Date"},"parameters":["Int32"],"returns":{"Named":"System.Result"},"body":[]},
+            {"name":"System.Time.Date.Instance","owner":{"Named":"System.Time.Date"},"instance":true,"parameters":[],"returns":"Int32","body":[]}]}
             """;
         NativeLibraryDefinition Read(string text) => NativeLibraryDefinition.ReadAssembly(NativeModuleContainer.WriteLibraryBinary(Encoding.UTF8.GetBytes(text)));
-        var genericNames = Read(source.Replace("\"types\":[", "\"types\":[{\"name\":\"System.Date\",\"generic_parameters\":[\"T\"]},"));
+        var genericNames = Read(source.Replace("\"types\":[", "\"types\":[{\"name\":\"System.Time.Date\",\"generic_parameters\":[\"T\"]},"));
         Check(genericNames.TypeNames.Count == 2, "native generic arities share descriptive names");
-        Reject(() => Read(source.Replace("\"types\":[", "\"types\":[{\"name\":\"System.Date\"},")));
+        Reject(() => Read(source.Replace("\"types\":[", "\"types\":[{\"name\":\"System.Time.Date\"},")));
         var library = Read(source);
-        Check(library.ModuleName == "System" && library.TypeNames.Single() == "System.Date" && library.Functions.Count == 3, "inventory");
+        Check(library.ModuleName == "System" && library.TypeNames.Single() == "System.Time.Date" && library.Functions.Count == 3, "inventory");
         var method = library.Functions[0];
         Check(method.TableIndex == 0 && method.TryGetStaticInt32Signature(out var count) && count == 1, "signature");
         Check(!library.Functions[1].TryGetStaticInt32Signature(out _) && !library.Functions[2].TryGetStaticInt32Signature(out _), "unsupported signatures retained");

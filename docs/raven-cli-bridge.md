@@ -7090,3 +7090,21 @@ and accepts both System.Void and unit nested constructor cases with it. Seven ex
 unit contract controls pass. A fresh Runtime/Data/Networking/Web build succeeds with
 the correction (using the in-progress System.Time migration); no retry is treated as
 a fix. This compiler correction is committed separately from that API migration.
+
+## Time namespace projection (2026-10-09)
+
+The native/source identity is System.Time.TimeOfDay (formerly System.Time), and the
+rest of the time/calendar family is likewise namespace-qualified under System.Time.
+No runtime opcode or host-service identity changes. The temporary reference producer
+and implementation catalogs now use these exact names; formatting remains under
+System.Globalization. All matching consumers require a rebuild. The source/native
+assembly owner remains System.Runtime; the documentation bridge remains an aggregate.
+
+The Instant bootstrap slice exposed a previously stale internal-call path during
+regeneration: its separately compiled CLI input needs the LocalDateTime internal
+factory visible during bootstrap compilation. The reference-library core alone
+exposes that declaration temporarily; import restores internal visibility and admits
+only the exact Instant-to-LocalDateTime Int64 factory call. The normal consumer
+reference omits it. Native source compilation retains the ordinary internal method
+without this shim. Local layout and public-factory rejection tests cover that bound;
+the native metadata/source compiler replaces this split-slice bridge.

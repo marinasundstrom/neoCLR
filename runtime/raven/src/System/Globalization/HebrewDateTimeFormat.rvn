@@ -1,13 +1,15 @@
 namespace System.Globalization
 
+import System.Time.*
+
 import System.Result.*
 
 // Hebrew-calendar dates use Hebrew letters; Gregorian dates retain numeric he-IL output.
 internal class HebrewDateTimeFormat : DateTimeFormatRules {
     private var digits: DateTimeFormatDigits = DateTimeFormatDigits()
-    private var calendar: System.Calendar
+    private var calendar: System.Time.Calendar
 
-    init(calendar: System.Calendar) {
+    init(calendar: System.Time.Calendar) {
         self.calendar = calendar
     }
 
@@ -69,7 +71,7 @@ internal class HebrewDateTimeFormat : DateTimeFormatRules {
         return digits.Pad(day, 2) + "." + digits.Pad(month, 2) + "." + digits.Pad(year, 4)
     }
 
-    func FormatTime(time: System.Time) -> string {
+    func FormatTime(time: System.Time.TimeOfDay) -> string {
         return digits.FormatTime(time, ".")
     }
 }

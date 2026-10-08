@@ -1,10 +1,11 @@
 include!("support/calendar_suite.rs");
 
 fn unwrap_calendar_result(name: &str) -> (String, String) {
+    let error_name = if name == "TimeOfDay" { "Time" } else { name };
     (
         String::new(),
         format!(
-            "call instance System.Result<System.{name},System.Invalid{name}Error>::GetOkCase()\ncall instance System.Result.Ok<System.{name}>::get_Value()"
+            "call instance System.Result<System.Time.{name},System.Time.Invalid{error_name}Error>::GetOkCase()\ncall instance System.Result.Ok<System.Time.{name}>::get_Value()"
         ),
     )
 }
@@ -29,19 +30,19 @@ fn neo_sample_defaults_and_results_roundtrip() {
 fn guest_cannot_forge_private_storage_even_without_verification() {
     for (name, scalar, constant) in [
         ("Date", "Int32", "ldc.i4 -1"),
-        ("Time", "Int64", "ldc.i8 -1"),
+        ("TimeOfDay", "Int64", "ldc.i8 -1"),
     ] {
-        assert!(neoclr::assemble(&format!(".module App\n.function Bad() -> System.{name}\n{constant}\nnewobj System.{name}\nret\n.end")).is_err());
+        assert!(neoclr::assemble(&format!(".module App\n.function Bad() -> System.Time.{name}\n{constant}\nnewobj System.Time.{name}\nret\n.end")).is_err());
         for (ret, body) in [
             (scalar.to_owned(), "ldfld 0\nret".to_owned()),
             (
-                format!("System.{name}"),
+                format!("System.Time.{name}"),
                 format!("{constant}\nstfld 0\nret"),
             ),
             (format!("{scalar}&"), "ldflda 0\nret".to_owned()),
         ] {
             let source = format!(
-                ".module App\n.entry Main\n.function Main() -> {ret}\n.local System.{name} value\nldloca value\ninitobj System.{name}\nldloca value\n{body}\n.end"
+                ".module App\n.entry Main\n.function Main() -> {ret}\n.local System.Time.{name} value\nldloca value\ninitobj System.Time.{name}\nldloca value\n{body}\n.end"
             );
             let module = neoclr::assemble(&source).unwrap();
             let p = LoadedProgram::new(&module).unwrap();

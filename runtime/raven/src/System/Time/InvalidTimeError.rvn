@@ -1,4 +1,6 @@
-namespace System
+namespace System.Time
+
+import System.*
 
 public struct InvalidTimeError {
     public init() { }

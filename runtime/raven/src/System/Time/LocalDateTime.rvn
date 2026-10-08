@@ -1,28 +1,30 @@
-namespace System
+namespace System.Time
+
+import System.*
 
 import System.Runtime.CompilerServices.RuntimeServices
 import System.Result.*
 
 public struct LocalDateTime {
     private field StoredDate: Date
-    private field StoredTime: Time
+    private field StoredTime: TimeOfDay
 
-    private init(date: Date, time: Time) {
+    private init(date: Date, time: TimeOfDay) {
         StoredDate = date
         StoredTime = time
     }
 
     /// Combines already validated civil values without selecting a zone or offset.
-    static func Create(date: Date, time: Time) -> LocalDateTime {
+    static func Create(date: Date, time: TimeOfDay) -> LocalDateTime {
         return LocalDateTime(date, time)
     }
 
     internal static func FromUnixTimeTicks(ticks: long) -> LocalDateTime {
         let parts = RuntimeServices.UnixTimeToLocal(ticks)
-        let Ok(date) = System.Date.Create(parts[0], parts[1], parts[2]) else {
+        let Ok(date) = System.Time.Date.Create(parts[0], parts[1], parts[2]) else {
             System.Fail("Invalid local date from runtime")
         }
-        let Ok(time) = System.Time.Create(parts[3], parts[4], parts[5], parts[6]) else {
+        let Ok(time) = System.Time.TimeOfDay.Create(parts[3], parts[4], parts[5], parts[6]) else {
             System.Fail("Invalid local time from runtime")
         }
         return LocalDateTime(date, time)
@@ -47,13 +49,13 @@ public struct LocalDateTime {
         if day > 3652058L {
             return Error(InvalidDateError())
         }
-        let date = System.Date.FromDayNumber((int)day)?
-        let Ok(time) = System.Time.FromTicks(ticks) else {
+        let date = System.Time.Date.FromDayNumber((int)day)?
+        let Ok(time) = System.Time.TimeOfDay.FromTicks(ticks) else {
             return Error(InvalidDateError())
         }
         return Ok(LocalDateTime(date, time))
     }
 
     val Date: Date => StoredDate
-    val Time: Time => StoredTime
+    val Time: TimeOfDay => StoredTime
 }

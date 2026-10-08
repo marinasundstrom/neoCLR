@@ -41,18 +41,18 @@ UTF-8 operations, with [Object content behavior](objects.md#string-through-objec
 mode. These APIs use documented Unicode simple-fold semantics,
 which can differ from .NET.
 
-[Calendar](xref:System.Calendar), [Culture](xref:System.Globalization.Culture),
+[Calendar](xref:System.Time.Calendar), [Culture](xref:System.Globalization.Culture),
 [Language](xref:System.Globalization.Language) and [DateTimeFormat](xref:System.Globalization.DateTimeFormat)
 provide Gregorian/Hebrew rendering. [CultureProvider](xref:System.Globalization.CultureProvider),
 [FixedCultureProvider](xref:System.Globalization.FixedCultureProvider) and
 [SystemCultureProvider](xref:System.Globalization.SystemCultureProvider) separate explicit selection
 from host discovery. See [globalization](/features/globalization/) for the tested example.
 
-[DateTime](xref:System.DateTime) is a development nominal union of
-[LocalDateTime](xref:System.LocalDateTime) and [ZonedDateTime](xref:System.ZonedDateTime).
-[TimeOffset](xref:System.TimeOffset) is fixed; [TimeZone](xref:System.TimeZone) supplies
-named IANA rules. [LocalTimeMapping](xref:System.LocalTimeMapping) preserves unique,
-ambiguous and skipped local times; [TimeZoneError](xref:System.TimeZoneError) reports
+[DateTime](xref:System.Time.DateTime) is a development nominal union of
+[LocalDateTime](xref:System.Time.LocalDateTime) and [ZonedDateTime](xref:System.Time.ZonedDateTime).
+[TimeOffset](xref:System.Time.TimeOffset) is fixed; [TimeZone](xref:System.Time.TimeZone) supplies
+named IANA rules. [LocalTimeMapping](xref:System.Time.LocalTimeMapping) preserves unique,
+ambiguous and skipped local times; [TimeZoneError](xref:System.Time.TimeZoneError) reports
 lookup/range/discovery failures. See [DateTime and zones](/features/time/) and the [exact union declaration](date-time-union.md).
 
 [Casing and decimal reporting](text-numbers.md) covers development
@@ -93,7 +93,7 @@ walks through the compiled hostname/echo POC.
 | Collections and arrays | [Collections and queries](/features/collections/) · [Arrays](/features/arrays/) | [ArrayList](xref:System.Collections.ArrayList`1) · [HashMap](xref:System.Collections.HashMap`2) · [System.Collections](xref:System.Collections) · [Array](xref:System.Array`1) |
 | Outcomes and callbacks | [Outcomes](/features/outcomes/) · [Function types](/features/functions/) | [Option](xref:System.Option`1) · [Result](xref:System.Result`2) · [Function shapes](functions.md) |
 | Queries | [Collections and queries](/features/collections/) | [System.Linq](xref:System.Linq) |
-| Time and clocks | [Dates and clocks](/features/time/) | [Date](xref:System.Date) · [Time](xref:System.Time) · [Instant](xref:System.Instant) · [Clock](xref:System.Clock) |
+| Time and clocks | [Dates and clocks](/features/time/) | [Date](xref:System.Time.Date) · [TimeOfDay](xref:System.Time.TimeOfDay) · [Instant](xref:System.Time.Instant) · [Clock](xref:System.Time.Clock) |
 | Text and encoding | [Strings](/features/strings/) | [String](xref:System.String) · [Char](xref:System.Char) · [System.Text](xref:System.Text) · [Encoding](xref:System.Text.Encoding) · [Decoder](xref:System.Text.Decoder) · [Encoder](xref:System.Text.Encoder) |
 | Mathematics and environment | [Expected outcomes](/features/outcomes/) | [System.Math](xref:System.Math) · [Environment](xref:System.Environment) |
 | Tasks and completion | [Tasks and async](/features/tasks/) · [Task.Run and callbacks](callbacks.md) | [System.Tasks](xref:System.Tasks) |

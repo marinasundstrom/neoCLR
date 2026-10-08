@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Move date/time values, clocks, timezone mappings/errors and calendar policies to
+  System.Time; rename the civil Time struct to TimeOfDay. LocalDateTime.Time keeps
+  its property name. Update source/native ownership, CLI bridge catalogs, generated
+  implementations, consumers and API reference together. This is a breaking
+  development identity change: update imports and rebuild matching libraries/apps.
+  Formatting policies stay in System.Globalization; representation and arithmetic
+  contracts are unchanged. Calendar output matches interpreted/native execution;
+  timezone service and nonempty record-boxing AOT gaps remain explicit.
+
 - Fix the native HttpContext constructor metadata mismatch through Raven's explicit
   unit-owner mapping (92a593ff7). Nested Promise<Result<Void, HttpError>> signatures
   now consistently select System.Runtime.Void instead of mixing in the temporary

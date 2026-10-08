@@ -1,5 +1,5 @@
-; Generated from runtime/raven/src/System/InvalidDateError.rvn. Regenerate with build_runtime_library.py.
-.type System.InvalidDateError
+; Generated from runtime/raven/src/System/Time/InvalidDateError.rvn. Regenerate with build_runtime_library.py.
+.type System.Time.InvalidDateError
 .sealed
 .method instance .ctor() -> Void
 M00000001_IL_0000:

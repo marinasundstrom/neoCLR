@@ -58,11 +58,11 @@ static class CoreDeclarations
             if (libraryBootstrap && collectionProbe)
             {
                 ArrayLibrary.Project(module);
-                var local = module.GetType("System.LocalDateTime");
+                var local = module.GetType("System.Time.LocalDateTime");
                 var localFactory = new Mono.Cecil.MethodDefinition("FromUnixTimeTicks",
-                    Mono.Cecil.MethodAttributes.Assembly | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig, local);
+                    Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig, local);
                 localFactory.Parameters.Add(new Mono.Cecil.ParameterDefinition("ticks", Mono.Cecil.ParameterAttributes.None,
-                    module.GetType("System.Instant").Methods.Single(m => m.Name == "FromUnixTimeTicks").Parameters[0].ParameterType));
+                    module.GetType("System.Time.Instant").Methods.Single(m => m.Name == "FromUnixTimeTicks").Parameters[0].ParameterType));
                 local.Methods.Add(localFactory);
                 foreach (var provider in new[] { "RuntimeTypeInfo", "RuntimeNominalTypeInfo", "RuntimeFunctionTypeInfo" })
                 {

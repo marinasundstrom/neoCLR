@@ -1,12 +1,13 @@
 include!("support/calendar_suite.rs");
 
 fn unwrap_calendar_result(name: &str) -> (String, String) {
+    let error_name = if name == "TimeOfDay" { "Time" } else { name };
     (
         format!(
-            ".local System.Result<System.{name},System.Invalid{name}Error> result\n.local System.{name} value\n"
+            ".local System.Result<System.Time.{name},System.Time.Invalid{error_name}Error> result\n.local System.Time.{name} value\n"
         ),
         format!(
-            "stloc result\nldloca result\nldloca value\ncall instance System.Result<System.{name},System.Invalid{name}Error>::TryGetOutput(System.{name}&)\nbrtrue parsed\nfault \"Expected a successful calendar result\"\nparsed:\nldloc value"
+            "stloc result\nldloca result\nldloca value\ncall instance System.Result<System.Time.{name},System.Time.Invalid{error_name}Error>::TryGetOutput(System.Time.{name}&)\nbrtrue parsed\nfault \"Expected a successful calendar result\"\nparsed:\nldloc value"
         ),
     )
 }
@@ -41,9 +42,9 @@ fn load_calendar_program(source: &str) -> LoadedProgram {
 fn readonly_time_body_cannot_mutate_its_receiver() {
     let library = calendar_library().replace(
         ".method instance readonly byref get_Ticks() -> Int64\n",
-        ".method instance readonly byref get_Ticks() -> Int64\nldarg 0\nldc.i8 0\nstfld System.Time::StoredTicks\npop\n");
+        ".method instance readonly byref get_Ticks() -> Int64\nldarg 0\nldc.i8 0\nstfld System.Time.TimeOfDay::StoredTicks\npop\n");
     let p = with_library(
-        ".module Probe\n.function Read(System.Time& value) -> Int64\nldarg value\ncall instance System.Time::get_Ticks()\nret\n.end",
+        ".module Probe\n.function Read(System.Time.TimeOfDay& value) -> Int64\nldarg value\ncall instance System.Time.TimeOfDay::get_Ticks()\nret\n.end",
         &library,
     );
     let error = p.verify().unwrap_err().to_string();
@@ -54,7 +55,7 @@ fn readonly_time_body_cannot_mutate_its_receiver() {
 fn time_private_constructor_is_inaccessible_outside_its_type() {
     let library = neoclr::assemble(&calendar_library()).unwrap();
     let error = neoclr::assembler::read_modules(
-        &[neoclr::assembler::ModuleInput::Source(".module Probe\n.function Make() -> System.Time\nldc.i8 -1\nnewobj instance System.Time::.ctor(Int64)\nret\n.end")],
+        &[neoclr::assembler::ModuleInput::Source(".module Probe\n.function Make() -> System.Time.TimeOfDay\nldc.i8 -1\nnewobj instance System.Time.TimeOfDay::.ctor(Int64)\nret\n.end")],
         &library).expect_err("private construction must be rejected").to_string();
     assert!(error.contains("access denied"), "{error}");
 }
