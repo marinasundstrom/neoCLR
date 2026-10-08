@@ -1,5 +1,10 @@
 # Modules as namespaces: initial assessment
 
+**Follow-up, 2026-10-09:** the author now directs implementation of the foundation,
+explicitly retaining assemblies as packaging/identity and allowing many modules per
+assembly. See the [implemented contract](../declaration-modules.md). The original
+assessment below is retained as the historical proposal stage.
+
 **Exploration recorded 2026-10-08; no implementation or format change.**
 The [original Version 0.2 proposal](../proposals/first-class-module-system.md) is
 preserved verbatim. The author noted that its artifact names do not reflect current

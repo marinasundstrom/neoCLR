@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length >= 1 && args[0] == "--declaration-modules") { DeclarationModuleChecks.Run(args.Length > 1 ? args[1] : null); return 0; }
+
 if (args is ["--native-core"]) { NativeCoreChecks.Run(); return 0; }
 
 if (args is ["--assembly-constants"]) { AssemblyConstantChecks.Run(); return 0; }

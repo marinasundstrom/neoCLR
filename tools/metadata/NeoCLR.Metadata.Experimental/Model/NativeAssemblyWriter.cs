@@ -330,6 +330,7 @@ public sealed partial class AssemblyBuilder
             return result.Count == 0 ? null : result.ToArray();
         }
         var manifest = new Dictionary<string, object> { ["name"] = Identity.Name, ["full_name"] = IdentityText(Identity), ["modules"] = new[] { Identity.Name + ".dll" }, ["references"] = dependencies.Keys.Select(IdentityText).ToArray() };
+        manifest["declaration_modules"] = new { version = 1, names = Definition.GetModules().Select(module => module.Name).ToArray() };
         if (arrayBacking is not null)
         {
             ValidateArrayBacking(arrayBacking);

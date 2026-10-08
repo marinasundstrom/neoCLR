@@ -1343,6 +1343,7 @@ impl Module {
             };
             self.assemblies
                 .push(crate::metadata_origin::AssemblyMetadata {
+                    declaration_modules: None,
                     value_type_references: vec![],
                     native_module_bindings: vec![],
                     native_type_bindings: vec![],

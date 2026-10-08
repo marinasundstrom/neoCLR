@@ -34,6 +34,7 @@ public sealed partial class NativeAssemblyDefinition
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
     private AssemblyConstantDefinition[] assemblyConstants = [];
+    private string[]? declarationModuleNames;
     private readonly uint entryPointToken;
     private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, PropertyRow[] properties, AssemblyIdentity[] references, HashSet<string> valueTypeReferences, Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases, uint entryPointToken)
     { this.entryPointToken = entryPointToken; this.nativeTypeAliases = nativeTypeAliases; this.valueTypeReferences = valueTypeReferences; Identity = identity; this.types = types; this.methods = methods; this.properties = properties; References = System.Array.AsReadOnly(references); }
@@ -67,6 +68,16 @@ public sealed partial class NativeAssemblyDefinition
             var manifests = Array(root, "assemblies", 1); Require(manifests.Length == 1, "one assembly manifest required");
             var manifest = manifests[0];
             var manifestFields = new List<string> { "name", "full_name", "modules", "references" };
+            string[]? declarationModuleNames = null;
+            if (manifest.TryGetProperty("declaration_modules", out var moduleTable))
+            {
+                manifestFields.Add("declaration_modules");
+                Shape(moduleTable, "version", "names");
+                Require(moduleTable.GetProperty("version").GetInt32() == 1, "unsupported declaration module version");
+                declarationModuleNames = Array(moduleTable, "names", 4096).Select(row => row.GetString()!).ToArray();
+                foreach (var name in declarationModuleNames) FunctionNamespaceEncoding.Validate(name);
+                Require(declarationModuleNames.Distinct(StringComparer.Ordinal).Count() == declarationModuleNames.Length, "duplicate declaration module");
+            }
             var valueTypeReferences = new HashSet<string>(StringComparer.Ordinal);
             if (manifest.TryGetProperty("value_type_references", out _))
             {
@@ -819,7 +830,14 @@ public sealed partial class NativeAssemblyDefinition
                 Require(candidates.Length == 1, "invalid native entry point");
                 entryPointToken = 0x06000001u + (uint)candidates[0].index;
             }
-            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences, nativeTypeAliases, entryPointToken) { assemblyConstants = constants.ToArray() };
+            if (declarationModuleNames is not null)
+            {
+                var owners = types.Where(type => type.DeclaringType < 0).Select(type => type.Namespace)
+                    .Concat(methods.Where(method => method.Owner < 0).Select(method => method.Namespace))
+                    .Concat(constants.Select(constant => constant.Namespace));
+                Require(owners.All(name => declarationModuleNames.Contains(name, StringComparer.Ordinal)), "missing declaration module owner");
+            }
+            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences, nativeTypeAliases, entryPointToken) { assemblyConstants = constants.ToArray(), declarationModuleNames = declarationModuleNames };
         }
         catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException or OverflowException)
         { throw new InvalidDataException("invalid native metadata", error); }

@@ -25,6 +25,23 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-09 — Implement the module foundation
+
+- **Author:** asks to implement module format and foundational neoCLR APIs, then
+  Raven parsing/binding/symbol changes. Permits reuse of namespace declaration syntax
+  with the `module` keyword as a starting point. Requests module terminology and a
+  website feature page while retaining assembly ownership in generated API reference.
+- **Author clarification:** one module per assembly is common, but assemblies may
+  contain many modules, notably System.Runtime. Assembly and module names need not
+  match. Submodules are a possible organizational shape.
+- **Assistant:** chooses bounded slices for native metadata/API ownership, Raven's
+  syntax and existing import/qualified lookup, and website documentation. Retains
+  physical-image APIs explicitly rather than silently reinterpreting their identity.
+- **Implemented foundation:** [versioned declaration containers](declaration-modules.md),
+  scoped authoring, reader/discovery views and runtime validation. Guest RuntimeContext,
+  module-private access and re-exports remain open; those proposal details are not
+  treated as author-approved completed contracts.
+
 ## 2026-10-08 — Move native compilation blockers into Raven
 
 - **Author:** directs work to Raven `codex/source-object-metadata-resolution`,

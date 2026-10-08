@@ -6,6 +6,9 @@ use std::collections::HashSet;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct AssemblyMetadata {
+    /// Logical declaration containers; None denotes legacy namespace projection.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub declaration_modules: Option<DeclarationModules>,
     pub name: String,
     pub full_name: String,
     pub modules: Vec<String>,
@@ -25,6 +28,14 @@ pub struct AssemblyMetadata {
     /// Compile-time assembly-level literals, with exact binary64 bits and no execution storage.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub constants: Vec<AssemblyConstant>,
+}
+
+/// Versioned logical module table, independent of physical image names.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DeclarationModules {
+    pub version: u32,
+    pub names: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -169,6 +180,42 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                 && s.chars().count() <= 1024
                 && !s.chars().any(|c| c.is_control() || c == '.')
         };
+        if let Some(table) = &assembly.declaration_modules {
+            let names: HashSet<_> = table.names.iter().map(String::as_str).collect();
+            if table.version != 1
+                || names.len() != table.names.len()
+                || names.len() > 4096
+                || names
+                    .iter()
+                    .any(|n| n.chars().count() > 1024 || (!n.is_empty() && !n.split('.').all(name)))
+            {
+                return Err(Fault::new("invalid declaration module table"));
+            }
+            let type_owners = module
+                .types
+                .iter()
+                .filter(|ty| ty.declaring_type.is_none())
+                .filter_map(|ty| ty.origin.as_ref())
+                .filter(|origin| origin.assembly == assembly.full_name)
+                .map(|origin| origin.name.rsplit_once('.').map_or("", |(owner, _)| owner));
+            let function_owners = module
+                .functions
+                .iter()
+                .filter(|f| f.owner.is_none())
+                .filter(|f| {
+                    f.origin
+                        .as_ref()
+                        .is_some_and(|origin| origin.assembly == assembly.full_name)
+                })
+                .map(|f| f.namespace.as_str());
+            if type_owners
+                .chain(function_owners)
+                .chain(assembly.constants.iter().map(|c| c.namespace.as_str()))
+                .any(|owner| !names.contains(owner))
+            {
+                return Err(Fault::new("missing declaration module owner"));
+            }
+        }
         for constant in &assembly.constants {
             if assembly.constants.len() > 4096
                 || !name(&constant.name)

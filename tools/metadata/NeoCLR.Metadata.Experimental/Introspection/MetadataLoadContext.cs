@@ -7,6 +7,11 @@ namespace NeoCLR.Metadata.Experimental.Introspection;
 /// Identity is scoped to this context; no global cache or disposal of shared snapshots is involved.</remarks>
 public sealed partial class MetadataLoadContext
 {
+    /// <summary>Discovers logical declaration modules in explicitly registered assemblies without loading dependencies.</summary>
+    /// <remarks>Equal paths in different assemblies remain distinct; callers can filter by exact assembly identity.</remarks>
+    public IReadOnlyList<DeclarationModuleDefinition> GetDeclarationModules() => Array.AsReadOnly(
+        Assemblies.SelectMany(assembly => assembly.Definition.GetModules()).ToArray());
+
     private readonly Dictionary<AssemblyIdentity, AssemblyInfo> assemblies = [];
     private readonly Dictionary<TypeDefinition, NominalTypeInfo> types = [];
     private readonly Dictionary<TypeReference, NominalTypeInfo> references = [];

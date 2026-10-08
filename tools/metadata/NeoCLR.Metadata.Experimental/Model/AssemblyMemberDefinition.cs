@@ -46,6 +46,8 @@ public sealed class AssemblyMemberDefinition
     public ModuleDefinition Module { get; }
     /// <summary>Gets the declaring assembly and its exact identity.</summary>
     public AssemblyDefinition Assembly => Module.Assembly;
+    /// <summary>Gets the logical module directly owning this declaration.</summary>
+    public DeclarationModuleDefinition DeclaringModule => Assembly.GetDeclarationModule(Namespace);
     /// <summary>Gets the namespace portion of the qualified name.</summary>
     public string Namespace { get; }
     /// <summary>Gets the simple metadata name.</summary>

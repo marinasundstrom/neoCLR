@@ -13,6 +13,29 @@ format-5 assemblies, including native top-level functions. Direct PE/#Neo runtim
 with a reference-only CLI projection. A bounded binary native payload now avoids JSON parsing at runtime. General rewriting
 and guest Introspection assembly loading remain pending.
 
+## Declaration modules (development, 2026-10-09)
+
+`AssemblyBuilder.DefineModule(string name)` declares a logical module independently
+of the assembly name and returns a canonical `DeclarationModuleDefinition`.
+`Name` is its qualified path, `Assembly` the packaging owner, and `IsProjection`
+reports whether an older input supplied only namespace names. `GetMembers()` returns
+direct types, free functions and constants, excluding child modules and nested types.
+
+On authored modules, `AddClass(name)`, `AddFunction(name, signature, visibility)` and
+`AddConstant(name, doubleValue, visibility)` use that module as the declaration owner.
+Function/constant visibility defaults to public; existing public/internal restrictions
+apply. Loaded snapshots reject mutations with `InvalidOperationException`. Invalid
+names, duplicate members and existing builder bounds produce the corresponding
+`ArgumentException`; this slice does not introduce module-private access.
+
+`AssemblyDefinition.GetModules()` returns logical modules in ordinal name order;
+`AssemblyMemberDefinition.DeclaringModule` identifies each direct owner.
+`MetadataLoadContext.GetDeclarationModules()` discovers all registered logical modules
+without resolving dependencies; callers must include assembly identity when names
+collide. Existing `AssemblyInfo.GetModules()` and `ModuleDefinition` still describe
+physical images. Empty logical modules survive native emission but not CLI projection.
+See [format, limits and migration](https://github.com/marinasundstrom/neoclr/blob/main/docs/declaration-modules.md).
+
 ## Unmanaged pointer signatures (development, 2026-10-07)
 
 `SignatureType.PointerTo(elementType)` creates an immutable unmanaged pointer signature.

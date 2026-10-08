@@ -1364,3 +1364,7 @@ System.Runtime.dll owners, summaries, generic interfaces and member links. The
 normal publishing path still uses the checked bridge snapshot until the wider
 native documentation migration is qualified. See the explicit native audit preview
 procedure above; no deployment is implied by local website validation.
+
+2026-10-09: logical declaration-module host APIs are covered in the
+[manual metadata reference](experimental-metadata.md#declaration-modules-development-2026-10-09).
+They do not change guest ModuleInfo or require a new guest reference snapshot.

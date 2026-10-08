@@ -118,6 +118,7 @@ public sealed partial class NativeAssemblyDefinition
                 return new ExplicitInterfaceImplementation(relationship, mapping.Name);
             }));
         result.MainModule.SetConstants(assemblyConstants);
+        result.DeclaredModuleNames = declarationModuleNames;
         return result;
     }
 }

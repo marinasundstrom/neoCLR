@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Author-directed module foundation (2026-10-09):** implement logical modules as
+declaration containers, retaining assembly deployment identity. The
+[module contract](declaration-modules.md) records the format/API foundation and
+remaining compiler, guest-runtime and access-policy boundaries. This explicitly
+advances the earlier exploration without adopting the entire proposal.
+
 **Author-directed API organization (2026-10-09):** group date/time values, clocks,
 calendars and timezone APIs under `System.Time`; rename the old `Time` value to
 `TimeOfDay`. This is an implemented development identity migration, with unchanged

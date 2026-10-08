@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Add the native declaration-module foundation: a versioned manifest table,
+  scoped authoring and reader/discovery APIs, explicit assembly ownership, empty
+  modules and validation in the runtime. Older metadata exposes marked namespace
+  projections; older readers reject the new field. Physical metadata modules and
+  guest RuntimeContext remain unchanged; module-private access is not implemented.
+
 - Preserve the selected native API preview across ordinary local website rebuilds.
   Apply and validate it before replacing the served website; fail without replacing
   the visible site when the selected audit is missing or fails validation. Selection
