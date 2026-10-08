@@ -118,9 +118,16 @@ an advantage over it; useful comparisons require equivalent behavior and measure
   requirement. A standalone output image does not by itself establish that build-path
   qualification. A [reduced core probe](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-core-bootstrap/README.md)
   now compiles through the explicit native-only compiler and reference-catalog APIs,
-  calls a separate native library and returns the same result interpreted and native. The complete runtime-library and driver/editor path still
-  requires migration.
+  calls a separate native library and returns the same result interpreted and native.
+  The explicit compiler-driver path now passes too. Complete runtime-library and
+  project/editor integration still require migration.
   This is not a general-purpose publishing command for every neoCLR app.
+- **API reference:** RavenDoc now has an explicit native metadata loader that uses its
+  existing reference renderer. Checked coverage includes documentation comments,
+  overloads, generics, inherited and extension members, navigation, search and
+  cross-library links. The website retains its complete current reference while the
+  production native bundle is qualified; native loader support alone does not establish
+  full library coverage.
 - **Library coverage:** Hello World, unions, console/text operations and selected routing
   paths work, along with the tested HTTP accept/read/write and task-completion path.
   Broader generics, library coverage and sustained server behavior still need qualification.

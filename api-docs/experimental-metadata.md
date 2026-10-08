@@ -7836,14 +7836,14 @@ Older readers reject the extension. Ordinary CLI reads expose no native constant
 standalone CLI writing/projection explicitly rejects a graph containing them.
 The nonauthoritative CLI envelope accompanying a native PE does not project these
 constants; native readers must use #Neo. No native execution or guest reflection API
-is implied by this descriptive metadata. See [Math contracts](../docs/math.md).
+is implied by this descriptive metadata. See [Math contracts](https://github.com/marinasundstrom/neoCLR/blob/main/docs/math.md).
 
 **Terminology correction (2026-10-08):** this unreleased API is now
 AssemblyConstantDefinition / AddConstant / Constants, and its manifest key is
 `assemblies[].constants`. Rebuild consumers and artifacts from the preceding same-day
 prototype; the former names/key are not compatibility aliases. Namespace remains
 part of the member name. Types and functions can also be assembly-level members;
-see [the naming contract](../docs/design/extended-cli-metadata.md#assembly-level-members-and-qualified-names-2026-10-08).
+see [the naming contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/extended-cli-metadata.md#assembly-level-members-and-qualified-names-2026-10-08).
 
 ## Assembly-level member model (development, 2026-10-08)
 
@@ -7901,7 +7901,7 @@ emitting a native PE/#Neo reference container through the builder overloads of
 `System.Runtime.CompilerServices.ReferenceAssemblyAttribute` for its reference marker.
 Callable carriers and Self signatures require their corresponding local declarations
 when used. The marker's parameterless constructor and valid base chain should be
-provided as in the [tested producer](../docs/experiments/native-core-bootstrap/Program.cs).
+provided as in the [tested producer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-core-bootstrap/Program.cs).
 
 Physical core references use local TypeDef handles, not an AssemblyRef to the output.
 Missing referenced local declarations or an absent native Object root raise
@@ -7911,4 +7911,4 @@ references colliding with output identity still reject. This is producer support
 not a complete core profile validator, compiler bootstrap or executable CLI core.
 Raven's opt-in compiler API native-only consumer now emits and executes integer arithmetic;
 full source-library/core qualification remains pending. See the
-[frontier and validation](../docs/experiments/native-core-bootstrap/README.md).
+[frontier and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-core-bootstrap/README.md).

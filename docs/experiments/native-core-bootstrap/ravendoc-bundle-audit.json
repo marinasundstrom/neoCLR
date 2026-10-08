@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-08",
+  "scope": "Existing split bundle admission into the explicit native-only RavenDoc loader; not a coverage count.",
+  "command": [
+    "dotnet",
+    "/Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net10.0/RavenDoc.dll",
+    "/tmp/native-math-bundle1008b/System.Runtime.dll",
+    "--native-core-reference",
+    "/tmp/native-math-bundle1008b/Core.dll",
+    "-o",
+    "/tmp/native-doc-bundle-audit1008/site"
+  ],
+  "exitCode": 1,
+  "stdout": "",
+  "stderr": "RavenDoc failed: System.IO.InvalidDataException: expected extended artifact; marker and #Neo missing\n   at NeoCLR.Metadata.Experimental.MetadataArtifactReader.ReadEnvelope(ReadOnlySpan`1 image, Boolean expectedExtended, Int32 maxImageSize) in /Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/MetadataArtifactReader.cs:line 85\n   at NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.Read(ReadOnlySpan`1 image) in /Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/RuntimeAssemblyContainer.cs:line 149\n   at Raven.CodeAnalysis.NeoClr.NeoClrReferenceCatalog.ReadNative(String corePath, IEnumerable`1 nativeReferencePaths) in /Users/robert/Projects/Raven/src/Raven.CodeAnalysis.NeoClr/NeoClrReferenceCatalog.cs:line 117\n   at NativeDocumentationInput.Generate(IReadOnlyList`1 inputs, String output, String corePath, IReadOnlyList`1 dependencies, DocumentationSiteOptions options) in /Users/robert/Projects/Raven/src/RavenDoc/NativeDocumentationInput.cs:line 24\n   at RavenDocCommand.GenerateFromAssemblies(IReadOnlyList`1 assemblyPaths, String outputPath, String targetFramework, DocumentationSiteOptions siteOptions, String nativeCoreReference, IReadOnlyList`1 referencePaths) in /Users/robert/Projects/Raven/src/RavenDoc/Program.cs:line 154\n   at RavenDocCommand.GenerateFromAssembly(String assemblyPath, String outputPath, String targetFramework, DocumentationSiteOptions siteOptions, String nativeCoreReference, IReadOnlyList`1 referencePaths) in /Users/robert/Projects/Raven/src/RavenDoc/Program.cs:line 142\n   at RavenDocCommand.Run(String[] args) in /Users/robert/Projects/Raven/src/RavenDoc/Program.cs:line 55\n",
+  "outputCreated": false,
+  "sha256": {
+    "/tmp/native-math-bundle1008b/Core.dll": "c6323692f045acdad6a8391661f819ba7cd76e0206935b90ee59c3e5c597aac8",
+    "/tmp/native-math-bundle1008b/bundle.json": "f0d97e2154e2000864686d1cf9db1bd2dfea7b64ed4dd8319673e2ae75f63315",
+    "/tmp/native-math-bundle1008b/System.Runtime.dll": "b771d6df9fd4d66c32e7f414bdaaab0029f656127100124f0b817b37b8a70d3a"
+  },
+  "websiteValidation": {
+    "command": "python3 scripts/build-website.py",
+    "pages": 1828,
+    "result": "PASS API coverage, local links and anchors",
+    "tests": "18 test_build_website.py tests passed",
+    "inputs": "Existing complete CLI documentation reference retained; native bundle not substituted."
+  }
+}

@@ -345,6 +345,9 @@ is not full bootstrap qualification or a replacement for the application/editor 
 Author-directed RavenDoc loader work now reuses the native catalog and existing full
 renderer, with [focused reference coverage](experiments/native-core-bootstrap/ravendoc-validation.json).
 The actual documentation bundle still requires migration and a public-API inventory check.
+An [admission audit](experiments/native-core-bootstrap/ravendoc-bundle-audit.json)
+confirms that the existing split bundle’s CLI core rejects on the native-only loader.
+Produce the matching native core and rebuild those libraries before switching the website.
 Compiler host tooling and compiler self-hosting are separate scope questions; this
 clarification specifically concerns the compiler target and emitted execution path.
 The HTTP native image already needs no installed .NET runtime, but that deployment

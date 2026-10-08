@@ -13,6 +13,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   member signatures, generics, inheritance/extensions, source/API content, search and
   cross-library links. Preserve the current complete website reference until the
   production bundle has matching coverage; no CoreProbe relabeling or reduced replacement.
+  Audit the existing split bundle: its CLI core correctly rejects on the native-only
+  loader. Update the native-compilation page with driver and documentation progress.
+  Fix metadata-reference links to repository design notes and experiments so the
+  complete website passes local-link validation and can be previewed (1,828 pages;
+  18 website tests).
 
 - Exercise Raven's explicit native-only metadata mode with an authored native core:
   compile an integer consumer without CLI semantic references and run it interpreted

@@ -1314,3 +1314,16 @@ route/coverage checks and ordinary .NET documentation as controls. The earlier e
 release deferral remains recorded; this follow-up confirms the desired outcome without
 selecting a renderer rewrite or silently establishing a new release gate. Existing
 reference snapshots and truthful owner labels remain until the input migration works.
+
+
+### Full-bundle loader admission (2026-10-08)
+
+The existing split bundle `native-math-bundle1008b` still selects `Core.dll` through
+RavenNeoClrCoreReference. Feeding that core to the explicit native-only RavenDoc loader
+rejects because it has no native payload, before any site is written. This is a producer/
+bundle migration requirement, not permission to silently use a CLI projection or remove
+public APIs. [Exact inputs and result](../docs/experiments/native-core-bootstrap/ravendoc-bundle-audit.json).
+The separate native-core fixture already qualifies the loader and renderer; it cannot
+stand in for production Runtime/Data/Networking/Web coverage. Next produce a matching
+native core and rebuild those libraries, then compare public types/members, documentation
+and routes before switching website inputs.
