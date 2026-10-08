@@ -824,3 +824,28 @@ libSystem dynamically linked. It reuses the successful fresh compilation from ru
 with matching source/producer hashes; run 2 raises the interpreter instruction budget
 to test the actual line-limit result. Default-limit and consecutive-read coverage
 remain the next slice.
+
+## Consecutive Console reads (2026-10-08)
+
+The [session sample](console-session.rvn) exercises the default `ReadLine()` overload,
+explicit invalid/excessive byte limits, `Console.In.ReadLine`, and `TextReader.Close`.
+It reads three lines through separate wrappers, verifies the closed wrapper returns
+`TextReadError.Closed`, and continues reading through Console afterward. The ordinary
+library owns these semantics; this slice adds executable coverage, not new bindings.
+Nested `let Error(TextReadError.Case) else` and `if let Some(...)` patterns compile.
+
+[Validation](console-session-validation.json) covers six input streams: three normal
+lines, Unicode/CRLF/final unterminated input, empty lines, immediate EOF, early EOF,
+and invalid UTF-8. Every stdout/stderr/exit matches the interpreter, including the
+prompt's broken-pipe user fault. The executable still runs alone with an empty
+environment and only libSystem dynamically linked. The explicit ten-million-instruction
+interpreter budget remains part of the recorded command.
+
+The pinned producer returned missing-Console-member diagnostics for source-path runs
+1–4. A byte-identical copy under `/tmp` compiled successfully; the [observed producer
+command and hashes](console-session-producer.json) are preserved and run 5 reuses that
+artifact after source/producer hash checks. A single-processor attempt did not remove
+the diagnostics. The cause remains unresolved: this is producer evidence, not a claim
+that source relocation fixes the compiler. Default and bounded line input now have
+standalone coverage. The remaining object WriteLine path needs virtual Object display
+and, for its fallback implementation, runtime type metadata.

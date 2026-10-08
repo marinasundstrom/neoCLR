@@ -275,7 +275,9 @@ union-case boxing now supports ordinary EncoderState.HasValue with preserved ide
 Verified nominal byte-array views now complete the ordinary Console.Write and
 standard-error text-writer path, including UTF-8/NUL and broken-pipe fault parity.
 The ordinary ReadLine graph now compiles with strict UTF-8 decoding and bounded
-nested Result/Option storage; standalone validation covers ten input cases and exact output-fault parity. An explicit failure binding now preserves
+nested Result/Option storage; standalone validation covers ten input cases and exact output-fault parity. A second
+session validates default/consecutive reads, typed errors and non-owning reader close.
+Object WriteLine still needs virtual display and default type metadata. An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked
 renderer and standalone exit-1 failure app are validated. Interpreter CLI execution

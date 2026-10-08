@@ -131,6 +131,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   matching 256-byte call results and 264-byte object allocation; retain 128 types
   and 16 direct fields. Validate decoder parity and storage/selection boundaries,
   plus ten standalone reader inputs and exact broken-pipe fault/exit parity.
+  Validate default and consecutive Console line reads, typed range/closed errors
+  and non-owning reader close behavior with six standalone session inputs. Preserve
+  successful producer command/hash evidence and report unresolved source-path
+  missing-member diagnostics separately.
 
 ### 2026-10-07
 

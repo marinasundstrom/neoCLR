@@ -137,7 +137,9 @@ interpreter/native output and broken-pipe user-fault parity. Console.ReadLine no
 decoding. Its measured 268-function/110-type/73-clone graph extends bounded selection
 to 512 functions/128 clones and nested values to 32 lanes, with matching call and
 object storage. Standalone line-input validation covers ten input cases and exact output-fault
-parity. Default-limit and consecutive-read coverage is next. The author adds a console-input sample after unions, exercising input and
+parity. A second standalone session covers default/consecutive reads, typed range/closed
+errors and non-owning wrapper close behavior. Object WriteLine remains dependent
+on virtual display and default type metadata. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.
 The author also raises reference counting for initial native reference types.

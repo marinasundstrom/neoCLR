@@ -1,0 +1,44 @@
+import System.*
+import System.IO.TextReadError
+import System.Result.*
+import System.Option.*
+
+func Main() -> int {
+    System.Console.Write("Lines: ")
+    let Error(TextReadError.InvalidRange) = System.Console.ReadLine(-1) else {
+        return 2
+    }
+    let Error(TextReadError.LimitExceeded) = System.Console.ReadLine(65537) else {
+        return 3
+    }
+    let Ok(first) = System.Console.ReadLine() else {
+        return 4
+    }
+    if let Some(firstLine) = first {
+        System.Console.WriteLine(firstLine)
+    } else {
+        System.Console.WriteLine("EOF")
+    }
+    let reader = System.Console.In
+    let Ok(second) = reader.ReadLine(32) else {
+        return 5
+    }
+    if let Some(secondLine) = second {
+        System.Console.WriteLine(secondLine)
+    } else {
+        System.Console.WriteLine("EOF")
+    }
+    reader.Close()
+    let Error(TextReadError.Closed) = reader.ReadLine(32) else {
+        return 6
+    }
+    let Ok(third) = System.Console.ReadLine(32) else {
+        return 7
+    }
+    if let Some(thirdLine) = third {
+        System.Console.WriteLine(thirdLine)
+    } else {
+        System.Console.WriteLine("EOF")
+    }
+    return 0
+}
