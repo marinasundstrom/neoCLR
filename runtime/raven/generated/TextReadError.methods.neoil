@@ -2,7 +2,7 @@
 .type System.IO.TextReadError
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
-.implements System.Runtime.CompilerServices.IUnion
+.implements System.Runtime.CompilerServices.UnionValue
 .field private Metadata_V1_3C5461673E Byte
 .field private Metadata_V1_3C496E76616C6964506174685061796C6F61643E System.IO.TextReadError.InvalidPath
 .field private Metadata_V1_3C4E6F74466F756E645061796C6F61643E System.IO.TextReadError.NotFound
@@ -130,6 +130,19 @@ ret
 .local System.IO.TextReadError.IoFailure unionDefault1_10
 .local System.IO.TextReadError.InvalidUtf8 unionDefault1_11
 .local System.IO.TextReadError.InvalidEncoding unionDefault1_12
+.local Byte unionFieldDefault4
+.local System.IO.TextReadError.InvalidPath unionFieldDefault7
+.local System.IO.TextReadError.NotFound unionFieldDefault10
+.local System.IO.TextReadError.AccessDenied unionFieldDefault13
+.local System.IO.TextReadError.WrongKind unionFieldDefault16
+.local System.IO.TextReadError.AlreadyExists unionFieldDefault19
+.local System.IO.TextReadError.Closed unionFieldDefault22
+.local System.IO.TextReadError.InvalidRange unionFieldDefault25
+.local System.IO.TextReadError.LimitExceeded unionFieldDefault28
+.local System.IO.TextReadError.WrongAccess unionFieldDefault31
+.local System.IO.TextReadError.IoFailure unionFieldDefault34
+.local System.IO.TextReadError.InvalidUtf8 unionFieldDefault37
+.local System.IO.TextReadError.InvalidEncoding unionFieldDefault40
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -217,67 +230,197 @@ ldloc unionDefault1_12
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
 M00000002_IL_0007:
-ldc.i4 1
-M00000002_IL_0008:
-stloc local0
-M00000002_IL_0009:
 ldarg 0
-M00000002_IL_000a:
-ldloc local0
-M00000002_IL_000b:
-conv.u1
-M00000002_IL_000c:
+M00000002_IL_0008:
+M00000002_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.IO.TextReadError::Metadata_V1_3C5461673E
 pop
-M00000002_IL_0011:
-ldarg 1
-M00000002_IL_0012:
-stloc local1
 M00000002_IL_0013:
 ldarg 0
 M00000002_IL_0014:
-ldloc local1
-M00000002_IL_0015:
+M00000002_IL_0019:
+ldloca unionFieldDefault7
+initobj System.IO.TextReadError.InvalidPath
+ldloc unionFieldDefault7
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
 pop
-M00000002_IL_001a:
+M00000002_IL_001f:
+ldarg 0
+M00000002_IL_0020:
+M00000002_IL_0025:
+ldloca unionFieldDefault10
+initobj System.IO.TextReadError.NotFound
+ldloc unionFieldDefault10
+stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000002_IL_002b:
+ldarg 0
+M00000002_IL_002c:
+M00000002_IL_0031:
+ldloca unionFieldDefault13
+initobj System.IO.TextReadError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000002_IL_0037:
+ldarg 0
+M00000002_IL_0038:
+M00000002_IL_003d:
+ldloca unionFieldDefault16
+initobj System.IO.TextReadError.WrongKind
+ldloc unionFieldDefault16
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000002_IL_0043:
+ldarg 0
+M00000002_IL_0044:
+M00000002_IL_0049:
+ldloca unionFieldDefault19
+initobj System.IO.TextReadError.AlreadyExists
+ldloc unionFieldDefault19
+stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M00000002_IL_004f:
+ldarg 0
+M00000002_IL_0050:
+M00000002_IL_0055:
+ldloca unionFieldDefault22
+initobj System.IO.TextReadError.Closed
+ldloc unionFieldDefault22
+stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M00000002_IL_005b:
+ldarg 0
+M00000002_IL_005c:
+M00000002_IL_0061:
+ldloca unionFieldDefault25
+initobj System.IO.TextReadError.InvalidRange
+ldloc unionFieldDefault25
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000002_IL_0067:
+ldarg 0
+M00000002_IL_0068:
+M00000002_IL_006d:
+ldloca unionFieldDefault28
+initobj System.IO.TextReadError.LimitExceeded
+ldloc unionFieldDefault28
+stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000002_IL_0073:
+ldarg 0
+M00000002_IL_0074:
+M00000002_IL_0079:
+ldloca unionFieldDefault31
+initobj System.IO.TextReadError.WrongAccess
+ldloc unionFieldDefault31
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M00000002_IL_007f:
+ldarg 0
+M00000002_IL_0080:
+M00000002_IL_0085:
+ldloca unionFieldDefault34
+initobj System.IO.TextReadError.IoFailure
+ldloc unionFieldDefault34
+stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000002_IL_008b:
+ldarg 0
+M00000002_IL_008c:
+M00000002_IL_0091:
+ldloca unionFieldDefault37
+initobj System.IO.TextReadError.InvalidUtf8
+ldloc unionFieldDefault37
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000002_IL_0097:
+ldarg 0
+M00000002_IL_0098:
+M00000002_IL_009d:
+ldloca unionFieldDefault40
+initobj System.IO.TextReadError.InvalidEncoding
+ldloc unionFieldDefault40
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+pop
+M00000002_IL_00a3:
+ldc.i4 1
+M00000002_IL_00a4:
+stloc local0
+M00000002_IL_00a5:
+ldarg 0
+M00000002_IL_00a6:
+ldloc local0
+M00000002_IL_00a7:
+conv.u1
+M00000002_IL_00a8:
+stfld System.IO.TextReadError::Metadata_V1_3C5461673E
+pop
+M00000002_IL_00ad:
+ldarg 1
+M00000002_IL_00ae:
+stloc local1
+M00000002_IL_00af:
+ldarg 0
+M00000002_IL_00b0:
+ldloc local1
+M00000002_IL_00b1:
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000002_IL_00b6:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.IO.TextReadError.InvalidPath& value) -> Boolean
+.local System.IO.TextReadError.InvalidPath local0
+ldloca local0
+initobj System.IO.TextReadError.InvalidPath
 M00000003_IL_0000:
-ldarg 0
+ldarg 1
 M00000003_IL_0001:
-ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
-M00000003_IL_0006:
-conv.i4
-M00000003_IL_0007:
-ldc.i4 1
-M00000003_IL_0008:
-conv.i4
+ldloca local0
+M00000003_IL_0003:
+initobj System.IO.TextReadError.InvalidPath
 M00000003_IL_0009:
+ldloc local0
+M00000003_IL_000a:
+stobj System.IO.TextReadError.InvalidPath
+M00000003_IL_000f:
+ldarg 0
+M00000003_IL_0010:
+ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
+M00000003_IL_0015:
+conv.i4
+M00000003_IL_0016:
+ldc.i4 1
+M00000003_IL_0017:
+conv.i4
+M00000003_IL_0018:
 ceq
 call neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean)
-M00000003_IL_000b:
-brtrue M00000003_IL_0015
-M00000003_IL_0010:
-br M00000003_IL_0023
-M00000003_IL_0015:
-ldarg 1
-M00000003_IL_0016:
-ldarg 0
-M00000003_IL_0017:
-ldfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
-M00000003_IL_001c:
-stobj System.IO.TextReadError.InvalidPath
-M00000003_IL_0021:
-ldc.bool true
-M00000003_IL_0022:
-ret
-M00000003_IL_0023:
+M00000003_IL_001a:
+brtrue M00000003_IL_0024
+M00000003_IL_001f:
+br M00000003_IL_0032
 M00000003_IL_0024:
-ldc.bool false
+ldarg 1
 M00000003_IL_0025:
+ldarg 0
+M00000003_IL_0026:
+ldfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+M00000003_IL_002b:
+stobj System.IO.TextReadError.InvalidPath
+M00000003_IL_0030:
+ldc.bool true
+M00000003_IL_0031:
+ret
+M00000003_IL_0032:
+M00000003_IL_0033:
+ldc.bool false
+M00000003_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.IO.TextReadError.NotFound value) -> Void
@@ -296,6 +439,19 @@ ret
 .local System.IO.TextReadError.IoFailure unionDefault1_10
 .local System.IO.TextReadError.InvalidUtf8 unionDefault1_11
 .local System.IO.TextReadError.InvalidEncoding unionDefault1_12
+.local Byte unionFieldDefault4
+.local System.IO.TextReadError.InvalidPath unionFieldDefault7
+.local System.IO.TextReadError.NotFound unionFieldDefault10
+.local System.IO.TextReadError.AccessDenied unionFieldDefault13
+.local System.IO.TextReadError.WrongKind unionFieldDefault16
+.local System.IO.TextReadError.AlreadyExists unionFieldDefault19
+.local System.IO.TextReadError.Closed unionFieldDefault22
+.local System.IO.TextReadError.InvalidRange unionFieldDefault25
+.local System.IO.TextReadError.LimitExceeded unionFieldDefault28
+.local System.IO.TextReadError.WrongAccess unionFieldDefault31
+.local System.IO.TextReadError.IoFailure unionFieldDefault34
+.local System.IO.TextReadError.InvalidUtf8 unionFieldDefault37
+.local System.IO.TextReadError.InvalidEncoding unionFieldDefault40
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -383,67 +539,197 @@ ldloc unionDefault1_12
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
 M00000004_IL_0007:
-ldc.i4 2
-M00000004_IL_0008:
-stloc local0
-M00000004_IL_0009:
 ldarg 0
-M00000004_IL_000a:
-ldloc local0
-M00000004_IL_000b:
-conv.u1
-M00000004_IL_000c:
+M00000004_IL_0008:
+M00000004_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.IO.TextReadError::Metadata_V1_3C5461673E
 pop
-M00000004_IL_0011:
-ldarg 1
-M00000004_IL_0012:
-stloc local1
 M00000004_IL_0013:
 ldarg 0
 M00000004_IL_0014:
-ldloc local1
-M00000004_IL_0015:
+M00000004_IL_0019:
+ldloca unionFieldDefault7
+initobj System.IO.TextReadError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000004_IL_001f:
+ldarg 0
+M00000004_IL_0020:
+M00000004_IL_0025:
+ldloca unionFieldDefault10
+initobj System.IO.TextReadError.NotFound
+ldloc unionFieldDefault10
 stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
 pop
-M00000004_IL_001a:
+M00000004_IL_002b:
+ldarg 0
+M00000004_IL_002c:
+M00000004_IL_0031:
+ldloca unionFieldDefault13
+initobj System.IO.TextReadError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000004_IL_0037:
+ldarg 0
+M00000004_IL_0038:
+M00000004_IL_003d:
+ldloca unionFieldDefault16
+initobj System.IO.TextReadError.WrongKind
+ldloc unionFieldDefault16
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000004_IL_0043:
+ldarg 0
+M00000004_IL_0044:
+M00000004_IL_0049:
+ldloca unionFieldDefault19
+initobj System.IO.TextReadError.AlreadyExists
+ldloc unionFieldDefault19
+stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M00000004_IL_004f:
+ldarg 0
+M00000004_IL_0050:
+M00000004_IL_0055:
+ldloca unionFieldDefault22
+initobj System.IO.TextReadError.Closed
+ldloc unionFieldDefault22
+stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M00000004_IL_005b:
+ldarg 0
+M00000004_IL_005c:
+M00000004_IL_0061:
+ldloca unionFieldDefault25
+initobj System.IO.TextReadError.InvalidRange
+ldloc unionFieldDefault25
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000004_IL_0067:
+ldarg 0
+M00000004_IL_0068:
+M00000004_IL_006d:
+ldloca unionFieldDefault28
+initobj System.IO.TextReadError.LimitExceeded
+ldloc unionFieldDefault28
+stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000004_IL_0073:
+ldarg 0
+M00000004_IL_0074:
+M00000004_IL_0079:
+ldloca unionFieldDefault31
+initobj System.IO.TextReadError.WrongAccess
+ldloc unionFieldDefault31
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M00000004_IL_007f:
+ldarg 0
+M00000004_IL_0080:
+M00000004_IL_0085:
+ldloca unionFieldDefault34
+initobj System.IO.TextReadError.IoFailure
+ldloc unionFieldDefault34
+stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000004_IL_008b:
+ldarg 0
+M00000004_IL_008c:
+M00000004_IL_0091:
+ldloca unionFieldDefault37
+initobj System.IO.TextReadError.InvalidUtf8
+ldloc unionFieldDefault37
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000004_IL_0097:
+ldarg 0
+M00000004_IL_0098:
+M00000004_IL_009d:
+ldloca unionFieldDefault40
+initobj System.IO.TextReadError.InvalidEncoding
+ldloc unionFieldDefault40
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+pop
+M00000004_IL_00a3:
+ldc.i4 2
+M00000004_IL_00a4:
+stloc local0
+M00000004_IL_00a5:
+ldarg 0
+M00000004_IL_00a6:
+ldloc local0
+M00000004_IL_00a7:
+conv.u1
+M00000004_IL_00a8:
+stfld System.IO.TextReadError::Metadata_V1_3C5461673E
+pop
+M00000004_IL_00ad:
+ldarg 1
+M00000004_IL_00ae:
+stloc local1
+M00000004_IL_00af:
+ldarg 0
+M00000004_IL_00b0:
+ldloc local1
+M00000004_IL_00b1:
+stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000004_IL_00b6:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.IO.TextReadError.NotFound& value) -> Boolean
+.local System.IO.TextReadError.NotFound local0
+ldloca local0
+initobj System.IO.TextReadError.NotFound
 M00000005_IL_0000:
-ldarg 0
+ldarg 1
 M00000005_IL_0001:
-ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
-M00000005_IL_0006:
-conv.i4
-M00000005_IL_0007:
-ldc.i4 2
-M00000005_IL_0008:
-conv.i4
+ldloca local0
+M00000005_IL_0003:
+initobj System.IO.TextReadError.NotFound
 M00000005_IL_0009:
+ldloc local0
+M00000005_IL_000a:
+stobj System.IO.TextReadError.NotFound
+M00000005_IL_000f:
+ldarg 0
+M00000005_IL_0010:
+ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
+M00000005_IL_0015:
+conv.i4
+M00000005_IL_0016:
+ldc.i4 2
+M00000005_IL_0017:
+conv.i4
+M00000005_IL_0018:
 ceq
 call neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_000b:
-brtrue M00000005_IL_0015
-M00000005_IL_0010:
-br M00000005_IL_0023
-M00000005_IL_0015:
-ldarg 1
-M00000005_IL_0016:
-ldarg 0
-M00000005_IL_0017:
-ldfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
-M00000005_IL_001c:
-stobj System.IO.TextReadError.NotFound
-M00000005_IL_0021:
-ldc.bool true
-M00000005_IL_0022:
-ret
-M00000005_IL_0023:
+M00000005_IL_001a:
+brtrue M00000005_IL_0024
+M00000005_IL_001f:
+br M00000005_IL_0032
 M00000005_IL_0024:
-ldc.bool false
+ldarg 1
 M00000005_IL_0025:
+ldarg 0
+M00000005_IL_0026:
+ldfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+M00000005_IL_002b:
+stobj System.IO.TextReadError.NotFound
+M00000005_IL_0030:
+ldc.bool true
+M00000005_IL_0031:
+ret
+M00000005_IL_0032:
+M00000005_IL_0033:
+ldc.bool false
+M00000005_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.IO.TextReadError.AccessDenied value) -> Void
@@ -462,6 +748,19 @@ ret
 .local System.IO.TextReadError.IoFailure unionDefault1_10
 .local System.IO.TextReadError.InvalidUtf8 unionDefault1_11
 .local System.IO.TextReadError.InvalidEncoding unionDefault1_12
+.local Byte unionFieldDefault4
+.local System.IO.TextReadError.InvalidPath unionFieldDefault7
+.local System.IO.TextReadError.NotFound unionFieldDefault10
+.local System.IO.TextReadError.AccessDenied unionFieldDefault13
+.local System.IO.TextReadError.WrongKind unionFieldDefault16
+.local System.IO.TextReadError.AlreadyExists unionFieldDefault19
+.local System.IO.TextReadError.Closed unionFieldDefault22
+.local System.IO.TextReadError.InvalidRange unionFieldDefault25
+.local System.IO.TextReadError.LimitExceeded unionFieldDefault28
+.local System.IO.TextReadError.WrongAccess unionFieldDefault31
+.local System.IO.TextReadError.IoFailure unionFieldDefault34
+.local System.IO.TextReadError.InvalidUtf8 unionFieldDefault37
+.local System.IO.TextReadError.InvalidEncoding unionFieldDefault40
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -549,67 +848,197 @@ ldloc unionDefault1_12
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
 M00000006_IL_0007:
-ldc.i4 3
-M00000006_IL_0008:
-stloc local0
-M00000006_IL_0009:
 ldarg 0
-M00000006_IL_000a:
-ldloc local0
-M00000006_IL_000b:
-conv.u1
-M00000006_IL_000c:
+M00000006_IL_0008:
+M00000006_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.IO.TextReadError::Metadata_V1_3C5461673E
 pop
-M00000006_IL_0011:
-ldarg 1
-M00000006_IL_0012:
-stloc local1
 M00000006_IL_0013:
 ldarg 0
 M00000006_IL_0014:
-ldloc local1
-M00000006_IL_0015:
+M00000006_IL_0019:
+ldloca unionFieldDefault7
+initobj System.IO.TextReadError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000006_IL_001f:
+ldarg 0
+M00000006_IL_0020:
+M00000006_IL_0025:
+ldloca unionFieldDefault10
+initobj System.IO.TextReadError.NotFound
+ldloc unionFieldDefault10
+stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000006_IL_002b:
+ldarg 0
+M00000006_IL_002c:
+M00000006_IL_0031:
+ldloca unionFieldDefault13
+initobj System.IO.TextReadError.AccessDenied
+ldloc unionFieldDefault13
 stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
 pop
-M00000006_IL_001a:
+M00000006_IL_0037:
+ldarg 0
+M00000006_IL_0038:
+M00000006_IL_003d:
+ldloca unionFieldDefault16
+initobj System.IO.TextReadError.WrongKind
+ldloc unionFieldDefault16
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000006_IL_0043:
+ldarg 0
+M00000006_IL_0044:
+M00000006_IL_0049:
+ldloca unionFieldDefault19
+initobj System.IO.TextReadError.AlreadyExists
+ldloc unionFieldDefault19
+stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M00000006_IL_004f:
+ldarg 0
+M00000006_IL_0050:
+M00000006_IL_0055:
+ldloca unionFieldDefault22
+initobj System.IO.TextReadError.Closed
+ldloc unionFieldDefault22
+stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M00000006_IL_005b:
+ldarg 0
+M00000006_IL_005c:
+M00000006_IL_0061:
+ldloca unionFieldDefault25
+initobj System.IO.TextReadError.InvalidRange
+ldloc unionFieldDefault25
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000006_IL_0067:
+ldarg 0
+M00000006_IL_0068:
+M00000006_IL_006d:
+ldloca unionFieldDefault28
+initobj System.IO.TextReadError.LimitExceeded
+ldloc unionFieldDefault28
+stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000006_IL_0073:
+ldarg 0
+M00000006_IL_0074:
+M00000006_IL_0079:
+ldloca unionFieldDefault31
+initobj System.IO.TextReadError.WrongAccess
+ldloc unionFieldDefault31
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M00000006_IL_007f:
+ldarg 0
+M00000006_IL_0080:
+M00000006_IL_0085:
+ldloca unionFieldDefault34
+initobj System.IO.TextReadError.IoFailure
+ldloc unionFieldDefault34
+stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000006_IL_008b:
+ldarg 0
+M00000006_IL_008c:
+M00000006_IL_0091:
+ldloca unionFieldDefault37
+initobj System.IO.TextReadError.InvalidUtf8
+ldloc unionFieldDefault37
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000006_IL_0097:
+ldarg 0
+M00000006_IL_0098:
+M00000006_IL_009d:
+ldloca unionFieldDefault40
+initobj System.IO.TextReadError.InvalidEncoding
+ldloc unionFieldDefault40
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+pop
+M00000006_IL_00a3:
+ldc.i4 3
+M00000006_IL_00a4:
+stloc local0
+M00000006_IL_00a5:
+ldarg 0
+M00000006_IL_00a6:
+ldloc local0
+M00000006_IL_00a7:
+conv.u1
+M00000006_IL_00a8:
+stfld System.IO.TextReadError::Metadata_V1_3C5461673E
+pop
+M00000006_IL_00ad:
+ldarg 1
+M00000006_IL_00ae:
+stloc local1
+M00000006_IL_00af:
+ldarg 0
+M00000006_IL_00b0:
+ldloc local1
+M00000006_IL_00b1:
+stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000006_IL_00b6:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.IO.TextReadError.AccessDenied& value) -> Boolean
+.local System.IO.TextReadError.AccessDenied local0
+ldloca local0
+initobj System.IO.TextReadError.AccessDenied
 M00000007_IL_0000:
-ldarg 0
+ldarg 1
 M00000007_IL_0001:
-ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
-M00000007_IL_0006:
-conv.i4
-M00000007_IL_0007:
-ldc.i4 3
-M00000007_IL_0008:
-conv.i4
+ldloca local0
+M00000007_IL_0003:
+initobj System.IO.TextReadError.AccessDenied
 M00000007_IL_0009:
+ldloc local0
+M00000007_IL_000a:
+stobj System.IO.TextReadError.AccessDenied
+M00000007_IL_000f:
+ldarg 0
+M00000007_IL_0010:
+ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
+M00000007_IL_0015:
+conv.i4
+M00000007_IL_0016:
+ldc.i4 3
+M00000007_IL_0017:
+conv.i4
+M00000007_IL_0018:
 ceq
 call neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_000b:
-brtrue M00000007_IL_0015
-M00000007_IL_0010:
-br M00000007_IL_0023
-M00000007_IL_0015:
-ldarg 1
-M00000007_IL_0016:
-ldarg 0
-M00000007_IL_0017:
-ldfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
-M00000007_IL_001c:
-stobj System.IO.TextReadError.AccessDenied
-M00000007_IL_0021:
-ldc.bool true
-M00000007_IL_0022:
-ret
-M00000007_IL_0023:
+M00000007_IL_001a:
+brtrue M00000007_IL_0024
+M00000007_IL_001f:
+br M00000007_IL_0032
 M00000007_IL_0024:
-ldc.bool false
+ldarg 1
 M00000007_IL_0025:
+ldarg 0
+M00000007_IL_0026:
+ldfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+M00000007_IL_002b:
+stobj System.IO.TextReadError.AccessDenied
+M00000007_IL_0030:
+ldc.bool true
+M00000007_IL_0031:
+ret
+M00000007_IL_0032:
+M00000007_IL_0033:
+ldc.bool false
+M00000007_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.IO.TextReadError.WrongKind value) -> Void
@@ -628,6 +1057,19 @@ ret
 .local System.IO.TextReadError.IoFailure unionDefault1_10
 .local System.IO.TextReadError.InvalidUtf8 unionDefault1_11
 .local System.IO.TextReadError.InvalidEncoding unionDefault1_12
+.local Byte unionFieldDefault4
+.local System.IO.TextReadError.InvalidPath unionFieldDefault7
+.local System.IO.TextReadError.NotFound unionFieldDefault10
+.local System.IO.TextReadError.AccessDenied unionFieldDefault13
+.local System.IO.TextReadError.WrongKind unionFieldDefault16
+.local System.IO.TextReadError.AlreadyExists unionFieldDefault19
+.local System.IO.TextReadError.Closed unionFieldDefault22
+.local System.IO.TextReadError.InvalidRange unionFieldDefault25
+.local System.IO.TextReadError.LimitExceeded unionFieldDefault28
+.local System.IO.TextReadError.WrongAccess unionFieldDefault31
+.local System.IO.TextReadError.IoFailure unionFieldDefault34
+.local System.IO.TextReadError.InvalidUtf8 unionFieldDefault37
+.local System.IO.TextReadError.InvalidEncoding unionFieldDefault40
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -715,67 +1157,197 @@ ldloc unionDefault1_12
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
 M00000008_IL_0007:
-ldc.i4 4
-M00000008_IL_0008:
-stloc local0
-M00000008_IL_0009:
 ldarg 0
-M00000008_IL_000a:
-ldloc local0
-M00000008_IL_000b:
-conv.u1
-M00000008_IL_000c:
+M00000008_IL_0008:
+M00000008_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.IO.TextReadError::Metadata_V1_3C5461673E
 pop
-M00000008_IL_0011:
-ldarg 1
-M00000008_IL_0012:
-stloc local1
 M00000008_IL_0013:
 ldarg 0
 M00000008_IL_0014:
-ldloc local1
-M00000008_IL_0015:
+M00000008_IL_0019:
+ldloca unionFieldDefault7
+initobj System.IO.TextReadError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000008_IL_001f:
+ldarg 0
+M00000008_IL_0020:
+M00000008_IL_0025:
+ldloca unionFieldDefault10
+initobj System.IO.TextReadError.NotFound
+ldloc unionFieldDefault10
+stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000008_IL_002b:
+ldarg 0
+M00000008_IL_002c:
+M00000008_IL_0031:
+ldloca unionFieldDefault13
+initobj System.IO.TextReadError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000008_IL_0037:
+ldarg 0
+M00000008_IL_0038:
+M00000008_IL_003d:
+ldloca unionFieldDefault16
+initobj System.IO.TextReadError.WrongKind
+ldloc unionFieldDefault16
 stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
 pop
-M00000008_IL_001a:
+M00000008_IL_0043:
+ldarg 0
+M00000008_IL_0044:
+M00000008_IL_0049:
+ldloca unionFieldDefault19
+initobj System.IO.TextReadError.AlreadyExists
+ldloc unionFieldDefault19
+stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M00000008_IL_004f:
+ldarg 0
+M00000008_IL_0050:
+M00000008_IL_0055:
+ldloca unionFieldDefault22
+initobj System.IO.TextReadError.Closed
+ldloc unionFieldDefault22
+stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M00000008_IL_005b:
+ldarg 0
+M00000008_IL_005c:
+M00000008_IL_0061:
+ldloca unionFieldDefault25
+initobj System.IO.TextReadError.InvalidRange
+ldloc unionFieldDefault25
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000008_IL_0067:
+ldarg 0
+M00000008_IL_0068:
+M00000008_IL_006d:
+ldloca unionFieldDefault28
+initobj System.IO.TextReadError.LimitExceeded
+ldloc unionFieldDefault28
+stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000008_IL_0073:
+ldarg 0
+M00000008_IL_0074:
+M00000008_IL_0079:
+ldloca unionFieldDefault31
+initobj System.IO.TextReadError.WrongAccess
+ldloc unionFieldDefault31
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M00000008_IL_007f:
+ldarg 0
+M00000008_IL_0080:
+M00000008_IL_0085:
+ldloca unionFieldDefault34
+initobj System.IO.TextReadError.IoFailure
+ldloc unionFieldDefault34
+stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000008_IL_008b:
+ldarg 0
+M00000008_IL_008c:
+M00000008_IL_0091:
+ldloca unionFieldDefault37
+initobj System.IO.TextReadError.InvalidUtf8
+ldloc unionFieldDefault37
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000008_IL_0097:
+ldarg 0
+M00000008_IL_0098:
+M00000008_IL_009d:
+ldloca unionFieldDefault40
+initobj System.IO.TextReadError.InvalidEncoding
+ldloc unionFieldDefault40
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+pop
+M00000008_IL_00a3:
+ldc.i4 4
+M00000008_IL_00a4:
+stloc local0
+M00000008_IL_00a5:
+ldarg 0
+M00000008_IL_00a6:
+ldloc local0
+M00000008_IL_00a7:
+conv.u1
+M00000008_IL_00a8:
+stfld System.IO.TextReadError::Metadata_V1_3C5461673E
+pop
+M00000008_IL_00ad:
+ldarg 1
+M00000008_IL_00ae:
+stloc local1
+M00000008_IL_00af:
+ldarg 0
+M00000008_IL_00b0:
+ldloc local1
+M00000008_IL_00b1:
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000008_IL_00b6:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.IO.TextReadError.WrongKind& value) -> Boolean
+.local System.IO.TextReadError.WrongKind local0
+ldloca local0
+initobj System.IO.TextReadError.WrongKind
 M00000009_IL_0000:
-ldarg 0
+ldarg 1
 M00000009_IL_0001:
-ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
-M00000009_IL_0006:
-conv.i4
-M00000009_IL_0007:
-ldc.i4 4
-M00000009_IL_0008:
-conv.i4
+ldloca local0
+M00000009_IL_0003:
+initobj System.IO.TextReadError.WrongKind
 M00000009_IL_0009:
+ldloc local0
+M00000009_IL_000a:
+stobj System.IO.TextReadError.WrongKind
+M00000009_IL_000f:
+ldarg 0
+M00000009_IL_0010:
+ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
+M00000009_IL_0015:
+conv.i4
+M00000009_IL_0016:
+ldc.i4 4
+M00000009_IL_0017:
+conv.i4
+M00000009_IL_0018:
 ceq
 call neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean)
-M00000009_IL_000b:
-brtrue M00000009_IL_0015
-M00000009_IL_0010:
-br M00000009_IL_0023
-M00000009_IL_0015:
-ldarg 1
-M00000009_IL_0016:
-ldarg 0
-M00000009_IL_0017:
-ldfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
-M00000009_IL_001c:
-stobj System.IO.TextReadError.WrongKind
-M00000009_IL_0021:
-ldc.bool true
-M00000009_IL_0022:
-ret
-M00000009_IL_0023:
+M00000009_IL_001a:
+brtrue M00000009_IL_0024
+M00000009_IL_001f:
+br M00000009_IL_0032
 M00000009_IL_0024:
-ldc.bool false
+ldarg 1
 M00000009_IL_0025:
+ldarg 0
+M00000009_IL_0026:
+ldfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+M00000009_IL_002b:
+stobj System.IO.TextReadError.WrongKind
+M00000009_IL_0030:
+ldc.bool true
+M00000009_IL_0031:
+ret
+M00000009_IL_0032:
+M00000009_IL_0033:
+ldc.bool false
+M00000009_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.IO.TextReadError.AlreadyExists value) -> Void
@@ -794,6 +1366,19 @@ ret
 .local System.IO.TextReadError.IoFailure unionDefault1_10
 .local System.IO.TextReadError.InvalidUtf8 unionDefault1_11
 .local System.IO.TextReadError.InvalidEncoding unionDefault1_12
+.local Byte unionFieldDefault4
+.local System.IO.TextReadError.InvalidPath unionFieldDefault7
+.local System.IO.TextReadError.NotFound unionFieldDefault10
+.local System.IO.TextReadError.AccessDenied unionFieldDefault13
+.local System.IO.TextReadError.WrongKind unionFieldDefault16
+.local System.IO.TextReadError.AlreadyExists unionFieldDefault19
+.local System.IO.TextReadError.Closed unionFieldDefault22
+.local System.IO.TextReadError.InvalidRange unionFieldDefault25
+.local System.IO.TextReadError.LimitExceeded unionFieldDefault28
+.local System.IO.TextReadError.WrongAccess unionFieldDefault31
+.local System.IO.TextReadError.IoFailure unionFieldDefault34
+.local System.IO.TextReadError.InvalidUtf8 unionFieldDefault37
+.local System.IO.TextReadError.InvalidEncoding unionFieldDefault40
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -881,67 +1466,197 @@ ldloc unionDefault1_12
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
 M0000000a_IL_0007:
-ldc.i4 5
-M0000000a_IL_0008:
-stloc local0
-M0000000a_IL_0009:
 ldarg 0
-M0000000a_IL_000a:
-ldloc local0
-M0000000a_IL_000b:
-conv.u1
-M0000000a_IL_000c:
+M0000000a_IL_0008:
+M0000000a_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.IO.TextReadError::Metadata_V1_3C5461673E
 pop
-M0000000a_IL_0011:
-ldarg 1
-M0000000a_IL_0012:
-stloc local1
 M0000000a_IL_0013:
 ldarg 0
 M0000000a_IL_0014:
-ldloc local1
-M0000000a_IL_0015:
+M0000000a_IL_0019:
+ldloca unionFieldDefault7
+initobj System.IO.TextReadError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M0000000a_IL_001f:
+ldarg 0
+M0000000a_IL_0020:
+M0000000a_IL_0025:
+ldloca unionFieldDefault10
+initobj System.IO.TextReadError.NotFound
+ldloc unionFieldDefault10
+stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M0000000a_IL_002b:
+ldarg 0
+M0000000a_IL_002c:
+M0000000a_IL_0031:
+ldloca unionFieldDefault13
+initobj System.IO.TextReadError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M0000000a_IL_0037:
+ldarg 0
+M0000000a_IL_0038:
+M0000000a_IL_003d:
+ldloca unionFieldDefault16
+initobj System.IO.TextReadError.WrongKind
+ldloc unionFieldDefault16
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M0000000a_IL_0043:
+ldarg 0
+M0000000a_IL_0044:
+M0000000a_IL_0049:
+ldloca unionFieldDefault19
+initobj System.IO.TextReadError.AlreadyExists
+ldloc unionFieldDefault19
 stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
 pop
-M0000000a_IL_001a:
+M0000000a_IL_004f:
+ldarg 0
+M0000000a_IL_0050:
+M0000000a_IL_0055:
+ldloca unionFieldDefault22
+initobj System.IO.TextReadError.Closed
+ldloc unionFieldDefault22
+stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M0000000a_IL_005b:
+ldarg 0
+M0000000a_IL_005c:
+M0000000a_IL_0061:
+ldloca unionFieldDefault25
+initobj System.IO.TextReadError.InvalidRange
+ldloc unionFieldDefault25
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M0000000a_IL_0067:
+ldarg 0
+M0000000a_IL_0068:
+M0000000a_IL_006d:
+ldloca unionFieldDefault28
+initobj System.IO.TextReadError.LimitExceeded
+ldloc unionFieldDefault28
+stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M0000000a_IL_0073:
+ldarg 0
+M0000000a_IL_0074:
+M0000000a_IL_0079:
+ldloca unionFieldDefault31
+initobj System.IO.TextReadError.WrongAccess
+ldloc unionFieldDefault31
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M0000000a_IL_007f:
+ldarg 0
+M0000000a_IL_0080:
+M0000000a_IL_0085:
+ldloca unionFieldDefault34
+initobj System.IO.TextReadError.IoFailure
+ldloc unionFieldDefault34
+stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M0000000a_IL_008b:
+ldarg 0
+M0000000a_IL_008c:
+M0000000a_IL_0091:
+ldloca unionFieldDefault37
+initobj System.IO.TextReadError.InvalidUtf8
+ldloc unionFieldDefault37
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M0000000a_IL_0097:
+ldarg 0
+M0000000a_IL_0098:
+M0000000a_IL_009d:
+ldloca unionFieldDefault40
+initobj System.IO.TextReadError.InvalidEncoding
+ldloc unionFieldDefault40
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+pop
+M0000000a_IL_00a3:
+ldc.i4 5
+M0000000a_IL_00a4:
+stloc local0
+M0000000a_IL_00a5:
+ldarg 0
+M0000000a_IL_00a6:
+ldloc local0
+M0000000a_IL_00a7:
+conv.u1
+M0000000a_IL_00a8:
+stfld System.IO.TextReadError::Metadata_V1_3C5461673E
+pop
+M0000000a_IL_00ad:
+ldarg 1
+M0000000a_IL_00ae:
+stloc local1
+M0000000a_IL_00af:
+ldarg 0
+M0000000a_IL_00b0:
+ldloc local1
+M0000000a_IL_00b1:
+stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M0000000a_IL_00b6:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.IO.TextReadError.AlreadyExists& value) -> Boolean
+.local System.IO.TextReadError.AlreadyExists local0
+ldloca local0
+initobj System.IO.TextReadError.AlreadyExists
 M0000000b_IL_0000:
-ldarg 0
+ldarg 1
 M0000000b_IL_0001:
-ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
-M0000000b_IL_0006:
-conv.i4
-M0000000b_IL_0007:
-ldc.i4 5
-M0000000b_IL_0008:
-conv.i4
+ldloca local0
+M0000000b_IL_0003:
+initobj System.IO.TextReadError.AlreadyExists
 M0000000b_IL_0009:
+ldloc local0
+M0000000b_IL_000a:
+stobj System.IO.TextReadError.AlreadyExists
+M0000000b_IL_000f:
+ldarg 0
+M0000000b_IL_0010:
+ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
+M0000000b_IL_0015:
+conv.i4
+M0000000b_IL_0016:
+ldc.i4 5
+M0000000b_IL_0017:
+conv.i4
+M0000000b_IL_0018:
 ceq
 call neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_000b:
-brtrue M0000000b_IL_0015
-M0000000b_IL_0010:
-br M0000000b_IL_0023
-M0000000b_IL_0015:
-ldarg 1
-M0000000b_IL_0016:
-ldarg 0
-M0000000b_IL_0017:
-ldfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
-M0000000b_IL_001c:
-stobj System.IO.TextReadError.AlreadyExists
-M0000000b_IL_0021:
-ldc.bool true
-M0000000b_IL_0022:
-ret
-M0000000b_IL_0023:
+M0000000b_IL_001a:
+brtrue M0000000b_IL_0024
+M0000000b_IL_001f:
+br M0000000b_IL_0032
 M0000000b_IL_0024:
-ldc.bool false
+ldarg 1
 M0000000b_IL_0025:
+ldarg 0
+M0000000b_IL_0026:
+ldfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+M0000000b_IL_002b:
+stobj System.IO.TextReadError.AlreadyExists
+M0000000b_IL_0030:
+ldc.bool true
+M0000000b_IL_0031:
+ret
+M0000000b_IL_0032:
+M0000000b_IL_0033:
+ldc.bool false
+M0000000b_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.IO.TextReadError.Closed value) -> Void
@@ -960,6 +1675,19 @@ ret
 .local System.IO.TextReadError.IoFailure unionDefault1_10
 .local System.IO.TextReadError.InvalidUtf8 unionDefault1_11
 .local System.IO.TextReadError.InvalidEncoding unionDefault1_12
+.local Byte unionFieldDefault4
+.local System.IO.TextReadError.InvalidPath unionFieldDefault7
+.local System.IO.TextReadError.NotFound unionFieldDefault10
+.local System.IO.TextReadError.AccessDenied unionFieldDefault13
+.local System.IO.TextReadError.WrongKind unionFieldDefault16
+.local System.IO.TextReadError.AlreadyExists unionFieldDefault19
+.local System.IO.TextReadError.Closed unionFieldDefault22
+.local System.IO.TextReadError.InvalidRange unionFieldDefault25
+.local System.IO.TextReadError.LimitExceeded unionFieldDefault28
+.local System.IO.TextReadError.WrongAccess unionFieldDefault31
+.local System.IO.TextReadError.IoFailure unionFieldDefault34
+.local System.IO.TextReadError.InvalidUtf8 unionFieldDefault37
+.local System.IO.TextReadError.InvalidEncoding unionFieldDefault40
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -1047,67 +1775,197 @@ ldloc unionDefault1_12
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
 M0000000c_IL_0007:
-ldc.i4 6
-M0000000c_IL_0008:
-stloc local0
-M0000000c_IL_0009:
 ldarg 0
-M0000000c_IL_000a:
-ldloc local0
-M0000000c_IL_000b:
-conv.u1
-M0000000c_IL_000c:
+M0000000c_IL_0008:
+M0000000c_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.IO.TextReadError::Metadata_V1_3C5461673E
 pop
-M0000000c_IL_0011:
-ldarg 1
-M0000000c_IL_0012:
-stloc local1
 M0000000c_IL_0013:
 ldarg 0
 M0000000c_IL_0014:
-ldloc local1
-M0000000c_IL_0015:
+M0000000c_IL_0019:
+ldloca unionFieldDefault7
+initobj System.IO.TextReadError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M0000000c_IL_001f:
+ldarg 0
+M0000000c_IL_0020:
+M0000000c_IL_0025:
+ldloca unionFieldDefault10
+initobj System.IO.TextReadError.NotFound
+ldloc unionFieldDefault10
+stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M0000000c_IL_002b:
+ldarg 0
+M0000000c_IL_002c:
+M0000000c_IL_0031:
+ldloca unionFieldDefault13
+initobj System.IO.TextReadError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M0000000c_IL_0037:
+ldarg 0
+M0000000c_IL_0038:
+M0000000c_IL_003d:
+ldloca unionFieldDefault16
+initobj System.IO.TextReadError.WrongKind
+ldloc unionFieldDefault16
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M0000000c_IL_0043:
+ldarg 0
+M0000000c_IL_0044:
+M0000000c_IL_0049:
+ldloca unionFieldDefault19
+initobj System.IO.TextReadError.AlreadyExists
+ldloc unionFieldDefault19
+stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M0000000c_IL_004f:
+ldarg 0
+M0000000c_IL_0050:
+M0000000c_IL_0055:
+ldloca unionFieldDefault22
+initobj System.IO.TextReadError.Closed
+ldloc unionFieldDefault22
 stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
 pop
-M0000000c_IL_001a:
+M0000000c_IL_005b:
+ldarg 0
+M0000000c_IL_005c:
+M0000000c_IL_0061:
+ldloca unionFieldDefault25
+initobj System.IO.TextReadError.InvalidRange
+ldloc unionFieldDefault25
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M0000000c_IL_0067:
+ldarg 0
+M0000000c_IL_0068:
+M0000000c_IL_006d:
+ldloca unionFieldDefault28
+initobj System.IO.TextReadError.LimitExceeded
+ldloc unionFieldDefault28
+stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M0000000c_IL_0073:
+ldarg 0
+M0000000c_IL_0074:
+M0000000c_IL_0079:
+ldloca unionFieldDefault31
+initobj System.IO.TextReadError.WrongAccess
+ldloc unionFieldDefault31
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M0000000c_IL_007f:
+ldarg 0
+M0000000c_IL_0080:
+M0000000c_IL_0085:
+ldloca unionFieldDefault34
+initobj System.IO.TextReadError.IoFailure
+ldloc unionFieldDefault34
+stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M0000000c_IL_008b:
+ldarg 0
+M0000000c_IL_008c:
+M0000000c_IL_0091:
+ldloca unionFieldDefault37
+initobj System.IO.TextReadError.InvalidUtf8
+ldloc unionFieldDefault37
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M0000000c_IL_0097:
+ldarg 0
+M0000000c_IL_0098:
+M0000000c_IL_009d:
+ldloca unionFieldDefault40
+initobj System.IO.TextReadError.InvalidEncoding
+ldloc unionFieldDefault40
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+pop
+M0000000c_IL_00a3:
+ldc.i4 6
+M0000000c_IL_00a4:
+stloc local0
+M0000000c_IL_00a5:
+ldarg 0
+M0000000c_IL_00a6:
+ldloc local0
+M0000000c_IL_00a7:
+conv.u1
+M0000000c_IL_00a8:
+stfld System.IO.TextReadError::Metadata_V1_3C5461673E
+pop
+M0000000c_IL_00ad:
+ldarg 1
+M0000000c_IL_00ae:
+stloc local1
+M0000000c_IL_00af:
+ldarg 0
+M0000000c_IL_00b0:
+ldloc local1
+M0000000c_IL_00b1:
+stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M0000000c_IL_00b6:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.IO.TextReadError.Closed& value) -> Boolean
+.local System.IO.TextReadError.Closed local0
+ldloca local0
+initobj System.IO.TextReadError.Closed
 M0000000d_IL_0000:
-ldarg 0
+ldarg 1
 M0000000d_IL_0001:
-ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
-M0000000d_IL_0006:
-conv.i4
-M0000000d_IL_0007:
-ldc.i4 6
-M0000000d_IL_0008:
-conv.i4
+ldloca local0
+M0000000d_IL_0003:
+initobj System.IO.TextReadError.Closed
 M0000000d_IL_0009:
+ldloc local0
+M0000000d_IL_000a:
+stobj System.IO.TextReadError.Closed
+M0000000d_IL_000f:
+ldarg 0
+M0000000d_IL_0010:
+ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
+M0000000d_IL_0015:
+conv.i4
+M0000000d_IL_0016:
+ldc.i4 6
+M0000000d_IL_0017:
+conv.i4
+M0000000d_IL_0018:
 ceq
 call neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean)
-M0000000d_IL_000b:
-brtrue M0000000d_IL_0015
-M0000000d_IL_0010:
-br M0000000d_IL_0023
-M0000000d_IL_0015:
-ldarg 1
-M0000000d_IL_0016:
-ldarg 0
-M0000000d_IL_0017:
-ldfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
-M0000000d_IL_001c:
-stobj System.IO.TextReadError.Closed
-M0000000d_IL_0021:
-ldc.bool true
-M0000000d_IL_0022:
-ret
-M0000000d_IL_0023:
+M0000000d_IL_001a:
+brtrue M0000000d_IL_0024
+M0000000d_IL_001f:
+br M0000000d_IL_0032
 M0000000d_IL_0024:
-ldc.bool false
+ldarg 1
 M0000000d_IL_0025:
+ldarg 0
+M0000000d_IL_0026:
+ldfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+M0000000d_IL_002b:
+stobj System.IO.TextReadError.Closed
+M0000000d_IL_0030:
+ldc.bool true
+M0000000d_IL_0031:
+ret
+M0000000d_IL_0032:
+M0000000d_IL_0033:
+ldc.bool false
+M0000000d_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.IO.TextReadError.InvalidRange value) -> Void
@@ -1126,6 +1984,19 @@ ret
 .local System.IO.TextReadError.IoFailure unionDefault1_10
 .local System.IO.TextReadError.InvalidUtf8 unionDefault1_11
 .local System.IO.TextReadError.InvalidEncoding unionDefault1_12
+.local Byte unionFieldDefault4
+.local System.IO.TextReadError.InvalidPath unionFieldDefault7
+.local System.IO.TextReadError.NotFound unionFieldDefault10
+.local System.IO.TextReadError.AccessDenied unionFieldDefault13
+.local System.IO.TextReadError.WrongKind unionFieldDefault16
+.local System.IO.TextReadError.AlreadyExists unionFieldDefault19
+.local System.IO.TextReadError.Closed unionFieldDefault22
+.local System.IO.TextReadError.InvalidRange unionFieldDefault25
+.local System.IO.TextReadError.LimitExceeded unionFieldDefault28
+.local System.IO.TextReadError.WrongAccess unionFieldDefault31
+.local System.IO.TextReadError.IoFailure unionFieldDefault34
+.local System.IO.TextReadError.InvalidUtf8 unionFieldDefault37
+.local System.IO.TextReadError.InvalidEncoding unionFieldDefault40
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -1213,67 +2084,197 @@ ldloc unionDefault1_12
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
 M0000000e_IL_0007:
-ldc.i4 7
-M0000000e_IL_0008:
-stloc local0
-M0000000e_IL_0009:
 ldarg 0
-M0000000e_IL_000a:
-ldloc local0
-M0000000e_IL_000b:
-conv.u1
-M0000000e_IL_000c:
+M0000000e_IL_0008:
+M0000000e_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.IO.TextReadError::Metadata_V1_3C5461673E
 pop
-M0000000e_IL_0011:
-ldarg 1
-M0000000e_IL_0012:
-stloc local1
 M0000000e_IL_0013:
 ldarg 0
 M0000000e_IL_0014:
-ldloc local1
-M0000000e_IL_0015:
+M0000000e_IL_0019:
+ldloca unionFieldDefault7
+initobj System.IO.TextReadError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M0000000e_IL_001f:
+ldarg 0
+M0000000e_IL_0020:
+M0000000e_IL_0025:
+ldloca unionFieldDefault10
+initobj System.IO.TextReadError.NotFound
+ldloc unionFieldDefault10
+stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M0000000e_IL_002b:
+ldarg 0
+M0000000e_IL_002c:
+M0000000e_IL_0031:
+ldloca unionFieldDefault13
+initobj System.IO.TextReadError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M0000000e_IL_0037:
+ldarg 0
+M0000000e_IL_0038:
+M0000000e_IL_003d:
+ldloca unionFieldDefault16
+initobj System.IO.TextReadError.WrongKind
+ldloc unionFieldDefault16
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M0000000e_IL_0043:
+ldarg 0
+M0000000e_IL_0044:
+M0000000e_IL_0049:
+ldloca unionFieldDefault19
+initobj System.IO.TextReadError.AlreadyExists
+ldloc unionFieldDefault19
+stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M0000000e_IL_004f:
+ldarg 0
+M0000000e_IL_0050:
+M0000000e_IL_0055:
+ldloca unionFieldDefault22
+initobj System.IO.TextReadError.Closed
+ldloc unionFieldDefault22
+stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M0000000e_IL_005b:
+ldarg 0
+M0000000e_IL_005c:
+M0000000e_IL_0061:
+ldloca unionFieldDefault25
+initobj System.IO.TextReadError.InvalidRange
+ldloc unionFieldDefault25
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
 pop
-M0000000e_IL_001a:
+M0000000e_IL_0067:
+ldarg 0
+M0000000e_IL_0068:
+M0000000e_IL_006d:
+ldloca unionFieldDefault28
+initobj System.IO.TextReadError.LimitExceeded
+ldloc unionFieldDefault28
+stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M0000000e_IL_0073:
+ldarg 0
+M0000000e_IL_0074:
+M0000000e_IL_0079:
+ldloca unionFieldDefault31
+initobj System.IO.TextReadError.WrongAccess
+ldloc unionFieldDefault31
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M0000000e_IL_007f:
+ldarg 0
+M0000000e_IL_0080:
+M0000000e_IL_0085:
+ldloca unionFieldDefault34
+initobj System.IO.TextReadError.IoFailure
+ldloc unionFieldDefault34
+stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M0000000e_IL_008b:
+ldarg 0
+M0000000e_IL_008c:
+M0000000e_IL_0091:
+ldloca unionFieldDefault37
+initobj System.IO.TextReadError.InvalidUtf8
+ldloc unionFieldDefault37
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M0000000e_IL_0097:
+ldarg 0
+M0000000e_IL_0098:
+M0000000e_IL_009d:
+ldloca unionFieldDefault40
+initobj System.IO.TextReadError.InvalidEncoding
+ldloc unionFieldDefault40
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+pop
+M0000000e_IL_00a3:
+ldc.i4 7
+M0000000e_IL_00a4:
+stloc local0
+M0000000e_IL_00a5:
+ldarg 0
+M0000000e_IL_00a6:
+ldloc local0
+M0000000e_IL_00a7:
+conv.u1
+M0000000e_IL_00a8:
+stfld System.IO.TextReadError::Metadata_V1_3C5461673E
+pop
+M0000000e_IL_00ad:
+ldarg 1
+M0000000e_IL_00ae:
+stloc local1
+M0000000e_IL_00af:
+ldarg 0
+M0000000e_IL_00b0:
+ldloc local1
+M0000000e_IL_00b1:
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M0000000e_IL_00b6:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.IO.TextReadError.InvalidRange& value) -> Boolean
+.local System.IO.TextReadError.InvalidRange local0
+ldloca local0
+initobj System.IO.TextReadError.InvalidRange
 M0000000f_IL_0000:
-ldarg 0
+ldarg 1
 M0000000f_IL_0001:
-ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
-M0000000f_IL_0006:
-conv.i4
-M0000000f_IL_0007:
-ldc.i4 7
-M0000000f_IL_0008:
-conv.i4
+ldloca local0
+M0000000f_IL_0003:
+initobj System.IO.TextReadError.InvalidRange
 M0000000f_IL_0009:
+ldloc local0
+M0000000f_IL_000a:
+stobj System.IO.TextReadError.InvalidRange
+M0000000f_IL_000f:
+ldarg 0
+M0000000f_IL_0010:
+ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
+M0000000f_IL_0015:
+conv.i4
+M0000000f_IL_0016:
+ldc.i4 7
+M0000000f_IL_0017:
+conv.i4
+M0000000f_IL_0018:
 ceq
 call neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean)
-M0000000f_IL_000b:
-brtrue M0000000f_IL_0015
-M0000000f_IL_0010:
-br M0000000f_IL_0023
-M0000000f_IL_0015:
-ldarg 1
-M0000000f_IL_0016:
-ldarg 0
-M0000000f_IL_0017:
-ldfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
-M0000000f_IL_001c:
-stobj System.IO.TextReadError.InvalidRange
-M0000000f_IL_0021:
-ldc.bool true
-M0000000f_IL_0022:
-ret
-M0000000f_IL_0023:
+M0000000f_IL_001a:
+brtrue M0000000f_IL_0024
+M0000000f_IL_001f:
+br M0000000f_IL_0032
 M0000000f_IL_0024:
-ldc.bool false
+ldarg 1
 M0000000f_IL_0025:
+ldarg 0
+M0000000f_IL_0026:
+ldfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+M0000000f_IL_002b:
+stobj System.IO.TextReadError.InvalidRange
+M0000000f_IL_0030:
+ldc.bool true
+M0000000f_IL_0031:
+ret
+M0000000f_IL_0032:
+M0000000f_IL_0033:
+ldc.bool false
+M0000000f_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.IO.TextReadError.LimitExceeded value) -> Void
@@ -1292,6 +2293,19 @@ ret
 .local System.IO.TextReadError.IoFailure unionDefault1_10
 .local System.IO.TextReadError.InvalidUtf8 unionDefault1_11
 .local System.IO.TextReadError.InvalidEncoding unionDefault1_12
+.local Byte unionFieldDefault4
+.local System.IO.TextReadError.InvalidPath unionFieldDefault7
+.local System.IO.TextReadError.NotFound unionFieldDefault10
+.local System.IO.TextReadError.AccessDenied unionFieldDefault13
+.local System.IO.TextReadError.WrongKind unionFieldDefault16
+.local System.IO.TextReadError.AlreadyExists unionFieldDefault19
+.local System.IO.TextReadError.Closed unionFieldDefault22
+.local System.IO.TextReadError.InvalidRange unionFieldDefault25
+.local System.IO.TextReadError.LimitExceeded unionFieldDefault28
+.local System.IO.TextReadError.WrongAccess unionFieldDefault31
+.local System.IO.TextReadError.IoFailure unionFieldDefault34
+.local System.IO.TextReadError.InvalidUtf8 unionFieldDefault37
+.local System.IO.TextReadError.InvalidEncoding unionFieldDefault40
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -1379,67 +2393,197 @@ ldloc unionDefault1_12
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
 M00000010_IL_0007:
-ldc.i4 8
-M00000010_IL_0008:
-stloc local0
-M00000010_IL_0009:
 ldarg 0
-M00000010_IL_000a:
-ldloc local0
-M00000010_IL_000b:
-conv.u1
-M00000010_IL_000c:
+M00000010_IL_0008:
+M00000010_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.IO.TextReadError::Metadata_V1_3C5461673E
 pop
-M00000010_IL_0011:
-ldarg 1
-M00000010_IL_0012:
-stloc local1
 M00000010_IL_0013:
 ldarg 0
 M00000010_IL_0014:
-ldloc local1
-M00000010_IL_0015:
+M00000010_IL_0019:
+ldloca unionFieldDefault7
+initobj System.IO.TextReadError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000010_IL_001f:
+ldarg 0
+M00000010_IL_0020:
+M00000010_IL_0025:
+ldloca unionFieldDefault10
+initobj System.IO.TextReadError.NotFound
+ldloc unionFieldDefault10
+stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000010_IL_002b:
+ldarg 0
+M00000010_IL_002c:
+M00000010_IL_0031:
+ldloca unionFieldDefault13
+initobj System.IO.TextReadError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000010_IL_0037:
+ldarg 0
+M00000010_IL_0038:
+M00000010_IL_003d:
+ldloca unionFieldDefault16
+initobj System.IO.TextReadError.WrongKind
+ldloc unionFieldDefault16
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000010_IL_0043:
+ldarg 0
+M00000010_IL_0044:
+M00000010_IL_0049:
+ldloca unionFieldDefault19
+initobj System.IO.TextReadError.AlreadyExists
+ldloc unionFieldDefault19
+stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M00000010_IL_004f:
+ldarg 0
+M00000010_IL_0050:
+M00000010_IL_0055:
+ldloca unionFieldDefault22
+initobj System.IO.TextReadError.Closed
+ldloc unionFieldDefault22
+stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M00000010_IL_005b:
+ldarg 0
+M00000010_IL_005c:
+M00000010_IL_0061:
+ldloca unionFieldDefault25
+initobj System.IO.TextReadError.InvalidRange
+ldloc unionFieldDefault25
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000010_IL_0067:
+ldarg 0
+M00000010_IL_0068:
+M00000010_IL_006d:
+ldloca unionFieldDefault28
+initobj System.IO.TextReadError.LimitExceeded
+ldloc unionFieldDefault28
 stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
-M00000010_IL_001a:
+M00000010_IL_0073:
+ldarg 0
+M00000010_IL_0074:
+M00000010_IL_0079:
+ldloca unionFieldDefault31
+initobj System.IO.TextReadError.WrongAccess
+ldloc unionFieldDefault31
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M00000010_IL_007f:
+ldarg 0
+M00000010_IL_0080:
+M00000010_IL_0085:
+ldloca unionFieldDefault34
+initobj System.IO.TextReadError.IoFailure
+ldloc unionFieldDefault34
+stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000010_IL_008b:
+ldarg 0
+M00000010_IL_008c:
+M00000010_IL_0091:
+ldloca unionFieldDefault37
+initobj System.IO.TextReadError.InvalidUtf8
+ldloc unionFieldDefault37
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000010_IL_0097:
+ldarg 0
+M00000010_IL_0098:
+M00000010_IL_009d:
+ldloca unionFieldDefault40
+initobj System.IO.TextReadError.InvalidEncoding
+ldloc unionFieldDefault40
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+pop
+M00000010_IL_00a3:
+ldc.i4 8
+M00000010_IL_00a4:
+stloc local0
+M00000010_IL_00a5:
+ldarg 0
+M00000010_IL_00a6:
+ldloc local0
+M00000010_IL_00a7:
+conv.u1
+M00000010_IL_00a8:
+stfld System.IO.TextReadError::Metadata_V1_3C5461673E
+pop
+M00000010_IL_00ad:
+ldarg 1
+M00000010_IL_00ae:
+stloc local1
+M00000010_IL_00af:
+ldarg 0
+M00000010_IL_00b0:
+ldloc local1
+M00000010_IL_00b1:
+stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000010_IL_00b6:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.IO.TextReadError.LimitExceeded& value) -> Boolean
+.local System.IO.TextReadError.LimitExceeded local0
+ldloca local0
+initobj System.IO.TextReadError.LimitExceeded
 M00000011_IL_0000:
-ldarg 0
+ldarg 1
 M00000011_IL_0001:
-ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
-M00000011_IL_0006:
-conv.i4
-M00000011_IL_0007:
-ldc.i4 8
-M00000011_IL_0008:
-conv.i4
+ldloca local0
+M00000011_IL_0003:
+initobj System.IO.TextReadError.LimitExceeded
 M00000011_IL_0009:
+ldloc local0
+M00000011_IL_000a:
+stobj System.IO.TextReadError.LimitExceeded
+M00000011_IL_000f:
+ldarg 0
+M00000011_IL_0010:
+ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
+M00000011_IL_0015:
+conv.i4
+M00000011_IL_0016:
+ldc.i4 8
+M00000011_IL_0017:
+conv.i4
+M00000011_IL_0018:
 ceq
 call neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean)
-M00000011_IL_000b:
-brtrue M00000011_IL_0015
-M00000011_IL_0010:
-br M00000011_IL_0023
-M00000011_IL_0015:
-ldarg 1
-M00000011_IL_0016:
-ldarg 0
-M00000011_IL_0017:
-ldfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
-M00000011_IL_001c:
-stobj System.IO.TextReadError.LimitExceeded
-M00000011_IL_0021:
-ldc.bool true
-M00000011_IL_0022:
-ret
-M00000011_IL_0023:
+M00000011_IL_001a:
+brtrue M00000011_IL_0024
+M00000011_IL_001f:
+br M00000011_IL_0032
 M00000011_IL_0024:
-ldc.bool false
+ldarg 1
 M00000011_IL_0025:
+ldarg 0
+M00000011_IL_0026:
+ldfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+M00000011_IL_002b:
+stobj System.IO.TextReadError.LimitExceeded
+M00000011_IL_0030:
+ldc.bool true
+M00000011_IL_0031:
+ret
+M00000011_IL_0032:
+M00000011_IL_0033:
+ldc.bool false
+M00000011_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.IO.TextReadError.WrongAccess value) -> Void
@@ -1458,6 +2602,19 @@ ret
 .local System.IO.TextReadError.IoFailure unionDefault1_10
 .local System.IO.TextReadError.InvalidUtf8 unionDefault1_11
 .local System.IO.TextReadError.InvalidEncoding unionDefault1_12
+.local Byte unionFieldDefault4
+.local System.IO.TextReadError.InvalidPath unionFieldDefault7
+.local System.IO.TextReadError.NotFound unionFieldDefault10
+.local System.IO.TextReadError.AccessDenied unionFieldDefault13
+.local System.IO.TextReadError.WrongKind unionFieldDefault16
+.local System.IO.TextReadError.AlreadyExists unionFieldDefault19
+.local System.IO.TextReadError.Closed unionFieldDefault22
+.local System.IO.TextReadError.InvalidRange unionFieldDefault25
+.local System.IO.TextReadError.LimitExceeded unionFieldDefault28
+.local System.IO.TextReadError.WrongAccess unionFieldDefault31
+.local System.IO.TextReadError.IoFailure unionFieldDefault34
+.local System.IO.TextReadError.InvalidUtf8 unionFieldDefault37
+.local System.IO.TextReadError.InvalidEncoding unionFieldDefault40
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -1545,67 +2702,197 @@ ldloc unionDefault1_12
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
 M00000012_IL_0007:
-ldc.i4 9
-M00000012_IL_0009:
-stloc local0
-M00000012_IL_000a:
 ldarg 0
-M00000012_IL_000b:
-ldloc local0
-M00000012_IL_000c:
-conv.u1
+M00000012_IL_0008:
 M00000012_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.IO.TextReadError::Metadata_V1_3C5461673E
 pop
-M00000012_IL_0012:
-ldarg 1
 M00000012_IL_0013:
-stloc local1
-M00000012_IL_0014:
 ldarg 0
-M00000012_IL_0015:
-ldloc local1
-M00000012_IL_0016:
+M00000012_IL_0014:
+M00000012_IL_0019:
+ldloca unionFieldDefault7
+initobj System.IO.TextReadError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000012_IL_001f:
+ldarg 0
+M00000012_IL_0020:
+M00000012_IL_0025:
+ldloca unionFieldDefault10
+initobj System.IO.TextReadError.NotFound
+ldloc unionFieldDefault10
+stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000012_IL_002b:
+ldarg 0
+M00000012_IL_002c:
+M00000012_IL_0031:
+ldloca unionFieldDefault13
+initobj System.IO.TextReadError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000012_IL_0037:
+ldarg 0
+M00000012_IL_0038:
+M00000012_IL_003d:
+ldloca unionFieldDefault16
+initobj System.IO.TextReadError.WrongKind
+ldloc unionFieldDefault16
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000012_IL_0043:
+ldarg 0
+M00000012_IL_0044:
+M00000012_IL_0049:
+ldloca unionFieldDefault19
+initobj System.IO.TextReadError.AlreadyExists
+ldloc unionFieldDefault19
+stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M00000012_IL_004f:
+ldarg 0
+M00000012_IL_0050:
+M00000012_IL_0055:
+ldloca unionFieldDefault22
+initobj System.IO.TextReadError.Closed
+ldloc unionFieldDefault22
+stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M00000012_IL_005b:
+ldarg 0
+M00000012_IL_005c:
+M00000012_IL_0061:
+ldloca unionFieldDefault25
+initobj System.IO.TextReadError.InvalidRange
+ldloc unionFieldDefault25
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000012_IL_0067:
+ldarg 0
+M00000012_IL_0068:
+M00000012_IL_006d:
+ldloca unionFieldDefault28
+initobj System.IO.TextReadError.LimitExceeded
+ldloc unionFieldDefault28
+stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000012_IL_0073:
+ldarg 0
+M00000012_IL_0074:
+M00000012_IL_0079:
+ldloca unionFieldDefault31
+initobj System.IO.TextReadError.WrongAccess
+ldloc unionFieldDefault31
 stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
 pop
-M00000012_IL_001b:
+M00000012_IL_007f:
+ldarg 0
+M00000012_IL_0080:
+M00000012_IL_0085:
+ldloca unionFieldDefault34
+initobj System.IO.TextReadError.IoFailure
+ldloc unionFieldDefault34
+stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000012_IL_008b:
+ldarg 0
+M00000012_IL_008c:
+M00000012_IL_0091:
+ldloca unionFieldDefault37
+initobj System.IO.TextReadError.InvalidUtf8
+ldloc unionFieldDefault37
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000012_IL_0097:
+ldarg 0
+M00000012_IL_0098:
+M00000012_IL_009d:
+ldloca unionFieldDefault40
+initobj System.IO.TextReadError.InvalidEncoding
+ldloc unionFieldDefault40
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+pop
+M00000012_IL_00a3:
+ldc.i4 9
+M00000012_IL_00a5:
+stloc local0
+M00000012_IL_00a6:
+ldarg 0
+M00000012_IL_00a7:
+ldloc local0
+M00000012_IL_00a8:
+conv.u1
+M00000012_IL_00a9:
+stfld System.IO.TextReadError::Metadata_V1_3C5461673E
+pop
+M00000012_IL_00ae:
+ldarg 1
+M00000012_IL_00af:
+stloc local1
+M00000012_IL_00b0:
+ldarg 0
+M00000012_IL_00b1:
+ldloc local1
+M00000012_IL_00b2:
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M00000012_IL_00b7:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.IO.TextReadError.WrongAccess& value) -> Boolean
+.local System.IO.TextReadError.WrongAccess local0
+ldloca local0
+initobj System.IO.TextReadError.WrongAccess
 M00000013_IL_0000:
-ldarg 0
+ldarg 1
 M00000013_IL_0001:
-ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
-M00000013_IL_0006:
-conv.i4
-M00000013_IL_0007:
-ldc.i4 9
+ldloca local0
+M00000013_IL_0003:
+initobj System.IO.TextReadError.WrongAccess
 M00000013_IL_0009:
-conv.i4
+ldloc local0
 M00000013_IL_000a:
+stobj System.IO.TextReadError.WrongAccess
+M00000013_IL_000f:
+ldarg 0
+M00000013_IL_0010:
+ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
+M00000013_IL_0015:
+conv.i4
+M00000013_IL_0016:
+ldc.i4 9
+M00000013_IL_0018:
+conv.i4
+M00000013_IL_0019:
 ceq
 call neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean)
-M00000013_IL_000c:
-brtrue M00000013_IL_0016
-M00000013_IL_0011:
-br M00000013_IL_0024
-M00000013_IL_0016:
-ldarg 1
-M00000013_IL_0017:
-ldarg 0
-M00000013_IL_0018:
-ldfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
-M00000013_IL_001d:
-stobj System.IO.TextReadError.WrongAccess
-M00000013_IL_0022:
-ldc.bool true
-M00000013_IL_0023:
-ret
-M00000013_IL_0024:
+M00000013_IL_001b:
+brtrue M00000013_IL_0025
+M00000013_IL_0020:
+br M00000013_IL_0033
 M00000013_IL_0025:
-ldc.bool false
+ldarg 1
 M00000013_IL_0026:
+ldarg 0
+M00000013_IL_0027:
+ldfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+M00000013_IL_002c:
+stobj System.IO.TextReadError.WrongAccess
+M00000013_IL_0031:
+ldc.bool true
+M00000013_IL_0032:
+ret
+M00000013_IL_0033:
+M00000013_IL_0034:
+ldc.bool false
+M00000013_IL_0035:
 ret
 .end
 .method instance byref .ctor(System.IO.TextReadError.IoFailure value) -> Void
@@ -1624,6 +2911,19 @@ ret
 .local System.IO.TextReadError.IoFailure unionDefault1_10
 .local System.IO.TextReadError.InvalidUtf8 unionDefault1_11
 .local System.IO.TextReadError.InvalidEncoding unionDefault1_12
+.local Byte unionFieldDefault4
+.local System.IO.TextReadError.InvalidPath unionFieldDefault7
+.local System.IO.TextReadError.NotFound unionFieldDefault10
+.local System.IO.TextReadError.AccessDenied unionFieldDefault13
+.local System.IO.TextReadError.WrongKind unionFieldDefault16
+.local System.IO.TextReadError.AlreadyExists unionFieldDefault19
+.local System.IO.TextReadError.Closed unionFieldDefault22
+.local System.IO.TextReadError.InvalidRange unionFieldDefault25
+.local System.IO.TextReadError.LimitExceeded unionFieldDefault28
+.local System.IO.TextReadError.WrongAccess unionFieldDefault31
+.local System.IO.TextReadError.IoFailure unionFieldDefault34
+.local System.IO.TextReadError.InvalidUtf8 unionFieldDefault37
+.local System.IO.TextReadError.InvalidEncoding unionFieldDefault40
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -1711,67 +3011,197 @@ ldloc unionDefault1_12
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
 M00000014_IL_0007:
-ldc.i4 10
-M00000014_IL_0009:
-stloc local0
-M00000014_IL_000a:
 ldarg 0
-M00000014_IL_000b:
-ldloc local0
-M00000014_IL_000c:
-conv.u1
+M00000014_IL_0008:
 M00000014_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.IO.TextReadError::Metadata_V1_3C5461673E
 pop
-M00000014_IL_0012:
-ldarg 1
 M00000014_IL_0013:
-stloc local1
-M00000014_IL_0014:
 ldarg 0
-M00000014_IL_0015:
-ldloc local1
-M00000014_IL_0016:
+M00000014_IL_0014:
+M00000014_IL_0019:
+ldloca unionFieldDefault7
+initobj System.IO.TextReadError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000014_IL_001f:
+ldarg 0
+M00000014_IL_0020:
+M00000014_IL_0025:
+ldloca unionFieldDefault10
+initobj System.IO.TextReadError.NotFound
+ldloc unionFieldDefault10
+stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000014_IL_002b:
+ldarg 0
+M00000014_IL_002c:
+M00000014_IL_0031:
+ldloca unionFieldDefault13
+initobj System.IO.TextReadError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000014_IL_0037:
+ldarg 0
+M00000014_IL_0038:
+M00000014_IL_003d:
+ldloca unionFieldDefault16
+initobj System.IO.TextReadError.WrongKind
+ldloc unionFieldDefault16
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000014_IL_0043:
+ldarg 0
+M00000014_IL_0044:
+M00000014_IL_0049:
+ldloca unionFieldDefault19
+initobj System.IO.TextReadError.AlreadyExists
+ldloc unionFieldDefault19
+stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M00000014_IL_004f:
+ldarg 0
+M00000014_IL_0050:
+M00000014_IL_0055:
+ldloca unionFieldDefault22
+initobj System.IO.TextReadError.Closed
+ldloc unionFieldDefault22
+stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M00000014_IL_005b:
+ldarg 0
+M00000014_IL_005c:
+M00000014_IL_0061:
+ldloca unionFieldDefault25
+initobj System.IO.TextReadError.InvalidRange
+ldloc unionFieldDefault25
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000014_IL_0067:
+ldarg 0
+M00000014_IL_0068:
+M00000014_IL_006d:
+ldloca unionFieldDefault28
+initobj System.IO.TextReadError.LimitExceeded
+ldloc unionFieldDefault28
+stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000014_IL_0073:
+ldarg 0
+M00000014_IL_0074:
+M00000014_IL_0079:
+ldloca unionFieldDefault31
+initobj System.IO.TextReadError.WrongAccess
+ldloc unionFieldDefault31
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M00000014_IL_007f:
+ldarg 0
+M00000014_IL_0080:
+M00000014_IL_0085:
+ldloca unionFieldDefault34
+initobj System.IO.TextReadError.IoFailure
+ldloc unionFieldDefault34
 stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
 pop
-M00000014_IL_001b:
+M00000014_IL_008b:
+ldarg 0
+M00000014_IL_008c:
+M00000014_IL_0091:
+ldloca unionFieldDefault37
+initobj System.IO.TextReadError.InvalidUtf8
+ldloc unionFieldDefault37
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000014_IL_0097:
+ldarg 0
+M00000014_IL_0098:
+M00000014_IL_009d:
+ldloca unionFieldDefault40
+initobj System.IO.TextReadError.InvalidEncoding
+ldloc unionFieldDefault40
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+pop
+M00000014_IL_00a3:
+ldc.i4 10
+M00000014_IL_00a5:
+stloc local0
+M00000014_IL_00a6:
+ldarg 0
+M00000014_IL_00a7:
+ldloc local0
+M00000014_IL_00a8:
+conv.u1
+M00000014_IL_00a9:
+stfld System.IO.TextReadError::Metadata_V1_3C5461673E
+pop
+M00000014_IL_00ae:
+ldarg 1
+M00000014_IL_00af:
+stloc local1
+M00000014_IL_00b0:
+ldarg 0
+M00000014_IL_00b1:
+ldloc local1
+M00000014_IL_00b2:
+stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000014_IL_00b7:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.IO.TextReadError.IoFailure& value) -> Boolean
+.local System.IO.TextReadError.IoFailure local0
+ldloca local0
+initobj System.IO.TextReadError.IoFailure
 M00000015_IL_0000:
-ldarg 0
+ldarg 1
 M00000015_IL_0001:
-ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
-M00000015_IL_0006:
-conv.i4
-M00000015_IL_0007:
-ldc.i4 10
+ldloca local0
+M00000015_IL_0003:
+initobj System.IO.TextReadError.IoFailure
 M00000015_IL_0009:
-conv.i4
+ldloc local0
 M00000015_IL_000a:
+stobj System.IO.TextReadError.IoFailure
+M00000015_IL_000f:
+ldarg 0
+M00000015_IL_0010:
+ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
+M00000015_IL_0015:
+conv.i4
+M00000015_IL_0016:
+ldc.i4 10
+M00000015_IL_0018:
+conv.i4
+M00000015_IL_0019:
 ceq
 call neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean)
-M00000015_IL_000c:
-brtrue M00000015_IL_0016
-M00000015_IL_0011:
-br M00000015_IL_0024
-M00000015_IL_0016:
-ldarg 1
-M00000015_IL_0017:
-ldarg 0
-M00000015_IL_0018:
-ldfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
-M00000015_IL_001d:
-stobj System.IO.TextReadError.IoFailure
-M00000015_IL_0022:
-ldc.bool true
-M00000015_IL_0023:
-ret
-M00000015_IL_0024:
+M00000015_IL_001b:
+brtrue M00000015_IL_0025
+M00000015_IL_0020:
+br M00000015_IL_0033
 M00000015_IL_0025:
-ldc.bool false
+ldarg 1
 M00000015_IL_0026:
+ldarg 0
+M00000015_IL_0027:
+ldfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+M00000015_IL_002c:
+stobj System.IO.TextReadError.IoFailure
+M00000015_IL_0031:
+ldc.bool true
+M00000015_IL_0032:
+ret
+M00000015_IL_0033:
+M00000015_IL_0034:
+ldc.bool false
+M00000015_IL_0035:
 ret
 .end
 .method instance byref .ctor(System.IO.TextReadError.InvalidUtf8 value) -> Void
@@ -1790,6 +3220,19 @@ ret
 .local System.IO.TextReadError.IoFailure unionDefault1_10
 .local System.IO.TextReadError.InvalidUtf8 unionDefault1_11
 .local System.IO.TextReadError.InvalidEncoding unionDefault1_12
+.local Byte unionFieldDefault4
+.local System.IO.TextReadError.InvalidPath unionFieldDefault7
+.local System.IO.TextReadError.NotFound unionFieldDefault10
+.local System.IO.TextReadError.AccessDenied unionFieldDefault13
+.local System.IO.TextReadError.WrongKind unionFieldDefault16
+.local System.IO.TextReadError.AlreadyExists unionFieldDefault19
+.local System.IO.TextReadError.Closed unionFieldDefault22
+.local System.IO.TextReadError.InvalidRange unionFieldDefault25
+.local System.IO.TextReadError.LimitExceeded unionFieldDefault28
+.local System.IO.TextReadError.WrongAccess unionFieldDefault31
+.local System.IO.TextReadError.IoFailure unionFieldDefault34
+.local System.IO.TextReadError.InvalidUtf8 unionFieldDefault37
+.local System.IO.TextReadError.InvalidEncoding unionFieldDefault40
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -1877,67 +3320,197 @@ ldloc unionDefault1_12
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
 M00000016_IL_0007:
-ldc.i4 11
-M00000016_IL_0009:
-stloc local0
-M00000016_IL_000a:
 ldarg 0
-M00000016_IL_000b:
-ldloc local0
-M00000016_IL_000c:
-conv.u1
+M00000016_IL_0008:
 M00000016_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.IO.TextReadError::Metadata_V1_3C5461673E
 pop
-M00000016_IL_0012:
-ldarg 1
 M00000016_IL_0013:
-stloc local1
-M00000016_IL_0014:
 ldarg 0
-M00000016_IL_0015:
-ldloc local1
-M00000016_IL_0016:
+M00000016_IL_0014:
+M00000016_IL_0019:
+ldloca unionFieldDefault7
+initobj System.IO.TextReadError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000016_IL_001f:
+ldarg 0
+M00000016_IL_0020:
+M00000016_IL_0025:
+ldloca unionFieldDefault10
+initobj System.IO.TextReadError.NotFound
+ldloc unionFieldDefault10
+stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000016_IL_002b:
+ldarg 0
+M00000016_IL_002c:
+M00000016_IL_0031:
+ldloca unionFieldDefault13
+initobj System.IO.TextReadError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000016_IL_0037:
+ldarg 0
+M00000016_IL_0038:
+M00000016_IL_003d:
+ldloca unionFieldDefault16
+initobj System.IO.TextReadError.WrongKind
+ldloc unionFieldDefault16
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000016_IL_0043:
+ldarg 0
+M00000016_IL_0044:
+M00000016_IL_0049:
+ldloca unionFieldDefault19
+initobj System.IO.TextReadError.AlreadyExists
+ldloc unionFieldDefault19
+stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M00000016_IL_004f:
+ldarg 0
+M00000016_IL_0050:
+M00000016_IL_0055:
+ldloca unionFieldDefault22
+initobj System.IO.TextReadError.Closed
+ldloc unionFieldDefault22
+stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M00000016_IL_005b:
+ldarg 0
+M00000016_IL_005c:
+M00000016_IL_0061:
+ldloca unionFieldDefault25
+initobj System.IO.TextReadError.InvalidRange
+ldloc unionFieldDefault25
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000016_IL_0067:
+ldarg 0
+M00000016_IL_0068:
+M00000016_IL_006d:
+ldloca unionFieldDefault28
+initobj System.IO.TextReadError.LimitExceeded
+ldloc unionFieldDefault28
+stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000016_IL_0073:
+ldarg 0
+M00000016_IL_0074:
+M00000016_IL_0079:
+ldloca unionFieldDefault31
+initobj System.IO.TextReadError.WrongAccess
+ldloc unionFieldDefault31
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M00000016_IL_007f:
+ldarg 0
+M00000016_IL_0080:
+M00000016_IL_0085:
+ldloca unionFieldDefault34
+initobj System.IO.TextReadError.IoFailure
+ldloc unionFieldDefault34
+stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000016_IL_008b:
+ldarg 0
+M00000016_IL_008c:
+M00000016_IL_0091:
+ldloca unionFieldDefault37
+initobj System.IO.TextReadError.InvalidUtf8
+ldloc unionFieldDefault37
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
 pop
-M00000016_IL_001b:
+M00000016_IL_0097:
+ldarg 0
+M00000016_IL_0098:
+M00000016_IL_009d:
+ldloca unionFieldDefault40
+initobj System.IO.TextReadError.InvalidEncoding
+ldloc unionFieldDefault40
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+pop
+M00000016_IL_00a3:
+ldc.i4 11
+M00000016_IL_00a5:
+stloc local0
+M00000016_IL_00a6:
+ldarg 0
+M00000016_IL_00a7:
+ldloc local0
+M00000016_IL_00a8:
+conv.u1
+M00000016_IL_00a9:
+stfld System.IO.TextReadError::Metadata_V1_3C5461673E
+pop
+M00000016_IL_00ae:
+ldarg 1
+M00000016_IL_00af:
+stloc local1
+M00000016_IL_00b0:
+ldarg 0
+M00000016_IL_00b1:
+ldloc local1
+M00000016_IL_00b2:
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000016_IL_00b7:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.IO.TextReadError.InvalidUtf8& value) -> Boolean
+.local System.IO.TextReadError.InvalidUtf8 local0
+ldloca local0
+initobj System.IO.TextReadError.InvalidUtf8
 M00000017_IL_0000:
-ldarg 0
+ldarg 1
 M00000017_IL_0001:
-ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
-M00000017_IL_0006:
-conv.i4
-M00000017_IL_0007:
-ldc.i4 11
+ldloca local0
+M00000017_IL_0003:
+initobj System.IO.TextReadError.InvalidUtf8
 M00000017_IL_0009:
-conv.i4
+ldloc local0
 M00000017_IL_000a:
+stobj System.IO.TextReadError.InvalidUtf8
+M00000017_IL_000f:
+ldarg 0
+M00000017_IL_0010:
+ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
+M00000017_IL_0015:
+conv.i4
+M00000017_IL_0016:
+ldc.i4 11
+M00000017_IL_0018:
+conv.i4
+M00000017_IL_0019:
 ceq
 call neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean)
-M00000017_IL_000c:
-brtrue M00000017_IL_0016
-M00000017_IL_0011:
-br M00000017_IL_0024
-M00000017_IL_0016:
-ldarg 1
-M00000017_IL_0017:
-ldarg 0
-M00000017_IL_0018:
-ldfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
-M00000017_IL_001d:
-stobj System.IO.TextReadError.InvalidUtf8
-M00000017_IL_0022:
-ldc.bool true
-M00000017_IL_0023:
-ret
-M00000017_IL_0024:
+M00000017_IL_001b:
+brtrue M00000017_IL_0025
+M00000017_IL_0020:
+br M00000017_IL_0033
 M00000017_IL_0025:
-ldc.bool false
+ldarg 1
 M00000017_IL_0026:
+ldarg 0
+M00000017_IL_0027:
+ldfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+M00000017_IL_002c:
+stobj System.IO.TextReadError.InvalidUtf8
+M00000017_IL_0031:
+ldc.bool true
+M00000017_IL_0032:
+ret
+M00000017_IL_0033:
+M00000017_IL_0034:
+ldc.bool false
+M00000017_IL_0035:
 ret
 .end
 .method instance byref .ctor(System.IO.TextReadError.InvalidEncoding value) -> Void
@@ -1956,6 +3529,19 @@ ret
 .local System.IO.TextReadError.IoFailure unionDefault1_10
 .local System.IO.TextReadError.InvalidUtf8 unionDefault1_11
 .local System.IO.TextReadError.InvalidEncoding unionDefault1_12
+.local Byte unionFieldDefault4
+.local System.IO.TextReadError.InvalidPath unionFieldDefault7
+.local System.IO.TextReadError.NotFound unionFieldDefault10
+.local System.IO.TextReadError.AccessDenied unionFieldDefault13
+.local System.IO.TextReadError.WrongKind unionFieldDefault16
+.local System.IO.TextReadError.AlreadyExists unionFieldDefault19
+.local System.IO.TextReadError.Closed unionFieldDefault22
+.local System.IO.TextReadError.InvalidRange unionFieldDefault25
+.local System.IO.TextReadError.LimitExceeded unionFieldDefault28
+.local System.IO.TextReadError.WrongAccess unionFieldDefault31
+.local System.IO.TextReadError.IoFailure unionFieldDefault34
+.local System.IO.TextReadError.InvalidUtf8 unionFieldDefault37
+.local System.IO.TextReadError.InvalidEncoding unionFieldDefault40
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -2043,67 +3629,197 @@ ldloc unionDefault1_12
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
 M00000018_IL_0007:
-ldc.i4 12
-M00000018_IL_0009:
-stloc local0
-M00000018_IL_000a:
 ldarg 0
-M00000018_IL_000b:
-ldloc local0
-M00000018_IL_000c:
-conv.u1
+M00000018_IL_0008:
 M00000018_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.IO.TextReadError::Metadata_V1_3C5461673E
 pop
-M00000018_IL_0012:
-ldarg 1
 M00000018_IL_0013:
-stloc local1
-M00000018_IL_0014:
 ldarg 0
-M00000018_IL_0015:
-ldloc local1
-M00000018_IL_0016:
+M00000018_IL_0014:
+M00000018_IL_0019:
+ldloca unionFieldDefault7
+initobj System.IO.TextReadError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000018_IL_001f:
+ldarg 0
+M00000018_IL_0020:
+M00000018_IL_0025:
+ldloca unionFieldDefault10
+initobj System.IO.TextReadError.NotFound
+ldloc unionFieldDefault10
+stfld System.IO.TextReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000018_IL_002b:
+ldarg 0
+M00000018_IL_002c:
+M00000018_IL_0031:
+ldloca unionFieldDefault13
+initobj System.IO.TextReadError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.IO.TextReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000018_IL_0037:
+ldarg 0
+M00000018_IL_0038:
+M00000018_IL_003d:
+ldloca unionFieldDefault16
+initobj System.IO.TextReadError.WrongKind
+ldloc unionFieldDefault16
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000018_IL_0043:
+ldarg 0
+M00000018_IL_0044:
+M00000018_IL_0049:
+ldloca unionFieldDefault19
+initobj System.IO.TextReadError.AlreadyExists
+ldloc unionFieldDefault19
+stfld System.IO.TextReadError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M00000018_IL_004f:
+ldarg 0
+M00000018_IL_0050:
+M00000018_IL_0055:
+ldloca unionFieldDefault22
+initobj System.IO.TextReadError.Closed
+ldloc unionFieldDefault22
+stfld System.IO.TextReadError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M00000018_IL_005b:
+ldarg 0
+M00000018_IL_005c:
+M00000018_IL_0061:
+ldloca unionFieldDefault25
+initobj System.IO.TextReadError.InvalidRange
+ldloc unionFieldDefault25
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000018_IL_0067:
+ldarg 0
+M00000018_IL_0068:
+M00000018_IL_006d:
+ldloca unionFieldDefault28
+initobj System.IO.TextReadError.LimitExceeded
+ldloc unionFieldDefault28
+stfld System.IO.TextReadError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000018_IL_0073:
+ldarg 0
+M00000018_IL_0074:
+M00000018_IL_0079:
+ldloca unionFieldDefault31
+initobj System.IO.TextReadError.WrongAccess
+ldloc unionFieldDefault31
+stfld System.IO.TextReadError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M00000018_IL_007f:
+ldarg 0
+M00000018_IL_0080:
+M00000018_IL_0085:
+ldloca unionFieldDefault34
+initobj System.IO.TextReadError.IoFailure
+ldloc unionFieldDefault34
+stfld System.IO.TextReadError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000018_IL_008b:
+ldarg 0
+M00000018_IL_008c:
+M00000018_IL_0091:
+ldloca unionFieldDefault37
+initobj System.IO.TextReadError.InvalidUtf8
+ldloc unionFieldDefault37
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000018_IL_0097:
+ldarg 0
+M00000018_IL_0098:
+M00000018_IL_009d:
+ldloca unionFieldDefault40
+initobj System.IO.TextReadError.InvalidEncoding
+ldloc unionFieldDefault40
 stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
 pop
-M00000018_IL_001b:
+M00000018_IL_00a3:
+ldc.i4 12
+M00000018_IL_00a5:
+stloc local0
+M00000018_IL_00a6:
+ldarg 0
+M00000018_IL_00a7:
+ldloc local0
+M00000018_IL_00a8:
+conv.u1
+M00000018_IL_00a9:
+stfld System.IO.TextReadError::Metadata_V1_3C5461673E
+pop
+M00000018_IL_00ae:
+ldarg 1
+M00000018_IL_00af:
+stloc local1
+M00000018_IL_00b0:
+ldarg 0
+M00000018_IL_00b1:
+ldloc local1
+M00000018_IL_00b2:
+stfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+pop
+M00000018_IL_00b7:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.IO.TextReadError.InvalidEncoding& value) -> Boolean
+.local System.IO.TextReadError.InvalidEncoding local0
+ldloca local0
+initobj System.IO.TextReadError.InvalidEncoding
 M00000019_IL_0000:
-ldarg 0
+ldarg 1
 M00000019_IL_0001:
-ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
-M00000019_IL_0006:
-conv.i4
-M00000019_IL_0007:
-ldc.i4 12
+ldloca local0
+M00000019_IL_0003:
+initobj System.IO.TextReadError.InvalidEncoding
 M00000019_IL_0009:
-conv.i4
+ldloc local0
 M00000019_IL_000a:
+stobj System.IO.TextReadError.InvalidEncoding
+M00000019_IL_000f:
+ldarg 0
+M00000019_IL_0010:
+ldfld System.IO.TextReadError::Metadata_V1_3C5461673E
+M00000019_IL_0015:
+conv.i4
+M00000019_IL_0016:
+ldc.i4 12
+M00000019_IL_0018:
+conv.i4
+M00000019_IL_0019:
 ceq
 call neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean)
-M00000019_IL_000c:
-brtrue M00000019_IL_0016
-M00000019_IL_0011:
-br M00000019_IL_0024
-M00000019_IL_0016:
-ldarg 1
-M00000019_IL_0017:
-ldarg 0
-M00000019_IL_0018:
-ldfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
-M00000019_IL_001d:
-stobj System.IO.TextReadError.InvalidEncoding
-M00000019_IL_0022:
-ldc.bool true
-M00000019_IL_0023:
-ret
-M00000019_IL_0024:
+M00000019_IL_001b:
+brtrue M00000019_IL_0025
+M00000019_IL_0020:
+br M00000019_IL_0033
 M00000019_IL_0025:
-ldc.bool false
+ldarg 1
 M00000019_IL_0026:
+ldarg 0
+M00000019_IL_0027:
+ldfld System.IO.TextReadError::Metadata_V1_3C496E76616C6964456E636F64696E675061796C6F61643E
+M00000019_IL_002c:
+stobj System.IO.TextReadError.InvalidEncoding
+M00000019_IL_0031:
+ldc.bool true
+M00000019_IL_0032:
+ret
+M00000019_IL_0033:
+M00000019_IL_0034:
+ldc.bool false
+M00000019_IL_0035:
 ret
 .end
 .method instance override byref ToString() -> String

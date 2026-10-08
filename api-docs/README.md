@@ -303,7 +303,7 @@ remains bounded. Token-aware HTTP Send and GetString remain pending.
 
 SocketError is now projected from its normal Raven union source when the bridge
 builds either core reference. Its old Is*/Get* helpers are removed; the generated
-HasValue, Value and conditional TryGetValue members are documented. IUnion is a
+HasValue, Value and conditional TryGetValue members are documented. UnionValue is a
 provisional ordinary compiler-support interface. RavenUnionCaseAttribute is excluded
 as compiler-reference metadata, with the exact reason in exclusions.json; it is not
 an executable runtime API. Rebuild the bridge after changing the embedded source.
@@ -311,7 +311,7 @@ an executable runtime API. Rebuild the bridge after changing the embedded source
 DnsError and UriError also use embedded-source projection. Their generated HasValue,
 Value and conditional TryGetValue members replace handwritten per-case Is*/Get*
 helpers. Their default values are inactive. The core projection runs sequentially
-so every family uses the same supplied IUnion identity.
+so every family uses the same supplied UnionValue identity.
 
 The same generated union documentation now covers StreamError, TextReadError,
 StorageLookupError, FileReadError, FileWriteError, ConsoleReadError, Utf8SliceError,
@@ -1248,4 +1248,23 @@ snapshot were refreshed together; the API snapshot check passes. Recompile old
 consumers with the matching runtime/compiler bundle. The wider legacy runtime
 snapshot check still reports a pre-existing missing StringBuilder input in Tuple;
 the regenerated Tasks slice's own input/output fingerprints pass. No website build
-or publication is claimed. The separate legacy `IUnion` migration remains next.
+or publication is claimed. The following union slice replaces the legacy `IUnion` protocol with `UnionValue`.
+
+### Union bridge refresh (2026-10-08)
+
+The reference now uses `System.Runtime.CompilerServices.UnionValue`. Its existing
+boxed Value getter is unchanged. All 27 generated union slices were regenerated
+with the current compiler, including explicit constructor field initialization.
+Their `TryGetValue` failure paths now clear outputs to defaults, matching Raven's
+shared body contract and native emission; older bridge fragments preserved them.
+The XML reference and executable contract sample now describe/test clearing.
+Do not rely on a previous output after a false result. Matched references, compiler,
+application and runtime fragments must be rebuilt together.
+
+Raven integration commit `be58723fb` completes the protocol mappings and keeps
+async interface signatures in target metadata for CLI emission. Sixteen focused
+profile/emission/.NET controls pass; the legacy async sample prints `Suspended`
+and `42`. Native-enabled compiler rebuild succeeds. This is tested on
+`codex/source-object-metadata-resolution`; the general cache fix is independently
+on Raven main as `d0a115dcf`. No bridge-free bootstrap or general native async
+entry-draining support is claimed.

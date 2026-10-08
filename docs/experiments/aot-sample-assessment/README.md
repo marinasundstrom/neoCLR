@@ -289,3 +289,11 @@ exit status. `library-async` still rejects `neoCLR.Runtime.DrainEntryTasks`; its
 lifecycle needs a real scheduling contract. These are sequential coverage checks,
 not benchmark measurements. The original 104-case survey is historical and has not
 been rerun wholesale. The CLI core bootstrap still exists.
+
+The [interface protocol validation](interface-protocol-validation.json) records the
+completed naming audit, matching reference refresh, legacy union/time/async consumers
+and Raven compiler controls. `UnionValue` replaces the final handwritten `IUnion`
+protocol. Regenerated legacy union outputs now clear on failed extraction, following
+Raven's already-shared body contract. This corrects a stale bridge snapshot, not a
+new native capability. The general source-lookup cache fix is independently tested
+on Raven main as `d0a115dcf`.

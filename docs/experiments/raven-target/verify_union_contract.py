@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-union-contract-') as temporary:
         raise AssertionError(result.stdout + result.stderr)
     print(json.dumps({'union_contract': 'passed', 'checks': [
         'construction and case identity', 'active None versus default carrier',
-        'TryGetValue preserves outputs on mismatch', 'IUnion.Value boxed cases',
+        'TryGetValue clears outputs on mismatch', 'UnionValue.Value boxed cases',
         'Option/Result propagation', 'same-type success and error payloads',
         'TaskOutcome completion/cancellation and inactive default', 'Void and nested outcomes', 'reference identity and value copies'
     ]}, indent=2))

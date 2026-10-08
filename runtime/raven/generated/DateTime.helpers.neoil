@@ -28,6 +28,13 @@ ldarg arg0
 callvirt instance System.Object::ToString()
 ret
 .end
+.function neoCLR.Library.System.DateTime.DefaultReference53797374656D2E5A6F6E65644461746554696D65() -> System.ZonedDateTime
+.local System.ZonedDateTime value
+ldloca value
+initobj System.ZonedDateTime
+ldloc value
+ret
+.end
 .function neoCLR.Library.System.DateTime.DefaultReference53797374656D2E4F626A656374() -> System.Object
 .local System.Object value
 ldloca value

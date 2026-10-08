@@ -2,7 +2,7 @@
 .type System.Tasks.TaskOutcome<T0>
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
-.implements System.Runtime.CompilerServices.IUnion
+.implements System.Runtime.CompilerServices.UnionValue
 .field private Metadata_V1_3C5461673E Byte
 .field private Metadata_V1_3C436F6D706C657465645061796C6F61643E System.Tasks.TaskOutcome.Completed<T0>
 .field private Metadata_V1_3C43616E63656C6C65645061796C6F61643E System.Tasks.TaskOutcome.Cancelled
@@ -203,6 +203,9 @@ ret
 .local Byte unionDefault1_0
 .local System.Tasks.TaskOutcome.Completed<T0> unionDefault1_1
 .local System.Tasks.TaskOutcome.Cancelled unionDefault1_2
+.local Byte unionFieldDefault4
+.local System.Tasks.TaskOutcome.Completed<T0> unionFieldDefault7
+.local System.Tasks.TaskOutcome.Cancelled unionFieldDefault10
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -230,67 +233,107 @@ ldloc unionDefault1_2
 stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
 pop
 M00000003_IL_0007:
-ldc.i4 1
-M00000003_IL_0008:
-stloc local0
-M00000003_IL_0009:
 ldarg 0
-M00000003_IL_000a:
-ldloc local0
-M00000003_IL_000b:
-conv.u1
-M00000003_IL_000c:
+M00000003_IL_0008:
+M00000003_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
 pop
-M00000003_IL_0011:
-ldarg 1
-M00000003_IL_0012:
-stloc local1
 M00000003_IL_0013:
 ldarg 0
 M00000003_IL_0014:
-ldloc local1
-M00000003_IL_0015:
+M00000003_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Tasks.TaskOutcome.Completed<T0>
+ldloc unionFieldDefault7
 stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C436F6D706C657465645061796C6F61643E
 pop
-M00000003_IL_001a:
+M00000003_IL_001f:
+ldarg 0
+M00000003_IL_0020:
+M00000003_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Tasks.TaskOutcome.Cancelled
+ldloc unionFieldDefault10
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+M00000003_IL_002b:
+ldc.i4 1
+M00000003_IL_002c:
+stloc local0
+M00000003_IL_002d:
+ldarg 0
+M00000003_IL_002e:
+ldloc local0
+M00000003_IL_002f:
+conv.u1
+M00000003_IL_0030:
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+pop
+M00000003_IL_0035:
+ldarg 1
+M00000003_IL_0036:
+stloc local1
+M00000003_IL_0037:
+ldarg 0
+M00000003_IL_0038:
+ldloc local1
+M00000003_IL_0039:
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C436F6D706C657465645061796C6F61643E
+pop
+M00000003_IL_003e:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Tasks.TaskOutcome.Completed<T0>& value) -> Boolean
+.local System.Tasks.TaskOutcome.Completed<T0> local0
+ldloca local0
+initobj System.Tasks.TaskOutcome.Completed<T0>
 M00000004_IL_0000:
-ldarg 0
+ldarg 1
 M00000004_IL_0001:
-ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
-M00000004_IL_0006:
-conv.i4
-M00000004_IL_0007:
-ldc.i4 1
-M00000004_IL_0008:
-conv.i4
+ldloca local0
+M00000004_IL_0003:
+initobj System.Tasks.TaskOutcome.Completed<T0>
 M00000004_IL_0009:
+ldloc local0
+M00000004_IL_000a:
+stobj System.Tasks.TaskOutcome.Completed<T0>
+M00000004_IL_000f:
+ldarg 0
+M00000004_IL_0010:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+M00000004_IL_0015:
+conv.i4
+M00000004_IL_0016:
+ldc.i4 1
+M00000004_IL_0017:
+conv.i4
+M00000004_IL_0018:
 ceq
 call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_000b:
-brtrue M00000004_IL_0015
-M00000004_IL_0010:
-br M00000004_IL_0023
-M00000004_IL_0015:
-ldarg 1
-M00000004_IL_0016:
-ldarg 0
-M00000004_IL_0017:
-ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C436F6D706C657465645061796C6F61643E
-M00000004_IL_001c:
-stobj System.Tasks.TaskOutcome.Completed<T0>
-M00000004_IL_0021:
-ldc.bool true
-M00000004_IL_0022:
-ret
-M00000004_IL_0023:
+M00000004_IL_001a:
+brtrue M00000004_IL_0024
+M00000004_IL_001f:
+br M00000004_IL_0032
 M00000004_IL_0024:
-ldc.bool false
+ldarg 1
 M00000004_IL_0025:
+ldarg 0
+M00000004_IL_0026:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C436F6D706C657465645061796C6F61643E
+M00000004_IL_002b:
+stobj System.Tasks.TaskOutcome.Completed<T0>
+M00000004_IL_0030:
+ldc.bool true
+M00000004_IL_0031:
+ret
+M00000004_IL_0032:
+M00000004_IL_0033:
+ldc.bool false
+M00000004_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Tasks.TaskOutcome.Cancelled value) -> Void
@@ -299,6 +342,9 @@ ret
 .local Byte unionDefault1_0
 .local System.Tasks.TaskOutcome.Completed<T0> unionDefault1_1
 .local System.Tasks.TaskOutcome.Cancelled unionDefault1_2
+.local Byte unionFieldDefault4
+.local System.Tasks.TaskOutcome.Completed<T0> unionFieldDefault7
+.local System.Tasks.TaskOutcome.Cancelled unionFieldDefault10
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -326,67 +372,107 @@ ldloc unionDefault1_2
 stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
 pop
 M00000005_IL_0007:
-ldc.i4 2
-M00000005_IL_0008:
-stloc local0
-M00000005_IL_0009:
 ldarg 0
-M00000005_IL_000a:
-ldloc local0
-M00000005_IL_000b:
-conv.u1
-M00000005_IL_000c:
+M00000005_IL_0008:
+M00000005_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
 pop
-M00000005_IL_0011:
-ldarg 1
-M00000005_IL_0012:
-stloc local1
 M00000005_IL_0013:
 ldarg 0
 M00000005_IL_0014:
-ldloc local1
-M00000005_IL_0015:
+M00000005_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Tasks.TaskOutcome.Completed<T0>
+ldloc unionFieldDefault7
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C436F6D706C657465645061796C6F61643E
+pop
+M00000005_IL_001f:
+ldarg 0
+M00000005_IL_0020:
+M00000005_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Tasks.TaskOutcome.Cancelled
+ldloc unionFieldDefault10
 stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
 pop
-M00000005_IL_001a:
+M00000005_IL_002b:
+ldc.i4 2
+M00000005_IL_002c:
+stloc local0
+M00000005_IL_002d:
+ldarg 0
+M00000005_IL_002e:
+ldloc local0
+M00000005_IL_002f:
+conv.u1
+M00000005_IL_0030:
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+pop
+M00000005_IL_0035:
+ldarg 1
+M00000005_IL_0036:
+stloc local1
+M00000005_IL_0037:
+ldarg 0
+M00000005_IL_0038:
+ldloc local1
+M00000005_IL_0039:
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+M00000005_IL_003e:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Tasks.TaskOutcome.Cancelled& value) -> Boolean
+.local System.Tasks.TaskOutcome.Cancelled local0
+ldloca local0
+initobj System.Tasks.TaskOutcome.Cancelled
 M00000006_IL_0000:
-ldarg 0
+ldarg 1
 M00000006_IL_0001:
-ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
-M00000006_IL_0006:
-conv.i4
-M00000006_IL_0007:
-ldc.i4 2
-M00000006_IL_0008:
-conv.i4
+ldloca local0
+M00000006_IL_0003:
+initobj System.Tasks.TaskOutcome.Cancelled
 M00000006_IL_0009:
+ldloc local0
+M00000006_IL_000a:
+stobj System.Tasks.TaskOutcome.Cancelled
+M00000006_IL_000f:
+ldarg 0
+M00000006_IL_0010:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+M00000006_IL_0015:
+conv.i4
+M00000006_IL_0016:
+ldc.i4 2
+M00000006_IL_0017:
+conv.i4
+M00000006_IL_0018:
 ceq
 call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
-M00000006_IL_000b:
-brtrue M00000006_IL_0015
-M00000006_IL_0010:
-br M00000006_IL_0023
-M00000006_IL_0015:
-ldarg 1
-M00000006_IL_0016:
-ldarg 0
-M00000006_IL_0017:
-ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
-M00000006_IL_001c:
-stobj System.Tasks.TaskOutcome.Cancelled
-M00000006_IL_0021:
-ldc.bool true
-M00000006_IL_0022:
-ret
-M00000006_IL_0023:
+M00000006_IL_001a:
+brtrue M00000006_IL_0024
+M00000006_IL_001f:
+br M00000006_IL_0032
 M00000006_IL_0024:
-ldc.bool false
+ldarg 1
 M00000006_IL_0025:
+ldarg 0
+M00000006_IL_0026:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+M00000006_IL_002b:
+stobj System.Tasks.TaskOutcome.Cancelled
+M00000006_IL_0030:
+ldc.bool true
+M00000006_IL_0031:
+ret
+M00000006_IL_0032:
+M00000006_IL_0033:
+ldc.bool false
+M00000006_IL_0034:
 ret
 .end
 .method instance byref get_Value() -> System.Object

@@ -45,7 +45,7 @@ static class SourceUnionReferences
             for (var index = 0; index < Owners.Length; index++)
             {
                 // Each subsequent compilation consumes the already projected support
-                // types, so Raven reuses the supplied core's IUnion identity.
+                // types, so Raven reuses the supplied core's UnionValue identity.
                 var compilation = Compilation.Create("SourceUnionReferences", [trees[index]],
                     [MetadataReference.CreateFromFile(input)], options);
                 var source = Path.Combine(directory, "SourceUnionReferences" + index + ".dll");

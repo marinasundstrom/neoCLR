@@ -675,11 +675,11 @@
     }
   },
   "System.Runtime.CompilerServices.IAsyncStateMachine.html": {
-    "uid": "T:System.Runtime.CompilerServices.IAsyncStateMachine",
+    "uid": "T:System.Runtime.CompilerServices.AsyncStateMachine",
     "anchors": {
-      "System_Runtime_CompilerServices_IAsyncStateMachine": "T:System.Runtime.CompilerServices.IAsyncStateMachine",
-      "System_Runtime_CompilerServices_IAsyncStateMachine_MoveNext": "M:System.Runtime.CompilerServices.IAsyncStateMachine.MoveNext",
-      "System_Runtime_CompilerServices_IAsyncStateMachine_SetStateMachine_System_Runtime_CompilerServices_IAsyncStateMachine_": "M:System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine"
+      "System_Runtime_CompilerServices_IAsyncStateMachine": "T:System.Runtime.CompilerServices.AsyncStateMachine",
+      "System_Runtime_CompilerServices_IAsyncStateMachine_MoveNext": "M:System.Runtime.CompilerServices.AsyncStateMachine.MoveNext",
+      "System_Runtime_CompilerServices_IAsyncStateMachine_SetStateMachine_System_Runtime_CompilerServices_IAsyncStateMachine_": "M:System.Runtime.CompilerServices.AsyncStateMachine.SetStateMachine"
     }
   },
   "System.Storage.FileWriteError.NotFound.html": {
@@ -744,9 +744,9 @@
     }
   },
   "System.Runtime.CompilerServices.ITaskAwaiter.html": {
-    "uid": "T:System.Runtime.CompilerServices.ITaskAwaiter",
+    "uid": "T:System.Runtime.CompilerServices.TaskAwaiter",
     "anchors": {
-      "System_Runtime_CompilerServices_ITaskAwaiter": "T:System.Runtime.CompilerServices.ITaskAwaiter"
+      "System_Runtime_CompilerServices_ITaskAwaiter": "T:System.Runtime.CompilerServices.TaskAwaiter"
     }
   },
   "System.Introspection.ModuleInfo.html": {

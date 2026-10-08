@@ -19,7 +19,7 @@ static class UnionImport
     const string Carrier = "System.Result<Int32,System.OverflowError>";
     const string Ok = "System.Result.Ok<Int32>";
     const string Error = "System.Result.Error<System.OverflowError>";
-    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null, bool VirtualFunction = false, string? FunctionReceiver = null, GenericInstanceMethod? GenericFunction = null, MethodReference? ConstructedFunction = null);
+    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null, bool VirtualFunction = false, string? FunctionReceiver = null, GenericInstanceMethod? GenericFunction = null, MethodReference? ConstructedFunction = null, ApplicationTypes.FieldShape? ConstructorField = null);
     sealed record State(List<Slot> Stack, bool[] Assigned);
     sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false, int[]? Outputs = null);
 
@@ -291,6 +291,14 @@ static class UnionImport
                     case Code.Initobj:
                         var initializedType = ProfileType((TypeReference)instruction.Operand);
                         var address = Expect(initializedType + "&");
+                        if (address.ConstructorField is { } constructorField)
+                        {
+                            // The CLI field-address/initobj pair is lowered to a checked
+                            // write on the unpublished native constructor receiver.
+                            var fieldDefault = $"unionFieldDefault{index}";
+                            code.AppendLine($".local {initializedType} {fieldDefault}\nldloca {fieldDefault}\ninitobj {initializedType}\nldloc {fieldDefault}\nstfld {constructorField.Owner}::{constructorField.Name}\npop");
+                            break;
+                        }
                         if (address.Local < 0)
                         {
                             // Generated value-type constructors zero their own receiver before
@@ -299,7 +307,7 @@ static class UnionImport
                                 || !method.DeclaringType.IsValueType
                                 || initializedType != ProfileType(method.DeclaringType)
                                 || NeedsInitialization(initializedType))
-                                throw new InvalidDataException("Only local or value-constructor receiver initialization is admitted.");
+                                throw new InvalidDataException($"Only local or value-constructor receiver initialization is admitted: {method.FullName}, local={address.Local}, argument={address.Argument}, initialized={initializedType}, receiver={ProfileType(method.DeclaringType)}, needsInitialization={NeedsInitialization(initializedType)}.");
                             if (libraryOwner is not null && (StandardUnionLibrary.IsCandidate(method.DeclaringType)
                                 || method.DeclaringType.DeclaringType is { } unionOwner && (StandardUnionLibrary.IsCandidate(unionOwner) || RavenUnionMetadata.CompanionTarget(unionOwner) is not null)))
                             {
@@ -415,11 +423,21 @@ static class UnionImport
                         ApplicationTypes.CheckFieldWrite(addressField.Resolve(), method);
                         var addressed = TupleBindings.Field(addressField) ?? ApplicationTypes.Field(addressField, method, ProfileType)
                             ?? throw new InvalidDataException("Unsupported application field address.");
-                        var addressOwner = Pop().Type;
+                        var addressReceiver = Pop();
+                        var addressOwner = addressReceiver.Type;
                         if (addressOwner != addressed.Owner + "&" && (!ApplicationTypes.IsReference(addressed.Owner) || !ApplicationTypes.Assignable(addressOwner, addressed.Owner)))
                             throw new InvalidDataException("Field addresses require stored values or reference owners.");
-                        Push(new(addressed.Type + "&"));
-                        code.AppendLine($"ldflda {addressed.Owner}::{addressed.Name}");
+                        var initializesOwnUnionField = libraryOwner is not null && method.IsConstructor
+                            && method.DeclaringType.IsValueType && addressReceiver.Argument == 0
+                            && addressField.Resolve().DeclaringType == method.DeclaringType
+                            && (StandardUnionLibrary.IsCandidate(method.DeclaringType)
+                                || method.DeclaringType.DeclaringType is { } fieldUnionOwner
+                                    && (StandardUnionLibrary.IsCandidate(fieldUnionOwner) || RavenUnionMetadata.CompanionTarget(fieldUnionOwner) is not null))
+                            && instruction.Next is { OpCode.Code: Code.Initobj, Operand: TypeReference fieldDefaultType }
+                            && ProfileType(fieldDefaultType) == addressed.Type;
+                        Push(new(addressed.Type + "&", ConstructorField: initializesOwnUnionField ? addressed : null));
+                        if (!initializesOwnUnionField)
+                            code.AppendLine($"ldflda {addressed.Owner}::{addressed.Name}");
                         break;
                     case Code.Ldfld:
                         if (!collectionProfile) throw new InvalidDataException("Native fields require target profile.");
@@ -495,8 +513,15 @@ static class UnionImport
                             throw new InvalidDataException("Reference indirect stores require a declared instance output argument.");
                         var referenceOutput = referenceDestination.Type[..^1];
                         if ((referenceOutput != "String" && !ApplicationTypes.IsReference(referenceOutput) && !GlobalizationBindings.IsName(referenceOutput))
-                            || referenceValue.Type != referenceOutput)
-                            throw new InvalidDataException("Reference output stores require an exact supported value type.");
+                            || (referenceValue.Type != referenceOutput && referenceValue.Type != "FaultNull"))
+                            throw new InvalidDataException($"Reference output stores require an exact supported value type: {method.FullName}, output={referenceOutput}, value={referenceValue.Type}.");
+                        if (referenceValue.Type == "FaultNull")
+                        {
+                            // CLI ldnull has no emitted stack value until its exact
+                            // supported reference type is known at this output store.
+                            var nullOutput = $"referenceOutputDefault{index}";
+                            code.AppendLine($".local {referenceOutput} {nullOutput}\nldloca {nullOutput}\ninitobj {referenceOutput}\nldloc {nullOutput}");
+                        }
                         code.AppendLine("stobj " + referenceOutput); break;
                     case Code.Stind_I4:
                         Expect("Int32");

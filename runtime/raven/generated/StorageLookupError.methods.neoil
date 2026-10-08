@@ -2,7 +2,7 @@
 .type System.Storage.StorageLookupError
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
-.implements System.Runtime.CompilerServices.IUnion
+.implements System.Runtime.CompilerServices.UnionValue
 .field private Metadata_V1_3C5461673E Byte
 .field private Metadata_V1_3C496E76616C6964506174685061796C6F61643E System.Storage.StorageLookupError.InvalidPath
 .field private Metadata_V1_3C4E6F74466F756E645061796C6F61643E System.Storage.StorageLookupError.NotFound
@@ -120,6 +120,14 @@ ret
 .local System.Storage.StorageLookupError.IoFailure unionDefault1_5
 .local System.Storage.StorageLookupError.InvalidRange unionDefault1_6
 .local System.Storage.StorageLookupError.LimitExceeded unionDefault1_7
+.local Byte unionFieldDefault4
+.local System.Storage.StorageLookupError.InvalidPath unionFieldDefault7
+.local System.Storage.StorageLookupError.NotFound unionFieldDefault10
+.local System.Storage.StorageLookupError.AccessDenied unionFieldDefault13
+.local System.Storage.StorageLookupError.WrongKind unionFieldDefault16
+.local System.Storage.StorageLookupError.IoFailure unionFieldDefault19
+.local System.Storage.StorageLookupError.InvalidRange unionFieldDefault22
+.local System.Storage.StorageLookupError.LimitExceeded unionFieldDefault25
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -177,67 +185,152 @@ ldloc unionDefault1_7
 stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 M00000002_IL_0007:
-ldc.i4 1
-M00000002_IL_0008:
-stloc local0
-M00000002_IL_0009:
 ldarg 0
-M00000002_IL_000a:
-ldloc local0
-M00000002_IL_000b:
-conv.u1
-M00000002_IL_000c:
+M00000002_IL_0008:
+M00000002_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
 pop
-M00000002_IL_0011:
-ldarg 1
-M00000002_IL_0012:
-stloc local1
 M00000002_IL_0013:
 ldarg 0
 M00000002_IL_0014:
-ldloc local1
-M00000002_IL_0015:
+M00000002_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.StorageLookupError.InvalidPath
+ldloc unionFieldDefault7
 stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
 pop
-M00000002_IL_001a:
+M00000002_IL_001f:
+ldarg 0
+M00000002_IL_0020:
+M00000002_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.StorageLookupError.NotFound
+ldloc unionFieldDefault10
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000002_IL_002b:
+ldarg 0
+M00000002_IL_002c:
+M00000002_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.StorageLookupError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.Storage.StorageLookupError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000002_IL_0037:
+ldarg 0
+M00000002_IL_0038:
+M00000002_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.StorageLookupError.WrongKind
+ldloc unionFieldDefault16
+stfld System.Storage.StorageLookupError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000002_IL_0043:
+ldarg 0
+M00000002_IL_0044:
+M00000002_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.StorageLookupError.IoFailure
+ldloc unionFieldDefault19
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000002_IL_004f:
+ldarg 0
+M00000002_IL_0050:
+M00000002_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.StorageLookupError.InvalidRange
+ldloc unionFieldDefault22
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000002_IL_005b:
+ldarg 0
+M00000002_IL_005c:
+M00000002_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.StorageLookupError.LimitExceeded
+ldloc unionFieldDefault25
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000002_IL_0067:
+ldc.i4 1
+M00000002_IL_0068:
+stloc local0
+M00000002_IL_0069:
+ldarg 0
+M00000002_IL_006a:
+ldloc local0
+M00000002_IL_006b:
+conv.u1
+M00000002_IL_006c:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+pop
+M00000002_IL_0071:
+ldarg 1
+M00000002_IL_0072:
+stloc local1
+M00000002_IL_0073:
+ldarg 0
+M00000002_IL_0074:
+ldloc local1
+M00000002_IL_0075:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000002_IL_007a:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.StorageLookupError.InvalidPath& value) -> Boolean
+.local System.Storage.StorageLookupError.InvalidPath local0
+ldloca local0
+initobj System.Storage.StorageLookupError.InvalidPath
 M00000003_IL_0000:
-ldarg 0
+ldarg 1
 M00000003_IL_0001:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
-M00000003_IL_0006:
-conv.i4
-M00000003_IL_0007:
-ldc.i4 1
-M00000003_IL_0008:
-conv.i4
+ldloca local0
+M00000003_IL_0003:
+initobj System.Storage.StorageLookupError.InvalidPath
 M00000003_IL_0009:
+ldloc local0
+M00000003_IL_000a:
+stobj System.Storage.StorageLookupError.InvalidPath
+M00000003_IL_000f:
+ldarg 0
+M00000003_IL_0010:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+M00000003_IL_0015:
+conv.i4
+M00000003_IL_0016:
+ldc.i4 1
+M00000003_IL_0017:
+conv.i4
+M00000003_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
-M00000003_IL_000b:
-brtrue M00000003_IL_0015
-M00000003_IL_0010:
-br M00000003_IL_0023
-M00000003_IL_0015:
-ldarg 1
-M00000003_IL_0016:
-ldarg 0
-M00000003_IL_0017:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
-M00000003_IL_001c:
-stobj System.Storage.StorageLookupError.InvalidPath
-M00000003_IL_0021:
-ldc.bool true
-M00000003_IL_0022:
-ret
-M00000003_IL_0023:
+M00000003_IL_001a:
+brtrue M00000003_IL_0024
+M00000003_IL_001f:
+br M00000003_IL_0032
 M00000003_IL_0024:
-ldc.bool false
+ldarg 1
 M00000003_IL_0025:
+ldarg 0
+M00000003_IL_0026:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+M00000003_IL_002b:
+stobj System.Storage.StorageLookupError.InvalidPath
+M00000003_IL_0030:
+ldc.bool true
+M00000003_IL_0031:
+ret
+M00000003_IL_0032:
+M00000003_IL_0033:
+ldc.bool false
+M00000003_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.StorageLookupError.NotFound value) -> Void
@@ -251,6 +344,14 @@ ret
 .local System.Storage.StorageLookupError.IoFailure unionDefault1_5
 .local System.Storage.StorageLookupError.InvalidRange unionDefault1_6
 .local System.Storage.StorageLookupError.LimitExceeded unionDefault1_7
+.local Byte unionFieldDefault4
+.local System.Storage.StorageLookupError.InvalidPath unionFieldDefault7
+.local System.Storage.StorageLookupError.NotFound unionFieldDefault10
+.local System.Storage.StorageLookupError.AccessDenied unionFieldDefault13
+.local System.Storage.StorageLookupError.WrongKind unionFieldDefault16
+.local System.Storage.StorageLookupError.IoFailure unionFieldDefault19
+.local System.Storage.StorageLookupError.InvalidRange unionFieldDefault22
+.local System.Storage.StorageLookupError.LimitExceeded unionFieldDefault25
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -308,67 +409,152 @@ ldloc unionDefault1_7
 stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 M00000004_IL_0007:
-ldc.i4 2
-M00000004_IL_0008:
-stloc local0
-M00000004_IL_0009:
 ldarg 0
-M00000004_IL_000a:
-ldloc local0
-M00000004_IL_000b:
-conv.u1
-M00000004_IL_000c:
+M00000004_IL_0008:
+M00000004_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
 pop
-M00000004_IL_0011:
-ldarg 1
-M00000004_IL_0012:
-stloc local1
 M00000004_IL_0013:
 ldarg 0
 M00000004_IL_0014:
-ldloc local1
-M00000004_IL_0015:
+M00000004_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.StorageLookupError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000004_IL_001f:
+ldarg 0
+M00000004_IL_0020:
+M00000004_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.StorageLookupError.NotFound
+ldloc unionFieldDefault10
 stfld System.Storage.StorageLookupError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
 pop
-M00000004_IL_001a:
+M00000004_IL_002b:
+ldarg 0
+M00000004_IL_002c:
+M00000004_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.StorageLookupError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.Storage.StorageLookupError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000004_IL_0037:
+ldarg 0
+M00000004_IL_0038:
+M00000004_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.StorageLookupError.WrongKind
+ldloc unionFieldDefault16
+stfld System.Storage.StorageLookupError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000004_IL_0043:
+ldarg 0
+M00000004_IL_0044:
+M00000004_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.StorageLookupError.IoFailure
+ldloc unionFieldDefault19
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000004_IL_004f:
+ldarg 0
+M00000004_IL_0050:
+M00000004_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.StorageLookupError.InvalidRange
+ldloc unionFieldDefault22
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000004_IL_005b:
+ldarg 0
+M00000004_IL_005c:
+M00000004_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.StorageLookupError.LimitExceeded
+ldloc unionFieldDefault25
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000004_IL_0067:
+ldc.i4 2
+M00000004_IL_0068:
+stloc local0
+M00000004_IL_0069:
+ldarg 0
+M00000004_IL_006a:
+ldloc local0
+M00000004_IL_006b:
+conv.u1
+M00000004_IL_006c:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+pop
+M00000004_IL_0071:
+ldarg 1
+M00000004_IL_0072:
+stloc local1
+M00000004_IL_0073:
+ldarg 0
+M00000004_IL_0074:
+ldloc local1
+M00000004_IL_0075:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000004_IL_007a:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.StorageLookupError.NotFound& value) -> Boolean
+.local System.Storage.StorageLookupError.NotFound local0
+ldloca local0
+initobj System.Storage.StorageLookupError.NotFound
 M00000005_IL_0000:
-ldarg 0
+ldarg 1
 M00000005_IL_0001:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
-M00000005_IL_0006:
-conv.i4
-M00000005_IL_0007:
-ldc.i4 2
-M00000005_IL_0008:
-conv.i4
+ldloca local0
+M00000005_IL_0003:
+initobj System.Storage.StorageLookupError.NotFound
 M00000005_IL_0009:
+ldloc local0
+M00000005_IL_000a:
+stobj System.Storage.StorageLookupError.NotFound
+M00000005_IL_000f:
+ldarg 0
+M00000005_IL_0010:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+M00000005_IL_0015:
+conv.i4
+M00000005_IL_0016:
+ldc.i4 2
+M00000005_IL_0017:
+conv.i4
+M00000005_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_000b:
-brtrue M00000005_IL_0015
-M00000005_IL_0010:
-br M00000005_IL_0023
-M00000005_IL_0015:
-ldarg 1
-M00000005_IL_0016:
-ldarg 0
-M00000005_IL_0017:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
-M00000005_IL_001c:
-stobj System.Storage.StorageLookupError.NotFound
-M00000005_IL_0021:
-ldc.bool true
-M00000005_IL_0022:
-ret
-M00000005_IL_0023:
+M00000005_IL_001a:
+brtrue M00000005_IL_0024
+M00000005_IL_001f:
+br M00000005_IL_0032
 M00000005_IL_0024:
-ldc.bool false
+ldarg 1
 M00000005_IL_0025:
+ldarg 0
+M00000005_IL_0026:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+M00000005_IL_002b:
+stobj System.Storage.StorageLookupError.NotFound
+M00000005_IL_0030:
+ldc.bool true
+M00000005_IL_0031:
+ret
+M00000005_IL_0032:
+M00000005_IL_0033:
+ldc.bool false
+M00000005_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.StorageLookupError.AccessDenied value) -> Void
@@ -382,6 +568,14 @@ ret
 .local System.Storage.StorageLookupError.IoFailure unionDefault1_5
 .local System.Storage.StorageLookupError.InvalidRange unionDefault1_6
 .local System.Storage.StorageLookupError.LimitExceeded unionDefault1_7
+.local Byte unionFieldDefault4
+.local System.Storage.StorageLookupError.InvalidPath unionFieldDefault7
+.local System.Storage.StorageLookupError.NotFound unionFieldDefault10
+.local System.Storage.StorageLookupError.AccessDenied unionFieldDefault13
+.local System.Storage.StorageLookupError.WrongKind unionFieldDefault16
+.local System.Storage.StorageLookupError.IoFailure unionFieldDefault19
+.local System.Storage.StorageLookupError.InvalidRange unionFieldDefault22
+.local System.Storage.StorageLookupError.LimitExceeded unionFieldDefault25
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -439,67 +633,152 @@ ldloc unionDefault1_7
 stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 M00000006_IL_0007:
-ldc.i4 3
-M00000006_IL_0008:
-stloc local0
-M00000006_IL_0009:
 ldarg 0
-M00000006_IL_000a:
-ldloc local0
-M00000006_IL_000b:
-conv.u1
-M00000006_IL_000c:
+M00000006_IL_0008:
+M00000006_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
 pop
-M00000006_IL_0011:
-ldarg 1
-M00000006_IL_0012:
-stloc local1
 M00000006_IL_0013:
 ldarg 0
 M00000006_IL_0014:
-ldloc local1
-M00000006_IL_0015:
+M00000006_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.StorageLookupError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000006_IL_001f:
+ldarg 0
+M00000006_IL_0020:
+M00000006_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.StorageLookupError.NotFound
+ldloc unionFieldDefault10
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000006_IL_002b:
+ldarg 0
+M00000006_IL_002c:
+M00000006_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.StorageLookupError.AccessDenied
+ldloc unionFieldDefault13
 stfld System.Storage.StorageLookupError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
 pop
-M00000006_IL_001a:
+M00000006_IL_0037:
+ldarg 0
+M00000006_IL_0038:
+M00000006_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.StorageLookupError.WrongKind
+ldloc unionFieldDefault16
+stfld System.Storage.StorageLookupError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000006_IL_0043:
+ldarg 0
+M00000006_IL_0044:
+M00000006_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.StorageLookupError.IoFailure
+ldloc unionFieldDefault19
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000006_IL_004f:
+ldarg 0
+M00000006_IL_0050:
+M00000006_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.StorageLookupError.InvalidRange
+ldloc unionFieldDefault22
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000006_IL_005b:
+ldarg 0
+M00000006_IL_005c:
+M00000006_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.StorageLookupError.LimitExceeded
+ldloc unionFieldDefault25
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000006_IL_0067:
+ldc.i4 3
+M00000006_IL_0068:
+stloc local0
+M00000006_IL_0069:
+ldarg 0
+M00000006_IL_006a:
+ldloc local0
+M00000006_IL_006b:
+conv.u1
+M00000006_IL_006c:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+pop
+M00000006_IL_0071:
+ldarg 1
+M00000006_IL_0072:
+stloc local1
+M00000006_IL_0073:
+ldarg 0
+M00000006_IL_0074:
+ldloc local1
+M00000006_IL_0075:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000006_IL_007a:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.StorageLookupError.AccessDenied& value) -> Boolean
+.local System.Storage.StorageLookupError.AccessDenied local0
+ldloca local0
+initobj System.Storage.StorageLookupError.AccessDenied
 M00000007_IL_0000:
-ldarg 0
+ldarg 1
 M00000007_IL_0001:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
-M00000007_IL_0006:
-conv.i4
-M00000007_IL_0007:
-ldc.i4 3
-M00000007_IL_0008:
-conv.i4
+ldloca local0
+M00000007_IL_0003:
+initobj System.Storage.StorageLookupError.AccessDenied
 M00000007_IL_0009:
+ldloc local0
+M00000007_IL_000a:
+stobj System.Storage.StorageLookupError.AccessDenied
+M00000007_IL_000f:
+ldarg 0
+M00000007_IL_0010:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+M00000007_IL_0015:
+conv.i4
+M00000007_IL_0016:
+ldc.i4 3
+M00000007_IL_0017:
+conv.i4
+M00000007_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_000b:
-brtrue M00000007_IL_0015
-M00000007_IL_0010:
-br M00000007_IL_0023
-M00000007_IL_0015:
-ldarg 1
-M00000007_IL_0016:
-ldarg 0
-M00000007_IL_0017:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
-M00000007_IL_001c:
-stobj System.Storage.StorageLookupError.AccessDenied
-M00000007_IL_0021:
-ldc.bool true
-M00000007_IL_0022:
-ret
-M00000007_IL_0023:
+M00000007_IL_001a:
+brtrue M00000007_IL_0024
+M00000007_IL_001f:
+br M00000007_IL_0032
 M00000007_IL_0024:
-ldc.bool false
+ldarg 1
 M00000007_IL_0025:
+ldarg 0
+M00000007_IL_0026:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+M00000007_IL_002b:
+stobj System.Storage.StorageLookupError.AccessDenied
+M00000007_IL_0030:
+ldc.bool true
+M00000007_IL_0031:
+ret
+M00000007_IL_0032:
+M00000007_IL_0033:
+ldc.bool false
+M00000007_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.StorageLookupError.WrongKind value) -> Void
@@ -513,6 +792,14 @@ ret
 .local System.Storage.StorageLookupError.IoFailure unionDefault1_5
 .local System.Storage.StorageLookupError.InvalidRange unionDefault1_6
 .local System.Storage.StorageLookupError.LimitExceeded unionDefault1_7
+.local Byte unionFieldDefault4
+.local System.Storage.StorageLookupError.InvalidPath unionFieldDefault7
+.local System.Storage.StorageLookupError.NotFound unionFieldDefault10
+.local System.Storage.StorageLookupError.AccessDenied unionFieldDefault13
+.local System.Storage.StorageLookupError.WrongKind unionFieldDefault16
+.local System.Storage.StorageLookupError.IoFailure unionFieldDefault19
+.local System.Storage.StorageLookupError.InvalidRange unionFieldDefault22
+.local System.Storage.StorageLookupError.LimitExceeded unionFieldDefault25
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -570,67 +857,152 @@ ldloc unionDefault1_7
 stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 M00000008_IL_0007:
-ldc.i4 4
-M00000008_IL_0008:
-stloc local0
-M00000008_IL_0009:
 ldarg 0
-M00000008_IL_000a:
-ldloc local0
-M00000008_IL_000b:
-conv.u1
-M00000008_IL_000c:
+M00000008_IL_0008:
+M00000008_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
 pop
-M00000008_IL_0011:
-ldarg 1
-M00000008_IL_0012:
-stloc local1
 M00000008_IL_0013:
 ldarg 0
 M00000008_IL_0014:
-ldloc local1
-M00000008_IL_0015:
+M00000008_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.StorageLookupError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000008_IL_001f:
+ldarg 0
+M00000008_IL_0020:
+M00000008_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.StorageLookupError.NotFound
+ldloc unionFieldDefault10
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000008_IL_002b:
+ldarg 0
+M00000008_IL_002c:
+M00000008_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.StorageLookupError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.Storage.StorageLookupError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000008_IL_0037:
+ldarg 0
+M00000008_IL_0038:
+M00000008_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.StorageLookupError.WrongKind
+ldloc unionFieldDefault16
 stfld System.Storage.StorageLookupError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
 pop
-M00000008_IL_001a:
+M00000008_IL_0043:
+ldarg 0
+M00000008_IL_0044:
+M00000008_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.StorageLookupError.IoFailure
+ldloc unionFieldDefault19
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000008_IL_004f:
+ldarg 0
+M00000008_IL_0050:
+M00000008_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.StorageLookupError.InvalidRange
+ldloc unionFieldDefault22
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000008_IL_005b:
+ldarg 0
+M00000008_IL_005c:
+M00000008_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.StorageLookupError.LimitExceeded
+ldloc unionFieldDefault25
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000008_IL_0067:
+ldc.i4 4
+M00000008_IL_0068:
+stloc local0
+M00000008_IL_0069:
+ldarg 0
+M00000008_IL_006a:
+ldloc local0
+M00000008_IL_006b:
+conv.u1
+M00000008_IL_006c:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+pop
+M00000008_IL_0071:
+ldarg 1
+M00000008_IL_0072:
+stloc local1
+M00000008_IL_0073:
+ldarg 0
+M00000008_IL_0074:
+ldloc local1
+M00000008_IL_0075:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000008_IL_007a:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.StorageLookupError.WrongKind& value) -> Boolean
+.local System.Storage.StorageLookupError.WrongKind local0
+ldloca local0
+initobj System.Storage.StorageLookupError.WrongKind
 M00000009_IL_0000:
-ldarg 0
+ldarg 1
 M00000009_IL_0001:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
-M00000009_IL_0006:
-conv.i4
-M00000009_IL_0007:
-ldc.i4 4
-M00000009_IL_0008:
-conv.i4
+ldloca local0
+M00000009_IL_0003:
+initobj System.Storage.StorageLookupError.WrongKind
 M00000009_IL_0009:
+ldloc local0
+M00000009_IL_000a:
+stobj System.Storage.StorageLookupError.WrongKind
+M00000009_IL_000f:
+ldarg 0
+M00000009_IL_0010:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+M00000009_IL_0015:
+conv.i4
+M00000009_IL_0016:
+ldc.i4 4
+M00000009_IL_0017:
+conv.i4
+M00000009_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
-M00000009_IL_000b:
-brtrue M00000009_IL_0015
-M00000009_IL_0010:
-br M00000009_IL_0023
-M00000009_IL_0015:
-ldarg 1
-M00000009_IL_0016:
-ldarg 0
-M00000009_IL_0017:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
-M00000009_IL_001c:
-stobj System.Storage.StorageLookupError.WrongKind
-M00000009_IL_0021:
-ldc.bool true
-M00000009_IL_0022:
-ret
-M00000009_IL_0023:
+M00000009_IL_001a:
+brtrue M00000009_IL_0024
+M00000009_IL_001f:
+br M00000009_IL_0032
 M00000009_IL_0024:
-ldc.bool false
+ldarg 1
 M00000009_IL_0025:
+ldarg 0
+M00000009_IL_0026:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+M00000009_IL_002b:
+stobj System.Storage.StorageLookupError.WrongKind
+M00000009_IL_0030:
+ldc.bool true
+M00000009_IL_0031:
+ret
+M00000009_IL_0032:
+M00000009_IL_0033:
+ldc.bool false
+M00000009_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.StorageLookupError.IoFailure value) -> Void
@@ -644,6 +1016,14 @@ ret
 .local System.Storage.StorageLookupError.IoFailure unionDefault1_5
 .local System.Storage.StorageLookupError.InvalidRange unionDefault1_6
 .local System.Storage.StorageLookupError.LimitExceeded unionDefault1_7
+.local Byte unionFieldDefault4
+.local System.Storage.StorageLookupError.InvalidPath unionFieldDefault7
+.local System.Storage.StorageLookupError.NotFound unionFieldDefault10
+.local System.Storage.StorageLookupError.AccessDenied unionFieldDefault13
+.local System.Storage.StorageLookupError.WrongKind unionFieldDefault16
+.local System.Storage.StorageLookupError.IoFailure unionFieldDefault19
+.local System.Storage.StorageLookupError.InvalidRange unionFieldDefault22
+.local System.Storage.StorageLookupError.LimitExceeded unionFieldDefault25
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -701,67 +1081,152 @@ ldloc unionDefault1_7
 stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 M0000000a_IL_0007:
-ldc.i4 5
-M0000000a_IL_0008:
-stloc local0
-M0000000a_IL_0009:
 ldarg 0
-M0000000a_IL_000a:
-ldloc local0
-M0000000a_IL_000b:
-conv.u1
-M0000000a_IL_000c:
+M0000000a_IL_0008:
+M0000000a_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
 pop
-M0000000a_IL_0011:
-ldarg 1
-M0000000a_IL_0012:
-stloc local1
 M0000000a_IL_0013:
 ldarg 0
 M0000000a_IL_0014:
-ldloc local1
-M0000000a_IL_0015:
+M0000000a_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.StorageLookupError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M0000000a_IL_001f:
+ldarg 0
+M0000000a_IL_0020:
+M0000000a_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.StorageLookupError.NotFound
+ldloc unionFieldDefault10
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M0000000a_IL_002b:
+ldarg 0
+M0000000a_IL_002c:
+M0000000a_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.StorageLookupError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.Storage.StorageLookupError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M0000000a_IL_0037:
+ldarg 0
+M0000000a_IL_0038:
+M0000000a_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.StorageLookupError.WrongKind
+ldloc unionFieldDefault16
+stfld System.Storage.StorageLookupError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M0000000a_IL_0043:
+ldarg 0
+M0000000a_IL_0044:
+M0000000a_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.StorageLookupError.IoFailure
+ldloc unionFieldDefault19
 stfld System.Storage.StorageLookupError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
 pop
-M0000000a_IL_001a:
+M0000000a_IL_004f:
+ldarg 0
+M0000000a_IL_0050:
+M0000000a_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.StorageLookupError.InvalidRange
+ldloc unionFieldDefault22
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M0000000a_IL_005b:
+ldarg 0
+M0000000a_IL_005c:
+M0000000a_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.StorageLookupError.LimitExceeded
+ldloc unionFieldDefault25
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M0000000a_IL_0067:
+ldc.i4 5
+M0000000a_IL_0068:
+stloc local0
+M0000000a_IL_0069:
+ldarg 0
+M0000000a_IL_006a:
+ldloc local0
+M0000000a_IL_006b:
+conv.u1
+M0000000a_IL_006c:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+pop
+M0000000a_IL_0071:
+ldarg 1
+M0000000a_IL_0072:
+stloc local1
+M0000000a_IL_0073:
+ldarg 0
+M0000000a_IL_0074:
+ldloc local1
+M0000000a_IL_0075:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M0000000a_IL_007a:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.StorageLookupError.IoFailure& value) -> Boolean
+.local System.Storage.StorageLookupError.IoFailure local0
+ldloca local0
+initobj System.Storage.StorageLookupError.IoFailure
 M0000000b_IL_0000:
-ldarg 0
+ldarg 1
 M0000000b_IL_0001:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
-M0000000b_IL_0006:
-conv.i4
-M0000000b_IL_0007:
-ldc.i4 5
-M0000000b_IL_0008:
-conv.i4
+ldloca local0
+M0000000b_IL_0003:
+initobj System.Storage.StorageLookupError.IoFailure
 M0000000b_IL_0009:
+ldloc local0
+M0000000b_IL_000a:
+stobj System.Storage.StorageLookupError.IoFailure
+M0000000b_IL_000f:
+ldarg 0
+M0000000b_IL_0010:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+M0000000b_IL_0015:
+conv.i4
+M0000000b_IL_0016:
+ldc.i4 5
+M0000000b_IL_0017:
+conv.i4
+M0000000b_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_000b:
-brtrue M0000000b_IL_0015
-M0000000b_IL_0010:
-br M0000000b_IL_0023
-M0000000b_IL_0015:
-ldarg 1
-M0000000b_IL_0016:
-ldarg 0
-M0000000b_IL_0017:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
-M0000000b_IL_001c:
-stobj System.Storage.StorageLookupError.IoFailure
-M0000000b_IL_0021:
-ldc.bool true
-M0000000b_IL_0022:
-ret
-M0000000b_IL_0023:
+M0000000b_IL_001a:
+brtrue M0000000b_IL_0024
+M0000000b_IL_001f:
+br M0000000b_IL_0032
 M0000000b_IL_0024:
-ldc.bool false
+ldarg 1
 M0000000b_IL_0025:
+ldarg 0
+M0000000b_IL_0026:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+M0000000b_IL_002b:
+stobj System.Storage.StorageLookupError.IoFailure
+M0000000b_IL_0030:
+ldc.bool true
+M0000000b_IL_0031:
+ret
+M0000000b_IL_0032:
+M0000000b_IL_0033:
+ldc.bool false
+M0000000b_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.StorageLookupError.InvalidRange value) -> Void
@@ -775,6 +1240,14 @@ ret
 .local System.Storage.StorageLookupError.IoFailure unionDefault1_5
 .local System.Storage.StorageLookupError.InvalidRange unionDefault1_6
 .local System.Storage.StorageLookupError.LimitExceeded unionDefault1_7
+.local Byte unionFieldDefault4
+.local System.Storage.StorageLookupError.InvalidPath unionFieldDefault7
+.local System.Storage.StorageLookupError.NotFound unionFieldDefault10
+.local System.Storage.StorageLookupError.AccessDenied unionFieldDefault13
+.local System.Storage.StorageLookupError.WrongKind unionFieldDefault16
+.local System.Storage.StorageLookupError.IoFailure unionFieldDefault19
+.local System.Storage.StorageLookupError.InvalidRange unionFieldDefault22
+.local System.Storage.StorageLookupError.LimitExceeded unionFieldDefault25
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -832,67 +1305,152 @@ ldloc unionDefault1_7
 stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 M0000000c_IL_0007:
-ldc.i4 6
-M0000000c_IL_0008:
-stloc local0
-M0000000c_IL_0009:
 ldarg 0
-M0000000c_IL_000a:
-ldloc local0
-M0000000c_IL_000b:
-conv.u1
-M0000000c_IL_000c:
+M0000000c_IL_0008:
+M0000000c_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
 pop
-M0000000c_IL_0011:
-ldarg 1
-M0000000c_IL_0012:
-stloc local1
 M0000000c_IL_0013:
 ldarg 0
 M0000000c_IL_0014:
-ldloc local1
-M0000000c_IL_0015:
+M0000000c_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.StorageLookupError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M0000000c_IL_001f:
+ldarg 0
+M0000000c_IL_0020:
+M0000000c_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.StorageLookupError.NotFound
+ldloc unionFieldDefault10
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M0000000c_IL_002b:
+ldarg 0
+M0000000c_IL_002c:
+M0000000c_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.StorageLookupError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.Storage.StorageLookupError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M0000000c_IL_0037:
+ldarg 0
+M0000000c_IL_0038:
+M0000000c_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.StorageLookupError.WrongKind
+ldloc unionFieldDefault16
+stfld System.Storage.StorageLookupError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M0000000c_IL_0043:
+ldarg 0
+M0000000c_IL_0044:
+M0000000c_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.StorageLookupError.IoFailure
+ldloc unionFieldDefault19
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M0000000c_IL_004f:
+ldarg 0
+M0000000c_IL_0050:
+M0000000c_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.StorageLookupError.InvalidRange
+ldloc unionFieldDefault22
 stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
 pop
-M0000000c_IL_001a:
+M0000000c_IL_005b:
+ldarg 0
+M0000000c_IL_005c:
+M0000000c_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.StorageLookupError.LimitExceeded
+ldloc unionFieldDefault25
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M0000000c_IL_0067:
+ldc.i4 6
+M0000000c_IL_0068:
+stloc local0
+M0000000c_IL_0069:
+ldarg 0
+M0000000c_IL_006a:
+ldloc local0
+M0000000c_IL_006b:
+conv.u1
+M0000000c_IL_006c:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+pop
+M0000000c_IL_0071:
+ldarg 1
+M0000000c_IL_0072:
+stloc local1
+M0000000c_IL_0073:
+ldarg 0
+M0000000c_IL_0074:
+ldloc local1
+M0000000c_IL_0075:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M0000000c_IL_007a:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.StorageLookupError.InvalidRange& value) -> Boolean
+.local System.Storage.StorageLookupError.InvalidRange local0
+ldloca local0
+initobj System.Storage.StorageLookupError.InvalidRange
 M0000000d_IL_0000:
-ldarg 0
+ldarg 1
 M0000000d_IL_0001:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
-M0000000d_IL_0006:
-conv.i4
-M0000000d_IL_0007:
-ldc.i4 6
-M0000000d_IL_0008:
-conv.i4
+ldloca local0
+M0000000d_IL_0003:
+initobj System.Storage.StorageLookupError.InvalidRange
 M0000000d_IL_0009:
+ldloc local0
+M0000000d_IL_000a:
+stobj System.Storage.StorageLookupError.InvalidRange
+M0000000d_IL_000f:
+ldarg 0
+M0000000d_IL_0010:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+M0000000d_IL_0015:
+conv.i4
+M0000000d_IL_0016:
+ldc.i4 6
+M0000000d_IL_0017:
+conv.i4
+M0000000d_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
-M0000000d_IL_000b:
-brtrue M0000000d_IL_0015
-M0000000d_IL_0010:
-br M0000000d_IL_0023
-M0000000d_IL_0015:
-ldarg 1
-M0000000d_IL_0016:
-ldarg 0
-M0000000d_IL_0017:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
-M0000000d_IL_001c:
-stobj System.Storage.StorageLookupError.InvalidRange
-M0000000d_IL_0021:
-ldc.bool true
-M0000000d_IL_0022:
-ret
-M0000000d_IL_0023:
+M0000000d_IL_001a:
+brtrue M0000000d_IL_0024
+M0000000d_IL_001f:
+br M0000000d_IL_0032
 M0000000d_IL_0024:
-ldc.bool false
+ldarg 1
 M0000000d_IL_0025:
+ldarg 0
+M0000000d_IL_0026:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+M0000000d_IL_002b:
+stobj System.Storage.StorageLookupError.InvalidRange
+M0000000d_IL_0030:
+ldc.bool true
+M0000000d_IL_0031:
+ret
+M0000000d_IL_0032:
+M0000000d_IL_0033:
+ldc.bool false
+M0000000d_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.StorageLookupError.LimitExceeded value) -> Void
@@ -906,6 +1464,14 @@ ret
 .local System.Storage.StorageLookupError.IoFailure unionDefault1_5
 .local System.Storage.StorageLookupError.InvalidRange unionDefault1_6
 .local System.Storage.StorageLookupError.LimitExceeded unionDefault1_7
+.local Byte unionFieldDefault4
+.local System.Storage.StorageLookupError.InvalidPath unionFieldDefault7
+.local System.Storage.StorageLookupError.NotFound unionFieldDefault10
+.local System.Storage.StorageLookupError.AccessDenied unionFieldDefault13
+.local System.Storage.StorageLookupError.WrongKind unionFieldDefault16
+.local System.Storage.StorageLookupError.IoFailure unionFieldDefault19
+.local System.Storage.StorageLookupError.InvalidRange unionFieldDefault22
+.local System.Storage.StorageLookupError.LimitExceeded unionFieldDefault25
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -963,67 +1529,152 @@ ldloc unionDefault1_7
 stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 M0000000e_IL_0007:
-ldc.i4 7
-M0000000e_IL_0008:
-stloc local0
-M0000000e_IL_0009:
 ldarg 0
-M0000000e_IL_000a:
-ldloc local0
-M0000000e_IL_000b:
-conv.u1
-M0000000e_IL_000c:
+M0000000e_IL_0008:
+M0000000e_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
 pop
-M0000000e_IL_0011:
-ldarg 1
-M0000000e_IL_0012:
-stloc local1
 M0000000e_IL_0013:
 ldarg 0
 M0000000e_IL_0014:
-ldloc local1
-M0000000e_IL_0015:
+M0000000e_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.StorageLookupError.InvalidPath
+ldloc unionFieldDefault7
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M0000000e_IL_001f:
+ldarg 0
+M0000000e_IL_0020:
+M0000000e_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.StorageLookupError.NotFound
+ldloc unionFieldDefault10
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M0000000e_IL_002b:
+ldarg 0
+M0000000e_IL_002c:
+M0000000e_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.StorageLookupError.AccessDenied
+ldloc unionFieldDefault13
+stfld System.Storage.StorageLookupError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M0000000e_IL_0037:
+ldarg 0
+M0000000e_IL_0038:
+M0000000e_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.StorageLookupError.WrongKind
+ldloc unionFieldDefault16
+stfld System.Storage.StorageLookupError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M0000000e_IL_0043:
+ldarg 0
+M0000000e_IL_0044:
+M0000000e_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.StorageLookupError.IoFailure
+ldloc unionFieldDefault19
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M0000000e_IL_004f:
+ldarg 0
+M0000000e_IL_0050:
+M0000000e_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.StorageLookupError.InvalidRange
+ldloc unionFieldDefault22
+stfld System.Storage.StorageLookupError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M0000000e_IL_005b:
+ldarg 0
+M0000000e_IL_005c:
+M0000000e_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.StorageLookupError.LimitExceeded
+ldloc unionFieldDefault25
 stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
-M0000000e_IL_001a:
+M0000000e_IL_0067:
+ldc.i4 7
+M0000000e_IL_0068:
+stloc local0
+M0000000e_IL_0069:
+ldarg 0
+M0000000e_IL_006a:
+ldloc local0
+M0000000e_IL_006b:
+conv.u1
+M0000000e_IL_006c:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+pop
+M0000000e_IL_0071:
+ldarg 1
+M0000000e_IL_0072:
+stloc local1
+M0000000e_IL_0073:
+ldarg 0
+M0000000e_IL_0074:
+ldloc local1
+M0000000e_IL_0075:
+stfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M0000000e_IL_007a:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.StorageLookupError.LimitExceeded& value) -> Boolean
+.local System.Storage.StorageLookupError.LimitExceeded local0
+ldloca local0
+initobj System.Storage.StorageLookupError.LimitExceeded
 M0000000f_IL_0000:
-ldarg 0
+ldarg 1
 M0000000f_IL_0001:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
-M0000000f_IL_0006:
-conv.i4
-M0000000f_IL_0007:
-ldc.i4 7
-M0000000f_IL_0008:
-conv.i4
+ldloca local0
+M0000000f_IL_0003:
+initobj System.Storage.StorageLookupError.LimitExceeded
 M0000000f_IL_0009:
+ldloc local0
+M0000000f_IL_000a:
+stobj System.Storage.StorageLookupError.LimitExceeded
+M0000000f_IL_000f:
+ldarg 0
+M0000000f_IL_0010:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C5461673E
+M0000000f_IL_0015:
+conv.i4
+M0000000f_IL_0016:
+ldc.i4 7
+M0000000f_IL_0017:
+conv.i4
+M0000000f_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
-M0000000f_IL_000b:
-brtrue M0000000f_IL_0015
-M0000000f_IL_0010:
-br M0000000f_IL_0023
-M0000000f_IL_0015:
-ldarg 1
-M0000000f_IL_0016:
-ldarg 0
-M0000000f_IL_0017:
-ldfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
-M0000000f_IL_001c:
-stobj System.Storage.StorageLookupError.LimitExceeded
-M0000000f_IL_0021:
-ldc.bool true
-M0000000f_IL_0022:
-ret
-M0000000f_IL_0023:
+M0000000f_IL_001a:
+brtrue M0000000f_IL_0024
+M0000000f_IL_001f:
+br M0000000f_IL_0032
 M0000000f_IL_0024:
-ldc.bool false
+ldarg 1
 M0000000f_IL_0025:
+ldarg 0
+M0000000f_IL_0026:
+ldfld System.Storage.StorageLookupError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+M0000000f_IL_002b:
+stobj System.Storage.StorageLookupError.LimitExceeded
+M0000000f_IL_0030:
+ldc.bool true
+M0000000f_IL_0031:
+ret
+M0000000f_IL_0032:
+M0000000f_IL_0033:
+ldc.bool false
+M0000000f_IL_0034:
 ret
 .end
 .method instance override byref ToString() -> String

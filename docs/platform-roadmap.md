@@ -7,8 +7,8 @@ target mappings must follow the runtime names. `AsyncStateMachine` and `TaskAwai
 now replace the source protocol names. The native class-interface callback slice
 passes three real async consumers and focused GC/fault checks; `DrainEntryTasks`
 remains an explicit runtime service gap. See the [sample assessment](experiments/aot-sample-assessment/README.md).
-The wider audit also found the handwritten legacy union bridge's `IUnion`; migrate
-that protocol next. This does not change the bootstrap release gate or promise
+The wider audit also found the handwritten legacy union bridge's `IUnion`; it now
+uses `UnionValue`, with regenerated fragments and executable union/time checks. This does not change the bootstrap release gate or promise
 runtime suspension, JIT, reflection or stable callback ABI support.
 
 ## Bounded AOT investigation and first implementation (2026-10-07)

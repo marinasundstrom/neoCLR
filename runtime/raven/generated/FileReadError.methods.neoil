@@ -2,7 +2,7 @@
 .type System.Storage.FileReadError
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
-.implements System.Runtime.CompilerServices.IUnion
+.implements System.Runtime.CompilerServices.UnionValue
 .field private Metadata_V1_3C5461673E Byte
 .field private Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E System.Storage.FileReadError.InvalidLimit
 .field private Metadata_V1_3C496E76616C6964506174685061796C6F61643E System.Storage.FileReadError.InvalidPath
@@ -122,6 +122,15 @@ ret
 .local System.Storage.FileReadError.TooLarge unionDefault1_6
 .local System.Storage.FileReadError.ReadFailed unionDefault1_7
 .local System.Storage.FileReadError.InvalidUtf8 unionDefault1_8
+.local Byte unionFieldDefault4
+.local System.Storage.FileReadError.InvalidLimit unionFieldDefault7
+.local System.Storage.FileReadError.InvalidPath unionFieldDefault10
+.local System.Storage.FileReadError.NotFound unionFieldDefault13
+.local System.Storage.FileReadError.AccessDenied unionFieldDefault16
+.local System.Storage.FileReadError.NotRegularFile unionFieldDefault19
+.local System.Storage.FileReadError.TooLarge unionFieldDefault22
+.local System.Storage.FileReadError.ReadFailed unionFieldDefault25
+.local System.Storage.FileReadError.InvalidUtf8 unionFieldDefault28
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -185,67 +194,161 @@ ldloc unionDefault1_8
 stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
 pop
 M00000002_IL_0007:
-ldc.i4 1
-M00000002_IL_0008:
-stloc local0
-M00000002_IL_0009:
 ldarg 0
-M00000002_IL_000a:
-ldloc local0
-M00000002_IL_000b:
-conv.u1
-M00000002_IL_000c:
+M00000002_IL_0008:
+M00000002_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
 pop
-M00000002_IL_0011:
-ldarg 1
-M00000002_IL_0012:
-stloc local1
 M00000002_IL_0013:
 ldarg 0
 M00000002_IL_0014:
-ldloc local1
-M00000002_IL_0015:
+M00000002_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.FileReadError.InvalidLimit
+ldloc unionFieldDefault7
 stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
 pop
-M00000002_IL_001a:
+M00000002_IL_001f:
+ldarg 0
+M00000002_IL_0020:
+M00000002_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.FileReadError.InvalidPath
+ldloc unionFieldDefault10
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000002_IL_002b:
+ldarg 0
+M00000002_IL_002c:
+M00000002_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.FileReadError.NotFound
+ldloc unionFieldDefault13
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000002_IL_0037:
+ldarg 0
+M00000002_IL_0038:
+M00000002_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.FileReadError.AccessDenied
+ldloc unionFieldDefault16
+stfld System.Storage.FileReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000002_IL_0043:
+ldarg 0
+M00000002_IL_0044:
+M00000002_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.FileReadError.NotRegularFile
+ldloc unionFieldDefault19
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+M00000002_IL_004f:
+ldarg 0
+M00000002_IL_0050:
+M00000002_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.FileReadError.TooLarge
+ldloc unionFieldDefault22
+stfld System.Storage.FileReadError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+M00000002_IL_005b:
+ldarg 0
+M00000002_IL_005c:
+M00000002_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.FileReadError.ReadFailed
+ldloc unionFieldDefault25
+stfld System.Storage.FileReadError::Metadata_V1_3C526561644661696C65645061796C6F61643E
+pop
+M00000002_IL_0067:
+ldarg 0
+M00000002_IL_0068:
+M00000002_IL_006d:
+ldloca unionFieldDefault28
+initobj System.Storage.FileReadError.InvalidUtf8
+ldloc unionFieldDefault28
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000002_IL_0073:
+ldc.i4 1
+M00000002_IL_0074:
+stloc local0
+M00000002_IL_0075:
+ldarg 0
+M00000002_IL_0076:
+ldloc local0
+M00000002_IL_0077:
+conv.u1
+M00000002_IL_0078:
+stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+pop
+M00000002_IL_007d:
+ldarg 1
+M00000002_IL_007e:
+stloc local1
+M00000002_IL_007f:
+ldarg 0
+M00000002_IL_0080:
+ldloc local1
+M00000002_IL_0081:
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+M00000002_IL_0086:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.FileReadError.InvalidLimit& value) -> Boolean
+.local System.Storage.FileReadError.InvalidLimit local0
+ldloca local0
+initobj System.Storage.FileReadError.InvalidLimit
 M00000003_IL_0000:
-ldarg 0
+ldarg 1
 M00000003_IL_0001:
-ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
-M00000003_IL_0006:
-conv.i4
-M00000003_IL_0007:
-ldc.i4 1
-M00000003_IL_0008:
-conv.i4
+ldloca local0
+M00000003_IL_0003:
+initobj System.Storage.FileReadError.InvalidLimit
 M00000003_IL_0009:
+ldloc local0
+M00000003_IL_000a:
+stobj System.Storage.FileReadError.InvalidLimit
+M00000003_IL_000f:
+ldarg 0
+M00000003_IL_0010:
+ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+M00000003_IL_0015:
+conv.i4
+M00000003_IL_0016:
+ldc.i4 1
+M00000003_IL_0017:
+conv.i4
+M00000003_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
-M00000003_IL_000b:
-brtrue M00000003_IL_0015
-M00000003_IL_0010:
-br M00000003_IL_0023
-M00000003_IL_0015:
-ldarg 1
-M00000003_IL_0016:
-ldarg 0
-M00000003_IL_0017:
-ldfld System.Storage.FileReadError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
-M00000003_IL_001c:
-stobj System.Storage.FileReadError.InvalidLimit
-M00000003_IL_0021:
-ldc.bool true
-M00000003_IL_0022:
-ret
-M00000003_IL_0023:
+M00000003_IL_001a:
+brtrue M00000003_IL_0024
+M00000003_IL_001f:
+br M00000003_IL_0032
 M00000003_IL_0024:
-ldc.bool false
+ldarg 1
 M00000003_IL_0025:
+ldarg 0
+M00000003_IL_0026:
+ldfld System.Storage.FileReadError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+M00000003_IL_002b:
+stobj System.Storage.FileReadError.InvalidLimit
+M00000003_IL_0030:
+ldc.bool true
+M00000003_IL_0031:
+ret
+M00000003_IL_0032:
+M00000003_IL_0033:
+ldc.bool false
+M00000003_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.InvalidPath value) -> Void
@@ -260,6 +363,15 @@ ret
 .local System.Storage.FileReadError.TooLarge unionDefault1_6
 .local System.Storage.FileReadError.ReadFailed unionDefault1_7
 .local System.Storage.FileReadError.InvalidUtf8 unionDefault1_8
+.local Byte unionFieldDefault4
+.local System.Storage.FileReadError.InvalidLimit unionFieldDefault7
+.local System.Storage.FileReadError.InvalidPath unionFieldDefault10
+.local System.Storage.FileReadError.NotFound unionFieldDefault13
+.local System.Storage.FileReadError.AccessDenied unionFieldDefault16
+.local System.Storage.FileReadError.NotRegularFile unionFieldDefault19
+.local System.Storage.FileReadError.TooLarge unionFieldDefault22
+.local System.Storage.FileReadError.ReadFailed unionFieldDefault25
+.local System.Storage.FileReadError.InvalidUtf8 unionFieldDefault28
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -323,67 +435,161 @@ ldloc unionDefault1_8
 stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
 pop
 M00000004_IL_0007:
-ldc.i4 2
-M00000004_IL_0008:
-stloc local0
-M00000004_IL_0009:
 ldarg 0
-M00000004_IL_000a:
-ldloc local0
-M00000004_IL_000b:
-conv.u1
-M00000004_IL_000c:
+M00000004_IL_0008:
+M00000004_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
 pop
-M00000004_IL_0011:
-ldarg 1
-M00000004_IL_0012:
-stloc local1
 M00000004_IL_0013:
 ldarg 0
 M00000004_IL_0014:
-ldloc local1
-M00000004_IL_0015:
+M00000004_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.FileReadError.InvalidLimit
+ldloc unionFieldDefault7
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+M00000004_IL_001f:
+ldarg 0
+M00000004_IL_0020:
+M00000004_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.FileReadError.InvalidPath
+ldloc unionFieldDefault10
 stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
 pop
-M00000004_IL_001a:
+M00000004_IL_002b:
+ldarg 0
+M00000004_IL_002c:
+M00000004_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.FileReadError.NotFound
+ldloc unionFieldDefault13
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000004_IL_0037:
+ldarg 0
+M00000004_IL_0038:
+M00000004_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.FileReadError.AccessDenied
+ldloc unionFieldDefault16
+stfld System.Storage.FileReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000004_IL_0043:
+ldarg 0
+M00000004_IL_0044:
+M00000004_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.FileReadError.NotRegularFile
+ldloc unionFieldDefault19
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+M00000004_IL_004f:
+ldarg 0
+M00000004_IL_0050:
+M00000004_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.FileReadError.TooLarge
+ldloc unionFieldDefault22
+stfld System.Storage.FileReadError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+M00000004_IL_005b:
+ldarg 0
+M00000004_IL_005c:
+M00000004_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.FileReadError.ReadFailed
+ldloc unionFieldDefault25
+stfld System.Storage.FileReadError::Metadata_V1_3C526561644661696C65645061796C6F61643E
+pop
+M00000004_IL_0067:
+ldarg 0
+M00000004_IL_0068:
+M00000004_IL_006d:
+ldloca unionFieldDefault28
+initobj System.Storage.FileReadError.InvalidUtf8
+ldloc unionFieldDefault28
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000004_IL_0073:
+ldc.i4 2
+M00000004_IL_0074:
+stloc local0
+M00000004_IL_0075:
+ldarg 0
+M00000004_IL_0076:
+ldloc local0
+M00000004_IL_0077:
+conv.u1
+M00000004_IL_0078:
+stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+pop
+M00000004_IL_007d:
+ldarg 1
+M00000004_IL_007e:
+stloc local1
+M00000004_IL_007f:
+ldarg 0
+M00000004_IL_0080:
+ldloc local1
+M00000004_IL_0081:
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000004_IL_0086:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.FileReadError.InvalidPath& value) -> Boolean
+.local System.Storage.FileReadError.InvalidPath local0
+ldloca local0
+initobj System.Storage.FileReadError.InvalidPath
 M00000005_IL_0000:
-ldarg 0
+ldarg 1
 M00000005_IL_0001:
-ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
-M00000005_IL_0006:
-conv.i4
-M00000005_IL_0007:
-ldc.i4 2
-M00000005_IL_0008:
-conv.i4
+ldloca local0
+M00000005_IL_0003:
+initobj System.Storage.FileReadError.InvalidPath
 M00000005_IL_0009:
+ldloc local0
+M00000005_IL_000a:
+stobj System.Storage.FileReadError.InvalidPath
+M00000005_IL_000f:
+ldarg 0
+M00000005_IL_0010:
+ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+M00000005_IL_0015:
+conv.i4
+M00000005_IL_0016:
+ldc.i4 2
+M00000005_IL_0017:
+conv.i4
+M00000005_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_000b:
-brtrue M00000005_IL_0015
-M00000005_IL_0010:
-br M00000005_IL_0023
-M00000005_IL_0015:
-ldarg 1
-M00000005_IL_0016:
-ldarg 0
-M00000005_IL_0017:
-ldfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
-M00000005_IL_001c:
-stobj System.Storage.FileReadError.InvalidPath
-M00000005_IL_0021:
-ldc.bool true
-M00000005_IL_0022:
-ret
-M00000005_IL_0023:
+M00000005_IL_001a:
+brtrue M00000005_IL_0024
+M00000005_IL_001f:
+br M00000005_IL_0032
 M00000005_IL_0024:
-ldc.bool false
+ldarg 1
 M00000005_IL_0025:
+ldarg 0
+M00000005_IL_0026:
+ldfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+M00000005_IL_002b:
+stobj System.Storage.FileReadError.InvalidPath
+M00000005_IL_0030:
+ldc.bool true
+M00000005_IL_0031:
+ret
+M00000005_IL_0032:
+M00000005_IL_0033:
+ldc.bool false
+M00000005_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.NotFound value) -> Void
@@ -398,6 +604,15 @@ ret
 .local System.Storage.FileReadError.TooLarge unionDefault1_6
 .local System.Storage.FileReadError.ReadFailed unionDefault1_7
 .local System.Storage.FileReadError.InvalidUtf8 unionDefault1_8
+.local Byte unionFieldDefault4
+.local System.Storage.FileReadError.InvalidLimit unionFieldDefault7
+.local System.Storage.FileReadError.InvalidPath unionFieldDefault10
+.local System.Storage.FileReadError.NotFound unionFieldDefault13
+.local System.Storage.FileReadError.AccessDenied unionFieldDefault16
+.local System.Storage.FileReadError.NotRegularFile unionFieldDefault19
+.local System.Storage.FileReadError.TooLarge unionFieldDefault22
+.local System.Storage.FileReadError.ReadFailed unionFieldDefault25
+.local System.Storage.FileReadError.InvalidUtf8 unionFieldDefault28
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -461,67 +676,161 @@ ldloc unionDefault1_8
 stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
 pop
 M00000006_IL_0007:
-ldc.i4 3
-M00000006_IL_0008:
-stloc local0
-M00000006_IL_0009:
 ldarg 0
-M00000006_IL_000a:
-ldloc local0
-M00000006_IL_000b:
-conv.u1
-M00000006_IL_000c:
+M00000006_IL_0008:
+M00000006_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
 pop
-M00000006_IL_0011:
-ldarg 1
-M00000006_IL_0012:
-stloc local1
 M00000006_IL_0013:
 ldarg 0
 M00000006_IL_0014:
-ldloc local1
-M00000006_IL_0015:
+M00000006_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.FileReadError.InvalidLimit
+ldloc unionFieldDefault7
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+M00000006_IL_001f:
+ldarg 0
+M00000006_IL_0020:
+M00000006_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.FileReadError.InvalidPath
+ldloc unionFieldDefault10
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000006_IL_002b:
+ldarg 0
+M00000006_IL_002c:
+M00000006_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.FileReadError.NotFound
+ldloc unionFieldDefault13
 stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
 pop
-M00000006_IL_001a:
+M00000006_IL_0037:
+ldarg 0
+M00000006_IL_0038:
+M00000006_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.FileReadError.AccessDenied
+ldloc unionFieldDefault16
+stfld System.Storage.FileReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000006_IL_0043:
+ldarg 0
+M00000006_IL_0044:
+M00000006_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.FileReadError.NotRegularFile
+ldloc unionFieldDefault19
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+M00000006_IL_004f:
+ldarg 0
+M00000006_IL_0050:
+M00000006_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.FileReadError.TooLarge
+ldloc unionFieldDefault22
+stfld System.Storage.FileReadError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+M00000006_IL_005b:
+ldarg 0
+M00000006_IL_005c:
+M00000006_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.FileReadError.ReadFailed
+ldloc unionFieldDefault25
+stfld System.Storage.FileReadError::Metadata_V1_3C526561644661696C65645061796C6F61643E
+pop
+M00000006_IL_0067:
+ldarg 0
+M00000006_IL_0068:
+M00000006_IL_006d:
+ldloca unionFieldDefault28
+initobj System.Storage.FileReadError.InvalidUtf8
+ldloc unionFieldDefault28
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000006_IL_0073:
+ldc.i4 3
+M00000006_IL_0074:
+stloc local0
+M00000006_IL_0075:
+ldarg 0
+M00000006_IL_0076:
+ldloc local0
+M00000006_IL_0077:
+conv.u1
+M00000006_IL_0078:
+stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+pop
+M00000006_IL_007d:
+ldarg 1
+M00000006_IL_007e:
+stloc local1
+M00000006_IL_007f:
+ldarg 0
+M00000006_IL_0080:
+ldloc local1
+M00000006_IL_0081:
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000006_IL_0086:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.FileReadError.NotFound& value) -> Boolean
+.local System.Storage.FileReadError.NotFound local0
+ldloca local0
+initobj System.Storage.FileReadError.NotFound
 M00000007_IL_0000:
-ldarg 0
+ldarg 1
 M00000007_IL_0001:
-ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
-M00000007_IL_0006:
-conv.i4
-M00000007_IL_0007:
-ldc.i4 3
-M00000007_IL_0008:
-conv.i4
+ldloca local0
+M00000007_IL_0003:
+initobj System.Storage.FileReadError.NotFound
 M00000007_IL_0009:
+ldloc local0
+M00000007_IL_000a:
+stobj System.Storage.FileReadError.NotFound
+M00000007_IL_000f:
+ldarg 0
+M00000007_IL_0010:
+ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+M00000007_IL_0015:
+conv.i4
+M00000007_IL_0016:
+ldc.i4 3
+M00000007_IL_0017:
+conv.i4
+M00000007_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_000b:
-brtrue M00000007_IL_0015
-M00000007_IL_0010:
-br M00000007_IL_0023
-M00000007_IL_0015:
-ldarg 1
-M00000007_IL_0016:
-ldarg 0
-M00000007_IL_0017:
-ldfld System.Storage.FileReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
-M00000007_IL_001c:
-stobj System.Storage.FileReadError.NotFound
-M00000007_IL_0021:
-ldc.bool true
-M00000007_IL_0022:
-ret
-M00000007_IL_0023:
+M00000007_IL_001a:
+brtrue M00000007_IL_0024
+M00000007_IL_001f:
+br M00000007_IL_0032
 M00000007_IL_0024:
-ldc.bool false
+ldarg 1
 M00000007_IL_0025:
+ldarg 0
+M00000007_IL_0026:
+ldfld System.Storage.FileReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+M00000007_IL_002b:
+stobj System.Storage.FileReadError.NotFound
+M00000007_IL_0030:
+ldc.bool true
+M00000007_IL_0031:
+ret
+M00000007_IL_0032:
+M00000007_IL_0033:
+ldc.bool false
+M00000007_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.AccessDenied value) -> Void
@@ -536,6 +845,15 @@ ret
 .local System.Storage.FileReadError.TooLarge unionDefault1_6
 .local System.Storage.FileReadError.ReadFailed unionDefault1_7
 .local System.Storage.FileReadError.InvalidUtf8 unionDefault1_8
+.local Byte unionFieldDefault4
+.local System.Storage.FileReadError.InvalidLimit unionFieldDefault7
+.local System.Storage.FileReadError.InvalidPath unionFieldDefault10
+.local System.Storage.FileReadError.NotFound unionFieldDefault13
+.local System.Storage.FileReadError.AccessDenied unionFieldDefault16
+.local System.Storage.FileReadError.NotRegularFile unionFieldDefault19
+.local System.Storage.FileReadError.TooLarge unionFieldDefault22
+.local System.Storage.FileReadError.ReadFailed unionFieldDefault25
+.local System.Storage.FileReadError.InvalidUtf8 unionFieldDefault28
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -599,67 +917,161 @@ ldloc unionDefault1_8
 stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
 pop
 M00000008_IL_0007:
-ldc.i4 4
-M00000008_IL_0008:
-stloc local0
-M00000008_IL_0009:
 ldarg 0
-M00000008_IL_000a:
-ldloc local0
-M00000008_IL_000b:
-conv.u1
-M00000008_IL_000c:
+M00000008_IL_0008:
+M00000008_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
 pop
-M00000008_IL_0011:
-ldarg 1
-M00000008_IL_0012:
-stloc local1
 M00000008_IL_0013:
 ldarg 0
 M00000008_IL_0014:
-ldloc local1
-M00000008_IL_0015:
+M00000008_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.FileReadError.InvalidLimit
+ldloc unionFieldDefault7
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+M00000008_IL_001f:
+ldarg 0
+M00000008_IL_0020:
+M00000008_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.FileReadError.InvalidPath
+ldloc unionFieldDefault10
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000008_IL_002b:
+ldarg 0
+M00000008_IL_002c:
+M00000008_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.FileReadError.NotFound
+ldloc unionFieldDefault13
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000008_IL_0037:
+ldarg 0
+M00000008_IL_0038:
+M00000008_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.FileReadError.AccessDenied
+ldloc unionFieldDefault16
 stfld System.Storage.FileReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
 pop
-M00000008_IL_001a:
+M00000008_IL_0043:
+ldarg 0
+M00000008_IL_0044:
+M00000008_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.FileReadError.NotRegularFile
+ldloc unionFieldDefault19
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+M00000008_IL_004f:
+ldarg 0
+M00000008_IL_0050:
+M00000008_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.FileReadError.TooLarge
+ldloc unionFieldDefault22
+stfld System.Storage.FileReadError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+M00000008_IL_005b:
+ldarg 0
+M00000008_IL_005c:
+M00000008_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.FileReadError.ReadFailed
+ldloc unionFieldDefault25
+stfld System.Storage.FileReadError::Metadata_V1_3C526561644661696C65645061796C6F61643E
+pop
+M00000008_IL_0067:
+ldarg 0
+M00000008_IL_0068:
+M00000008_IL_006d:
+ldloca unionFieldDefault28
+initobj System.Storage.FileReadError.InvalidUtf8
+ldloc unionFieldDefault28
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000008_IL_0073:
+ldc.i4 4
+M00000008_IL_0074:
+stloc local0
+M00000008_IL_0075:
+ldarg 0
+M00000008_IL_0076:
+ldloc local0
+M00000008_IL_0077:
+conv.u1
+M00000008_IL_0078:
+stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+pop
+M00000008_IL_007d:
+ldarg 1
+M00000008_IL_007e:
+stloc local1
+M00000008_IL_007f:
+ldarg 0
+M00000008_IL_0080:
+ldloc local1
+M00000008_IL_0081:
+stfld System.Storage.FileReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000008_IL_0086:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.FileReadError.AccessDenied& value) -> Boolean
+.local System.Storage.FileReadError.AccessDenied local0
+ldloca local0
+initobj System.Storage.FileReadError.AccessDenied
 M00000009_IL_0000:
-ldarg 0
+ldarg 1
 M00000009_IL_0001:
-ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
-M00000009_IL_0006:
-conv.i4
-M00000009_IL_0007:
-ldc.i4 4
-M00000009_IL_0008:
-conv.i4
+ldloca local0
+M00000009_IL_0003:
+initobj System.Storage.FileReadError.AccessDenied
 M00000009_IL_0009:
+ldloc local0
+M00000009_IL_000a:
+stobj System.Storage.FileReadError.AccessDenied
+M00000009_IL_000f:
+ldarg 0
+M00000009_IL_0010:
+ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+M00000009_IL_0015:
+conv.i4
+M00000009_IL_0016:
+ldc.i4 4
+M00000009_IL_0017:
+conv.i4
+M00000009_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
-M00000009_IL_000b:
-brtrue M00000009_IL_0015
-M00000009_IL_0010:
-br M00000009_IL_0023
-M00000009_IL_0015:
-ldarg 1
-M00000009_IL_0016:
-ldarg 0
-M00000009_IL_0017:
-ldfld System.Storage.FileReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
-M00000009_IL_001c:
-stobj System.Storage.FileReadError.AccessDenied
-M00000009_IL_0021:
-ldc.bool true
-M00000009_IL_0022:
-ret
-M00000009_IL_0023:
+M00000009_IL_001a:
+brtrue M00000009_IL_0024
+M00000009_IL_001f:
+br M00000009_IL_0032
 M00000009_IL_0024:
-ldc.bool false
+ldarg 1
 M00000009_IL_0025:
+ldarg 0
+M00000009_IL_0026:
+ldfld System.Storage.FileReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+M00000009_IL_002b:
+stobj System.Storage.FileReadError.AccessDenied
+M00000009_IL_0030:
+ldc.bool true
+M00000009_IL_0031:
+ret
+M00000009_IL_0032:
+M00000009_IL_0033:
+ldc.bool false
+M00000009_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.NotRegularFile value) -> Void
@@ -674,6 +1086,15 @@ ret
 .local System.Storage.FileReadError.TooLarge unionDefault1_6
 .local System.Storage.FileReadError.ReadFailed unionDefault1_7
 .local System.Storage.FileReadError.InvalidUtf8 unionDefault1_8
+.local Byte unionFieldDefault4
+.local System.Storage.FileReadError.InvalidLimit unionFieldDefault7
+.local System.Storage.FileReadError.InvalidPath unionFieldDefault10
+.local System.Storage.FileReadError.NotFound unionFieldDefault13
+.local System.Storage.FileReadError.AccessDenied unionFieldDefault16
+.local System.Storage.FileReadError.NotRegularFile unionFieldDefault19
+.local System.Storage.FileReadError.TooLarge unionFieldDefault22
+.local System.Storage.FileReadError.ReadFailed unionFieldDefault25
+.local System.Storage.FileReadError.InvalidUtf8 unionFieldDefault28
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -737,67 +1158,161 @@ ldloc unionDefault1_8
 stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
 pop
 M0000000a_IL_0007:
-ldc.i4 5
-M0000000a_IL_0008:
-stloc local0
-M0000000a_IL_0009:
 ldarg 0
-M0000000a_IL_000a:
-ldloc local0
-M0000000a_IL_000b:
-conv.u1
-M0000000a_IL_000c:
+M0000000a_IL_0008:
+M0000000a_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
 pop
-M0000000a_IL_0011:
-ldarg 1
-M0000000a_IL_0012:
-stloc local1
 M0000000a_IL_0013:
 ldarg 0
 M0000000a_IL_0014:
-ldloc local1
-M0000000a_IL_0015:
+M0000000a_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.FileReadError.InvalidLimit
+ldloc unionFieldDefault7
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+M0000000a_IL_001f:
+ldarg 0
+M0000000a_IL_0020:
+M0000000a_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.FileReadError.InvalidPath
+ldloc unionFieldDefault10
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M0000000a_IL_002b:
+ldarg 0
+M0000000a_IL_002c:
+M0000000a_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.FileReadError.NotFound
+ldloc unionFieldDefault13
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M0000000a_IL_0037:
+ldarg 0
+M0000000a_IL_0038:
+M0000000a_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.FileReadError.AccessDenied
+ldloc unionFieldDefault16
+stfld System.Storage.FileReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M0000000a_IL_0043:
+ldarg 0
+M0000000a_IL_0044:
+M0000000a_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.FileReadError.NotRegularFile
+ldloc unionFieldDefault19
 stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
 pop
-M0000000a_IL_001a:
+M0000000a_IL_004f:
+ldarg 0
+M0000000a_IL_0050:
+M0000000a_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.FileReadError.TooLarge
+ldloc unionFieldDefault22
+stfld System.Storage.FileReadError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+M0000000a_IL_005b:
+ldarg 0
+M0000000a_IL_005c:
+M0000000a_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.FileReadError.ReadFailed
+ldloc unionFieldDefault25
+stfld System.Storage.FileReadError::Metadata_V1_3C526561644661696C65645061796C6F61643E
+pop
+M0000000a_IL_0067:
+ldarg 0
+M0000000a_IL_0068:
+M0000000a_IL_006d:
+ldloca unionFieldDefault28
+initobj System.Storage.FileReadError.InvalidUtf8
+ldloc unionFieldDefault28
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M0000000a_IL_0073:
+ldc.i4 5
+M0000000a_IL_0074:
+stloc local0
+M0000000a_IL_0075:
+ldarg 0
+M0000000a_IL_0076:
+ldloc local0
+M0000000a_IL_0077:
+conv.u1
+M0000000a_IL_0078:
+stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+pop
+M0000000a_IL_007d:
+ldarg 1
+M0000000a_IL_007e:
+stloc local1
+M0000000a_IL_007f:
+ldarg 0
+M0000000a_IL_0080:
+ldloc local1
+M0000000a_IL_0081:
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+M0000000a_IL_0086:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.FileReadError.NotRegularFile& value) -> Boolean
+.local System.Storage.FileReadError.NotRegularFile local0
+ldloca local0
+initobj System.Storage.FileReadError.NotRegularFile
 M0000000b_IL_0000:
-ldarg 0
+ldarg 1
 M0000000b_IL_0001:
-ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
-M0000000b_IL_0006:
-conv.i4
-M0000000b_IL_0007:
-ldc.i4 5
-M0000000b_IL_0008:
-conv.i4
+ldloca local0
+M0000000b_IL_0003:
+initobj System.Storage.FileReadError.NotRegularFile
 M0000000b_IL_0009:
+ldloc local0
+M0000000b_IL_000a:
+stobj System.Storage.FileReadError.NotRegularFile
+M0000000b_IL_000f:
+ldarg 0
+M0000000b_IL_0010:
+ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+M0000000b_IL_0015:
+conv.i4
+M0000000b_IL_0016:
+ldc.i4 5
+M0000000b_IL_0017:
+conv.i4
+M0000000b_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_000b:
-brtrue M0000000b_IL_0015
-M0000000b_IL_0010:
-br M0000000b_IL_0023
-M0000000b_IL_0015:
-ldarg 1
-M0000000b_IL_0016:
-ldarg 0
-M0000000b_IL_0017:
-ldfld System.Storage.FileReadError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
-M0000000b_IL_001c:
-stobj System.Storage.FileReadError.NotRegularFile
-M0000000b_IL_0021:
-ldc.bool true
-M0000000b_IL_0022:
-ret
-M0000000b_IL_0023:
+M0000000b_IL_001a:
+brtrue M0000000b_IL_0024
+M0000000b_IL_001f:
+br M0000000b_IL_0032
 M0000000b_IL_0024:
-ldc.bool false
+ldarg 1
 M0000000b_IL_0025:
+ldarg 0
+M0000000b_IL_0026:
+ldfld System.Storage.FileReadError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+M0000000b_IL_002b:
+stobj System.Storage.FileReadError.NotRegularFile
+M0000000b_IL_0030:
+ldc.bool true
+M0000000b_IL_0031:
+ret
+M0000000b_IL_0032:
+M0000000b_IL_0033:
+ldc.bool false
+M0000000b_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.TooLarge value) -> Void
@@ -812,6 +1327,15 @@ ret
 .local System.Storage.FileReadError.TooLarge unionDefault1_6
 .local System.Storage.FileReadError.ReadFailed unionDefault1_7
 .local System.Storage.FileReadError.InvalidUtf8 unionDefault1_8
+.local Byte unionFieldDefault4
+.local System.Storage.FileReadError.InvalidLimit unionFieldDefault7
+.local System.Storage.FileReadError.InvalidPath unionFieldDefault10
+.local System.Storage.FileReadError.NotFound unionFieldDefault13
+.local System.Storage.FileReadError.AccessDenied unionFieldDefault16
+.local System.Storage.FileReadError.NotRegularFile unionFieldDefault19
+.local System.Storage.FileReadError.TooLarge unionFieldDefault22
+.local System.Storage.FileReadError.ReadFailed unionFieldDefault25
+.local System.Storage.FileReadError.InvalidUtf8 unionFieldDefault28
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -875,67 +1399,161 @@ ldloc unionDefault1_8
 stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
 pop
 M0000000c_IL_0007:
-ldc.i4 6
-M0000000c_IL_0008:
-stloc local0
-M0000000c_IL_0009:
 ldarg 0
-M0000000c_IL_000a:
-ldloc local0
-M0000000c_IL_000b:
-conv.u1
-M0000000c_IL_000c:
+M0000000c_IL_0008:
+M0000000c_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
 pop
-M0000000c_IL_0011:
-ldarg 1
-M0000000c_IL_0012:
-stloc local1
 M0000000c_IL_0013:
 ldarg 0
 M0000000c_IL_0014:
-ldloc local1
-M0000000c_IL_0015:
+M0000000c_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.FileReadError.InvalidLimit
+ldloc unionFieldDefault7
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+M0000000c_IL_001f:
+ldarg 0
+M0000000c_IL_0020:
+M0000000c_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.FileReadError.InvalidPath
+ldloc unionFieldDefault10
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M0000000c_IL_002b:
+ldarg 0
+M0000000c_IL_002c:
+M0000000c_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.FileReadError.NotFound
+ldloc unionFieldDefault13
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M0000000c_IL_0037:
+ldarg 0
+M0000000c_IL_0038:
+M0000000c_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.FileReadError.AccessDenied
+ldloc unionFieldDefault16
+stfld System.Storage.FileReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M0000000c_IL_0043:
+ldarg 0
+M0000000c_IL_0044:
+M0000000c_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.FileReadError.NotRegularFile
+ldloc unionFieldDefault19
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+M0000000c_IL_004f:
+ldarg 0
+M0000000c_IL_0050:
+M0000000c_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.FileReadError.TooLarge
+ldloc unionFieldDefault22
 stfld System.Storage.FileReadError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
 pop
-M0000000c_IL_001a:
+M0000000c_IL_005b:
+ldarg 0
+M0000000c_IL_005c:
+M0000000c_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.FileReadError.ReadFailed
+ldloc unionFieldDefault25
+stfld System.Storage.FileReadError::Metadata_V1_3C526561644661696C65645061796C6F61643E
+pop
+M0000000c_IL_0067:
+ldarg 0
+M0000000c_IL_0068:
+M0000000c_IL_006d:
+ldloca unionFieldDefault28
+initobj System.Storage.FileReadError.InvalidUtf8
+ldloc unionFieldDefault28
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M0000000c_IL_0073:
+ldc.i4 6
+M0000000c_IL_0074:
+stloc local0
+M0000000c_IL_0075:
+ldarg 0
+M0000000c_IL_0076:
+ldloc local0
+M0000000c_IL_0077:
+conv.u1
+M0000000c_IL_0078:
+stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+pop
+M0000000c_IL_007d:
+ldarg 1
+M0000000c_IL_007e:
+stloc local1
+M0000000c_IL_007f:
+ldarg 0
+M0000000c_IL_0080:
+ldloc local1
+M0000000c_IL_0081:
+stfld System.Storage.FileReadError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+M0000000c_IL_0086:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.FileReadError.TooLarge& value) -> Boolean
+.local System.Storage.FileReadError.TooLarge local0
+ldloca local0
+initobj System.Storage.FileReadError.TooLarge
 M0000000d_IL_0000:
-ldarg 0
+ldarg 1
 M0000000d_IL_0001:
-ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
-M0000000d_IL_0006:
-conv.i4
-M0000000d_IL_0007:
-ldc.i4 6
-M0000000d_IL_0008:
-conv.i4
+ldloca local0
+M0000000d_IL_0003:
+initobj System.Storage.FileReadError.TooLarge
 M0000000d_IL_0009:
+ldloc local0
+M0000000d_IL_000a:
+stobj System.Storage.FileReadError.TooLarge
+M0000000d_IL_000f:
+ldarg 0
+M0000000d_IL_0010:
+ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+M0000000d_IL_0015:
+conv.i4
+M0000000d_IL_0016:
+ldc.i4 6
+M0000000d_IL_0017:
+conv.i4
+M0000000d_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
-M0000000d_IL_000b:
-brtrue M0000000d_IL_0015
-M0000000d_IL_0010:
-br M0000000d_IL_0023
-M0000000d_IL_0015:
-ldarg 1
-M0000000d_IL_0016:
-ldarg 0
-M0000000d_IL_0017:
-ldfld System.Storage.FileReadError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
-M0000000d_IL_001c:
-stobj System.Storage.FileReadError.TooLarge
-M0000000d_IL_0021:
-ldc.bool true
-M0000000d_IL_0022:
-ret
-M0000000d_IL_0023:
+M0000000d_IL_001a:
+brtrue M0000000d_IL_0024
+M0000000d_IL_001f:
+br M0000000d_IL_0032
 M0000000d_IL_0024:
-ldc.bool false
+ldarg 1
 M0000000d_IL_0025:
+ldarg 0
+M0000000d_IL_0026:
+ldfld System.Storage.FileReadError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+M0000000d_IL_002b:
+stobj System.Storage.FileReadError.TooLarge
+M0000000d_IL_0030:
+ldc.bool true
+M0000000d_IL_0031:
+ret
+M0000000d_IL_0032:
+M0000000d_IL_0033:
+ldc.bool false
+M0000000d_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.ReadFailed value) -> Void
@@ -950,6 +1568,15 @@ ret
 .local System.Storage.FileReadError.TooLarge unionDefault1_6
 .local System.Storage.FileReadError.ReadFailed unionDefault1_7
 .local System.Storage.FileReadError.InvalidUtf8 unionDefault1_8
+.local Byte unionFieldDefault4
+.local System.Storage.FileReadError.InvalidLimit unionFieldDefault7
+.local System.Storage.FileReadError.InvalidPath unionFieldDefault10
+.local System.Storage.FileReadError.NotFound unionFieldDefault13
+.local System.Storage.FileReadError.AccessDenied unionFieldDefault16
+.local System.Storage.FileReadError.NotRegularFile unionFieldDefault19
+.local System.Storage.FileReadError.TooLarge unionFieldDefault22
+.local System.Storage.FileReadError.ReadFailed unionFieldDefault25
+.local System.Storage.FileReadError.InvalidUtf8 unionFieldDefault28
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -1013,67 +1640,161 @@ ldloc unionDefault1_8
 stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
 pop
 M0000000e_IL_0007:
-ldc.i4 7
-M0000000e_IL_0008:
-stloc local0
-M0000000e_IL_0009:
 ldarg 0
-M0000000e_IL_000a:
-ldloc local0
-M0000000e_IL_000b:
-conv.u1
-M0000000e_IL_000c:
+M0000000e_IL_0008:
+M0000000e_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
 pop
-M0000000e_IL_0011:
-ldarg 1
-M0000000e_IL_0012:
-stloc local1
 M0000000e_IL_0013:
 ldarg 0
 M0000000e_IL_0014:
-ldloc local1
-M0000000e_IL_0015:
+M0000000e_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.FileReadError.InvalidLimit
+ldloc unionFieldDefault7
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+M0000000e_IL_001f:
+ldarg 0
+M0000000e_IL_0020:
+M0000000e_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.FileReadError.InvalidPath
+ldloc unionFieldDefault10
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M0000000e_IL_002b:
+ldarg 0
+M0000000e_IL_002c:
+M0000000e_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.FileReadError.NotFound
+ldloc unionFieldDefault13
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M0000000e_IL_0037:
+ldarg 0
+M0000000e_IL_0038:
+M0000000e_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.FileReadError.AccessDenied
+ldloc unionFieldDefault16
+stfld System.Storage.FileReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M0000000e_IL_0043:
+ldarg 0
+M0000000e_IL_0044:
+M0000000e_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.FileReadError.NotRegularFile
+ldloc unionFieldDefault19
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+M0000000e_IL_004f:
+ldarg 0
+M0000000e_IL_0050:
+M0000000e_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.FileReadError.TooLarge
+ldloc unionFieldDefault22
+stfld System.Storage.FileReadError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+M0000000e_IL_005b:
+ldarg 0
+M0000000e_IL_005c:
+M0000000e_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.FileReadError.ReadFailed
+ldloc unionFieldDefault25
 stfld System.Storage.FileReadError::Metadata_V1_3C526561644661696C65645061796C6F61643E
 pop
-M0000000e_IL_001a:
+M0000000e_IL_0067:
+ldarg 0
+M0000000e_IL_0068:
+M0000000e_IL_006d:
+ldloca unionFieldDefault28
+initobj System.Storage.FileReadError.InvalidUtf8
+ldloc unionFieldDefault28
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M0000000e_IL_0073:
+ldc.i4 7
+M0000000e_IL_0074:
+stloc local0
+M0000000e_IL_0075:
+ldarg 0
+M0000000e_IL_0076:
+ldloc local0
+M0000000e_IL_0077:
+conv.u1
+M0000000e_IL_0078:
+stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+pop
+M0000000e_IL_007d:
+ldarg 1
+M0000000e_IL_007e:
+stloc local1
+M0000000e_IL_007f:
+ldarg 0
+M0000000e_IL_0080:
+ldloc local1
+M0000000e_IL_0081:
+stfld System.Storage.FileReadError::Metadata_V1_3C526561644661696C65645061796C6F61643E
+pop
+M0000000e_IL_0086:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.FileReadError.ReadFailed& value) -> Boolean
+.local System.Storage.FileReadError.ReadFailed local0
+ldloca local0
+initobj System.Storage.FileReadError.ReadFailed
 M0000000f_IL_0000:
-ldarg 0
+ldarg 1
 M0000000f_IL_0001:
-ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
-M0000000f_IL_0006:
-conv.i4
-M0000000f_IL_0007:
-ldc.i4 7
-M0000000f_IL_0008:
-conv.i4
+ldloca local0
+M0000000f_IL_0003:
+initobj System.Storage.FileReadError.ReadFailed
 M0000000f_IL_0009:
+ldloc local0
+M0000000f_IL_000a:
+stobj System.Storage.FileReadError.ReadFailed
+M0000000f_IL_000f:
+ldarg 0
+M0000000f_IL_0010:
+ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+M0000000f_IL_0015:
+conv.i4
+M0000000f_IL_0016:
+ldc.i4 7
+M0000000f_IL_0017:
+conv.i4
+M0000000f_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
-M0000000f_IL_000b:
-brtrue M0000000f_IL_0015
-M0000000f_IL_0010:
-br M0000000f_IL_0023
-M0000000f_IL_0015:
-ldarg 1
-M0000000f_IL_0016:
-ldarg 0
-M0000000f_IL_0017:
-ldfld System.Storage.FileReadError::Metadata_V1_3C526561644661696C65645061796C6F61643E
-M0000000f_IL_001c:
-stobj System.Storage.FileReadError.ReadFailed
-M0000000f_IL_0021:
-ldc.bool true
-M0000000f_IL_0022:
-ret
-M0000000f_IL_0023:
+M0000000f_IL_001a:
+brtrue M0000000f_IL_0024
+M0000000f_IL_001f:
+br M0000000f_IL_0032
 M0000000f_IL_0024:
-ldc.bool false
+ldarg 1
 M0000000f_IL_0025:
+ldarg 0
+M0000000f_IL_0026:
+ldfld System.Storage.FileReadError::Metadata_V1_3C526561644661696C65645061796C6F61643E
+M0000000f_IL_002b:
+stobj System.Storage.FileReadError.ReadFailed
+M0000000f_IL_0030:
+ldc.bool true
+M0000000f_IL_0031:
+ret
+M0000000f_IL_0032:
+M0000000f_IL_0033:
+ldc.bool false
+M0000000f_IL_0034:
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.InvalidUtf8 value) -> Void
@@ -1088,6 +1809,15 @@ ret
 .local System.Storage.FileReadError.TooLarge unionDefault1_6
 .local System.Storage.FileReadError.ReadFailed unionDefault1_7
 .local System.Storage.FileReadError.InvalidUtf8 unionDefault1_8
+.local Byte unionFieldDefault4
+.local System.Storage.FileReadError.InvalidLimit unionFieldDefault7
+.local System.Storage.FileReadError.InvalidPath unionFieldDefault10
+.local System.Storage.FileReadError.NotFound unionFieldDefault13
+.local System.Storage.FileReadError.AccessDenied unionFieldDefault16
+.local System.Storage.FileReadError.NotRegularFile unionFieldDefault19
+.local System.Storage.FileReadError.TooLarge unionFieldDefault22
+.local System.Storage.FileReadError.ReadFailed unionFieldDefault25
+.local System.Storage.FileReadError.InvalidUtf8 unionFieldDefault28
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -1151,67 +1881,161 @@ ldloc unionDefault1_8
 stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
 pop
 M00000010_IL_0007:
-ldc.i4 8
-M00000010_IL_0008:
-stloc local0
-M00000010_IL_0009:
 ldarg 0
-M00000010_IL_000a:
-ldloc local0
-M00000010_IL_000b:
-conv.u1
-M00000010_IL_000c:
+M00000010_IL_0008:
+M00000010_IL_000d:
+ldloca unionFieldDefault4
+initobj Byte
+ldloc unionFieldDefault4
 stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
 pop
-M00000010_IL_0011:
-ldarg 1
-M00000010_IL_0012:
-stloc local1
 M00000010_IL_0013:
 ldarg 0
 M00000010_IL_0014:
-ldloc local1
-M00000010_IL_0015:
+M00000010_IL_0019:
+ldloca unionFieldDefault7
+initobj System.Storage.FileReadError.InvalidLimit
+ldloc unionFieldDefault7
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+M00000010_IL_001f:
+ldarg 0
+M00000010_IL_0020:
+M00000010_IL_0025:
+ldloca unionFieldDefault10
+initobj System.Storage.FileReadError.InvalidPath
+ldloc unionFieldDefault10
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000010_IL_002b:
+ldarg 0
+M00000010_IL_002c:
+M00000010_IL_0031:
+ldloca unionFieldDefault13
+initobj System.Storage.FileReadError.NotFound
+ldloc unionFieldDefault13
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000010_IL_0037:
+ldarg 0
+M00000010_IL_0038:
+M00000010_IL_003d:
+ldloca unionFieldDefault16
+initobj System.Storage.FileReadError.AccessDenied
+ldloc unionFieldDefault16
+stfld System.Storage.FileReadError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000010_IL_0043:
+ldarg 0
+M00000010_IL_0044:
+M00000010_IL_0049:
+ldloca unionFieldDefault19
+initobj System.Storage.FileReadError.NotRegularFile
+ldloc unionFieldDefault19
+stfld System.Storage.FileReadError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+M00000010_IL_004f:
+ldarg 0
+M00000010_IL_0050:
+M00000010_IL_0055:
+ldloca unionFieldDefault22
+initobj System.Storage.FileReadError.TooLarge
+ldloc unionFieldDefault22
+stfld System.Storage.FileReadError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+M00000010_IL_005b:
+ldarg 0
+M00000010_IL_005c:
+M00000010_IL_0061:
+ldloca unionFieldDefault25
+initobj System.Storage.FileReadError.ReadFailed
+ldloc unionFieldDefault25
+stfld System.Storage.FileReadError::Metadata_V1_3C526561644661696C65645061796C6F61643E
+pop
+M00000010_IL_0067:
+ldarg 0
+M00000010_IL_0068:
+M00000010_IL_006d:
+ldloca unionFieldDefault28
+initobj System.Storage.FileReadError.InvalidUtf8
+ldloc unionFieldDefault28
 stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
 pop
-M00000010_IL_001a:
+M00000010_IL_0073:
+ldc.i4 8
+M00000010_IL_0074:
+stloc local0
+M00000010_IL_0075:
+ldarg 0
+M00000010_IL_0076:
+ldloc local0
+M00000010_IL_0077:
+conv.u1
+M00000010_IL_0078:
+stfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+pop
+M00000010_IL_007d:
+ldarg 1
+M00000010_IL_007e:
+stloc local1
+M00000010_IL_007f:
+ldarg 0
+M00000010_IL_0080:
+ldloc local1
+M00000010_IL_0081:
+stfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000010_IL_0086:
 ldvoid
 ret
 .end
 .method instance byref TryGetValue(out(true) System.Storage.FileReadError.InvalidUtf8& value) -> Boolean
+.local System.Storage.FileReadError.InvalidUtf8 local0
+ldloca local0
+initobj System.Storage.FileReadError.InvalidUtf8
 M00000011_IL_0000:
-ldarg 0
+ldarg 1
 M00000011_IL_0001:
-ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
-M00000011_IL_0006:
-conv.i4
-M00000011_IL_0007:
-ldc.i4 8
-M00000011_IL_0008:
-conv.i4
+ldloca local0
+M00000011_IL_0003:
+initobj System.Storage.FileReadError.InvalidUtf8
 M00000011_IL_0009:
+ldloc local0
+M00000011_IL_000a:
+stobj System.Storage.FileReadError.InvalidUtf8
+M00000011_IL_000f:
+ldarg 0
+M00000011_IL_0010:
+ldfld System.Storage.FileReadError::Metadata_V1_3C5461673E
+M00000011_IL_0015:
+conv.i4
+M00000011_IL_0016:
+ldc.i4 8
+M00000011_IL_0017:
+conv.i4
+M00000011_IL_0018:
 ceq
 call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
-M00000011_IL_000b:
-brtrue M00000011_IL_0015
-M00000011_IL_0010:
-br M00000011_IL_0023
-M00000011_IL_0015:
-ldarg 1
-M00000011_IL_0016:
-ldarg 0
-M00000011_IL_0017:
-ldfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
-M00000011_IL_001c:
-stobj System.Storage.FileReadError.InvalidUtf8
-M00000011_IL_0021:
-ldc.bool true
-M00000011_IL_0022:
-ret
-M00000011_IL_0023:
+M00000011_IL_001a:
+brtrue M00000011_IL_0024
+M00000011_IL_001f:
+br M00000011_IL_0032
 M00000011_IL_0024:
-ldc.bool false
+ldarg 1
 M00000011_IL_0025:
+ldarg 0
+M00000011_IL_0026:
+ldfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+M00000011_IL_002b:
+stobj System.Storage.FileReadError.InvalidUtf8
+M00000011_IL_0030:
+ldc.bool true
+M00000011_IL_0031:
+ret
+M00000011_IL_0032:
+M00000011_IL_0033:
+ldc.bool false
+M00000011_IL_0034:
 ret
 .end
 .method instance override byref ToString() -> String

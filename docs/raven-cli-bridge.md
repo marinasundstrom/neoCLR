@@ -6874,3 +6874,38 @@ TaskQueue.Current during legacy bootstrap, without changing accessibility. Nativ
 Runtime/Data/Networking/Web build and three async interpreter/AOT consumers pass.
 The Tasks fragment and public API snapshot were regenerated; the complete legacy
 snapshot still has an unrelated stale Tuple/StringBuilder input record.
+
+## Legacy union interface name (development, 2026-10-08)
+
+The boxed-active-case bridge protocol is `System.Runtime.CompilerServices.UnionValue`,
+replacing `IUnion`. The descriptive name avoids colliding with `Union` attribute
+shorthand and does not change the Value getter or inactive-carrier semantics.
+Raven's neoCLR Runtime Contract selects the name for interface lookup, generated
+interface definitions and reuse. Controlled legacy probe-core callers use the same
+name through the existing explicit core-identity compatibility contract. Ordinary
+.NET compilation keeps its own `IUnion` protocol. Compiler internals such as
+`IUnionSymbol` are .NET APIs and are outside neoCLR's runtime naming rule.
+
+This is temporary CLI representation support; native unions carry native union
+metadata and do not gain general boxing/reflection support from this rename.
+The runtime neoIL declaration, bridge reference/importer, generated union fragments
+and consumer samples must be rebuilt together. No compatibility alias is retained.
+
+The bridge importer also accepts current Raven's explicit union-field defaults:
+an exact constructor-self field-address/initobj pair becomes a checked native
+field write, preserving unpublished receiver verification. A null literal stored
+through an already admitted typed reference output becomes its typed default.
+Neither adaptation enables arbitrary argument writes or general constructor borrows.
+Current shared synthesized TryGetValue bodies clear outputs on failure; regenerated
+fragments now match native emission and Raven's .NET tests. Older legacy snapshots
+preserved outputs, so callers must use only the success result or handle defaults.
+The union contract sample and time/timezone consumer pass after regeneration; ten
+error-union admission/rejection cases pass.
+
+Raven integration commit `be58723fb` completes the protocol mappings and keeps
+async interface signatures in target metadata for CLI emission. Sixteen focused
+profile/emission/.NET controls pass; the legacy async sample prints `Suspended`
+and `42`. Native-enabled compiler rebuild succeeds. This is tested on
+`codex/source-object-metadata-resolution`; the general cache fix is independently
+on Raven main as `d0a115dcf`. No bridge-free bootstrap or general native async
+entry-draining support is claimed.

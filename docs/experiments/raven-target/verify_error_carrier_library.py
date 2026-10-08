@@ -59,7 +59,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
             emitted = (output / 'Implementation.neoil').read_text()
             assert '.type System.' + owner + '\n' in emitted
             assert '.field private Stored Value' not in emitted
-            assert '.implements System.Runtime.CompilerServices.IUnion' in emitted
+            assert '.implements System.Runtime.CompilerServices.UnionValue' in emitted
             assert '.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()' in emitted
             assert '.method instance override byref ToString() -> String' in emitted
     print(f'{len(cases)} error carrier admission cases passed')

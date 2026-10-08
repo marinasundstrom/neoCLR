@@ -53,7 +53,7 @@ constructor exclusions remain explicit; they are not supported application const
 ## CLI union carrier details
 
 The CLI reference assembly used by this website represents unions through generated
-carriers. Its IUnion contract exposes the boxed active case; default carriers are
+carriers. Its UnionValue contract exposes the boxed active case; default carriers are
 inactive. These are details of the documentation/CLI representation, not an additional
 interface requirement for native NeoCLR unions. Ordinary source should use named cases,
 patterns and propagation, including explicit None construction for absence.

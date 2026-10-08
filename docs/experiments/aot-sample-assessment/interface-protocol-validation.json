@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-08",
+  "neoClrBaseRevision": "0f04b7eed794871a4027f36dde2654f53b73d254",
+  "ravenIntegrationRevision": "be58723fb2ae5723b43edd840611a4986127c305",
+  "ravenMainGeneralLookupFix": "d0a115dcf",
+  "checks": {
+    "unionContract": {
+      "union_contract": "passed",
+      "checks": [
+        "construction and case identity",
+        "active None versus default carrier",
+        "TryGetValue clears outputs on mismatch",
+        "UnionValue.Value boxed cases",
+        "Option/Result propagation",
+        "same-type success and error payloads",
+        "TaskOutcome completion/cancellation and inactive default",
+        "Void and nested outcomes",
+        "reference identity and value copies"
+      ]
+    },
+    "timeAndTimezone": {
+      "exitCode": 0,
+      "output": "ImportedUnion: typed-stack/control-flow verification passed (4277 IL functions; maximum stack 7; runtime value checks remain)\nVerified saved project: /private/tmp/union-interface-demo/time/.neoclr-build/build-e6d31c52/output/App.neoil\nEurope/Stockholm\nTime and timezone checks passed\n"
+    },
+    "cliAsync": {
+      "exitCode": 0,
+      "output": "ImportedUnion: typed-stack/control-flow verification passed (4255 IL functions; maximum stack 7; runtime value checks remain)\nVerified saved project: /private/tmp/union-interface-demo/async/.neoclr-build/build-n8fy_kn_/output/App.neoil\nSuspended\n42\n"
+    },
+    "errorUnionAdmission": {
+      "exitCode": 0,
+      "output": "10 error carrier admission cases passed\n"
+    },
+    "ravenProfileEmissionAndDotNetControls": {
+      "passed": 16,
+      "failed": 0
+    },
+    "runtimeInterfaceNaming": {
+      "passed": 2,
+      "failed": 0
+    },
+    "regeneratedUnionSlices": 27,
+    "apiSnapshot": "passed"
+  },
+  "hashes": {
+    "/Users/robert/Projects/neoclr/docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll": "eca8bb77655f0c3b7a80305a6a7c7fa088c78f8c818f9aadecbc2b98b162a224",
+    "/Users/robert/Projects/neoclr/docs/experiments/raven-target/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "16b15f92c1be98757ca69a345ddbcd61773cb98363e55238b8a5788fe6d11018",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "1dce6941418f7a32fff61e5cc9a8083aec687cd1e3ef9541910c7b3801149be2",
+    "/private/tmp/union-interface-demo/System.neoil": "639ff00f05ae6d9aee5d406674b291a221a172ae192efa19d8b9072b04fbe915",
+    "/private/tmp/union-interface-demo/demo/NeoCLR.CoreProbe.dll": "aa7c81ce78adce0476a8f8f4fa5799481e570b6d495daa5672decbf382e5c008"
+  },
+  "limitations": [
+    "Coverage checks, not performance measurements.",
+    "Legacy CLI bridge checks do not qualify bridge-free bootstrap.",
+    "The complete legacy generated snapshot has a pre-existing missing StringBuilder input in Tuple; the 27 regenerated union slices and Tasks fingerprints pass.",
+    "Native async entry DrainEntryTasks remains unsupported; see the separate native sample follow-up."
+  ]
+}

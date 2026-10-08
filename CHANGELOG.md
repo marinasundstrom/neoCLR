@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Replace the legacy union interface `IUnion` with `UnionValue`, coordinated with
+  Raven `be58723fb` and completing the
+  unprefixed runtime interface audit across Raven source and neoIL. Regenerate 27
+  union slices and matching API references. The CLI importer now translates exact
+  union-constructor field initialization and typed null output stores. Refreshed
+  `TryGetValue` failures clear outputs to defaults, matching the existing native/Raven
+  contract; legacy callers that expected preservation must migrate. Union and
+  time/timezone consumers pass. Raven's general source lookup correction is also
+  validated and committed on Raven main as `d0a115dcf`.
+
 - Rename the Raven-source async interfaces to `AsyncStateMachine` and `TaskAwaiter`,
   coordinated with Raven target mapping `185d32f06`; .NET names remain unchanged.
   Rebuild matched compiler/reference/runtime/application bundles because metadata

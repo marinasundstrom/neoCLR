@@ -4,7 +4,7 @@ using Mono.Cecil;
 // reference family must match; application namespaces alone never authorize aliasing.
 static class StandardUnionLibrary
 {
-    public const string ProtocolName = "System.Runtime.CompilerServices.IUnion";
+    public const string ProtocolName = "System.Runtime.CompilerServices.UnionValue";
 
     // Provisional Raven bridge protocol; the VM only sees an ordinary interface.
     public static string? ProtocolType(TypeReference type)

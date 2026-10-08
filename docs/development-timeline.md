@@ -12068,3 +12068,26 @@ the reproduction and 16 lookup tests pass. The Tasks slice and API snapshot were
 refreshed. The wider neoIL audit then found `IUnion`; its migration remains next.
 The full legacy snapshot check separately reports an existing missing StringBuilder
 input in Tuple, not an async naming failure.
+
+**Follow-up:** the general lookup fix also passes all 16 focused tests on Raven
+main and is committed there as `d0a115dcf`. The assistant selects `UnionValue` for
+the legacy boxed-active-case protocol, avoiding the `Union` attribute shorthand.
+This is an assistant implementation choice within the author's naming direction,
+not a change to native union storage or an author-selected reflection API.
+
+**Union outcome:** all 27 affected union slices were regenerated. The constructor
+field-initialization and typed-null-output gaps in the legacy importer were fixed.
+The executable Option/Result/TaskOutcome and time/timezone samples pass. The old
+union sample's preservation assertions were stale: Raven commit `0d261d8be`
+explicitly initialized failed TryGetValue outputs, documented and tested since
+2026-10-03. The assistant aligned the legacy fragments, assertions and current API
+docs with that shared contract, recording the compatibility change. This does not
+introduce a new target-specific output policy. A reverse control on Raven main
+fails both new source-lookup regressions when the cache fix is removed; restoring
+it passes all 16 lookup tests.
+
+**Final protocol validation:** Raven `be58723fb` retains renamed async interfaces
+in target metadata during CLI emission, including the explicit legacy probe-core
+profile. All 16 focused profile/emission/.NET controls pass and the CLI async
+sample executes suspension and result `42`. The native-enabled compiler rebuild
+succeeds. No runtime Raven/neoIL interface declaration retains the `I` prefix.

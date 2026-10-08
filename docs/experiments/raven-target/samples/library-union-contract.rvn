@@ -57,7 +57,7 @@ func Main() {
     if none.TryGetValue(out extracted) {
         System.Fail("Wrong case extraction")
     }
-    Check(extracted.Value == 42, "Wrong case must preserve output")
+    Check(extracted.Value == 0, "Wrong case must clear output")
 
     var output = 99
     let hasOutput = none.TryGetOutput(out output)
@@ -69,19 +69,19 @@ func Main() {
     if inactive.TryGetValue(out extracted) {
         System.Fail("Inactive extraction")
     }
-    Check(extracted.Value == 42, "Inactive extraction preserves output")
+    Check(extracted.Value == 0, "Inactive extraction clears output")
 
-    let view = (IUnion)(object)some
-    Check(view.Value is System.Option.Some<int>(let boxedNumber) && boxedNumber == 42, "IUnion boxed case")
-    let noneView = (IUnion)(object)none
-    Check(noneView.Value is None, "IUnion active None")
+    let view = (UnionValue)(object)some
+    Check(view.Value is System.Option.Some<int>(let boxedNumber) && boxedNumber == 42, "UnionValue boxed case")
+    let noneView = (UnionValue)(object)none
+    Check(noneView.Value is None, "UnionValue active None")
 
     let ok: Result<int, string> = Ok(42)
     let error: Result<int, string> = Error("failed")
     Check(PropagateResult(ok) is Ok(let number) && number == 42, "Ok propagation")
     Check(PropagateResult(error) is Error(let message) && message.Equals("failed"), "Error propagation")
-    let resultView = (IUnion)(object)error
-    Check(resultView.Value is System.Result.Error<string>(let boxedMessage) && boxedMessage.Equals("failed"), "Result IUnion")
+    let resultView = (UnionValue)(object)error
+    Check(resultView.Value is System.Result.Error<string>(let boxedMessage) && boxedMessage.Equals("failed"), "Result UnionValue")
     let inactiveResult = default(Result<int, string>)
     Check(!inactiveResult.HasValue && Object.ReferenceEquals(inactiveResult.Value, null), "Default Result")
 
@@ -119,13 +119,13 @@ func Main() {
     if taskCancelled.TryGetValue(out taskCase) {
         System.Fail("Cancelled cannot extract Completed")
     }
-    Check(taskCase.Value == 42, "Task case mismatch preserves output")
+    Check(taskCase.Value == 0, "Task case mismatch clears output")
     let inactiveTask = default(TaskOutcome<int>)
     Check(!inactiveTask.HasValue && Object.ReferenceEquals(inactiveTask.Value, null), "Default TaskOutcome")
-    let taskView = (IUnion)(object)taskCompleted
+    let taskView = (UnionValue)(object)taskCompleted
     let boxedTaskCase = (TaskOutcome<int>.Completed<int>)taskView.Value
-    Check(boxedTaskCase.Value == 42, "TaskOutcome IUnion")
-    let cancelledView = (IUnion)(object)taskCancelled
+    Check(boxedTaskCase.Value == 42, "TaskOutcome UnionValue")
+    let cancelledView = (UnionValue)(object)taskCancelled
     Check(cancelledView.Value is Cancelled, "Boxed cancellation case")
     let voidTask: TaskOutcome<System.Void> = Completed(())
     Check(voidTask is Completed(_), "Completed Void")

@@ -17,6 +17,15 @@ class InterfaceNamesTests(unittest.TestCase):
         self.assertEqual([], [(path, name) for path, name in declarations
                               if re.match(r'I[A-Z]', name)])
 
+    def test_runtime_neoil_interfaces_do_not_use_dotnet_i_prefix(self):
+        declarations = []
+        for path in sorted((ROOT / 'runtime').rglob('*.neoil')):
+            for match in re.finditer(r'^\.interface\s+([\w.]+)', path.read_text(), re.MULTILINE):
+                declarations.append((str(path.relative_to(ROOT)), match.group(1)))
+        self.assertTrue(declarations, 'No neoIL interface declarations were audited')
+        self.assertEqual([], [(path, name) for path, name in declarations
+                              if re.match(r'I[A-Z]', name.rsplit('.', 1)[-1])])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -11,7 +11,10 @@ Option and Result follow Raven.Core's source declarations and generated
 union contract. Other migrated unions include networking, HTTP, storage, stream,
 JSON and reflection errors. Carriers implement `IUnion.Value`; generated
 `HasValue` and typed `TryGetValue` distinguish active cases from default carriers.
-`Value` boxes the active case. An unsuccessful case extraction preserves its output.
+`Value` boxes the active case. An unsuccessful case extraction clears its output to the payload default.
+This follows Raven's shared synthesized-body contract; `out(true)` guarantees
+initialization on success, not preservation on failure. Older legacy bridge
+fragments preserved outputs; rebuild callers and libraries together.
 The [Option and Result API guide](raven-union-api.md) explains propagation and defaults.
 
 A union's discriminator and payload belong to its ordinary carrier representation.

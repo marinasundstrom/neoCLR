@@ -80,7 +80,7 @@ This prints `42`. `Promise<T>` owns completion; its `Task` lets consumers await 
 
 `TaskOutcome<T>` is a standard Raven union with `Completed(T)` and `Cancelled`
 cases. Use patterns to inspect it. `HasValue` reports an active case, `Value` boxes
-that case through `IUnion`, and `TryGetValue` extracts a matching case. An inactive
+that case through `UnionValue` in development references (formerly `IUnion`), and `TryGetValue` extracts a matching case. An inactive
 default is distinct from cancellation. `Task.Outcome` uses `None` while pending.
 
 | Situation | Meaning |
