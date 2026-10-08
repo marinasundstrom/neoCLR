@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Qualify Raven concat conversions and expose the remaining boxed-display AOT gate."""
+"""Qualify Raven concat conversions and expose the remaining String/Object-view AOT gate."""
 import argparse
 import hashlib
 import json
@@ -27,12 +27,24 @@ sha = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
 compiler_inputs = {compiler, *compiler.parent.glob("*.dll"), *compiler.parent.glob("*.deps.json"), *compiler.parent.glob("*.runtimeconfig.json")}
 adapters = [base / "text-host.c", faults / "render.c", base / "console.c", base.parent / "aot-scalar/console.c", base / "text-arena.c"]
 inputs = compiler_inputs | {runtime, aot, core, seed, library, ownership, Path(__file__).resolve(), base / "text-arena.h", *adapters}
-report = dict(profile="raven-concat-conversions-v1", baseRevision=subprocess.check_output(
+report = dict(profile="raven-boxed-int32-v1", baseRevision=subprocess.check_output(
     ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(), SDKROOT=os.environ.get("SDKROOT"),
     inputs={str(path): sha(path) for path in sorted(inputs)}, commands=[])
 
 
 def save():
+    # Preserve small evidence; complete command bytes are hashed before compaction.
+    for command in report["commands"]:
+        for stream in ("stdout", "stderr"):
+            value = command[stream]
+            if len(value) > 8000:
+                command[stream + "Sha256"] = hashlib.sha256(value.encode()).hexdigest()
+                command[stream + "OriginalBytes"] = len(value.encode())
+                if "--inspect" in command["command"]:
+                    details = json.loads(value)
+                    command[stream] = json.dumps({key: details[key] for key in ("schema", "admission", "notice")})
+                else:
+                    command[stream] = value[-4000:]
     (output / "validation.json").write_text(json.dumps(report, indent=2) + "\n")
 
 
@@ -49,7 +61,7 @@ context = ["--system", seed, "--module", library, "--object-root", library]
 flags = context + ["--compile-system", "--bind-user-fault", "--bind-console-write-line",
                    "--bind-utf8-text", "--bind-int32-to-string", "--reference-arena"]
 expected_numeric = "".join(f"Value: {value}\n{value}\nValue: {value}\n" for value in (42, -2147483648, 2147483647)) + "Null: \n"
-for stem, expected_text in (("interpolation", expected_numeric), ("interpolation-text", "Text: hé😀/z\x00end\n")):
+for stem, expected_text in (("interpolation", expected_numeric), ("interpolation-text", "Text: hé😀/z\x00end\n"), ("boxed-int32", "-2147483648\n-1\n0\n1\n42\n2147483647\n")):
     source, assembly = base / (stem + ".rvn"), output / (stem + ".dll")
     report["inputs"][str(source)] = sha(source)
     run(["dotnet", compiler, "neoclr", "--core-reference", core, "--runtime-seed", seed,
@@ -62,17 +74,20 @@ for stem, expected_text in (("interpolation", expected_numeric), ("interpolation
     obj = output / (stem + ".o")
     report[stem] = dict(assemblySha256=sha(assembly), stdout=expected_text, admission=inspection["admission"])
     if stem == "interpolation":
-        assert inspection["admission"] == dict(accepted=False, phase="selection",
-            firstError="Object display with boxing or arrays requires a later receiver/metadata profile")
+        admission = inspection["admission"]
+        assert not admission["accepted"] and admission["phase"] == "compilation"
+        assert "reference casts require a class, interface or verified array view" in admission["firstError"]
         run([aot, "--closed-world", assembly, "@entry", obj, *flags], expected=1)
-        assert not obj.exists(), "Rejected boxed display published a native object"
+        assert not obj.exists(), "Rejected String/Object views published a native object"
         continue
     assert inspection["admission"]["accepted"]
     run([aot, "--closed-world", assembly, "@entry", obj, *flags])
     binary = output / stem
     run(["clang", "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", *adapters, obj, "-o", binary])
     imports = set(run(["nm", "-u", obj]).stdout.decode().split())
-    assert imports == {"_neoclr_console_write_line_utf8_v1", "_neoclr_string_concat_v1"}, imports
+    expected_imports = {"_neoclr_console_write_line_utf8_v1"}
+    expected_imports |= {"_neoclr_allocate_object_v1", "_neoclr_int32_to_string_v1"} if stem == "boxed-int32" else {"_neoclr_string_concat_v1"}
+    assert imports == expected_imports, imports
     dependencies = [line.split()[0] for line in run(["otool", "-L", binary]).stdout.decode().splitlines()[1:]]
     assert dependencies == ["/usr/lib/libSystem.B.dylib"], dependencies
     with tempfile.TemporaryDirectory() as directory:
@@ -83,4 +98,4 @@ for stem, expected_text in (("interpolation", expected_numeric), ("interpolation
     report[stem].update(executableSha256=sha(binary), dynamicDependencies=dependencies,
                         executableOnlyDirectory=True, emptyEnvironment=True, nativeMatchesInterpreter=True)
 save()
-print("Passed: native CIL concat conversions; standalone text interpolation; boxed-display AOT rejection retained")
+print("Passed: native CIL concat conversions; standalone text interpolation; standalone boxed Int32; String/Object-view rejection retained")

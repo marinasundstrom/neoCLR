@@ -6715,3 +6715,10 @@ See [the interpolation consumer](experiments/aot-console/README.md#interpolation
 for integer/null native CIL execution and standalone text interpolation. Boxed numeric
 Object display remains rejected by AOT pending a receiver/metadata profile; this is
 not a permanent language or Console restriction. No public API snapshot changes.
+
+The subsequent [boxed Int32 AOT slice](experiments/aot-console/README.md#boxed-int32-console-display-2026-10-08)
+consumes that same producer without compiler/configuration changes. Native code now
+preserves copied Int32 boxes and Object display; mixed interpolation reaches the
+remaining String-to-Object view boundary. No temporary CLI encoding, new guest API or
+metadata schema is introduced. The private box representation belongs to AOT codegen
+and does not replace native metadata identity or commit a stable external ABI.

@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Extend experimental ARM64 AOT with distinct copied Int32 boxes and verified
+  Object.ToString dispatch through the explicit Int32 formatter binding. Preserve
+  Object views, identity, result publication and exact managed fault sites under
+  boxing/formatting exhaustion. Validate 44 Console AOT tests and a fresh standalone
+  Raven Console.WriteLine(Object) consumer across six Int32 values. Mixed interpolation
+  now reaches the separate unsupported String-to-Object view boundary; wider boxing,
+  unboxing and general Object metadata remain outside this profile. No public ABI,
+  Raven compiler, Runtime Contract or runtime-library API change.
+
 - Qualify Raven's shared synthesized-concat conversion fix on main and the native
   integration branch: fresh native CIL preserves integer endpoints and null text;
   text-only interpolation runs as a standalone ARM64 executable with UTF-8/NUL parity

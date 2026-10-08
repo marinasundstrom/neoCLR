@@ -397,6 +397,12 @@ pub fn prepare(
         }
     }
     super::boxing::project(&mut selected, &mut report)?;
+    let boxed_display = report["int32Boxes"].as_array().is_some_and(|r| !r.is_empty())
+        && report["objectDisplayDispatch"].as_array().is_some_and(|r| !r.is_empty());
+    if boxed_display && !bind_int32_to_string {
+        return Err("boxed Int32 display requires --bind-int32-to-string".into());
+    }
+    report["boxedInt32Display"] = json!(boxed_display);
     let system_type_names: std::collections::BTreeSet<_> = neoclr::library::system()
         .map_err(|e| e.to_string())?.types.iter().map(|t| t.name.as_str()).collect();
     let mut static_projections = vec![];

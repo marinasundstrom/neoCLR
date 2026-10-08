@@ -1,0 +1,16 @@
+import System.*
+
+func Display(value: int) {
+    let boxed: object = value
+    Console.WriteLine(boxed)
+}
+
+func Main() -> int {
+    Display(-2147483648)
+    Display(-1)
+    Display(0)
+    Display(1)
+    Display(42)
+    Display(2147483647)
+    return 0
+}

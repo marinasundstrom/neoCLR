@@ -197,7 +197,7 @@ pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usiz
     let array_owner = array_backing.map(|i| Type::Named(input.types[i].name.clone())).or_else(|| byte_array_owner(input));
     for &i in reached {
         for op in &input.functions[i].body {
-            if display && matches!(op, Op::BoxValue(_) | Op::NewArray(_) | Op::ReserveArray(_)) {
+            if display && (matches!(op, Op::BoxValue(t) if *t != Type::Int32) || matches!(op, Op::NewArray(_) | Op::ReserveArray(_))) {
                 return Err("Object display with boxing or arrays requires a later receiver/metadata profile".into());
             }
             if matches!(op, Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte)) {

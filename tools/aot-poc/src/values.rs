@@ -200,7 +200,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         }
     }
     let text_arena = references || details.is_some_and(|d| !d.int32_to_string.is_empty() || !d.int64_to_string.is_empty() || !d.uint64_to_string.is_empty());
-    let format_service = if details.is_some_and(|d| !d.int32_to_string.is_empty()) {
+    let format_service = if details.is_some_and(|d| !d.int32_to_string.is_empty() || d.boxed_int32_display) {
         let mut sig = module.make_signature();
         sig.params.extend([AbiParam::new(types::I32), AbiParam::new(types::I64), AbiParam::new(types::I64)]);
         sig.returns.push(AbiParam::new(types::I32));
@@ -275,11 +275,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             let parameters = b.block_params(entry).to_vec();
             let output = parameters[parameters.len() - 1 - usize::from(details.is_some())];
             let fault_context = details.map(|_| *parameters.last().unwrap());
-            if let Some(&record) = details.and_then(|d| d.empty_record_boxes.get(&i)) {
+            if let Some(&record) = details.and_then(|d| d.empty_record_boxes.get(&i).or_else(|| d.int32_boxes.get(&i))) {
                 let service = module.declare_func_in_func(object_service.unwrap(), b.func);
                 let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                 let tag = b.ins().iconst(types::I32, record as i64);
-                let bytes = b.ins().iconst(types::I32, 8);
+                let primitive = details.unwrap().int32_boxes.contains_key(&i);
+                let bytes = b.ins().iconst(types::I32, if primitive { 16 } else { 8 });
                 let call = b.ins().call(service, &[arena, tag, bytes, output]);
                 let raw = b.inst_results(call)[0];
                 let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
@@ -290,6 +291,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
+                if primitive {
+                    let pointer = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                    b.ins().store(MemFlags::new(), parameters[0], pointer, 8);
+                }
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks(); b.finalize();
@@ -300,6 +305,31 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 // Caller checks null. Forward the original receiver, result slot and
                 // context; no synthetic interface frame enters the managed trace.
                 let tag = b.ins().load(types::I64, MemFlags::new(), parameters[0], 0);
+                if details.is_some_and(|d| d.boxed_int32_display) {
+                    for &type_index in details.unwrap().int32_boxes.values() {
+                        let matched = b.create_block();
+                        let next = b.create_block();
+                        let equal = matches_type(&mut b, &p, tag, type_index);
+                        b.ins().brif(equal, matched, &[], next, &[]);
+                        b.switch_to_block(matched);
+                        let value = b.ins().load(types::I32, MemFlags::new(), parameters[0], 8);
+                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        let service = module.declare_func_in_func(format_service.unwrap(), b.func);
+                        let call = b.ins().call(service, &[value, arena, output]);
+                        let raw = b.inst_results(call)[0];
+                        let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                        let memory = b.ins().iconst(types::I32, 5);
+                        let runtime = b.ins().iconst(types::I32, 3);
+                        let status = b.ins().select(exhausted, memory, runtime);
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                        let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                        site.capture_frame = false;
+                        return_if_detailed(&mut b, failed, status, Some(&site));
+                        let zero = b.ins().iconst(types::I32, 0);
+                        b.ins().return_(&[zero]);
+                        b.switch_to_block(next);
+                    }
+                }
                 for &(type_index, target) in targets {
                     let matched = b.create_block();
                     let next = b.create_block();

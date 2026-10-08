@@ -1032,7 +1032,7 @@ path, preserving Unicode and embedded NUL through native CIL and standalone ARM6
 The executable runs alone with an empty environment and links only libSystem; host
 adapters are linked into it. [Validation](interpolation-validation.json) records fresh
 commands and compiler, bundle, adapter and artifact hashes. Long command output is
-compacted with full-output hashes; the reproduction driver retains full output. Reproduce with:
+compacted with full-output hashes; the current driver also compacts long output. Reproduce with:
 
 ```sh
 SDKROOT="$(xcrun --show-sdk-path)" python3 docs/experiments/aot-console/verify_interpolation.py \
@@ -1045,3 +1045,50 @@ Compared with .NET's Object formatting/boxing support, this is a smaller explici
 native profile. Normalizing calls in Raven preserves semantic information for either
 backend; it does not supply native boxed primitive dispatch or general type metadata.
 The existing bounded text arena, private ABI and UTF-8 contracts remain unchanged.
+
+## Boxed Int32 Console display (2026-10-08)
+
+The next bounded profile admits `box Int32` and dispatches verified Object.ToString
+calls on those boxes through the existing Int32 UTF-8 formatter. Each boxing operation
+allocates a distinct 16-byte arena object: private eight-byte type tag, four-byte copied
+payload and zeroed padding. Changing the original value cannot change the snapshot.
+The tag is a generated private record identity, not an exported native type or stable
+ABI. Existing Object views and reference equality preserve identity. Empty-record
+boxing and verified class overrides retain their previous behavior.
+
+Object display with Int32 boxes requires both `--reference-arena` and
+`--bind-int32-to-string`. The ordinary Console.WriteLine(Object) wrapper compiles;
+no guest method is replaced by a host Console shortcut. Boxing and formatting share
+the bounded invocation arena. Allocation/formatting exhaustion records
+NativeMemoryLimitExceeded at the original caller instruction, does not publish the
+entry result, and omits private helper frames. No host adapter or public ABI changes.
+
+[boxed-int32.rvn](boxed-int32.rvn) is the fresh Raven consumer. The updated
+[driver](verify_interpolation.py) qualifies it alongside the text interpolation
+control and the remaining mixed interpolation rejection. [Evidence](boxed-int32-validation.json)
+records the exact tool/bundle hashes and standalone interpreter/native parity for
+Int32 minimum, -1, 0, 1, 42 and maximum. The executable runs alone with an empty
+environment and only libSystem dynamically linked. Long diagnostics are compacted
+with their full-output hashes. The earlier interpolation evidence is historical.
+
+The 44 focused Console AOT tests pass, including a new metadata consumer
+[boxed-int32.neoil](boxed-int32.neoil). It checks distinct boxes, copied values,
+Object views, exact integer output, both allocation failures and formatting failure
+with exact managed stack traces, untouched result storage and arena canaries. Missing
+formatter opt-in rejects before publishing an object file.
+
+This reuses the [Object/CLR comparison](../../object-model-review.md) and
+[boxing contract](../../boxed-interface-values.md): copied boxing and reference
+identity match the intended CLR ergonomics, while this implementation deliberately
+uses invocation lifetime instead of a managed collector. A formatter shortcut on an
+unboxed value would lose observable identity; full general boxed dispatch would require
+more metadata and lifetime machinery. This bounded representation preserves identity
+at an allocation/copy cost; no performance advantage is claimed. Wider primitive
+boxes, unboxing, boxed interfaces, general Object methods and reclamation remain open.
+
+Mixed integer interpolation now advances past boxing admission and fails at the
+String-to-Object conversion: immutable UTF-8 text pointers do not yet have identity-
+preserving Object views. That is the next bounded step. Arrays and non-Int32 boxes
+combined with Object display still reject. No Raven compiler or Runtime Contract
+change is needed for this slice; the producer is the previously fixed integration
+branch, with its general binder fixes already on Raven main.

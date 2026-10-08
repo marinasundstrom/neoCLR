@@ -2205,3 +2205,65 @@ fn concatenation_requires_exact_opt_in_contract() {
         if mode==2 {assert!(String::from_utf8_lossy(&r.stderr).contains("conflicting function signature"),"{r:?}");}
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn boxed_int32_display_preserves_snapshot_identity_and_limits() {
+    let seed=neoclr::assemble(&format!("{OBJECT_DISPLAY_SEED}\n.function neoCLR.Runtime.WriteLine(String) -> Void\n.methodimpl InternalCall\n.end\n")).unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/boxed-int32.neoil");
+    let app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)],&seed).unwrap().remove(0);
+    let dir=Temp::new();
+    let flags=["--compile-system","--reference-arena","--bind-int32-to-string","--bind-console-write-line"];
+    let r=compile_linked_module(&dir,&seed,&app,&flags);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let report:serde_json::Value=serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["int32Boxes"].as_array().unwrap().len(),1);
+    assert_eq!(report["boxedInt32Display"],true);
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc,char **argv) {
+    uint64_t storage[33]={0};storage[32]=UINT64_C(0xa5a5a5a5a5a5a5a5);
+    int32_t value=argc>1?(int32_t)strtol(argv[1],NULL,10):0;
+    unsigned capacity=argc>2?(unsigned)strtoul(argv[2],NULL,10):256;
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,capacity,0}};
+    int32_t result=-99;int status=neoclr_entry_v4(value,&result,&ctx);
+    if(storage[32]!=UINT64_C(0xa5a5a5a5a5a5a5a5) || ctx.text.used>capacity)return 93;
+    if(status){if(result!=-99)return 92;neoclr_aot_render_fault(stderr,&ctx.fault);return 1;}
+    return result;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-fault-details/render.c")).arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-console/console.c")).arg(base.join("aot-scalar/console.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for value in [i32::MIN,-1,0,1,42,i32::MAX] {
+        let expected=method.invoke(vec![neoclr::Value::Int32(value)],neoclr::Limits::default()).unwrap();
+        assert_eq!(expected.value,neoclr::Value::Int32(0));
+        let r=Command::new(dir.0.join("app")).arg(value.to_string()).env_clear().output().unwrap();
+        assert_eq!(r.status.code(),Some(0),"{r:?}");
+        assert_eq!(r.stdout,format!("{value}\n{value}\n").as_bytes());
+        assert_eq!(r.stdout,expected.stdout);assert!(r.stderr.is_empty());
+    }
+    for capacity in [15,31,32] {
+        let r=Command::new(dir.0.join("app")).args(["42",&capacity.to_string()]).env_clear().output().unwrap();
+        assert_eq!(r.status.code(),Some(1),"{r:?}");assert!(r.stdout.is_empty());
+        let diagnostic=String::from_utf8_lossy(&r.stderr);
+        assert!(diagnostic.starts_with("NativeMemoryLimitExceeded: Native memory limit exceeded\n"),"{r:?}");
+        let frames=match capacity {
+            15=>"   at Box [instruction 1]\n   at Calculate [instruction 3]\n",
+            31=>"   at Box [instruction 1]\n   at Calculate [instruction 8]\n",
+            _=>"   at Calculate [instruction 19]\n",
+        };
+        assert_eq!(diagnostic,format!("NativeMemoryLimitExceeded: Native memory limit exceeded\n{frames}"));
+    }
+    let reject=Temp::new();
+    let r=compile_linked_module(&reject,&seed,&app,&["--compile-system","--reference-arena","--bind-console-write-line"]);
+    assert!(!r.status.success() && !reject.0.join("app.o").exists());
+    assert!(String::from_utf8_lossy(&r.stderr).contains("boxed Int32 display requires --bind-int32-to-string"),"{r:?}");
+}

@@ -283,8 +283,10 @@ concatenation and ordinary static String wrappers also compile the ReadToEnd pat
 nine standalone reader cases and exact output-fault parity are verified. Shared Raven
 lookup fixes also qualify fresh compilation with imported Console names, without
 producer staging or artifact reuse. Shared concat conversion fixes unblock integer
-interpolation in native CIL; String-only interpolation runs standalone. Boxed numeric
-Object display remains outside the AOT profile. An explicit failure binding now preserves
+interpolation in native CIL; String-only interpolation runs standalone. Int32 boxing and
+Object display now run standalone with bounded invocation storage. Mixed interpolation
+still needs String-to-Object views; wider boxing and general Object metadata remain open.
+An explicit failure binding now preserves
 user messages and managed traces in caller-owned native records; a shared interpreter
 host view uses the same runtime message catalog and 64-frame truncation rule. A linked
 renderer and standalone exit-1 failure app are validated. Interpreter CLI execution

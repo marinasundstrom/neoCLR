@@ -1,0 +1,42 @@
+.module BoxedInt32
+.function Box(Int32 value) -> System.Object
+ldarg value
+box Int32
+ret
+.end
+.function Calculate(Int32 input) -> Int32
+.local Int32 value
+.local System.Object first
+.local System.Object second
+ldarg input
+stloc value
+ldloc value
+call Box(Int32)
+stloc first
+ldc.i4 99
+stloc value
+ldarg input
+call Box(Int32)
+stloc second
+ldloc first
+ldloc second
+ref.eq
+brtrue Failed
+ldloc first
+isinst System.Object
+ref.isnull
+brtrue Failed
+ldloc first
+callvirt instance System.Object::ToString()
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldloc second
+callvirt instance System.Object::ToString()
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldc.i4 0
+ret
+Failed:
+ldc.i4 91
+ret
+.end
