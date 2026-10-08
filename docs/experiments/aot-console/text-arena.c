@@ -396,6 +396,24 @@ int32_t neoclr_reserve_records_v1(neoclr_aot_text_arena *arena, int32_t length,
     return NEOCLR_AOT_FAULT_NONE;
 }
 
+int32_t neoclr_allocate_scalars_v1(neoclr_aot_text_arena *arena, int32_t length,
+                                 int32_t reserved, void **output) {
+    if (length < 0 || !arena || !output || (reserved != 0 && reserved != 1))
+        return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (length > 65536) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
+    void *storage;
+    uint64_t bytes = 24 + (uint64_t)length * 9;
+    /* Scalar bits, even pointer-shaped integers, must not retain other objects. */
+    int32_t status = reserve_storage(arena, bytes, BYTES_STORAGE, &storage);
+    if (status) return status;
+    uint64_t header[] = {UINT64_C(0x80000006), (uint64_t)length, 1};
+    memcpy(storage, header, sizeof(header));
+    memset((unsigned char *)storage + 24, 0, (size_t)length * 8);
+    memset((unsigned char *)storage + 24 + (size_t)length * 8, reserved ? 0 : 1, (size_t)length);
+    *output = storage;
+    return NEOCLR_AOT_FAULT_NONE;
+}
+
 int32_t neoclr_string_compare_ordinal_v1(const neoclr_aot_text *left,
         const neoclr_aot_text *right, int32_t *output) {
     if (!left || !right || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;

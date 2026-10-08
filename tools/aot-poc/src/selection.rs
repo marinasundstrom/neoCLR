@@ -5,6 +5,14 @@ use serde_json::{Value, json};
 use std::collections::BTreeSet;
 type Error = Box<dyn std::error::Error>;
 
+/// Pointer-free, single-lane elements in the private scalar-array layout.
+/// Byte retains its existing compact storage and native I/O contract.
+pub(crate) fn scalar_array_element(t: &Type) -> bool {
+    matches!(t, Type::Int32 | Type::UInt32 | Type::Int64 | Type::UInt64
+        | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void
+        | Type::IntPtr | Type::UIntPtr)
+}
+
 /// Metadata-only owner of static methods; never an executable reference value.
 pub(crate) fn static_owner(t: &neoclr::metadata::TypeDef) -> bool {
     t.is_reference_type
@@ -422,7 +430,7 @@ pub(super) fn select_inventory_with_host_roots(
             Type::Function(shape) => { pending_types.extend(shape.parameters); pending_types.push(shape.returns); }
             Type::ByRef(t) => pending_types.push(*t),
             Type::Array(t) if *t == Type::Byte => (),
-            Type::ArrayRef(t) if *t == Type::String => (),
+            Type::ArrayRef(t) if *t == Type::String || scalar_array_element(&t) => (),
             Type::ArrayRef(t) if matches!(*t, Type::Function(_) | Type::Named(_)) => pending_types.push(*t),
             Type::ArrayRef(t) if *t == Type::Byte => {
                 if let Some(owner) = byte_array_owner(input) { pending_types.push(owner); }

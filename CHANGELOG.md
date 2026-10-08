@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Compile bounded scalar arrays for integer, Boolean and Void elements, preserving
+  default/reserved initialization, exact element identities, checked access and atomic
+  GC payloads. Verify 77 native/interpreter mode/type comparisons and real Raven array
+  aliasing/mutation; nine selected consumers advance to separately recorded blockers.
+  Element borrows, jagged arrays and nominal/interface views remain unsupported.
+
 - Assess 104 Raven samples with same-artifact interpreted/native execution, recording
   emission and AOT blockers separately. Preserve a focused callback/HTTP baseline;
   prioritize primitive arrays while keeping universal sample parity out of the release

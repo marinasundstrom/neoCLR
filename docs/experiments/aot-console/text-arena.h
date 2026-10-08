@@ -85,6 +85,9 @@ int32_t neoclr_allocate_strings_v1(neoclr_aot_text_arena *arena, int32_t length,
  * Success alone publishes the array; markers distinguish unwritten elements. */
 int32_t neoclr_reserve_records_v1(neoclr_aot_text_arena *arena, int32_t length,
                                 uint32_t lanes, void **output);
+/* Atomic scalar snapshots: one padded lane and initialization byte per element. */
+int32_t neoclr_allocate_scalars_v1(neoclr_aot_text_arena *arena, int32_t length,
+                                 int32_t reserved, void **output);
 int32_t neoclr_string_compare_ordinal_v1(const neoclr_aot_text *left,
     const neoclr_aot_text *right, int32_t *output);
 #endif

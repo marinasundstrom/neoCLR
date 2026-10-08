@@ -4216,3 +4216,188 @@ int main(void) {{
         }
     }
 }
+
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_scalar_arrays_preserve_types_defaults_roots_and_faults() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    for (ty, value, zero) in [
+        ("Int32", "ldc.i4 -2147483648", "ldc.i4 0"),
+        ("UInt32", "ldc.i4 -1\nconv.u4", "ldc.i4 0\nconv.u4"),
+        ("Int64", "ldc.i8 -9223372036854775808", "ldc.i8 0"),
+        ("UInt64", "ldc.i8 -1\nconv.u8", "ldc.i8 0\nconv.u8"),
+        ("SByte", "ldc.i4 255\nconv.i1", "ldc.i4 0\nconv.i1"),
+        ("Int16", "ldc.i4 65535\nconv.i2", "ldc.i4 0\nconv.i2"),
+        ("UInt16", "ldc.i4 -1\nconv.u2", "ldc.i4 0\nconv.u2"),
+        ("Boolean", "ldc.bool true", "ldc.bool false"),
+        ("Void", "ldvoid", "ldvoid"),
+        ("IntPtr", "ldc.i4 -42\nconv.i", "ldc.i4 0\nconv.i"),
+        ("UIntPtr", "ldc.i4 42\nconv.u", "ldc.i4 0\nconv.u"),
+    ] {
+        let check = |expected: &str| match ty {
+            "Void" => "pop".to_owned(),
+            "IntPtr" | "UIntPtr" => format!("conv.i8\n{expected}\nconv.i8\nceq\nbrfalse Failed"),
+            _ => format!("{expected}\nceq\nbrfalse Failed"),
+        };
+        let source = format!(r#"
+.module ScalarArrays
+.function Calculate(Int32 mode) -> Int32
+.local arrayref<{ty}> values
+.local Int32 count
+ldc.i4 2
+newarr {ty}
+stloc values
+ldloc values
+ldc.i4 0
+ldelem {ty}
+{default_check}
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Uninitialized
+ldarg mode
+ldc.i4 2
+ceq
+brtrue NegativeIndex
+ldarg mode
+ldc.i4 3
+ceq
+brtrue EndIndex
+ldarg mode
+ldc.i4 4
+ceq
+brtrue Null
+ldarg mode
+ldc.i4 5
+ceq
+brtrue NegativeLength
+ldarg mode
+ldc.i4 6
+ceq
+brtrue TooLarge
+ldc.i4 2
+array.reserve {ty}
+stloc values
+ldloc values
+ldc.i4 1
+{value}
+stelem {ty}
+ldc.i4 0
+stloc count
+Loop:
+ldc.i4 8
+newarr {ty}
+pop
+ldloc count
+ldc.i4 1
+add
+stloc count
+ldloc count
+ldc.i4 100
+clt
+brtrue Loop
+ldloc values
+ldc.i4 1
+ldelem {ty}
+{written_check}
+ldc.i4 42
+ret
+Uninitialized:
+ldc.i4 1
+array.reserve {ty}
+ldc.i4 0
+ldelem {ty}
+pop
+br Failed
+NegativeIndex:
+ldloc values
+ldc.i4 -1
+ldelem {ty}
+pop
+br Failed
+EndIndex:
+ldloc values
+ldc.i4 2
+{value}
+stelem {ty}
+br Failed
+Null:
+ldloca values
+initobj arrayref<{ty}>
+ldloc values
+ldc.i4 0
+ldelem {ty}
+pop
+br Failed
+NegativeLength:
+ldc.i4 -1
+newarr {ty}
+pop
+br Failed
+TooLarge:
+ldc.i4 65537
+array.reserve {ty}
+pop
+Failed:
+ldc.i4 -1
+ret
+.end
+"#, default_check=check(zero), written_check=check(value));
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena", "--native-gc"], false);
+        assert!(r.status.success(), "{ty}: {}", String::from_utf8_lossy(&r.stderr));
+        fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+int main(void) {
+    uint64_t buffer[257]; buffer[256] = 1234567;
+    neoclr_aot_context ctx = {.text = {(unsigned char *)buffer, 2048, 0}};
+    int statuses[] = {0, 3, 8, 8, 6, 3, 7};
+    for (int mode = 0; mode < 7; mode++) {
+        int32_t result = -99;
+        int status = neoclr_entry_v4(mode, &result, &ctx);
+        if (status != statuses[mode] || result != (mode ? -99 : 42)) return 1;
+        if (status && neoclr_aot_render_fault(stderr, &ctx.fault)) return 2;
+        if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 3;
+        if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used) return 4;
+        if (buffer[256] != 1234567) return 5;
+    }
+    return 0;
+}
+"#).unwrap();
+        let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+            .arg(&base).arg(dir.0.join("host.c")).arg(base.join("root-probe.c"))
+            .arg(base.join("native-gc.c")).arg(base.join("text-arena.c"))
+            .arg(base.join("../aot-fault-details/render.c"))
+            .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host")).output().unwrap();
+        assert!(r.status.success(), "{ty}: {}", String::from_utf8_lossy(&r.stderr));
+        let r = Command::new(dir.0.join("host")).output().unwrap();
+        assert!(r.status.success(), "{ty}: {r:?}");
+        let app = neoclr::assemble(&source).unwrap();
+        let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+        let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+        assert_eq!(method.invoke(vec![neoclr::Value::Int32(0)], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        let mut faults = String::new();
+        for mode in 1..7 {
+            let fault = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default()).unwrap_err();
+            faults.push_str(&fault.diagnostic().to_string());
+        }
+        assert_eq!(String::from_utf8_lossy(&r.stderr), faults, "{ty}");
+    }
+}
+
+#[test]
+fn native_scalar_arrays_reject_element_borrows_and_incompatible_elements() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    for body in [
+        "ldc.i4 1\nnewarr Int32\nldc.i4 0\nldelema Int32\npop",
+        "ldc.i4 1\nnewarr Int32\nldc.i4 0\nldelem UInt32\npop",
+        "ldc.i4 1\nnewarr Int64\nldc.i4 0\nldelem UInt64\npop",
+    ] {
+        let dir = Temp::new();
+        let source = format!(".module BadArrays\n.function Calculate() -> Int32\n{body}\nldc.i4 0\nret\n.end");
+        let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena", "--native-gc"], false);
+        assert!(!r.status.success(), "unsupported scalar array contract admitted");
+    }
+}

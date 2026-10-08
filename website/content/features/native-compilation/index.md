@@ -173,3 +173,9 @@ to remove its temporary CLI Core dependency.
 Future reflection may use IL-free metadata beside the executable, sharing descriptions
 with native interop. Invocation would additionally require retained native code and
 calling conventions. This is a proposal, not current support.
+
+
+The first coverage follow-up adds bounded integer, Boolean and Void arrays, including
+checked reserved storage and atomic GC payloads. The ordinary Raven array sample now
+runs in both modes. Nine other selected samples advance to further metadata, primitive
+wrapper, callback and service gaps; broad Tasks/await parity is not yet claimed.

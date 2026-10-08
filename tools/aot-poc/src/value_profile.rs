@@ -25,6 +25,7 @@ pub(super) enum Ty {
     Wide,
     ReferenceArray(usize), // Checked reserved slots retaining nominal object identity.
     RecordArray(usize), // Checked reserved snapshots of a closed value record.
+    ScalarArray(Type), // Atomic one-lane slots; exact element identity retained.
     CallableArray(Type), // Initialized/reserved pointer slots of one exact Function shape.
     Callable(Type), // Managed descriptor: target identity and strong heap receiver.
     Address(Box<Ty>),
@@ -125,7 +126,7 @@ impl<'a> Profile<'a> {
                     f.deferred
                         || !(matches!(f.ty, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::Void | Type::String | Type::Named(_))
                             || (references && matches!(&f.ty, Type::Function(_)))
-                            || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Function(_) | Type::Named(_)))))
+                            || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Function(_) | Type::Named(_)) || crate::selection::scalar_array_element(t))))
                 })
             {
                 return Err(format!("{}: value profile requires nongeneric records with at most sixteen Int32/small-integer/Boolean/String/local-record fields", t.name).into());
@@ -390,6 +391,7 @@ impl<'a> Profile<'a> {
                 for t in shape.parameters.iter().chain([&shape.returns]) { self.ty(t)?; }
                 Ty::Callable(t.clone())
             }
+            Type::ArrayRef(t) if self.references && crate::selection::scalar_array_element(t) => Ty::ScalarArray(t.as_ref().clone()),
             Type::ArrayRef(t) if self.references && matches!(**t, Type::Function(_)) => {
                 self.ty(t)?;
                 Ty::CallableArray(t.as_ref().clone())
@@ -454,7 +456,7 @@ impl<'a> Profile<'a> {
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
             Ty::Erased => vec![false, true],
-            Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::Callable(_) | Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray | Ty::ByteValues | Ty::Size | Ty::Wide => vec![true],
+            Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::Callable(_) | Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray | Ty::ByteValues | Ty::Size | Ty::Wide => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
             _ => vec![false; self.lanes(t)],
@@ -823,6 +825,8 @@ impl<'a> Profile<'a> {
                 }
                 Op::IsInstance(t) | Op::CastClass(t) if self.references && (matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_))
                     || (self.array_backing.is_some() && self.ty(t)? == Ty::ByteArray)) => (),
+                Op::NewArray(t) | Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
+                    if self.references && crate::selection::scalar_array_element(t) => (),
                 Op::NewArray(Type::String) | Op::ReserveArray(Type::String) | Op::ArrayElement(Type::String) | Op::StoreArrayElement(Type::String) if self.references => (),
                 Op::NewArray(t) | Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
                     if self.references && matches!(t, Type::Function(_)) => { self.ty(t)?; },
@@ -937,7 +941,7 @@ impl<'a> Profile<'a> {
                     stack.push(self.ty(t)?);
                 }
                 Op::ReferenceIsNull => {
-                    if !matches!(pop(&mut stack)?, Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::Callable(_) | Ty::CallableArray(_) | Ty::Literal | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray) {
+                    if !matches!(pop(&mut stack)?, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::Callable(_) | Ty::CallableArray(_) | Ty::Literal | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray) {
                         return Err(fail(pc, "null test requires text or reference"));
                     }
                     stack.push(Ty::Bool);
@@ -945,22 +949,26 @@ impl<'a> Profile<'a> {
                 Op::ReferenceEqual => {
                     for _ in 0..2 {
                         let ty = pop(&mut stack)?;
-                        if !matches!(ty, Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray) && !(ty == Ty::Literal && self.references) {
+                        if !matches!(ty, Ty::ScalarArray(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray) && !(ty == Ty::Literal && self.references) {
                             return Err(fail(pc, "identity requires managed references; text requires --reference-arena"));
                         }
                     }
                     stack.push(Ty::Bool);
                 }
+                Op::NewArray(t) | Op::ReserveArray(t) if crate::selection::scalar_array_element(t) => {
+                    take(&mut stack, &Ty::Int)?;
+                    stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
+                }
                 Op::ReserveArray(t) if matches!(t, Type::Named(_)) => {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
-                Op::ArrayElement(t) if matches!(t, Type::Named(_)) => {
+                Op::ArrayElement(t) if matches!(t, Type::Named(_)) || crate::selection::scalar_array_element(t) => {
                     take(&mut stack, &Ty::Int)?;
                     take(&mut stack, &self.ty(&Type::ArrayRef(Box::new(t.clone())))?)?;
-                    stack.push(self.ty(t)?);
+                    stack.push(Self::stack_type(&self.ty(t)?));
                 }
-                Op::StoreArrayElement(t) if matches!(t, Type::Named(_)) => {
+                Op::StoreArrayElement(t) if matches!(t, Type::Named(_)) || crate::selection::scalar_array_element(t) => {
                     take(&mut stack, &self.ty(t)?)?;
                     take(&mut stack, &Ty::Int)?;
                     take(&mut stack, &self.ty(&Type::ArrayRef(Box::new(t.clone())))?)?;
@@ -998,7 +1006,7 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::ByteArray);
                 }
                 Op::ArrayLength => {
-                    if !matches!(pop(&mut stack)?, Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::ByteArray | Ty::StringArray | Ty::ByteValues) {
+                    if !matches!(pop(&mut stack)?, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::ByteArray | Ty::StringArray | Ty::ByteValues) {
                         return Err(fail(pc, "array length requires a byte array or immutable byte values"));
                     }
                     stack.push(Ty::Size);

@@ -110,6 +110,30 @@ in this survey include parallel-process contention and must not be used as bench
 Other neoIL/Rust/HTTP integration suites are outside the 104 denominator. Existing
 focused evidence covers more native operations than these older API samples exercise.
 
+## First implemented follow-up: scalar arrays
+
+[Bounded scalar-array support](../aot-console/scalar-arrays.md) now passes 77 native/
+interpreter mode/type comparisons plus atomic-GC/allocation checks. Ten selected Raven
+consumers were rebuilt and rerun; all still run successfully interpreted. `library-arrays`
+now also runs natively with matching output. The other nine advance beyond the original
+primitive-array rejection to explicit further boundaries:
+
+| Consumer | Next AOT boundary |
+| --- | --- |
+| library-booleans | Boolean value-member owner |
+| library-array-foreach | RuntimeTypeHandle metadata |
+| library-array-unified | Jagged Int32 arrays |
+| application-order-collections | Unsupported instruction in Main |
+| library-generic-collections | Int64 value-member owner |
+| library-async | DrainEntryTasks service |
+| library-async-cancellation, library-task-result, native-async-state | Value-receiver callback binding |
+
+[Raw follow-up](scalar-array-followup.json). This confirms why the original 39 first
+blockers were not a 39-sample completion estimate. The initial matrix below remains
+historical evidence; this follow-up supersedes its primitive-array implementation gap.
+Next inspect primitive wrapper ownership as a potentially small fix; Tasks entry draining
+and value-receiver callbacks remain distinct runtime/ABI work.
+
 ## Per-sample matrix
 
 `Emission blocked` means neither mode was run. Interpreter `expected 1/23` identifies

@@ -400,6 +400,13 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_reserve_bytes_v1", Linkage::Import, &sig)?)
     } else { None };
+    let scalar_array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op|
+        matches!(op, Op::NewArray(t) | Op::ReserveArray(t) if crate::selection::scalar_array_element(t)))) {
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64, types::I32, types::I32, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_allocate_scalars_v1", Linkage::Import, &sig)?)
+    } else { None };
     let record_array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op|
         matches!(op, Op::ReserveArray(neoclr::metadata::Type::Named(_))))) {
         let mut sig = module.make_signature();
@@ -1121,6 +1128,18 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let value = stack.split_off(stack.len() - p.lanes(&ty));
                         stack.extend(normalize(&mut b, &p, &ty, &value));
                     }
+                    Op::NewArray(t) | Op::ReserveArray(t) if crate::selection::scalar_array_element(t) => {
+                        let count = pop(&mut stack);
+                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        let output = b.ins().stack_addr(types::I64, call_result, 0);
+                        let reserved = b.ins().iconst(types::I32, i64::from(matches!(op, Op::ReserveArray(_))));
+                        let service = module.declare_func_in_func(scalar_array_service.unwrap(), b.func);
+                        let call = b.ins().call(service, &[arena, count, reserved, output]);
+                        let status = b.inst_results(call)[0];
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        return_if_detailed(&mut b, failed, status, site.as_ref());
+                        stack.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
+                    }
                     Op::ReserveArray(t) if matches!(t, neoclr::metadata::Type::Named(_)) => {
                         let count = pop(&mut stack);
                         let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
@@ -1161,7 +1180,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         null_reference(&mut b, array, site.as_ref());
                         stack.push(b.ins().load(types::I64, MemFlags::new(), array, 8));
                     }
-                    Op::ArrayElement(t) | Op::StoreArrayElement(t) if matches!(t, neoclr::metadata::Type::Named(_)) => {
+                    Op::ArrayElement(t) | Op::StoreArrayElement(t) if matches!(t, neoclr::metadata::Type::Named(_)) || crate::selection::scalar_array_element(t) => {
                         let ty = p.ty(t)?;
                         let width = p.lanes(&ty);
                         let value = if matches!(op, Op::StoreArrayElement(_)) {

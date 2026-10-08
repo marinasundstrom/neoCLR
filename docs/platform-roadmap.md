@@ -333,7 +333,7 @@ primitive arrays account for 39. The interpreter has 63 successful zero exits, t
 intentional exit/fault controls and two introspection failures. Four focused callback/
 queue/Result consumers and the HTTP baseline pass separately. The author subsequently
 directs fixing easy and urgent native issues: assess bounded primitive arrays next,
-then rerun selected consumers rather than treating all 104 as release blockers.
+then rerun selected consumers rather than treating all 104 as release blockers. Bounded scalar arrays now pass 77 mode/type comparisons and eleven GC kernel tests; of ten selected follow-ups, `library-arrays` now runs in both modes and nine reveal further metadata, primitive-wrapper, callback or service boundaries. [Follow-up evidence](experiments/aot-sample-assessment/scalar-array-followup.json).
 
 The author proposes future AOT reflection using IL-free sidecar metadata, converging
 with metadata-based interop. [Design questions](native-execution-investigation.md#il-free-metadata-for-aot-reflection-and-interop-author-proposal-2026-10-08)
