@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add a private macOS ARM64 remaining-stack probe and sanitized worker-stack/unwind
+  checks at two optimization levels. Record the required compiler/frame/host-entry
+  contract and comparison with .NET sufficient-stack checks; recursive native CIL
+  admission remains disabled until that integration is validated.
+
 - Add a private native TaskQueue scope and exact closed service bindings. Retain the
   default queue and preserve active explicit Run/Drain receiver lookup; validate a real
   Raven Promise/queue consumer in both modes plus scope/contract checks. Align native

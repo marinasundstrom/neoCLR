@@ -157,3 +157,22 @@ fn native_task_scope_preserves_default_and_active_queue_ownership() {
     assert!(r.status.success(), "{r:?}");
     fs::remove_dir_all(dir).unwrap();
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_stack_probe_respects_worker_stack_bounds_and_unwinds() {
+    let dir = std::env::temp_dir().join(format!("neoclr-native-stack-{}", std::process::id()));
+    fs::create_dir_all(&dir).unwrap();
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    for optimization in ["-O0", "-O2"] {
+        let binary = dir.join(optimization);
+        let r = Command::new("clang")
+            .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds", optimization])
+            .arg(base.join("native-stack-test.c")).arg(base.join("native-stack.c"))
+            .arg("-o").arg(&binary).output().unwrap();
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let r = Command::new(binary).output().unwrap();
+        assert!(r.status.success(), "{r:?}");
+    }
+    fs::remove_dir_all(dir).unwrap();
+}
