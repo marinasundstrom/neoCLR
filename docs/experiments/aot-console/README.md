@@ -1677,12 +1677,12 @@ reclamation is enabled.
 ## Executable stack-root probes (2026-10-08)
 
 `--probe-stack-roots` now emits the planned stack spills before each covered operation
-and calls `neoclr_probe_stack_roots_v1`. It requires `--fault-details` or an existing
+and calls the private probe callback (now `neoclr_probe_stack_roots_v2`). It requires `--fault-details` or an existing
 context-enabled binding, preserving that profile's entry ABI. It is off by default;
 ordinary emission adds no callback import or probe data. Inspection uses the same option
 and reports `capabilities.stackRootProbes`.
 
-The callback receives the compiled function index, IL instruction, a read-only array of
+The v2 callback receives a diagnostic frame pointer, IL instruction, a read-only array of
 64-bit lanes, its count, and an image-owned JSON plan with byte length and a trailing NUL.
 The [private header](root-probe.h) states the contract. Each point overwrites a per-function
 scratch snapshot: required pointer/discriminator lanes come from the actual current SSA
@@ -1690,17 +1690,16 @@ values, 32-bit tags are extended, and numeric holes are zero. The buffer is incl
 the existing 64 KiB frame-storage budget. Published callback arguments make the spills
 observable in executable code, unlike unused stores intended for future registration.
 
-Snapshots are valid only during the synchronous callback. The hook must not allocate,
-reenter, retain pointers, mutate roots or trigger collection. No parent frame, local or
-argument root set is registered, and no future result/constructor receiver is active in
-this pre-operation snapshot. Native adapters remain uncovered. Persistent frames, host
-state, owner recovery, result activation and success/fault cleanup still precede GC.
+Snapshots may be observed through the active diagnostic chain during callbacks. The hook
+must not allocate, reenter, retain frames beyond their lifetime, mutate roots or trigger
+collection. No local or argument root set is registered, and no future result/constructor
+receiver is active in this pre-operation snapshot. Native adapters remain uncovered. Complete root coverage, host roots, owner recovery and result activation still precede GC.
 The callback is diagnostic only; it is not a stable ABI or the proposed native metadata
 interop interface. The default runtime and managed contracts are unchanged.
 
 The [diagnostic adapter](root-probe.c) reads the initialized snapshots without following
 pointers and counts calls per thread. Its counter accumulates across entry invocations;
-there is no global active-root registry. The route harness reports counts only in its
+the diagnostic chain is thread-local rather than a process-global collector registry. The route harness reports counts only in its
 measurement mode, leaving normal output/fault comparisons unchanged. Reproduce the
 existing lifetime driver with `--probe-stack-roots`; it links this adapter explicitly.
 
@@ -1716,3 +1715,42 @@ Compared with the existing CLR root-map baseline, this demonstrates stack materi
 at selected boundaries but still lacks complete root lifetime registration and safepoint
 coverage. The opt-in path adds stores, static JSON and synchronous calls; it is a
 correctness instrument with overhead, not a performance optimization or collector.
+
+## Diagnostic frame lifetimes (2026-10-08)
+
+The opt-in probe now links a 48-byte, stack-owned frame on entry to every ordinary managed
+body, including bodies without a pre-operation point. Each frame records its host context,
+function index, prior frame and latest initialized stack snapshot. A callee's callback can
+observe its suspended callers' snapshots. Native adapter/dispatch wrappers remain omitted;
+this is still an incomplete root set and must not be used to collect.
+
+After lowering, a pass inserts `neoclr_probe_leave_v1` before every return in the completed
+function IR. This covers normal returns, explicit faults, arithmetic/null checks and
+propagated call failures without relying on each emitter branch to remember cleanup.
+The frame storage counts toward the existing 64 KiB frame budget. The host entry ABI is
+unchanged. Default, uninstrumented builds add no frame storage or callback dependency.
+
+The private callback ABI changes from `neoclr_probe_stack_roots_v1` to v2, taking a frame
+pointer instead of a function index; function/context identities are in the frame.
+Instrumented images now also require `neoclr_probe_enter_v1` and `neoclr_probe_leave_v1`.
+Recompile/relink diagnostic hosts and images together against [root-probe.h](root-probe.h).
+This does not change guest APIs or select a stable external GC/hosting ABI.
+
+The supplied adapter uses a thread-local linked chain and validates LIFO removal. It
+clears removed frames, exposes head/depth for host assertions, and reads ancestor
+snapshots without following managed pointers. A frame can describe a nested host context;
+context identity does not turn the chain into isolated collector root sets. Asynchronous
+collection, reentry from hooks, native unwinding and longjmp remain unsupported.
+
+The ARM64 lifecycle test enters three functions, validates the caller-only retained String
+from the deepest function, returns normally, propagates a deepest-frame divide fault,
+and reenters successfully. All nine entries have matching leaves, peak depth is three,
+and the chain is empty after each host return. Fault trace/result behavior is preserved.
+The real route host now requires an empty chain on every normal and fault return;
+[frame validation](route-probe-frame-validation.json) records those execution checks.
+Fourteen focused probe, inspection and fault-detail tests pass.
+
+This follows the existing CLR/shadow-stack comparison: lexical frame lifetime and cleanup
+are necessary but insufficient for a precise collector. Arguments/locals, initialized
+borrow pointees, constructor/result activation, native adapters and host/fault roots still
+need coverage. Diagnostic ancestor scanning adds overhead; no speed or memory claim is made.

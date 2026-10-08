@@ -20,6 +20,9 @@ int main(int argc, char **argv) {
     neoclr_aot_context context = {.text = {storage, capacity, 0}};
     int32_t result = -99;
     int32_t status = neoclr_entry_v4(requests, &result, &context);
+#ifdef NEOCLR_ROOT_PROBES
+    if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1()) return 3;
+#endif
     for (int i = 0; i < 8; ++i) if (storage[capacity + i] != 0xa5) return 3;
     if (context.text.used > capacity || (status && (result != -99 || context.fault.code != (uint32_t)status))) return 3;
     if (!status && (context.fault.code || context.fault.frame_count || context.fault.message)) return 3;

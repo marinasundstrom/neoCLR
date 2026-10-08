@@ -399,6 +399,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             .signature
             .clone();
         let mut fb = FunctionBuilderContext::new();
+        let mut probe_frame = None;
         {
             let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
             let entry = b.create_block();
@@ -755,8 +756,15 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 frame_bytes += bytes as usize + 7;
                 slot(&mut b, bytes)
             });
+            if root_probes.is_some() {
+                frame_bytes += 48 + 7;
+                probe_frame = Some(slot(&mut b, 48));
+            }
             if frame_bytes > 65536 {
                 return Err("value profile frame storage exceeds 64 KiB".into());
+            }
+            if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                probes.enter(&mut module, &mut b, frame, fault_context.unwrap(), i);
             }
             let blocks: Vec<_> = f.body.iter().map(|_| b.create_block()).collect();
             for (pc, stack) in flows[i].iter().enumerate() {
@@ -779,7 +787,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let pop = |s: &mut Vec<ir::Value>| s.pop().expect("checked stack");
                 let mut site = diagnostic_data.as_ref().map(|d| d.site(&mut module, &mut b, fault_context.unwrap(), i, pc));
                 if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
-                    probes.emit(&mut module, &mut b, i, pc, spill, &stack);
+                    probes.emit(&mut module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
                 }
                 match op {
                     Op::Int(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
@@ -1247,6 +1255,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             }
             b.seal_all_blocks();
             b.finalize();
+        }
+        if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+            probes.finish(&mut module, &mut context.func, frame);
         }
         module.define_function(ids[i], &mut context)?;
     }

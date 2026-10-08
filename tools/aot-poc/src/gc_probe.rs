@@ -1,8 +1,9 @@
-//! Opt-in, synchronous read-only snapshots. This is deliberately not root registration.
+//! Opt-in diagnostic frame chain. Incomplete roots: collection remains forbidden.
 use super::{
     Error, gc_points,
     profile::{Profile, Stacks},
 };
+use cranelift_codegen::cursor::{Cursor, FuncCursor};
 use cranelift_codegen::ir::{self, AbiParam, InstBuilder, StackSlot, types};
 use cranelift_frontend::FunctionBuilder;
 use cranelift_module::{DataDescription, DataId, FuncId, Linkage, Module};
@@ -17,6 +18,8 @@ struct Point {
 }
 pub(super) struct Probes {
     callback: FuncId,
+    enter: FuncId,
+    leave: FuncId,
     points: HashMap<(usize, usize), Point>,
 }
 impl Probes {
@@ -29,7 +32,7 @@ impl Probes {
         let mut sig = module.make_signature();
         sig.params.extend(
             [
-                types::I32,
+                types::I64,
                 types::I32,
                 types::I64,
                 types::I32,
@@ -39,7 +42,17 @@ impl Probes {
             .map(AbiParam::new),
         );
         let callback =
-            module.declare_function("neoclr_probe_stack_roots_v1", Linkage::Import, &sig)?;
+            module.declare_function("neoclr_probe_stack_roots_v2", Linkage::Import, &sig)?;
+        let mut enter_sig = module.make_signature();
+        enter_sig
+            .params
+            .extend([types::I64, types::I64, types::I32].map(AbiParam::new));
+        let enter =
+            module.declare_function("neoclr_probe_enter_v1", Linkage::Import, &enter_sig)?;
+        let mut leave_sig = module.make_signature();
+        leave_sig.params.push(AbiParam::new(types::I64));
+        let leave =
+            module.declare_function("neoclr_probe_leave_v1", Linkage::Import, &leave_sig)?;
         let mut points = HashMap::new();
         for (i, f) in p.input.functions.iter().enumerate() {
             if gc_points::native_body(p, i, details) {
@@ -80,7 +93,41 @@ impl Probes {
                 );
             }
         }
-        Ok(Self { callback, points })
+        Ok(Self {
+            callback,
+            enter,
+            leave,
+            points,
+        })
+    }
+    pub fn enter(
+        &self,
+        module: &mut ObjectModule,
+        b: &mut FunctionBuilder<'_>,
+        frame: StackSlot,
+        context: ir::Value,
+        function: usize,
+    ) {
+        let address = b.ins().stack_addr(types::I64, frame, 0);
+        let function = b.ins().iconst(types::I32, function as i64);
+        let enter = module.declare_func_in_func(self.enter, b.func);
+        b.ins().call(enter, &[address, context, function]);
+    }
+    // Lowering emits returns in many fault branches. Instrument the completed IR
+    // so all returns, including arithmetic/null faults, share the same cleanup.
+    pub fn finish(&self, module: &mut ObjectModule, func: &mut ir::Function, frame: StackSlot) {
+        let returns: Vec<_> = func
+            .layout
+            .blocks()
+            .flat_map(|block| func.layout.block_insts(block))
+            .filter(|&inst| func.dfg.insts[inst].opcode() == ir::Opcode::Return)
+            .collect();
+        let leave = module.declare_func_in_func(self.leave, func);
+        for inst in returns {
+            let mut cursor = FuncCursor::new(func).at_inst(inst);
+            let address = cursor.ins().stack_addr(types::I64, frame, 0);
+            cursor.ins().call(leave, &[address]);
+        }
     }
     pub fn storage_bytes(&self, function: usize) -> Option<u32> {
         self.points
@@ -96,6 +143,7 @@ impl Probes {
         function: usize,
         pc: usize,
         slot: StackSlot,
+        frame: StackSlot,
         stack: &[ir::Value],
     ) {
         let Some(point) = self.points.get(&(function, pc)) else {
@@ -116,7 +164,7 @@ impl Probes {
             };
             b.ins().stack_store(value, slot, (lane * 8) as i32);
         }
-        let function = b.ins().iconst(types::I32, function as i64);
+        let frame = b.ins().stack_addr(types::I64, frame, 0);
         let pc = b.ins().iconst(types::I32, pc as i64);
         let address = b.ins().stack_addr(types::I64, slot, 0);
         let count = b.ins().iconst(types::I32, point.stack_lanes as i64);
@@ -124,9 +172,7 @@ impl Probes {
         let descriptor = b.ins().global_value(types::I64, data);
         let length = b.ins().iconst(types::I32, point.length as i64);
         let callback = module.declare_func_in_func(self.callback, b.func);
-        b.ins().call(
-            callback,
-            &[function, pc, address, count, descriptor, length],
-        );
+        b.ins()
+            .call(callback, &[frame, pc, address, count, descriptor, length]);
     }
 }

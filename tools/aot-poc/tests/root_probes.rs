@@ -15,13 +15,21 @@ fn native_probes_observe_real_spills_across_calls_faults_and_reentry() {
     fs::write(
         &input,
         r#".module Probes
-.function Id(Value value) -> Value
+.function Id(Value value,Int32 fail) -> Value
+ldarg fail
+brfalse Success
+ldc.i4 1
+ldc.i4 0
+div
+pop
+Success:
 ldarg value
 ret
 .end
-.function Echo(Value value) -> Value
+.function Echo(Value value,Int32 fail) -> Value
 ldarg value
-call Id(Value)
+ldarg fail
+call Id(Value,Int32)
 ret
 .end
 .function Main(Int32 fail) -> Int32
@@ -29,17 +37,11 @@ ldc.i8 99
 ldstr "keep"
 ldstr "argument"
 value.pack String
-call Echo(Value)
-pop
-pop
-pop
 ldarg fail
-brfalse Done
-ldc.i4 1
-ldc.i4 0
-div
-ret
-Done:
+call Echo(Value,Int32)
+pop
+pop
+pop
 ldc.i4 42
 ret
 .end
@@ -61,31 +63,53 @@ ret
         let imports = Command::new("nm").arg("-u").arg(&output).output().unwrap();
         assert!(imports.status.success());
         assert_eq!(
-            String::from_utf8_lossy(&imports.stdout).contains("neoclr_probe_stack_roots_v1"),
+            String::from_utf8_lossy(&imports.stdout).contains("neoclr_probe_stack_roots_v2"),
             probe
         );
     }
     let host = dir.0.join("host.c");
     fs::write(&host, r#"
 #include "fault-details.h"
+#include "root-probe.h"
 #include <stdlib.h>
 #include <string.h>
-static unsigned calls;
+static unsigned calls, enters, leaves, depth, peak;
+static neoclr_probe_frame *head;
 static int text(uint64_t value, const char *expected) {
     const neoclr_aot_text *t = (const void *)(uintptr_t)value;
     return t && t->length == strlen(expected) && !memcmp(t->bytes, expected, t->length);
 }
-void neoclr_probe_stack_roots_v1(uint32_t function, uint32_t pc,
+void neoclr_probe_enter_v1(neoclr_probe_frame *frame, const void *context, uint32_t function) {
+    if (!frame || !context || (head && head->context != context)) abort();
+    memset(frame, 0, sizeof(*frame));
+    frame->previous = head; frame->context = context; frame->function = function;
+    head = frame; enters++; depth++; if (depth > peak) peak = depth;
+    if (function == 0) {
+        const neoclr_probe_frame *caller = frame->previous;
+        if (!caller || caller->function != 1 || !caller->previous || caller->previous->function != 2 ||
+            !text(caller->previous->lanes[1], "keep")) abort();
+    }
+}
+void neoclr_probe_leave_v1(neoclr_probe_frame *frame) {
+    if (head != frame || !depth) abort();
+    head = frame->previous; depth--; leaves++;
+    memset(frame, 0, sizeof(*frame));
+}
+void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t pc,
     const uint64_t *lanes, uint32_t count, const char *plan, uint32_t length) {
+    if (head != frame) abort();
+    uint32_t function = frame->function;
+    frame->lanes = lanes; frame->lane_count = count; frame->plan = plan;
+    frame->length = length; frame->instruction = pc;
     if (!plan || strlen(plan) != length || !strstr(plan, "requiredSpillLanes")) abort();
     if (function == 2 && pc == 1) {
         if (count != 1 || lanes[0]) abort();
     } else if (function == 2 && pc == 2) {
         if (count != 2 || lanes[0] || !text(lanes[1], "keep")) abort();
-    } else if (function == 2 && pc == 4) {
-        if (count != 4 || lanes[0] || !text(lanes[1], "keep") || lanes[2] != 4 || !text(lanes[3], "argument")) abort();
-    } else if (function == 1 && pc == 1) {
-        if (count != 2 || lanes[0] != 4 || !text(lanes[1], "argument")) abort();
+    } else if (function == 2 && pc == 5) {
+        if (count != 5 || lanes[4] || lanes[0] || !text(lanes[1], "keep") || lanes[2] != 4 || !text(lanes[3], "argument")) abort();
+    } else if (function == 1 && pc == 2) {
+        if (count != 3 || lanes[2] || lanes[0] != 4 || !text(lanes[1], "argument")) abort();
     } else { abort(); }
     calls++;
 }
@@ -94,11 +118,12 @@ int main(void) {
     for (int i = 0; i < 3; i++) {
         int32_t result = -99;
         int32_t status = neoclr_entry_v3(i == 1, &result, &fault);
+        if (head || depth || enters != leaves) return 4;
         if (i == 1) {
-            if (status != 1 || result != -99 || fault.code != 1 || fault.frame_count != 1) return 1;
+            if (status != 1 || result != -99 || fault.code != 1 || fault.frame_count != 3) return 1;
         } else if (status || result != 42 || fault.code || fault.frame_count) return 2;
     }
-    return calls == 12 ? 0 : 3;
+    return calls == 12 && enters == 9 && leaves == 9 && peak == 3 ? 0 : 3;
 }
 "#).unwrap();
     let binary = dir.0.join("app");
@@ -110,6 +135,8 @@ int main(void) {
             PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .join("../../docs/experiments/aot-fault-details"),
         )
+        .arg("-I")
+        .arg(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console"))
         .arg(host)
         .arg(dir.0.join("probe.o"))
         .arg("-o")

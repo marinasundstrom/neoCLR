@@ -528,3 +528,11 @@ checks preserve output/fault behavior. See the [probe contract](experiments/aot-
 This closes the observability gap for pre-operation stack spills, while persistent root
 frames, ancestor roots, native adapters and result/fault lifetimes remain unimplemented.
 It adds diagnostic overhead and does not enable collection or claim CLR-equivalent roots.
+
+Diagnostic frames now persist across ordinary managed calls, carry host-context identity,
+and unlink before every completed-IR return. Tests cover caller snapshots, deepest-frame
+fault propagation and reentry; the real route host requires an empty chain at return.
+[Details and evidence](experiments/aot-console/README.md#diagnostic-frame-lifetimes-2026-10-08)
+record the private v2 probe migration. This is a lifetime audit of incomplete root sets,
+not activation of the proposed collector. Native wrappers and non-stack root categories
+remain outstanding; ancestor scanning adds diagnostic cost.

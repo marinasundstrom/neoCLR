@@ -198,9 +198,12 @@ Reachable IL-boundary plans now identify retained evaluation-stack roots, pendin
 and spill lanes ([evidence](experiments/aot-console/route-root-points-validation.json));
 native adapter/dispatch internals are explicit coverage gaps. Opt-in stack probes now
 emit the planned spills and expose initialized snapshots to a linked read-only diagnostic
-callback ([validation](experiments/aot-console/route-root-probe-validation.json)). Implement
-persistent root-frame publication and cleanup, adapter coverage and
-emitted allocation descriptors next, then nonmoving tracing/reclamation before qualifying
+callback ([validation](experiments/aot-console/route-root-probe-validation.json)). Opt-in
+diagnostic frames now retain ancestor
+snapshots and unlink on success/fault returns ([validation](experiments/aot-console/route-probe-frame-validation.json)).
+Arguments, locals, borrows, pending results, adapters and host/fault roots remain incomplete.
+Extend frame coverage next, then add allocation descriptors and nonmoving tracing/reclamation
+before qualifying
 sustained HTTP execution. This is planned integration work, not an implemented native
 collector. Borrowed String interface receivers remain unsupported.
 The author adds a console-input sample after unions, exercising input and
