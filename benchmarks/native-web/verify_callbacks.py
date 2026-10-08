@@ -11,13 +11,14 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
-p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList'))
+p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues'))
 a = p.parse_args()
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
 base = ROOT / 'docs/experiments/aot-console'
-seed, core, ownership = (bundle / 'lib' / n for n in ('System.runtime.neox', 'Core.dll', 'ownership.json'))
-libs = [bundle / 'lib' / n for n in ('System.Runtime.dll', 'System.Web.dll', 'System.Networking.dll', 'System.Data.dll')]
+library = bundle / 'lib' if (bundle / 'lib').is_dir() else bundle
+seed, core, ownership = (library / n for n in ('System.runtime.neox', 'Core.dll', 'ownership.json'))
+libs = [library / n for n in ('System.Runtime.dll', 'System.Web.dll', 'System.Networking.dll', 'System.Data.dll')]
 context = ['--system', seed, *[x for lib in libs for x in ('--module', lib)], '--object-root', libs[0]]
 flags = [*context, '--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc', '--bind-int32-to-string', '--bind-utf8-text']
 adapters = [base / 'callback-host.c', base / 'root-probe.c', base / 'native-gc.c',

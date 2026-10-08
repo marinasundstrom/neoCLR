@@ -1439,6 +1439,19 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         b.ins().return_(&[success]);
                         continue;
                     }
+                    Op::BitNot => {
+                        let value = pop(&mut stack);
+                        stack.push(b.ins().bnot(value));
+                    }
+                    Op::BitAnd | Op::BitOr | Op::BitXor => {
+                        let right = pop(&mut stack);
+                        let left = pop(&mut stack);
+                        stack.push(match op {
+                            Op::BitAnd => b.ins().band(left, right),
+                            Op::BitOr => b.ins().bor(left, right),
+                            _ => b.ins().bxor(left, right),
+                        });
+                    }
                     Op::Add | Op::Sub | Op::Mul => {
                         let r = pop(&mut stack);
                         let l = pop(&mut stack);

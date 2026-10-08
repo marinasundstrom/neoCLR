@@ -188,6 +188,10 @@ and standalone dependencies. [The implementation notes](../../docs/experiments/a
 describe initialized snapshots, conservative tracing and unsupported operations.
 
 The full HTTP driver next exceeds the current 128-specialized-type budget. `TaskResultList.rvn`
-is a narrower admission probe for Result<Void,HttpError>; native success is not yet
-claimed because HttpStatusCode enum metadata remains unsupported. The source is checked
-in to drive that next step, rather than hiding the wider HTTP dependency.
+is a narrower admission probe for Result<Void,HttpError>; the current compiler reports
+a System.Void native import error, so its execution remains unclaimed.
+
+`EnumValues.rvn` now passes in both modes with HttpStatusCode named/unnamed values,
+BindingFlags masks and ArrayList growth/copy isolation. Run `verify_callbacks.py
+--case EnumValues`; [evidence](enum-validation.json) includes sanitized execution,
+64 KiB native GC and standalone dependencies. See the [enum implementation notes](../../docs/experiments/aot-console/enum-values.md).

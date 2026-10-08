@@ -109,7 +109,10 @@ impl<'a> Profile<'a> {
                 .is_some_and(|base| object_base.is_some_and(|i| *base == Type::Named(input.types[i].name.clone())));
             if (t.is_reference_type && !static_owner && !references)
                 || t.representation != Representation::Record
-                || t.enum_info.is_some()
+                || t.enum_info.as_ref().is_some_and(|info| info.underlying != Type::Int32
+                    || t.is_reference_type || t.fields.len() != 1
+                    || t.fields[0].ty != Type::Int32
+                    || t.fields[0].visibility != neoclr::metadata::Visibility::Private)
                 || (t.base.is_some() && !root_base)
                 || (t.is_abstract && !static_owner && !root)
                 || !t.generic_parameters.is_empty()
@@ -597,7 +600,7 @@ impl<'a> Profile<'a> {
                         .filter(|n| f.out_parameters.contains(n)),
                 ),
                 Op::ConvertInt32 | Op::ConvertUInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 | Op::ConvertInt64 | Op::ConvertUInt64 | Op::ConvertNativeInt | Op::ConvertNativeUInt => (),
-                Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_)
+                Op::BitNot | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_)
                 | Op::IsInstance(_) | Op::CastClass(_) | Op::ReferenceIsNull | Op::NewArray(_) | Op::ReserveArray(_) | Op::ArrayLength => {
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
                     state.stack.push(None);
@@ -783,6 +786,7 @@ impl<'a> Profile<'a> {
                 | Op::Less
                 | Op::GreaterUnsigned
                 | Op::LessUnsigned
+                | Op::BitAnd | Op::BitOr | Op::BitXor | Op::BitNot
                 | Op::Add
                 | Op::Sub
                 | Op::Mul
@@ -845,7 +849,9 @@ impl<'a> Profile<'a> {
                 Op::Int64(_) => stack.push(Ty::Wide),
                 Op::String(_) => stack.push(Ty::Literal),
                 Op::ConvertInt32 | Op::ConvertUInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 | Op::ConvertInt64 | Op::ConvertUInt64 | Op::ConvertNativeInt | Op::ConvertNativeUInt => {
-                    if !matches!(pop(&mut stack)?, Ty::Int | Ty::Size | Ty::Wide) { return Err(fail(pc, "conversion requires an integer stack category")); }
+                    let source = pop(&mut stack)?;
+                    let enum_storage = matches!(op, Op::ConvertInt32) && matches!(source, Ty::Record(n) if self.input.types[n].enum_info.is_some());
+                    if !matches!(source, Ty::Int | Ty::Size | Ty::Wide) && !enum_storage { return Err(fail(pc, "conversion requires an integer stack category or enum-to-Int32")); }
                     stack.push(match op {
                         Op::ConvertInt64 | Op::ConvertUInt64 => Ty::Wide,
                         Op::ConvertNativeInt | Op::ConvertNativeUInt => Ty::Size,
@@ -1059,6 +1065,15 @@ impl<'a> Profile<'a> {
                     if !matches!(pop(&mut stack)?, Ty::Int | Ty::Bool) {
                         return Err(fail(pc, "branch requires Int32 or Boolean"));
                     }
+                }
+                Op::BitNot => {
+                    take(&mut stack, &Ty::Int)?;
+                    stack.push(Ty::Int);
+                }
+                Op::BitAnd | Op::BitOr | Op::BitXor => {
+                    take(&mut stack, &Ty::Int)?;
+                    take(&mut stack, &Ty::Int)?;
+                    stack.push(Ty::Int);
                 }
                 Op::Add | Op::Sub | Op::Mul => {
                     let t = pop(&mut stack)?;

@@ -3478,3 +3478,71 @@ fn descriptive_sealing_does_not_hide_an_unselected_derived_type() {
     assert!(String::from_utf8_lossy(&r.stderr).contains("virtual calls requiring dispatch"), "{r:?}");
     assert!(!dir.0.join("app.o").exists());
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn enum_values_preserve_signed_domain_nominal_calls_and_array_snapshots() {
+    let dir=Temp::new();
+    let seed=neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/enum-values.neoil");
+    let r=compile_source(&dir,&seed,source,&["--compile-system","--reference-arena","--bind-user-fault","--bind-utf8-text"],false);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc, char **argv) {
+    uint64_t storage[128];
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    int32_t result=-99;
+    int status=neoclr_entry_v4(argc>1 ? atoi(argv[1]) : 0,&result,&ctx);
+    if (status) {
+        if (result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
+        neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
+    }
+    printf("%d\n",result);return 0;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let app=neoclr::assemble(source).unwrap();
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in [i32::MIN, -1, 0, 200, 599, i32::MAX] {
+        let reference=method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default());
+        let r=Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        match reference {
+            Ok(result)=>{
+                assert_eq!(r.status.code(),Some(0),"{mode}: {r:?}");
+                let neoclr::Value::Int32(value)=result.value else {panic!("expected Int32")};
+                assert_eq!(r.stdout,format!("{value}\n").as_bytes());
+                assert!(r.stderr.is_empty());
+            }
+            Err(fault)=>{
+                assert_eq!(r.status.code(),Some(1),"{mode}: {r:?}");
+                assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(),"{mode}");
+            }
+        }
+    }
+}
+
+#[test]
+fn enum_layout_and_nominal_identity_are_verified_before_native_projection() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let original = include_str!("../../../docs/experiments/aot-console/enum-values.neoil");
+    for (source, diagnostic) in [
+        (original.replace(".field private Bits Int32", ".field Bits Int32"), "enum requires"),
+        (original.replace(".field private Bits Int32", ".field private Bits Int64"), "enum requires"),
+        (original.replace("call Echo<Status>(Status)", "call Echo<Other>(Other)")
+            + "\n.type Other\n.enum Int32\n.field private Bits Int32\n.end\n", "Fault:"),
+    ] {
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
+        assert!(!r.status.success());
+        assert!(String::from_utf8_lossy(&r.stderr).contains(diagnostic), "{r:?}");
+        assert!(!dir.0.join("app.o").exists());
+    }
+}

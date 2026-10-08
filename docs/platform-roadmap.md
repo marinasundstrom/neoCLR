@@ -50,7 +50,7 @@ Function arrays and the real ArrayList callback consumer now support growth, cop
 replacement and collection. [Reserved value arrays](experiments/aot-console/record-arrays.md)
 now execute the real ArrayList<Result<int,string>> growth/copy/replacement path with nested
 reference tracing. The full server reaches the 128-type specialization budget; the narrower
-HTTP result shape also exposes enum storage. Next address bounded selection and enum admission,
+HTTP result shape also exposes enum storage. [Native Int32 enum admission](experiments/aot-console/enum-values.md) now passes status/flags collection consumers; the nested result probe next exposes a System.Void import gap. Next address that import and bounded selection,
 then task dispatch, host-root ownership and asynchronous socket services. Component benchmarks do not
 qualify a server.
 

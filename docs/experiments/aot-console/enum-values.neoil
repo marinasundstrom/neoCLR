@@ -1,0 +1,50 @@
+.module EnumValues
+.type Status
+.enum Int32
+.literal OK 200
+.literal Unknown 599
+.field private Bits Int32
+.method instance byref get_Value() -> Int32
+ldarg 0
+ldfld 0
+ret
+.end
+.end
+.function Echo<T>(T value) -> T
+ldarg value
+ret
+.end
+.function Calculate(Int32 value) -> Int32
+.local arrayref<Status> values
+.local Status original
+ldarg value
+newobj Status
+conv.i4
+ldc.i4 -1
+xor
+not
+ldc.i4 -1
+and
+ldc.i4 0
+or
+newobj Status
+call Echo<Status>(Status)
+stloc original
+ldc.i4 2
+array.reserve Status
+stloc values
+ldloc values
+ldc.i4 0
+ldloc original
+stelem Status
+ldc.i4 200
+newobj Status
+stloc original
+ldloc values
+ldc.i4 0
+ldelem Status
+stloc original
+ldloca original
+call instance Status::get_Value()
+ret
+.end

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Admit verified Int32 enums in the bounded native value profile, retaining nominal
+  identity through calls and reserved array snapshots. Add explicit enum storage
+  conversion and Int32 bitwise operations; validate signed extremes and real Raven
+  HTTP status/flags collections in both modes. The full server remains blocked by
+  the specialization budget; the nested HTTP-result probe exposes a Void import gap.
+
 - Add development System.Text.StringBuilder with fluent append, atomic byte-limit
   faults, LF line append, clear/reuse and cached immutable snapshots. Add separator-aware
   String.Join for initialized non-null string arrays. Share checked one-allocation

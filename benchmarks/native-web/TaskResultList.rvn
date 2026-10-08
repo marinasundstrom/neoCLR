@@ -25,5 +25,16 @@ func Main() -> int {
     let Error(HttpError.Handler(latest)) = results[0] else {
         return 3
     }
-    return if latest == "discarded payload" { 0 } else { 4 }
+    if latest != "discarded payload" {
+        return 4
+    }
+    results[1] = Error(HttpError.UnsuccessfulStatus((HttpStatusCode)599))
+    if let Error(HttpError.UnsuccessfulStatus(code)) = results[1] {
+        if (int)code != 599 {
+            return 5
+        }
+    } else {
+        return 6
+    }
+    return 0
 }
