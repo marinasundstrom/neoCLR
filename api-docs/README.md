@@ -191,7 +191,7 @@ Keep [reference support](reference-support.md) aligned
 when those renderer limitations change.
 
 RavenDoc now renders the previously excluded TaskQueue Post/Run, Task OnCompleted,
-ITaskAwaiter OnCompleted, FileText WriteAllText and OutputStream/FileOutputStream/
+TaskAwaiter OnCompleted, FileText WriteAllText and OutputStream/FileOutputStream/
 TextWriter/StreamWriter Flush signatures, including Func<Void> and Result<Void,E>.
 Their Markdown guides remain behavioral reference, not renderer exclusions.
 Existing selected types include the HTTP client/server/context and response configuration APIs,
@@ -1239,3 +1239,13 @@ in the aggregate reference, complete type inventory and authored XML. The builde
 uses explicit UTF-8 quota units and fluent faulting append; Join preserves empty
 elements and rejects null inputs. Native class-library ownership is System.Runtime;
 the documentation assembly remains the temporary CLI aggregate described above.
+
+### Unprefixed async interfaces (2026-10-08)
+
+`AsyncStateMachine` and `TaskAwaiter` replace the prefixed development protocol
+names. The selected type inventory, authored XML, matching bridge reference and
+snapshot were refreshed together; the API snapshot check passes. Recompile old
+consumers with the matching runtime/compiler bundle. The wider legacy runtime
+snapshot check still reports a pre-existing missing StringBuilder input in Tuple;
+the regenerated Tasks slice's own input/output fingerprints pass. No website build
+or publication is claimed. The separate legacy `IUnion` migration remains next.

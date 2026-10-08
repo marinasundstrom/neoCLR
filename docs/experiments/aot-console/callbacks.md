@@ -2,7 +2,7 @@
 
 The HTTP app stores callbacks in tasks and cancellation objects. The reference-arena
 AOT profile now admits the existing native Function metadata for static functions and
-nonvirtual heap-class methods. This extends execution of already-supported metadata
+nonvirtual heap-class methods and closed class-interface dispatch. This extends execution of already-supported metadata
 on main; it adds no Raven syntax, Runtime Contract setting, CLI bridge encoding or
 public library API, and does not merge a separate structural-language experiment.
 
@@ -23,7 +23,7 @@ not addresses, stable symbols or an external ABI. At most 32 possible targets pe
 shape are admitted. The default profile rejects recursive call graphs, including conservative callback
 edges; this can reject an acyclic dynamic path. The explicit
 [native stack budget](native-stack.md) now admits guarded recursion. Borrowed/output signatures, callback operations inside
-output-parameter methods, virtual/interface-bound receivers, Function equality,
+output-parameter methods, virtual class methods, borrowed/value interface receivers, Function equality,
 Object views and introspection remain outside this profile. Ordinary no-result calls
 remain distinct from inhabited Void results.
 
@@ -167,3 +167,20 @@ interpreter, including empty/prefix/embedded-NUL strings, composed/decomposed te
 U+10000 versus U+E000. It also rejects ordinary same-named methods with matching result
 types. Full Server admission now reaches the specialized RegisterTaskQueue service.
 This closes a missing binding, not a compiler lookup or guest text-semantics change.
+
+## Closed class-interface callbacks (2026-10-08)
+
+A Function bound through a nominal interface uses the existing closed-world
+interface thunk and keeps the original receiver object alive. The selected
+implementations must all take ordinary heap-class receivers; string/array
+projections and borrowed value receivers remain rejected. The descriptor's target
+is a private thunk identity, not a promised reflection/equality identity or ABI.
+Neither target inspection nor hot replacement is added.
+
+Focused sanitized native/interpreter checks cover two implementations, retained
+mutable state across 1,000 garbage callback allocations, null binding/invocation,
+callee fault frames, untouched output on failure and complete root/heap cleanup.
+Three real Raven async samples also match both modes; see the
+[sample assessment](../aot-sample-assessment/README.md). Entry task draining remains
+a separate service gap. .NET's bound-interface delegates likewise retain a receiver;
+this POC uses a bounded thunk table rather than exposing CLR delegate internals.

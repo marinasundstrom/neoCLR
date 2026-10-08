@@ -36,7 +36,7 @@ for every operation. Focused baseline verifiers additionally assert expected out
 | --- | ---: | --- |
 | Primitive arrays | 39 | Int32 30, Void 5, Int64 3, Boolean 1; common to collections, Tasks/await and helpers |
 | RuntimeTypeHandle | 7 | Introspection and reflection-driven JSON mapping; metadata/invocation design needed |
-| Other storage/dispatch/services | 10 | Interface arrays, virtual dispatch, value-receiver callbacks, Char generics, Double, pointers, environment/files/path/value contracts |
+| Other storage/dispatch/services | 10 | Interface arrays, virtual dispatch, interface-bound callbacks, Char generics, Double, pointers, environment/files/path/value contracts |
 
 Counts describe the **first rejection only**. Primitive arrays may expose further
 callback/dispatch/service gaps; 39 is not a promise that one patch makes 39 samples work.
@@ -66,7 +66,7 @@ rewriting was used to inflate the result.
    of unsupported address semantics. Then rerun selected collections/async consumers.
    Reuse interpreter semantics; do not create an AOT-specific language API.
 4. **Reassess Tasks/await after arrays.** Keep the passing fn<Void>/TaskQueue compatibility
-   host as the baseline; value-receiver callbacks and result-bearing async samples need
+   host as the baseline; interface-bound callbacks and result-bearing async samples need
    separate treatment. Runtime Scheduler/green threads are not prerequisites.
 5. **Harden the HTTP teaser and qualification.** Keep malformed-input/fault cleanup,
    repeat-request evidence and matched measurements. Retain existing editor/Windows
@@ -126,13 +126,13 @@ primitive-array rejection to explicit further boundaries:
 | application-order-collections | Unsupported instruction in Main |
 | library-generic-collections | Int64 value-member owner |
 | library-async | DrainEntryTasks service |
-| library-async-cancellation, library-task-result, native-async-state | Value-receiver callback binding |
+| library-async-cancellation, library-task-result, native-async-state | Interface-bound callback binding (initially misclassified) |
 
 [Raw follow-up](scalar-array-followup.json). This confirms why the original 39 first
 blockers were not a 39-sample completion estimate. The initial matrix below remains
 historical evidence; this follow-up supersedes its primitive-array implementation gap.
 Next inspect primitive wrapper ownership as a potentially small fix; Tasks entry draining
-and value-receiver callbacks remain distinct runtime/ABI work.
+and interface-bound callbacks remain distinct runtime/ABI work.
 
 ## Second implemented follow-up: primitive members and wide ordering
 
@@ -148,7 +148,7 @@ output. `library-calendar` advances to unsupported wide arithmetic in Time.get_H
 calendar services and broad numeric coverage are not claimed. Together with scalar
 arrays, three previously blocked samples now pass. The original 104-case survey is not
 rerun wholesale, and its historical counts above are not presented as a fresh census.
-Next distinguish small arithmetic gaps from Tasks entry lifecycle/value-receiver
+Next distinguish small arithmetic gaps from Tasks entry lifecycle/interface-bound
 callback work; preserve the release's explicit bootstrap and baseline priorities.
 
 ## Third implemented follow-up: wide division and remainder
@@ -273,3 +273,19 @@ can precede other missing dependencies.
 | native-async-entry-pending | expected 1 | AOT rejected | specialization requires closed reference-free local value types: ArrayRef(Int32) |
 | native-async-propagation | exit 0 | AOT rejected | native callback binding requires a static function or nonvirtual heap class receiver |
 | native-async-state | exit 0 | AOT rejected | specialization requires closed reference-free local value types: ArrayRef(Int32) |
+
+## Interface-bound callbacks and interface names (2026-10-08)
+
+The earlier generic callback diagnostic was incorrectly described as a value-receiver
+restriction for the async samples. Exact target inspection identifies the abstract
+`AsyncStateMachine.MoveNext` interface method (previously `IAsyncStateMachine`).
+The bounded native profile now binds closed class-interface thunks while retaining
+the actual object. No borrowed receiver capture or state-machine copy is introduced.
+
+The [four-case follow-up](interface-followup.json) recompiles against the renamed
+native Runtime/Data/Networking/Web bundle. `native-async-state`,
+`library-async-cancellation` and `library-task-result` match interpreter output and
+exit status. `library-async` still rejects `neoCLR.Runtime.DrainEntryTasks`; its entry
+lifecycle needs a real scheduling contract. These are sequential coverage checks,
+not benchmark measurements. The original 104-case survey is historical and has not
+been rerun wholesale. The CLI core bootstrap still exists.

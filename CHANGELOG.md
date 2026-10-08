@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Rename the Raven-source async interfaces to `AsyncStateMachine` and `TaskAwaiter`,
+  coordinated with Raven target mapping `185d32f06`; .NET names remain unchanged.
+  Rebuild matched compiler/reference/runtime/application bundles because metadata
+  identities change. Refresh the async bridge fragments and API snapshot, and guard
+  all runtime source interfaces against the `I` prefix. Native closed class-interface
+  callbacks retain receivers through GC and preserve fault frames; state, cancellation
+  and task-result samples now match interpreted execution. Entry task draining remains
+  unsupported in AOT. Validation and limitations are recorded in the sample assessment.
+
 - Admit native 64-bit division/remainder with operand-width overflow guards and
   unchanged zero/overflow fault behavior. Verify 72 native/interpreter cases and
   calendar sample parity; record the remaining time-contract/time-zone boundaries.

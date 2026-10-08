@@ -5,7 +5,7 @@ its application platform. They are compiler/runtime integration details and may 
 deprecated or removed when runtime-owned suspension replaces generated machinery.
 Use Task and await in application code; no public scheduler design is implied.
 
-The reference includes IAsyncStateMachine, ITaskAwaiter and
+The reference includes AsyncStateMachine, TaskAwaiter and
 AsyncTaskMethodBuilder&lt;T&gt; under System.Runtime.CompilerServices.
 
 ## Visibility and intended use
@@ -49,7 +49,7 @@ A value state does not eliminate Promise, Task, dispatcher or continuation alloc
 
 ## Continuation member
 
-`ITaskAwaiter.OnCompleted(callback: Func<System.Void>)` registers a continuation on
+`TaskAwaiter.OnCompleted(callback: Func<System.Void>)` registers a continuation on
 the awaited operation's dispatcher. It returns no result. Task implements this
 contract. RavenDoc includes this Func&lt;Void&gt; signature alongside the other builder
 members. See the [callback reference](callbacks.md) for continuation behavior.

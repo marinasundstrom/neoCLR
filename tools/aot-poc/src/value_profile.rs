@@ -279,9 +279,20 @@ impl<'a> Profile<'a> {
                     p.ty(function_type)?;
                     let callee = p.callee(target)?;
                     let bound = &input.functions[callee];
-                    if bound.is_virtual || bound.is_override || bound.is_abstract || bound.receiver_byref || bound.impl_flags != 0
-                        || (bound.instance && !matches!(p.args[callee].first(), Some(Ty::Reference(_)))) {
-                        return Err("native callback binding requires a static function or nonvirtual heap class receiver".into());
+                    // Reuse the existing closed-world interface thunk. The receiver's
+                    // concrete class is immutable during this image's lifetime; the
+                    // descriptor retains that same object, not an interface snapshot.
+                    let interface_callback = crate::selection::interface_contract(input, bound)
+                        && !string_dispatch.is_some_and(|targets| targets.contains_key(&callee))
+                        && p.dispatch.get(&callee).is_some_and(|targets| !targets.is_empty()
+                            && targets.iter().all(|(owner, implementation)| array_backing != Some(*owner)
+                                && matches!(p.args[*implementation].first(), Some(Ty::Reference(_)))));
+                    if ((!interface_callback && (bound.is_virtual || bound.is_abstract)) || bound.is_override)
+                        || bound.receiver_byref || bound.impl_flags != 0
+                        || (bound.instance && !matches!(p.args[callee].first(), Some(Ty::Reference(_))) && !interface_callback) {
+                        return Err(format!("native callback binding requires a static function, nonvirtual heap class receiver or closed class-interface dispatch: target {}, receiver {:?}, byref={}, virtual={}, override={}, abstract={}",
+                            bound.name, p.args[callee].first(), bound.receiver_byref,
+                            bound.is_virtual, bound.is_override, bound.is_abstract).into());
                     }
                 }
                 if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {

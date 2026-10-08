@@ -189,3 +189,9 @@ General virtual dispatch, Tasks entry lifecycle and reflection remain separate g
 Wide division/remainder now preserve interpreter results and faults, with 72 boundary
 comparisons. The calendar sample also passes; complete time-zone/service coverage is
 not implied.
+
+A further development slice admits callbacks bound through closed class interfaces.
+Three async samples now match interpreter/native output, including cancellation and
+task results; async entry draining remains unsupported. The runtime protocol uses
+`AsyncStateMachine` and `TaskAwaiter`, with matching Raven target mappings. Old
+artifacts need recompilation. These coverage checks are not new benchmark results.

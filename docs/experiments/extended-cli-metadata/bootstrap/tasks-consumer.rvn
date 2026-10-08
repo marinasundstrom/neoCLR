@@ -4,7 +4,7 @@ import System.Result.*
 import System.Runtime.CompilerServices.*
 import System.Concurrency.*
 
-class Counter : IAsyncStateMachine {
+class Counter : AsyncStateMachine {
     private var count: int = 0
     val Count: int => count
 
@@ -12,7 +12,7 @@ class Counter : IAsyncStateMachine {
         count = count + 1
     }
 
-    func SetStateMachine(stateMachine: IAsyncStateMachine) { }
+    func SetStateMachine(stateMachine: AsyncStateMachine) { }
 }
 
 func Answer() -> int => 40

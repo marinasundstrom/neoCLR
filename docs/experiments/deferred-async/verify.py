@@ -23,7 +23,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-deferred-async-') as folder:
     app = next((root / 'obj').glob('**/imported/App.neoil'))
     source = app.read_text()
     types = re.split(r'(?m)^\.type ', source)
-    states = [t for t in types if '.implements System.Runtime.CompilerServices.IAsyncStateMachine\n' in t]
+    states = [t for t in types if '.implements System.Runtime.CompilerServices.AsyncStateMachine\n' in t]
     assert states and all('.field deferred ' in t for t in states), source
     assert all('.field deferred ' not in t for t in types if t not in states), source
     run = subprocess.run([str(args.runner.resolve()), str(app), str(bundle / 'lib/System.neoil'), '96'],

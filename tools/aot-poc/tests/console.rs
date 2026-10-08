@@ -3145,8 +3145,23 @@ int main(void) {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_callbacks_retain_receivers_and_propagate_faults() {
+    check_native_callbacks(include_str!("../../../docs/experiments/aot-console/callbacks.neoil"));
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_interface_callbacks_retain_receivers_and_propagate_faults() {
+    let source = include_str!("../../../docs/experiments/aot-console/callbacks.neoil")
+        .replace(".type class Counter\n", ".interface Adder\n.method instance Add(Int32 delta) -> Int32\n.end\n.end\n.type class Counter\n.implements Adder\n")
+        .replace("function.bind fn<Int32,Int32> = instance Counter::Add(Int32)", "castclass Adder\nfunction.bind fn<Int32,Int32> = instance Adder::Add(Int32)")
+        .replace("Fault:\nfunction.bind fn<Int32,Int32> = Fail(Int32)", "Fault:\nnewobj.ctor instance Broken::.ctor()\ncastclass Adder\nfunction.bind fn<Int32,Int32> = instance Adder::Add(Int32)");
+    let source = source + "\n.type class Broken\n.implements Adder\n.method instance .ctor() -> noresult\nret\n.end\n.method instance Add(Int32 number) -> Int32\nldarg number\nldc.i4 0\ndiv\nret\n.end\n.end\n";
+    check_native_callbacks(&source);
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_native_callbacks(source: &str) {
     let dir = Temp::new();
-    let source = include_str!("../../../docs/experiments/aot-console/callbacks.neoil");
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let flags = ["--compile-system", "--reference-arena", "--native-gc"];
     let r = compile_source(&dir, &seed, source, &flags, false);

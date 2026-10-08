@@ -46,7 +46,7 @@ static class TaskBindings
                 public static Task<T> Run<T>(Func<T> callback) => default;
                 public static Task<T> Run<T>(Func<Task<T>> callback) => default;
             }
-            public sealed class Task<T> : Runtime.CompilerServices.ITaskAwaiter {
+            public sealed class Task<T> : Runtime.CompilerServices.TaskAwaiter {
                 public Task(Promise<T> source) { }
                 public TaskState State => default;
                 public Option<TaskOutcome<T>> Outcome => default;
@@ -71,22 +71,22 @@ static class TaskBindings
             }
         }
         namespace Runtime.CompilerServices {
-            public interface IAsyncStateMachine {
+            public interface AsyncStateMachine {
                 void MoveNext();
-                void SetStateMachine(IAsyncStateMachine stateMachine);
+                void SetStateMachine(AsyncStateMachine stateMachine);
             }
-            public interface ITaskAwaiter { void OnCompleted(Func<PropagationUnit> callback); }
+            public interface TaskAwaiter { void OnCompleted(Func<PropagationUnit> callback); }
             public sealed class AsyncTaskMethodBuilder<T> {
                 public AsyncTaskMethodBuilder(Tasks.TaskQueue queue) { }
                 public static AsyncTaskMethodBuilder<T> Create() => default;
                 public Tasks.Task<T> Task => default;
-                public void Start<TState>(ref TState stateMachine) where TState : IAsyncStateMachine { }
-                public void SetStateMachine(IAsyncStateMachine stateMachine) { }
+                public void Start<TState>(ref TState stateMachine) where TState : AsyncStateMachine { }
+                public void SetStateMachine(AsyncStateMachine stateMachine) { }
                 public bool HasStateMachine() => false;
-                public IAsyncStateMachine GetStateMachine() => default;
+                public AsyncStateMachine GetStateMachine() => default;
                 public void SetResult(T value) { }
                 public void SetCancelled() { }
-                public void AwaitOnCompleted<TAwaiter, TState>(ref TAwaiter awaiter, ref TState stateMachine) where TAwaiter : ITaskAwaiter where TState : IAsyncStateMachine { }
+                public void AwaitOnCompleted<TAwaiter, TState>(ref TAwaiter awaiter, ref TState stateMachine) where TAwaiter : TaskAwaiter where TState : AsyncStateMachine { }
             }
         }
         """;
@@ -94,10 +94,10 @@ static class TaskBindings
     // Application metadata exposes the ref compiler protocol; the bootstrap
     // library implements the retained-owner operations used by its specialization.
     public static string ForReference(bool libraryBootstrap) => !libraryBootstrap ? Declarations : Declarations
-        .Replace("public void Start<TState>(ref TState stateMachine) where TState : IAsyncStateMachine { }",
-            "public void Start(IAsyncStateMachine stateMachine) { }")
-        .Replace("public void AwaitOnCompleted<TAwaiter, TState>(ref TAwaiter awaiter, ref TState stateMachine) where TAwaiter : ITaskAwaiter where TState : IAsyncStateMachine { }",
-            "public void AwaitOnCompleted(ITaskAwaiter awaiter, IAsyncStateMachine stateMachine) { }");
+        .Replace("public void Start<TState>(ref TState stateMachine) where TState : AsyncStateMachine { }",
+            "public void Start(AsyncStateMachine stateMachine) { }")
+        .Replace("public void AwaitOnCompleted<TAwaiter, TState>(ref TAwaiter awaiter, ref TState stateMachine) where TAwaiter : TaskAwaiter where TState : AsyncStateMachine { }",
+            "public void AwaitOnCompleted(TaskAwaiter awaiter, AsyncStateMachine stateMachine) { }");
 
     public static void Project(ModuleDefinition module)
     {
@@ -145,7 +145,7 @@ static class TaskBindings
         if (internalMember ? !library || !definition.IsAssembly : !definition.IsPublic)
             throw new InvalidDataException("Invalid Task member visibility.");
         if (kind == "Task" && (definition.DeclaringType.Interfaces.Count != 1
-            || definition.DeclaringType.Interfaces[0].InterfaceType.FullName != "System.Runtime.CompilerServices.ITaskAwaiter"
+            || definition.DeclaringType.Interfaces[0].InterfaceType.FullName != "System.Runtime.CompilerServices.TaskAwaiter"
             || !RuntimeSignatures.IsCore(definition.DeclaringType.Interfaces[0].InterfaceType.Scope)))
             throw new InvalidDataException("Invalid Task awaiter interface.");
         var staticMember = kind == "TaskQueue" && definition.Name is "get_Current" or "get_Default";

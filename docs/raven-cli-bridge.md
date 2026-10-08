@@ -6849,3 +6849,28 @@ failure, then passes native serialization/reimport, value-result and wrong-core
 checks. TaskResultList.rvn now compiles and executes interpreted; native admission
 next rejects HttpError's 40 flattened lanes against the current 32-lane limit.
 The HTTP app remains work in progress; no native server execution is claimed.
+
+## Unprefixed async interfaces (development, 2026-10-08)
+
+The neoCLR target uses `System.Runtime.CompilerServices.AsyncStateMachine` and
+`TaskAwaiter`. The runtime owns these declarations; Raven's target contract maps
+its internal state-machine special type to the unprefixed name for lookup and
+CLI emission. The native metadata importer recognizes that name in the explicitly
+selected async provider. The temporary CLI importer recognizes it in the configured
+core/async provider. Ordinary .NET keeps `IAsyncStateMachine`. `TaskAwaiter` is an
+ordinary runtime interface discovered through builder signatures, not a new compiler
+special type. No async protocol or scheduling semantics change.
+
+This intentionally changes neoCLR source and metadata identities: rebuild consumers
+and all runtime/reference bundles together. Old prefixed artifacts are not aliases.
+CLI bridge helpers retain their existing callback/heap state-machine restrictions;
+the native backend emits the actual unprefixed metadata identity. A future removal
+of the CLI bootstrap does not require another public interface rename.
+
+Validation: Raven integration commits `185d32f06` (naming) and `f0981d07f`
+(general source lookup) pass 37 profile/async and 16 symbol lookup tests respectively.
+The latter fixes a provisional imported-type cache entry hiding source
+TaskQueue.Current during legacy bootstrap, without changing accessibility. Native
+Runtime/Data/Networking/Web build and three async interpreter/AOT consumers pass.
+The Tasks fragment and public API snapshot were regenerated; the complete legacy
+snapshot still has an unrelated stale Tuple/StringBuilder input record.

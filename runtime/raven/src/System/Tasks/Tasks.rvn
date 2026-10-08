@@ -123,7 +123,7 @@ public class TaskQueue {
     }
 }
 
-public class Task<T> : System.Runtime.CompilerServices.ITaskAwaiter {
+public class Task<T> : System.Runtime.CompilerServices.TaskAwaiter {
     private field source: Promise<T>
 
     internal init(source: Promise<T>) {
@@ -259,18 +259,18 @@ namespace System.Runtime.CompilerServices {
     import System.Option.*
     import System.Tasks.*
 
-    public interface IAsyncStateMachine {
+    public interface AsyncStateMachine {
         func MoveNext()
-        func SetStateMachine(stateMachine: IAsyncStateMachine)
+        func SetStateMachine(stateMachine: AsyncStateMachine)
     }
 
-    public interface ITaskAwaiter {
+    public interface TaskAwaiter {
         func OnCompleted(callback: () -> System.Void)
     }
 
     public class AsyncTaskMethodBuilder<T> {
         private field source: Promise<T>
-        private field machine: Option<IAsyncStateMachine>
+        private field machine: Option<AsyncStateMachine>
 
         init(queue: TaskQueue) {
             source = Promise<T>(queue)
@@ -283,11 +283,11 @@ namespace System.Runtime.CompilerServices {
 
         val Task: Task<T> => source.Task
 
-        func Start(stateMachine: IAsyncStateMachine) {
+        func Start(stateMachine: AsyncStateMachine) {
             stateMachine.MoveNext()
         }
 
-        func SetStateMachine(stateMachine: IAsyncStateMachine) {
+        func SetStateMachine(stateMachine: AsyncStateMachine) {
             machine = Some(stateMachine)
         }
 
@@ -295,7 +295,7 @@ namespace System.Runtime.CompilerServices {
             return machine is Some(_)
         }
 
-        func GetStateMachine() -> IAsyncStateMachine {
+        func GetStateMachine() -> AsyncStateMachine {
             if let Some(state) = machine {
                 return state
             }
@@ -313,7 +313,7 @@ namespace System.Runtime.CompilerServices {
             _ = source.Cancel()
         }
 
-        func AwaitOnCompleted(awaiter: ITaskAwaiter, stateMachine: IAsyncStateMachine) {
+        func AwaitOnCompleted(awaiter: TaskAwaiter, stateMachine: AsyncStateMachine) {
             awaiter.OnCompleted(stateMachine.MoveNext)
         }
     }

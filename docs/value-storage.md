@@ -184,7 +184,7 @@ the added property, so new application artifacts require a matching runtime. Thi
 is an internal storage contract, not a public library member or Raven annotation.
 
 The managed bridge selects application reference types explicitly implementing core
-System.Runtime.CompilerServices.IAsyncStateMachine, independently of generated type
+System.Runtime.CompilerServices.AsyncStateMachine (formerly IAsyncStateMachine), independently of generated type
 names or Raven union metadata. It marks their fields deferred; library types and
 ordinary application classes are unchanged. No Runtime Contract setting changes.
 This supports today's generated state machines; it does not implement runtime

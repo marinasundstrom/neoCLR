@@ -69,7 +69,7 @@ static class LibraryImplementation
         }
         if (owner == "System.Tasks.Task" && includeTaskFamily)
         {
-            var names = new[] { "System.Tasks.TaskQueue", "System.Tasks.Task`1", "System.Tasks.Promise`1", "System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1", "System.Runtime.CompilerServices.IAsyncStateMachine", "System.Runtime.CompilerServices.ITaskAwaiter" };
+            var names = new[] { "System.Tasks.TaskQueue", "System.Tasks.Task`1", "System.Tasks.Promise`1", "System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1", "System.Runtime.CompilerServices.AsyncStateMachine", "System.Runtime.CompilerServices.TaskAwaiter" };
             foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name.Split('`')[0]);
             return names.SelectMany(name => source.GetType(name).IsInterface ? InterfaceRoots(source.GetType(name), core.GetType(name), name) : InstanceRoots(source.GetType(name), core.GetType(name), name.Split('`')[0])).Concat(Roots(source, core, "System.Tasks.Task", includeTaskFamily: false)).Concat(Roots(source, core, "System.Tasks.TaskOperators")).Concat(Roots(source, core, "System.Tasks.TaskResultOperators")).ToArray();
         }

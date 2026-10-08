@@ -12045,3 +12045,26 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
   as the first AOT blocker in otherwise-interpretable collections/async consumers;
   confirm layout and lifetime requirements before admission. Broader reflection and
   green-thread changes remain future work.
+
+## 2026-10-08 — Unprefixed runtime interfaces
+
+**Author direction:** ensure none of neoCLR's interfaces use the `I` naming
+convention, including Raven's mappings for the neoCLR target profile.
+**Assistant audit:** source interfaces already use names such as `Iterable`,
+`Disposable` and `HttpHandler`; `IAsyncStateMachine` and `ITaskAwaiter` remained.
+**Implemented async slice:** coordinate `AsyncStateMachine` / `TaskAwaiter`
+across runtime source, compiler target mapping and the temporary CLI bridge.
+Preserve .NET target names and internal compiler special-type identifiers.
+This changes metadata identities and requires rebuilding matched applications,
+runtime libraries and compiler references. The native callback dispatch fix remains
+a separate slice; naming does not itself add async scheduling support.
+
+**Validation/outcome:** Raven mapping commit `185d32f06` passes 37 profile/async
+tests. A fresh native library bundle and three real async consumers pass. Native
+interface callbacks pass sanitized receiver retention, null and fault parity tests;
+entry-task draining remains unsupported. Legacy Tasks regeneration exposed a general
+source/metadata cache bug; withholding provisional declaration-time results fixes
+the reproduction and 16 lookup tests pass. The Tasks slice and API snapshot were
+refreshed. The wider neoIL audit then found `IUnion`; its migration remains next.
+The full legacy snapshot check separately reports an existing missing StringBuilder
+input in Tuple, not an async naming failure.

@@ -202,7 +202,7 @@ static class UnionImport
             var valueConstructor = libraryOwner is null && method.IsConstructor && method.DeclaringType.IsValueType;
             var emitInstance = method.HasThis && !valueConstructor;
             var asyncStateMember = method.HasThis && method.Name is "MoveNext" or "SetStateMachine"
-                && method.DeclaringType.Interfaces.Any(i => i.InterfaceType.FullName == "System.Runtime.CompilerServices.IAsyncStateMachine"
+                && method.DeclaringType.Interfaces.Any(i => i.InterfaceType.FullName == "System.Runtime.CompilerServices.AsyncStateMachine"
                     && RuntimeSignatures.IsCore(i.InterfaceType.Scope));
             var emitOwnedStatic = OwnedApplicationStatic(method) || method.DeclaringType.IsInterface && method.IsStatic || libraryOwner is not null && method.IsStatic && !JsonBindings.IsGenericSerializerMethod(method) && ((((StorageItemBindings.IsName(method.DeclaringType.FullName) || ((IPAddressBindings.IsName(method.DeclaringType.FullName) || ((GlobalizationBindings.IsName(method.DeclaringType.FullName) || ComparerBindings.IsName(method.DeclaringType.FullName)) || UriBindings.IsName(method.DeclaringType.FullName))) || PathBindings.IsName(method.DeclaringType.FullName))) || StreamBindings.IsName(method.DeclaringType.FullName)) || (((JsonBindings.IsName(method.DeclaringType.FullName) || HttpBindings.IsName(method.DeclaringType.FullName)) || SocketBindings.IsName(method.DeclaringType.FullName)) || (CancellationBindings.IsReference(method.DeclaringType.FullName) || WorkerBindings.IsName(method.DeclaringType.FullName)))) || AsyncBindings.IsName(method.DeclaringType.FullName) || method.DeclaringType.FullName == "System.Tasks.TaskQueue" || method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType) || ArrayLibrary.IsMatched(method.DeclaringType) || MarkerLibrary.IsMatched(method.DeclaringType) || DescriptorLibrary.IsProvider(method.DeclaringType));
             var result = ProfileType(method.ReturnType, true);
@@ -236,7 +236,7 @@ static class UnionImport
                     if (ManagedArrayBindings.IsType(top.Type) && ManagedArrayBindings.IsType(type) && top.Type != type)
                         throw new InvalidDataException("Mutable array conversions require identical element types.");
                     if (!(CollectionBindings.Assignable(PrimitiveBindings.Stack(top.Type), PrimitiveBindings.Stack(type))
-                        || (type == "System.Runtime.CompilerServices.ITaskAwaiter" && TaskBindings.IsType(top.Type) && top.Type.StartsWith("System.Tasks.Task<")) || ReflectionBindings.Assignable(top.Type, type) || ApplicationTypes.Assignable(top.Type, type)))
+                        || (type == "System.Runtime.CompilerServices.TaskAwaiter" && TaskBindings.IsType(top.Type) && top.Type.StartsWith("System.Tasks.Task<")) || ReflectionBindings.Assignable(top.Type, type) || ApplicationTypes.Assignable(top.Type, type)))
                         throw new InvalidDataException($"Input stack type mismatch in {method.FullName} at IL_{instruction.Offset:x4}: expected {type}, found {top.Type}.");
                     return top;
                 }

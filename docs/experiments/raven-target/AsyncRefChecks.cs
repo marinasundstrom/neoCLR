@@ -10,7 +10,7 @@ static class AsyncRefChecks
         using var app = ModuleDefinition.CreateModule("AsyncContractProbe", ModuleKind.Dll);
         var state = new TypeDefinition("", "State", TypeAttributes.Public | TypeAttributes.Sealed,
             app.ImportReference(core.GetType("System.ValueType")));
-        state.Interfaces.Add(new InterfaceImplementation(app.ImportReference(core.GetType("System.Runtime.CompilerServices.IAsyncStateMachine"))));
+        state.Interfaces.Add(new InterfaceImplementation(app.ImportReference(core.GetType("System.Runtime.CompilerServices.AsyncStateMachine"))));
         app.Types.Add(state);
         ApplicationTypes.Reset(app);
         var definition = core.GetType("System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1");

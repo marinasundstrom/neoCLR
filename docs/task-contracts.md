@@ -179,7 +179,7 @@ queues; the runtime drives the default queue. Tasks have cancellation state but 
 awaiter protocol propagates cancellation to an enclosing async method.
 
 The provisional System.Runtime.CompilerServices protocol consists of
-IAsyncStateMachine, ITaskAwaiter and AsyncTaskMethodBuilder<T>. The builder receives
+AsyncStateMachine, TaskAwaiter and AsyncTaskMethodBuilder<T>. The builder receives
 reference state and awaiters by value, stores a Promise and registers MoveNext as a
 continuation. Compared with .NET's generic by-reference builder protocol, this is
 smaller for neoCLR's current object model but allocates heap state, including for

@@ -37,30 +37,30 @@ ldarg arg0
 newobj instance System.Tasks.TaskOutcome<T0>::.ctor(System.Tasks.TaskOutcome.Completed<T0>)
 ret
 .end
-.function neoCLR.Library.System.Tasks.Task.RuntimeUnion8(System.Option.None arg0) -> System.Option<System.Runtime.CompilerServices.IAsyncStateMachine>
+.function neoCLR.Library.System.Tasks.Task.RuntimeUnion8(System.Option.None arg0) -> System.Option<System.Runtime.CompilerServices.AsyncStateMachine>
 ldarg arg0
-newobj instance System.Option<System.Runtime.CompilerServices.IAsyncStateMachine>::.ctor(System.Option.None)
+newobj instance System.Option<System.Runtime.CompilerServices.AsyncStateMachine>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Tasks.Task.RuntimeUnion9(System.Runtime.CompilerServices.IAsyncStateMachine arg0) -> System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>
+.function neoCLR.Library.System.Tasks.Task.RuntimeUnion9(System.Runtime.CompilerServices.AsyncStateMachine arg0) -> System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>
 ldarg arg0
-newobj instance System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>::.ctor(System.Runtime.CompilerServices.IAsyncStateMachine)
+newobj instance System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>::.ctor(System.Runtime.CompilerServices.AsyncStateMachine)
 ret
 .end
-.function neoCLR.Library.System.Tasks.Task.RuntimeUnion10(System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine> arg0) -> System.Option<System.Runtime.CompilerServices.IAsyncStateMachine>
+.function neoCLR.Library.System.Tasks.Task.RuntimeUnion10(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine> arg0) -> System.Option<System.Runtime.CompilerServices.AsyncStateMachine>
 ldarg arg0
-newobj instance System.Option<System.Runtime.CompilerServices.IAsyncStateMachine>::.ctor(System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>)
+newobj instance System.Option<System.Runtime.CompilerServices.AsyncStateMachine>::.ctor(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>)
 ret
 .end
-.function neoCLR.Library.System.Tasks.Task.RuntimeUnion11(System.Option<System.Runtime.CompilerServices.IAsyncStateMachine>& arg0,out(true) System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>& arg1) -> Boolean
+.function neoCLR.Library.System.Tasks.Task.RuntimeUnion11(System.Option<System.Runtime.CompilerServices.AsyncStateMachine>& arg0,out(true) System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Runtime.CompilerServices.IAsyncStateMachine>::TryGetValue(System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>&)
+call instance System.Option<System.Runtime.CompilerServices.AsyncStateMachine>::TryGetValue(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
 ret
 .end
-.function neoCLR.Library.System.Tasks.Task.RuntimeUnion12(System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>& arg0) -> System.Runtime.CompilerServices.IAsyncStateMachine
+.function neoCLR.Library.System.Tasks.Task.RuntimeUnion12(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>& arg0) -> System.Runtime.CompilerServices.AsyncStateMachine
 ldarg arg0
-call instance System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>::get_Value()
+call instance System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Tasks.Task.RuntimeUnion13<T0>(System.Option<System.Tasks.TaskOutcome<T0>>& arg0,out(true) System.Option.Some<System.Tasks.TaskOutcome<T0>>& arg1) -> Boolean
@@ -185,10 +185,10 @@ False:
     ldc.i4 0
     ret
 .end
-.function neoCLR.Library.System.Tasks.Task.CheckFunctionReceiver_Application_V1_T_343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331383A494173796E6353746174654D616368696E65(System.Runtime.CompilerServices.IAsyncStateMachine) -> void
-.local System.Runtime.CompilerServices.IAsyncStateMachine empty
+.function neoCLR.Library.System.Tasks.Task.CheckFunctionReceiver_Application_V1_T_343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331373A4173796E6353746174654D616368696E65(System.Runtime.CompilerServices.AsyncStateMachine) -> void
+.local System.Runtime.CompilerServices.AsyncStateMachine empty
 ldloca empty
-initobj System.Runtime.CompilerServices.IAsyncStateMachine
+initobj System.Runtime.CompilerServices.AsyncStateMachine
 ldarg 0
 ldloc empty
 ref.eq
@@ -240,7 +240,7 @@ initobj System.Tasks.TaskQueue
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
-call neoCLR.Runtime.DefaultTaskQueue()
+call neoCLR.Runtime.GetDefaultTaskQueue<System.Tasks.TaskQueue>()
 M00000002_IL_0007:
 stloc local0
 M00000002_IL_0008:
@@ -262,7 +262,7 @@ stloc local1
 M00000002_IL_001e:
 ldloc local1
 M00000002_IL_001f:
-call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)
+call neoCLR.Runtime.RegisterTaskQueue<System.Tasks.TaskQueue>(System.Tasks.TaskQueue)
 pop
 M00000002_IL_0024:
 M00000002_IL_0025:
@@ -283,7 +283,7 @@ initobj System.Tasks.TaskQueue
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
-call neoCLR.Runtime.CurrentTaskQueue()
+call neoCLR.Runtime.GetCurrentTaskQueue<System.Tasks.TaskQueue>()
 M00000003_IL_0007:
 stloc local0
 M00000003_IL_0008:
@@ -925,7 +925,7 @@ ret
 .type class System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>
 .sealed
 .field private source System.Tasks.Promise<T0>
-.field private machine System.Option<System.Runtime.CompilerServices.IAsyncStateMachine>
+.field private machine System.Option<System.Runtime.CompilerServices.AsyncStateMachine>
 .property instance Task() -> System.Tasks.Task<T0>
 .get instance System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::get_Task()
 .end
@@ -973,22 +973,22 @@ ldarg 0
 M0000001c_IL_0003:
 ldfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::source
 M0000001c_IL_0008:
-callvirt instance System.Tasks.Promise<T0>::get_Task()
+call instance System.Tasks.Promise<T0>::get_Task()
 M0000001c_IL_000d:
 ret
 .end
-.method instance Start(System.Runtime.CompilerServices.IAsyncStateMachine stateMachine) -> noresult
+.method instance Start(System.Runtime.CompilerServices.AsyncStateMachine stateMachine) -> noresult
 M0000001d_IL_0000:
 M0000001d_IL_0001:
 M0000001d_IL_0002:
 ldarg 1
 M0000001d_IL_0003:
-callvirt instance System.Runtime.CompilerServices.IAsyncStateMachine::MoveNext()
+callvirt instance System.Runtime.CompilerServices.AsyncStateMachine::MoveNext()
 M0000001d_IL_0008:
 M0000001d_IL_0009:
 ret
 .end
-.method instance SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine stateMachine) -> noresult
+.method instance SetStateMachine(System.Runtime.CompilerServices.AsyncStateMachine stateMachine) -> noresult
 M0000001e_IL_0000:
 M0000001e_IL_0001:
 M0000001e_IL_0002:
@@ -996,9 +996,9 @@ ldarg 0
 M0000001e_IL_0003:
 ldarg 1
 M0000001e_IL_0004:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion9(System.Runtime.CompilerServices.IAsyncStateMachine)
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion9(System.Runtime.CompilerServices.AsyncStateMachine)
 M0000001e_IL_0009:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion10(System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>)
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion10(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>)
 M0000001e_IL_000e:
 stfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::machine
 M0000001e_IL_0013:
@@ -1006,12 +1006,12 @@ M0000001e_IL_0014:
 ret
 .end
 .method instance HasStateMachine() -> Boolean
-.local System.Option<System.Runtime.CompilerServices.IAsyncStateMachine> local0
-.local System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine> local1
+.local System.Option<System.Runtime.CompilerServices.AsyncStateMachine> local0
+.local System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine> local1
 ldloca local0
-initobj System.Option<System.Runtime.CompilerServices.IAsyncStateMachine>
+initobj System.Option<System.Runtime.CompilerServices.AsyncStateMachine>
 ldloca local1
-initobj System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>
+initobj System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>
 M0000001f_IL_0000:
 M0000001f_IL_0001:
 M0000001f_IL_0002:
@@ -1023,19 +1023,19 @@ stloc local0
 M0000001f_IL_0009:
 ldloca local1
 M0000001f_IL_000b:
-initobj System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>
+initobj System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>
 M0000001f_IL_0011:
 ldloca local0
 M0000001f_IL_0013:
 ldloca local1
 M0000001f_IL_0015:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion11(System.Option<System.Runtime.CompilerServices.IAsyncStateMachine>&,System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>&)
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion11(System.Option<System.Runtime.CompilerServices.AsyncStateMachine>&,System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
 M0000001f_IL_001a:
 brfalse M0000001f_IL_002d
 M0000001f_IL_001f:
 ldloca local1
 M0000001f_IL_0021:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion12(System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>&)
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion12(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
 M0000001f_IL_0026:
 pop
 M0000001f_IL_0027:
@@ -1048,16 +1048,16 @@ M0000001f_IL_002e:
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetStateMachine() -> System.Runtime.CompilerServices.IAsyncStateMachine
-.local System.Runtime.CompilerServices.IAsyncStateMachine local0
-.local System.Option<System.Runtime.CompilerServices.IAsyncStateMachine> local1
-.local System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine> local2
+.method instance GetStateMachine() -> System.Runtime.CompilerServices.AsyncStateMachine
+.local System.Runtime.CompilerServices.AsyncStateMachine local0
+.local System.Option<System.Runtime.CompilerServices.AsyncStateMachine> local1
+.local System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine> local2
 ldloca local0
-initobj System.Runtime.CompilerServices.IAsyncStateMachine
+initobj System.Runtime.CompilerServices.AsyncStateMachine
 ldloca local1
-initobj System.Option<System.Runtime.CompilerServices.IAsyncStateMachine>
+initobj System.Option<System.Runtime.CompilerServices.AsyncStateMachine>
 ldloca local2
-initobj System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>
+initobj System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>
 M00000020_IL_0000:
 M00000020_IL_0001:
 M00000020_IL_0002:
@@ -1069,19 +1069,19 @@ stloc local1
 M00000020_IL_0009:
 ldloca local2
 M00000020_IL_000b:
-initobj System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>
+initobj System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>
 M00000020_IL_0011:
 ldloca local1
 M00000020_IL_0013:
 ldloca local2
 M00000020_IL_0015:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion11(System.Option<System.Runtime.CompilerServices.IAsyncStateMachine>&,System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>&)
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion11(System.Option<System.Runtime.CompilerServices.AsyncStateMachine>&,System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
 M00000020_IL_001a:
 brfalse M00000020_IL_0033
 M00000020_IL_001f:
 ldloca local2
 M00000020_IL_0021:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion12(System.Option.Some<System.Runtime.CompilerServices.IAsyncStateMachine>&)
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion12(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
 M00000020_IL_0026:
 stloc local0
 M00000020_IL_0027:
@@ -1120,7 +1120,7 @@ ldfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::source
 M00000021_IL_0018:
 ldarg 1
 M00000021_IL_0019:
-callvirt instance System.Tasks.Promise<T0>::Complete(T0)
+call instance System.Tasks.Promise<T0>::Complete(T0)
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
 M00000021_IL_001e:
 pop
@@ -1144,7 +1144,7 @@ ldarg 0
 M00000022_IL_0013:
 ldfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::source
 M00000022_IL_0018:
-callvirt instance System.Tasks.Promise<T0>::Cancel()
+call instance System.Tasks.Promise<T0>::Cancel()
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
 M00000022_IL_001d:
 pop
@@ -1152,7 +1152,7 @@ M00000022_IL_001e:
 M00000022_IL_001f:
 ret
 .end
-.method instance AwaitOnCompleted(System.Runtime.CompilerServices.ITaskAwaiter awaiter,System.Runtime.CompilerServices.IAsyncStateMachine stateMachine) -> noresult
+.method instance AwaitOnCompleted(System.Runtime.CompilerServices.TaskAwaiter awaiter,System.Runtime.CompilerServices.AsyncStateMachine stateMachine) -> noresult
 M00000023_IL_0000:
 M00000023_IL_0001:
 M00000023_IL_0002:
@@ -1162,24 +1162,24 @@ ldarg 2
 M00000023_IL_0004:
 dup
 M00000023_IL_0005:
-call neoCLR.Library.System.Tasks.Task.CheckFunctionReceiver_Application_V1_T_343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331383A494173796E6353746174654D616368696E65(System.Runtime.CompilerServices.IAsyncStateMachine)
+call neoCLR.Library.System.Tasks.Task.CheckFunctionReceiver_Application_V1_T_343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331373A4173796E6353746174654D616368696E65(System.Runtime.CompilerServices.AsyncStateMachine)
 M00000023_IL_000b:
-newobj Application.FunctionTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331383A494173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual
-function.bind fn<Void> = instance Application.FunctionTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331383A494173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual::FunctionTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331383A494173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual()
+newobj Application.FunctionTarget_Application_V1_M_363A6D6574686F643133323A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331373A4173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual
+function.bind fn<Void> = instance Application.FunctionTarget_Application_V1_M_363A6D6574686F643133323A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331373A4173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual::FunctionTarget_Application_V1_M_363A6D6574686F643133323A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331373A4173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual()
 M00000023_IL_0010:
-callvirt instance System.Runtime.CompilerServices.ITaskAwaiter::OnCompleted(fn<Void>)
+callvirt instance System.Runtime.CompilerServices.TaskAwaiter::OnCompleted(fn<Void>)
 M00000023_IL_0015:
 M00000023_IL_0016:
 ret
 .end
 .end
-.interface System.Runtime.CompilerServices.IAsyncStateMachine
+.interface System.Runtime.CompilerServices.AsyncStateMachine
 .method instance MoveNext() -> noresult
 .end
-.method instance SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine stateMachine) -> noresult
+.method instance SetStateMachine(System.Runtime.CompilerServices.AsyncStateMachine stateMachine) -> noresult
 .end
 .end
-.interface System.Runtime.CompilerServices.ITaskAwaiter
+.interface System.Runtime.CompilerServices.TaskAwaiter
 .method instance OnCompleted(fn<Void> callback) -> noresult
 .end
 .end
@@ -2256,12 +2256,12 @@ ldvoid
 ret
 .end
 .end
-.type class Application.FunctionTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331383A494173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual
-.field Target System.Runtime.CompilerServices.IAsyncStateMachine
-.method instance FunctionTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331383A494173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual() -> Void
+.type class Application.FunctionTarget_Application_V1_M_363A6D6574686F643133323A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331373A4173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual
+.field Target System.Runtime.CompilerServices.AsyncStateMachine
+.method instance FunctionTarget_Application_V1_M_363A6D6574686F643133323A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331373A4173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual() -> Void
 ldarg 0
-ldfld Application.FunctionTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331383A494173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual::Target
-callvirt instance System.Runtime.CompilerServices.IAsyncStateMachine::MoveNext()
+ldfld Application.FunctionTarget_Application_V1_M_363A6D6574686F643133323A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331373A4173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual::Target
+callvirt instance System.Runtime.CompilerServices.AsyncStateMachine::MoveNext()
 ldvoid
 ret
 .end

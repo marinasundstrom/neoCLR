@@ -4,20 +4,20 @@ using Mono.Cecil;
 static class AsyncBindings
 {
     const string Prefix = "System.Runtime.CompilerServices.";
-    public static bool IsName(string name) => name is Prefix + "IAsyncStateMachine" or Prefix + "ITaskAwaiter" or Prefix + "AsyncTaskMethodBuilder`1";
+    public static bool IsName(string name) => name is Prefix + "AsyncStateMachine" or Prefix + "TaskAwaiter" or Prefix + "AsyncTaskMethodBuilder`1";
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public static string? Type(TypeReference type)
     {
         if (!RuntimeSignatures.IsCore(type.Scope) || type.IsValueType) return null;
-        if (type.FullName is Prefix + "IAsyncStateMachine" or Prefix + "ITaskAwaiter") return type.FullName;
+        if (type.FullName is Prefix + "AsyncStateMachine" or Prefix + "TaskAwaiter") return type.FullName;
         if (type is GenericInstanceType g && g.ElementType.FullName == Prefix + "AsyncTaskMethodBuilder`1"
             && g.GenericArguments.Count == 1 && GenericUnionBindings.Type(g.GenericArguments[0]) is { } payload)
             return Prefix + "AsyncTaskMethodBuilder<" + payload + ">";
         return null;
     }
     public static bool IsType(string name) => name.StartsWith(Prefix + "AsyncTaskMethodBuilder<")
-        || name is Prefix + "IAsyncStateMachine" or Prefix + "ITaskAwaiter";
+        || name is Prefix + "AsyncStateMachine" or Prefix + "TaskAwaiter";
     public static CollectionBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool construct)
     {
         var owner = Type(reference.DeclaringType);
@@ -26,10 +26,10 @@ static class AsyncBindings
             || definition.IsStatic != (definition.Name == "Create") || definition.DeclaringType.IsValueType)
             throw new InvalidDataException("Invalid provisional async member.");
         var contract = definition.DeclaringType;
-        var interfaceOwner = owner is Prefix + "IAsyncStateMachine" or Prefix + "ITaskAwaiter";
+        var interfaceOwner = owner is Prefix + "AsyncStateMachine" or Prefix + "TaskAwaiter";
         var allowed = owner switch {
-            Prefix + "IAsyncStateMachine" => definition.Name is "MoveNext" or "SetStateMachine",
-            Prefix + "ITaskAwaiter" => definition.Name == "OnCompleted",
+            Prefix + "AsyncStateMachine" => definition.Name is "MoveNext" or "SetStateMachine",
+            Prefix + "TaskAwaiter" => definition.Name == "OnCompleted",
             _ => definition.Name is ".ctor" or "Create" or "get_Task" or "SetResult" or "SetCancelled" or "Start" or "SetStateMachine" or "HasStateMachine" or "GetStateMachine" or "AwaitOnCompleted"
         };
         if (!allowed || contract.IsInterface != interfaceOwner || contract.HasInterfaces
@@ -38,7 +38,7 @@ static class AsyncBindings
             || (interfaceOwner && (!definition.IsAbstract || !definition.IsVirtual)))
             throw new InvalidDataException("Invalid provisional async owner.");
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type, allowOpenMethodParameters: GenericUnionBindings.ParameterMap is not null);
-        var state = Prefix + "IAsyncStateMachine";
+        var state = Prefix + "AsyncStateMachine";
         var payload = reference.DeclaringType is GenericInstanceType g ? GenericUnionBindings.Type(g.GenericArguments[0]) : null;
         var expected = definition.Name switch {
             ".ctor" => ("System.Tasks.TaskQueue", "noresult"),
@@ -49,7 +49,7 @@ static class AsyncBindings
             "Start" or "SetStateMachine" => (state, "noresult"),
             "HasStateMachine" => ("", "Boolean"),
             "GetStateMachine" => ("", state),
-            "AwaitOnCompleted" => (Prefix + "ITaskAwaiter," + state, "noresult"),
+            "AwaitOnCompleted" => (Prefix + "TaskAwaiter," + state, "noresult"),
             "MoveNext" => ("", "noresult"),
             "OnCompleted" => ("fn<Void>", "noresult"),
             _ => throw new InvalidDataException("Unsupported async member: " + definition.FullName)
@@ -84,7 +84,7 @@ static class AsyncBindings
             if (definition.Parameters[i].IsOut || definition.Parameters[i].ParameterType is not ByReferenceType { ElementType: GenericParameter parameter }
                 || parameter.Position != i || parameter.Type != GenericParameterType.Method)
                 throw new InvalidDataException("Async protocol requires exact ref generic parameters.");
-            var expected = Prefix + (start || i == 1 ? "IAsyncStateMachine" : "ITaskAwaiter");
+            var expected = Prefix + (start || i == 1 ? "AsyncStateMachine" : "TaskAwaiter");
             var constraints = definition.GenericParameters[i].Constraints;
             if (constraints.Count != 1 || constraints[0].ConstraintType.FullName != expected
                 || !RuntimeSignatures.IsCore(constraints[0].ConstraintType.Scope))
@@ -94,9 +94,9 @@ static class AsyncBindings
         var state = map(stateType);
         var stateDefinition = stateType.Resolve();
         if (!ApplicationTypes.IsModule(stateDefinition.Module) || stateDefinition.HasGenericParameters && !ApplicationTypes.IsGenericApplication(stateType)
-            || !stateDefinition.Interfaces.Any(i => i.InterfaceType.FullName == Prefix + "IAsyncStateMachine" && RuntimeSignatures.IsCore(i.InterfaceType.Scope)))
+            || !stateDefinition.Interfaces.Any(i => i.InterfaceType.FullName == Prefix + "AsyncStateMachine" && RuntimeSignatures.IsCore(i.InterfaceType.Scope)))
             throw new InvalidDataException("Async state must be an admitted application state machine.");
-        var machine = Prefix + "IAsyncStateMachine";
+        var machine = Prefix + "AsyncStateMachine";
         if (start)
         {
             var load = stateDefinition.IsValueType ? "" : "ldobj " + state + "\n";
@@ -126,10 +126,10 @@ call instance {owner}::SetStateMachine({machine})
 ldloc {id}_builder
 ldloc {id}_awaiter
 ldobj {awaiter}
-castclass {Prefix}ITaskAwaiter
+castclass {Prefix}TaskAwaiter
 ldloc {id}_builder
 call instance {owner}::GetStateMachine()
-call instance {owner}::AwaitOnCompleted({Prefix}ITaskAwaiter,{machine})
+call instance {owner}::AwaitOnCompleted({Prefix}TaskAwaiter,{machine})
 """;
         return new([owner, awaiter + "&", state + "&"], "noresult", body);
     }
