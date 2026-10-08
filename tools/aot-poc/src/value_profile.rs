@@ -70,9 +70,9 @@ fn object_base_shape(t: &neoclr::metadata::TypeDef) -> bool {
 
 impl<'a> Profile<'a> {
     pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>, object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>, string_dispatch: Option<&HashMap<usize, usize>>) -> Result<Self, Error> {
-        if input.name == "System" || input.types.len() > 128 || input.functions.len() > 512 {
+        if input.name == "System" || input.types.len() > crate::limits::TYPES || input.functions.len() > crate::limits::FUNCTIONS {
             return Err(
-                "value profile requires an application with at most 128 types and 512 functions"
+                "value profile requires an application with at most 256 types and 1024 functions"
                     .into(),
             );
         }

@@ -1621,7 +1621,7 @@ fn raven_generic_methods_compile_from_pe_and_neox_with_original_tokens_reported(
 
 #[test]
 fn generic_method_clones_are_bounded_and_keep_plain_callees_at_the_limit() {
-    for count in [128, 129] {
+    for count in [256, 257] {
         let mut source =
             String::from(".module MethodLimit\n.entry Main\n.function Main() -> Int32\n");
         for i in 0..count {
@@ -1641,12 +1641,12 @@ fn generic_method_clones_are_bounded_and_keep_plain_callees_at_the_limit() {
         );
         assert_eq!(
             result.status.success(),
-            count == 128,
+            count == 256,
             "{}",
             String::from_utf8_lossy(&result.stderr)
         );
-        if count == 129 {
-            assert!(String::from_utf8_lossy(&result.stderr).contains("128 clones"));
+        if count == 257 {
+            assert!(String::from_utf8_lossy(&result.stderr).contains("256 clones"));
             assert!(!temp.0.join("value.o").exists());
         }
     }
@@ -1936,8 +1936,8 @@ ret
 }
 
 #[test]
-fn expanded_value_function_budget_accepts_512_and_rejects_513() {
-    for count in [512,513] {
+fn expanded_value_function_budget_accepts_1024_and_rejects_1025() {
+    for count in [1024,1025] {
         let mut source=String::from(".module FunctionBudget\n.function Main() -> Int32\n");
         for n in 1..count { source.push_str(&format!("call F{n}()\npop\n")); }
         source.push_str("ldc.i4 42\nret\n.end\n");
@@ -1946,8 +1946,8 @@ fn expanded_value_function_budget_accepts_512_and_rejects_513() {
         let module=neoclr::assemble(&source).unwrap();
         let temp=Temp::new();
         let r=compile_mode(&neoclr::metadata_container::write_module(&module).unwrap(),&temp,"Main",true);
-        assert_eq!(r.status.success(),count==512,"{}",String::from_utf8_lossy(&r.stderr));
-        if count==513 {
+        assert_eq!(r.status.success(),count==1024,"{}",String::from_utf8_lossy(&r.stderr));
+        if count==1025 {
             assert!(!temp.0.join("value.o").exists());
             assert!(String::from_utf8_lossy(&r.stderr).contains("selected functions exceed"));
         }
@@ -2013,5 +2013,27 @@ fn erased_wide_integer_mismatch_faults_without_publishing_result() {
         assert!(compiled.status.success(), "{}", String::from_utf8_lossy(&compiled.stderr));
         #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
         native_mode(&bytes, 0, 3, 12345, "@entry", true);
+    }
+}
+
+#[test]
+fn selected_value_type_budget_accepts_256_and_rejects_257() {
+    for count in [256, 257] {
+        let mut source = String::from(".module TypeBudget\n.function Main() -> Int32\n");
+        for index in 0..count {
+            source += &format!("call Make{index}()\npop\n");
+        }
+        source += "ldc.i4 42\nret\n.end\n";
+        for index in 0..count {
+            source += &format!(".type T{index}\n.field Value Int32\n.end\n.function Make{index}() -> T{index}\nldc.i4 1\nnewobj T{index}\nret\n.end\n");
+        }
+        let module = neoclr::assemble(&source).unwrap();
+        let temp = Temp::new();
+        let result = compile_mode(&neoclr::metadata_container::write_module(&module).unwrap(), &temp, "Main", true);
+        assert_eq!(result.status.success(), count == 256, "{}", String::from_utf8_lossy(&result.stderr));
+        if count == 257 {
+            assert!(!temp.0.join("value.o").exists());
+            assert!(String::from_utf8_lossy(&result.stderr).contains("selected types exceed"));
+        }
     }
 }

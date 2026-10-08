@@ -319,7 +319,7 @@ pub(super) fn select_inventory(
             if !functions.insert(i) {
                 continue;
             }
-            if functions.len() > 512 {
+            if functions.len() > crate::limits::FUNCTIONS {
                 return Err("selected functions exceed the value profile limit".into());
             }
             if object_display_contract(&input.functions[i]) { continue; }
@@ -392,7 +392,7 @@ pub(super) fn select_inventory(
                 if !types.insert(*i) {
                     continue;
                 }
-                if types.len() > 128 {
+                if types.len() > crate::limits::TYPES {
                     return Err("selected types exceed the value profile limit".into());
                 }
                 let t = &input.types[*i];

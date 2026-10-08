@@ -1780,9 +1780,9 @@ fn boxed_empty_profile_rejects_other_shapes_and_counts_generated_helpers() {
         assert!(!r.status.success() && !dir.0.join("app.o").exists());
         assert!(String::from_utf8_lossy(&r.stderr).contains(message),"{r:?}");
     }
-    let calls=(0..510).map(|n| format!("call F{n}()\npop\n")).collect::<String>();
+    let calls=(0..1022).map(|n| format!("call F{n}()\npop\n")).collect::<String>();
     let mut large=source.replacen("call Box()",&format!("{calls}call Box()"),1);
-    for n in 0..510 {large.push_str(&format!(".function F{n}() -> Int32\nldc.i4 0\nret\n.end\n"));}
+    for n in 0..1022 {large.push_str(&format!(".function F{n}() -> Int32\nldc.i4 0\nret\n.end\n"));}
     let app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&large)],&seed).unwrap().remove(0);
     let dir=Temp::new();let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena"]);
     assert!(!r.status.success() && !dir.0.join("app.o").exists());

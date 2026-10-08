@@ -18,6 +18,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and now runs natively after extending the checked value/array/GC layout bound to
   64 lanes and sizing call scratch for selected layouts. Validate nested HTTP error
   unions, status payloads, let/if-let matching, copies and GC under replacement.
+  Coordinate native selection/boxing/codegen bounds at 256 types, 1,024 functions and
+  256 clones, with counted diagnostics and boundary tests. The full server now clears
+  selection (208 shapes/570 functions/213 clones) and exposes reference-array admission.
 
 - Add development System.Text.StringBuilder with fluent append, atomic byte-limit
   faults, LF line append, clear/reuse and cached immutable snapshots. Add separator-aware

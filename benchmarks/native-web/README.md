@@ -187,7 +187,7 @@ instructions; it does not claim equal execution budgets or measure performance.
 and standalone dependencies. [The implementation notes](../../docs/experiments/aot-console/record-arrays.md)
 describe initialized snapshots, conservative tracing and unsupported operations.
 
-The full HTTP driver next exceeds the current 128-specialized-type budget. `TaskResultList.rvn`
+The full HTTP driver initially exceeded the 128-specialized-type budget (see the later selection evidence below). `TaskResultList.rvn`
 is a narrower admission probe for Result<Void,HttpError>; the explicit-core System.Void import fix now lets it compile and run interpreted.
 The subsequent 64-lane value/array/GC slice also passes native execution with nested
 HTTP error/status payloads, let/if-let patterns, copies and 1,000 replacements.
@@ -199,3 +199,19 @@ records sanitized parity and standalone dependencies. The earlier
 BindingFlags masks and ArrayList growth/copy isolation. Run `verify_callbacks.py
 --case EnumValues`; [evidence](enum-validation.json) includes sanitized execution,
 64 KiB native GC and standalone dependencies. See the [enum implementation notes](../../docs/experiments/aot-console/enum-values.md).
+
+### Full-server selection after nested results
+
+[Admission evidence](server-selection-validation.json) records the existing HTTP
+Server source clearing specialization with 208 shapes, 570 functions and 213 clones.
+Shared experimental bounds are now 256 types, 1,024 functions (including generated
+boxing helpers) and 256 clones. Tests cover accepted/rejected edges and preserve
+plain callees at the clone limit. Inspection includes counts and bounded failures.
+The next rejection is nominal arrays of reference-class elements. This is compiler
+admission evidence, not HTTP execution or a benchmark; no server comparison is ready.
+
+These caps bound development work and memory; they are not platform type limits or
+trimming. As in the existing .NET Native AOT comparison, the compiler must materialize
+required closed instantiations. Raising checked caps accommodates this consumer but
+can increase compilation time/memory; it does not reduce reachability or prove an
+optimization. The original input-metadata, frame-size and runtime heap limits remain.

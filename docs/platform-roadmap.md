@@ -49,8 +49,8 @@ now retain receivers through collection and preserve fault traces in real Raven 
 Function arrays and the real ArrayList callback consumer now support growth, copies,
 replacement and collection. [Reserved value arrays](experiments/aot-console/record-arrays.md)
 now execute the real ArrayList<Result<int,string>> growth/copy/replacement path with nested
-reference tracing. The full server reaches the 128-type specialization budget; the narrower
-HTTP result shape also exposes enum storage. [Native Int32 enum admission](experiments/aot-console/enum-values.md) now passes status/flags collection consumers; the nested result probe now runs in both modes after an explicit-core Void import fix and coordinated 64-lane native layout/GC admission. Next address bounded selection,
+reference tracing. The full server originally reached the 128-type specialization budget; the narrower
+HTTP result shape also exposes enum storage. [Native Int32 enum admission](experiments/aot-console/enum-values.md) now passes status/flags collection consumers; the nested result probe now runs in both modes after an explicit-core Void import fix and coordinated 64-lane native layout/GC admission. Coordinated 256-type/1,024-function/256-clone bounds now select the full server (208/570/213). Next address reference arrays,
 then task dispatch, host-root ownership and asynchronous socket services. Component benchmarks do not
 qualify a server.
 

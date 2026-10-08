@@ -67,11 +67,10 @@ budget. [Evidence](../../../benchmarks/native-web/record-array-validation.json) 
 commands/hashes and server admission. Run `verify_callbacks.py --case ResultList` with
 the same required paths as the other native-web consumers. No server timings are claimed.
 
-The full HTTP driver now reaches the current 128-specialized-type limit. A narrower
+The initial full HTTP probe reached the former 128-specialized-type limit. A narrower
 [TaskResultList.rvn](../../../benchmarks/native-web/TaskResultList.rvn) admission probe
 uses the exact Result<Void,HttpError> shape; an initial direct probe exposes unsupported
-HttpStatusCode enum metadata, not a Raven emitter failure. Its native success is not
-claimed. Direct Int32.ToString receiver projection and Object-display candidate selection
+HttpStatusCode enum metadata, not a Raven emitter failure. That initial probe did not execute natively; the later result below supersedes it. Direct Int32.ToString receiver projection and Object-display candidate selection
 also surfaced while developing the storage sample; the passing consumer uses the existing
 explicit String.Concat path to keep this slice about arrays. Those backend gaps and
 bounded full-server selection remain follow-up work, alongside task/socket completion.
@@ -96,4 +95,4 @@ Validation covers a 64-lane returned record, oversized-layout rejection, sanitiz
 allocation and GC of a last-lane reference with uninitialized elements ignored, and
 buffer canaries. [HTTP result evidence](../../../benchmarks/native-web/http-result-validation.json)
 records interpreter/native parity in a 64 KiB heap and libSystem-only standalone
-linkage. The full server still hits the separate 128-type specialization limit.
+linkage. The next selection slice now admits the full server within coordinated 256-type/1,024-function/256-clone bounds; reference arrays are the next rejection.

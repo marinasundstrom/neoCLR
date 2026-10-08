@@ -24,7 +24,7 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         let primitive = ty == Type::Int32;
         let index = if primitive {
             if let Some(index) = int32_index { index } else {
-                if input.types.len() >= 128 { return Err("boxing tags exceed the selected type limit".into()); }
+                if input.types.len() >= crate::limits::TYPES { return Err("boxing tags exceed the selected type limit".into()); }
                 let index = input.types.len();
                 let mut name = "$aot_BoxedInt32".to_owned();
                 while input.types.iter().any(|t| t.name == name) { name.push('_'); }
@@ -40,7 +40,7 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
             return Err("record boxing currently requires empty value records".into());
         }
         let helper = if let Some(&helper) = helpers.get(&index) { helper } else {
-            if input.functions.len() >= 512 { return Err("boxing helpers exceed the selected function limit".into()); }
+            if input.functions.len() >= crate::limits::FUNCTIONS { return Err("boxing helpers exceed the selected function limit".into()); }
             let helper = input.functions.len();
             let mut name = format!("$aot_box_{}_{index}", if primitive { "int32" } else { "empty" });
             while input.functions.iter().any(|f| f.name == name) { name.push('_'); }

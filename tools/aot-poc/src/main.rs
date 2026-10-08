@@ -4,6 +4,7 @@ mod compiler;
 mod fault_details;
 mod inspection;
 mod linking;
+mod limits;
 mod selection;
 mod specialization;
 
