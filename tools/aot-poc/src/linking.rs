@@ -123,7 +123,7 @@ pub fn prepare(
     for (i, function) in joined.functions.iter_mut().enumerate() {
         function.definition = Some(method_id(i));
         for op in &mut function.body {
-            if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
+            if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) | Op::BindFunction { target, .. } = op {
                 if target.definition.is_none() {
                     let matches: Vec<_> = local_services.iter().filter(|(index, f)| {
                         methods[*index].module == methods[i].module
@@ -468,7 +468,7 @@ pub fn prepare(
     for (i, f) in selected.functions.iter_mut().enumerate() {
         f.name = private_names[i].clone();
         for op in &mut f.body {
-            if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
+            if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) | Op::BindFunction { target, .. } = op {
                 if let Some(id) = &target.definition {
                     target.name = private_names[id.index as usize].clone();
                 }

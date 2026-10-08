@@ -157,6 +157,13 @@ impl Probes {
                         let ty = p.ty(target.owner.as_ref().unwrap())?;
                         vec![(1, ty.clone()), (2, ty)]
                     }
+                    Op::Call(target) | Op::CallVirtual(target) if crate::selection::callable_invoke(target).is_some() => {
+                        let shape = crate::selection::callable_invoke(target).unwrap();
+                        if shape.no_result { vec![] } else {
+                            let t = p.ty(&shape.returns)?;
+                            vec![(3, t.clone()), (2, t)]
+                        }
+                    }
                     Op::Call(target) | Op::CallVirtual(target) => p.results[p.callee(target)?]
                         .clone()
                         .map(|t| vec![(3, t.clone()), (2, t)])

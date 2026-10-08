@@ -65,7 +65,8 @@ interpreter already supports this behavior, so no interpreter change was needed.
 invalid addresses/ranges, duplicate binding, idempotent close, stale handles and port
 reuse. `ListenFault.rvn` leaves a listener open before a user fault; the native host
 releases it and matches interpreter fault output. The complete HTTP server still
-reaches a function-valued generic argument and needs asynchronous socket/task support.
+advances through stored callback support to Function-array admission and still needs
+asynchronous socket/task support.
 [Wide-value evidence](handle-validation.json) records the earlier admission boundary;
 [current listener evidence](listener-validation.json) records the completed lifecycle.
 This is correctness/admission work, not a performance optimization; the routing
@@ -144,3 +145,25 @@ Raven interpreter/native output. It checks opt-in admission, sanitized adapters 
 standalone dependency lists. No requests are accepted and no throughput is measured.
 The [private native hosting contract](../../docs/experiments/aot-console/socket-listener.md)
 requires entering/leaving a socket scope for every invocation; GC is not descriptor cleanup.
+
+## Stored callback prerequisite
+
+`Callbacks.rvn` keeps a bound Counter method inside a holder while creating and invoking
+1,000 static callbacks. `CallbackFault.rvn` raises a user fault from a lambda. Both run
+from the same compiled metadata in the interpreter and native code, with exact fault
+output parity. The native host checks frame cleanup and collects the quiescent heap;
+a separate IL test stresses receiver-only reachability in 2 KiB. These are synchronous
+callback correctness tests, not task execution or throughput measurements.
+
+```sh
+SDKROOT=$(xcrun --show-sdk-path) python3 benchmarks/native-web/verify_callbacks.py \
+  --compiler /path/to/rvnc.dll --runtime target/release/neoclr \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --bundle /path/to/neoclr-native-poc --output target/native-callback-validation
+```
+
+[Callback evidence](callback-validation.json) includes tool/source hashes, commands,
+standalone dependencies and the next HTTP admission boundary (Function arrays).
+[Implementation and provisional limits](../../docs/experiments/aot-console/callbacks.md)
+explain dispatch, ownership and the .NET comparison. No public API/bridge change or
+interpreter modification is required for this native implementation slice.

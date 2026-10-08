@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Add bounded AOT execution of existing Function metadata: static/bound heap callbacks,
+  typed stored values, closed generic owners, GC receiver retention and result handoff.
+  Preserve interpreter fault diagnostics, including null binding versus null invocation.
+  Reject recursive/borrowed/output callback paths and excessive dispatch candidates.
+  Add native/interpretive Raven callback samples and sanitized GC/fault tests. The HTTP
+  app advances to Function-array admission; task/socket completion and server timings
+  remain work in progress. No public API, Raven compiler or bridge contract changes.
+
 - Extend AOT erased transport and closed specialization with Int64/UInt64, preserving
   high bits and exact type tags through generic calls. Admit full-width equality;
   mismatched unpack retains RuntimeError/no-result-publication behavior. Add Raven

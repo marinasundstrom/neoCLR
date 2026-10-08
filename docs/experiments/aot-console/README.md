@@ -1976,3 +1976,10 @@ path with statically linked POSIX adapters and an explicit host-owned cleanup sc
 Typed errors and fault output match interpreter execution; outstanding listeners close
 even when guest code faults. See the [contract, limits and validation](socket-listener.md).
 Async accept/read/write and the full HTTP app remain work in progress.
+
+## Stored callbacks on the HTTP path (2026-10-08)
+
+The reference profile now executes bounded static/bound Function callbacks with managed
+receiver retention and exact interpreter fault parity. See [the callback experiment](callbacks.md)
+and its Raven consumers. Function arrays and asynchronous host completion remain open;
+this does not yet make the HTTP app executable natively.

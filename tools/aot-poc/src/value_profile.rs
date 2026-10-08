@@ -23,6 +23,7 @@ pub(super) enum Ty {
     ByteValues, // Immutable native-produced value-array snapshot; no element addresses.
     Size,
     Wide,
+    Callable(Type), // Managed descriptor: target identity and strong heap receiver.
     Address(Box<Ty>),
 }
 impl Ty {
@@ -117,6 +118,7 @@ impl<'a> Profile<'a> {
                 || t.fields.iter().any(|f| {
                     f.deferred
                         || !(matches!(f.ty, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::Void | Type::String | Type::Named(_))
+                            || (references && matches!(&f.ty, Type::Function(_)))
                             || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String))))
                 })
             {
@@ -263,7 +265,23 @@ impl<'a> Profile<'a> {
                 }
             }
             for (pc, op) in f.body.iter().enumerate() {
+                if let Op::BindFunction { function_type, target } = op {
+                    if !f.out_parameters.is_empty() { return Err("native callback binding in output-parameter methods requires a later profile".into()); }
+                    p.ty(function_type)?;
+                    let callee = p.callee(target)?;
+                    let bound = &input.functions[callee];
+                    if bound.is_virtual || bound.is_override || bound.is_abstract || bound.receiver_byref || bound.impl_flags != 0
+                        || (bound.instance && !matches!(p.args[callee].first(), Some(Ty::Reference(_)))) {
+                        return Err("native callback binding requires a static function or nonvirtual heap class receiver".into());
+                    }
+                }
                 if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
+                    if let Some(shape) = crate::selection::callable_invoke(target) {
+                        if !f.out_parameters.is_empty() { return Err("native callback invocation in output-parameter methods requires a later profile".into()); }
+                        p.ty(target.owner.as_ref().unwrap())?;
+                        edges[i].extend(p.callable_targets(&Type::Function(Box::new(shape.clone())))?);
+                        continue;
+                    }
                     let callee = p.callee(target)?;
                     let c = &input.functions[callee];
                     if !matches!(op, Op::Construct(_)) && c.instance && c.name.ends_with("..ctor")
@@ -325,6 +343,21 @@ impl<'a> Profile<'a> {
         }
         Ok(p)
     }
+    pub fn callable_targets(&self, shape: &Type) -> Result<Vec<usize>, Error> {
+        let mut targets = vec![];
+        for f in &self.input.functions {
+            for op in &f.body {
+                if let Op::BindFunction { function_type, target } = op {
+                    if function_type == shape {
+                        let c = self.callee(target)?;
+                        if !targets.contains(&c) { targets.push(c); }
+                    }
+                }
+            }
+        }
+        if targets.len() > 32 { return Err("native callback shape exceeds 32 possible targets".into()); }
+        Ok(targets)
+    }
     pub fn ty(&self, t: &Type) -> Result<Ty, Error> {
         Ok(match t {
             Type::Int32 | Type::UInt32 => Ty::Int,
@@ -335,6 +368,14 @@ impl<'a> Profile<'a> {
             Type::Boolean => Ty::Bool,
             Type::Void => Ty::Unit,
             Type::Value => Ty::Erased,
+            Type::Function(shape) if self.references => {
+                if !shape.out_parameters.is_empty() || !shape.out_when_true.is_empty()
+                    || shape.parameters.iter().chain([&shape.returns]).any(|t| matches!(t, Type::ByRef(_) | Type::ReadOnlyByRef(_))) {
+                    return Err("native callbacks do not yet admit borrowed/output signature slots".into());
+                }
+                for t in shape.parameters.iter().chain([&shape.returns]) { self.ty(t)?; }
+                Ty::Callable(t.clone())
+            }
             Type::String => Ty::Literal,
             Type::Char => Ty::Character,
             Type::IntPtr | Type::UIntPtr => Ty::Size,
@@ -388,7 +429,7 @@ impl<'a> Profile<'a> {
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
             Ty::Erased => vec![false, true],
-            Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray | Ty::ByteValues | Ty::Size | Ty::Wide => vec![true],
+            Ty::Callable(_) | Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray | Ty::ByteValues | Ty::Size | Ty::Wide => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
             _ => vec![false; self.lanes(t)],
@@ -745,6 +786,7 @@ impl<'a> Profile<'a> {
                 | Op::DivideUnsigned
                 | Op::Remainder
                 | Op::RemainderUnsigned => (),
+                Op::BindFunction { .. } if self.references => (),
                 Op::IsInstance(Type::String) | Op::CastClass(Type::String) | Op::ReferenceIsNull | Op::ReferenceEqual => (),
                 Op::IsInstance(Type::ArrayRef(_)) | Op::CastClass(Type::ArrayRef(_)) if self.array_backing.is_none() => {
                     return Err(fail(pc, "byte-array casts require verified backing"));
@@ -939,16 +981,27 @@ impl<'a> Profile<'a> {
                         stack.push(if matches!(owner, Ty::Address(_)) { Ty::Unit } else { owner });
                     }
                 }
-                Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
+                Op::BindFunction { function_type, target } => {
                     let c = self.callee(target)?;
-                    let construct = matches!(op, Op::Construct(_));
-                    for t in self.args[c].iter().skip(usize::from(construct)).rev() {
-                        take(&mut stack, t)?;
-                    }
-                    if construct {
-                        stack.push(self.ty(target.owner.as_ref().unwrap())?);
-                    } else if let Some(t) = &self.results[c] {
-                        stack.push(Self::stack_type(t));
+                    if target.instance { take(&mut stack, &self.args[c][0])?; }
+                    stack.push(self.ty(function_type)?);
+                }
+                Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
+                    if let Some(signature) = crate::selection::callable_invoke(target) {
+                        for t in signature.parameters.iter().rev() { take(&mut stack, &self.ty(t)?)?; }
+                        take(&mut stack, &self.ty(target.owner.as_ref().unwrap())?)?;
+                        if !signature.no_result { stack.push(Self::stack_type(&self.ty(&signature.returns)?)); }
+                    } else {
+                        let c = self.callee(target)?;
+                        let construct = matches!(op, Op::Construct(_));
+                        for t in self.args[c].iter().skip(usize::from(construct)).rev() {
+                            take(&mut stack, t)?;
+                        }
+                        if construct {
+                            stack.push(self.ty(target.owner.as_ref().unwrap())?);
+                        } else if let Some(t) = &self.results[c] {
+                            stack.push(Self::stack_type(t));
+                        }
                     }
                 }
                 Op::Return => {

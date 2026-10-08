@@ -44,9 +44,10 @@ publishing server comparisons. [Native compilation](../website/content/features/
 has its own feature page and homepage entry. Any next-release POC remains explicitly
 **work in progress**, with limitations and timing scope next to results. A socket-handle prerequisite now adds exact Int64/UInt64 erased transport, generic
 specialization and equality. The isolated listener now runs in both modes with exact native service bindings and
-explicit host-scope cleanup, including guest fault exits. The full server still reaches
-unsupported function-valued generic arguments. Next address callback representation,
-root ownership and asynchronous socket/task services. Component benchmarks do not
+explicit host-scope cleanup, including guest fault exits. [Stored native callbacks](experiments/aot-console/callbacks.md)
+now retain receivers through collection and preserve fault traces in real Raven consumers.
+The full server advances to Function-array admission. Next address callback containers,
+task dispatch, host-root ownership and asynchronous socket services. Component benchmarks do not
 qualify a server.
 
 **Author clarification:** build the CIL-to-native, self-contained executable foundation

@@ -7,6 +7,7 @@ use serde_json::{Value, json};
 #[derive(Debug, PartialEq, Eq)]
 enum Trace {
     Text,
+    Callable,
     Object(usize),
     Interface(usize),
     ByteArray,
@@ -22,6 +23,7 @@ struct Slot {
 }
 fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
     let trace = match ty {
+        Ty::Callable(_) => Trace::Callable,
         Ty::Literal | Ty::Character => Trace::Text,
         Ty::Reference(i) if p.array_backing == Some(*i) => Trace::ByteArray,
         Ty::Reference(i) => Trace::Object(*i),
@@ -83,6 +85,7 @@ pub(super) fn seed_lanes(p: &Profile<'_>, ty: &Ty) -> Vec<usize> {
 fn encode(slots: Vec<Slot>) -> Vec<Value> {
     slots.into_iter().map(|slot| {
         let recipe = match slot.trace {
+            Trace::Callable => json!({"kind": "callable", "receiver": "strong-heap-owner"}),
             Trace::Text => json!({"kind": "text", "storage": "image-or-arena"}),
             Trace::Object(i) => json!({"kind": "object-view", "typeIndex": i, "stringTagMask": 1}),
             Trace::Interface(i) => json!({"kind": "interface-view", "typeIndex": i, "stringTagMask": 1}),

@@ -44,6 +44,14 @@ pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fau
 
 pub(super) fn point(p: &Profile<'_>, op: &Op, stack: &[Ty]) -> Result<Option<Value>, Error> {
     let (consumed, kind, result, receiver) = match op {
+        Op::BindFunction { function_type, target } => (
+            usize::from(target.instance), "callback-bind", Some(p.ty(function_type)?), None,
+        ),
+        Op::Call(target) | Op::CallVirtual(target) if crate::selection::callable_invoke(target).is_some() => {
+            let shape = crate::selection::callable_invoke(target).unwrap();
+            (shape.parameters.len() + 1, "callback-invoke",
+                if shape.no_result { None } else { Some(p.ty(&shape.returns)?) }, None)
+        }
         Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
             let callee = p.callee(target)?;
             let construct = matches!(op, Op::Construct(_));

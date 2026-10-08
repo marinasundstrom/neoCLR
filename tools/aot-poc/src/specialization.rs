@@ -51,6 +51,12 @@ impl Specializer<'_> {
             Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr => {
                 return Ok(ty.clone());
             }
+            Type::Function(shape) => {
+                let mut shape = shape.as_ref().clone();
+                shape.parameters = shape.parameters.iter().map(|t| self.lower(t)).collect::<Result<_, _>>()?;
+                shape.returns = self.lower(&shape.returns)?;
+                return Ok(Type::Function(Box::new(shape)));
+            }
             Type::ByRef(t) => return Ok(Type::ByRef(Box::new(self.lower(t)?))),
             Type::Array(t) if **t == Type::Byte => return Ok(ty.clone()),
             Type::ArrayRef(t) if **t == Type::String => return Ok(ty.clone()),
@@ -275,9 +281,12 @@ impl Specializer<'_> {
             *t = self.lower(&substitute(t, arguments, methods).map_err(|e| e.to_string())?)?;
         }
         for op in &mut result.body {
+            if let Op::BindFunction { function_type, .. } = op {
+                *function_type = self.lower(&substitute(function_type, arguments, methods).map_err(|e| e.to_string())?)?;
+            }
             let virtual_call = matches!(op, Op::CallVirtual(_));
             match op {
-                Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
+                Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) | Op::BindFunction { target, .. } => {
                     let mut closed = target.clone();
                     closed.owner = target
                         .owner
@@ -297,6 +306,12 @@ impl Specializer<'_> {
                         .map(|t| substitute(t, arguments, methods))
                         .collect::<Result<_, _>>()
                         .map_err(|e| e.to_string())?;
+                    if super::selection::callable_invoke(&closed).is_some() {
+                        closed.owner = closed.owner.as_ref().map(|t| self.lower(t)).transpose()?;
+                        closed.parameters = closed.parameters.iter().map(|t| self.lower(t)).collect::<Result<_, _>>()?;
+                        *target = closed;
+                        continue;
+                    }
                     let instance = self.resolve(&closed)?;
                     let callee = &self.source.functions[instance.source];
                     if virtual_call && !super::selection::interface_contract(self.source, callee) && !super::selection::object_display_contract(callee) && (callee.is_virtual || callee.is_abstract || callee.is_override) {
@@ -366,6 +381,10 @@ fn validate_argument(ty: &Type, depth: usize) -> Result<(), Error> {
     }
     match ty {
         Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String | Type::Int64 | Type::UInt64 | Type::Named(_) => Ok(()),
+        Type::Function(shape) => {
+            for t in shape.parameters.iter().chain([&shape.returns]) { validate_argument(t, depth + 1)?; }
+            Ok(())
+        }
         Type::Constructed { arguments, .. } => {
             for arg in arguments {
                 validate_argument(arg, depth + 1)?;

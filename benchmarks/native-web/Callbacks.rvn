@@ -1,0 +1,47 @@
+import System.*
+
+class Counter {
+    private var number: int
+
+    init(number: int) {
+        self.number = number
+    }
+
+    func Add(delta: int) -> int {
+        number += delta
+        return number
+    }
+}
+
+class CallbackHolder {
+    private val callback: (int) -> int
+
+    init(callback: (int) -> int) {
+        self.callback = callback
+    }
+
+    func Invoke(value: int) -> int => callback(value)
+}
+
+func Make() -> (int) -> int {
+    let counter = Counter(40)
+    return counter.Add
+}
+
+func AddTwo(value: int) -> int => value + 2
+
+func Main() -> int {
+    let held = CallbackHolder(Make())
+    var count = 0
+    while count < 1000 {
+        let callback: (int) -> int = AddTwo
+        if callback(40) != 42 {
+            return 1
+        }
+        count += 1
+    }
+    if held.Invoke(1) != 41 {
+        return 2
+    }
+    return if held.Invoke(1) == 42 { 0 } else { 3 }
+}

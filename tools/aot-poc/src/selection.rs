@@ -51,6 +51,13 @@ pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Va
     }
 }
 
+pub(super) fn callable_invoke(target: &FunctionRef) -> Option<&neoclr::metadata::FunctionType> {
+    match target.owner.as_ref() {
+        Some(Type::Function(shape)) if target.name == "$Function.Invoke" && target.instance => Some(shape),
+        _ => None,
+    }
+}
+
 fn resolve(input: &neoclr::Module, target: &FunctionRef) -> Result<usize, Error> {
     if !target.generic_arguments.is_empty() {
         return Err("closed-world selection does not support generic calls".into());
@@ -307,7 +314,8 @@ pub(super) fn select_inventory(
             if object_display_contract(&input.functions[i]) { continue; }
             for op in &input.functions[i].body {
                 match op {
-                    Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
+                    Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) | Op::BindFunction { target, .. } => {
+                        if callable_invoke(target).is_some() { continue; }
                         let callee = resolve(input, target)?;
                         let f = &input.functions[callee];
                         if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && !object_display_contract(f) && (f.is_virtual || f.is_abstract || f.is_override) {
@@ -341,6 +349,7 @@ pub(super) fn select_inventory(
         pending_types.push(f.returns.clone());
         for op in &f.body {
             if matches!(op, Op::BoxValue(_)) { pending_types.push(Type::Named("System.Object".into())); }
+            if let Op::BindFunction { function_type, .. } = op { pending_types.push(function_type.clone()); }
             if let Op::New(t)
             | Op::InitializeObject(t)
             | Op::LoadObject(t)
@@ -392,6 +401,7 @@ pub(super) fn select_inventory(
                     ));
                 }
             }
+            Type::Function(shape) => { pending_types.extend(shape.parameters); pending_types.push(shape.returns); }
             Type::ByRef(t) => pending_types.push(*t),
             Type::Array(t) if *t == Type::Byte => (),
             Type::ArrayRef(t) if *t == Type::String => (),
@@ -440,7 +450,8 @@ pub(super) fn select_inventory(
             index: i as u32,
         });
         for op in &mut f.body {
-            if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
+            if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) | Op::BindFunction { target, .. } = op {
+                if callable_invoke(target).is_some() { continue; }
                 let old = resolve(input, target)?;
                 let new = rows.binary_search(&old).expect("selected call");
                 target.definition = Some(MemberId {

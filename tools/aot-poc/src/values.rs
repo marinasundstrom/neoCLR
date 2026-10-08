@@ -363,7 +363,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_is_single_grapheme_v1", Linkage::Import, &sig)?)
     } else { None };
-    let object_service = if references && (input.types.iter().any(|t| t.is_reference_type && !crate::selection::static_owner(t)) || details.is_some_and(|d| !d.empty_record_boxes.is_empty())) {
+    let object_service = if references && (input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::BindFunction { .. }))) || input.types.iter().any(|t| t.is_reference_type && !crate::selection::static_owner(t)) || details.is_some_and(|d| !d.empty_record_boxes.is_empty())) {
         let mut sig = module.make_signature();
         sig.params.extend([AbiParam::new(types::I64), AbiParam::new(types::I32), AbiParam::new(types::I32), AbiParam::new(types::I64)]);
         sig.returns.push(AbiParam::new(types::I32));
@@ -1195,6 +1195,88 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         } else {
                             let start = stack.len() - p.lanes(owner) + offset;
                             stack[start..start + value.len()].copy_from_slice(&value);
+                        }
+                    }
+                    Op::BindFunction { target, .. } => {
+                        let c = p.callee(target)?;
+                        let receiver = if target.instance {
+                            let receiver = pop(&mut stack);
+                            // Binding uses the interpreter's invalid-receiver fault;
+                            // invoking a null function separately uses NullReference.
+                            let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
+                            let invalid = b.ins().iconst(types::I32, 3);
+                            return_if_detailed(&mut b, null, invalid, site.as_ref());
+                            receiver
+                        } else { b.ins().iconst(types::I64, 0) };
+                        let service = module.declare_func_in_func(object_service.unwrap(), b.func);
+                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        // Private descriptor header, never exposed as a nominal class.
+                        let type_id = b.ins().iconst(types::I32, u32::MAX as i64);
+                        let bytes = b.ins().iconst(types::I32, 24);
+                        let output = b.ins().stack_addr(types::I64, call_result, 0);
+                        let call = b.ins().call(service, &[arena, type_id, bytes, output]);
+                        let raw = b.inst_results(call)[0];
+                        let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                        let memory = b.ins().iconst(types::I32, 5);
+                        let runtime = b.ins().iconst(types::I32, 3);
+                        let status = b.ins().select(exhausted, memory, runtime);
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                        return_if_detailed(&mut b, failed, status, site.as_ref());
+                        let descriptor = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                        let identity = b.ins().iconst(types::I64, (c + 1) as i64);
+                        b.ins().store(MemFlags::new(), identity, descriptor, 8);
+                        b.ins().store(MemFlags::new(), receiver, descriptor, 16);
+                        stack.push(descriptor);
+                    }
+                    Op::Call(target) | Op::CallVirtual(target) if crate::selection::callable_invoke(target).is_some() => {
+                        let signature = crate::selection::callable_invoke(target).unwrap();
+                        let owner = target.owner.as_ref().unwrap();
+                        let count = signature.parameters.iter().map(|t| p.ty(t).map(|t| p.lanes(&t))).collect::<Result<Vec<_>, _>>()?.into_iter().sum::<usize>();
+                        let actual = stack.split_off(stack.len() - count);
+                        let descriptor = pop(&mut stack);
+                        null_reference(&mut b, descriptor, site.as_ref());
+                        let identity = b.ins().load(types::I64, MemFlags::new(), descriptor, 8);
+                        let result = b.ins().stack_addr(types::I64, call_result, 0);
+                        let result_type = if signature.no_result { None } else { Some(p.ty(&signature.returns)?) };
+                        if let (Some(probes), Some(t)) = (&root_probes, &result_type) {
+                            let zero = b.ins().iconst(types::I64, 0);
+                            for lane in gc_layout::seed_lanes(&p, t) {
+                                b.ins().store(MemFlags::new(), zero, result, (lane * 8) as i32);
+                            }
+                            probes.publish(&mut module, &mut b, i, pc, 3, probe_frame.unwrap(), transient_table.unwrap(), result);
+                        }
+                        let join = b.create_block();
+                        b.append_block_param(join, types::I32);
+                        for c in p.callable_targets(owner)? {
+                            let matched = b.create_block();
+                            let next = b.create_block();
+                            let equal = b.ins().icmp_imm(IntCC::Equal, identity, (c + 1) as i64);
+                            b.ins().brif(equal, matched, &[], next, &[]);
+                            b.switch_to_block(matched);
+                            let mut args = Vec::new();
+                            if input.functions[c].instance {
+                                args.push(b.ins().load(types::I64, MemFlags::new(), descriptor, 16));
+                            }
+                            args.extend_from_slice(&actual);
+                            args.push(result);
+                            if let Some(context) = fault_context { args.push(context); }
+                            let callee = module.declare_func_in_func(ids[c], b.func);
+                            let call = b.ins().call(callee, &args);
+                            let status = b.inst_results(call)[0];
+                            b.ins().jump(join, &[status.into()]);
+                            b.switch_to_block(next);
+                        }
+                        let invalid = b.ins().iconst(types::I32, 3);
+                        b.ins().jump(join, &[invalid.into()]);
+                        b.switch_to_block(join);
+                        let status = b.block_params(join)[0];
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        return_if_detailed(&mut b, failed, status, site.as_ref());
+                        if let Some(t) = &result_type {
+                            if let Some(probes) = &root_probes {
+                                probes.publish(&mut module, &mut b, i, pc, 2, probe_frame.unwrap(), transient_table.unwrap(), result);
+                            }
+                            stack.extend(read(&mut b, &p, t, result));
                         }
                     }
                     Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {

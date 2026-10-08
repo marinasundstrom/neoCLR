@@ -27,7 +27,7 @@ pub fn report(
                     .expect("tagged instruction")
                     .to_owned();
                 *histogram.entry(name.clone()).or_default() += 1;
-                if let Op::Call(target) | Op::Construct(target) | Op::CallVirtual(target) = op {
+                if let Op::Call(target) | Op::Construct(target) | Op::CallVirtual(target) | Op::BindFunction { target, .. } = op {
                     // Inventory exact references. Never guess binding from a source name,
                     // or silently turn unresolved calls into omitted native code.
                     calls.push(
