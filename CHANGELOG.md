@@ -13,6 +13,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   String.Join for initialized non-null string arrays. Share checked one-allocation
   materialization between interpreter and native C services; retain existing GC owners.
   Admit verified sealed-owner native virtual calls while preserving null checks.
+  Also reject that projection when the complete loaded set contains a derived type;
+  current sealing metadata is descriptive rather than runtime-enforced.
   Refresh CLI library/reference projections, String constructor/operator admission,
   API documentation and executable samples. Compare construction workloads in both
   modes; the current builder is not a demonstrated performance improvement over Concat.

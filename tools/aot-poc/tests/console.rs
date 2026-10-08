@@ -3466,3 +3466,15 @@ fn unsealed_virtual_calls_still_require_dispatch() {
     assert!(String::from_utf8_lossy(&r.stderr).contains("virtual calls requiring dispatch"), "{r:?}");
     assert!(!dir.0.join("app.o").exists());
 }
+
+#[test]
+fn descriptive_sealing_does_not_hide_an_unselected_derived_type() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = format!("{}\n.type class Derived\n.extends Answer\n.end\n",
+        include_str!("../../../docs/experiments/aot-console/sealed-member.neoil"));
+    let dir = Temp::new();
+    let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
+    assert!(!r.status.success());
+    assert!(String::from_utf8_lossy(&r.stderr).contains("virtual calls requiring dispatch"), "{r:?}");
+    assert!(!dir.0.join("app.o").exists());
+}

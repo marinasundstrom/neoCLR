@@ -86,13 +86,15 @@ pub(super) fn interface_contract(input: &neoclr::Module, f: &neoclr::metadata::F
         .is_some_and(|t| t.representation == neoclr::metadata::Representation::Interface)
 }
 
-/// A verified sealed reference owner cannot acquire a more-derived implementation.
+/// Sealing is descriptive metadata today: also check the complete loaded type set.
 /// Keep callvirt for its null check; only the private native projection loses slots.
 pub(super) fn sealed_member(input: &neoclr::Module, f: &neoclr::metadata::Function) -> bool {
     f.instance && !f.is_abstract && !f.receiver_byref && f.impl_flags == 0
         && f.owner.as_ref().and_then(|t| input.type_definition(t))
             .is_some_and(|t| t.is_reference_type && t.is_sealed
-                && t.representation != neoclr::metadata::Representation::Interface)
+                && t.representation != neoclr::metadata::Representation::Interface
+                && !input.types.iter().any(|candidate| candidate.base.as_ref()
+                    .and_then(Type::definition_name) == Some(t.name.as_str())))
 }
 
 /// Narrow class-virtual slice used by Console.WriteLine(Object). Original load-set
