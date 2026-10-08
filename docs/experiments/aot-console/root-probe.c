@@ -33,7 +33,7 @@ static void observe_fault(const void *context) {
 }
 void neoclr_probe_enter_v3(neoclr_probe_frame *frame, const void *context, uint32_t function,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
-    if (!frame || !context || function >= 512) abort();
+    if (!frame || !context || function >= 1024) abort();
     memset(frame, 0, sizeof(*frame));
     frame->previous = head;
     frame->context = context;

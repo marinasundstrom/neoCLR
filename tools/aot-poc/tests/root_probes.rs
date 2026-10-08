@@ -381,3 +381,41 @@ int main(void) {
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     assert!(Command::new(binary).status().unwrap().success());
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn published_frame_function_bound_matches_native_selection() {
+    use std::os::unix::process::ExitStatusExt;
+    let dir = Temp(std::env::temp_dir().join(format!("neoclr-root-bound-{}", std::process::id())));
+    fs::create_dir(&dir.0).unwrap();
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("bound.c"), r#"
+#include "native-gc.h"
+#include <sys/resource.h>
+int main(int argc, char **argv) {
+    (void)argv;
+    struct rlimit limit = {0, 0};
+    if (setrlimit(RLIMIT_CORE, &limit)) return 1;
+    neoclr_aot_context context = {0};
+    neoclr_probe_frame frame;
+    neoclr_probe_storage empty = {0};
+    neoclr_probe_enter_v3(&frame, &context, argc > 1 ? 1024 : 1023, &empty, 0, "", 0);
+    if (frame.function != 1023 || neoclr_root_probe_depth_v1() != 1) return 2;
+    neoclr_probe_leave_v1(&frame);
+    return neoclr_root_probe_depth_v1() != 0;
+}
+"#).unwrap();
+    for gc in [false, true] {
+        let binary = dir.0.join(if gc { "gc" } else { "probe" });
+        let mut command = Command::new("clang");
+        command.args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds", "-I"])
+            .arg(&base).arg(dir.0.join("bound.c")).arg(base.join("root-probe.c"));
+        if gc { command.arg("-DNEOCLR_NATIVE_GC").arg(base.join("native-gc.c")); }
+        let r = command.arg("-o").arg(&binary).output().unwrap();
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let r = Command::new(&binary).output().unwrap();
+        assert!(r.status.success(), "{r:?}");
+        let r = Command::new(&binary).arg("invalid").output().unwrap();
+        assert_eq!(r.status.signal(), Some(6), "out-of-range frame must abort: {r:?}");
+    }
+}

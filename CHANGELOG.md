@@ -12,6 +12,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   context/thread lookup and entry-reset guards. Validate retention, reclamation, stale
   handles, quotas and compiled entry behavior. GC-enabled native objects require the
   matching entry-check helper; asynchronous callback/socket execution remains WIP.
+  Align published-frame validation with the compiler's 1,024-function bound; validate
+  the highest supported ID and rejection beyond it in GC and diagnostic modes.
 
 - Record a future HttpMethod abstraction proposal, including custom-token validation,
   case semantics and migration questions. No public API or HTTP capability changes.

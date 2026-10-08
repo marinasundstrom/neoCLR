@@ -232,3 +232,9 @@ invalid/interior/freed pointers, stale/wrong-context/foreign-thread handles, glo
 distinct tokens, pool exhaustion, out-of-order release, entry reset and buffer canaries.
 These are correctness checks, not HTTP benchmark results. Generated GC-enabled objects
 now require the matching `neoclr_gc_entry_check_v1` C helper when linking.
+
+A follow-up aligns the published-frame hook with the compiler's 1,024-function
+selection limit (the helper still used 512). The focused
+`published_frame_function_bound_matches_native_selection` test checks ID 1023
+enter/leave and rejection of ID 1024 in both GC and diagnostic builds. This fixes
+a native helper admission mismatch; it does not broaden the compiler's limit.
