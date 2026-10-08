@@ -833,3 +833,37 @@ The author now asks to finish this POC for now. Use the shared
 [client/server tracker](http-capabilities.md) for the finish line and future HTTP work,
 including modern protocol boundaries. The current source API is not a universal
 async body contract, and connection-per-request is not a permanent design decision.
+
+## Future HttpMethod type — proposal, 2026-10-08
+
+The author suggests considering an equivalent to .NET HttpMethod later. This is
+a design candidate, not an implemented API or a change to the native HTTP priority.
+HttpRequest.Method currently exposes a string and existing factories select supported
+verbs. The earlier common-verb checkpoint describes that implementation, not a
+permanent decision against a method type.
+
+An immutable method token could centralize validation and supply named standard
+methods while preserving extension methods. A closed enum would need an additional
+custom-token representation; retaining strings avoids migration but leaves validation
+and comparisons distributed. Value versus reference representation remains open:
+compare copying/default-value validity against allocation and GC costs before choosing.
+This belongs in the HTTP library; it should not require special CIL or backend semantics.
+
+Primary sources reviewed 2026-10-08:
+[.NET HttpMethod API](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpmethod?view=net-10.0),
+[pinned .NET 10 implementation](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Net.Http/src/System/Net/Http/HttpMethod.cs),
+and [RFC 9110 section 9.1](https://www.rfc-editor.org/rfc/rfc9110.html#section-9.1).
+.NET supplies standard instances, validates custom tokens, and uses case-insensitive
+equality and hashing. HTTP method tokens are case-sensitive. A provisional preference
+is to preserve exact spelling and case-sensitive identity, avoiding conflation of
+extension methods; this would deliberately differ from .NET comparison behavior and
+needs explicit migration tests. Construction failure policy (Result versus fault),
+UTF-8/ASCII token validation and token length limits remain undecided.
+
+Introducing a token must not imply support for every method's protocol semantics:
+HEAD framing, CONNECT tunneling, request-body policies and server dispatch remain
+separate capabilities. Plan a compatible transition for Method consumers and route
+registration. Validate standard/custom methods, invalid and non-ASCII tokens, casing,
+equality/hash consistency, wire preservation and unsupported-method handling in both
+interpreter and native execution before adopting the public API. No performance
+improvement is claimed and no implementation is scheduled by this proposal.

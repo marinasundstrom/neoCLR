@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Record a future HttpMethod abstraction proposal, including custom-token validation,
+  case semantics and migration questions. No public API or HTTP capability changes.
+
 - Admit verified Int32 enums in the bounded native value profile, retaining nominal
   identity through calls and reserved array snapshots. Add explicit enum storage
   conversion and Int32 bitwise operations; validate signed extremes and real Raven

@@ -11931,3 +11931,16 @@ not establish a new permanent roadmap priority outside the author-directed AOT w
 - **Open:** Broad formatter/collection overloads, mutable native-buffer ownership,
   larger quotas and replacing actual HTTP construction remain later work. This side
   quest does not establish that the HTTP server runs natively or change its priority.
+
+## 2026-10-08 — Future HTTP method abstraction
+
+- **Author:** Suggests that neoCLR might need an equivalent to .NET HttpMethod later,
+  linking its API documentation.
+- **Assistant proposal:** Consider an immutable token with standard instances and
+  validated extension methods. Keep representation, construction errors and migration
+  open; explicitly compare .NET's case-insensitive equality with HTTP's case-sensitive
+  tokens. Method representation must not imply unsupported protocol capabilities.
+- **Action:** Inspect current string Method storage and record the
+  [proposal and primary sources](http-client-design.md#future-httpmethod-type--proposal-2026-10-08).
+  No API is implemented or approved by this exchange. Native HTTP execution remains
+  the active goal; host GC root work is still in progress.

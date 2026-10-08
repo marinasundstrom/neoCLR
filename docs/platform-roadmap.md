@@ -35,6 +35,11 @@ small consumers are intermediate validation mechanisms, not constraints that the
 API must fit or a final server memory policy. Collector choice, native root reporting
 and reclamation remain open; pursue these when the real dependency chain requires them.
 
+**Future HTTP library candidate (author suggestion, 2026-10-08):** consider an
+[HttpMethod abstraction](http-client-design.md#future-httpmethod-type--proposal-2026-10-08)
+with standard and extension tokens. API shape and scheduling remain open; this does
+not reprioritize the native HTTP execution work.
+
 **Benchmarkable web app (author direction, 2026-10-08):** use the same checked-in
 Raven workload for interpreted/native comparisons first, then equivalent apps on other
 platforms. The [native-web workbench](../benchmarks/native-web/README.md) starts with
