@@ -317,6 +317,9 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
         let name = row["name"].as_str().unwrap();
         let (parameters, result, implementation, symbol) = match name {
+            "neoCLR.Runtime.StringContainsOrdinal" => (vec![Type::String, Type::String], Type::Boolean, "string-contains-ordinal-v1", "neoclr_string_contains_ordinal_v1"),
+            "neoCLR.Runtime.StringStartsWithOrdinal" => (vec![Type::String, Type::String], Type::Boolean, "string-starts-with-ordinal-v1", "neoclr_string_starts_with_ordinal_v1"),
+            "neoCLR.Runtime.StringEndsWithOrdinal" => (vec![Type::String, Type::String], Type::Boolean, "string-ends-with-ordinal-v1", "neoclr_string_ends_with_ordinal_v1"),
             "neoCLR.Runtime.StringConcat" => (vec![Type::String, Type::String], Type::String, "string-concat-v1", "neoclr_string_concat_v1"),
             "neoCLR.Runtime.Utf8Decode" => (vec![Type::ArrayRef(Box::new(Type::Byte))], Type::Value, "utf8-decode-v1", "neoclr_utf8_decode_v1"),
             "neoCLR.Runtime.Utf8Encode" => (vec![Type::String], Type::Array(Box::new(Type::Byte)), "utf8-encode-v1", "neoclr_utf8_encode_v1"),
@@ -332,12 +335,13 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
             || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
             || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
             || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
-            return Err("native UTF-8 binding requires exact StringByteCount(String) -> Int32 or StringSliceUtf8(String, Int32, Int32) -> Value or Utf8Encode(String) -> Byte[] or Utf8Decode(arrayref<Byte>) -> Value or StringConcat(String, String) -> String InternalCall contract".into());
+            return Err("native UTF-8 binding requires exact StringByteCount(String) -> Int32 or StringSliceUtf8(String, Int32, Int32) -> Value or Utf8Encode(String) -> Byte[] or Utf8Decode(arrayref<Byte>) -> Value or StringConcat(String, String) -> String or ordinal String predicates(String, String) -> Boolean InternalCall contract".into());
         }
         f.impl_flags = 0;
         // A verifier-valid nonreturning placeholder needs no unsupported array
         // constructor; only the reported InternalCall is lowered to native code.
         f.body = if matches!(result, Type::Array(_)) { vec![Op::Branch(0)] }
+            else if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
             else if result == Type::String { vec![Op::String(String::new()), Op::Return] }
             else if result == Type::Value { vec![Op::String(String::new()), Op::PackValue(Type::String), Op::Return] }
             else { vec![Op::Int(0), Op::Return] };

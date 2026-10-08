@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-08
 
+- Extend experimental ARM64 AOT UTF-8 bindings with exact String ContainsOrdinal,
+  StartsWithOrdinal and EndsWithOrdinal predicates. Preserve empty-pattern, Unicode,
+  embedded-NUL and null-fault behavior without allocation. Add a bounded Console
+  request-line consumer with an application Route union and Int32 item IDs; this is
+  an HTTP-oriented parsing experiment, not a server or general protocol parser.
+  Validate 53 Console tests, including 60 native/interpreter predicate comparisons,
+  and 18 standalone input streams with exact output/fault parity and only libSystem
+  dynamically linked.
+  Public APIs, Raven contracts, metadata and native context ABI are unchanged.
+
 - Extend experimental ARM64 AOT integer-text binding with exact Int32 parsing and
   static Int32 wrapper projection. Preserve whole-text ASCII grammar, malformed-before-
   overflow precedence, allocation-free parsing and null-fault diagnostics. Add a bounded

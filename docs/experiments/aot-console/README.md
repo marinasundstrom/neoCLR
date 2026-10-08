@@ -1360,3 +1360,62 @@ libSystem dynamically linked. The final run reuses the first run's successful fr
 Raven compilation after producer/source hash checks, then rebuilds the native image.
 The evidence embeds the producer command and artifact hash; no compiler fix or source
 relocation was needed. The supplied bundle and compiler binaries are identified by hash.
+
+
+## Bounded request-line and route consumer (2026-10-08)
+
+The [Raven consumer](request-line.rvn) reads one line with a 96-byte limit, recognizes
+`GET /health HTTP/1.1` and `GET /items/<id> HTTP/1.1`, and produces an application-owned
+Route union. Parsing returns Result<Route, string>; input uses Result<Option<string>,
+TextReadError>. Ordinary `let ... else` and `if let` branches handle those outcomes.
+Item IDs use the existing Int32 parser and reject negative values; signs and leading
+zeros retain that parser's policy. Slices and public parser/union bodies stay CIL.
+
+This is a small consumer to drive AOT toward HTTP. It is not the library HttpServer
+parser or RoutePattern implementation and does not replace either. It performs no
+socket I/O, header/body parsing, URL decoding or HTTP response serialization. Tabs and
+NUL are explicitly rejected, unknown targets/methods/versions return sample diagnostics,
+and query/fragment-bearing item IDs fail integer parsing. It is not a general request
+validation or security boundary. Console's existing line-ending/EOF policy applies;
+CRLF and a final unterminated line are accepted here.
+
+The missing native dependencies were the reserved StringContainsOrdinal,
+StringStartsWithOrdinal and StringEndsWithOrdinal services. `--bind-utf8-text` now binds
+only their exact `(String, String) -> Boolean` InternalCall signatures, with the existing
+reference-arena capability. Their linked adapters compare explicit UTF-8 lengths/bytes,
+allocate no memory and publish a normalized Boolean. Empty patterns match; embedded NUL
+is ordinary text; null operands fault without publishing output. Ordinary same-named
+methods cannot acquire a native binding. The public String wrappers remain compiled.
+No Raven emitter, Runtime Contract setting, metadata schema, public API or context ABI
+changes are required.
+
+This restores the [existing ordinal matching contract](../../ordinal-text.md), whose
+.NET comparison distinguishes explicit ordinal matching from culture-sensitive prefix/
+suffix defaults. Exact matching of valid Unicode text can operate directly on UTF-8;
+no normalization, case folding or grapheme segmentation is intended. Prefix/suffix use
+length-checked byte comparisons. Substring search uses a simple scan with worst-case
+O(text bytes × pattern bytes) work, so this slice makes no throughput improvement claim.
+The motivating input is bounded; general high-volume search should be measured before
+choosing an optimized search implementation. Lifetime/reclamation and execution budgets
+remain separate native work.
+
+All 53 Console tests pass. The new focused test compares 60 native/interpreter results
+and faults across empty, shorter/longer, case-different, repeated-prefix, Unicode,
+normalization-different and NUL patterns, plus both null-operand positions. Zero-capacity
+arena checks establish that matching allocates nothing, and negative checks cover
+missing opt-in and ordinary same-named methods. Existing parser and reader coverage
+remains part of that focused Console suite.
+
+Run `verify_interactive.py --request-line` with the usual compiler/runtime/bundle/output
+arguments. The executable retains the existing 64 KiB invocation arena. The next sample
+should attempt the existing RoutePattern API against an in-memory target, to discover
+remaining library/backend dependencies before adding network ownership and I/O.
+
+[Fresh standalone evidence](request-line-validation.json) records 18 input streams with
+explicit expected output and interpreter/native parity: both routes, numeric limits,
+signs, empty/negative/overflow IDs, query-bearing IDs, an unknown Unicode target,
+unsupported method/version, NUL/tab, root path, trailing version text, EOF, invalid UTF-8
+and the byte limit. Exact broken-pipe fault diagnostics also match. The freshly compiled
+Raven artifact records 217 functions and 97 types in its selection inventory; the
+inspection inventory and producer/bundle hashes are recorded in the evidence. The
+executable runs alone with an empty environment and only libSystem dynamically linked.

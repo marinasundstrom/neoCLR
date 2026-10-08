@@ -305,7 +305,10 @@ explicit native binding. Native line-oriented text input has bounded standalone 
 sample now combines Int32.Parse with Result/Option patterns, preserving parse outcomes,
 EOF, read errors and fault traces in a standalone executable. Allocation-free Int32
 parsing is opt-in through the experimental integer-text binding; other numeric parsers
-remain native-backend work.
+remain native-backend work. A bounded two-route GET request-line sample now compiles
+with an application union and ordinal String predicates, preserving exact output and
+faults across 18 input streams. It has no socket, header/body or general HTTP parsing
+support; the predicates extend the experimental UTF-8 binding without allocation.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

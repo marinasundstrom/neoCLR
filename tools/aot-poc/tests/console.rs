@@ -2693,3 +2693,87 @@ fn int32_parsing_rejects_ordinary_same_named_methods() {
     assert!(!r.status.success() && !dir.0.join("app.o").exists(), "{r:?}");
     assert!(String::from_utf8_lossy(&r.stderr).contains("exact reserved Int32 parsing"), "{r:?}");
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn ordinal_string_predicates_preserve_utf8_nulls_and_allocation_independence() {
+    let names = ["StringContainsOrdinal", "StringStartsWithOrdinal", "StringEndsWithOrdinal"];
+    let mut seed_source = String::from(".module System\n.references ()\n");
+    for name in names {
+        seed_source.push_str(&format!(".function neoCLR.Runtime.{name}(String, String) -> Boolean\n.methodimpl InternalCall\n.end\n"));
+    }
+    let seed = neoclr::assemble(&seed_source).unwrap();
+    let cases = [("", ""), ("abc", ""), ("", "a"), ("abc", "a"), ("abc", "b"), ("abc", "c"),
+        ("abc", "abc"), ("abc", "abcd"), ("abc", "A"), ("aaaaab", "aaab"), ("hé😀z", "é😀"),
+        ("hé😀z", "😀z"), ("é😀", "é"), ("é", "é"), ("a\0b", "\0"), ("a\0b", "a\0"),
+        ("a\0b", "\0b"), ("a\0b", "a\0c")];
+    let mut source = String::from(".module Predicates\n.function Calculate(Int32 mode) -> Int32\n.local String absent\n");
+    for i in 0..cases.len()*3+6 {
+        source.push_str(&format!("ldarg mode\nldc.i4 {i}\nceq\nbrtrue Case{i}\n"));
+    }
+    source.push_str("ldc.i4 -1\nret\n");
+    for (i, (text, pattern)) in cases.iter().enumerate() {
+        for (j, name) in names.iter().enumerate() {
+            source.push_str(&format!("Case{}:\nldstr {}\nldstr {}\ncall neoCLR.Runtime.{name}(String, String)\nbrtrue Yes\nldc.i4 0\nret\n", i*3+j, serde_json::to_string(text).unwrap(), serde_json::to_string(pattern).unwrap()));
+        }
+    }
+    for j in 0..6 {
+        source.push_str(&format!("Case{}:\nldloca absent\ninitobj String\n", cases.len()*3+j));
+        source.push_str(if j<3 { "ldloc absent\nldstr \"\"\n" } else { "ldstr \"\"\nldloc absent\n" });
+        source.push_str(&format!("call neoCLR.Runtime.{}(String, String)\nbrtrue Yes\nldc.i4 0\nret\n", names[j%3]));
+    }
+    source.push_str("Yes:\nldc.i4 1\nret\n.end\n");
+    let dir = Temp::new();
+    let denied = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
+    assert!(!denied.status.success() && !dir.0.join("app.o").exists());
+    let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena", "--bind-utf8-text"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"), r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc, char **argv) {
+    neoclr_aot_context ctx = {0};
+    int32_t result = -99;
+    int status = neoclr_entry_v4(argc > 1 ? atoi(argv[1]) : 0, &result, &ctx);
+    if (ctx.text.used) return 93;
+    if (status) {
+        if (result != -99 || ctx.fault.code != (uint32_t)status) return 92;
+        neoclr_aot_render_fault(stderr, &ctx.fault);
+        return 1;
+    }
+    printf("%d\n", result);
+    return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let app = neoclr::assemble(&source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in 0..cases.len()*3+6 {
+        let reference = method.invoke(vec![neoclr::Value::Int32(mode as i32)], neoclr::Limits::default());
+        let r = Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        if mode >= cases.len()*3 {
+            let fault = reference.unwrap_err();
+            assert_eq!(r.status.code(), Some(1), "{r:?}");
+            assert_eq!(String::from_utf8_lossy(&r.stderr), fault.diagnostic().to_string());
+        } else {
+            let neoclr::Value::Int32(value) = reference.unwrap().value else { panic!("unexpected result") };
+            assert_eq!(r.status.code(), Some(0), "{mode}: {r:?}");
+            assert_eq!(String::from_utf8_lossy(&r.stdout), format!("{value}\n"), "mode {mode}");
+            assert!(r.stderr.is_empty());
+        }
+    }
+    for name in names {
+        let ordinary = neoclr::assemble(&format!(".module System\n.references ()\n.function neoCLR.Runtime.{name}(String, String) -> Boolean\nldc.bool false\nret\n.end\n")).unwrap();
+        let source = format!(".module Bad\n.function Calculate() -> Int32\nldstr \"a\"\nldstr \"a\"\ncall neoCLR.Runtime.{name}(String, String)\npop\nldc.i4 0\nret\n.end");
+        let reject = Temp::new();
+        let r = compile_source(&reject, &ordinary, &source, &["--compile-system", "--reference-arena", "--bind-utf8-text"], false);
+        assert!(!r.status.success() && !reject.0.join("app.o").exists(), "{r:?}");
+        assert!(String::from_utf8_lossy(&r.stderr).contains("native UTF-8 binding requires exact"), "{r:?}");
+    }
+}

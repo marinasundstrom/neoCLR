@@ -1,0 +1,63 @@
+import System.*
+import System.Result.*
+import System.Option.*
+
+union Route {
+    case Health
+    case Item(int)
+}
+
+func Parse(line: string) -> Result<Route, string> {
+    if line.ContainsOrdinal("\u0000") || line.ContainsOrdinal("\t") {
+        return Error("Invalid request line")
+    }
+    if !line.StartsWithOrdinal("GET /") {
+        return Error("Unsupported request")
+    }
+    if !line.EndsWithOrdinal(" HTTP/1.1") {
+        return Error("Unsupported version")
+    }
+    let Ok(target) = line.SliceUtf8(4, line.GetUtf8ByteCount() - 13) else {
+        return Error("Invalid target")
+    }
+    if target == "/health" {
+        return Ok(Route.Health)
+    }
+    if !target.StartsWithOrdinal("/items/") {
+        return Error("No route")
+    }
+    let Ok(text) = target.SliceUtf8(7, target.GetUtf8ByteCount() - 7) else {
+        return Error("Invalid item id")
+    }
+    let Ok(id) = Int32.Parse(text) else {
+        return Error("Invalid item id")
+    }
+    if id < 0 {
+        return Error("Invalid item id")
+    }
+    return Ok(Route.Item(id))
+}
+
+func Main() -> int {
+    Console.WriteLine("Request line:")
+    let Ok(option) = Console.ReadLine(96) else {
+        Console.WriteLine("Read failed")
+        return 1
+    }
+    let Some(line) = option else {
+        Console.WriteLine("EOF")
+        return 0
+    }
+    let parsed = Parse(line)
+    if let Ok(route) = parsed {
+        if let Route.Item(id) = route {
+            Console.WriteLine("Item")
+            Console.WriteLine(id)
+        } else {
+            Console.WriteLine("Health")
+        }
+    } else if let Error(message) = parsed {
+        Console.WriteLine(message)
+    }
+    return 0
+}

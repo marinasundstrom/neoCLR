@@ -6771,3 +6771,12 @@ projects static Int32 wrappers. Public Parse/Result code remains ordinary native
 there is no Raven emission, Runtime Contract option, CLI encoding, public API or schema
 change. The same integration compiler and bundle compile the repeated-input/union sample.
 Whole-text ASCII grammar, error precedence and null faults match the interpreter.
+
+
+The [bounded request-line consumer](experiments/aot-console/README.md#bounded-request-line-and-route-consumer-2026-10-08)
+uses the existing String ordinal predicate wrappers, an application Route union and
+Int32.Parse. The native UTF-8 binding now implements the three exact reserved predicate
+services; their ordinary public wrappers and emitted union/control-flow code remain
+unchanged. There is no compiler-affecting or Runtime Contract configuration change,
+new CLI encoding, public API or metadata schema. The consumer is a parsing experiment,
+not the HttpServer implementation or a replacement route contract.

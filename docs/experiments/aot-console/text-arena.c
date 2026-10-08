@@ -253,3 +253,37 @@ publish:;
     memcpy(output, lanes, sizeof(lanes));
     return NEOCLR_AOT_FAULT_NONE;
 }
+
+
+int32_t neoclr_string_starts_with_ordinal_v1(const neoclr_aot_text *text,
+        const neoclr_aot_text *pattern, int32_t *output) {
+    if (!text || !pattern || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    *output = pattern->length <= text->length &&
+        memcmp(text->bytes, pattern->bytes, (size_t)pattern->length) == 0;
+    return NEOCLR_AOT_FAULT_NONE;
+}
+
+int32_t neoclr_string_ends_with_ordinal_v1(const neoclr_aot_text *text,
+        const neoclr_aot_text *pattern, int32_t *output) {
+    if (!text || !pattern || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    *output = pattern->length <= text->length &&
+        memcmp(text->bytes + (text->length - pattern->length), pattern->bytes, (size_t)pattern->length) == 0;
+    return NEOCLR_AOT_FAULT_NONE;
+}
+
+int32_t neoclr_string_contains_ordinal_v1(const neoclr_aot_text *text,
+        const neoclr_aot_text *pattern, int32_t *output) {
+    if (!text || !pattern || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    int32_t found = pattern->length == 0;
+    if (!found && pattern->length <= text->length) {
+        uint64_t last = text->length - pattern->length;
+        for (uint64_t at = 0; at <= last; ++at) {
+            if (memcmp(text->bytes + at, pattern->bytes, (size_t)pattern->length) == 0) {
+                found = 1;
+                break;
+            }
+        }
+    }
+    *output = found;
+    return NEOCLR_AOT_FAULT_NONE;
+}

@@ -172,8 +172,12 @@ Line-oriented Console input already has standalone coverage. A bounded repeated-
 consumer now combines Int32.Parse with Result/Option patterns and Console output across
 11 input streams ([evidence](experiments/aot-console/parse-session-validation.json)). The
 native parser preserves whole-text ASCII grammar and malformed-before-overflow precedence
-without allocating. A bounded request-line/route parser is the next proposed consumer
-on the path toward HTTP. Borrowed String interface receivers remain unsupported.
+without allocating. A bounded request-line/route consumer now runs standalone across
+18 input streams, using an application union, Int32 IDs and newly bound ordinal String
+predicates ([evidence](experiments/aot-console/request-line-validation.json)). It covers
+only two GET routes, not a server or complete HTTP grammar. Trying the existing
+RoutePattern API in memory is the next proposed step before network I/O. Borrowed
+String interface receivers remain unsupported.
 The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

@@ -65,4 +65,9 @@ int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_te
  * Publishes erased Int32 or Byte(1=InvalidFormat, 2=Overflow), no allocation.
  * Null arguments fault without publishing output. */
 int32_t neoclr_parse_int32_v1(const neoclr_aot_text *text, void *output);
+/* Exact, case-sensitive UTF-8 bytes; empty patterns match. Null inputs fault.
+ * Predicates allocate nothing and publish a normalized Boolean only on success. */
+int32_t neoclr_string_contains_ordinal_v1(const neoclr_aot_text *text, const neoclr_aot_text *pattern, int32_t *output);
+int32_t neoclr_string_starts_with_ordinal_v1(const neoclr_aot_text *text, const neoclr_aot_text *pattern, int32_t *output);
+int32_t neoclr_string_ends_with_ordinal_v1(const neoclr_aot_text *text, const neoclr_aot_text *pattern, int32_t *output);
 #endif
