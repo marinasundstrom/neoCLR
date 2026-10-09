@@ -1,8 +1,9 @@
 # Windows native console host prerequisites
 
 Development experiment, 2026-10-09. The Windows scalar/literal-console backend is
-qualified; general managed Windows code generation remains rejected. An explicit
-integer-only generated-stack experiment now passes its Windows execution gate. It does not introduce a public API.
+qualified. Generated stack and array-root experiments also pass, and a separate
+synchronous console project profile now produces and runs standalone Windows EXEs.
+General hosting and non-console platform services remain unqualified. It does not introduce a public API.
 
 ## Memory ownership: qualified private probe
 
@@ -233,9 +234,9 @@ first-fault propagation and exactly-once cleanup. Reuse the
 before adding migration or green threads. Current root TLS, callbacks and stack
 adapters remain replacement boundaries, not public scheduling policy.
 
-Next: qualify a bounded heap-allocating guest against the working collector host,
-including generated live-reference retention and fault cleanup. General managed profiles and
-project kits remain rejected until their separate requirements have evidence.
+The heap and console project integration gates below now establish the next
+synchronous boundaries. Broader platform services, packaged Windows native kits
+and suspendable hosting retain their separate evidence requirements.
 
 ## Generated heap experiment
 
@@ -264,7 +265,11 @@ closed-world value/reference backend, exact console/UTF-8 service bindings and t
 qualified guarded heap/stack host. It uses a 1 MiB heap, status-based fault rendering,
 collection and checked teardown, and a normal 1 MiB OS thread stack. Standard input,
 output and error are binary byte streams; terminal glyph/code-page display remains
-separate. Its dedicated project gate is pending. See the
+separate. Its [dedicated project gate](windows-native-project-validation.json) now
+passes five Windows builds/executions with interpreter parity, including managed
+arrays/text, binary input/output and guest fault diagnostics. Each EXE runs alone
+with only KERNEL32.dll imports, no SDK/bundle on PATH, and no helper DLL beside it.
+Existing-output preservation and stale-build rejection also pass. See the
 [build instructions](native-poc-bundle.md#windows-x64-console-source-checkout).
 
 The backend opt-in is `--windows-console-experiment` with explicit Windows target,

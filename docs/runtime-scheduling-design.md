@@ -454,3 +454,9 @@ qualifies the existing synchronous normal-thread path only. Inline page probes a
 fresh system bounds do not supply suspendable frames, activation-owned roots or
 native unwind/SEH metadata; those remain prerequisites for any stackful scheduling
 experiment. See [execution evidence](windows-generated-stack-validation.json).
+
+The Windows synchronous console project path now also runs managed array/text and
+binary-I/O consumers as standalone EXEs, with fault diagnostics and checked cleanup.
+It uses the same normal-thread host and status-return contracts; it does not turn
+thread-local roots into activation ownership or qualify stack migration. Keep those
+boundaries explicit when the next persistent-host/suspension experiment is selected.

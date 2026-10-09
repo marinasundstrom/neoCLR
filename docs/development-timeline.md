@@ -12823,6 +12823,13 @@ claim follows from these focused checks.
   source hashes match [the evidence](windows-generated-heap-validation.json).
   A canonical collector-kind mapping fixes MSVC's cross-enum assertion diagnostic.
   Project source compiles to Windows COFF locally; macOS project regression passes.
-- **Open:** standalone Windows project execution is pending. Default Object display
+  Subsequently [run 37958647006](https://github.com/marinasundstrom/neoCLR/actions/runs/37958647006)
+  at `a0b50a96` passes all five Raven project builds and standalone Windows EXEs,
+  with exact interpreter parity for managed arrays/text, interpolation, binary I/O
+  and guest faults. Each EXE imports only KERNEL32.dll. Existing-output preservation
+  and failed-rebuild/stale-output rejection pass. All 126 artifact hashes, 25 source
+  inputs, 32 pinned-bundle inputs and five project inputs are verified in the
+  [project evidence](windows-native-project-validation.json).
+- **Open:** Windows HTTP/non-console services, packaged native kits and general hosting. Default Object display
   with arrays exposes an existing backend restriction; the combined sample uses
   explicit Int32 formatting, and interpolation has a separate acceptance case.

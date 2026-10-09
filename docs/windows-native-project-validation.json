@@ -1,0 +1,561 @@
+{
+  "passed": true,
+  "scope": "Development Windows x64 synchronous native console project builds",
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "-C",
+        "D:\\a\\neoCLR\\neoCLR",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "--info"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--manifest-path",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\Cargo.toml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-console",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\managed project with spaces\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\debug\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\managed native output"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\managed native output\\app.dll",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.runtime.neox",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Web.dll",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Runtime.dll"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\managed executable only\\app.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-console",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\managed project with spaces\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\debug\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\managed native output"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-console",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\managed project with spaces\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\debug\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\failed rebuild"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-console",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\interpolation project with spaces\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\debug\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\interpolation native output"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\interpolation native output\\app.dll",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.runtime.neox",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Web.dll",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Runtime.dll"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\interpolation executable only\\app.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-console",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\input project with spaces\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\debug\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\input native output"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\input native output\\app.dll",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.runtime.neox",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Web.dll",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Runtime.dll"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\input executable only\\app.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-console",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\output project with spaces\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\debug\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\output native output"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\output native output\\app.dll",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.runtime.neox",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Web.dll",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Runtime.dll"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\output executable only\\app.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-console",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\fault project with spaces\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\debug\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\fault native output"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\fault native output\\app.dll",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.runtime.neox",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Web.dll",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Runtime.dll"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-validation\\fault executable only\\app.exe"
+      ],
+      "exitCode": 1
+    }
+  ],
+  "cases": [
+    {
+      "name": "managed",
+      "exitCode": 0,
+      "stdout": "Hello, Caf\u00e9 \ud83c\udf0d\nAnswer: 42\nh\u00e9\ud83d\ude00\u0000z\nreplacement\n",
+      "stderr": "",
+      "dependencies": [
+        "KERNEL32.dll"
+      ],
+      "standalone": true,
+      "interpreterParity": true
+    },
+    {
+      "name": "interpolation",
+      "exitCode": 0,
+      "stdout": "Value: 42\n42\nValue: 42\nValue: -2147483648\n-2147483648\nValue: -2147483648\nValue: 2147483647\n2147483647\nValue: 2147483647\nNull: \n",
+      "stderr": "",
+      "dependencies": [
+        "KERNEL32.dll"
+      ],
+      "standalone": true,
+      "interpreterParity": true
+    },
+    {
+      "name": "input",
+      "exitCode": 0,
+      "stdout": "1\n26\nClosed input\n",
+      "stderr": "",
+      "dependencies": [
+        "KERNEL32.dll"
+      ],
+      "standalone": true,
+      "interpreterParity": true
+    },
+    {
+      "name": "output",
+      "exitCode": 0,
+      "stdout": "A\u0000BClosed output\n",
+      "stderr": "B",
+      "dependencies": [
+        "KERNEL32.dll"
+      ],
+      "standalone": true,
+      "interpreterParity": true
+    },
+    {
+      "name": "fault",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "DivideByZero: Division by zero\n   at NeoMetadata_A7C2F16BB5152C82BC5319223B718606AAA1924225311B29F193428FEEF31A87.F_446976696465 [instruction 2]\n   at NeoMetadata_A7C2F16BB5152C82BC5319223B718606AAA1924225311B29F193428FEEF31A87.F_4D61696E [instruction 1]\n",
+      "dependencies": [
+        "KERNEL32.dll"
+      ],
+      "standalone": true,
+      "interpreterParity": true
+    }
+  ],
+  "revision": "a0b50a96db0d1d43fa81c860fcbbaca4dbde9736",
+  "bundle": {
+    "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/neoclr-preview13-win-x64.tar.gz",
+    "sha256": "ffcd3ec90d7ae9e0e7754ee276b16a18c2a087b4bb04acfc477b73913538d9cc",
+    "manifestSha256": "c2cdaec2aa4a13526cc8dfbf3ecf937a6eec9245584f3d9da6b06f8a763d4a50"
+  },
+  "dotnet": ".NET SDK:\r\n Version:           11.0.100-rc.1.26425.128\r\n Commit:            3551975be0\r\n Workload version:  11.0.100-manifests.a6e318ce\r\n MSBuild version:   18.11.0-1.26425.128+3551975be\r\n\r\nRuntime Environment:\r\n OS Name:     Windows\r\n OS Version:  10.0.20348\r\n OS Platform: Windows\r\n RID:         win-x64\r\n Base Path:   C:\\Program Files\\dotnet\\sdk\\11.0.100-rc.1.26425.128\r\n\r\n.NET workloads installed:\r\n [maui-windows]\r\n   Installation Source: VS 17.14.37710.0\r\n   Manifest Version:    11.0.0-preview.6.26360.8/11.0.100-preview.6\r\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.maui\\11.0.0-preview.6.26360.8\\WorkloadManifest.json\r\n   Install Type:        FileBased\r\n\r\n [maccatalyst]\r\n   Installation Source: VS 17.14.37710.0\r\n   Manifest Version:    26.5.11720-net11-p6/11.0.100-preview.6\r\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.maccatalyst\\26.5.11720-net11-p6\\WorkloadManifest.json\r\n   Install Type:        FileBased\r\n\r\n [ios]\r\n   Installation Source: VS 17.14.37710.0\r\n   Manifest Version:    26.5.11720-net11-p6/11.0.100-preview.6\r\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.ios\\26.5.11720-net11-p6\\WorkloadManifest.json\r\n   Install Type:        FileBased\r\n\r\n [android]\r\n   Installation Source: VS 17.14.37710.0\r\n   Manifest Version:    37.0.0-preview.6.59/11.0.100-preview.6\r\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-preview.6\\microsoft.net.sdk.android\\37.0.0-preview.6.59\\WorkloadManifest.json\r\n   Install Type:        FileBased\r\n\r\n [wasm-tools]\r\n   Installation Source: VS 17.14.37710.0\r\n   Manifest Version:    11.0.100-rc.1.26425.128/11.0.100-rc.1\r\n   Manifest Path:       C:\\Program Files\\dotnet\\sdk-manifests\\11.0.100-rc.1\\microsoft.net.workload.mono.toolchain.current\\11.0.100-rc.1.26425.128\\WorkloadManifest.json\r\n   Install Type:        FileBased\r\n\r\nConfigured to use workload sets when installing new manifests.\r\nNo workload sets are installed. Run \"dotnet workload restore\" to install a workload set.\r\n\r\nHost:\r\n  Version:      11.0.0-rc.1.26425.128\r\n  Architecture: x64\r\n  Commit:       3551975be0\r\n\r\n.NET SDKs installed:\r\n  8.0.131 [C:\\Program Files\\dotnet\\sdk]\r\n  8.0.206 [C:\\Program Files\\dotnet\\sdk]\r\n  8.0.319 [C:\\Program Files\\dotnet\\sdk]\r\n  8.0.425 [C:\\Program Files\\dotnet\\sdk]\r\n  9.0.121 [C:\\Program Files\\dotnet\\sdk]\r\n  9.0.205 [C:\\Program Files\\dotnet\\sdk]\r\n  9.0.318 [C:\\Program Files\\dotnet\\sdk]\r\n  10.0.112 [C:\\Program Files\\dotnet\\sdk]\r\n  10.0.204 [C:\\Program Files\\dotnet\\sdk]\r\n  10.0.303 [C:\\Program Files\\dotnet\\sdk]\r\n  10.0.401 [C:\\Program Files\\dotnet\\sdk]\r\n  11.0.100-rc.1.26425.128 [C:\\Program Files\\dotnet\\sdk]\r\n\r\n.NET runtimes installed:\r\n  Microsoft.AspNetCore.App 6.0.46 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 8.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 8.0.22 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 9.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 10.0.8 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 11.0.0-rc.1.26425.128 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.NETCore.App 6.0.46 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 8.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 8.0.22 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 9.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 10.0.8 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 11.0.0-rc.1.26425.128 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.WindowsDesktop.App 8.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n  Microsoft.WindowsDesktop.App 8.0.22 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n  Microsoft.WindowsDesktop.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n  Microsoft.WindowsDesktop.App 9.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n  Microsoft.WindowsDesktop.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n  Microsoft.WindowsDesktop.App 10.0.8 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n  Microsoft.WindowsDesktop.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n  Microsoft.WindowsDesktop.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n  Microsoft.WindowsDesktop.App 11.0.0-rc.1.26425.128 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n\r\nOther architectures found:\r\n  x86   [C:\\Program Files (x86)\\dotnet]\r\n    registered at [HKLM\\SOFTWARE\\dotnet\\Setup\\InstalledVersions\\x86\\InstallLocation]\r\n\r\nEnvironment variables:\r\n  DOTNET_MULTILEVEL_LOOKUP                 [0]\r\n  DOTNET_NOLOGO                            [1]\r\n  DOTNET_ROOT                              [C:\\Program Files\\dotnet]\r\n  DOTNET_SKIP_FIRST_TIME_EXPERIENCE        [1]\r\n\r\nglobal.json file:\r\n  Not found\r\n\r\nLearn more:\r\n  https://aka.ms/dotnet/info\r\n\r\nDownload .NET:\r\n  https://aka.ms/dotnet/download\r\n",
+  "aotSha256": "ebd828e7b077941d19d3dbe7655d5d473fdad6a68927ab45cb58efb689849c71",
+  "existingOutputPreserved": true,
+  "staleOutputRejected": true,
+  "files": {
+    "aot-build.stderr.log": "97faa56ced8a88937b2ae58597d49f5163470bd6a93c5e53391550fcb715ffb7",
+    "aot-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dotnet.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dotnet.stdout.log": "469fd84b84fcd02aebd891135bf5a55c2cfbb9a2baa542259a265928baf13140",
+    "existing-output-rejected.stderr.log": "3b925f4cf952b2fff9cb172dfe428fefbb7dbcd0b2e236dbc1a4f32686cd2dcf",
+    "existing-output-rejected.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "failed rebuild/build.json": "db25e42b4bf825fa1bba904c174a396efa70961102ee00e9f1956266a13d7f36",
+    "fault executable only/app.exe": "e33a0f7ca4f7b21fd5cd3e192e585d017950584c31d879ba5f13d7bf78220e44",
+    "fault native output/app.dll": "a3b079ce68b6aafa3449e081948d18ea1576baff11a35172c3b7e81b0cadb948",
+    "fault native output/app.exe": "e33a0f7ca4f7b21fd5cd3e192e585d017950584c31d879ba5f13d7bf78220e44",
+    "fault native output/app.obj": "a881570b5a10e4309dcc1008701a3595247eaaa7bf03b31b4f8c8809dc6497b4",
+    "fault native output/build.json": "697e4d20ef97304b1b0f1ee01ac8ef0bb9843ea9495b25a7484da1499667e98a",
+    "fault native output/console.obj": "bc9f691fcf2804cc8d3920a15a7c0419529645c330f88b477ccb34d4ef1b2a27",
+    "fault native output/native-gc.obj": "72c78c296bc9b0c76eb028840e68fd3c1d841de10b9ba527a23c941da9d38b9e",
+    "fault native output/render.obj": "3650e7ea1ab91b9f6d21cc17d693679d2518dde6cf7c78308be4379340a29a44",
+    "fault native output/root-probe.obj": "e88ade8cbfa824fd2dca1a783452f44c04301c82b3341add3745e33c2e72bf15",
+    "fault native output/text-arena.obj": "b8721e71f4ecf188a8ae01b2e36ec0990dfabe8c80a4d634c48136e053975542",
+    "fault native output/windows-console-host.obj": "0c3e14e6058a12eed67fd8756325925a8e99dabad5044bc2411528b72573f017",
+    "fault native output/windows-gc-host.obj": "47770d27eba028358c47a36151338c7dfa106a55be06af5ed60efbb8355ca512",
+    "fault native output/windows-host-memory.obj": "19e202bbc71ae3e869b16e7820698ea6301ce231aa1132d9eb459219836da9db",
+    "fault native output/windows-native-stack.obj": "b9f0f580f2442eef66dfbf7c413631c11960ec74ce15088a91bb4dbea3c5fe1d",
+    "fault project with spaces/App.rvnproj": "a8368de0353b61fa9401962cc85180a0c85f01abc12dd7c25149b661e110c8e4",
+    "fault project with spaces/bin/neoclr/WindowsNative.dll": "a3b079ce68b6aafa3449e081948d18ea1576baff11a35172c3b7e81b0cadb948",
+    "fault project with spaces/Main.rvn": "80ee5037095af10d6c5ea483622e57450e0f90c4ca5fdfd436dce8ed364fb63e",
+    "fault-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fault-build.stdout.log": "2c6d1792c4bc58bdc59fb5488f9284457ab86014bc9af98fdc80d088bf8cedc0",
+    "fault-interpreter.stderr.log": "bd8d691c98d1a48ace61b4a678803b81caeb81cfd889abd3499c9b3cf0db704c",
+    "fault-interpreter.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fault-native.stderr.log": "bd8d691c98d1a48ace61b4a678803b81caeb81cfd889abd3499c9b3cf0db704c",
+    "fault-native.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "input executable only/app.exe": "6c48b00b8bcc64c79d2fd12ec873453bf880f9c0d1a4f6c2945cbbb34a479dda",
+    "input native output/app.dll": "9a5ca092875345008bae3b50a388c39d64b4bbc9460bdf73299122fe02cba257",
+    "input native output/app.exe": "6c48b00b8bcc64c79d2fd12ec873453bf880f9c0d1a4f6c2945cbbb34a479dda",
+    "input native output/app.obj": "de531f3433416a3ca10c743a1c33df8c31a239889ddc6e7765dcd7cc7cd9be86",
+    "input native output/build.json": "9db002275e2c5a4d3f758e556d9a0c27ccd8234103a17785d161b82380c7e9cd",
+    "input native output/console.obj": "7a7e2ac80408c1122d4ff4485a2563198a6ff2b4a95fdeb381df096b852a0f06",
+    "input native output/native-gc.obj": "d99d7e157772d3605cd43683c7d60802f0d51794449c333db1a196230dd853b1",
+    "input native output/render.obj": "411651525fa134a97b80a4e1129aabdf9e939eb762e57f6ea03d797356d0479d",
+    "input native output/root-probe.obj": "9f3e929a73a669d5c9da6e570a56069e23a6401898c11774bdf8e710e2b765be",
+    "input native output/text-arena.obj": "a20fe03cab941deddd069a1bd92c3880dc98981f04dbca0035664e30908c4d70",
+    "input native output/windows-console-host.obj": "4f2e01edb65317858587f38a2a0fb7cf8d395b21cfe1775d747c561d79b787ce",
+    "input native output/windows-gc-host.obj": "d8f7593b11c83aa277614804b31f9d3a207ef1328c9cc3ee4b0094ed524a0f0f",
+    "input native output/windows-host-memory.obj": "3f5a36eeb75938d48398317cc8fa886eb889a717c0120abdd0edd10530ec6378",
+    "input native output/windows-native-stack.obj": "49dc4b55eb996d5f9f77a864dfc7364410acea25a224421e140ba47b895feff0",
+    "input project with spaces/App.rvnproj": "a8368de0353b61fa9401962cc85180a0c85f01abc12dd7c25149b661e110c8e4",
+    "input project with spaces/bin/neoclr/WindowsNative.dll": "9a5ca092875345008bae3b50a388c39d64b4bbc9460bdf73299122fe02cba257",
+    "input project with spaces/Main.rvn": "1256b5fa30e272aa083ca10f9e33f961f60390d03c5da7db98ccff378608edf5",
+    "input-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "input-build.stdout.log": "219cb0cb1faa682a855c0a1e386cf9a2a20cb1790a9d5b657bbdae864693f9e3",
+    "input-interpreter.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "input-interpreter.stdout.log": "dcfb2ac0d0d22900297ee6cc4d28d018acad544c7dc8ca765df22c466483f690",
+    "input-native.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "input-native.stdout.log": "dcfb2ac0d0d22900297ee6cc4d28d018acad544c7dc8ca765df22c466483f690",
+    "interpolation executable only/app.exe": "cc1cf1f701ec5a288c4f9e7dd653c44c6d542b24cda3fc29e3a464aeb2f12f1f",
+    "interpolation native output/app.dll": "14cdda862136ca4a3043122282b2382640e29f8edad418e0d9400cf6540e539f",
+    "interpolation native output/app.exe": "cc1cf1f701ec5a288c4f9e7dd653c44c6d542b24cda3fc29e3a464aeb2f12f1f",
+    "interpolation native output/app.obj": "bb3fc49aca6a5a40723a88c8da1391a31c0a73c0a288aacf1f51f42f341ac3bc",
+    "interpolation native output/build.json": "954c4e933e4c24fe2161c75d028c89669e33ffd945b9bf52b4b34312ed0c8d93",
+    "interpolation native output/console.obj": "28833f7094cf4fa2ea63bb566c19ed8ca541f9f0ce58264247ae418cc741ba05",
+    "interpolation native output/native-gc.obj": "1bd6b318d05d64e8f5a3d50afbed9db3e1a4704c8e3253a412077719d841c524",
+    "interpolation native output/render.obj": "ce11417cb8392d17dbb43d3dfababa8e011d44e92340dd990e4d29d901109e11",
+    "interpolation native output/root-probe.obj": "1d6650a671f71c9265643f29883a2b17e1e9cf3b0145660da0cc5c6c15398131",
+    "interpolation native output/text-arena.obj": "7f0fcca1919d8a9bcfc75efca604ad7d482118f8468ce33695ae17582a395990",
+    "interpolation native output/windows-console-host.obj": "20717434d934524643c5795c7c4dd92bd8d497180d54459279e5290dec87e035",
+    "interpolation native output/windows-gc-host.obj": "858a14da74fd9d849057db29965bb1a4aa21f0e45389081d2fc05e02003dd7a3",
+    "interpolation native output/windows-host-memory.obj": "15dfb185f1ae1ae575e78c9f60fed6264563eb4a1621164d57dc2879e49366d9",
+    "interpolation native output/windows-native-stack.obj": "c60669256a1ce50df8135b042b77bc5131e39552c0228aef04a193069b62197b",
+    "interpolation project with spaces/App.rvnproj": "a8368de0353b61fa9401962cc85180a0c85f01abc12dd7c25149b661e110c8e4",
+    "interpolation project with spaces/bin/neoclr/WindowsNative.dll": "14cdda862136ca4a3043122282b2382640e29f8edad418e0d9400cf6540e539f",
+    "interpolation project with spaces/Main.rvn": "e18ee6e528c651f2003eac9dafa5172e0ad6cc424a83b84995509d7e3cc412f2",
+    "interpolation-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "interpolation-build.stdout.log": "efeddf31e2a35d1a2de1a3c5cca3e389a18f38433b66556023bb3c1b65688a44",
+    "interpolation-interpreter.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "interpolation-interpreter.stdout.log": "3d43c5b7546623be274327217cc7c77452a1f40b0890f5a0dba1f9aad748f306",
+    "interpolation-native.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "interpolation-native.stdout.log": "3d43c5b7546623be274327217cc7c77452a1f40b0890f5a0dba1f9aad748f306",
+    "managed executable only/app.exe": "67bdaeac625f9ba52118c80e9d7a5ff151c5165d5c0eee1da0a845474d460a2b",
+    "managed native output/app.dll": "151003d521786a34f553e2c0d55c51ad9de17bc4d3d0f19ce9629665a4e8c350",
+    "managed native output/app.exe": "67bdaeac625f9ba52118c80e9d7a5ff151c5165d5c0eee1da0a845474d460a2b",
+    "managed native output/app.obj": "004aa4a6809b7de527a19b4a272a2d2e0e6f3f2ce4555a47f50dfcdf540c5ee6",
+    "managed native output/build.json": "c6c5fbb12095a3f6877170883dd7158fcaeaf431fa4f9e02305303f63844b936",
+    "managed native output/console.obj": "bcad99bfb0189ac9ecdd64e1096cbca261a58ace8e078d15c5861202666d95e4",
+    "managed native output/native-gc.obj": "2b35a810252b6fd5afe6b586f9955ed88ee122bce3ee44c8f4be82d7218b7a43",
+    "managed native output/render.obj": "9a7dd3ae20f663b5926bda48179078e98369af0701beaa6f3085136bb4a5879f",
+    "managed native output/root-probe.obj": "58f84235216a9454eab7cd37d4e6e66495eb2682552d3673bc260cba05414b17",
+    "managed native output/text-arena.obj": "2d7e6929a925f6d2cbb9fd2f9e2350308ae24d4a1baf71799180d87a30311483",
+    "managed native output/windows-console-host.obj": "544277b05d2f751bf018f2407306c99c08f7b42e749f4fdbd1e221a462a24d74",
+    "managed native output/windows-gc-host.obj": "c42714c47f178557196c63979f9ebba63904b31bc090f29c37be87cbbfce6d22",
+    "managed native output/windows-host-memory.obj": "c563386ff9a512cc6b845bc5046152f96843bd2ac30840e3a85ee6a296e98888",
+    "managed native output/windows-native-stack.obj": "e1f59449b1e01dcf926017a0dbf2da90138a6a319853cb26f809820fe06a0967",
+    "managed project with spaces/App.rvnproj": "a8368de0353b61fa9401962cc85180a0c85f01abc12dd7c25149b661e110c8e4",
+    "managed project with spaces/bin/neoclr/WindowsNative.dll": "151003d521786a34f553e2c0d55c51ad9de17bc4d3d0f19ce9629665a4e8c350",
+    "managed project with spaces/Main.rvn": "36b6e34a7a8ed7ae1d69b33def903830ce86899e9709a30da7ec1b333f1d2876",
+    "managed-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "managed-build.stdout.log": "88023d19a1070b5afd4a67d26246ede1d8a57404bae2a78aa9d809e118a1e824",
+    "managed-interpreter.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "managed-interpreter.stdout.log": "58e51f0ff7adef8d9f0d7d2663bff3aef600fd876dcf3f6591454c843ad572f1",
+    "managed-native.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "managed-native.stdout.log": "58e51f0ff7adef8d9f0d7d2663bff3aef600fd876dcf3f6591454c843ad572f1",
+    "output executable only/app.exe": "4149feabef9fef24b541ec9c9832d80808be455f41858110cc7b3f02fdf0f540",
+    "output native output/app.dll": "0b5ab5b55ab5ae61135507c446943fc3a11262459afb9b5fe1adfbbca753d986",
+    "output native output/app.exe": "4149feabef9fef24b541ec9c9832d80808be455f41858110cc7b3f02fdf0f540",
+    "output native output/app.obj": "e24bbec6c31f7d7286d12a94f229c935c329e3d64f64cc41b3c1ae1608de860b",
+    "output native output/build.json": "59d278f2ebaeb75ba3685581b0bd0e48a133399df835d7e5a814662bb14c9701",
+    "output native output/console.obj": "8ed6abc2780594b4c811cde78f2003b5c88787453cb4e8119cc283bd2ecdd551",
+    "output native output/native-gc.obj": "0e17b4d5006ab0a01fc648fac874478a029f5e35451705f2e9bd972c4cf498b8",
+    "output native output/render.obj": "0ca758a51ff2ace50a24be398becd81577dd57151a7e1321e84f2a8e49c6e07c",
+    "output native output/root-probe.obj": "6ed935fbdda20871ac1efb265eef3ec4e807c5fc5825ce96018f0260fac085e9",
+    "output native output/text-arena.obj": "6c242688e7b4174ca9797c1549a8849b0d021a00394258a2c74799aa32cbfa66",
+    "output native output/windows-console-host.obj": "18502e38e323fc4e7055cc765e0e0e45adfb089391210df9696ec9c3ab56503d",
+    "output native output/windows-gc-host.obj": "10eaa3a797a75f88494af0ef457605b1ef42f46cfaec53e3fe0295bd26fa465c",
+    "output native output/windows-host-memory.obj": "ee75a51dd89993fec06ebd557694f426bf7369551aef49ae0f1daa47a492713c",
+    "output native output/windows-native-stack.obj": "7aab28f37f542af5b29925fa1ae001bbd7c5d7455b6db1f60338b231fcee75b0",
+    "output project with spaces/App.rvnproj": "a8368de0353b61fa9401962cc85180a0c85f01abc12dd7c25149b661e110c8e4",
+    "output project with spaces/bin/neoclr/WindowsNative.dll": "0b5ab5b55ab5ae61135507c446943fc3a11262459afb9b5fe1adfbbca753d986",
+    "output project with spaces/Main.rvn": "f2dde50cd5f2355a0493ecdae2b7af1dbc9178f2549836d43bd115118f0808a9",
+    "output-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "output-build.stdout.log": "fec5b4f80ae0c1997c029073ecfb92acd4d34342b017ce3410089a6024f58631",
+    "output-interpreter.stderr.log": "df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c",
+    "output-interpreter.stdout.log": "535a89e430f3b62970e2008937e2f04c4f6854abea37cbe67737d8f79d55cc25",
+    "output-native.stderr.log": "df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c",
+    "output-native.stdout.log": "535a89e430f3b62970e2008937e2f04c4f6854abea37cbe67737d8f79d55cc25",
+    "revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "revision.stdout.log": "d9ad1a4c39314c79b500619a2c85d80eec6ef22d689805f6a20bb9965f38b0fd",
+    "stale-output-rejected.stderr.log": "1bc83ae94fcfc2b22a9193f84b1f5c0eeb13ae3f55f243f65caa31daae04c6fb",
+    "stale-output-rejected.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "date": "2026-10-09",
+  "githubRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/37958647006",
+  "artifact": "windows-native-project-37958647006-1",
+  "downloadedFileHashesVerified": true,
+  "verification": {
+    "artifactFiles": 126,
+    "sourceInputsAgainstGitWithCheckoutLineEndings": {
+      "scripts/build-native-project.py": "cff084ae09358a690b29cc1ba887bfc15af73c3c87054e4e94370751b5d3c79c",
+      "tools/native/windows-console-host.c": "f7ee93d514781db8ca3029f005e491c3e7c1e2cd16329dc652c67610786f3f11",
+      "tools/native/windows-gc-host.c": "1af29df8568c25d43fc95c24be354e7486b09901878b5b99cb6e8b2d190ef03a",
+      "tools/native/windows-host-memory.c": "774114602ce99ea6d2f69d613cb7b5c26f6d3f2af5fc91edebcb70c51db1d59d",
+      "tools/native/windows-native-stack.c": "ae24c1a05235ec25e3df672d548d5b4ae75811ede0fbb7988efbbc859bbb9b84",
+      "docs/experiments/aot-console/root-probe.c": "53c89bf572e362623da7bac7241c19744aa79b3310f951c520b570e448bc5a67",
+      "docs/experiments/aot-console/native-gc.c": "a3d1690a5a38f2c116a106760f30db79badd3a4f86198d61501a05a250fdc5d4",
+      "docs/experiments/aot-console/text-arena.c": "ead9f336a394e3dfdb82d9916d29a2f4e4cbc1db8cc5ebfc53cc75050917374e",
+      "docs/experiments/aot-console/console.c": "4e66906f7ab938c2ea9e5b2d8d171c9ffe07da07f7ec5d588f596d1cd22e6678",
+      "docs/experiments/aot-fault-details/render.c": "a64b1bc44da5095e70d5a30c8e58af6305a14df3e270741a11334e1d9de8850e",
+      "docs/experiments/aot-console/console.h": "9a0669bebeb7e94e7e284cfa670327394c9d47bfe1c6b0a3482ae5b2a01b13d3",
+      "docs/experiments/aot-console/file-input.h": "1d9417f18a7b6437aabdd19a5d1274b4b9d9a365ca88a71d6255140d31780753",
+      "docs/experiments/aot-console/file-output.h": "fdd1420cdf244d11046883d67b11c221e905d328c266b27cd37ac95c35704e8f",
+      "docs/experiments/aot-console/native-gc.h": "791d698ec40abaaf6a199e90e4e4c9299c666c5d9d40f6375320ca9ccb75bcc6",
+      "docs/experiments/aot-console/native-stack.h": "49849a834d7599685a8880bcdcda0505ce0465175eb7b38d841c660731d7610f",
+      "docs/experiments/aot-console/root-probe.h": "f9b59905e5167081517a1c142294df7485a619aec1332fced0ee25c2043b0698",
+      "docs/experiments/aot-console/socket-listener.h": "e4ac0756f27b5875ebd141d76e6f12c2f5ec46a891ea73987226de5b09b835bd",
+      "docs/experiments/aot-console/string-unicode.h": "99c078e3aacbb1de67b5253314ee53d65d5c2970de7677a9f7b01c98a72ef801",
+      "docs/experiments/aot-console/task-queue.h": "e24e3209b496681302069ddd11725dff6255e05a1d4ba367c3dbe739f091828b",
+      "docs/experiments/aot-console/text-arena.h": "03e670e1cb6885096f1999dd5947f26088f45873f3a1ffa3bfeb2775c0560404",
+      "docs/experiments/aot-scalar/abi.h": "1f197432f88cdfc0df8652444ec6e06b5b677d513c3a3dd12f6b50dd25ee4512",
+      "docs/experiments/aot-scalar/console.h": "0cda9317577bacf03f2658bd9cee6bfb5b83b03f00e39bca11bc42f012a36393",
+      "docs/experiments/aot-fault-details/fault-details.h": "bb717fcf0645ee35682d6a05ec555c8824426f25bf0745c4368b34eb2964a6cb",
+      "tools/native/windows-gc-host.h": "f9e0d59e9b4811e6ea7f0f5fe5d13824d1e16c14f5c0532dbbe1357a75f8987e",
+      "tools/native/windows-host-memory.h": "370ec5f2a8d73db08144c70aa51fb8fe3704b038fd3b9dbb0b26630826c5f6c9"
+    },
+    "bundleInputsAgainstPinnedDownloadedArchive": {
+      "lib/bundle.json": "3ad7347c77520f17d454e91331d909628b3cb63d4dc6090c3c210f797d266958",
+      "lib/System.Runtime.dll": "b6e56be4e8908d3d530b9c1ed79ad1bb6089127f5c7f5f514c464944b293da5e",
+      "lib/System.Data.dll": "8251b72579c759a894dbce3b00804d66d606b2f7670264891951ded2d6b4c1be",
+      "lib/System.Networking.dll": "2e8db5178993e16ac3f46af077f6b3dd402178a910a64f14b4ac85de0f467840",
+      "lib/System.Web.dll": "43b6799439b9bde7a97af226637db3219f1a160a5edb6e077cbb0b1598c21832",
+      "lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+      "lib/NeoCLR.ClassLibrary.props": "3cd2d52dfff595e759cbde6a5c2801e23795f790d7dd90b62f6a9d97e4fe0c11",
+      "lib/Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f",
+      "lib/ownership.json": "c5410dc4a208513219e02f7c895fd8e2a4912bb9a718e5f66dda007e6ba85ef9",
+      "sdk/tools/rvnc/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+      "sdk/tools/rvnc/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+      "sdk/tools/rvnc/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+      "sdk/tools/rvnc/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+      "sdk/tools/rvnc/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+      "sdk/tools/rvnc/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+      "sdk/tools/rvnc/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+      "sdk/tools/rvnc/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+      "sdk/tools/rvnc/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+      "sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "0f18156ebcc7b1fef3b2cf45feecc0945d64e1121ae6809974afa33aff52b7af",
+      "sdk/tools/rvnc/Raven.CodeAnalysis.Console.dll": "7e1f88357cae15c987104a9ce1a18e90eee9025d45e584d753aaecc0dcb3fe09",
+      "sdk/tools/rvnc/Raven.CodeAnalysis.dll": "a41d381370cffdf18d03aed5d96152c8060a288f7a573339eefa3fabc66e50aa",
+      "sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "50fa147bc7d0c28491cfa191444ecdfb8e5ad644e8aab6331d782cc18bee36f1",
+      "sdk/tools/rvnc/Raven.Core.dll": "9a661999845c8940fad5ed5eaaa2bdb00de1032b4f544ae754e7dd1066d7ffcf",
+      "sdk/tools/rvnc/RavenDoc.dll": "fcc25ecd1736c05fada020a40737a54ed3b0accdc6e77b0814ca56dea8ec663f",
+      "sdk/tools/rvnc/rvnc.dll": "1e4697ee8febf7b997c05ceff081de2a3675273e2ec214f2430efc9679b26edb",
+      "sdk/tools/rvnc/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+      "sdk/tools/rvnc/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+      "sdk/tools/rvnc/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+      "sdk/tools/rvnc/RavenDoc.deps.json": "55692e59dead5358e32dc7b44924a4578bd194f8b56fe00481530cb568ab3a24",
+      "sdk/tools/rvnc/RavenDoc.runtimeconfig.json": "7ed127d518025dc407a379eb73f23a389adcbbc780fde71314303e0ca1df615b",
+      "sdk/tools/rvnc/rvnc.deps.json": "60d5666dd3d7b82bfafd9ab71314b6f85838600cd4e89a6d67b47e1a1c8c495b",
+      "sdk/tools/rvnc/rvnc.runtimeconfig.json": "7ed127d518025dc407a379eb73f23a389adcbbc780fde71314303e0ca1df615b"
+    },
+    "projectInputsAgainstRetainedArtifacts": {
+      "managed project with spaces/App.rvnproj": "a8368de0353b61fa9401962cc85180a0c85f01abc12dd7c25149b661e110c8e4",
+      "interpolation project with spaces/App.rvnproj": "a8368de0353b61fa9401962cc85180a0c85f01abc12dd7c25149b661e110c8e4",
+      "input project with spaces/App.rvnproj": "a8368de0353b61fa9401962cc85180a0c85f01abc12dd7c25149b661e110c8e4",
+      "output project with spaces/App.rvnproj": "a8368de0353b61fa9401962cc85180a0c85f01abc12dd7c25149b661e110c8e4",
+      "fault project with spaces/App.rvnproj": "a8368de0353b61fa9401962cc85180a0c85f01abc12dd7c25149b661e110c8e4"
+    },
+    "backendHashesConsistentAcrossBuildReports": 5
+  },
+  "executableBytes": {
+    "managed": 216064,
+    "interpolation": 217088,
+    "input": 381952,
+    "output": 331776,
+    "fault": 167424
+  }
+}

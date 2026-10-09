@@ -470,7 +470,15 @@ now also passes Windows execution: inline page probes, final-frame bounds,
 small-stack rejection, recursive diagnostic return, complete frame cleanup and
 successful host reuse. [Evidence](windows-generated-stack-validation.json) records
 run `37956371244` at `29670d3b`, with 49 artifact and 37 source hashes verified.
-Heap-allocating guest lowering and native unwind qualification remain open.
+The [generated array-heap gate](windows-generated-heap-validation.json) then passes
+408 allocations in a 2 KiB heap with retained caller locals/callee arguments,
+bounds/exhaustion fault cleanup and complete reclamation. The
+[Windows console project gate](windows-native-project-validation.json) now also
+passes five ordinary Raven project builds and standalone EXEs with exact interpreter
+parity: managed arrays/text, interpolation, binary input/output and guest faults.
+Only KERNEL32.dll is imported. Existing-output and failed-rebuild protections pass;
+all 126 artifact hashes are verified. Windows non-console services, packaged native
+kits and native unwind qualification remain open.
 
 ## Shared native contracts to establish
 

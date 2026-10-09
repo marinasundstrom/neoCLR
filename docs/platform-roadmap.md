@@ -88,9 +88,7 @@ Windows workflow. [Heap evidence](windows-host-memory-validation.json) passes 12
 allocation/release lifecycles and both guard boundaries. The
 [Windows collector consumer](windows-collector-validation.json) now retains rooted
 graphs, hands roots to published frames, reclaims cycles, rejects premature/foreign
-teardown and passes exhaustion/cleanup plus existing collector contracts. Next
-qualify generated-code stack probing, frame bounds and managed lowering against
-this working host. The [Windows host stack gate](windows-stack-validation.json)
+teardown and passes exhaustion/cleanup plus existing collector contracts. The [Windows host stack gate](windows-stack-validation.json)
 now rejects 128 KiB admission before allocation, rejects fibers and safely returns
 from deep calls on 512 KiB/1 MiB stacks with collection and GC-frame cleanup.
 The [generated integer-stack gate](windows-generated-stack-validation.json) now
@@ -100,8 +98,13 @@ The [generated array-heap gate](windows-generated-heap-validation.json) now pass
 live local/argument retention, allocation churn, bounds/exhaustion faults, complete
 reclamation and reuse. The author then explicitly directs continuing until Windows
 native compilation works. A development Windows console project profile now builds
-ordinary Raven projects through the guarded host; its standalone execution gate is
-pending. Windows packaged project kits and non-console services remain unsupported. Full
+ordinary Raven projects through the guarded host. Its
+[Windows project gate](windows-native-project-validation.json) passes five fresh
+builds and standalone EXEs with exact interpreter parity for managed arrays/text,
+interpolation, binary I/O and guest fault diagnostics. It also preserves existing
+outputs and rejects stale output after a failed rebuild. This completes a usable
+Windows synchronous console build path. Windows packaged project kits and
+non-console services remain unsupported. Full
 bootstrap, general hosting and reload remain open.
 
 **Preview 13 published (2026-10-09):** after Raven's shared website publication,

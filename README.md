@@ -50,6 +50,13 @@ collections, Tasks, JSON and HTTP samples. Install and verify using the
 from native metadata. The primitive core and retained runtime seed remain explicit
 bootstrap inputs; the full System library is not yet independently bootstrapped.
 
+Development native compilation now builds ordinary Raven projects into standalone
+**Windows x64 console EXEs** and macOS ARM64 executables. The Windows console gate
+passes managed arrays/text, binary I/O, fault parity and executable-only deployment.
+See [native project build instructions](docs/native-poc-bundle.md#windows-x64-console-source-checkout)
+and [Windows execution evidence](docs/windows-native-project-validation.json).
+These are source-checkout development workflows, separate from Preview 13 packaging.
+
 The following Preview 11 instructions describe the older bridge distribution.
 
 Preview 11 demonstrates typed JSON HTTP client/server applications over TCP,

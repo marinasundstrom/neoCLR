@@ -76,14 +76,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   faults, full reclamation and context reuse. Verify 60 artifact and 40 source hashes.
   Reuse canonical collector kind constants in the text/array adapter, avoiding
   MSVC's cross-enum static-assert warning without disabling warnings.
-  General managed services and kits remain unsupported.
+  These remain private probes; the project integration below adds the console profile.
 
 - Add an explicit development `windows-console` profile to the project build command:
   Raven project compilation, guarded GC/stack host, x64 COFF/MSVC linking, static CRT,
   byte-preserving standard I/O and standalone dependency checks. Add a source sample
   and dedicated Windows project Action with interpreter parity, standalone deployment,
-  existing-output protection and stale-build rejection. Windows execution is pending;
-  local COFF compilation, profile rejection and macOS project regression pass.
+  existing-output protection and stale-build rejection. Windows run `37958647006`
+  at `a0b50a96` passes all five projects: managed arrays/text, interpolation, binary
+  input/output and divide-by-zero diagnostics, with exact interpreter parity and
+  executable-only deployment. All EXEs import only KERNEL32.dll; verify all 126
+  artifact hashes, 25 source inputs, 32 pinned-bundle inputs and five project inputs.
+  Local COFF compilation, profile rejection and macOS project regression pass.
   Keep HTTP, file/path, scheduler and extended text services outside this profile;
   packaged development kits still advertise only their macOS profiles.
 

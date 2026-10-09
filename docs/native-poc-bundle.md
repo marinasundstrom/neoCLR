@@ -4,7 +4,8 @@
 
 ### Windows x64 console (source checkout)
 
-Development profile; Windows execution qualification is pending. Use a Windows x64
+Development profile, [qualified on Windows Server 2022 x64](windows-native-project-validation.json).
+Use a Windows x64
 **Developer PowerShell / x64 Native Tools prompt** with MSVC C tools, Rust/Cargo,
 Python 3.12 and the .NET SDK required by the selected Raven bundle. The pinned
 Preview 13 Windows bundle uses .NET 11 RC1 `11.0.100-rc.1.26425.128`; project evaluation
@@ -29,7 +30,16 @@ output directory must be new. `build.json` retains commands, diagnostics, input
 hashes and dependencies. Failed compilation/linking never publishes `app.exe`;
 an existing destination is preserved. Copy only `app.exe` to deploy: the intended
 runtime dependency is Windows' `KERNEL32.dll`, with no .NET, Raven bundle or helper
-DLL needed beside it. The dedicated Action checks executable-only deployment.
+DLL needed beside it. [Run 37958647006](https://github.com/marinasundstrom/neoCLR/actions/runs/37958647006)
+at `a0b50a96db0d1d43fa81c860fcbbaca4dbde9736` passes five fresh project builds and
+standalone executions: managed arrays/text, interpolation, binary input/output and
+a divide-by-zero fault. All match interpreter stdout/stderr and exit status exactly.
+The EXEs range from 167,424 to 381,952 bytes in this recorded static-CRT build
+(the managed sample is 216,064 bytes); this is artifact size, not a performance claim.
+Existing-output preservation and failed-rebuild/stale-output rejection also pass.
+All 126 retained artifact hashes, 25 source inputs, 32 pinned-bundle inputs and five
+project inputs are verified; the backend hash is consistent across all five build
+reports. See the [retained evidence](windows-native-project-validation.json).
 
 The synchronous profile includes the existing bounded value/reference lowering,
 native GC, stack guards, console input/output, UTF-8 text and Int32 formatting.

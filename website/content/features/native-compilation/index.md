@@ -3,8 +3,8 @@ title: Native compilation
 ---
 # Native compilation
 
-neoCLR's experimental ahead-of-time (AOT) compiler produces standalone ARM64 executables
-for a supported subset of Raven applications. The interpreter remains available;
+neoCLR's experimental ahead-of-time (AOT) compiler produces standalone executables
+on macOS ARM64 and Windows x64 for a supported subset of Raven applications. The interpreter remains available;
 interpreter API support does not automatically imply native support.
 
 ## From Raven to an executable
@@ -12,7 +12,8 @@ interpreter API support does not automatically imply native support.
 Raven source is compiled to neoCLR metadata and instructions, then lowered to native
 object code and linked with the required library and runtime support. Tested macOS
 executables use the OS's libSystem and need no separately installed neoCLR or .NET
-runtime to run. The compiler toolchain has its own requirements.
+runtime to run. Tested Windows console EXEs use a static CRT and import only
+KERNEL32.dll. The compiler toolchain has its own requirements.
 
 AOT moves compilation work to build time and produces an architecture-specific binary.
 Memory management, text, I/O and fault handling still require runtime implementations
@@ -27,6 +28,14 @@ still requires the compiler's .NET SDKs and Apple's macOS tools; the resulting
 executable needs only the OS libraries. The kit is not included in Preview 13. See the
 [development build instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md#development-project-to-executable-workflow-2026-10-09)
 for the supported console profile and prerequisites.
+
+A separate Windows x64 source-checkout workflow now compiles ordinary Raven projects
+and links standalone console EXEs with MSVC. Its Windows Action passes managed
+arrays/text, interpolation, binary input/output and fault diagnostics with exact
+interpreter parity. Each EXE runs without the SDK or bundle beside it. See the
+[Windows build instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md#windows-x64-console-source-checkout).
+This development profile is separate from Preview 13; a packaged Windows native
+build kit and Windows HTTP/services remain future work.
 
 The development kit also offers an explicit `--profile http` project build for the
 existing one-request HTTP sample. It links the bounded socket/task host and native
@@ -72,23 +81,13 @@ library and runtime artifacts; this is not a general publishing workflow for all
 
 ## Current limitations
 
-- **Platform:** console/HTTP project-kit qualification is on macOS ARM64. Native Windows path
-  behavior and broader platform support remain open.
-  A separate development Windows x64 scalar/literal-console profile now passes
-  MSVC linking and native/interpreter comparisons, including standalone Hello World
-  from both retained metadata and freshly compiled Raven source on Windows, through
-  PE/#Neo and NEOX. Fresh-source coverage also passes calls, branches, empty/repeated
-  loops and byte-exact UTF-8/NUL output. Scalar comparison results retain typed
-  Boolean stack checks; this remains the primitive/console bootstrap. Windows managed services and
-  packaged native project kits remain unsupported. An independent Windows guarded-heap
-  host passes allocation, guard-boundary and release tests. Its collector consumer
-  also passes root retention, reclamation, thread isolation and guarded teardown.
-  Host admission now rejects undersized stacks and fibers; deep-call checks
-  return safely with GC-frame cleanup. An explicit integer-only generated-stack
-  experiment now passes Windows execution with page probing, frame bounds,
-  diagnostic fault return and host reuse. Generated array roots now survive
-  allocation churn and fault cleanup. A source-checkout Windows console project
-  profile is in development, with standalone execution qualification pending.
+- **Platform:** macOS ARM64 has console/HTTP project workflows and a development kit.
+  Windows x64 has a qualified source-checkout console project workflow with a
+  guarded heap, generated stack protection, live-root retention and fault cleanup.
+  The Windows gate checks standalone execution, UTF-8/NUL and binary input/output,
+  interpreter parity and rejected stale builds. Windows HTTP, file/path services,
+  packaged native build kits and broader hosting remain open. Fibers and stack
+  migration are not admitted by the current normal-thread host contract.
 - **Code and APIs:** broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.
 - **Async:** async entry points waiting for host I/O are unsupported; selected
