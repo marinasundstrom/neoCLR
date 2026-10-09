@@ -5,11 +5,14 @@
 #ifdef NEOCLR_NATIVE_GC
 #include "native-gc.h"
 #endif
-enum { TEXT_STORAGE = 1, OBJECT_STORAGE = 2, BYTES_STORAGE = 3, STRINGS_STORAGE = 4, RECORDS_STORAGE = 5 };
 #ifdef NEOCLR_NATIVE_GC
-_Static_assert((int)TEXT_STORAGE == (int)NEOCLR_GC_TEXT && (int)OBJECT_STORAGE == (int)NEOCLR_GC_OBJECT &&
-               (int)BYTES_STORAGE == (int)NEOCLR_GC_BYTES && (int)STRINGS_STORAGE == (int)NEOCLR_GC_STRINGS && (int)RECORDS_STORAGE == (int)NEOCLR_GC_RECORDS,
-               "allocation kind contract");
+/* Use the collector's canonical kind constants directly. MSVC diagnoses even
+ * explicitly cast cross-enum comparisons in C static assertions (C5287). */
+enum { TEXT_STORAGE = NEOCLR_GC_TEXT, OBJECT_STORAGE = NEOCLR_GC_OBJECT,
+       BYTES_STORAGE = NEOCLR_GC_BYTES, STRINGS_STORAGE = NEOCLR_GC_STRINGS,
+       RECORDS_STORAGE = NEOCLR_GC_RECORDS };
+#else
+enum { TEXT_STORAGE = 1, OBJECT_STORAGE = 2, BYTES_STORAGE = 3, STRINGS_STORAGE = 4, RECORDS_STORAGE = 5 };
 #endif
 static int32_t reserve_storage(neoclr_aot_text_arena *arena, uint64_t bytes,
                                uint32_t kind, void **output) {

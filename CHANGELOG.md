@@ -72,6 +72,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add a separately gated Windows Int32-array heap experiment with generated
   local/argument roots, allocation churn, bounds/exhaustion faults and host reuse.
   Extend Windows CI with a 2 KiB heap consumer; execution qualification is pending.
+  Reuse canonical collector kind constants in the text/array adapter, avoiding
+  MSVC's cross-enum static-assert warning without disabling warnings.
   General managed services and kits remain unsupported.
 
 - Add a development macOS ARM64 project-to-executable console command using the
