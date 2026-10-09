@@ -5086,7 +5086,7 @@ ret
         let result = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena"]);
         if matching {
             assert!(!result.status.success() && !dir.0.join("app.o").exists());
-            assert!(String::from_utf8_lossy(&result.stderr).contains("record boxing requires Int32 or a local closed empty value record"));
+            assert!(String::from_utf8_lossy(&result.stderr).contains("record boxing requires Int32, Boolean or a local closed empty value record"));
             continue;
         }
         assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
@@ -5533,6 +5533,42 @@ ret
                 assert_eq!(native.status.code(), Some(1));
                 assert_eq!(String::from_utf8_lossy(&native.stderr), "RuntimeError: unknown type shape query\n   at Calculate [instruction 2]\n", "{name}/{selector}");
             }
+        }
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_primitive_boxes_preserve_values_identity_and_checked_faults() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/primitive-boxes.neoil");
+    let app = neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &seed).unwrap().remove(0);
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    let dir = Temp::new();
+    let result = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena", "--native-gc"]);
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    let result = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds"])
+        .arg(base.join("aot-console/text-host.c")).arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-console/native-gc.c")).arg(base.join("aot-console/root-probe.c"))
+        .arg(base.join("aot-fault-details/render.c")).arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    for mode in 0..6 {
+        let interpreted = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default());
+        let native = Command::new(dir.0.join("host")).arg(mode.to_string()).output().unwrap();
+        assert!(native.stdout.is_empty());
+        if mode < 3 {
+            assert_eq!(interpreted.unwrap().value, neoclr::Value::Int32(42));
+            assert_eq!(native.status.code(), Some(42), "{mode}: {native:?}");
+            assert!(native.stderr.is_empty());
+        } else {
+            let error = interpreted.unwrap_err();
+            assert_eq!(native.status.code(), Some(1));
+            let code = if mode == 4 { "NullReference" } else { "InvalidCast" };
+            let diagnostic = String::from_utf8_lossy(&native.stderr);
+            assert!(diagnostic.starts_with(&format!("{code}: {}\n   at Calculate [instruction ", error.message)), "{mode}: {diagnostic}");
+            assert_eq!(diagnostic.lines().count(), 2);
         }
     }
 }

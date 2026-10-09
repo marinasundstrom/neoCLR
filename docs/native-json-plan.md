@@ -244,13 +244,32 @@ property discovery, invocation and native JSON remain unqualified. This implemen
 the existing neoCLR reflection contract; the earlier .NET/retention comparison and
 provisional dispatch-size tradeoff remain applicable.
 
+## Primitive object values — 2026-10-09
+
+Native Boolean boxes now have a distinct tag and immutable scalar snapshot, alongside
+Int32 boxes. Exact `isinst` preserves the original reference on a match and returns
+null otherwise. `unbox.any` checks null and exact primitive identity before loading
+the scalar payload; it preserves NullReference/InvalidCast, interpreter messages and
+caller fault frames. String/reference unboxing follows existing reference casts.
+The private native fault protocol adds InvalidCast code 11 without changing context
+layout. Boxed Boolean Object.ToString remains explicitly unadmitted.
+
+The portable primitive-box consumer checks false/true, Int32.MinValue, identity,
+wrong primitive and String boxes, null unboxing, GC cleanup after success/fault,
+root-frame balance and buffer canaries. The interpreter/native regression and the
+existing Int32 display/snapshot/limit regression pass on macOS. The unchanged JSON
+probe now advances to the native interface-array admission gap required by metadata
+collections. This is existing CLR-style exact boxed-value behavior, not a new public
+API or a claimed improvement over .NET; the existing reflection comparison applies.
+
 ## Evidence
 
 The original typed probe rejects native specialization with
 `specialization requires closed reference-free local value types: RuntimeTypeHandle`.
 The type-token slice removes that rejection; subsequent native admission still rejects
-Boolean boxing in `ObjectMapper.ReadValue` at instruction 110. Further metadata
-service and reflection dispatch gaps remain.
+Boolean boxing in `ObjectMapper.ReadValue` at instruction 110. The subsequent
+primitive-box slice removes that rejection; the next probe rejects interface-valued
+arrays. Further metadata service and reflection dispatch gaps remain.
 
 `type-tokens.neoil` checks primitive identity, distinct nominal types, distinct closed
 generic shapes and a handle stored in a generic class. The Rust regression compares

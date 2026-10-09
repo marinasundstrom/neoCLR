@@ -46,6 +46,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Qualify portable shape checks on macOS/Windows in action `37981420430` and
   preserve a Raven NominalTypeInfo probe whose name/nominal queries run natively
   with interpreter parity on macOS. Full reflection/JSON remain unfinished.
+  Add Boolean box snapshots and exact Int32/Boolean box tests/unboxing with null,
+  type, fault-frame and GC cleanup checks. Add private native InvalidCast status 11.
+  Preserve reference unboxing through existing casts; Boolean box display remains
+  explicitly unadmitted. JSON admission now reaches interface-valued arrays.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

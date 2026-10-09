@@ -68,7 +68,8 @@ for primitive/closed nominal token producers are implemented. A standalone nativ
 consumer executes descriptor queries with interpreter parity. A build-time
 source metadata catalogue now preserves
 selected nominal declarations and closed property signatures through specialization
-without rooting accessor bodies. Explicit metadata retention, runtime tables, checked
+without rooting accessor bodies. Primitive boxing/unboxing now advances the JSON
+probe to interface-array admission. Explicit metadata retention, runtime tables, checked
 accessor/constructor dispatch and complete native JSON execution remain unfinished.
 Once parity works, the author selects JSON serialization/deserialization as an
 interpreter-versus-native benchmark case; see the protocol in the native JSON plan.

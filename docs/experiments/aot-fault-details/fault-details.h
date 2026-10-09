@@ -12,6 +12,7 @@
 #define NEOCLR_AOT_FAULT_RUNTIME_ERROR 3
 #define NEOCLR_AOT_FAULT_USER_FAULT 4
 #define NEOCLR_AOT_FAULT_STACK_OVERFLOW 9
+#define NEOCLR_AOT_FAULT_INVALID_CAST 11
 /* MSVC reports C4200 for this C flexible array even in /std:c11 mode.
  * Preserve the length-plus-bytes ABI; suppress only this declaration. */
 #ifdef _MSC_VER

@@ -1,0 +1,83 @@
+.module PrimitiveBoxes
+.type class abstract System.Object
+.end
+.function Calculate(Int32 mode) -> Int32
+.local System.Object value
+ldarg mode
+ldc.i4 3
+ceq
+brtrue Wrong
+ldarg mode
+ldc.i4 4
+ceq
+brtrue Null
+ldarg mode
+ldc.i4 5
+ceq
+brtrue Text
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Integer
+ldarg mode
+ldc.i4 1
+ceq
+box Boolean
+stloc value
+ldloc value
+isinst Int32
+ref.isnull
+brfalse Failed
+ldloc value
+isinst Boolean
+ref.isnull
+brtrue Failed
+ldloc value
+isinst Boolean
+ldloc value
+ref.eq
+brfalse Failed
+ldloc value
+unbox.any Boolean
+ldarg mode
+ldc.i4 1
+ceq
+ceq
+brfalse Failed
+ldc.i4 42
+ret
+Integer:
+ldc.i4 -2147483648
+box Int32
+stloc value
+ldloc value
+isinst Boolean
+ref.isnull
+brfalse Failed
+ldloc value
+unbox.any Int32
+ldc.i4 -2147483648
+ceq
+brfalse Failed
+ldc.i4 42
+ret
+Wrong:
+ldc.bool true
+box Boolean
+unbox.any Int32
+ret
+Null:
+ldloca value
+initobj System.Object
+ldloc value
+unbox.any Int32
+ret
+Text:
+ldstr "hello"
+box String
+unbox.any Int32
+ret
+Failed:
+ldc.i4 -1
+ret
+.end

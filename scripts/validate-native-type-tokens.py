@@ -18,10 +18,11 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--runtime-equality', action='store_true', help='Exercise the TypeEquals runtime service instead of direct token equality')
     parser.add_argument('--descriptor-queries', action='store_true', help='Exercise semantic names and generic arity')
+    parser.add_argument('--primitive-boxes', action='store_true', help='Exercise scalar box identity and checked unboxing')
     args = parser.parse_args()
     aot, out = args.aot.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    report = dict(passed=False, platform=platform.platform(), machine=platform.machine(), commands=[], runtimeEquality=args.runtime_equality, descriptorQueries=args.descriptor_queries)
+    report = dict(passed=False, platform=platform.platform(), machine=platform.machine(), commands=[], runtimeEquality=args.runtime_equality, descriptorQueries=args.descriptor_queries, primitiveBoxes=args.primitive_boxes)
     def run(command, name):
         r = subprocess.run(list(map(str, command)), cwd=out, capture_output=True, timeout=120)
         (out / (name + '.stdout')).write_bytes(r.stdout)
@@ -42,6 +43,9 @@ def main():
         if args.descriptor_queries:
             sources[0] = base / 'type-descriptors-test.c'
             inputs += [sources[0], base / 'type-descriptors.neoil']
+        if args.primitive_boxes:
+            sources[0] = base / 'primitive-boxes-test.c'
+            inputs += [sources[0], base / 'primitive-boxes.neoil']
         if windows:
             sources += [ROOT / 'tools/native/windows-native-stack.c']
             inputs += [sources[-1]]
@@ -57,6 +61,8 @@ def main():
         if args.descriptor_queries:
             with seed.open('a') as f:
                 f.write('.type System.Int32\n.end\n.function neoCLR.Runtime.TypeName(RuntimeTypeHandle) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgumentCount(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32) -> Boolean\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String) -> Void\n.methodimpl InternalCall\n.end\n')
+        if args.primitive_boxes:
+            seed.write_text('.module System\n.references ()\n')
         source = base / 'type-tokens.neoil'
         if args.runtime_equality:
             source = out / 'type-equality.neoil'
@@ -64,6 +70,8 @@ def main():
         helper.write_text('.module Helpers\n.references ()\n')
         if args.descriptor_queries:
             source = base / 'type-descriptors.neoil'
+        if args.primitive_boxes:
+            source = base / 'primitive-boxes.neoil'
         obj = out / ('guest.obj' if windows else 'guest.o')
         flags = ['--compile-system', '--reference-arena', '--native-gc']
         if args.descriptor_queries:
@@ -76,6 +84,8 @@ def main():
         run([*cc, *sources, obj, *link], 'host-build')
         r = run([exe], 'execute')
         expected = (b'System.Int32\nAccount\nModel\nModel\n' if args.descriptor_queries else b'') + b'Type tokens: 42\n'
+        if args.primitive_boxes:
+            expected = b'Primitive boxes: 42\n'
         if r.stdout.replace(b'\r\n', b'\n') != expected or r.stderr:
             raise ValueError('Unexpected token identity result')
         if sha(aot) != report['aotSha256'] or any(sha(ROOT / n) != h for n, h in report['inputs'].items()):

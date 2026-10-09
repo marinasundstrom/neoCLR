@@ -84,6 +84,8 @@ pub struct Options {
     pub native_integer_to64: Vec<usize>,
     pub reference_arena: bool,
     pub descriptor_queries: Vec<usize>,
+    pub scalar_box_queries: HashMap<usize, (Option<usize>, bool)>,
+    pub boolean_boxes: HashMap<usize, usize>,
     pub int32_boxes: HashMap<usize, usize>,
     pub boxed_int32_display: bool,
     pub empty_record_boxes: HashMap<usize, usize>,
@@ -120,6 +122,10 @@ impl Options {
             descriptor_queries: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| matches!(r["implementation"].as_str(), Some("type-name-closed-v1" | "type-argument-count-closed-v1" | "type-shape-closed-v1")))
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            scalar_box_queries: report.and_then(|r| r["scalarBoxQueries"].as_array()).into_iter().flatten()
+                .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, (r["typeCompiledIndex"].as_u64().map(|v| v as usize), r["unbox"].as_bool()?)))).collect(),
+            boolean_boxes: report.and_then(|r| r["booleanBoxes"].as_array()).into_iter().flatten()
+                .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),
             int32_boxes: report.and_then(|r| r["int32Boxes"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),
             empty_record_boxes: report.and_then(|r| r["emptyRecordBoxes"].as_array()).into_iter().flatten()

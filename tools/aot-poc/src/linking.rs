@@ -604,6 +604,7 @@ pub fn prepare(
     report["sealedMemberProjections"] = json!(sealed_members.iter().map(|i| json!({"compiledIndex":i,
         "policy":"verified sealed owner or inherited display with one loaded implementation; retain callvirt null checks and ordinary body"})).collect::<Vec<_>>());
     super::boxing::project(&mut selected, &mut report)?;
+    super::boxing::project_scalar_queries(&mut selected, &mut report)?;
     super::boxing::project_char_tests(&mut selected, &mut report)?;
     let boxed_display = report["int32Boxes"].as_array().is_some_and(|r| !r.is_empty())
         && report["objectDisplayDispatch"].as_array().is_some_and(|r| !r.is_empty());
@@ -611,6 +612,10 @@ pub fn prepare(
         return Err("boxed Int32 display requires --bind-int32-to-string".into());
     }
     report["boxedInt32Display"] = json!(boxed_display);
+    if report["booleanBoxes"].as_array().is_some_and(|r| !r.is_empty())
+        && report["objectDisplayDispatch"].as_array().is_some_and(|r| !r.is_empty()) {
+        return Err("boxed Boolean display is not yet admitted".into());
+    }
     let system_type_names: std::collections::BTreeSet<_> = neoclr::library::system()
         .map_err(|e| e.to_string())?.types.iter().map(|t| t.name.as_str()).collect();
     let mut static_projections = vec![];

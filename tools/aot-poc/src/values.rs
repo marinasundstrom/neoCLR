@@ -600,11 +600,57 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     emit_stack_check(&mut module, &mut b, stack_check, diagnostic_data.as_ref(), fault_context.unwrap(), i, false);
                 }
             }
-            if let Some(&record) = details.and_then(|d| d.empty_record_boxes.get(&i).or_else(|| d.int32_boxes.get(&i))) {
+            if let Some(&(tag_index, unbox)) = details.and_then(|d| d.scalar_box_queries.get(&i)) {
+                let receiver = parameters[0];
+                let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
+                if unbox {
+                    let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                    site.capture_frame = false;
+                    let status = b.ins().iconst(types::I32, 6);
+                    return_if_detailed(&mut b, null, status, Some(&site));
+                }
+                let read_tag = b.create_block();
+                let matched = b.create_block();
+                let absent = b.create_block();
+                let bits = b.ins().band_imm(receiver, 1);
+                let text = b.ins().icmp_imm(IntCC::NotEqual, bits, 0);
+                let invalid = b.ins().bor(null, text);
+                b.ins().brif(invalid, absent, &[], read_tag, &[]);
+                b.switch_to_block(read_tag);
+                let tag = b.ins().load(types::I64, MemFlags::new(), receiver, 0);
+                let valid = if let Some(index) = tag_index { matches_type(&mut b, &p, tag, index) }
+                    else { b.ins().iconst(types::I8, 0) };
+                b.ins().brif(valid, matched, &[], absent, &[]);
+                b.switch_to_block(matched);
+                let value = if unbox { b.ins().load(types::I32, MemFlags::new(), receiver, 8) } else { receiver };
+                write(&mut b, output, &[value]);
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().return_(&[zero]);
+                b.switch_to_block(absent);
+                if unbox {
+                    let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 1);
+                    site.capture_frame = false;
+                    let status = b.ins().iconst(types::I32, 11);
+                    site.record(&mut b, status);
+                    b.ins().return_(&[status]);
+                } else {
+                    let pointer = b.ins().iconst(types::I64, 0);
+                    write(&mut b, output, &[pointer]);
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                }
+                b.seal_all_blocks(); b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                continue;
+            }
+            if let Some(&record) = details.and_then(|d| d.empty_record_boxes.get(&i).or_else(|| d.int32_boxes.get(&i)).or_else(|| d.boolean_boxes.get(&i))) {
                 let service = module.declare_func_in_func(object_service.unwrap(), b.func);
                 let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                 let tag = b.ins().iconst(types::I32, record as i64);
-                let primitive = details.unwrap().int32_boxes.contains_key(&i);
+                let primitive = details.unwrap().int32_boxes.contains_key(&i) || details.unwrap().boolean_boxes.contains_key(&i);
                 let bytes = b.ins().iconst(types::I32, if primitive { 16 } else { 8 });
                 let call = b.ins().call(service, &[arena, tag, bytes, output]);
                 let raw = b.inst_results(call)[0];

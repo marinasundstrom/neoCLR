@@ -14,7 +14,8 @@ int neoclr_aot_render_fault(FILE *stream, const neoclr_aot_fault *fault) {
                            fault->code == 7 ? "ArrayLimitExceeded" :
                            fault->code == 8 ? "IndexOutOfRange" :
                            fault->code == 9 ? "StackOverflow" :
-                           fault->code == 10 ? "InternPoolLimitExceeded" : "UnknownFault";
+                           fault->code == 10 ? "InternPoolLimitExceeded" :
+                           fault->code == 11 ? "InvalidCast" : "UnknownFault";
     fprintf(stream, "%s: ", category);
     text(stream, fault->message);
     fputc('\n', stream);
