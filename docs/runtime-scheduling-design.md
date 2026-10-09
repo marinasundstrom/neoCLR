@@ -431,3 +431,9 @@ packages the existing host unchanged. Its request and callback-fault checks vali
 today's scope cleanup and diagnostic behavior, not suspended activations. Queue
 draining/readiness dispatch, pthread stack guards and thread-local roots remain
 the explicit replacement boundaries for the co-evolving scheduler work.
+
+The [Windows native host prerequisites](windows-native-host.md) separate the heap
+owner from OS thread identity. The private allocation probe has no TLS state, but
+release still requires all activations, callbacks and roots to be gone; the raw
+allocator does not enforce that precondition. Collector integration must establish
+that ownership before suspension can retain the heap across host returns.

@@ -80,7 +80,8 @@ library and runtime artifacts; this is not a general publishing workflow for all
   PE/#Neo and NEOX. Fresh-source coverage also passes calls, branches, empty/repeated
   loops and byte-exact UTF-8/NUL output. Scalar comparison results retain typed
   Boolean stack checks; this remains the primitive/console bootstrap. Windows managed services and
-  native project kits remain unsupported.
+  native project kits remain unsupported. An independent guarded-heap host probe
+  is in development; it does not enable managed Windows execution.
 - **Code and APIs:** broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.
 - **Async:** async entry points waiting for host I/O are unsupported; selected

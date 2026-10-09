@@ -41,6 +41,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Windows run `37951030197` at `d7ae97ab` passes seven tests without skips,
   including six standalone executions and 32 scalar comparisons; all 113
   downloaded artifact hashes are verified.
+  Define Windows managed-host allocation, stack and suspension ownership
+  prerequisites. Add a private bounded VirtualAlloc heap with reserved guard
+  pages and a focused MSVC lifecycle/guard workflow; execution is pending.
+  Managed Windows code generation and project kits remain unsupported.
 
 - Add a development macOS ARM64 project-to-executable console command using the
   selected bundle's Raven project build, existing AOT backend and explicit native
