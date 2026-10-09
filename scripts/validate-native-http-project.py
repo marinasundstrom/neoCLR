@@ -30,10 +30,10 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def rebuild_libraries(run, bundle, output):
-    # Preview 13 supplies the pinned compiler and primitive bootstrap. Public
-    # development APIs come from this checkout, not the published library payload.
+    # Preview 13 supplies the primitive bootstrap. Build the exact development
+    # compiler required by positional map pairs, then this checkout’s libraries.
     run([sys.executable, ROOT / 'scripts/prepare-native-development-bundle.py', '--bundle', bundle,
-         '--output', output, '--compiler-revision', '71cafd353'], 'development-libraries')
+         '--output', output, '--build-compiler', '--compiler-revision', 'd5fadf968feaea2c1073255ef5cb04f997fc5604'], 'development-libraries')
     return output / 'bundle'
 
 def serve(command, request, fragmented, cwd, env=None):

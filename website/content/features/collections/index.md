@@ -160,7 +160,12 @@ uses an explicit equality comparer. These concrete types are unsynchronized and
 iterate shallow snapshots; queue/stack snapshots follow removal order and set order
 is unspecified. Count followed by another operation is not an atomic transaction.
 
-The public consumer passes native macOS and interpreted execution. Windows
-qualification and future concurrent implementations remain separate work. The
-requested iterable Map with a deconstructable record-struct pair is still in progress.
+Queue, Stack and Set pass native macOS, Windows x64 and interpreted checks.
+Development `Map<K,V>` also implements `Iterable<KeyValuePair<K,V>>`. Each pair has
+read-only `Key` and `Value` properties and supports `let (key, value) = pair`.
+HashMap iteration captures a shallow snapshot in unspecified order. Pair iteration
+passes native macOS and interpreted checks; Windows pair qualification is separate.
+The native pair supports construction, copying and deconstruction; full record
+equality, hashing, formatting and init-only updates remain unsupported.
+Future concurrent implementations remain separate work.
 See the type and member contracts in the [API reference](/docs/).

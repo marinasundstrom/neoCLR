@@ -1,0 +1,61 @@
+{
+  "workflowRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/37999664216",
+  "revision": "a5378b4402d4af369cfb6144165310ef8a1a8878",
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "reportSha256": "dc940f5ea3ab0e8711b4cd671469ac1106871551287e8a4ab29b6e15e43c82f2",
+  "verifiedDownloadedFiles": 1481,
+  "verifiedSourceInputs": 7,
+  "cases": [
+    {
+      "name": "collections",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\collections executable only\\app.exe"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\collections native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "scope": "Queue/Stack/Set public library consumer; predates iterable Map. Newly built interpreter/AOT binaries outside artifact were stability-checked in CI, not locally rehashed.",
+  "buildArtifacts": {
+    "app.dll": "b62cd475871911cc2d570e27b40dd26076be1d8097d8d2f8259654672faa77ae",
+    "app.obj": "77a058a012f8e12c6bd0df89e0e636f16602a7df342355aa41929e1f602ca5e1",
+    "app.exe": "01019021e182235a9ca22235095aab250a6e969f5021acda75ee732d72f2da9c"
+  },
+  "dependencies": [
+    "KERNEL32.dll"
+  ],
+  "isolatedExecutableMatchesBuild": true
+}

@@ -1,0 +1,4 @@
+record class Pair(val Value: int)
+class Program {
+    static func Main() -> int => 0
+}

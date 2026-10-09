@@ -35,6 +35,19 @@ public class HashMap<K, V> : MutableMap<K, V> {
     val Count: int => keys.Count
     val Keys: Sequence<K> => keys.Copy()
 
+    /// <summary>Returns a shallow snapshot of key/value pairs in unspecified order.</summary>
+    func GetIterator() -> Iterator<KeyValuePair<K, V>> {
+        Enter()
+        let pairs = ArrayList<KeyValuePair<K, V>>(keys.Count)
+        var index = 0
+        while index < keys.Count {
+            pairs.Add(KeyValuePair<K, V>(keys[index], values[index]))
+            index = index + 1
+        }
+        Leave()
+        return pairs.GetIterator()
+    }
+
     private func Enter() {
         if busy {
             System.Fail("HashMap callbacks must not reenter the map")

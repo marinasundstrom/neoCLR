@@ -13166,3 +13166,20 @@ claim follows from these focused checks.
   NEOMETA001. Preserve the requested value-pair contract while addressing compiler
   declaration/synthesized-member support. No iterable Map or concurrent collection
   completion is claimed. Windows collections qualification is pending.
+
+### 2026-10-10 — Map pairs and the collection implementation boundary
+
+- Author: “Map should support Iterable<KeyValuePair> where KeyValuePair is a struct
+  record that can be deconstructed”; continue to a basic collection library and
+  consider future concurrent versions. The follow-up “Could you implement it?”
+  reinforces implementation rather than stopping at design.
+- Assistant action: Queue/Stack/Set committed; Windows x64 action passed and its
+  downloaded artifacts/source hashes were checked. Added Map pair iteration and
+  direct shallow pair snapshots, plus native positional-record lowering in Raven.
+- Assistant decision: keep concurrency guarantees on concrete future types; existing
+  implementations are unsynchronized. Keep pair construction/copy/getters/deconstruction
+  distinct from full native record equality/hash/display/init support, which remains
+  open. This bounded adapter decision is not an author approval of permanent limits.
+- Evidence: [collection contracts](collection-contracts.md),
+  [executable consumer](experiments/native-collections/),
+  [Windows Queue/Stack/Set report](experiments/native-collections/windows-validation.json).

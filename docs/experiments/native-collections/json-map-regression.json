@@ -1,0 +1,132 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "name": "json",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/native-json-map-regression/json executable only/app"
+          ],
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/release/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/native-json-map-regression/json native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--manifest-path",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/Cargo.toml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--bin",
+        "neoclr"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "console",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-json-map-regression/json project with spaces/Native.rvnproj",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/native-json-map-regression/json project with spaces/reflection-roots.json",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle",
+        "--aot",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/native-json-map-regression/json native output"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "revision": "a5378b4402d4af369cfb6144165310ef8a1a8878",
+  "inputs": {
+    "scripts/validate-native-json.py": "fc1e74e797227593aade3911c9b15a044b64958fa81e3845665775f1579b4961",
+    "scripts/build-native-project.py": "782379cfbeaaa706c0921c0dea02061d23f9e31c735be004bd78031a7267359a",
+    "scripts/validate-native-http-project.py": "f84ec7a22cbaf2f6269ff6e8b7eff52b0283ed73b6f1c17eae30341c2afab8ab",
+    "scripts/validate-windows-project.py": "9ea2ab50b5d6bb88c96ace264d742249da42210f91aae2c6e877bb1d72a58959",
+    "scripts/prepare-native-development-bundle.py": "5822d135ba2d2b60ccbd4c7a9eb6ac8b61d1d348f69401f876d2ffd18130193b",
+    "docs/experiments/native-json/Main.rvn": "3afe13db7bf226a1d34ba2348d4b9d75b2d3d1ec5d339abffe8c78e848513f00",
+    "docs/experiments/native-json/Native.rvnproj": "0850f3b745334e38184a1bcb685f854693fe861780c1d9561c8b61054bd24681",
+    "docs/experiments/native-json/reflection-roots.json": "a4625cf1de5683cd08aa45561ff98b5bb876155b397518af521f3854d7674c3a"
+  },
+  "bundleManifestSha256": "2e4fdda009681a2f42717dbb6ebd9b648e2a63d5d8ebd8339bf0a2001daefb23",
+  "aotSha256": "4ac5d0a2d88fec541ae6f4cc06881383a4e5683e9545f9ee957c8e87c63a2ee7",
+  "interpreterSha256": "16060f22b9caaef312c754bb571ba705ccd3092c4620b84d95c95b822351777d",
+  "files": {
+    "aot-build.stderr.log": "ee1d3fffa2022e962e63e0dbe4d35c9c198450a20c29fc09030f635dbb38bfcd",
+    "aot-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "interpreter-build.stderr.log": "9576f1f7e73fc2bb1ec2336aae60cb485c591eadc60a1b998573411c34057e08",
+    "interpreter-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "json executable only/app": "c8c5691e7a1c4a2854238fb8f5860637590ac5ba86f5709e99846d7ba075474d",
+    "json native output/app": "c8c5691e7a1c4a2854238fb8f5860637590ac5ba86f5709e99846d7ba075474d",
+    "json native output/app.dll": "46a6be0c5967174133cb2249287dd7bdf843a13ada91d3c0c53b9e1d4a298cee",
+    "json native output/app.o": "de786c130e87b4bddd62e00d3a337de87e7b70049ce941a189f4091526ef0e46",
+    "json native output/build.json": "aa704109d43d46dad777441d4f208345a2f642565dfd1e5d64fae6aa359927e9",
+    "json project with spaces/Main.rvn": "3afe13db7bf226a1d34ba2348d4b9d75b2d3d1ec5d339abffe8c78e848513f00",
+    "json project with spaces/Native.rvnproj": "0850f3b745334e38184a1bcb685f854693fe861780c1d9561c8b61054bd24681",
+    "json project with spaces/bin/neoclr/NativeJson.dll": "46a6be0c5967174133cb2249287dd7bdf843a13ada91d3c0c53b9e1d4a298cee",
+    "json project with spaces/reflection-roots.json": "a4625cf1de5683cd08aa45561ff98b5bb876155b397518af521f3854d7674c3a",
+    "json-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "json-build.stdout.log": "e8df31f178a3b05ff0cff58d5b9c3b47891e64ba6910ac7c2ae38677ff73e9ea",
+    "json-interpreter.json": "54a4ed4616b7119e3c248cc8a769ded1ac77560f0540676ef0d6e76c061e4fcf",
+    "json-native.json": "e68f883495cd1edaca08629698c33ba5230805132608ee3f0263541f00b864a6",
+    "revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "revision.stdout.log": "6b4581a81fb2f876d7214b33e9535bc0f61470dd89a216acc2ae329188056608"
+  },
+  "evidenceNote": "Focused JSON collection regression with iterable Map and the exact d5fadf968feaea2c1073255ef5cb04f997fc5604 compiler development bundle; tested working tree atop reported neoCLR revision."
+}

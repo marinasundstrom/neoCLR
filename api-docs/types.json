@@ -30,6 +30,7 @@
   "System.Collections.HashSet`1",
   "System.Collections.Iterable`1",
   "System.Collections.Iterator`1",
+  "System.Collections.KeyValuePair`2",
   "System.Collections.List`1",
   "System.Collections.Map`2",
   "System.Collections.MutableMap`2",

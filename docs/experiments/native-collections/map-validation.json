@@ -1,0 +1,169 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "name": "collections",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/native-map-pairs-final2/collections executable only/app"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/release/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/native-map-pairs-final2/collections native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--manifest-path",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/Cargo.toml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--bin",
+        "neoclr"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "console",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-map-pairs-final2/collections project with spaces/Native.rvnproj",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/map-pairs-pinned/bundle",
+        "--aot",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/native-map-pairs-final2/collections native output"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "revision": "a5378b4402d4af369cfb6144165310ef8a1a8878",
+  "inputs": {
+    "scripts/validate-native-collections.py": "d4d2671424078084a0359bf7c8f5f78c0fe10ac4ecd8ed274e701a5e51c0681b",
+    "scripts/build-native-project.py": "782379cfbeaaa706c0921c0dea02061d23f9e31c735be004bd78031a7267359a",
+    "scripts/validate-native-http-project.py": "f84ec7a22cbaf2f6269ff6e8b7eff52b0283ed73b6f1c17eae30341c2afab8ab",
+    "scripts/validate-windows-project.py": "9ea2ab50b5d6bb88c96ace264d742249da42210f91aae2c6e877bb1d72a58959",
+    "scripts/prepare-native-development-bundle.py": "5822d135ba2d2b60ccbd4c7a9eb6ac8b61d1d348f69401f876d2ffd18130193b",
+    "docs/experiments/native-collections/Main.rvn": "59f7a256692afdfefd6799fb26672645edb1a1f9320f4603c55e6fc3365a1e32",
+    "docs/experiments/native-collections/Native.rvnproj": "bf0967a9a414a5334ee5edea71d1ffddca4c46e25154c13b05b19c65ed4fac1d",
+    "docs/experiments/map-pairs/rejections/generated-equality.rvn": "617c8707017cb6fac465242253110e1f5aaafbef165fb71b5735dadad23d35a5",
+    "docs/experiments/map-pairs/rejections/imported-update.rvn": "ce8d66abca0508688225e1dcf7d0345ab558cf8dad575ff0c7c4be2d0a590a03",
+    "docs/experiments/map-pairs/rejections/mutable-component.rvn": "920431efacbe7bca768b1dbff97a89805b6ae5caee52c20936240b0513a6a9e0",
+    "docs/experiments/map-pairs/rejections/record-class.rvn": "71b0599bed035e7be182a0c55562640af79eaa84d785bcde493c33ad32035605"
+  },
+  "bundleManifestSha256": "2e4fdda009681a2f42717dbb6ebd9b648e2a63d5d8ebd8339bf0a2001daefb23",
+  "aotSha256": "4ac5d0a2d88fec541ae6f4cc06881383a4e5683e9545f9ee957c8e87c63a2ee7",
+  "interpreterSha256": "16060f22b9caaef312c754bb571ba705ccd3092c4620b84d95c95b822351777d",
+  "rejections": [
+    {
+      "name": "generated-equality",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support unregistered dependency: NativeCollections for struct Pair.func Equals(other: Pair) -> bool.\n"
+    },
+    {
+      "name": "imported-update",
+      "exitCode": 1,
+      "diagnostic": "error RAV0200: 'Key' is read-only and cannot be assigned to.\n"
+    },
+    {
+      "name": "mutable-component",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support constructor-initialized positional val components.\n"
+    },
+    {
+      "name": "record-class",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support positional record structs without additional members.\n"
+    }
+  ],
+  "files": {
+    "aot-build.stderr.log": "4cf86278c1e6d659943a46a3d7e3da429ac15be90f0f17742e24ef85228e7d3e",
+    "aot-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collections executable only/app": "c1cf7f50ba66b685c20d0464ccbbd7079ad1951b08ad33521793e856594fc369",
+    "collections native output/app": "c1cf7f50ba66b685c20d0464ccbbd7079ad1951b08ad33521793e856594fc369",
+    "collections native output/app.dll": "8ca3dce7a508c36bb448dca6f36e48ca234c22ac1d0b1c7ef23c80588f051ba8",
+    "collections native output/app.o": "85a54397b5d5dd8626b516264c2f4ccf7b755d79efe6da14832dfb00bfcd129e",
+    "collections native output/build.json": "ea6421c759e63be5a3f4626fe4219f32d4e319a409f51736eae942278f17a62f",
+    "collections project with spaces/Main.rvn": "59f7a256692afdfefd6799fb26672645edb1a1f9320f4603c55e6fc3365a1e32",
+    "collections project with spaces/Native.rvnproj": "bf0967a9a414a5334ee5edea71d1ffddca4c46e25154c13b05b19c65ed4fac1d",
+    "collections project with spaces/bin/neoclr/NativeCollections.dll": "8ca3dce7a508c36bb448dca6f36e48ca234c22ac1d0b1c7ef23c80588f051ba8",
+    "collections-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collections-build.stdout.log": "1d1ac2f0e9ec740d832a448842ea584310d02f14a20cc77768076f7d64afa96d",
+    "collections-interpreter.json": "340d394afba484b603e2ce9ef1fe9a013ac61ff95f3984eda02b4de7daac0329",
+    "collections-native.json": "db53c856d908451bf2a067a4de3aae7043ceb6436a9c56d0388f09ed0681cd90",
+    "interpreter-build.stderr.log": "9576f1f7e73fc2bb1ec2336aae60cb485c591eadc60a1b998573411c34057e08",
+    "interpreter-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reject-generated-equality/Main.rvn": "617c8707017cb6fac465242253110e1f5aaafbef165fb71b5735dadad23d35a5",
+    "reject-generated-equality/Native.rvnproj": "bf0967a9a414a5334ee5edea71d1ffddca4c46e25154c13b05b19c65ed4fac1d",
+    "reject-generated-equality/diagnostics.txt": "13369062ca60e62516fac8ec7d199ed56f892fa320cad14ad2ab2a8d6cb15e55",
+    "reject-imported-update/Main.rvn": "ce8d66abca0508688225e1dcf7d0345ab558cf8dad575ff0c7c4be2d0a590a03",
+    "reject-imported-update/Native.rvnproj": "bf0967a9a414a5334ee5edea71d1ffddca4c46e25154c13b05b19c65ed4fac1d",
+    "reject-imported-update/diagnostics.txt": "da302df6fe429dfa77fb8530d4318f2412de58331866b488883b141ab1ccd020",
+    "reject-mutable-component/Main.rvn": "920431efacbe7bca768b1dbff97a89805b6ae5caee52c20936240b0513a6a9e0",
+    "reject-mutable-component/Native.rvnproj": "bf0967a9a414a5334ee5edea71d1ffddca4c46e25154c13b05b19c65ed4fac1d",
+    "reject-mutable-component/diagnostics.txt": "ce264c66bef2b9329b3842ca4386e78f1b0ba0b7a9f1cf3fe827d6898577079b",
+    "reject-record-class/Main.rvn": "71b0599bed035e7be182a0c55562640af79eaa84d785bcde493c33ad32035605",
+    "reject-record-class/Native.rvnproj": "bf0967a9a414a5334ee5edea71d1ffddca4c46e25154c13b05b19c65ed4fac1d",
+    "reject-record-class/diagnostics.txt": "48f08a97dbdc5a69ec6cb904c8ba5b9384a684a51c50ee904f118810b5dffefe",
+    "revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "revision.stdout.log": "6b4581a81fb2f876d7214b33e9535bc0f61470dd89a216acc2ae329188056608"
+  },
+  "compilerRevision": "d5fadf968feaea2c1073255ef5cb04f997fc5604",
+  "compilerBranch": "codex/source-object-metadata-resolution",
+  "evidenceNote": "Validated working-tree Map slice on top of the reported neoCLR revision; source inputs and compiled artifacts are hashed in this report. Compiler was rebuilt from the exact remote commit, then source libraries were rebuilt.",
+  "preparationReportSha256": "00f57572c83310e5d9887e38bdd8d21d68f0e820b719199ea79fcd1b37ee3778"
+}

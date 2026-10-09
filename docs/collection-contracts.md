@@ -392,11 +392,32 @@ These points guide future design; no concurrent collection is implemented here.
 
 ### Iterable Map and value pairs
 
-The author explicitly requests Map<K,V> : Iterable<KeyValuePair<K,V>>, with
-KeyValuePair a deconstructable record struct. Preserve value storage and named
-Key/Value properties alongside deconstruction; no separate Keys snapshot should be
-needed to traverse pairs. The exact record declaration is retained in
-[the reduced consumer](experiments/map-pairs/raven/Main.rvn). The pinned native
-emitter rejects record declarations (NEOMETA001); implementation requires native
-record declaration/synthesized-member support, not a reference-class substitution.
-This requested Map contract remains active work, not a shipped feature of this slice.
+The author explicitly requests Map<K,V> : Iterable<KeyValuePair<K,V>>, with a
+record-struct pair. The development implementation now supplies KeyValuePair<K,V>
+with read-only Key/Value, value copying and Deconstruct, and makes Map iterable.
+HashMap captures pairs directly in a shallow snapshot, without a Keys snapshot or
+additional lookups/comparer calls. Later inserts/replacements do not alter captured
+pairs; referenced objects remain shared. Order is unspecified. This costs O(Count)
+time and storage and retains captured references. Snapshot creation is not atomic
+under concurrent mutation. Iterable itself makes no snapshot/concurrency promise.
+
+.NET 10's [KeyValuePair source](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Collections/Generic/KeyValuePair.cs)
+uses a readonly struct with named getters and an out-parameter Deconstruct method.
+That library API, rather than C# record synthesis, is the ergonomic baseline.
+[Rust HashMap iteration](https://doc.rust-lang.org/std/collections/struct.HashMap.html#method.iter)
+returns borrowed pairs; neoCLR's current model instead copies pair values and shares
+object references. Sources reviewed 2026-10-10. The earlier C5 and .NET interface
+feedback review above supports keeping iteration separate from mutation and scheduling.
+A live version-checked iterator avoids snapshot allocation but couples enumeration to
+mutation; snapshots were selected for predictable current behavior, not a performance
+claim. Future concurrent implementations must select and document their consistency.
+
+Raven's explicit native positional-record storage capability is bounded: constructors,
+copying, getters and simple deconstruction work; equality, hashing, display helpers and
+init accessors are not exported. Metadata currently carries a normal value type, not
+full record semantics. The .NET compiler target retains ordinary record behavior.
+This is a temporary development restriction, with native equality/hash/init metadata
+work still required. See the [integration contract](raven-cli-bridge.md#native-positional-record-storage--2026-10-10)
+and [passing consumer](experiments/native-collections/). Adding Iterable is a source
+compatibility change for custom Map implementations: they must implement GetIterator.
+Map removal/clear and advanced operations remain subsequent API work.

@@ -14,8 +14,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and native API snapshot. Native macOS/interpreter consumer and interpreter queue
   element-release checks pass; add a dedicated Windows action. Current implementations
   are unsynchronized; future concurrency guarantees remain implementation-specific.
-  Record requested iterable Map with deconstructable record-struct pairs; native
-  record emission remains a dependency and is not claimed complete.
+  Windows x64 Queue/Stack/Set action also passes; retain verified downloaded evidence.
+  Add Map pair iteration and deconstructable KeyValuePair value storage with shallow
+  HashMap snapshots. Custom Map implementations must now supply GetIterator. Native
+  positional records require the matching development compiler and omit equality,
+  hashing, formatting and init-only helpers; full record support remains open.
+  Native macOS/interpreter pair checks, four compiler rejection cases and the
+  focused JSON collection regression pass. Pin the shared Windows development-library
+  workflow to the exact Raven integration compiler revision and build it reproducibly
+  before rebuilding source libraries.
 
 - Add sets to the author-selected collection work and implement an application-local
   set prototype with read/mutation interfaces, explicit equality comparers, duplicate

@@ -120,10 +120,10 @@ author subsequently adds sets; see the [set review and prototype](experiments/se
 
 **Basic collection development:** Queue/ArrayQueue, Stack/ArrayStack and
 Set/MutableSet/HashSet now pass the [public native/interpreter consumer](experiments/native-collections/).
-Windows qualification is pending. The author directs continuing to a basic library
-set with future concurrent variants considered, and explicitly requests iterable
-Map with a deconstructable record-struct KeyValuePair. Native record support is the
-next dependency; see the [contracts and concurrency boundaries](collection-contracts.md#basic-library-slice-and-future-concurrency--2026-10-10).
+Queue/Stack/Set also pass the [Windows x64 action](experiments/native-collections/windows-validation.json).
+Map now supports iterable, deconstructable KeyValuePair values through a bounded native
+positional-record storage contract; full native record semantics remain open.
+Future concurrent variants retain implementation-specific atomicity/iteration contracts; see the [contracts and concurrency boundaries](collection-contracts.md#basic-library-slice-and-future-concurrency--2026-10-10).
 
 ### Follow-up review areas — author direction, 2026-10-10
 

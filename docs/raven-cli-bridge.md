@@ -7271,3 +7271,28 @@ unchanged. The bridge's exact static signature bindings and matching reference
 snapshot are updated together. This temporary projection belongs to neoCLR's bridge;
 native metadata/library consumers already read the real unit owner directly.
 See [semantics and focused validation](task-completion-factories.md).
+
+## Native positional record storage — 2026-10-10
+
+Raven's explicit PositionalRecordStorage target capability enables top-level positional
+record structs with val components for KeyValuePair transport. Native metadata stores
+an ordinary value type with primary/copy constructors, getters and Deconstruct;
+portable lowering evaluates a deconstruction receiver once and assigns simple bindings
+or discards. This does not change Runtime Contract configuration or ordinary .NET
+record emission. The CLI reference describes the same bounded value API; it does not
+encode full native record semantics.
+
+Restrictions: no record marker/init-only accessor encoding, generated equality,
+hashing or display helpers, mutable components, extra members or record classes.
+Unsupported source helper calls are rejected; imported properties are getter-only.
+These are temporary adapter limits, not language rules. Raven owns admission and
+lowering; neoCLR owns native metadata/value verification and copying. Replacement
+requires full native record metadata plus shared equality/hash/display contracts.
+The matching development compiler and rebuilt class libraries are required; the
+Preview 13 compiler rejects these source declarations. See Raven's
+`docs/compiler/neoclr-cli-bridge.md` and [map pair evidence](experiments/map-pairs/).
+
+Tested compiler: `d5fadf968feaea2c1073255ef5cb04f997fc5604` on Raven
+`codex/source-object-metadata-resolution` (not Raven main). The standalone
+instance-deconstruction lowering is a general integration candidate; native record
+admission depends on that line’s existing portable/native adapter.

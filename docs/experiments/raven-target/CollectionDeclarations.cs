@@ -64,7 +64,13 @@ static class CollectionDeclarations
                 public void Clear() { }
                 public Iterator<T> GetIterator() => default;
             }
-            public interface Map<K, V> {
+            public readonly struct KeyValuePair<K, V> {
+                public KeyValuePair(K Key, V Value) { this.Key = Key; this.Value = Value; }
+                public K Key { get; }
+                public V Value { get; }
+                public void Deconstruct(out K Key, out V Value) { Key = this.Key; Value = this.Value; }
+            }
+            public interface Map<K, V> : Iterable<KeyValuePair<K, V>> {
                 int Count { get; }
                 Sequence<K> Keys { get; }
                 Option<V> Find(K key);
@@ -83,6 +89,7 @@ static class CollectionDeclarations
                 public bool ContainsKey(K key) => default;
                 public bool TryAdd(K key, V value) => default;
                 public void Set(K key, V value) { }
+                public Iterator<KeyValuePair<K, V>> GetIterator() => default;
             }
             public interface Iterable<T> { Iterator<T> GetIterator(); }
             public interface Iterator<T> : Disposable {

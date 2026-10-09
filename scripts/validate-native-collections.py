@@ -48,6 +48,8 @@ def main():
                   ROOT / 'scripts/prepare-native-development-bundle.py']
         for _, sample, _ in samples:
             inputs += [ROOT / 'docs/experiments' / sample / n for n in ('Main.rvn', 'Native.rvnproj')]
+        rejections = sorted((ROOT / 'docs/experiments/map-pairs/rejections').glob('*.rvn'))
+        inputs += rejections
         report['inputs'] = {p.relative_to(ROOT).as_posix(): sha(p) for p in inputs}
         if args.bundle:
             bundle = args.bundle.resolve()
@@ -107,6 +109,21 @@ def main():
                 if (result.returncode, stdout, stderr) != (0, expected, ''):
                     raise ValueError(name + ' ' + mode + ' result mismatch')
             report['cases'].append(dict(name=name, passed=True, results=results))
+        report['rejections'] = []
+        for fixture in rejections:
+            project = out / ('reject-' + fixture.stem)
+            project.mkdir()
+            shutil.copy2(ROOT / 'docs/experiments/native-collections/Native.rvnproj', project / 'Native.rvnproj')
+            shutil.copy2(fixture, project / 'Main.rvn')
+            command = ['dotnet', str(bundle / 'sdk/tools/rvnc/rvnc.dll'), 'neoclr', '--project', str(project / 'Native.rvnproj')]
+            env = dict(os.environ, NeoClrBundleRoot=str(bundle))
+            result = subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True, timeout=120)
+            diagnostic = result.stdout + result.stderr
+            (project / 'diagnostics.txt').write_text(diagnostic)
+            expected = 'error RAV' if fixture.stem == 'imported-update' else 'error NEOMETA001'
+            if result.returncode == 0 or expected not in diagnostic:
+                raise ValueError('Expected explicit rejection for ' + fixture.name + ': ' + diagnostic)
+            report['rejections'].append(dict(name=fixture.stem, exitCode=result.returncode, diagnostic=diagnostic))
         if sha(runtime) != report['interpreterSha256'] or sha(aot) != report['aotSha256'] or any(sha(ROOT / n) != h for n, h in report['inputs'].items()):
             raise ValueError('Inputs changed during validation')
         report['passed'] = True

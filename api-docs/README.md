@@ -1461,5 +1461,8 @@ Queue/ArrayQueue, Stack/ArrayStack and Set/MutableSet/HashSet are selected in th
 reference with member XML and a matching native snapshot. Removal/peek Option
 results, bool membership-change results, explicit comparers, snapshot iteration and
 unsynchronized behavior are documented. No public type is excluded for this slice.
-Map pair iteration is requested but remains pending native record-struct support;
-it is not represented as implemented in the reference.
+Map now inherits Iterable of KeyValuePair, with its public constructor,
+getters and Deconstruct selected and documented. HashMap.GetIterator documents
+snapshot cost, lifetime and concurrency limits. The native positional-record storage
+restriction is explicit; equality/hash/display/init helpers are not native APIs.
+The matching compiler is required to rebuild the native library snapshot.

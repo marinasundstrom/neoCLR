@@ -1,0 +1,8 @@
+import System.Collections.*
+class Program {
+    static func Main() -> int {
+        let pair = KeyValuePair<int, int>(1, 2)
+        pair.Key = 3
+        return 0
+    }
+}

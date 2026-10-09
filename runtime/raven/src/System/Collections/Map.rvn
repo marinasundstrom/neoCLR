@@ -1,6 +1,6 @@
 namespace System.Collections
 
-public interface Map<K, V> {
+public interface Map<K, V> : Iterable<KeyValuePair<K, V>> {
     val Count: int { get }
     val Keys: Sequence<K> { get }
     func Find(key: K) -> System.Option<V>

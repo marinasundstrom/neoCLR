@@ -1,21 +1,21 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "55c155cee38127e62caba674505153561a29beaae8581cca714c85a4dea062d6",
-  "librarySourceRevision": "6c25135558655f45dded4bbff5f438dfb818bcbc",
-  "compilerRevision": "71cafd353",
+  "sha256": "92681cf3c0e2535acadbe87ecf08f64c563ee286b62b54b269e32b8d735312fb",
+  "librarySourceRevision": "a5378b4402d4af369cfb6144165310ef8a1a8878",
+  "compilerRevision": "d5fadf968feaea2c1073255ef5cb04f997fc5604",
   "rendererRevision": "6c90bf2c48d9d60480476433f90ddc4d0cee4a0d",
   "libraryArtifacts": {
-    "System.Runtime.dll": "1751061277dd6f4095713f27612625e43c65c3150916a3f08c892f8dad725ff3",
-    "System.Data.dll": "cfbb2f0158f76fd908d07f4edeb27a5b2089b0fbdbffb7e1649b166d4ec57718",
-    "System.Networking.dll": "5fc233676639a6cea16969f968b03d31b3fb1ebecd1618601efb546f6c290d99",
-    "System.Web.dll": "f116a407077996f8d9713d9765c3bd9839f9a6d58e6e77711afcc25b314a5fcb",
+    "System.Runtime.dll": "3a0cd5c92428d4dfb377deba21eebf53bed47f22ff4bd55add931f47eaa7a527",
+    "System.Data.dll": "a6e203e502d4bdaccce6aa61661d2399db8eb182724e5f78830d560b85fbb65a",
+    "System.Networking.dll": "f3cf0103d951bf0410921c1f7e83a4fed8ab0f8efc4f0dc31b6aeb096d4d980f",
+    "System.Web.dll": "df799c3887bc0f0fc40f3c2c144e39aed85716bf72429ab758b5ac16589998a6",
     "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
     "Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f"
   },
   "renderingEvidence": {
-    "normalized-sidecars.json": "e517cf5751f877fb90716e59b2d337289f32dacb2abda4d0bfff2e95d20ed57e",
-    "restored-xml-comments.json": "b08c9849608c2b3e59a72b6aff7697a0540d0a6d0c18ec3db7cfe9c871667593"
+    "normalized-sidecars.json": "cf58bb80a302fa6d608e72f7bf1dd08b6000456f3d505a077601db5b7440d51f",
+    "restored-xml-comments.json": "8b8e1b10f4bcad0468c4222d49b12d27690b5e2e9fbe66f0230c927ebff41953"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

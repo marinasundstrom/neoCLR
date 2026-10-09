@@ -111,6 +111,9 @@ class Program {
         if !CheckSnapshots() || !CheckSets() {
             return 21
         }
+        if !CheckMaps() {
+            return 30
+        }
         Console.WriteLine("collections passed")
         return 0
     }
@@ -135,6 +138,41 @@ class Program {
         }
         reversed.Dispose()
         return true
+    }
+
+    static func CheckMaps() -> bool {
+        let map: MutableMap<string, int> = HashMap<string, int>(StringComparer.Ordinal)
+        if !map.TryAdd("answer", 42) || map.TryAdd("answer", 99) || !map.TryAdd("雪", 7) {
+            return false
+        }
+        let view: Map<string, int> = map
+        let iterable: Iterable<KeyValuePair<string, int>> = view
+        let snapshot = iterable.GetIterator()
+        map.Set("answer", 99)
+        map.Set("later", 100)
+        var total = 0
+        var count = 0
+        while snapshot.MoveNext() {
+            let (key, value) = snapshot.Current
+            if key == "answer" && value != 42 || key == "雪" && value != 7 || key == "later" {
+                return false
+            }
+            total = total + value
+            count = count + 1
+        }
+        snapshot.Dispose()
+        if count != 2 || total != 49 || view.Count != 3 {
+            return false
+        }
+        total = 0
+        for pair in iterable {
+            let (key, value) = pair
+            total = total + value
+        }
+        let original = KeyValuePair<string, int>("copy", 12)
+        let copy = original
+        let (key, value) = copy
+        return total == 206 && key == "copy" && value == 12 && original.Key == key && original.Value == value
     }
 
     static func CheckSets() -> bool {
