@@ -70,8 +70,11 @@ regressions pass. [Windows evidence](experiments/windows-aot-scalar-validation.j
 records the initial object-only boundary. The subsequent
 [dedicated Windows run](windows-aot-execution-validation.json) passes all four
 tests with no skips, including 32 MSVC-linked native/interpreter comparisons.
-Next run the Raven-produced Hello World as a Windows executable. Windows project
-kits and managed services remain unsupported. Full bootstrap, general hosting and
+The [Raven Hello World Windows run](windows-raven-hello-validation.json) now passes
+standalone PE/#Neo and NEOX execution with byte-exact interpreter output, alongside
+the 32 scalar comparisons (five tests, no skips). Next qualify a fresh Raven source
+build through this bounded Windows path. Windows project kits and managed services
+remain unsupported. Full bootstrap, general hosting and
 reload remain open.
 
 **Preview 13 published (2026-10-09):** after Raven's shared website publication,

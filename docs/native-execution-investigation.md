@@ -344,9 +344,9 @@ at `7cfe27222d875686f6ce5b0bfa052b8a64d05e88` passes all four tests with no skip
 on Windows Server 2022 x64. The MSVC-linked consumer passes 32 input comparisons
 covering calls, loops/branches, divide/overflow faults, UTF-8, NUL and LF output.
 The [retained report](windows-aot-execution-validation.json) includes toolchain
-identity, native outcomes and verified downloaded artifact hashes. The Raven Hello
-World fixture is object-emission-tested; its Windows executable run remains a
-separate next consumer. This supersedes the initial execution-pending status, not
+identity, native outcomes and verified downloaded artifact hashes. At that revision the Raven Hello
+World fixture had object-emission evidence only; the subsequent execution evidence
+below closes that consumer boundary. This supersedes the initial execution-pending status, not
 the managed-service/unwind limitations below.
 
 The dedicated job uses Windows Server 2022 with an explicit x64 MSVC developer
@@ -380,16 +380,22 @@ Those gaps must be addressed before broader native hosting/suspension qualificat
 Windows inspection, closed-world libraries, value/managed profiles, GC, task/socket
 services, native project kits and stack guards remain explicitly unsupported.
 The Windows C adapter is an acceptance host, not the Windows implementation of
-the macOS console/HTTP kit. With bounded Windows linking/execution now qualified, use actual
-Raven-produced scalar/console metadata in execution before extending services or advertising
-Windows project publication. Windows execution was performed in GitHub Actions;
+the macOS console/HTTP kit. With retained Raven-produced metadata now exercised,
+qualify a fresh source build before extending services or advertising Windows project
+publication. Windows execution was performed in GitHub Actions;
 no local Windows host or emulator was used.
 
 The next Windows gate now includes the retained Raven Hello World fixture in both
 PE/#Neo and standalone NEOX containers. MSVC links with `/MT`; the test copies only
 the executable into a fresh directory and checks exit zero and byte-exact interpreter
 stdout/stderr. Its separate completion marker requires both containers, so a skipped
-native test cannot qualify the run. Execution of this extension is pending. This
+native test cannot qualify the run.
+
+**Raven execution qualified (2026-10-09):** [run 37948836623](https://github.com/marinasundstrom/neoCLR/actions/runs/37948836623)
+at `ee0dac801513901966a22e502e257868372034cf` passes five tests with no skips on
+Windows Server 2022 x64. Both containers produce standalone executables that return
+zero, print `Hello, world!` plus LF, and leave stderr empty; the 32 scalar comparisons
+also pass. All 66 downloaded file hashes match the [retained report](windows-raven-hello-validation.json). This
 qualifies the retained compiler fixture, not a fresh Raven source build on Windows.
 Like .NET Native AOT, startup is native; this probe covers only literal console output
 and does not claim comparable library coverage. The C adapter remains provisional.

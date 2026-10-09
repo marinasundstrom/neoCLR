@@ -12709,5 +12709,12 @@ claim follows from these focused checks.
   evidence file hashes match the report. See the
   [retained execution evidence](windows-aot-execution-validation.json).
 - **Boundary:** this closes the scalar/literal-console Windows execution gate.
-  Raven Hello World has Windows object emission evidence; its executable run,
+  At that point Raven Hello World had Windows object emission evidence only;
   Windows managed services/project kits and unwinding remain separate work.
+- **Subsequent assistant action/outcome:** under the author’s continuation, adds
+  standalone execution for retained Raven PE/#Neo and NEOX Hello World inputs.
+  [Run 37948836623](https://github.com/marinasundstrom/neoCLR/actions/runs/37948836623)
+  at `ee0dac80` passes five tests without skips, including both Hello World
+  executables and 32 scalar comparisons. Verifies all 66 downloaded evidence hashes;
+  records the [report](windows-raven-hello-validation.json). Fresh Raven source
+  compilation on Windows remains unqualified.

@@ -22,7 +22,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and a report that cannot pass when native execution is skipped or incomplete.
   Add a required standalone Raven Hello World execution gate for retained PE/#Neo
   and NEOX inputs, linking a static-CRT startup adapter and deploying only the EXE;
-  compare UTF-8 stdout/stderr with the interpreter. Windows execution pending.
+  compare UTF-8 stdout/stderr with the interpreter. Windows run `37948836623`
+  at `ee0dac80` passes all five tests without skips, including both standalone
+  containers and the 32 scalar comparisons; all 66 artifact hashes are verified.
+  This qualifies the retained compiler fixture, not a fresh Raven source build.
 
 - Add a development macOS ARM64 project-to-executable console command using the
   selected bundle's Raven project build, existing AOT backend and explicit native
