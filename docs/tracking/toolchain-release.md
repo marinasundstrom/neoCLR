@@ -38,6 +38,10 @@ String-payload union display now passes Some/None/Ok/Error in all three paths af
 bounded nonmatching Char-test lowering. Char box producers still reject without output;
 escaped-string/primitive display and full production Object/bootstrap remain open.
 [Display evidence](../experiments/native-core-bootstrap/union-display-validation.json).
+Int32 union descriptions now also pass zero/negative/min/max and integer Result
+payloads with the explicit native formatter; omitted binding rejects before output.
+[Integer evidence](../experiments/native-core-bootstrap/integer-display-validation.json).
+Other primitive boxes and escaping remain outside this qualification.
 
 Release remains gated on complete production source-runtime bootstrap without the
 CLI semantic bridge, matching SDK/editor/native artifacts and extracted-package

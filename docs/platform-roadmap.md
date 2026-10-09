@@ -12,7 +12,9 @@ Generic String boxing/Object display now also preserves text and reference ident
 across modes after correcting native reference-view lowering and excluding unboxed
 values from Object dispatch candidates. [Evidence](experiments/native-core-bootstrap/README.md#generic-string-boxing-and-object-display-2026-10-09).
 String-payload union display now passes Some/None/Ok/Error across modes with bounded
-nonmatching Char-box tests. Matching Char boxes remain rejected; escaping, primitive
+nonmatching Char-box tests. Int32 payloads also pass zero/negative/min/max and both
+Result cases with the explicit native integer formatter; missing binding publishes no object.
+[Integer display evidence](experiments/native-core-bootstrap/integer-display-validation.json). Matching Char boxes remain rejected; escaping, other primitive
 payload display and full core bootstrap remain open.
 [Display evidence](experiments/native-core-bootstrap/README.md#nonmatching-char-tests-and-string-union-display-2026-10-09).
 Expand production primitive/String/Object contracts next.

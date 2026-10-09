@@ -298,3 +298,24 @@ boxed input. Quotes/backslashes in String payloads still need an escaping contra
 primitive payload formatting and production String/Object bootstrap remain open.
 The website's bounded work-in-progress claim remains accurate; no website build is
 needed for this internal lowering and executable qualification.
+
+## Int32 union display qualification (2026-10-09)
+
+The `--union-display` consumer now also checks Some(0), Some(-1), both Int32 limits,
+Result.Ok(42) and Result.Error(-7). These execute the unchanged production union
+formatter bodies with the existing boxed Int32 native display implementation;
+no replacement union or fixture Object method supplies the expected numbers.
+The verifier explicitly selects `--bind-int32-to-string`. A separate invocation
+omitting that flag must diagnose the missing formatter and publish no object file.
+
+[Integer display evidence](integer-display-validation.json) records project run,
+independent interpreter and standalone ARM64 result 42, plus libSystem-only linkage
+and the negative binding check. The preceding String-only report is retained as
+historical evidence. This is additional release qualification of an existing native
+formatter, not new boxing/IL support or a performance claim. It follows the existing
+[boxed Int32 contract](../aot-console/README.md) and CLI comparisons above.
+
+Boolean, Char and wider primitive boxes are not qualified by this sample. Escaping,
+matching Char tests and full production String/Object bootstrap remain open. The
+website's bounded development description stays accurate; no public API or compiler
+contract changes in this slice.

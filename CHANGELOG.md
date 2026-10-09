@@ -18,7 +18,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Admit nonmatching Char box tests in the closed native profile, preserving null
   Object results while rejecting Char box producers. Production Option/Result
   string-payload descriptions now match project/interpreter/ARM64 execution,
-  including Unicode/NUL text. Matching Char boxes, escaping and complete core
+  including Unicode/NUL text. Extend qualification to Int32 zero/negative/min/max
+  and integer Result payloads, with rejection before output when the native integer
+  formatter binding is missing. Matching Char boxes, escaping and complete core
   bootstrap remain unsupported or unqualified.
 
 - Lower generic String boxing to the existing native Object reference view and

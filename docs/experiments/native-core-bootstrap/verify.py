@@ -21,7 +21,7 @@ def main():
     parser.add_argument('--text-services', action='store_true', help='With --project, verify native UTF-8 wrappers and production union frontier.')
     parser.add_argument('--unions', action='store_true', help='With --text-services, execute unchanged production Option/Result and pattern controls.')
     parser.add_argument('--string-boxing', action='store_true', help='With --unions, check generic String boxing/display and reference identity.')
-    parser.add_argument('--union-display', action='store_true', help='With --unions, check string-payload union display; excludes --string-boxing.')
+    parser.add_argument('--union-display', action='store_true', help='With --unions, check String/Int32 union display and formatter binding; excludes --string-boxing.')
     args = parser.parse_args()
     if args.project and not args.driver:
         parser.error('--project requires --driver')
@@ -142,8 +142,16 @@ def main():
     interpreted = run([runtime, 'run', consumer, *dependencies, '--show-result'], expected=42, include_stderr=True)
     if interpreted.strip() != '=> Int32(42)':
         raise AssertionError(interpreted)
+    if args.union_display:
+        rejected_object = artifacts / 'unbound-display.o'
+        diagnostic = run([aot, '--closed-world', consumer, '@entry', rejected_object, *dependencies,
+            '--compile-system', '--reference-arena', '--bind-utf8-text'], expected=1, include_stderr=True)
+        if 'boxed Int32 display requires --bind-int32-to-string' not in diagnostic or rejected_object.exists():
+            raise AssertionError('Missing formatter did not reject before publication: ' + diagnostic)
+        report['missingIntegerFormatter'] = {'diagnostic': diagnostic.strip(), 'outputPublished': False}
     selection = run([aot, '--closed-world', consumer, '@entry', artifacts / 'consumer.o', *dependencies,
-        *(['--compile-system', '--reference-arena', '--bind-utf8-text'] if args.text_services else [])])
+        *(['--compile-system', '--reference-arena', '--bind-utf8-text'] if args.text_services else []),
+        *(['--bind-int32-to-string'] if args.union_display else [])])
     (output / 'selection.json').write_text(selection)
     adapters = [HERE / 'text-host.c', HERE.parent / 'aot-console/text-arena.c'] if args.text_services else [HERE / 'host.c']
     run(['clang', '-arch', 'arm64', '-Wall', '-Wextra', '-Werror', *adapters, artifacts / 'consumer.o', '-o', artifacts / 'consumer'])
@@ -167,9 +175,9 @@ def main():
         report.pop('unionChecks', None)
         report['boxingChecks'] = ['generic String-to-Object', 'Unicode/NUL display', 'alias identity', 'distinct equal-content identity', 'unboxed value construction excluded from Object dispatch']
     if args.union_display:
-        report['scope'] = 'Native-only production Option/Result String display over fixture core; no Char box producers, escaped strings or general Object display qualification.'
+        report['scope'] = 'Native-only production Option/Result String and Int32 display over fixture core; explicit integer formatter. No Char box producers, escaped strings or general Object display qualification.'
         report.pop('unionChecks', None)
-        report['displayChecks'] = ['Some Unicode/NUL', 'None', 'Ok String', 'Error String']
+        report['displayChecks'] = ['Some Unicode/NUL', 'None', 'Ok String', 'Error String', 'Some Int32 zero/negative/min/max', 'Ok Int32', 'Error Int32', 'missing formatter rejection']
     report['revisions'] = {name: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip()
                            for name, path in [('neoclr', ROOT), ('raven', args.raven)]}
     inputs = [runtime, aot, *[p for p in HERE.iterdir() if p.suffix in ('.cs', '.csproj', '.rvn', '.neoil', '.c', '.py')]]

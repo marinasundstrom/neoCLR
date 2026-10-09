@@ -2,6 +2,11 @@ module Example.Display
 
 import System.*
 
+func CheckNumber(value: int, expected: string) -> bool {
+    let option = Option<int>.Some(value)
+    return String.CompareOrdinal(option.ToString(), expected) == 0
+}
+
 func Main() -> int {
     let present = Option<string>.Some("hé🙂\u0000z")
     if String.CompareOrdinal(present.ToString(), "Option.Some(\"hé🙂\u0000z\")") != 0 {
@@ -18,6 +23,26 @@ func Main() -> int {
     let failure = Result<string, string>.Error("failed")
     if String.CompareOrdinal(failure.ToString(), "Result.Error(\"failed\")") != 0 {
         return 4
+    }
+    if !CheckNumber(0, "Option.Some(0)") {
+        return 5
+    }
+    if !CheckNumber(-1, "Option.Some(-1)") {
+        return 6
+    }
+    if !CheckNumber(-2147483647 - 1, "Option.Some(-2147483648)") {
+        return 7
+    }
+    if !CheckNumber(2147483647, "Option.Some(2147483647)") {
+        return 8
+    }
+    let number = Result<int, string>.Ok(42)
+    if String.CompareOrdinal(number.ToString(), "Result.Ok(42)") != 0 {
+        return 9
+    }
+    let errorCode = Result<string, int>.Error(-7)
+    if String.CompareOrdinal(errorCode.ToString(), "Result.Error(-7)") != 0 {
+        return 10
     }
     return 42
 }
