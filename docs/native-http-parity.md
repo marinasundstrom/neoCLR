@@ -65,6 +65,10 @@ Primary OS references reviewed 2026-10-09:
 consumers on macOS and Windows. The macOS build uses undefined/bounds sanitizers;
 Windows uses MSVC /W4 /WX and the static CRT. Reports retain source/artifact hashes,
 commands and logs, and cannot pass when any consumer is skipped. The dedicated
-`Native network parity` Action runs both platforms. Local macOS checks pass;
-Windows evidence is pending. These C consumers are prerequisites, not evidence
-that Raven HttpClient or a Windows native HTTP project already works.
+`Native network parity` Action runs both platforms.
+[Run 37960722734](https://github.com/marinasundstrom/neoCLR/actions/runs/37960722734)
+at `da8ca1f2` passes all three consumers on macOS ARM64 and Windows x64. All
+45 downloaded artifact hashes and 14 source inputs per platform are verified in
+[the retained evidence](native-network-parity-validation.json), allowing Windows
+checkout line endings. These C consumers are prerequisites, not evidence that
+Raven HttpClient or a Windows native HTTP project already works.

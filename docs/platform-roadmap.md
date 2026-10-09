@@ -30,7 +30,10 @@ structural experiments retain their branch restrictions.
 HttpServer work consistently and predictably on macOS and Windows. Use one shared
 HTTP/network contract and qualify both platforms with the same scenarios. The
 [parity plan](native-http-parity.md) tracks the shared socket adapter, Windows
-server host and missing native DNS/outbound-connect bindings.
+server host and missing native DNS/outbound-connect bindings. The first
+[shared socket gate](native-network-parity-validation.json) passes all three
+listener/accept/transfer consumers on macOS ARM64 and Windows x64 at `da8ca1f2`;
+HTTP project/client qualification remains separate.
 
 **Author clarification (2026-10-09):** once the native compilation foundations are
 ready, let runtime suspension, runtime-owned scheduling and green threads co-evolve

@@ -116,5 +116,6 @@ and limitations. No performance ranking against .NET is established.
 
 The next native showcase targets both HttpClient and HttpServer on macOS and
 Windows, with shared cancellation, deadline and cleanup contracts. A shared
-socket adapter and paired platform checks are in development. Native client
+socket adapter now passes the same listener, accept and transfer contract tests
+on macOS ARM64 and Windows x64. Native client
 DNS/connect and the Windows HTTP project profile are not yet qualified.

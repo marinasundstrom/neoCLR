@@ -12844,7 +12844,10 @@ claim follows from these focused checks.
   Adds a GitHub Actions matrix using the same native contract consumers. Records
   the [acceptance sequence and research](native-http-parity.md).
 - **Outcome so far:** local macOS listener, deferred accept and transfer consumers
-  pass with sanitizers. Windows execution remains pending for this slice.
+  pass with sanitizers. Subsequently run `37960722734` at `da8ca1f2` passes the
+  same three consumers on macOS ARM64 and Windows x64. Verifies all 45 artifact
+  hashes and 14 source inputs per platform in the
+  [retained evidence](native-network-parity-validation.json).
 - **Open:** Windows HTTP host/project integration and native DNS/outbound-connect
   bindings for HttpClient on both platforms. Existing macOS server evidence does
   not establish a working native client. Scheduling ownership remains provisional.

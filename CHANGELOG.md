@@ -12,9 +12,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   lifecycle, accept, transfer, cancellation and deadline policy behind a private
   Winsock/POSIX boundary, preserving native-width Windows handles and balanced
   Winsock ownership. Add identical listener/accept/transfer contract tests to a
-  two-platform GitHub Actions matrix. Local macOS sanitizer checks pass; Windows
-  qualification is pending. Native HttpClient DNS/connect and the Windows HTTP
-  project profile remain planned work, not implemented capabilities.
+  two-platform GitHub Actions matrix. Run `37960722734` at `da8ca1f2` passes all
+  three consumers on macOS ARM64 and Windows x64; verify 45 artifact hashes and
+  14 source inputs per platform. Native HttpClient DNS/connect and the Windows
+  HTTP project profile remain planned work, not implemented capabilities.
 
 - Add explicit `x86_64-pc-windows-msvc` AOT target selection for the bounded scalar
   and literal-console profile, emitting x64 COFF with the target calling convention.
