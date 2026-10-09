@@ -17,7 +17,62 @@ public class Guarded {
     var Active: bool { get; set; } = false
 }
 
+public class Bulletin {
+    init() { }
+    var Title: string { get; set; } = ""
+    var Current: Report { get; set; } = Report()
+    var Previous: Report { get; set; } = Report()
+}
+
+func CheckDocument(input: string, canonical: string) -> Result<bool, JsonError> {
+    let tree = JsonSerializer.DeserializeNode(input)?
+    let text = JsonSerializer.SerializeNode(tree)?
+    if text != canonical {
+        return Ok(false)
+    }
+    let copy = JsonSerializer.DeserializeNode(text)?
+    let copiedText = JsonSerializer.SerializeNode(copy)?
+    return Ok(copiedText == canonical)
+}
+
+func CheckBulletin(input: string, canonical: string, title: string,
+                   currentName: string, count: int, active: bool) -> Result<bool, JsonError> {
+    let documentMatches = CheckDocument(input, canonical)?
+    if !documentMatches {
+        return Ok(false)
+    }
+    let value = JsonSerializer.Deserialize<Bulletin>(input)?
+    if value.Title != title || value.Current.Name != currentName ||
+       value.Current.Count != count || value.Current.Active != active ||
+       value.Previous.Name != "Before" || value.Previous.Count != 0 || value.Previous.Active {
+        return Ok(false)
+    }
+    let serialized = JsonSerializer.Serialize(value)?
+    if serialized != canonical {
+        return Ok(false)
+    }
+    let copy = JsonSerializer.Deserialize<Bulletin>(serialized)?
+    return Ok(copy.Title == value.Title && copy.Current.Name == value.Current.Name &&
+              copy.Current.Count == count && copy.Current.Active == active &&
+              copy.Previous.Name == "Before" && copy.Previous.Count == 0 && !copy.Previous.Active)
+}
+
 func Main() -> int {
+    if CheckBulletin(" {\"Title\":\"Weather\",\"Current\":{\"Name\":\"Café\",\"Count\":3,\"Active\":true},\"Previous\":{\"Name\":\"Before\",\"Count\":0,\"Active\":false}} ", "{\"Title\":\"Weather\",\"Current\":{\"Name\":\"Café\",\"Count\":3,\"Active\":true},\"Previous\":{\"Name\":\"Before\",\"Count\":0,\"Active\":false}}", "Weather", "Café", 3, true) is not Ok(true) {
+        return 20
+    }
+    if CheckBulletin("{\"Title\":\"Empty title? No\",\"Current\":{\"Name\":\"雪\",\"Count\":-2147483648,\"Active\":false},\"Previous\":{\"Name\":\"Before\",\"Count\":0,\"Active\":false}}", "{\"Title\":\"Empty title? No\",\"Current\":{\"Name\":\"雪\",\"Count\":-2147483648,\"Active\":false},\"Previous\":{\"Name\":\"Before\",\"Count\":0,\"Active\":false}}", "Empty title? No", "雪", -2147483648, false) is not Ok(true) {
+        return 21
+    }
+    if CheckDocument("{\"station\":\"Café\",\"readings\":[1,-2,0],\"flags\":[true,false,null],\"empty\":[],\"metadata\":{},\"detail\":{\"text\":\"雪\",\"decimal\":1.25e2}}", "{\"station\":\"Café\",\"readings\":[1,-2,0],\"flags\":[true,false,null],\"empty\":[],\"metadata\":{},\"detail\":{\"text\":\"雪\",\"decimal\":1.25e2}}") is not Ok(true) {
+        return 22
+    }
+    if JsonSerializer.DeserializeNode("[1,]") is Ok(_) {
+        return 23
+    }
+    if JsonSerializer.Deserialize<Bulletin>("{\"Title\":\"bad\",\"Current\":{\"Name\":\"ok\",\"Count\":3,\"Active\":true},\"Previous\":{\"Name\":\"Before\",\"Count\":\"wrong\",\"Active\":false}}") is Ok(_) {
+        return 24
+    }
     if JsonSerializer.Deserialize<Report>("{bad") is Ok(_) {
         return 3
     }

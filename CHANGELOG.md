@@ -85,7 +85,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   project qualification is pending. Enable checked console stack budgets/integer text
   consistently across platforms. Add the project-level Windows JSON action.
   Verify sixteen low-level property/prior-gate reports on macOS/Windows in action
-  `37989124785`. Record representative JsonValue/object document coverage plans.
+  `37989124785`. Add two nested document round trips through both JsonValue and typed objects,
+  plus mixed DOM arrays/null/empty containers/decimal tokens and malformed input.
+  Validate native/interpreter parity on macOS; typed collection coverage remains open.
   Record expanded nested/array/list/sequence/string-keyed-map correctness scope and
   benchmark/data-publication follow-up; the expanded milestone remains incomplete.
 

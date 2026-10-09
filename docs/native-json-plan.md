@@ -553,3 +553,13 @@ and serialized both as JsonValue trees and typed objects. Use the same documents
 where shapes are supported; assert field/element values after round trips and test
 malformed documents. Compare semantic values, allowing documented canonical escape
 spelling. Include empty and nested containers, UTF-8, integer boundaries and ordering.
+
+The representative document consumer now passes on macOS ARM64 in both modes:
+two nested Bulletin/Report documents use both DOM and typed paths, with field-level
+checks after deserialization and a second round trip. A mixed DOM document covers
+arrays, null, empty containers, Unicode and decimal token preservation. Trailing
+array commas and wrong nested property types are rejected. See the
+[corpus](experiments/native-json/README.md#representative-document-checks). Typed
+collection coverage remains open. Test helpers use local propagation bindings to
+avoid the pinned compiler's expression-boundary limitation; no compiler change is
+claimed.

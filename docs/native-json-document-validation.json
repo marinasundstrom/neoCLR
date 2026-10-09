@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-09",
+  "scope": "Nested typed objects and JsonValue document corpus on macOS ARM64; not a benchmark",
+  "baseRevision": "3b851dd1f061aa555c3ee0f21ac8ee6c4054c572",
+  "sourceSha256": {
+    "docs/experiments/native-json/Main.rvn": "47ed0159d5bcb8b98c9bb386dca55ec20cd6ea5aeeacc1ad04025c5a1c92d2aa",
+    "docs/experiments/native-json/reflection-roots.json": "9e7fbc5ba3cd38e14ff0926ea6819d8f9ec09b06fab4893a0990d49516a8560c"
+  },
+  "buildReportSha256": "8209a2d2f5bd060290a6cf3e4e55f03c6016eb345340c25f7e243c62ab0ebf8a",
+  "results": {
+    "native": {
+      "exitCode": 0,
+      "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+      "stderr": ""
+    },
+    "interpreter": {
+      "exitCode": 0,
+      "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+      "stderr": ""
+    }
+  }
+}

@@ -3299,3 +3299,8 @@ work at normal API URLs. The local integrated preview exercises these; productio
 coverage and no-bridge qualification remain open. A fresh bundle closes the old
 bundle's missing Math constants; an intermittent HttpContext metadata validation
 failure seen on the first build still needs investigation. See the documentation audit's integration procedure.
+
+Native JSON evidence update (2026-10-09): the public
+[document corpus](experiments/native-json/README.md#representative-document-checks)
+now validates nested object and DOM round trips on macOS in both modes. This does
+not complete typed arrays/collections or Windows project qualification.

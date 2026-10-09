@@ -13031,3 +13031,7 @@ claim follows from these focused checks.
   after round trips and malformed input in interpreted/native execution. Nested
   objects, arrays, lists/sequences and string-keyed maps remain the expanded scope;
   this new corpus is planned, not claimed complete by the earlier flat probe.
+- **Performed:** added two nested Bulletin/Report document round trips through DOM
+  and typed objects, plus a mixed DOM document and invalid inputs. Native macOS and
+  interpreter execution pass with identical output and no diagnostics. Typed
+  collection coverage and Windows qualification remain open.

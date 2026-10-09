@@ -27,3 +27,24 @@ the public introspection consumer. The Windows workflow rebuilds current librari
 from the pinned development compiler and runs the same projects. Windows
 qualification and the expanded nested/array/list/sequence/string-keyed-map milestone
 remain pending. This development probe is not a published capability or benchmark.
+
+## Representative document checks
+
+`Main.rvn` now runs two nested bulletin documents through both `JsonValue` and
+`Bulletin`/`Report` objects. Each path deserializes, serializes and deserializes again.
+Object checks assert all fields of both nested reports; DOM checks compare a known
+canonical document after each round trip, so a stable but incorrect transformation
+cannot satisfy the test. One input includes surrounding whitespace.
+
+| Case | Coverage |
+| --- | --- |
+| Weather bulletin | Nested objects, UTF-8 Café, positive/zero integers, true/false |
+| Second bulletin | Unicode 雪, Int32.MinValue, nested object field preservation |
+| Mixed DOM document | Integer arrays, true/false/null array, empty array/object, nested decimal token |
+| Rejected documents | Trailing array comma, wrong nested property type, earlier flat validation cases |
+
+The mixed DOM document is deliberately not mapped to a typed object: nullable and
+decimal object mapping are outside the current mapper contract. Typed arrays,
+lists/sequences and string-keyed maps still require their own acceptance cases.
+Exit codes 20–24 identify document corpus failures; success keeps the original
+single-line output. The Windows action uses this same source.
