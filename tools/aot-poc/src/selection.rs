@@ -179,18 +179,27 @@ pub(super) fn implicit_implementation(input: &neoclr::Module, concrete: &Type, c
         .unwrap_or_else(|| m.name.rsplit('.').next().unwrap().to_owned());
     let name = member_name(contract);
     let mut candidates = vec![];
+    let mut explicit = vec![];
     for (index, method) in input.functions.iter().enumerate() {
-        if method.owner.as_ref().and_then(Type::definition_name) != concrete.definition_name()
-            || member_name(method) != name { continue; }
+        if method.owner.as_ref().and_then(Type::definition_name) != concrete.definition_name() { continue; }
+        let maps_contract = method.interface_implementations.iter().any(|target|
+            target.owner.as_ref().and_then(|t| t.substitute_type_parameters(arguments).ok()) == contract.owner
+            && target.instance == contract.instance
+            && target.parameters.iter().map(|t| t.substitute_type_parameters(arguments)).collect::<Result<Vec<_>, _>>().ok().as_ref() == Some(&contract.parameters)
+            && (target.definition.as_ref().is_some_and(|id| Some(id) == contract.definition.as_ref())
+                || target.definition.is_none() && target.name == contract.name));
+        if !maps_contract && member_name(method) != name { continue; }
         let method = closed_signature(method, arguments)?;
         if method.owner.as_ref() == Some(concrete) && method.instance == contract.instance
             && method.parameters == contract.parameters && method.returns == contract.returns
             && method.no_result == contract.no_result && method.out_parameters == contract.out_parameters
-            && method.visibility == neoclr::metadata::Visibility::Public && method.interface_implementations.is_empty()
             && method.generic_parameters.is_empty() {
-            candidates.push((index, FunctionRef { definition: method.definition.clone(), name: method.name.clone(), owner: method.owner.clone(), instance: method.instance, generic_arguments: vec![], parameters: method.parameters.clone() }));
+            let target = (index, FunctionRef { definition: method.definition.clone(), name: method.name.clone(), owner: method.owner.clone(), instance: method.instance, generic_arguments: vec![], parameters: method.parameters.clone() });
+            if maps_contract { explicit.push(target); }
+            else if member_name(&method) == name && method.visibility == neoclr::metadata::Visibility::Public && method.interface_implementations.is_empty() { candidates.push(target); }
         }
     }
+    if !explicit.is_empty() { candidates = explicit; }
     let [target] = candidates.as_slice() else { return Err(format!("interface implementation is missing or ambiguous: {} on {concrete:?}", contract.name).into()); };
     Ok(target.clone())
 }
@@ -231,6 +240,11 @@ pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usiz
     let mut constructed = BTreeSet::new();
     let array_owner = array_backing.map(|i| Type::Named(input.types[i].name.clone())).or_else(|| byte_array_owner(input));
     for &i in reached {
+        for &index in reference_backings {
+            if input.types[index].fields.first().is_some_and(|f| f.ty == input.functions[i].returns) {
+                constructed.insert(input.types[index].name.as_str());
+            }
+        }
         for op in &input.functions[i].body {
             if display && (matches!(op, Op::BoxValue(t) if !matches!(t, Type::Int32 | Type::String)) || matches!(op, Op::NewArray(_) | Op::ReserveArray(_))) {
                 return Err("Object display with boxing or arrays requires a later receiver/metadata profile".into());
@@ -442,7 +456,7 @@ pub(super) fn select_inventory_with_host_roots(
             Type::Function(shape) => { pending_types.extend(shape.parameters); pending_types.push(shape.returns); }
             Type::ByRef(t) => pending_types.push(*t),
             Type::Array(t) if *t == Type::Byte => (),
-            Type::ArrayRef(t) if *t == Type::String || scalar_array_element(&t) => (),
+            Type::ArrayRef(t) if matches!(*t, Type::String | Type::Char) || scalar_array_element(&t) => (),
             Type::ArrayRef(t) if matches!(*t, Type::Function(_) | Type::Named(_)) => pending_types.push(*t),
             Type::ArrayRef(t) if *t == Type::Byte => {
                 if let Some(owner) = byte_array_owner(input) { pending_types.push(owner); }

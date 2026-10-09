@@ -60,7 +60,10 @@ impl Specializer<'_> {
             }
             Type::ByRef(t) => return Ok(Type::ByRef(Box::new(self.lower(t)?))),
             Type::Array(t) if **t == Type::Byte => return Ok(ty.clone()),
-            Type::ArrayRef(t) if **t == Type::String || super::selection::scalar_array_element(t) => return Ok(ty.clone()),
+            Type::ArrayRef(t) if matches!(**t, Type::String | Type::Char) || super::selection::scalar_array_element(t) => {
+                if let Some(owner) = super::selection::array_owner(self.source, t) { self.lower(&owner)?; }
+                return Ok(ty.clone());
+            },
             Type::ArrayRef(t) if matches!(**t, Type::Function(_) | Type::Named(_) | Type::Constructed { .. }) => {
                 let lowered = self.lower(t)?;
                 if self.source.type_definition(t).is_some_and(|t| t.is_reference_type && t.representation == neoclr::metadata::Representation::Record) {
@@ -173,7 +176,7 @@ impl Specializer<'_> {
         if target
             .generic_arguments
             .iter()
-            .any(|t| !matches!(t, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String | Type::Int64 | Type::UInt64 | Type::Function(_) | Type::Named(_) | Type::Constructed { .. }))
+            .any(|t| !matches!(t, Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::Function(_) | Type::Named(_) | Type::Constructed { .. }))
         {
             return Err(
                 format!("generic method arguments require primitive, Function or closed nominal shapes: {} {:?}", target.name, target.generic_arguments).into(),
@@ -288,6 +291,18 @@ impl Specializer<'_> {
         {
             *t = self.lower(&substitute(t, arguments, methods).map_err(|e| e.to_string())?)?;
         }
+        for target in &mut result.interface_implementations {
+            let mut closed = target.clone();
+            closed.owner = closed.owner.as_ref().map(|t| substitute(t, arguments, methods)).transpose().map_err(|e| e.to_string())?;
+            closed.parameters = closed.parameters.iter().map(|t| substitute(t, arguments, methods)).collect::<Result<_, _>>().map_err(|e| e.to_string())?;
+            let instance = self.resolve(&closed)?;
+            let callee = &self.source.functions[instance.source];
+            pending.push(instance.clone());
+            target.definition = Some(neoclr::metadata::MemberId { module: self.source.name.clone(), revision: self.source.revision.clone(), index: instance.row as u32 });
+            target.owner = closed.owner.as_ref().map(|t| self.owner(t, closed.instance)).transpose()?;
+            target.name = lowered_member_name(callee, target.owner.as_ref());
+            target.parameters = closed.parameters.iter().map(|t| self.lower(t)).collect::<Result<_, _>>()?;
+        }
         for op in &mut result.body {
             if let Op::Construct(target) = op {
                 let definition = target.owner.as_ref().and_then(|owner| self.source.type_definition(owner))
@@ -395,7 +410,7 @@ fn validate_argument(ty: &Type, depth: usize) -> Result<(), Error> {
         return Err("generic argument nesting exceeds 16".into());
     }
     match ty {
-        Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String | Type::Int64 | Type::UInt64 | Type::Named(_) => Ok(()),
+        Type::Int32 | Type::UInt32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String | Type::Char | Type::Int64 | Type::UInt64 | Type::Named(_) => Ok(()),
         Type::Function(shape) => {
             for t in shape.parameters.iter().chain([&shape.returns]) { validate_argument(t, depth + 1)?; }
             Ok(())
@@ -511,10 +526,15 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
                 contracts.push(super::selection::closed_signature(original, &instance.types)?);
             }
             if display { continue; }
+            if let Type::ArrayRef(element) = substitute(&original.returns, &instance.types, &instance.methods).map_err(|e| e.to_string())? {
+                if let Some(owner) = super::selection::array_owner(input, &element) {
+                    if !constructed.contains(&owner) { constructed.push(owner); }
+                }
+            }
             for op in &original.body {
                 if let Op::NewArray(element) | Op::ReserveArray(element) = op {
                     let element = substitute(element, &instance.types, &instance.methods).map_err(|e| e.to_string())?;
-                    if let Some(owner) = super::selection::array_owner(input, &element).filter(|_| element == Type::Byte || input.type_definition(&element).is_some_and(|t| t.is_reference_type && t.representation == neoclr::metadata::Representation::Record)) {
+                    if let Some(owner) = super::selection::array_owner(input, &element).filter(|_| matches!(element, Type::Byte | Type::String | Type::Char) || super::selection::scalar_array_element(&element) || input.type_definition(&element).is_some_and(|t| t.is_reference_type && t.representation == neoclr::metadata::Representation::Record)) {
                         if !constructed.contains(&owner) { constructed.push(owner); }
                     }
                 }
@@ -532,6 +552,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
                 if !visited.contains(&instance.row) { pending.push(instance); }
             }
             for owner in &constructed {
+                if *owner == Type::String { continue; }
                 if !super::selection::object_display_contract(&contract) && !super::selection::implements_interface(input, owner, contract.owner.as_ref().unwrap()) { continue; }
                 let definition = input.type_definition(owner).ok_or("constructed interface implementor requires local definition")?;
                 // Unboxed value construction does not create an Object receiver.
@@ -615,7 +636,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
     let reference_backings: Vec<_> = context.shapes.iter().filter(|shape|
         input.assemblies.iter().any(|a| a.array_backing.as_ref().is_some_and(|id| input.types[shape.source].definition.as_ref() == Some(id)))
         && shape.arguments.len() == 1
-        && input.type_definition(&shape.arguments[0]).is_some_and(|t| t.is_reference_type && t.representation == neoclr::metadata::Representation::Record))
+        && (matches!(shape.arguments[0], Type::String | Type::Char) || super::selection::scalar_array_element(&shape.arguments[0]) || input.type_definition(&shape.arguments[0]).is_some_and(|t| t.is_reference_type && t.representation == neoclr::metadata::Representation::Record)))
         .map(|shape| shape.row).collect();
     let report = json!({"referenceArrayBackings":reference_backings,"policy":"up to 256 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 256 function clones and 1024 selected functions; no constraints",
         "typeCount": context.shapes.len(), "functionCount": context.instances.len(), "functionCloneCount": context.clones,

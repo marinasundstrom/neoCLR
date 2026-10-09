@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Complete the bounded native String POC from unchanged Raven sources and native-only
+  metadata. Add verified character/scalar array views, explicit String interface
+  dispatch and receiver-slot construction lowering. Check interpreted/ARM64 output,
+  exact fault rendering, repeated GC entries and missing-binding rejection; retain
+  documented Object-display, bootstrap and intern-lookup limitations for later work.
+
 - Share Unicode casing/folding kernels with statically linked native String services,
   including grapheme/scalar snapshots and character construction. Add a GC-rooted,
   per-entry intern pool with explicit quotas; record its provisional linear lookup

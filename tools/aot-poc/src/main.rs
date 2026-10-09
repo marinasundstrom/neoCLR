@@ -7,6 +7,7 @@ mod linking;
 mod limits;
 mod selection;
 mod specialization;
+mod string_projection;
 
 use std::{
     env, fs,

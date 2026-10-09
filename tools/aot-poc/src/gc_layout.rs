@@ -37,7 +37,7 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
         Ty::Reference(i) => Trace::Object(*i),
         Ty::Interface(i) => Trace::Interface(*i),
         Ty::ByteArray => Trace::ByteArray,
-        Ty::StringArray => Trace::StringArray,
+        Ty::StringArray | Ty::CharacterArray => Trace::StringArray,
         Ty::ByteValues => Trace::ByteValues,
         // Even a borrow of an integer can keep its owning object/array alive.
         // Tracing the pointee alone is insufficient for an interior address.

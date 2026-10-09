@@ -1,0 +1,110 @@
+module Example.NativeString
+
+import System.*
+import System.Result.*
+import System.Text.Utf8SliceError.*
+
+func Main() -> int {
+    let text = "hé🙂\u0000text".Replace("text", "done")
+    if String.CompareOrdinal(text, "hé🙂\u0000done") != 0 {
+        return 1
+    }
+    if text.GetUtf8ByteCount() != 12 {
+        return 2
+    }
+    if !text.ContainsOrdinal("🙂\u0000") {
+        return 3
+    }
+    if text.Length != 8 || text.IsEmpty || !"".IsEmpty {
+        return 4
+    }
+    if !text.StartsWithOrdinal("hé") || !text.EndsWithOrdinal("done") {
+        return 5
+    }
+    if String.CompareOrdinal("Straße ﬃ".ToUpperInvariant(), "STRASSE FFI") != 0 {
+        return 6
+    }
+    if String.CompareOrdinal("ΟΣ İ".ToLowerInvariant(), "ος i\u0307") != 0 {
+        return 7
+    }
+    if String.CompareOrdinalIgnoreCase("ÅΣẞ\u0000", "åςß\u0000") != 0 {
+        return 8
+    }
+    if String.Compare("a", "A", StringComparison.OrdinalIgnoreCase) != 0 {
+        return 9
+    }
+    if String.Compare("a", "A", StringComparison.Ordinal) <= 0 {
+        return 10
+    }
+    let Ok(slice) = text.SliceUtf8(1, 2) else {
+        return 11
+    }
+    if !slice.Equals("é") {
+        return 12
+    }
+    let Error(InvalidBoundary) = text.SliceUtf8(2, 1) else {
+        return 13
+    }
+    let Error(OutOfRange) = text.SliceUtf8(-1, 1) else {
+        return 14
+    }
+    let values = ["a", "é", "", "🙂"]
+    if !String.Join("|", values).Equals("a|é||🙂") {
+        return 15
+    }
+    let graphemes = "e\u0301👩‍💻"
+    if graphemes.Length != 2 {
+        return 16
+    }
+    let chars = [graphemes[0], graphemes[1]]
+    if !String(chars).Equals(graphemes) {
+        return 17
+    }
+    var characters = 0
+    let iterator = graphemes.GetIterator()
+    while iterator.MoveNext() {
+        characters += 1
+    }
+    iterator.Dispose()
+    if characters != 2 {
+        return 18
+    }
+    let scalars = graphemes.GetScalars()
+    if scalars.Count != 5 || scalars[0] != 101 {
+        return 19
+    }
+    let first = String.Intern(String.Concat("he", "llo"))
+    let second = String.Intern(String.Concat("h", "ello"))
+    if !Object.ReferenceEquals(first, second) {
+        return 20
+    }
+    if !String.Concat(first, second).Equals("hellohello") {
+        return 21
+    }
+    if first != "hello" || first == "HELLO" {
+        return 22
+    }
+    let equality: EquatableTo<string> = first
+    if !equality.Equals(second) {
+        return 23
+    }
+    let sequence: Collections.Sequence<char> = graphemes
+    if sequence.Count != 2 || String([sequence[0]]) != "e\u0301" {
+        return 24
+    }
+    let snapshot = String(chars)
+    chars[0] = "x"[0]
+    if snapshot != graphemes {
+        return 25
+    }
+    let Ok(atEnd) = text.SliceUtf8(12, 0) else {
+        return 26
+    }
+    if !atEnd.IsEmpty || String.Join("|", []) != "" {
+        return 27
+    }
+    if String.CompareOrdinalIgnoreCase("é", "e\u0301") == 0 {
+        return 28
+    }
+    return 42
+}

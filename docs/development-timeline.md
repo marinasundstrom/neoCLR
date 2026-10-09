@@ -12416,3 +12416,17 @@ claim follows from these focused checks.
   was checked in the browser for System.Time navigation, TimeOfDay summaries and
   System.Runtime ownership. This does not qualify every time API for AOT or publish
   the website.
+
+### 2026-10-09 — Bound native String work to the release POC
+
+- **Author:** “Keep in mind that we're looking to release a proof of concept. It
+  does not have to solve all the problems, just the most urgent ones before we
+  release it.” This clarified the ongoing instruction to finish native String.
+- **Assistant:** proposed closing the current source-String qualification and
+  validation rather than expanding into Object display, intern optimization or
+  full core bootstrap. Native String consumers now pass interpreted and ARM64
+  execution; remaining limitations are recorded in the
+  [POC scope](experiments/native-core-bootstrap/README.md#production-string-poc-2026-10-09).
+- **Author:** earlier directed that RavenDoc branch work be integrated after native
+  String is done. That integration remains the next authorized step; no branch
+  deletion or integration is claimed by this entry.

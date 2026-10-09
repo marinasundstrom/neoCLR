@@ -19,7 +19,8 @@ pub(super) enum Ty {
     Reference(usize),
     Interface(usize),
     ByteArray,
-    StringArray, // Invocation-owned pointer slots; nominal/interface views remain excluded.
+    CharacterArray, // Same pointer-slot layout, distinct element identity.
+    StringArray, // Invocation-owned pointer slots; verified nominal backing enables views.
     ByteValues, // Immutable native-produced value-array snapshot; no element addresses.
     Size,
     Wide,
@@ -96,7 +97,7 @@ impl<'a> Profile<'a> {
             let valid = input.types.get(i).is_some_and(|t| t.is_reference_type
                 && t.representation == Representation::Record && t.fields.len() == 1
                 && t.generic_parameters.is_empty()
-                && matches!(&t.fields[0].ty, Type::ArrayRef(element) if input.type_definition(element).is_some_and(|e| e.is_reference_type && e.representation == Representation::Record)));
+                && matches!(&t.fields[0].ty, Type::ArrayRef(element) if matches!(**element, Type::String | Type::Char) || crate::selection::scalar_array_element(element) || input.type_definition(element).is_some_and(|e| e.is_reference_type && e.representation == Representation::Record)));
             if !references || !valid { return Err("invalid private reference-array backing projection".into()); }
         }
         for (index, t) in input.types.iter().enumerate() {
@@ -133,9 +134,9 @@ impl<'a> Profile<'a> {
                 || t.fields.len() > 16
                 || t.fields.iter().any(|f| {
                     f.deferred
-                        || !(matches!(f.ty, Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::Void | Type::String | Type::Named(_))
+                        || !(matches!(f.ty, Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::Void | Type::String | Type::Char | Type::Named(_))
                             || (references && matches!(&f.ty, Type::Function(_)))
-                            || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Function(_) | Type::Named(_)) || crate::selection::scalar_array_element(t))))
+                            || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Char | Type::Function(_) | Type::Named(_)) || crate::selection::scalar_array_element(t))))
                 })
             {
                 return Err(format!("{}: value profile requires nongeneric records with at most sixteen supported scalar/reference/local-record fields", t.name).into());
@@ -432,6 +433,7 @@ impl<'a> Profile<'a> {
             Type::Array(t) if **t == Type::Byte && self.references => Ty::ByteValues,
             Type::ArrayRef(t) if **t == Type::Byte && self.references => Ty::ByteArray,
             Type::ArrayRef(t) if **t == Type::String && self.references => Ty::StringArray,
+            Type::ArrayRef(t) if **t == Type::Char && self.references => Ty::CharacterArray,
             Type::Named(name) => {
                 let i = self
                     .input
@@ -478,7 +480,7 @@ impl<'a> Profile<'a> {
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
             Ty::Erased => vec![false, true],
-            Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::Callable(_) | Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray | Ty::ByteValues | Ty::Size | Ty::Wide => vec![true],
+            Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::Callable(_) | Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray | Ty::ByteValues | Ty::Size | Ty::Wide => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
             _ => vec![false; self.lanes(t)],
@@ -509,8 +511,8 @@ impl<'a> Profile<'a> {
     }
     fn reference_assignable(&self, actual: &Ty, expected: &Ty) -> bool {
         match (actual, expected) {
-            (Ty::ByteArray | Ty::ReferenceArray(_), Ty::Reference(i)) if self.backing_for_array(actual) == Some(*i) => true,
-            (Ty::ByteArray | Ty::ReferenceArray(_), _) if self.backing_for_array(actual).is_some() => self.reference_assignable(&Ty::Reference(self.backing_for_array(actual).unwrap()), expected),
+            (Ty::ByteArray | Ty::ReferenceArray(_) | Ty::ScalarArray(_) | Ty::StringArray | Ty::CharacterArray, Ty::Reference(i)) if self.backing_for_array(actual) == Some(*i) => true,
+            (Ty::ByteArray | Ty::ReferenceArray(_) | Ty::ScalarArray(_) | Ty::StringArray | Ty::CharacterArray, _) if self.backing_for_array(actual).is_some() => self.reference_assignable(&Ty::Reference(self.backing_for_array(actual).unwrap()), expected),
             (Ty::Reference(actual) | Ty::Interface(actual), Ty::Interface(expected)) =>
                 crate::selection::implements_interface(self.input, &Type::Named(self.input.types[*actual].name.clone()), &Type::Named(self.input.types[*expected].name.clone())),
             (Ty::Reference(actual), Ty::Reference(expected)) if self.object_base == Some(*expected) =>
@@ -520,7 +522,7 @@ impl<'a> Profile<'a> {
     }
     pub fn cast_targets(&self, target: &Ty) -> Vec<usize> {
         match target {
-            Ty::ByteArray | Ty::ReferenceArray(_) => self.backing_for_array(target).into_iter().collect(),
+            Ty::ByteArray | Ty::ReferenceArray(_) | Ty::ScalarArray(_) | Ty::StringArray | Ty::CharacterArray => self.backing_for_array(target).into_iter().collect(),
             Ty::Reference(i) if self.object_base == Some(*i) => self.input.types.iter().enumerate()
                 .filter(|(_, t)| t.representation == Representation::Record && !t.is_abstract)
                 .map(|(i, _)| i).collect(),
@@ -858,7 +860,7 @@ impl<'a> Profile<'a> {
                     || self.backing_for_array(&self.ty(t)?).is_some()) => (),
                 Op::NewArray(t) | Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
                     if self.references && crate::selection::scalar_array_element(t) => (),
-                Op::NewArray(Type::String) | Op::ReserveArray(Type::String) | Op::ArrayElement(Type::String) | Op::StoreArrayElement(Type::String) if self.references => (),
+                Op::NewArray(Type::String | Type::Char) | Op::ReserveArray(Type::String | Type::Char) | Op::ArrayElement(Type::String | Type::Char) | Op::StoreArrayElement(Type::String | Type::Char) if self.references => (),
                 Op::NewArray(t) | Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
                     if self.references && matches!(t, Type::Function(_)) => { self.ty(t)?; },
                 Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte) | Op::ArrayElement(Type::Byte) | Op::StoreArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) | Op::ArrayLength if self.references => (),
@@ -962,7 +964,7 @@ impl<'a> Profile<'a> {
                 }
                 Op::IsInstance(Type::String) | Op::CastClass(Type::String) => {
                     let source = pop(&mut stack)?;
-                    if source != Ty::Literal && !(self.references && matches!(source, Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::ReferenceArray(_))) {
+                    if source != Ty::Literal && !(self.references && matches!(source, Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::ReferenceArray(_) | Ty::ScalarArray(_) | Ty::StringArray | Ty::CharacterArray)) {
                         return Err(fail(pc, "String casts require text or managed references"));
                     }
                     stack.push(Ty::Literal);
@@ -975,7 +977,7 @@ impl<'a> Profile<'a> {
                     stack.push(self.ty(t)?);
                 }
                 Op::ReferenceIsNull => {
-                    if !matches!(pop(&mut stack)?, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::Callable(_) | Ty::CallableArray(_) | Ty::Literal | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray) {
+                    if !matches!(pop(&mut stack)?, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::Callable(_) | Ty::CallableArray(_) | Ty::Literal | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray) {
                         return Err(fail(pc, "null test requires text or reference"));
                     }
                     stack.push(Ty::Bool);
@@ -983,7 +985,7 @@ impl<'a> Profile<'a> {
                 Op::ReferenceEqual => {
                     for _ in 0..2 {
                         let ty = pop(&mut stack)?;
-                        if !matches!(ty, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::StringArray) && !(ty == Ty::Literal && self.references) {
+                        if !matches!(ty, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray) && !(ty == Ty::Literal && self.references) {
                             return Err(fail(pc, "identity requires managed references; text requires --reference-arena"));
                         }
                     }
@@ -1021,26 +1023,26 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &Ty::Int)?;
                     take(&mut stack, &Ty::CallableArray(t.clone()))?;
                 }
-                Op::NewArray(Type::String) | Op::ReserveArray(Type::String) => {
+                Op::NewArray(t @ (Type::String | Type::Char)) | Op::ReserveArray(t @ (Type::String | Type::Char)) => {
                     take(&mut stack, &Ty::Int)?;
-                    stack.push(Ty::StringArray);
+                    stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
-                Op::ArrayElement(Type::String) => {
+                Op::ArrayElement(t @ (Type::String | Type::Char)) => {
                     take(&mut stack, &Ty::Int)?;
-                    take(&mut stack, &Ty::StringArray)?;
-                    stack.push(Ty::Literal);
+                    take(&mut stack, &self.ty(&Type::ArrayRef(Box::new(t.clone())))?)?;
+                    stack.push(self.ty(t)?);
                 }
-                Op::StoreArrayElement(Type::String) => {
-                    take(&mut stack, &Ty::Literal)?;
+                Op::StoreArrayElement(t @ (Type::String | Type::Char)) => {
+                    take(&mut stack, &self.ty(t)?)?;
                     take(&mut stack, &Ty::Int)?;
-                    take(&mut stack, &Ty::StringArray)?;
+                    take(&mut stack, &self.ty(&Type::ArrayRef(Box::new(t.clone())))?)?;
                 }
                 Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte) => {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(Ty::ByteArray);
                 }
                 Op::ArrayLength => {
-                    if !matches!(pop(&mut stack)?, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::ByteArray | Ty::StringArray | Ty::ByteValues) {
+                    if !matches!(pop(&mut stack)?, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray | Ty::ByteValues) {
                         return Err(fail(pc, "array length requires a byte array or immutable byte values"));
                     }
                     stack.push(Ty::Size);

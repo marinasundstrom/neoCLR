@@ -505,3 +505,47 @@ contracts, plus Result/slice/failure dependencies. The transcript also retains t
 source/imported String member-ownership errors for GetUtf8ByteCount; those need
 qualification once the dependency graph resolves. Earlier contract-only evidence
 is kept separately. Full native String/core bootstrap remains open.
+
+## Production String POC (2026-10-09)
+
+The unchanged production String source and 15 production dependencies now compile
+against native-only metadata and run in the interpreter and ARM64 AOT. This closes
+the bounded native String POC, not complete class-library bootstrap. The fixture
+still supplies minimal Object slots, primitive declarations and runtime-service
+facades; Raven is hosted by .NET during compilation, but it imports no CLI semantic
+reference library. The emitted executable links text/Unicode/GC support statically
+and shares only the operating system C library.
+
+`verify-source-string.py --raven /path/to/Raven --output /fresh/output` compiles the
+library and three checked-in consumers, compares interpreted/native execution,
+checks exact fault rendering, repeated GC entries, required bindings and dynamic
+library dependencies. Build the runtime, AOT tool and release aot-native-text static
+library first. On macOS use the matching Xcode SDKROOT. The script also runs a
+separate UBSan build, which intentionally loads the sanitizer's diagnostic library.
+
+The primary consumer covers every declared public String member, except the Object
+Concat overload exercised by the separate Object consumer: operators, explicit
+Collection.Count, equality, grapheme indexing/iteration, scalar view, construction
+and snapshot independence, Intern identity, both comparison modes, casing, Replace,
+Join, predicates, byte count, Length/IsEmpty and SliceUtf8 result patterns. Empty
+search produces identical RuntimeError message and frames in both modes. Native
+construction lowers the verified receiver-slot body to a private factory; argument
+address/receiver operations and constructor chaining remain explicitly rejected.
+Character/String/scalar array interface views retain exact verified backing types.
+
+Release POC limitations: full source Object/core bootstrap, the project driver's
+primitive-ownership configuration, general reflection and arbitrary Object display
+remain open. AOT conservatively requires explicit ToString overrides on reachable
+constructed types, so the Object-concatenation consumer is qualified separately.
+Native intern lookup is a bounded linear scan, with its measurements and ownership
+contract recorded in [native String services](../aot-console/README.md#native-string-services-development-2026-10-09).
+The possible iterator dispatch cycle uses the existing guarded native stack profile.
+These are development contracts, not a stable native ABI or universal .NET parity.
+The existing UTF-8/grapheme/Unicode divergences are preserved across execution modes.
+
+Focused regression evidence: metadata primitive references and erased values,
+managed text vectors, shared casing, native Unicode/GC quota checks, String runtime
+suites, and native character/String/array profiles. The AOT unit suite uses an
+8 MiB test-thread stack for its existing 256-type dependency-depth stress case;
+the default debug test-thread stack overflowed. An initial broad native test attempt
+used the incompatible default SDK and was stopped; focused checks use Xcode's SDK.

@@ -392,6 +392,15 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
         let name = row["name"].as_str().unwrap();
         let (parameters, result, implementation, symbol) = match name {
+            "neoCLR.Runtime.StringGraphemeCount" => (vec![Type::String], Type::Int32, "string-grapheme-count-v1", "neoclr_string_grapheme_count_v1"),
+            "neoCLR.Runtime.StringGraphemeAt" => (vec![Type::String, Type::Int32], Type::Char, "string-grapheme-at-v1", "neoclr_string_grapheme_at_v1"),
+            "neoCLR.Runtime.StringGraphemes" => (vec![Type::String], Type::ArrayRef(Box::new(Type::Char)), "string-graphemes-v1", "neoclr_string_graphemes_v1"),
+            "neoCLR.Runtime.StringScalars" => (vec![Type::String], Type::ArrayRef(Box::new(Type::UInt32)), "string-scalars-v1", "neoclr_string_scalars_v1"),
+            "neoCLR.Runtime.StringFromChars" => (vec![Type::ArrayRef(Box::new(Type::Char))], Type::String, "string-from-chars-v1", "neoclr_string_from_chars_v1"),
+            "neoCLR.Runtime.StringToUpperInvariant" => (vec![Type::String], Type::String, "string-upper-v1", "neoclr_string_upper_v1"),
+            "neoCLR.Runtime.StringToLowerInvariant" => (vec![Type::String], Type::String, "string-lower-v1", "neoclr_string_lower_v1"),
+            "neoCLR.Runtime.StringCompareOrdinalIgnoreCase" => (vec![Type::String, Type::String], Type::Int32, "string-compare-ignore-case-v1", "neoclr_string_compare_ignore_case_v1"),
+            "neoCLR.Runtime.StringIntern" => (vec![Type::String], Type::String, "string-intern-v1", "neoclr_string_intern_v1"),
             "neoCLR.Runtime.StringCompareOrdinal" => (vec![Type::String, Type::String], Type::Int32, "string-compare-ordinal-v1", "neoclr_string_compare_ordinal_v1"),
             "neoCLR.Runtime.StringContainsOrdinal" => (vec![Type::String, Type::String], Type::Boolean, "string-contains-ordinal-v1", "neoclr_string_contains_ordinal_v1"),
             "neoCLR.Runtime.StringStartsWithOrdinal" => (vec![Type::String, Type::String], Type::Boolean, "string-starts-with-ordinal-v1", "neoclr_string_starts_with_ordinal_v1"),
@@ -418,7 +427,7 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
         f.impl_flags = 0;
         // A verifier-valid nonreturning placeholder needs no unsupported array
         // constructor; only the reported InternalCall is lowered to native code.
-        f.body = if matches!(result, Type::Array(_)) { vec![Op::Branch(0)] }
+        f.body = if matches!(result, Type::Array(_) | Type::ArrayRef(_) | Type::Char) { vec![Op::Branch(0)] }
             else if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
             else if result == Type::String { vec![Op::String(String::new()), Op::Return] }
             else if result == Type::Value { vec![Op::String(String::new()), Op::PackValue(Type::String), Op::Return] }

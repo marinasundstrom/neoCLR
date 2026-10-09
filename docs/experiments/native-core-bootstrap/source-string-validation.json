@@ -1,0 +1,61 @@
+{
+  "scope": "Production String and 15 production dependencies; native metadata only. Fixture core Object, not full core bootstrap.",
+  "sourceHashes": {
+    "String": "f19337a7f451f01e64ac97879d692801d862649e47af55f8e45d3aea9dc783c4",
+    "Array": "6e421b09a2909d31ca48781106f8b9a82d9af59d9d0c9e6a30855c7284590c3f",
+    "EquatableTo": "0abe8cc42a1a0430c85a80fedf1a450e909370276dde862846dd9dbd0ba4fbd9",
+    "Disposable": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d",
+    "Collections/Iterator": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14",
+    "Collections/Iterable": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06",
+    "Collections/Collection": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db",
+    "Collections/Sequence": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a",
+    "Collections/MutableSequence": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8",
+    "StringComparison": "aa73d44c5e53d5487d092998401033e82f4e11d86d1a4537babd3bd3c9986944",
+    "Propagatable": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
+    "Option": "d691d1e10b36c5484cd9d7e410cb12b11397e6b6bcffd5cc273a147c67399b96",
+    "Result": "e251512b797a3eb0d536e3df32aed723e10541952cd9f6949f1b58c19b132835",
+    "Attribute": "89211bdc6852fa7d85dc38bec55c3a643113636049eaf6cd17d384db3c317f94",
+    "Runtime/CompilerServices/UnionAttribute": "2b5dc7aca6883217188df40ce57c31025703caa869bcdcf775309eda34c804d9",
+    "Text/Utf8SliceError": "f29a15ee4b50179e8478f0a8b8898e69b867306aa09547e579db62929d79fe7d"
+  },
+  "ravenRevision": "a1464759238cb058b71e7eccc95408d42b50a905",
+  "neoClrRevision": "a2365fa7403643bcc09111d7a4301c1aa9cdbcc6",
+  "dynamicDependencies": "/private/tmp/string-final-poc-1009/artifacts/string-app:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+  "date": "2026-10-09",
+  "validatedWithUncommittedImplementation": true,
+  "reproduce": "verify-source-string.py --raven /path/to/Raven --output /fresh/output",
+  "checks": [
+    "16 unchanged production Raven sources compiled against native-only metadata",
+    "StringConsumer and StringObjectConsumer return 42 in interpreter and ARM64",
+    "three entries with collection and reset",
+    "StringFaultConsumer message and stack identical across modes",
+    "missing UTF-8 binding and native GC reject without object output",
+    "inspection rejects String.Intern without native GC",
+    "separate UBSan consumer passes",
+    "ordinary binary links only libSystem"
+  ],
+  "nativeRuns": [
+    "42; three entries, 873 collections, 168 reclaimed allocations",
+    "42; three entries, 873 collections, 168 reclaimed allocations",
+    "42; three entries, 84 collections, 24 reclaimed allocations"
+  ],
+  "focusedRegressions": {
+    "runtimeSuites": 22,
+    "nativeString": 13,
+    "nativeCharacter": 3,
+    "nativeNominalArray": 7,
+    "nativeScalarArray": 2,
+    "aotUnit": 12,
+    "primitiveReference": 2,
+    "managedTextVector": 1,
+    "sharedCasing": 2,
+    "sharedUnicodeKernel": 3
+  },
+  "limitations": [
+    "fixture Object, not full source core bootstrap",
+    "Object display requires explicit overrides for reachable constructed types",
+    "intern lookup is linear and bounded",
+    "matched private native ABI and macOS ARM64 stack guard",
+    "AOT unit depth stress uses RUST_MIN_STACK=8388608"
+  ]
+}

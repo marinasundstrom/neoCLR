@@ -1,0 +1,8 @@
+module Example.NativeStringFault
+
+import System.*
+
+func Main() -> int {
+    let text = "example".Replace("", "x")
+    return text.Length
+}

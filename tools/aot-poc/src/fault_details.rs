@@ -50,6 +50,15 @@ pub struct Options {
     pub string_join_parts: Vec<usize>,
     pub string_replace_ordinal: Vec<usize>,
     pub string_concat: Vec<usize>,
+    pub string_grapheme_count: Vec<usize>,
+    pub string_grapheme_at: Vec<usize>,
+    pub string_graphemes: Vec<usize>,
+    pub string_scalars: Vec<usize>,
+    pub string_from_chars: Vec<usize>,
+    pub string_upper: Vec<usize>,
+    pub string_lower: Vec<usize>,
+    pub string_compare_ignore_case: Vec<usize>,
+    pub string_intern: Vec<usize>,
     pub string_byte_count: Vec<usize>,
     pub utf8_decode: Vec<usize>,
     pub utf8_encode: Vec<usize>,
@@ -227,6 +236,33 @@ impl Options {
                 .filter(|r| r["implementation"] == "string-concat-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
+            string_grapheme_count: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-grapheme-count-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            string_grapheme_at: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-grapheme-at-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            string_graphemes: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-graphemes-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            string_scalars: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-scalars-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            string_from_chars: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-from-chars-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            string_upper: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-upper-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            string_lower: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-lower-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            string_compare_ignore_case: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-compare-ignore-case-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            string_intern: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-intern-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             string_byte_count: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter().flatten()
@@ -297,7 +333,7 @@ impl Options {
 pub struct Data {
     frames: Vec<DataId>,
     messages: HashMap<(usize, usize), DataId>,
-    defaults: [DataId; 8],
+    defaults: [DataId; 9],
 }
 fn literal(module: &mut ObjectModule, name: &str, text: &str) -> Result<DataId, Error> {
     let id = module.declare_data(name, Linkage::Local, false, false)?;
@@ -356,6 +392,7 @@ impl Data {
             literal(module, "fault_array_limit", neoclr::FaultCode::ArrayLimitExceeded.standard_message().unwrap())?,
             literal(module, "fault_index", neoclr::FaultCode::IndexOutOfRange.standard_message().unwrap())?,
             literal(module, "fault_stack", neoclr::FaultCode::StackOverflow.standard_message().unwrap())?,
+            literal(module, "fault_intern", neoclr::FaultCode::InternPoolLimitExceeded.standard_message().unwrap())?,
         ];
         Ok(Self {
             frames,
@@ -392,7 +429,7 @@ pub struct Site {
     context: ir::Value,
     frame: ir::Value,
     pc: usize,
-    defaults: [ir::Value; 8],
+    defaults: [ir::Value; 9],
     pub message: Option<ir::Value>,
     pub capture_frame: bool,
 }
@@ -421,7 +458,9 @@ impl Site {
             let index = b.ins().icmp_imm(IntCC::Equal, status, 8);
             let message = b.ins().select(index, self.defaults[6], message);
             let stack = b.ins().icmp_imm(IntCC::Equal, status, 9);
-            b.ins().select(stack, self.defaults[7], message)
+            let message = b.ins().select(stack, self.defaults[7], message);
+            let intern = b.ins().icmp_imm(IntCC::Equal, status, 10);
+            b.ins().select(intern, self.defaults[8], message)
         };
         b.ins().store(MemFlags::new(), status, self.context, 0);
         b.ins().store(MemFlags::new(), message, self.context, 8);

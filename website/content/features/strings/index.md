@@ -277,3 +277,19 @@ culture dependency. Number provides a separate arithmetic contract; parsing is n
 part of it. See [numeric API contracts](/docs/text-numbers.html) for exact rules and the
 current generic-import limits. A shared numeric parsing interface remains a possible
 future direction.
+
+## Native compilation preview
+
+The development ARM64 compiler now runs the unchanged Raven `String` implementation
+compiled against native metadata. Tested consumers cover construction from characters,
+grapheme iteration, scalar access, Unicode casing, comparison, joining, replacement,
+UTF-8 slicing and interned identity. The native binary links the text services
+statically; it needs no shared managed runtime. Interpreter and native fault output
+are checked together.
+
+This is a work-in-progress bootstrap milestone, not full core-library qualification.
+The native intern pool is bounded and currently uses linear lookup. Native Object
+display still requires explicit overrides for reachable constructed types; the
+Object-concatenation consumer is qualified separately. Matching development compiler,
+metadata and native host artifacts are required. See [native compilation](../native-compilation/)
+for the wider release scope.

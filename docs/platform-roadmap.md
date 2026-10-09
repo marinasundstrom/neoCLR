@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Native String POC (2026-10-09):** unchanged production String and its native-only
+source dependencies now pass interpreted and ARM64 execution, with static Unicode
+services, GC-rooted intern ownership, array interface views and matching faults.
+The release target is a bounded proof of concept, not resolution of every platform
+limitation. Full core bootstrap, broad Object display and intern optimization remain
+separate follow-up work. [Scope and evidence](experiments/native-core-bootstrap/README.md#production-string-poc-2026-10-09).
+
 **Native core value prerequisite (2026-10-09):** selected native System.ValueType
 classification now admits ordinary value declarations, with copied/mutated struct
 parity in project run, interpreter and ARM64 native execution. Unchanged production
@@ -28,8 +35,9 @@ The six production collection/equality interfaces needed by String now compile
 unchanged against native-only metadata and pass imported generic dispatch in project,
 interpreter and ARM64 execution. [Dependency contract evidence](experiments/native-core-bootstrap/README.md#production-string-dependency-contracts-2026-10-09).
 The native fixture now exposes seven real scalar text-service facades; direct calls
-pass both modes and source String resolves RuntimeServices. Remaining text/vector
-services, array/primitive dependencies and source String ownership are next. Full core bootstrap remains open.
+pass both modes and source String resolves RuntimeServices. Those remaining text/vector
+services, array/primitive dependencies and source String ownership are now qualified
+by the production String POC above. Full core bootstrap remains open.
 [Union source evidence](experiments/native-core-bootstrap/README.md#production-union-source-subset-2026-10-09).
 [Text-service evidence](experiments/native-core-bootstrap/README.md#native-text-services-and-module-projection-2026-10-09).
 

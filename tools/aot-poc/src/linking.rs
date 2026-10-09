@@ -88,7 +88,8 @@ pub fn prepare(
                 index: i as u32,
             });
         }
-        for (i, _) in input.types.iter().enumerate() {
+        for (i, ty) in input.types.iter().enumerate() {
+            if ty.primitive_reference { continue; }
             types.push(TypeDefId {
                 module: input.name.clone(),
                 revision: input.revision.clone(),
@@ -96,7 +97,7 @@ pub fn prepare(
             });
         }
         joined.functions.extend(input.functions.iter().cloned());
-        joined.types.extend(input.types.iter().cloned());
+        joined.types.extend(input.types.iter().filter(|t| !t.primitive_reference).cloned());
         for assembly in &input.assemblies {
             if joined
                 .assemblies
@@ -469,21 +470,27 @@ pub fn prepare(
         .map(|(i, _)| json!({"compiledIndex": i,
             "policy": "verified public nonvirtual Int32 wrapper; explicit borrowed receiver, unchanged CIL"})).collect::<Vec<_>>());
     // The original load set owns its String methods. The backend's bundled String
-    // cannot be redeclared; lower verified public nonvirtual instance wrappers to
+    // cannot be redeclared; lower verified nonvirtual instance wrappers and explicit interface implementations to
     // free functions with an explicit receiver, preserving the original CIL body.
+    super::string_projection::constructors(&mut selected, &mut report)?;
     let string_members: std::collections::BTreeSet<_> = selected.functions.iter().enumerate()
         .filter(|(_, f)| f.owner == Some(neoclr::metadata::Type::String) && f.instance)
         .map(|(i, _)| i).collect();
     for &i in &string_members {
         let f = &selected.functions[i];
         if !reference_arena || f.receiver_byref || f.receiver_readonly || f.is_virtual || f.is_override
-            || f.is_abstract || !f.generic_parameters.is_empty() || !f.interface_implementations.is_empty()
-            || f.visibility != neoclr::metadata::Visibility::Public || f.name.ends_with("..ctor") {
-            return Err("String instance projection requires public nonvirtual ordinary wrappers and --reference-arena".into());
+            || f.is_abstract || !f.generic_parameters.is_empty()
+            || (f.visibility != neoclr::metadata::Visibility::Public && f.interface_implementations.is_empty()) || f.name.ends_with("..ctor") {
+            return Err("String instance projection requires public or explicit-interface nonvirtual wrappers and --reference-arena".into());
         }
     }
     for (i, f) in selected.functions.iter_mut().enumerate() {
         if string_members.contains(&i) {
+            if !f.interface_implementations.is_empty() {
+                f.interface_implementations.clear();
+                f.visibility = neoclr::metadata::Visibility::Internal;
+                if let Some(origin) = &mut f.origin { origin.member_access = Some(neoclr::metadata_origin::SourceAccess::Assembly); }
+            }
             f.owner = None;
             f.namespace = "System".into();
             f.instance = false;

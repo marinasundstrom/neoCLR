@@ -1,0 +1,18 @@
+module Example.NativeStringObjects
+
+import System.*
+
+func Main() -> int {
+    let left: Object? = "hello"
+    let right: Object? = null
+    if String.Concat(left, right) != "hello" {
+        return 1
+    }
+    if String.Concat(right, left) != "hello" {
+        return 2
+    }
+    if String.Concat(right, right) != "" {
+        return 3
+    }
+    return 42
+}

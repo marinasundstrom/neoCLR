@@ -4,7 +4,8 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.NeoClr;
 using Raven.CodeAnalysis.Syntax;
 
-if (args.Length is < 1 or > 2 || args.Length == 2 && args[1] != "--text-services") throw new ArgumentException("Specify a fresh output directory and optional --text-services.");
+if (args.Length is < 1 or > 2 || args.Length == 2 && args[1] is not ("--text-services" or "--source-string")) throw new ArgumentException("Specify a fresh output directory and optional --text-services or --source-string.");
+var sourceString = args.Length == 2 && args[1] == "--source-string";
 var output = Path.GetFullPath(args[0]);
 if (Directory.Exists(output)) throw new IOException("Output directory already exists.");
 Directory.CreateDirectory(output);
@@ -24,6 +25,11 @@ var equals = root.AddNativeObjectSlot("Equals", new(PrimitiveType.Boolean, [root
 equals.GetILGenerator().Emit(OpCode.Ldc_Bool, false);
 equals.GetILGenerator().Return();
 core.AddClass("System", "ValueType", root);
+if (sourceString)
+{
+    core.AddClass("System", "Enum", root);
+    core.AddClass("System", "Array", root);
+}
 var attribute = core.AddClass("System", "Attribute", root);
 var attributeCtor = attribute.AddConstructor(Array.Empty<PrimitiveType>());
 attributeCtor.GetILGenerator().LoadArgument(0);
@@ -37,11 +43,14 @@ markerCtor.GetILGenerator().Return();
 foreach (var primitive in new[] { PrimitiveType.Byte, PrimitiveType.Int32, PrimitiveType.Int64, PrimitiveType.Double, PrimitiveType.Boolean, PrimitiveType.Void })
     core.AddValueType("System", primitive.ToString()).SetNativePrimitive(primitive);
 var stringType = core.AddClass("System", "String", root);
-stringType.SetNativePrimitive(PrimitiveType.String);
+if (sourceString) stringType.SetNativePrimitiveReference(PrimitiveType.String);
+else stringType.SetNativePrimitive(PrimitiveType.String);
 if (args.Length == 2)
 {
-    core.AddValueType("System", "Char").SetNativeGrapheme();
+    var charType = core.AddValueType("System", "Char");
+    charType.SetNativeGrapheme();
     var services = core.AddClass("System.Runtime.CompilerServices", "RuntimeServices", root);
+    var nativeText = new Dictionary<string, MethodBuilder>();
     MethodBuilder AddTextService(string name, MethodSignature signature)
     {
         var runtimeCall = core.AddFunction("neoCLR.Runtime", name, signature);
@@ -51,6 +60,7 @@ if (args.Length == 2)
         for (var i = 0; i < signature.ParameterTypes.Count; i++) il.LoadArgument(i);
         il.Call(runtimeCall);
         il.Return();
+        nativeText.Add(name, runtimeCall);
         return runtimeCall;
     }
     foreach (var name in new[] { "StringContainsOrdinal", "StringStartsWithOrdinal", "StringEndsWithOrdinal" })
@@ -69,6 +79,7 @@ if (args.Length == 2)
     {
         var signature = new MethodSignature(result, [PrimitiveType.String, PrimitiveType.String]);
         var runtimeCall = AddTextService(service, signature);
+        if (sourceString) continue;
         var wrapper = stringType.AddMethod(member, signature);
         var il = wrapper.GetILGenerator();
         il.LoadArgument(0);
@@ -78,22 +89,63 @@ if (args.Length == 2)
     }
     var replaceService = AddTextService("StringReplaceOrdinal",
         new(PrimitiveType.String, [PrimitiveType.String, PrimitiveType.String, PrimitiveType.String]));
-    var replace = stringType.AddInstanceMethod("Replace",
-        new(PrimitiveType.String, [PrimitiveType.String, PrimitiveType.String]));
-    var replaceIl = replace.GetILGenerator();
-    replaceIl.LoadArgument(0);
-    replaceIl.LoadArgument(1);
-    replaceIl.LoadArgument(2);
-    replaceIl.Call(replaceService);
-    replaceIl.Return();
+    if (!sourceString)
+    {
+        var replace = stringType.AddInstanceMethod("Replace",
+            new(PrimitiveType.String, [PrimitiveType.String, PrimitiveType.String]));
+        var replaceIl = replace.GetILGenerator();
+        replaceIl.LoadArgument(0);
+        replaceIl.LoadArgument(1);
+        replaceIl.LoadArgument(2);
+        replaceIl.Call(replaceService);
+        replaceIl.Return();
+    }
     var byteCount = AddTextService("StringByteCount", new(PrimitiveType.Int32, [PrimitiveType.String]));
-    var count = stringType.AddInstanceMethod("GetByteCount", new(PrimitiveType.Int32, []));
-    count.GetILGenerator().LoadArgument(0);
-    count.GetILGenerator().Call(byteCount);
-    count.GetILGenerator().Return();
+    if (!sourceString)
+    {
+        var count = stringType.AddInstanceMethod("GetByteCount", new(PrimitiveType.Int32, []));
+        count.GetILGenerator().LoadArgument(0);
+        count.GetILGenerator().Call(byteCount);
+        count.GetILGenerator().Return();
+    }
+    if (sourceString)
+    {
+        core.AddValueType("System", "UInt32").SetNativePrimitive(PrimitiveType.UInt32);
+        var value = core.AddValueType("System", "Value");
+        value.SetNativePrimitive(PrimitiveType.Value);
+        foreach (var name in new[] { "StringIntern", "StringToUpperInvariant", "StringToLowerInvariant" })
+            AddTextService(name, new(PrimitiveType.String, [PrimitiveType.String]));
+        AddTextService("StringGraphemeCount", new(PrimitiveType.Int32, [PrimitiveType.String]));
+        AddTextService("StringCompareOrdinalIgnoreCase", new(PrimitiveType.Int32, [PrimitiveType.String, PrimitiveType.String]));
+        AddTextService("StringGraphemeAt", new(charType, [PrimitiveType.String, PrimitiveType.Int32]));
+        AddTextService("CharFromString", new(charType, [PrimitiveType.String]));
+        AddTextService("CharText", new(PrimitiveType.String, [charType]));
+        AddTextService("StringFromChars", new(PrimitiveType.String, [SignatureType.ArrayOf(charType)]));
+        AddTextService("StringGraphemes", new(SignatureType.ArrayOf(charType), [PrimitiveType.String]));
+        AddTextService("StringScalars", new(SignatureType.ArrayOf(PrimitiveType.UInt32), [PrimitiveType.String]));
+        AddTextService("StringJoinParts", new(PrimitiveType.String, [SignatureType.ArrayOf(PrimitiveType.String), PrimitiveType.Int32, PrimitiveType.String, PrimitiveType.Int32]));
+        AddTextService("StringSliceUtf8", new(value, [PrimitiveType.String, PrimitiveType.Int32, PrimitiveType.Int32]));
+        var equal = services.AddMethod("StringEquals", new(PrimitiveType.Boolean, [PrimitiveType.String, PrimitiveType.String]));
+        equal.LoadArgument(0); equal.LoadArgument(1); equal.Call(nativeText["StringCompareOrdinal"]);
+        equal.LoadConstant(0); equal.Emit(OpCode.Ceq); equal.Return();
+        foreach (var unpack in new[] { false, true })
+        {
+            var target = SignatureType.MethodParameter(0);
+            var valueMethod = services.AddMethod(unpack ? "UnpackValue" : "IsValue", new(unpack ? target : PrimitiveType.Boolean, [value], ["T"]));
+            valueMethod.LoadArgument(0); valueMethod.Emit(unpack ? OpCode.ValueUnpack : OpCode.ValueIs, target); valueMethod.Return();
+        }
+        var storage = core.AddClass("System.Runtime.CompilerServices", "CheckedStorage", root);
+        var reserve = storage.AddMethod("Reserve", new(SignatureType.ArrayOf(SignatureType.MethodParameter(0)), [PrimitiveType.Int32], ["T"]));
+        reserve.LoadArgument(0); reserve.Emit(OpCode.ReserveArray, SignatureType.MethodParameter(0)); reserve.Return();
+        var fail = core.AddFunction("neoCLR.Runtime", "Fail", new(PrimitiveType.Void, [PrimitiveType.String]));
+        fail.SetInternalCall();
+        var failure = core.AddFunction("System", "Fail", new(PrimitiveType.Void, [PrimitiveType.String]));
+        failure.LoadArgument(0); failure.Call(fail); failure.Return();
+    }
 }
 var bytes = RuntimeAssemblyContainer.WriteLibraryBinary(core);
 File.WriteAllBytes(Path.Combine(output, "NativeCore.dll"), bytes);
+if (sourceString) return SourceString.Build(core, output);
 var input = new AssemblyBuilder(new("Input", new(1, 0, 0, 0)), identity);
 var method = input.AddType("Example", "Input").AddMethod("Value", new(PrimitiveType.Int32, []));
 method.GetILGenerator().LoadConstant(40);

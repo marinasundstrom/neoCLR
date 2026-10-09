@@ -126,8 +126,19 @@ fn matches_type(b: &mut FunctionBuilder<'_>, p: &Profile<'_>, tag: ir::Value, in
         let reserved = b.ins().icmp_imm(IntCC::Equal, tag, 0x80000002);
         b.ins().bor(ordinary, reserved)
     } else if p.reference_array_backings.contains(&index) {
-        b.ins().icmp_imm(IntCC::Equal, tag, (((index as u64 + 1) << 32) | 0x80000005) as i64)
+        let owner = b.ins().ushr_imm(tag, 32);
+        b.ins().icmp_imm(IntCC::Equal, owner, index as i64 + 1)
     } else { b.ins().icmp_imm(IntCC::Equal, tag, index as i64) }
+}
+
+fn tag_array(b: &mut FunctionBuilder<'_>, p: &Profile<'_>, ty: &Ty, array: ir::Value) {
+    if let Some(index) = p.backing_for_array(ty) {
+        if p.array_backing == Some(index) { return; }
+        let kind = b.ins().load(types::I64, MemFlags::new(), array, 0);
+        let kind = b.ins().band_imm(kind, 0xffffffff);
+        let tagged = b.ins().bor_imm(kind, ((index as i64 + 1) << 32) as i64);
+        b.ins().store(MemFlags::new(), tagged, array, 0);
+    }
 }
 
 // Private Object views use the low bit of aligned text pointers. Null stays zero.
@@ -228,6 +239,9 @@ fn check_byte_value_replacement(b: &mut FunctionBuilder<'_>, address: ir::Value,
 }
 
 pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
+    if details.is_some_and(|d| !d.native_gc && !d.string_intern.is_empty()) {
+        return Err("native String.Intern requires --native-gc for invocation-scoped strong ownership".into());
+    }
     let reservations = input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ReserveArray(_))));
     let references = details.is_some_and(|d| d.reference_arena);
     if details.is_some_and(|d| d.native_gc && (!d.reference_arena || !d.probe_stack_roots)) {
@@ -392,6 +406,15 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             (&d.string_join_parts, "neoclr_string_join_parts_v1", vec![types::I64, types::I32, types::I64, types::I32, types::I64, types::I64]),
             (&d.string_replace_ordinal, "neoclr_string_replace_ordinal_v1", vec![types::I64, types::I64, types::I64, types::I64, types::I64]),
             (&d.string_concat, "neoclr_string_concat_v1", vec![types::I64, types::I64, types::I64, types::I64]),
+            (&d.string_grapheme_count, "neoclr_string_grapheme_count_v1", vec![types::I64, types::I64]),
+            (&d.string_grapheme_at, "neoclr_string_grapheme_at_v1", vec![types::I64, types::I32, types::I64, types::I64]),
+            (&d.string_graphemes, "neoclr_string_graphemes_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.string_scalars, "neoclr_string_scalars_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.string_from_chars, "neoclr_string_from_chars_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.string_upper, "neoclr_string_upper_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.string_lower, "neoclr_string_lower_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.string_compare_ignore_case, "neoclr_string_compare_ignore_case_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.string_intern, "neoclr_string_intern_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_byte_count, "neoclr_string_byte_count_v1", vec![types::I64, types::I64]),
             (&d.string_slice_utf8, "neoclr_string_slice_utf8_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
         ] {
@@ -467,7 +490,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         Some(module.declare_function("neoclr_reserve_records_v1", Linkage::Import, &sig)?)
     } else { None };
     let reference_array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op|
-        matches!(op, Op::NewArray(t) | Op::ReserveArray(t) if matches!(t, neoclr::metadata::Type::String | neoclr::metadata::Type::Function(_))))) {
+        matches!(op, Op::NewArray(t) | Op::ReserveArray(t) if matches!(t, neoclr::metadata::Type::String | neoclr::metadata::Type::Char | neoclr::metadata::Type::Function(_))))) {
         let mut sig = module.make_signature();
         sig.params.extend([types::I64, types::I32, types::I32, types::I64].map(AbiParam::new));
         sig.returns.push(AbiParam::new(types::I32));
@@ -902,13 +925,16 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 } else if details.unwrap().string_slice_utf8.contains(&i) || details.unwrap().string_replace_ordinal.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], parameters[2], arena, output]
+                } else if details.unwrap().string_grapheme_at.contains(&i) {
+                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                    vec![parameters[0], parameters[1], arena, output]
                 } else if details.unwrap().string_concat.contains(&i) || details.unwrap().path_combine.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], arena, output]
-                } else if details.unwrap().utf8_encode.contains(&i) || details.unwrap().utf8_decode.contains(&i) || details.unwrap().path_file_name.contains(&i) {
+                } else if details.unwrap().string_graphemes.contains(&i) || details.unwrap().string_scalars.contains(&i) || details.unwrap().string_from_chars.contains(&i) || details.unwrap().string_upper.contains(&i) || details.unwrap().string_lower.contains(&i) || details.unwrap().string_intern.contains(&i) || details.unwrap().utf8_encode.contains(&i) || details.unwrap().utf8_decode.contains(&i) || details.unwrap().path_file_name.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], arena, output]
-                } else if details.unwrap().string_compare_ordinal.contains(&i)
+                } else if details.unwrap().string_compare_ignore_case.contains(&i) || details.unwrap().string_compare_ordinal.contains(&i)
                     || details.unwrap().string_contains_ordinal.contains(&i)
                     || details.unwrap().string_starts_with_ordinal.contains(&i)
                     || details.unwrap().string_ends_with_ordinal.contains(&i) {
@@ -920,15 +946,30 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let memory = b.ins().iconst(types::I32, 5);
                 let runtime = b.ins().iconst(types::I32, 3);
                 let status = b.ins().select(exhausted, memory, runtime);
-                let status = if details.unwrap().utf8_encode.contains(&i) {
+                let status = if details.unwrap().utf8_encode.contains(&i) || details.unwrap().string_graphemes.contains(&i) || details.unwrap().string_scalars.contains(&i) {
                     let limited = b.ins().icmp_imm(IntCC::Equal, raw, 7);
                     let array_limit = b.ins().iconst(types::I32, 7);
                     b.ins().select(limited, array_limit, status)
+                } else { status };
+                let status = if details.unwrap().string_grapheme_at.contains(&i) {
+                    let bounded = b.ins().icmp_imm(IntCC::Equal, raw, 8);
+                    let index = b.ins().iconst(types::I32, 8);
+                    b.ins().select(bounded, index, status)
+                } else if details.unwrap().string_intern.contains(&i) {
+                    let limited = b.ins().icmp_imm(IntCC::Equal, raw, 10);
+                    let intern = b.ins().iconst(types::I32, 10);
+                    b.ins().select(limited, intern, status)
                 } else { status };
                 let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
                 let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
+                if let Some(ty) = &p.results[i] {
+                    if p.backing_for_array(ty).is_some() {
+                        let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                        tag_array(&mut b, &p, ty, array);
+                    }
+                }
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks(); b.finalize();
@@ -1246,7 +1287,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let status = b.inst_results(call)[0];
                         let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                         return_if_detailed(&mut b, failed, status, site.as_ref());
-                        stack.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
+                        let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                        tag_array(&mut b, &p, &p.ty(&neoclr::metadata::Type::ArrayRef(Box::new(t.clone())))?, array);
+                        stack.push(array);
                     }
                     Op::NewArray(t) if matches!(t, neoclr::metadata::Type::Named(_)) => {
                         let count = pop(&mut stack);
@@ -1281,7 +1324,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         }
                         stack.push(array);
                     }
-                    Op::NewArray(t) | Op::ReserveArray(t) if matches!(t, neoclr::metadata::Type::String | neoclr::metadata::Type::Function(_)) => {
+                    Op::NewArray(t) | Op::ReserveArray(t) if matches!(t, neoclr::metadata::Type::String | neoclr::metadata::Type::Char | neoclr::metadata::Type::Function(_)) => {
                         let count = pop(&mut stack);
                         let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                         let output = b.ins().stack_addr(types::I64, call_result, 0);
@@ -1291,7 +1334,31 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let status = b.inst_results(call)[0];
                         let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                         return_if_detailed(&mut b, failed, status, site.as_ref());
-                        stack.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
+                        let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                        tag_array(&mut b, &p, &p.ty(&neoclr::metadata::Type::ArrayRef(Box::new(t.clone())))?, array);
+                        if matches!(op, Op::NewArray(neoclr::metadata::Type::Char)) {
+                            let data = module.declare_data_in_func(default_character, b.func);
+                            let character = b.ins().global_value(types::I64, data);
+                            let loop_block = b.create_block();
+                            b.append_block_param(loop_block, types::I32);
+                            let body = b.create_block();
+                            let done = b.create_block();
+                            let zero = b.ins().iconst(types::I32, 0);
+                            b.ins().jump(loop_block, &[zero.into()]);
+                            b.switch_to_block(loop_block);
+                            let index = b.block_params(loop_block)[0];
+                            let more = b.ins().icmp(IntCC::SignedLessThan, index, count);
+                            b.ins().brif(more, body, &[], done, &[]);
+                            b.switch_to_block(body);
+                            let wide = b.ins().uextend(types::I64, index);
+                            let offset = b.ins().imul_imm(wide, 8);
+                            let slot = b.ins().iadd(array, offset);
+                            b.ins().store(MemFlags::new(), character, slot, 16);
+                            let next = b.ins().iadd_imm(index, 1);
+                            b.ins().jump(loop_block, &[next.into()]);
+                            b.switch_to_block(done);
+                        }
+                        stack.push(array);
                     }
                     Op::NewArray(neoclr::metadata::Type::Byte) | Op::ReserveArray(neoclr::metadata::Type::Byte) => {
                         let count = pop(&mut stack);
@@ -1345,7 +1412,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         }
                     }
                     Op::ArrayElement(t) | Op::StoreArrayElement(t) | Op::ArrayAddress(t) => {
-                        let pointers = matches!(t, neoclr::metadata::Type::String | neoclr::metadata::Type::Function(_));
+                        let pointers = matches!(t, neoclr::metadata::Type::String | neoclr::metadata::Type::Char | neoclr::metadata::Type::Function(_));
                         let value = if matches!(op, Op::StoreArrayElement(_)) { Some(pop(&mut stack)) } else { None };
                         let index = pop(&mut stack);
                         let array = pop(&mut stack);
@@ -1360,6 +1427,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let address = b.ins().iadd(data, offset);
                         if reservations {
                             let kind = b.ins().load(types::I64, MemFlags::new(), array, 0);
+                            let kind = b.ins().band_imm(kind, 0xffffffff);
                             let reserved = b.ins().icmp_imm(IntCC::Equal, kind, if pointers { 0x80000004 } else { 0x80000002 });
                             let check = b.create_block();
                             let ready = b.create_block();
