@@ -63,8 +63,10 @@ native HTTP, including the introspection and reflection support it needs. The
 [native JSON plan](native-json-plan.md) takes priority over further general hosting
 and reload slices. Reuse the existing serializer and qualify typed client/server
 payloads consistently on macOS ARM64 and Windows x64. Closed type-token storage and
-identity are the first implemented foundation; property metadata, checked accessor/
-constructor dispatch and complete native JSON execution remain unfinished.
+identity are implemented. A build-time source metadata catalogue now preserves
+selected nominal declarations and closed property signatures through specialization
+without rooting accessor bodies. Explicit metadata retention, runtime tables, checked
+accessor/constructor dispatch and complete native JSON execution remain unfinished.
 
 **Author clarification (2026-10-09):** once the native compilation foundations are
 ready, let runtime suspension, runtime-owned scheduling and green threads co-evolve

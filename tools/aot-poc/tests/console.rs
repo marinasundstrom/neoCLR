@@ -5321,3 +5321,92 @@ fn native_type_tokens_execute_with_interpreter_identity_parity() {
     assert_eq!(r.stdout, b"Type tokens: 42\n");
     assert!(r.stderr.is_empty());
 }
+
+#[test]
+fn native_source_metadata_survives_specialization_without_rooting_accessors() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = r#"
+.module MetadataShapes
+.type Box<T>
+.field Stored T
+.property instance Value() -> T
+.get instance Box<T>::Read()
+.end
+.method instance Read() -> T
+ldarg this
+ldfld Box<T>::Stored
+ret
+.end
+.end
+.function Calculate() -> Int32
+ldtoken Box<Int32>
+pop
+ldtoken Box<Boolean>
+pop
+ldc.i4 42
+ret
+.end
+"#;
+    let app = neoclr::assemble(source).unwrap();
+    let before = serde_json::to_value(&app).unwrap();
+    let dir = Temp::new();
+    let result = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena"]);
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    let rows = report["sourceMetadata"]["types"].as_array().unwrap();
+    assert_eq!(rows.len(), 2);
+    for (row, ty) in rows.iter().zip(["Int32", "Boolean"]) {
+        assert_eq!(row["name"], "Box");
+        assert_eq!(row["definition"]["module"], "MetadataShapes");
+        assert_eq!(row["definition"]["index"], 0);
+        assert_eq!(row["typeArguments"], serde_json::json!([ty]));
+        assert_eq!(row["properties"][0]["name"], "Value");
+        assert_eq!(row["properties"][0]["ty"], ty);
+        let getter: neoclr::metadata::FunctionRef = serde_json::from_value(row["properties"][0]["getter"].clone()).unwrap();
+        assert_eq!(getter.owner, Some(neoclr::metadata::Type::Constructed {
+            definition: "Box".into(), arguments: vec![neoclr::metadata::Type::from_name(ty)],
+        }));
+        assert_eq!(row["declaredMethods"][0]["definition"]["module"], "MetadataShapes");
+        assert_eq!(row["declaredMethods"][0]["returns"], ty);
+    }
+    assert_ne!(rows[0]["compiledTypeIndex"], rows[1]["compiledTypeIndex"]);
+    assert!(report["functions"].as_array().unwrap().iter().all(|r| r["name"] != "Box.Read"));
+    assert!(report["excludedFunctions"].as_array().unwrap().iter().any(|r| r["name"] == "Box.Read"));
+    assert_eq!(serde_json::to_value(&app).unwrap(), before);
+}
+
+#[test]
+fn native_source_metadata_keeps_access_and_original_member_identity() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let mut app = neoclr::assemble(r#"
+.module MetadataAccess
+.type Plain
+.property static Value() -> Int32
+.get Plain::Read()
+.end
+.method private static Read() -> Int32
+ldc.i4 17
+ret
+.end
+.end
+.function Calculate() -> Int32
+ldtoken Plain
+pop
+ldc.i4 42
+ret
+.end
+"#).unwrap();
+    // Bind the original association explicitly to exercise relocation safety.
+    let id = neoclr::metadata::MemberId { module: app.name.clone(), revision: app.revision.clone(), index: 0 };
+    app.types[0].properties[0].getter.as_mut().unwrap().definition = Some(id.clone());
+    let dir = Temp::new();
+    let result = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena"]);
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    let row = &report["sourceMetadata"]["types"][0];
+    assert_eq!(row["declaration"], serde_json::to_value(&app.types[0]).unwrap());
+    assert_eq!(row["properties"][0]["getter"]["definition"], serde_json::to_value(id).unwrap());
+    assert_eq!(row["declaredMethods"][0]["visibility"], "private");
+    assert_eq!(row["declaredMethods"][0]["instance"], false);
+    assert_eq!(report["functions"].as_array().unwrap().len(), 1);
+}

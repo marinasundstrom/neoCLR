@@ -141,6 +141,30 @@ must not be compared, persisted or used across reload. Keep native Windows ARM64
 qualification separate. Ordinary .NET/Raven behavior and Runtime Contract settings
 remain unchanged; this work is in neoCLR's native selection/backend layers.
 
+## Implemented source metadata catalogue — 2026-10-09
+
+The explicit-load-set linker now snapshots validated source metadata before
+canonicalization and specialization. Its private `sourceMetadata` report includes
+selected nominal declarations with original module/revision identities, closed
+property signatures and accessor references, and declared method identity/access
+information. Closed generic instances retain their shared declaration identity and
+distinct type arguments. The original declaration remains available alongside the
+closed view; native synthetic type names do not replace semantic names.
+
+This is build-time preservation and inspection only. It adds no executable roots,
+immutable runtime tables, metadata-root configuration or reflection bindings. An
+accessor appearing in this catalogue can still be excluded from native code. The
+catalogue covers selected nominal types, not every primitive or metadata-only type;
+explicit retention closure and runtime type identity integration remain next steps.
+The implementation reuses the source verifier and does not loosen access checks.
+
+Validation: two focused `native_source_metadata` tests compile generic and
+non-generic consumers, preserve original member IDs/private access, close property
+and accessor types, and assert unused accessor bodies remain excluded. The two
+`native_type_tokens` tests still pass, including native/interpreter executable
+identity parity. The unchanged typed JSON probe reaches its existing Boolean-boxing
+rejection; this catalogue does not claim that reflection or JSON executes natively.
+
 ## Evidence
 
 The original typed probe rejects native specialization with

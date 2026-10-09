@@ -110,6 +110,8 @@ pub fn prepare(
             joined.assemblies.push(assembly.clone());
         }
     }
+    // Keep original scope identities and property associations before relocation.
+    let source_metadata = joined.clone();
     let method_id = |i| MemberId {
         module: app.name.clone(),
         revision: app.revision.clone(),
@@ -272,6 +274,7 @@ pub fn prepare(
             row["definition"] = json!(types[row["sourceIndex"].as_u64().unwrap() as usize]);
         }
     }
+    report["sourceMetadata"] = super::reflection_metadata::catalogue(&source_metadata, &types, &methods, &report)?;
     if let Some(index) = report["arrayBackingProjection"]["compiledIndex"].as_u64() {
         if let Some(row) = report["types"].as_array().unwrap().iter().find(|r| r["compiledIndex"] == index).cloned() {
             report["arrayBackingProjection"]["definition"] = row["definition"].clone();

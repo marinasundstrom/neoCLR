@@ -20,6 +20,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Explicit build-time roots remain a proposed first mechanism, not a public API.
   Qualify native type identity on macOS ARM64 and Windows x64 in action
   `37978562111` at `3a8c315c`, verifying both artifacts and their source inputs.
+  Preserve selected nominal source declarations, closed property signatures and
+  member identities/access in a private build-time catalogue before native lowering.
+  Keep accessor bodies excluded unless independently reachable; runtime metadata
+  tables, explicit retention roots and reflection invocation remain unfinished.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

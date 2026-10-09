@@ -5,6 +5,7 @@ mod fault_details;
 mod inspection;
 mod linking;
 mod limits;
+mod reflection_metadata;
 mod selection;
 mod specialization;
 mod string_projection;
