@@ -232,7 +232,7 @@ pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usiz
     let array_owner = array_backing.map(|i| Type::Named(input.types[i].name.clone())).or_else(|| byte_array_owner(input));
     for &i in reached {
         for op in &input.functions[i].body {
-            if display && (matches!(op, Op::BoxValue(t) if *t != Type::Int32) || matches!(op, Op::NewArray(_) | Op::ReserveArray(_))) {
+            if display && (matches!(op, Op::BoxValue(t) if !matches!(t, Type::Int32 | Type::String)) || matches!(op, Op::NewArray(_) | Op::ReserveArray(_))) {
                 return Err("Object display with boxing or arrays requires a later receiver/metadata profile".into());
             }
             if matches!(op, Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte)) {
@@ -254,6 +254,9 @@ pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usiz
     let mut targets = vec![];
     for (ti, t) in input.types.iter().enumerate() {
         if !constructed.contains(t.name.as_str()) || (!display && !implements_interface(input, &Type::Named(t.name.clone()), f.owner.as_ref().unwrap())) { continue; }
+        // A value constructor alone cannot contribute a reference dispatch target.
+        // Unsupported boxes still reject above; interface dispatch is unchanged.
+        if display && !t.is_reference_type { continue; }
         if !t.is_reference_type || !t.generic_parameters.is_empty() || t.representation != neoclr::metadata::Representation::Record {
             return Err("interface dispatch requires nongeneric constructed classes".into());
         }

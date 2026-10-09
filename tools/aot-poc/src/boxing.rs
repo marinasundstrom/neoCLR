@@ -1,4 +1,4 @@
-//! Private lowering of verified empty value-record and Int32 boxing. This is not a native
+//! Private lowering of verified String reference views, empty value-record and Int32 boxing. This is not a native
 //! runtime-service binding: the source instruction retains its identity and fault site.
 use neoclr::metadata::{Function, FunctionRef, Instruction as Op, MemberId, Representation, Type};
 use serde_json::{Value, json};
@@ -20,7 +20,15 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
     let mut helpers = std::collections::BTreeMap::new();
     let mut rows = vec![];
     let mut int32_rows = vec![];
+    let mut string_rows = vec![];
     for (caller, pc, ty) in sites {
+        // String is intrinsic reference storage. Match the interpreter's Object
+        // view materialization instead of treating it as a value-record box.
+        if ty == Type::String {
+            input.functions[caller].body[pc] = Op::CastClass(object.clone());
+            string_rows.push(json!({"functionCompiledIndex":caller,"instruction":pc}));
+            continue;
+        }
         let primitive = ty == Type::Int32;
         let index = if primitive {
             if let Some(index) = int32_index { index } else {
@@ -61,6 +69,7 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         let sites = if primitive { &mut int32_rows } else { &mut rows };
         sites.push(json!({"functionCompiledIndex":caller,"instruction":pc,"helperCompiledIndex":helper,"typeCompiledIndex":index}));
     }
+    report["stringBoxSites"] = json!(string_rows);
     report["int32BoxSites"] = json!(int32_rows);
     report["emptyRecordBoxSites"] = json!(rows);
     report["emptyRecordBoxes"] = json!(helpers.into_iter().filter(|(ty, _)| Some(*ty) != int32_index).map(|(ty, helper)| json!({"typeCompiledIndex":ty,"helperCompiledIndex":helper})).collect::<Vec<_>>());

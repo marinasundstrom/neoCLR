@@ -8,7 +8,11 @@ fixture wrappers now pass both modes after an AOT module-ownership projection fi
 the four-source union/attribute build reaches imported class-base admission. Including
 the production Attribute source now compiles the complete five-source subset and
 passes union pattern/protocol execution in all three paths. [Evidence and next work](experiments/native-core-bootstrap/README.md#value-type-foundation-and-production-union-frontier-2026-10-09).
-Full core bootstrap remains open; expand production primitive/String/Object contracts next.
+Generic String boxing/Object display now also preserves text and reference identity
+across modes after correcting native reference-view lowering and excluding unboxed
+values from Object dispatch candidates. [Evidence](experiments/native-core-bootstrap/README.md#generic-string-boxing-and-object-display-2026-10-09).
+Full union display reaches unsupported isinst Char; full core bootstrap remains open.
+Expand production primitive/String/Object contracts next.
 [Union source evidence](experiments/native-core-bootstrap/README.md#production-union-source-subset-2026-10-09).
 [Text-service evidence](experiments/native-core-bootstrap/README.md#native-text-services-and-module-projection-2026-10-09).
 

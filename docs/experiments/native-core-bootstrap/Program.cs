@@ -41,6 +41,14 @@ stringType.SetNativePrimitive(PrimitiveType.String);
 if (args.Length == 2)
 {
     core.AddValueType("System", "Char").SetNativeGrapheme();
+    var identitySignature = new MethodSignature(PrimitiveType.Boolean, [root, root]);
+    var referenceEquals = core.AddFunction("neoCLR.Runtime", "ObjectReferenceEquals", identitySignature);
+    referenceEquals.SetInternalCall();
+    var identityWrapper = root.AddMethod("ReferenceEquals", identitySignature);
+    identityWrapper.GetILGenerator().LoadArgument(0);
+    identityWrapper.GetILGenerator().LoadArgument(1);
+    identityWrapper.GetILGenerator().Call(referenceEquals);
+    identityWrapper.GetILGenerator().Return();
     foreach (var (member, service, result) in new[] {
         ("Concat", "StringConcat", PrimitiveType.String),
         ("CompareOrdinal", "StringCompareOrdinal", PrimitiveType.Int32) })

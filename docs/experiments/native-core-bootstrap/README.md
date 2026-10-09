@@ -222,3 +222,43 @@ bootstrap, union formatting/equality/hash qualification, installed editor accept
 or extracted-package qualification. Next expand the native primitive/String/Object
 source contracts and use their real display behavior before qualifying formatted
 unions; keep the imported-inheritance capability gap explicit when splitting libraries.
+
+## Generic String boxing and Object display (2026-10-09)
+
+Add `--string-boxing` to the `--project --text-services --unions` verifier command.
+The [boxing consumer](boxing-consumer.rvn) converts a String through a generic
+`Box<T>` method to Object, displays its Unicode/NUL text, checks alias identity and
+checks that separately concatenated equal-content strings remain distinct. It also
+constructs an unrelated production Option<int>. This exposed two native admission
+errors: unboxed value constructors were treated as Object dispatch candidates, and
+closed `box String` was treated as unsupported value-record boxing.
+
+AOT now excludes unboxed values from Object dispatch candidate discovery in both
+specialization and selection. It lowers verified `box String` to the existing
+String-to-Object view conversion, retaining the CIL instruction's position and
+recording `stringBoxSites`. This uses the existing reference arena; it introduces
+no new runtime service or stable ABI. General value boxing, Char boxes, unboxing,
+array display and default Object metadata display remain outside this slice.
+
+[Execution evidence](string-boxing-validation.json) records project/interpreter/native
+result 42 and libSystem-only linkage. The fixture's new Object.ReferenceEquals
+wrapper calls the real existing runtime identity service. Its placeholder Object
+slot bodies remain deliberately nonproduction; native String display uses the
+existing intrinsic text path, and the interpreter uses its matching String behavior.
+The focused AOT `object_display_accepts_string_boxing_with_unboxed_value_construction`
+regression additionally compares UTF-8/NUL user-fault rendering and stack traces.
+Existing Object override/null/fault and invalid override/base/boxing rejection tests pass.
+
+This follows the CLI distinction between reference conversion and copied value
+boxing, reusing the [.NET/Object comparison](../../object-model-review.md) and
+[boxing research](../../boxed-interface-values.md). The interpreter already handles
+this String path, so it needs no change. Native and interpreter allocation policies
+still differ; result/identity parity does not imply identical allocation counts or
+resource-exhaustion thresholds. No performance claim is made.
+
+A further probe of `Option<string>.Some("hé🙂").ToString()` succeeds in the
+interpreter but native admission now reaches `isinst Char` in the generated formatter
+(instruction 19), which this profile does not support. That is separate from String
+boxing and must not be bypassed by removing the formatter's Char branch. Escaping,
+primitive display and production String/Object bootstrap remain open. The website's
+bounded work-in-progress description remains accurate; no public API was added.

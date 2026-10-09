@@ -1,0 +1,26 @@
+module Example.Boxing
+
+import System.*
+
+func Box<T>(value: T) -> Object {
+    return value
+}
+
+func Main() -> int {
+    let unused = Option<int>.Some(1)
+    let text = String.Concat("hé", "🙂\u0000z")
+    let value = Box(text)
+    if String.CompareOrdinal(value.ToString(), text) != 0 {
+        return 1
+    }
+    let alias: object = text
+    if !Object.ReferenceEquals(value, alias) {
+        return 2
+    }
+    let separate = String.Concat("hé", "🙂\u0000z")
+    let other = Box(separate)
+    if Object.ReferenceEquals(value, other) {
+        return 3
+    }
+    return 42
+}

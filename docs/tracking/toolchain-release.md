@@ -30,6 +30,12 @@ all five unchanged sources now compile into a native library, with pattern/proto
 consumer parity in project run, interpreter and ARM64 execution. The imported-base
 restriction remains a rejection control; it is not required by this source-built subset.
 [Union evidence](../experiments/native-core-bootstrap/union-source-validation.json).
+Generic String-to-Object boxing now passes display/identity checks alongside unrelated
+unboxed union construction in all three execution paths. Native projection retains
+reference identity and excludes unboxed values from Object dispatch candidates.
+[Boxing evidence](../experiments/native-core-bootstrap/string-boxing-validation.json).
+Full union display remains blocked at isinst Char; this does not qualify production
+Object formatting or complete native core bootstrap.
 
 Release remains gated on complete production source-runtime bootstrap without the
 CLI semantic bridge, matching SDK/editor/native artifacts and extracted-package

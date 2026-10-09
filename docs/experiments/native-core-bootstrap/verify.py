@@ -20,6 +20,7 @@ def main():
     parser.add_argument('--value-types', action='store_true', help='With --project, check copied values and the production union core frontier.')
     parser.add_argument('--text-services', action='store_true', help='With --project, verify native UTF-8 wrappers and production union frontier.')
     parser.add_argument('--unions', action='store_true', help='With --text-services, execute unchanged production Option/Result and pattern controls.')
+    parser.add_argument('--string-boxing', action='store_true', help='With --unions, check generic String boxing/display and reference identity.')
     args = parser.parse_args()
     if args.project and not args.driver:
         parser.error('--project requires --driver')
@@ -29,6 +30,8 @@ def main():
         parser.error('--text-services requires --project and cannot combine with --value-types')
     if args.unions and not args.text_services:
         parser.error('--unions requires --text-services')
+    if args.string_boxing and not args.unions:
+        parser.error('--string-boxing requires --unions')
     output = args.output.resolve()
     if output.exists():
         raise FileExistsError(output)
@@ -84,7 +87,8 @@ def main():
     if args.project:
         directory = artifacts / 'project'
         directory.mkdir()
-        (directory / 'Main.rvn').write_text((HERE / 'union-consumer.rvn').read_text() if args.unions
+        (directory / 'Main.rvn').write_text((HERE / 'boxing-consumer.rvn').read_text() if args.string_boxing
+            else (HERE / 'union-consumer.rvn').read_text() if args.unions
             else (HERE / 'text-consumer.rvn').read_text() if args.text_services
             else (HERE / 'value-consumer.rvn').read_text() if args.value_types
             else 'module Example.App\n' + (HERE / 'consumer.rvn').read_text())
@@ -154,6 +158,10 @@ def main():
         report['scope'] = 'Unchanged production Propagatable/Option/Result/Attribute/UnionAttribute over native-only fixture core; imported-base rejection retained.'
         report.pop('textChecks', None)
         report['unionChecks'] = ['Some/None', 'Ok/Error', 'let-else success/failure', 'if-let match/mismatch/else', 'UTF-8 and NUL error payload', 'production TryGetOutput/TryGetResidual including mismatched output reset']
+    if args.string_boxing:
+        report['scope'] = 'Native-only generic String boxing, Object display/reference identity and unrelated unboxed production union construction.'
+        report.pop('unionChecks', None)
+        report['boxingChecks'] = ['generic String-to-Object', 'Unicode/NUL display', 'alias identity', 'distinct equal-content identity', 'unboxed value construction excluded from Object dispatch']
     report['revisions'] = {name: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip()
                            for name, path in [('neoclr', ROOT), ('raven', args.raven)]}
     inputs = [runtime, aot, *[p for p in HERE.iterdir() if p.suffix in ('.cs', '.csproj', '.rvn', '.neoil', '.c', '.py')]]

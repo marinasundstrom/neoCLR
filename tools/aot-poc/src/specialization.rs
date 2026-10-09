@@ -534,6 +534,9 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
             for owner in &constructed {
                 if !super::selection::object_display_contract(&contract) && !super::selection::implements_interface(input, owner, contract.owner.as_ref().unwrap()) { continue; }
                 let definition = input.type_definition(owner).ok_or("constructed interface implementor requires local definition")?;
+                // Unboxed value construction does not create an Object receiver.
+                // Boxed-value admission remains checked independently during selection.
+                if super::selection::object_display_contract(&contract) && !definition.is_reference_type { continue; }
                 if !definition.is_reference_type || definition.representation != neoclr::metadata::Representation::Record {
                     return Err("interface dispatch requires constructed classes".into());
                 }

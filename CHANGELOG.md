@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Lower generic String boxing to the existing native Object reference view and
+  exclude unrelated unboxed value construction from Object display dispatch.
+  Native-only Raven display/alias/distinct-string checks now match the interpreter;
+  focused UTF-8/NUL fault and stack-trace regression passes. Unsupported value-box
+  display guards remain. Complete union formatting still reaches unsupported isinst Char.
+
 - Preserve System module ownership when AOT projects verified primitive methods to
   private functions; native-only static and String instance wrappers now pass
   interpreter/ARM64 UTF-8 checks. Missing declaration-owner diagnostics identify
