@@ -77,7 +77,7 @@ class ReportServer {
 
 }
 
-func Main(arguments: string[]) {
+func StartServer(arguments: string[]) -> Task<()> {
     var count = 1
     if arguments.Length > 0 {
         if let Ok(parsed) = Int32.Parse(arguments[0]) {
@@ -86,25 +86,32 @@ func Main(arguments: string[]) {
     }
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
         System.Fail("Listen failed")
-        return
+        return Promise<()>().Task
     }
     let Ok(port) = server.GetLocalPort() else {
         server.Close()
         System.Fail("Local port unavailable")
-        return
+        return Promise<()>().Task
     }
     Console.WriteLine(port)
     let Ok(pattern) = RoutePattern.Parse("/stations/{stationId}/reports") else {
         server.Close()
         System.Fail("Invalid station pattern")
-        return
+        return Promise<()>().Task
     }
     let serving = ReportServer(pattern).Serve(server, count)
-    serving.OnCompleted(() => {
-        server.Close()
-        if let Error(error) = serving.GetResult() {
-            System.Fail(error.ToString())
-        }
-        Console.WriteLine("Reports served")
-    })
+    return FinishServing(server, serving)
+}
+
+async func FinishServing(server: HttpServer, serving: Task<Result<unit, AppError>>) -> Task<()> {
+    let result = await serving
+    server.Close()
+    if let Error(error) = result {
+        System.Fail(error.ToString())
+    }
+    Console.WriteLine("Reports served")
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    await StartServer(arguments)
 }

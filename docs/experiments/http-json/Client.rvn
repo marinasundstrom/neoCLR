@@ -14,19 +14,17 @@ class ReportClient {
 
 }
 
-func Main(arguments: string[]) {
+async func Main(arguments: string[]) -> Task<()> {
     if arguments.Length != 1 {
         System.Fail("Supply the server base URL, for example http://localhost:8080/")
-        return
+        return ()
     }
     let client = HttpClient()
     client.BaseUri = Some(arguments[0])
-    let submission = ReportClient().SubmitReport(client)
-    submission.OnCompleted(() => {
-        if let Ok(reply) = submission.GetResult() {
-            Console.WriteLine(reply)
-        } else if let Error(error) = submission.GetResult() {
-            System.Fail(error.ToString())
-        }
-    })
+    let result = await ReportClient().SubmitReport(client)
+    if let Ok(reply) = result {
+        Console.WriteLine(reply)
+    } else if let Error(error) = result {
+        System.Fail(error.ToString())
+    }
 }

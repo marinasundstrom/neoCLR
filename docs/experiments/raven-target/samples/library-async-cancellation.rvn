@@ -13,6 +13,7 @@ async func Read(input: Task<int>) -> Task<int> {
 func Main() {
     let promise = Promise<int>()
     let result = Read(promise.Task)
+    // Observe cancellation explicitly: awaiting result would cancel Main before it prints.
     result.OnCompleted(() => {
         if result.Outcome is Some(Cancelled) {
             WriteLine("Cancelled")

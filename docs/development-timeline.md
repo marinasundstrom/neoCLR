@@ -12905,3 +12905,13 @@ claim follows from these focused checks.
   produce NEOMETA003 or a null receiver. Record these independently in the bridge
   notes. Samples use ordinary if-pattern statements for output and synchronous
   startup helpers, retaining await for asynchronous work. No compiler fix is claimed.
+
+- **Website follow-up:** the author asks to update samples where relevant and the
+  native compilation page specifically. Updates the Web/Tasks/case/native pages,
+  extracts tested async entry examples, and converts downloadable report clients
+  and servers to await. Ten focused sample checks pass, including three paired
+  report exchanges; see [the evidence](website-await-validation.json).
+- **Next authorized slice:** the author directs continuing after this slice. The
+  assistant selects repeated native HTTP invocation and guest-fault recovery as
+  the next bounded prerequisite for the roadmap's reusable native host. This is
+  a plan; persistent application state and a public hosting API are not claimed.

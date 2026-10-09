@@ -5,15 +5,16 @@ import System.Console.*
 
 async func Print(input: Task<Result<int, string>>) -> Task<unit> {
     let result = await input
-    match result {
-        Ok(let value) => WriteLine(value)
-        Error(let message) => WriteLine(message)
+    if let Ok(value) = result {
+        WriteLine(value)
+    } else if let Error(message) = result {
+        WriteLine(message)
     }
-    return ()
 }
 
-func Main() {
+async func Main() -> Task<unit> {
     let promise = Promise<Result<int, string>>()
-    _ = Print(promise.Task.MapResult(value => value + 1))
+    let printing = Print(promise.Task.MapResult(value => value + 1))
     promise.Complete(Ok(41))
+    await printing
 }

@@ -76,8 +76,8 @@ uses HttpContext to parse the body and return a JSON acknowledgement with status
 201. Bad JSON or report shapes return 400; unknown routes return 404.
 
 Application-owned converters project HttpError and JsonError into AppError while
-retaining the original causes through helpers and async methods. The completion
-callback converts errors to display text at its reporting boundary. Ordinary steps use propagation. The
+retaining the original causes through helpers and async methods. Async `Main` awaits the submission and converts errors to display text at its
+reporting boundary. Ordinary steps use propagation. The
 server handles invalid input explicitly where it chooses the HTTP response.
 
 [Download the client/server sample](/samples/http-json.zip). It uses the runtime

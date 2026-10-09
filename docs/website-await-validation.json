@@ -1,0 +1,119 @@
+{
+  "date": "2026-10-09",
+  "scope": "Await-first website Task and HTTP examples with implicit unit completion",
+  "compiler": "native-build-kit compiler 71cafd353; no compiler changes",
+  "reportSha256": "55654df8ba7057e0c0da42f10ff2785ca7c0cc5cdcd68da6971534dae90533cd",
+  "artifactHashesVerified": 67,
+  "cases": [
+    {
+      "name": "producer",
+      "passed": true
+    },
+    {
+      "name": "result",
+      "passed": true
+    },
+    {
+      "name": "cancellation",
+      "passed": true
+    },
+    {
+      "name": "overview",
+      "passed": true,
+      "requests": [
+        [
+          "GET",
+          "/greeting"
+        ]
+      ]
+    },
+    {
+      "name": "json",
+      "passed": true,
+      "requests": [
+        [
+          "POST",
+          "/reports",
+          {
+            "station": "Caf\u00e9"
+          }
+        ]
+      ]
+    },
+    {
+      "name": "json-pair",
+      "passed": true
+    },
+    {
+      "name": "mapped",
+      "passed": true,
+      "requests": [
+        [
+          "GET",
+          "/report"
+        ],
+        [
+          "POST",
+          "/reports",
+          {
+            "station": "Caf\u00e9"
+          }
+        ]
+      ]
+    },
+    {
+      "name": "mapped-pair",
+      "passed": true
+    },
+    {
+      "name": "routed",
+      "passed": true,
+      "requests": [
+        [
+          "GET",
+          "/stations/42/reports"
+        ],
+        [
+          "POST",
+          "/stations/42/reports",
+          {
+            "station": {
+              "name": "Caf\u00e9",
+              "description": "Sensor"
+            },
+            "readings": [
+              21,
+              22
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "name": "routed-pair",
+      "passed": true
+    }
+  ],
+  "sourceInputs": {
+    "docs/experiments/raven-target/samples/library-task-producer.rvn": "782afa44459debcb7a8a522128df0fd864508a001faf9f5df0e8d1704133f888",
+    "docs/experiments/raven-target/samples/library-task-result.rvn": "65306410a99383e1935dea4f49b4e4b4959b0846175ce7cc1091d5d66c203cab",
+    "docs/experiments/raven-target/samples/library-async-cancellation.rvn": "d13ed93eee12072c3048865e8a9fedff67afe8f7dda63fe0c766f691ea5fc5da",
+    "docs/experiments/http-client/Overview.rvn": "0d1377b16fe37be55a038823b53d2075290003c7c4673316a23957a771eb6f18",
+    "docs/experiments/http-json/Client.rvn": "db50a47ed23e10167c1e9401b2331ccf36ef66cf7c3ce079232cfed3fe908382",
+    "docs/experiments/http-json/Application.rvn": "4c0d11318a51325c706a88efb349e8a41ccb384027712424a284ab0dcfdcd0c6",
+    "docs/experiments/http-json/Server.rvn": "fa4aea92817e29e87a3440342da08f3e8534a5c668dbb4910ff32b4c3775a32a",
+    "docs/experiments/json-object-mapping/HttpClient.rvn": "7fe7ef6dbc0f167231e0b6be9385f5650c686db67d833079553fbac011090852",
+    "docs/experiments/json-object-mapping/HttpApplication.rvn": "76f5e0ec5cd523b424d7f76794e2894fcf3802f96ee9a290e18d732932df25bd",
+    "docs/experiments/json-object-mapping/HttpServer.rvn": "521bb512dd44ce2bf9b17a4b85a7660134992abb751f93f34ea7d471a1f710e9",
+    "docs/experiments/http-routing/Client.rvn": "a068abb6442948e09ed3a7a95672b70472cc525ee3110a1b74db05819a7ac50e",
+    "docs/experiments/json-object-mapping/NestedHttpApplication.rvn": "610a98ae139867b7f4a868cae4c5179bd88dfbcf10f661c43644c4d707fa0218",
+    "docs/experiments/http-routing/Server.rvn": "96b20d09513f48c10965c22163dc3f25fcb6d94ce8f4736e5ba10fa62d596a18",
+    "docs/experiments/http-routing/Routes.rvn": "1a2a4b9341d47a992e991a90a117eef0b2368fce2c3ffddffe22f81650a14cfe"
+  },
+  "command": "python3 scripts/validate-await-samples.py --bundle target/native-build-kit-slice/neoclr-native-build-kit/bundle --output target/website-await-samples-5",
+  "limitations": [
+    "Interpreter/library sample checks do not qualify native JSON/reflection support.",
+    "Explicit cancellation observation retains a documented OnCompleted callback.",
+    "Synchronous setup helpers avoid pinned compiler pattern-hoisting limitations recorded in docs/raven-cli-bridge.md."
+  ]
+}

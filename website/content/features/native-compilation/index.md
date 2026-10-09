@@ -4,61 +4,74 @@ title: Native compilation
 # Native compilation
 
 neoCLR's experimental ahead-of-time (AOT) compiler produces standalone executables
-on macOS ARM64 and Windows x64 for a supported subset of Raven applications. The interpreter remains available;
-interpreter API support does not automatically imply native support.
+on macOS ARM64 and Windows x64 for a supported subset of Raven applications,
+including console programs and the HttpClient/HttpServer showcases. The interpreter
+remains available; interpreter API support does not automatically imply native support.
 
 ## From Raven to an executable
 
 Raven source is compiled to neoCLR metadata and instructions, then lowered to native
-object code and linked with the required library and runtime support. Tested macOS
-executables use the OS's libSystem and need no separately installed neoCLR or .NET
-runtime to run. Tested Windows console EXEs use a static CRT and import only
-KERNEL32.dll. The compiler toolchain has its own requirements.
+object code and linked with the required library and runtime support. The resulting
+program needs no separately installed neoCLR or .NET runtime. Tested macOS binaries
+use libSystem. Windows console EXEs import KERNEL32; the HTTP EXEs also use WS2_32
+for networking. Windows builds link the CRT statically.
 
 AOT moves compilation work to build time and produces an architecture-specific binary.
 Memory management, text, I/O and fault handling still require runtime implementations
 linked into that binary. See [architecture](../../architecture/) for those layers.
 
-Development builds now have a bounded project-to-executable console workflow on
-macOS ARM64. It builds an ordinary Raven project with a selected native bundle,
-links a standalone executable and records build diagnostics and dependencies.
-A separate development kit now packages the compiler, libraries, AOT tool and
-native adapters, so application builds need no source checkout or Cargo. Building
-still requires the compiler's .NET SDKs and Apple's macOS tools; the resulting
-executable needs only the OS libraries. The kit is not included in Preview 13. See the
-[development build instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md#development-project-to-executable-workflow-2026-10-09)
-for the supported console profile and prerequisites.
+The development project workflow builds an ordinary Raven project with a matching
+compiler/library bundle, links its executable and records diagnostics and dependencies.
+Choose the profile for the host and workload:
 
-A separate Windows x64 source-checkout workflow now compiles ordinary Raven projects
-and links standalone console EXEs with MSVC. Its Windows Action passes managed
-arrays/text, interpolation, binary input/output and fault diagnostics with exact
-interpreter parity. Each EXE runs without the SDK or bundle beside it. See the
-[Windows build instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md#windows-x64-console-source-checkout).
-This development profile is separate from Preview 13; a packaged Windows native
-build kit and Windows HTTP/services remain future work.
+| Host | Console profile | HTTP profile | Build tools |
+| --- | --- | --- | --- |
+| macOS ARM64 | `console` | `http` | Matching .NET SDKs and Apple's macOS tools |
+| Windows x64 | `windows-console` | `windows-http` | Matching .NET SDKs and MSVC x64 tools |
 
-The development kit also offers an explicit `--profile http` project build for the
-existing one-request HTTP sample. It links the bounded socket/task host and native
-GC support; the console profile remains the default. This makes the POC easier to
-build, without claiming a production scheduler, runtime suspension or green threads.
+The macOS development kit packages the compiler, libraries, AOT tool and native
+adapters, so application builds need no source checkout or Cargo. Windows currently
+uses the source-checkout workflow. These native build workflows are separate from
+Preview 13; a packaged Windows native build kit remains future work.
+
+[macOS development build instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md#development-project-to-executable-workflow-2026-10-09) ·
+[Windows development build instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md#windows-x64-console-source-checkout)
+
+<a id="development-http-platform-parity"></a>
 
 ## A working HTTP proof of concept
 
-This library example parses a route, extracts an integer parameter and prints `42`
-in both interpreted and native execution:
+The client resolves `localhost`, connects and awaits a UTF-8 greeting. The server
+accepts a loopback GET `/greeting`, sends `Café 🌍` and closes its listener. Both
+programs run as separate standalone executables. Application code uses `await`,
+including in `Main`; a unit-returning async function completes when it reaches the end.
+
+The tested server awaits one exchange and reports its outcome:
 
 ```raven
-{{NATIVE_ROUTING_SAMPLE}}
+{{HTTP_SERVER_AWAIT_SAMPLE}}
 ```
 
-The HTTP server example accepts a loopback GET `/greeting` and returns the UTF-8 body
-`Café 🌍`. A repeated-request version serves sequential connections in one process.
-These examples exercise compiled library code, sockets, queues and managed memory.
-Sustained load and general concurrent server operation still need qualification.
+Its entry point awaits the helper that opens the listener and starts serving:
 
-[Web and HTTP](../web/) explains the APIs. The
-[native examples and build instructions](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/native-web)
-provide the development setup for these executables.
+```raven
+{{NATIVE_HTTP_ENTRY_SAMPLE}}
+```
+
+The native host drives task continuations and I/O completions until the exchange
+finishes. Explicit `OnCompleted` callbacks remain useful for completion adapters
+and tests, but are not required by native application entry points.
+
+The macOS and Windows checks compare native behavior with the interpreter for
+successful and fragmented exchanges, malformed HTTP, refused connections, timeouts,
+cancellation and guest faults. They also run a Raven client against a separate
+Raven server, with only the executable in each deployment directory.
+
+[Web and HTTP](../web/) shows client calls, response handlers and complete samples.
+[Native HTTP build and validation instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-http-parity.md)
+provide the development setup and retained evidence. A repeated-request server
+workbench also exists; sustained load and general concurrent operation still need
+qualification.
 
 <a id="coverage-baseline"></a>
 
@@ -67,35 +80,41 @@ provide the development setup for these executables.
 | Area | Current scope |
 | --- | --- |
 | Application data | Selected class, value, union, generic and collection programs |
-| Text and console | UTF-8 input/output and supported string operations |
+| Text and console | UTF-8 input/output and supported string operations on both hosts |
 | Files | Bounded UTF-8 file reads/writes and lexical paths on macOS |
-| HTTP | Routing and the tested accept/read/write/task-completion path |
-| Async | Selected Tasks and cancellation cases; async entry queue and opt-in host I/O pumping |
+| HTTP | Tested client DNS/connect/read/write and server accept/request/response paths on both hosts |
+| Async | Selected Tasks and cancellation; async Main can await host I/O in the HTTP profiles |
 | Arithmetic | Integer operations and a bounded Double arithmetic/comparison subset |
 
 This describes tested workloads, not universal support for every API in those areas.
 The compiler reports unsupported contracts. Use matching development compiler,
 library and runtime artifacts; this is not a general publishing workflow for all apps.
 
+The routing workbench also parses a route, extracts an integer parameter and prints
+`42` in both interpreted and native execution:
+
+```raven
+{{NATIVE_ROUTING_SAMPLE}}
+```
+
 <a id="current-caveats"></a>
 
 ## Current limitations
 
-- **Platform:** macOS ARM64 has console/HTTP project workflows and a development kit.
-  Windows x64 has a qualified source-checkout console project workflow with a
-  guarded heap, generated stack protection, live-root retention and fault cleanup.
-  The Windows gate checks standalone execution, UTF-8/NUL and binary input/output,
-  interpreter parity and rejected stale builds. Windows HTTP, file/path services,
-  packaged native build kits and broader hosting remain open. Fibers and stack
-  migration are not admitted by the current normal-thread host contract.
+- **Platform:** native Windows ARM64 is planned but unqualified. Windows file/path
+  services and packaged native build kits remain open.
+- **HTTP:** these bounded showcases do not establish native support for the entire
+  Web API surface, TLS, HTTP/2 or arbitrary concurrent servers. The native transport
+  uses IPv4, bounded DNS workers and polled socket operations.
 - **Code and APIs:** broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.
-- **Async:** async entry points waiting for host I/O are unsupported; selected
-  queue-driven cases do not establish general async parity.
+- **Async and hosting:** the HTTP profiles have a bounded completion loop, not a
+  public scheduler. General suspension, green threads, stack migration and reusable
+  application hosting remain work in progress.
 - **Memory:** the nonmoving collector uses conservative payload scanning and a bounded
   buffer. It can retain extra objects and fragment storage; collection policy is provisional.
-- **Reliability:** supported paths preserve Fault details and stack traces, but not every
-  disconnect, cancellation or cleanup path is qualified.
+- **Reliability:** the tested failures preserve Fault details, traces and cleanup;
+  broader disconnect, cancellation and hosting combinations still need qualification.
 - **Deployment:** OS dependencies remain. Trimming, a stable public native ABI and a
   fully independent production-core bootstrap are unfinished.
 
@@ -103,30 +122,11 @@ JIT and native hot reload remain future work. See [project direction](../../prop
 and [garbage collection](../gc/) for related topics.
 
 <a id="measurements-and-comparisons"></a>
-
 <a id="development-follow-up-native-gc-lookup"></a>
 
 ## Performance measurements
 
 The [benchmark report](../../benchmarks/) compares recorded interpreter and native
-builds using routing and HTTP workloads. It includes the methodology, measurements
-and limitations. No performance ranking against .NET is established.
-
-### Development: HTTP platform parity
-
-The next native showcase targets both HttpClient and HttpServer on macOS and
-Windows, with shared cancellation, deadline and cleanup contracts. A shared
-socket adapter now passes the same listener, accept and transfer contract tests
-on macOS ARM64 and Windows x64. Native client
-DNS/connect remains unqualified. An opt-in `windows-http` project profile now
-composes the shared server host with Windows heap/stack protection. Five real
-request/fault scenarios now pass with interpreter parity on Windows x64 and
-macOS ARM64, including executable-only deployment. Native HttpClient and Windows
-ARM64 qualification remain open.
-
-
-The development HTTP client showcase now uses async `Main` and `await`. Its native
-entry pump keeps startup roots published while driving the selected host's I/O
-completions. Standalone client qualification on macOS and Windows is in progress;
-this does not add a public scheduler or general native async coverage. Explicit
-callbacks remain useful for library adapters and focused host-boundary tests.
+builds using routing and HTTP workloads. It includes methodology, measurements
+and limitations. The cross-platform HTTP checks establish correctness, not a
+performance ranking against .NET.

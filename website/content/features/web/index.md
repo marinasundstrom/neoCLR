@@ -5,11 +5,12 @@ title: Web and HTTP
 
 Raven client and server applications exchange UTF-8 content through neoCLR TCP sockets,
 with DNS on the client. HttpClient, HttpServer, request/response types, content and
-handlers live in System.Web.Http. Applications can use callbacks or async functions.
+handlers live in System.Web.Http. Use async functions and `await` for application
+control flow; handlers and completion adapters can still use callbacks.
 
 For native execution status and the benchmark workbench, see
-[Native compilation](../native-compilation/). The server AOT path remains work in progress;
-API availability here does not imply native-backend support.
+[Native compilation](../native-compilation/) for the supported standalone HTTP
+showcases. Broader API availability here does not imply native-backend support.
 
 ## HttpClient: call an HTTP service
 
@@ -25,6 +26,12 @@ Calling `GreetingClient().Read("http://localhost:8080/", token)` requests
 text or a structured HttpError. `GetString` rejects non-success statuses and
 invalid UTF-8. Acknowledged cancellation cancels the task instead of returning an
 HTTP error. Use `CancellationToken.None` when no cancellation is needed.
+
+An async entry point awaits the operation and handles its Result:
+
+```raven
+{{HTTP_CLIENT_MAIN_SAMPLE}}
+```
 
 ### What the client offers
 
@@ -177,8 +184,14 @@ callback-driven exchange; calling it is another way to build an application loop
 This [server callback](/samples/http-server/Server.rvn) builds a byte response.
 `HttpServer.Listen("127.0.0.1", 0, 4)` binds a loopback listener; `GetLocalPort()`
 reports the selected port. `ServeOne(Respond)` accepts one GET, HEAD, POST, PUT, PATCH or DELETE, awaits the callback,
-sends its response and closes that connection. The caller closes the listener.
+sends its response and closes that connection. The caller awaits completion and closes the listener.
 `Close()` stops listening and closes owned exchanges, including pending accepts and callback waits.
+
+The server's async `Main` awaits this exchange helper:
+
+```raven
+{{HTTP_SERVER_AWAIT_SAMPLE}}
+```
 
 [Download the server and interoperability verifier](/samples/http-server.zip).
 It pairs separate neoCLR processes, tests an independent .NET client, and sends

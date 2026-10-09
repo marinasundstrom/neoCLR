@@ -23,15 +23,13 @@ class GreetingClient {
     }
 }
 
-func Main() {
+async func Main() -> Task<()> {
     // The verifier substitutes the local peer's port.
-    let fetching = GreetingClient().Read("http://localhost:19091/", CancellationToken.None)
-    fetching.OnCompleted(() => {
-        if let Ok(text) = fetching.GetResult() {
-            Console.WriteLine("HTTP 200")
-            Console.WriteLine(text)
-        } else if let Error(error) = fetching.GetResult() {
-            Console.WriteLine("HTTP error: " + error.ToString())
-        }
-    })
+    let result = await GreetingClient().Read("http://localhost:19091/", CancellationToken.None)
+    if let Ok(text) = result {
+        Console.WriteLine("HTTP 200")
+        Console.WriteLine(text)
+    } else if let Error(error) = result {
+        Console.WriteLine("HTTP error: " + error.ToString())
+    }
 }

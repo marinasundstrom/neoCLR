@@ -49,6 +49,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   synchronous listener setup separate from awaiting the exchange while a pinned
   compiler pattern-hoisting issue is tracked independently.
 
+- Update website HTTP and Task samples to await completion from async Main,
+  including DOM, mapped JSON and routed client/server pairs. Omit redundant trailing
+  unit returns; document the cancellation observer's intentional callback. Extract
+  complete tested entry/serving examples on the Web and native compilation pages.
+  Refresh native platforms, build profiles, DNS/connect and async-entry support;
+  preserve Windows ARM64, general scheduler and deployment limitations. All ten
+  focused website sample checks pass, with artifact/source hashes retained in
+  `docs/website-await-validation.json`.
+
 - Add explicit `x86_64-pc-windows-msvc` AOT target selection for the bounded scalar
   and literal-console profile, emitting x64 COFF with the target calling convention.
   Preserve default macOS ARM64 output; reject Windows managed/closed-world and

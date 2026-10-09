@@ -93,7 +93,10 @@ default is distinct from cancellation. `Task.Outcome` uses `None` while pending.
 {{TASK_CANCELLATION_SAMPLE}}
 ```
 
-This prints only `Cancelled`. The message after the await never runs. `Outcome` is None while pending and Some of the terminal outcome afterward. Ordinary application code can await; orchestration code can inspect outcomes explicitly.
+This prints only `Cancelled`. The message after the await never runs. `Outcome` is None while pending and Some of the terminal outcome afterward. Use `await` by default in application code, including async `Main`. This example
+uses `OnCompleted` deliberately to observe and print cancellation: awaiting that
+cancelled result would cancel Main before it could print. Orchestration code can
+inspect outcomes explicitly.
 
 `MapResult` explicitly maps the Ok payload of a Task containing a Result. It preserves Error and propagates cancellation without invoking the mapper. Ordinary `Map` still receives the whole Result.
 
