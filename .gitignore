@@ -22,3 +22,6 @@
 
 /docs/experiments/native-json/bin/
 /docs/experiments/native-json/obj/
+
+/docs/experiments/native-introspection/bin/
+/docs/experiments/native-introspection/obj/

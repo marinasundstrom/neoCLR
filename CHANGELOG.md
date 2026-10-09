@@ -43,6 +43,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   visibility. Invalid selectors preserve RuntimeError and caller frames. Validate
   160 interpreter/native cases, closed-union/imported-visibility facts and unchanged
   ordinary user-fault behavior; extend the portable descriptor consumer.
+  Qualify portable shape checks on macOS/Windows in action `37981420430` and
+  preserve a Raven NominalTypeInfo probe whose name/nominal queries run natively
+  with interpreter parity on macOS. Full reflection/JSON remain unfinished.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

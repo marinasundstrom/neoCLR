@@ -1,0 +1,16 @@
+import System.*
+import System.Introspection.*
+
+public class Report {
+    init() { }
+    var Name: string { get; set; } = ""
+}
+
+func Main() -> int {
+    let info = (NominalTypeInfo)typeof(Report)
+    Console.WriteLine(info.Name)
+    if !info.IsNominalType {
+        return 2
+    }
+    return 0
+}
