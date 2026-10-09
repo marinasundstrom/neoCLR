@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Record completed RavenDoc integration and temporary-branch cleanup after the
+  native String POC. Verify the existing pinned publisher checksum; no archive
+  replacement or website publication is needed for this integration.
+
 - Complete the bounded native String POC from unchanged Raven sources and native-only
   metadata. Add verified character/scalar array views, explicit String interface
   dispatch and receiver-slot construction lowering. Check interpreted/ARM64 output,

@@ -119,3 +119,14 @@ table and String.FlatMap. The actual pages show `() -> void`, `() -> Task<T>` an
 `char -> Iterable<U>`. Parameter names no longer wrap mid-identifier. The correction
 was independently integrated/pushed to Raven main and cherry-picked into the native
 integration branch (`2554322c4`).
+
+### Integration status (2026-10-09)
+
+The pinned `17fc78ba9` rendering work is integrated into Raven's
+`codex/source-object-metadata-resolution` through merge `c6d2137e3` (36 focused
+RavenDoc tests passed). General rendering equivalents are also on Raven main.
+The temporary `codex/ravendoc-module-members` and
+`codex/ravendoc-module-members-integration` branches and their temporary worktree
+were removed after ancestry checks. The archive is unchanged and checksum-verified;
+its pinned commit remains reachable through the merge. Branch cleanup does not
+publish this development website.

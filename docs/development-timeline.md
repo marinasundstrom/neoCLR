@@ -12428,5 +12428,11 @@ claim follows from these focused checks.
   execution; remaining limitations are recorded in the
   [POC scope](experiments/native-core-bootstrap/README.md#production-string-poc-2026-10-09).
 - **Author:** earlier directed that RavenDoc branch work be integrated after native
-  String is done. That integration remains the next authorized step; no branch
-  deletion or integration is claimed by this entry.
+  String is done, then explicitly asked to clean up the branches afterwards.
+- **Outcome:** native String POC committed as `c12a533d` after its prerequisite
+  slices. RavenDoc's five remaining commits were merged into Raven's
+  `codex/source-object-metadata-resolution` as `c6d2137e3`; the focused suite passed
+  36 tests (baseline 29). Both temporary RavenDoc branches and the clean temporary
+  worktree were removed after verifying their work was retained. The pinned
+  RavenDoc archive checksum matches its recorded revision, now an ancestor of the
+  integration branch. Nothing was pushed or published.
