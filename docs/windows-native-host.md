@@ -1,8 +1,8 @@
 # Windows native console host prerequisites
 
 Development experiment, 2026-10-09. The Windows scalar/literal-console backend is
-qualified; managed Windows code generation remains rejected. This document records
-host requirements before widening that profile. It does not introduce a public API.
+qualified; general managed Windows code generation remains rejected. An explicit
+integer-only generated-stack experiment now tests the next integration boundary. It does not introduce a public API.
 
 ## Memory ownership: qualified private probe
 
@@ -163,12 +163,45 @@ recorded revision with checkout line endings; see the
 [retained report](windows-stack-validation.json). These depths are evidence for
 this compiler/consumer, not a portable recursion-depth contract.
 
-Windows managed code generation still needs final-frame and outgoing-call bounds,
-Cranelift page-probing checks, guard placement and actual generated-code fault
-return tests. MSVC C-frame success does not prove those properties or close the
-x64 unwind/SEH/native stack-walking gap. See the existing
-[macOS stack experiment](experiments/aot-console/native-stack.md). Windows managed
-profiles remain rejected until that separate integration is qualified.
+## Generated integer frames: explicit development experiment
+
+`--target x86_64-pc-windows-msvc --windows-stack-experiment --reference-arena
+--native-gc --native-stack-budget` admits only Int32 functions/locals, integer
+arithmetic/comparisons, branches and direct calls. Types, heap allocations, services,
+callbacks, closed-world compilation and inspection remain outside this Windows
+experiment. Ordinary target selection still rejects managed profiles. The private
+`neoclr_entry_v4` context entry and existing GC-frame hooks use Windows x64 calling
+conventions, including stack arguments and shadow space.
+
+The generated backend uses pinned Cranelift 0.121.2's x64 inline stack probing with
+`enable_probestack=true`, `probestack_strategy=inline` and a 4 KiB page stride.
+Primary implementation evidence: that package's `src/isa/x64/abi.rs`
+(`gen_probestack_unroll`, `gen_inline_probestack`) and `src/machinst/abi.rs`
+(`frame_size`), reviewed 2026-10-09. The compiled frame size excludes linkage and
+outgoing arguments. Charge 16 bytes of linkage, conservatively eight bytes per
+argument rounded to 16, and Windows' 32-byte shadow space. Reject a final charge
+above 64 KiB. Keep the exported entry below one page because its prologue precedes
+its first budget check. Every ordinary generated function publishes its frame and
+checks remaining stack before executing its body. The prior caller's 256 KiB
+reserve covers the bounded next frame and matched adapter/fault-return path.
+
+This extends the sufficient-stack comparison above; it does not add a .NET public
+API or recover from Windows stack-overflow exceptions. Inline probing grows
+committed pages before large frames skip guard pages, without introducing an
+outline helper ABI. It costs prologue instructions and leaves the existing generous
+reserve. Disabling probing or merely checking recursion depth would not establish
+the Windows stack-growth contract. Native unwind/SEH interoperability, arbitrary
+foreign reentry, OS commitment failure and activation migration remain unqualified.
+
+The focused Rust tests inspect actual COFF probe bytes and hook imports, reject
+incomplete opt-in and non-integer programs, and verify the final machine-frame
+boundary after code generation. A 512-local integer fixture forces a frame larger
+than one page. The Windows Action links it against the guarded collector host and
+requires shallow success, recursive status 9 with unchanged output and valid fault
+text, complete frame removal, collection and repeated successful entry. It also
+calls the generated entry on a 128 KiB stack to test rejection before guest body
+execution. Executable Windows evidence is pending for this slice; local cross-target
+checks and the macOS recursive-stack regression pass.
 
 ## Suspension and scheduling ownership
 
@@ -190,6 +223,6 @@ first-fault propagation and exactly-once cleanup. Reuse the
 before adding migration or green threads. Current root TLS, callbacks and stack
 adapters remain replacement boundaries, not public scheduling policy.
 
-Next: qualify generated-code stack probing, frame bounds and managed lowering
-against the working collector host and admission guard. Keep Windows managed profiles and project kits rejected until
-those separate requirements have executable evidence.
+Next: obtain the generated integer-frame Windows execution evidence, then widen
+managed lowering against the working collector host. General managed profiles and
+project kits remain rejected until their separate requirements have evidence.

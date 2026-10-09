@@ -84,8 +84,9 @@ library and runtime artifacts; this is not a general publishing workflow for all
   host passes allocation, guard-boundary and release tests. Its collector consumer
   also passes root retention, reclamation, thread isolation and guarded teardown.
   Host admission now rejects undersized stacks and fibers; deep-call checks
-  return safely with GC-frame cleanup. Generated-code stack probing and managed
-  Windows code generation remain open.
+  return safely with GC-frame cleanup. An explicit integer-only generated-stack
+  experiment adds page probing and frame bounds; Windows execution qualification
+  is pending. General managed Windows code generation remains open.
 - **Code and APIs:** broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.
 - **Async:** async entry points waiting for host I/O are unsupported; selected

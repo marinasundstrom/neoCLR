@@ -238,7 +238,7 @@ fn check_byte_value_replacement(b: &mut FunctionBuilder<'_>, address: ir::Value,
     b.switch_to_block(ready);
 }
 
-pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
+pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>, platform_target: super::Target) -> Result<Vec<u8>, Error> {
     if details.is_some_and(|d| !d.native_gc && !d.string_intern.is_empty()) {
         return Err("native String.Intern requires --native-gc for invocation-scoped strong ownership".into());
     }
@@ -281,7 +281,14 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     neoclr::LoadedProgram::new(input).and_then(|v| v.verify()).map_err(|e| e.to_string())?;
     let mut flags = settings::builder();
     flags.set("is_pic", "true")?;
-    let isa = isa::lookup("aarch64-apple-darwin".parse().unwrap())?
+    if platform_target == super::Target::WindowsX64 {
+        // Windows grows the committed stack a guard page at a time. The pinned
+        // x64 backend probes each 4 KiB page before installing a large frame.
+        flags.set("enable_probestack", "true")?;
+        flags.set("probestack_strategy", "inline")?;
+        flags.set("probestack_size_log2", "12")?;
+    }
+    let isa = isa::lookup(platform_target.triple().parse().unwrap())?
         .finish(settings::Flags::new(flags))?;
     let mut module = ObjectModule::new(ObjectBuilder::new(
         isa,
@@ -1868,6 +1875,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         b.finalize();
     }
     define_checked(&mut module, export, &mut context, stack_budget)?;
+    // Entry's prologue runs before its first budget check; keep it below one
+    // page. Hosts still owe a usable stack to call the ABI at all.
+    if platform_target == super::Target::WindowsX64 && frame_charge(&context, true)? > 4096 {
+        return Err("Windows stack experiment entry frame exceeds one page".into());
+    }
     if details.is_some_and(|d| d.native_gc) {
         compile_host_callbacks(&mut module, &p, &ids, stack_check, diagnostic_data.as_ref())?;
         if let Some(drain) = details.and_then(|d| d.task_queue_drain) {
@@ -1965,19 +1977,23 @@ fn define_checked(module: &mut ObjectModule, id: cranelift_module::FuncId,
     context: &mut cranelift_codegen::Context, stack_budget: bool) -> Result<(), Error> {
     module.define_function(id, context)?;
     if stack_budget {
-        // Cranelift 0.121.2 frame_size excludes FP/LR and ephemeral outgoing args.
-        // This backend uses fixed I32/I64 arguments only: charge eight bytes for
-        // every argument (including register args) and round to the ARM64 alignment.
-        let outgoing = context.func.dfg.signatures.values()
-            .map(|sig| sig.params.len() as u64 * 8).max().unwrap_or(0);
-        let outgoing = (outgoing + 15) & !15;
-        let bytes = u64::from(context.compiled_code().ok_or("missing final machine frame")?.frame_size)
-            + 16 + outgoing;
+        let windows = module.isa().default_call_conv() == cranelift_codegen::isa::CallConv::WindowsFastcall;
+        let bytes = frame_charge(context, windows)?;
         if bytes > 65536 {
             return Err("native stack budget requires final machine frames including call arguments at most 64 KiB".into());
         }
     }
     Ok(())
+}
+
+fn frame_charge(context: &cranelift_codegen::Context, windows: bool) -> Result<u64, Error> {
+    // Cranelift 0.121.2 frame_size excludes linkage and ephemeral outgoing args.
+    // Charge every argument, including register args, plus Windows shadow space.
+    // Both targets require 16-byte alignment; this intentionally overestimates.
+    let outgoing = context.func.dfg.signatures.values()
+        .map(|sig| sig.params.len() as u64 * 8).max().unwrap_or(0);
+    Ok(u64::from(context.compiled_code().ok_or("missing final machine frame")?.frame_size)
+        + 16 + ((outgoing + 15) & !15) + if windows { 32 } else { 0 })
 }
 
 fn compile_host_queue(module: &mut ObjectModule, target: cranelift_module::FuncId,
@@ -2022,4 +2038,40 @@ fn compile_host_queue(module: &mut ObjectModule, target: cranelift_module::FuncI
         b.seal_all_blocks(); b.finalize();
     }
     define_checked(module, export, &mut context, stack_check.is_some())
+}
+
+#[cfg(test)]
+mod windows_frame_tests {
+    use super::*;
+
+    #[test]
+    fn windows_final_frame_limit_includes_machine_linkage_and_call_space() {
+        for (size, accepted) in [(64000, true), (65536, false)] {
+            let mut flags = settings::builder();
+            flags.set("enable_probestack", "true").unwrap();
+            flags.set("probestack_strategy", "inline").unwrap();
+            let isa = isa::lookup("x86_64-pc-windows-msvc".parse().unwrap()).unwrap()
+                .finish(settings::Flags::new(flags)).unwrap();
+            let mut module = ObjectModule::new(ObjectBuilder::new(isa, "frame_boundary", cranelift_module::default_libcall_names()).unwrap());
+            let mut context = module.make_context();
+            context.func.signature.returns.push(AbiParam::new(types::I32));
+            let id = module.declare_function("boundary", Linkage::Export, &context.func.signature).unwrap();
+            let mut fb = FunctionBuilderContext::new();
+            {
+                let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+                let entry = b.create_block();
+                b.switch_to_block(entry);
+                let storage = slot(&mut b, size);
+                let value = b.ins().iconst(types::I32, 42);
+                b.ins().stack_store(value, storage, 0);
+                let value = b.ins().stack_load(types::I32, storage, 0);
+                b.ins().return_(&[value]);
+                b.seal_all_blocks();
+                b.finalize();
+            }
+            let result = define_checked(&mut module, id, &mut context, true);
+            if accepted { result.unwrap(); }
+            else { assert!(result.unwrap_err().to_string().contains("final machine frames")); }
+        }
+    }
 }

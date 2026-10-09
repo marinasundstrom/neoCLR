@@ -93,7 +93,9 @@ qualify generated-code stack probing, frame bounds and managed lowering against
 this working host. The [Windows host stack gate](windows-stack-validation.json)
 now rejects 128 KiB admission before allocation, rejects fibers and safely returns
 from deep calls on 512 KiB/1 MiB stacks with collection and GC-frame cleanup.
-Windows project kits and managed services remain unsupported. Full
+An explicit integer-only generated-stack experiment now adds page probing and
+final-frame bounds; its Windows executable gate is pending. General Windows
+project kits and managed services remain unsupported. Full
 bootstrap, general hosting and reload remain open.
 
 **Preview 13 published (2026-10-09):** after Raven's shared website publication,

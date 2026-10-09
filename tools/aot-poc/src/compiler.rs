@@ -67,10 +67,26 @@ pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bo
                 })
         })
     {
-        if target == Target::WindowsX64 {
+        if target == Target::WindowsX64 && !details.is_some_and(|d| d.windows_stack_experiment) {
             return Err("Windows x64 currently supports only scalar and literal-console lowering; value/managed profiles remain macOS ARM64-only".into());
         }
-        return values::compile(input, root, details);
+        if target == Target::WindowsX64 {
+            // Deliberately qualify only generated integer frames, not managed services.
+            if !details.is_some_and(|d| d.native_gc && d.native_stack_budget && d.reference_arena && d.probe_stack_roots)
+                || !input.types.is_empty() || input.name == "System"
+                || input.functions.iter().any(|f| {
+                    f.is_internal_call() || f.pinvoke.is_some() || f.owner.is_some() || f.instance
+                        || f.parameters.iter().chain(&f.locals).chain([&f.returns]).any(|t| *t != Type::Int32)
+                        || f.body.iter().any(|op| !matches!(op,
+                            Op::Int(_) | Op::Arg(_) | Op::Load(_) | Op::Store(_) |
+                            Op::Add | Op::Sub | Op::Mul | Op::Equal | Op::Less | Op::Greater |
+                            Op::Branch(_) | Op::BranchTrue(_) | Op::BranchFalse(_) |
+                            Op::Dup | Op::Pop | Op::Return | Op::Call(_)))
+                }) {
+                return Err("Windows stack experiment admits only Int32 functions and bounded integer control flow with GC frames and stack budget".into());
+            }
+        }
+        return values::compile(input, root, details, target);
     }
     if input.name == "System" || input.functions.len() > 128 {
         return Err(

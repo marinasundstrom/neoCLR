@@ -34,6 +34,10 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         target = compiler::Target::parse(value)?;
         args.drain(index..=index + 1);
     }
+    let windows_stack_count = args.iter().filter(|a| *a == "--windows-stack-experiment").count();
+    if windows_stack_count > 1 { return Err("duplicate --windows-stack-experiment option".into()); }
+    let windows_stack = windows_stack_count == 1;
+    args.retain(|a| a != "--windows-stack-experiment");
     let probe_count = args.iter().filter(|a| *a == "--probe-stack-roots").count();
     if probe_count > 1 { return Err("duplicate --probe-stack-roots option".into()); }
     let gc_count = args.iter().filter(|a| *a == "--native-gc").count();
@@ -161,7 +165,11 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     args.retain(|a| a != "--reference-arena");
     if bind_socket_listener && !reference_arena { return Err("--bind-socket-listener requires --reference-arena".into()); }
     if native_gc && !reference_arena { return Err("--native-gc requires --reference-arena".into()); }
-    if reference_arena && !compile_system {
+    if windows_stack && (target != compiler::Target::WindowsX64 || !native_gc
+        || !native_stack_budget || !reference_arena || compile_system) {
+        return Err("--windows-stack-experiment requires Windows x64, --native-gc, --native-stack-budget and --reference-arena, without --compile-system".into());
+    }
+    if reference_arena && !compile_system && !windows_stack {
         return Err("--reference-arena requires --compile-system".into());
     }
     if bind_console_stream_output && !reference_arena {
@@ -330,7 +338,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     };
     let compile_input = selection.as_ref().map_or(&input, |(module, _)| module);
     let details = fault_details.then(|| fault_details::Options::from_report(selection.as_ref().map(|(_, r)| r)));
-    let details = details.map(|mut d| { d.probe_stack_roots = probe_stack_roots; d.native_gc = native_gc; d.native_stack_budget = native_stack_budget; d });
+    let details = details.map(|mut d| {
+        d.windows_stack_experiment = windows_stack;
+        if windows_stack { d.reference_arena = true; }
+        d.probe_stack_roots = probe_stack_roots;
+        d.native_gc = native_gc;
+        d.native_stack_budget = native_stack_budget;
+        d
+    });
     let object = compiler::compile_for_target(compile_input, root, !closed && args.len() == 4, details.as_ref(), target)?;
     // Do not clobber an existing artifact, including on failed compilation.
     let mut output = fs::OpenOptions::new()
@@ -342,7 +357,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         println!("{}", serde_json::to_string_pretty(&report)?);
         return Ok(());
     }
-    println!("Emitted {} object; C export: {}", target.triple(), if fault_details { "neoclr_entry_v3 with caller-owned fault details" } else { "neoclr_entry_v2" });
+    println!("Emitted {} object; C export: {}", target.triple(), if reference_arena { "neoclr_entry_v4 with caller-owned collector context" } else if fault_details { "neoclr_entry_v3 with caller-owned fault details" } else { "neoclr_entry_v2" });
     Ok(())
 }
 

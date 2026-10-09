@@ -61,7 +61,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Windows run `37955003321` at `78f62757` passes 128 KiB admission rejection
   before allocation and safe return at depths 15/46 on 512 KiB/1 MiB stacks;
   heap/collector regressions pass. Verify 31 artifact and 16 source hashes.
-  Managed Windows code generation and project kits remain unsupported.
+  Add an explicit integer-only Windows generated-stack experiment, with inline
+  4 KiB page probes, final machine-frame bounds including shadow space, a bounded
+  entry prologue and existing diagnostic/GC-frame cleanup. Extend the Windows host
+  Action with a linked recursive guest, small-stack rejection and repeated host
+  reuse. Local COFF/admission checks and the macOS stack regression pass; Windows
+  generated execution is pending. General managed services and kits remain unsupported.
 
 - Add a development macOS ARM64 project-to-executable console command using the
   selected bundle's Raven project build, existing AOT backend and explicit native

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Qualify private Windows host memory prerequisites, independently of AOT codegen."""
+"""Qualify private Windows host memory prerequisites, and bounded integer AOT stack codegen."""
 import argparse
 import hashlib
 import json
@@ -16,12 +16,12 @@ def main():
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    report = dict(passed=False, scope='Private Windows x64 guarded heap and collector/root lifecycle; bounded native stack probe; no managed codegen qualification',
+    report = dict(passed=False, scope='Private Windows x64 guarded heap and collector/root lifecycle; bounded native stack probe; integer-only generated stack experiment; no managed service qualification',
                   platform=platform.platform(), commands=[])
 
     def run(command, name):
         command = list(map(str, command))
-        result = subprocess.run(command, cwd=out, capture_output=True, timeout=120)
+        result = subprocess.run(command, cwd=out, capture_output=True, timeout=360)
         (out / (name + '.stdout.log')).write_bytes(result.stdout)
         (out / (name + '.stderr.log')).write_bytes(result.stderr)
         report['commands'].append(dict(command=command, exitCode=result.returncode))
@@ -78,6 +78,33 @@ def main():
                 or not 1 < stack.get('depth512KiB', 0) < stack.get('depth1MiB', 0) < 64):
             raise ValueError('Stack acceptance did not complete boundary and return checks')
         report['stackExecution'] = stack
+        generated_inputs = [ROOT / 'tools/native' / name for name in
+                            ('windows-generated-stack.neoil', 'windows-generated-stack-test.c')]
+        generated_inputs += list((ROOT / 'tools/aot-poc/src').glob('*.rs'))
+        generated_inputs += [ROOT / 'tools/aot-poc/Cargo.toml', ROOT / 'tools/aot-poc/Cargo.lock']
+        report['inputs'].update({p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in generated_inputs})
+        (out / generated_inputs[0].name).write_bytes(generated_inputs[0].read_bytes())
+        manifest = ROOT / 'tools/aot-poc/Cargo.toml'
+        run(['rustc', '--version', '--verbose'], 'rust-toolchain')
+        run(['cargo', 'test', '--locked', '--manifest-path', manifest, '--test', 'windows_stack'], 'generated-contract')
+        run(['cargo', 'test', '--locked', '--manifest-path', manifest, '--bin', 'neoclr-aot-poc', 'windows_final_frame_limit'], 'generated-frame-boundary')
+        compiler = ROOT / 'tools/aot-poc/target/debug/neoclr-aot-poc.exe'
+        report['compilerSha256'] = hashlib.sha256(compiler.read_bytes()).hexdigest()
+        run([compiler, generated_inputs[0], 'Calculate', out / 'generated-stack.obj',
+             '--target', 'x86_64-pc-windows-msvc', '--windows-stack-experiment',
+             '--reference-arena', '--native-gc', '--native-stack-budget'], 'generated-compile')
+        run(['dumpbin', '/disasm', out / 'generated-stack.obj'], 'generated-disassembly')
+        run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
+             '/DNEOCLR_NATIVE_GC', '/Fe:generated-stack.exe', generated_inputs[1],
+             ROOT / 'tools/native/windows-gc-host.c', ROOT / 'tools/native/windows-native-stack.c',
+             inputs[0], base / 'native-gc.c', base / 'root-probe.c', out / 'generated-stack.obj'], 'generated-build')
+        result = run([out / 'generated-stack.exe'], 'generated-execute')
+        generated = json.loads(result.stdout)
+        if (result.stderr or generated.get('passed') is not True
+                or generated.get('smallStackRejected') is not True or generated.get('reusePassed') is not True
+                or not 5 < generated.get('snapshots512KiB', 0) < generated.get('snapshots1MiB', 0) < 512):
+            raise ValueError('Generated stack acceptance did not complete fault, cleanup and reuse checks')
+        report['generatedStackExecution'] = generated
         report['passed'] = True
     except Exception as error:
         report['error'] = str(error)

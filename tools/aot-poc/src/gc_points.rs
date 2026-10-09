@@ -217,7 +217,7 @@ ret
             reference_arena: true,
             ..Default::default()
         };
-        super::super::compile(&module, "Main", Some(&details)).unwrap();
+        super::super::compile(&module, "Main", Some(&details), crate::compiler::Target::MacosArm64).unwrap();
         let p = Profile::new(&module, true, None, None, &[], None, None, None, false).unwrap();
         let report = report(&p, Some(&details)).unwrap();
         let functions = report["functions"].as_array().unwrap();
