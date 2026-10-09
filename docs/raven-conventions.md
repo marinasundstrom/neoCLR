@@ -16,7 +16,9 @@ sequential async control flow in application code and showcases. Use `OnComplete
 only for a concrete purpose, such as implementing an awaiter/continuation adapter,
 observing a cancellation outcome, or testing the callback boundary itself. Document
 that purpose. Missing native entry-point I/O pumping is a runtime implementation
-gap to fix, not a reason to make application examples callback-driven.
+gap to fix, not a reason to make application examples callback-driven. Let
+`Task<()>`/`Task<unit>` functions complete by reaching the end; omit a redundant
+trailing `return ()`. Keep explicit unit returns where an early exit is intended.
 
 ## Assembly-level members and qualified names (2026-10-08)
 

@@ -17,30 +17,31 @@ func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     return source.Task
 }
 
-func Start(server: HttpServer) {
+async func Start(server: HttpServer) -> Task<()> {
     let serving = server.ServeOne(Respond)
-    serving.OnCompleted(() => {
-        let result = serving.GetResult()
-        server.Close()
-        if let Ok(_) = result {
-            Console.WriteLine("Served greeting; server closed")
-        } else if let Error(message) = result {
-            Console.WriteLine(String.Concat("Server error: ", message.ToString()))
-        }
-    })
     TaskQueue.Default.Post(() => Console.WriteLine("Other work runs while HTTP accept is pending"))
+    let result = await serving
+    server.Close()
+    if let Ok(_) = result {
+        Console.WriteLine("Served greeting; server closed")
+    } else if let Error(message) = result {
+        Console.WriteLine(String.Concat("Server error: ", message.ToString()))
+    }
 }
 
-func Main() {
+func ListenAndServe() -> Task<()> {
     if let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) {
         if let Ok(port) = server.GetLocalPort() {
             Console.WriteLine(port)
-            Start(server)
-        } else {
-            server.Close()
-            System.Fail("Local port unavailable")
+            return Start(server)
         }
-    } else {
-        System.Fail("Listen failed")
+        server.Close()
+        System.Fail("Local port unavailable")
     }
+    System.Fail("Listen failed")
+    return Promise<()>().Task
+}
+
+async func Main() -> Task<()> {
+    await ListenAndServe()
 }

@@ -7227,3 +7227,33 @@ argument of the receiver's type. Do not infer that distinction from parameter
 names. Raven owns the emitter/reader contract; native metadata must retain the
 semantic information. This documentation fix does not change runtime binaries or
 claim to resolve the native reader's broader classification limitation.
+
+
+### Await-first sample qualification and deferred compiler cases (2026-10-09)
+
+The native HTTP showcase now uses async Main and ordinary await. Native entry I/O
+pumping is a neoCLR backend/host change; Runtime Contract configuration, Raven CLI
+representation and public Task APIs are unchanged. Ordinary `Task<()>`/`Task<unit>`
+fall-through already works with bundled compiler `71cafd353`; no trailing unit
+return is required. Native metadata remains the long-term target, as above.
+
+Two general compiler candidates were exposed independently of the native host:
+
+- A `Task<unit>` async helper ending with `match result { Ok(let value) =>
+  Console.WriteLine(value); Error(let message) => Console.WriteLine(message) }`
+  is rejected with RAV1503 (unit to Task<unit>). The equivalent if-pattern statements
+  and ordinary fall-through compile and run. Do not infer that unit functions
+  require a trailing explicit return.
+- Moving listener setup into async Main with pattern-bound server/port locals can
+  fail native metadata definite-assignment validation (NEOMETA003), or a nested
+  if-pattern can call GetLocalPort on a null hoisted receiver. The same synchronous
+  setup and an async helper receiving ordinary arguments work in both interpreter
+  and native execution. These samples keep synchronous startup in a named helper;
+  no explicit completion callback is needed. Unreachable Task returns after
+  System.Fail satisfy the helper's static return contract.
+
+Ownership: Raven async binding/hoisting and native metadata validation. These are
+reproduced against the pinned native-build-kit compiler and deferred for independent
+compiler regression fixes on the shared line, not permanent neoCLR rules. This
+sample change alters no compiler encoding. Qualification commands are in
+`scripts/validate-native-client-project.py` and `scripts/validate-await-samples.py`.

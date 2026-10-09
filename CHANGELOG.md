@@ -41,6 +41,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   cleanup on faults. Record await as the default application convention. Add a
   standalone Windows client/server qualification workflow; end-to-end execution is
   under validation. Focused unit, inheritance and sanitized heap/scope tests pass.
+  Windows run `37966271634` at `87ce8a71` passes all ten native client scenarios,
+  including a separate Raven server process; verify 42 retained artifact hashes and
+  KERNEL32/WS2_32-only imports. Convert the server showcase to async Main/await and
+  omit redundant trailing unit returns. All five server request/fault cases pass on
+  macOS; six queue-entry regressions preserve interpreter/native parity. Keep
+  synchronous listener setup separate from awaiting the exchange while a pinned
+  compiler pattern-hoisting issue is tracked independently.
 
 - Add explicit `x86_64-pc-windows-msvc` AOT target selection for the bounded scalar
   and literal-console profile, emitting x64 COFF with the target calling convention.

@@ -35,5 +35,4 @@ async func Main() -> Task<()> {
     } else if let Error(error) = result {
         Console.WriteLine(String.Concat("Error: ", error.ToString()))
     }
-    return ()
 }

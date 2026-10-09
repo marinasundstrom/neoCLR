@@ -6,7 +6,9 @@ reference, bridge and library artifacts. The published Preview 9 SDK is insuffic
 `Server.rvn` listens on IPv4 loopback with an OS-selected port, prints the port,
 serves one `/greeting` request with `Café 🌍`, then closes its listener. The response
 uses UTF-8 bytes and a Content-Type header; HttpServer supplies Content-Length and
-Connection: close. Queued work runs while accept is pending.
+Connection: close. Async Main awaits serving and cleanup; queued work runs while
+accept is pending. The response handler creates an already-completed Task to satisfy
+the handler contract; it performs no asynchronous operation.
 
 From the repository root:
 

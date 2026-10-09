@@ -12891,3 +12891,17 @@ claim follows from these focused checks.
   admission. Converts the client showcase to async Main/await and adds guard tests.
 - **Validation status:** local and Windows executable qualification is in progress;
   no general scheduler, green-thread implementation or Windows ARM64 support is claimed.
+
+- **Native client outcome:** run [37966271634](https://github.com/marinasundstrom/neoCLR/actions/runs/37966271634)
+  at `87ce8a71` passes ten Windows client cases, matching the interpreter, including
+  a separate Raven server. All ten also pass on macOS. Artifact checks verify 42
+  Windows files and system-only DLL dependencies.
+- **Author follow-up:** requests website sample updates and asks whether `return ()`
+  is logically necessary. **Assistant validation:** ordinary async unit fall-through
+  compiles and executes successfully with the pinned compiler; removes redundant
+  trailing returns. Early unit returns still express an intentional early exit.
+- **Remaining compiler candidates:** the pinned compiler rejects an async unit body
+  ending in a match with RAV1503; hoisted pattern locals in async listener setup can
+  produce NEOMETA003 or a null receiver. Record these independently in the bridge
+  notes. Samples use ordinary if-pattern statements for output and synchronous
+  startup helpers, retaining await for asynchronous work. No compiler fix is claimed.

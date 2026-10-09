@@ -2147,7 +2147,7 @@ fn object_display_rejects_fallback_base_calls_and_unverified_overrides() {
         if mode==2 {assert!(error.contains("verified concrete override"),"{r:?}");}
         if mode==3 {assert!(error.contains("Fault:"),"source validation must reject before projection: {r:?}");}
         if matches!(mode,5|6) {assert!(error.contains("boxing or arrays"),"{r:?}");}
-        if mode==7 {assert!(error.contains("leading Object base"),"{r:?}");}
+        if mode==7 {assert!(error.contains("leading base constructor"),"{r:?}");}
         if mode==8 {assert!(error.contains("single leading base initializer"),"{r:?}");}
         if mode==4 {assert!(error.contains("requires --reference-arena"),"{r:?}");}
     }
