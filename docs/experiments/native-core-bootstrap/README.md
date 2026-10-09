@@ -471,3 +471,37 @@ source. Keep the existing bridge-generated String tests and native fixture escap
 checks as separate evidence. Do not introduce placeholder implementations to satisfy
 these dependencies. No Raven compiler change, public API change, bridge encoding
 change or full native core qualification is claimed by this slice.
+
+
+## Native text-service facade foundation (2026-10-09)
+
+The text-enabled native core now declares System.Runtime.CompilerServices.RuntimeServices
+with seven ordinary static forwarding methods: StringConcat, StringCompareOrdinal,
+StringReplaceOrdinal, StringByteCount, StringContainsOrdinal, StringStartsWithOrdinal
+and StringEndsWithOrdinal. Each forwards all arguments to the matching assembly-level
+neoCLR.Runtime InternalCall declaration. The existing String wrappers share those
+same declarations. There are no placeholder bodies or .NET reference assemblies in
+this dependency path; this is still a bounded fixture, not the full production core.
+
+The `--string-contracts` consumer now calls the imported facade directly, covering
+UTF-8/NUL concatenation, replacement, byte count and matching/mismatching ordinal
+predicates alongside the existing interface tests. Project run, interpreter and
+ARM64 execution return 42, and the native executable links only libSystem.
+[Updated evidence](string-services-validation.json). The source String negative
+control now requires missing StringFromChars and rejects a missing RuntimeServices
+type diagnostic: this verifies progress past the prior unresolved type boundary
+without claiming complete source compilation. Neither failure publishes output.
+
+This follows the existing [runtime-service separation](../../runtime-services.md):
+like the split between .NET CoreLib methods and CLR intrinsics, a library-facing
+method forwards to a runtime implementation. The native metadata facade preserves
+neoCLR's exact UTF-8 signatures and fault behavior; it is not a stable foreign ABI
+or a claim of matching .NET's overloads. The interpreter and AOT use the existing
+shared service implementations and AOT opt-in bindings. No Runtime Contract option,
+CLI bridge representation, public API or native service ABI changes are introduced.
+
+Next supply the remaining text/Char/vector services, UInt32 and array/storage
+contracts, plus Result/slice/failure dependencies. The transcript also retains the
+source/imported String member-ownership errors for GetUtf8ByteCount; those need
+qualification once the dependency graph resolves. Earlier contract-only evidence
+is kept separately. Full native String/core bootstrap remains open.

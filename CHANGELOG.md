@@ -12,7 +12,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   String through native-only compilation and imported generic dispatch in project,
   interpreter and ARM64 execution. Missing contract references reject before output;
   record the remaining source String dependency boundary. This is bootstrap
-  qualification, not complete native String support or a new public API.
+  qualification, not complete native String support or a new public API. Add seven
+  real text-service forwarding methods to the native fixture RuntimeServices type;
+  direct facade calls pass both execution modes and source String now resolves
+  that type. Remaining member/storage dependencies still reject before output.
 
 - Refocus the website on understanding and using neoCLR: explain the runtime,
   library and Raven toolchain on the homepage, group guide entry points, replace

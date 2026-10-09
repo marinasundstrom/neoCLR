@@ -211,13 +211,13 @@ def main():
         if missing.exists() or 'Sequence<string>' not in diagnostic:
             raise AssertionError('Missing contract assembly did not reject before output')
         report['missingContracts'] = {'outputPublished': False, 'diagnostics': diagnostic}
-        report['contractChecks'] = ['inherited generic Count/indexer/GetIterator', 'Iterator Current/MoveNext', 'inherited Dispose', 'EquatableTo match/mismatch', 'Unicode/NUL payload']
+        report['contractChecks'] = ['inherited generic Count/indexer/GetIterator', 'Iterator Current/MoveNext', 'inherited Dispose', 'EquatableTo match/mismatch', 'Unicode/NUL payload', 'native RuntimeServices concat/replace/compare/byte count/predicates']
         rejected = artifacts / 'ProductionString.dll'
         diagnostic = run(['dotnet', args.driver.resolve(), 'neoclr', '--native-core-reference', core,
             '--reference', contracts, '--library', '-o', rejected,
             ROOT / 'runtime/raven/src/System/String.rvn'], expected=1, include_stderr=True)
-        if rejected.exists() or 'RuntimeServices' not in diagnostic:
-            raise AssertionError('Expected missing String runtime-service dependencies without output')
+        if rejected.exists() or 'StringFromChars' not in diagnostic or "'RuntimeServices' is not in scope" in diagnostic:
+            raise AssertionError('Expected unresolved vector services, with RuntimeServices resolved and no output')
         report['stringFrontier'] = {'complete': False, 'diagnostics': diagnostic,
             'next': 'Provide native runtime-service and array/primitive dependencies, then qualify source String ownership.'}
     report['revisions'] = {name: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip()

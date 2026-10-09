@@ -41,6 +41,20 @@ stringType.SetNativePrimitive(PrimitiveType.String);
 if (args.Length == 2)
 {
     core.AddValueType("System", "Char").SetNativeGrapheme();
+    var services = core.AddClass("System.Runtime.CompilerServices", "RuntimeServices", root);
+    MethodBuilder AddTextService(string name, MethodSignature signature)
+    {
+        var runtimeCall = core.AddFunction("neoCLR.Runtime", name, signature);
+        runtimeCall.SetInternalCall();
+        var facade = services.AddMethod(name, signature);
+        var il = facade.GetILGenerator();
+        for (var i = 0; i < signature.ParameterTypes.Count; i++) il.LoadArgument(i);
+        il.Call(runtimeCall);
+        il.Return();
+        return runtimeCall;
+    }
+    foreach (var name in new[] { "StringContainsOrdinal", "StringStartsWithOrdinal", "StringEndsWithOrdinal" })
+        AddTextService(name, new(PrimitiveType.Boolean, [PrimitiveType.String, PrimitiveType.String]));
     var identitySignature = new MethodSignature(PrimitiveType.Boolean, [root, root]);
     var referenceEquals = core.AddFunction("neoCLR.Runtime", "ObjectReferenceEquals", identitySignature);
     referenceEquals.SetInternalCall();
@@ -54,8 +68,7 @@ if (args.Length == 2)
         ("CompareOrdinal", "StringCompareOrdinal", PrimitiveType.Int32) })
     {
         var signature = new MethodSignature(result, [PrimitiveType.String, PrimitiveType.String]);
-        var runtimeCall = core.AddFunction("neoCLR.Runtime", service, signature);
-        runtimeCall.SetInternalCall();
+        var runtimeCall = AddTextService(service, signature);
         var wrapper = stringType.AddMethod(member, signature);
         var il = wrapper.GetILGenerator();
         il.LoadArgument(0);
@@ -63,9 +76,8 @@ if (args.Length == 2)
         il.Call(runtimeCall);
         il.Return();
     }
-    var replaceService = core.AddFunction("neoCLR.Runtime", "StringReplaceOrdinal",
+    var replaceService = AddTextService("StringReplaceOrdinal",
         new(PrimitiveType.String, [PrimitiveType.String, PrimitiveType.String, PrimitiveType.String]));
-    replaceService.SetInternalCall();
     var replace = stringType.AddInstanceMethod("Replace",
         new(PrimitiveType.String, [PrimitiveType.String, PrimitiveType.String]));
     var replaceIl = replace.GetILGenerator();
@@ -74,8 +86,7 @@ if (args.Length == 2)
     replaceIl.LoadArgument(2);
     replaceIl.Call(replaceService);
     replaceIl.Return();
-    var byteCount = core.AddFunction("neoCLR.Runtime", "StringByteCount", new(PrimitiveType.Int32, [PrimitiveType.String]));
-    byteCount.SetInternalCall();
+    var byteCount = AddTextService("StringByteCount", new(PrimitiveType.Int32, [PrimitiveType.String]));
     var count = stringType.AddInstanceMethod("GetByteCount", new(PrimitiveType.Int32, []));
     count.GetILGenerator().LoadArgument(0);
     count.GetILGenerator().Call(byteCount);

@@ -2,6 +2,7 @@ module Example.StringContracts
 
 import System.*
 import System.Collections.*
+import System.Runtime.CompilerServices.RuntimeServices
 
 class TextCell : Sequence<string>, Iterator<string>, EquatableTo<string> {
     private val text: string
@@ -34,7 +35,7 @@ class TextCell : Sequence<string>, Iterator<string>, EquatableTo<string> {
     }
 
     func Equals(other: string) -> bool {
-        return String.CompareOrdinal(text, other) == 0
+        return RuntimeServices.StringCompareOrdinal(text, other) == 0
     }
 }
 
@@ -68,6 +69,26 @@ func Main() -> int {
     }
     if equality.Equals("different") {
         return 8
+    }
+    let joined = RuntimeServices.StringConcat("hé", "🙂\u0000text")
+    let replaced = RuntimeServices.StringReplaceOrdinal(joined, "text", "done")
+    if RuntimeServices.StringCompareOrdinal(replaced, "hé🙂\u0000done") != 0 {
+        return 9
+    }
+    if RuntimeServices.StringByteCount(replaced) != 12 {
+        return 10
+    }
+    if !RuntimeServices.StringContainsOrdinal(replaced, "🙂\u0000") {
+        return 11
+    }
+    if !RuntimeServices.StringStartsWithOrdinal(replaced, "hé") {
+        return 12
+    }
+    if !RuntimeServices.StringEndsWithOrdinal(replaced, "done") {
+        return 13
+    }
+    if RuntimeServices.StringEndsWithOrdinal(replaced, "text") {
+        return 14
     }
     return 42
 }

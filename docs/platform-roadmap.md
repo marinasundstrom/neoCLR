@@ -27,8 +27,9 @@ interpreter and ARM64 checks. [Service contract](experiments/native-core-bootstr
 The six production collection/equality interfaces needed by String now compile
 unchanged against native-only metadata and pass imported generic dispatch in project,
 interpreter and ARM64 execution. [Dependency contract evidence](experiments/native-core-bootstrap/README.md#production-string-dependency-contracts-2026-10-09).
-Next provide real runtime-service and array/primitive dependencies, then qualify
-source String ownership. Full core bootstrap remains open.
+The native fixture now exposes seven real scalar text-service facades; direct calls
+pass both modes and source String resolves RuntimeServices. Remaining text/vector
+services, array/primitive dependencies and source String ownership are next. Full core bootstrap remains open.
 [Union source evidence](experiments/native-core-bootstrap/README.md#production-union-source-subset-2026-10-09).
 [Text-service evidence](experiments/native-core-bootstrap/README.md#native-text-services-and-module-projection-2026-10-09).
 
