@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Record the completed author-directed Raven website publication: validate shared
+  RavenDoc Type extension presentation for .NET and introduce neoCLR as a related
+  experimental project while retaining Raven's current .NET target. Verify the
+  deployed source revision and live pages.
+
 - Record completed RavenDoc integration and temporary-branch cleanup after the
   native String POC. Verify the existing pinned publisher checksum; no archive
   replacement or website publication is needed for this integration.

@@ -12436,3 +12436,26 @@ claim follows from these focused checks.
   worktree were removed after verifying their work was retained. The pinned
   RavenDoc archive checksum matches its recorded revision, now an ancestor of the
   integration branch. Nothing was pushed or published.
+
+### 2026-10-09 — Publish Raven's shared documentation changes first
+
+- **Author:** requested a Raven website release before starting neoCLR's release
+  procedure, including the shared RavenDoc Type extension presentation and checks
+  that it works well for Raven targeting .NET.
+- **Assistant:** built Raven main in an isolated checkout, checked the actual .NET
+  Raven.Core extension pages in desktop/mobile and light/dark modes, and added
+  browser regressions. Fixed a stale static-class assertion and theme-test mock,
+  plus Copy-button overlap on long mobile API declarations (`c7e6248ee`).
+- **Author:** suggested mentioning neoCLR and linking its website while keeping
+  .NET as Raven's official target.
+- **Assistant:** added a related-project note to Raven's homepage and overview,
+  explicitly describing neoCLR integration as experimental (`e56c81084`). Checked
+  the link and responsive rendering. The initial publication run was cancelled
+  so the note could ship with the documentation update.
+- **Publication:** final website workflow
+  [37915415706](https://github.com/marinasundstrom/raven/actions/runs/37915415706)
+  passed its build, WebAssembly playground, navigation and documentation browser
+  checks and deployed successfully. The live [Raven site](https://marinasundstrom.github.io/raven/)
+  reports source commit `e56c810845cbdb4bf3940ddfe06edd38fa750197`. Verified the
+  published neoCLR link and .NET target wording, plus the extension reference's
+  receiver, assembly and desktop/mobile layout. No neoCLR package release was started.
