@@ -190,11 +190,23 @@ fn string_ownership_does_not_intern_separate_equal_inputs() {
 fn string_reference_instruction_matches_owner_identity() {
     for (body, expected) in [
         ("ldarg input\nldarg input\nref.eq\nret", true),
-        ("ldarg input\ncastclass System.Object\nldarg input\ncastclass System.Object\nref.eq\nret", true),
-        ("ldarg input\nldarg input\ncastclass System.Object\nref.eq\nret", true),
+        (
+            "ldarg input\ncastclass System.Object\nldarg input\ncastclass System.Object\nref.eq\nret",
+            true,
+        ),
+        (
+            "ldarg input\nldarg input\ncastclass System.Object\nref.eq\nret",
+            true,
+        ),
         ("ldstr \"same\"\nldstr \"same\"\nref.eq\nret", false),
-        ("ldstr \"same\"\ncastclass System.Object\nldstr \"same\"\ncastclass System.Object\nref.eq\nret", false),
-        (".local String empty\nldloca empty\ninitobj String\nldarg input\nldloc empty\nref.eq\nret", false),
+        (
+            "ldstr \"same\"\ncastclass System.Object\nldstr \"same\"\ncastclass System.Object\nref.eq\nret",
+            false,
+        ),
+        (
+            ".local String empty\nldloca empty\ninitobj String\nldarg input\nldloc empty\nref.eq\nret",
+            false,
+        ),
     ] {
         let program = program(body, "", "Boolean");
         let result = invoke(&program, "same".into()).unwrap();

@@ -213,7 +213,10 @@ fn source_fail_and_legacy_fault_are_both_terminal() {
 
 #[test]
 fn common_fault_diagnostic_uses_codes_and_preserves_user_text() {
-    for (body, returns) in [("ldc.i4 1\nldc.i4 0\ndiv", "Int32"), ("ldc.i4 2147483647\nldc.i4 1\nadd.ovf", "Int32")] {
+    for (body, returns) in [
+        ("ldc.i4 1\nldc.i4 0\ndiv", "Int32"),
+        ("ldc.i4 2147483647\nldc.i4 1\nadd.ovf", "Int32"),
+    ] {
         let fault = failure(body, returns, Limits::default());
         let diagnostic = fault.diagnostic();
         assert_eq!(diagnostic.code, fault.code);
@@ -222,12 +225,16 @@ fn common_fault_diagnostic_uses_codes_and_preserves_user_text() {
         assert!(diagnostic.to_string().contains("   at "));
     }
     for message in ["", "DivideByZero", "Unicode 🌍\0message"] {
-        let fault = failure(&format!("fault {}", serde_json::to_string(message).unwrap()), "Int32", Limits::default());
+        let fault = failure(
+            &format!("fault {}", serde_json::to_string(message).unwrap()),
+            "Int32",
+            Limits::default(),
+        );
         assert_eq!(fault.diagnostic().code, FaultCode::UserFault);
         assert_eq!(fault.diagnostic().message, message);
         assert_eq!(FaultCode::UserFault.standard_message(), None);
     }
-    let fault=assemble("invalid").unwrap_err();
+    let fault = assemble("invalid").unwrap_err();
     assert!(fault.diagnostic().stack_trace.is_none());
     assert_eq!(fault.diagnostic().message, "Runtime error");
     assert!(!fault.message.is_empty()); // Legacy detailed diagnostics remain available.

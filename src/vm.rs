@@ -426,7 +426,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             ));
         }
         if def.primitive_reference {
-            return Err(Fault::new("primitive reference requires load-set resolution"));
+            return Err(Fault::new(
+                "primitive reference requires load-set resolution",
+            ));
         }
         let ty = Type::from_name(&def.name);
         if ty.definition_name() != Some(def.name.as_str()) {

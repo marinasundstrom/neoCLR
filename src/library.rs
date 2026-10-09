@@ -303,18 +303,38 @@ fn resolve_primitive_references(module: &mut Module) -> Result<(), Fault> {
     for reference in module.types.iter().filter(|t| t.primitive_reference) {
         let ty = crate::metadata::Type::from_name(&reference.name);
         if reference.representation != crate::metadata::Representation::Runtime
-            || !ty.is_primitive() || ty == crate::metadata::Type::Char || !reference.fields.is_empty()
-            || !reference.implements.is_empty() || !reference.properties.is_empty()
-            || !reference.generic_parameters.is_empty() || !reference.generic_constraints.is_empty()
-            || reference.declaring_type.is_some() || reference.enum_info.is_some()
-            || reference.packing.is_some() || reference.minimum_size.is_some()
-            || reference.is_abstract || reference.is_closed_hierarchy
-            || module.functions.iter().any(|f| f.owner.as_ref() == Some(&ty)
-                && f.definition.as_ref().map(|d| &d.module) == reference.definition.as_ref().map(|d| &d.module)) {
+            || !ty.is_primitive()
+            || ty == crate::metadata::Type::Char
+            || !reference.fields.is_empty()
+            || !reference.implements.is_empty()
+            || !reference.properties.is_empty()
+            || !reference.generic_parameters.is_empty()
+            || !reference.generic_constraints.is_empty()
+            || reference.declaring_type.is_some()
+            || reference.enum_info.is_some()
+            || reference.packing.is_some()
+            || reference.minimum_size.is_some()
+            || reference.is_abstract
+            || reference.is_closed_hierarchy
+            || module.functions.iter().any(|f| {
+                f.owner.as_ref() == Some(&ty)
+                    && f.definition.as_ref().map(|d| &d.module)
+                        == reference.definition.as_ref().map(|d| &d.module)
+            })
+        {
             return Err(Fault::new("invalid primitive reference declaration"));
         }
-        if module.types.iter().filter(|t| !t.primitive_reference && t.name == reference.name).count() != 1 {
-            return Err(Fault::new(format!("primitive reference {} requires exactly one implementation", reference.name)));
+        if module
+            .types
+            .iter()
+            .filter(|t| !t.primitive_reference && t.name == reference.name)
+            .count()
+            != 1
+        {
+            return Err(Fault::new(format!(
+                "primitive reference {} requires exactly one implementation",
+                reference.name
+            )));
         }
     }
     module.types.retain(|t| !t.primitive_reference);
@@ -330,12 +350,14 @@ mod primitive_reference_tests {
         serde_json::from_value(serde_json::json!({
             "name": "System.String", "representation": "Runtime", "fields": [],
             "is_reference_type": true, "primitive_reference": reference
-        })).unwrap()
+        }))
+        .unwrap()
     }
 
     #[test]
     fn primitive_references_require_one_executable_owner_and_preserve_inputs() {
-        let mut module: Module = crate::assembler::parse_module(".module Test\n.references ()\n").unwrap();
+        let mut module: Module =
+            crate::assembler::parse_module(".module Test\n.references ()\n").unwrap();
         module.types = vec![declaration(true)];
         assert!(resolve_primitive_references(&mut module).is_err());
         module.types.push(declaration(false));

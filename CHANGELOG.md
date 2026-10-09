@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Prepare Windows x64 and macOS ARM64 release qualification. Apply Rust formatting
+  and replace an equivalent metadata-version pattern to satisfy strict Clippy on
+  the current toolchain; no metadata admission behavior changes.
+
 - Record the completed author-directed Raven website publication: validate shared
   RavenDoc Type extension presentation for .NET and introduce neoCLR as a related
   experimental project while retaining Raven's current .NET target. Verify the

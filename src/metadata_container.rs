@@ -304,7 +304,7 @@ pub fn load_envelope(image: &[u8]) -> Result<Module, Fault> {
 }
 
 fn decode_payload((version, bytes): (u16, &[u8])) -> Result<Module, Fault> {
-    if matches!(version, 2 | 3 | 4) {
+    if matches!(version, 2..=4) {
         crate::native_binary::decode(bytes, version >= 3, version == 4)
     } else {
         crate::decode_module(std::str::from_utf8(bytes).map_err(|_| invalid("invalid UTF-8"))?)

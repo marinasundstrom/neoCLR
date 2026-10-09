@@ -365,7 +365,10 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
                     return fault.to_string();
                 }
                 let diagnostic = fault.diagnostic().to_string();
-                diagnostic.strip_suffix('\n').unwrap_or(&diagnostic).to_owned()
+                diagnostic
+                    .strip_suffix('\n')
+                    .unwrap_or(&diagnostic)
+                    .to_owned()
             })?;
             if gc_stats {
                 let stats = execution.heap.statistics();

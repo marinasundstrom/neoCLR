@@ -1,7 +1,7 @@
 //! Logical runtime-service uses; no target ABI or ownership policy is implied.
 use crate::{
-    metadata::{Function, Instruction as Op},
     Fault,
+    metadata::{Function, Instruction as Op},
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

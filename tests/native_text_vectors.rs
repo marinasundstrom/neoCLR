@@ -1,7 +1,8 @@
 use neoclr::{Limits, LoadedProgram, Value, assemble};
 
 fn program(service: &str, element: &str) -> Result<LoadedProgram, neoclr::Fault> {
-    let module = assemble(&format!(r#".module System
+    let module = assemble(&format!(
+        r#".module System
 .function neoCLR.Runtime.{service}(String text) -> arrayref<{element}>
 .methodimpl InternalCall
 .end
@@ -12,7 +13,8 @@ ldlen
 conv.i4
 ret
 .end
-"#))?;
+"#
+    ))?;
     LoadedProgram::new(&module)
 }
 
@@ -24,9 +26,38 @@ fn managed_text_vectors_match_exact_elements_and_enforce_limits() {
         ("Utf8Encode", "Byte", 6),
     ] {
         let p = program(service, element).unwrap();
-        assert_eq!(p.resolve_function(&neoclr::assembler::parse_function_ref("Main()").unwrap()).unwrap().invoke(vec![], Limits::default()).unwrap().value, Value::Int32(count));
-        assert!(p.resolve_function(&neoclr::assembler::parse_function_ref("Main()").unwrap()).unwrap().invoke(vec![], Limits { array_elements: 1, ..Limits::default() }).is_err());
-        assert!(p.resolve_function(&neoclr::assembler::parse_function_ref("Main()").unwrap()).unwrap().invoke(vec![], Limits { heap_objects: 0, ..Limits::default() }).is_err());
+        assert_eq!(
+            p.resolve_function(&neoclr::assembler::parse_function_ref("Main()").unwrap())
+                .unwrap()
+                .invoke(vec![], Limits::default())
+                .unwrap()
+                .value,
+            Value::Int32(count)
+        );
+        assert!(
+            p.resolve_function(&neoclr::assembler::parse_function_ref("Main()").unwrap())
+                .unwrap()
+                .invoke(
+                    vec![],
+                    Limits {
+                        array_elements: 1,
+                        ..Limits::default()
+                    }
+                )
+                .is_err()
+        );
+        assert!(
+            p.resolve_function(&neoclr::assembler::parse_function_ref("Main()").unwrap())
+                .unwrap()
+                .invoke(
+                    vec![],
+                    Limits {
+                        heap_objects: 0,
+                        ..Limits::default()
+                    }
+                )
+                .is_err()
+        );
         for wrong in ["String", "Int32"] {
             assert!(program(service, wrong).is_err());
         }

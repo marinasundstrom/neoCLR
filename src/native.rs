@@ -542,7 +542,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.StringIntern", [Type::String]) => (Binding::StringIntern, Type::String),
         (
             "neoCLR.Runtime.StringJoinParts",
-            [Type::ArrayRef(element), Type::Int32, Type::String, Type::Int32],
+            [
+                Type::ArrayRef(element),
+                Type::Int32,
+                Type::String,
+                Type::Int32,
+            ],
         ) if **element == Type::String => (Binding::StringJoinParts, Type::String),
         ("neoCLR.Runtime.StringReplaceOrdinal", [Type::String, Type::String, Type::String]) => {
             (Binding::StringReplaceOrdinal, Type::String)
@@ -910,8 +915,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             )));
         }
     };
-    let array_reference_result = matches!(binding, Binding::Utf8Encode | Binding::StringGraphemes | Binding::StringScalars)
-        && matches!((&returns, &function.returns), (Type::Array(expected), Type::ArrayRef(actual)) if expected == actual);
+    let array_reference_result = matches!(
+        binding,
+        Binding::Utf8Encode | Binding::StringGraphemes | Binding::StringScalars
+    ) && matches!((&returns, &function.returns), (Type::Array(expected), Type::ArrayRef(actual)) if expected == actual);
     if function.returns != returns && !array_reference_result {
         return Err(Fault::new(format!(
             "runtime binding return type mismatch for {}",
@@ -1313,7 +1320,12 @@ impl Binding {
             }
             (
                 Self::StringJoinParts,
-                [Value::ObjectReference(parts), Value::Int32(count), Value::String(separator), Value::Int32(expected)],
+                [
+                    Value::ObjectReference(parts),
+                    Value::Int32(count),
+                    Value::String(separator),
+                    Value::Int32(expected),
+                ],
             ) => {
                 let Value::Array {
                     element: Type::String,
@@ -1364,7 +1376,10 @@ impl Binding {
                 }
                 Ok(Value::String(text.into()))
             }
-            (Self::StringReplaceOrdinal, [Value::String(text), Value::String(old), Value::String(new)]) => {
+            (
+                Self::StringReplaceOrdinal,
+                [Value::String(text), Value::String(old), Value::String(new)],
+            ) => {
                 let invalid = || Fault::coded(crate::FaultCode::RuntimeError, "Runtime error");
                 if old.is_empty() {
                     return Err(invalid());
@@ -1373,7 +1388,8 @@ impl Binding {
                 if count == 0 || old == new {
                     return Ok(Value::String(text.clone()));
                 }
-                let length = text.len()
+                let length = text
+                    .len()
                     .checked_sub(count.checked_mul(old.len()).ok_or_else(invalid)?)
                     .and_then(|n| n.checked_add(count.checked_mul(new.len())?))
                     .ok_or_else(invalid)?;
