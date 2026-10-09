@@ -19,6 +19,8 @@ if (args.Length >= 1 && args[0] == "--declaration-modules") { DeclarationModuleC
 
 if (args is ["--erased-values", var valueOutput]) { ErasedValueChecks.Run(valueOutput); return 0; }
 
+if (args is ["--primitive-references"]) { PrimitiveReferenceChecks.Run(); return 0; }
+
 if (args is ["--native-core"]) { NativeCoreChecks.Run(); return 0; }
 
 if (args is ["--assembly-constants"]) { AssemblyConstantChecks.Run(); return 0; }

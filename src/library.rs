@@ -92,6 +92,7 @@ pub(crate) fn link_modules_with_object_root(
         linked.types.extend(dependency.types);
         linked.functions.extend(dependency.functions);
     }
+    resolve_primitive_references(&mut linked)?;
     let mut linked = crate::scope::normalize_module(&linked, &linked)?;
     bind_local_internal_references(&mut linked)?;
     crate::vm::validate_linked(&linked)?;
@@ -293,5 +294,77 @@ mod scoped_service_result_tests {
                 .contains("duplicate internal-call declaration in one module"),
             "{error}"
         );
+    }
+}
+
+// Bootstrap storage declarations are not implementations. Never choose between
+// competing executable owners: the usual duplicate-definition check still applies.
+fn resolve_primitive_references(module: &mut Module) -> Result<(), Fault> {
+    for reference in module.types.iter().filter(|t| t.primitive_reference) {
+        let ty = crate::metadata::Type::from_name(&reference.name);
+        if reference.representation != crate::metadata::Representation::Runtime
+            || !ty.is_primitive() || ty == crate::metadata::Type::Char || !reference.fields.is_empty()
+            || !reference.implements.is_empty() || !reference.properties.is_empty()
+            || !reference.generic_parameters.is_empty() || !reference.generic_constraints.is_empty()
+            || reference.declaring_type.is_some() || reference.enum_info.is_some()
+            || reference.packing.is_some() || reference.minimum_size.is_some()
+            || reference.is_abstract || reference.is_closed_hierarchy
+            || module.functions.iter().any(|f| f.owner.as_ref() == Some(&ty)
+                && f.definition.as_ref().map(|d| &d.module) == reference.definition.as_ref().map(|d| &d.module)) {
+            return Err(Fault::new("invalid primitive reference declaration"));
+        }
+        if module.types.iter().filter(|t| !t.primitive_reference && t.name == reference.name).count() != 1 {
+            return Err(Fault::new(format!("primitive reference {} requires exactly one implementation", reference.name)));
+        }
+    }
+    module.types.retain(|t| !t.primitive_reference);
+    Ok(())
+}
+
+#[cfg(test)]
+mod primitive_reference_tests {
+    use super::*;
+    use crate::metadata::{Module, TypeDef};
+
+    fn declaration(reference: bool) -> TypeDef {
+        serde_json::from_value(serde_json::json!({
+            "name": "System.String", "representation": "Runtime", "fields": [],
+            "is_reference_type": true, "primitive_reference": reference
+        })).unwrap()
+    }
+
+    #[test]
+    fn primitive_references_require_one_executable_owner_and_preserve_inputs() {
+        let mut module: Module = crate::assembler::parse_module(".module Test\n.references ()\n").unwrap();
+        module.types = vec![declaration(true)];
+        assert!(resolve_primitive_references(&mut module).is_err());
+        module.types.push(declaration(false));
+        module.types.push(declaration(false));
+        assert!(resolve_primitive_references(&mut module).is_err());
+        module.types.pop();
+        let original = module.clone();
+        resolve_primitive_references(&mut module).unwrap();
+        assert_eq!(module.types.len(), 1);
+        assert!(!module.types[0].primitive_reference);
+        assert!(original.types[0].primitive_reference);
+    }
+
+    #[test]
+    fn primitive_reference_cannot_hide_invalid_storage_contract() {
+        let mut module = crate::assembler::parse_module(".module Test\n.references ()\n").unwrap();
+        let valid = declaration(true);
+        for case in 0..6 {
+            let mut reference = valid.clone();
+            match case {
+                0 => reference.name = "System.Char".into(),
+                1 => reference.packing = Some(8),
+                2 => reference.minimum_size = Some(8),
+                3 => reference.is_abstract = true,
+                4 => reference.implements.push(crate::metadata::Type::String),
+                _ => reference.generic_parameters.push(Some("T".into())),
+            }
+            module.types = vec![reference, declaration(false)];
+            assert!(resolve_primitive_references(&mut module).is_err());
+        }
     }
 }

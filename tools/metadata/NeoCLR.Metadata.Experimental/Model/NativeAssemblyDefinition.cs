@@ -20,6 +20,7 @@ public sealed partial class NativeAssemblyDefinition
         internal string? BaseName { get; init; }
         internal int BaseIndex { get; set; } = -1;
         internal PrimitiveType? NativePrimitive { get; init; }
+        internal bool PrimitiveReference { get; init; }
         internal bool NativeGrapheme { get; init; }
         internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = [];
     }
@@ -221,10 +222,13 @@ public sealed partial class NativeAssemblyDefinition
                         _ => throw new InvalidDataException("unsupported native type visibility")
                     };
                 }
+                bool primitiveReference = type.TryGetProperty("primitive_reference", out var referenceFlag) && referenceFlag.GetBoolean();
+                if (type.TryGetProperty("primitive_reference", out _)) typeFields.Add("primitive_reference");
                 bool hasRepresentation = type.TryGetProperty("representation", out var representation);
                 bool isInterface = hasRepresentation && representation.GetString() == "Interface";
                 bool isPrimitive = hasRepresentation && representation.GetString() == "Runtime";
                 if (hasRepresentation) { typeFields.Add("representation"); Require(isInterface || isPrimitive, "unsupported native representation"); }
+                Require(!primitiveReference || isPrimitive, "primitive reference requires runtime representation");
                 var baseInterfaces = type.TryGetProperty("implements", out _) ? Array(type, "implements", 256).Select(b => b.Clone()).ToArray() : [];
                 if (type.TryGetProperty("implements", out _)) typeFields.Add("implements");
 
@@ -302,6 +306,7 @@ public sealed partial class NativeAssemblyDefinition
                     Require((nativeName == "System.Char" || primitive is { } scalar && TypeDefinition.IsSupportedNativePrimitive(scalar)) && isValueType == (primitive != PrimitiveType.String) && !isStatic &&
                         declaringType < 0 && typeNames.Length == 0 && fieldRows.Count == 0 && enumMembers is null,
                         "invalid runtime primitive declaration");
+                    Require(!primitiveReference || primitive is not null && baseInterfaces.Length == 0 && propertyElements.Length == 0, "invalid primitive reference contract");
                     ns = "System"; name = nativeName[7..];
                 }
                 else if (declaringType >= 0)
@@ -352,7 +357,7 @@ public sealed partial class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
             }
             for (int i = 0; i < types.Count; i++)
             {
@@ -614,6 +619,7 @@ public sealed partial class NativeAssemblyDefinition
                     if (constructed) Shape(construction, "definition", "arguments");
                     var ownerName = primitiveOwner ? "System." + (owner.GetString() == "Char" ? "Char" : ReadPrimitive(owner.GetString(), false).ToString()) : constructed ? Text(construction, "definition") : Text(owner, "Named");
                     ownerIndex = types.FindIndex(t => t.NativeName == ownerName); Require(ownerIndex >= 0, "missing native method owner");
+                    Require(!types[ownerIndex].PrimitiveReference, "primitive reference cannot declare members");
                     Require(types[ownerIndex].EnumMembers is null && primitiveOwner == (types[ownerIndex].NativePrimitive is not null || types[ownerIndex].NativeGrapheme), "invalid native owner representation");
                     Require(!primitiveOwner || name is not (".ctor" or ".cctor") || name == ".ctor" && types[ownerIndex].NativePrimitive == PrimitiveType.String, "runtime primitive constructor is unsupported");
                     var arity = types[ownerIndex].GenericNames.Length;
@@ -981,7 +987,7 @@ public sealed partial class NativeAssemblyDefinition
         {
             var definition = type.IsValueType ? graph.AddValueType(type.Namespace, type.Name, type.Visibility)
                 : graph.AddClass(type.Namespace, type.Name, type.Visibility);
-            definition.SetNativePrimitive(primitive);
+            if (type.PrimitiveReference) definition.SetNativePrimitiveReference(primitive); else definition.SetNativePrimitive(primitive);
             return definition;
         }
         if (type.EnumMembers is { } members)

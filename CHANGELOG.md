@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Add explicit memberless native primitive references for source-library bootstrap.
+  Preserve them through metadata readers and require exactly one executable owner
+  during loading; reject standalone execution and malformed storage declarations.
+  Document Raven’s native array/callback/source-String integration contract.
+
 - Give extension receivers a dedicated API section with separately linked type
   components and type-parameter navigation. Document Operators' element type in
   the same Type parameters table used by generic types. Module pages list Type

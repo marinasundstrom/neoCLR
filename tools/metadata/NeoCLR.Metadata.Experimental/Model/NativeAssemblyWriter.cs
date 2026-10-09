@@ -375,7 +375,7 @@ public sealed partial class AssemblyBuilder
             assemblies = new[] { manifest },
             types = types.Select((type, index) => new NativeTypeRow(
                 TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = type.IsEnum ? "private" : f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface && !type.IsValueType && type.NativePrimitive is null, !type.IsInterface && type.IsAbstract, (type.Definition.Attributes & 0x100) != 0, type.IsClosedHierarchy,
-                TypeOrigin(type, index), type.LocalBase is { } baseType ? SignatureValue(baseType.OpenSignature) : null, type.IsInterface ? "Interface" : (type.NativePrimitive is not null || type.NativeGrapheme) ? "Runtime" : null,
+                TypeOrigin(type, index), type.Definition.IsNativePrimitiveReference, type.LocalBase is { } baseType ? SignatureValue(baseType.OpenSignature) : null, type.IsInterface ? "Interface" : (type.NativePrimitive is not null || type.NativeGrapheme) ? "Runtime" : null,
                 !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
                 type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, !type.Definition.CustomAttributes.Any(a => !type.Definition.IsFlagsAttribute(a)) ? null : type.Definition.CustomAttributes.Where(a => !type.Definition.IsFlagsAttribute(a)).Select(a => Attribute(a)).ToArray(), type.IsEnum ? new { underlying = "Int32", flags = type.IsFlagsEnum, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null)).ToArray(),
@@ -428,6 +428,8 @@ public sealed partial class AssemblyBuilder
         bool is_abstract, bool is_sealed,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
         bool is_closed_hierarchy, object origin,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+        bool primitive_reference,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         object? @base,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

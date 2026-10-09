@@ -253,6 +253,9 @@ pub struct GenericConstraint {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TypeDef {
+    /// Memberless bootstrap storage declaration; not an executable owner.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub primitive_reference: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<crate::metadata_origin::MetadataOrigin>,
     /// Internal nominal classification; a future CLI reader derives this from standard metadata.

@@ -780,6 +780,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     }
                     let ty = Type::from_name(&name);
                     typedef = Some(TypeDef {
+                        primitive_reference: false,
                         is_reference_type,
                         enum_info: None,
                         visibility,

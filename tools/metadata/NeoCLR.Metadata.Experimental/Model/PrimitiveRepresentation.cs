@@ -22,6 +22,18 @@ public sealed partial class TypeDefinition
         NativePrimitive = primitive;
     }
 
+    /// <summary>Whether this is a memberless bootstrap declaration whose executable owner must be supplied by another module.</summary>
+    public bool IsNativePrimitiveReference { get; private set; }
+
+    /// <summary>Declares a primitive storage contract without claiming its executable implementation.</summary>
+    public void SetNativePrimitiveReference(PrimitiveType primitive)
+    {
+        SetNativePrimitive(primitive);
+        if (Methods.Count != 0 || Interfaces.Count != 0 || Properties.Count != 0)
+            throw new ArgumentException("primitive reference must be memberless");
+        IsNativePrimitiveReference = true;
+    }
+
     internal static bool IsSupportedNativePrimitive(PrimitiveType primitive) => primitive is PrimitiveType.Void or PrimitiveType.String or PrimitiveType.Boolean or PrimitiveType.RuntimeTypeHandle or PrimitiveType.Value || IsNumericPrimitive(primitive);
 
     internal static bool IsNumericPrimitive(PrimitiveType primitive) => primitive is PrimitiveType.SByte or PrimitiveType.Byte or
@@ -37,9 +49,11 @@ public sealed partial class TypeBuilder
     /// <param name="primitive">The canonical primitive matching this System declaration.</param>
     /// <exception cref="ArgumentException">See TypeDefinition.SetNativePrimitive.</exception>
     public void SetNativePrimitive(PrimitiveType primitive) => Definition.SetNativePrimitive(primitive);
+    /// <summary>Declares a memberless primitive bootstrap contract; execution requires a separate implementation.</summary>
+    public void SetNativePrimitiveReference(PrimitiveType primitive) => Definition.SetNativePrimitiveReference(primitive);
     internal void ValidatePrimitiveRepresentation()
     {
-        if (NativePrimitive is { } primitive) Definition.SetNativePrimitive(primitive);
+        if (NativePrimitive is { } primitive) { Definition.SetNativePrimitive(primitive); if (Definition.IsNativePrimitiveReference) Definition.SetNativePrimitiveReference(primitive); }
         if (NativeGrapheme) Definition.SetNativeGrapheme();
     }
 }

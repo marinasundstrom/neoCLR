@@ -7968,3 +7968,27 @@ Validation: `NeoCLR.Metadata.Experimental.Tests --erased-values <directory>`
 writes matching/mismatched slice consumers and checks round-trip, operand/stack
 rejection and CLI rejection. The interpreter returns 42 for the matching consumer
 and a RuntimeError with a managed stack for mismatched extraction.
+
+## Primitive bootstrap references (development, 2026-10-09)
+
+`TypeDefinition.IsNativePrimitiveReference` identifies a memberless storage
+reference. `TypeDefinition.SetNativePrimitiveReference(PrimitiveType)` and the
+corresponding `TypeBuilder` method designate it. The canonical System identity,
+primitive category and ordinary native primitive restrictions still apply. Methods,
+properties and interfaces are forbidden; invalid authored declarations throw
+`ArgumentException`, and loaded definitions remain immutable.
+
+Native metadata writes `primitive_reference: true` and both definition readers
+preserve it. The runtime load set must supply exactly one executable declaration
+of that primitive. Missing or competing implementations fault during loading;
+references cannot be executed on their own. This is an explicit bootstrap contract,
+not an ordering rule for shadowing duplicate types. Executable CLI emission rejects
+native primitive declarations as before. Char retains its separate grapheme
+contract and is not admitted by this API.
+
+For example, a native core catalog can reference String storage while the separate
+production String library supplies the implementation. This differs from CLR core
+library identity resolution: neoCLR explicitly separates the bootstrap storage
+reference from its executable owner. The benefit is native-only source bootstrap;
+the cost is an additional load-set validation rule. It does not grant arbitrary
+cross-assembly primitive replacement or promise a stable native ABI.

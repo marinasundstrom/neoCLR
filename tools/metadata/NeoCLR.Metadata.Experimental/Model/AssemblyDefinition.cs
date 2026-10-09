@@ -396,7 +396,7 @@ public sealed partial class AssemblyDefinition
     internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null, bool UnsupportedParameterModes = false, IReadOnlyDictionary<int, string>? ParameterNames = null, MethodConstraintRow[]? InterfaceConstraints = null, int? ParameterArrayIndex = null, IReadOnlyDictionary<int, NullableAnnotation>? NullableAnnotations = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
-    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null, bool IsEnum = false, PrimitiveType? NativePrimitive = null, bool NativeGrapheme = false, uint BaseTypeToken = 0, bool IsClosedHierarchy = false, bool IsFlagsEnum = false);
+    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null, bool IsEnum = false, PrimitiveType? NativePrimitive = null, bool NativeGrapheme = false, uint BaseTypeToken = 0, bool IsClosedHierarchy = false, bool IsFlagsEnum = false, bool PrimitiveReference = false);
 }
 
 /// <summary>An owned manifest-module definition with local TypeDef lookup.</summary>
@@ -529,7 +529,7 @@ public sealed partial class TypeDefinition
             return relationship;
         }).ToArray()));
         MetadataToken = row.Token; Namespace = row.Namespace;
-        Name = row.Name; NativePrimitive = row.NativePrimitive; NativeGrapheme = row.NativeGrapheme; IsValueType = row.IsValueType; IsEnum = row.IsEnum; GenericArity = row.Arity; CanImportReference = row.CanImportReference; ValueTypeCore = row.ValueTypeCore; declaringToken = row.DeclaringToken; Attributes = row.Attributes;
+        Name = row.Name; IsNativePrimitiveReference = row.PrimitiveReference; NativePrimitive = row.NativePrimitive; NativeGrapheme = row.NativeGrapheme; IsValueType = row.IsValueType; IsEnum = row.IsEnum; GenericArity = row.Arity; CanImportReference = row.CanImportReference; ValueTypeCore = row.ValueTypeCore; declaringToken = row.DeclaringToken; Attributes = row.Attributes;
     }
     /// <summary>Gets the intrinsic native value category, or whether a CLI declaration directly extends System.ValueType or System.Enum.</summary>
     /// <remarks>This is a metadata classification, not runtime type loading or base-identity validation.</remarks>

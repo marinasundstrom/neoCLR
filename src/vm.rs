@@ -425,6 +425,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 "managed System.Array<T> requires the intrinsic System array shape",
             ));
         }
+        if def.primitive_reference {
+            return Err(Fault::new("primitive reference requires load-set resolution"));
+        }
         let ty = Type::from_name(&def.name);
         if ty.definition_name() != Some(def.name.as_str()) {
             return Err(Fault::new("type definitions must use canonical names"));

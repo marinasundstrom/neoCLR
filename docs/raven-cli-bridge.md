@@ -7191,3 +7191,21 @@ metadata/source codegen replaces the bridge adapter with the ordinary instance b
 Non-null arguments, empty-search RuntimeError and explicit empty replacement deletion
 are neoCLR contracts; do not infer .NET nullable/culture overloads from the name.
 See [validation and remaining native core work](experiments/native-core-bootstrap/README.md#stringreplace-facade-and-positive-escaping-2026-10-09).
+
+### Native String source ownership (2026-10-09)
+
+Raven shared integration `a14647592` admits native Array shape lookup, native
+Function callbacks with accessible component types, and source-selected String
+member lookup (including synthesized union escaping). Discarded inhabited-unit
+callback results use the actual callable return contract. Ordinary .NET callable
+visibility/array behavior remains unchanged; focused callback and array tests pass.
+
+The native-only String fixture configures NativeCore as the core/Object/unit/failure
+provider, NativeString as the array/iteration and executable String owner, and
+`primitiveImplementations: [String]` during source emission. Its memberless core
+String uses the explicit primitive-reference metadata contract. Native readers
+preserve the flag and the runtime requires one executable owner; it is not a
+permission to shadow duplicate implementations. No CLI semantic import is used.
+The reference PE remains a temporary transport for native metadata, with no claim
+that executing its CLI bodies implements String. Production core bootstrap and
+project-driver selection of primitive ownership remain separate qualification work.

@@ -1380,3 +1380,7 @@ qualified; complete native source-core bootstrap remains unfinished.
 
 2026-10-09: host-only ValueIs/ValueUnpack metadata operands are documented in
 [the metadata reference](experimental-metadata.md#native-erased-result-operands-development-2026-10-09); guest API signatures are unchanged.
+
+2026-10-09: host primitive bootstrap references are documented in the
+[manual metadata reference](experimental-metadata.md#primitive-bootstrap-references-development-2026-10-09).
+This host authoring/reading API does not change guest String signatures or snapshots.
