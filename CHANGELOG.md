@@ -24,6 +24,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   option, interpreter/native parity checks and a Windows HTTP session action.
   Allow five seconds for the post-exit refusal probe so Windows can report the
   closed listener after its SYN retry interval; a timeout still fails the gate.
+  Windows action `37976713202` at `84b6e425` passes all three cases with complete
+  results matching macOS; verify 1,435 artifact hashes and 37 tracked source inputs.
   Exchanges use await; only the documented unit callback adapter starts asynchronous
   work for the host to drain. General async export completion remains unfinished.
   Record a separate pinned-compiler async pattern-local hoisting issue; the final

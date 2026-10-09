@@ -55,7 +55,33 @@
     ]
   },
   "faultComparison": "Native and interpreter guest fault frames match exactly; the interpreter additionally has precisely its verified DrainEntryTasks and artifact async-entry frames. Full traces retained in report.",
-  "github": "Windows qualification pending",
+  "github": {
+    "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/37976713202",
+    "revision": "84b6e425bf31df3816b776882974720c7bff4413",
+    "platform": "Windows-2022Server-10.0.20348-SP0",
+    "reportSha256": "f4dd8ab10f18bbf1c76f264b0b2cf5496b3af9723d4051192f36d459c1639e04",
+    "artifactHashesVerified": 1435,
+    "trackedSourceHashesVerified": 37,
+    "dependencies": [
+      "WS2_32.dll",
+      "KERNEL32.dll"
+    ],
+    "sameNativeAndInterpreterResultsAsMacOS": true,
+    "cases": [
+      {
+        "name": "three-requests",
+        "passed": true
+      },
+      {
+        "name": "fragmented",
+        "passed": true
+      },
+      {
+        "name": "fault-after-success",
+        "passed": true
+      }
+    ]
+  },
   "limitations": [
     "Three serial requests; no general async export completion, concurrent serving, reload or scheduler claim",
     "Host service scopes close sockets before session discard; no guest finalizers promised on faults",

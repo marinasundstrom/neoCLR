@@ -73,7 +73,11 @@ host dispatch. The gate checks exactly those two expected frames against the
 artifact entry name and retains both complete traces. The native executable runs alone without managed-runtime
 search paths. The host checks session cleanup; the test checks listener shutdown.
 Reports retain source, toolchain and artifact hashes. See
-[qualification evidence](../../native-retained-http-validation.json).
+[qualification evidence](../../native-retained-http-validation.json). All three cases
+pass locally on macOS ARM64 and in Windows x64
+[Action 37976713202](https://github.com/marinasundstrom/neoCLR/actions/runs/37976713202)
+at `84b6e425`; complete native/interpreter results match across OSes. The downloaded
+Windows evidence verifies 1,435 artifact hashes and 37 tracked source inputs.
 
 Windows ARM64, general async export completion, broader cancellation/disconnect
 recovery, persistent-host supervision and code-generation lifetimes remain open.

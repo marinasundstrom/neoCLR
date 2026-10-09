@@ -54,8 +54,8 @@ pass on macOS ARM64 and Windows x64 at `c77e2b07`, with matching fault output. A
 without heap scanning; the [handoff gate](native-bootstrap-handoff-validation.json)
 passes on macOS ARM64 and Windows x64 at `201f567b`. A [retained-state HTTP consumer](experiments/retained-http/README.md) now uses that
 handoff for three serial exchanges with collection between calls and terminal-fault
-shutdown. Its [qualification](native-retained-http-validation.json) is tracked
-separately. General async export completion and broader persistent-host contracts
+shutdown. Its [qualification](native-retained-http-validation.json) passes three
+matching scenarios on macOS ARM64 and Windows x64 (`84b6e425`). General async export completion and broader persistent-host contracts
 remain open before reusable hosting or hot reload can be claimed.
 
 **Author clarification (2026-10-09):** once the native compilation foundations are
