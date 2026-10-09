@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Add a private retained native session with explicit root ownership, an entry-reset
+  anchor, bounded callback retention and fail-closed dispatch after guest faults.
+  Reject copied/wrong-thread sessions, reentry and shutdown with foreign service
+  roots; preserve diagnostics until explicit whole-session discard, including intern
+  pool teardown. Add portable lifecycle and generated-callback gates. This is an
+  ownership experiment, not a public hosting API or an application export handoff.
+
 - Add a private serial-reuse HTTP host gate: preserve the first guest failure,
   render then clear fault roots, release task/socket scopes and require an empty
   collected heap before another entry. Compare success/fault-or-cancellation/

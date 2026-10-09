@@ -118,6 +118,18 @@ int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context) {
         if (frame->context == context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     return 0;
 }
+int32_t neoclr_gc_owned_roots_check_v1(neoclr_aot_context *context, const uint64_t *handles, uint32_t count) {
+    if (!context || count > NEOCLR_GC_HOST_ROOT_LIMIT || (count && !handles)) return 3;
+    for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
+        if (f->context == context) return 3;
+    for (uint32_t i = 0; i < count; i++) {
+        if (!find_host_root(context, handles[i])) return 3;
+        for (uint32_t j = 0; j < i; j++) if (handles[j] == handles[i]) return 3;
+    }
+    uint32_t actual = 0;
+    for (host_root *r = host_head; r; r = r->next) actual += r->context == context;
+    return actual == count ? 0 : 3;
+}
 int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
                              uint32_t kind, void **output) {
     if (!output || !blocks_valid(a) || !bytes || kind < NEOCLR_GC_TEXT || kind > NEOCLR_GC_INTERN)

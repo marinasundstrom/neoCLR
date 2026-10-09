@@ -1,0 +1,59 @@
+name: Native retained session
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'docs/experiments/aot-console/native-session*'
+      - 'docs/experiments/aot-console/native-gc*'
+      - 'docs/experiments/aot-console/root-probe*'
+      - 'docs/experiments/aot-console/host-callbacks.neoil'
+      - 'tools/native/windows-native-stack.c'
+      - 'tools/aot-poc/**'
+      - 'scripts/validate-native-session.py'
+      - '.github/workflows/native-session.yml'
+  pull_request:
+    paths:
+      - 'docs/experiments/aot-console/native-session*'
+      - 'docs/experiments/aot-console/native-gc*'
+      - 'docs/experiments/aot-console/root-probe*'
+      - 'docs/experiments/aot-console/host-callbacks.neoil'
+      - 'tools/native/windows-native-stack.c'
+      - 'tools/aot-poc/**'
+      - 'scripts/validate-native-session.py'
+      - '.github/workflows/native-session.yml'
+permissions:
+  contents: read
+jobs:
+  contracts:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: cargo build --locked --manifest-path tools/aot-poc/Cargo.toml
+      - name: Run macOS session contracts
+        if: runner.os == 'macOS'
+        run: python3 scripts/validate-native-session.py --aot tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-session-validation
+      - name: Run Windows session contracts
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw 'MSVC x64 tools not found' }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-session.py --aot tools/aot-poc/target/debug/neoclr-aot-poc.exe --output target/native-session-validation"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-session-${{ matrix.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: target/native-session-validation/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: warn

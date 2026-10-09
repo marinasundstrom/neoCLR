@@ -21,6 +21,9 @@ int32_t neoclr_gc_host_root_read_v1(neoclr_aot_context *context, uint64_t handle
 int32_t neoclr_gc_host_root_release_v1(neoclr_aot_context *context, uint64_t handle);
 /* Entry reset is forbidden while this thread holds roots or guest frames for the context. */
 int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context);
+/* Quiescent exclusive ownership check. The supplied distinct handles must be
+ * exactly this thread's complete root set for the context; no mutation occurs. */
+int32_t neoclr_gc_owned_roots_check_v1(neoclr_aot_context *, const uint64_t *, uint32_t);
 /* Private dispatcher admission: quiescent, fault-free context and rooted Function
  * descriptor. Output remains unchanged on rejection. Context belongs to one image. */
 int32_t neoclr_gc_callback_read_v1(neoclr_aot_context *context, uint64_t handle, void **output);
