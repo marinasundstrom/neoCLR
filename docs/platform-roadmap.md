@@ -26,6 +26,16 @@ repairs support these consumers; broad structural types, a wholesale RavenDoc
 rewrite and JIT remain deferred until concrete needs justify them. Existing
 structural experiments retain their branch restrictions.
 
+**Author clarification (2026-10-09):** once the native compilation foundations are
+ready, let runtime suspension, runtime-owned scheduling and green threads co-evolve
+with them. This is a cross-cutting design/implementation track alongside subsequent
+native, HTTP and hosting slices, not work deferred until all AOT coverage or ports
+are complete. Preserve shared lifecycle contracts across interpreter, AOT and
+eventual JIT; current console/HTTP hosts, TaskQueue adapters, pthread stack guards
+and TLS roots remain provisional. See the
+[scheduling follow-up](runtime-scheduling-design.md#co-evolution-with-native-foundations--2026-10-09).
+No stack model, preemption policy or public Scheduler API is selected yet.
+
 Comparison: [.NET Native AOT](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
 already offers project-level self-contained native deployment. The immediate benefit
 here is making neoCLR's existing UTF-8/Raven execution accessible and reproducible;
@@ -42,9 +52,13 @@ now builds ordinary projects with a selected bundle and links a bounded macOS
 ARM64 executable. [Focused evidence](experiments/native-project-build-validation.json)
 covers UTF-8/interpolation, interpreter/native fault parity, executable-only
 deployment, unsupported recursion rejection, existing-output preservation and
-rejection of stale project output after a failed rebuild. Next package the matched
-backend/adapters and workflow for checkout-independent use, then extend the project
-path to HTTP. Windows AOT, full bootstrap, hosting and reload remain open.
+rejection of stale project output after a failed rebuild. The subsequent
+[development kit](native-poc-bundle.md#relocatable-development-kit) packages the
+matched backend/adapters and compiler/library bundle. Its
+[extracted acceptance](experiments/native-build-kit-validation.json) passes outside
+the checkout without Cargo, including standalone UTF-8 execution and pre-build
+rejection of modified adapter/backend/compiler inputs. Next extend the project path
+to HTTP. Windows AOT, full bootstrap, hosting and reload remain open.
 
 **Preview 13 published (2026-10-09):** after Raven's shared website publication,
 the author requested the next neoCLR POC release for Windows and macOS, with a

@@ -12,16 +12,25 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   selected bundle's Raven project build, existing AOT backend and explicit native
   runtime adapters. Record build inputs/diagnostics and publish only after linking
   and OS-dependency checks; preserve existing output directories. This synchronous
-  1 MiB GC profile still requires a source checkout and separately built AOT tool;
-  it does not add native compilation to the released bundles or support Windows.
+  1 MiB GC profile is also available as a separately staged development build kit,
+  with a matched AOT build, catalogued compiler/library bundle, native adapters,
+  sample project, input hashes and dependency license texts. Application builds
+  from the extracted kit require neither a source checkout nor Cargo; kit integrity
+  is checked before tool invocation. This does not change released bundles or add Windows.
   Focused acceptance passes UTF-8/interpolation and fault parity, isolated execution,
   unsupported recursion rejection and stale/existing-output protection. Select a
   matching Apple Clang/macOS SDK explicitly through xcrun.
+  Extracted-kit acceptance also passes an application build outside the checkout
+  without Cargo and rejects modified adapter, backend and compiler configuration
+  before invoking tools.
 
 - Record the post-Preview 13 priority discussion and subsequent author selection:
   prioritize usable project-level native compilation, bounded Windows portability,
   then hosting and reload; implement and validate in individually committed slices.
   These are development priorities, not newly shipped capabilities.
+  Record the author's follow-up that suspension, runtime-owned scheduling and green
+  threads should co-evolve with the native foundations, with shared cross-mode
+  lifecycle contracts and provisional host/stack adapters.
 
 - Correct API extension visibility: internal runtime-service containers no longer
   contribute public-looking members such as ConsoleFlush and ConsoleWriteBytes

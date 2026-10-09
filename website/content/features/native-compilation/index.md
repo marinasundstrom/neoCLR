@@ -21,8 +21,10 @@ linked into that binary. See [architecture](../../architecture/) for those layer
 Development builds now have a bounded project-to-executable console workflow on
 macOS ARM64. It builds an ordinary Raven project with a selected native bundle,
 links a standalone executable and records build diagnostics and dependencies.
-It currently requires a source checkout and a separately built AOT tool; it is
-not included in Preview 13. See the
+A separate development kit now packages the compiler, libraries, AOT tool and
+native adapters, so application builds need no source checkout or Cargo. Building
+still requires the compiler's .NET SDKs and Apple's macOS tools; the resulting
+executable needs only the OS libraries. The kit is not included in Preview 13. See the
 [development build instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md#development-project-to-executable-workflow-2026-10-09)
 for the supported console profile and prerequisites.
 

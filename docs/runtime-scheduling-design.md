@@ -394,3 +394,34 @@ optimization to the interpreter when it applies and validate it there; do not cl
 that a native-only adapter automatically improves interpreter performance. The current
 Raven queue success/fault consumers exercise the same artifact in both modes. They
 can later qualify a Scheduler adapter, while host Drain exports remain private.
+
+### Co-evolution with native foundations — 2026-10-09
+
+During the project-level native compilation/build-kit work, the author asks to
+consider runtime suspension, runtime scheduling and green threads once the native
+foundations are ready, and to let them co-evolve. This reinforces the shared-service
+direction above. It does not require finishing every AOT feature or Windows port
+before beginning suspension work, nor does it add suspension to the synchronous
+console kit's qualification scope.
+
+Continue the bounded native build and HTTP consumers while reviewing activation
+ownership whenever adding host callbacks, GC roots, stack guards or scheduling.
+The initial console host's one-entry heap lifetime and the current HTTP host's
+queue pumping are explicit adapters, not permanent runtime scheduling contracts.
+Do not make pthread identity/TLS or an uninterrupted native call stack the abstract
+owner of suspended work; backend adapters must identify what would change when
+activations own their state and roots.
+
+An initial suspension experiment should exercise one activation suspending and
+resuming on readiness, a captured value surviving collection, and cancellation or
+shutdown releasing it exactly once. Reuse cross-mode lifecycle/fault consumers and
+the .NET/JVM comparisons above. Assess stackless activation records and stackful
+green threads against the same scenario before selecting storage, stack scanning,
+foreign-call restrictions, carrier migration or preemption. Compare wakeup latency,
+retained memory and rooting costs when executable alternatives exist; no performance
+claim follows from the direction itself. Suspended activations and callbacks must
+also retain the appropriate code generation for later reload.
+
+These are proposed experiment boundaries, not implemented suspension or an approved
+public Scheduler API. The next native HTTP/hosting slices should report their
+replacement boundaries and any evidence that changes these choices.

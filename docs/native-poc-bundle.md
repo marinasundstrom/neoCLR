@@ -2,6 +2,55 @@
 
 ## Development project-to-executable workflow (2026-10-09)
 
+### Relocatable development kit
+
+The native console workflow can now be staged as a separate development kit with
+the compiler/library bundle, a freshly built AOT tool, native adapters and a sample
+project. From a source checkout, using a qualified native POC bundle:
+
+```sh
+python3 scripts/package-native-build-kit.py \
+  --bundle /path/to/neoclr-native-poc \
+  --output /path/to/new-kit-candidate
+python3 scripts/verify-native-build-kit.py \
+  --archive /path/to/new-kit-candidate/neoclr-native-build-kit-osx-arm64.tar.gz \
+  --output /path/to/new-kit-qualification
+```
+
+Packaging requires Cargo and its locked dependencies available locally. It builds
+the AOT executable, checks its architecture/OS dependencies, verifies the source
+bundle's catalog, and archives only catalogued bundle files plus selected build
+support. The kit includes dependency license texts/inventory, the AOT lockfile,
+source/input hashes and an archive checksum. Candidate creation does not publish
+a release or change Preview 13 assets. A dirty source state is recorded explicitly.
+
+Extract the archive and run from its `neoclr-native-build-kit` directory:
+
+```sh
+python3 scripts/build-native-project.py \
+  --project samples/hello/App.rvnproj --output ../hello-native
+../hello-native/app
+```
+
+Application builds need Python 3.9+, the bundled compiler's .NET SDKs and Apple's
+macOS build tools; neither Cargo nor the source checkout is needed. The helper
+selects the kit-owned compiler/library bundle and backend automatically, verifies
+kit file hashes before invoking tools, and rejects overrides to a different pair.
+The shipped sample is catalogued: use a separate project importing the kit's
+`bundle/lib/NeoCLR.ClassLibrary.props` when editing your own application. Hashes
+establish consistency, not an authenticated signature. The standalone executable
+does not require the kit, .NET or a managed runtime installation.
+
+The extraction verifier builds from a temporary path with spaces outside the
+checkout, with Cargo removed from PATH, runs the executable alone with an empty
+environment, and checks that modified adapters, backend and compiler configuration
+are rejected before tool invocation. The synchronous console profile below is
+unchanged; HTTP project publication and Windows AOT remain separate work.
+The [2026-10-09 extracted-kit evidence](experiments/native-build-kit-validation.json)
+records the tested archive hash, source inputs, bundled-toolchain manifest and results.
+
+### Source-checkout workflow
+
 From a neoCLR source checkout on macOS ARM64, build the current AOT tool and use
 an ordinary executable `.rvnproj` importing the selected split bundle's
 `lib/NeoCLR.ClassLibrary.props`:
@@ -58,7 +107,7 @@ division fault against the interpreter, executable-only deployment with an empty
 environment, unsupported-recursion rejection and preservation of existing output.
 The [2026-10-09 acceptance record](experiments/native-project-build-validation.json)
 passes those cases and rejects a failed rebuild despite its previously emitted DLL.
-Packaging this workflow with matching backend/adapters is the next slice; Windows
+The relocatable kit above packages this workflow with its backend/adapters; Windows
 native compilation and HTTP project publication remain separate qualification.
 This reuses the [.NET deployment comparison](native-execution-investigation.md):
 project-level native build ergonomics are familiar, while neoCLR's currently

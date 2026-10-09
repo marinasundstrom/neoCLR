@@ -12673,3 +12673,24 @@ claim follows from these focused checks.
   [recorded evidence](experiments/native-project-build-validation.json).
   The helper is not yet a packaged AOT release; matched tool/adapters packaging
   and the HTTP project path are next.
+
+## 2026-10-09 — Native kit and co-evolving runtime suspension
+
+- **Author continuation:** directs continued work on the selected native compilation
+  priority. The assistant stages a relocatable development console kit containing
+  the compiler/library bundle, freshly built AOT tool, adapters and sample project.
+  Extracted acceptance passes outside the checkout with Cargo absent from PATH,
+  isolated UTF-8 execution and pre-build rejection of three modified tool inputs.
+  [Evidence](experiments/native-build-kit-validation.json) records the candidate;
+  no release publication or Windows/HTTP qualification is claimed.
+- **Author clarification:** “Another thing to consider is runtime suspension,
+  runtime scheduling, and green threads when we have a the native compilation
+  foundations ready and let that co-evolve”.
+- **Assistant response/action:** records a cross-cutting track alongside subsequent
+  native/HTTP/hosting work, rather than waiting for complete AOT coverage. Retains
+  the current hosts, queue adapters and stack/TLS mechanisms as provisional. Adds
+  proposed suspend/resume, GC-root retention, cancellation/shutdown and code-generation
+  lifetime checks to the [scheduling design](runtime-scheduling-design.md#co-evolution-with-native-foundations--2026-10-09).
+- **Open:** stackful/stackless choice, carrier migration, preemption, public Scheduler
+  shape and implementation scheduling remain unselected. The author clarification
+  does not establish implemented green threads or expand the console kit's scope.

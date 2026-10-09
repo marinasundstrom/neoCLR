@@ -1,0 +1,4 @@
+func Main() -> int {
+    System.Console.WriteLine("Hello, Café 🌍")
+    return 0
+}

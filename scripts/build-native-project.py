@@ -13,6 +13,24 @@ ROOT = Path(__file__).resolve().parents[1]
 PROFILE = 'macos-arm64-console-v1'
 
 
+def support_files():
+    base = ROOT / 'docs/experiments'
+    return [ROOT / 'scripts/build-native-project.py', ROOT / 'tools/native/console-host.c',
+            *[base / 'aot-console' / name for name in
+              ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c')],
+            base / 'aot-scalar/console.c', base / 'aot-fault-details/render.c',
+            *sorted((base / 'aot-console').glob('*.h')),
+            *sorted((base / 'aot-scalar').glob('*.h')),
+            *sorted((base / 'aot-fault-details').glob('*.h'))]
+
+
+def verify_files(root, files):
+    for relative, expected in files.items():
+        path = (root / relative).resolve()
+        if Path(relative).is_absolute() or root not in path.parents or not path.is_file() or sha(path) != expected:
+            raise ValueError('Package file mismatch: ' + relative)
+
+
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -47,6 +65,22 @@ def build(project, bundle, aot, output):
         return result.stdout
 
     try:
+        kit_path = ROOT / 'native-build-kit.json'
+        if kit_path.exists():
+            kit = json.loads(kit_path.read_text())
+            if kit.get('format') != 'neoclr-native-build-kit-v1' or kit.get('profile') != PROFILE:
+                raise ValueError('Unsupported native build kit')
+            if bundle != ROOT / 'bundle' or aot != ROOT / 'bin/neoclr-aot-poc':
+                raise ValueError('Packaged builds require the kit-owned bundle and AOT tool')
+            required_files = {p.relative_to(ROOT).as_posix() for p in support_files()}
+            required_files |= {'bin/neoclr-aot-poc', 'bundle/manifest.json', 'bundle/lib/bundle.json'}
+            if not required_files <= kit['files'].keys():
+                raise ValueError('Native build kit omits required inputs')
+            verify_files(ROOT, kit['files'])
+            bundle_manifest = json.loads((bundle / 'manifest.json').read_text())
+            if any(kit['files'].get('bundle/' + p) != digest for p, digest in bundle_manifest['files'].items()):
+                raise ValueError('Native build kit differs from bundled toolchain manifest')
+            report['kitManifestSha256'] = sha(kit_path)
         clang = run(['xcrun', '--sdk', 'macosx', '--find', 'clang']).strip()
         sdk = run(['xcrun', '--sdk', 'macosx', '--show-sdk-path']).strip()
         report['toolchain'] = dict(clang=clang, sdk=sdk, version=run([clang, '--version']))
@@ -115,12 +149,15 @@ def build(project, bundle, aot, output):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('project', 'bundle', 'aot', 'output'):
+    for name in ('project', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
+    packaged = (ROOT / 'native-build-kit.json').is_file()
+    parser.add_argument('--bundle', type=Path, required=not packaged, default=ROOT / 'bundle' if packaged else None)
+    parser.add_argument('--aot', type=Path, required=not packaged, default=ROOT / 'bin/neoclr-aot-poc' if packaged else None)
     args = parser.parse_args()
     try:
         print(build(*(getattr(args, name).resolve() for name in ('project', 'bundle', 'aot', 'output'))))
-    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
+    except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.SubprocessError) as error:
         print('native build: ' + str(error), file=sys.stderr)
         return 1
     return 0
