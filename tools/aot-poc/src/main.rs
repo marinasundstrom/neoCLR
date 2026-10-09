@@ -24,6 +24,16 @@ fn main() {
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut args: Vec<_> = env::args_os().skip(1).collect();
+    let mut target = compiler::Target::MacosArm64;
+    if args.iter().filter(|a| *a == "--target").count() > 1 {
+        return Err("duplicate --target option".into());
+    }
+    if let Some(index) = args.iter().position(|a| a == "--target") {
+        let value = args.get(index + 1).and_then(|a| a.to_str())
+            .ok_or("--target requires a target triple")?;
+        target = compiler::Target::parse(value)?;
+        args.drain(index..=index + 1);
+    }
     let probe_count = args.iter().filter(|a| *a == "--probe-stack-roots").count();
     if probe_count > 1 { return Err("duplicate --probe-stack-roots option".into()); }
     let gc_count = args.iter().filter(|a| *a == "--native-gc").count();
@@ -199,6 +209,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let inspect = args.first().is_some_and(|a| a == "--inspect");
     let inspect_closed = inspect && args.get(3).is_some_and(|a| a == "--closed-world");
     let closed = args.first().is_some_and(|a| a == "--closed-world");
+    if target == compiler::Target::WindowsX64 && (inspect || closed) {
+        return Err("Windows x64 currently supports only scalar/literal-console emission; inspection and closed-world profiles remain macOS ARM64-only".into());
+    }
     if !(args.len() == 3
         || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
     {
@@ -318,7 +331,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let compile_input = selection.as_ref().map_or(&input, |(module, _)| module);
     let details = fault_details.then(|| fault_details::Options::from_report(selection.as_ref().map(|(_, r)| r)));
     let details = details.map(|mut d| { d.probe_stack_roots = probe_stack_roots; d.native_gc = native_gc; d.native_stack_budget = native_stack_budget; d });
-    let object = compiler::compile(compile_input, root, !closed && args.len() == 4, details.as_ref())?;
+    let object = compiler::compile_for_target(compile_input, root, !closed && args.len() == 4, details.as_ref(), target)?;
     // Do not clobber an existing artifact, including on failed compilation.
     let mut output = fs::OpenOptions::new()
         .write(true)
@@ -329,7 +342,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         println!("{}", serde_json::to_string_pretty(&report)?);
         return Ok(());
     }
-    println!("Emitted aarch64-apple-darwin object; C export: {}", if fault_details { "neoclr_entry_v3 with caller-owned fault details" } else { "neoclr_entry_v2" });
+    println!("Emitted {} object; C export: {}", target.triple(), if fault_details { "neoclr_entry_v3 with caller-owned fault details" } else { "neoclr_entry_v2" });
     Ok(())
 }
 

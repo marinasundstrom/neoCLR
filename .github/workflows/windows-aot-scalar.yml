@@ -1,0 +1,36 @@
+name: Windows x64 scalar AOT
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'src/**'
+      - 'Cargo.*'
+      - 'tools/aot-poc/**'
+      - 'tools/native/windows-scalar-host.c'
+      - 'docs/experiments/aot-scalar/**'
+      - 'docs/experiments/aot-hello/**'
+      - '.github/workflows/windows-aot-scalar.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'Cargo.*'
+      - 'tools/aot-poc/**'
+      - 'tools/native/windows-scalar-host.c'
+      - 'docs/experiments/aot-scalar/**'
+      - 'docs/experiments/aot-hello/**'
+      - '.github/workflows/windows-aot-scalar.yml'
+permissions:
+  contents: read
+jobs:
+  scalar-console:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Emit, link and run the bounded Windows profile
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw 'MSVC x64 tools not found' }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && cargo test --locked --manifest-path tools/aot-poc/Cargo.toml --test windows_scalar -- --nocapture"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

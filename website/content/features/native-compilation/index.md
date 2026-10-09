@@ -74,6 +74,8 @@ library and runtime artifacts; this is not a general publishing workflow for all
 
 - **Platform:** executable qualification is on macOS ARM64. Native Windows path
   behavior and broader platform support remain open.
+  Development scalar/literal-console compilation can emit Windows x64 COFF
+  objects; Windows linking/execution and native project kits are not yet qualified.
 - **Code and APIs:** broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.
 - **Async:** async entry points waiting for host I/O are unsupported; selected

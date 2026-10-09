@@ -296,6 +296,65 @@ application environment permits JIT or downloaded native replacements. AOT modul
 loading also depends on signing, loader and distribution policy. Cross-compilation
 requires the target linker/SDK/sysroot as well as an ARM64 code generator.
 
+## Windows x64 scalar object foundation (2026-10-09)
+
+The author-selected next portability slice now adds explicit
+`--target x86_64-pc-windows-msvc` to `neoclr-aot-poc`. The existing default remains
+`aarch64-apple-darwin`, including when running the compiler on another host; target
+selection is explicit rather than inferred from the build machine. The scalar
+backend uses Cranelift 0.121.2's target-default calling convention and emits x64 COFF.
+Mach-O build-version metadata is emitted only for Mach-O. Existing scalar ABI v2
+status/result-pointer semantics and temporary length-prefixed literal text remain
+unchanged. No Raven metadata or .NET compiler mapping changes are introduced.
+
+```sh
+cargo build --locked --manifest-path tools/aot-poc/Cargo.toml
+tools/aot-poc/target/debug/neoclr-aot-poc \
+  docs/experiments/aot-scalar/scalar.neoil Calculate scalar.obj \
+  --target x86_64-pc-windows-msvc
+```
+
+Local cross-target tests inspect COFF architecture, exported entry symbol and
+relocations for scalar calls, control flow, arithmetic faults and literal-console
+output. They also reject unsupported targets/profiles and preserve existing output.
+The retained Raven-produced Hello World PE/#Neo artifact also emits an x64 COFF
+object through `@entry --console`; this reuses the recorded source/compiler fixture.
+This establishes object emission, **not Windows executable qualification**.
+[Evidence](experiments/windows-aot-scalar-validation.json) distinguishes those checks
+from the pending Windows run. The six existing inspection tests and seventeen scalar
+tests pass on macOS, including actual C-consumer/interpreter parity.
+
+On a Windows x64 MSVC developer command prompt, run:
+
+```sh
+cargo test --locked --manifest-path tools/aot-poc/Cargo.toml --test windows_scalar
+```
+
+The Windows-only execution test links a C consumer with MSVC's static CRT and
+checks eight Int32 inputs for each of four workloads, comparing with interpreter
+results and fault codes. The bounded host locks stdout and sets redirected streams
+to binary mode, preserving UTF-8 bytes, LF and embedded NUL. Interactive console
+code-page/display policy is not qualified. The
+[focused Windows workflow](../.github/workflows/windows-aot-scalar.yml) runs this gate
+on relevant pushes/PRs or manual dispatch. It has not been run for this local slice.
+
+Baseline: Microsoft's [x64 calling convention](https://learn.microsoft.com/en-us/cpp/build/x64-calling-convention?view=msvc-170)
+specifies register arguments, shadow space, alignment and unwind requirements;
+[_lock_file](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/lock-file?view=msvc-170)
+documents the CRT stream lock (reviewed 2026-10-09). Reuse the existing .NET/CLI
+arithmetic and status-propagation comparison from the scalar experiments. Selecting
+the Windows convention is required interoperability work, not an improvement over
+.NET Native AOT. Cranelift object emission here does not add Windows unwind tables,
+SEH interoperability or native stack walking; guest faults use explicit statuses.
+Those gaps must be addressed before broader native hosting/suspension qualification.
+
+Windows inspection, closed-world libraries, value/managed profiles, GC, task/socket
+services, native project kits and stack guards remain explicitly unsupported.
+The Windows C adapter is an acceptance host, not the Windows implementation of
+the macOS console/HTTP kit. Next qualify Windows linking/execution, then use actual
+Raven-produced scalar/console metadata in execution before extending services or advertising
+Windows project publication. No local Windows host or emulator was available.
+
 ## Shared native contracts to establish
 
 1. **Lowering and checks.** Resolve and verify a declared IL subset into a typed

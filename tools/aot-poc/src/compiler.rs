@@ -18,12 +18,39 @@ use std::collections::{HashMap, HashSet};
 
 type Error = Box<dyn std::error::Error>;
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(super) enum Target {
+    MacosArm64,
+    WindowsX64,
+}
+
+impl Target {
+    pub(super) fn parse(value: &str) -> Result<Self, Error> {
+        match value {
+            "aarch64-apple-darwin" => Ok(Self::MacosArm64),
+            "x86_64-pc-windows-msvc" => Ok(Self::WindowsX64),
+            _ => Err(format!("unsupported AOT target: {value}").into()),
+        }
+    }
+
+    pub(super) fn triple(self) -> &'static str {
+        match self {
+            Self::MacosArm64 => "aarch64-apple-darwin",
+            Self::WindowsX64 => "x86_64-pc-windows-msvc",
+        }
+    }
+}
+
 pub(super) fn trace_layout(input: &neoclr::Module, details: Option<&crate::fault_details::Options>) -> Result<serde_json::Value, Error> {
     values::trace_layout(input, details)
 }
 
 
 pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
+    compile_for_target(input, root, console, details, Target::MacosArm64)
+}
+
+pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bool, details: Option<&crate::fault_details::Options>, target: Target) -> Result<Vec<u8>, Error> {
     if details.is_some() || !input.types.is_empty()
         || input.functions.iter().any(|f| {
             f.parameters
@@ -40,6 +67,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool, details
                 })
         })
     {
+        if target == Target::WindowsX64 {
+            return Err("Windows x64 currently supports only scalar and literal-console lowering; value/managed profiles remain macOS ARM64-only".into());
+        }
         return values::compile(input, root, details);
     }
     if input.name == "System" || input.functions.len() > 128 {
@@ -146,7 +176,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool, details
         .and_then(|program| program.verify())
         .map_err(|error| error.to_string())?;
 
-    let target = "aarch64-apple-darwin"
+    let target = target.triple()
         .parse()
         .expect("fixed valid target triple");
     let mut settings = settings::builder();
@@ -427,7 +457,9 @@ fn finish(module: ObjectModule) -> Result<Vec<u8>, Error> {
     let mut version = object::write::MachOBuildVersion::default();
     version.platform = object::macho::PLATFORM_MACOS;
     version.minos = 11 << 16;
-    product.object.set_macho_build_version(version);
+    if product.object.format() == object::BinaryFormat::MachO {
+        product.object.set_macho_build_version(version);
+    }
     Ok(product.emit()?)
 }
 

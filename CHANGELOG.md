@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Add explicit `x86_64-pc-windows-msvc` AOT target selection for the bounded scalar
+  and literal-console profile, emitting x64 COFF with the target calling convention.
+  Preserve default macOS ARM64 output; reject Windows managed/closed-world and
+  inspection profiles. Cross-target object checks and macOS regressions pass.
+  Add a Windows C consumer and focused CI job for calls, branches, faults and UTF-8
+  byte output; Windows linking/execution remains unqualified until that job runs.
+
 - Add a development macOS ARM64 project-to-executable console command using the
   selected bundle's Raven project build, existing AOT backend and explicit native
   runtime adapters. Record build inputs/diagnostics and publish only after linking

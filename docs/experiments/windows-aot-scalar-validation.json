@@ -1,0 +1,151 @@
+{
+  "date": "2026-10-09",
+  "baseRevision": "c820ed73739a3320bd26f31ceda07d92a0e95fed",
+  "scope": "Cross-target x64 COFF emission on macOS ARM64; Windows native linking/execution pending",
+  "windowsExecution": "not run; no Windows host/emulator available",
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "docs/experiments/aot-scalar/scalar.neoil",
+        "Calculate",
+        "target/windows-aot-scalar-evidence/scalar.obj",
+        "--target",
+        "x86_64-pc-windows-msvc"
+      ],
+      "exitCode": 0,
+      "stdout": "Emitted x86_64-pc-windows-msvc object; C export: neoclr_entry_v2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "docs/experiments/aot-scalar/control-flow.neoil",
+        "Calculate",
+        "target/windows-aot-scalar-evidence/control-flow.obj",
+        "--target",
+        "x86_64-pc-windows-msvc"
+      ],
+      "exitCode": 0,
+      "stdout": "Emitted x86_64-pc-windows-msvc object; C export: neoclr_entry_v2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "docs/experiments/aot-scalar/faults.neoil",
+        "Calculate",
+        "target/windows-aot-scalar-evidence/faults.obj",
+        "--target",
+        "x86_64-pc-windows-msvc"
+      ],
+      "exitCode": 0,
+      "stdout": "Emitted x86_64-pc-windows-msvc object; C export: neoclr_entry_v2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "docs/experiments/aot-scalar/console.neoil",
+        "Calculate",
+        "target/windows-aot-scalar-evidence/console.obj",
+        "--target",
+        "x86_64-pc-windows-msvc",
+        "--console"
+      ],
+      "exitCode": 0,
+      "stdout": "Emitted x86_64-pc-windows-msvc object; C export: neoclr_entry_v2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "docs/experiments/aot-hello/RavenHello.pe",
+        "@entry",
+        "target/windows-aot-scalar-evidence/raven-hello.obj",
+        "--target",
+        "x86_64-pc-windows-msvc",
+        "--console"
+      ],
+      "exitCode": 0,
+      "stdout": "Emitted x86_64-pc-windows-msvc object; C export: neoclr_entry_v2\n",
+      "stderr": ""
+    }
+  ],
+  "tests": {
+    "windows_scalar": {
+      "passed": 3,
+      "ignored": 1,
+      "ignoredReason": "Windows x64/MSVC C-consumer gate"
+    },
+    "scalar": {
+      "passed": 17,
+      "host": "macOS ARM64; actual native/interpreter parity"
+    },
+    "inspection": {
+      "passed": 6
+    }
+  },
+  "artifacts": {
+    "scalar": {
+      "inputSha256": "33df2ac6c3d2e1d7cd70f1094de476fa3d58e348af705dcfba07dceead789db7",
+      "objectSha256": "47a425af3c93cbb487ee6bd22e6b69cc523d91af302fc8b904d0fe858c16595e",
+      "machine": "0x8664",
+      "rawSectionHeaderNames": [
+        ".text"
+      ]
+    },
+    "control-flow": {
+      "inputSha256": "ca325b2b5454a3d66486681b563a78fccd2a9da3fe3caf5b730882a9c674b330",
+      "objectSha256": "6c12f0bdc4ce9f1e835ef409bf5c58a79214bedce42794bf3834606a93b4ab0a",
+      "machine": "0x8664",
+      "rawSectionHeaderNames": [
+        ".text"
+      ]
+    },
+    "faults": {
+      "inputSha256": "71fffdc8cde0285dc4cde54a6a6c8d79d2aead01c78cf4988cf0ba431229d81e",
+      "objectSha256": "7d8f1521f1f224ce6768339427902c631b78071b558264d82624505754fd4ef0",
+      "machine": "0x8664",
+      "rawSectionHeaderNames": [
+        ".text"
+      ]
+    },
+    "console": {
+      "inputSha256": "aae868acae2b70a14bbd2a4aa95d022da4fb4836bb69604915d31fb7bd38c0c2",
+      "objectSha256": "968204feb25379e24f78ac2c4dfb2847588cac06ff25e1d504072b71444a8387",
+      "machine": "0x8664",
+      "rawSectionHeaderNames": [
+        ".rdata",
+        ".text",
+        "/4",
+        "/4",
+        "/4",
+        "/4",
+        "/4",
+        "/4"
+      ]
+    },
+    "raven-hello": {
+      "inputSha256": "7b3dc09c6979dd3fde39e4e2d541e847b0b2a7d8570a83f28b38da54bb70dbd2",
+      "objectSha256": "d8ccbae92053bbc573b802e25ebc37c952d73001d214be79e08343f4f8573fa3",
+      "machine": "0x8664",
+      "rawSectionHeaderNames": [
+        ".rdata",
+        ".text",
+        "/4",
+        "/4"
+      ]
+    }
+  },
+  "inputs": {
+    "tools/aot-poc/Cargo.toml": "c019c231e2143ede389e7b9d6d62b10a959bdddd2a534eb8360c5195405cabe7",
+    "tools/aot-poc/Cargo.lock": "f90efeb999e032fd2ae50e6e60aca9451959a1622ff12f046757711221af7b44",
+    "tools/aot-poc/src/compiler.rs": "bf3db06a843052d51bce9b0ccf08e61d6473589cef67c0e839e17c57ad8dfcb8",
+    "tools/aot-poc/src/main.rs": "7c3ea68d9bac86271911fccba8884f112aa7ebb05121ddf7caf6f86b65f4a0f7",
+    "tools/aot-poc/tests/windows_scalar.rs": "95efcd6b44599c7d2ad6356ef443e6d288d6937989113bbe2f844e4af34804f7",
+    "tools/native/windows-scalar-host.c": "b93b6ac3b0b7944dc3e7d61ff7349013e8b9ad3453eb547ae2ee4049f90aaf50",
+    ".github/workflows/windows-aot-scalar.yml": "ed82b4058353ef0ec96496c5e4a22e6fd40f383f4ac707e2767c9d25908b272e"
+  },
+  "aotSha256": "246cddeec1cc0990f91109b53b434bd751d3c102d377de49eb3aceeff4f39b8f"
+}
