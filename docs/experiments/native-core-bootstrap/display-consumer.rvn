@@ -1,0 +1,23 @@
+module Example.Display
+
+import System.*
+
+func Main() -> int {
+    let present = Option<string>.Some("hé🙂\u0000z")
+    if String.CompareOrdinal(present.ToString(), "Option.Some(\"hé🙂\u0000z\")") != 0 {
+        return 1
+    }
+    let absent = Option<string>.None()
+    if String.CompareOrdinal(absent.ToString(), "Option.None") != 0 {
+        return 2
+    }
+    let success = Result<string, string>.Ok("ready")
+    if String.CompareOrdinal(success.ToString(), "Result.Ok(\"ready\")") != 0 {
+        return 3
+    }
+    let failure = Result<string, string>.Error("failed")
+    if String.CompareOrdinal(failure.ToString(), "Result.Error(\"failed\")") != 0 {
+        return 4
+    }
+    return 42
+}

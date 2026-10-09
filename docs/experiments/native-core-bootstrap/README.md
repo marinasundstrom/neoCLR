@@ -262,3 +262,39 @@ interpreter but native admission now reaches `isinst Char` in the generated form
 boxing and must not be bypassed by removing the formatter's Char branch. Escaping,
 primitive display and production String/Object bootstrap remain open. The website's
 bounded work-in-progress description remains accurate; no public API was added.
+
+## Nonmatching Char tests and String union display (2026-10-09)
+
+`verify.py --project --text-services --unions --union-display` now compiles and
+executes the [display consumer](display-consumer.rvn) using the unchanged five-source
+production union subset. Some with a Unicode/NUL string, None, Ok with a string
+and Error with a string produce their expected descriptions. Project run,
+independent interpreter and standalone ARM64 code all return 42; native linkage
+remains libSystem only. [Evidence](union-display-validation.json) records inputs
+and commands. This supersedes the preceding String-payload display rejection.
+
+The generated formatter retains its Char test. The closed native profile still
+rejects every Char box producer and has no external boxed-object entry inputs;
+therefore an admitted `isinst Char` can only return null. After original verification,
+specialization and boxing admission, AOT replaces these sites with a private,
+nonallocating helper returning a null reference to the selected Object root.
+`nonmatchingCharBoxTests` records the sites and this restriction. The helper is
+needed because the backend's bundled verification context has a different Object
+identity; manufacturing a host-root result would violate the source contract.
+It consumes one helper function within the existing native function budget.
+
+This is bounded closed-world lowering, **not matching Char-box support**. Focused
+checks compare null, String, ordinary class and boxed Int32 inputs against the
+interpreter; each returns a null reference without a cast fault. A real Char box
+matches in the interpreter and rejects without native output. Future Char boxing
+must replace this proof/lowering with a real exact-box type test. The formatter's
+Char branch is not removed from source or native metadata.
+
+The contract follows the existing [CLI type-test research](../../object-model-review.md):
+a nonmatching `isinst` returns null, rather than a default value or exception.
+No metadata/ABI format or public API changes, no performance claim, and no interpreter
+change. The native profile still excludes matching Char boxes, unboxing and arbitrary
+boxed input. Quotes/backslashes in String payloads still need an escaping contract;
+primitive payload formatting and production String/Object bootstrap remain open.
+The website's bounded work-in-progress claim remains accurate; no website build is
+needed for this internal lowering and executable qualification.

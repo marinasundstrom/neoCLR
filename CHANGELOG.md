@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Admit nonmatching Char box tests in the closed native profile, preserving null
+  Object results while rejecting Char box producers. Production Option/Result
+  string-payload descriptions now match project/interpreter/ARM64 execution,
+  including Unicode/NUL text. Matching Char boxes, escaping and complete core
+  bootstrap remain unsupported or unqualified.
+
 - Lower generic String boxing to the existing native Object reference view and
   exclude unrelated unboxed value construction from Object display dispatch.
   Native-only Raven display/alias/distinct-string checks now match the interpreter;

@@ -34,8 +34,10 @@ Generic String-to-Object boxing now passes display/identity checks alongside unr
 unboxed union construction in all three execution paths. Native projection retains
 reference identity and excludes unboxed values from Object dispatch candidates.
 [Boxing evidence](../experiments/native-core-bootstrap/string-boxing-validation.json).
-Full union display remains blocked at isinst Char; this does not qualify production
-Object formatting or complete native core bootstrap.
+String-payload union display now passes Some/None/Ok/Error in all three paths after
+bounded nonmatching Char-test lowering. Char box producers still reject without output;
+escaped-string/primitive display and full production Object/bootstrap remain open.
+[Display evidence](../experiments/native-core-bootstrap/union-display-validation.json).
 
 Release remains gated on complete production source-runtime bootstrap without the
 CLI semantic bridge, matching SDK/editor/native artifacts and extracted-package

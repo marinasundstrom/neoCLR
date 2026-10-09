@@ -78,3 +78,39 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
     }
     Ok(())
 }
+
+/// After boxing admission, no Char box can exist in this closed profile. Preserve
+/// the null Object result of isinst without making the backend's bundled Object
+/// identity replace the selected source root. Do not call before project(): Char
+/// box producers must reject, rather than turning a possible match into null.
+pub fn project_char_tests(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Error> {
+    let sites: Vec<_> = input.functions.iter().enumerate().flat_map(|(i, f)| {
+        f.body.iter().enumerate().filter_map(move |(pc, op)| {
+            matches!(op, Op::IsInstance(Type::Char)).then_some((i, pc))
+        })
+    }).collect();
+    if sites.is_empty() { return Ok(()); }
+    if report["referenceArena"] != true { return Err("Char box tests require --reference-arena".into()); }
+    if input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::BoxValue(Type::Char)))) {
+        return Err("Char box tests cannot project a Char box producer".into());
+    }
+    let root = report["objectBaseProjection"]["compiledIndex"].as_u64()
+        .ok_or("Char box tests require a verified Object base")? as usize;
+    let object = Type::Named(input.types[root].name.clone());
+    if input.functions.len() >= crate::limits::FUNCTIONS { return Err("Char test helper exceeds the selected function limit".into()); }
+    let helper = input.functions.len();
+    let mut name = "$aot_nonmatching_char_box".to_owned();
+    while input.functions.iter().any(|f| f.name == name) { name.push('_'); }
+    let definition = MemberId { module: input.name.clone(), revision: input.revision.clone(), index: helper as u32 };
+    input.functions.push(serde_json::from_value(json!({"name":name,"definition":definition,
+        "parameters":[object],"returns":object,"locals":[object],
+        "body":[Op::LocalAddress(0),Op::InitializeObject(object.clone()),Op::Load(0),Op::Return]}))?);
+    for &(caller, pc) in &sites {
+        input.functions[caller].body[pc] = Op::Call(FunctionRef { definition:Some(definition.clone()), name:name.clone(),
+            owner:None, instance:false, generic_arguments:vec![], parameters:vec![object.clone()] });
+    }
+    report["nonmatchingCharBoxTests"] = json!({"helperCompiledIndex":helper,
+        "sites":sites.into_iter().map(|(function, instruction)| json!({"functionCompiledIndex":function,"instruction":instruction})).collect::<Vec<_>>(),
+        "policy":"closed profile rejects Char box producers; preserve null Object result; no matching Char box support"});
+    Ok(())
+}

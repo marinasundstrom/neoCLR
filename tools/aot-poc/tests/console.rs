@@ -5076,3 +5076,61 @@ ret
     assert!(result.stdout.is_empty());
     assert_eq!(String::from_utf8_lossy(&result.stderr), fault.diagnostic().to_string());
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn char_box_tests_preserve_null_results_and_reject_matching_producers() {
+    let seed = neoclr::assemble(OBJECT_DISPLAY_SEED).unwrap();
+    let cases = [
+        ("ldloca value\ninitobj System.Object\nldloc value", false),
+        ("ldstr \"hé🙂\"\nbox String", false),
+        ("newobj.ctor instance A::.ctor()\ncastclass System.Object", false),
+        ("ldc.i4 7\nbox Int32", false),
+        ("ldloca character\ninitobj Char\nldloc character\nbox Char", true),
+    ];
+    for (producer, matching) in cases {
+        let source = format!(r#"
+.module CharBoxTest
+.type class A
+.method instance .ctor() -> noresult
+ret
+.end
+.end
+.function Calculate(Int32 unused) -> Int32
+.local System.Object value
+.local Char character
+{producer}
+isinst Char
+ref.isnull
+brtrue Missing
+ldc.i4 1
+ret
+Missing:
+ldc.i4 42
+ret
+.end
+"#);
+        let app = neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)], &seed).unwrap().remove(0);
+        let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+        let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+        assert_eq!(method.invoke(vec![neoclr::Value::Int32(0)], neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(if matching { 1 } else { 42 }));
+        let dir = Temp::new();
+        let result = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena"]);
+        if matching {
+            assert!(!result.status.success() && !dir.0.join("app.o").exists());
+            assert!(String::from_utf8_lossy(&result.stderr).contains("record boxing requires Int32 or a local closed empty value record"));
+            continue;
+        }
+        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+        let result = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror"])
+            .arg(base.join("aot-console/text-host.c")).arg(base.join("aot-console/text-arena.c"))
+            .arg(base.join("aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+            .arg("-o").arg(dir.0.join("app")).output().unwrap();
+        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        let result = Command::new(dir.0.join("app")).env_clear().output().unwrap();
+        assert_eq!(result.status.code(), Some(42));
+        assert!(result.stdout.is_empty() && result.stderr.is_empty());
+    }
+}

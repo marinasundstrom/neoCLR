@@ -11,7 +11,10 @@ passes union pattern/protocol execution in all three paths. [Evidence and next w
 Generic String boxing/Object display now also preserves text and reference identity
 across modes after correcting native reference-view lowering and excluding unboxed
 values from Object dispatch candidates. [Evidence](experiments/native-core-bootstrap/README.md#generic-string-boxing-and-object-display-2026-10-09).
-Full union display reaches unsupported isinst Char; full core bootstrap remains open.
+String-payload union display now passes Some/None/Ok/Error across modes with bounded
+nonmatching Char-box tests. Matching Char boxes remain rejected; escaping, primitive
+payload display and full core bootstrap remain open.
+[Display evidence](experiments/native-core-bootstrap/README.md#nonmatching-char-tests-and-string-union-display-2026-10-09).
 Expand production primitive/String/Object contracts next.
 [Union source evidence](experiments/native-core-bootstrap/README.md#production-union-source-subset-2026-10-09).
 [Text-service evidence](experiments/native-core-bootstrap/README.md#native-text-services-and-module-projection-2026-10-09).

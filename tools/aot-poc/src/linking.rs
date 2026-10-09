@@ -584,6 +584,7 @@ pub fn prepare(
     report["sealedMemberProjections"] = json!(sealed_members.iter().map(|i| json!({"compiledIndex":i,
         "policy":"verified sealed reference owner; retain callvirt null checks and ordinary method body"})).collect::<Vec<_>>());
     super::boxing::project(&mut selected, &mut report)?;
+    super::boxing::project_char_tests(&mut selected, &mut report)?;
     let boxed_display = report["int32Boxes"].as_array().is_some_and(|r| !r.is_empty())
         && report["objectDisplayDispatch"].as_array().is_some_and(|r| !r.is_empty());
     if boxed_display && !bind_int32_to_string {
