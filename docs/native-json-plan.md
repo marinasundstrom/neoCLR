@@ -274,8 +274,8 @@ Executable macOS tests cover reserved/default arrays, interface dispatch, aliasi
 collection and interpreter-matched faults. Unlike CLR reference-array covariance,
 this reuses neoCLR’s invariant array contract; it adds no runtime covariant store
 checks or new public collection API. The next probe rejects the missing
-`ObjectTypeHandle` runtime service. Further metadata service and reflection dispatch
-gaps remain.
+`ObjectTypeHandle` runtime service (implemented in the next slice below). Further
+metadata service and reflection dispatch gaps remain.
 
 `type-tokens.neoil` checks primitive identity, distinct nominal types, distinct closed
 generic shapes and a handle stored in a generic class. The Rust regression compares
@@ -314,3 +314,26 @@ and match behavior/payloads explicitly; it is not silently interchangeable with
 neoCLR's existing mapper. No speedup or memory improvement is claimed in advance.
 This protocol is an assistant proposal supporting the author's benchmark direction;
 the harness and results are not implemented yet.
+
+## Native object type identity — 2026-10-09
+
+The exact ObjectTypeHandle service now maps concrete source class tags, empty
+record boxes and Int32/Boolean boxes to the same image-local tokens as `typeof`.
+Intrinsic String object views map to String, without allocating another box.
+Abstract/static declarations and private array backing records are excluded from
+the dispatch table. Compound object shapes remain unsupported: querying one faults
+explicitly rather than exposing a backend storage type. Null preserves the existing
+NullReference payload and caller location. Native diagnostic rendering still uses
+the raw fault message; interpreter diagnostics can render a canonical category text.
+
+This provides a bounded subset of CLR Object.GetType semantics, with linear image
+local dispatch instead of a general runtime method-table descriptor. There is no
+new public API or performance claim. The macOS executable test compares primitives,
+String and distinct closed generic classes with interpreter execution. A portable
+C consumer checks roots, collection, null diagnostics and heap bounds; it is included
+in both macOS/Windows action jobs. The public Raven probe confirms GetType/typeof
+equality on macOS, with the documented temporary explicit Object cast.
+
+The unchanged JSON probe now reaches `ReflectionConstructionCheck`. Explicit
+metadata/invocation retention, property discovery and checked invocation are still
+required before the end-to-end JSON milestone can be claimed.

@@ -11,7 +11,8 @@ pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fau
         return true;
     }
     details.is_some_and(|d| {
-        d.scalar_box_queries.contains_key(&i)
+        d.object_type_queries.contains_key(&i)
+            || d.scalar_box_queries.contains_key(&i)
             || d.int32_boxes.contains_key(&i)
             || d.boolean_boxes.contains_key(&i)
             || d.empty_record_boxes.contains_key(&i)

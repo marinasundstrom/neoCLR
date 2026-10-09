@@ -398,8 +398,6 @@ pub fn prepare(
     let reference_arena = context.is_some_and(|c| c.reference_arena);
     report["referenceArena"] = json!(reference_arena);
     if reference_arena {
-        let rows = super::reflection_metadata::bind_queries(&mut selected, &source_metadata, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
         let rows = super::bindings::type_equals(&mut selected, &report)?;
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
         let rows = super::bindings::object_reference_equals(&mut selected, &report)?;
@@ -606,6 +604,11 @@ pub fn prepare(
     super::boxing::project(&mut selected, &mut report)?;
     super::boxing::project_scalar_queries(&mut selected, &mut report)?;
     super::boxing::project_char_tests(&mut selected, &mut report)?;
+    if reference_arena {
+        super::reflection_metadata::bind_object_type(&mut selected, &mut report)?;
+        let rows = super::reflection_metadata::bind_queries(&mut selected, &source_metadata, &report)?;
+        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+    }
     let boxed_display = report["int32Boxes"].as_array().is_some_and(|r| !r.is_empty())
         && report["objectDisplayDispatch"].as_array().is_some_and(|r| !r.is_empty());
     if boxed_display && !bind_int32_to_string {

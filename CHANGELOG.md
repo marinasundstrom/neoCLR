@@ -51,7 +51,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Preserve reference unboxing through existing casts; Boolean box display remains
   explicitly unadmitted. Admit native interface-valued arrays and their exact generic
   backing views, preserving dispatch, aliasing, null/uninitialized/bounds faults and
-  GC ownership. JSON admission now reaches the missing ObjectTypeHandle service.
+  GC ownership. Add concrete ObjectTypeHandle mapping for source classes, primitive/
+  empty-record boxes and String, preserving null fault payload/location and excluding
+  private array storage types. Add portable checks and a public Raven GetType/typeof
+  parity probe; document its temporary explicit Object cast. JSON now reaches
+  reflection construction checks; property discovery/invocation remain unfinished.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

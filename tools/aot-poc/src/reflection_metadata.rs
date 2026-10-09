@@ -454,3 +454,89 @@ mod shape_tests {
         assert!(!shape(&source, &ty).unwrap()[10]);
     }
 }
+
+/// Map private heap tags back to semantic tokens. Array backing records are not
+/// source array types and must never escape as GetType results.
+pub fn bind_object_type(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Error> {
+    use neoclr::metadata::{Instruction as Op, Representation};
+    let rows: Vec<_> = report["functions"].as_array().into_iter().flatten()
+        .filter(|r| r["name"] == "neoCLR.Runtime.ObjectTypeHandle").cloned().collect();
+    if rows.is_empty() { return Ok(()); }
+    let root = report["objectBaseProjection"]["compiledIndex"].as_u64()
+        .ok_or("ObjectTypeHandle requires the verified Object base")? as usize;
+    let object = Type::Named(input.types[root].name.clone());
+    let backings: Vec<_> = report["referenceArrayBackingProjections"].as_array().into_iter().flatten()
+        .filter_map(|r| r["compiledIndex"].as_u64()).collect();
+    let mut targets = vec![];
+    for row in report["sourceMetadata"]["types"].as_array().into_iter().flatten() {
+        let index = row["compiledTypeIndex"].as_u64().ok_or("missing object type index")? as usize;
+        let t = &input.types[index];
+        if t.is_reference_type && !t.is_abstract && t.representation == Representation::Record
+            && !backings.contains(&(index as u64))
+            && report["arrayBackingProjection"]["compiledIndex"].as_u64() != Some(index as u64) {
+            targets.push(json!({"typeCompiledIndex":index,"token":Type::Named(t.name.clone())}));
+        }
+    }
+    for (key, primitive) in [("int32Boxes", Some(Type::Int32)), ("booleanBoxes", Some(Type::Boolean)), ("emptyRecordBoxes", None)] {
+        for row in report[key].as_array().into_iter().flatten() {
+            let index = row["typeCompiledIndex"].as_u64().ok_or("missing box tag")? as usize;
+            let token = primitive.clone().unwrap_or_else(|| Type::Named(input.types[index].name.clone()));
+            targets.push(json!({"typeCompiledIndex":index,"token":token}));
+        }
+    }
+    for row in rows {
+        let index = row["compiledIndex"].as_u64().ok_or("missing object query index")? as usize;
+        let f = &mut input.functions[index];
+        if f.name != "neoCLR.Runtime.ObjectTypeHandle" || f.owner.is_some() || f.instance
+            || f.parameters != vec![object.clone()] || f.returns != Type::RuntimeTypeHandle
+            || f.no_result || f.impl_flags != 0x1000 || f.pinvoke.is_some()
+            || !f.body.is_empty() || !f.locals.is_empty() || f.receiver_byref || f.receiver_readonly
+            || f.is_virtual || f.is_override || f.is_abstract || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+            return Err("ObjectTypeHandle requires the exact reserved InternalCall contract".into());
+        }
+        f.impl_flags = 0;
+        // Native body uses these diagnostic slots and enumerated token producers.
+        f.body = vec![Op::Fault("GetType requires a non-null instance".into()),
+            Op::Fault("native GetType does not yet admit this object shape".into()),
+            Op::LoadTypeToken(Type::String), Op::Pop];
+        for target in &targets {
+            f.body.extend([Op::LoadTypeToken(serde_json::from_value(target["token"].clone())?), Op::Pop]);
+        }
+        f.body.push(Op::Fault("unreachable native object query body".into()));
+        report["nativeBindings"].as_array_mut().unwrap().push(json!({"compiledIndex":index,
+            "name":row["name"],"implementation":"object-type-closed-v1", "targets":targets,
+            "policy":"exact source class/box tags and intrinsic String; compound objects fail closed"}));
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod object_tests {
+    use super::*;
+    #[test]
+    fn object_query_requires_exact_contract_and_excludes_private_backings() {
+        let original = neoclr::assemble(".module Test\n.type class abstract System.Object\n.end\n.type class Model\n.end\n.type class ArrayStorage\n.end\n.function neoCLR.Runtime.ObjectTypeHandle(System.Object) -> RuntimeTypeHandle\n.methodimpl InternalCall\n.end\n").unwrap();
+        let report = json!({"objectBaseProjection":{"compiledIndex":0},
+            "referenceArrayBackingProjections":[{"compiledIndex":2}],"nativeBindings":[],
+            "functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.ObjectTypeHandle"}],
+            "sourceMetadata":{"types":[{"compiledTypeIndex":0},{"compiledTypeIndex":1},{"compiledTypeIndex":2}]}});
+        let mut input = original.clone();
+        let mut valid = report.clone();
+        bind_object_type(&mut input, &mut valid).unwrap();
+        assert_eq!(valid["nativeBindings"][0]["targets"], json!([{"typeCompiledIndex":1,"token":Type::Named("Model".into())}]));
+        for change in 0..4 {
+            let mut input = original.clone();
+            let f = &mut input.functions[0];
+            match change {
+                0 => f.returns = Type::Int32,
+                1 => f.impl_flags = 0,
+                2 => f.locals.push(Type::Int32),
+                _ => f.body.push(neoclr::metadata::Instruction::Fault("body".into())),
+            }
+            assert!(bind_object_type(&mut input, &mut report.clone()).unwrap_err().to_string().contains("exact reserved"));
+        }
+    }
+}

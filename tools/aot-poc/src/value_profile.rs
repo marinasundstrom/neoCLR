@@ -940,7 +940,7 @@ impl<'a> Profile<'a> {
                 let actual = pop(s)?;
                 let expected = Self::stack_type(expected);
                 if actual != expected && !self.reference_assignable(&actual, &expected) {
-                    return Err(fail(pc, "value operand type mismatch"));
+                    return Err(format!("{} instruction {pc}: value operand type mismatch: expected {expected:?}, found {actual:?} for {op:?}", f.name).into());
                 }
                 Ok(())
             };

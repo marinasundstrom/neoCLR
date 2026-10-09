@@ -1,0 +1,72 @@
+.module ObjectTypes
+.type class abstract System.Object
+.end
+.type class Cell<T>
+.method instance .ctor() -> noresult
+ret
+.end
+.end
+.function neoCLR.Runtime.ObjectTypeHandle(System.Object value) -> RuntimeTypeHandle
+.methodimpl InternalCall
+.end
+.function Calculate(Int32 mode) -> Int32
+.local System.Object value
+ldarg mode
+ldc.i4 1
+beq Boolean
+ldarg mode
+ldc.i4 2
+beq Text
+ldarg mode
+ldc.i4 3
+beq First
+ldarg mode
+ldc.i4 4
+beq Second
+ldarg mode
+ldc.i4 5
+beq Null
+ldc.i4 9
+box Int32
+call neoCLR.Runtime.ObjectTypeHandle(System.Object)
+ldtoken Int32
+br Check
+Boolean:
+ldc.bool true
+box Boolean
+call neoCLR.Runtime.ObjectTypeHandle(System.Object)
+ldtoken Boolean
+br Check
+Text:
+ldstr "Café"
+box String
+call neoCLR.Runtime.ObjectTypeHandle(System.Object)
+ldtoken String
+br Check
+First:
+newobj.ctor instance Cell<Int32>::.ctor()
+castclass System.Object
+call neoCLR.Runtime.ObjectTypeHandle(System.Object)
+ldtoken Cell<Int32>
+br Check
+Second:
+newobj.ctor instance Cell<Boolean>::.ctor()
+castclass System.Object
+call neoCLR.Runtime.ObjectTypeHandle(System.Object)
+ldtoken Cell<Boolean>
+br Check
+Null:
+ldloca value
+initobj System.Object
+ldloc value
+call neoCLR.Runtime.ObjectTypeHandle(System.Object)
+ldtoken System.Object
+Check:
+ceq
+brfalse Failed
+ldc.i4 42
+ret
+Failed:
+ldc.i4 -1
+ret
+.end

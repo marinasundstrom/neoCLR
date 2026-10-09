@@ -69,7 +69,8 @@ consumer executes descriptor queries with interpreter parity. A build-time
 source metadata catalogue now preserves
 selected nominal declarations and closed property signatures through specialization
 without rooting accessor bodies. Primitive boxing/unboxing and interface-valued arrays now advance the JSON
-probe to the missing ObjectTypeHandle service. Explicit metadata retention, runtime tables, checked
+probe to reflection construction checks. ObjectTypeHandle now maps source class
+and primitive box identities; the public Raven GetType/typeof probe passes on macOS. Explicit metadata retention, runtime tables, checked
 accessor/constructor dispatch and complete native JSON execution remain unfinished.
 Once parity works, the author selects JSON serialization/deserialization as an
 interpreter-versus-native benchmark case; see the protocol in the native JSON plan.

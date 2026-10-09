@@ -110,7 +110,8 @@ The routing workbench also parses a route, extracts an integer parameter and pri
   uses IPv4, bounded DNS workers and polled socket operations.
 - **Code and APIs:** development includes opaque closed type-token identity and the
   runtime type-equality, name, generic-arity and type-shape queries for primitive and closed
-  nominal token producers as first steps toward native JSON. Property discovery and reflection invocation remain
+  nominal token producers, plus concrete source-class/primitive-box `GetType()` identity,
+  as first steps toward native JSON. Compound object queries remain unsupported. Property discovery and reflection invocation remain
   unfinished, so typed JSON serialization is not yet a native capability.
   Broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.

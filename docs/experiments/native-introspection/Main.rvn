@@ -12,5 +12,9 @@ func Main() -> int {
     if !info.IsNominalType {
         return 2
     }
+    let value = (object)Report()
+    if !value.GetType().Equals(info) {
+        return 3
+    }
     return 0
 }

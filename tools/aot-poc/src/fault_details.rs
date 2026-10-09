@@ -84,6 +84,7 @@ pub struct Options {
     pub native_integer_to64: Vec<usize>,
     pub reference_arena: bool,
     pub descriptor_queries: Vec<usize>,
+    pub object_type_queries: HashMap<usize, Vec<(usize, neoclr::metadata::Type)>>,
     pub scalar_box_queries: HashMap<usize, (Option<usize>, bool)>,
     pub boolean_boxes: HashMap<usize, usize>,
     pub int32_boxes: HashMap<usize, usize>,
@@ -122,6 +123,10 @@ impl Options {
             descriptor_queries: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| matches!(r["implementation"].as_str(), Some("type-name-closed-v1" | "type-argument-count-closed-v1" | "type-shape-closed-v1")))
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            object_type_queries: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "object-type-closed-v1")
+                .map(|r| (r["compiledIndex"].as_u64().unwrap() as usize, r["targets"].as_array().unwrap().iter()
+                    .map(|t| (t["typeCompiledIndex"].as_u64().unwrap() as usize, serde_json::from_value(t["token"].clone()).unwrap())).collect())).collect(),
             scalar_box_queries: report.and_then(|r| r["scalarBoxQueries"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, (r["typeCompiledIndex"].as_u64().map(|v| v as usize), r["unbox"].as_bool()?)))).collect(),
             boolean_boxes: report.and_then(|r| r["booleanBoxes"].as_array()).into_iter().flatten()

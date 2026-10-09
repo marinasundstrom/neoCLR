@@ -600,6 +600,51 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     emit_stack_check(&mut module, &mut b, stack_check, diagnostic_data.as_ref(), fault_context.unwrap(), i, false);
                 }
             }
+            if let Some(targets) = details.and_then(|d| d.object_type_queries.get(&i)) {
+                let receiver = parameters[0];
+                let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                site.capture_frame = false;
+                let status = b.ins().iconst(types::I32, 6);
+                return_if_detailed(&mut b, null, status, Some(&site));
+                let text_block = b.create_block();
+                let object_block = b.create_block();
+                let bits = b.ins().band_imm(receiver, 1);
+                let text = b.ins().icmp_imm(IntCC::NotEqual, bits, 0);
+                b.ins().brif(text, text_block, &[], object_block, &[]);
+                b.switch_to_block(text_block);
+                let identity = type_tokens.iter().position(|t| *t == neoclr::metadata::Type::String).expect("String token producer") + 1;
+                let value = b.ins().iconst(types::I64, identity as i64);
+                write(&mut b, output, &[value]);
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().return_(&[zero]);
+                b.switch_to_block(object_block);
+                let tag = b.ins().load(types::I64, MemFlags::new(), receiver, 0);
+                for (index, token) in targets {
+                    let matched = b.create_block();
+                    let next = b.create_block();
+                    let exact = b.ins().icmp_imm(IntCC::Equal, tag, *index as i64);
+                    b.ins().brif(exact, matched, &[], next, &[]);
+                    b.switch_to_block(matched);
+                    let identity = type_tokens.iter().position(|t| t == token).expect("object token producer") + 1;
+                    let value = b.ins().iconst(types::I64, identity as i64);
+                    write(&mut b, output, &[value]);
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.switch_to_block(next);
+                }
+                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 1);
+                site.capture_frame = false;
+                let status = b.ins().iconst(types::I32, 3);
+                site.record(&mut b, status);
+                b.ins().return_(&[status]);
+                b.seal_all_blocks(); b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(&mut module, &mut context.func, frame);
+                }
+                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                continue;
+            }
             if let Some(&(tag_index, unbox)) = details.and_then(|d| d.scalar_box_queries.get(&i)) {
                 let receiver = parameters[0];
                 let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
