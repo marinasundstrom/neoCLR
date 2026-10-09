@@ -20,13 +20,25 @@ int32_t neoclr_console_write_line_utf8_v1(const uint8_t *bytes, size_t length) {
 }
 
 #define main scalar_main
+#ifdef NEOCLR_HELLO_HOST
+#include "../../docs/experiments/aot-hello/main.c"
+#else
 #include "../../docs/experiments/aot-scalar/host.c"
+#endif
 #undef main
 
+#ifdef NEOCLR_HELLO_HOST
+int main(void) {
+#else
 int main(int argc, char **argv) {
+#endif
     /* Preserve UTF-8 bytes, embedded NUL and LF in redirected acceptance output.
        Interactive Windows console rendering/code-page policy is separate work. */
     if (_setmode(_fileno(stdout), _O_BINARY) == -1 ||
         _setmode(_fileno(stderr), _O_BINARY) == -1) return 2;
+    #ifdef NEOCLR_HELLO_HOST
+    return scalar_main();
+    #else
     return scalar_main(argc, argv);
+    #endif
 }

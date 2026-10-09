@@ -19,6 +19,17 @@ def require_execution(path):
     return data
 
 
+def require_raven_execution(path):
+    data = json.loads(path.read_text(encoding='utf-8'))
+    outcomes = data.get('outcomes', [])
+    if (data.get('passed') is not True or len(outcomes) != 2
+            or {case.get('container') for case in outcomes} != {'PE/#Neo', 'NEOX'}
+            or any(case.get('exitCode') != 0 or case.get('stdout') != 'Hello, world!\n'
+                   or case.get('stderr') != '' for case in outcomes)):
+        raise ValueError('Raven Hello World gate did not complete both standalone container executions')
+    return data
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
@@ -51,6 +62,7 @@ def main():
                    '--test', 'windows_scalar', '--', '--nocapture']
         run(command, 'tests')
         report['execution'] = require_execution(evidence / 'windows-execution.json')
+        report['ravenExecution'] = require_raven_execution(evidence / 'raven-execution.json')
         report['passed'] = True
     except Exception as error:
         report['error'] = str(error)
@@ -59,7 +71,7 @@ def main():
                            for p in sorted(out.rglob('*')) if p.is_file()}
         (out / 'report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
         summary = f"Windows scalar AOT: {'PASS' if report['passed'] else 'FAIL'}\n\nRevision: {report.get('revision', 'unavailable')}\n\n"
-        summary += '32 native/interpreter comparisons passed.\n' if report['passed'] else report.get('error', 'Unknown failure') + '\n'
+        summary += '32 scalar comparisons and 2 standalone Raven Hello World executions passed.\n' if report['passed'] else report.get('error', 'Unknown failure') + '\n'
         if os.environ.get('GITHUB_STEP_SUMMARY'):
             with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as stream:
                 stream.write(summary)

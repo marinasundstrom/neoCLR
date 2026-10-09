@@ -291,3 +291,99 @@ fn windows_c_consumer_executes_calls_branches_faults_and_utf8() {
     }
     save(&outcomes, true);
 }
+
+#[test]
+#[cfg_attr(
+    not(all(target_os = "windows", target_arch = "x86_64")),
+    ignore = "requires Windows x64 and MSVC"
+)]
+fn raven_hello_runs_as_standalone_windows_executable() {
+    let fixture = include_bytes!("../../../docs/experiments/aot-hello/RavenHello.pe");
+    let module = neoclr::metadata_container::decode(fixture).unwrap();
+    let program = neoclr::LoadedProgram::new(&module).unwrap();
+    let interpreted = program.run(neoclr::ExecutionOptions::default()).unwrap();
+    assert_eq!(interpreted.stdout, b"Hello, world!\n");
+    let mut outcomes = Vec::new();
+    let save = |outcomes: &Vec<serde_json::Value>, passed| {
+        if let Some(path) = std::env::var_os("NEOCLR_WINDOWS_AOT_EVIDENCE") {
+            fs::write(
+                PathBuf::from(path).join("raven-execution.json"),
+                serde_json::to_vec_pretty(
+                    &serde_json::json!({"passed": passed, "outcomes": outcomes}),
+                )
+                .unwrap(),
+            )
+            .unwrap();
+        }
+    };
+    save(&outcomes, false);
+    for (container, bytes) in [
+        ("PE/#Neo", fixture.to_vec()),
+        (
+            "NEOX",
+            neoclr::metadata_container::write_module(&module).unwrap(),
+        ),
+    ] {
+        let dir = Temp::new();
+        let input = dir.0.join("raven.bin");
+        fs::write(&input, bytes).unwrap();
+        let compiled = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+            .arg(&input)
+            .arg("@entry")
+            .arg(dir.0.join("app.obj"))
+            .args(["--console", "--target", "x86_64-pc-windows-msvc"])
+            .output()
+            .unwrap();
+        fs::write(dir.0.join("compile.stdout.log"), &compiled.stdout).unwrap();
+        fs::write(dir.0.join("compile.stderr.log"), &compiled.stderr).unwrap();
+        assert!(
+            compiled.status.success(),
+            "{}",
+            String::from_utf8_lossy(&compiled.stderr)
+        );
+        let host =
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../native/windows-scalar-host.c");
+        let linked = Command::new("cl")
+            .current_dir(&dir.0)
+            .args([
+                "/nologo",
+                "/W4",
+                "/WX",
+                "/std:c11",
+                "/MT",
+                "/DNEOCLR_HELLO_HOST",
+                "/Fe:app.exe",
+            ])
+            .arg(host)
+            .arg(dir.0.join("app.obj"))
+            .output()
+            .unwrap();
+        fs::write(dir.0.join("link.stdout.log"), &linked.stdout).unwrap();
+        fs::write(dir.0.join("link.stderr.log"), &linked.stderr).unwrap();
+        assert!(
+            linked.status.success(),
+            "{}{}",
+            String::from_utf8_lossy(&linked.stdout),
+            String::from_utf8_lossy(&linked.stderr)
+        );
+        // Deploy only the executable; no metadata, interpreter or compiler assets.
+        let deployed = dir.0.join("standalone");
+        fs::create_dir(&deployed).unwrap();
+        fs::copy(dir.0.join("app.exe"), deployed.join("hello.exe")).unwrap();
+        let result = Command::new(deployed.join("hello.exe"))
+            .current_dir(&deployed)
+            .output()
+            .unwrap();
+        outcomes.push(serde_json::json!({
+            "container": container, "directory": deployed, "exitCode": result.status.code(),
+            "stdout": String::from_utf8_lossy(&result.stdout),
+            "stderr": String::from_utf8_lossy(&result.stderr),
+        }));
+        save(&outcomes, false);
+        assert_eq!(result.status.code(), Some(0));
+        assert_eq!(result.stdout, interpreted.stdout);
+        assert_eq!(result.stderr, interpreted.stderr);
+        assert_eq!(fs::read_dir(&deployed).unwrap().count(), 1);
+    }
+    save(&outcomes, true);
+}

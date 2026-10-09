@@ -385,6 +385,15 @@ Raven-produced scalar/console metadata in execution before extending services or
 Windows project publication. Windows execution was performed in GitHub Actions;
 no local Windows host or emulator was used.
 
+The next Windows gate now includes the retained Raven Hello World fixture in both
+PE/#Neo and standalone NEOX containers. MSVC links with `/MT`; the test copies only
+the executable into a fresh directory and checks exit zero and byte-exact interpreter
+stdout/stderr. Its separate completion marker requires both containers, so a skipped
+native test cannot qualify the run. Execution of this extension is pending. This
+qualifies the retained compiler fixture, not a fresh Raven source build on Windows.
+Like .NET Native AOT, startup is native; this probe covers only literal console output
+and does not claim comparable library coverage. The C adapter remains provisional.
+
 ## Shared native contracts to establish
 
 1. **Lowering and checks.** Resolve and verify a declared IL subset into a typed

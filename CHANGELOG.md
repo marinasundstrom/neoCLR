@@ -20,6 +20,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Extend the dedicated GitHub Actions gate with exact-revision manual dispatch,
   explicit MSVC setup, retained objects/executables and compiler/linker/test logs,
   and a report that cannot pass when native execution is skipped or incomplete.
+  Add a required standalone Raven Hello World execution gate for retained PE/#Neo
+  and NEOX inputs, linking a static-CRT startup adapter and deploying only the EXE;
+  compare UTF-8 stdout/stderr with the interpreter. Windows execution pending.
 
 - Add a development macOS ARM64 project-to-executable console command using the
   selected bundle's Raven project build, existing AOT backend and explicit native
