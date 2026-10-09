@@ -18,8 +18,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Winsock ownership. Add identical listener/accept/transfer contract tests to a
   two-platform GitHub Actions matrix. Run `37960722734` at `da8ca1f2` passes all
   three consumers on macOS ARM64 and Windows x64; verify 45 artifact hashes and
-  14 source inputs per platform. Native HttpClient DNS/connect and the Windows
-  HTTP project profile remain planned work, not implemented capabilities.
+  14 source inputs per platform. Native HttpClient DNS/connect qualification
+  remains planned. Add an opt-in Windows HTTP project profile
+  with guarded heap/stack admission, shared HTTP callback loop, binary output and
+  system-only KERNEL32/WS2_32 imports. Add paired interpreter/standalone request
+  and fault validation; Windows execution qualification is pending.
 
 - Add explicit `x86_64-pc-windows-msvc` AOT target selection for the bounded scalar
   and literal-console profile, emitting x64 COFF with the target calling convention.

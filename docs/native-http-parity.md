@@ -92,3 +92,21 @@ specifies stack and calling conventions; [GitHub's runner reference](https://doc
 lists `windows-11-arm` for native execution (reviewed 2026-10-09). Adding that
 qualification costs another toolchain/artifact/test lane; no difficulty or
 performance claim is established yet.
+
+## Windows HTTP project integration (development)
+
+`--profile windows-http` selects the explicit `--windows-http-experiment` backend
+contract: Windows x64, closed-world compilation, reference arena, GC frames, stack
+budget and task/listener/accept/transfer bindings. File/path/character services
+remain rejected. This is a private backend/host contract with no Raven compiler
+or CLI metadata encoding change. The macOS `http` profile remains the default
+HTTP target. Both use the same callback loop and 15-second host completion bound.
+Windows supplies guarded heap/stack admission and binary CRT streams; the EXE may
+import only KERNEL32 and WS2_32. Scope/root cleanup precedes heap destruction.
+
+`scripts/validate-native-http-project.py` builds fresh greeting and callback-fault
+projects, compares five real-request scenarios against the interpreter, executes
+with only the native binary in its directory and no runtime/SDK on PATH, and
+rejects overwrite/stale-output publication. The dedicated Windows HTTP Action
+retains build logs and hashed artifacts. Windows execution is pending. The
+HttpClient DNS/connect work and ARM64 qualification remain separate.

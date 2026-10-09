@@ -12862,3 +12862,7 @@ claim follows from these focused checks.
   pinned backend has ARM64 inline probing support, not proof of a working port.
 - **Action:** records ARM64 as an additional target and preserves Windows HTTP
   integration as the immediate task. No ARM64 implementation is claimed.
+
+- **HTTP implementation action:** adds the opt-in Windows HTTP backend/project
+  profile, shared macOS/Windows callback loop and standalone request/fault gate.
+  Local backend admission tests pass; Windows execution evidence remains pending.

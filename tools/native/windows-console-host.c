@@ -19,6 +19,7 @@ int32_t neoclr_console_write_line_utf8_v1(const uint8_t *bytes, size_t length) {
     _unlock_file(stdout);
     return failed;
 }
+#ifndef NEOCLR_HTTP_HOST
 int main(void) {
     /* Byte contracts include embedded NUL and LF; console display policy remains
      * the terminal's responsibility. No CRT CRLF or Ctrl-Z translation. */
@@ -37,3 +38,5 @@ int main(void) {
     if (host_error) fputs("neoCLR native console cleanup failed\n", stderr);
     return host_error ? 2 : status ? 1 : result;
 }
+
+#endif

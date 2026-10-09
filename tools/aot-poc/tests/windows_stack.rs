@@ -98,3 +98,28 @@ fn console_experiment_requires_windows_context_and_rejects_unqualified_services(
         assert!(!dir.0.join("app.obj").exists());
     }
 }
+
+#[test]
+fn http_experiment_requires_complete_windows_service_contract() {
+    let flags = ["--target", "x86_64-pc-windows-msvc", "--windows-http-experiment",
+        "--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget",
+        "--bind-task-queue", "--bind-socket-listener", "--bind-socket-accept", "--bind-socket-transfer"];
+    for missing in ["--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget",
+        "--bind-task-queue", "--bind-socket-listener", "--bind-socket-accept", "--bind-socket-transfer"] {
+        let dir = Temp::new();
+        let selected: Vec<_> = flags.iter().copied().filter(|f| *f != missing).collect();
+        assert!(!compile(&dir, SOURCE, &selected).status.success());
+        assert!(!dir.0.join("app.obj").exists());
+    }
+    for extra in ["--bind-paths", "--bind-file-input", "--bind-file-output", "--bind-character-text", "--windows-console-experiment"] {
+        let dir = Temp::new();
+        let mut selected = flags.to_vec();
+        selected.push(extra);
+        assert!(!compile(&dir, SOURCE, &selected).status.success());
+        assert!(!dir.0.join("app.obj").exists());
+    }
+    let dir = Temp::new();
+    let selected: Vec<_> = flags.iter().map(|f| if *f == "x86_64-pc-windows-msvc" { "aarch64-apple-darwin" } else { *f }).collect();
+    assert!(!compile(&dir, SOURCE, &selected).status.success());
+    assert!(!dir.0.join("app.obj").exists());
+}

@@ -12,7 +12,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = 'macos-arm64-console-v1'
-PROFILES = {'console': PROFILE, 'http': 'macos-arm64-http-v1', 'windows-console': 'windows-x64-console-v1'}
+PROFILES = {'console': PROFILE, 'http': 'macos-arm64-http-v1', 'windows-console': 'windows-x64-console-v1', 'windows-http': 'windows-x64-http-v1'}
 
 
 def support_files():
@@ -43,10 +43,11 @@ def sha(path):
 
 
 def build(project, bundle, aot, output, profile=PROFILE):
-    windows = profile == PROFILES['windows-console']
+    windows = profile in (PROFILES['windows-console'], PROFILES['windows-http'])
+    http = profile in (PROFILES['http'], PROFILES['windows-http'])
     if windows:
         if platform.system() != 'Windows' or platform.machine().lower() not in ('amd64', 'x86_64'):
-            raise ValueError('Windows console profile requires a Windows x64 MSVC build host')
+            raise ValueError('Windows profiles require a Windows x64 MSVC build host')
     elif platform.system() != 'Darwin' or platform.machine() != 'arm64':
         raise ValueError('This profile requires a macOS ARM64 build host')
     compiler = bundle / 'sdk/tools/rvnc/rvnc.dll'
@@ -129,9 +130,13 @@ def build(project, bundle, aot, output, profile=PROFILE):
                         ('windows-console-host.c', 'windows-gc-host.c', 'windows-host-memory.c', 'windows-native-stack.c')]
             adapters += [base / name for name in ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c')]
             adapters += [base.parent / 'aot-fault-details/render.c']
-        if profile == PROFILES['http']:
-            adapters[0] = ROOT / 'benchmarks/native-web/http-host.c'
-            adapters += [base / name for name in ('native-stack.c', 'task-queue.c', 'socket-listener.c')]
+        if http:
+            if windows:
+                adapters += [ROOT / 'benchmarks/native-web/http-host.c']
+            else:
+                adapters[0] = ROOT / 'benchmarks/native-web/http-host.c'
+                adapters += [base / 'native-stack.c']
+            adapters += [base / name for name in ('task-queue.c', 'socket-listener.c')]
         inputs = [Path(__file__).resolve(), project, catalog_path, aot, *required, *adapters,
                   *base.glob('*.h'), *base.parent.joinpath('aot-scalar').glob('*.h'),
                   *base.parent.joinpath('aot-fault-details').glob('*.h'),
@@ -153,22 +158,25 @@ def build(project, bundle, aot, output, profile=PROFILE):
         flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
                  '--bind-console-read-byte', '--bind-console-write-line', '--bind-console-stream-output',
                  '--bind-int32-to-string', '--bind-utf8-text']
-        if profile == PROFILES['http']:
+        if http:
             flags += ['--native-stack-budget', '--bind-integer-text', '--bind-task-queue',
                       '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer']
         if windows:
-            flags += ['--target', 'x86_64-pc-windows-msvc', '--windows-console-experiment', '--native-stack-budget']
+            flags += ['--target', 'x86_64-pc-windows-msvc', '--windows-http-experiment' if http else '--windows-console-experiment']
+            if not http:
+                flags += ['--native-stack-budget']
         obj = output / ('app.obj' if windows else 'app.o')
         run([aot, '--closed-world', assembly, '@entry', obj, *context, *flags])
         # Publish the executable only after link and dependency checks succeed.
         pending = output / ('app.pending.exe' if windows else 'app.pending')
         if windows:
             run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
-                 '/DNEOCLR_NATIVE_GC', '/I' + str(base), '/Fo' + str(output) + '/',
-                 '/Fe:' + str(pending), *adapters, obj, '/link', '/STACK:1048576'])
+                 '/DNEOCLR_NATIVE_GC', *(['/DNEOCLR_HTTP_HOST'] if http else []), '/I' + str(base), '/Fo' + str(output) + '/',
+                 '/Fe:' + str(pending), *adapters, obj, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http else [])])
             import re
             dependencies = re.findall(r'^\s+([A-Za-z0-9_.-]+\.dll)\s*$', run(['dumpbin', '/dependents', pending]), re.MULTILINE | re.IGNORECASE)
-            if not dependencies or any(name.lower() != 'kernel32.dll' for name in dependencies):
+            allowed = {'kernel32.dll', *(['ws2_32.dll'] if http else [])}
+            if not dependencies or any(name.lower() not in allowed for name in dependencies):
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:
             run([clang, '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',

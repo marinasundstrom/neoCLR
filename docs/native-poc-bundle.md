@@ -327,3 +327,19 @@ these exactly reproduce the previously accepted SHA256 artifacts:
 The generator reuses the existing bootstrap declarations; no application/native
 library is translated into CLI metadata. Full native primitive bootstrap is later work.
 The author selected `v0.1.0-preview.12`, macOS arm64, and integration into NeoCLR main.
+
+### Windows HTTP project profile (development)
+
+From a Windows x64 MSVC developer shell, with the same pinned bundle and backend
+prerequisites as the console profile:
+
+```powershell
+python scripts/build-native-project.py --profile windows-http --project path/to/App.rvnproj --bundle path/to/neoclr-native-poc --aot path/to/neoclr-aot-poc.exe --output path/to/new-output
+path/to/new-output/app.exe
+```
+
+This opt-in profile supports the bounded HttpServer showcase with the shared
+HTTP host, Winsock and guarded Windows collector/stack owner. Its only admitted
+dynamic dependencies are KERNEL32.dll and WS2_32.dll. Validation and remaining
+client/ARM64 boundaries are tracked in [HTTP parity](native-http-parity.md).
+Windows execution qualification is pending; this is not general HttpClient support.

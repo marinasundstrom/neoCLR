@@ -118,4 +118,6 @@ The next native showcase targets both HttpClient and HttpServer on macOS and
 Windows, with shared cancellation, deadline and cleanup contracts. A shared
 socket adapter now passes the same listener, accept and transfer contract tests
 on macOS ARM64 and Windows x64. Native client
-DNS/connect and the Windows HTTP project profile are not yet qualified.
+DNS/connect remains unqualified. An opt-in `windows-http` project profile now
+composes the shared server host with Windows heap/stack protection; its native
+Windows execution gate is pending.

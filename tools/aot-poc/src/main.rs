@@ -48,6 +48,11 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let windows_console = windows_console_count == 1;
     args.retain(|a| a != "--windows-console-experiment");
     if windows_console && (windows_stack || windows_heap) { return Err("select one Windows experiment".into()); }
+    let windows_http_count = args.iter().filter(|a| *a == "--windows-http-experiment").count();
+    if windows_http_count > 1 { return Err("duplicate --windows-http-experiment option".into()); }
+    let windows_http = windows_http_count == 1;
+    args.retain(|a| a != "--windows-http-experiment");
+    if windows_http && (windows_console || windows_stack || windows_heap) { return Err("select one Windows experiment".into()); }
     let probe_count = args.iter().filter(|a| *a == "--probe-stack-roots").count();
     if probe_count > 1 { return Err("duplicate --probe-stack-roots option".into()); }
     let gc_count = args.iter().filter(|a| *a == "--native-gc").count();
@@ -183,6 +188,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         || bind_socket_listener || bind_socket_accept || bind_socket_transfer || bind_character_text || bind_integer_text) {
         return Err("Windows console experiment does not support file, path, task, socket, character or extended integer services".into());
     }
+    if windows_http && (target != compiler::Target::WindowsX64 || !compile_system
+        || !native_gc || !native_stack_budget || !reference_arena
+        || !bind_task_queue || !bind_socket_listener || !bind_socket_accept || !bind_socket_transfer) {
+        return Err("Windows HTTP experiment requires Windows x64, --compile-system, --reference-arena, --native-gc, --native-stack-budget and task/listener/accept/transfer bindings".into());
+    }
+    if windows_http && (bind_paths || bind_file_input || bind_file_output || bind_character_text) {
+        return Err("Windows HTTP experiment does not support file, path or character services".into());
+    }
     if (windows_stack || windows_heap) && (target != compiler::Target::WindowsX64 || !native_gc
         || !native_stack_budget || !reference_arena || compile_system) {
         return Err("Windows stack/heap experiments require Windows x64, --native-gc, --native-stack-budget and --reference-arena, without --compile-system".into());
@@ -235,7 +248,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let inspect = args.first().is_some_and(|a| a == "--inspect");
     let inspect_closed = inspect && args.get(3).is_some_and(|a| a == "--closed-world");
     let closed = args.first().is_some_and(|a| a == "--closed-world");
-    if target == compiler::Target::WindowsX64 && (inspect || closed && !windows_console) {
+    if target == compiler::Target::WindowsX64 && (inspect || closed && !windows_console && !windows_http) {
         return Err("Windows x64 currently supports only scalar/literal-console emission; inspection and closed-world profiles remain macOS ARM64-only".into());
     }
     if !(args.len() == 3
@@ -359,6 +372,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let details = details.map(|mut d| {
         d.windows_stack_experiment = windows_stack || windows_heap;
         d.windows_console_experiment = windows_console;
+        d.windows_http_experiment = windows_http;
         d.windows_heap_experiment = windows_heap;
         if windows_stack || windows_heap { d.reference_arena = true; }
         d.probe_stack_roots = probe_stack_roots;
