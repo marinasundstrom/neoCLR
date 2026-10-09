@@ -12,7 +12,18 @@
 #define NEOCLR_AOT_FAULT_RUNTIME_ERROR 3
 #define NEOCLR_AOT_FAULT_USER_FAULT 4
 #define NEOCLR_AOT_FAULT_STACK_OVERFLOW 9
+/* MSVC reports C4200 for this C flexible array even in /std:c11 mode.
+ * Preserve the length-plus-bytes ABI; suppress only this declaration. */
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4200)
+#endif
 typedef struct { uint64_t length; unsigned char bytes[]; } neoclr_aot_text;
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+_Static_assert(sizeof(neoclr_aot_text) == 8, "text header size");
+_Static_assert(offsetof(neoclr_aot_text, bytes) == 8, "text bytes offset");
 typedef struct {
     const neoclr_aot_text *function;
     uint32_t instruction;

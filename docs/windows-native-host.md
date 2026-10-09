@@ -82,7 +82,9 @@ reclaims it after the frame leaves. It rejects premature/foreign-thread close,
 checks TLS handle isolation, fills the heap to exhaustion with unchanged output
 on failure, and collects/releases all storage. The existing C collector contract
 consumer also runs on Windows, covering interior/fault roots, initialized array
-slots, reuse and malformed-descriptor recovery. Windows execution is pending.
+slots, reuse and malformed-descriptor recovery. MSVC C4200 suppression is scoped
+to the C flexible-array text descriptor; static assertions preserve its 8-byte
+header and byte offset. Windows execution is pending.
 
 ## Stack protection: required, not implemented by this probe
 

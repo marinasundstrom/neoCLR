@@ -49,7 +49,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add a Windows collector host over that heap, rejecting foreign-thread or
   live-root/frame teardown. Extend the focused gate with cyclic-graph retention,
   host-to-frame root handoff, reclamation, exhaustion/output preservation and
-  cleanup, plus the existing collector contract consumer. Execution pending.
+  cleanup, plus the existing collector contract consumer. Scope MSVC C4200
+  suppression to the shared flexible-array text declaration and assert its
+  unchanged 8-byte header/byte offset. Windows execution pending.
   Managed Windows code generation and project kits remain unsupported.
 
 - Add a development macOS ARM64 project-to-executable console command using the
