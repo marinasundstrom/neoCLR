@@ -24,6 +24,77 @@ public class Bulletin {
     var Previous: Report { get; set; } = Report()
 }
 
+public class NodeEnvelope {
+    init() { }
+    var Payload: JsonValue { get; set; } = JsonNull()
+    var Details: JsonObject { get; set; } = JsonObject()
+    var Items: JsonValue[] { get; set; } = []
+}
+
+public class GuardedNode {
+    init() {
+        System.Fail("Invalid node kind ran model code")
+    }
+    var Payload: JsonObject { get; set; } = JsonObject()
+}
+
+func CheckNodes() -> Result<bool, JsonError> {
+    let input = "{\"Payload\":{\"message\":\"Café\"},\"Details\":{\"number\":1.25e2},\"Items\":[true,null,{\"value\":1}]}"
+    let value = JsonSerializer.Deserialize<NodeEnvelope>(input)?
+    if value.Payload is not JsonObject || value.Items.Length != 3 ||
+       value.Items[0] is not JsonBoolean || value.Items[1] is not JsonNull ||
+       value.Items[2] is not JsonObject {
+        return Ok(false)
+    }
+    let number = value.Details.Field("number")?
+    if number is JsonNumber numeric {
+        if numeric.Text != "1.25e2" {
+            return Ok(false)
+        }
+    } else {
+        return Ok(false)
+    }
+    let text = JsonSerializer.Serialize(value)?
+    if text != input {
+        return Ok(false)
+    }
+    let copy = JsonSerializer.Deserialize<NodeEnvelope>(text)?
+    let copiedText = JsonSerializer.Serialize(copy)?
+    if copiedText != input {
+        return Ok(false)
+    }
+    for scalar in ["null", "true", "1.25e2", "\"雪\"", "[]", "{}"] {
+        let node = JsonSerializer.Deserialize<JsonValue>(scalar)?
+        let serialized = JsonSerializer.Serialize(node)?
+        if serialized != scalar {
+            return Ok(false)
+        }
+    }
+    let scalarString = JsonSerializer.Deserialize<JsonString>("\"text\"")?
+    let scalarNumber = JsonSerializer.Deserialize<JsonNumber>("12.5")?
+    let scalarBoolean = JsonSerializer.Deserialize<JsonBoolean>("false")?
+    _ = JsonSerializer.Deserialize<JsonNull>("null")?
+    let array = JsonSerializer.Deserialize<JsonArray>("[1]")?
+    if scalarString.Value != "text" || scalarNumber.Text != "12.5" || scalarBoolean.Value || array.Count != 1 {
+        return Ok(false)
+    }
+    if JsonSerializer.Deserialize<JsonObject>("[]") is not Error(JsonError.TypeMismatch(_)) ||
+       JsonSerializer.Deserialize<JsonArray>("{}") is not Error(JsonError.TypeMismatch(_)) ||
+       JsonSerializer.Deserialize<JsonString>("null") is not Error(JsonError.TypeMismatch(_)) ||
+       JsonSerializer.Deserialize<GuardedNode>("{\"Payload\":[]}") is not Error(JsonError.TypeMismatch(_)) {
+        return Ok(false)
+    }
+    let deep = JsonSerializer.DeserializeNode("[[[[]]]]")?
+    value.Payload = deep
+    if JsonSerializer.Serialize(value) is not Error(JsonError.LimitExceeded(_)) {
+        return Ok(false)
+    }
+    let cycle = JsonArray()
+    _ = cycle.Add(cycle)?
+    value.Payload = cycle
+    return Ok(JsonSerializer.Serialize(value) is Error(JsonError.LimitExceeded(_)))
+}
+
 func CheckDocument(input: string, canonical: string) -> Result<bool, JsonError> {
     let tree = JsonSerializer.DeserializeNode(input)?
     let text = JsonSerializer.SerializeNode(tree)?
@@ -75,6 +146,9 @@ func CheckArrays() -> Result<bool, JsonError> {
 }
 
 func Main() -> int {
+    if CheckNodes() is not Ok(true) {
+        return 26
+    }
     if CheckArrays() is not Ok(true) {
         return 25
     }

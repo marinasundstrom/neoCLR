@@ -98,6 +98,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   preserving closed argument identity and invalid-index faults without retaining
   unrelated library bodies. Add nested collection-type introspection checks;
   collection serialization/construction remains unfinished.
+  Support explicit JsonValue/concrete JSON node declarations at typed roots, model
+  properties and array elements. Preserve node content and number tokens, enforce
+  concrete kind matching before model code, and retain whole-document limits.
+  Object declarations do not infer nodes; JsonNull remains distinct from CLR null.
+  Validate the mixed-object corpus on macOS in both modes and refresh API snapshots.
   Record expanded nested/array/list/sequence/string-keyed-map correctness scope and
   benchmark/data-publication follow-up; the expanded milestone remains incomplete.
 

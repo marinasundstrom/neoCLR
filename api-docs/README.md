@@ -1445,3 +1445,12 @@ native snapshot, with matching XML help and legacy bridge reference. The tempora
 CLI unit projection now covers property signatures as well as accessors; no public
 API is excluded. See [the contract](../docs/task-completion-factories.md). Published
 Preview 13 libraries must be rebuilt before compiling consumers of these helpers.
+
+### Embedded JSON nodes (2026-10-09)
+
+The existing JsonSerializer overloads now support explicit JsonValue/concrete node
+declarations at roots, model properties and vector elements. Type/member XML and
+the JSON guide describe kind validation, JsonNull, Object non-inference and shared
+document limits. The matching bridge reference was regenerated (no public signature
+change), checked, and the native rendered snapshot refreshed from the rebuilt
+libraries with RavenDoc 6c90bf2c. No new API is excluded.

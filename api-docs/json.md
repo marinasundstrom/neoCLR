@@ -42,6 +42,24 @@ constructor. The serializer invokes real constructors/getters/setters through
 JsonValue inputs to the Object overload still use the DOM codec, including when
 held as Object. Prefer SerializeNode when explicitly working with nodes.
 
+## Dynamic JSON content inside typed models (development)
+
+Declare a property or array element as `JsonValue` to retain any JSON kind inside
+an otherwise typed model. `JsonObject`, `JsonArray`, `JsonString`, `JsonNumber`,
+`JsonBoolean` and `JsonNull` require the matching kind; a mismatch returns
+`JsonError.TypeMismatch` before model constructors or setters run. The same rule
+applies to root `Deserialize<T>` calls and the TypeInfo overload.
+
+Serialization embeds node content directly. It does not reflect over node members
+or quote an object/array as text. Number tokens keep their spelling. JSON null is an
+explicit `JsonNull` node; CLR null references remain unsupported. `Object`-typed
+properties do not infer JSON node mapping. The complete mixed document shares the
+existing depth, occurrence and byte limits, including cycles inside embedded nodes.
+
+The [tested NodeEnvelope sample](../docs/experiments/native-json/Main.rvn) combines
+`JsonValue`, `JsonObject` and `JsonValue[]` properties. Lists/maps of nodes depend on
+the still-unfinished collection mapping support.
+
 ## Provisional property rules
 
 - Map String, Int32 and Boolean public instance properties, plus nested nongeneric
@@ -52,12 +70,12 @@ held as Object. Prefer SerializeNode when explicitly working with nodes.
 - Every writable mapped property must be present on input. Unknown JSON fields are
   ignored; duplicate decoded names remain invalid. This strict presence rule differs
   from .NET's default treatment of non-required missing properties.
-- Reject null, generic collections, Option, enums, unsupported scalars
+- Reject CLR null references, generic collections, Option, enums, unsupported scalars
   and indexers in participating properties. Int32 requires a checked integer token;
   fraction/exponent tokens are not coerced.
 
 Development nested writes require each property value to have its declared runtime
-type; polymorphic properties are rejected. Reads use each declared class and its
+type; polymorphic properties are rejected except for explicit JsonValue declarations. Reads use each declared class and its
 public parameterless constructor. Shared children serialize as repeated JSON objects;
 deserialization constructs independent instances rather than preserving identity.
 

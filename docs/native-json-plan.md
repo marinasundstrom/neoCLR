@@ -625,3 +625,45 @@ standalone native/interpreter parity on macOS ARM64. The focused native argument
 query consumer passes valid identity, negative and out-of-range checks with matching
 RuntimeError text and caller instruction. Windows qualification of this new query
 will follow the project action; prior Windows JSON corpus evidence remains valid.
+
+## Explicit JSON subtrees in typed models — 2026-10-09
+
+The author requests dynamic JSON content within typed neoCLR objects and explicitly
+chooses node declarations instead of inferring nodes for Object properties. The
+shared mapper now recognizes JsonValue and all six concrete node kinds by type
+identity, before ordinary model reflection. JsonValue accepts any kind; concrete
+node declarations require a matching kind, otherwise TypeMismatch is returned
+during whole-input preflight before user constructors/setters. The existing generic
+and TypeInfo overloads support these declarations at roots, properties and vector
+elements. Generic collection elements will use this same path once collection
+mapping is implemented. Node implementation properties are never serialized.
+
+The parsed node is retained, without cloning or numeric conversion. JsonNull is
+explicit JSON data; null references remain unsupported, and Object-typed model
+properties do not infer nodes. Serialization embeds the node into the complete
+output tree, whose writer still checks total depth, value occurrences, bytes and
+cycles. It does not validate each subtree with a fresh, independent limit budget.
+
+Comparison: System.Text.Json supports DOM serialization/deserialization through
+JsonNode and concrete kinds ([official DOM guide](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/use-dom),
+reviewed 2026-10-09). neoCLR's JsonValue is the whole DOM root, analogous to .NET's
+JsonNode rather than its scalar JsonValue class. This slice adopts mixed model/DOM
+composition using the existing neoCLR representation; it does not claim a .NET
+improvement. Explicit JsonNull preserves the existing missing-versus-null distinction
+but differs from .NET nullable-node conventions. Alternatives—Object inference or
+reflecting over node implementation fields—were rejected for this slice: the author
+chose explicit declarations, and reflection would expose implementation structure
+instead of the intended JSON. Retained mutable nodes preserve reference identity;
+callers needing an independent copy must explicitly round trip or copy data.
+
+The NodeEnvelope consumer covers object, scalar and array subtrees, number token
+spelling, repeated round trips, every root node kind, concrete kind mismatches,
+preflight before a faulting constructor, embedded depth overflow and cycles. Native
+macOS and matching interpreter runs pass; Windows execution of this new library
+slice awaits the project action. Lists/sequences/maps remain the next main work.
+
+The mixed-node macOS report and source/bundle hashes are recorded in
+[node evidence](native-json-node-validation.json). The preceding generic query
+project also passes Windows action
+[37993153131](https://github.com/marinasundstrom/neoCLR/actions/runs/37993153131);
+that earlier action does not include this embedded-node mapper change.

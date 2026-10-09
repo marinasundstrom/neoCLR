@@ -87,6 +87,9 @@ scalar/object vector corpus now passes on Windows x64 with interpreter parity
 Native GetGenericArgument now inspects retained closed collection type arguments,
 with nested generic identity and invalid-index parity checks on macOS. Collection
 construction and shared JSON list/map mapping remain the next bounded work.
+Author-directed explicit JSON subtree support now passes in mixed typed models
+(JsonValue/concrete node roots, properties and vectors) on macOS in both modes;
+Object declarations do not infer nodes. Windows qualification of this slice is pending.
 Evaluate the Introspection/Reflection API alongside implementation before stability,
 preserving its overall structure while keeping details revisable; see the
 [pre-stable review](introspection-design.md#pre-stable-api-evaluation--2026-10-09).

@@ -515,3 +515,13 @@ This is development sample source with String/Int32 payloads and up to 16 public
 nongeneric cases, not an installed SDK mapper. It rejects structural overlap at
 startup. Requests still decode input and invoke checked constructors; no performance
 advantage is claimed. Source generation remains a future alternative.
+
+### Dynamic JSON content in typed models (development)
+
+Explicit JsonValue properties can hold arbitrary JSON subtrees inside otherwise
+typed objects. JsonObject, JsonArray and scalar node declarations require their
+matching kind. Nodes serialize as JSON content; JsonNull is explicit data, and
+Object-typed properties do not infer nodes. Whole-document limits still apply.
+The [tested NodeEnvelope consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-json/Main.rvn)
+uses JsonValue, JsonObject and JsonValue[]; see the [API rules](/docs/json/).
+List/map mapping remains under development.

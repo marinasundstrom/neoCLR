@@ -11,8 +11,20 @@ import System.Runtime.CompilerServices.*
 internal class ObjectMapper {
     init() { }
 
+    private static func IsNodeType(type: TypeInfo) -> bool {
+        return type.Equals(typeof(JsonValue)) || type.Equals(typeof(JsonObject)) ||
+               type.Equals(typeof(JsonArray)) || type.Equals(typeof(JsonString)) ||
+               type.Equals(typeof(JsonNumber)) || type.Equals(typeof(JsonBoolean)) ||
+               type.Equals(typeof(JsonNull))
+    }
+
+    private static func MatchesNode(value: JsonValue, type: TypeInfo) -> bool {
+        let instance: Object = value
+        return type.Equals(typeof(JsonValue)) || instance.GetType().Equals(type)
+    }
+
     private static func CheckType(type: TypeInfo) -> Result<unit, JsonError> {
-        if type.Equals(typeof(string)) || type.Equals(typeof(int)) || type.Equals(typeof(bool)) {
+        if IsNodeType(type) || type.Equals(typeof(string)) || type.Equals(typeof(int)) || type.Equals(typeof(bool)) {
             return Ok(())
         }
         if type.IsArray {
@@ -40,6 +52,16 @@ internal class ObjectMapper {
     private static func WriteValue(value: Object?, type: TypeInfo, depth: int) -> Result<JsonValue, JsonError> {
         _ = CheckType(type)?
         let present: Object = value ?? return Error(JsonError.UnsupportedMapping("Null mapped value"))
+        if IsNodeType(type) {
+            if present is JsonValue node {
+                if MatchesNode(node, type) {
+                    // The final writer validates the whole mixed tree, including
+                    // node depth, occurrences, cycles and encoded byte limits.
+                    return Ok(node)
+                }
+            }
+            return Error(JsonError.TypeMismatch("declared JSON node kind"))
+        }
         if !present.GetType().Equals(type) {
             return Error(JsonError.UnsupportedMapping("Polymorphic mapped value"))
         }
@@ -97,6 +119,12 @@ internal class ObjectMapper {
     // limitation on Boolean conversions at multi-argument private calls.
     private static func ReadValue(value: JsonValue, type: TypeInfo, depth: int, construct: int) -> Result<Object, JsonError> {
         _ = CheckType(type)?
+        if IsNodeType(type) {
+            if MatchesNode(value, type) {
+                return Ok(value)
+            }
+            return Error(JsonError.TypeMismatch("declared JSON node kind"))
+        }
         if type.Equals(typeof(string)) {
             if value is JsonString text {
                 return Ok(text.Value)

@@ -49,3 +49,13 @@ Report array, plus integer/object array serialization. Lists/sequences, string-k
 maps and native jagged arrays still require their own acceptance cases.
 Exit codes 20–25 identify document corpus failures; success keeps the original
 single-line output. The Windows action uses this same source.
+
+## Explicit node properties (development)
+
+NodeEnvelope combines JsonValue, JsonObject and JsonValue[] with normal model
+construction. Nodes embed their JSON content directly; the checks cover Unicode,
+exact number-token spelling and round trips. Root Deserialize<JsonValue> accepts
+every kind, while concrete node declarations reject mismatches before model code.
+JsonNull is explicit data; Object properties do not infer nodes. Embedded depth
+overflow and cycles still fail whole-document limits. Exit code 26 identifies this
+corpus; it passes macOS interpreter/native execution with the rebuilt libraries.

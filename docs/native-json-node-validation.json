@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-09",
+  "scope": "Explicit JSON node roots, model properties and vector elements; macOS native/interpreter parity",
+  "baseRevision": "1b83357b3a88aa3d34ba5846dc79b6abb228d916",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "passed": true,
+  "sourceSha256": {
+    "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "5468ce9aa842c5abdbb2138fe425f1b0f8e2ac84bca4f2cea38bd8aeadf8deb6",
+    "docs/experiments/native-json/Main.rvn": "88412be1a756377c6013738edbeb6519ac7157960762b8539e55a0f1d551f258",
+    "docs/experiments/native-json/reflection-roots.json": "71c1ce8720db62cf1eb421b6d090c430c4311a1040253fdb7bd09d78d5e699d3"
+  },
+  "bundleManifestSha256": "5c7e05e92c44cc6ff77f30277cd92b600ef6d0d095ef8cc0642c307df77ef569",
+  "reportSha256": "835f33a66a39d7b219fe46855140f32a1a7f1735b8eaa790e54303d2cdd0a626",
+  "cases": [
+    {
+      "name": "introspection",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/native-json-nodes-validation/introspection executable only/app"
+          ],
+          "exitCode": 0,
+          "stdout": "Report\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/bin/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/native-json-nodes-validation/introspection native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "Report\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "name": "json",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/native-json-nodes-validation/json executable only/app"
+          ],
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/bin/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/native-json-nodes-validation/json native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/json-node-development/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ]
+}

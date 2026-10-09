@@ -13035,3 +13035,20 @@ claim follows from these focused checks.
   and typed objects, plus a mixed DOM document and invalid inputs. Native macOS and
   interpreter execution pass with identical output and no diagnostics. Typed
   collection coverage and Windows qualification remain open.
+
+## 2026-10-09 — JSON nodes inside typed objects
+
+- **Author:** asks that JSON values/objects and other nodes be valid within a typed
+  neoCLR object during serialization/deserialization, explaining that this enables
+  dynamic content within the object structure.
+- **Assistant:** proposes treating explicitly declared node properties/elements as
+  JSON subtrees rather than reflecting their implementation members. Asks whether
+  Object declarations should infer nodes.
+- **Author decision:** “Require explicit JSON node types for now.”
+- **Implementation in progress:** JsonValue accepts every kind; concrete node types
+  require matching kinds; JsonNull stays an explicit node. Full-document limits
+  and validation before model code remain in force. Lists/sequences/maps remain
+  the broader active milestone; this author-directed slice does not replace them.
+- **Outcome:** the shared mapper and NodeEnvelope acceptance corpus now pass native
+  macOS and interpreter execution. API type/member help and native snapshots are
+  refreshed; Windows qualification for this new behavior remains pending.
