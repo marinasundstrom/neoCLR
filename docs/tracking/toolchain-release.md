@@ -25,6 +25,11 @@ fixture wrappers now pass project/interpreter/ARM64 execution after preserving S
 module ownership during AOT primitive-method projection. The four-source build now
 reaches imported Attribute inheritance; full formatting/core remain unqualified.
 [Text evidence](../experiments/native-core-bootstrap/text-services-validation.json).
+Including production Attribute alongside UnionAttribute resolves that subset's build:
+all five unchanged sources now compile into a native library, with pattern/protocol
+consumer parity in project run, interpreter and ARM64 execution. The imported-base
+restriction remains a rejection control; it is not required by this source-built subset.
+[Union evidence](../experiments/native-core-bootstrap/union-source-validation.json).
 
 Release remains gated on complete production source-runtime bootstrap without the
 CLI semantic bridge, matching SDK/editor/native artifacts and extracted-package

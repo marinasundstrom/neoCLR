@@ -13,7 +13,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   interpreter/ARM64 UTF-8 checks. Missing declaration-owner diagnostics identify
   the module and assembly. The optional native core fixture advances the unchanged
   four-source union build to imported Attribute inheritance; production core and
-  complete union formatting remain unqualified.
+  complete union formatting remain unqualified. A follow-up includes production
+  Attribute with UnionAttribute and now qualifies the unchanged five-source union
+  subset through project/interpreter/ARM64 pattern and propagation-protocol checks;
+  imported-base rejection remains a separate control.
 
 - Qualify native-only copied-struct execution after Raven's core ValueType identity
   correction. Extend the minimal core fixture with Byte and retain the unchanged

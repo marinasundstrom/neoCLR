@@ -194,3 +194,31 @@ The fixture still lacks real Object display/equality and String.Replace; synthes
 quoted display without Replace does not escape quotes/backslashes. This evidence
 therefore does not qualify full union formatting, production core bootstrap or release
 readiness. Website capability claims stay unchanged.
+
+## Production union source subset (2026-10-09)
+
+Add `--unions` to the text-services command. The verifier compiles unchanged
+Propagatable, Option, Result, Attribute and UnionAttribute sources into a separate
+native library, references it from a native-only project, then executes the
+[union consumer](union-consumer.rvn) through project run, independent interpreter
+and standalone ARM64 code. All return 42; native linkage remains libSystem only.
+[Evidence](union-source-validation.json) records the five source hashes and commands.
+
+The consumer covers Some/None, Ok/Error, let-else success/failure, if-let matching,
+nonmatching and else branches, Unicode/NUL error payloads and the production
+TryGetOutput/TryGetResidual bodies, including resetting a mismatched output.
+Inspection of the selected closure confirms no fixture Object method is called.
+No new IL semantics, metadata encoding, compiler change or performance claim.
+
+This refines the preceding frontier assessment: the four-file probe omitted the
+production Attribute base. Including that source keeps the existing local inheritance
+contract and succeeds; imported class inheritance remains a separately checked
+NEOMETA001 rejection, not a blocker for this five-file source subset. The verifier
+records it as `importedBaseRejection` in union mode. It does not omit UnionAttribute,
+change production sources or manufacture substitute union carriers to obtain success.
+
+The core remains API-authored and incomplete. This is not full source System.Runtime
+bootstrap, union formatting/equality/hash qualification, installed editor acceptance
+or extracted-package qualification. Next expand the native primitive/String/Object
+source contracts and use their real display behavior before qualifying formatted
+unions; keep the imported-inheritance capability gap explicit when splitting libraries.

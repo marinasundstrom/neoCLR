@@ -1,0 +1,66 @@
+module Example.Unions
+
+import System.*
+import System.Option.*
+import System.Result.*
+
+func Unwrap(option: Option<int>) -> int {
+    let Some(value) = option else {
+        return 2
+    }
+    return value
+}
+
+func Main() -> int {
+    let present = Option<int>.Some(40)
+    let absent = Option<int>.None()
+    if Unwrap(absent) != 2 {
+        return 1
+    }
+    let Ok(number) = Result<int, string>.Ok(Unwrap(present)) else {
+        return 2
+    }
+    let failure = Result<int, string>.Error("hé🙂\u0000error")
+    let Error(message) = failure else {
+        return 3
+    }
+    if String.CompareOrdinal(message, "hé🙂\u0000error") != 0 {
+        return 4
+    }
+    if let Some(_) = absent {
+        return 5
+    }
+    if let Error(_) = Result<int, string>.Ok(42) {
+        return 6
+    }
+    if let Some(value) = present {
+        if value != number {
+            return 7
+        }
+    } else {
+        return 8
+    }
+    if let Error(text) = failure {
+        if text.GetByteCount() != 13 {
+            return 9
+        }
+    } else {
+        return 10
+    }
+    var output = 99
+    if absent.TryGetOutput(out output) || output != 0 {
+        return 11
+    }
+    if !present.TryGetOutput(out output) || output != 40 {
+        return 12
+    }
+    var residual = ""
+    if !failure.TryGetResidual(out residual) || String.CompareOrdinal(residual, message) != 0 {
+        return 13
+    }
+    var unit: System.Void = ()
+    if !absent.TryGetResidual(out unit) {
+        return 14
+    }
+    return number + Unwrap(absent)
+}

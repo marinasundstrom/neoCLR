@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--project', action='store_true', help='Validate native-only project selection; requires --driver.')
     parser.add_argument('--value-types', action='store_true', help='With --project, check copied values and the production union core frontier.')
     parser.add_argument('--text-services', action='store_true', help='With --project, verify native UTF-8 wrappers and production union frontier.')
+    parser.add_argument('--unions', action='store_true', help='With --text-services, execute unchanged production Option/Result and pattern controls.')
     args = parser.parse_args()
     if args.project and not args.driver:
         parser.error('--project requires --driver')
@@ -26,6 +27,8 @@ def main():
         parser.error('--value-types requires --project')
     if args.text_services and (not args.project or args.value_types):
         parser.error('--text-services requires --project and cannot combine with --value-types')
+    if args.unions and not args.text_services:
+        parser.error('--unions requires --text-services')
     output = args.output.resolve()
     if output.exists():
         raise FileExistsError(output)
@@ -51,6 +54,13 @@ def main():
     core = artifacts / 'NativeCore.dll'
     library = artifacts / 'Input.dll'
     consumer = artifacts / 'Consumer.dll'
+    production_sources = [ROOT / 'runtime/raven/src/System' / name for name in (
+        'Propagatable.rvn', 'Option.rvn', 'Result.rvn', 'Runtime/CompilerServices/UnionAttribute.rvn')]
+    union_library = artifacts / 'ProductionValues.dll'
+    attribute_source = ROOT / 'runtime/raven/src/System/Attribute.rvn'
+    if args.unions:
+        run(['dotnet', args.driver.resolve(), 'neoclr', '--native-core-reference', core,
+             '--library', '-o', union_library, *production_sources, attribute_source])
     if args.driver and not args.project:
         driver = args.driver.resolve()
         consumer = artifacts / 'DriverConsumer.dll'
@@ -74,7 +84,8 @@ def main():
     if args.project:
         directory = artifacts / 'project'
         directory.mkdir()
-        (directory / 'Main.rvn').write_text((HERE / 'text-consumer.rvn').read_text() if args.text_services
+        (directory / 'Main.rvn').write_text((HERE / 'union-consumer.rvn').read_text() if args.unions
+            else (HERE / 'text-consumer.rvn').read_text() if args.text_services
             else (HERE / 'value-consumer.rvn').read_text() if args.value_types
             else 'module Example.App\n' + (HERE / 'consumer.rvn').read_text())
         project = directory / 'App.rvnproj'
@@ -90,6 +101,9 @@ def main():
             ET.SubElement(group, name).text = value
         reference = ET.SubElement(ET.SubElement(root, 'ItemGroup'), 'Reference', Include='Input')
         ET.SubElement(reference, 'HintPath').text = '../Input.dll'
+        if args.unions:
+            reference = ET.SubElement(ET.SubElement(root, 'ItemGroup'), 'Reference', Include='ProductionValues')
+            ET.SubElement(reference, 'HintPath').text = '../ProductionValues.dll'
         ET.ElementTree(root).write(project, encoding='unicode')
         command = ['dotnet', args.driver.resolve(), 'neoclr', '--project', project]
         run(command)
@@ -105,19 +119,18 @@ def main():
         group.remove(invalid)
         ET.ElementTree(root).write(project, encoding='unicode')
         report['project'] = {'nativeOnly': True, 'runExit': 42, 'mixedSelectionPreservedOutput': True}
-    production_sources = []
     if args.value_types or args.text_services:
-        production_sources = [ROOT / 'runtime/raven/src/System' / name for name in (
-            'Propagatable.rvn', 'Option.rvn', 'Result.rvn', 'Runtime/CompilerServices/UnionAttribute.rvn')]
         rejected = artifacts / 'ProductionUnions.dll'
         diagnostic = run(['dotnet', args.driver.resolve(), 'neoclr', '--native-core-reference', core,
             '--library', '-o', rejected, *production_sources], expected=1, include_stderr=True)
         expected_diagnostic = ('NEOMETA001', 'class UnionAttribute') if args.text_services else ('RAV1501', 'String.Concat')
         if not all(part in diagnostic for part in expected_diagnostic) or rejected.exists():
             raise AssertionError('Union core frontier did not reject cleanly before publication: ' + diagnostic)
-        report['productionUnionFrontier'] = {'diagnostic': diagnostic.strip(),
+        report['importedBaseRejection' if args.unions else 'productionUnionFrontier'] = {'diagnostic': diagnostic.strip(),
             'outputPublished': False, 'sourcesUnchanged': True}
     dependencies = ['--module', core, '--module', library, '--system', seed, '--object-root', core]
+    if args.unions:
+        dependencies += ['--module', union_library]
     interpreted = run([runtime, 'run', consumer, *dependencies, '--show-result'], expected=42, include_stderr=True)
     if interpreted.strip() != '=> Int32(42)':
         raise AssertionError(interpreted)
@@ -137,11 +150,17 @@ def main():
     if args.text_services:
         report['scope'] = 'Native-only fixture UTF-8 static and instance wrappers; unchanged production union emission frontier. Not production Object or String completeness.'
         report['textChecks'] = ['Unicode concatenation', 'empty left/right', 'embedded NUL', 'ordinal inequality', 'instance UTF-8 byte count']
+    if args.unions:
+        report['scope'] = 'Unchanged production Propagatable/Option/Result/Attribute/UnionAttribute over native-only fixture core; imported-base rejection retained.'
+        report.pop('textChecks', None)
+        report['unionChecks'] = ['Some/None', 'Ok/Error', 'let-else success/failure', 'if-let match/mismatch/else', 'UTF-8 and NUL error payload', 'production TryGetOutput/TryGetResidual including mismatched output reset']
     report['revisions'] = {name: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip()
                            for name, path in [('neoclr', ROOT), ('raven', args.raven)]}
     inputs = [runtime, aot, *[p for p in HERE.iterdir() if p.suffix in ('.cs', '.csproj', '.rvn', '.neoil', '.c', '.py')]]
     inputs += list((HERE / 'bin/Debug/net10.0').glob('*.dll'))
     inputs += [core, library, consumer, seed, artifacts / 'consumer', *production_sources, *adapters]
+    if args.unions:
+        inputs += [union_library, attribute_source]
     if args.driver:
         inputs += list(args.driver.resolve().parent.glob('*.dll'))
     if args.project:
