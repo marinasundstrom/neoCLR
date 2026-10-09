@@ -20,14 +20,14 @@ def require_execution(path):
     return data
 
 
-def require_raven_execution(path):
+def require_raven_execution(path, expected_stdout='Hello, world!\n'):
     data = json.loads(path.read_text(encoding='utf-8'))
     outcomes = data.get('outcomes', [])
     if (data.get('passed') is not True or len(outcomes) != 2
             or {case.get('container') for case in outcomes} != {'PE/#Neo', 'NEOX'}
-            or any(case.get('exitCode') != 0 or case.get('stdout') != 'Hello, world!\n'
+            or any(case.get('exitCode') != 0 or case.get('stdout') != expected_stdout
                    or case.get('stderr') != '' for case in outcomes)):
-        raise ValueError('Raven Hello World gate did not complete both standalone container executions')
+        raise ValueError('Raven gate did not complete both standalone container executions')
     return data
 
 
@@ -45,6 +45,7 @@ def main():
     fresh = out / 'fresh-source'
     fresh.mkdir()
     assembly = fresh / 'RavenHello.dll'
+    flow_assembly = fresh / 'RavenFlow.dll'
     report = dict(passed=False, scope='Windows x64 scalar/literal-console AOT; no managed profiles or project kit qualification',
                   platform=platform.platform(), machine=platform.machine(), commands=[])
 
@@ -54,7 +55,8 @@ def main():
         with log.open('w', encoding='utf-8') as stream:
             result = subprocess.run(command, cwd=cwd, stdout=stream, stderr=subprocess.STDOUT,
                 env={**os.environ, 'NEOCLR_WINDOWS_AOT_EVIDENCE': str(evidence),
-                     'NEOCLR_WINDOWS_FRESH_RAVEN': str(assembly)}, timeout=1500)
+                     'NEOCLR_WINDOWS_FRESH_RAVEN': str(assembly),
+                     'NEOCLR_WINDOWS_FRESH_FLOW': str(flow_assembly)}, timeout=1500)
         report['commands'].append(dict(command=command, exitCode=result.returncode, log=log.name))
         if result.returncode:
             raise RuntimeError(f'{name} failed with exit {result.returncode}; see {log}')
@@ -81,17 +83,23 @@ def main():
                           'NeoCLR.Metadata.Experimental.dll')
         report['compilerFiles'] = {name: hashlib.sha256((compiler.parent / name).read_bytes()).hexdigest()
                                    for name in compiler_files}
-        source = fresh / 'hello.rvn'
-        shutil.copyfile(ROOT / 'docs/experiments/aot-hello/hello.rvn', source)
-        run(['dotnet', compiler, 'neoclr', '-o', assembly, source], 'raven-compile')
-        if not assembly.is_file():
-            raise ValueError('Raven compiler did not produce fresh native metadata')
+        for filename, destination, log_name in [
+            ('hello.rvn', assembly, 'raven-compile'),
+            ('windows-flow.rvn', flow_assembly, 'raven-flow-compile'),
+        ]:
+            source = fresh / filename
+            shutil.copyfile(ROOT / 'docs/experiments/aot-hello' / filename, source)
+            run(['dotnet', compiler, 'neoclr', '-o', destination, source], log_name)
+            if not destination.is_file():
+                raise ValueError('Raven compiler did not produce fresh native metadata')
         command = ['cargo', 'test', '--locked', '--manifest-path', 'tools/aot-poc/Cargo.toml',
                    '--test', 'windows_scalar', '--', '--nocapture']
         run(command, 'tests')
         report['execution'] = require_execution(evidence / 'windows-execution.json')
         report['ravenExecution'] = require_raven_execution(evidence / 'raven-execution.json')
         report['freshRavenExecution'] = require_raven_execution(evidence / 'fresh-raven-execution.json')
+        expected_flow = json.loads((ROOT / 'docs/experiments/aot-hello/windows-flow.expected.json').read_text(encoding='utf-8'))
+        report['freshFlowExecution'] = require_raven_execution(evidence / 'fresh-flow-execution.json', expected_flow['stdout'])
         report['passed'] = True
     except Exception as error:
         report['error'] = str(error)
@@ -100,7 +108,7 @@ def main():
                            for p in sorted(out.rglob('*')) if p.is_file()}
         (out / 'report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
         summary = f"Windows scalar AOT: {'PASS' if report['passed'] else 'FAIL'}\n\nRevision: {report.get('revision', 'unavailable')}\n\n"
-        summary += '32 scalar comparisons and 4 standalone Raven Hello World executions (retained and fresh source) passed.\n' if report['passed'] else report.get('error', 'Unknown failure') + '\n'
+        summary += '32 scalar comparisons and 6 standalone Raven executions (Hello World and fresh calls/loops/UTF-8) passed.\n' if report['passed'] else report.get('error', 'Unknown failure') + '\n'
         if os.environ.get('GITHUB_STEP_SUMMARY'):
             with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as stream:
                 stream.write(summary)

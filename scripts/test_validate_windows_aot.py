@@ -48,6 +48,22 @@ class ExecutionGateTests(unittest.TestCase):
             path.write_text(json.dumps(report))
             self.assertEqual(module.require_raven_execution(path), report)
 
+    def test_flow_gate_requires_exact_utf8_nul_and_line_endings(self):
+        expected = json.loads((module.ROOT / 'docs/experiments/aot-hello/windows-flow.expected.json').read_text(encoding='utf-8'))['stdout']
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'fresh-flow-execution.json'
+            for output in ('Hello, world!\n', expected.replace('\0', ''),
+                           expected.replace('\n', '\r\n'), expected.replace('🌍', '?'), expected):
+                report = {'passed': True, 'outcomes': [
+                    dict(container=name, exitCode=0, stdout=output, stderr='')
+                    for name in ('PE/#Neo', 'NEOX')]}
+                path.write_text(json.dumps(report), encoding='utf-8')
+                if output == expected:
+                    self.assertEqual(module.require_raven_execution(path, expected), report)
+                else:
+                    with self.assertRaises(ValueError):
+                        module.require_raven_execution(path, expected)
+
 
 if __name__ == '__main__':
     unittest.main()

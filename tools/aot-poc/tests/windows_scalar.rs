@@ -299,7 +299,7 @@ fn windows_c_consumer_executes_calls_branches_faults_and_utf8() {
 )]
 fn raven_hello_runs_as_standalone_windows_executable() {
     let fixture = include_bytes!("../../../docs/experiments/aot-hello/RavenHello.pe");
-    assert_windows_hello(fixture, "raven-execution.json");
+    assert_windows_program(fixture, "raven-execution.json", b"Hello, world!\n");
 }
 
 #[test]
@@ -311,14 +311,34 @@ fn fresh_raven_source_runs_as_standalone_windows_executable() {
     let input = std::env::var_os("NEOCLR_WINDOWS_FRESH_RAVEN")
         .expect("run scripts/validate-windows-aot.py with --raven-source");
     let bytes = fs::read(input).unwrap();
-    assert_windows_hello(&bytes, "fresh-raven-execution.json");
+    assert_windows_program(&bytes, "fresh-raven-execution.json", b"Hello, world!\n");
 }
 
-fn assert_windows_hello(fixture: &[u8], marker: &str) {
+#[test]
+#[cfg_attr(
+    not(all(target_os = "windows", target_arch = "x86_64")),
+    ignore = "requires Windows x64, MSVC and freshly compiled Raven input"
+)]
+fn fresh_raven_calls_loops_and_utf8_run_as_standalone_windows_executable() {
+    let input = std::env::var_os("NEOCLR_WINDOWS_FRESH_FLOW")
+        .expect("run scripts/validate-windows-aot.py with --raven-source");
+    let bytes = fs::read(input).unwrap();
+    let expected: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../docs/experiments/aot-hello/windows-flow.expected.json"
+    ))
+    .unwrap();
+    assert_windows_program(
+        &bytes,
+        "fresh-flow-execution.json",
+        expected["stdout"].as_str().unwrap().as_bytes(),
+    );
+}
+
+fn assert_windows_program(fixture: &[u8], marker: &str, expected_stdout: &[u8]) {
     let module = neoclr::metadata_container::decode(fixture).unwrap();
     let program = neoclr::LoadedProgram::new(&module).unwrap();
     let interpreted = program.run(neoclr::ExecutionOptions::default()).unwrap();
-    assert_eq!(interpreted.stdout, b"Hello, world!\n");
+    assert_eq!(interpreted.stdout, expected_stdout);
     let mut outcomes = Vec::new();
     let save = |outcomes: &Vec<serde_json::Value>, passed| {
         if let Some(path) = std::env::var_os("NEOCLR_WINDOWS_AOT_EVIDENCE") {

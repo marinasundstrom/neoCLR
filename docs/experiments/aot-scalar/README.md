@@ -43,7 +43,10 @@ contract below remains unchanged for modules without declarations.
   are supported; reachable paths must return or remain within the function's CFG.
 - `br`, Int32 `brtrue`/`brfalse`, and `beq`, `bne.un`, `bgt`, `blt`, `bge`, `ble`
   with signed/unsigned forms. Loops and nonempty operand-stack joins are supported.
-  Boolean-producing comparison instructions, switch and local reset remain outside
+  Boolean constants, Int32 `ceq`/`clt`/`cgt`, Boolean equality and Boolean truth
+  branches are also accepted. Boolean stack values remain distinct from Int32;
+  signatures and locals remain Int32-only. Unsigned Boolean-producing comparisons,
+  switch and local reset remain outside
   this profile. The ordinary verifier enforces definite assignment of locals.
 - An explicitly named `() -> Int32` or `(Int32) -> Int32` root exports the C symbol
   `neoclr_entry_v2`, returning a status and writing the result through a pointer

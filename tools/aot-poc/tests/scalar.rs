@@ -815,3 +815,38 @@ fn fault_does_not_hide_unsupported_dead_instructions() {
     assert!(String::from_utf8_lossy(&result.stderr).contains("unsupported instruction"));
     assert!(!object.exists());
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn scalar_boolean_comparisons_match_interpreter_at_int32_boundaries() {
+    for operation in ["ceq", "clt", "cgt"] {
+        let source = format!(
+            ".module Comparisons\n.function Calculate(Int32 value) -> Int32\nldarg value\nldc.i4 0\n{operation}\nldc.bool false\nceq\nbrtrue False\nldc.i4 1\nret\nFalse:\nldc.i4 0\nret\n.end\n"
+        );
+        assert_native_parity(&source, &[i32::MIN, -1, 0, 1, i32::MAX], |value| {
+            i32::from(match operation {
+                "ceq" => value == 0,
+                "clt" => value < 0,
+                _ => value > 0,
+            })
+        });
+    }
+}
+
+#[test]
+fn scalar_boolean_values_do_not_become_int32_operands() {
+    for body in [
+        "ldc.bool true\nldc.i4 1\nadd\nret",
+        "ldc.bool true\nret",
+        "ldc.bool true\nldc.i4 1\nceq\npop\nldc.i4 0\nret",
+        "ldc.bool true\nldc.bool false\nclt\npop\nldc.i4 0\nret",
+    ] {
+        let temp = Temp::new();
+        let object = temp.0.join("invalid.o");
+        let source = format!(
+            ".module InvalidBool\n.function Calculate(Int32 value) -> Int32\n{body}\n.end\n"
+        );
+        assert!(!compile(&source, &object).status.success());
+        assert!(!object.exists());
+    }
+}

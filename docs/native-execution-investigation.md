@@ -430,6 +430,24 @@ explicit AnyCPU selection resolves it. No compiler semantic or bridge changes
 were needed. Project kits, managed Windows services and unwinding remain outside
 this slice; calls/control flow and UTF-8 source coverage are the next bounded checks.
 
+The fresh-source gate now also compiles [a calls/loops/UTF-8 consumer](experiments/aot-hello/windows-flow.rvn).
+It checks negative/zero/positive branches, an empty loop and repeated nested calls,
+then emits multibyte text, embedded NUL, a combining character and LF. A separate
+completion record requires both PE/#Neo and NEOX to match the interpreter and the
+checked-in expected bytes; missing NUL, CRLF conversion and changed UTF-8 fail.
+
+This exposed a scalar backend gap: Raven emits Boolean-producing `ceq`/`clt`/`cgt`
+and Boolean constants before truth branches, while the original scalar experiment
+only handled direct comparison branches. The backend now tracks Boolean stack
+values separately, lowers signed Int32 comparisons and same-type equality, and
+rejects Boolean arithmetic or implicit Boolean/Int32 mixing. Function signatures
+and locals remain Int32-only. This follows the existing neoCLR typed Boolean
+contract while preserving .NET comparison outcomes; it is additional lowering
+coverage, not a new language or bridge contract. The existing CLR/scalar research
+and verifier remain the baseline. Local native Int32 boundary tests, rejection
+checks, source compilation and Windows COFF emission pass; Windows execution of
+this extension is pending.
+
 ## Shared native contracts to establish
 
 1. **Lowering and checks.** Resolve and verify a declared IL subset into a typed

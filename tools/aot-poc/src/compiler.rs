@@ -266,7 +266,7 @@ pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bo
                             blocks[pc],
                             match kind {
                                 flow::Kind::Literal => types::I64,
-                                flow::Kind::Int32 | flow::Kind::Unit => types::I32,
+                                flow::Kind::Int32 | flow::Kind::Boolean | flow::Kind::Unit => types::I32,
                             },
                         );
                     }
@@ -289,6 +289,21 @@ pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bo
                 match op {
                     Op::Int(value) => {
                         stack.push(builder.ins().iconst(types::I32, i64::from(*value)))
+                    }
+                    Op::Bool(value) => {
+                        stack.push(builder.ins().iconst(types::I32, i64::from(*value)))
+                    }
+                    Op::Equal | Op::Less | Op::Greater => {
+                        let right = stack.pop().expect("validated stack");
+                        let left = stack.pop().expect("validated stack");
+                        let condition = match op {
+                            Op::Equal => IntCC::Equal,
+                            Op::Less => IntCC::SignedLessThan,
+                            Op::Greater => IntCC::SignedGreaterThan,
+                            _ => unreachable!(),
+                        };
+                        let result = builder.ins().icmp(condition, left, right);
+                        stack.push(builder.ins().uextend(types::I32, result));
                     }
                     Op::String(_) => {
                         let data =

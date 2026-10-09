@@ -1,0 +1,40 @@
+func Double(value: int) -> int {
+    return value * 2
+}
+
+func Sum(value: int) -> int {
+    if value < 0 {
+        System.Console.WriteLine("negative")
+        return -1
+    }
+    if value == 0 {
+        System.Console.WriteLine("zero")
+    } else {
+        System.Console.WriteLine("positive")
+    }
+    var index = 1
+    var total = 0
+    while index <= value {
+        total = total + Double(index)
+        index = index + 1
+    }
+    return total
+}
+
+func Main() -> int {
+    let negative = Sum(-3)
+    let empty = Sum(0)
+    let positive = Sum(5)
+    if negative != -1 {
+        return 1
+    }
+    if empty != 0 {
+        return 2
+    }
+    if positive != 30 {
+        return 3
+    }
+    System.Console.WriteLine("Calls and loops — hej, שלום, 🌍!")
+    System.Console.WriteLine("NUL: A\u0000B; combining: é")
+    return 0
+}

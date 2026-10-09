@@ -78,7 +78,9 @@ library and runtime artifacts; this is not a general publishing workflow for all
   MSVC linking and native/interpreter comparisons, including standalone Hello World
   from both retained metadata and freshly compiled Raven source on Windows, through
   PE/#Neo and NEOX. Fresh-source coverage is limited to the primitive/console Hello
-  World bootstrap. Windows managed services and
+  World bootstrap; an expanded calls/loops/UTF-8 source gate is awaiting Windows
+  execution evidence. Scalar comparison results now retain typed Boolean stack
+  checks. Windows managed services and
   native project kits remain unsupported.
 - **Code and APIs:** broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.

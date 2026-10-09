@@ -24,6 +24,7 @@ pub(super) fn comparison(op: &Op) -> Option<(usize, IntCC)> {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(super) enum Kind {
     Int32,
+    Boolean,
     Literal,
     Unit,
 }
@@ -43,12 +44,13 @@ pub(super) fn analyze(function: &Function) -> Result<Stacks, Error> {
     let mut edges = Vec::new();
     for (pc, op) in function.body.iter().enumerate() {
         let effect = match op {
-            Op::Int(_) | Op::String(_) => (0, 1),
+            Op::Int(_) | Op::Bool(_) | Op::String(_) => (0, 1),
             Op::Arg(index) if *index < function.parameters.len() => (0, 1),
             Op::Load(index) if *index < function.locals.len() => (0, 1),
             Op::Store(index) if *index < function.locals.len() => (1, 0),
             Op::Dup => (1, 2),
             Op::Pop => (1, 0),
+            Op::Equal | Op::Less | Op::Greater => (2, 1),
             Op::Add
             | Op::Sub
             | Op::Mul
@@ -95,12 +97,16 @@ pub(super) fn analyze(function: &Function) -> Result<Stacks, Error> {
             return Err(fail(pc, "stack underflow"));
         }
         let popped = stack.split_off(depth - pops);
-        let expected = if matches!(op, Op::Call(target) if console_call(target)) {
-            Kind::Literal
-        } else {
-            Kind::Int32
+        let valid_operands = match op {
+            Op::Dup | Op::Pop => true,
+            Op::Equal => popped[0] == popped[1] && matches!(popped[0], Kind::Int32 | Kind::Boolean),
+            Op::BranchTrue(_) | Op::BranchFalse(_) => {
+                matches!(popped[0], Kind::Int32 | Kind::Boolean)
+            }
+            Op::Call(target) if console_call(target) => popped == [Kind::Literal],
+            _ => popped.iter().all(|kind| *kind == Kind::Int32),
         };
-        if !matches!(op, Op::Dup | Op::Pop) && popped.iter().any(|kind| *kind != expected) {
+        if !valid_operands {
             return Err(fail(
                 pc,
                 "unsupported operand type for scalar/console instruction",
@@ -108,6 +114,7 @@ pub(super) fn analyze(function: &Function) -> Result<Stacks, Error> {
         }
         match op {
             Op::String(_) => stack.push(Kind::Literal),
+            Op::Bool(_) | Op::Equal | Op::Less | Op::Greater => stack.push(Kind::Boolean),
             Op::Call(target) if console_call(target) => stack.push(Kind::Unit),
             Op::Dup => {
                 stack.extend_from_slice(&popped);

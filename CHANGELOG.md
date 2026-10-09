@@ -33,7 +33,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   executions (retained/fresh PE/#Neo and NEOX) and 32 scalar comparisons. Verify
   all 91 downloaded artifact hashes. Select AnyCPU explicitly for the
   managed compiler build so MSVC’s Platform=x64 environment cannot redirect its
-  output layout; native code still targets Windows x64.
+  output layout; native code still targets Windows x64. Extend fresh-source
+  qualification with calls, branches, empty/repeated loops and byte-exact UTF-8,
+  NUL and combining-character output. Add the scalar Boolean constants and
+  comparison-result lowering emitted by Raven, preserving typed stack checks and
+  Int32-only signatures/locals. Local native boundary/rejection checks pass;
+  Windows execution of the expanded source gate is pending.
 
 - Add a development macOS ARM64 project-to-executable console command using the
   selected bundle's Raven project build, existing AOT backend and explicit native
