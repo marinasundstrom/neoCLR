@@ -67,10 +67,32 @@ int32_t neoclr_entry_tasks_begin_v1(neoclr_aot_context *context, int32_t entry,
     }
     if (!startup) return 3;
     int32_t status = neoclr_task_queue_default_v1(context, output);
-    if (!status) scope->entry_draining = 1;
+    if (!status) {
+        scope->entry_draining = 1;
+        scope->entry_boundary = neoclr_root_probe_head_v1();
+    }
     return status;
 }
 void neoclr_entry_tasks_end_v1(neoclr_aot_context *context) {
     neoclr_task_scope *scope = find(context);
-    if (scope) scope->entry_draining = 0;
+    if (scope) {
+        scope->entry_draining = 0;
+        scope->entry_boundary = NULL;
+    }
+}
+
+static int at_entry_boundary(neoclr_task_scope *scope) {
+    return scope && scope->entry_draining && !scope->context->fault.code &&
+        scope->entry_boundary && neoclr_root_probe_head_v1() == scope->entry_boundary;
+}
+int32_t neoclr_entry_tasks_poll_v1(neoclr_aot_context *context, int32_t required, uint64_t *callback) {
+    neoclr_task_scope *scope = find(context);
+    if (!callback || !at_entry_boundary(scope)) return -3;
+    if (!scope->poll) return required ? -3 : 0;
+    return scope->poll(context, callback, scope->entry_boundary, scope->poll_state);
+}
+int32_t neoclr_entry_callback_read_v1(neoclr_aot_context *context, uint64_t handle, void **output) {
+    neoclr_task_scope *scope = find(context);
+    if (!at_entry_boundary(scope)) return 3;
+    return neoclr_gc_callback_read_suspended_v1(context, handle, output, scope->entry_boundary);
 }

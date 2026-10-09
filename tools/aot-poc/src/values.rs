@@ -366,7 +366,13 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.params.truncate(1);
         sig.returns.clear();
         let end = module.declare_function("neoclr_entry_tasks_end_v1", Linkage::Import, &sig)?;
-        Some((begin, end))
+        sig.params = [types::I64, types::I32, types::I64].map(AbiParam::new).to_vec();
+        sig.returns.push(AbiParam::new(types::I32));
+        let poll = module.declare_function("neoclr_entry_tasks_poll_v1", Linkage::Import, &sig)?;
+        sig.params = [types::I64, types::I64].map(AbiParam::new).to_vec();
+        let callback = module.declare_function("neoclr_invoke_entry_callback_v1", Linkage::Export, &sig)?;
+        let queue = module.declare_function("neoclr_task_queue_default_v1", Linkage::Import, &sig)?;
+        Some((begin, end, poll, callback, queue))
     } else { None };
     let mut socket_services = std::collections::HashMap::new();
     if let Some(d) = details {
@@ -381,6 +387,14 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             (&d.socket_receive, "neoclr_socket_receive_v1", vec![types::I64, types::I64, types::I32, types::I32, types::I64, types::I64, types::I64]),
             (&d.socket_send, "neoclr_socket_send_v1", vec![types::I64, types::I64, types::I32, types::I32, types::I64, types::I64, types::I64]),
             (&d.socket_transfer_result, "neoclr_socket_transfer_result_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.dns_lookup, "neoclr_dns_lookup_v1", vec![types::I64, types::I64, types::I64, types::I64]),
+            (&d.dns_lookup_until, "neoclr_dns_lookup_until_v1", vec![types::I64, types::I64, types::I64, types::I64, types::I64]),
+            (&d.dns_cancel, "neoclr_dns_cancel_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.dns_result, "neoclr_dns_result_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.dns_addresses, "neoclr_dns_addresses_v1", vec![types::I32, types::I64, types::I64, types::I64]),
+            (&d.socket_connect, "neoclr_socket_connect_v1", vec![types::I64, types::I32, types::I64, types::I64, types::I64]),
+            (&d.socket_connect_addresses, "neoclr_socket_connect_addresses_v1", vec![types::I64, types::I32, types::I64, types::I64, types::I64]),
+            (&d.socket_connect_addresses_until, "neoclr_socket_connect_addresses_until_v1", vec![types::I64, types::I32, types::I64, types::I64, types::I64, types::I64]),
             (&d.socket_accept, "neoclr_socket_accept_v1", vec![types::I64, types::I64, types::I64, types::I64]),
             (&d.socket_connect_result, "neoclr_socket_connect_result_v1", vec![types::I64, types::I64, types::I64]),
             (&d.socket_cancel, "neoclr_socket_cancel_v1", vec![types::I64, types::I64, types::I64]),
@@ -691,7 +705,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             if details.is_some_and(|d| d.entry_task_drain.contains(&i)) {
                 let d = details.unwrap();
                 let ctx = fault_context.unwrap();
-                let (begin, end) = entry_drain_services.unwrap();
+                let (begin, end, poll, callback, queue_read) = entry_drain_services.unwrap();
                 let begin = module.declare_func_in_func(begin, b.func);
                 let end = module.declare_func_in_func(end, b.func);
                 let entry = b.ins().iconst(types::I32, root as i64);
@@ -708,22 +722,61 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let done = b.create_block();
                 b.append_block_param(done, types::I32);
                 let zero = b.ins().iconst(types::I32, 0);
+                let cycle = b.create_block();
+                let poll_work = b.create_block();
+                b.ins().jump(cycle, &[]);
+                b.switch_to_block(cycle);
                 if let Some(drain) = d.task_queue_drain {
+                    let reader = module.declare_func_in_func(queue_read, b.func);
+                    let call = b.ins().call(reader, &[ctx, queue_output]);
+                    let status = b.inst_results(call)[0];
+                    let loaded = b.create_block();
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                    b.ins().brif(failed, done, &[status.into()], loaded, &[]);
+                    b.switch_to_block(loaded);
                     let queue = b.ins().load(types::I64, MemFlags::new(), queue_output, 0);
                     let absent = b.ins().icmp_imm(IntCC::Equal, queue, 0);
                     let work = b.create_block();
-                    b.ins().brif(absent, done, &[zero.into()], work, &[]);
+                    b.ins().brif(absent, poll_work, &[], work, &[]);
                     b.switch_to_block(work);
-                    // Queue is strongly rooted by the task scope. Startup roots stay
-                    // published; the ordinary Drain frame checks its own stack budget.
+                    // Ordinary managed Drain publishes its own frame; startup remains rooted.
                     let result = b.ins().stack_addr(types::I64, storage, 8);
                     let callee = module.declare_func_in_func(ids[drain], b.func);
                     let call = b.ins().call(callee, &[queue, result, ctx]);
                     let status = b.inst_results(call)[0];
-                    b.ins().jump(done, &[status.into()]);
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                    b.ins().brif(failed, done, &[status.into()], poll_work, &[]);
                 } else {
-                    b.ins().jump(done, &[zero.into()]);
+                    b.ins().jump(poll_work, &[]);
                 }
+                b.switch_to_block(poll_work);
+                let poll = module.declare_func_in_func(poll, b.func);
+                let required = b.ins().iconst(types::I32, i64::from(d.entry_host_io));
+                let call = b.ins().call(poll, &[ctx, required, queue_output]);
+                let ready = b.inst_results(call)[0];
+                let pending = b.create_block();
+                let idle = b.ins().icmp_imm(IntCC::Equal, ready, 0);
+                b.ins().brif(idle, done, &[zero.into()], pending, &[]);
+                b.switch_to_block(pending);
+                let dispatch = b.create_block();
+                let waiting = b.ins().icmp_imm(IntCC::Equal, ready, 2);
+                b.ins().brif(waiting, cycle, &[], dispatch, &[]);
+                b.switch_to_block(dispatch);
+                let invoke = b.create_block();
+                let fault = b.create_block();
+                let available = b.ins().icmp_imm(IntCC::Equal, ready, 1);
+                b.ins().brif(available, invoke, &[], fault, &[]);
+                b.switch_to_block(fault);
+                let error = b.ins().iconst(types::I32, 3);
+                site.record(&mut b, error);
+                b.ins().jump(done, &[error.into()]);
+                b.switch_to_block(invoke);
+                let handle = b.ins().load(types::I64, MemFlags::new(), queue_output, 0);
+                let callback = module.declare_func_in_func(callback, b.func);
+                let call = b.ins().call(callback, &[handle, ctx]);
+                let status = b.inst_results(call)[0];
+                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                b.ins().brif(failed, done, &[status.into()], cycle, &[]);
                 b.switch_to_block(done);
                 let status = b.block_params(done)[0];
                 b.ins().call(end, &[ctx]);
@@ -740,7 +793,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             }
             if let Some(service) = socket_services.get(&i) {
                 let service = module.declare_func_in_func(*service, b.func);
-                let mut args = parameters[..p.args[i].len()].to_vec();
+                let argument_lanes: usize = p.args[i].iter().map(|t| lanes(&p, t).len()).sum();
+                let mut args = parameters[..argument_lanes].to_vec();
                 args.push(fault_context.unwrap());
                 if details.unwrap().task_queue_current.contains(&i) {
                     let run = b.ins().iconst(types::I32, details.unwrap().task_queue_run.map_or(-1, |i| i as i64));
@@ -758,6 +812,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
+                if let Some(ty @ Ty::StringArray) = &p.results[i] {
+                    let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                    tag_array(&mut b, &p, ty, array);
+                }
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks(); b.finalize();
@@ -1881,7 +1939,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         return Err("Windows stack experiment entry frame exceeds one page".into());
     }
     if details.is_some_and(|d| d.native_gc) {
-        compile_host_callbacks(&mut module, &p, &ids, stack_check, diagnostic_data.as_ref())?;
+        compile_host_callbacks(&mut module, &p, &ids, stack_check, diagnostic_data.as_ref(), false)?;
+        if details.is_some_and(|d| !d.entry_task_drain.is_empty()) {
+            compile_host_callbacks(&mut module, &p, &ids, stack_check, diagnostic_data.as_ref(), true)?;
+        }
         if let Some(drain) = details.and_then(|d| d.task_queue_drain) {
             compile_host_queue(&mut module, ids[drain], drain, stack_check, diagnostic_data.as_ref().unwrap())?;
         }
@@ -1891,20 +1952,20 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
 
 // Quiescent host entry for the existing inhabited-Void callback shape. The strong
 // handle keeps the descriptor/receiver alive across the callee's collection points.
-fn compile_host_callbacks(module: &mut ObjectModule, p: &Profile<'_>, ids: &[cranelift_module::FuncId], stack_check: Option<cranelift_module::FuncId>, diagnostic_data: Option<&crate::fault_details::Data>) -> Result<(), Error> {
+fn compile_host_callbacks(module: &mut ObjectModule, p: &Profile<'_>, ids: &[cranelift_module::FuncId], stack_check: Option<cranelift_module::FuncId>, diagnostic_data: Option<&crate::fault_details::Data>, entry_pump: bool) -> Result<(), Error> {
     use neoclr::metadata::{FunctionType, Type};
     let shape = Type::Function(Box::new(FunctionType {
         parameters: vec![], returns: Type::Void, no_result: false,
         out_parameters: vec![], out_when_true: vec![],
     }));
     let targets = p.callable_targets(&shape)?;
-    if targets.is_empty() { return Ok(()); }
+    if targets.is_empty() && !entry_pump { return Ok(()); }
     let mut signature = module.make_signature();
     signature.params.extend([types::I64, types::I64, types::I64].map(AbiParam::new));
     signature.returns.push(AbiParam::new(types::I32));
-    let reader = module.declare_function("neoclr_gc_callback_read_v1", Linkage::Import, &signature)?;
+    let reader = module.declare_function(if entry_pump { "neoclr_entry_callback_read_v1" } else { "neoclr_gc_callback_read_v1" }, Linkage::Import, &signature)?;
     signature.params.pop();
-    let export = module.declare_function("neoclr_invoke_void_callback_v1", Linkage::Export, &signature)?;
+    let export = module.declare_function(if entry_pump { "neoclr_invoke_entry_callback_v1" } else { "neoclr_invoke_void_callback_v1" }, Linkage::Export, &signature)?;
     let mut context = module.make_context();
     context.func.signature = signature;
     let mut fb = FunctionBuilderContext::new();

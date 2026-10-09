@@ -88,12 +88,10 @@ int32_t neoclr_gc_host_root_release_v1(neoclr_aot_context *context, uint64_t han
     *root = (host_root){0};
     return 0;
 }
-int32_t neoclr_gc_callback_read_v1(neoclr_aot_context *context, uint64_t handle, void **output) {
+static int32_t callback_read(neoclr_aot_context *context, uint64_t handle, void **output) {
     host_root *root = find_host_root(context, handle);
     if (!root || !output || !root->value || context->fault.code ||
         !blocks_valid(&context->text) || !live_base(&context->text, root->value)) return 3;
-    for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
-        if (f->context == context) return 3;
     const block *allocation = (const block *)root->value - 1;
     uint64_t kind;
     if (allocation->kind != NEOCLR_GC_OBJECT || allocation->bytes != 24) return 3;
@@ -101,6 +99,16 @@ int32_t neoclr_gc_callback_read_v1(neoclr_aot_context *context, uint64_t handle,
     if (kind != UINT32_MAX) return 3;
     *output = root->value;
     return 0;
+}
+int32_t neoclr_gc_callback_read_v1(neoclr_aot_context *context, uint64_t handle, void **output) {
+    for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
+        if (f->context == context) return 3;
+    return callback_read(context, handle, output);
+}
+int32_t neoclr_gc_callback_read_suspended_v1(neoclr_aot_context *context, uint64_t handle,
+    void **output, const neoclr_probe_frame *boundary) {
+    if (!boundary || neoclr_root_probe_head_v1() != boundary || boundary->context != context) return 3;
+    return callback_read(context, handle, output);
 }
 int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context) {
     if (!context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -231,7 +239,7 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
             if (b->bytes < 24) goto invalid_descriptor;
             memcpy(&kind, data, 8); memcpy(&length, data + 8, 8); memcpy(&lanes, data + 16, 8);
             if ((kind & UINT64_C(0xffffffff)) != UINT64_C(0x80000005) ||
-                (kind >> 32) > 256 || ((kind >> 32) && lanes != 1) || !lanes || lanes > 64 ||
+                (kind >> 32) > 512 || ((kind >> 32) && lanes != 1) || !lanes || lanes > 64 ||
                 length > 65536 || length > (b->bytes - 24) / (lanes * 8 + 1)) goto invalid_descriptor;
             uint64_t markers = 24 + length * lanes * 8;
             for (uint64_t i = 0; i < length; i++) {

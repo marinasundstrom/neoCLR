@@ -21,6 +21,7 @@ pub struct Options {
     pub console_write_line: Vec<usize>,
     pub console_write_bytes: Vec<usize>,
     pub console_flush: Vec<usize>,
+    pub entry_host_io: bool,
     pub entry_task_drain: Vec<usize>,
     pub task_queue_register: Vec<usize>,
     pub task_queue_default: Vec<usize>,
@@ -30,6 +31,14 @@ pub struct Options {
     pub socket_listen: Vec<usize>,
     pub socket_local_port: Vec<usize>,
     pub socket_close: Vec<usize>,
+    pub dns_lookup: Vec<usize>,
+    pub dns_lookup_until: Vec<usize>,
+    pub dns_cancel: Vec<usize>,
+    pub dns_result: Vec<usize>,
+    pub dns_addresses: Vec<usize>,
+    pub socket_connect: Vec<usize>,
+    pub socket_connect_addresses: Vec<usize>,
+    pub socket_connect_addresses_until: Vec<usize>,
     pub socket_accept: Vec<usize>,
     pub socket_connect_result: Vec<usize>,
     pub socket_cancel: Vec<usize>,
@@ -125,6 +134,30 @@ impl Options {
                     ))
                 })
                 .collect(),
+            dns_lookup: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "dns-lookup-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            dns_lookup_until: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "dns-lookup-until-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            dns_cancel: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "dns-cancel-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            dns_result: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "dns-result-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            dns_addresses: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "dns-addresses-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            socket_connect: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-connect-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            socket_connect_addresses: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-connect-addresses-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            socket_connect_addresses_until: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "socket-connect-addresses-until-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             socket_accept: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "socket-accept-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
@@ -155,6 +188,8 @@ impl Options {
             socket_send: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "socket-send-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            entry_host_io: report.and_then(|r| r["nativeBindings"].as_array()).is_some_and(|rows|
+                rows.iter().any(|r| r["implementation"] == "entry-task-drain-v1" && r["requiresHostIo"] == true)),
             entry_task_drain: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "entry-task-drain-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),

@@ -1,0 +1,39 @@
+import System.*
+import System.Result.*
+import System.Option.*
+import System.Tasks.*
+import System.Concurrency.*
+import System.Web.Http.*
+
+func ReadInput(limit: int) -> string {
+    if let Ok(Some(text)) = Console.ReadLine(limit) {
+        return text
+    }
+    System.Fail("Expected input on stdin")
+    return ""
+}
+
+async func Main() -> Task<()> {
+    let url = ReadInput(1024)
+    let mode = ReadInput(32)
+    let cancellation = CancellationTokenSource()
+    if mode == "pre-cancel" {
+        cancellation.Cancel()
+    }
+    let client = HttpClient()
+    let request = client.GetString(url, cancellation.Token)
+    if mode == "cancel" {
+        cancellation.Cancel()
+    }
+    let result = await request
+    cancellation.Dispose()
+    if let Ok(text) = result {
+        if mode == "fault" {
+            System.Fail("Client continuation fault")
+        }
+        Console.WriteLine(text)
+    } else if let Error(error) = result {
+        Console.WriteLine(String.Concat("Error: ", error.ToString()))
+    }
+    return ()
+}

@@ -31,7 +31,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   cancellation, phase/shared deadlines and owner-thread callback cleanup. Local
   sanitizer contracts pass for DNS snapshots, held-worker cancellation/timeout,
   worker limits, scope teardown, address fallback and refused connections;
-  Windows and the Raven HttpClient consumer remain under validation.
+  Windows adapter run `37963921861` passes all four socket consumers on Windows
+  x64 and macOS ARM64. Bind the existing DNS/connect services in the native backend,
+  preserve inherited reference fields and admit proven monomorphic inherited display.
+  Raise coordinated type/clone bounds to 512, retain the 1024-function cap and reject
+  dependency nesting beyond 128 before host-stack exhaustion. Match collector typed
+  array validation to the new type bound. Add an await-based HttpClient showcase and
+  explicit native entry I/O pumping at a saved published-root boundary, with guard
+  cleanup on faults. Record await as the default application convention. Add a
+  standalone Windows client/server qualification workflow; end-to-end execution is
+  under validation. Focused unit, inheritance and sanitized heap/scope tests pass.
 
 - Add explicit `x86_64-pc-windows-msvc` AOT target selection for the bounded scalar
   and literal-console profile, emitting x64 COFF with the target calling convention.

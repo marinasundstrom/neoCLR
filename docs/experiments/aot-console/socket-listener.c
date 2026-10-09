@@ -315,11 +315,20 @@ int32_t neoclr_socket_send_until_v1(uint64_t socket, void *array, int32_t offset
     if (deadline_ns(stamp, &deadline)) return 3;
     return transfer(1, deadline, socket, array, offset, count, callback, context, output);
 }
+static int32_t socket_poll(neoclr_aot_context *, uint64_t *);
 int32_t neoclr_socket_poll_v1(neoclr_aot_context *context, uint64_t *callback) {
-    neoclr_socket_scope *scope = find_scope(context);
-    if (!scope || !callback || context->fault.code) return -3;
     for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
         if (f->context == context) return -3;
+    return socket_poll(context, callback);
+}
+int32_t neoclr_socket_poll_suspended_v1(neoclr_aot_context *context, uint64_t *callback,
+    const neoclr_probe_frame *boundary) {
+    if (!boundary || neoclr_root_probe_head_v1() != boundary || boundary->context != context) return -3;
+    return socket_poll(context, callback);
+}
+static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
+    neoclr_socket_scope *scope = find_scope(context);
+    if (!scope || !callback || context->fault.code) return -3;
     for (unsigned n = 0; n < 64; n++) {
         unsigned i = (scope->poll_cursor + n) % 64;
         if (scope->operations[i].state == 1 && scope->operations[i].kind >= 4) {

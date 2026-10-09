@@ -12877,3 +12877,17 @@ claim follows from these focused checks.
 - **Remaining:** native HttpClient DNS/connect, Windows ARM64 qualification and
   broader hosting/scheduling. The bounded Windows HTTP server project integration
   requested for this slice is working.
+
+## 2026-10-09 — Await is the application default
+
+- **Author:** asks why the native client uses `request.OnCompleted` and whether Main
+  should handle `await`; then directs: "Continue and fix it. Using await should be
+  the default unless good reasons and purpose."
+- **Assistant assessment:** identifies the queue-only native entry drain and the
+  post-entry socket loop as the missing integration. Explicit callbacks were a
+  low-level DNS/connect bring-up pattern, not the intended application style.
+- **Action:** records the convention and implements a host-installed I/O pump while
+  startup roots remain published, with separate suspension-boundary callback
+  admission. Converts the client showcase to async Main/await and adds guard tests.
+- **Validation status:** local and Windows executable qualification is in progress;
+  no general scheduler, green-thread implementation or Windows ARM64 support is claimed.

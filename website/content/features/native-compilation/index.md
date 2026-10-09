@@ -70,7 +70,7 @@ provide the development setup for these executables.
 | Text and console | UTF-8 input/output and supported string operations |
 | Files | Bounded UTF-8 file reads/writes and lexical paths on macOS |
 | HTTP | Routing and the tested accept/read/write/task-completion path |
-| Async | Selected Tasks and cancellation cases; queue-only async entry draining |
+| Async | Selected Tasks and cancellation cases; async entry queue and opt-in host I/O pumping |
 | Arithmetic | Integer operations and a bounded Double arithmetic/comparison subset |
 
 This describes tested workloads, not universal support for every API in those areas.
@@ -123,3 +123,10 @@ composes the shared server host with Windows heap/stack protection. Five real
 request/fault scenarios now pass with interpreter parity on Windows x64 and
 macOS ARM64, including executable-only deployment. Native HttpClient and Windows
 ARM64 qualification remain open.
+
+
+The development HTTP client showcase now uses async `Main` and `await`. Its native
+entry pump keeps startup roots published while driving the selected host's I/O
+completions. Standalone client qualification on macOS and Windows is in progress;
+this does not add a public scheduler or general native async coverage. Explicit
+callbacks remain useful for library adapters and focused host-boundary tests.

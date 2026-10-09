@@ -150,4 +150,33 @@ The focused native client consumer tests numeric resolution, rooted snapshot
 retention, cancellation/timeout while workers are held, capacity retained after
 cancellation, context teardown before worker completion, address fallback,
 expired connect admission and connection refusal. macOS passes with sanitizers;
-Windows and end-to-end Raven client qualification remain pending.
+Windows run `37963921861` also passes all four socket consumers on both platforms;
+end-to-end await-based Raven client qualification remains pending.
+
+
+## Await-first native entry integration (2026-10-09, in development)
+
+The author requires `await` as the application default. The client showcase uses
+async `Main` and awaits `HttpClient.GetString`; explicit callbacks remain appropriate
+inside library awaiters and host-boundary tests. The native task scope now has an
+opt-in host poll hook and a saved published entry-frame boundary. See the
+[entry lifecycle contract](experiments/aot-console/task-queue.md). Queue-only hosts
+need no socket linkage. Missing required I/O pumping faults deterministically.
+The existing cancellation contract is unchanged: cancelling an awaited task propagates
+to the entry task, whose result is a cancellation fault under the current bridge.
+
+The backend binds the exact existing DNS/connect InternalCalls. Closed-world
+reference layouts now preserve inherited field prefixes and assignability, with
+leading direct-base constructor forwarding. An inherited virtual `ToString` body
+can be selected only when every loaded descendant has no competing member; even
+an unconstructed descendant override rejects monomorphic admission. This closes
+the `IPAddress` formatting path without claiming general virtual dispatch. Relative
+to CLR reference inheritance, this is a deliberately narrower admission proof,
+with a 32-lane object layout bound. Closed selection allows 512 types and 512 clones
+under the existing 1024-function cap and a 128-level dependency nesting guard; these are compiler work limits, not language
+limits. No performance improvement is claimed. General dispatch remains separate.
+
+The private DNS snapshot tag and these backend admission rules do not change Raven
+Runtime Contract configuration or emitted CLI metadata. Compiler bridge ownership
+and replacement remain as documented above. Rebuild generated objects and native
+adapters together; their entry-scope ABI is private and has changed.

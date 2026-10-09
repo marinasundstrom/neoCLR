@@ -77,7 +77,7 @@ impl<'a> Profile<'a> {
     pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>, reference_backings: &[usize], object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>, string_dispatch: Option<&HashMap<usize, usize>>, primitive_receivers: Option<&[usize]>, native_stack_budget: bool) -> Result<Self, Error> {
         if input.name == "System" || input.types.len() > crate::limits::TYPES || input.functions.len() > crate::limits::FUNCTIONS {
             return Err(
-                "value profile requires an application with at most 256 types and 1024 functions"
+                "value profile requires an application with at most 512 types and 1024 functions"
                     .into(),
             );
         }
@@ -100,7 +100,7 @@ impl<'a> Profile<'a> {
                 && matches!(&t.fields[0].ty, Type::ArrayRef(element) if matches!(**element, Type::String | Type::Char) || crate::selection::scalar_array_element(element) || input.type_definition(element).is_some_and(|e| e.is_reference_type && e.representation == Representation::Record)));
             if !references || !valid { return Err("invalid private reference-array backing projection".into()); }
         }
-        for (index, t) in input.types.iter().enumerate() {
+        for t in &input.types {
             if references && t.representation == Representation::Interface {
                 if !t.fields.is_empty() || t.base.is_some() || t.implements.iter().any(|parent| input.type_definition(parent).is_none_or(|p| p.representation != Representation::Interface))
                     || !t.generic_parameters.is_empty() || !t.generic_constraints.is_empty()
@@ -116,17 +116,17 @@ impl<'a> Profile<'a> {
                 return Err(format!("{}: only reference-arena nongeneric interface views are supported", t.name).into());
             }
             let static_owner = crate::selection::static_owner(t);
-            let root = references && object_base == Some(index);
-            let root_base = references && t.is_reference_type && t.base.as_ref()
-                .is_some_and(|base| object_base.is_some_and(|i| *base == Type::Named(input.types[i].name.clone())));
+            let reference_base = references && t.is_reference_type && t.base.as_ref()
+                .is_some_and(|base| input.type_definition(base).is_some_and(|b| b.is_reference_type
+                    && b.representation == Representation::Record && b.generic_parameters.is_empty()));
             if (t.is_reference_type && !static_owner && !references)
                 || t.representation != Representation::Record
                 || t.enum_info.as_ref().is_some_and(|info| info.underlying != Type::Int32
                     || t.is_reference_type || t.fields.len() != 1
                     || t.fields[0].ty != Type::Int32
                     || t.fields[0].visibility != neoclr::metadata::Visibility::Private)
-                || (t.base.is_some() && !root_base)
-                || (t.is_abstract && !static_owner && !root)
+                || (t.base.is_some() && !reference_base)
+                || (t.is_abstract && !static_owner && !(references && t.is_reference_type))
                 || !t.generic_parameters.is_empty()
                 || !t.generic_constraints.is_empty()
                 || t.packing.is_some()
@@ -168,6 +168,12 @@ impl<'a> Profile<'a> {
             states[i] = 1;
             let fields = p.input.types[i].fields.clone();
             let mut width = 0;
+            if let Some(base) = &p.input.types[i].base {
+                let Ty::Reference(parent) = p.ty(base)? else { return Err("reference base must be a class".into()); };
+                layout(p, parent, states)?;
+                width = p.widths[parent];
+                p.layouts[i] = p.layouts[parent].clone();
+            }
             for field in fields {
                 let ty = p.stored(&field.ty)?;
                 if let Ty::Record(child) = ty {
@@ -178,6 +184,9 @@ impl<'a> Profile<'a> {
                 if width > 64 {
                     return Err(format!("{}: value layout exceeds sixty-four flattened lanes ({width})", p.input.types[i].name).into());
                 }
+            }
+            if p.input.types[i].is_reference_type && width > 32 {
+                return Err("reference hierarchy exceeds the 264-byte native object bound".into());
             }
             p.widths[i] = width.max(1);
             states[i] = 2;
@@ -277,13 +286,18 @@ impl<'a> Profile<'a> {
         for (i, f) in input.functions.iter().enumerate() {
             let owner = f.owner.as_ref().and_then(|t| input.type_definition(t));
             let reference_constructor = f.instance && f.name.ends_with("..ctor") && owner.is_some_and(|t| t.is_reference_type);
-            if reference_constructor && owner.unwrap().base.is_some() {
+            // Only an unconditional prefix forwarding receiver/arguments to the
+            // direct base initializer is admitted; original verification checked types.
+            let base_initializer = if reference_constructor && owner.unwrap().base.is_some() {
                 let base = owner.unwrap().base.as_ref().unwrap();
-                if !matches!(f.body.as_slice(), [Op::Arg(0), Op::Call(target), ..]
-                    if target.instance && target.owner.as_ref() == Some(base) && target.name.ends_with("..ctor") && target.parameters.is_empty()) {
-                    return Err("reference constructor requires an unconditional leading Object base constructor call".into());
+                let prefix = f.body.iter().take_while(|op| matches!(op, Op::Arg(_))).count();
+                if !matches!(f.body.first(), Some(Op::Arg(0))) || !matches!(f.body.get(prefix), Some(Op::Call(target))
+                    if target.instance && target.owner.as_ref() == Some(base) && target.name.ends_with("..ctor")
+                    && prefix == target.parameters.len() + 1) {
+                    return Err("reference constructor requires an unconditional leading base constructor call with forwarded arguments".into());
                 }
-            }
+                Some(prefix)
+            } else { None };
             for (pc, op) in f.body.iter().enumerate() {
                 if let Op::BindFunction { function_type, target } = op {
                     if !f.out_parameters.is_empty() { return Err("native callback binding in output-parameter methods requires a later profile".into()); }
@@ -317,7 +331,7 @@ impl<'a> Profile<'a> {
                     let c = &input.functions[callee];
                     if !matches!(op, Op::Construct(_)) && c.instance && c.name.ends_with("..ctor")
                         && c.owner.as_ref().and_then(|t| input.type_definition(t)).is_some_and(|t| t.is_reference_type)
-                        && !(matches!(op, Op::Call(_)) && reference_constructor && pc == 1
+                        && !(matches!(op, Op::Call(_)) && reference_constructor && Some(pc) == base_initializer
                             && matches!(f.body.first(), Some(Op::Arg(0))) && owner.unwrap().base == c.owner) {
                         return Err("reference constructor calls require newobj.ctor or the single leading base initializer".into());
                     }
@@ -509,14 +523,23 @@ impl<'a> Profile<'a> {
         if *ty == Ty::ByteArray { return self.array_backing; }
         self.reference_array_backings.iter().copied().find(|i| self.ty(&self.input.types[*i].fields[0].ty).ok().as_ref() == Some(ty))
     }
+    fn derives_from(&self, actual: usize, expected: usize) -> bool {
+        let mut index = actual;
+        for _ in 0..self.input.types.len() {
+            if index == expected { return true; }
+            let Some(base) = &self.input.types[index].base else { return false; };
+            let Ok(Ty::Reference(parent)) = self.ty(base) else { return false; };
+            index = parent;
+        }
+        false
+    }
     fn reference_assignable(&self, actual: &Ty, expected: &Ty) -> bool {
         match (actual, expected) {
             (Ty::ByteArray | Ty::ReferenceArray(_) | Ty::ScalarArray(_) | Ty::StringArray | Ty::CharacterArray, Ty::Reference(i)) if self.backing_for_array(actual) == Some(*i) => true,
             (Ty::ByteArray | Ty::ReferenceArray(_) | Ty::ScalarArray(_) | Ty::StringArray | Ty::CharacterArray, _) if self.backing_for_array(actual).is_some() => self.reference_assignable(&Ty::Reference(self.backing_for_array(actual).unwrap()), expected),
             (Ty::Reference(actual) | Ty::Interface(actual), Ty::Interface(expected)) =>
                 crate::selection::implements_interface(self.input, &Type::Named(self.input.types[*actual].name.clone()), &Type::Named(self.input.types[*expected].name.clone())),
-            (Ty::Reference(actual), Ty::Reference(expected)) if self.object_base == Some(*expected) =>
-                self.input.types[*actual].base.as_ref().is_some_and(|t| *t == Type::Named(self.input.types[*expected].name.clone())),
+            (Ty::Reference(actual), Ty::Reference(expected)) => self.derives_from(*actual, *expected),
             _ => false,
         }
     }
@@ -526,7 +549,9 @@ impl<'a> Profile<'a> {
             Ty::Reference(i) if self.object_base == Some(*i) => self.input.types.iter().enumerate()
                 .filter(|(_, t)| t.representation == Representation::Record && !t.is_abstract)
                 .map(|(i, _)| i).collect(),
-            Ty::Reference(i) => vec![*i],
+            Ty::Reference(i) => self.input.types.iter().enumerate()
+                .filter(|(n, t)| t.is_reference_type && !t.is_abstract && self.derives_from(*n, *i))
+                .map(|(n, _)| n).collect(),
             Ty::Interface(i) => {
                 let target = Type::Named(self.input.types[*i].name.clone());
                 self.input.types.iter().enumerate()
@@ -560,11 +585,18 @@ impl<'a> Profile<'a> {
         let (Ty::Record(owner) | Ty::Reference(owner)) = t else {
             return Err("field access requires a value record".into());
         };
-        self.ty(&self.input.types[*owner]
-            .fields
-            .get(index)
-            .ok_or("field index out of range")?
-            .ty)
+        let mut owner = *owner;
+        let mut index = index;
+        for _ in 0..self.input.types.len() {
+            if let Some(base) = &self.input.types[owner].base {
+                let Ty::Reference(parent) = self.ty(base)? else { return Err("invalid reference base".into()); };
+                let inherited = self.layouts[parent].len();
+                if index < inherited { owner = parent; continue; }
+                index -= inherited;
+            }
+            return self.ty(&self.input.types[owner].fields.get(index).ok_or("field index out of range")?.ty);
+        }
+        Err("cyclic reference field hierarchy".into())
     }
     pub fn callee(&self, target: &FunctionRef) -> Result<usize, Error> {
         if !target.generic_arguments.is_empty() {

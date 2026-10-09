@@ -160,6 +160,13 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if bind_socket_accept && (!compile_system || !native_gc) {
         return Err("--bind-socket-accept requires --compile-system and --native-gc".into());
     }
+    let client_count = args.iter().filter(|a| *a == "--bind-socket-client").count();
+    if client_count > 1 { return Err("duplicate --bind-socket-client option".into()); }
+    let bind_socket_client = client_count == 1;
+    args.retain(|a| a != "--bind-socket-client");
+    if bind_socket_client && (!compile_system || !native_gc || !bind_socket_accept) {
+        return Err("--bind-socket-client requires --compile-system, --native-gc and --bind-socket-accept".into());
+    }
     let transfer_count = args.iter().filter(|a| *a == "--bind-socket-transfer").count();
     if transfer_count > 1 { return Err("duplicate --bind-socket-transfer option".into()); }
     let bind_socket_transfer = transfer_count == 1;
@@ -185,7 +192,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         return Err("Windows console experiment requires Windows x64, --compile-system, --reference-arena, --native-gc and --native-stack-budget".into());
     }
     if windows_console && (bind_paths || bind_file_input || bind_file_output || bind_task_queue
-        || bind_socket_listener || bind_socket_accept || bind_socket_transfer || bind_character_text || bind_integer_text) {
+        || bind_socket_listener || bind_socket_accept || bind_socket_transfer || bind_socket_client || bind_character_text || bind_integer_text) {
         return Err("Windows console experiment does not support file, path, task, socket, character or extended integer services".into());
     }
     if windows_http && (target != compiler::Target::WindowsX64 || !compile_system
@@ -255,7 +262,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
     {
         return Err(
-            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-paths binds exact lexical Unix path services; --bind-file-output binds bounded blocking UTF-8 file output; --bind-file-input binds bounded strict UTF-8 file input; --bind-utf8-text binds UTF-8 encoding/decoding, concatenation, ordinal predicates, byte counts and scalar-boundary slices with --reference-arena; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds Int32 parsing, signed/unsigned 64-bit formatting and native-width conversion services; --bind-socket-transfer binds Receive/Send/TransferResult and request-deadline services with --native-gc; --bind-task-queue binds exact closed TaskQueue services with --native-gc; --bind-socket-accept binds Accept/ConnectResult/Cancel with --native-gc; --bind-socket-listener binds Listen/LocalPort/Close to an explicit host socket scope (requires --reference-arena); --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics; --probe-stack-roots adds a read-only pre-operation spill callback (requires a context-enabled profile, not a collector); --native-gc enables experimental nonmoving collection with --reference-arena and a matching statically linked GC adapter; --native-stack-budget opts into guarded recursion with --native-gc and the matching macOS ARM64 stack adapter"
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-paths binds exact lexical Unix path services; --bind-file-output binds bounded blocking UTF-8 file output; --bind-file-input binds bounded strict UTF-8 file input; --bind-utf8-text binds UTF-8 encoding/decoding, concatenation, ordinal predicates, byte counts and scalar-boundary slices with --reference-arena; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds Int32 parsing, signed/unsigned 64-bit formatting and native-width conversion services; --bind-socket-transfer binds Receive/Send/TransferResult and request-deadline services with --native-gc; --bind-socket-client binds bounded DNS/outbound connect with --native-gc and --bind-socket-accept; --bind-task-queue binds exact closed TaskQueue services with --native-gc; --bind-socket-accept binds Accept/ConnectResult/Cancel with --native-gc; --bind-socket-listener binds Listen/LocalPort/Close to an explicit host socket scope (requires --reference-arena); --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics; --probe-stack-roots adds a read-only pre-operation spill callback (requires a context-enabled profile, not a collector); --native-gc enables experimental nonmoving collection with --reference-arena and a matching statically linked GC adapter; --native-stack-budget opts into guarded recursion with --native-gc and the matching macOS ARM64 stack adapter"
                 .into(),
         );
     }
@@ -333,6 +340,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 bind_socket_accept,
                 bind_task_queue,
                 bind_socket_transfer,
+                bind_socket_client,
                 reference_arena,
             })
         })

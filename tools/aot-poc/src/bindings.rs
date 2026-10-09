@@ -495,6 +495,42 @@ pub fn socket_accept(input: &mut neoclr::Module, selection: &Value) -> Result<Ve
     Ok(bindings)
 }
 
+pub fn socket_client(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    let callback = neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature");
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        let (parameters, result, implementation, symbol) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.DnsLookup") => (vec![Type::String, callback.clone()], Type::Value, "dns-lookup-v1", "neoclr_dns_lookup_v1"),
+            Some("neoCLR.Runtime.DnsLookupUntil") => (vec![Type::String, Type::Int64, callback.clone()], Type::Value, "dns-lookup-until-v1", "neoclr_dns_lookup_until_v1"),
+            Some("neoCLR.Runtime.DnsCancel") => (vec![Type::Int64], Type::Boolean, "dns-cancel-v1", "neoclr_dns_cancel_v1"),
+            Some("neoCLR.Runtime.DnsResult") => (vec![Type::Int64], Type::Value, "dns-result-v1", "neoclr_dns_result_v1"),
+            Some("neoCLR.Runtime.DnsAddresses") => (vec![Type::Value], Type::ArrayRef(Box::new(Type::String)), "dns-addresses-v1", "neoclr_dns_addresses_v1"),
+            Some("neoCLR.Runtime.SocketConnect") => (vec![Type::String, Type::Int32, callback.clone()], Type::Value, "socket-connect-v1", "neoclr_socket_connect_v1"),
+            Some("neoCLR.Runtime.SocketConnectAddresses") => (vec![Type::ArrayRef(Box::new(Type::String)), Type::Int32, callback.clone()], Type::Value, "socket-connect-addresses-v1", "neoclr_socket_connect_addresses_v1"),
+            Some("neoCLR.Runtime.SocketConnectAddressesUntil") => (vec![Type::ArrayRef(Box::new(Type::String)), Type::Int32, Type::Int64, callback.clone()], Type::Value, "socket-connect-addresses-until-v1", "neoclr_socket_connect_addresses_until_v1"),
+            _ => continue,
+        };
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != row["name"].as_str().unwrap()
+            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != parameters || f.returns != result || f.no_result
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
+            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
+        { return Err("native client binding requires exact reserved DNS/connect InternalCall contract".into()); }
+        f.impl_flags = 0;
+        f.body = if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
+            else if matches!(result, Type::ArrayRef(_)) { vec![Op::Branch(0)] }
+            else { vec![Op::Void, Op::PackValue(Type::Void), Op::Return] };
+        bindings.push(json!({"definition": row["definition"], "name": row["name"],
+            "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
+            "storage": "bounded DNS workers own host data only; rooted callbacks and owner-thread nonblocking connect"}));
+    }
+    Ok(bindings)
+}
+
 pub fn socket_transfer(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
@@ -659,14 +695,12 @@ pub fn task_queue(input: &mut neoclr::Module, selection: &Value, source: &neoclr
     }
     for row in selection["functions"].as_array().unwrap() {
         if row["name"] != "neoCLR.Runtime.DrainEntryTasks" { continue; }
-        // Queue-only entry draining must not pretend to await host completions.
-        if selection["functions"].as_array().unwrap().iter().any(|r|
-            r["name"].as_str().is_some_and(|n| n.starts_with("neoCLR.Runtime.Socket")
-                && !matches!(n, "neoCLR.Runtime.SocketListen" | "neoCLR.Runtime.SocketLocalPort"
-                    | "neoCLR.Runtime.SocketClose" | "neoCLR.Runtime.SocketDeadlineAfter"
-                    | "neoCLR.Runtime.SocketDeadlineExpired"))) {
-            return Err("native DrainEntryTasks supports queued work only; host I/O completion pumping is not supported".into());
-        }
+        let host_io = selection["functions"].as_array().unwrap().iter().any(|r|
+            r["name"].as_str().is_some_and(|n| n.starts_with("neoCLR.Runtime.Dns") ||
+                (n.starts_with("neoCLR.Runtime.Socket") && !matches!(n,
+                    "neoCLR.Runtime.SocketListen" | "neoCLR.Runtime.SocketLocalPort" |
+                    "neoCLR.Runtime.SocketClose" | "neoCLR.Runtime.SocketDeadlineAfter" |
+                    "neoCLR.Runtime.SocketDeadlineExpired"))));
         let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
         if f.name != "neoCLR.Runtime.DrainEntryTasks"
             || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
@@ -682,7 +716,7 @@ pub fn task_queue(input: &mut neoclr::Module, selection: &Value, source: &neoclr
         f.impl_flags = 0;
         f.body = vec![Op::Void, Op::Return];
         rows.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],
-            "implementation":"entry-task-drain-v1"}));
+            "implementation":"entry-task-drain-v1","requiresHostIo":host_io}));
     }
     let mut frames = json!({});
     if let Some(ty) = queue_type {
@@ -702,7 +736,7 @@ pub fn task_queue(input: &mut neoclr::Module, selection: &Value, source: &neoclr
 mod task_queue_tests {
     use super::*;
     #[test]
-    fn entry_drain_requires_exact_service_and_excludes_host_completion_work() {
+    fn entry_drain_requires_exact_service_and_marks_host_completion_work() {
         let mut source = neoclr::assemble(".module System\n.references ()\n.function neoCLR.Runtime.DrainEntryTasks() -> Void\nldvoid\nret\n.end").unwrap();
         source.functions[0].impl_flags = 0x1000;
         source.functions[0].body.clear();
@@ -723,10 +757,11 @@ mod task_queue_tests {
             }
             assert!(task_queue(&mut input, &inventory, &source).is_err(), "mutation {change}");
         }
-        for service in ["SocketAccept", "SocketReceive", "SocketSend", "SocketReceiveUntil", "SocketSendUntil", "SocketConnectResult"] {
+        for service in ["SocketAccept", "SocketReceive", "SocketSend", "SocketReceiveUntil", "SocketSendUntil", "SocketConnectResult", "DnsLookup", "DnsLookupUntil"] {
             let mut selected = inventory.clone();
             selected["functions"].as_array_mut().unwrap().push(json!({"name":format!("neoCLR.Runtime.{service}")}));
-            assert!(task_queue(&mut source.clone(), &selected, &source).unwrap_err().to_string().contains("host I/O"));
+            let (rows, _) = task_queue(&mut source.clone(), &selected, &source).unwrap();
+            assert_eq!(rows[0]["requiresHostIo"], true);
         }
     }
     #[test]

@@ -61,7 +61,7 @@ int main(void) {
     uint64_t *child = allocate(&c, 16, NEOCLR_GC_OBJECT);
     dead = allocate(&c, 16, NEOCLR_GC_OBJECT);
     CHECK(references && child && dead);
-    references[0] = (UINT64_C(256) << 32) | UINT64_C(0x80000005);
+    references[0] = (UINT64_C(512) << 32) | UINT64_C(0x80000005);
     references[1] = 2; references[2] = 1;
     references[3] = (uintptr_t)child; references[4] = (uintptr_t)dead;
     ((unsigned char *)references)[40] = 1;
@@ -70,11 +70,11 @@ int main(void) {
     CHECK(!neoclr_gc_collect_v1(&c, &frame));
     CHECK(neoclr_gc_statistics_v1().reclaimed_allocations == reclaimed + 1);
     child[1] = 42;
-    for (uint64_t type = 1; type <= 256; type += 255) {
+    for (uint64_t type = 1; type <= 512; type += 511) {
         references[0] = (type << 32) | UINT64_C(0x80000005);
         CHECK(!neoclr_gc_collect_v1(&c, &frame) && child[1] == 42);
     }
-    references[0] = (UINT64_C(257) << 32) | UINT64_C(0x80000005);
+    references[0] = (UINT64_C(513) << 32) | UINT64_C(0x80000005);
     CHECK(neoclr_gc_collect_v1(&c, &frame) == 3);
     references[0] = (UINT64_C(1) << 32) | UINT64_C(0x80000006);
     CHECK(neoclr_gc_collect_v1(&c, &frame) == 3);

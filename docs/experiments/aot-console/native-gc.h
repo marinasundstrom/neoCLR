@@ -41,4 +41,6 @@ neoclr_gc_statistics neoclr_gc_statistics_v1(void);
  * Failure preserves output; reset at the next admitted entry releases the pool. */
 int32_t neoclr_string_intern_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
                                const neoclr_aot_text **output);
+/* Private entry-pump reader: the owner must validate its saved suspension boundary. */
+int32_t neoclr_gc_callback_read_suspended_v1(neoclr_aot_context *, uint64_t, void **, const neoclr_probe_frame *);
 #endif

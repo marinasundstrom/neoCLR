@@ -39,6 +39,7 @@ int32_t neoclr_socket_listen_v1(const neoclr_aot_text *address, int32_t port, in
 int32_t neoclr_socket_local_port_v1(uint64_t handle, neoclr_aot_context *context, void *output);
 int32_t neoclr_socket_close_v1(uint64_t handle, neoclr_aot_context *context, void *output);
 #ifdef NEOCLR_NATIVE_GC
+#include "native-gc.h"
 /* Callback must be a verified fn<Void> descriptor from this image/context. */
 int32_t neoclr_socket_accept_v1(uint64_t listener, void *callback, neoclr_aot_context *context, void *output);
 int32_t neoclr_socket_connect_result_v1(uint64_t operation, neoclr_aot_context *context, void *output);
@@ -68,5 +69,7 @@ int32_t neoclr_socket_connect_addresses_until_v1(const void *, int32_t, int64_t,
  * handle, -3 host misuse. Never invokes guest code. Consume result during dispatch;
  * scope teardown releases abandoned operations, roots and accepted sockets. */
 int32_t neoclr_socket_poll_v1(neoclr_aot_context *context, uint64_t *callback);
+/* Trusted host entry pump; validates the exact published suspension boundary. */
+int32_t neoclr_socket_poll_suspended_v1(neoclr_aot_context *, uint64_t *, const neoclr_probe_frame *);
 #endif
 #endif

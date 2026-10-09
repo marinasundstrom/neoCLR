@@ -1,4 +1,10 @@
 #include "task-queue.h"
+static int32_t poll_pending(neoclr_aot_context *context, uint64_t *callback,
+    const neoclr_probe_frame *boundary, void *state) {
+    if (boundary->context != context || !callback) return -3;
+    (*(int *)state)++;
+    return 2;
+}
 #define CHECK(x) do { if (!(x)) return __LINE__; } while (0)
 int main(void) {
     uint64_t buffer[129] = {0}; buffer[128] = 1234567;
@@ -20,6 +26,30 @@ int main(void) {
     CHECK(!neoclr_entry_tasks_begin_v1(&c, 7, 42, 43, &read) && !read);
     CHECK(neoclr_entry_tasks_begin_v1(&c, 7, 42, 43, &read) == 3);
     CHECK(neoclr_task_scope_leave_v1(&scope) == 3);
+    uint64_t callback = 0, callback_root = 0;
+    void *descriptor = NULL;
+    CHECK(!neoclr_entry_tasks_poll_v1(&c, 0, &callback));
+    CHECK(neoclr_entry_tasks_poll_v1(&c, 1, &callback) == -3);
+    int polls = 0;
+    scope.poll = poll_pending; scope.poll_state = &polls;
+    CHECK(neoclr_entry_tasks_poll_v1(&c, 1, &callback) == 2 && polls == 1);
+    CHECK(!neoclr_gc_allocate_v1(&c.text, 24, NEOCLR_GC_OBJECT, &descriptor));
+    ((uint64_t *)descriptor)[0] = UINT32_MAX;
+    ((uint64_t *)descriptor)[1] = 1;
+    ((uint64_t *)descriptor)[2] = 0;
+    CHECK(!neoclr_gc_host_root_create_v1(&c, descriptor, &callback_root));
+    CHECK(!neoclr_gc_collect_v1(&c, neoclr_root_probe_head_v1()));
+    CHECK(neoclr_gc_callback_read_v1(&c, callback_root, &read) == 3);
+    CHECK(!neoclr_entry_callback_read_v1(&c, callback_root, &read) && read == descriptor);
+    neoclr_probe_frame child;
+    neoclr_probe_enter_v3(&child, &c, 42, &empty, 0, "", 0);
+    CHECK(neoclr_entry_tasks_poll_v1(&c, 1, &callback) == -3 && polls == 1);
+    CHECK(neoclr_entry_callback_read_v1(&c, callback_root, &read) == 3);
+    neoclr_probe_leave_v1(&child);
+    CHECK(!neoclr_entry_callback_read_v1(&c, callback_root, &read));
+    CHECK(!neoclr_gc_host_root_release_v1(&c, callback_root));
+    scope.poll = NULL; scope.poll_state = NULL;
+
     neoclr_entry_tasks_end_v1(&c);
     neoclr_probe_leave_v1(&startup);
     CHECK(!neoclr_gc_allocate_v1(&c.text, 16, NEOCLR_GC_OBJECT, &queue));

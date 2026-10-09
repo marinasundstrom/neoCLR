@@ -160,7 +160,7 @@ def build(project, bundle, aot, output, profile=PROFILE):
                  '--bind-int32-to-string', '--bind-utf8-text']
         if http:
             flags += ['--native-stack-budget', '--bind-integer-text', '--bind-task-queue',
-                      '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer']
+                      '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-socket-client']
         if windows:
             flags += ['--target', 'x86_64-pc-windows-msvc', '--windows-http-experiment' if http else '--windows-console-experiment']
             if not http:

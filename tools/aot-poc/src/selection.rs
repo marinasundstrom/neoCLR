@@ -106,6 +106,33 @@ pub(super) fn sealed_member(input: &neoclr::Module, f: &neoclr::metadata::Functi
                     .and_then(Type::definition_name) == Some(t.name.as_str())))
 }
 
+/// In a complete closed load set, an inherited ToString override needs no runtime
+/// choice when every descendant retains that implementation. Reject any same-name
+/// descendant member conservatively, including new-slot and generic candidates.
+pub(super) fn inherited_display_member(input: &neoclr::Module, f: &neoclr::metadata::Function) -> bool {
+    if !f.instance || f.receiver_byref || !f.is_virtual || !f.is_override || f.is_abstract
+        || f.impl_flags != 0 || !f.parameters.is_empty() || f.returns != Type::String
+        || f.no_result || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+        || f.name.rsplit('.').next() != Some("ToString") { return false; }
+    let Some(owner) = f.owner.as_ref().and_then(|t| input.type_definition(t)) else { return false; };
+    if !owner.is_reference_type || !owner.generic_parameters.is_empty() { return false; }
+    for candidate in &input.types {
+        if candidate.name == owner.name { continue; }
+        let mut base = candidate.base.as_ref();
+        for _ in 0..input.types.len() {
+            let Some(ty) = base.and_then(|t| input.type_definition(t)) else { break; };
+            if ty.name == owner.name {
+                if !candidate.generic_parameters.is_empty() || input.functions.iter().any(|method|
+                    method.owner.as_ref().and_then(Type::definition_name) == Some(candidate.name.as_str())
+                    && method.instance && method.name.rsplit('.').next() == Some("ToString")) { return false; }
+                break;
+            }
+            base = ty.base.as_ref();
+        }
+    }
+    true
+}
+
 /// Narrow class-virtual slice used by Console.WriteLine(Object). Original load-set
 /// verification supplies slot ancestry; a same-named ordinary member is never enough.
 pub(super) fn object_display_contract(f: &neoclr::metadata::Function) -> bool {
@@ -370,7 +397,7 @@ pub(super) fn select_inventory_with_host_roots(
                         if callable_invoke(target).is_some() { continue; }
                         let callee = resolve(input, target)?;
                         let f = &input.functions[callee];
-                        if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && !object_display_contract(f) && !sealed_member(input, f) && (f.is_virtual || f.is_abstract || f.is_override) {
+                        if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && !object_display_contract(f) && !sealed_member(input, f) && !inherited_display_member(input, f) && (f.is_virtual || f.is_abstract || f.is_override) {
                             return Err("virtual calls requiring dispatch need a later selection profile".into());
                         }
                         if matches!(op, Op::Call(_)) && object_display_contract(f) {

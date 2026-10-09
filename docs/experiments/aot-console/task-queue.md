@@ -121,18 +121,26 @@ active Run/Drain callbacks, and calls outside the selected entry. Its guard is r
 on both successful return and guest fault, preserving output atomicity and fault frames.
 Startup locals and the default queue remain roots throughout callback collections.
 
-This first path supports queued work only. Images selecting entry draining together
-with socket completion services are rejected with an explicit host-I/O diagnostic.
-They must not read an entry task's result before its host completion arrives. Native
-host waiting/resumption, fairness, cancellation budgets and a future Scheduler remain
-separate work; this change neither adds a blocking wait nor relaxes host callback entry.
+Native HTTP hosts can now install an explicit owner-thread poll hook. Entry drain
+alternates ordinary queue draining with one host completion until the queue and
+host operations are idle. An image selecting DNS/socket completion services requires
+that hook; an absent hook faults instead of prematurely reading the entry result.
+The matching HTTP host retains the existing fifteen-second completion budget and
+one-millisecond idle pause. This bounded showcase host is not a general scheduler.
 
-Compared with .NET's async entry wrapper, the ergonomic goal is still an entry that
-returns only after its task completes. neoCLR currently achieves queue-only progress
-by running its explicit queue and then using its existing result/fault contract. An
+Begin saves the exact published frame-stack head. Polling and callback admission
+require that head, the active entry guard and a fault-free context. Nested managed
+frames therefore cannot re-enter the pump. A separate callback export validates the
+retained descriptor and invokes its selected body with normal stack/GC instrumentation.
+The ordinary quiescent host exports remain strict. End releases the entry guard on
+success and fault; the host then releases socket/task scopes and collects the heap.
+
+Compared with .NET's async entry wrapper, the ergonomic goal remains an entry that
+returns only after its task completes. neoCLR now drives its explicit queue and the
+opted-in host I/O adapter before using its existing result/fault contract. An
 unresolved promise faults; it is not an implicit indefinite wait. This reuses the
 interpreter's entry-drain lifecycle described in the existing
-[scheduling research](../../runtime-scheduling-design.md), with a narrower native
+[scheduling research](../../runtime-scheduling-design.md), with an explicit native
 admission boundary. Native code keeps live C frames, so this is not the future green
 thread or stackless suspension representation. No public API or compiler mapping changes.
 

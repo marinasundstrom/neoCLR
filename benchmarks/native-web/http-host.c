@@ -14,6 +14,20 @@ static uint64_t milliseconds(void) {
     uint64_t now = neoclr_os_monotonic_ns();
     return now ? now / UINT64_C(1000000) : UINT64_MAX;
 }
+typedef struct entry_io { neoclr_socket_scope *sockets; uint64_t started; } entry_io;
+static int32_t poll_entry(neoclr_aot_context *context, uint64_t *callback,
+    const neoclr_probe_frame *boundary, void *state) {
+    entry_io *io = state;
+    uint64_t now = milliseconds();
+    if (now == UINT64_MAX || io->started == UINT64_MAX || now - io->started > 15000) return -3;
+    unsigned active = 0;
+    for (unsigned i = 0; i < 64; i++) active += io->sockets->operations[i].state != 0;
+    if (!active) return 0;
+    int32_t ready = neoclr_socket_poll_suspended_v1(context, callback, boundary);
+    if (ready) return ready;
+    neoclr_os_pause();
+    return 2;
+}
 int main(void) {
 #ifdef _WIN32
     if (_setmode(_fileno(stdin), _O_BINARY) == -1 ||
@@ -37,6 +51,9 @@ int main(void) {
     if (neoclr_task_scope_enter_v1(&tasks, context)) {
         neoclr_socket_scope_leave_v1(&sockets); host_error = 1; goto release_heap;
     }
+    entry_io io = {&sockets, milliseconds()};
+    tasks.poll = poll_entry;
+    tasks.poll_state = &io;
     status = neoclr_entry_v4(0, &result, context);
     uint64_t started = milliseconds();
     while (!status && !host_error) {

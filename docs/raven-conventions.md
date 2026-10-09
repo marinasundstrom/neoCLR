@@ -9,6 +9,15 @@ neoCLR's target API and bootstrap have narrower capabilities than ordinary Raven
 on .NET. Compile examples against the target rather than assuming similar syntax
 or host APIs work here.
 
+## Await asynchronous work (2026-10-09)
+
+Author direction: use `await` by default, including an async `Main`. Prefer ordinary
+sequential async control flow in application code and showcases. Use `OnCompleted`
+only for a concrete purpose, such as implementing an awaiter/continuation adapter,
+observing a cancellation outcome, or testing the callback boundary itself. Document
+that purpose. Missing native entry-point I/O pumping is a runtime implementation
+gap to fix, not a reason to make application examples callback-driven.
+
 ## Assembly-level members and qualified names (2026-10-08)
 
 Author clarification: types, functions and constants can be assembly-level members.

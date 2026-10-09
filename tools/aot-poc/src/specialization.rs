@@ -22,6 +22,7 @@ struct Specializer<'a> {
     source: &'a neoclr::Module,
     shapes: Vec<Shape>,
     type_clones: usize,
+    type_depth: usize,
     instances: Vec<Instance>,
     clones: usize,
 }
@@ -48,6 +49,13 @@ impl Specializer<'_> {
         self.lower(&ty)
     }
     fn lower(&mut self, ty: &Type) -> Result<Type, Error> {
+        if self.type_depth >= 128 { return Err("type dependency nesting exceeds 128".into()); }
+        self.type_depth += 1;
+        let result = self.lower_inner(ty);
+        self.type_depth -= 1;
+        result
+    }
+    fn lower_inner(&mut self, ty: &Type) -> Result<Type, Error> {
         let (name, arguments) = match ty {
             Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr => {
                 return Ok(ty.clone());
@@ -102,7 +110,7 @@ impl Specializer<'_> {
         if let Some(existing) = self.shapes.iter().find(|v| v.source == i && v.arguments == arguments) {
             return Ok(Type::Named(existing.name.clone()));
         }
-        if self.shapes.len() >= MAX_SPECIALIZED_TYPES { return Err("specialized type count exceeds 256".into()); }
+        if self.shapes.len() >= MAX_SPECIALIZED_TYPES { return Err("specialized type count exceeds 512".into()); }
         let row = if self.shapes.iter().any(|v| v.source == i) {
             let row = self.source.types.len() + self.type_clones;
             self.type_clones += 1;
@@ -141,7 +149,7 @@ impl Specializer<'_> {
                 // empty static companions and rejects every executable use.
                 let owner_index = self.type_index(&owner.name)?;
                 if !self.shapes.iter().any(|v| v.source == owner_index) && self.shapes.len() >= MAX_SPECIALIZED_TYPES {
-                    return Err("specialized type count exceeds 256".into());
+                    return Err("specialized type count exceeds 512".into());
                 }
                 if !self.shapes.iter().any(|v| v.source == owner_index) {
                     self.shapes.push(Shape { source: owner_index, arguments: vec![], row: owner_index, name: owner.name.clone() });
@@ -158,7 +166,7 @@ impl Specializer<'_> {
                 let i = self.type_index(name)?;
                 if super::selection::static_owner(&self.source.types[i]) {
                     if !self.shapes.iter().any(|v| v.source == i) && self.shapes.len() >= MAX_SPECIALIZED_TYPES {
-                        return Err("specialized type count exceeds 256".into());
+                        return Err("specialized type count exceeds 512".into());
                     }
                     if !self.shapes.iter().any(|v| v.source == i) {
                         self.shapes.push(Shape { source: i, arguments: vec![], row: i, name: name.clone() });
@@ -234,7 +242,7 @@ impl Specializer<'_> {
         if self.instances.len() >= crate::limits::FUNCTIONS
             || (self.clones >= MAX_FUNCTION_CLONES && (!target.generic_arguments.is_empty() || self.instances.iter().any(|v| v.source == i)))
         {
-            return Err(format!("method specialization exceeds 1024 selected functions or 256 clones ({} functions, {} clones, {} types)", self.instances.len(), self.clones, self.shapes.len()).into());
+            return Err(format!("method specialization exceeds 1024 selected functions or 512 clones ({} functions, {} clones, {} types)", self.instances.len(), self.clones, self.shapes.len()).into());
         }
         let row = if target.generic_arguments.is_empty() && !self.instances.iter().any(|v| v.source == i) {
             i
@@ -344,8 +352,8 @@ impl Specializer<'_> {
                     }
                     let instance = self.resolve(&closed)?;
                     let callee = &self.source.functions[instance.source];
-                    if virtual_call && !super::selection::interface_contract(self.source, callee) && !super::selection::object_display_contract(callee) && !super::selection::sealed_member(self.source, callee) && (callee.is_virtual || callee.is_abstract || callee.is_override) {
-                        return Err("virtual calls requiring dispatch need a later specialization profile".into());
+                    if virtual_call && !super::selection::interface_contract(self.source, callee) && !super::selection::object_display_contract(callee) && !super::selection::sealed_member(self.source, callee) && !super::selection::inherited_display_member(self.source, callee) && (callee.is_virtual || callee.is_abstract || callee.is_override) {
+                        return Err(format!("virtual calls requiring dispatch need a later specialization profile: {}", callee.name).into());
                     }
                     if !virtual_call && super::selection::object_display_contract(callee) {
                         return Err("direct Object.ToString calls require default display metadata support".into());
@@ -452,6 +460,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
         source: input,
         shapes: vec![],
         type_clones: 0,
+        type_depth: 0,
         instances: vec![root_instance.clone()],
         clones: 0,
     };
@@ -638,7 +647,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
         && shape.arguments.len() == 1
         && (matches!(shape.arguments[0], Type::String | Type::Char) || super::selection::scalar_array_element(&shape.arguments[0]) || input.type_definition(&shape.arguments[0]).is_some_and(|t| t.is_reference_type && t.representation == neoclr::metadata::Representation::Record)))
         .map(|shape| shape.row).collect();
-    let report = json!({"referenceArrayBackings":reference_backings,"policy":"up to 256 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 256 function clones and 1024 selected functions; no constraints",
+    let report = json!({"referenceArrayBackings":reference_backings,"policy":"up to 512 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 512 function clones and 1024 selected functions; no constraints",
         "typeCount": context.shapes.len(), "functionCount": context.instances.len(), "functionCloneCount": context.clones,
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
@@ -686,13 +695,24 @@ mod tests {
     use super::*;
 
     #[test]
+    fn deeply_nested_type_dependencies_fail_without_overflowing_the_host_stack() {
+        let mut source = String::from(".module Deep\n.function Main(T0 value) -> Int32\nldc.i4 0\nret\n.end\n");
+        for index in 0..140 {
+            source += &format!(".type class T{index}\n");
+            if index < 139 { source += &format!(".field Next T{}\n", index + 1); }
+            source += ".end\n";
+        }
+        let input = neoclr::assemble(&source).unwrap();
+        assert!(expand(&input, "Main").err().unwrap().to_string().contains("type dependency nesting exceeds 128"));
+    }
+    #[test]
     fn closed_type_budget_includes_nongeneric_dependency_shapes() {
         for count in [128, MAX_SPECIALIZED_TYPES, MAX_SPECIALIZED_TYPES + 1] {
             let mut source = String::from(".module Shapes\n.function Main(T0 value) -> Int32\nldc.i4 0\nret\n.end\n");
             for index in 0..count {
                 source += &format!(".type class T{index}\n");
-                if index + 1 < count {
-                    source += &format!(".field Next T{}\n", index + 1);
+                for child in [index * 2 + 1, index * 2 + 2] {
+                    if child < count { source += &format!(".field Child{child} T{child}\n"); }
                 }
                 source += ".end\n";
             }
@@ -704,7 +724,7 @@ mod tests {
                 assert_eq!(report["functionCount"], 1);
                 assert_eq!(report["functionCloneCount"], 0);
             } else {
-                assert!(result.err().unwrap().to_string().contains("specialized type count exceeds 256"));
+                assert!(result.err().unwrap().to_string().contains("specialized type count exceeds 512"));
             }
         }
     }

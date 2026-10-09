@@ -38,6 +38,9 @@
   and `val` for read-only properties. Compile target examples instead of assuming
   every host Raven/.NET API or syntax spelling is supported.
 
+- Use `await` by default for asynchronous work, including async `Main`. Reserve
+  explicit `OnCompleted` for a documented adapter, outcome-observation or callback-test purpose.
+
 - Prefer readable code over compact formatting. Expand block expressions and
   statements across lines when that makes their contents easier to follow; there is
   no requirement to fit a complete block on one line.

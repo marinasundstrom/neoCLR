@@ -23,6 +23,7 @@ pub struct RuntimeContext {
     pub bind_socket_accept: bool,
     pub bind_task_queue: bool,
     pub bind_socket_transfer: bool,
+    pub bind_socket_client: bool,
     pub reference_arena: bool,
 }
 
@@ -375,6 +376,11 @@ pub fn prepare(
         let rows = super::bindings::socket_accept(&mut selected, &report)?;
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
     }
+    let bind_socket_client = context.is_some_and(|c| c.bind_socket_client);
+    if bind_socket_client {
+        let rows = super::bindings::socket_client(&mut selected, &report)?;
+        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+    }
     let bind_socket_transfer = context.is_some_and(|c| c.bind_socket_transfer);
     if bind_socket_transfer {
         let rows = super::bindings::socket_transfer(&mut selected, &report)?;
@@ -582,14 +588,14 @@ pub fn prepare(
     report["valueDisplayProjections"] = json!(value_display.iter().map(|i| json!({"compiledIndex":i,
         "policy":"verified value ToString override; preserve direct by-reference receiver and original CIL"})).collect::<Vec<_>>());
     let sealed_members: Vec<_> = selected.functions.iter().enumerate()
-        .filter(|(_, f)| (f.is_virtual || f.is_override) && super::selection::sealed_member(&selected, f))
+        .filter(|(_, f)| (f.is_virtual || f.is_override) && (super::selection::sealed_member(&selected, f) || super::selection::inherited_display_member(&selected, f)))
         .map(|(i, _)| i).collect();
     for &i in &sealed_members {
         selected.functions[i].is_virtual = false;
         selected.functions[i].is_override = false;
     }
     report["sealedMemberProjections"] = json!(sealed_members.iter().map(|i| json!({"compiledIndex":i,
-        "policy":"verified sealed reference owner; retain callvirt null checks and ordinary method body"})).collect::<Vec<_>>());
+        "policy":"verified sealed owner or inherited display with one loaded implementation; retain callvirt null checks and ordinary body"})).collect::<Vec<_>>());
     super::boxing::project(&mut selected, &mut report)?;
     super::boxing::project_char_tests(&mut selected, &mut report)?;
     let boxed_display = report["int32Boxes"].as_array().is_some_and(|r| !r.is_empty())
@@ -650,7 +656,7 @@ pub fn prepare(
     }
     report["loadSet"] = json!({"modules": inputs.iter().map(|m| json!({"name": m.name, "revision": m.revision})).collect::<Vec<_>>(),
         "validation": "all original bodies verified with runtime binder before private canonical projection",
-        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "bindConsoleWriteLine": bind_console_write_line, "bindConsoleStreamOutput": bind_console_stream_output, "bindInt32ToString": bind_int32_to_string, "bindUtf8Text": bind_utf8_text, "bindPaths": bind_paths, "bindFileOutput": bind_file_output, "bindFileInput": bind_file_input, "bindCharacterText": bind_character_text, "bindIntegerText": bind_integer_text, "bindSocketListener": bind_socket_listener, "bindSocketAccept": bind_socket_accept, "bindTaskQueue": bind_task_queue, "bindSocketTransfer": bind_socket_transfer, "referenceArena": reference_arena, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
+        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "bindConsoleWriteLine": bind_console_write_line, "bindConsoleStreamOutput": bind_console_stream_output, "bindInt32ToString": bind_int32_to_string, "bindUtf8Text": bind_utf8_text, "bindPaths": bind_paths, "bindFileOutput": bind_file_output, "bindFileInput": bind_file_input, "bindCharacterText": bind_character_text, "bindIntegerText": bind_integer_text, "bindSocketListener": bind_socket_listener, "bindSocketAccept": bind_socket_accept, "bindTaskQueue": bind_task_queue, "bindSocketTransfer": bind_socket_transfer, "bindSocketClient": bind_socket_client, "referenceArena": reference_arena, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
         "limits": "up to 128 closed value/reference/interface shapes and 128 function clones; primitive static generic methods; one to eight explicit dependencies; no dynamic loading"});
     Ok((selected, report))
 }
