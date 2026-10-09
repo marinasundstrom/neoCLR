@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Record the author’s follow-up review areas: runtime scheduling and suspension,
+  Queue/Stack collections, a database-backed web sample with a Dapper-like mapper,
+  and missing Time Parse methods. Keep JSON qualification first; provider, API and
+  runtime-policy choices remain investigations rather than implemented features.
+
 - Add recursive built-in Sequence/List/ArrayList and string-keyed
   Map/MutableMap/HashMap JSON mapping, constructing ArrayList and ordinal HashMap
   through private checked generic adapters shared by interpreter/native tooling.

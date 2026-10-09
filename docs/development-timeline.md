@@ -13088,3 +13088,18 @@ claim follows from these focused checks.
 - **Sequencing:** the collection review is the next author-selected topic. The
   previously requested JSON benchmark/publication work remains recorded, not
   cancelled or claimed complete.
+
+## 2026-10-10 — Follow-up platform review areas
+
+- **Author:** lists runtime scheduling, collections such as Queue and Stack, a
+  database provider for the web-app sample with a Dapper-like object mapper,
+  missing Parse methods on Time types, and runtime suspension as areas to examine.
+- **Assistant response/action:** records these in the
+  [roadmap review list](platform-roadmap.md#follow-up-review-areas--author-direction-2026-10-10),
+  with bounded investigations and comparison questions. Keeps basic JSON
+  qualification first and collections as the next selected review. Scheduling and
+  suspension remain the existing co-evolving native-runtime track.
+- **Open:** collection contracts, database provider and mapper design, exact Time
+  parser gaps, and suspension/scheduler policies are not selected by this request.
+  The list does not establish a delivery order among all five areas or cancel the
+  earlier benchmark direction. No implementation outcome is claimed here.
