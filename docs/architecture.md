@@ -11,6 +11,21 @@ runtime services; it is not a replacement CLR for arbitrary .NET binaries.
 
 ![Compilation, validation and execution pipeline](../website/architecture.svg)
 
+## Modules organize the library
+
+The class library and its APIs are organized into **modules that form namespaces**.
+Modules are neoCLR's primary means of organizing code: each is a named container for
+types, functions and constants, and its name supplies their namespace for qualified
+lookup and imports. This gives code organization an explicit declaration owner rather
+than relying on arbitrary namespace groupings.
+
+For example, the `System.Runtime` assembly contains modules such as `System`,
+`System.Math` and `System.Time`. Assemblies retain packaging and dependency identity;
+a module need not correspond to an assembly or a separate file. See the
+[Modules feature page](../website/content/features/modules/index.md) for the model,
+declarations and current limits, and [declaration modules](declaration-modules.md)
+for the metadata contract.
+
 ## Source and tools
 
 Raven binds source through its compiler and selects a target-specific metadata/emission

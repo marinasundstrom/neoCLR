@@ -34,6 +34,13 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   pipeline, runtime/service layers and PE/NEOX/payload boundaries. Distinguishes
   current transport, native execution limits and future CLI-derived direction,
   and links the guides from the website and repository indexes.
+- **Author clarification:** class-library APIs live in modules that form namespaces;
+  modules are the primary code organization, rather than arbitrary namespaces. Asks
+  for this terminology in architecture documentation, leaving the full explanation
+  to the Modules feature page.
+- **Assistant follow-up:** adds this explanation and module examples to both
+  architecture pages, links the Modules feature page, and labels the library layer
+  in the diagram as modules.
 - **Scope:** documentation of existing behavior; no new runtime or format contract
   and no change in roadmap priority. See [architecture](architecture.md) and
   [metadata format](metadata-format.md). Validation and commit results are recorded

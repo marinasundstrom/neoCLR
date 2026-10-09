@@ -5,6 +5,18 @@ and development tools. The layers are familiar from .NET, but the runtime owns i
 metadata, execution and service contracts. It is an independent experimental platform,
 not a runtime for arbitrary .NET applications.
 
+## Modules organize the library
+
+The class library and its APIs are organized into **modules that form namespaces**.
+Modules are the primary means of organizing neoCLR code. A module owns types,
+functions and constants; its name supplies their namespace for qualified lookup and
+imports. This makes the organization explicit and easy to follow.
+
+For example, `System.Runtime` is an assembly containing modules such as `System`,
+`System.Math` and `System.Time`. Assemblies provide packaging and dependency identity,
+while modules organize declarations. The [Modules feature page](../features/modules/)
+explains declarations, imports, ownership and the current limits.
+
 ## Runtime layers
 
 ![Applications, library, managed execution, host services and operating system](../runtime-layers.svg)
@@ -44,7 +56,7 @@ heap objects or OS handles. Read the [metadata format](../metadata/) for the art
 | Metadata, loader and verifier | Definition identity, dependencies, signatures and executable-code checks |
 | Execution backend | Calls, control flow, storage operations and the selected execution mode |
 | Runtime primitives and services | GC, text/numbers, initialization, scheduling, Faults and host resource access |
-| Raven library | Application APIs built from library code and explicit service contracts |
+| Raven library | Modules organizing application APIs, built from library code and explicit service contracts |
 
 The current Raven target has copied values and reference-semantic classes and arrays.
 Managed byrefs address slots; unmanaged pointers have a separate interop contract.

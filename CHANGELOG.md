@@ -11,7 +11,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Add architecture and metadata-format documentation and website guides, with
   compilation, layered runtime-service and artifact-format diagrams. Document
   current PE/NEOX encoding, ownership, admission boundaries and native execution
-  limits; link both guides through website and repository navigation.
+  limits; link both guides through website and repository navigation. Clarify that
+  modules forming namespaces are the primary organization of class-library APIs,
+  with the Modules feature page providing the detailed model.
 
 - Admit nonmatching Char box tests in the closed native profile, preserving null
   Object results while rejecting Char box producers. Production Option/Result
