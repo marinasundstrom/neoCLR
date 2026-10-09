@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Refresh the release validator's native seed pin for the added String.Replace
+  service. Keep Preview 12's published bootstrap evidence unchanged; candidate
+  source and package execution must still pass before publication.
+
 - Prepare Windows x64 and macOS ARM64 release qualification. Apply Rust formatting
   and replace an equivalent metadata-version pattern to satisfy strict Clippy on
   the current toolchain; no metadata admission behavior changes.

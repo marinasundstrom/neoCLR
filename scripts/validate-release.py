@@ -117,7 +117,9 @@ def main():
             seed = output / "System.neox"
             run([executable, "assemble", source / "runtime/raven/native/poc-seed.neoil", seed, "--format", "neox"], source)
             digest = hashlib.sha256(seed.read_bytes()).hexdigest()
-            if digest != "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc":
+            # Current seed includes the ordinal replacement service introduced
+            # after Preview 12. Preserve the old release's pin in its evidence.
+            if digest != "0d44005b8fb48a4655fef1cbb33b5e37987d9a06a8dc8ecbbeb3b1622f0137fd":
                 raise RuntimeError("native bootstrap seed differs from qualified artifact")
             report["native_seed_sha256"] = digest
         for name in ["counter", "collections", "outputs", "reflection", "reference-identity",

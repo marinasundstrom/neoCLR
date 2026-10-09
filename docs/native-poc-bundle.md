@@ -1,5 +1,19 @@
 # Native POC bundle
 
+## Next release qualification (2026-10-09)
+
+The author has requested Windows x64 and macOS ARM64 packages for the next POC.
+Neither target is certified by older reports. Rebuild the matching compiler,
+runtime, libraries and editor; run the extracted sample and host checks on each.
+ARM64 AOT experiments do not imply Windows x64 native-code generation support.
+
+The current retained seed adds the ordinal String replacement service after
+Preview 12. Its freshly assembled SHA256 is
+`0d44005b8fb48a4655fef1cbb33b5e37987d9a06a8dc8ecbbeb3b1622f0137fd`.
+The release validator checks this current pin; Preview 12's historical pin below
+is unchanged. The seed remains an explicit bootstrap input, and full native-only
+core bootstrap remains outside this bounded release qualification.
+
 This is the development native release path. It does not invoke the CLI translation
 bridge. Raven libraries are built into native metadata first, then distributed with
 the matching native-enabled SDK, VSIX and runtime. The primitive CLI core and retained
