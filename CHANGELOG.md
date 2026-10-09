@@ -35,6 +35,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   interpreter-parity consumer, GC/bounds checks and explicit missing-metadata/shape/
   contract rejection tests. This uses bounded generated dispatch; general runtime
   descriptor tables, property queries, invocation and JSON remain unfinished.
+  Qualify the descriptor consumer on macOS ARM64 and Windows x64 at `ba871e0d`
+  in action `37980244735`, verifying all six direct-token/equality/descriptor reports
+  and their source/artifact hashes. Add runnable consumer instructions.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

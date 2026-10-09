@@ -202,7 +202,10 @@ instantiations, checks generic arity and distinguishes the Model identities. Its
 standalone native host checks GC cleanup and buffer bounds; its output matches the
 interpreter. Run `scripts/validate-native-type-tokens.py` with `--descriptor-queries`
 to build and execute it on macOS ARM64 or Windows x64. The validator retains the
-executable and hashes its source/artifacts. The Windows job runs the same fixture.
+executable and hashes its source/artifacts. The Windows job runs the same fixture. Both platform jobs pass at `ba871e0d`
+in action `37980244735`; all six reports and source/artifact hashes are verified.
+See [descriptor evidence](native-type-descriptor-validation.json) and
+[runnable instructions](experiments/aot-console/type-descriptors.md).
 
 This is a closed descriptor-query subset, not general TypeInfo or JSON admission.
 Array/function signature queries reject explicitly for now, as do missing source
