@@ -209,5 +209,13 @@ new guarantee is explicit reusable entry cleanup; costs include full collection
 between entries and a deliberately stateless boundary. Persistent roots, retained
 code/data ownership and suspension migration remain separate design/validation work.
 
-[macOS reuse evidence](native-http-reuse-validation.json) records all 14 passing
-cases. Windows reuse qualification is pending the identical dedicated gate.
+[Shared reuse evidence](native-http-reuse-validation.json) records all 14 passing
+client/factory/recovery cases on macOS ARM64 and Windows x64. Windows client run
+[37970610749](https://github.com/marinasundstrom/neoCLR/actions/runs/37970610749)
+and the five-case server run
+[37970610944](https://github.com/marinasundstrom/neoCLR/actions/runs/37970610944)
+both pass at `15ebc8b5`, using rebuilt source libraries. Downloaded binary, library,
+compiler and validation hashes are verified against the reports; tracked source
+inputs match that commit, allowing Windows checkout line endings. Ten non-execution
+`.vscode` files per toolchain were omitted by artifact upload; the evidence records
+that exact gap and subsequent uploads include hidden files.

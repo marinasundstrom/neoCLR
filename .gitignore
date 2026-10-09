@@ -12,3 +12,7 @@
 # Native class-library project outputs.
 /runtime/raven/projects/**/bin/
 /runtime/raven/projects/**/obj/
+
+# Native task-factory contract project outputs.
+/docs/experiments/task-factories/bin/
+/docs/experiments/task-factories/obj/

@@ -169,5 +169,13 @@
     "/Users/robert/Projects/neoclr/target/task-factories-final/TaskFactories.o": "978b3cdb7139f46d6ffd9b120eed9b91afc39008077e9aee7c4005c310f41706",
     "/Users/robert/Projects/neoclr/target/task-factories-final/TaskFactories-standalone": "e8fd30cd2a8ce27e158d1d09ac1fc141212bae92b59a495657cdb81f4e31b452"
   },
-  "httpServerReportSha256": "4668ef1fa6a3a815d2aca5851813ae6fe06deb6519f9bc16ba05f645e5626a85"
+  "httpServerReportSha256": "4668ef1fa6a3a815d2aca5851813ae6fe06deb6519f9bc16ba05f645e5626a85",
+  "windows": {
+    "revision": "15ebc8b599b183da417e618f38d78a7ca82b1dff",
+    "clientRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/37970610749",
+    "serverRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/37970610944",
+    "factoryCase": "task-factories",
+    "passed": true,
+    "evidence": "native-http-reuse-validation.json"
+  }
 }

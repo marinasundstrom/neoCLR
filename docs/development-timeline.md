@@ -40,8 +40,12 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   preserves current-dispatcher callback ordering and reference identity, and
   replaces the HTTP samples' pending placeholders. There is no cross-invocation
   cache or default(T) completion. Native HTTP repeated invocation/fault recovery
-  remains the next bounded hosting slice. See the
-  [factory contract and validation](task-completion-factories.md).
+  was implemented next: three entries share one native heap/context, with scope/root
+  teardown and collection between success, fault/cancellation and successful recovery.
+  All 14 client/factory/recovery cases and five server cases pass on macOS ARM64 and
+  Windows x64. Persistent guest state and a public hosting API remain open. See the
+  [factory contract](task-completion-factories.md) and
+  [downloaded cross-platform evidence](native-http-reuse-validation.json).
 
 ## 2026-10-09 — Website audience and editorial cleanup
 

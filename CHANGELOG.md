@@ -13,7 +13,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   collected heap before another entry. Compare success/fault-or-cancellation/
   success on one native context with fresh interpreter invocations. This is
   stateless reuse qualification, not a public persistent-host API. All 14 macOS
-  client/factory/recovery cases pass; Windows reuse qualification is pending. Record the
+  client/factory/recovery cases pass. Windows client run `37970610749` passes the
+  same 14 cases and server run `37970610944` passes all five cases at `15ebc8b5`.
+  Verify downloaded binary/library/compiler outputs and tracked source hashes;
+  record the artifact service's omission of ten bundled editor-setting files per
+  run and retain hidden files in future uploads. Ignore local factory-project build
+  outputs. Record the
   previous await-based Windows client/server successes at `fbd73677`, verifying
   42 client and 53 server artifact hashes, and advance the roadmap to hosting.
 

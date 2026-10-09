@@ -72,5 +72,6 @@ jobs:
         with:
           name: windows-native-http-project-${{ github.run_id }}-${{ github.run_attempt }}
           path: target/windows-http-project-validation/
+          include-hidden-files: true
           retention-days: 14
           if-no-files-found: warn

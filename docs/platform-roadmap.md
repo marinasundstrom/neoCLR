@@ -30,7 +30,7 @@ structural experiments retain their branch restrictions.
 HttpServer work consistently and predictably on macOS and Windows. Use one shared
 HTTP/network contract and qualify both platforms with the same scenarios. The
 [parity plan](native-http-parity.md) tracks the shared socket adapter, Windows
-server host and missing native DNS/outbound-connect bindings. The first
+server host and native DNS/outbound-connect bindings. The first
 [shared socket gate](native-network-parity-validation.json) passes all three
 listener/accept/transfer consumers on macOS ARM64 and Windows x64 at `da8ca1f2`.
 The subsequent [Windows HTTP project gate](windows-native-http-project-validation.json)
@@ -42,8 +42,11 @@ processes and faults, on Windows x64; corresponding macOS cases pass. The author
 native Windows ARM64 support. Track it as an additional target, with explicit
 ABI, stack-probing, host/toolchain and native-execution gates; do not equate x64
 emulation with ARM64 qualification. The author prioritized Windows HTTP project
-integration first; that bounded gate now passes. Next qualify serial native host reuse across HTTP success, faults and cancellation,
-then address persistent state and broader hosting contracts.
+integration first; that bounded gate now passes. The [serial reuse gate](native-http-reuse-validation.json) now passes on macOS ARM64
+and Windows x64 at `15ebc8b5`, including completed task factories, pending/continuation
+fault recovery and cancellation recovery on one heap/context. Next address explicit
+retained state/root ownership and broader persistent-host contracts; the current
+host gate is deliberately stateless.
 
 **Author clarification (2026-10-09):** once the native compilation foundations are
 ready, let runtime suspension, runtime-owned scheduling and green threads co-evolve

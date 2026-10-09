@@ -1,6 +1,6 @@
 {
   "date": "2026-10-09",
-  "scope": "macOS ARM64 native HTTP and serial stateless host recovery",
+  "scope": "macOS ARM64 and Windows x64 native HTTP and serial stateless host recovery",
   "reportSha256": "c86c04de528a5908eeba9deb69e59c3b4123481746319d6001289ff288b3dfdd",
   "artifactHashesVerified": 32,
   "sources": {
@@ -86,5 +86,168 @@
       ]
     }
   ],
-  "windows": "Pending identical dedicated workflow gate; not yet qualified for reuse."
+  "windows": [
+    {
+      "name": "client",
+      "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/37970610749",
+      "revision": "15ebc8b599b183da417e618f38d78a7ca82b1dff",
+      "reportSha256": "cf8cbf2570c2c51bcee4eb6a4b0bbcb14fe9bae29ae52a3358cfcb0b5449d270",
+      "artifactHashesVerified": 1475,
+      "trackedSourceHashesVerified": 243,
+      "omittedArtifactFiles": [
+        "development toolchain/bundle/samples/collections/.vscode/settings.json",
+        "development toolchain/bundle/samples/collections/.vscode/tasks.json",
+        "development toolchain/bundle/samples/http-json-client/.vscode/settings.json",
+        "development toolchain/bundle/samples/http-json-client/.vscode/tasks.json",
+        "development toolchain/bundle/samples/http-json-server/.vscode/settings.json",
+        "development toolchain/bundle/samples/http-json-server/.vscode/tasks.json",
+        "development toolchain/bundle/samples/json/.vscode/settings.json",
+        "development toolchain/bundle/samples/json/.vscode/tasks.json",
+        "development toolchain/bundle/samples/tasks/.vscode/settings.json",
+        "development toolchain/bundle/samples/tasks/.vscode/tasks.json"
+      ],
+      "omissionScope": "Upload-artifact v4 excluded bundled .vscode editor settings only; all executable, object, compiler, library, seed and validation outputs are present. Future uploads explicitly retain hidden files.",
+      "cases": [
+        {
+          "name": "task-factories",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "greeting",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "numeric",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "fragmented",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "malformed",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "refused",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "timeout",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "pre-cancel",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "cancel",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "continuation-fault",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "paired-raven-server",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "continuation-fault-recovery",
+          "passed": true,
+          "nativeInterpreterParity": true,
+          "invocations": 3,
+          "freshInterpreterExitCodes": [
+            0,
+            1,
+            0
+          ],
+          "sameNativeHeapAndContext": true
+        },
+        {
+          "name": "pending-fault-recovery",
+          "passed": true,
+          "nativeInterpreterParity": true,
+          "invocations": 3,
+          "freshInterpreterExitCodes": [
+            0,
+            1,
+            0
+          ],
+          "sameNativeHeapAndContext": true
+        },
+        {
+          "name": "cancellation-recovery",
+          "passed": true,
+          "nativeInterpreterParity": true,
+          "invocations": 3,
+          "freshInterpreterExitCodes": [
+            0,
+            1,
+            0
+          ],
+          "sameNativeHeapAndContext": true
+        }
+      ]
+    },
+    {
+      "name": "server",
+      "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/37970610944",
+      "revision": "15ebc8b599b183da417e618f38d78a7ca82b1dff",
+      "reportSha256": "c4f1f0712b43ad6cb7f912f2d06d3df16569fb40b83a43287d45108a798b7a4e",
+      "artifactHashesVerified": 1448,
+      "trackedSourceHashesVerified": 240,
+      "omittedArtifactFiles": [
+        "development toolchain/bundle/samples/collections/.vscode/settings.json",
+        "development toolchain/bundle/samples/collections/.vscode/tasks.json",
+        "development toolchain/bundle/samples/http-json-client/.vscode/settings.json",
+        "development toolchain/bundle/samples/http-json-client/.vscode/tasks.json",
+        "development toolchain/bundle/samples/http-json-server/.vscode/settings.json",
+        "development toolchain/bundle/samples/http-json-server/.vscode/tasks.json",
+        "development toolchain/bundle/samples/json/.vscode/settings.json",
+        "development toolchain/bundle/samples/json/.vscode/tasks.json",
+        "development toolchain/bundle/samples/tasks/.vscode/settings.json",
+        "development toolchain/bundle/samples/tasks/.vscode/tasks.json"
+      ],
+      "omissionScope": "Upload-artifact v4 excluded bundled .vscode editor settings only; all executable, object, compiler, library, seed and validation outputs are present. Future uploads explicitly retain hidden files.",
+      "cases": [
+        {
+          "name": "greeting",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "fragmented",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "duplicate-length",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "handler-error",
+          "passed": true,
+          "nativeInterpreterParity": true
+        },
+        {
+          "name": "callback-fault",
+          "passed": true,
+          "nativeInterpreterParity": true
+        }
+      ]
+    }
+  ]
 }
