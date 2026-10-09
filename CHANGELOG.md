@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Record requested Windows ARM64 qualification and its ABI/stack/toolchain gates;
+  keep Windows HTTP project integration as the immediate showcase priority.
+  ARM64 native support remains planned.
+
 - Begin the author-directed macOS/Windows native HTTP parity work. Share socket
   lifecycle, accept, transfer, cancellation and deadline policy behind a private
   Winsock/POSIX boundary, preserving native-width Windows handles and balanced

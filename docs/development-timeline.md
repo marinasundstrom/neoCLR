@@ -12851,3 +12851,14 @@ claim follows from these focused checks.
 - **Open:** Windows HTTP host/project integration and native DNS/outbound-connect
   bindings for HttpClient on both platforms. Existing macOS server evidence does
   not establish a working native client. Scheduling ownership remains provisional.
+
+## 2026-10-09 — Windows ARM64 scope and HTTP priority
+
+- **Author:** requests Windows on ARM support, assuming it would be easy to fix;
+  then directs continuing until Windows HTTP project integration is solved because
+  it is important for the showcase.
+- **Assistant assessment:** shared Winsock services should carry over, but current
+  x64 guards, ABI and stack assumptions need separate ARM64 qualification. The
+  pinned backend has ARM64 inline probing support, not proof of a working port.
+- **Action:** records ARM64 as an additional target and preserves Windows HTTP
+  integration as the immediate task. No ARM64 implementation is claimed.

@@ -72,3 +72,23 @@ at `da8ca1f2` passes all three consumers on macOS ARM64 and Windows x64. All
 [the retained evidence](native-network-parity-validation.json), allowing Windows
 checkout line endings. These C consumers are prerequisites, not evidence that
 Raven HttpClient or a Windows native HTTP project already works.
+
+## Windows ARM64 follow-up
+
+The author requests Windows on ARM support (2026-10-09), then explicitly directs
+completion of Windows HTTP project integration for the showcase. Preserve that
+sequence. Winsock and most host-service policy should be reusable, but current
+target selection, MSVC host guards and stack accounting explicitly assume x64.
+Cranelift 0.121.2 has AArch64 inline probes; its outlined probe path is unimplemented.
+Neither fact establishes Windows ARM64 generated-code correctness. Validate target
+ABI/COFF linking, page probing, final-frame bounds, host admission and managed
+root/fault cleanup on native ARM64 before admitting the project profile.
+
+Unlike .NET's established per-architecture deployment model, this remains a
+missing neoCLR target qualification, not a proposed semantic difference. Use
+`aarch64-pc-windows-msvc` as the prospective native target, separate from ARM64EC
+or x64 emulation. [Microsoft's ARM64 ABI](https://learn.microsoft.com/en-us/cpp/build/arm64-windows-abi-conventions?view=msvc-170)
+specifies stack and calling conventions; [GitHub's runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
+lists `windows-11-arm` for native execution (reviewed 2026-10-09). Adding that
+qualification costs another toolchain/artifact/test lane; no difficulty or
+performance claim is established yet.
