@@ -37,8 +37,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   qualification with calls, branches, empty/repeated loops and byte-exact UTF-8,
   NUL and combining-character output. Add the scalar Boolean constants and
   comparison-result lowering emitted by Raven, preserving typed stack checks and
-  Int32-only signatures/locals. Local native boundary/rejection checks pass;
-  Windows execution of the expanded source gate is pending.
+  Int32-only signatures/locals. Local native boundary/rejection checks pass.
+  Windows run `37951030197` at `d7ae97ab` passes seven tests without skips,
+  including six standalone executions and 32 scalar comparisons; all 113
+  downloaded artifact hashes are verified.
 
 - Add a development macOS ARM64 project-to-executable console command using the
   selected bundle's Raven project build, existing AOT backend and explicit native

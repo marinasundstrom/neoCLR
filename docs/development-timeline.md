@@ -12726,3 +12726,13 @@ claim follows from these focused checks.
   `Platform=x64` changing the managed compiler output path, resolved with explicit
   AnyCPU compiler selection. This establishes the primitive/console source path;
   broader source consumers, Windows managed services and project kits remain open.
+
+- **Expanded source outcome:** continued work exposes missing scalar Boolean-result
+  lowering for Raven’s `ceq`/`clt`/`cgt` and Boolean constants. The assistant adds
+  typed stack support and rejection checks without changing Raven or its emitter.
+  [Run 37951030197](https://github.com/marinasundstrom/neoCLR/actions/runs/37951030197)
+  at `d7ae97ab` passes seven Windows tests, including fresh source calls, branches,
+  empty/repeated loops and exact UTF-8/NUL output in PE/#Neo and NEOX. All 113
+  artifact hashes match the [report](windows-raven-flow-validation.json). Native
+  macOS comparison boundary tests also pass. Windows managed host allocation,
+  stack protection and suspension lifecycle requirements remain open.

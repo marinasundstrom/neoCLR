@@ -445,8 +445,16 @@ and locals remain Int32-only. This follows the existing neoCLR typed Boolean
 contract while preserving .NET comparison outcomes; it is additional lowering
 coverage, not a new language or bridge contract. The existing CLR/scalar research
 and verifier remain the baseline. Local native Int32 boundary tests, rejection
-checks, source compilation and Windows COFF emission pass; Windows execution of
-this extension is pending.
+checks, source compilation and Windows COFF emission pass.
+
+**Source control-flow execution qualified (2026-10-09):**
+[run 37951030197](https://github.com/marinasundstrom/neoCLR/actions/runs/37951030197)
+at `d7ae97abfd1659062aaf2416d212689fb98567b0` passes all seven Windows tests without
+skips: six standalone PE/#Neo/NEOX executions across retained Hello World, fresh
+Hello World and the fresh calls/loops consumer, plus 32 scalar comparisons. Both
+flow executables return zero with exact expected stdout and empty stderr. All 113
+downloaded hashes match the [retained report](windows-raven-flow-validation.json).
+The source coverage gap is closed without changing Raven or its metadata emitter.
 
 ## Shared native contracts to establish
 

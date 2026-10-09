@@ -75,11 +75,15 @@ standalone PE/#Neo and NEOX execution with byte-exact interpreter output, alongs
 the 32 scalar comparisons (five tests, no skips). The subsequent
 [fresh-source Windows run](windows-fresh-raven-validation.json) builds pinned Raven
 `71cafd35` with the current metadata writer and compiles Hello World on Windows;
-both containers execute with interpreter parity (six tests, no skips). Next extend
-fresh-source coverage to calls/control flow and UTF-8 literals before Windows
-managed-service or project-kit work. Windows project kits and managed services
-remain unsupported. Full bootstrap, general hosting and
-reload remain open.
+both containers execute with interpreter parity (six tests, no skips). The
+[expanded source gate](windows-raven-flow-validation.json) now passes calls,
+branches, empty/repeated loops and exact UTF-8/NUL output in both containers
+(seven tests, no skips). It adds the Boolean comparison-result lowering Raven
+needs, with typed stack checks and Int32 signatures/locals. Next establish Windows
+managed-console host allocation and stack-protection requirements before widening
+managed services or project kits; account for suspension lifecycle boundaries in
+that work. Windows project kits and managed services remain unsupported. Full
+bootstrap, general hosting and reload remain open.
 
 **Preview 13 published (2026-10-09):** after Raven's shared website publication,
 the author requested the next neoCLR POC release for Windows and macOS, with a
