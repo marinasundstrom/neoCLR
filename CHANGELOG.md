@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Refresh source regressions for the current contracts: reject an unassigned
+  metadata schema, recognize conflicting-signature diagnostics, preserve String
+  owner identity through Object views, and check shared fault stack rendering.
+  The five focused test targets pass; runtime behavior is unchanged.
+
 - Capture VS Code acceptance output through a process task instead of Unix shell
   quoting, preserving argument boundaries on Windows and macOS. Normalize only
   CRLF/LF in exact-output comparisons; keep exit-code and stderr checks.

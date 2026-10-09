@@ -85,7 +85,10 @@ fn return_type_alone_cannot_distinguish_overloads() {
             ".module Test\n.entry Main\n.function F -> Int32\n.param int\nldc.i4 1\nret\n.end\n.function F -> {second}\n.param Int32\nldc.i4 2\nret\n.end\n.function Main -> Void\nldvoid\nret\n.end"
         );
         let fault = assemble(&source).unwrap_err();
-        assert!(fault.message.contains("duplicate"));
+        assert!(
+            fault.message.contains("conflicting function signature"),
+            "{fault}"
+        );
     }
 }
 

@@ -58,7 +58,12 @@ fn mixed_unnamed_and_named_slots_and_legacy_params_are_supported() {
 #[test]
 fn names_do_not_distinguish_overloads_or_appear_in_call_signatures() {
     let source = ".module Test\n.function F(int32 a) -> Void\nldvoid\nret\n.end\n.function F(int32 b) -> Void\nldvoid\nret\n.end";
-    assert!(assemble(source).unwrap_err().message.contains("duplicate"));
+    assert!(
+        assemble(source)
+            .unwrap_err()
+            .message
+            .contains("conflicting function signature")
+    );
     assert!(neoclr::assembler::parse_function_ref("F(int32 a)").is_err());
 }
 

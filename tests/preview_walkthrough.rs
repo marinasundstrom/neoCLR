@@ -121,13 +121,13 @@ fn walkthrough_sources_and_artifacts_have_the_documented_outputs_and_exits() {
                     assert!(error.contains("System.Array.GetElementAddress"), "{error}");
                 } else {
                     assert!(error.contains("Demonstration fault"), "{error}");
-                    let fail = error.find("  at Fail()").unwrap();
-                    let work = error.find("  at Work()").unwrap();
-                    let main = error.find("  at Main()").unwrap();
+                    let fail = error.find("   at Fail [instruction ").unwrap();
+                    let work = error.find("   at Work [instruction ").unwrap();
+                    let main = error.find("   at Main [instruction ").unwrap();
                     assert!(fail < work && work < main, "{error}");
                 }
                 assert!(error.contains("Main"), "{error}");
-                assert!(error.contains("IL instruction"), "{error}");
+                assert!(error.contains("[instruction "), "{error}");
                 assert!(!stdout(&result).contains("=>"));
             } else {
                 for (input, expected) in &cases {

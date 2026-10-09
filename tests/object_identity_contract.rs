@@ -70,14 +70,14 @@ fn typed_nulls_compare_by_absence_not_their_declared_type() {
 }
 
 #[test]
-fn current_string_projection_allocates_wrappers_not_canonical_string_identity() {
-    // This records an unresolved divergence, not the desired public API contract.
+fn string_object_views_preserve_the_original_text_owner_identity() {
+    // Object projection and round-tripping retain the immutable String owner.
     for (right, same) in [
         ("ldloc root", true),
-        ("ldloc text\ncastclass System.Object", false),
+        ("ldloc text\ncastclass System.Object", true),
         (
             "ldloc root\ncastclass String\ncastclass System.Object",
-            false,
+            true,
         ),
     ] {
         let body = format!(

@@ -113,7 +113,8 @@ fn translated_native_envelope_preserves_generic_library_metadata() {
     overlay.push(0);
     assert!(metadata_container::decode_envelope(&overlay).is_err());
     let mut schema = image.to_vec();
-    schema[18] = 4;
+    // Schema 4 is supported for module declarations; 255 is unassigned.
+    schema[18] = 255;
     assert!(metadata_container::decode_envelope(&schema).is_err());
     let mut optional = image.to_vec();
     optional[20] = 0;
