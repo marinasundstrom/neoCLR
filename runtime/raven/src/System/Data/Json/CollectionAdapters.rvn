@@ -1,0 +1,61 @@
+namespace System.Data.Json
+
+import System.*
+import System.Collections.*
+import System.Option.*
+
+// Private generic execution targets for checked collection reflection adapters.
+// JSON validation and recursive mapping remain in ObjectMapper.
+internal class CollectionAdapters {
+    private init() { }
+
+    static func SequenceCount<T>(value: Object) -> int {
+        let sequence = (Sequence<T>)value
+        return sequence.Count
+    }
+
+    static func SequenceGet<T>(value: Object, index: int) -> Object {
+        let sequence = (Sequence<T>)value
+        return sequence[index]
+    }
+
+    static func SequenceCreate<T>(values: Object[], keys: string[]) -> Object {
+        let list = ArrayList<T>(values.Length)
+        for value in values {
+            list.Add((T)value)
+        }
+        return list
+    }
+
+    static func MapCount<T>(value: Object) -> int {
+        let map = (Map<string, T>)value
+        return map.Count
+    }
+
+    static func MapKey<T>(value: Object, index: int) -> string {
+        let map = (Map<string, T>)value
+        return map.Keys[index]
+    }
+
+    static func MapGet<T>(value: Object, index: int) -> Object {
+        let map = (Map<string, T>)value
+        let key = map.Keys[index]
+        if let Some(item) = map.Find(key) {
+            return item
+        }
+        System.Fail("Collection changed while reading")
+    }
+
+    static func MapCreate<T>(values: Object[], keys: string[]) -> Object {
+        if values.Length != keys.Length {
+            System.Fail("Collection keys and values must have equal lengths")
+        }
+        let map = HashMap<string, T>(StringComparer.Ordinal)
+        for index in 0..<values.Length {
+            if !map.TryAdd(keys[index], (T)values[index]) {
+                System.Fail("Duplicate collection key")
+            }
+        }
+        return map
+    }
+}

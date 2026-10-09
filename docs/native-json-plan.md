@@ -11,7 +11,7 @@ current serializer and its interpreter contract as the semantic reference.
 `JsonSerializer.Deserialize<Report>` and `Serialize(Object)` APIs. Its string, Int32
 and Boolean properties exercise UTF-8 text, type identity, property metadata,
 construction, boxing and getter/setter invocation. The interpreter prints
-`{"Name":"Café","Count":3,"Active":true}`. Native execution is **not yet admitted**.
+`{"Name":"Café","Count":3,"Active":true}`. The original flat case now passes both modes; later sections track the expanded corpus.
 The HTTP follow-up must use the same mapper through JsonContent/client JSON APIs,
 not a separate serializer or hand-written JSON strings.
 
@@ -667,3 +667,105 @@ The mixed-node macOS report and source/bundle hashes are recorded in
 project also passes Windows action
 [37993153131](https://github.com/marinasundstrom/neoCLR/actions/runs/37993153131);
 that earlier action does not include this embedded-node mapper change.
+
+## Converter and wire-contract follow-up — 2026-10-09
+
+The author requests eventual System.Text.Json-style converters, inheritance
+contracts and Raven union wire formats, then explicitly directs finishing the
+current basic JSON support first. Converters are deferred; this does not change
+the active nested-object, vector, list/sequence, string-keyed map and explicit-node
+milestone. No converter API or polymorphic mapping is implemented by this note.
+
+When that follow-up begins, compare .NET's typed converters and generic converter
+factories with its separate contract/polymorphism configuration. Reuse recursive
+mapping, limits and retained type identity rather than adding JSON policy to the
+runtime. Resolve registration precedence, nested delegation without converter
+recursion, null handling, discriminator collisions/unknown cases, and converter
+effects during validation before selecting a public API. The current guarantee
+of input validation before model constructors/setters must not silently become
+a guarantee that arbitrary user converters have no effects.
+
+Primary references reviewed 2026-10-09:
+[converters](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/converters-how-to),
+[contracts](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/custom-contracts),
+and [polymorphism](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism).
+Use .NET 10 as the initial compatibility baseline; later-version additions in
+these evolving pages are separate evaluation inputs, not baseline requirements.
+
+Raven source inspected at 6c90bf2c48d9d60480476433f90ddc4d0cee4a0d
+(`src/Raven.Core/Option.rvn`, `Result.rvn`, `UnionJsonConverter.rvn` and
+`test/Raven.Core.Tests/UnionTest.cs`) already distinguishes:
+Option's payload-or-null representation; Result's `case` plus `value`/ `data`
+representation; parenthesized unions' primitive payloads and typed object form;
+and opt-in tagged unions using a configurable discriminator (default `$case`).
+Generated cases flatten their properties; direct payloads use a naming-policy-aware
+`Value` member. Do not collapse these into one universal tagged representation.
+These are source-inspected contracts, not a fresh Raven test run or a claim that
+neoCLR supports them. Null/inactive-carrier behavior and unknown-case fallback
+need explicit compatibility tests before adoption. A cross-target golden-document
+corpus should precede any compatibility claim.
+
+## Built-in collection mapping — development, 2026-10-10
+
+The shared mapper recognizes exact source-owned Sequence/List/ArrayList and
+string-keyed Map/MutableMap/HashMap families. It recursively maps their elements
+using the same scalar, model, vector and explicit-node rules. Reads construct
+ArrayList or HashMap with StringComparer.Ordinal; interface declarations accept
+the matching built-in implementation. Custom collection implementations and
+non-string keys remain unsupported. Map output follows observed key order, but
+custom comparer identity/behavior is not serialized.
+
+Compared with System.Text.Json's [supported collections](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/supported-types),
+the familiar sequence-as-array and dictionary-as-object shapes are retained.
+neoCLR deliberately starts with a smaller construction policy and requires string
+keys. This reduces implicit conversion/factory rules; the cost is fewer compatible
+models. Existing required-property, exact scalar, explicit-null and document-limit
+differences remain. No performance advantage is claimed.
+
+Private adapters bind retained closed element types to ordinary generic Raven
+collection methods. The Rust planner is shared by interpreter and native tooling;
+the generated native dispatch checks runtime TypeInfo identity before calling the
+same helper bodies. JSON names, parsing, validation and recursive mapping remain
+in ObjectMapper. The private service/helper names and source scope are a temporary
+execution bridge, not a public reflection API or stable ABI. Type tokens, explicit
+property roots, concrete generic call arguments and constructed collection owners
+supply the bounded inventory.
+General arbitrary runtime generic construction is not implied. Direct closed
+constructions are conservatively inventoried across the load set, which can retain
+more collection adapters than the consumer needs. Constructor inference excludes
+callable type arguments whose native metadata is not admitted; it does not turn
+unrelated task-queue storage into reflection roots. Native execution adapters are
+limited to admitted reference/Int32/Boolean elements; unsupported scalar families
+remain classifiable without selecting unsupported boxing bodies. Precise type-flow
+retention remains follow-up work. The clone allowance now shares the existing
+1,024-function cap instead of stopping independently at 512 clones; the total
+function and 512-type limits are unchanged.
+
+Map reads use real TryAdd and map writes use real Keys/Find, preserving ordinary
+checks. Keys currently returns a snapshot; repeated indexed mapping therefore has
+quadratic copying cost within the 31-entry container limit. Replace that with a
+stable enumeration protocol when larger documents/performance work justify it.
+Concurrent mutation during serialization is unsupported. The entire JSON input
+is preflighted before model constructors/setters, including collection elements.
+
+StringComparer.Ordinal now directly invokes the private UTF-8 content hash
+contract, preserving the interpreter's existing FNV-1a result without requiring
+general Object.GetHashCode virtual dispatch. Native ordinal/ignore-case kernels
+reuse the interpreter's hash/folding implementation and allocate no temporary
+byte vector. Hashes remain in-process collection values, not wire identifiers.
+Generic reference boxing/unboxing uses ordinary checked reference casts; value
+boxing remains restricted to existing admitted value shapes.
+
+The project driver conditionally links the matched allocation-free native text
+archive when selected bindings require Unicode comparison/hashing. Source builds
+use Cargo; packaged macOS kits carry the archive. Windows uses the same source
+kernel, with execution qualification still required for this slice. The JSON
+validator builds the current interpreter so new private services are compared
+against the matching implementation rather than an older bundled runtime.
+
+
+The complete reflection/JSON project corpus passes on macOS ARM64 in
+`target/native-json-collections-qualified/report.json`, including matching
+optimized interpreter results. Follow-up write-only retention checks also pass in both modes;
+[recorded evidence](native-json-collection-validation.json) includes source/binary hashes. Windows collection qualification and HTTP integration remain
+next; earlier Windows node/array evidence is not collection evidence.

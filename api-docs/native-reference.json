@@ -1,21 +1,21 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "851ef640562cf3f40a83da2a5aac67b7aa64aaacbf2dc0bf5977a0933da5592c",
-  "librarySourceRevision": "1b83357b3a88aa3d34ba5846dc79b6abb228d916",
+  "sha256": "49109b95f762cf5267e079242e44ff570eef437220087f3b0e66672f225ae82a",
+  "librarySourceRevision": "891de0bb524557fcd881984c699525388ff46382",
   "compilerRevision": "71cafd353",
   "rendererRevision": "6c90bf2c48d9d60480476433f90ddc4d0cee4a0d",
   "libraryArtifacts": {
-    "System.Runtime.dll": "ce88b10cedeb4ac2284b9c099f87466557daa9c48c0f4e74e3eb3f622cb1d5b3",
-    "System.Data.dll": "1f5aa634dd4c9a0d4eeaf0013557bf8138bd5062e40dac3f35a066a0ccdf596d",
-    "System.Networking.dll": "a872843f7403b0fea9a4be991f6c10e97b61ddba7bb2b2aaf44d04b419df63d9",
-    "System.Web.dll": "7fe13647267f4381f4ab354fc928b272f436066d4142a8d214a7fcb114449b95",
+    "System.Runtime.dll": "07982a692ae7889c5f9aae542150b6f9f281215c8fcc467a630a237f74e9c186",
+    "System.Data.dll": "8139aefa65b97d99c3fff6de3b6cede9194efde81460bf0d0c24006cc9479e93",
+    "System.Networking.dll": "168caf2b21b44636f182527c4621b2b001c6e08f8d5ac41f9fcbb45dd3b4fa18",
+    "System.Web.dll": "5fefdadc7cf52fa5545cc7a4a4e2663efebe931febfe85d5a9d050611d5fca73",
     "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
     "Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f"
   },
   "renderingEvidence": {
     "normalized-sidecars.json": "e517cf5751f877fb90716e59b2d337289f32dacb2abda4d0bfff2e95d20ed57e",
-    "restored-xml-comments.json": "6724fbfba1210e1cbf512d0a218446a444b8bd22b5091a41fac1a85344e50f7a"
+    "restored-xml-comments.json": "f606eb4cabeadd4e1b004fe202733be5bf16c7415ad580297137e93e7039d456"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

@@ -35,7 +35,7 @@ Serialize(output: OutputStream, value: Object) -> Result<unit, JsonError>
 Use `JsonSerializer.Deserialize<YourClass>(text)?` for a typed result, or pass
 `typeof(YourClass)` to the non-generic read overload. Both use the same mapper and
 return the same structured errors, including UnsupportedMapping for unsupported
-targets such as unsupported value types and generic lists. Object construction requires a
+targets such as unsupported value types and non-string map keys. Object construction requires a
 runtime-backed public nongeneric reference class with a public parameterless
 constructor. The serializer invokes real constructors/getters/setters through
 [runtime reflection](reflection.md); it never writes backing fields directly.
@@ -57,8 +57,8 @@ properties do not infer JSON node mapping. The complete mixed document shares th
 existing depth, occurrence and byte limits, including cycles inside embedded nodes.
 
 The [tested NodeEnvelope sample](../docs/experiments/native-json/Main.rvn) combines
-`JsonValue`, `JsonObject` and `JsonValue[]` properties. Lists/maps of nodes depend on
-the still-unfinished collection mapping support.
+`JsonValue`, `JsonObject` and `JsonValue[]` properties. Supported lists and maps
+can also contain explicitly declared JSON nodes.
 
 ## Provisional property rules
 
@@ -70,12 +70,13 @@ the still-unfinished collection mapping support.
 - Every writable mapped property must be present on input. Unknown JSON fields are
   ignored; duplicate decoded names remain invalid. This strict presence rule differs
   from .NET's default treatment of non-required missing properties.
-- Reject CLR null references, generic collections, Option, enums, unsupported scalars
+- Reject CLR null references, unsupported collection families, Option, enums, unsupported scalars
   and indexers in participating properties. Int32 requires a checked integer token;
   fraction/exponent tokens are not coerced.
 
 Development nested writes require each property value to have its declared runtime
-type; polymorphic properties are rejected except for explicit JsonValue declarations. Reads use each declared class and its
+type; polymorphic properties are rejected except for explicit JsonValue declarations
+and the supported collection interfaces described below. Reads use each declared class and its
 public parameterless constructor. Shared children serialize as repeated JSON objects;
 deserialization constructs independent instances rather than preserving identity.
 
@@ -98,10 +99,34 @@ Order and empty arrays are preserved. Each array admits at most 31 elements;
 every object or array consumes a container level and contributes to the existing
 32-value document bound. Element types are exact, with no coercion or polymorphic
 substitution. Null arrays/elements are rejected; missing writable array properties
-remain errors. Generic lists, interfaces, dictionaries, rectangular arrays and
-unsupported scalar elements remain outside this slice. Shared model elements
+remain errors. Rectangular arrays and unsupported scalar elements remain outside
+this slice; supported collection elements use the rules below. Shared model elements
 serialize repeatedly and deserialize independently. The complete input tree,
 including later elements, is validated before any model constructor/setter runs.
+
+## Lists, sequences and string-keyed maps — development
+
+| Declared type | JSON shape | Deserialized implementation |
+| --- | --- | --- |
+| `Sequence<T>`, `List<T>`, `ArrayList<T>` | Array | `ArrayList<T>` |
+| `Map<string, T>`, `MutableMap<string, T>`, `HashMap<string, T>` | Object | `HashMap<string, T>(StringComparer.Ordinal)` |
+
+These exact built-in families work at roots, properties and recursively as elements.
+Supported element types include nested models, arrays, collections and explicit
+JSON nodes. Empty collections and sequence order are preserved. Map keys are
+case-sensitive UTF-8 strings; writing uses the map's observed key order. Reading
+uses ordinal comparison, so a custom comparer is not preserved by a round trip.
+
+The same complete-document bounds apply: 31 entries per container, four container
+levels, 32 value occurrences and 1024 UTF-8 bytes. Invalid later elements fail
+preflight before any model constructor or setter executes. Each occurrence is
+constructed independently; shared references are not preserved.
+
+Arbitrary collection implementations, custom construction factories and non-string
+keys are unsupported. `Object` element declarations still do not infer JSON nodes.
+Ordinary model inheritance, converters, naming policies and union mapping remain
+follow-up work. This is bounded development support, not general .NET serializer
+compatibility.
 
 ## Streams and limits
 

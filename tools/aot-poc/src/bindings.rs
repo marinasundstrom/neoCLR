@@ -400,6 +400,8 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
             "neoCLR.Runtime.StringToUpperInvariant" => (vec![Type::String], Type::String, "string-upper-v1", "neoclr_string_upper_v1"),
             "neoCLR.Runtime.StringToLowerInvariant" => (vec![Type::String], Type::String, "string-lower-v1", "neoclr_string_lower_v1"),
             "neoCLR.Runtime.StringCompareOrdinalIgnoreCase" => (vec![Type::String, Type::String], Type::Int32, "string-compare-ignore-case-v1", "neoclr_string_compare_ignore_case_v1"),
+            "neoCLR.Runtime.StringHashOrdinal" => (vec![Type::String], Type::Int32, "string-hash-ordinal-v1", "neoclr_string_hash_ordinal_v1"),
+            "neoCLR.Runtime.StringHashOrdinalIgnoreCase" => (vec![Type::String], Type::Int32, "string-hash-ignore-case-v1", "neoclr_string_hash_ignore_case_v1"),
             "neoCLR.Runtime.StringIntern" => (vec![Type::String], Type::String, "string-intern-v1", "neoclr_string_intern_v1"),
             "neoCLR.Runtime.StringCompareOrdinal" => (vec![Type::String, Type::String], Type::Int32, "string-compare-ordinal-v1", "neoclr_string_compare_ordinal_v1"),
             "neoCLR.Runtime.StringContainsOrdinal" => (vec![Type::String, Type::String], Type::Boolean, "string-contains-ordinal-v1", "neoclr_string_contains_ordinal_v1"),

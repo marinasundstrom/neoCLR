@@ -27,6 +27,10 @@ internal class ObjectMapper {
         if IsNodeType(type) || type.Equals(typeof(string)) || type.Equals(typeof(int)) || type.Equals(typeof(bool)) {
             return Ok(())
         }
+        let collection = neoCLR.Runtime.ReflectionCollectionKind(type)
+        if collection != 0 {
+            return CheckType(type.GetGenericArgument(collection - 1))
+        }
         if type.IsArray {
             if let Some(element) = type.GetElementType() {
                 return CheckType(element)
@@ -62,7 +66,14 @@ internal class ObjectMapper {
             }
             return Error(JsonError.TypeMismatch("declared JSON node kind"))
         }
-        if !present.GetType().Equals(type) {
+        let collection = neoCLR.Runtime.ReflectionCollectionKind(type)
+        let actual = present.GetType()
+        if collection != 0 {
+            if neoCLR.Runtime.ReflectionCollectionKind(actual) != collection ||
+               !actual.GetGenericArgument(collection - 1).Equals(type.GetGenericArgument(collection - 1)) {
+                return Error(JsonError.UnsupportedMapping("Incompatible collection value"))
+            }
+        } else if !actual.Equals(type) {
             return Error(JsonError.UnsupportedMapping("Polymorphic mapped value"))
         }
         if present is string text {
@@ -77,6 +88,30 @@ internal class ObjectMapper {
         }
         if depth >= 4 {
             return Error(JsonError.LimitExceeded("Container depth exceeds four (or cyclic graph)"))
+        }
+        if collection != 0 {
+            let element = type.GetGenericArgument(collection - 1)
+            let count = neoCLR.Runtime.ReflectionCollectionCount(type, present)
+            if count > 31 {
+                return Error(JsonError.LimitExceeded("Collection exceeds 31 items"))
+            }
+            if collection == 1 {
+                let sequence = JsonArray()
+                for index in 0..<count {
+                    let item = neoCLR.Runtime.ReflectionCollectionGet(type, present, index)
+                    let child = WriteValue(item, element, depth + 1)?
+                    _ = sequence.Add(child)?
+                }
+                return Ok(sequence)
+            }
+            let map = JsonObject()
+            for index in 0..<count {
+                let key = neoCLR.Runtime.ReflectionCollectionKey(type, present, index)
+                let item = neoCLR.Runtime.ReflectionCollectionGet(type, present, index)
+                let child = WriteValue(item, element, depth + 1)?
+                _ = map.Add(key, child)?
+            }
+            return Ok(map)
         }
         if type.IsArray {
             let Some(element) = type.GetElementType() else {
@@ -146,6 +181,41 @@ internal class ObjectMapper {
         }
         if depth >= 4 {
             return Error(JsonError.LimitExceeded("Container depth exceeds four"))
+        }
+        let collection = neoCLR.Runtime.ReflectionCollectionKind(type)
+        if collection != 0 {
+            let element = type.GetGenericArgument(collection - 1)
+            if collection == 1 {
+                if value is JsonArray sequence {
+                    let items = CheckedStorage.Reserve<Object>(sequence.Count)
+                    for index in 0..<sequence.Count {
+                        let child = sequence.Item(index)?
+                        let mapped = ReadValue(child, element, depth + 1, construct)?
+                        items[index] = mapped
+                    }
+                    if construct == 0 {
+                        return Ok(sequence)
+                    }
+                    return Ok(neoCLR.Runtime.ReflectionCollectionCreate(type, items, []))
+                }
+                return Error(JsonError.TypeMismatch("array"))
+            }
+            if value is JsonObject map {
+                let items = CheckedStorage.Reserve<Object>(map.Count)
+                let keys = CheckedStorage.Reserve<string>(map.Count)
+                for index in 0..<map.Count {
+                    let key = map.Name(index)?
+                    let child = map.Item(index)?
+                    let mapped = ReadValue(child, element, depth + 1, construct)?
+                    keys[index] = key
+                    items[index] = mapped
+                }
+                if construct == 0 {
+                    return Ok(map)
+                }
+                return Ok(neoCLR.Runtime.ReflectionCollectionCreate(type, items, keys))
+            }
+            return Error(JsonError.TypeMismatch("object"))
         }
         if type.IsArray {
             let Some(element) = type.GetElementType() else {

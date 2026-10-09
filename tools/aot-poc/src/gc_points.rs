@@ -59,6 +59,8 @@ pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fau
                 &d.string_upper,
                 &d.string_lower,
                 &d.string_compare_ignore_case,
+                &d.string_hash_ordinal,
+                &d.string_hash_ignore_case,
                 &d.string_intern,
                 &d.string_byte_count,
                 &d.utf8_decode,

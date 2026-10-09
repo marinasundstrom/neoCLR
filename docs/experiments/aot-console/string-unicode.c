@@ -115,3 +115,13 @@ int32_t neoclr_string_from_chars_v1(const void *array, neoclr_aot_text_arena *a,
     *output=result;
     return 0;
 }
+
+extern int32_t neoclr_unicode_hash_v1(const unsigned char *, size_t, int32_t, int32_t *);
+int32_t neoclr_string_hash_ordinal_v1(const neoclr_aot_text *text, int32_t *output) {
+    if (!text || !output) return 3;
+    return neoclr_unicode_hash_v1(text->bytes, text->length, 0, output);
+}
+int32_t neoclr_string_hash_ignore_case_v1(const neoclr_aot_text *text, int32_t *output) {
+    if (!text || !output) return 3;
+    return neoclr_unicode_hash_v1(text->bytes, text->length, 1, output);
+}

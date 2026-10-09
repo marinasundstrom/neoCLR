@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-10",
+  "scope": "Nested models, vectors, explicit nodes and built-in collections including write-only construction; macOS ARM64 native/optimized interpreter parity",
+  "baseRevision": "891de0bb524557fcd881984c699525388ff46382",
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "sourceSha256": {
+    ".github/workflows/windows-native-json.yml": "ddd872c7f125afd34484345c2e3bc3ae0e02ffd7c59daab5e93251f377201bb1",
+    "docs/experiments/aot-console/string-unicode.c": "a60796d24fc52c9847c1f0fb6d7224a9c5034f9f46761040bc9ea9042a35857a",
+    "docs/experiments/aot-console/string-unicode.h": "1190d0fb9bdae299aabd608a9c14d0732fc6375dda96d553b96299491b90e1a3",
+    "docs/experiments/native-json/Main.rvn": "3afe13db7bf226a1d34ba2348d4b9d75b2d3d1ec5d339abffe8c78e848513f00",
+    "docs/experiments/native-json/reflection-roots.json": "a4625cf1de5683cd08aa45561ff98b5bb876155b397518af521f3854d7674c3a",
+    "runtime/raven/src/System/Data/Json/CollectionAdapters.rvn": "e2d3abd811cd182b590bf54167541cc4242e0948da495900bca54481b1a1f0e8",
+    "runtime/raven/src/System/Data/Json/CollectionCalls.rvn": "68489faaa4589830d83a03ba578628e2cc00c7917d9525649fd6e32b70620b10",
+    "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "f1b03257a5b648cc297e2d31f6f095d916bc2b3dd3908285f4b94dc3fc84ff2e",
+    "runtime/raven/src/System/StringComparer.rvn": "4cb7da2adba05909cbe650d9a1302bf45bb9fc90a51eb31c0a5d1d7c0e321b41",
+    "runtime/raven/src/System/StringHashCalls.rvn": "7363ca2427b97f06e911c3f3fa5a5861165b2c7ccaaa69235a79427fbf285705",
+    "scripts/build-native-project.py": "782379cfbeaaa706c0921c0dea02061d23f9e31c735be004bd78031a7267359a",
+    "scripts/package-native-build-kit.py": "d883cc82b535eb96c417f2a90bb42daf17e97374da1da3064d10c8b1384db6b9",
+    "scripts/validate-native-json.py": "fc1e74e797227593aade3911c9b15a044b64958fa81e3845665775f1579b4961",
+    "src/lib.rs": "d8c15a32c117ec90f55cd3210b0ab209f347f7c67bafae0fef7d62bbf8044412",
+    "src/native.rs": "2e320e5dfef8997c8874808714a6de08ba2667ae4a2a521106ff93f71bef77ad",
+    "src/native_metadata.rs": "e1ca2813ba504aa545a9931d9a428a345b9b0df1689589f71638e582a1be4b96",
+    "src/reflection_collections.rs": "1260e26d5b609d0705877474abac6f379cc28dc75ac2f95766ef4151f3f0d87a",
+    "src/services.rs": "812ae6fdf5a1887cd7faad2b37889522e61d719bc1f9c409eac644bea5d59d3c",
+    "src/string_comparison.rs": "189a137edc82d58af7cc5fc0175410d57a8a36698b04a2fd5228ae65eea38acb",
+    "src/vm.rs": "ee1e1c086741ea7ff6ad355add201884071ed77e3e6cd255f9170ba3f3e97d64",
+    "tools/aot-native-text/src/lib.rs": "0af72c358dc31b3ffe520e42a9abcd3e22878a5162310e4c893fe5bf32efd5b5",
+    "tools/aot-poc/src/bindings.rs": "ed8e23528a3f10f454f2929b3360b735a4baf4801e7fa5dbef16cff32fa48c23",
+    "tools/aot-poc/src/boxing.rs": "eac6e6cda876ed276c98c64de47fcde887a9ffc4739d89c9e8a1993ca79e26d0",
+    "tools/aot-poc/src/fault_details.rs": "cddd7b3a668ad5c609030187eaa46dfb5a36825d6db3d7e29577e5e1229e6b10",
+    "tools/aot-poc/src/gc_points.rs": "01791289c792ab5c4a26788fa2e82c107582b56cfa104cb0f85f369542401545",
+    "tools/aot-poc/src/limits.rs": "97797a5a870ddabe04a76962759e0cc889afe18d05d060da84de6feea94ab49b",
+    "tools/aot-poc/src/linking.rs": "816331d8af4ac9c548038541391ac7d8c4a39f85a9860789ba4988997ff1519c",
+    "tools/aot-poc/src/main.rs": "65d65486f17fe20be059147a73df23cff097d29abacdc3a409051de767d81427",
+    "tools/aot-poc/src/reflection_collections.rs": "374f41e82df8dc2d66c9792e170d924c45c0f16e361854741e435dc292d390f8",
+    "tools/aot-poc/src/specialization.rs": "4a1dc787ceb1e1d3880eeb216019d1fb1d2078402979f1a33f5ab88f43632d72",
+    "tools/aot-poc/src/values.rs": "725691ead1d1056f6612d3fd4b479e6728354a5f1461628098f6419e644bf550",
+    "tools/aot-poc/tests/console.rs": "af463a74713465aa19d4c8bb3f5bcbec8bf66b4efdfb642b25ffa145285f2f7a"
+  },
+  "reportSha256": "f35896ff221e3d229d096441c40c13e82c4f0626d67e81cbfc9b05802d6ea416",
+  "bundleManifestSha256": "44b4cc9e2fd977b068cb9634a1c3a0465814b5ab1670fc076105ddf6c10feb80",
+  "aotSha256": "55e3ff6e910b2a0a96823c9ba9e85a4ede5ba8eea794b9a0f980dc2d23dce00a",
+  "interpreterSha256": "16060f22b9caaef312c754bb571ba705ccd3092c4620b84d95c95b822351777d",
+  "cases": [
+    {
+      "name": "json",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/native-json-collections-write-closed/json executable only/app"
+          ],
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/release/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/native-json-collections-write-closed/json native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/json-collection-hash-development/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/json-collection-hash-development/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/json-collection-hash-development/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/json-collection-hash-development/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/json-collection-hash-development/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/json-collection-hash-development/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "precedingFullReflectionAndJsonReportSha256": "35b3e5b83a00d80d36a1f30cf0e912be7383cfd9a3647bd4ddb5f9cf58f8d5aa",
+  "focusedChecks": [
+    "2 shared collection contract tests passed",
+    "1 native generic reference identity/interface execution test passed",
+    "1 shared native text hash contract test passed",
+    "2 native API snapshot tests passed",
+    "RavenDoc source/reference fingerprint check passed"
+  ],
+  "windows": "Pending collection project action; earlier node-only action 37993972338 passed"
+}

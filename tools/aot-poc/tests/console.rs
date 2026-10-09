@@ -5969,3 +5969,79 @@ ret
         }
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_generic_reference_boxing_preserves_identity_and_interface_access() {
+    let source = r#"
+.module ReferenceBoxes
+.type class abstract System.Object
+.end
+.interface Answer
+.method instance Read() -> Int32
+.end
+.end
+.type class Cell
+.implements Answer
+.field Number Int32
+.method instance .ctor(Int32 value) -> noresult
+ldarg 0
+ldarg value
+stfld Cell::Number
+ret
+.end
+.method instance Read() -> Int32
+ldarg 0
+ldfld Cell::Number
+ret
+.end
+.end
+.type class Other
+.method instance .ctor() -> noresult
+ret
+.end
+.end
+.function Box<T>(T value) -> System.Object
+ldarg value
+box T
+ret
+.end
+.function Extract<T>(System.Object value) -> T
+ldarg value
+unbox.any T
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Cell cell
+.local Cell alias
+ldarg mode
+brtrue Wrong
+ldc.i4 1
+newobj.ctor instance Cell::.ctor(Int32)
+stloc cell
+ldloc cell
+call Box<Cell>(Cell)
+call Extract<Cell>(System.Object)
+stloc alias
+ldloc alias
+ldc.i4 42
+stfld Cell::Number
+ldloc cell
+castclass Answer
+call Box<Answer>(Answer)
+call Extract<Answer>(System.Object)
+callvirt instance Answer::Read()
+ret
+Wrong:
+newobj.ctor instance Other::.ctor()
+call Box<Other>(Other)
+call Extract<Answer>(System.Object)
+callvirt instance Answer::Read()
+ret
+Failed:
+ldc.i4 0
+ret
+.end
+"#;
+    check_reflection_arrays(source, 1, b"");
+}

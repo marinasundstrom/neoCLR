@@ -175,8 +175,9 @@ can be selected only when every loaded descendant has no competing member; even
 an unconstructed descendant override rejects monomorphic admission. This closes
 the `IPAddress` formatting path without claiming general virtual dispatch. Relative
 to CLR reference inheritance, this is a deliberately narrower admission proof,
-with a 32-lane object layout bound. Closed selection allows 512 types and 512 clones
-under the existing 1024-function cap and a 128-level dependency nesting guard; these are compiler work limits, not language
+with a 32-lane object layout bound. Closed selection allows 512 types. The original 512-clone allowance was aligned
+with the existing 1024-function cap on 2026-10-10 for generic JSON collection adapters;
+each clone still consumes that same total function budget and a 128-level dependency nesting guard; these are compiler work limits, not language
 limits. No performance improvement is claimed. General dispatch remains separate.
 
 The private DNS snapshot tag and these backend admission rules do not change Raven

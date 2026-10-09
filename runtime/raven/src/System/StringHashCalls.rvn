@@ -1,0 +1,7 @@
+namespace neoCLR.Runtime
+
+import System.Runtime.CompilerServices.*
+
+// Exact UTF-8 ordinal content hash; private implementation contract.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringHashOrdinal(value: string) -> int;

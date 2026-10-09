@@ -6,6 +6,27 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-10
+
+- Add recursive built-in Sequence/List/ArrayList and string-keyed
+  Map/MutableMap/HashMap JSON mapping, constructing ArrayList and ordinal HashMap
+  through private checked generic adapters shared by interpreter/native tooling.
+  Preserve explicit nodes, whole-input preflight and existing document bounds;
+  custom collection families, comparer preservation, non-string keys and converters remain outside
+  this slice. Admit generic reference boxing/unboxing through ordinary checked casts.
+  Retain directly constructed collection shapes for write-only consumers and align
+  generic clones with the unchanged 1,024-function cap. Unsupported scalar element
+  shapes remain classifiable without selecting unsupported native boxing bodies.
+  Add allocation-free native ordinal/simple-fold string hashes and conditionally link
+  the matched Unicode archive in project builds and packaged macOS kits. The source
+  JSON validator now builds the matching interpreter and supports focused consumers.
+  Record the author's decision to defer converter/inheritance/union wire-contract
+  work until basic JSON is ready; these remain plans, not implemented APIs.
+  Validate the expanded reflection/JSON corpus on macOS with the matching optimized
+  interpreter; Windows collection qualification remains pending.
+  Record a subsequent collections review, with a queue interface/implementation
+  as the author’s first candidate once basic JSON is sufficiently qualified.
+
 ### 2026-10-09
 
 - Prioritize native JSON through the existing introspection/reflection-backed mapper.

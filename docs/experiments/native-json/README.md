@@ -24,9 +24,9 @@ the HTTP profile expects task-pump exports.
 Run `scripts/validate-native-json.py --output target/my-json-validation --bundle
 /absolute/path/to/development/bundle` for standalone native/interpreter parity and
 the public introspection consumer. The Windows workflow rebuilds current libraries
-from the pinned development compiler and runs the same projects. Windows
-qualification and the expanded nested/array/list/sequence/string-keyed-map milestone
-remain pending. This development probe is not a published capability or benchmark.
+from the pinned development compiler and runs the same projects. The earlier
+nested-object/vector/node slices pass Windows; the new collection slice awaits
+its Windows action. macOS native and interpreter collection round trips pass. This development probe is not a published capability or benchmark.
 
 ## Representative document checks
 
@@ -45,8 +45,8 @@ cannot satisfy the test. One input includes surrounding whitespace.
 
 The mixed DOM document is deliberately not mapped to a typed object: nullable and
 decimal object mapping are outside the current mapper contract. Typed Int32/Boolean/String/Report arrays now have value checks, including an empty
-Report array, plus integer/object array serialization. Lists/sequences, string-keyed
-maps and native jagged arrays still require their own acceptance cases.
+Report array, plus integer/object array serialization. Native jagged arrays still require their own acceptance cases; collection cases
+are described below.
 Exit codes 20–25 identify document corpus failures; success keeps the original
 single-line output. The Windows action uses this same source.
 
@@ -59,3 +59,23 @@ every kind, while concrete node declarations reject mismatches before model code
 JsonNull is explicit data; Object properties do not infer nodes. Embedded depth
 overflow and cycles still fail whole-document limits. Exit code 26 identifies this
 corpus; it passes macOS interpreter/native execution with the rebuilt libraries.
+
+
+## Built-in collections (development)
+
+Exit code 27 identifies the collection corpus. It exercises List<int> mutation,
+serialization-only ArrayList<bool>/HashMap<string, bool> construction,
+a Sequence<Report> model property, Map<string, JsonValue> dynamic content,
+empty ArrayList/HashMap, MutableMap and nested Map<string, Sequence<int>>.
+Repeated round trips preserve values, array order and distinct ordinal keys.
+Unicode and a key longer than 31 bytes exercise content hashing without a
+temporary fixed-size byte vector. A bad later list/map element must fail before
+a faulting earlier model constructor runs. Non-string keys are rejected.
+
+Readers construct ArrayList and HashMap(StringComparer.Ordinal); arbitrary
+collection implementations, custom comparer preservation and inferred Object
+nodes are excluded. Existing container/depth/document limits apply recursively.
+The project driver links matching native Unicode helpers only when selected.
+Run a focused consumer with `validate-native-json.py --case json`; the default
+continues to run both reflection and JSON projects. The validator builds the current
+interpreter for matching private service support.

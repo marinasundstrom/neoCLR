@@ -449,6 +449,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             (&d.string_upper, "neoclr_string_upper_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_lower, "neoclr_string_lower_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_compare_ignore_case, "neoclr_string_compare_ignore_case_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.string_hash_ordinal, "neoclr_string_hash_ordinal_v1", vec![types::I64, types::I64]),
+            (&d.string_hash_ignore_case, "neoclr_string_hash_ignore_case_v1", vec![types::I64, types::I64]),
             (&d.string_intern, "neoclr_string_intern_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_byte_count, "neoclr_string_byte_count_v1", vec![types::I64, types::I64]),
             (&d.string_slice_utf8, "neoclr_string_slice_utf8_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),

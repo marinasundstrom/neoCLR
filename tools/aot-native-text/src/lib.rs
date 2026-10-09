@@ -121,3 +121,46 @@ pub unsafe extern "C" fn neoclr_unicode_visit_v1(bytes: *const u8, length: usize
     } else { return 3; }
     0
 }
+
+/// Hashes validated UTF-8 with the same content policy as the interpreter.
+/// # Safety
+/// Input must be readable for length bytes; output must be aligned, writable,
+/// and disjoint from input. No pointer is retained.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_unicode_hash_v1(bytes: *const u8, length: usize,
+    ignore_case: i32, output: *mut i32) -> i32 {
+    let Some(text) = (unsafe { input(bytes, length) }) else { return 3 };
+    if output.is_null() || !(0..=1).contains(&ignore_case) { return 3; }
+    unsafe { *output = if ignore_case == 0 { string_comparison::hash_ordinal(text) }
+        else { string_comparison::hash_ignore_case(text) }; }
+    0
+}
+
+#[cfg(test)]
+mod hash_tests {
+    use super::*;
+    fn hash(text: &str, policy: i32) -> i32 {
+        let mut value = 0;
+        assert_eq!(unsafe { neoclr_unicode_hash_v1(text.as_ptr(), text.len(), policy, &mut value) }, 0);
+        value
+    }
+
+    #[test]
+    fn content_hashes_preserve_utf8_nul_and_simple_fold_contracts() {
+        assert_eq!(hash("", 0), 2166136261u32 as i32);
+        assert_eq!(hash("hello", 0), 0x4f9f2cabu32 as i32);
+        for (left, right) in [("Å", "å"), ("Σ", "ς"), ("𐐀", "𐐨"), ("A\0B", "a\0b")] {
+            assert_eq!(hash(left, 1), hash(right, 1));
+            assert_ne!(hash(left, 0), hash(right, 0));
+        }
+        assert_ne!(hash("ß", 1), hash("ss", 1));
+        assert_ne!(hash("é", 0), hash("e\u{301}", 0));
+        let long = "雪".repeat(128);
+        assert_eq!(hash(&long, 0), string_comparison::hash_ordinal(&long));
+        let mut output = 123;
+        assert_eq!(unsafe { neoclr_unicode_hash_v1([255].as_ptr(), 1, 0, &mut output) }, 3);
+        assert_eq!(output, 123);
+        assert_eq!(unsafe { neoclr_unicode_hash_v1(b"a".as_ptr(), 1, 2, &mut output) }, 3);
+        assert_eq!(output, 123);
+    }
+}

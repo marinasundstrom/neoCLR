@@ -189,6 +189,7 @@ pub fn prepare(
         }).collect::<Result<_, _>>()?;
     if let Some(retention) = reflection_retention.as_mut() {
         reflection_roots.extend(super::reflection_properties::bind(&mut joined, &source_metadata, &types, &methods, retention)?);
+        super::reflection_collections::bind(&mut joined, &source_metadata, &types, retention)?;
         super::reflection_snapshots::bind(&mut joined, &source_metadata, &types, retention)?;
     }
     let source_conformance = joined.clone();
@@ -434,6 +435,10 @@ pub fn prepare(
             .filter(|r| matches!(r["name"].as_str(),Some("neoCLR.Runtime.TypeProperties" | "neoCLR.Runtime.TypeElementType")))
             .map(|r| json!({"compiledIndex":r["compiledIndex"],"name":r["name"],"implementation":"reflection-snapshot-retained-v1"})).collect();
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        let collection_rows: Vec<_> = report["functions"].as_array().unwrap().iter()
+            .filter(|r| r["name"].as_str().is_some_and(|n|n.starts_with("neoCLR.Runtime.ReflectionCollection")))
+            .map(|r| json!({"compiledIndex":r["compiledIndex"],"name":r["name"],"implementation":"reflection-collection-retained-v1"})).collect();
+        report["nativeBindings"].as_array_mut().unwrap().extend(collection_rows);
         let bindings = report["reflectionRetention"]["propertyBindings"].as_array().unwrap().clone();
         for binding in bindings {
             let row = report["functions"].as_array().unwrap().iter().find(|r| r["definition"] == binding["definition"]);

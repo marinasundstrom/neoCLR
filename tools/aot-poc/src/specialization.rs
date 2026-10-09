@@ -242,7 +242,7 @@ impl Specializer<'_> {
         if self.instances.len() >= crate::limits::FUNCTIONS
             || (self.clones >= MAX_FUNCTION_CLONES && (!target.generic_arguments.is_empty() || self.instances.iter().any(|v| v.source == i)))
         {
-            return Err(format!("method specialization exceeds 1024 selected functions or 512 clones ({} functions, {} clones, {} types)", self.instances.len(), self.clones, self.shapes.len()).into());
+            return Err(format!("method specialization exceeds {} selected functions or {} clones ({} functions, {} clones, {} types)", crate::limits::FUNCTIONS, MAX_FUNCTION_CLONES, self.instances.len(), self.clones, self.shapes.len()).into());
         }
         let row = if target.generic_arguments.is_empty() && !self.instances.iter().any(|v| v.source == i) {
             i

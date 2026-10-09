@@ -23,6 +23,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--bundle', type=Path, help='Required on macOS; Windows rebuilds the pinned bundle libraries')
+    parser.add_argument('--case', choices=['introspection', 'json'], help='Run one focused consumer; default runs both')
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -44,6 +45,8 @@ def main():
         report['revision'] = run(['git', 'rev-parse', 'HEAD'], 'revision').stdout.decode().strip()
         samples = [('introspection', 'native-introspection', 'Report\n'),
                    ('json', 'native-json', '{"Name":"Café","Count":3,"Active":true}\n')]
+        if args.case:
+            samples = [sample for sample in samples if sample[0] == args.case]
         inputs = [Path(__file__).resolve(), ROOT / 'scripts/build-native-project.py',
                   ROOT / 'scripts/validate-native-http-project.py', ROOT / 'scripts/validate-windows-project.py',
                   ROOT / 'scripts/prepare-native-development-bundle.py']
@@ -71,6 +74,9 @@ def main():
         run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'], 'aot-build')
         aot = ROOT / ('tools/aot-poc/target/debug/neoclr-aot-poc' + ('.exe' if windows else ''))
         report['aotSha256'] = sha(aot)
+        run(['cargo', 'build', '--locked', '--release', '--bin', 'neoclr'], 'interpreter-build')
+        runtime = ROOT / ('target/release/neoclr' + ('.exe' if windows else ''))
+        report['interpreterSha256'] = sha(runtime)
         for name, sample, expected in samples:
             project = out / (name + ' project with spaces')
             project.mkdir()
@@ -89,14 +95,14 @@ def main():
             shutil.copy2(dest / exe.name, exe)
             lib = bundle / 'lib'
             catalog = json.loads((lib / 'bundle.json').read_text())
-            interpreter = [bundle / ('bin/neoclr.exe' if windows else 'bin/neoclr'), 'run', dest / 'app.dll',
+            interpreter = [runtime, 'run', dest / 'app.dll',
                            '--system', lib / catalog['runtimeSeed'],
                            *[arg for assembly in catalog['assemblyNames'] for arg in ('--module', lib / (assembly + '.dll'))],
                            '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']
             env = {k: v for k, v in os.environ.items() if k.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
             results = []
             for mode, command, cwd, environment in [('native', [exe], isolated, env), ('interpreter', interpreter, ROOT, None)]:
-                result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=90)
+                result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=600 if mode == 'interpreter' else 90)
                 stdout = result.stdout.decode('utf-8').replace('\r\n', '\n')
                 stderr = result.stderr.decode('utf-8').replace('\r\n', '\n')
                 record = dict(mode=mode, command=list(map(str, command)), exitCode=result.returncode, stdout=stdout, stderr=stderr)
@@ -105,7 +111,7 @@ def main():
                 if (result.returncode, stdout, stderr) != (0, expected, ''):
                     raise ValueError(name + ' ' + mode + ' result mismatch')
             report['cases'].append(dict(name=name, passed=True, results=results))
-        if sha(aot) != report['aotSha256'] or any(sha(ROOT / n) != h for n, h in report['inputs'].items()):
+        if sha(runtime) != report['interpreterSha256'] or sha(aot) != report['aotSha256'] or any(sha(ROOT / n) != h for n, h in report['inputs'].items()):
             raise ValueError('Inputs changed during validation')
         report['passed'] = True
     except Exception as error:

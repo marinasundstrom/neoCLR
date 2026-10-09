@@ -34,6 +34,7 @@ pub(crate) enum Binding {
     ReflectionMemberCheck(u8),
     ReflectionAssignable,
     ReflectionArray(u8),
+    ReflectionCollection(u8),
     ReflectionPropertyCheck(bool),
     ReflectionProperty(bool),
     ObjectTypeHandle,
@@ -88,6 +89,7 @@ pub(crate) enum Binding {
     StringByteCount,
     StringCompareOrdinal,
     StringCompareOrdinalIgnoreCase,
+    StringHashOrdinal,
     StringHashOrdinalIgnoreCase,
     StringContainsOrdinal,
     StringStartsWithOrdinal,
@@ -150,7 +152,7 @@ pub(crate) fn bind_in(module: &crate::Module, function: &Function) -> Result<Bin
             function.name.as_str(),
             "neoCLR.Runtime.ExecutingAssembly" | "neoCLR.Runtime.ReflectionArrayCreate"
         );
-    if relevant {
+    if relevant || function.name.starts_with("neoCLR.Runtime.ReflectionCollection") {
         let mut contract = function.clone();
         contract.parameters = function
             .parameters
@@ -270,6 +272,22 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             return Err(Fault::new("reflection binding signature mismatch"));
         }
         return Ok(Binding::Reflection(query));
+    }
+    for (kind, name) in ["Kind", "Count", "Get", "Key", "Create"].iter().enumerate() {
+        if function.name != format!("neoCLR.Runtime.ReflectionCollection{name}") { continue; }
+        let object = Type::from_name("System.Object");
+        let mut expected = vec![Type::from_name("System.Introspection.TypeInfo")];
+        match kind {
+            0 => {},
+            1 => expected.push(object.clone()),
+            2 | 3 => expected.extend([object.clone(), Type::Int32]),
+            _ => expected.extend([Type::ArrayRef(Box::new(object.clone())), Type::ArrayRef(Box::new(Type::String))]),
+        }
+        let returns = match kind { 0 | 1 => Type::Int32, 3 => Type::String, _ => object };
+        if function.parameters != expected || function.returns != returns || function.no_result {
+            return Err(Fault::new("reflection collection signature mismatch"));
+        }
+        return Ok(Binding::ReflectionCollection(kind as u8));
     }
     for (kind, name) in ["Length", "Get", "Create"].iter().enumerate() {
         if function.name != format!("neoCLR.Runtime.ReflectionArray{name}") {
@@ -560,6 +578,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.StringCompareOrdinalIgnoreCase", [Type::String, Type::String]) => {
             (Binding::StringCompareOrdinalIgnoreCase, Type::Int32)
+        }
+        ("neoCLR.Runtime.StringHashOrdinal", [Type::String]) => {
+            (Binding::StringHashOrdinal, Type::Int32)
         }
         ("neoCLR.Runtime.StringHashOrdinalIgnoreCase", [Type::String]) => {
             (Binding::StringHashOrdinalIgnoreCase, Type::Int32)
@@ -1435,6 +1456,9 @@ impl Binding {
                     },
                 ))
             }
+            (Self::StringHashOrdinal, [Value::String(value)]) => Ok(Value::Int32(
+                crate::string_comparison::hash_ordinal(value),
+            )),
             (Self::StringHashOrdinalIgnoreCase, [Value::String(value)]) => Ok(Value::Int32(
                 crate::string_comparison::hash_ignore_case(value),
             )),

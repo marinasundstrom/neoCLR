@@ -13,6 +13,12 @@ pub(crate) fn compare_ignore_case(left: &str, right: &str) -> Ordering {
     left.chars().map(fold).cmp(right.chars().map(fold))
 }
 
+pub(crate) fn hash_ordinal(value: &str) -> i32 {
+    value.bytes().fold(2166136261u32, |hash, byte| {
+        (hash ^ u32::from(byte)).wrapping_mul(16777619)
+    }) as i32
+}
+
 pub(crate) fn hash_ignore_case(value: &str) -> i32 {
     let mut hash = 2166136261u32;
     let mut buffer = [0u8; 4];

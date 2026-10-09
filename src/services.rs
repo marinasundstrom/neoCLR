@@ -125,6 +125,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
                 RuntimeService::ManagedArrays
             }
             crate::native::Binding::ReflectionConstruct
+            | crate::native::Binding::ReflectionCollection(_)
             | crate::native::Binding::ReflectionMember(_)
             | crate::native::Binding::ReflectionProperty(_) => RuntimeService::ReflectionExecution,
             crate::native::Binding::ReflectionConstructionCheck
@@ -188,6 +189,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             | crate::native::Binding::StringReplaceOrdinal
             | crate::native::Binding::StringCompareOrdinal
             | crate::native::Binding::StringCompareOrdinalIgnoreCase
+            | crate::native::Binding::StringHashOrdinal
             | crate::native::Binding::StringHashOrdinalIgnoreCase
             | crate::native::Binding::StringContainsOrdinal
             | crate::native::Binding::StringStartsWithOrdinal
@@ -207,7 +209,8 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
         if matches!(
             &binding,
             crate::native::Binding::ReflectionConstruct
-                | crate::native::Binding::ReflectionMember(_)
+                | crate::native::Binding::ReflectionCollection(_)
+            | crate::native::Binding::ReflectionMember(_)
                 | crate::native::Binding::ReflectionProperty(_)
         ) {
             uses.extend(
@@ -248,7 +251,8 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
         if matches!(
             &binding,
             crate::native::Binding::UnixTimeToLocal
-                | crate::native::Binding::ReflectionMember(_)
+                | crate::native::Binding::ReflectionCollection(_)
+            | crate::native::Binding::ReflectionMember(_)
                 | crate::native::Binding::ReflectionMemberCheck(_)
                 | crate::native::Binding::TimeZoneMapLocal
                 | crate::native::Binding::EnvironmentArguments

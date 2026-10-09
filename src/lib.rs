@@ -50,6 +50,7 @@ mod reachability;
 mod references;
 mod reflection;
 mod reflection_arrays;
+mod reflection_collections;
 mod reflection_execution;
 mod reflection_members;
 mod reflection_properties;

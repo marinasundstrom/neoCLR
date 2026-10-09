@@ -34,7 +34,7 @@ def main():
     sources = [*ROOT.joinpath('src').rglob('*.rs'), *ROOT.joinpath('tools/aot-poc/src').rglob('*.rs'),
                ROOT / 'docs/experiments/http-server/Server.rvn',
                ROOT / 'Cargo.toml', ROOT / 'Cargo.lock', cargo_manifest, cargo_manifest.parent / 'Cargo.lock',
-               Path(__file__).resolve(), *builder.support_files()]
+               Path(__file__).resolve(), *builder.support_files(), *builder.native_text_sources()]
     inputs = {str(p.relative_to(ROOT)): builder.sha(p) for p in sources}
     command = ['cargo', 'build', '--locked', '--manifest-path', str(cargo_manifest), '--message-format=json']
     result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=True)
@@ -64,6 +64,11 @@ def main():
     copy(bundle / 'manifest.json', 'bundle/manifest.json')
     builder.verify_files(staged / 'bundle', manifest['files'])
     copy(aot, 'bin/neoclr-aot-poc')
+    text_manifest = ROOT / 'tools/aot-native-text/Cargo.toml'
+    subprocess.run(['cargo', 'build', '--locked', '--release', '--target', 'aarch64-apple-darwin',
+                    '--manifest-path', str(text_manifest)], cwd=ROOT, check=True)
+    copy(text_manifest.parent / 'target/aarch64-apple-darwin/release/libneoclr_aot_native_text.a',
+         'lib/libneoclr_aot_native_text.a')
     for source in builder.support_files():
         copy(source, source.relative_to(ROOT))
     for source in (ROOT / 'tools/native/samples/hello').iterdir():

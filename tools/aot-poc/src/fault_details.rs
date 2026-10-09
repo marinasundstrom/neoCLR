@@ -72,6 +72,8 @@ pub struct Options {
     pub string_upper: Vec<usize>,
     pub string_lower: Vec<usize>,
     pub string_compare_ignore_case: Vec<usize>,
+    pub string_hash_ordinal: Vec<usize>,
+    pub string_hash_ignore_case: Vec<usize>,
     pub string_intern: Vec<usize>,
     pub string_byte_count: Vec<usize>,
     pub utf8_decode: Vec<usize>,
@@ -123,7 +125,7 @@ impl Options {
                     .filter_map(|t| Some((t["typeCompiledIndex"].as_u64()? as usize, t["functionCompiledIndex"].as_u64()? as usize))).collect()))).collect(),
             boxed_int32_display: report.is_some_and(|r| r["boxedInt32Display"] == true),
             descriptor_queries: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
-                .filter(|r| matches!(r["implementation"].as_str(), Some("type-name-closed-v1" | "type-argument-count-closed-v1" | "type-argument-closed-v1" | "type-shape-closed-v1" | "reflection-construction-retained-v1" | "reflection-array-closed-v1" | "reflection-property-retained-v1" | "reflection-snapshot-retained-v1")))
+                .filter(|r| matches!(r["implementation"].as_str(), Some("type-name-closed-v1" | "type-argument-count-closed-v1" | "type-argument-closed-v1" | "type-shape-closed-v1" | "reflection-construction-retained-v1" | "reflection-array-closed-v1" | "reflection-property-retained-v1" | "reflection-snapshot-retained-v1" | "reflection-collection-retained-v1")))
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             reflection_array_sites: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| matches!(r["implementation"].as_str(), Some("reflection-array-closed-v1" | "reflection-property-retained-v1")))
@@ -328,6 +330,12 @@ impl Options {
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             string_compare_ignore_case: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "string-compare-ignore-case-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            string_hash_ordinal: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-hash-ordinal-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            string_hash_ignore_case: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-hash-ignore-case-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             string_intern: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "string-intern-v1")

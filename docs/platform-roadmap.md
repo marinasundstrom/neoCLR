@@ -81,20 +81,34 @@ getter/setter policies now generate checked accessor adapters; focused macOS tes
 cover access/value errors, real effects and user faults. Rooted property snapshots and vector element queries now execute through the public
 Raven facades, and the flat typed JSON round trip passes on macOS. The author expands
 the milestone to nested objects, arrays, typed lists/sequences and string-keyed maps;
-lists/sequences and maps remain unfinished. The existing nested object, DOM and
+the built-in list/sequence and string-keyed map mapper now passes macOS
+native/interpreter round trips, including nested collections and preflight before
+model code. Windows qualification of this collection slice is pending. The existing nested object, DOM and
 scalar/object vector corpus now passes on Windows x64 with interpreter parity
 ([evidence](windows-native-json-validation.json)), alongside macOS ARM64.
 Native GetGenericArgument now inspects retained closed collection type arguments,
 with nested generic identity and invalid-index parity checks on macOS. Collection
-construction and shared JSON list/map mapping remain the next bounded work.
+reads construct ArrayList and ordinal HashMap using checked generic library adapters;
+custom collections and non-string keys remain unsupported. See the
+[collection design and bounds](native-json-plan.md#built-in-collection-mapping--development-2026-10-10).
 Author-directed explicit JSON subtree support now passes in mixed typed models
 (JsonValue/concrete node roots, properties and vectors) on macOS in both modes;
-Object declarations do not infer nodes. Windows qualification of this slice is pending.
+Object declarations do not infer nodes. Windows action
+[37993972338](https://github.com/marinasundstrom/neoCLR/actions/runs/37993972338)
+also passes at `891de0bb`; its artifacts have not yet been independently hash-verified.
+The author defers converters and inheritance/union wire contracts until basic JSON
+is ready; see the [follow-up](native-json-plan.md#converter-and-wire-contract-follow-up--2026-10-09).
 Evaluate the Introspection/Reflection API alongside implementation before stability,
 preserving its overall structure while keeping details revisable; see the
 [pre-stable review](introspection-design.md#pre-stable-api-evaluation--2026-10-09).
-Once parity works, the author selects JSON serialization/deserialization as an
-interpreter-versus-native benchmark case; see the protocol in the native JSON plan.
+**Author follow-up (2026-10-10):** once basic JSON serialization is good enough,
+review the collection API and identify useful additions. A queue interface and
+implementation are the first named candidate, not yet a settled API. Evaluate
+actual HTTP/runtime scheduling consumers, existing collection contracts and .NET
+ergonomics/behavior before selecting additions. Finish the current JSON correctness
+and platform qualification first. The earlier interpreter/native JSON benchmark
+and later framework-comparison direction remains recorded in the native JSON plan;
+this new request makes the collection review the next author-selected topic.
 
 **Author clarification (2026-10-09):** once the native compilation foundations are
 ready, let runtime suspension, runtime-owned scheduling and green threads co-evolve

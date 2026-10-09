@@ -24,12 +24,14 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
     let mut int32_rows = vec![];
     let mut bool_rows = vec![];
     let mut string_rows = vec![];
+    let mut reference_rows = vec![];
     for (caller, pc, ty) in sites {
         // String is intrinsic reference storage. Match the interpreter's Object
         // view materialization instead of treating it as a value-record box.
-        if ty == Type::String {
+        if input.is_object_reference_type(&ty) {
             input.functions[caller].body[pc] = Op::CastClass(object.clone());
-            string_rows.push(json!({"functionCompiledIndex":caller,"instruction":pc}));
+            if ty == Type::String { string_rows.push(json!({"functionCompiledIndex":caller,"instruction":pc})); }
+            else { reference_rows.push(json!({"functionCompiledIndex":caller,"instruction":pc})); }
             continue;
         }
         let primitive = matches!(ty, Type::Int32 | Type::Boolean);
@@ -49,7 +51,7 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         let t = &input.types[index];
         if t.is_reference_type || t.representation != Representation::Record || !t.fields.is_empty()
             || t.base.is_some() || t.enum_info.is_some() || !t.generic_parameters.is_empty() {
-            return Err("record boxing currently requires empty value records".into());
+            return Err(format!("record boxing currently requires empty value records; found {ty:?} in {} at instruction {pc}", input.functions[caller].name).into());
         }
         let helper = if let Some(&helper) = helpers.get(&index) { helper } else {
             if input.functions.len() >= crate::limits::FUNCTIONS { return Err("boxing helpers exceed the selected function limit".into()); }
@@ -74,6 +76,7 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         sites.push(json!({"functionCompiledIndex":caller,"instruction":pc,"helperCompiledIndex":helper,"typeCompiledIndex":index}));
     }
     report["stringBoxSites"] = json!(string_rows);
+    report["referenceBoxSites"] = json!(reference_rows);
     report["int32BoxSites"] = json!(int32_rows);
     report["booleanBoxSites"] = json!(bool_rows);
     report["emptyRecordBoxSites"] = json!(rows);
@@ -134,7 +137,7 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
         })
     }).collect();
     // Reference unboxing is the ordinary checked reference cast in the VM.
-    let reference_types: Vec<_> = input.types.iter().filter(|t| t.is_reference_type).map(|t| Type::Named(t.name.clone())).collect();
+    let reference_types: Vec<_> = input.types.iter().filter(|t| t.is_reference_type || t.representation == Representation::Interface).map(|t| Type::Named(t.name.clone())).collect();
     for f in &mut input.functions {
         for op in &mut f.body {
             if let Op::UnboxAny(t) = op {

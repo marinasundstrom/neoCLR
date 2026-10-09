@@ -1,5 +1,7 @@
 import System.*
 import System.Data.Json.*
+import System.Collections.*
+import System.Option.*
 import System.Result.*
 
 public class Report {
@@ -36,6 +38,85 @@ public class GuardedNode {
         System.Fail("Invalid node kind ran model code")
     }
     var Payload: JsonObject { get; set; } = JsonObject()
+}
+
+public class CollectionEnvelope {
+    init() { }
+    var Reports: Sequence<Report> { get; set; } = ArrayList<Report>()
+    var Content: Map<string, JsonValue> { get; set; } = HashMap<string, JsonValue>(StringComparer.Ordinal)
+}
+
+func CheckCollections() -> Result<bool, JsonError> {
+    // These types are used only for writing: constructor reachability must retain them.
+    let flags = ArrayList<bool>()
+    flags.Add(true)
+    flags.Add(false)
+    if JsonSerializer.Serialize(flags)? != "[true,false]" {
+        return Ok(false)
+    }
+    let settings = HashMap<string, bool>(StringComparer.Ordinal)
+    _ = settings.TryAdd("enabled", true)
+    if JsonSerializer.Serialize(settings)? != "{\"enabled\":true}" {
+        return Ok(false)
+    }
+    let integers = JsonSerializer.Deserialize<List<int>>("[1,-2,0]")?
+    if integers.Count != 3 || integers[1] != -2 {
+        return Ok(false)
+    }
+    integers.Add(4)
+    let text = JsonSerializer.Serialize(integers)?
+    if text != "[1,-2,0,4]" {
+        return Ok(false)
+    }
+    let input = "{\"Reports\":[{\"Name\":\"Café\",\"Count\":3,\"Active\":true}],\"Content\":{\"extra\":{\"values\":[1,null]},\"empty\":[]}}"
+    let value = JsonSerializer.Deserialize<CollectionEnvelope>(input)?
+    if value.Reports.Count != 1 || value.Reports[0].Name != "Café" || value.Content.Count != 2 {
+        return Ok(false)
+    }
+    if value.Content.Find("extra") is not Some(JsonObject) {
+        return Ok(false)
+    }
+    let output = JsonSerializer.Serialize(value)?
+    if output != input {
+        return Ok(false)
+    }
+    let copy = JsonSerializer.Deserialize<CollectionEnvelope>(output)?
+    let copied = JsonSerializer.Serialize(copy)?
+    if copied != input {
+        return Ok(false)
+    }
+    let empty = JsonSerializer.Deserialize<HashMap<string, int>>("{}")?
+    let noItems = JsonSerializer.Deserialize<ArrayList<string>>("[]")?
+    if empty.Count != 0 || noItems.Count != 0 {
+        return Ok(false)
+    }
+    if JsonSerializer.Deserialize<List<int>>("[1,\"bad\"]") is not Error(JsonError.TypeMismatch(_)) ||
+       JsonSerializer.Deserialize<Map<string, int>>("{\"a\":false}") is not Error(JsonError.TypeMismatch(_)) ||
+       JsonSerializer.Deserialize<Map<int, int>>("{\"a\":1}") is not Error(JsonError.UnsupportedMapping(_)) {
+        return Ok(false)
+    }
+    let keys = JsonSerializer.Deserialize<MutableMap<string, int>>("{\"A\":1,\"a\":2,\"雪\":3,\"café\":4,\"a key longer than thirty one UTF-8 bytes\":5}")?
+    if keys.Count != 5 || keys.Find("A") is not Some(1) || keys.Find("a") is not Some(2) ||
+       keys.Find("雪") is not Some(3) {
+        return Ok(false)
+    }
+    let keyText = JsonSerializer.Serialize(keys)?
+    let keyCopy = JsonSerializer.Deserialize<Map<string, int>>(keyText)?
+    if keyCopy.Count != 5 || keyCopy.Find("a key longer than thirty one UTF-8 bytes") is not Some(5) {
+        return Ok(false)
+    }
+    let nested = JsonSerializer.Deserialize<Map<string, Sequence<int>>>("{\"items\":[1,2],\"empty\":[]}")?
+    if JsonSerializer.Serialize(nested)? != "{\"items\":[1,2],\"empty\":[]}" {
+        return Ok(false)
+    }
+    // A bad later element must fail before the earlier model's faulting constructor.
+    if JsonSerializer.Deserialize<List<Guarded>>("[{\"Count\":1,\"Active\":true},{\"Count\":\"bad\",\"Active\":true}]") is not Error(JsonError.TypeMismatch(_)) {
+        return Ok(false)
+    }
+    if JsonSerializer.Deserialize<Map<string, Guarded>>("{\"first\":{\"Count\":1,\"Active\":true},\"later\":{\"Count\":false,\"Active\":true}}") is not Error(JsonError.TypeMismatch(_)) {
+        return Ok(false)
+    }
+    return Ok(true)
 }
 
 func CheckNodes() -> Result<bool, JsonError> {
@@ -146,6 +227,9 @@ func CheckArrays() -> Result<bool, JsonError> {
 }
 
 func Main() -> int {
+    if CheckCollections() is not Ok(true) {
+        return 27
+    }
     if CheckNodes() is not Ok(true) {
         return 26
     }

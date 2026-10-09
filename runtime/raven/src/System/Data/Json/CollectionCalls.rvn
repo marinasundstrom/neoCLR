@@ -1,0 +1,21 @@
+namespace neoCLR.Runtime
+
+import System.*
+import System.Introspection.*
+import System.Runtime.CompilerServices.*
+
+// Private source-owned adapter contract; no JSON parsing or mapping in the host.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionCollectionKind(type: TypeInfo) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionCollectionCount(type: TypeInfo, value: Object) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionCollectionGet(type: TypeInfo, value: Object, index: int) -> Object;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionCollectionKey(type: TypeInfo, value: Object, index: int) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionCollectionCreate(type: TypeInfo, values: Object[], keys: string[]) -> Object;

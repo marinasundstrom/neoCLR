@@ -13052,3 +13052,39 @@ claim follows from these focused checks.
 - **Outcome:** the shared mapper and NodeEnvelope acceptance corpus now pass native
   macOS and interpreter execution. API type/member help and native snapshots are
   refreshed; Windows qualification for this new behavior remains pending.
+
+## 2026-10-09 — Defer converters until basic JSON is ready
+
+- **Author:** asks to consider .NET serializer behavior, inheritance wire formats,
+  Raven's existing .NET union contracts and custom JSON converters.
+- **Assistant:** inspects Raven's converter source/tests and Microsoft's converter,
+  contract and polymorphism documentation; proposes retaining the distinct union
+  formats and evaluating explicit derived-type registration.
+- **Author correction:** explicitly prioritizes completing the basic JSON support
+  already underway and adding converters later.
+- **Action:** records the follow-up in the [native JSON plan](native-json-plan.md#converter-and-wire-contract-follow-up--2026-10-09).
+  Nested objects/collections remain active. The current collection consumer exposes
+  native string-comparer hashing as the next execution dependency; a fix is in
+  progress. Converter APIs and inheritance/union JSON support remain unimplemented.
+
+## 2026-10-10 — Basic JSON collection execution
+
+- **Outcome following the author’s basic-JSON priority:** built-in list/sequence/string-keyed-map round trips,
+  nested models/nodes/collections, ordinal Unicode keys and validation before
+  model code pass macOS native and matching optimized interpreter execution.
+  Generic reference boxing and native content hashing close the encountered
+  execution gaps. API documentation is refreshed and serialization-only retention checks pass
+  in both modes. Windows qualification remains the next validation step.
+  [Evidence](native-json-collection-validation.json).
+
+## 2026-10-10 — Review collections after basic JSON
+
+- **Author:** directs a review of collections once JSON serialization is good enough,
+  to determine useful additions; names a queue interface and implementation as one
+  candidate.
+- **Assistant:** commits to finishing the current JSON qualification first, then
+  reviewing collection gaps against concrete HTTP/runtime scheduling uses and .NET
+  APIs. A queue is a candidate, not an approved final contract or implemented API.
+- **Sequencing:** the collection review is the next author-selected topic. The
+  previously requested JSON benchmark/publication work remains recorded, not
+  cancelled or claimed complete.

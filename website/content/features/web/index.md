@@ -458,8 +458,10 @@ The managed report sample fetches a typed report from a neoCLR server, posts it 
 and reads a JSON acknowledgement. The mapper supports String, Int32 and Boolean
 properties, nested reference objects and typed arrays with the same scalar
 rules, in documents up to 1,024 UTF-8 bytes. Conversion is synchronous over
-buffered HTTP content. Per-call header options, generic lists and nullable mapping
-remain later work. See [the API guide](/docs/json.html) for the exact scope.
+buffered HTTP content. Development mapping also supports built-in lists/sequences
+and string-keyed maps, including nested models and explicit JSON nodes. Map reads
+use ordinal string comparison. Per-call header options, nullable mapping and JSON
+converters remain later work. See [the API guide](/docs/json.html) for the exact scope.
 
 ## JSON DOM
 

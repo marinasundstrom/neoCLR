@@ -59,3 +59,20 @@ pub fn generic_arguments(module: &Module, owner: &Type) -> Result<Vec<Type>, Fau
         .generic_arguments.iter()
         .map(|handle| handle_type(module, handle)).collect()
 }
+
+/// Classify a scoped built-in collection and its ordinary concrete implementation.
+pub fn collection_shape(module: &Module, service: &crate::metadata::Function, owner: &Type)
+    -> Result<Option<(i32, Type, Type)>, Fault> {
+    crate::reflection_collections::shape(module, service, owner)
+}
+
+/// Plan a call to source-owned generic collection code without executing it.
+pub fn collection_plan(module: &Module, service: &crate::metadata::Function, owner: &Type, operation: u8)
+    -> Result<crate::metadata::Function, Fault> {
+    crate::reflection_collections::plan(module, service, owner, operation)
+}
+
+/// Validate the private collection service before generating any native dispatch.
+pub fn validate_collection_service(module: &crate::Module, service: &crate::metadata::Function, operation: u8) -> Result<(), crate::Fault> {
+    crate::reflection_collections::validate_service(module, service, operation)
+}

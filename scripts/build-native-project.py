@@ -15,6 +15,13 @@ PROFILE = 'macos-arm64-console-v1'
 PROFILES = {'console': PROFILE, 'http': 'macos-arm64-http-v1', 'windows-console': 'windows-x64-console-v1', 'windows-http': 'windows-x64-http-v1'}
 
 
+def native_text_sources():
+    return [ROOT / 'tools/aot-native-text/Cargo.toml', ROOT / 'tools/aot-native-text/Cargo.lock',
+            ROOT / 'tools/aot-native-text/src/lib.rs',
+            *[ROOT / 'src' / name for name in
+              ('string_comparison.rs', 'string_case_folding.rs', 'string_casing_data.rs', 'string_casing_kernel.rs')]]
+
+
 def support_files():
     base = ROOT / 'docs/experiments'
     return [ROOT / 'scripts/build-native-project.py', ROOT / 'tools/native/console-host.c',
@@ -25,7 +32,7 @@ def support_files():
               ('windows-console-host.c', 'windows-gc-host.c', 'windows-host-memory.c', 'windows-native-stack.c')],
             *[base / 'aot-console' / name for name in
               ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c',
-               'native-stack.c', 'task-queue.c', 'socket-listener.c')],
+               'native-stack.c', 'task-queue.c', 'socket-listener.c', 'string-unicode.c')],
             base / 'aot-scalar/console.c', base / 'aot-fault-details/render.c',
             *sorted((base / 'aot-console').glob('*.h')),
             *sorted((base / 'aot-scalar').glob('*.h')),
@@ -185,13 +192,35 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         if reflection_roots:
             report['inputs'][str(reflection_roots)] = sha(reflection_roots)
             flags += ['--reflection-roots', reflection_roots]
-        run([aot, '--closed-world', assembly, selected_root, obj, *context, *flags])
+        selection = json.loads(run([aot, '--closed-world', assembly, selected_root, obj, *context, *flags]))
+        text_services = {'neoclr_string_compare_ignore_case_v1', 'neoclr_string_hash_ordinal_v1',
+                         'neoclr_string_hash_ignore_case_v1', 'neoclr_string_upper_v1',
+                         'neoclr_string_lower_v1', 'neoclr_string_grapheme_count_v1',
+                         'neoclr_string_grapheme_at_v1', 'neoclr_string_graphemes_v1',
+                         'neoclr_string_scalars_v1', 'neoclr_string_from_chars_v1'}
+        native_text = []
+        if any(binding.get('symbol') in text_services for binding in selection.get('nativeBindings', [])):
+            adapters.append(base / 'string-unicode.c')
+            archive_name = 'neoclr_aot_native_text.lib' if windows else 'libneoclr_aot_native_text.a'
+            if kit_path.exists():
+                archive = ROOT / 'lib' / archive_name
+                if kit['files'].get(archive.relative_to(ROOT).as_posix()) != sha(archive):
+                    raise ValueError('Native build kit omits matching native text archive')
+            else:
+                for path in native_text_sources():
+                    report['inputs'][str(path)] = sha(path)
+                manifest = ROOT / 'tools/aot-native-text/Cargo.toml'
+                target = 'x86_64-pc-windows-msvc' if windows else 'aarch64-apple-darwin'
+                run(['cargo', 'build', '--locked', '--release', '--target', target, '--manifest-path', manifest])
+                archive = manifest.parent / 'target' / target / 'release' / archive_name
+            report['inputs'][str(archive)] = sha(archive)
+            native_text.append(archive)
         # Publish the executable only after link and dependency checks succeed.
         pending = output / ('app.pending.exe' if windows else 'app.pending')
         if windows:
             run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
                  '/DNEOCLR_NATIVE_GC', *(['/DNEOCLR_HTTP_HOST'] if http else []), '/I' + str(base), '/Fo' + str(output) + '/',
-                 '/Fe:' + str(pending), *adapters, obj, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http else [])])
+                 '/Fe:' + str(pending), *adapters, obj, *native_text, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http else [])])
             import re
             dependencies = re.findall(r'^\s+([A-Za-z0-9_.-]+\.dll)\s*$', run(['dumpbin', '/dependents', pending]), re.MULTILINE | re.IGNORECASE)
             allowed = {'kernel32.dll', *(['ws2_32.dll'] if http else [])}
@@ -199,7 +228,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:
             run([clang, '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
-                 '-DNEOCLR_NATIVE_GC', '-I', base, *adapters, obj, '-o', pending])
+                 '-DNEOCLR_NATIVE_GC', '-I', base, *adapters, obj, *native_text, '-o', pending])
             dependencies = [line.split()[0] for line in run(['xcrun', 'otool', '-L', pending]).splitlines()[1:]]
             if dependencies != ['/usr/lib/libSystem.B.dylib']:
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
