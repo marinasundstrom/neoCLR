@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Present extension containers with a dedicated icon, an extension declaration and
+  linked receiver types in the API reference. Share the rendering with Raven main;
+  validate native Operators as `extension Operators for Iterable<T>`.
+
 - Correct API sidebar icons for module functions and constants using RavenDoc's
   existing member glyphs. Group module constants under Constants rather than
   Members, preserve reference URLs, and validate the native Math module's rendering.

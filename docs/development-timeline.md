@@ -50,6 +50,15 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   separates Constants from Functions, and replaces the API landing page's accumulated
   change notes with module browsing, subject entry points and short reading guidance.
 
+- **Author follow-up:** points to `System.Linq.Operators` and asks to distinguish
+  extension containers from static classes, give them a distinct icon, include
+  receiver information and display `extension Operators for Iterable<T>`. Requests
+  the presentation on Raven main and emphasizes sharing behavior through the similar
+  metadata markers.
+- **Assistant approach:** uses semantic extension receivers in the shared publisher,
+  with a dedicated container icon and linked receiver types. Validates source,
+  imported .NET and native reference rendering, preserving ordinary static classes.
+
 ## 2026-10-09 — Architecture and metadata explanations
 
 - **Author:** requests repository documentation and website pages for architecture

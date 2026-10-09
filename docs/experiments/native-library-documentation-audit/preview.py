@@ -39,6 +39,14 @@ def main():
         assert f'field_{constant}.html' in navigation
         constant_link = re.search(r'<a[^>]*href="[^"]*System/Math/field_' + constant + r'\.html"[^>]*>.*?</a>', navigation, re.S)
         assert constant_link and 'symbol-icon--field' in constant_link[0]
+    operators = (source / 'System/Linq/Operators/index.html').read_text()
+    assert '<span>Extension container</span>' in operators
+    assert 'extension Operators for Iterable&lt;T&gt;' in operators
+    assert '<strong>Receiver type</strong>' in operators
+    assert 'Iterable%601/index.html' in operators
+    assert 'static class Operators' not in operators
+    extension_link = re.search(r'<a[^>]*href="[^"]*System/Linq/Operators/index\.html"[^>]*>.*?</a>', navigation, re.S)
+    assert extension_link and 'symbol-icon--extension' in extension_link[0]
     overloads = (source / 'System/Math/method_Abs.html').read_text()
     assert 'Abs(value: int)' in overloads and 'Abs(value: double)' in overloads
     destination = args.site.resolve() if args.site else ROOT / 'target/website'

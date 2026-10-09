@@ -255,3 +255,28 @@ The full 3,490-page website build and link/anchor checks pass with the regenerat
 native preview; browser review confirms the member icons, groups and landing layout.
 Existing API description gaps remain reported by the build. No website publication
 is performed by this update.
+
+## Extension container presentation (2026-10-09)
+
+RavenDoc identifies extension containers using semantic receiver information on
+the type or its public members. The shared renderer gives containers a distinct
+icon and label in navigation, module listings and page headers, and links their
+receiver types. A single receiver produces an extension declaration; a container
+with multiple receivers lists them without inventing one declaration. Ordinary
+static classes keep their existing presentation.
+
+The native Operators page displays `extension Operators for Iterable<T>`. Imported
+metadata can lift container parameters onto members, so this display does not infer
+a generic container identity from receiver parameters. Source containers retain
+their declared parameters. No metadata encoding, Runtime Contract, binding or runtime
+behavior changes are required; this presentation is shared with Raven main.
+
+The shared presentation is committed on Raven main at
+`950e4f047748efc88923f59f8c7e80096e09f3e9`; neoCLR's pinned integration revision
+`1910ab350bd64a9c8f2ec7b7365d14fa9beaff35` contains the same change.
+The 42 focused RavenDoc/namespace tests cover source and imported .NET containers,
+generic receivers, multiple receivers, navigation icons and ordinary static classes.
+The production native audit, 21 website tests and full 3,490-page build/link checks
+pass. Browser review confirms Operators' distinct icon, extension declaration and
+linked `Iterable<T>` receiver. Existing missing-description notices remain; website
+publication is separate.
