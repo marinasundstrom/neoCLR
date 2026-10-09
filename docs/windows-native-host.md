@@ -145,7 +145,11 @@ through non-elided 16 KiB buffers, publish GC frames, stop with status 9, collec
 while a root is live, and return normally with every frame removed. It verifies
 headroom again and reclaims the object. A converted fiber must be rejected and
 normal-thread checks must work after conversion back. The build retains compiler
-stack probing; it does not recover from an OS stack overflow. Execution is pending.
+stack probing; it does not recover from an OS stack overflow. The independent
+probe passes [run 37954770377](https://github.com/marinasundstrom/neoCLR/actions/runs/37954770377)
+at `db2fd66b`, stopping at depths 15 and 46. The collector host now calls this
+check before allocating: small stacks and fibers return status 9 with the owner
+record unchanged. Integrated admission execution is pending.
 
 Windows managed code generation still needs final-frame and outgoing-call bounds,
 Cranelift page-probing checks, guard placement and actual generated-code fault

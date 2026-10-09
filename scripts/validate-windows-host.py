@@ -44,13 +44,14 @@ def main():
         report['execution'] = dict(exitCode=0, stdout=result.stdout.decode(), stderr='', allocationLifecycles=12)
         base = ROOT / 'docs/experiments/aot-console'
         collector_inputs = [ROOT / 'tools/native' / name for name in
-                            ('windows-gc-host.c', 'windows-gc-host.h', 'windows-gc-host-test.c')]
-        collector_inputs += [base / name for name in ('native-gc.c', 'native-gc-test.c', 'root-probe.c', 'native-gc.h', 'root-probe.h', 'text-arena.h')]
+                            ('windows-gc-host.c', 'windows-gc-host.h', 'windows-gc-host-test.c', 'windows-native-stack.c')]
+        collector_inputs += [base / name for name in ('native-gc.c', 'native-gc-test.c', 'root-probe.c', 'native-gc.h', 'root-probe.h', 'text-arena.h', 'native-stack.h')]
         collector_inputs += [ROOT / 'docs/experiments/aot-fault-details/fault-details.h']
         report['inputs'].update({p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in collector_inputs})
         run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
              '/Fe:host-collector.exe', ROOT / 'tools/native/windows-gc-host-test.c',
-             ROOT / 'tools/native/windows-gc-host.c', inputs[0], base / 'native-gc.c', base / 'root-probe.c'], 'collector-build')
+             ROOT / 'tools/native/windows-gc-host.c', ROOT / 'tools/native/windows-native-stack.c',
+             inputs[0], base / 'native-gc.c', base / 'root-probe.c'], 'collector-build')
         result = run([out / 'host-collector.exe'], 'collector-execute')
         expected = b'Windows collector: rooted graph, frame handoff, thread isolation, exhaustion and cleanup passed\r\n'
         if result.stdout != expected or result.stderr:

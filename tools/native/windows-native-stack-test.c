@@ -66,6 +66,9 @@ __declspec(noinline) static int32_t guarded_entry(int32_t *output) {
 }
 static DWORD WINAPI small_worker(void *argument) {
     (void)argument;
+    neoclr_windows_gc_host host = {0};
+    assert(neoclr_windows_gc_host_open(&host, 4096) == 9);
+    assert(!host.heap.reservation && !host.context.text.data && !host.thread_id);
     int32_t output = 123;
     assert(guarded_entry(&output) == 9 && output == 123);
     assert(!neoclr_root_probe_head_v1());
@@ -90,6 +93,9 @@ int main(void) {
      * not qualified by this system-thread stack contract. */
     assert(ConvertThreadToFiber(NULL) != NULL);
     assert(neoclr_native_stack_check_v1() == 9);
+    neoclr_windows_gc_host fiber_host = {0};
+    assert(neoclr_windows_gc_host_open(&fiber_host, 4096) == 9);
+    assert(!fiber_host.heap.reservation && !fiber_host.thread_id);
     assert(ConvertFiberToThread());
     assert(neoclr_native_stack_check_v1() == 0);
     printf("{\"passed\":true,\"smallStackRejected\":true,\"fiberRejected\":true,\"depth512KiB\":%u,\"depth1MiB\":%u}\n", shallow, deep);

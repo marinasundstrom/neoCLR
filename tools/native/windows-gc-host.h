@@ -11,6 +11,7 @@ typedef struct {
     neoclr_aot_context context;
     uint32_t thread_id;
 } neoclr_windows_gc_host;
+/* Admission returns 9 without allocating on an undersized/unsupported stack. */
 int32_t neoclr_windows_gc_host_open(neoclr_windows_gc_host *host, size_t capacity);
 /* Rejects foreign thread, live host handles and active published guest frames.
  * Render any fault first. On success all context storage becomes invalid.
