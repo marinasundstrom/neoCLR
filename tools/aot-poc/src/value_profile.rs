@@ -624,13 +624,22 @@ impl<'a> Profile<'a> {
         }
         Ok(i)
     }
-    pub fn root(&self, root: &str) -> Result<usize, Error> {
+    pub fn root(&self, root: &str, bootstrap: bool) -> Result<usize, Error> {
         let candidates = self.names.get(root).ok_or("root function not found")?;
         let [i] = candidates.as_slice() else {
             return Err("ambiguous value root name; use a uniquely named wrapper".into());
         };
         let i = *i;
         let f = &self.input.functions[i];
+        if bootstrap {
+            let valid = matches!(&f.returns, Type::Function(shape) if shape.parameters.is_empty()
+                && shape.returns == Type::Void && !shape.no_result
+                && shape.out_parameters.is_empty() && shape.out_when_true.is_empty());
+            if f.instance || f.no_result || !f.out_parameters.is_empty() || !valid || !(self.args[i].is_empty() || self.args[i] == [Ty::Int]) {
+                return Err("native host bootstrap must be static with zero arguments or one Int32 argument and exactly fn<Void> result".into());
+            }
+            return Ok(i);
+        }
         if f.instance
             || !matches!(self.results[i], None | Some(Ty::Int | Ty::Unit))
             || !(self.args[i].is_empty() || self.args[i] == [Ty::Int])

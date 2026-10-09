@@ -11,6 +11,7 @@ type Error = Box<dyn std::error::Error>;
 pub struct Options {
     pub probe_stack_roots: bool,
     pub native_gc: bool,
+    pub native_host_bootstrap: bool,
     pub native_stack_budget: bool,
     pub windows_stack_experiment: bool,
     pub windows_heap_experiment: bool,
@@ -101,6 +102,7 @@ impl Options {
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             probe_stack_roots: false,
             native_gc: false,
+            native_host_bootstrap: false,
             native_stack_budget: false,
             windows_stack_experiment: false,
             windows_heap_experiment: false,

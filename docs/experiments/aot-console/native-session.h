@@ -16,6 +16,13 @@ typedef struct neoclr_native_session {
     uint32_t count, phase;
 } neoclr_native_session;
 int32_t neoclr_session_open_v1(neoclr_native_session *, neoclr_aot_context *);
+/* Bootstrap owns the returned handle until successful adoption. Failure leaves
+ * both the handle and session untouched. Adopt requires exclusive context roots;
+ * after success only the session may release/replace this handle. */
+int32_t neoclr_session_adopt_v1(neoclr_native_session *, neoclr_aot_context *, uint64_t);
+/* Explicit opt-in AOT export: output is unchanged on failure; success transfers
+ * one strong fn<Void> root to the caller, to adopt or release on this thread. */
+int32_t neoclr_bootstrap_callback_v1(int32_t, uint64_t *, neoclr_aot_context *);
 int32_t neoclr_session_retain_v1(neoclr_native_session *, void *, uint64_t *);
 int32_t neoclr_session_invoke_v1(neoclr_native_session *, uint64_t);
 int32_t neoclr_session_collect_v1(neoclr_native_session *);

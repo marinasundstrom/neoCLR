@@ -3784,13 +3784,44 @@ int main(void) {
 }
 
 #[test]
+fn native_host_bootstrap_requires_explicit_exact_contract() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/host-callbacks.neoil");
+    for flags in [
+        vec!["--compile-system", "--reference-arena", "--native-gc"],
+        vec!["--compile-system", "--reference-arena", "--native-host-bootstrap"],
+        vec!["--compile-system", "--reference-arena", "--native-gc", "--native-host-bootstrap", "--native-host-bootstrap"],
+    ] {
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, source, &flags, false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists(), "{r:?}");
+    }
+    let flags = ["--compile-system", "--reference-arena", "--native-gc", "--native-host-bootstrap"];
+    for source in [
+        ".module App\n.function Calculate() -> Int32\nldc.i4 42\nret\n.end",
+        ".module App\n.function Target() -> Int32\nldc.i4 42\nret\n.end\n.function Calculate() -> fn<Int32>\nfunction.bind fn<Int32> = Target()\nret\n.end",
+    ] {
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, source, &flags, false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists(), "{r:?}");
+        assert!(String::from_utf8_lossy(&r.stderr).contains("exactly fn<Void> result"), "{r:?}");
+    }
+    let dir = Temp::new();
+    let r = compile_source(&dir, &seed, source, &flags, true);
+    assert!(r.status.success(), "{r:?}");
+    let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["capabilities"]["nativeHostBootstrap"], true);
+    assert!(!dir.0.join("app.o").exists());
+}
+
+#[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_host_callbacks_preserve_roots_state_and_faults_without_entry_reset() {
     let dir = Temp::new();
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let source = include_str!("../../../docs/experiments/aot-console/host-callbacks.neoil");
     let r = compile_source(&dir, &seed, source,
-        &["--compile-system", "--reference-arena", "--native-gc"], false);
+        &["--compile-system", "--reference-arena", "--native-gc", "--native-host-bootstrap"], false);
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     fs::write(dir.0.join("host.c"), include_str!("../../../docs/experiments/aot-console/native-session-compiled-test.c")).unwrap();

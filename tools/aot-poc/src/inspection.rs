@@ -13,6 +13,7 @@ pub fn report(
     probe_stack_roots: bool,
     native_gc: bool,
     native_stack_budget: bool,
+    native_host_bootstrap: bool,
 ) -> Value {
     let mut histogram = BTreeMap::<String, usize>::new();
     let functions: Vec<_> = input
@@ -62,7 +63,7 @@ pub fn report(
         Ok(prepared) => {
             let module = prepared.as_ref().map_or(input, |(module, _)| module);
             let details = fault_details.then(|| super::fault_details::Options::from_report(prepared.as_ref().map(|(_, r)| r)));
-            let details = details.map(|mut d| { d.probe_stack_roots = probe_stack_roots; d.native_gc = native_gc; d.native_stack_budget = native_stack_budget; d });
+            let details = details.map(|mut d| { d.probe_stack_roots = probe_stack_roots; d.native_gc = native_gc; d.native_host_bootstrap = native_host_bootstrap; d.native_stack_budget = native_stack_budget; d });
             let admission = match super::compiler::compile(module, root, false, details.as_ref()) {
                 Ok(_) => json!({"accepted": true}),
                 Err(e) => {
@@ -85,7 +86,7 @@ pub fn report(
     json!({"schema": "neoclr-aot-inspection-v1", "module": input.name, "root": root,
         "scope": "inventory includes all declarations; admission uses admissionMode",
         "admissionMode": if closed { "closed-world" } else { "whole-module" },
-        "traceLayout": trace_layout, "selection": selection, "capabilities": {"console": false, "faultDetails": fault_details, "stackRootProbes": probe_stack_roots, "nativeGC": native_gc, "nativeStackBudget": native_stack_budget}, "admission": admission,
+        "traceLayout": trace_layout, "selection": selection, "capabilities": {"console": false, "faultDetails": fault_details, "stackRootProbes": probe_stack_roots, "nativeGC": native_gc, "nativeHostBootstrap": native_host_bootstrap, "nativeStackBudget": native_stack_budget}, "admission": admission,
         "assemblies": input.assemblies, "types": input.types, "functions": functions, "opcodes": histogram,
         "notice": "Build diagnostics only. Not a deployable metadata sidecar, stable ABI or export manifest."})
 }

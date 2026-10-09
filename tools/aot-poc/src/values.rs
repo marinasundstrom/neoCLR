@@ -252,7 +252,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         return Err("native stack budget requires GC frame publication".into());
     }
     let p = Profile::new(input, references, details.and_then(|d| d.object_base), details.and_then(|d| d.array_backing), details.map_or(&[], |d| d.reference_array_backings.as_slice()), details.map(|d| &d.object_display), details.map(|d| &d.string_dispatch), details.map(|d| d.primitive_receivers.as_slice()), details.is_some_and(|d| d.native_stack_budget))?;
-    let root = p.root(root)?;
+    let bootstrap = details.is_some_and(|d| d.native_host_bootstrap);
+    if bootstrap && !details.is_some_and(|d| d.native_gc) {
+        return Err("native host bootstrap requires native GC".into());
+    }
+    let root = p.root(root, bootstrap)?;
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))
         .collect::<Result<_, _>>()?;
@@ -1863,6 +1867,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         signature.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_gc_entry_check_v1", Linkage::Import, &signature)?)
     } else { None };
+    let export_root = if bootstrap {
+        let mut signature = module.make_signature();
+        signature.params = vec![AbiParam::new(types::I64); 3];
+        signature.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_gc_host_root_create_v1", Linkage::Import, &signature)?)
+    } else { None };
     // Only the stable experiment C entry is exported. Private aggregate signatures
     // are intentionally not a public ARM64 struct ABI.
     let mut context = module.make_context();
@@ -1874,7 +1884,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         .returns
         .push(AbiParam::new(types::I32));
     let export =
-        module.declare_function(if text_arena { "neoclr_entry_v4" } else if details.is_some() { "neoclr_entry_v3" } else { "neoclr_entry_v2" }, Linkage::Export, &context.func.signature)?;
+        module.declare_function(if bootstrap { "neoclr_bootstrap_callback_v1" } else if text_arena { "neoclr_entry_v4" } else if details.is_some() { "neoclr_entry_v3" } else { "neoclr_entry_v2" }, Linkage::Export, &context.func.signature)?;
     let target = module.declare_func_in_func(ids[root], &mut context.func);
     let mut fb = FunctionBuilderContext::new();
     {
@@ -1883,7 +1893,19 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         b.append_block_params_for_function_params(entry);
         b.switch_to_block(entry);
         let params = b.block_params(entry).to_vec();
-        if details.is_some() { crate::fault_details::reset(&mut b, params[2]); }
+        if bootstrap {
+            let rejected = b.create_block();
+            let admitted = b.create_block();
+            let null_output = b.ins().icmp_imm(IntCC::Equal, params[1], 0);
+            let null_context = b.ins().icmp_imm(IntCC::Equal, params[2], 0);
+            let invalid = b.ins().bor(null_output, null_context);
+            b.ins().brif(invalid, rejected, &[], admitted, &[]);
+            b.switch_to_block(rejected);
+            let status = b.ins().iconst(types::I32, 3);
+            b.ins().return_(&[status]);
+            b.switch_to_block(admitted);
+        }
+        if details.is_some() && !bootstrap { crate::fault_details::reset(&mut b, params[2]); }
         if let Some(check) = entry_check {
             let check = module.declare_func_in_func(check, b.func);
             let call = b.ins().call(check, &[params[2]]);
@@ -1893,10 +1915,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
             b.ins().brif(failed, rejected, &[], admitted, &[]);
             b.switch_to_block(rejected);
-            b.ins().store(MemFlags::new(), status, params[2], 0);
+            if !bootstrap { b.ins().store(MemFlags::new(), status, params[2], 0); }
             b.ins().return_(&[status]);
             b.switch_to_block(admitted);
         }
+        if bootstrap { crate::fault_details::reset(&mut b, params[2]); }
         if stack_budget {
             emit_stack_check(&mut module, &mut b, stack_check, diagnostic_data.as_ref(), params[2], root, false);
         }
@@ -1917,18 +1940,43 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         if details.is_some() { call_args.push(params[2]); }
         let call = b.ins().call(target, &call_args);
         let status = b.inst_results(call)[0];
-        if unit_result {
+        if bootstrap {
             let success = b.create_block();
-            let done = b.create_block();
+            let failed = b.create_block();
             let ok = b.ins().icmp_imm(IntCC::Equal, status, 0);
-            b.ins().brif(ok, success, &[], done, &[]);
+            b.ins().brif(ok, success, &[], failed, &[]);
+            b.switch_to_block(failed);
+            b.ins().return_(&[status]);
             b.switch_to_block(success);
-            let zero = b.ins().iconst(types::I32, 0);
-            b.ins().store(MemFlags::new(), zero, params[1], 0);
-            b.ins().jump(done, &[]);
-            b.switch_to_block(done);
+            // Guest frames have unwound. Creating a host root does not collect;
+            // ownership is published atomically before control returns to C.
+            let callback = b.ins().load(types::I64, MemFlags::new(), result, 0);
+            let nonnull = b.create_block();
+            let invalid = b.create_block();
+            let is_null = b.ins().icmp_imm(IntCC::Equal, callback, 0);
+            b.ins().brif(is_null, invalid, &[], nonnull, &[]);
+            b.switch_to_block(invalid);
+            let rejected = b.ins().iconst(types::I32, 3);
+            b.ins().return_(&[rejected]);
+            b.switch_to_block(nonnull);
+            let create = module.declare_func_in_func(export_root.unwrap(), b.func);
+            let call = b.ins().call(create, &[params[2], callback, params[1]]);
+            let status = b.inst_results(call)[0];
+            b.ins().return_(&[status]);
+        } else {
+            if unit_result {
+                let success = b.create_block();
+                let done = b.create_block();
+                let ok = b.ins().icmp_imm(IntCC::Equal, status, 0);
+                b.ins().brif(ok, success, &[], done, &[]);
+                b.switch_to_block(success);
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().store(MemFlags::new(), zero, params[1], 0);
+                b.ins().jump(done, &[]);
+                b.switch_to_block(done);
+            }
+            b.ins().return_(&[status]);
         }
-        b.ins().return_(&[status]);
         b.seal_all_blocks();
         b.finalize();
     }

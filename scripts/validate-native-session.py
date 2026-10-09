@@ -50,7 +50,7 @@ def main():
         seed = out / 'System.neoil'; seed.write_text('.module System\n.references ()\n')
         helper = out / 'Helpers.neoil'; helper.write_text('.module Helpers\n.references ()\n')
         obj = out / ('guest.obj' if windows else 'guest.o')
-        flags = ['--compile-system', '--reference-arena', '--native-gc']
+        flags = ['--compile-system', '--reference-arena', '--native-gc', '--native-host-bootstrap']
         if windows: flags += ['--target', 'x86_64-pc-windows-msvc', '--windows-console-experiment', '--native-stack-budget']
         run([aot, '--closed-world', base / 'host-callbacks.neoil', 'Calculate', obj, '--system', seed, '--module', helper, *flags], 'guest-build')
         for name in ('kernel', 'compiled'):

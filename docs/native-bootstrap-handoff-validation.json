@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-09",
+  "scope": "Private explicit fn<Void> bootstrap export and retained-session adoption",
+  "local": {
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "machine": "arm64",
+    "reportSha256": "ecd32ecb86ea9af3a2cf49a51ebad58432e5092bdd817c7407bbfbfd81a496af",
+    "artifactHashesVerified": 21,
+    "inputs": {
+      "docs/experiments/aot-console/native-session.c": "ad41da2d8ab0893cc6c82c7777c5676de8e0e06309a8e13cdb3f44d74998bb07",
+      "docs/experiments/aot-console/native-gc.c": "dfe3e554913e625e86f2a260e96999934fcf55b980c7c9e1a8dbf26dae4c6f10",
+      "docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+      "docs/experiments/aot-console/text-arena.c": "911021e591a5dc8e3effed7007a540ba227ca5ac64d796696f49780c81e86efb",
+      "docs/experiments/aot-fault-details/render.c": "9f49363611400a570209716219c64ffb4df9f4d1c31185e163cd773d51a427b9",
+      "docs/experiments/aot-console/native-session.h": "b221dc77da887518e90210bbbfb8ac6ffd6d14416c41faa199ecd2fb43bef7bd",
+      "docs/experiments/aot-console/native-session-test.c": "cdca8b06af45feaf12f7d44d74144f88130eb5b8898a8f0bd178fa18e8a5da11",
+      "docs/experiments/aot-console/native-session-compiled-test.c": "900df428cc4aae07fb15588b20af30adfd2189f9435d6e2a5d954f5024f8af28",
+      "docs/experiments/aot-console/native-gc.h": "2710426be29f0e01061236dcc8dd82db92b0e92ef04633be07575cb4c53df721",
+      "docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+      "docs/experiments/aot-console/text-arena.h": "b4dbae37afe2b8e64b15a3cea1e5b55868aa487da44e7369ff2d063df5a2e99b",
+      "docs/experiments/aot-console/native-stack.h": "f2dcc1dfcb410a919c25bd290a19149366a36426ca0683b704a4da0a8d06b355",
+      "docs/experiments/aot-console/host-callbacks.neoil": "01913c5efc02d36e97560fe80d23b0bc1c5b878ec591c194147e1707b789e02f",
+      "docs/experiments/aot-fault-details/fault-details.h": "2bff27d6fbe97a06fa47bf7c2e286f2731fe2fa7f71a0d1cbb4e2fdd1e4690bd",
+      "scripts/validate-native-session.py": "540702b58ef07ee46ed21759539f1b9fffb2f814d56657fc5677843dfe110038"
+    },
+    "cases": [
+      {
+        "name": "kernel",
+        "passed": true,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "name": "compiled",
+        "passed": true,
+        "stdout": "",
+        "stderr": "DivideByZero: Division by zero\n   at Fail [instruction 2]\n"
+      }
+    ]
+  },
+  "additionalChecks": [
+    "Compiler rejects absent/duplicate opt-in and wrong root return shapes; inspection reports the explicit capability",
+    "Generated callback fault matches interpreter",
+    "Ordinary unit entry still publishes zero only on success"
+  ],
+  "github": "Pending qualification of this extension; earlier session lifecycle evidence remains in native-retained-session-validation.json"
+}

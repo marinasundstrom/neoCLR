@@ -34,9 +34,7 @@ ret
 ldc.i4 42
 ret
 .end
-.function Calculate(Int32 mode) -> Int32
-.local fn<Void> held
-.local fn<Int32> wrong
+.function Calculate(Int32 mode) -> fn<Void>
 ldarg mode
 ldc.i4 1
 ceq
@@ -48,24 +46,20 @@ brtrue Fault
 ldarg mode
 ldc.i4 3
 ceq
-brtrue Wrong
+brtrue BootstrapFault
 ldc.i4 0
 newobj.ctor instance Counter::.ctor(Int32)
 function.bind fn<Void> = instance Counter::Tick()
-stloc held
-br End
+ret
 Static:
 function.bind fn<Void> = Unit()
-stloc held
-br End
+ret
 Fault:
 function.bind fn<Void> = Fail()
-stloc held
-br End
-Wrong:
-function.bind fn<Int32> = WrongShape()
-stloc wrong
-End:
-ldc.i4 42
+ret
+BootstrapFault:
+call Fail()
+pop
+function.bind fn<Void> = Unit()
 ret
 .end

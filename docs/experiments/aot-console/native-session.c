@@ -20,6 +20,18 @@ int32_t neoclr_session_open_v1(neoclr_native_session *s, neoclr_aot_context *c) 
     *s = (neoclr_native_session){.owner = s, .context = c, .roots = {anchor}, .count = 1, .phase = READY};
     return 0;
 }
+int32_t neoclr_session_adopt_v1(neoclr_native_session *s, neoclr_aot_context *c, uint64_t handle) {
+    void *callback = NULL;
+    if (!s || s->owner || s->phase || !c ||
+        neoclr_gc_callback_read_v1(c, handle, &callback) ||
+        neoclr_gc_owned_roots_check_v1(c, &handle, 1)) return 3;
+    uint64_t anchor = 0;
+    int32_t status = neoclr_gc_host_root_create_v1(c, NULL, &anchor);
+    if (status) return status;
+    *s = (neoclr_native_session){.owner = s, .context = c,
+        .roots = {anchor, handle}, .count = 2, .phase = READY};
+    return 0;
+}
 int32_t neoclr_session_retain_v1(neoclr_native_session *s, void *value, uint64_t *output) {
     if (!quiescent(s) || s->phase != READY || s->context->fault.code || !output) return 3;
     if (s->count == NEOCLR_SESSION_ROOT_LIMIT + 1) return 5;

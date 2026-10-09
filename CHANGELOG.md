@@ -13,7 +13,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Reject copied/wrong-thread sessions, reentry and shutdown with foreign service
   roots; preserve diagnostics until explicit whole-session discard, including intern
   pool teardown. Add portable lifecycle and generated-callback gates. This is an
-  ownership experiment, not a public hosting API or an application export handoff.
+  ownership experiment, not a public hosting API. Add an explicit opt-in AOT
+  `fn<Void>` bootstrap export and atomic session adoption, replacing fixture heap
+  scanning with an owned handle. Preserve output and existing session diagnostics
+  on rejected handoff; check collection before adoption, bootstrap faults, foreign
+  roots and root-quota exhaustion. Ordinary entry ABI and Raven contracts remain
+  unchanged; a retained-state HTTP consumer remains pending.
   Run `37972822432` at `c77e2b07` passes the same lifecycle and generated-callback
   gates on macOS ARM64 and Windows x64; verify 21/25 artifact hashes and 15/16
   source inputs respectively. Compiled callback faults also match the interpreter
