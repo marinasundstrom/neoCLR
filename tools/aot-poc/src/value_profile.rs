@@ -98,7 +98,7 @@ impl<'a> Profile<'a> {
             let valid = input.types.get(i).is_some_and(|t| t.is_reference_type
                 && t.representation == Representation::Record && t.fields.len() == 1
                 && t.generic_parameters.is_empty()
-                && matches!(&t.fields[0].ty, Type::ArrayRef(element) if matches!(**element, Type::String | Type::Char) || crate::selection::scalar_array_element(element) || input.type_definition(element).is_some_and(|e| e.is_reference_type && e.representation == Representation::Record)));
+                && matches!(&t.fields[0].ty, Type::ArrayRef(element) if matches!(**element, Type::String | Type::Char) || crate::selection::scalar_array_element(element) || input.type_definition(element).is_some_and(|e| (e.is_reference_type && e.representation == Representation::Record) || e.representation == Representation::Interface)));
             if !references || !valid { return Err("invalid private reference-array backing projection".into()); }
         }
         for t in &input.types {
@@ -436,8 +436,8 @@ impl<'a> Profile<'a> {
             Type::ArrayRef(t) if self.references && matches!(**t, Type::Named(_)) => {
                 match self.ty(t)? {
                     Ty::Record(index) => Ty::RecordArray(index),
-                    Ty::Reference(index) => Ty::ReferenceArray(index),
-                    _ => return Err("nominal native arrays require value records or reference classes".into()),
+                    Ty::Reference(index) | Ty::Interface(index) => Ty::ReferenceArray(index),
+                    _ => return Err("nominal native arrays require value records, reference classes or interfaces".into()),
                 }
             }
             Type::String => Ty::Literal,
@@ -910,9 +910,9 @@ impl<'a> Profile<'a> {
                     if self.references && matches!(t, Type::Function(_)) => { self.ty(t)?; },
                 Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte) | Op::ArrayElement(Type::Byte) | Op::StoreArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) | Op::ArrayLength if self.references => (),
                 Op::NewArray(t) if self.references && matches!(t, Type::Named(_))
-                    && matches!(self.ty(t)?, Ty::Reference(_)) => (),
+                    && matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_)) => (),
                 Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
-                    if self.references && matches!(t, Type::Named(_)) && matches!(self.ty(t)?, Ty::Record(_) | Ty::Reference(_)) => (),
+                    if self.references && matches!(t, Type::Named(_)) && matches!(self.ty(t)?, Ty::Record(_) | Ty::Reference(_) | Ty::Interface(_)) => (),
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
                 }

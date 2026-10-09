@@ -1839,6 +1839,21 @@ fn nominal_reference_array_views_preserve_exact_dispatch_aliases_and_faults() {
 }
 
 #[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn interface_element_array_views_preserve_exact_dispatch_aliases_and_faults() {
+    let source = include_str!("../../../docs/experiments/aot-console/reference-array-views.neoil")
+        .replace(".type class Counter", ".interface ICounter\n.end\n.type class Counter\n.implements ICounter")
+        .replace("<Counter>", "<ICounter>")
+        .replace("newarr Counter", "newarr ICounter")
+        .replace("array.reserve Counter", "array.reserve ICounter")
+        .replace("ldelem Counter", "ldelem ICounter\ncastclass Counter")
+        .replace("newobj instance Counter::.ctor(Int32)", "newobj instance Counter::.ctor(Int32)\ncastclass ICounter")
+        .replace("Set(Int32, Counter)", "Set(Int32, ICounter)")
+        .replace("callvirt instance Read<ICounter>::Get(Int32)", "callvirt instance Read<ICounter>::Get(Int32)\ncastclass Counter");
+    check_array_views(array_views_source(&source), true);
+}
+
+#[test]
 fn nominal_reference_array_views_reject_storage_borrows_and_replacement() {
     let source = include_str!("../../../docs/experiments/aot-console/reference-array-views.neoil");
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
@@ -3632,17 +3647,24 @@ fn enum_layout_and_nominal_identity_are_verified_before_native_projection() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_reference_arrays_preserve_identity_owners_and_faults() {
-    check_reference_arrays(false);
+    check_reference_arrays(false, false);
 }
 
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_default_reference_arrays_preserve_nulls_identity_and_faults() {
-    check_reference_arrays(true);
+    check_reference_arrays(true, false);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_interface_arrays_preserve_dispatch_identity_and_faults() {
+    check_reference_arrays(false, true);
+    check_reference_arrays(true, true);
 }
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-fn check_reference_arrays(default_initialized: bool) {
+fn check_reference_arrays(default_initialized: bool, interface_elements: bool) {
     let dir = Temp::new();
     let mut source = include_str!("../../../docs/experiments/aot-console/reference-arrays.neoil").to_owned();
     if default_initialized {
@@ -3661,6 +3683,19 @@ Limit:
 ldc.i4 65537
 Allocate:
 newarr Counter"#);
+    }
+    if interface_elements {
+        source = source.replace(".type class Counter", ".interface ICounter\n.method instance Add(Int32 delta) -> Int32\n.end\n.end\n.type class Counter\n.implements ICounter")
+            .replace("arrayref<Counter>", "arrayref<ICounter>")
+            .replace(".local Counter", ".local ICounter")
+            .replace("array.reserve Counter", "array.reserve ICounter")
+            .replace("newarr Counter", "newarr ICounter")
+            .replace("stelem Counter", "castclass ICounter\nstelem ICounter")
+            .replace("ldelem Counter", "ldelem ICounter")
+            .replace("initobj Counter", "initobj ICounter")
+            .replace("call instance Counter::Add(Int32)", "callvirt instance ICounter::Add(Int32)")
+            .replace("ldfld Counter::Number\nret\nUninitialized:", "ldc.i4 0\ncallvirt instance ICounter::Add(Int32)\nret\nUninitialized:")
+            .replace("ldelem ICounter\nldfld Counter::Number", "ldelem ICounter\nldc.i4 0\ncallvirt instance ICounter::Add(Int32)");
     }
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let flags = ["--compile-system", "--reference-arena", "--native-gc"];

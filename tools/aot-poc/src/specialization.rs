@@ -74,7 +74,7 @@ impl Specializer<'_> {
             },
             Type::ArrayRef(t) if matches!(**t, Type::Function(_) | Type::Named(_) | Type::Constructed { .. }) => {
                 let lowered = self.lower(t)?;
-                if self.source.type_definition(t).is_some_and(|t| t.is_reference_type && t.representation == neoclr::metadata::Representation::Record) {
+                if self.source.type_definition(t).is_some_and(|t| (t.is_reference_type && t.representation == neoclr::metadata::Representation::Record) || t.representation == neoclr::metadata::Representation::Interface) {
                     if let Some(owner) = super::selection::array_owner(self.source, t) { self.lower(&owner)?; }
                 }
                 return Ok(Type::ArrayRef(Box::new(lowered)));
@@ -543,7 +543,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
             for op in &original.body {
                 if let Op::NewArray(element) | Op::ReserveArray(element) = op {
                     let element = substitute(element, &instance.types, &instance.methods).map_err(|e| e.to_string())?;
-                    if let Some(owner) = super::selection::array_owner(input, &element).filter(|_| matches!(element, Type::Byte | Type::String | Type::Char) || super::selection::scalar_array_element(&element) || input.type_definition(&element).is_some_and(|t| t.is_reference_type && t.representation == neoclr::metadata::Representation::Record)) {
+                    if let Some(owner) = super::selection::array_owner(input, &element).filter(|_| matches!(element, Type::Byte | Type::String | Type::Char) || super::selection::scalar_array_element(&element) || input.type_definition(&element).is_some_and(|t| (t.is_reference_type && t.representation == neoclr::metadata::Representation::Record) || t.representation == neoclr::metadata::Representation::Interface)) {
                         if !constructed.contains(&owner) { constructed.push(owner); }
                     }
                 }
@@ -645,7 +645,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
     let reference_backings: Vec<_> = context.shapes.iter().filter(|shape|
         input.assemblies.iter().any(|a| a.array_backing.as_ref().is_some_and(|id| input.types[shape.source].definition.as_ref() == Some(id)))
         && shape.arguments.len() == 1
-        && (matches!(shape.arguments[0], Type::String | Type::Char) || super::selection::scalar_array_element(&shape.arguments[0]) || input.type_definition(&shape.arguments[0]).is_some_and(|t| t.is_reference_type && t.representation == neoclr::metadata::Representation::Record)))
+        && (matches!(shape.arguments[0], Type::String | Type::Char) || super::selection::scalar_array_element(&shape.arguments[0]) || input.type_definition(&shape.arguments[0]).is_some_and(|t| (t.is_reference_type && t.representation == neoclr::metadata::Representation::Record) || t.representation == neoclr::metadata::Representation::Interface)))
         .map(|shape| shape.row).collect();
     let report = json!({"referenceArrayBackings":reference_backings,"policy":"up to 512 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 512 function clones and 1024 selected functions; no constraints",
         "typeCount": context.shapes.len(), "functionCount": context.instances.len(), "functionCloneCount": context.clones,

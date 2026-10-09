@@ -49,7 +49,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add Boolean box snapshots and exact Int32/Boolean box tests/unboxing with null,
   type, fault-frame and GC cleanup checks. Add private native InvalidCast status 11.
   Preserve reference unboxing through existing casts; Boolean box display remains
-  explicitly unadmitted. JSON admission now reaches interface-valued arrays.
+  explicitly unadmitted. Admit native interface-valued arrays and their exact generic
+  backing views, preserving dispatch, aliasing, null/uninitialized/bounds faults and
+  GC ownership. JSON admission now reaches the missing ObjectTypeHandle service.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

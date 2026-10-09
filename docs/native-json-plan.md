@@ -268,8 +268,14 @@ The original typed probe rejects native specialization with
 `specialization requires closed reference-free local value types: RuntimeTypeHandle`.
 The type-token slice removes that rejection; subsequent native admission still rejects
 Boolean boxing in `ObjectMapper.ReadValue` at instruction 110. The subsequent
-primitive-box slice removes that rejection; the next probe rejects interface-valued
-arrays. Further metadata service and reflection dispatch gaps remain.
+primitive-box slice removes that rejection. Interface-valued native arrays now
+use initialized managed-reference slots and invariant closed generic backing views.
+Executable macOS tests cover reserved/default arrays, interface dispatch, aliasing,
+collection and interpreter-matched faults. Unlike CLR reference-array covariance,
+this reuses neoCLR’s invariant array contract; it adds no runtime covariant store
+checks or new public collection API. The next probe rejects the missing
+`ObjectTypeHandle` runtime service. Further metadata service and reflection dispatch
+gaps remain.
 
 `type-tokens.neoil` checks primitive identity, distinct nominal types, distinct closed
 generic shapes and a handle stored in a generic class. The Rust regression compares
