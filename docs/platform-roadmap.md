@@ -1,5 +1,41 @@
 # neoCLR platform roadmap
 
+## Active direction: usable native compilation (2026-10-09)
+
+After Preview 13, the author selects native compilation as the next priority and
+directs implementation in validated, individually committed slices. Make an
+ordinary Raven project produce a standalone executable through a reproducible
+toolchain workflow. Begin with macOS ARM64 console applications, then the existing
+HTTP workload. Close required core/bootstrap gaps while tracking full bootstrap
+completion independently. Preview 13's interpreter qualification remains unchanged.
+
+Acceptance: explicit supported scope and unsupported-feature diagnostics, packaged
+tool/dependency provenance, execution without an installed managed runtime,
+interpreter/native behavior and fault parity, cleanup evidence, and scoped startup,
+size, memory and sustained-request measurements as applicable to each consumer.
+The first implementation slice should compose existing compiler/backend contracts;
+it need not invent a new compiler API or claim general native coverage.
+
+Next, qualify a bounded Windows x64 scalar/console port before extending GC and
+HTTP services. This changes both OS and architecture relative to macOS ARM64;
+existing Windows interpreter support does not qualify its native backend.
+Follow with an experimental persistent native host (state, roots, callbacks,
+faults and shutdown), then compatible-body hot reload with explicit code-generation
+lifetimes. JIT is not a prerequisite for reload. API design and focused RavenDoc
+repairs support these consumers; broad structural types, a wholesale RavenDoc
+rewrite and JIT remain deferred until concrete needs justify them. Existing
+structural experiments retain their branch restrictions.
+
+Comparison: [.NET Native AOT](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
+already offers project-level self-contained native deployment. The immediate benefit
+here is making neoCLR's existing UTF-8/Raven execution accessible and reproducible;
+costs include platform-specific linking/services, packaging and a bounded supported
+subset. No performance superiority is established. Reuse the
+[native execution investigation](native-execution-investigation.md) and
+[native web evidence](../benchmarks/native-web/README.md). This author direction
+supersedes older immediate-priority notes below; their completed evidence and open
+technical gaps remain valid. No release date or version is selected.
+
 **Preview 13 published (2026-10-09):** after Raven's shared website publication,
 the author requested the next neoCLR POC release for Windows and macOS, with a
 final pass over urgent issues. Qualify Windows x64 and macOS ARM64 packages from

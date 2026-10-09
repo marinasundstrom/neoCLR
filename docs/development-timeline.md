@@ -12620,3 +12620,45 @@ claim follows from these focused checks.
   the assets advertised a ten-minute cache lifetime. The assistant proposed asset
   versioning, but the author chose to wait and then confirmed “Works om safari”.
   No speculative CSS or cache-versioning change was made.
+
+## 2026-10-09 — Next priority after Preview 13 (discussion)
+
+- **Author question:** asks which next priority to bet on: continued AOT/native
+  compilation, including Windows; hot reload; JIT; API design; structural types;
+  RavenDoc improvement/refactoring or a Raven-on-.NET rewrite; runtime hosting.
+- **Assistant assessment:** the qualified release uses the interpreter, while
+  ARM64 native HTTP execution has source-experiment evidence. Recommend making
+  native compilation usable through an ordinary project workflow first, with
+  explicit supported scope, diagnostics and standalone deployment evidence.
+  Close native-only core/bootstrap gaps required by those consumers; track full
+  bootstrap independently rather than imply the production String POC completes it.
+  See the [roadmap](platform-roadmap.md), [release evidence](preview-13-validation.json)
+  and [native web workbench](../benchmarks/native-web/README.md).
+- **Assistant proposal:** begin with a packaged macOS ARM64 native consumer;
+  follow with a bounded Windows x64 scalar/console portability proof before
+  extending Windows services to the same HTTP workload. Then exercise an
+  experimental persistent native host with explicit roots, callbacks, faults
+  and shutdown; use that lifecycle experience for compatible-body reload.
+  Retain API design and targeted RavenDoc corrections as supporting work.
+  Defer broad structural type expansion, JIT and a wholesale RavenDoc rewrite
+  until a concrete consumer or measured bottleneck justifies them. A Raven-on-.NET
+  tooling slice could independently exercise Raven, but would not validate neoCLR AOT.
+- **Comparison:** [.NET Native AOT](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
+  already provides self-contained native deployment; neoCLR must demonstrate its
+  own useful UTF-8/Raven workflow rather than claim AOT itself is unique.
+  [.NET hosting](https://learn.microsoft.com/en-us/dotnet/core/tutorials/netcore-hosting)
+  provides a native-host baseline, distinct from AOT executable deployment.
+  Sources reviewed 2026-10-09; these are existing .NET capabilities, not proof of
+  neoCLR performance or hosting equivalence. Reload proposals reuse the
+  [existing lifecycle investigation](native-execution-investigation.md#hot-reload-across-execution-modes).
+- **Status:** recommendation only; no subsequent author selection is available.
+  Recorded this discussion and changelog entry. No compiler/runtime/tooling
+  implementation, roadmap reprioritization or commit was performed.
+
+- **Subsequent author decision:** “OK. Document that direction. And start working.
+  Commit each slice.” The assistant records the selected native compilation,
+  Windows portability, hosting and reload sequence at the top of the roadmap,
+  preserving the earlier recommendation as the preceding discussion. Begin with
+  a bounded ordinary-project native build workflow using existing backend contracts.
+  Implementation outcomes follow in the linked roadmap/evidence and changelog;
+  this decision alone does not establish packaging or native platform qualification.

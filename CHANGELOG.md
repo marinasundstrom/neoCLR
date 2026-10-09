@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Record the post-Preview 13 priority discussion and subsequent author selection:
+  prioritize usable project-level native compilation, bounded Windows portability,
+  then hosting and reload; implement and validate in individually committed slices.
+  These are development priorities, not newly shipped capabilities.
+
 - Correct API extension visibility: internal runtime-service containers no longer
   contribute public-looking members such as ConsoleFlush and ConsoleWriteBytes
   to Boolean. Refresh the shared RavenDoc renderer and native reference snapshot;
