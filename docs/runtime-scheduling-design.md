@@ -447,3 +447,10 @@ rejects fibers, including at collector-host admission. Small-stack and deep-call
 consumers pass with GC-frame cleanup. This is a normal OS-thread contract; future
 activation-owned stacks need their own bounds/root rules rather than bypassing
 the rejection or retaining stale system-thread bounds.
+
+The integer-only Windows generated-stack gate now passes actual generated recursion,
+status-based fault return and host reuse with every published frame removed. This
+qualifies the existing synchronous normal-thread path only. Inline page probes and
+fresh system bounds do not supply suspendable frames, activation-owned roots or
+native unwind/SEH metadata; those remain prerequisites for any stackful scheduling
+experiment. See [execution evidence](windows-generated-stack-validation.json).

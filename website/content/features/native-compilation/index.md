@@ -85,8 +85,9 @@ library and runtime artifacts; this is not a general publishing workflow for all
   also passes root retention, reclamation, thread isolation and guarded teardown.
   Host admission now rejects undersized stacks and fibers; deep-call checks
   return safely with GC-frame cleanup. An explicit integer-only generated-stack
-  experiment adds page probing and frame bounds; Windows execution qualification
-  is pending. General managed Windows code generation remains open.
+  experiment now passes Windows execution with page probing, frame bounds,
+  diagnostic fault return and host reuse. Heap-allocating guest qualification and
+  general managed Windows code generation remain open.
 - **Code and APIs:** broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.
 - **Async:** async entry points waiting for host I/O are unsupported; selected

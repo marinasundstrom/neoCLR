@@ -377,8 +377,9 @@ the Windows convention is required interoperability work, not an improvement ove
 SEH interoperability or native stack walking; guest faults use explicit statuses.
 Those gaps must be addressed before broader native hosting/suspension qualification.
 
-Windows inspection, closed-world libraries, value/managed profiles, GC, task/socket
-services, native project kits and stack guards remain explicitly unsupported.
+This scalar profile does not admit Windows inspection, closed-world libraries,
+value/managed profiles, GC or task/socket services. Native project kits remain
+unsupported; later private host and generated-stack evidence is recorded below.
 The Windows C adapter is an acceptance host, not the Windows implementation of
 the macOS console/HTTP kit. With retained Raven-produced metadata now exercised,
 qualify a fresh source build before extending services or advertising Windows project
@@ -463,8 +464,13 @@ guard boundaries. Its subsequent collector consumer passes rooted retention,
 frame handoff, reclamation, exhaustion and teardown checks on Windows; see
 [collector evidence](windows-collector-validation.json). The [Windows host stack evidence](windows-stack-validation.json) also verifies
 small-stack/fiber admission rejection before allocation and bounded deep-call
-return with GC-frame cleanup. Managed lowering, generated-frame/probing integration
-and native unwind qualification remain explicitly open.
+return with GC-frame cleanup. The explicit integer-only
+[generated-stack experiment](windows-native-host.md#generated-integer-frames-explicit-development-experiment)
+now also passes Windows execution: inline page probes, final-frame bounds,
+small-stack rejection, recursive diagnostic return, complete frame cleanup and
+successful host reuse. [Evidence](windows-generated-stack-validation.json) records
+run `37956371244` at `29670d3b`, with 49 artifact and 37 source hashes verified.
+Heap-allocating guest lowering and native unwind qualification remain open.
 
 ## Shared native contracts to establish
 

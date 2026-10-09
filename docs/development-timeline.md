@@ -12789,3 +12789,22 @@ claim follows from these focused checks.
 - **Remaining:** generated-code frame bounds, page probing and fault-return checks
   before managed Windows lowering; C-host evidence does not establish guest SEH
   interoperability, native stack walking or activation migration.
+
+## 2026-10-09 — Windows generated stack protection executes successfully
+
+- **Author:** “Continue solving that”, following the Windows host admission work.
+- **Assistant action:** adds an explicitly gated Int32-only Windows code-generation
+  experiment using the existing GC-frame and diagnostic ABI. Enables Cranelift's
+  inline page probes, bounds final frames including Windows shadow space, and keeps
+  the entry prologue below one page. Extends the Windows Action with a real linked
+  recursive guest and repeated fault/success cycles against the guarded host.
+- **Outcome:** [run 37956371244](https://github.com/marinasundstrom/neoCLR/actions/runs/37956371244)
+  at `29670d3b` passes small-stack rejection, shallow success, recursive status 9
+  with unchanged output and valid diagnostics, complete GC-frame cleanup, collection
+  and context reuse. COFF/admission and final-frame tests pass without skips; the
+  existing host gates and local macOS stack regression pass. Verifies all 49 artifact
+  and 37 source hashes in the [report](windows-generated-stack-validation.json).
+- **Remaining:** qualify a bounded heap-allocating guest and generated live roots
+  before broadening managed services. Native unwind/SEH interoperability and
+  activation-owned stacks/roots remain open; this result does not select a green-thread
+  implementation or remove fiber rejection.

@@ -2,7 +2,7 @@
 
 Development experiment, 2026-10-09. The Windows scalar/literal-console backend is
 qualified; general managed Windows code generation remains rejected. An explicit
-integer-only generated-stack experiment now tests the next integration boundary. It does not introduce a public API.
+integer-only generated-stack experiment now passes its Windows execution gate. It does not introduce a public API.
 
 ## Memory ownership: qualified private probe
 
@@ -200,8 +200,18 @@ than one page. The Windows Action links it against the guarded collector host an
 requires shallow success, recursive status 9 with unchanged output and valid fault
 text, complete frame removal, collection and repeated successful entry. It also
 calls the generated entry on a 128 KiB stack to test rejection before guest body
-execution. Executable Windows evidence is pending for this slice; local cross-target
-checks and the macOS recursive-stack regression pass.
+execution. [Windows run 37956371244](https://github.com/marinasundstrom/neoCLR/actions/runs/37956371244)
+at `29670d3bdbd8ff0ff7fcba5205c5569a4f0e81a8` passes all these checks, plus two
+COFF/admission tests and the final-frame boundary test without skips. The retained
+MSVC disassembly shows a 4 KiB probe followed by a 4,704-byte recursive stack
+adjustment. The 512 KiB and 1 MiB workers publish 55 and 165 pre-operation snapshots
+respectively before returning status 9; these are observed snapshot counts, not
+portable recursion limits. Both workers repeat the fault path and successfully
+reuse the same context. Existing heap, collector and C stack gates also pass.
+All 49 downloaded artifact hashes and 37 source hashes match the recorded revision
+with checkout line endings; see the [retained report](windows-generated-stack-validation.json).
+Local cross-target checks and the macOS recursive-stack regression pass. This closes
+the generated integer-frame integration gate, not general managed Windows lowering.
 
 ## Suspension and scheduling ownership
 
@@ -223,6 +233,6 @@ first-fault propagation and exactly-once cleanup. Reuse the
 before adding migration or green threads. Current root TLS, callbacks and stack
 adapters remain replacement boundaries, not public scheduling policy.
 
-Next: obtain the generated integer-frame Windows execution evidence, then widen
-managed lowering against the working collector host. General managed profiles and
+Next: qualify a bounded heap-allocating guest against the working collector host,
+including generated live-reference retention and fault cleanup. General managed profiles and
 project kits remain rejected until their separate requirements have evidence.
