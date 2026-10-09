@@ -1,12 +1,19 @@
 name: Windows x64 scalar AOT
 on:
   workflow_dispatch:
+    inputs:
+      revision:
+        description: Exact neoCLR commit or ref to qualify (blank uses selected workflow ref)
+        required: false
+        type: string
   push:
     paths:
       - 'src/**'
       - 'Cargo.*'
       - 'tools/aot-poc/**'
       - 'tools/native/windows-scalar-host.c'
+      - 'scripts/validate-windows-aot.py'
+      - 'scripts/test_validate_windows_aot.py'
       - 'docs/experiments/aot-scalar/**'
       - 'docs/experiments/aot-hello/**'
       - '.github/workflows/windows-aot-scalar.yml'
@@ -16,6 +23,8 @@ on:
       - 'Cargo.*'
       - 'tools/aot-poc/**'
       - 'tools/native/windows-scalar-host.c'
+      - 'scripts/validate-windows-aot.py'
+      - 'scripts/test_validate_windows_aot.py'
       - 'docs/experiments/aot-scalar/**'
       - 'docs/experiments/aot-hello/**'
       - '.github/workflows/windows-aot-scalar.yml'
@@ -23,14 +32,31 @@ permissions:
   contents: read
 jobs:
   scalar-console:
-    runs-on: windows-latest
+    runs-on: windows-2022
+    timeout-minutes: 35
+    env:
+      PYTHONUTF8: '1'
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.revision || github.sha }}
       - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check qualification reporting
+        run: python -m unittest discover -s scripts -p test_validate_windows_aot.py
       - name: Emit, link and run the bounded Windows profile
         shell: pwsh
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && cargo test --locked --manifest-path tools/aot-poc/Cargo.toml --test windows_scalar -- --nocapture"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-windows-aot.py --output target/windows-aot-validation"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-x64-aot-${{ github.run_id }}-${{ github.run_attempt }}
+          path: target/windows-aot-validation/
+          retention-days: 14
+          if-no-files-found: warn

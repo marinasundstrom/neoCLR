@@ -14,6 +14,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   inspection profiles. Cross-target object checks and macOS regressions pass.
   Add a Windows C consumer and focused CI job for calls, branches, faults and UTF-8
   byte output; Windows linking/execution remains unqualified until that job runs.
+  Extend the dedicated GitHub Actions gate with exact-revision manual dispatch,
+  explicit MSVC setup, retained objects/executables and compiler/linker/test logs,
+  and a report that cannot pass when native execution is skipped or incomplete.
 
 - Add a development macOS ARM64 project-to-executable console command using the
   selected bundle's Raven project build, existing AOT backend and explicit native

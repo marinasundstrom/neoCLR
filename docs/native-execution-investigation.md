@@ -338,6 +338,24 @@ code-page/display policy is not qualified. The
 [focused Windows workflow](../.github/workflows/windows-aot-scalar.yml) runs this gate
 on relevant pushes/PRs or manual dispatch. It has not been run for this local slice.
 
+The dedicated job uses Windows Server 2022 with an explicit x64 MSVC developer
+environment. Manual dispatch accepts a `revision` commit/ref, and the report records
+the resolved checkout SHA. `scripts/validate-windows-aot.py` retains the Cargo test
+log, linker logs, input programs, COFF objects, C-consumer executables and all 32
+native outcomes in a GitHub artifact on success or failure. It requires the native
+execution completion record; zero tests, a skipped native test or a partial run
+cannot be reported as qualification. The workflow has a 35-minute timeout and
+14-day artifact retention. It does not publish a package or run website deployment.
+
+After the workflow is on the selected remote ref, dispatch an exact candidate:
+
+```sh
+gh workflow run windows-aot-scalar.yml --ref main -f revision=COMMIT_SHA
+```
+
+Relevant code pushes/PRs also trigger this focused gate automatically; a matching
+automatic run can provide the same evidence without dispatching a duplicate.
+
 Baseline: Microsoft's [x64 calling convention](https://learn.microsoft.com/en-us/cpp/build/x64-calling-convention?view=msvc-170)
 specifies register arguments, shadow space, alignment and unwind requirements;
 [_lock_file](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/lock-file?view=msvc-170)

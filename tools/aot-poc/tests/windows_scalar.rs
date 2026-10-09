@@ -9,7 +9,11 @@ static NEXT: AtomicUsize = AtomicUsize::new(0);
 struct Temp(PathBuf);
 impl Temp {
     fn new() -> Self {
-        let path = std::env::temp_dir().join(format!(
+        let base = std::env::var_os("NEOCLR_WINDOWS_AOT_EVIDENCE")
+            .map(PathBuf::from)
+            .unwrap_or_else(std::env::temp_dir);
+        fs::create_dir_all(&base).unwrap();
+        let path = base.join(format!(
             "neoclr-windows-scalar-{}-{}",
             std::process::id(),
             NEXT.fetch_add(1, Ordering::Relaxed)
@@ -20,7 +24,9 @@ impl Temp {
 }
 impl Drop for Temp {
     fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
+        if std::env::var_os("NEOCLR_WINDOWS_AOT_EVIDENCE").is_none() {
+            let _ = fs::remove_dir_all(&self.0);
+        }
     }
 }
 const SCALAR: &str = include_str!("../../../docs/experiments/aot-scalar/scalar.neoil");
@@ -164,6 +170,20 @@ fn unsupported_windows_profiles_and_targets_publish_nothing() {
     ignore = "requires Windows x64 and MSVC"
 )]
 fn windows_c_consumer_executes_calls_branches_faults_and_utf8() {
+    let mut outcomes = Vec::new();
+    let save = |outcomes: &Vec<serde_json::Value>, passed| {
+        if let Some(path) = std::env::var_os("NEOCLR_WINDOWS_AOT_EVIDENCE") {
+            fs::write(
+                PathBuf::from(path).join("windows-execution.json"),
+                serde_json::to_vec_pretty(
+                    &serde_json::json!({"passed": passed, "outcomes": outcomes}),
+                )
+                .unwrap(),
+            )
+            .unwrap();
+        }
+    };
+    save(&outcomes, false);
     for (source, flags) in [
         (SCALAR, vec![]),
         (FLOW, vec![]),
@@ -186,6 +206,8 @@ fn windows_c_consumer_executes_calls_branches_faults_and_utf8() {
             .arg(dir.0.join("app.obj"))
             .output()
             .unwrap();
+        fs::write(dir.0.join("link.stdout.log"), &linked.stdout).unwrap();
+        fs::write(dir.0.join("link.stderr.log"), &linked.stderr).unwrap();
         assert!(
             linked.status.success(),
             "{}{}",
@@ -204,6 +226,12 @@ fn windows_c_consumer_executes_calls_branches_faults_and_utf8() {
                 .arg(value.to_string())
                 .output()
                 .unwrap();
+            outcomes.push(serde_json::json!({
+                "directory": dir.0, "input": value, "exitCode": result.status.code(),
+                "stdout": String::from_utf8_lossy(&result.stdout),
+                "stderr": String::from_utf8_lossy(&result.stderr),
+            }));
+            save(&outcomes, false);
             if source == FAULTS && (value == -1 || value == i32::MAX) {
                 let fault = interpreted.unwrap_err();
                 assert_eq!(
@@ -261,4 +289,5 @@ fn windows_c_consumer_executes_calls_branches_faults_and_utf8() {
             assert!(result.stderr.is_empty());
         }
     }
+    save(&outcomes, true);
 }
