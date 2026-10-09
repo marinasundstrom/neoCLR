@@ -16,10 +16,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--aot', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--runtime-equality', action='store_true', help='Exercise the TypeEquals runtime service instead of direct token equality')
     args = parser.parse_args()
     aot, out = args.aot.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    report = dict(passed=False, platform=platform.platform(), machine=platform.machine(), commands=[])
+    report = dict(passed=False, platform=platform.platform(), machine=platform.machine(), commands=[], runtimeEquality=args.runtime_equality)
     def run(command, name):
         r = subprocess.run(list(map(str, command)), cwd=out, capture_output=True, timeout=120)
         (out / (name + '.stdout')).write_bytes(r.stdout)
@@ -48,13 +49,17 @@ def main():
         report['inputs'] = {p.relative_to(ROOT).as_posix(): sha(p) for p in inputs}
         report['aotSha256'] = sha(aot)
         seed, helper = out / 'System.neoil', out / 'Helpers.neoil'
-        seed.write_text('.module System\n.references ()\n')
+        seed.write_text('.module System\n.references ()\n' + ('.function neoCLR.Runtime.TypeEquals(RuntimeTypeHandle,RuntimeTypeHandle) -> Boolean\n.methodimpl InternalCall\n.end\n' if args.runtime_equality else ''))
+        source = base / 'type-tokens.neoil'
+        if args.runtime_equality:
+            source = out / 'type-equality.neoil'
+            source.write_text((base / 'type-tokens.neoil').read_text().replace('ceq', 'call neoCLR.Runtime.TypeEquals(RuntimeTypeHandle,RuntimeTypeHandle)'))
         helper.write_text('.module Helpers\n.references ()\n')
         obj = out / ('guest.obj' if windows else 'guest.o')
         flags = ['--compile-system', '--reference-arena', '--native-gc']
         if windows:
             flags += ['--target', 'x86_64-pc-windows-msvc', '--windows-console-experiment', '--native-stack-budget']
-        run([aot, '--closed-world', base / 'type-tokens.neoil', 'Calculate', obj, '--system', seed, '--module', helper, *flags], 'guest-build')
+        run([aot, '--closed-world', source, 'Calculate', obj, '--system', seed, '--module', helper, *flags], 'guest-build')
         exe = out / ('host.exe' if windows else 'host')
         link = ['/Fe:' + str(exe), '/link', '/STACK:1048576'] if windows else ['-o', exe]
         run([*cc, *sources, obj, *link], 'host-build')

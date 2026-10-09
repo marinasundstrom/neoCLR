@@ -38,7 +38,9 @@ jobs:
       - run: cargo build --locked --manifest-path tools/aot-poc/Cargo.toml
       - name: Run macOS type token contracts
         if: runner.os == 'macOS'
-        run: python3 scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-type-tokens-validation
+        run: |
+          python3 scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-type-tokens-validation
+          python3 scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-type-equality-validation --runtime-equality
       - name: Run Windows type token contracts
         if: runner.os == 'Windows'
         shell: pwsh
@@ -47,11 +49,15 @@ jobs:
           if (-not $vs) { throw 'MSVC x64 tools not found' }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc.exe --output target/native-type-tokens-validation"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc.exe --output target/native-type-equality-validation --runtime-equality"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: native-type-tokens-${{ matrix.os }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: target/native-type-tokens-validation/
+          path: |
+            target/native-type-tokens-validation/
+            target/native-type-equality-validation/
           include-hidden-files: true
           retention-days: 14
           if-no-files-found: warn

@@ -5410,3 +5410,29 @@ ret
     assert_eq!(row["declaredMethods"][0]["instance"], false);
     assert_eq!(report["functions"].as_array().unwrap().len(), 1);
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_type_equals_executes_with_interpreter_identity_parity() {
+    let seed = neoclr::library::system().unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/type-tokens.neoil").replace("ceq", "call neoCLR.Runtime.TypeEquals(RuntimeTypeHandle,RuntimeTypeHandle)");
+    let app = neoclr::assemble(&source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, seed).unwrap();
+    let function = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate()").unwrap()).unwrap();
+    assert_eq!(function.invoke(vec![], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    let dir = Temp::new();
+    let r = compile_source(&dir, seed, &source, &["--compile-system", "--reference-arena", "--native-gc"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(base.join("type-tokens-test.c"))
+        .arg(base.join("native-gc.c")).arg(base.join("root-probe.c")).arg(base.join("text-arena.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host"))
+        .output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
+    assert!(r.status.success(), "{r:?}");
+    assert_eq!(r.stdout, b"Type tokens: 42\n");
+    assert!(r.stderr.is_empty());
+}

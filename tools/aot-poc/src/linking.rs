@@ -398,6 +398,8 @@ pub fn prepare(
     let reference_arena = context.is_some_and(|c| c.reference_arena);
     report["referenceArena"] = json!(reference_arena);
     if reference_arena {
+        let rows = super::bindings::type_equals(&mut selected, &report)?;
+        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
         let rows = super::bindings::object_reference_equals(&mut selected, &report)?;
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
     }

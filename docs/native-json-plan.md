@@ -165,6 +165,22 @@ and accessor types, and assert unused accessor bodies remain excluded. The two
 identity parity. The unchanged typed JSON probe reaches its existing Boolean-boxing
 rejection; this catalogue does not claim that reflection or JSON executes natively.
 
+## Implemented type-equality service — 2026-10-09
+
+The reference-arena native profile now lowers the exact reserved
+`neoCLR.Runtime.TypeEquals(RuntimeTypeHandle, RuntimeTypeHandle) -> Boolean`
+InternalCall to token identity comparison. This is the existing service used by
+`TypeInfo.Equals`, not a new public API. It allocates nothing and does not compare
+display names or grant reflection invocation rights. Source verification remains
+mandatory; altered signatures, bodies and receiver/generic contracts are rejected.
+
+A standalone native consumer compares primitive, nominal and closed generic tokens,
+including stored handles, against interpreter execution. Exact-contract rejection
+checks and the sanitized macOS consumer pass. The portable type-token validator now
+has a `--runtime-equality` mode included in both platform jobs. See the
+[service validation evidence](native-type-equality-validation.json). Runtime property
+queries, object-to-type mapping, invocation and native JSON remain unfinished.
+
 ## Evidence
 
 The original typed probe rejects native specialization with

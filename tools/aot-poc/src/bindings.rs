@@ -590,6 +590,30 @@ pub fn object_reference_equals(input: &mut neoclr::Module, selection: &Value) ->
     Ok(bindings)
 }
 
+/// Closed-image type identity shares the token equality primitive; no addresses escape.
+pub fn type_equals(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        if row["name"] != "neoCLR.Runtime.TypeEquals" { continue; }
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != row["name"].as_str().unwrap()
+            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle] || f.returns != Type::Boolean || f.no_result
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
+            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
+        { return Err("native identity binding requires exact TypeEquals(RuntimeTypeHandle,RuntimeTypeHandle) -> Boolean InternalCall contract".into()); }
+        f.impl_flags = 0;
+        f.body = vec![Op::Arg(0), Op::Arg(1), Op::Equal, Op::Return];
+        bindings.push(json!({"definition": row["definition"], "name": row["name"],
+            "compiledIndex": row["compiledIndex"], "implementation": "type-equals-intrinsic-v1",
+            "semantics": "closed-image type identity; no names, addresses, allocation or invocation rights"}));
+    }
+    Ok(bindings)
+}
+
 #[cfg(test)]
 mod identity_tests {
     use super::*;
@@ -801,5 +825,34 @@ mod task_queue_tests {
             no_argument["functions"][0]["methodArguments"] = json!([]);
             assert!(task_queue(&mut source.clone(), &no_argument, &source).is_err());
         }
+    }
+}
+
+#[cfg(test)]
+mod type_identity_tests {
+    use super::*;
+
+    #[test]
+    fn type_equals_requires_exact_reserved_contract() {
+        let source = neoclr::assemble(".module Identity\n.function neoCLR.Runtime.TypeEquals(RuntimeTypeHandle left, RuntimeTypeHandle right) -> Boolean\n.methodimpl InternalCall\n.end\n").unwrap();
+        let inventory = json!({"functions":[{"name":"neoCLR.Runtime.TypeEquals","compiledIndex":0}]});
+        for change in 0..8 {
+            let mut input = source.clone();
+            match change {
+                0 => input.functions[0].impl_flags = 0,
+                1 => input.functions[0].body = vec![Op::Bool(false), Op::Return],
+                2 => input.functions[0].parameters[0] = Type::UInt64,
+                3 => input.functions[0].returns = Type::Int32,
+                4 => input.functions[0].receiver_byref = true,
+                5 => input.functions[0].out_parameters = vec![0],
+                6 => input.functions[0].owner = Some(Type::Named("Pretender".into())),
+                _ => input.functions[0].generic_parameters = vec![Some("T".into())],
+            }
+            assert!(type_equals(&mut input, &inventory).is_err());
+        }
+        let mut input = source.clone();
+        assert_eq!(type_equals(&mut input, &inventory).unwrap().len(), 1);
+        assert_eq!(input.functions[0].impl_flags, 0);
+        assert!(matches!(input.functions[0].body[2], Op::Equal));
     }
 }

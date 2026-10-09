@@ -26,6 +26,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   tables, explicit retention roots and reflection invocation remain unfinished.
   Record the author-directed interpreter/native JSON benchmark case after correctness
   parity, with a proposed measurement protocol; no benchmark results are claimed.
+  Lower the exact TypeEquals runtime service to native image-local type identity,
+  with interpreter parity and malformed-contract rejection tests. Extend the
+  macOS/Windows type-token action with an executable runtime-equality consumer;
+  general TypeInfo queries and reflection invocation remain unfinished.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.
