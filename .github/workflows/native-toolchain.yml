@@ -9,8 +9,12 @@ on:
         description: Exact Raven commit to qualify with this neoCLR revision
         required: true
         default: 71cafd353900394a4f670a8ad8691597f6115091
+      bundle_run:
+        description: Optional prior run whose packaged bundle should receive editor-only requalification
+        required: false
 permissions:
   contents: read
+  actions: read
 jobs:
   windows-native:
     runs-on: windows-latest
@@ -23,11 +27,13 @@ jobs:
         with:
           path: neoclr
       - uses: actions/checkout@v4
+        if: ${{ !inputs.bundle_run }}
         with:
           repository: marinasundstrom/raven
           ref: ${{ inputs.raven_revision || '71cafd353900394a4f670a8ad8691597f6115091' }}
           path: raven
       - uses: dtolnay/rust-toolchain@stable
+        if: ${{ !inputs.bundle_run }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
@@ -37,16 +43,20 @@ jobs:
         with:
           python-version: '3.12'
       - uses: actions/setup-node@v4
+        if: ${{ !inputs.bundle_run }}
         with:
           node-version: '22'
       - run: choco install zip --no-progress -y
+        if: ${{ !inputs.bundle_run }}
       - name: Build runtime and test portable HTTP readiness
+        if: ${{ !inputs.bundle_run }}
         working-directory: neoclr
         run: |
           python -m unittest discover -s scripts -p test_native_http_readiness.py
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           cargo build --locked --release --bin neoclr
       - name: Build native compiler SDK
+        if: ${{ !inputs.bundle_run }}
         shell: bash
         working-directory: raven
         run: |
@@ -54,6 +64,7 @@ jobs:
           export RAVEN_PACKAGE_OUTPUT="$(cygpath -m "$GITHUB_WORKSPACE/packages")"
           scripts/package-sdk.sh win-x64 "$PACKAGE_VERSION"
       - name: Build bootstrap tools sequentially
+        if: ${{ !inputs.bundle_run }}
         shell: pwsh
         run: |
           dotnet build neoclr/tools/metadata/NeoCLR.Metadata.Translate/NeoCLR.Metadata.Translate.csproj -c Release
@@ -61,6 +72,7 @@ jobs:
           dotnet build neoclr/docs/experiments/raven-target/Probe.csproj "-p:RavenRoot=$env:GITHUB_WORKSPACE/raven"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Build editor package with matching server
+        if: ${{ !inputs.bundle_run }}
         shell: pwsh
         working-directory: raven/src/Raven.VSCode
         run: |
@@ -73,6 +85,7 @@ jobs:
           npx --no-install vsce package "$env:PACKAGE_VERSION" --no-update-package-json --no-dependencies --out "$env:GITHUB_WORKSPACE/packages/raven-vscode.vsix"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Compile libraries, package and run extracted samples
+        if: ${{ !inputs.bundle_run }}
         shell: pwsh
         working-directory: neoclr
         run: |
@@ -92,6 +105,23 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python 'target/extracted bundle/neoclr-native-poc/tools/verify-native-bundle.py' --report target/windows-native-acceptance.json
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - uses: actions/download-artifact@v4
+        if: ${{ inputs.bundle_run != '' }}
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.bundle_run }}
+          name: windows-native-qualification
+          path: neoclr/target/reused
+      - name: Extract previously qualified bundle
+        if: ${{ inputs.bundle_run != '' }}
+        shell: pwsh
+        working-directory: neoclr
+        run: |
+          $archive = (Get-ChildItem target/reused -Recurse -Filter neoclr-native-poc.tar.gz | Select-Object -First 1).FullName
+          if (!$archive) { throw 'The selected run has no packaged bundle' }
+          New-Item -ItemType Directory 'target/extracted bundle'
+          tar -xzf $archive -C 'target/extracted bundle'
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Verify packaged extension in VS Code
         shell: pwsh
         working-directory: neoclr
@@ -110,7 +140,13 @@ jobs:
           if (!$installed) { throw 'Packaged extension was not installed' }
           & $code --new-window --user-data-dir $profile --extensions-dir $extensions --skip-welcome --skip-release-notes --disable-workspace-trust "--extensionDevelopmentPath=$installed" "--extensionTestsPath=$PWD/scripts/native-vscode-acceptance.cjs" "$PWD/target/editor-acceptance.code-workspace"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          $acceptance = Get-Content target/editor-acceptance/vscode-acceptance.json | ConvertFrom-Json
+          # code.cmd returns after launching the Windows GUI. Wait for the test
+          # harness's completion report rather than interpreting launch as success.
+          $report = 'target/editor-acceptance/vscode-acceptance.json'
+          $deadline = (Get-Date).AddMinutes(15)
+          while (!(Test-Path $report) -and (Get-Date) -lt $deadline) { Start-Sleep -Seconds 2 }
+          if (!(Test-Path $report)) { throw 'Timed out waiting for installed editor acceptance' }
+          $acceptance = Get-Content $report | ConvertFrom-Json
           if (!$acceptance.passed) { throw 'Installed editor acceptance failed' }
       - uses: actions/upload-artifact@v4
         if: always()
@@ -123,3 +159,4 @@ jobs:
             neoclr/target/distribution/*.tar.gz
             neoclr/target/editor-acceptance/vscode-*.json
             neoclr/target/vscode-profile/logs/**
+            neoclr/target/reused/**

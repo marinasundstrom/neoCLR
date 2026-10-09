@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Wait for Windows VS Code acceptance to finish after its asynchronous launch.
+  Allow editor-only qualification of a previously built bundle, preserving the
+  original package and consumer evidence instead of rebuilding unaffected tools.
+
 - Select Preview 13 for Windows x64/macOS ARM64 qualification. Pin the matching
   Raven packaging revision, version the Windows editor asset consistently with its
   SDK, and add installed-extension acceptance without a development-server override.
