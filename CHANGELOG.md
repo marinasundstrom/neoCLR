@@ -18,7 +18,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   scanning with an owned handle. Preserve output and existing session diagnostics
   on rejected handoff; check collection before adoption, bootstrap faults, foreign
   roots and root-quota exhaustion. Ordinary entry ABI and Raven contracts remain
-  unchanged; a retained-state HTTP consumer remains pending. Handoff Action
+  unchanged. Add a retained HTTP consumer using one listener and counter across
+  three dispatches, collecting between exchanges and discarding the session after
+  service teardown on success or faults. Add an explicit private project bootstrap
+  option, interpreter/native parity checks and a Windows HTTP session action.
+  Exchanges use await; only the documented unit callback adapter starts asynchronous
+  work for the host to drain. General async export completion remains unfinished.
+  Record a separate pinned-compiler async pattern-local hoisting issue; the final
+  interpreter consumer uses a normal lexical binding, not a compiler fix.
+  Handoff Action
   `37974336464` at `201f567b` passes on macOS ARM64 and Windows x64 with matching
   faults; verify 21/25 artifact hashes and 15/16 source inputs respectively.
   Run `37972822432` at `c77e2b07` passes the same lifecycle and generated-callback

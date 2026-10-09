@@ -16,3 +16,6 @@
 # Native task-factory contract project outputs.
 /docs/experiments/task-factories/bin/
 /docs/experiments/task-factories/obj/
+
+/docs/experiments/retained-http/bin/
+/docs/experiments/retained-http/obj/

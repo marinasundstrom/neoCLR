@@ -113,8 +113,9 @@ The routing workbench also parses a route, extracts an integer parameter and pri
 - **Async and hosting:** the HTTP profiles have a bounded completion loop, not a
   public scheduler. General suspension, green threads, stack migration and reusable
   application hosting remain work in progress. A private development experiment
-  now transfers rooted callbacks into retained sessions with explicit shutdown;
-  integrating this lifetime into the HTTP showcase is still pending.
+  now transfers rooted callbacks into retained sessions with explicit shutdown.
+  A bounded HTTP consumer preserves a counter and listener across three exchanges;
+  general async export completion and reusable hosting remain unfinished.
 - **Memory:** the nonmoving collector uses conservative payload scanning and a bounded
   buffer. It can retain extra objects and fragment storage; collection policy is provisional.
 - **Reliability:** the tested failures preserve Fault details, traces and cleanup;

@@ -52,8 +52,11 @@ owned roots, fail-closed dispatch after faults and explicit shutdown admission.
 [Lifecycle and generated-callback gates](native-retained-session-validation.json)
 pass on macOS ARM64 and Windows x64 at `c77e2b07`, with matching fault output. An explicit opt-in callback bootstrap now transfers a strong handle into the session
 without heap scanning; the [handoff gate](native-bootstrap-handoff-validation.json)
-passes on macOS ARM64 and Windows x64 at `201f567b`. A retained-state HTTP consumer remains the
-next integration work.
+passes on macOS ARM64 and Windows x64 at `201f567b`. A [retained-state HTTP consumer](experiments/retained-http/README.md) now uses that
+handoff for three serial exchanges with collection between calls and terminal-fault
+shutdown. Its [qualification](native-retained-http-validation.json) is tracked
+separately. General async export completion and broader persistent-host contracts
+remain open before reusable hosting or hot reload can be claimed.
 
 **Author clarification (2026-10-09):** once the native compilation foundations are
 ready, let runtime suspension, runtime-owned scheduling and green threads co-evolve

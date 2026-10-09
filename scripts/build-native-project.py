@@ -18,7 +18,8 @@ PROFILES = {'console': PROFILE, 'http': 'macos-arm64-http-v1', 'windows-console'
 def support_files():
     base = ROOT / 'docs/experiments'
     return [ROOT / 'scripts/build-native-project.py', ROOT / 'tools/native/console-host.c',
-            ROOT / 'benchmarks/native-web/http-host.c',
+            ROOT / 'benchmarks/native-web/http-host.c', ROOT / 'benchmarks/native-web/http-session-host.c',
+            base / 'aot-console/native-session.c',
             *sorted((ROOT / 'tools/native').glob('windows-*.h')),
             *[ROOT / 'tools/native' / name for name in
               ('windows-console-host.c', 'windows-gc-host.c', 'windows-host-memory.c', 'windows-native-stack.c')],
@@ -42,9 +43,11 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def build(project, bundle, aot, output, profile=PROFILE):
+def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None):
     windows = profile in (PROFILES['windows-console'], PROFILES['windows-http'])
     http = profile in (PROFILES['http'], PROFILES['windows-http'])
+    if bootstrap_root and not http:
+        raise ValueError('Private session bootstrap requires an HTTP profile')
     if windows:
         if platform.system() != 'Windows' or platform.machine().lower() not in ('amd64', 'x86_64'):
             raise ValueError('Windows profiles require a Windows x64 MSVC build host')
@@ -61,7 +64,7 @@ def build(project, bundle, aot, output, profile=PROFILE):
             raise ValueError('Required build tool is missing: ' + tool)
     output.mkdir(parents=True, exist_ok=False)
     report = dict(profile=profile, passed=False, project=str(project),
-                  host=platform.platform(), commands=[], inputs={})
+                  host=platform.platform(), bootstrapRoot=bootstrap_root, commands=[], inputs={})
 
     def save():
         (output / 'build.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -137,6 +140,9 @@ def build(project, bundle, aot, output, profile=PROFILE):
                 adapters[0] = ROOT / 'benchmarks/native-web/http-host.c'
                 adapters += [base / 'native-stack.c']
             adapters += [base / name for name in ('task-queue.c', 'socket-listener.c')]
+        if bootstrap_root:
+            adapters = [ROOT / 'benchmarks/native-web/http-session-host.c' if p == ROOT / 'benchmarks/native-web/http-host.c' else p for p in adapters]
+            adapters += [base / 'native-session.c']
         inputs = [Path(__file__).resolve(), project, catalog_path, aot, *required, *adapters,
                   *base.glob('*.h'), *base.parent.joinpath('aot-scalar').glob('*.h'),
                   *base.parent.joinpath('aot-fault-details').glob('*.h'),
@@ -165,8 +171,21 @@ def build(project, bundle, aot, output, profile=PROFILE):
             flags += ['--target', 'x86_64-pc-windows-msvc', '--windows-http-experiment' if http else '--windows-console-experiment']
             if not http:
                 flags += ['--native-stack-budget']
+        selected_root = '@entry'
+        if bootstrap_root:
+            # Temporary Raven CLI bridge spells assembly-level functions as F_<UTF8 hex>.
+            # Resolve from the actual inventory; never assume an assembly hash prefix.
+            inventory = json.loads(run([aot, '--inspect', assembly, bootstrap_root]))
+            spelling = 'F_' + bootstrap_root.encode('utf-8').hex().upper()
+            matches = [f['name'] for f in inventory['functions']
+                       if f['name'] == bootstrap_root or f['name'].rsplit('.', 1)[-1] == spelling]
+            if len(matches) != 1:
+                raise ValueError('Bootstrap must identify one assembly-level function: ' + bootstrap_root)
+            selected_root = matches[0]
+            report['resolvedBootstrapRoot'] = selected_root
+            flags += ['--native-host-bootstrap']
         obj = output / ('app.obj' if windows else 'app.o')
-        run([aot, '--closed-world', assembly, '@entry', obj, *context, *flags])
+        run([aot, '--closed-world', assembly, selected_root, obj, *context, *flags])
         # Publish the executable only after link and dependency checks succeed.
         pending = output / ('app.pending.exe' if windows else 'app.pending')
         if windows:
@@ -203,6 +222,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile', choices=PROFILES, default='console',
                         help='Explicit native service/host profile (default: console)')
+    parser.add_argument('--bootstrap-root', help='Private retained HTTP experiment: fn<Void> factory, three host dispatches')
     for name in ('project', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     packaged = (ROOT / 'native-build-kit.json').is_file()
@@ -211,7 +231,7 @@ def main():
     args = parser.parse_args()
     try:
         print(build(*(getattr(args, name).resolve() for name in ('project', 'bundle', 'aot', 'output')),
-                    profile=PROFILES[args.profile]))
+                    profile=PROFILES[args.profile], bootstrap_root=args.bootstrap_root))
     except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.SubprocessError) as error:
         print('native build: ' + str(error), file=sys.stderr)
         return 1

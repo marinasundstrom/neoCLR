@@ -110,7 +110,9 @@ shapes, and inspect-mode reporting records the capability. The handoff gate pass
 at `201f567b`, with matching fault output. All 21/25 artifact hashes and 15/16 source
 hashes respectively are verified (allowing Windows checkout line endings), recorded in
 [native-bootstrap-handoff-validation.json](native-bootstrap-handoff-validation.json).
-A retained-state HTTP consumer remains the next integration work.
+The next [retained-state HTTP consumer](experiments/retained-http/README.md) now
+uses this handoff; its platform evidence is tracked separately. General async export
+completion and broader persistent-host contracts remain open.
 The website's existing statement that general reusable hosting is unfinished remains
 accurate; there is no new public API reference entry for this private C experiment.
 

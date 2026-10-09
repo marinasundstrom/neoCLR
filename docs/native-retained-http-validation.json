@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-09",
+  "scope": "Private retained HTTP server session; three serial exchanges on one listener and counter",
+  "local": {
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "reportSha256": "11c115487c46d1f13e95119d89e4a0edc168e2d12f44f7c88ca09bb986a405cd",
+    "artifactHashesVerified": 17,
+    "buildInputsVerified": 62,
+    "inputs": {
+      "scripts/validate-retained-http.py": "4923b7949c3af8b6f21389d437786fd70f485d65cdb650d8f0e460cc5aca4def",
+      "scripts/validate-native-http-project.py": "958446c28b7208e8e0424915bb79b96cd29d72ad59be3eb8f630548fd0afc1e9",
+      "scripts/verify-native-http-json.py": "15f665ff9f893d3047ea1793ca43a20510d813ad78b8d835c15f4d0ad909660b",
+      "docs/experiments/retained-http/Server.rvn": "df3913df8f12f75c9ba9b78d9bfa4e3a267806b5f5837a4690e13accc2c799e2",
+      "docs/experiments/retained-http/Native.rvnproj": "1fadf5e594b71f9cecde182c89853bf669a5f454b1399eda2d45eedba58b4939",
+      "scripts/build-native-project.py": "c935d337dce24d4cf6e6df141184282c0ec936e4e0939fa7612d99186b5f75e5",
+      "benchmarks/native-web/http-session-host.c": "94dff45575355552a9bc560e2aaca62f9bd77e6dfb696dc0cfd85331aacc5d0f",
+      "docs/experiments/aot-console/native-session.c": "ad41da2d8ab0893cc6c82c7777c5676de8e0e06309a8e13cdb3f44d74998bb07"
+    },
+    "dependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ],
+    "cases": [
+      {
+        "name": "three-requests",
+        "passed": true,
+        "exitCode": 0,
+        "stdout": "Completed 1\nCompleted 2\nCompleted 3\n",
+        "responseBodies": [
+          "Request 1",
+          "Request 2",
+          "Request 3"
+        ]
+      },
+      {
+        "name": "fragmented",
+        "passed": true,
+        "exitCode": 0,
+        "stdout": "Completed 1\nCompleted 2\nCompleted 3\n",
+        "responseBodies": [
+          "Request 1",
+          "Request 2",
+          "Request 3"
+        ]
+      },
+      {
+        "name": "fault-after-success",
+        "passed": true,
+        "exitCode": 1,
+        "stdout": "Completed 1\n",
+        "responseBodies": [
+          "Request 1",
+          ""
+        ]
+      }
+    ]
+  },
+  "faultComparison": "Native and interpreter guest fault frames match exactly; the interpreter additionally has precisely its verified DrainEntryTasks and artifact async-entry frames. Full traces retained in report.",
+  "github": "Windows qualification pending",
+  "limitations": [
+    "Three serial requests; no general async export completion, concurrent serving, reload or scheduler claim",
+    "Host service scopes close sockets before session discard; no guest finalizers promised on faults",
+    "Pinned Raven async pattern-local hoisting candidate remains deferred; final Main uses a normal lexical binding"
+  ]
+}

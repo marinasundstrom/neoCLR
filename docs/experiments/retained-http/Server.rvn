@@ -1,0 +1,68 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Tasks.*
+import System.Text.*
+import System.Web.Http.*
+
+class HttpSession {
+    private val server: HttpServer
+    private var count: int = 0
+
+    init(server: HttpServer) {
+        self.server = server
+    }
+
+    private func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        count += 1
+        if request.Target == "/fault" {
+            System.Fail("Retained HTTP handler fault")
+        }
+        let headers = ArrayList<HttpHeader>()
+        headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
+        let body = String.Concat("Request ", count.ToString())
+        let result: Result<HttpResponse, HttpError> = Ok(HttpResponse(200, headers, Utf8.Encode(body)))
+        return Task.FromResult(result)
+    }
+
+    async func Exchange() -> Task<()> {
+        let result = await server.ServeOne(Respond)
+        if let Error(error) = result {
+            System.Fail(error.ToString())
+        }
+        Console.WriteLine(String.Concat("Completed ", count.ToString()))
+    }
+
+    func Dispatch() {
+        // The private C export accepts a synchronous unit callback. It starts one
+        // exchange; the host owns and drains its continuations before dispatching again.
+        _ = Exchange()
+    }
+
+    func Close() {
+        server.Close()
+    }
+}
+
+func CreateSession() -> HttpSession {
+    if let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) {
+        if let Ok(port) = server.GetLocalPort() {
+            Console.WriteLine(port)
+            return HttpSession(server)
+        }
+        server.Close()
+    }
+    System.Fail("Retained HTTP listen failed")
+}
+
+func Bootstrap() -> () -> () {
+    return CreateSession().Dispatch
+}
+
+async func Main() -> Task<()> {
+    let session = CreateSession()
+    await session.Exchange()
+    await session.Exchange()
+    await session.Exchange()
+    session.Close()
+}
