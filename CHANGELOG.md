@@ -6,6 +6,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+No changes yet.
+
+## 0.1.0-preview.13 — 2026-10-09
+
+Windows x64 and macOS ARM64 toolchain bundles pass extracted consumer and installed
+editor qualification. Canonical source validation and focused platform checks pass;
+ARM64 AOT remains a separate source experiment, and full native core bootstrap is
+unfinished. See [release notes](docs/preview-13-release-notes.md) and
+[exact evidence](docs/preview-13-validation.json).
+
 ### 2026-10-09
 
 - Lead the Tasks guide with the compiled Task.Run/await example; keep explicit

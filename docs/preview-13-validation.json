@@ -1,0 +1,2590 @@
+{
+  "version": "0.1.0-preview.13",
+  "date": "2026-10-09",
+  "status": "qualified release candidate",
+  "platforms": [
+    "osx-arm64",
+    "win-x64"
+  ],
+  "validatedCodeRevision": "3ff1a66e7783a25d52a90cdf9d1100b5ebb968da",
+  "sourceWorkflow": "https://github.com/marinasundstrom/neoCLR/actions/runs/37924446703",
+  "windowsToolchainWorkflow": "https://github.com/marinasundstrom/neoCLR/actions/runs/37921281428",
+  "hostValidation": {
+    "windows": {
+      "status": "passed",
+      "scope": "focused host contracts; not full suite or packaged SDK qualification",
+      "platform": "Windows-2025Server-10.0.26100-SP0",
+      "toolchain": "stable",
+      "createdUtc": "2026-10-09T11:33:56.370155+00:00",
+      "commit": "354421faccf23aba7e984d8d57f435bec5dc72a1",
+      "validator_sha256": "ac510aacda40991669dde06c7b3fc0817c5f481d8aed2654f5df60f95f87d0b4",
+      "integration_tests": [
+        "cancellation",
+        "workers",
+        "environment",
+        "instant_clock",
+        "date_time",
+        "file_input",
+        "file_output",
+        "file_streams",
+        "path",
+        "io_errors",
+        "console",
+        "console_streams",
+        "cli",
+        "cli_modules",
+        "source_files",
+        "native",
+        "pinvoke",
+        "native_integers",
+        "native_memory_api",
+        "target_layout"
+      ],
+      "unit_filters": [
+        "file_io::",
+        "file_streams::",
+        "workers::",
+        "socket_io::",
+        "name_resolution::",
+        "socket_vm_probe::",
+        "external_io_gc_probe::",
+        "scheduler::"
+      ],
+      "commands": [
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--no-fail-fast",
+            "--test",
+            "cancellation",
+            "--test",
+            "workers",
+            "--test",
+            "environment",
+            "--test",
+            "instant_clock",
+            "--test",
+            "date_time",
+            "--test",
+            "file_input",
+            "--test",
+            "file_output",
+            "--test",
+            "file_streams",
+            "--test",
+            "path",
+            "--test",
+            "io_errors",
+            "--test",
+            "console",
+            "--test",
+            "console_streams",
+            "--test",
+            "cli",
+            "--test",
+            "cli_modules",
+            "--test",
+            "source_files",
+            "--test",
+            "native",
+            "--test",
+            "pinvoke",
+            "--test",
+            "native_integers",
+            "--test",
+            "native_memory_api",
+            "--test",
+            "target_layout"
+          ],
+          "exit_code": 0,
+          "seconds": 281.281
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "file_io::"
+          ],
+          "exit_code": 0,
+          "seconds": 59.016
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "file_streams::"
+          ],
+          "exit_code": 0,
+          "seconds": 0.172
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "workers::"
+          ],
+          "exit_code": 0,
+          "seconds": 0.125
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "socket_io::"
+          ],
+          "exit_code": 0,
+          "seconds": 2.125
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "name_resolution::"
+          ],
+          "exit_code": 0,
+          "seconds": 0.125
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "socket_vm_probe::"
+          ],
+          "exit_code": 0,
+          "seconds": 29.453
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "external_io_gc_probe::"
+          ],
+          "exit_code": 0,
+          "seconds": 0.125
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "scheduler::"
+          ],
+          "exit_code": 0,
+          "seconds": 0.125
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "run",
+            "--locked",
+            "--release",
+            "--example",
+            "invoke"
+          ],
+          "exit_code": 0,
+          "seconds": 1.484
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "run",
+            "--locked",
+            "--release",
+            "--example",
+            "build_native"
+          ],
+          "exit_code": 0,
+          "seconds": 0.61
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "run",
+            "--locked",
+            "--release",
+            "--",
+            "run",
+            "examples/pinvoke.neoil"
+          ],
+          "exit_code": 0,
+          "seconds": 0.234
+        }
+      ]
+    },
+    "macos": {
+      "status": "passed",
+      "scope": "focused host contracts; not full suite or packaged SDK qualification",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "toolchain": "stable",
+      "createdUtc": "2026-10-09T11:33:34.238533+00:00",
+      "commit": "354421faccf23aba7e984d8d57f435bec5dc72a1",
+      "validator_sha256": "d1a68ef773b903cab095713c3dc524e1ad9d779074d4be3cffb871db0ccfd6d2",
+      "integration_tests": [
+        "cancellation",
+        "workers",
+        "environment",
+        "instant_clock",
+        "date_time",
+        "file_input",
+        "file_output",
+        "file_streams",
+        "path",
+        "io_errors",
+        "console",
+        "console_streams",
+        "cli",
+        "cli_modules",
+        "source_files",
+        "native",
+        "pinvoke",
+        "native_integers",
+        "native_memory_api",
+        "target_layout"
+      ],
+      "unit_filters": [
+        "file_io::",
+        "file_streams::",
+        "workers::",
+        "socket_io::",
+        "name_resolution::",
+        "socket_vm_probe::",
+        "external_io_gc_probe::",
+        "scheduler::"
+      ],
+      "commands": [
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--no-fail-fast",
+            "--test",
+            "cancellation",
+            "--test",
+            "workers",
+            "--test",
+            "environment",
+            "--test",
+            "instant_clock",
+            "--test",
+            "date_time",
+            "--test",
+            "file_input",
+            "--test",
+            "file_output",
+            "--test",
+            "file_streams",
+            "--test",
+            "path",
+            "--test",
+            "io_errors",
+            "--test",
+            "console",
+            "--test",
+            "console_streams",
+            "--test",
+            "cli",
+            "--test",
+            "cli_modules",
+            "--test",
+            "source_files",
+            "--test",
+            "native",
+            "--test",
+            "pinvoke",
+            "--test",
+            "native_integers",
+            "--test",
+            "native_memory_api",
+            "--test",
+            "target_layout"
+          ],
+          "exit_code": 0,
+          "seconds": 167.403
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "file_io::"
+          ],
+          "exit_code": 0,
+          "seconds": 28.058
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "file_streams::"
+          ],
+          "exit_code": 0,
+          "seconds": 0.078
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "workers::"
+          ],
+          "exit_code": 0,
+          "seconds": 0.067
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "socket_io::"
+          ],
+          "exit_code": 0,
+          "seconds": 0.16
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "name_resolution::"
+          ],
+          "exit_code": 0,
+          "seconds": 0.064
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "socket_vm_probe::"
+          ],
+          "exit_code": 0,
+          "seconds": 17.728
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "external_io_gc_probe::"
+          ],
+          "exit_code": 0,
+          "seconds": 0.063
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "test",
+            "--locked",
+            "--release",
+            "--lib",
+            "scheduler::"
+          ],
+          "exit_code": 0,
+          "seconds": 0.054
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "run",
+            "--locked",
+            "--release",
+            "--example",
+            "invoke"
+          ],
+          "exit_code": 0,
+          "seconds": 0.899
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "run",
+            "--locked",
+            "--release",
+            "--example",
+            "build_native"
+          ],
+          "exit_code": 0,
+          "seconds": 0.342
+        },
+        {
+          "argv": [
+            "cargo",
+            "+stable",
+            "run",
+            "--locked",
+            "--release",
+            "--",
+            "run",
+            "examples/pinvoke.neoil"
+          ],
+          "exit_code": 0,
+          "seconds": 0.131
+        }
+      ]
+    }
+  },
+  "bundles": {
+    "osx-arm64": {
+      "archive": "neoclr-preview13-osx-arm64.tar.gz",
+      "sha256": "1bc32b49ea6cbca5860e312b658420ff835ce4b9f714076b0357dc2892fe4c21",
+      "bytes": 46681462,
+      "manifest": {
+        "format": "neoclr-native-poc-v1",
+        "sourceRevision": "7ec2193144e8eb6a8b95a2aad82020e03e2facc9",
+        "sourceDirty": false,
+        "platform": "macOS-27.0-arm64-arm-64bit",
+        "runtime": "bin/neoclr",
+        "objectRoot": "lib/System.Runtime.dll",
+        "runtimeSeed": "lib/System.runtime.neox",
+        "modules": [
+          "lib/System.Runtime.dll",
+          "lib/System.Data.dll",
+          "lib/System.Networking.dll",
+          "lib/System.Web.dll"
+        ],
+        "samples": {
+          "collections": {
+            "expected": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n"
+          },
+          "tasks": {
+            "expected": "Suspended\n42\n"
+          },
+          "json": {
+            "expected": "JSON object mapping checks passed\n"
+          },
+          "http-json-server": {
+            "expected": null
+          },
+          "http-json-client": {
+            "expected": null
+          }
+        }
+      },
+      "provenance": {
+        "declaredRuntimeRevision": "3ff1a66e7783a25d52a90cdf9d1100b5ebb968da",
+        "runtimeSha256": "a4c18a72d7a971314b990c13adea35fdcd5b89244771f92c0e82b60f84470560",
+        "packagerSha256": "8bdbd2957b402c9a3b8666b0713699333b26d88b9ee1f30bb9e7a3fe5824e088",
+        "sdkVersion": "0.1.14-neoclr.preview13",
+        "vsixSha256": "04425852cee2f068d44a1aa64a7c05dbfbd1bceafe358b61cf54415fa5d16d2d"
+      },
+      "librarySourceRevision": "9fd8f6b8eb10b067c58127222833a6339696bae4",
+      "compilerRevision": "c6d2137e34d11f0c8888c5e91f0c6257f53e6c87",
+      "consumerAcceptance": {
+        "passed": true,
+        "root": "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc",
+        "commands": [
+          {
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/collections/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/collections/bin/neoclr/App.dll\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/bin/neoclr",
+              "run",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/collections/bin/neoclr/App.dll",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--instructions",
+              "100000000"
+            ],
+            "exitCode": 0,
+            "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/tasks/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/tasks/bin/neoclr/App.dll\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/bin/neoclr",
+              "run",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/tasks/bin/neoclr/App.dll",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--instructions",
+              "100000000"
+            ],
+            "exitCode": 0,
+            "stdout": "Suspended\n42\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/json/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/json/bin/neoclr/App.dll\n",
+            "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n"
+          },
+          {
+            "command": [
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/bin/neoclr",
+              "run",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/json/bin/neoclr/App.dll",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--instructions",
+              "100000000"
+            ],
+            "exitCode": 0,
+            "stdout": "JSON object mapping checks passed\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/http-json-server/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll\n",
+            "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\n"
+          },
+          {
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/http-json-client/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll\n",
+            "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\nwarning RAV0162: Unreachable code\n"
+          },
+          {
+            "command": [
+              "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/tools/verify-native-http-json.py",
+              "--runtime",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/bin/neoclr",
+              "--server",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll",
+              "--client",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll",
+              "--seed",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--output",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final-macos-acceptance-http.json"
+            ],
+            "exitCode": 0,
+            "stdout": "Native HTTP/JSON server requests passed\nNative HTTP/JSON client/server pair passed\n",
+            "stderr": ""
+          }
+        ],
+        "verifiedFiles": 1043,
+        "http": {
+          "inputs": {
+            "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/bin/neoclr": "a4c18a72d7a971314b990c13adea35fdcd5b89244771f92c0e82b60f84470560",
+            "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll": "e1e4de8fc62e4cef2f875a810c5124b963694cf08b39620e1e301ff204b70f01",
+            "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll": "721d5cc7764ede5a37bab4b3a1715962512d7da5e004bcc6ff074479cea98cf6",
+            "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+            "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll": "48a1f70a5ec03a014513b9435143a522b899c7aa87360140f38b01aecdf0ad22",
+            "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll": "a5aee2d42b20208a9ef98d84fdd0015d9eec19d5cfbbc6f0abac92817f55bf00",
+            "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll": "e1ec6f25882f29ebfaefdbf3eb6d737b8d6ae46dc7d7071b873b49a2474f66a2",
+            "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll": "8db239ee54c899764552c365d6b1e5b21cc4c54c0cb9121cc64d5415875eaa32"
+          },
+          "runs": [
+            {
+              "serverCommand": [
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/bin/neoclr",
+                "run",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll",
+                "--system",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox",
+                "--instructions",
+                "100000000",
+                "--module",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+                "--module",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll",
+                "--module",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll",
+                "--module",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll",
+                "--object-root",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+                "--",
+                "4"
+              ],
+              "requests": [
+                {
+                  "method": "GET",
+                  "path": "/report",
+                  "status": 200,
+                  "body": {
+                    "station": "Caf\u00e9"
+                  }
+                },
+                {
+                  "method": "POST",
+                  "path": "/reports",
+                  "status": 201,
+                  "body": {
+                    "accepted": true
+                  }
+                },
+                {
+                  "method": "POST",
+                  "path": "/reports",
+                  "status": 400,
+                  "body": {
+                    "error": "Invalid report"
+                  }
+                },
+                {
+                  "method": "GET",
+                  "path": "/missing",
+                  "status": 404,
+                  "body": {
+                    "error": "Not found"
+                  }
+                }
+              ],
+              "port": "58012",
+              "server": {
+                "exitCode": 0,
+                "stdout": "Reports served\n",
+                "stderr": ""
+              }
+            },
+            {
+              "serverCommand": [
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/bin/neoclr",
+                "run",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll",
+                "--system",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox",
+                "--instructions",
+                "100000000",
+                "--module",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+                "--module",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll",
+                "--module",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll",
+                "--module",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll",
+                "--object-root",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+                "--",
+                "2"
+              ],
+              "requests": [],
+              "port": "58020",
+              "clientCommand": [
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/bin/neoclr",
+                "run",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll",
+                "--system",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox",
+                "--instructions",
+                "100000000",
+                "--module",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+                "--module",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll",
+                "--module",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll",
+                "--module",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll",
+                "--object-root",
+                "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+                "--",
+                "http://127.0.0.1:58020/"
+              ],
+              "client": {
+                "exitCode": 0,
+                "stdout": "{\"accepted\":true}\n",
+                "stderr": ""
+              },
+              "server": {
+                "exitCode": 0,
+                "stdout": "Reports served\n",
+                "stderr": ""
+              }
+            }
+          ],
+          "passed": true
+        }
+      },
+      "editorAcceptance": {
+        "vscode": "1.140.0",
+        "checks": [
+          "native imported hover",
+          "native imported Markdown documentation hover",
+          "native Markdown sidecar edit refreshes hover",
+          "native XML fallback after Markdown member deletion",
+          "read-only metadata declaration navigation",
+          "native imported completion",
+          "native imported completion documentation",
+          "actual file watcher invalidates replaced native library",
+          "unsaved buffer survives native workspace reload",
+          "missing native reference produces a project diagnostic",
+          "native dependency recovery clears the project diagnostic",
+          "System.Data.Json.JsonValue native hover and metadata navigation",
+          "shipped native Networking documentation appears in hover",
+          "System.Networking.IPAddress native hover and metadata navigation",
+          "System.Web.Http.HttpClient native hover and metadata navigation",
+          "imported bundle configuration edit produces project diagnostic",
+          "restored bundle configuration recovers the workspace",
+          "unchanged broad sample imports source-built class library",
+          "native Option and Result type hovers retain union kind and constructed arguments",
+          "repeated broad-sample type and query hovers return symbols",
+          "broad-sample hovers return after unsaved edits",
+          "configured VS Code native build task",
+          "VS Code task executes exact broad-sample output on native runtime",
+          "failed build preserves last successful artifact",
+          "ordinary .NET editor hover and diagnostics",
+          "unchanged Tasks/await sample builds and executes from VS Code"
+        ],
+        "passed": true,
+        "hoverTimings": [
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:17.971Z",
+            "elapsedMs": 46,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:18.520Z",
+            "elapsedMs": 9,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:19.031Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:19.532Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:20.035Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:20.537Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:21.038Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:21.541Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:22.042Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:22.545Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:23.047Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:23.549Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:24.051Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:24.553Z",
+            "elapsedMs": 386,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:24.941Z",
+            "elapsedMs": 33,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:25.475Z",
+            "elapsedMs": 6284,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:31.759Z",
+            "elapsedMs": 1355,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:33.615Z",
+            "elapsedMs": 1952,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:40.211Z",
+            "elapsedMs": 862,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:26:41.575Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 43,
+            "startedAt": "2026-10-09T11:26:47.612Z",
+            "elapsedMs": 863,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 44,
+            "startedAt": "2026-10-09T11:26:48.496Z",
+            "elapsedMs": 76,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 42,
+            "startedAt": "2026-10-09T11:26:48.581Z",
+            "elapsedMs": 90,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:55.249Z",
+            "elapsedMs": 1071,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:26:56.319Z",
+            "elapsedMs": 29,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:26:56.349Z",
+            "elapsedMs": 3,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:56.352Z",
+            "elapsedMs": 2,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:26:56.354Z",
+            "elapsedMs": 8,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:26:56.362Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 90,
+            "character": 26,
+            "startedAt": "2026-10-09T11:26:56.365Z",
+            "elapsedMs": 3,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 91,
+            "character": 10,
+            "startedAt": "2026-10-09T11:26:56.369Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:56.373Z",
+            "elapsedMs": 2,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:26:56.376Z",
+            "elapsedMs": 2,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:26:56.377Z",
+            "elapsedMs": 3,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 90,
+            "character": 26,
+            "startedAt": "2026-10-09T11:26:56.380Z",
+            "elapsedMs": 2,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 91,
+            "character": 10,
+            "startedAt": "2026-10-09T11:26:56.382Z",
+            "elapsedMs": 2,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:56.384Z",
+            "elapsedMs": 3,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:26:56.388Z",
+            "elapsedMs": 3,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:26:56.391Z",
+            "elapsedMs": 5,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 90,
+            "character": 26,
+            "startedAt": "2026-10-09T11:26:56.396Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 91,
+            "character": 10,
+            "startedAt": "2026-10-09T11:26:56.400Z",
+            "elapsedMs": 2,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:56.407Z",
+            "elapsedMs": 59,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:56.467Z",
+            "elapsedMs": 61,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:56.530Z",
+            "elapsedMs": 52,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance-dotnet/Main.rvn",
+            "line": 0,
+            "character": 35,
+            "startedAt": "2026-10-09T11:27:13.952Z",
+            "elapsedMs": 750,
+            "hasResult": true
+          }
+        ],
+        "lastHover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+        "diagnostics": [],
+        "hover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+        "completion": [
+          {
+            "label": "VersionOne",
+            "description": "EditorApi"
+          }
+        ],
+        "bundleHovers": {
+          "System.Data.Json.JsonValue": "```raven\nsealed class JsonValue\n```\n\nType in `Json`",
+          "System.Networking.IPAddress": "```raven\nsealed class IPAddress: EquatableTo<IPAddress>\n```\n\nType in `Networking`\n\n---\n\nAn immutable IP address in the closed IPv4 and IPv6 family.",
+          "System.Web.Http.HttpClient": "```raven\nclass HttpClient\n```\n\nType in `Http`"
+        },
+        "unionHovers": {
+          "Option<Order>": "```raven\nunion struct Option<Order>: Propagatable<Option<Order>, Order, void>\n```\n\nType in `System`",
+          "Result<Order, SingleError>": "```raven\nunion struct Result<Order, SingleError>: Propagatable<Result<Order, SingleError>, Order, SingleError>\n```\n\nType in `System`"
+        },
+        "repeatedMainHovers": [
+          {
+            "round": 0,
+            "term": "ArrayList",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:56.352Z",
+            "elapsedMs": 2,
+            "hasResult": true
+          },
+          {
+            "round": 0,
+            "term": "Option<Order>",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:26:56.354Z",
+            "elapsedMs": 8,
+            "hasResult": true
+          },
+          {
+            "round": 0,
+            "term": "Result<Order, SingleError>",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:26:56.362Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "round": 0,
+            "term": "Filter(",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 90,
+            "character": 26,
+            "startedAt": "2026-10-09T11:26:56.365Z",
+            "elapsedMs": 3,
+            "hasResult": true
+          },
+          {
+            "round": 0,
+            "term": ".Map(",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 91,
+            "character": 10,
+            "startedAt": "2026-10-09T11:26:56.369Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "round": 1,
+            "term": "ArrayList",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:56.373Z",
+            "elapsedMs": 2,
+            "hasResult": true
+          },
+          {
+            "round": 1,
+            "term": "Option<Order>",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:26:56.376Z",
+            "elapsedMs": 2,
+            "hasResult": true
+          },
+          {
+            "round": 1,
+            "term": "Result<Order, SingleError>",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:26:56.377Z",
+            "elapsedMs": 3,
+            "hasResult": true
+          },
+          {
+            "round": 1,
+            "term": "Filter(",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 90,
+            "character": 26,
+            "startedAt": "2026-10-09T11:26:56.380Z",
+            "elapsedMs": 2,
+            "hasResult": true
+          },
+          {
+            "round": 1,
+            "term": ".Map(",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 91,
+            "character": 10,
+            "startedAt": "2026-10-09T11:26:56.382Z",
+            "elapsedMs": 2,
+            "hasResult": true
+          },
+          {
+            "round": 2,
+            "term": "ArrayList",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:56.384Z",
+            "elapsedMs": 3,
+            "hasResult": true
+          },
+          {
+            "round": 2,
+            "term": "Option<Order>",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:26:56.388Z",
+            "elapsedMs": 3,
+            "hasResult": true
+          },
+          {
+            "round": 2,
+            "term": "Result<Order, SingleError>",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:26:56.391Z",
+            "elapsedMs": 5,
+            "hasResult": true
+          },
+          {
+            "round": 2,
+            "term": "Filter(",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 90,
+            "character": 26,
+            "startedAt": "2026-10-09T11:26:56.396Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "round": 2,
+            "term": ".Map(",
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 91,
+            "character": 10,
+            "startedAt": "2026-10-09T11:26:56.400Z",
+            "elapsedMs": 2,
+            "hasResult": true
+          }
+        ],
+        "postEditMainHovers": [
+          {
+            "round": 0,
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:56.407Z",
+            "elapsedMs": 59,
+            "hasResult": true
+          },
+          {
+            "round": 1,
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:56.467Z",
+            "elapsedMs": 61,
+            "hasResult": true
+          },
+          {
+            "round": 2,
+            "uri": "file:///Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:26:56.530Z",
+            "elapsedMs": 52,
+            "hasResult": true
+          }
+        ],
+        "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview13-candidate/portable-editor-acceptance/bin/neoclr/App.dll\nDuplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n"
+      }
+    },
+    "win-x64": {
+      "archive": "neoclr-preview13-win-x64.tar.gz",
+      "sha256": "ffcd3ec90d7ae9e0e7754ee276b16a18c2a087b4bb04acfc477b73913538d9cc",
+      "bytes": 46830794,
+      "manifest": {
+        "format": "neoclr-native-poc-v1",
+        "sourceRevision": "3ff1a66e7783a25d52a90cdf9d1100b5ebb968da",
+        "sourceDirty": false,
+        "platform": "Windows-2025Server-10.0.26100-SP0",
+        "runtime": "bin/neoclr.exe",
+        "objectRoot": "lib/System.Runtime.dll",
+        "runtimeSeed": "lib/System.runtime.neox",
+        "modules": [
+          "lib/System.Runtime.dll",
+          "lib/System.Data.dll",
+          "lib/System.Networking.dll",
+          "lib/System.Web.dll"
+        ],
+        "samples": {
+          "collections": {
+            "expected": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n"
+          },
+          "tasks": {
+            "expected": "Suspended\n42\n"
+          },
+          "json": {
+            "expected": "JSON object mapping checks passed\n"
+          },
+          "http-json-server": {
+            "expected": null
+          },
+          "http-json-client": {
+            "expected": null
+          }
+        }
+      },
+      "provenance": {
+        "declaredRuntimeRevision": "3ff1a66e7783a25d52a90cdf9d1100b5ebb968da",
+        "runtimeSha256": "5f3fb87c37b0bbe45317674d62981466acb00edcc27840a75e5db8d1d466b6c1",
+        "packagerSha256": "c5a0ed590dce0f83ae2dea419f793ab20743bb999e8a3d06f4bb3e0c88cbd2df",
+        "sdkVersion": "0.1.14-neoclr.preview13",
+        "vsixSha256": "f5aa7c984ba05ac98c2eab03476db36582ab7ef0d0f4f139e78e85f77d75c893"
+      },
+      "librarySourceRevision": "3ff1a66e7783a25d52a90cdf9d1100b5ebb968da",
+      "compilerRevision": "71cafd353900394a4f670a8ad8691597f6115091",
+      "consumerAcceptance": {
+        "passed": true,
+        "root": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+        "commands": [
+          {
+            "command": [
+              "dotnet",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.dll",
+              "neoclr",
+              "--project",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\collections\\App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\collections\\bin\\neoclr\\App.dll\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+              "run",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\collections\\bin\\neoclr\\App.dll",
+              "--system",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.runtime.neox",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Data.dll",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Networking.dll",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Web.dll",
+              "--object-root",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+              "--instructions",
+              "100000000"
+            ],
+            "exitCode": 0,
+            "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "dotnet",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.dll",
+              "neoclr",
+              "--project",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\tasks\\App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\tasks\\bin\\neoclr\\App.dll\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+              "run",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\tasks\\bin\\neoclr\\App.dll",
+              "--system",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.runtime.neox",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Data.dll",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Networking.dll",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Web.dll",
+              "--object-root",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+              "--instructions",
+              "100000000"
+            ],
+            "exitCode": 0,
+            "stdout": "Suspended\n42\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "dotnet",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.dll",
+              "neoclr",
+              "--project",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\bin\\neoclr\\App.dll\n",
+            "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n"
+          },
+          {
+            "command": [
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+              "run",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\bin\\neoclr\\App.dll",
+              "--system",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.runtime.neox",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Data.dll",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Networking.dll",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Web.dll",
+              "--object-root",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+              "--instructions",
+              "100000000"
+            ],
+            "exitCode": 0,
+            "stdout": "JSON object mapping checks passed\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "dotnet",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.dll",
+              "neoclr",
+              "--project",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.dll\n",
+            "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\n"
+          },
+          {
+            "command": [
+              "dotnet",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.dll",
+              "neoclr",
+              "--project",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.dll\n",
+            "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\nwarning RAV0162: Unreachable code\n"
+          },
+          {
+            "command": [
+              "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\tools\\verify-native-http-json.py",
+              "--runtime",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+              "--server",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.dll",
+              "--client",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.dll",
+              "--seed",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.runtime.neox",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Data.dll",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Networking.dll",
+              "--module",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Web.dll",
+              "--object-root",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+              "--output",
+              "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\windows-native-acceptance-http.json"
+            ],
+            "exitCode": 0,
+            "stdout": "Native HTTP/JSON server requests passed\nNative HTTP/JSON client/server pair passed\n",
+            "stderr": ""
+          }
+        ],
+        "verifiedFiles": 1043,
+        "http": {
+          "inputs": {
+            "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe": "5f3fb87c37b0bbe45317674d62981466acb00edcc27840a75e5db8d1d466b6c1",
+            "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.dll": "8d27805767efcb9e715f801666e60bfde4d025e083ca40936ad0a51a3fbbd924",
+            "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.dll": "97c7294c183e4a0e794b05396a9ed382d2e63be9b1da17c4a223706c8a25f1b1",
+            "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+            "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll": "b6e56be4e8908d3d530b9c1ed79ad1bb6089127f5c7f5f514c464944b293da5e",
+            "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Data.dll": "8251b72579c759a894dbce3b00804d66d606b2f7670264891951ded2d6b4c1be",
+            "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Networking.dll": "2e8db5178993e16ac3f46af077f6b3dd402178a910a64f14b4ac85de0f467840",
+            "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Web.dll": "43b6799439b9bde7a97af226637db3219f1a160a5edb6e077cbb0b1598c21832"
+          },
+          "runs": [
+            {
+              "serverCommand": [
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+                "run",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.dll",
+                "--system",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.runtime.neox",
+                "--instructions",
+                "100000000",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Data.dll",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Networking.dll",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Web.dll",
+                "--object-root",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+                "--",
+                "4"
+              ],
+              "requests": [
+                {
+                  "method": "GET",
+                  "path": "/report",
+                  "status": 200,
+                  "body": {
+                    "station": "Caf\u00e9"
+                  }
+                },
+                {
+                  "method": "POST",
+                  "path": "/reports",
+                  "status": 201,
+                  "body": {
+                    "accepted": true
+                  }
+                },
+                {
+                  "method": "POST",
+                  "path": "/reports",
+                  "status": 400,
+                  "body": {
+                    "error": "Invalid report"
+                  }
+                },
+                {
+                  "method": "GET",
+                  "path": "/missing",
+                  "status": 404,
+                  "body": {
+                    "error": "Not found"
+                  }
+                }
+              ],
+              "port": "55229",
+              "server": {
+                "exitCode": 0,
+                "stdout": "Reports served\n",
+                "stderr": ""
+              }
+            },
+            {
+              "serverCommand": [
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+                "run",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.dll",
+                "--system",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.runtime.neox",
+                "--instructions",
+                "100000000",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Data.dll",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Networking.dll",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Web.dll",
+                "--object-root",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+                "--",
+                "2"
+              ],
+              "requests": [],
+              "port": "55240",
+              "clientCommand": [
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+                "run",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.dll",
+                "--system",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.runtime.neox",
+                "--instructions",
+                "100000000",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Data.dll",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Networking.dll",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Web.dll",
+                "--object-root",
+                "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+                "--",
+                "http://127.0.0.1:55240/"
+              ],
+              "client": {
+                "exitCode": 0,
+                "stdout": "{\"accepted\":true}\n",
+                "stderr": ""
+              },
+              "server": {
+                "exitCode": 0,
+                "stdout": "Reports served\n",
+                "stderr": ""
+              }
+            }
+          ],
+          "passed": true
+        }
+      },
+      "editorAcceptance": {
+        "vscode": "1.141.0",
+        "checks": [
+          "native imported hover",
+          "native imported Markdown documentation hover",
+          "native Markdown sidecar edit refreshes hover",
+          "native XML fallback after Markdown member deletion",
+          "read-only metadata declaration navigation",
+          "native imported completion",
+          "native imported completion documentation",
+          "actual file watcher invalidates replaced native library",
+          "unsaved buffer survives native workspace reload",
+          "missing native reference produces a project diagnostic",
+          "native dependency recovery clears the project diagnostic",
+          "System.Data.Json.JsonValue native hover and metadata navigation",
+          "shipped native Networking documentation appears in hover",
+          "System.Networking.IPAddress native hover and metadata navigation",
+          "System.Web.Http.HttpClient native hover and metadata navigation",
+          "imported bundle configuration edit produces project diagnostic",
+          "restored bundle configuration recovers the workspace",
+          "unchanged broad sample imports source-built class library",
+          "native Option and Result type hovers retain union kind and constructed arguments",
+          "repeated broad-sample type and query hovers return symbols",
+          "broad-sample hovers return after unsaved edits",
+          "configured VS Code native build task",
+          "VS Code task executes exact broad-sample output on native runtime",
+          "failed build preserves last successful artifact",
+          "ordinary .NET editor hover and diagnostics",
+          "unchanged Tasks/await sample builds and executes from VS Code"
+        ],
+        "passed": true,
+        "hoverTimings": [
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:14.788Z",
+            "elapsedMs": 101,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:15.417Z",
+            "elapsedMs": 15,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:15.933Z",
+            "elapsedMs": 2,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:16.436Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:16.938Z",
+            "elapsedMs": 5,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:17.444Z",
+            "elapsedMs": 2,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:17.954Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:18.469Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:18.975Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:19.484Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:19.985Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:20.501Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:21.015Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:21.518Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:22.021Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:22.535Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:23.037Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:23.550Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:24.054Z",
+            "elapsedMs": 1,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:24.565Z",
+            "elapsedMs": 2,
+            "hasResult": false
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:25.068Z",
+            "elapsedMs": 665,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:25.735Z",
+            "elapsedMs": 67,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:26.303Z",
+            "elapsedMs": 4717,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:31.021Z",
+            "elapsedMs": 1280,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:32.801Z",
+            "elapsedMs": 2313,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:39.882Z",
+            "elapsedMs": 641,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 41,
+            "startedAt": "2026-10-09T11:28:41.025Z",
+            "elapsedMs": 7,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 43,
+            "startedAt": "2026-10-09T11:28:48.095Z",
+            "elapsedMs": 842,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 44,
+            "startedAt": "2026-10-09T11:28:48.967Z",
+            "elapsedMs": 65,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+            "line": 0,
+            "character": 42,
+            "startedAt": "2026-10-09T11:28:49.050Z",
+            "elapsedMs": 116,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:55.847Z",
+            "elapsedMs": 1254,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:28:57.102Z",
+            "elapsedMs": 16,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:28:57.118Z",
+            "elapsedMs": 5,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:57.123Z",
+            "elapsedMs": 14,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:28:57.137Z",
+            "elapsedMs": 5,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:28:57.143Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 90,
+            "character": 26,
+            "startedAt": "2026-10-09T11:28:57.146Z",
+            "elapsedMs": 7,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 91,
+            "character": 10,
+            "startedAt": "2026-10-09T11:28:57.153Z",
+            "elapsedMs": 5,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:57.158Z",
+            "elapsedMs": 7,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:28:57.165Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:28:57.170Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 90,
+            "character": 26,
+            "startedAt": "2026-10-09T11:28:57.173Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 91,
+            "character": 10,
+            "startedAt": "2026-10-09T11:28:57.177Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:57.181Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:28:57.184Z",
+            "elapsedMs": 3,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:28:57.188Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 90,
+            "character": 26,
+            "startedAt": "2026-10-09T11:28:57.191Z",
+            "elapsedMs": 6,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 91,
+            "character": 10,
+            "startedAt": "2026-10-09T11:28:57.197Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:57.209Z",
+            "elapsedMs": 77,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:57.291Z",
+            "elapsedMs": 150,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:57.445Z",
+            "elapsedMs": 161,
+            "hasResult": true
+          },
+          {
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-dotnet/Main.rvn",
+            "line": 0,
+            "character": 35,
+            "startedAt": "2026-10-09T11:29:28.286Z",
+            "elapsedMs": 7717,
+            "hasResult": true
+          }
+        ],
+        "lastHover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+        "diagnostics": [],
+        "hover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+        "completion": [
+          {
+            "label": "VersionOne",
+            "description": "EditorApi"
+          }
+        ],
+        "bundleHovers": {
+          "System.Data.Json.JsonValue": "```raven\nsealed class JsonValue\n```\n\nType in `Json`",
+          "System.Networking.IPAddress": "```raven\nsealed class IPAddress: EquatableTo<IPAddress>\n```\n\nType in `Networking`\n\n---\n\nAn immutable IP address in the closed IPv4 and IPv6 family.",
+          "System.Web.Http.HttpClient": "```raven\nclass HttpClient\n```\n\nType in `Http`"
+        },
+        "unionHovers": {
+          "Option<Order>": "```raven\nunion struct Option<Order>: Propagatable<Option<Order>, Order, void>\n```\n\nType in `System`",
+          "Result<Order, SingleError>": "```raven\nunion struct Result<Order, SingleError>: Propagatable<Result<Order, SingleError>, Order, SingleError>\n```\n\nType in `System`"
+        },
+        "repeatedMainHovers": [
+          {
+            "round": 0,
+            "term": "ArrayList",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:57.123Z",
+            "elapsedMs": 14,
+            "hasResult": true
+          },
+          {
+            "round": 0,
+            "term": "Option<Order>",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:28:57.137Z",
+            "elapsedMs": 5,
+            "hasResult": true
+          },
+          {
+            "round": 0,
+            "term": "Result<Order, SingleError>",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:28:57.143Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "round": 0,
+            "term": "Filter(",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 90,
+            "character": 26,
+            "startedAt": "2026-10-09T11:28:57.146Z",
+            "elapsedMs": 7,
+            "hasResult": true
+          },
+          {
+            "round": 0,
+            "term": ".Map(",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 91,
+            "character": 10,
+            "startedAt": "2026-10-09T11:28:57.153Z",
+            "elapsedMs": 5,
+            "hasResult": true
+          },
+          {
+            "round": 1,
+            "term": "ArrayList",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:57.158Z",
+            "elapsedMs": 7,
+            "hasResult": true
+          },
+          {
+            "round": 1,
+            "term": "Option<Order>",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:28:57.165Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "round": 1,
+            "term": "Result<Order, SingleError>",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:28:57.170Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "round": 1,
+            "term": "Filter(",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 90,
+            "character": 26,
+            "startedAt": "2026-10-09T11:28:57.173Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "round": 1,
+            "term": ".Map(",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 91,
+            "character": 10,
+            "startedAt": "2026-10-09T11:28:57.177Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "round": 2,
+            "term": "ArrayList",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:57.181Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "round": 2,
+            "term": "Option<Order>",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 33,
+            "character": 60,
+            "startedAt": "2026-10-09T11:28:57.184Z",
+            "elapsedMs": 3,
+            "hasResult": true
+          },
+          {
+            "round": 2,
+            "term": "Result<Order, SingleError>",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 41,
+            "character": 47,
+            "startedAt": "2026-10-09T11:28:57.188Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          },
+          {
+            "round": 2,
+            "term": "Filter(",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 90,
+            "character": 26,
+            "startedAt": "2026-10-09T11:28:57.191Z",
+            "elapsedMs": 6,
+            "hasResult": true
+          },
+          {
+            "round": 2,
+            "term": ".Map(",
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 91,
+            "character": 10,
+            "startedAt": "2026-10-09T11:28:57.197Z",
+            "elapsedMs": 4,
+            "hasResult": true
+          }
+        ],
+        "postEditMainHovers": [
+          {
+            "round": 0,
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:57.209Z",
+            "elapsedMs": 77,
+            "hasResult": true
+          },
+          {
+            "round": 1,
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:57.291Z",
+            "elapsedMs": 150,
+            "hasResult": true
+          },
+          {
+            "round": 2,
+            "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+            "line": 25,
+            "character": 55,
+            "startedAt": "2026-10-09T11:28:57.445Z",
+            "elapsedMs": 161,
+            "hasResult": true
+          }
+        ],
+        "stdout": "Native build output: d:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\bin\\neoclr\\App.dll\nDuplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n"
+      }
+    }
+  },
+  "limits": [
+    "Windows x64 qualification covers the interpreter and native-metadata compiler/editor workflow, not x64 AOT.",
+    "AOT remains a separate macOS ARM64 source experiment.",
+    "The shipped library bundle retains an explicit primitive CLI core and native seed; full native core bootstrap remains incomplete.",
+    "The native API snapshot preserves 136 explicitly marked legacy migration gaps."
+  ],
+  "aotValidation": {
+    "platform": "macOS ARM64",
+    "scope": "AOT crate unit/integration groups plus focused repaired regressions; not a single uninterrupted all-green run",
+    "matchingSdk": "MacOSX26.2.sdk",
+    "rustMinStack": 8388608,
+    "groups": {
+      "unit": 12,
+      "console": 101,
+      "inspection": 6,
+      "linking": 18,
+      "nativeGc": 12,
+      "rootProbes": 5,
+      "scalar": 17,
+      "values": 52,
+      "faultDetails": 6
+    }
+  },
+  "websiteValidation": {
+    "pages": 3491,
+    "legacyMigrationGaps": 136,
+    "visualReview": [
+      "desktop install page",
+      "desktop Type extensions",
+      "mobile declaration Copy spacing",
+      "separate Guides and structural API navigation",
+      "Object derived types and EquatableTo implementing types: five visible, expansion and keyboard collapse on desktop/mobile",
+      "shared renderer derived interfaces fixture: five visible and all remaining links expandable",
+      "all 24 module introductions present; System.Time desktop and HTTP JSON mobile",
+      "Tasks guide leads with Task.Run/await"
+    ],
+    "nativeRoutes": [
+      "System/Math/field_Pi.html",
+      "System/Time/LocalDateTime/index.html",
+      "System/Linq/Operators/method_All.html"
+    ],
+    "rendererRevision": "68a027962ff951269863297a4e07d5b744242453",
+    "sharedRavenMainRevision": "0308f7b0400dc2f087bc0c5d2f030c41020041f8",
+    "nativeSnapshot": {
+      "format": 1,
+      "archive": "native-reference.zip",
+      "sha256": "fcd37cb9204aa4818d492ca0eba82af190060ff346df46e10108686f2261b8c3",
+      "librarySourceRevision": "9fd8f6b8eb10b067c58127222833a6339696bae4",
+      "compilerRevision": "c6d2137e34d11f0c8888c5e91f0c6257f53e6c87",
+      "rendererRevision": "68a027962ff951269863297a4e07d5b744242453",
+      "libraryArtifacts": {
+        "System.Runtime.dll": "48a1f70a5ec03a014513b9435143a522b899c7aa87360140f38b01aecdf0ad22",
+        "System.Data.dll": "a5aee2d42b20208a9ef98d84fdd0015d9eec19d5cfbbc6f0abac92817f55bf00",
+        "System.Networking.dll": "e1ec6f25882f29ebfaefdbf3eb6d737b8d6ae46dc7d7071b873b49a2474f66a2",
+        "System.Web.dll": "8db239ee54c899764552c365d6b1e5b21cc4c54c0cb9121cc64d5415875eaa32",
+        "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+        "Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f"
+      },
+      "renderingEvidence": {
+        "normalized-sidecars.json": "e517cf5751f877fb90716e59b2d337289f32dacb2abda4d0bfff2e95d20ed57e",
+        "restored-xml-comments.json": "d7aa00b083b96e3a9ea00f909b020c1caab9c3833bd104087b2fbfbdb83a9756"
+      },
+      "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
+    },
+    "guidePages": 53,
+    "moduleIntroductions": 24,
+    "taskRunLeadExample": {
+      "source": "docs/experiments/task-run/UnitAwait.rvn",
+      "compiler": "macOS release candidate SDK",
+      "runtime": "macOS release candidate interpreter",
+      "stdout": "completed\n",
+      "exitCode": 0,
+      "browser": "first example uses await Task.Run; download matches source; isolated Thread example remains later"
+    },
+    "websiteContractTests": 22
+  },
+  "sourceValidation": {
+    "status": "passed",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "toolchain": "stable",
+    "distribution": "native",
+    "full_tests": true,
+    "smoke_programs": [
+      "counter",
+      "collections",
+      "outputs",
+      "reflection",
+      "reference-identity",
+      "interfaces",
+      "arrays",
+      "control-flow",
+      "typeof",
+      "ordinal-text",
+      "character-classification",
+      "math",
+      "date-time",
+      "common-interfaces",
+      "predicate-search",
+      "reflection-hierarchy",
+      "constructor-chaining",
+      "default-interfaces",
+      "explicit-interfaces",
+      "generic-functions",
+      "function-objects",
+      "closures",
+      "readonly",
+      "environment",
+      "file-report"
+    ],
+    "build_profile": "release",
+    "validator_sha256": "39966f52f01c765a7255ab423455ec199975f64cedf355b3542c0857e64e5bc9",
+    "commit": "354421faccf23aba7e984d8d57f435bec5dc72a1",
+    "archive_sha256": "0767f6f70bde5a35b05755980827da0726a5c09e89ee5bb47107721c3a101324",
+    "tracked_files": 4850,
+    "registry_packages": 79,
+    "notice_files": 156,
+    "raven_library_snapshot": "not qualified by native distribution profile",
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1",
+    "native_seed_sha256": "0d44005b8fb48a4655fef1cbb33b5e37987d9a06a8dc8ecbbeb3b1622f0137fd",
+    "elapsed_seconds": 1232.964
+  },
+  "validatedSourceRevision": "354421faccf23aba7e984d8d57f435bec5dc72a1",
+  "windowsEditorWorkflow": "https://github.com/marinasundstrom/neoCLR/actions/runs/37923688429",
+  "qualificationRepairs": {
+    "initialSourceWorkflow": "https://github.com/marinasundstrom/neoCLR/actions/runs/37921281313",
+    "initialSourceStatus": "failed",
+    "sourceRepairRevision": "354421faccf23aba7e984d8d57f435bec5dc72a1",
+    "sourceRepair": "Five stale source-test expectations updated to implemented schema, signature diagnostic, String identity and shared fault-rendering contracts; 35 focused tests passed before the complete rerun. No runtime change.",
+    "editorRepairs": "Windows GUI acceptance waits for its report; task capture uses a portable launcher. Final 26-check acceptance reused the original bundle without rebuilding.",
+    "packagingCompilerDifference": "macOS compiler c6d2137e and Windows compiler 71cafd353 differ only in SDK packaging and changelog, including Windows host paths; no compiler semantic change.",
+    "releaseRevisionDifference": "Later commits update tests, acceptance harnesses, website tooling, snapshots and release documentation. Runtime and library source semantics are unchanged from the recorded bundle revisions."
+  },
+  "localFullSuite": {
+    "command": "cargo test --locked --release --all-targets --no-fail-fast",
+    "platform": "macOS ARM64",
+    "status": "passed",
+    "testExecutables": 240,
+    "passedTests": 1816,
+    "ignoredTests": 0,
+    "logSha256": "b526c36caa3b5235e541a1f1dc1186501888845be3d71d26df17ef5214051cb3"
+  },
+  "prerequisites": {
+    "dotnet11Sdk": "11.0.100-rc.1.26425.128",
+    "alsoRequired": [
+      ".NET 10 SDK",
+      "Python 3",
+      "VS Code for editor integration"
+    ],
+    "scope": ".NET is required by compiler and language server, not the interpreter."
+  },
+  "qualifiedSourceArchive": {
+    "archive": "neoclr-preview13-qualified-source.tar",
+    "sha256": "0767f6f70bde5a35b05755980827da0726a5c09e89ee5bb47107721c3a101324",
+    "revision": "354421faccf23aba7e984d8d57f435bec5dc72a1",
+    "note": "Exact extracted-source validation input; final tag additionally includes documented website and release-record changes."
+  }
+}

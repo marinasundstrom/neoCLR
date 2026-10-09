@@ -1,10 +1,12 @@
 # Native POC bundle
 
-## Next release qualification (2026-10-09)
+## Preview 13 qualification (2026-10-09)
 
 The author has requested Windows x64 and macOS ARM64 packages for the next POC.
-Neither target is certified by older reports. Rebuild the matching compiler,
-runtime, libraries and editor; run the extracted sample and host checks on each.
+Both matching compiler/runtime/library/editor bundles pass extracted consumers
+and 26 installed-editor checks per host. Canonical source validation and focused
+Windows/macOS host checks pass. [Exact evidence](preview-13-validation.json) records
+package hashes and the separate runtime, compiler, library and source-test revisions.
 ARM64 AOT experiments do not imply Windows x64 native-code generation support.
 
 The current retained seed adds the ordinal String replacement service after

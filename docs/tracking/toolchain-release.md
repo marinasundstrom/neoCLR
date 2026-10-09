@@ -5,6 +5,21 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
+## Preview 13 qualification — 2026-10-09
+
+The author selected a bounded Windows x64/macOS ARM64 POC release after the native
+String milestone. Both extracted toolchain bundles pass collections, Tasks, JSON
+and live HTTP consumers; each installed VS Code extension passes 26 acceptance
+checks, including ordinary .NET behavior. Canonical source/archive qualification,
+focused host checks and minimum-Rust compilation pass. See the
+[Preview 13 release record](../preview-13-validation.json).
+
+This later release scope supersedes the full-bootstrap release prerequisite in the
+earlier readiness assessment below. The primitive CLI core and native seed remain
+explicit bundle inputs; full production native-only core bootstrap stays open.
+ARM64 AOT is a separate source experiment, not a Windows x64 backend or a bundled
+native-build task. See [release notes](../preview-13-release-notes.md).
+
 ## Native-only compiler-target readiness — 2026-10-09
 
 The module foundation is followed by native-only project core selection on Raven

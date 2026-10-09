@@ -1,7 +1,7 @@
 # neoCLR Preview 13 — modules and native compilation POC
 
-Candidate qualification is in progress for **Windows x64** and **macOS ARM64**.
-Publication is pending the final source, package and editor checks.
+Qualified for **Windows x64** and **macOS ARM64**. Both packages include the
+matching Raven compiler, VS Code extension, runtime, libraries and samples.
 
 This preview brings module-oriented metadata and tooling, a source-built
 Runtime/Data/Networking/Web library split, improved API documentation and an
@@ -14,7 +14,12 @@ Install the .NET 11 SDK **11.0.100-rc.1.26425.128** (RC1), a .NET 10 SDK,
 Python 3 and VS Code. Both bundles were tested with that .NET 11 SDK. The Raven
 compiler and language server require .NET; the neoCLR interpreter does not.
 
-Extract the package for your OS and architecture and keep its folders together.
+Download the matching package:
+
+- [Windows x64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/neoclr-preview13-win-x64.tar.gz)
+- [macOS ARM64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/neoclr-preview13-osx-arm64.tar.gz)
+
+Extract the package and keep its folders together.
 From the extracted `neoclr-native-poc` directory, verify the installation:
 
 ```sh
@@ -60,4 +65,21 @@ native compiler, stable ABI or native hot reload is promised by this preview.
 - Recorded benchmarks are development measurements on named configurations,
   not performance guarantees for either release platform.
 
-Final artifact hashes and exact qualification revisions will be recorded with the release.
+## Qualification evidence
+
+Both extracted bundles pass collections, Tasks, JSON and paired live HTTP consumers.
+Each installed editor extension passes 26 checks. Canonical extracted-source tests,
+smoke programs and notice checks pass, with focused host checks on Windows and
+macOS and minimum-Rust compilation on Linux, Windows and macOS. The local macOS
+source suite passes 1,816 tests.
+
+The initial source run exposed five stale test expectations, repaired before the
+passing rerun. Windows editor acceptance needed portable capture and GUI-wait
+harness fixes; its final run reused the original package. Runtime code did not
+change during those repairs.
+
+[Validation record](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/preview-13-validation.json) and
+[SHA-256 checksums](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/SHA256SUMS)
+record exact bundle, compiler, library and source revisions. The separately attached
+qualified-source archive is the exact canonical validation input; the release tag
+additionally includes website, sample-documentation and release-record updates.

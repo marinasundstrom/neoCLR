@@ -12523,3 +12523,21 @@ claim follows from these focused checks.
   Object and EquatableTo pages on desktop and mobile. Both keep five entries
   visible; expansion and keyboard collapse preserve every remaining link.
   Structural contracts remain in the API tree and Guides retains its own sidebar.
+
+### 2026-10-09 — Preview 13 qualification complete
+
+- **Author direction:** release the bounded POC for Windows and macOS, retaining
+  the native String milestone and explicit remaining limits.
+- **Assistant outcome:** Windows x64 and macOS ARM64 extracted bundles pass
+  collections, Tasks, JSON and live HTTP consumers; each installed VS Code
+  extension passes 26 checks. Canonical source workflow `37924446703` passes
+  after five stale expectation repairs; the local source suite passes 1,816 tests.
+  Windows GUI wait and command-capture repairs were acceptance-harness fixes,
+  validated against the original bundle. Runtime code remains at `3ff1a66e`.
+- **Documentation follow-ups:** separate Guides navigation, structural API contracts,
+  bounded relationship lists, all 24 module introductions and a compiled Task.Run
+  lead example have been reviewed in the browser.
+- **Remaining limits:** the primitive CLI core/native seed remain explicit inputs;
+  full native-only core bootstrap, general AOT coverage and x64 AOT are unfinished.
+  ARM64 AOT remains a separate source experiment. See the
+  [release qualification record](preview-13-validation.json).
