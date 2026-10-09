@@ -13136,3 +13136,19 @@ claim follows from these focused checks.
   Windows x64. Windows ARM64, HTTP execution of the expanded collection corpus,
   benchmarks and converters are not established by this result. The requested
   general-purpose collections work can proceed independently of TaskQueue.
+
+## 2026-10-10 — Sets join collection work
+
+- **Author:** “We should also have sets”, followed by a request to continue work.
+- **Assistant action:** adds sets to the active collection scope and implements an
+  application-local read/mutation interface and hash-based prototype, using existing
+  EqualityComparer/HashMap behavior. This remains independent of TaskQueue.
+- **Tradeoff:** HashMap lacks removal, so the prototype rebuilds survivors. This
+  validates behavior but is not the proposed production algorithm. Shared hash
+  removal/reference release is the next implementation question; public API and
+  JSON set admission are not claimed by the prototype.
+
+- **Outcome:** the set probe passes native macOS and interpreter execution with
+  matching output; the .NET baseline passes corresponding membership cases.
+  [Evidence](experiments/sets/storage-validation.json). Windows, GC reclamation and
+  hostile callbacks remain unqualified.

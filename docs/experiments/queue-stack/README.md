@@ -16,8 +16,9 @@ promises Count and iteration; Sequence additionally promises indexed access.
 Queue/Stack need not implement Sequence or change List's existing contracts.
 
 The recommendation is to prototype Queue first, then Stack using the same storage
-findings. Other candidates (sets, deques, priority queues, persistent collections)
-remain outside this bounded review until a concrete consumer selects them. Existing
+findings. The author subsequently adds [sets](../sets/README.md) to the collection
+work. Deques, priority queues and persistent collections remain outside this bounded
+review until a concrete consumer selects them. Existing
 list/map removal gaps deserve separate review; this is not a complete collections
 redesign. See the [implemented hierarchy](../../collection-contracts.md).
 

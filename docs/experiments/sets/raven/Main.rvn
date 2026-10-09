@@ -1,0 +1,145 @@
+import System.*
+import System.Collections.*
+
+// Application-local contracts for evaluation, not production library declarations.
+interface SetView<T> : Collection<T> {
+    func Contains(value: T) -> bool
+}
+
+interface MutableSetView<T> : SetView<T> {
+    func Add(value: T) -> bool
+    func Remove(value: T) -> bool
+    func Clear()
+}
+
+class SetStorage<T> : MutableSetView<T> {
+    // Pinned compiler bridge requires explicit storage for constructor-assigned fields.
+    private field comparer: EqualityComparer<T>
+    private field entries: HashMap<T, bool>
+    private var busy = false
+
+    init(comparer: EqualityComparer<T>) {
+        self.comparer = comparer
+        entries = HashMap<T, bool>(comparer)
+    }
+
+    val Count: int => entries.Count
+
+    private func Enter() {
+        if busy {
+            System.Fail("Set callbacks must not reenter the set")
+        }
+        busy = true
+    }
+
+    private func Leave() {
+        busy = false
+    }
+
+    func Contains(value: T) -> bool {
+        Enter()
+        let found = entries.ContainsKey(value)
+        Leave()
+        return found
+    }
+
+    func Add(value: T) -> bool {
+        Enter()
+        let added = entries.TryAdd(value, true)
+        Leave()
+        return added
+    }
+
+    func Remove(value: T) -> bool {
+        Enter()
+        if !entries.ContainsKey(value) {
+            Leave()
+            return false
+        }
+        // Temporary prototype: HashMap has no removal yet. Rebuild without the key.
+        let replacement = HashMap<T, bool>(comparer)
+        for existing in entries.Keys {
+            if !comparer.Equals(existing, value) {
+                replacement.TryAdd(existing, true)
+            }
+        }
+        entries = replacement
+        Leave()
+        return true
+    }
+
+    func Clear() {
+        Enter()
+        entries = HashMap<T, bool>(comparer)
+        Leave()
+    }
+
+    func GetIterator() -> Iterator<T> => entries.Keys.GetIterator()
+}
+
+// Every key collides: equality must still distinguish values and suppress repeats.
+class CollidingIntegers : EqualityComparer<int> {
+    func Equals(left: int, right: int) -> bool => left == right
+    func GetHashCode(value: int) -> int => 1
+}
+
+class Program {
+    static func Main() -> int {
+        let storage = SetStorage<int>(CollidingIntegers())
+        let set: MutableSetView<int> = storage
+        let view: SetView<int> = storage
+        var index = 0
+        while index < 24 {
+            if !set.Add(index) || set.Add(index) {
+                return 1
+            }
+            index = index + 1
+        }
+        if view.Count != 24 || view.Contains(25) {
+            return 2
+        }
+        let snapshot = view.GetIterator()
+        if !set.Remove(12) || set.Remove(12) || view.Contains(12) || view.Count != 23 {
+            return 3
+        }
+        index = 0
+        while index < 24 {
+            if index != 12 && !view.Contains(index) {
+                return 4
+            }
+            index = index + 1
+        }
+        var snapshotCount = 0
+        while snapshot.MoveNext() {
+            snapshotCount = snapshotCount + 1
+        }
+        snapshot.Dispose()
+        if snapshotCount != 24 || !set.Add(12) {
+            return 5
+        }
+        var sum = 0
+        for value in view {
+            sum = sum + value
+        }
+        if sum != 276 {
+            return 6
+        }
+        set.Clear()
+        if view.Count != 0 || view.Contains(0) || set.Remove(0) || !set.Add(42) {
+            return 7
+        }
+        let words = SetStorage<string>(StringComparer.Ordinal)
+        if !words.Add("Café") || words.Add("Café") || !words.Add("café") || !words.Add("雪") {
+            return 8
+        }
+        if words.Count != 3 || !words.Contains("雪") || !words.Remove("Café") || !words.Contains("café") {
+            return 9
+        }
+        words.Clear()
+        if words.Count != 0 || !words.Add("雪") {
+            return 10
+        }
+        Console.WriteLine("set storage passed")
+        return 0
+    }
+}

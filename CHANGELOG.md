@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add sets to the author-selected collection work and implement an application-local
+  set prototype with read/mutation interfaces, explicit equality comparers, duplicate
+  suppression, membership, removal and clearing. Removal rebuilds the map for now;
+  this is an experiment, not a new public library API or production algorithm.
+  Native macOS/interpreter collision, growth, interface dispatch, duplicate/removal,
+  snapshot, clear/reuse and Unicode checks pass, alongside a .NET comparison.
+
 - Record the author’s follow-up review areas: runtime scheduling and suspension,
   Queue/Stack collections, a database-backed web sample with a Dapper-like mapper,
   and missing Time Parse methods. Keep JSON qualification first; provider, API and

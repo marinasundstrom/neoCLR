@@ -115,7 +115,8 @@ contracts, GC reclamation and Windows Queue/Stack qualification remain open. The
 bounded basic JSON correctness/platform gate now passes on macOS ARM64 and Windows
 x64; collection API work can proceed. The earlier interpreter/native JSON benchmark
 and later framework-comparison direction remains recorded in the native JSON plan;
-this new request makes the collection review the next author-selected topic.
+this new request makes the collection review the next author-selected topic. The
+author subsequently adds sets; see the [set review and prototype](experiments/sets/README.md).
 
 ### Follow-up review areas — author direction, 2026-10-10
 
@@ -127,7 +128,7 @@ continue to co-evolve with native foundations.
 | Area | Bounded next investigation | Comparison and decisions to record |
 |---|---|---|
 | Runtime scheduling | Review runnable work, I/O wakeups, cancellation and host ownership against the existing [scheduler design](runtime-scheduling-design.md). | Compare .NET Task/ThreadPool responsibilities with runtime-owned execution; preserve interpreter/native lifecycle consistency. |
-| Queue and Stack | Review FIFO/LIFO interfaces and concrete implementations against [current collection contracts](collection-contracts.md) and actual consumers. | Compare .NET Queue/Stack ergonomics, empty results, iteration, growth and reference release; select useful additions without treating the broader [collection proposal](proposals/collections-api.md) as implemented. |
+| Queue, Stack and sets | Review FIFO/LIFO and set interfaces and concrete implementations against [current collection contracts](collection-contracts.md) and actual consumers. | Compare .NET Queue/Stack/HashSet ergonomics, equality, duplicates, removal, empty results, iteration, growth and reference release; select useful additions without treating the broader [collection proposal](proposals/collections-api.md) as implemented. |
 | Database-backed web sample | Select a provider and a small parameterized query/update scenario with a Dapper-like typed object mapper. | Evaluate Dapper/ADO.NET responsibilities, UTF-8 conversion, null/type mapping, connection/transaction lifetime and native macOS/Windows dependencies. Provider choice, mapping strategy and public contracts remain open. |
 | Missing Time Parse methods | Audit existing time types and parsers, then select missing methods needed by real inputs. | Compare .NET parsing and existing neoCLR Result/error conventions; decide invariant round trips, culture, offset/zone ambiguity and invalid-input behavior before extending APIs. |
 | Runtime suspension | Review safe suspension/resumption boundaries, retained roots and host-resource lifetime alongside scheduling. | Compare CLR suspension/GC coordination and cooperative execution approaches; distinguish runtime suspension from awaiting I/O and leave the stack/preemption model open. |

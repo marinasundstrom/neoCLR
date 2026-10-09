@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "results": [
+    {
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "set storage passed\n",
+      "stderr": ""
+    },
+    {
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "set storage passed\n",
+      "stderr": ""
+    }
+  ],
+  "hashes": {
+    "docs/experiments/sets/validate.py": "c9a58014428c540e0ddacc43e1825e68b37f1904cb6d37b835375487ed87fee7",
+    "docs/experiments/sets/raven/Main.rvn": "f5ed455f9e65164356fea4423d386d2151b72ec656574c8317d6fcc68e3f3f0b",
+    "docs/experiments/sets/raven/Native.rvnproj": "eca616ac001b4c97c9881d19af86d1fcda32e9b69d7c2914a86bccdce5098892",
+    "target/set-storage-probe-qualified/app": "38c85a5e0adf58ba870b9a393fd5459be66e8a14d29a6453a975ce1a40100a00",
+    "target/set-storage-probe-qualified/app.dll": "2a060d4d6589f27b9eb921e38ea0126d8114ffb7a8fbdd4a12ef769d1144a068",
+    "target/set-storage-probe-qualified/build.json": "929e9e3a76b12b59ae2d53fb5a1d6e66bf9ced9378e2415b3427309b0397f0bb",
+    "target/release/neoclr": "16060f22b9caaef312c754bb571ba705ccd3092c4620b84d95c95b822351777d",
+    "target/json-collection-hash-development/bundle/manifest.json": "44b4cc9e2fd977b068cb9634a1c3a0465814b5ab1670fc076105ddf6c10feb80"
+  }
+}

@@ -344,3 +344,12 @@ and clarifies that TaskQueue is not necessarily connected. The
 [bounded review and .NET comparison](experiments/queue-stack/README.md) recommends
 small general-purpose FIFO/LIFO contracts and array-backed prototypes. These remain
 proposals; no scheduler migration, new public collection or JSON admission is claimed.
+
+## Sets added to the active review — 2026-10-10
+
+The author explicitly requests sets alongside Queue and Stack. The
+[set review and application-local prototype](experiments/sets/README.md) evaluates
+Set/MutableSet capabilities and a hash-based implementation using existing comparers.
+Membership, duplicate results, removal and clearing are in scope. Final storage,
+set algebra, JSON mapping and production API publication remain separate steps;
+this does not adopt the entire earlier consolidated collection proposal.
