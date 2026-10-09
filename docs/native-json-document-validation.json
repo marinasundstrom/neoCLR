@@ -18,5 +18,33 @@
       "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
       "stderr": ""
     }
+  },
+  "typedVectorFollowUp": {
+    "baseRevision": "a7d0cfe7f483ee0eb18bbc7bd0c3e0f6b2d085a4",
+    "sourceSha256": {
+      "docs/experiments/native-json/Main.rvn": "29d1ab0655b99dfb39134ee1c50965dba92ec21ec558c3cdf77c138d215e818c",
+      "tools/aot-poc/src/specialization.rs": "25f5107a98a14d2c6f1b7802ee8b022639b14ce8ab11945b356fe8eae54949f5",
+      "tools/aot-poc/src/boxing.rs": "5192e6b3268052dfa445d7f4d80bbf4f89c485b3e05b6ceda605989d2ab98469",
+      "tools/aot-poc/src/reflection_snapshots.rs": "9f44db4dbc869d2ca6238c37919f564927c4fe891fdf88b5531224e5c4b38c53"
+    },
+    "buildReportSha256": "320a53577cb9ce453a02e70d662ad66d2df1ff074f0d41b6b789e57c6d147d54",
+    "results": {
+      "native": {
+        "exitCode": 0,
+        "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+        "stderr": ""
+      },
+      "interpreter": {
+        "exitCode": 0,
+        "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+        "stderr": ""
+      }
+    },
+    "windowsCrossCompilation": {
+      "exitCode": 0,
+      "reportSha256": "cab077dd537e9119db2cfb55848039da55c5c758c2867f7e6df14072e01b9c97",
+      "objectSha256": "ace261e0a0f0d92f1b28e8fb590d7f325c61f7dcdee04ba8a21cc9bb21bbbf0d",
+      "executionVerified": false
+    }
   }
 }

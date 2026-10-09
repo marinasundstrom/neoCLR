@@ -202,8 +202,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         return Err("Windows console experiment requires Windows x64, --compile-system, --reference-arena, --native-gc and --native-stack-budget".into());
     }
     if windows_console && (bind_paths || bind_file_input || bind_file_output || bind_task_queue
-        || bind_socket_listener || bind_socket_accept || bind_socket_transfer || bind_socket_client || bind_character_text || bind_integer_text) {
-        return Err("Windows console experiment does not support file, path, task, socket, character or extended integer services".into());
+        || bind_socket_listener || bind_socket_accept || bind_socket_transfer || bind_socket_client || bind_character_text) {
+        return Err("Windows console experiment does not support file, path, task, socket or character services".into());
     }
     if windows_http && (target != compiler::Target::WindowsX64 || !compile_system
         || !native_gc || !native_stack_budget || !reference_arena

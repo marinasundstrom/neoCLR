@@ -57,7 +57,27 @@ func CheckBulletin(input: string, canonical: string, title: string,
               copy.Previous.Name == "Before" && copy.Previous.Count == 0 && !copy.Previous.Active)
 }
 
+func CheckArrays() -> Result<bool, JsonError> {
+    let integers = JsonSerializer.Deserialize<int[]>("[1,-2,0]")?
+    if integers.Length != 3 || integers[0] != 1 || integers[1] != -2 || integers[2] != 0 {
+        return Ok(false)
+    }
+    let integerText = JsonSerializer.Serialize(integers)?
+    let flags = JsonSerializer.Deserialize<bool[]>("[true,false]")?
+    let names = JsonSerializer.Deserialize<string[]>("[\"Café\",\"雪\"]")?
+    let empty = JsonSerializer.Deserialize<Report[]>("[]")?
+    let reports = JsonSerializer.Deserialize<Report[]>("[{\"Name\":\"Café\",\"Count\":3,\"Active\":true}]")?
+    let reportText = JsonSerializer.Serialize(reports)?
+    return Ok(integerText == "[1,-2,0]" && flags.Length == 2 && flags[0] && !flags[1] &&
+              names.Length == 2 && names[0] == "Café" && names[1] == "雪" && empty.Length == 0 &&
+              reports.Length == 1 && reports[0].Name == "Café" && reports[0].Count == 3 && reports[0].Active &&
+              reportText == "[{\"Name\":\"Café\",\"Count\":3,\"Active\":true}]")
+}
+
 func Main() -> int {
+    if CheckArrays() is not Ok(true) {
+        return 25
+    }
     if CheckBulletin(" {\"Title\":\"Weather\",\"Current\":{\"Name\":\"Café\",\"Count\":3,\"Active\":true},\"Previous\":{\"Name\":\"Before\",\"Count\":0,\"Active\":false}} ", "{\"Title\":\"Weather\",\"Current\":{\"Name\":\"Café\",\"Count\":3,\"Active\":true},\"Previous\":{\"Name\":\"Before\",\"Count\":0,\"Active\":false}}", "Weather", "Café", 3, true) is not Ok(true) {
         return 20
     }

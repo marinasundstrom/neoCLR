@@ -138,7 +138,7 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
     for f in &mut input.functions {
         for op in &mut f.body {
             if let Op::UnboxAny(t) = op {
-                if *t == Type::String || reference_types.contains(t) { *op = Op::CastClass(t.clone()); }
+                if *t == Type::String || matches!(t, Type::ArrayRef(_)) || reference_types.contains(t) { *op = Op::CastClass(t.clone()); }
             }
         }
     }

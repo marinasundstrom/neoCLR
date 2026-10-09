@@ -3302,5 +3302,5 @@ failure seen on the first build still needs investigation. See the documentation
 
 Native JSON evidence update (2026-10-09): the public
 [document corpus](experiments/native-json/README.md#representative-document-checks)
-now validates nested object and DOM round trips on macOS in both modes. This does
-not complete typed arrays/collections or Windows project qualification.
+now validates nested object and DOM round trips on macOS in both modes. This also covers typed scalar/object vectors. Lists/sequences, maps, jagged native
+arrays and Windows project qualification remain open.

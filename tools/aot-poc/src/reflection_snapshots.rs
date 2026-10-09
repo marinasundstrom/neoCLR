@@ -321,15 +321,39 @@ pub fn bind(
         })
         .map(|(i, _)| i)
         .collect();
-    let tokens: Vec<_> = input
-        .functions
-        .iter()
-        .flat_map(|f| &f.body)
-        .filter_map(|op| match op {
-            Op::LoadTypeToken(t @ Type::ArrayRef(_)) if concrete(t) => Some(t.clone()),
-            _ => None,
-        })
-        .collect();
+    // Close the vector inventory over explicit generic call arguments and retained
+    // property signatures, before snapshot factories introduce their own tokens.
+    fn vectors(t: &Type, tokens: &mut Vec<Type>) {
+        match t {
+            Type::ArrayRef(element) => {
+                if concrete(t) && !tokens.contains(t) {
+                    tokens.push(t.clone());
+                }
+                vectors(element, tokens);
+            }
+            Type::Constructed { arguments, .. } => {
+                for argument in arguments { vectors(argument, tokens); }
+            }
+            _ => {}
+        }
+    }
+    let mut tokens = vec![];
+    for op in input.functions.iter().flat_map(|f| &f.body) {
+        match op {
+            Op::LoadTypeToken(t) => vectors(t, &mut tokens),
+            Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target)
+            | Op::BindFunction { target, .. } => {
+                for argument in &target.generic_arguments { vectors(argument, &mut tokens); }
+            }
+            _ => {}
+        }
+    }
+    for row in retention["types"].as_array().unwrap() {
+        if row["properties"] != true { continue; }
+        let id: TypeDefId = serde_json::from_value(row["definition"].clone())?;
+        let ti = definitions.iter().position(|d| *d == id).ok_or("missing snapshot root")?;
+        for property in &source.types[ti].properties { vectors(&property.ty, &mut tokens); }
+    }
     let mut projections = vec![];
     for index in services {
         let f = &input.functions[index];

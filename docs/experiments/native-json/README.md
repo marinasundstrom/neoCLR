@@ -44,7 +44,8 @@ cannot satisfy the test. One input includes surrounding whitespace.
 | Rejected documents | Trailing array comma, wrong nested property type, earlier flat validation cases |
 
 The mixed DOM document is deliberately not mapped to a typed object: nullable and
-decimal object mapping are outside the current mapper contract. Typed arrays,
-lists/sequences and string-keyed maps still require their own acceptance cases.
-Exit codes 20–24 identify document corpus failures; success keeps the original
+decimal object mapping are outside the current mapper contract. Typed Int32/Boolean/String/Report arrays now have value checks, including an empty
+Report array, plus integer/object array serialization. Lists/sequences, string-keyed
+maps and native jagged arrays still require their own acceptance cases.
+Exit codes 20–25 identify document corpus failures; success keeps the original
 single-line output. The Windows action uses this same source.

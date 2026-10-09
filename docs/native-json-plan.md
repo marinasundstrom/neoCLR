@@ -563,3 +563,30 @@ array commas and wrong nested property types are rejected. See the
 collection coverage remains open. Test helpers use local propagation bindings to
 avoid the pinned compiler's expression-boundary limitation; no compiler change is
 claimed.
+
+## Typed vector admission follow-up — 2026-10-09
+
+Native specialization now accepts closed vector generic arguments and lowers their
+reference unboxing through the existing checked cast. Element descriptors are
+retained from explicit generic call arguments and rooted property signatures, as
+well as direct tokens. This avoids requiring redundant typeof expressions in JSON
+consumers. It is still a bounded source inventory, not arbitrary runtime discovery;
+indirect generic flows and jagged native array storage remain separate work.
+
+The public corpus adds Int32, Boolean, String and Report array deserialization,
+including an empty Report array, value checks and integer/object array serialization.
+Native macOS and interpreter output match. A focused generic-unboxing consumer
+covers the vector argument alongside existing scalar/fault cases. No JSON-specific
+backend serializer or public API is added. CLR generic array arguments are the
+behavioral baseline; the temporary native compiler specializes closed vectors.
+
+The first Windows project action (37991032994) stopped at profile admission: the
+console flag check still rejected integer-text services although the host already
+links the shared implementation. The check now admits those services, preserving
+rejection of file/path/task/socket/character services. Windows execution must still
+qualify the complete project; this admission correction alone is not that evidence.
+
+The expanded project also cross-compiles to Windows x64 COFF with the corrected
+console gate. [Evidence](native-json-document-validation.json) records source,
+build and object hashes separately from macOS execution. Windows execution remains
+unverified until the project workflow passes.

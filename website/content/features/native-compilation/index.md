@@ -145,3 +145,8 @@ The [benchmark report](../../benchmarks/) compares recorded interpreter and nati
 builds using routing and HTTP workloads. It includes methodology, measurements
 and limitations. The cross-platform HTTP checks establish correctness, not a
 performance ranking against .NET.
+
+The development JSON corpus additionally exercises two nested documents through
+JsonValue and typed objects, plus typed scalar/object vectors, with macOS
+interpreter/native parity. Lists/sequences, maps and Windows project execution
+remain under development; no comparative benchmark results are published yet.

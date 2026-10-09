@@ -88,6 +88,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   `37989124785`. Add two nested document round trips through both JsonValue and typed objects,
   plus mixed DOM arrays/null/empty containers/decimal tokens and malformed input.
   Validate native/interpreter parity on macOS; typed collection coverage remains open.
+  Admit closed vector generic arguments and checked reference unboxing; retain array
+  element descriptors from generic calls and rooted property signatures. Validate
+  typed scalar/object array JSON on macOS with interpreter parity. Correct the Windows
+  console profile gate for its linked integer-text services; Windows execution awaits CI.
   Record expanded nested/array/list/sequence/string-keyed-map correctness scope and
   benchmark/data-publication follow-up; the expanded milestone remains incomplete.
 

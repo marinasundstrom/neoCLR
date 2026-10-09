@@ -5876,7 +5876,8 @@ fn native_property_metadata_roots_do_not_retain_accessor_bodies() {
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_generic_unboxing_closes_method_arguments() {
     let source = include_str!("../../../docs/experiments/aot-console/reflection-arrays.neoil")
-        .replace("unbox.any Int32", "call Extract<Int32>(System.Object)");
+        .replace("unbox.any Int32", "call Extract<Int32>(System.Object)")
+        .replace("stloc result", "call Extract<arrayref<Int32>>(System.Object)\ncastclass System.Object\nstloc result");
     let source = format!("{source}\n.function Extract<T>(System.Object value) -> T\nldarg value\nunbox.any T\nret\n.end\n");
     check_reflection_arrays(&source, 8, b"");
 }
