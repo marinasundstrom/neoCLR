@@ -24,7 +24,7 @@ Use `Equals` to compare type identity. Names are useful for display, but do not 
 
 TypeInfo compares represented types through both typed equality and Object.Equals. Repeated queries may allocate different descriptors; ReferenceEquals still compares those allocations. Generic arguments and array element types participate in type identity.
 
-Object.GetHashCode is consistent with that equality, and ToString displays the represented DisplayName in development (FullName in Preview 11). Different types can have colliding hashes; neither names nor hashes are persistent identity keys. EquatableTo&lt;TypeInfo&gt; takes a non-null TypeInfo. Object.Equals(Object?) is the explicitly null-aware boundary.
+Object.GetHashCode is consistent with that equality, and ToString displays the represented DisplayName. Different types can have colliding hashes; neither names nor hashes are persistent identity keys. EquatableTo&lt;TypeInfo&gt; takes a non-null TypeInfo. Object.Equals(Object?) is the explicitly null-aware boundary.
 
 Assembly descriptors compare full catalog identities; module descriptors compare that identity plus their module name. Their Object hashes use the same keys, and display returns the assembly FullName or module Name. This is scoped to one loaded program, without CLR loader-context semantics. Field, method and property descriptors compare their kind, closed declaring type and definition index, with matching hashes and Name display. Parameter descriptors retain owner kind, closed declaring type, definition index and position for equality and hashing. Tokens may be zero; a property index parameter remains distinct from its accessor parameter. Owner resolution through a public Member property is still future work. See the [introspection guide](../../docs/introspection.html) and [TypeInfo API reference](../../docs/api/System.Introspection.TypeInfo.html) for current contracts.
 
@@ -83,13 +83,14 @@ Sequence does not expose element replacement.
 
 ## Member kinds and pattern matching
 
-The public Info contracts are sealed interfaces. The current `MemberInfo` hierarchy has four public cases, so Raven can check that this match covers the whole hierarchy.
+The public Info contracts are sealed interfaces. A match can distinguish fields,
+methods, constructors, properties and nominal types:
 
 ```raven
 {{TOUR_MATCH}}
 ```
 
-Callers work with those public cases, without matching private runtime implementation classes. `NominalTypeInfo` is the development type member case, replacing Preview 11’s `TypeInfo`, so a nested nominal type can be described as a member. `DeclaringType` returns `Option<TypeInfo>`: nested types and ordinary members have an owner; top-level types do not. `ParameterInfo` remains separate.
+Callers work with those public cases, without matching private runtime implementation classes. `NominalTypeInfo` describes nominal types as members, including nested types. `DeclaringType` returns `Option<TypeInfo>`: nested types and ordinary members have an owner; top-level types do not. `ParameterInfo` remains separate.
 
 ```raven
 {{TOUR_MEMBERS}}
@@ -101,7 +102,9 @@ Callers work with those public cases, without matching private runtime implement
 
 ## Complete example
 
-Use matching Preview 11 compiler, runtime and reference artifacts. Follow the [project-based setup guide](../../try/), then save this sample as Main.rvn and run the neoCLR task.
+Use matching development compiler, runtime and reference artifacts for this tour.
+Follow the [project-based setup guide](../../try/), then save this sample as Main.rvn
+and run the neoCLR task.
 
 1. [Download the complete Raven sample](../../samples/library-introspection-tour.rvn), including its imports, Widget class, helper and Main function.
 2. Copy it into `Main.rvn` in the prepared `Demo` project and save.
@@ -139,8 +142,8 @@ Sequence states the collection capability without requiring an array in the publ
 Constructor discovery adds `GetConstructors()` and the `ConstructorInfo`
 member case. It returns declared public instance constructors by default; explicit
 BindingFlags can inspect nonpublic declarations. Constructors remain separate from
-GetMethods. Exhaustive matches over the development MemberInfo family must include
-ConstructorInfo as well as the cases shown in the Preview 11 sample above.
+GetMethods. Exhaustive matches over MemberInfo include ConstructorInfo, as in the
+example above.
 
 [Reflection](../reflection/) separately supplies Result-based construction, method
 invocation and member access. Metadata discovery alone grants no execution permission.
@@ -175,15 +178,14 @@ The descriptive model supports the bounded development reflection extensions abo
 
 [See the proposals and their tradeoffs →](../../proposals/#introspection)
 
-The selected Function type direction introduces `NominalTypeInfo` for names,
-namespaces and declaration metadata, alongside `TypeInfo.IsNominalType`.
+`NominalTypeInfo` provides names, module paths and declaration metadata, alongside
+`TypeInfo.IsNominalType`.
 Structural Function types describe callable shapes, with Function objects
-as their instances. The descriptor split is implemented on the development feature branch: common
+as their instances. Common
 TypeInfo exposes DisplayName, IsNominalType and IsFunctionType; declaration metadata requires
 NominalTypeInfo. Structural types can still have members and extension members;
-member discovery stays on common TypeInfo. Raven callbacks now import into structural
-Function shapes, and a tested extension can target a function shape. Legacy
-delegate declarations and opcodes are removed. FunctionTypeInfo.InvokeMethod and
+member discovery stays on common TypeInfo. Raven callbacks use structural
+Function shapes, and extensions can target a function shape. FunctionTypeInfo.InvokeMethod and
 GetMethods expose the same synthesized public instance Invoke signature. Member
 and parameter Module/MetadataToken, and MethodInfo.DefinitionIndex, are optional;
 synthesized descriptors return None. Typed invocation is supported; dynamic
@@ -213,11 +215,10 @@ Questions, sample programs and documentation corrections are welcome. See [how t
 
 [System.Introspection](xref:System.Introspection)
 
-The generated reference describes Preview 11. Use matching toolchain artifacts.
 
 ## Enum names and values
 
-Preview 11 APIs on `System.Enum` support both a known enum and discovery through
+APIs on `System.Enum` support both a known enum and discovery through
 `TypeInfo`:
 
 ```raven

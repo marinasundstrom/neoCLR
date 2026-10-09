@@ -4,74 +4,69 @@ toc: false
 
 # About neoCLR
 
-neoCLR is an experimental application platform. It brings together application APIs, managed execution, language integration and development tools. Working programs guide which .NET and CLR contracts to retain and where to investigate alternatives.
-
-**Experimental POC.** Preview 11 includes typed JSON HTTP client/server applications,
-TCP networking, streams, Storage, Tasks and isolated workers. The project is open
-source under the MIT license.
-
-Explore the [architecture](../architecture/) and [metadata format](../metadata/)
-for diagrams of the platform layers and compiled artifacts.
-
-## Background
-
-The project starts from .NET’s managed-platform model: value and reference types, generics, interfaces, metadata and garbage collection. The question is which parts to preserve and which alternatives are worth testing when building an independent application platform.
-
-An earlier small language experiment, Neo, exercised the runtime through readable programs compiled to neoIL. It remains in the repository as historical work. The current frontend is [Raven](../raven/), a separate language that normally targets .NET. Its compiler emits CLI metadata and IL; the neoCLR integration imports the supported subset.
-
-Using Raven lets application samples, library code and compiler integration develop together. Runtime guarantees also need direct IL tests, so their correctness does not depend solely on checks in one source language.
+neoCLR is an open-source project developing a managed runtime, a class library and
+tools for Raven applications. It was initiated by Marina Sundström and is available
+under the MIT license.
 
 <a id="goals"></a>
 
-## What the project aims to establish
+<a id="background"></a>
 
-The goal is to support the path from writing an application to building, running and inspecting it. The runtime, APIs, compiler integration, project tooling and editor support are parts of that platform. Each should be evaluated through complete programs, with foundational primitives and small library operations tested before larger applications.
+## Project scope
 
-Each proposed difference needs a concrete benefit, an account of its costs and executable evidence. Keeping the existing .NET behavior is a valid outcome. Starting independently does not by itself make an implementation faster, safer or simpler.
+The platform brings compilation, execution, application APIs and editor support together.
+Raven programs use modules to organize code and access libraries for text, collections,
+files, Tasks, networking and HTTP. The runtime manages memory and supplies the services
+those libraries need.
 
-Proposals are inputs to this process. They can conflict, and their API shapes are not commitments. Samples should expose problems early enough to revise the contracts.
+The project is experimental. The [installation guide](../try/) describes the available
+toolchain; [feature guides](../guides/) explain supported behavior and practical limits.
 
 <a id="dotnet"></a>
 
 ## Relationship to .NET
 
-neoCLR retains the distinction between copied values and shared class or array references, managed garbage collection, generics and ordinary method dispatch. CLI metadata provides a compiler boundary. The runtime and System library are independent implementations; arbitrary unchanged .NET assemblies are not supported.
+neoCLR uses familiar managed-platform concepts: values and objects, generics,
+interfaces, metadata and garbage collection. Its runtime and class library are
+independent implementations. UTF-8 text and explicit Option/Result outcomes are
+important parts of its programming model.
 
-Read [neoCLR and .NET](../comparison/) for the maintained comparison of contracts,
-implementation, compatibility and current limitations.
+Raven can target both .NET and neoCLR, each with its own library contracts.
+neoCLR does not run arbitrary .NET applications. See the
+[platform comparison](../comparison/) for the differences that affect programs.
 
 <a id="implementation"></a>
 
-## Current implementation
+## How it works
 
-The runtime is a Rust interpreter with a nonmoving tracing collector and an initial terminal debugger. The library includes arrays, collections, typed outcomes, text conversion, date/time values, bounded file helpers and runtime metadata discovery. Tasks, cancellation, isolated workers, provider-bound storage, byte/text streams, bounded reflection and HTTP client/server exchanges are available in development.
+The runtime is implemented in Rust. Raven supplies the source language, compiler and
+editor integration. The interpreter executes neoCLR assemblies; a developing ARM64
+AOT backend compiles supported applications into standalone executables.
 
-neoCLR and its guest programs run without .NET. Raven compilation, the import bridge, MSBuild and the Raven Language Server use .NET. The [build and run guide](../try/) describes the matching toolchain and distinguishes published examples from development APIs.
-
-Major limits include the bounded importer, bounded IPv4 networking and cleartext HTTP/1.1 rather than a complete network stack, incomplete cleanup during terminal faults, and no JIT backend. The [guides](../guides/) record the smaller supported subsets.
+[Architecture](../architecture/) introduces these layers, and [metadata](../metadata/)
+explains how compiled libraries connect tools and execution.
 
 <a id="direction"></a>
 
-## Roadmap
+## Project direction
 
-The current HTTP POC exchanges typed JSON between neoCLR client and server and
-supports known-length source uploads. Preview 11 adds nested Web API
-models, routing samples and foundational library capabilities. Current capabilities and
-possible extensions are summarized on the [direction page](../proposals/#http-poc).
-No date is promised for the next release.
-
-Later candidates include a file catalog, download queue, time-aware report, assembly explorer and portable sample pack. Their order can change. Memory views, nullability, runtime suspension and alternative execution backends remain research topics rather than prerequisites for every sample.
+The project develops through working applications and library use cases.
+[Project direction](../proposals/) summarizes open areas such as broader native
+execution, HTTP capabilities and module features. These are areas of work and
+exploration, not a release schedule.
 
 <a id="participate"></a>
 
-## Participation
+## Contributing
 
-neoCLR is an early project initiated by Marina Sundström. It is open to people interested in managed runtimes, compilers, API design, tooling and documentation. Questions and critical comparisons are useful contributions alongside code.
+Run a sample, report a problem, improve a guide or propose a change with a concrete
+use case. For substantial contributions, open an issue to discuss scope.
 
-A starting point is to run a sample and report what worked or failed, improve an explanation, add a focused test, or describe an application the current API cannot express. For substantial changes, discuss the scope first so the work fits the active milestone or answers an explicit research question.
+[Source and pull requests](https://github.com/marinasundstrom/neoCLR) ·
+[Issues and questions](https://github.com/marinasundstrom/neoCLR/issues)
 
-[Contribution guidance](../#feedback) covers reports and proposals. [GitHub Issues](https://github.com/marinasundstrom/neoCLR/issues) is the current place for questions and design discussion; code and documentation changes can be submitted as pull requests.
-
-### Development records
-
-The repository retains the [development conversation record](https://github.com/marinasundstrom/neoCLR/blob/main/docs/development-timeline.md), including author directions, AI-assisted work and subsequent corrections. The [working roadmap](https://github.com/marinasundstrom/neoCLR/blob/main/docs/platform-roadmap.md) links implementation evidence, and the [research process](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design-research.md) describes how design alternatives are compared.
+The website explains the platform and how to use it. The repository's
+[documentation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/README.md)
+contains implementation contracts, design research, validation procedures and
+[development history](https://github.com/marinasundstrom/neoCLR/blob/main/docs/development-timeline.md)
+for contributors.

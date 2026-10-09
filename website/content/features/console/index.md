@@ -50,7 +50,6 @@ Reports with input bytes, expected output and the toolchain revision help us eva
 
 [Console](xref:System.Console) · [TextReader](xref:System.IO.TextReader) · [TextWriter](xref:System.IO.TextWriter)
 
-The generated reference describes Preview 11. Use matching toolchain artifacts.
 
 ## Command-line arguments
 
@@ -69,8 +68,7 @@ func Main(arguments: string[]) {
 
 The array contains application arguments, excluding the executable name, as in .NET.
 Without arguments it is empty. Environment.GetCommandLineArgs() includes the
-executable name. Main() without parameters continues to work. This support requires
-the managed collection profile in Preview 11.
+executable name. Main() without parameters is also supported.
 
 ## Displaying values
 

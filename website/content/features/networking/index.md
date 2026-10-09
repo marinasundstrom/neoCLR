@@ -3,9 +3,8 @@ title: Networking
 ---
 # Networking
 
-The current POC resolves a host name, connects a
-TCP client, sends bytes and reads the reply from a separate neoCLR server. It is available with matching Preview 11
-artifacts.
+The networking APIs resolve host names, connect TCP clients and exchange bytes
+with a server. The current socket backend supports IPv4.
 
 ## Address values
 
@@ -30,12 +29,11 @@ String socket overloads also accept numeric addresses.
 
 ## Shared budgets
 
-Native source-built Networking and Web now share an opaque
+Networking and Web share an opaque
 [NetworkDeadline](xref:System.Networking.NetworkDeadline). DNS, connection attempts and
 partial transfers can use the same deadline without restarting it. HTTP retains its
 15-second exchange budget; existing shorter phase limits and cancellation behavior remain.
 The default deadline is expired. See the [API contract](/docs/sockets.html) for limits.
-This is development support, not a new published release or a performance claim.
 
 ## Resolve, connect, exchange
 

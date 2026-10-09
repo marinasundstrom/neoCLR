@@ -219,7 +219,6 @@ not normalize text or ignore case. Use it with the development HashMap construct
 or through `EqualityComparer<string>` and `Comparer<string>`.
 See [collections and comparer policies](../collections/#comparer-policies-development)
 for a tested example and [StringComparer](xref:System.StringComparer) for signatures.
-Use matching Preview 11 artifacts for this API.
 
 
 `String.Compare(left, right, StringComparison.Ordinal)` selects exact UTF-8 ordering.
@@ -232,7 +231,6 @@ for duplicate detection and lookup. Simple folding equates `ẞ/ß` and `K/k`,
 `ß/ss`; it does not normalize text or apply language-specific rules. These results
 and folded ordering can differ from .NET's OrdinalIgnoreCase. An unknown mode faults.
 See [StringComparison](xref:System.StringComparison) and [StringComparer](xref:System.StringComparer).
-Use matching Preview 11 runtime and SDK artifacts.
 
 The [text foundation review](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/text-abstraction.md#systemtext-foundation-review--2026-09-27)
 uses Swift as the closer model for character-facing text APIs, with explicit scalar
@@ -249,9 +247,8 @@ independent [Decoder](xref:System.Text.Decoder) instances. [Encodings](xref:Syst
 provides UTF-8 and strict ASCII. ASCII rejects unrepresentable text and bytes above
 127; it never silently substitutes characters. StreamReader/StreamWriter accept
 these policies while keeping UTF-8 defaults. See [encoding contracts](../../docs/streams.html#selected-encodings-development)
-for ownership, bounds and errors. [Encoder](xref:System.Text.Encoder) now accepts valid text and drains bounded byte
-output, with explicit progress and finalization. A public builder and broader codecs
-remain possible next steps.
+for ownership, bounds and errors. [Encoder](xref:System.Text.Encoder) accepts valid text and drains bounded byte
+output, with explicit progress and finalization. Broader codecs remain future work.
 
 <a id="unicode-casing-and-decimal-reports-development"></a>
 

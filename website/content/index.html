@@ -1,22 +1,22 @@
 ---
-title: neoCLR — Experimental application platform
+title: neoCLR — A managed runtime and application library
 layout: landing
 toc: false
 ---
 <section class="landing-hero" aria-labelledby="hero-title">
   <div>
-    <p class="landing-eyebrow">RUNTIME · LIBRARY · RAVEN · TOOLS</p>
-    <h1 id="hero-title">An experimental<br>application platform.</h1>
-    <p class="landing-lead">A managed runtime and application APIs, explored through working Raven programs. Familiar .NET foundations, with room to question the contracts.</p>
-    <div class="landing-actions"><a class="primary-action" href="try/">Build your first project →</a><a href="docs/">Browse the API reference</a></div>
-    <p class="landing-note">Open source · Interpreted execution · Automatic memory management</p>
+    <p class="landing-eyebrow">OPEN-SOURCE SOFTWARE PROJECT</p>
+    <h1 id="hero-title">A managed runtime<br>for Raven applications.</h1>
+    <p class="landing-lead">neoCLR is an experimental application platform with its own runtime, class library and development tools. Write Raven programs using familiar .NET concepts, UTF-8 text and APIs for collections, files, async work and HTTP.</p>
+    <div class="landing-actions"><a class="primary-action" href="try/">Get started →</a><a href="https://github.com/marinasundstrom/neoCLR">View source on GitHub</a></div>
+    <p class="landing-note">MIT license · Garbage-collected memory · macOS arm64 toolchain</p>
   </div>
   <div class="landing-example">
-    <p class="landing-eyebrow">RAVEN / EXPLICIT OUTCOMES</p>
-    <h2>A value, or an explicit absence</h2>
+    <p class="landing-eyebrow">RAVEN EXAMPLE</p>
+    <h2>Represent an optional value</h2>
     <pre><code class="language-raven">{{OPTION_SAMPLE}}</code></pre>
-    <p>Return <code>Some(value)</code> for a match, or <code>None</code> when no element matches.</p>
-    <a href="features/outcomes/">Explore Option and Result →</a>
+    <p><code>Option</code> represents a value that may be absent. Match <code>Some(value)</code> or <code>None</code> to handle either result.</p>
+    <a href="features/outcomes/">Option and Result →</a>
   </div>
 </section>
 <a id="start"></a>
@@ -43,37 +43,21 @@ toc: false
 <a id="next"></a>
 <a id="api-proposals"></a>
 <a id="exploring"></a>
+<section class="landing-section landing-split" aria-labelledby="platform-title">
+  <div><h2 id="platform-title">Runtime, library and tools</h2><p>The runtime executes compiled Raven programs with automatic memory management. The class library is organized into modules that form namespaces. The toolchain includes a compiler, project support and a VS Code extension.</p><p>Programs run in the interpreter. An ARM64 ahead-of-time compiler also produces standalone executables for a supported subset of applications.</p><a href="architecture/">How neoCLR fits together →</a></div>
+  <div><h2 id="status-title">Try the project</h2><p>The downloadable macOS arm64 bundle includes the tools and runnable collections, Tasks, JSON and HTTP samples. Start with a bundled project, then explore the library.</p><p>neoCLR is experimental and APIs can change. It has its own runtime and libraries; it does not run arbitrary .NET applications. Native compilation has narrower coverage than the interpreter.</p><a href="try/">Installation and requirements →</a></div>
+</section>
 <section class="landing-section" aria-labelledby="features-title">
-  <div class="landing-section-heading"><h2 id="features-title">Explore the platform</h2><a href="guides/">All guides →</a></div>
-  <p>Small APIs, executable examples and explicit limits. Guides explain how the APIs work and where their limits are.</p>
+  <div class="landing-section-heading"><h2 id="features-title">Explore neoCLR</h2><a href="guides/">All guides →</a></div>
   <div class="feature-grid">
-    <a class="feature-box" href="features/modules/"><span class="feature-category">ORGANIZATION · DEVELOPMENT</span><h3>Modules</h3><p>Organize types, functions and constants in named modules. Keep assembly packaging independent of declaration names.</p><span class="feature-more">Explore modules →</span></a>
-    <a class="feature-box" href="features/native-compilation/"><span class="feature-category">EXECUTION · WORK IN PROGRESS</span><h3>Native compilation</h3><p>Compile Raven and neoCLR CIL into standalone ARM64 executables. Follow the web-server POC, interpreter comparisons and current limits.</p><span class="feature-more">Explore native compilation →</span></a>
-    <a class="feature-box" href="features/outcomes/"><span class="feature-category">ERRORS &amp; ABSENCE</span><h3>Option and Result</h3><p>Match and propagate expected outcomes, including operations with no useful result.</p><span class="feature-more">Read the guide →</span></a>
-    <a class="feature-box" href="features/arrays/"><span class="feature-category">DATA</span><h3>Arrays and collections</h3><p>Shared array storage, invariant element types, and separate read, replace and grow capabilities.</p><span class="feature-more">Read the guide →</span></a>
-    <a class="feature-box" href="features/collections/"><span class="feature-category">QUERIES</span><h3>Filter, map and combine</h3><p>Work with iterable queries and typed cardinality outcomes. Materialize only when needed.</p><span class="feature-more">Read the guide →</span></a>
-    <a class="feature-box" href="features/strings/"><span class="feature-category">TEXT</span><h3>Unicode and UTF-8</h3><p>Distinguish grapheme clusters, Unicode scalars and bytes, with strict conversion at boundaries.</p><span class="feature-more">Read the guide →</span></a>
-    <a class="feature-box" href="features/tasks/"><span class="feature-category">ASYNC</span><h3>Tasks and promises</h3><p>Await results, supply producer completion and understand the limits of isolated workers.</p><span class="feature-more">Read the guide →</span></a>
-    <a class="feature-box" href="features/networking/"><span class="feature-category">NETWORKING · DEVELOPMENT</span><h3>DNS and TCP sockets</h3><p>Resolve a hostname, accept a connection and exchange bytes between two neoCLR programs.</p><span class="feature-more">Read the guide →</span></a>
-    <a class="feature-box" href="features/web/"><span class="feature-category">WEB · EXPERIMENT</span><h3>HTTP clients and servers</h3><p>Exchange bounded HTTP messages and typed JSON between client and server applications, with replaceable client handlers.</p><span class="feature-more">Read the guide →</span></a>
-    <a class="feature-box" href="features/functions/"><span class="feature-category">TYPES · DEVELOPMENT</span><h3>Function types</h3><p>Delegates evolved: callable objects with structural signature types, value binding equality and target inspection.</p><span class="feature-more">Read the guide →</span></a>
-    <a class="feature-box" href="features/introspection/"><span class="feature-category">DISCOVERY</span><h3>Types and members</h3><p>Explore assemblies, types and members through one model, with explicit identity contracts.</p><span class="feature-more">Read the guide →</span></a>
-    <a class="feature-box" href="features/reflection/"><span class="feature-category">EXECUTION</span><h3>Reflection</h3><p>Construct objects, invoke methods and access members with explicit validation results.</p><span class="feature-more">Explore reflection →</span></a>
-    <a class="feature-box" href="features/gc/"><span class="feature-category">RUNTIME</span><h3>Garbage collection</h3><p>Inspect managed object counters, request collection, and express reference lifetime.</p><span class="feature-more">Explore garbage collection →</span></a>
-    <a class="feature-box" href="features/files/"><span class="feature-category">I/O · DEVELOPMENT</span><h3>Files, Storage and streams</h3><p>Resolve provider-bound files and directories, and read or write byte and text streams.</p><span class="feature-more">Read the guide →</span></a>
-    <a class="feature-box" href="features/console/"><span class="feature-category">TERMINAL · DEVELOPMENT</span><h3>Console and standard streams</h3><p>Handle input, output, end-of-input and typed errors through a common stream contract.</p><span class="feature-more">Read the guide →</span></a>
-    <a class="feature-box" href="features/globalization/"><span class="feature-category">GLOBALIZATION · DEVELOPMENT</span><h3>Cultures and calendars</h3><p>Convert Gregorian and Hebrew dates, render Hebrew or Latin text, and discover system culture preferences.</p><span class="feature-more">Explore globalization →</span></a>
-    <a class="feature-box" href="features/time/"><span class="feature-category">TIME</span><h3>Dates, times and zones</h3><p>Represent local or zoned dates, inspect daylight-saving overlaps, and distinguish civil from elapsed time. Provisional preview APIs.</p><span class="feature-more">Read the guide →</span></a>
+    <a class="feature-box" href="raven/"><span class="feature-category">LANGUAGE</span><h3>Write Raven</h3><p>Functions, classes, pattern matching and typed outcomes, with editor support.</p><span class="feature-more">Language introduction →</span></a>
+    <a class="feature-box" href="features/modules/"><span class="feature-category">PLATFORM FOUNDATIONS</span><h3>Organize code with modules</h3><p>Modules form namespaces for types, functions and constants. Assemblies package them for use.</p><span class="feature-more">Modules and imports →</span></a>
+    <a class="feature-box" href="guides/#language-and-everyday-code"><span class="feature-category">EVERYDAY APIS</span><h3>Work with data and text</h3><p>Collections and queries, UTF-8 strings, dates, optional values and errors.</p><span class="feature-more">Library guides →</span></a>
+    <a class="feature-box" href="features/web/"><span class="feature-category">APPLICATION DEVELOPMENT</span><h3>Build an HTTP application</h3><p>Connect a client and server, route requests and exchange typed JSON.</p><span class="feature-more">HTTP clients and servers →</span></a>
+    <a class="feature-box" href="features/native-compilation/"><span class="feature-category">EXECUTION</span><h3>Compile to native code</h3><p>Explore standalone ARM64 execution, supported workloads and current limitations.</p><span class="feature-more">Native compilation →</span></a>
+    <a class="feature-box" href="docs/"><span class="feature-category">API REFERENCE</span><h3>Look up an API</h3><p>Browse library modules, type and member signatures, parameters and behavior.</p><span class="feature-more">Browse the reference →</span></a>
   </div>
 </section>
-<section class="landing-section landing-split" aria-labelledby="status-title">
-  <div><h2 id="status-title">Try the native Raven POC</h2><p><strong>Preview 12</strong> brings native Raven metadata import and emission, source-built library consumers, Tasks, JSON and HTTP examples, and VS Code API help. The matched native toolchain is qualified on macOS arm64; primitive bootstrap and runtime seed dependencies remain explicit.</p><p>The platform is experimental. Feature pages explain current limits and possible directions; use the matching runtime and development tools.</p><a href="try/">Install the matching toolchain →</a></div>
-  <div><h2 id="direction-title">Build toward useful applications</h2><p>The development milestone is end-to-end Raven compilation into native NeoCLR assemblies. Nine of ten selected POC samples compile and execute, including collections, JSON mapping, async work and a localhost HTTP pair. Inheritance and the native editor workflow remain release gates.</p><p>HTTP is a bounded cleartext POC; TLS, HTTP/2, HTTP/3 and a JIT remain future work. The importer supports a bounded CLI subset, not arbitrary unchanged .NET assemblies.</p><a href="raven/#native-target">Native target status →</a></div>
-</section>
-<section class="landing-section landing-reference" aria-labelledby="reference-title">
-  <div><p class="landing-eyebrow">ONE SITE, FROM EXAMPLE TO CONTRACT</p><h2 id="reference-title">Find the guide. Look up the API.</h2><p>Use tested walkthroughs to understand behavior, then follow the Raven API reference for types, members, errors and limitations.</p></div>
-  <div class="landing-actions"><a class="primary-action" href="guides/">Explore guides →</a><a href="docs/">Open the API reference →</a></div>
-</section>
 <section class="landing-section" aria-labelledby="feedback">
-  <h2 id="feedback">Help shape the project</h2><p>Run a sample, improve a guide, report a problem or bring a concrete API use case. Questions and critical comparisons matter alongside code.</p><p><a href="https://github.com/marinasundstrom/neoCLR/issues">Questions and issues</a> · <a href="https://github.com/marinasundstrom/neoCLR">Source and pull requests</a> · <a href="about/">About neoCLR</a></p>
+  <h2 id="feedback">Project and contributions</h2><p>neoCLR is developed in the open. Bug reports, documentation improvements, sample applications and code contributions are welcome.</p><p><a href="https://github.com/marinasundstrom/neoCLR">Source code</a> · <a href="https://github.com/marinasundstrom/neoCLR/issues">Issues and questions</a> · <a href="proposals/">Project direction</a> · <a href="about/">About neoCLR</a></p>
 </section>

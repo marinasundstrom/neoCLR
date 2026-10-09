@@ -72,7 +72,7 @@ The client fetches a report from the service, submits it, and reads the reply:
 
 The server's POST handler uses the first operation to respond with 201; malformed
 reports receive 400. `ReadReply` checks the response status and reads its JSON.
-Preview 11 supports the nested station model shown in the full case.
+The full case includes the nested station model.
 
 [Case: Building a Http server app →](/cases/http-server/)
 The walkthrough includes the shared models, routing, client connection setup,
@@ -245,8 +245,7 @@ is a correctness POC, not a performance benchmark. Generated async states still 
 
 ## Direction
 
-The active development direction is a small Web API. Nested objects and typed
-arrays are implemented in development. RoutePattern now lets an existing
+JSON mapping supports nested objects and typed arrays. RoutePattern lets an existing
 HttpServer handler match paths and extract named values or checked Int32 parameters.
 An application union is an optional convenience for dispatch with match. See the
 [routed station case](/cases/http-server/#development-case-routing-with-typed-parameters)
@@ -361,7 +360,7 @@ before DNS. Content sources must remain stable while consumed.
 
 [Download the POST echo example and focused checks](/samples/http-post.zip).
 The checks cover neoCLR peers, an independent raw peer and a .NET client, including
-empty and binary bodies. Header append/remove operations, OPTIONS, unknown-length uploads, streaming responses, compression and Expect/continue are still outside this checkpoint.
+empty and binary bodies. Header append/remove operations, OPTIONS, unknown-length uploads, streaming responses, compression and Expect/continue are still unsupported.
 
 ## Looking up headers
 
@@ -411,9 +410,9 @@ application fields and at most 2,048 encoded header bytes. Stream-backed content
 
 ## Other request methods
 
-Preview 11 APIs include `Put`, `Patch` and `Delete`, with string/Uri addresses and
+HttpClient provides `Put`, `Patch` and `Delete`, with string/Uri addresses and
 optional cancellation tokens. They use the same BaseUri and handler pipeline as Get
-and Post. PUT/PATCH take HttpContent; DELETE has no body in this checkpoint. Non-success
+and Post. PUT/PATCH take HttpContent; DELETE has no body in the current API. Non-success
 statuses remain responses, so callers choose their status policy:
 
 ```raven
@@ -443,7 +442,7 @@ cancellation-token overloads. `HttpJsonError` preserves either the HTTP or JSON
 cause. Cancellation remains task cancellation.
 
 The managed report sample fetches a typed report from a neoCLR server, posts it back,
-and reads a JSON acknowledgement. Preview 11 maps String, Int32 and Boolean
+and reads a JSON acknowledgement. The mapper supports String, Int32 and Boolean
 properties, nested reference objects and typed arrays with the same scalar
 rules, in documents up to 1,024 UTF-8 bytes. Conversion is synchronous over
 buffered HTTP content. Per-call header options, generic lists and nullable mapping

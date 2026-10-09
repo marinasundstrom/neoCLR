@@ -11,8 +11,7 @@ reference-passing contracts mean the same Function type. Callers can share that
 contract directly, without declaring a named delegate type. A Function object is
 an instance of the signature, bound to a particular target.
 
-**Development API:** available in development builds after Preview 11, using the
-matching runtime and Raven toolchain.
+**Development API:** use a matching development runtime and Raven toolchain.
 
 ## Pass behavior by its signature
 

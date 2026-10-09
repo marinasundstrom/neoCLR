@@ -25,6 +25,25 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-09 — Website audience and editorial cleanup
+
+- **Author:** asks for a concise website with detail where it matters, observing that
+  historical information distracts readers. Directs continuation of a cleanup, with
+  a landing page that immediately explains the product and the tone of a software
+  project page rather than a preachy presentation.
+- **Assistant:** identifies accumulated chronology in Direction and Native compilation,
+  stale About information and repeated release notes. Proposes current-state feature
+  guides, grouped homepage entry points and separate benchmark reporting.
+- **Author clarification:** website and GitHub documentation need a clear divide;
+  they present different views for different audiences and should not repeat the same
+  details in the same way.
+- **Assistant action:** rewrites the principal website pages, separates benchmarks,
+  simplifies the website's metadata/architecture explanations, removes redundant
+  feature-page release commentary and records the audience split in
+  [website maintenance](design/feature-pages.md). Retains exact requirements for
+  versioned runnable samples and links to implementation records. Repository contracts
+  and published release history are not rewritten as part of this editorial change.
+
 ## 2026-10-09 — Architecture and metadata explanations
 
 - **Author:** requests repository documentation and website pages for architecture

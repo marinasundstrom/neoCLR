@@ -2,8 +2,7 @@
 
 System.Storage describes provider-bound paths, files and directories. System.IO
 supplies byte streams, text readers and writers. Operations are synchronous and
-return typed Result errors. Use matching Preview 11 runtime and SDK artifacts;
-see [setup](../../try/#development) for published package availability.
+return typed Result errors. See [setup](../../try/) for toolchain requirements.
 
 <a id="example"></a>
 
@@ -67,7 +66,6 @@ fails before writing. StreamWriter uses bounded encoder output and
 provides Finish to observe final conversion bytes/errors. Flush handles the stream;
 Close releases ownership. Call Finish and Flush explicitly when required before
 Close. See [selected encoding contracts](../../docs/streams.html#selected-encodings-development).
-Use matching Preview 11 artifacts for these overloads.
 
 ## Behavior and limits
 

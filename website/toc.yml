@@ -40,6 +40,8 @@
       href: features/introspection/index.md
     - name: Native compilation
       href: features/native-compilation/index.md
+    - name: Native benchmarks
+      href: benchmarks/index.md
     - name: Garbage collection
       href: features/gc/index.md
     - name: Reflection

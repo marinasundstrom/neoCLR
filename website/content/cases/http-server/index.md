@@ -116,9 +116,9 @@ Use `--mapped` for the flat typed-model variant, which fetches then submits a re
 
 ## Development case: a report with a nested station
 
-**Included in Preview 11.** The same report
-exchange now carries a station name and a description of where the sensor is
-installed and why staff use it, plus a `readings` array of integer measurements. This report exceeds the old 128-byte JSON limit. The client first fetches
+The report
+exchange carries a station name and a description of where the sensor is
+installed and why staff use it, plus a `readings` array of integer measurements. The client first fetches
 this model from GET `/report`, then submits it to POST `/reports`. The server
 reads the nested station and returns the same 201 acknowledgement. This is still
 an explicit HttpServer application. The routing case below uses a
@@ -188,7 +188,7 @@ construction, error and stream ownership contracts.
 
 ## Development case: routing with typed parameters
 
-**Included in Preview 11.** A station is now
+A station is
 addressed by ID: GET `/stations/42/reports` reads its report and POST to the same
 path submits it. Station 42 is the small case's known sensor. The shared nested
 JSON models above are unchanged.

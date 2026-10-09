@@ -1,85 +1,66 @@
-# Metadata format
+# Metadata and compiled libraries
 
-Metadata connects neoCLR's compiler, tools and runtime. It records assemblies,
-declarations, signatures, references and instruction bodies so that a compiled library
-can be imported, inspected and executed without its source files.
+Metadata describes the contents of a compiled neoCLR assembly: its modules, types,
+functions, constants and references to other assemblies. It lets the compiler and
+editor understand a library without its source files, and lets the runtime resolve
+and check the code it executes.
 
-The current native format has several layers. Its CLI-derived design direction and
-its implemented transport should be distinguished: today the native execution model
-is carried in NEOX, either on its own or inside a PE file's `#Neo` stream.
+## One library, several uses
+
+Suppose an application imports a separately compiled library. The compiler reads its
+public declarations and checks calls against their signatures. The editor uses those
+same declarations for completion and navigation. At execution time, the runtime binds
+the application's references to the supplied libraries and verifies instruction bodies.
+Reading a library's metadata does not run its application code.
+
+[Modules](../features/modules/) form namespaces for declarations. Assemblies package
+those modules and supply dependency identity. Two assemblies can declare modules with
+the same name without becoming the same owner.
+
+<a id="what-an-artifact-contains"></a>
+<a id="neox-framing-and-payload"></a>
+
+## The artifact layers
 
 ![PE transport, NEOX framing, execution encoding and semantic module](../metadata-format.svg)
 
-## What an artifact contains
+Native metadata and instructions are carried in a **NEOX** container. It can be stored
+as a standalone file or inside a PE file's **#Neo** stream. The layers separate file
+framing, payload encoding and the meaning of the declarations and instructions.
 
-| Part | What it describes |
+| Layer | Purpose |
 | --- | --- |
-| Assembly manifest | Identity, referenced assemblies and ownership information |
-| Declaration modules | Named containers for top-level types, functions and constants |
-| Type/member definitions | Signatures, generic parameters, constraints and member relationships |
-| Definition and member references | The identities used when dependencies are bound |
-| Instruction bodies | The operations checked by the verifier and executed by a backend |
+| PE wrapper, when present | Carries metadata streams in a familiar executable-file container |
+| NEOX envelope | Identifies versioned sections and their boundaries |
+| Native payload | Encodes declarations, references and instruction bodies |
+| Resolved program | Binds those references to the actual supplied dependencies |
 
-An assembly can contain several [declaration modules](../features/modules/). An assembly
-identity and a module name identify a logical declaration container. Physical metadata
-images are separate: a module does not automatically have its own file or load lifetime.
-Source tokens and executable definition identities also serve different purposes.
+The current binary payload uses a restricted CBOR object encoding. JSON remains a
+legacy/intermediate representation. Neither representation contains live objects,
+open files or other execution state.
 
-For a separately compiled library, tools first read its declarations and signatures.
-The runtime later resolves the application's references against the supplied dependency
-set and verifies executable bodies. Reading a signature does not execute the library.
-[Introspection](../features/introspection/) and [reflection](../features/reflection/)
-explain the supported runtime views.
+<a id="pe-is-a-container-not-a-compatibility-promise"></a>
+<a id="validation-and-evolution"></a>
 
-## NEOX framing and payload
+## Compatibility and validation
 
-The envelope starts with `NEOX`, version 0.1, a total length and a section directory.
-Each directory entry gives a section kind, schema version, required/optional flag,
-offset and length. The native execution section is kind 256 and must be required.
-Unknown required sections, invalid ranges and unsupported schemas are rejected.
+A PE file is not automatically a .NET assembly that the CLR can execute. neoCLR runs
+the native model carried by `#Neo`; ordinary CLI tools may recognize the outer file
+without understanding that model. The [platform comparison](../comparison/) explains
+the broader relationship to .NET.
 
-| Layer | Current representation |
-| --- | --- |
-| Envelope header | 16 bytes; magic, versions, count and length |
-| Directory entry | 16 bytes; kind, schema, flags, offset and length |
-| Execution schema 1 | Legacy UTF-8 JSON |
-| Execution schemas 2/3/4 | Bounded CBOR object encoding |
-| Semantic model | Format 5, independent of the execution schema number |
+The runtime checks container structure and payload encoding, then resolves dependencies
+and verifies executable code. A file that parses successfully has only passed the first
+part of that process. Versioned contracts allow readers to reject features they cannot
+preserve rather than silently misinterpret them.
 
-The current standalone writer selects schema 3 up to an 8 MiB envelope and schema 4
-above that, up to 16 MiB. Legacy schemas retain smaller budgets. Binary decoding
-checks definite lengths, nesting/node limits, UTF-8 text and duplicate map keys before
-constructing the metadata model. This is a restricted CBOR profile, not arbitrary CBOR
-and not a memory dump of Rust objects.
+For application development, keep compiler, library and runtime artifacts together as
+shown in [setup](../try/). [Introspection](../features/introspection/) exposes supported
+metadata views to programs; [reflection](../features/reflection/) adds controlled
+construction and invocation.
 
-## PE is a container, not a compatibility promise
+## Implementing a reader or writer
 
-A native PE image contains a recognition marker, metadata streams and a `#Neo` stream
-holding NEOX. A SHA-256 binding detects inconsistent metadata streams; it is not a
-publisher signature. The reader also checks layout, stream overlap and padding.
-
-The runtime executes the native model carried by `#Neo`, not the CLI method bodies
-in the wrapper. Ordinary CLI tools may parse the outer file without understanding
-neoCLR's executable semantics. The typed instruction records are not automatically
-ECMA CIL byte streams: branch indices, for example, are not byte displacements.
-
-This transport makes native metadata experiments possible while retaining a familiar
-outer container. Its cost is a separate payload and a need for neoCLR-aware readers.
-Standard CLI tables and opcode meanings remain the design baseline where they fit;
-a fully CLI-authoritative representation remains a future migration direction.
-
-## Validation and evolution
-
-Framing checks, payload decoding, dependency resolution and typed verification are
-separate gates. Passing an early gate does not imply the later ones passed.
-Versioned contracts permit readers to reject features they cannot preserve. For example,
-the version-1 declaration-module table preserves empty modules; older inputs expose
-marked namespace projections, while older readers reject the new manifest field.
-Use matching compiler, library and runtime artifacts rather than editing version numbers.
-
-See [architecture](../architecture/) for how the reader fits into execution, or the
-[detailed format document](https://github.com/marinasundstrom/neoCLR/blob/main/docs/metadata-format.md)
-for byte offsets, admission budgets, source references and existing test evidence.
-The underlying references are [ECMA-335](https://ecma-international.org/publications-and-standards/standards/ecma-335/)
-and [CBOR RFC 8949](https://www.rfc-editor.org/rfc/rfc8949.html); neither alone defines
-neoCLR's semantics or guarantees .NET compatibility.
+The [repository format specification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/metadata-format.md)
+covers byte layout, schema versions, size budgets, ownership validation and test evidence.
+The [architecture guide](../architecture/) explains how metadata fits into the platform.

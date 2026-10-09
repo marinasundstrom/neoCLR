@@ -74,6 +74,32 @@ expand a sample into a large application merely to justify calling it a case.
 Evolve the report case into the selected Web API story as nested JSON and
 WebApplication become implemented; do not show planned endpoints as runnable code.
 
+## Website and repository audiences — author direction, 2026-10-09
+
+The website helps visitors understand, evaluate and use neoCLR. The homepage must
+explain the product immediately: runtime, class library, Raven and tools, with a clear
+path to installation and examples. Use the tone of a software project page. Avoid
+manifestos, repeated methodological qualifications and claims of superiority.
+
+Repository documentation serves contributors and implementers: exact contracts,
+design alternatives, compiler/backend boundaries, validation commands, artifact
+revisions and development history. Website content must not echo that documentation
+in the same detail or structure. Explain the user-facing model on site and link to
+GitHub for optional implementation depth. Keep public API usage contracts in the
+on-site API reference; this audience split does not remove API documentation duties.
+
+Maintain current explanations instead of appending progress reports. Remove resolved
+limitations and stale checkpoints from feature narratives. Preserve their evidence in
+repository records and Git history. Keep exact availability in setup/download pages,
+with local exceptions only where needed to use a particular API or versioned sample.
+The shared development notice must distinguish the site from published packages.
+
+A feature guide normally needs a purpose, a tested example, important behavior,
+current limitations and links to reference material. Length follows the reader's
+need, not a fixed word quota. Dedicated benchmark reports keep measurements alongside
+methodology and caveats; feature introductions link to them without retelling the
+optimization history. Preserve useful public anchors when reorganizing pages.
+
 ## Information structure
 
 | Location | Purpose | Required distinction |

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Refocus the website on understanding and using neoCLR: explain the runtime,
+  library and Raven toolchain on the homepage, group guide entry points, replace
+  development chronology with current capabilities/directions, and separate native
+  benchmark reports. Distinguish website guidance from GitHub implementation docs;
+  remove stale release commentary while preserving versioned sample requirements.
+
 - Add the private ordinal UTF-8 replacement service to interpreter and ARM64 native
   text bindings, with non-overlapping replacement, deletion, unchanged-result
   identity and checked allocation. Focused parity and failure-path checks pass.

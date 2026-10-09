@@ -13,6 +13,7 @@ concepts, different contracts and compatibility limits.
 
 ## Platform foundations
 
+- [Modules](../features/modules/) — organize declarations into modules that form namespaces.
 - [Architecture](../architecture/) — compiler, runtime layers, services and execution modes.
 - [Metadata format](../metadata/) — assembly ownership, PE/NEOX layers and validation.
 
@@ -36,12 +37,14 @@ They need only enough application context to explain the choices and results.
 | [Collections and queries](../features/collections/) | Read, replace, grow, filter and transform collections |
 | [Strings and UTF-8](../features/strings/) | Distinguish graphemes, scalars and bytes |
 | [Dates and clocks](../features/time/) | Validate civil dates and obtain a clock instant |
+| [Globalization](../features/globalization/) | Cultures, calendars and localized formatting |
 
 ## Operations and runtime services
 
 | Guide | What you’ll learn |
 | --- | --- |
-| [Native compilation](../features/native-compilation/) | Standalone ARM64 POC, interpreted/native comparisons and development caveats |
+| [Native compilation](../features/native-compilation/) | Standalone ARM64 execution, supported workloads and limits |
+| [Native benchmarks](../benchmarks/) | Measurements and methodology for interpreter/native comparisons |
 | [Tasks and async](../features/tasks/) | Await results, complete promises and understand isolated workers |
 | [Files and Storage](../features/files/) | Resolve storage items and use byte/text streams |
 | [Console and standard streams](../features/console/) | Handle input, output, end-of-input and typed errors |
@@ -49,6 +52,7 @@ They need only enough application context to explain the choices and results.
 | [Web and HTTP](../features/web/) | Client/server exchanges, handlers, JSON and bounded stream uploads |
 | [Introspection](../features/introspection/) | Discover types and members and understand descriptor identity |
 | [Reflection](../features/reflection/) | Construct objects, invoke methods and access fields and properties |
+| [Garbage collection](../features/gc/) | Understand managed lifetimes and collection controls |
 
 ## Development walkthroughs
 
@@ -65,8 +69,3 @@ about the latest downloadable bundle.
 
 See [development setup](../try/#development) for toolchain requirements. Broader ideas
 belong in [direction and proposals](../proposals/), separate from implemented guides.
-
-[Globalization](../features/globalization/) covers culture, language, system discovery and Gregorian/Hebrew rendering (provisional development APIs).
-
-[Garbage collection](../features/gc/) — inspect execution-local object counters,
-request collection, and express reference lifetime.

@@ -1,7 +1,7 @@
 # Dates, times and time zones
 
 Date and TimeOfDay describe civil fields. Instant identifies a point on the timeline,
-Duration an elapsed amount, and Clock supplies Now. **The named-zone APIs below are provisional Preview 11 APIs.**
+Duration an elapsed amount, and Clock supplies Now. Named-zone APIs are provisional.
 
 The development API groups these constructs in `System.Time`: use
 `import System.Time.*`. `TimeOfDay` replaces the former `System.Time` struct.

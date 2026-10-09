@@ -42,11 +42,10 @@ neoCLR target. The neoIL assembler supplies another input path for low-level pro
 and runtime tests. Native library metadata also supplies symbols to the compiler,
 language server and documentation tools.
 
-The loader checks the artifact's structure, resolves its declared dependencies and binds
-references into a prepared program. Typed verification then checks instruction and call
-contracts. Decoding a file alone does not establish that its code is valid. Execution
-creates frames and managed state from this prepared model; metadata contains no live
-heap objects or OS handles. Read the [metadata format](../metadata/) for the artifact layers.
+The runtime resolves the application's library dependencies and checks that its
+instructions and calls are valid before execution. Metadata supplies declarations and
+code; execution creates the live objects and other program state. Read
+[metadata and compiled libraries](../metadata/) for how those artifacts connect the tools.
 
 ## Runtime and library responsibilities
 
@@ -74,10 +73,9 @@ metadata/IL and links runtime support into a standalone executable. Checked case
 include routing and bounded HTTP serving; general interpreter/native parity is open.
 A native executable still needs implementations of GC, text, queues, I/O and Faults.
 
-JIT, general native AOT, native hot reload and trimming remain future work. The native
-bootstrap also retains explicit primitive-core/runtime inputs; source-built library
-coverage does not establish a fully independent production core. Use the matching
-artifacts described in [setup](../try/).
+JIT, general native AOT, native hot reload and trimming remain future work.
+[Setup](../try/) describes the available toolchain, and
+[native compilation](../features/native-compilation/) lists its execution limits.
 
 ## Relationship to .NET
 
