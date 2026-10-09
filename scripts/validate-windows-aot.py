@@ -70,8 +70,10 @@ def main():
         report['compilerRevision'] = run(['git', '-C', raven, 'rev-parse', 'HEAD'], 'raven-revision')
         report['dotnet'] = run(['dotnet', '--info'], 'dotnet')
         # The primitive/console bootstrap needs no Raven.Core or packaged SDK.
+        # vcvars64 sets Platform=x64; keep managed compiler output layout explicit.
         run(['dotnet', 'build', raven / 'src/Raven.Compiler/Raven.Compiler.csproj',
-             '-c', 'Release', '-f', 'net10.0', '-p:UseRavenCoreReference=false',
+             '-c', 'Release', '-f', 'net10.0', '-p:Platform=AnyCPU',
+             '-p:UseRavenCoreReference=false',
              '-p:NeoClrMetadataProject=' + str(ROOT / 'tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj')],
             'raven-build', cwd=raven)
         compiler = raven / 'src/Raven.Compiler/bin/Release/net10.0/rvnc.dll'

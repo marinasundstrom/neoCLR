@@ -403,6 +403,8 @@ and does not claim comparable library coverage. The C adapter remains provisiona
 The fresh-source extension builds Raven `71cafd353900394a4f670a8ad8691597f6115091`
 (the existing native-toolchain qualification pin) with the current neoCLR metadata
 writer, then compiles `docs/experiments/aot-hello/hello.rvn` using `rvnc neoclr`.
+`Platform=AnyCPU` keeps the managed compiler output layout independent of the
+MSVC shell’s `Platform=x64`; the native target remains Windows x64.
 `UseRavenCoreReference=false` selects the compiler bootstrap; this literal-console
 probe does not use the class-library SDK or change any compiler/bridge contract.
 The workflow installs the same .NET 10/11 SDK versions as native-toolchain CI.

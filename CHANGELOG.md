@@ -29,7 +29,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Raven `71cafd35` with the current metadata writer and compile Hello World source
   on Windows, requiring separate PE/#Neo and NEOX execution records. Retain
   compiler revision/hashes, build diagnostics, source and emitted metadata; fresh
-  source execution qualification is pending.
+  source execution qualification is pending. Select AnyCPU explicitly for the
+  managed compiler build so MSVC’s Platform=x64 environment cannot redirect its
+  output layout; native code still targets Windows x64.
 
 - Add a development macOS ARM64 project-to-executable console command using the
   selected bundle's Raven project build, existing AOT backend and explicit native
