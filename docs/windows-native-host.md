@@ -4,7 +4,7 @@ Development experiment, 2026-10-09. The Windows scalar/literal-console backend i
 qualified; managed Windows code generation remains rejected. This document records
 host requirements before widening that profile. It does not introduce a public API.
 
-## Memory ownership: implemented probe, execution pending
+## Memory ownership: qualified private probe
 
 The existing macOS console host owns a zeroed 1 MiB buffer for one synchronous
 entry, then collects and frees it. The independent Windows
@@ -43,7 +43,15 @@ rejection, release and repeated empty release. It also rejects zero, oversize,
 SIZE_MAX and null owners. Test-only SEH observes access violations; it establishes
 no generated-code SEH/unwind contract. OS allocation failure injection and GC
 integration remain open. Reports retain the source revision, input hashes, native
-binary, build/execution logs and output hashes. Windows execution is pending.
+binary, build/execution logs and output hashes.
+
+**Windows evidence:** [run 37952512363](https://github.com/marinasundstrom/neoCLR/actions/runs/37952512363)
+at `9c3c586e1e4277be5068a4f45fa5033807c92c18` passes all 12 lifecycles on Windows
+Server 2022 x64 with warnings treated as errors. All nine downloaded artifact hashes
+match; the three source hashes match the recorded Git revision with Windows checkout
+CRLF line endings. See the [retained report](windows-host-memory-validation.json).
+This qualifies allocation and perimeter protection only; it does not qualify a
+Windows collector, guest memory faults or native stack safety.
 
 ## Stack protection: required, not implemented by this probe
 

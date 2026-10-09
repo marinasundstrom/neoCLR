@@ -43,7 +43,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   downloaded artifact hashes are verified.
   Define Windows managed-host allocation, stack and suspension ownership
   prerequisites. Add a private bounded VirtualAlloc heap with reserved guard
-  pages and a focused MSVC lifecycle/guard workflow; execution is pending.
+  pages and a focused MSVC lifecycle/guard workflow. Windows run `37952512363`
+  at `9c3c586e` passes 12 allocation lifecycles and both guard-boundary checks;
+  verify nine artifact hashes and three source hashes with checkout line endings.
   Managed Windows code generation and project kits remain unsupported.
 
 - Add a development macOS ARM64 project-to-executable console command using the

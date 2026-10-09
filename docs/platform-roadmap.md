@@ -84,7 +84,10 @@ managed-console host allocation and stack-protection requirements before widenin
 managed services or project kits; account for suspension lifecycle boundaries in
 that work. The [Windows host prerequisites](windows-native-host.md) now specify
 these boundaries and include an independent guarded-heap adapter and focused
-Windows workflow (execution pending). Windows project kits and managed services remain unsupported. Full
+Windows workflow. [Heap evidence](windows-host-memory-validation.json) passes 12
+allocation/release lifecycles and both guard boundaries. Next test collector/root
+portability against this memory before stack and managed-code qualification.
+Windows project kits and managed services remain unsupported. Full
 bootstrap, general hosting and reload remain open.
 
 **Preview 13 published (2026-10-09):** after Raven's shared website publication,

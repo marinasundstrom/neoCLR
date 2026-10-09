@@ -456,6 +456,12 @@ flow executables return zero with exact expected stdout and empty stderr. All 11
 downloaded hashes match the [retained report](windows-raven-flow-validation.json).
 The source coverage gap is closed without changing Raven or its metadata emitter.
 
+The [Windows host prerequisite contract](windows-native-host.md) now documents
+allocation ownership, stack protection and suspension boundaries. Its independent
+guarded-heap C probe passes 12 Windows allocation/release lifecycles and both
+guard boundaries. This leaves managed lowering, collector integration and stack
+qualification explicitly open.
+
 ## Shared native contracts to establish
 
 1. **Lowering and checks.** Resolve and verify a declared IL subset into a typed

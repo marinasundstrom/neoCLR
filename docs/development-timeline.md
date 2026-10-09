@@ -12736,3 +12736,20 @@ claim follows from these focused checks.
   artifact hashes match the [report](windows-raven-flow-validation.json). Native
   macOS comparison boundary tests also pass. Windows managed host allocation,
   stack protection and suspension lifecycle requirements remain open.
+
+## 2026-10-09 — Windows managed-host prerequisites
+
+- **Author:** continues the native work after Windows scalar source qualification.
+- **Assistant proposal/action:** documents a bounded host contract comparing .NET
+  allocation/stack APIs and Win32 mechanisms; keeps allocation ownership separate
+  from thread identity for the previously requested suspension co-evolution. Adds
+  an independent private guarded-heap adapter and focused Windows Action. This is
+  an experimental host choice, not an author-selected public allocator or scheduler.
+- **Outcome:** [run 37952512363](https://github.com/marinasundstrom/neoCLR/actions/runs/37952512363)
+  at `9c3c586e` passes 12 allocation/release lifecycles, real guard-boundary faults
+  and invalid-input checks. Nine artifact hashes match; three source hashes match
+  the recorded revision with Windows checkout CRLF. See the
+  [contract](windows-native-host.md) and [evidence](windows-host-memory-validation.json).
+- **Open:** collector/root portability, native stack protection and unwind support,
+  activation-owned roots and cancellation/shutdown lifetime enforcement. Windows
+  managed code generation and project kits remain unsupported.

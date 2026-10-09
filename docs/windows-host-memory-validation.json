@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "scope": "Private Windows x64 guarded heap; no managed execution or stack qualification",
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "-C",
+        "D:\\a\\neoCLR\\neoCLR",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/O2",
+        "/MT",
+        "/Fe:host-memory.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory-test.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\host-memory.exe"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "revision": "9c3c586e1e4277be5068a4f45fa5033807c92c18",
+  "inputs": {
+    "tools/native/windows-host-memory.c": "774114602ce99ea6d2f69d613cb7b5c26f6d3f2af5fc91edebcb70c51db1d59d",
+    "tools/native/windows-host-memory.h": "370ec5f2a8d73db08144c70aa51fb8fe3704b038fd3b9dbb0b26630826c5f6c9",
+    "tools/native/windows-host-memory-test.c": "bffb4d15c8dc72ef82eb4611df83bdf0409efa28c664248bea00e2c26431792e"
+  },
+  "execution": {
+    "exitCode": 0,
+    "stdout": "Windows guarded heap: 12 allocation lifecycles passed\r\n",
+    "stderr": "",
+    "allocationLifecycles": 12
+  },
+  "files": {
+    "build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build.stdout.log": "6ffe2c3c4d89c5349ba24d6b40ca8a333e5f5b28a5d6df835247500ed75bc65d",
+    "execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "execute.stdout.log": "769b1c1e55d7c08aecd93a8931a9fc65e23bd1a41155eea41aa838d5a19982a4",
+    "host-memory.exe": "f96d8ad77bb06ef1165a6daf2c4c7de71e4324402f87480af3b6981f3a8192dc",
+    "revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "revision.stdout.log": "aac8befe900ed2706db3d700e25bc46ec6f7c11259252a8475c97e04845aae42",
+    "windows-host-memory-test.obj": "f597c26aec07f487ffefe71172a96cd0acf93c6fc043ee52f0fc36cd1fab3da9",
+    "windows-host-memory.obj": "6197df9ed539a725842f8203eb1a394dd860c0d6fdddc044d39549950df63339"
+  },
+  "date": "2026-10-09",
+  "githubRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/37952512363",
+  "artifact": "windows-native-host-37952512363-1",
+  "downloadedFileHashesVerified": true,
+  "sourceHashVerification": {
+    "tools/native/windows-host-memory.c": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-host-memory.h": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-host-memory-test.c": "Git blob with Windows checkout CRLF"
+  }
+}
