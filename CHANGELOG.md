@@ -6,6 +6,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+## 0.1.0-preview.13 — 2026-10-09
+
+Windows x64 and macOS ARM64 toolchain bundles pass extracted consumer and installed
+editor qualification. Canonical source validation and focused platform checks pass;
+ARM64 AOT remains a separate source experiment, and full native core bootstrap is
+unfinished. See [release notes](docs/preview-13-release-notes.md) and
+[exact evidence](docs/preview-13-validation.json).
+
 ### 2026-10-09
 
 - Align shared RavenDoc extension presentation across .NET and native metadata:
@@ -18,16 +26,6 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Rewrite current API and feature guides around usage and supported behavior,
   removing stale Preview 11 labels, upgrade instructions and superseded checkpoints.
   Preserve compatibility anchors, explicit POC limits and research/benchmark evidence.
-
-## 0.1.0-preview.13 — 2026-10-09
-
-Windows x64 and macOS ARM64 toolchain bundles pass extracted consumer and installed
-editor qualification. Canonical source validation and focused platform checks pass;
-ARM64 AOT remains a separate source experiment, and full native core bootstrap is
-unfinished. See [release notes](docs/preview-13-release-notes.md) and
-[exact evidence](docs/preview-13-validation.json).
-
-### 2026-10-09
 
 - Lead the Tasks guide with the compiled Task.Run/await example; keep explicit
   isolated Thread usage in its own later section. Adapt module documentation IDs
