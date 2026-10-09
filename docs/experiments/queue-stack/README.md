@@ -1,7 +1,7 @@
 # Queue and Stack review — 2026-10-10
 
-Status: proposed library contracts and a passing .NET comparison, not implemented
-neoCLR APIs. The author requests useful collection additions after basic JSON and
+Status: proposed library contracts, a passing .NET comparison and passing
+application-local neoCLR storage probes; no new public collection APIs. The author requests useful collection additions after basic JSON and
 explicitly clarifies that TaskQueue is not necessarily connected to this work.
 Queue and Stack are general-purpose collections; neither scheduler migration nor
 TaskQueue replacement is a requirement or justification for this slice.
@@ -107,3 +107,38 @@ passed on macOS arm64, SDK `11.0.100-rc.1.26425.128`, runtime `.NET 10.0.0`.
 The committed probe checks FIFO wrap/growth, LIFO iteration/removal, non-removing
 peek, mutation rejection, Clear, empty Try results and present-null distinction.
 This is baseline evidence, not a neoCLR implementation or performance benchmark.
+
+## Storage experiment outcome
+
+The [Raven consumer](raven/Main.rvn) now compiles through the existing project driver
+and passes native macOS arm64 and matching interpreter execution. It uses private
+application-local QueueStorage/StackStorage classes over ArrayList<Option<T>>;
+this deliberately reuses existing allocation APIs rather than adding an intrinsic.
+The probe checks FIFO wrap/growth/order, LIFO growth/order, empty results, peek/count,
+reference aliasing, cleared slot tags and Clear/reuse for Int32 and reference items.
+The [validation report](storage-validation.json) records identical output, empty
+diagnostics and source/tool/artifact hashes. The bundle uses compiler `71cafd353`.
+
+Cleared tags do not prove GC reclamation. This prototype also leaves nullable/value
+record elements, iterator policy, public interface dispatch, Windows execution and
+capacity-bound negative tests open. ArrayList's backing capacity can exceed the
+prototype's logical slot count; production storage need not retain this wrapper.
+The experiment establishes a viable ordinary-library execution path, not production
+collection readiness or a performance result. No scheduling code was changed.
+
+Reproduce from the repository root with the matching development bundle:
+
+```sh
+SDKROOT=$(xcrun --sdk macosx --show-sdk-path) python3 scripts/build-native-project.py \
+  --profile console --project docs/experiments/queue-stack/raven/Native.rvnproj \
+  --bundle target/json-collection-hash-development/bundle \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --output target/queue-stack-storage-probe
+python3 docs/experiments/queue-stack/validate.py \
+  --build target/queue-stack-storage-probe \
+  --bundle target/json-collection-hash-development/bundle \
+  --interpreter target/release/neoclr
+```
+
+Choose a fresh output directory if rerunning the native builder. The validator
+accepts an already-built artifact and writes validation.json alongside it.

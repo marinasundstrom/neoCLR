@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "results": [
+    {
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "queue and stack storage passed\n",
+      "stderr": ""
+    },
+    {
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "queue and stack storage passed\n",
+      "stderr": ""
+    }
+  ],
+  "hashes": {
+    "docs/experiments/queue-stack/validate.py": "1dec79909bb1f681b240f439138f7e934f90a0b205d362db69a2b40af0cb416d",
+    "docs/experiments/queue-stack/raven/Main.rvn": "30ce7034a15e66edfeeb503c130c7ae2d08838ee3e66a70da203b6a54cbd20c0",
+    "docs/experiments/queue-stack/raven/Native.rvnproj": "710cbb70c9713962cd8cfc5963e06461fcae60ad9ad9b7d08ce660fbf3e5b4c5",
+    "target/queue-stack-storage-probe/app": "2b19b69462b1d8348de3e4e9f278b5d238443f0b783d82f0b904184af8736ff0",
+    "target/queue-stack-storage-probe/app.dll": "faeb29c147abfb5f78e636bc9cda50a4f5c26c3835304b391afd36160fb2d039",
+    "target/queue-stack-storage-probe/build.json": "780c3a8fee67feab2189110207fa3bcb7ad57ce2f981345aabd64a10801e72c3",
+    "target/release/neoclr": "16060f22b9caaef312c754bb571ba705ccd3092c4620b84d95c95b822351777d",
+    "target/json-collection-hash-development/bundle/manifest.json": "44b4cc9e2fd977b068cb9634a1c3a0465814b5ab1670fc076105ddf6c10feb80"
+  }
+}

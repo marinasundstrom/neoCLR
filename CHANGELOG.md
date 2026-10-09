@@ -14,7 +14,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   runtime-policy choices remain investigations rather than implemented features.
   Add a Queue/Stack design review and passing .NET behavior probe; record the
   author’s clarification that general-purpose collections are independent of
-  TaskQueue. Proposed APIs and storage experiments remain unimplemented.
+  TaskQueue. Application-local FIFO/LIFO storage probes using Option slots now
+  pass native macOS and interpreter order, growth, clear/reuse and reference-alias
+  checks without new runtime services. Public APIs, GC reclamation and Windows
+  collection qualification remain open.
 
 - Add recursive built-in Sequence/List/ArrayList and string-keyed
   Map/MutableMap/HashMap JSON mapping, constructing ArrayList and ordinal HashMap

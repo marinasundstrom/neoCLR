@@ -107,7 +107,9 @@ implementation are the first named candidate, not yet a settled API. Evaluate
 general-purpose collection consumers, existing collection contracts and .NET
 ergonomics/behavior before selecting additions. The author clarifies that TaskQueue
 is not necessarily connected; collection additions do not require scheduler changes.
-See the [Queue/Stack review](experiments/queue-stack/README.md). Finish the current JSON correctness
+See the [Queue/Stack review](experiments/queue-stack/README.md): application-local
+Option-slot storage probes pass native macOS and interpreter execution; public
+contracts, GC reclamation and Windows collection qualification remain open. Finish the current JSON correctness
 and platform qualification first. The earlier interpreter/native JSON benchmark
 and later framework-comparison direction remains recorded in the native JSON plan;
 this new request makes the collection review the next author-selected topic.

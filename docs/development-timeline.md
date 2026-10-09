@@ -13116,3 +13116,10 @@ claim follows from these focused checks.
 - **Performed:** the .NET baseline probe passes FIFO/LIFO, growth, peek, mutation,
   clear and empty/null cases. neoCLR Queue/Stack implementation remains next work;
   no prototype success or final public contract is claimed by this review.
+
+- **Subsequent performed experiment:** application-local QueueStorage/StackStorage
+  over Option slots pass native macOS and interpreter execution with matching
+  output. The [report](experiments/queue-stack/storage-validation.json) covers
+  FIFO/LIFO, growth, peek, cleared tags and reuse/reference aliases. It does not
+  prove GC reclamation, Windows execution or public API conformance. Scheduling
+  code remains untouched.

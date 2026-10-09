@@ -1,0 +1,233 @@
+import System.*
+import System.Collections.*
+import System.Option.*
+
+// Application-local storage experiment, not the proposed public collection API.
+class QueueStorage<T> {
+    private var slots = ArrayList<Option<T>>()
+    private var head = 0
+    private var count = 0
+
+    val Count: int => count
+
+    func Enqueue(value: T) {
+        if count == slots.Count {
+            let capacity = slots.Count
+            if capacity > 1073741823 {
+                System.Fail("Queue capacity overflow")
+            }
+            var size = 4
+            if capacity != 0 {
+                size = capacity * 2
+            }
+            let expanded = ArrayList<Option<T>>(size)
+            var index = 0
+            while index < count {
+                expanded.Add(slots[(head + index) % capacity])
+                index = index + 1
+            }
+            while index < size {
+                expanded.Add(None)
+                index = index + 1
+            }
+            slots = expanded
+            head = 0
+        }
+        slots[(head + count) % slots.Count] = Some(value)
+        count = count + 1
+    }
+
+    func Peek() -> Option<T> {
+        if count == 0 {
+            return None
+        }
+        return slots[head]
+    }
+
+    func Dequeue() -> Option<T> {
+        if count == 0 {
+            return None
+        }
+        let result = slots[head]
+        slots[head] = None
+        head = (head + 1) % slots.Count
+        count = count - 1
+        return result
+    }
+
+    func Clear() {
+        while count != 0 {
+            Dequeue()
+        }
+    }
+
+    // Inspect occupancy for the probe; this does not establish GC reclamation.
+    func HasOnlyEmptySlots() -> bool {
+        for slot in slots {
+            if slot is Some(_) {
+                return false
+            }
+        }
+        return true
+    }
+}
+
+// Reuses initialized optional slots to test LIFO removal without a new intrinsic.
+class StackStorage<T> {
+    private var slots = ArrayList<Option<T>>()
+    private var count = 0
+
+    val Count: int => count
+
+    func Push(value: T) {
+        if count == slots.Count {
+            slots.Add(Some(value))
+        } else {
+            slots[count] = Some(value)
+        }
+        count = count + 1
+    }
+
+    func Peek() -> Option<T> {
+        if count == 0 {
+            return None
+        }
+        return slots[count - 1]
+    }
+
+    func Pop() -> Option<T> {
+        if count == 0 {
+            return None
+        }
+        count = count - 1
+        let result = slots[count]
+        slots[count] = None
+        return result
+    }
+
+    func Clear() {
+        while count != 0 {
+            Pop()
+        }
+    }
+
+    func HasOnlyEmptySlots() -> bool {
+        for slot in slots {
+            if slot is Some(_) {
+                return false
+            }
+        }
+        return true
+    }
+}
+
+class Item {
+    var Value: int { get; set; } = 7
+}
+
+class Program {
+    static func Main() -> int {
+        let queue = QueueStorage<int>()
+        if queue.Dequeue() is Some(_) {
+            return 1
+        }
+        var index = 0
+        while index < 4 {
+            queue.Enqueue(index)
+            index = index + 1
+        }
+        if queue.Dequeue() is not Some(0) {
+            return 2
+        }
+        if queue.Dequeue() is not Some(1) {
+            return 3
+        }
+        while index < 12 {
+            queue.Enqueue(index)
+            index = index + 1
+        }
+        if queue.Peek() is not Some(2) || queue.Count != 10 {
+            return 4
+        }
+        index = 2
+        while index < 12 {
+            if queue.Dequeue() is Some(let value) {
+                if value != index {
+                    return 5
+                }
+            } else {
+                return 6
+            }
+            index = index + 1
+        }
+        if !queue.HasOnlyEmptySlots() {
+            return 7
+        }
+        let items = QueueStorage<Item>()
+        let item = Item()
+        items.Enqueue(item)
+        if items.Dequeue() is Some(let alias) {
+            alias.Value = 8
+        } else {
+            return 8
+        }
+        if item.Value != 8 || !items.HasOnlyEmptySlots() {
+            return 9
+        }
+        items.Enqueue(item)
+        items.Clear()
+        if items.Count != 0 || !items.HasOnlyEmptySlots() {
+            return 10
+        }
+        items.Enqueue(item)
+        if items.Peek() is not Some(_) {
+            return 11
+        }
+        let stack = StackStorage<int>()
+        if stack.Pop() is Some(_) || stack.Peek() is Some(_) {
+            return 12
+        }
+        index = 0
+        while index < 12 {
+            stack.Push(index)
+            index = index + 1
+        }
+        if stack.Peek() is not Some(11) || stack.Count != 12 {
+            return 13
+        }
+        while index > 0 {
+            index = index - 1
+            if stack.Pop() is Some(let value) {
+                if value != index {
+                    return 14
+                }
+            } else {
+                return 15
+            }
+        }
+        if !stack.HasOnlyEmptySlots() {
+            return 16
+        }
+        let references = StackStorage<Item>()
+        references.Push(item)
+        if references.Pop() is Some(let alias) {
+            alias.Value = 9
+        } else {
+            return 17
+        }
+        if item.Value != 9 || !references.HasOnlyEmptySlots() {
+            return 18
+        }
+        references.Push(item)
+        references.Clear()
+        if references.Count != 0 || !references.HasOnlyEmptySlots() {
+            return 19
+        }
+        references.Push(item)
+        if references.Peek() is not Some(_) {
+            return 20
+        }
+        Console.WriteLine("queue and stack storage passed")
+        return 0
+    }
+}
