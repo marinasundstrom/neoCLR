@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--string-boxing', action='store_true', help='With --unions, check generic String boxing/display and reference identity.')
     parser.add_argument('--union-display', action='store_true', help='With --unions, check String/Int32 union display and formatter binding; excludes --string-boxing.')
     parser.add_argument('--escaping-audit', action='store_true', help='With --unions, Verify union quote/backslash escaping through real String.Replace services.')
+    parser.add_argument('--string-contracts', action='store_true', help='With --text-services, execute unchanged production collection/equality interfaces and record the remaining String source frontier.')
     args = parser.parse_args()
     if args.project and not args.driver:
         parser.error('--project requires --driver')
@@ -38,6 +39,8 @@ def main():
         parser.error('--union-display requires --unions and excludes --string-boxing')
     if args.escaping_audit and (not args.unions or args.union_display or args.string_boxing):
         parser.error('--escaping-audit requires --unions and excludes other display modes')
+    if args.string_contracts and (not args.text_services or args.unions):
+        parser.error('--string-contracts requires --text-services and excludes --unions')
     output = args.output.resolve()
     if output.exists():
         raise FileExistsError(output)
@@ -67,6 +70,13 @@ def main():
         'Propagatable.rvn', 'Option.rvn', 'Result.rvn', 'Runtime/CompilerServices/UnionAttribute.rvn')]
     union_library = artifacts / 'ProductionValues.dll'
     attribute_source = ROOT / 'runtime/raven/src/System/Attribute.rvn'
+    contracts = artifacts / 'StringContracts.dll'
+    contract_sources = [ROOT / 'runtime/raven/src/System' / name for name in (
+        'EquatableTo.rvn', 'Disposable.rvn', 'Collections/Iterator.rvn',
+        'Collections/Iterable.rvn', 'Collections/Collection.rvn', 'Collections/Sequence.rvn')]
+    if args.string_contracts:
+        run(['dotnet', args.driver.resolve(), 'neoclr', '--native-core-reference', core,
+             '--library', '-o', contracts, *contract_sources])
     if args.unions:
         run(['dotnet', args.driver.resolve(), 'neoclr', '--native-core-reference', core,
              '--library', '-o', union_library, *production_sources, attribute_source])
@@ -93,7 +103,8 @@ def main():
     if args.project:
         directory = artifacts / 'project'
         directory.mkdir()
-        (directory / 'Main.rvn').write_text((HERE / 'escaping-audit.rvn').read_text() if args.escaping_audit
+        (directory / 'Main.rvn').write_text((HERE / 'string-contracts-consumer.rvn').read_text() if args.string_contracts
+            else (HERE / 'escaping-audit.rvn').read_text() if args.escaping_audit
             else (HERE / 'display-consumer.rvn').read_text() if args.union_display
             else (HERE / 'boxing-consumer.rvn').read_text() if args.string_boxing
             else (HERE / 'union-consumer.rvn').read_text() if args.unions
@@ -113,6 +124,9 @@ def main():
             ET.SubElement(group, name).text = value
         reference = ET.SubElement(ET.SubElement(root, 'ItemGroup'), 'Reference', Include='Input')
         ET.SubElement(reference, 'HintPath').text = '../Input.dll'
+        if args.string_contracts:
+            reference = ET.SubElement(ET.SubElement(root, 'ItemGroup'), 'Reference', Include='StringContracts')
+            ET.SubElement(reference, 'HintPath').text = '../StringContracts.dll'
         if args.unions:
             reference = ET.SubElement(ET.SubElement(root, 'ItemGroup'), 'Reference', Include='ProductionValues')
             ET.SubElement(reference, 'HintPath').text = '../ProductionValues.dll'
@@ -141,6 +155,8 @@ def main():
         report['importedBaseRejection' if args.unions else 'productionUnionFrontier'] = {'diagnostic': diagnostic.strip(),
             'outputPublished': False, 'sourcesUnchanged': True}
     dependencies = ['--module', core, '--module', library, '--system', seed, '--object-root', core]
+    if args.string_contracts:
+        dependencies += ['--module', contracts]
     if args.unions:
         dependencies += ['--module', union_library]
     interpreted = run([runtime, 'run', consumer, *dependencies, '--show-result'], expected=42, include_stderr=True)
@@ -186,11 +202,31 @@ def main():
         report['scope'] = 'Production Option/Result escaping over native fixture String.Replace; not full core bootstrap qualification.'
         report.pop('unionChecks', None)
         report['escapingChecks'] = ['Some and Error quote/backslash ordering', 'Unicode and embedded NUL preserved', 'non-overlapping replacement', 'empty replacement deletion']
+    if args.string_contracts:
+        report['scope'] = 'Unchanged production collection/equality interfaces with native-only imports and dispatch; not complete String/core bootstrap.'
+        report.pop('textChecks', None)
+        missing = artifacts / 'MissingContracts.dll'
+        diagnostic = run(['dotnet', args.driver.resolve(), 'neoclr', '--native-core-reference', core,
+            '--library', '-o', missing, HERE / 'string-contracts-consumer.rvn'], expected=1, include_stderr=True)
+        if missing.exists() or 'Sequence<string>' not in diagnostic:
+            raise AssertionError('Missing contract assembly did not reject before output')
+        report['missingContracts'] = {'outputPublished': False, 'diagnostics': diagnostic}
+        report['contractChecks'] = ['inherited generic Count/indexer/GetIterator', 'Iterator Current/MoveNext', 'inherited Dispose', 'EquatableTo match/mismatch', 'Unicode/NUL payload']
+        rejected = artifacts / 'ProductionString.dll'
+        diagnostic = run(['dotnet', args.driver.resolve(), 'neoclr', '--native-core-reference', core,
+            '--reference', contracts, '--library', '-o', rejected,
+            ROOT / 'runtime/raven/src/System/String.rvn'], expected=1, include_stderr=True)
+        if rejected.exists() or 'RuntimeServices' not in diagnostic:
+            raise AssertionError('Expected missing String runtime-service dependencies without output')
+        report['stringFrontier'] = {'complete': False, 'diagnostics': diagnostic,
+            'next': 'Provide native runtime-service and array/primitive dependencies, then qualify source String ownership.'}
     report['revisions'] = {name: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip()
                            for name, path in [('neoclr', ROOT), ('raven', args.raven)]}
     inputs = [runtime, aot, *[p for p in HERE.iterdir() if p.suffix in ('.cs', '.csproj', '.rvn', '.neoil', '.c', '.py')]]
     inputs += list((HERE / 'bin/Debug/net10.0').glob('*.dll'))
     inputs += [core, library, consumer, seed, artifacts / 'consumer', *production_sources, *adapters]
+    if args.string_contracts:
+        inputs += [contracts, *contract_sources, ROOT / 'runtime/raven/src/System/String.rvn']
     if args.unions:
         inputs += [union_library, attribute_source]
     if args.driver:

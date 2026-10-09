@@ -438,3 +438,36 @@ Facade validation also passes all six opaque-library admission cases, including 
 Replace export/service checks and existing rejected storage/signature mutations. The
 website build checks 3490 pages; the Replace page was inspected in the browser with
 signature, XML text, parameter links and the existing bridge migration notice intact.
+
+
+## Production String dependency contracts (2026-10-09)
+
+`--project --text-services --string-contracts` compiles the unchanged production
+EquatableTo, Disposable, Iterator, Iterable, Collection and Sequence sources into
+StringContracts.dll using only the native core reference. A separate
+[consumer](string-contracts-consumer.rvn) implements the imported generic interfaces
+and checks inherited Count/indexer/GetIterator, Current/MoveNext, inherited Dispose,
+and equality match/mismatch over Unicode/NUL text. Project run, interpreter and ARM64
+execution return 42; native linking requires only libSystem. Omitting the contracts
+assembly rejects before output. [Reproduction evidence](string-contracts-validation.json).
+
+This is the existing neoCLR hierarchy, not a new API design. Compared with .NET's
+IEquatable, IEnumerable/IEnumerator and collection interfaces, it preserves familiar
+interface dispatch and disposal concepts while using neoCLR names, explicit Count
+and the Sequence indexer contract. This check validates dependency identity and
+execution; it does not claim a collection performance advantage, .NET interface
+identity compatibility or production String implementation completeness.
+
+The same gate attempts the unmodified production String source with those contracts
+and requires a diagnostic failure without publishing an artifact. The current
+fixture lacks RuntimeServices, CheckedStorage, array/unsigned primitive support,
+StringComparison and result/slice/failure dependencies. Imported fixture String also
+lacks the full source member set. The diagnostic transcript records this actual
+boundary; adding interfaces alone cannot establish source String ownership.
+
+Next provide the real native runtime-service declarations and array/primitive
+contract graph, then qualify String's intrinsic storage/owner mapping with unchanged
+source. Keep the existing bridge-generated String tests and native fixture escaping
+checks as separate evidence. Do not introduce placeholder implementations to satisfy
+these dependencies. No Raven compiler change, public API change, bridge encoding
+change or full native core qualification is claimed by this slice.
