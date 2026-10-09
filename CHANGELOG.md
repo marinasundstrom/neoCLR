@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Add native metadata `ValueIs` and `ValueUnpack` operands for typed inspection of
+  runtime erased results, including generic extraction. Reject incompatible stacks
+  and executable CLI emission; validate matching and mismatched UTF-8 slice results.
+
 - Present extension containers with a dedicated icon, an extension declaration and
   linked receiver types in the API reference. Share the rendering with Raven main;
   validate native Operators as `extension Operators for Iterable<T>`.

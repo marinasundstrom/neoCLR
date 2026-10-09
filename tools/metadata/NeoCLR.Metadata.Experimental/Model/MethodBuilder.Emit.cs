@@ -150,6 +150,10 @@ public enum OpCode
     Conv_I,
     /// <summary>Converts a supported numeric value to unsigned native width (conv.u).</summary>
     Conv_U,
+    /// <summary>Tests the storage tag of an erased Value; native-only, with a non-Void type operand.</summary>
+    ValueIs,
+    /// <summary>Extracts a matching payload from erased Value; a mismatched tag faults. Native-only.</summary>
+    ValueUnpack,
 
 }
 

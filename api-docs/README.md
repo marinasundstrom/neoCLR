@@ -1377,3 +1377,6 @@ selection, with argument, result, fault and ordinal UTF-8 documentation. The mat
 bridge reference and source snapshot are refreshed. It requires non-null arguments;
 empty replacement deletes and empty search faults. Native fixture union escaping is
 qualified; complete native source-core bootstrap remains unfinished.
+
+2026-10-09: host-only ValueIs/ValueUnpack metadata operands are documented in
+[the metadata reference](experimental-metadata.md#native-erased-result-operands-development-2026-10-09); guest API signatures are unchanged.

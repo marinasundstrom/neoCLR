@@ -7953,3 +7953,18 @@ Missing native inputs retain the catalog's I/O errors. Failed loading does not r
 the last successful configuration. This bounded path does not establish full core
 completeness or installed-editor qualification. See the
 [executable project check](https://github.com/marinasundstrom/neoclr/blob/main/docs/experiments/native-core-bootstrap/README.md#native-only-project-qualification-2026-10-09).
+
+### Native erased-result operands (development, 2026-10-09)
+
+`IILGenerator.Emit(OpCode.ValueIs, SignatureType)` consumes an erased `Value` and
+produces Boolean. `ValueUnpack` consumes `Value` and produces the operand type;
+a mismatched tag raises RuntimeError. Method generic parameters are supported.
+Void, managed references, pointers and Self operands are rejected. These are
+neoCLR storage operations, distinct from CLR object `isinst` and `unbox.any`;
+they do not allocate a box. Executable CLI output rejects these operations;
+reference-only CLI projections carry signatures, not executable behavior.
+
+Validation: `NeoCLR.Metadata.Experimental.Tests --erased-values <directory>`
+writes matching/mismatched slice consumers and checks round-trip, operand/stack
+rejection and CLI rejection. The interpreter returns 42 for the matching consumer
+and a RuntimeError with a managed stack for mismatched extraction.

@@ -263,3 +263,9 @@ explicitly depends on the emitted owner; hashes and finalization commands are re
 Use `verify_retained_catalog.py` to verify the load set and execute a control, including
 wrong-revision and failed-publication cases. See the
 [bootstrap catalog evidence](../../docs/experiments/extended-cli-metadata/retained-catalog-2026-10-07.md).
+
+Native erased-result inspection is available through `Emit(OpCode.ValueIs, type)`
+and `Emit(OpCode.ValueUnpack, type)`. Both require an erased Value input; only the
+first returns Boolean. Extraction faults on a mismatched tag. Executable CLI
+emission rejects these native storage operations. Run the focused metadata test
+mode `--erased-values <fresh-directory>` for admission and round-trip checks.

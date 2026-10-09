@@ -356,6 +356,8 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("native primitive implementations require native emission");
         if (!referenceOnly && methods.Any(m => m.Instructions.Any(i => i.Op == "array.reserve")))
             throw new InvalidDataException("checked uninitialized array reservation requires native emission; executable CLI has no equivalent operation");
+        if (!referenceOnly && methods.Any(m => m.Instructions.Any(i => i.Op is "value.is" or "value.unpack")))
+            throw new InvalidDataException("erased Value operations require native emission");
         var metadata = new MetadataBuilder();
         // A stable per-builder MVID preserves snapshot scope; PE content IDs/timestamps are deterministic.
         metadata.AddModule(0, metadata.GetOrAddString(Identity.Name + ".dll"), metadata.GetOrAddGuid(mvid), default, default);

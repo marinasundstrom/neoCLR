@@ -254,6 +254,14 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
             elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
             Append(new("object.unbox", Type: elementType)); return;
         }
+        if (opCode is OpCode.ValueIs or OpCode.ValueUnpack)
+        {
+            if (elementType.Primitive == PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf || elementType.PointerElement is not null)
+                throw new ArgumentException("Value operation requires a storage type", nameof(elementType));
+            elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
+            Append(new(opCode == OpCode.ValueIs ? "value.is" : "value.unpack", Type: elementType));
+            return;
+        }
         if (opCode == OpCode.Castclass)
         {
             if (!IsReferenceSignature(elementType)) throw new ArgumentException("Castclass requires a reference target", nameof(elementType));

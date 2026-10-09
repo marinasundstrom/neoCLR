@@ -316,6 +316,11 @@ public sealed partial class MethodBuilder
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Single or PrimitiveType.Double or PrimitiveType.Boolean))
                         throw new InvalidDataException("equality requires numeric or Boolean operands");
                     var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(PrimitiveType.Boolean); break;
+                case "value.is":
+                case "value.unpack":
+                    Pop(PrimitiveType.Value);
+                    stack.Add(instruction.Op == "value.is" ? (SignatureType)PrimitiveType.Boolean : instruction.Type!);
+                    break;
                 case "object.box":
                     Pop(instruction.Type!); stack.Add((SignatureType)Assembly.ObjectType); break;
                 case "reference.test":
