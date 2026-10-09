@@ -1,0 +1,165 @@
+{
+  "passed": true,
+  "scope": "Private Windows x64 guarded heap and collector/root lifecycle; no managed codegen or stack qualification",
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "-C",
+        "D:\\a\\neoCLR\\neoCLR",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/O2",
+        "/MT",
+        "/Fe:host-memory.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory-test.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\host-memory.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/Fe:host-collector.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\host-collector.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/Fe:collector-contract.exe",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\collector-contract.exe"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "revision": "8ac8040b967fc6f70bd793d37bfdd043e7a98d5e",
+  "inputs": {
+    "tools/native/windows-host-memory.c": "774114602ce99ea6d2f69d613cb7b5c26f6d3f2af5fc91edebcb70c51db1d59d",
+    "tools/native/windows-host-memory.h": "370ec5f2a8d73db08144c70aa51fb8fe3704b038fd3b9dbb0b26630826c5f6c9",
+    "tools/native/windows-host-memory-test.c": "bffb4d15c8dc72ef82eb4611df83bdf0409efa28c664248bea00e2c26431792e",
+    "tools/native/windows-gc-host.c": "0464c6f5c54d93c57a15a8bac575ac9b67508308f4791fd406fb9c2311a93da6",
+    "tools/native/windows-gc-host.h": "14cd66ffc950f671749a51884d072b82896b24db0d2363cc5c883edecba3f794",
+    "tools/native/windows-gc-host-test.c": "daacecfc7e71fce637e8b3ce9c96221a59864f00cf674c6b7eaca8936762759d",
+    "docs/experiments/aot-console/native-gc.c": "a3d1690a5a38f2c116a106760f30db79badd3a4f86198d61501a05a250fdc5d4",
+    "docs/experiments/aot-console/native-gc-test.c": "29e46d68d8d31d79bc50c0ac6e7301863aa5bcdfdf2bae0750316552661f77e2",
+    "docs/experiments/aot-console/root-probe.c": "53c89bf572e362623da7bac7241c19744aa79b3310f951c520b570e448bc5a67",
+    "docs/experiments/aot-console/native-gc.h": "791d698ec40abaaf6a199e90e4e4c9299c666c5d9d40f6375320ca9ccb75bcc6",
+    "docs/experiments/aot-console/root-probe.h": "f9b59905e5167081517a1c142294df7485a619aec1332fced0ee25c2043b0698",
+    "docs/experiments/aot-console/text-arena.h": "03e670e1cb6885096f1999dd5947f26088f45873f3a1ffa3bfeb2775c0560404",
+    "docs/experiments/aot-fault-details/fault-details.h": "bb717fcf0645ee35682d6a05ec555c8824426f25bf0745c4368b34eb2964a6cb"
+  },
+  "execution": {
+    "exitCode": 0,
+    "stdout": "Windows guarded heap: 12 allocation lifecycles passed\r\n",
+    "stderr": "",
+    "allocationLifecycles": 12
+  },
+  "collectorExecution": {
+    "exitCode": 0,
+    "stdout": "Windows collector: rooted graph, frame handoff, thread isolation, exhaustion and cleanup passed\r\n",
+    "stderr": ""
+  },
+  "collectorContract": {
+    "exitCode": 0
+  },
+  "files": {
+    "build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build.stdout.log": "6ffe2c3c4d89c5349ba24d6b40ca8a333e5f5b28a5d6df835247500ed75bc65d",
+    "collector-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-build.stdout.log": "9b0e360e114fc1313e95f3a188d397145745da7086e343529eb3c4a52c6299bb",
+    "collector-contract-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-contract-build.stdout.log": "43382405b027e5d7f7422cba2a504c986e483141fddb9fde86cc2f4221f1a744",
+    "collector-contract-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-contract-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-contract.exe": "b6df01fba287dd9e2cb3f938d325c758b495d9f0214bb1fad741051c87885ce8",
+    "collector-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-execute.stdout.log": "989810d33565bee0a0e5bedb0354f266c94b27c562f190287b998bcaafa10277",
+    "execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "execute.stdout.log": "769b1c1e55d7c08aecd93a8931a9fc65e23bd1a41155eea41aa838d5a19982a4",
+    "host-collector.exe": "75a731bb6ec39b0b25561d16d9873e238d67d29abd28fdea556959bb2fa1905c",
+    "host-memory.exe": "ef7d1c51d6dfd9e4fc1bd19d80e23784d15d10371faa265b92e5fcff26e5f12c",
+    "native-gc-test.obj": "85109f3bf223d70a6404e290d40e075767be90b0a4ea5f3f685f344a22086760",
+    "native-gc.obj": "d3be234b5eaca92c39c5c426d53ac57e26d78f7d73febe0b1d597d988102ec09",
+    "revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "revision.stdout.log": "f0974d391be7c44ec5d2edd10d80754493bc40813533bda5af9e011937d27156",
+    "root-probe.obj": "93b25f7c2b28f6b050f53d8da391950c64080c501e67be4d66745fae0a37b3f9",
+    "windows-gc-host-test.obj": "7ba700c6b756a6e2a2c2418ee29988e7a2dae892125537582bb72fc1ca6c6306",
+    "windows-gc-host.obj": "be4228f633aebdf4bfc9ee3f5bb58a13b156cd0387765e27442e84c5ef48d9fd",
+    "windows-host-memory-test.obj": "89f6b8b28e60fa236dd4bef03340ec78abc39a03015cc4c33ef43dcbe15e03c6",
+    "windows-host-memory.obj": "ffa196553ef458fa3eda0b1e04d17048917d5ff328663c015a95bab0d500c9cc"
+  },
+  "date": "2026-10-09",
+  "githubRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/37953377713",
+  "artifact": "windows-native-host-37953377713-1",
+  "downloadedFileHashesVerified": true,
+  "sourceHashVerification": {
+    "tools/native/windows-host-memory.c": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-host-memory.h": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-host-memory-test.c": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-gc-host.c": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-gc-host.h": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-gc-host-test.c": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/native-gc.c": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/native-gc-test.c": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/root-probe.c": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/native-gc.h": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/root-probe.h": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/text-arena.h": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-fault-details/fault-details.h": "Git blob with Windows checkout CRLF"
+  },
+  "priorAttempt": {
+    "githubRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/37953137852",
+    "outcome": "Strict MSVC build rejected C4200 on flexible-array text descriptor; scoped suppression and ABI assertions resolve it."
+  }
+}

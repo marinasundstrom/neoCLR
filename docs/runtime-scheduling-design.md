@@ -435,5 +435,9 @@ the explicit replacement boundaries for the co-evolving scheduler work.
 The [Windows native host prerequisites](windows-native-host.md) separate the heap
 owner from OS thread identity. The private allocation probe has no TLS state, but
 release still requires all activations, callbacks and roots to be gone; the raw
-allocator does not enforce that precondition. Collector integration must establish
-that ownership before suspension can retain the heap across host returns.
+allocator does not enforce that precondition. The subsequent Windows collector
+host now rejects teardown with registered host roots or published frames, and
+from another thread. Its executable consumer verifies retention across root
+handoff and reclamation after release. This establishes the current synchronous
+lifecycle, not activation-owned roots: suspension still needs explicit ownership
+that survives host returns before migration or deferred cleanup is allowed.

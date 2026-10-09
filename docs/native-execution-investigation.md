@@ -459,8 +459,10 @@ The source coverage gap is closed without changing Raven or its metadata emitter
 The [Windows host prerequisite contract](windows-native-host.md) now documents
 allocation ownership, stack protection and suspension boundaries. Its independent
 guarded-heap C probe passes 12 Windows allocation/release lifecycles and both
-guard boundaries. This leaves managed lowering, collector integration and stack
-qualification explicitly open.
+guard boundaries. Its subsequent collector consumer passes rooted retention,
+frame handoff, reclamation, exhaustion and teardown checks on Windows; see
+[collector evidence](windows-collector-validation.json). Managed lowering and stack
+qualification remain explicitly open.
 
 ## Shared native contracts to establish
 

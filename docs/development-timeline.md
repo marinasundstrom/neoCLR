@@ -12753,3 +12753,22 @@ claim follows from these focused checks.
 - **Open:** collector/root portability, native stack protection and unwind support,
   activation-owned roots and cancellation/shutdown lifetime enforcement. Windows
   managed code generation and project kits remain unsupported.
+
+## 2026-10-09 — Working Windows collector host
+
+- **Author:** “Continue and don't stop until you have something that works.”
+- **Assistant commitment/action:** carries the Windows host slice through an
+  executable collector consumer, using the existing collector and root contracts
+  over guarded Windows memory. Adds teardown rejection for registered roots,
+  published frames and foreign threads. Fixes MSVC's flexible-array warning with
+  scoped suppression and unchanged-layout assertions after the first build fails.
+- **Outcome:** [run 37953377713](https://github.com/marinasundstrom/neoCLR/actions/runs/37953377713)
+  at `8ac8040b` executes `host-collector.exe`: cyclic-graph retention, host-to-frame
+  root handoff, reclamation, thread isolation, exhaustion/output preservation and
+  cleanup all pass. Existing collector contracts and 12 heap lifecycles also pass.
+  Verifies 24 artifact and 13 source hashes; focused macOS collector/root regressions
+  pass. See [evidence](windows-collector-validation.json) and
+  [host contract](windows-native-host.md).
+- **Boundary:** this is a working native C collector host, not yet managed Windows
+  AOT execution. Stack protection and managed lowering remain separate gates;
+  thread-affine roots are not green-thread or migration support.

@@ -85,8 +85,11 @@ managed services or project kits; account for suspension lifecycle boundaries in
 that work. The [Windows host prerequisites](windows-native-host.md) now specify
 these boundaries and include an independent guarded-heap adapter and focused
 Windows workflow. [Heap evidence](windows-host-memory-validation.json) passes 12
-allocation/release lifecycles and both guard boundaries. Next test collector/root
-portability against this memory before stack and managed-code qualification.
+allocation/release lifecycles and both guard boundaries. The
+[Windows collector consumer](windows-collector-validation.json) now retains rooted
+graphs, hands roots to published frames, reclaims cycles, rejects premature/foreign
+teardown and passes exhaustion/cleanup plus existing collector contracts. Next
+qualify stack protection and managed lowering against this working host.
 Windows project kits and managed services remain unsupported. Full
 bootstrap, general hosting and reload remain open.
 

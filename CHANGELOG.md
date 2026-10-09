@@ -51,7 +51,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   host-to-frame root handoff, reclamation, exhaustion/output preservation and
   cleanup, plus the existing collector contract consumer. Scope MSVC C4200
   suppression to the shared flexible-array text declaration and assert its
-  unchanged 8-byte header/byte offset. Windows execution pending.
+  unchanged 8-byte header/byte offset. Windows run `37953377713` at `8ac8040b`
+  passes the integrated collector consumer, existing collector contracts and
+  12 guarded-heap lifecycles. Verify 24 artifacts and 13 source hashes; local
+  collector/host-root regressions also pass.
   Managed Windows code generation and project kits remain unsupported.
 
 - Add a development macOS ARM64 project-to-executable console command using the

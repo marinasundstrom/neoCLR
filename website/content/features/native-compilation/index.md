@@ -81,8 +81,9 @@ library and runtime artifacts; this is not a general publishing workflow for all
   loops and byte-exact UTF-8/NUL output. Scalar comparison results retain typed
   Boolean stack checks; this remains the primitive/console bootstrap. Windows managed services and
   native project kits remain unsupported. An independent Windows guarded-heap
-  host probe passes allocation, guard-boundary and release tests; collector
-  integration and stack protection remain open.
+  host passes allocation, guard-boundary and release tests. Its collector consumer
+  also passes root retention, reclamation, thread isolation and guarded teardown.
+  Stack protection and managed Windows code generation remain open.
 - **Code and APIs:** broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.
 - **Async:** async entry points waiting for host I/O are unsupported; selected

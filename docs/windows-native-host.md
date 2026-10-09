@@ -50,10 +50,11 @@ at `9c3c586e1e4277be5068a4f45fa5033807c92c18` passes all 12 lifecycles on Window
 Server 2022 x64 with warnings treated as errors. All nine downloaded artifact hashes
 match; the three source hashes match the recorded Git revision with Windows checkout
 CRLF line endings. See the [retained report](windows-host-memory-validation.json).
-This qualifies allocation and perimeter protection only; it does not qualify a
-Windows collector, guest memory faults or native stack safety.
+That run qualifies allocation and perimeter protection only. The subsequent
+collector evidence is below; neither run qualifies guest memory faults or native
+stack safety.
 
-## Collector integration: implementation, execution pending
+## Collector integration: working Windows consumer
 
 The private [collector host](../tools/native/windows-gc-host.c) now owns the guarded
 heap and existing `neoclr_aot_context`. The creating thread must remain alive and
@@ -84,7 +85,25 @@ on failure, and collects/releases all storage. The existing C collector contract
 consumer also runs on Windows, covering interior/fault roots, initialized array
 slots, reuse and malformed-descriptor recovery. MSVC C4200 suppression is scoped
 to the C flexible-array text descriptor; static assertions preserve its 8-byte
-header and byte offset. Windows execution is pending.
+header and byte offset.
+
+**Windows execution passed (2026-10-09):**
+[run 37953377713](https://github.com/marinasundstrom/neoCLR/actions/runs/37953377713)
+at `8ac8040b967fc6f70bd793d37bfdd043e7a98d5e` builds and runs `host-collector.exe`
+with `/W4 /WX /O2`. It prints:
+
+```text
+Windows collector: rooted graph, frame handoff, thread isolation, exhaustion and cleanup passed
+```
+
+The existing `collector-contract.exe` also exits zero, and all 12 guarded-heap
+lifecycles still pass. All 24 downloaded artifact hashes and 13 input hashes match
+the recorded revision (with Windows checkout CRLF where applicable). The
+[retained report](windows-collector-validation.json) records commands, outcomes,
+source identities and the earlier strict-build failure. Two focused macOS collector
+and host-root tests pass after the shared-header compatibility change. No collector
+algorithm or Raven compiler changes were needed. These are working native C host
+consumers; managed Windows code generation remains separately gated.
 
 ## Stack protection: required, not implemented by this probe
 
@@ -112,7 +131,10 @@ no TLS dependency, but neither this adapter nor the existing GC roots implement
 activation migration. The eventual host must retain the heap, roots and code
 generation while any activation or callback is live, including while suspended.
 Shutdown/cancellation must first settle those owners and only then release memory.
-This release precondition is not dynamically checked by the raw allocator.
+The raw allocator does not dynamically check this release precondition. The
+collector wrapper now rejects teardown while registered handles or published
+frames are live and from foreign threads. It does not account for unregistered
+suspended work; that requires explicit activation ownership before migration.
 
 Do not cache thread stack bounds as an activation's permanent stack contract.
 Stackful activations need explicit stack ownership and bounds; stackless activations
@@ -122,6 +144,6 @@ first-fault propagation and exactly-once cleanup. Reuse the
 before adding migration or green threads. Current root TLS, callbacks and stack
 adapters remain replacement boundaries, not public scheduling policy.
 
-Next: complete Windows execution of the collector/root-chain consumers, then
-qualify stack protection and managed lowering. Keep Windows managed profiles and project kits rejected until
+Next: qualify Windows stack protection and managed lowering against the working
+collector host. Keep Windows managed profiles and project kits rejected until
 those separate requirements have executable evidence.
