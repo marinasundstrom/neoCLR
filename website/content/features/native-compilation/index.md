@@ -119,5 +119,7 @@ Windows, with shared cancellation, deadline and cleanup contracts. A shared
 socket adapter now passes the same listener, accept and transfer contract tests
 on macOS ARM64 and Windows x64. Native client
 DNS/connect remains unqualified. An opt-in `windows-http` project profile now
-composes the shared server host with Windows heap/stack protection; its native
-Windows execution gate is pending.
+composes the shared server host with Windows heap/stack protection. Five real
+request/fault scenarios now pass with interpreter parity on Windows x64 and
+macOS ARM64, including executable-only deployment. Native HttpClient and Windows
+ARM64 qualification remain open.

@@ -108,5 +108,12 @@ import only KERNEL32 and WS2_32. Scope/root cleanup precedes heap destruction.
 projects, compares five real-request scenarios against the interpreter, executes
 with only the native binary in its directory and no runtime/SDK on PATH, and
 rejects overwrite/stale-output publication. The dedicated Windows HTTP Action
-retains build logs and hashed artifacts. Windows execution is pending. The
-HttpClient DNS/connect work and ARM64 qualification remain separate.
+retains build logs and hashed artifacts. Windows run
+[37961490213](https://github.com/marinasundstrom/neoCLR/actions/runs/37961490213) at
+`353188bf` passes all five cases with exact interpreter parity, as does the
+macOS ARM64 run. [Retained evidence](windows-native-http-project-validation.json)
+verifies all 53 Windows and 29 macOS artifact hashes; all 29 Windows and 25 macOS
+tracked build inputs match the commit, including checkout line endings. The
+32 Windows bundle inputs match the pinned bundle and both build reports use
+the same recorded backend hash. The x64 console regression also passes in run
+`37961490084`. HttpClient DNS/connect and ARM64 qualification remain separate.

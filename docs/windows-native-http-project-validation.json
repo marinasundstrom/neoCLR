@@ -1,0 +1,794 @@
+{
+  "date": "2026-10-09",
+  "passed": true,
+  "revision": "353188bfa6fa68e6272e09ad860207ddc911cc10",
+  "workflowRun": 37961490213,
+  "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/37961490213",
+  "scope": "Development Windows x64 HTTP server project integration with macOS ARM64 parity; no native HttpClient or Windows ARM64 qualification",
+  "localNote": "Local run started before commit; every tracked build input independently matches this revision.",
+  "validation": [
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "reportSha256": "69360493b9d6f5d9e7b0e201df5b6285ae58563be2404fdc75c7228244ba9be6",
+      "verifiedArtifacts": 53,
+      "inputVerification": {
+        "backend-report-match": 1,
+        "bundle": 32,
+        "project": 2,
+        "source": 29
+      },
+      "inputs": {
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py": {
+          "sha256": "80bba8268c41a33dbc28904539d6d638746cee0eecd237294965d5df383fb9a8",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\fault project with spaces\\App.rvnproj": {
+          "sha256": "1c2fdb556f3513d84bd0501dd9570083a19631cb69fd293181613c9a46077ba8",
+          "verification": "project"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\bundle.json": {
+          "sha256": "3ad7347c77520f17d454e91331d909628b3cb63d4dc6090c3c210f797d266958",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\debug\\neoclr-aot-poc.exe": {
+          "sha256": "a9834fac482fcd8446e762a43894dbcd7054f96830f65297d0a30b3180eeaa6d",
+          "verification": "backend-report-match"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Runtime.dll": {
+          "sha256": "b6e56be4e8908d3d530b9c1ed79ad1bb6089127f5c7f5f514c464944b293da5e",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Data.dll": {
+          "sha256": "8251b72579c759a894dbce3b00804d66d606b2f7670264891951ded2d6b4c1be",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Networking.dll": {
+          "sha256": "2e8db5178993e16ac3f46af077f6b3dd402178a910a64f14b4ac85de0f467840",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.Web.dll": {
+          "sha256": "43b6799439b9bde7a97af226637db3219f1a160a5edb6e077cbb0b1598c21832",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\System.runtime.neox": {
+          "sha256": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\NeoCLR.ClassLibrary.props": {
+          "sha256": "3cd2d52dfff595e759cbde6a5c2801e23795f790d7dd90b62f6a9d97e4fe0c11",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\Core.dll": {
+          "sha256": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\lib\\ownership.json": {
+          "sha256": "c5410dc4a208513219e02f7c895fd8e2a4912bb9a718e5f66dda007e6ba85ef9",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-console-host.c": {
+          "sha256": "e9b83f6d9d119be64efdbf23688196e5675f235a2abef6d5c13cbfef9d140bd9",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c": {
+          "sha256": "1af29df8568c25d43fc95c24be354e7486b09901878b5b99cb6e8b2d190ef03a",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c": {
+          "sha256": "774114602ce99ea6d2f69d613cb7b5c26f6d3f2af5fc91edebcb70c51db1d59d",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c": {
+          "sha256": "ae24c1a05235ec25e3df672d548d5b4ae75811ede0fbb7988efbbc859bbb9b84",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c": {
+          "sha256": "53c89bf572e362623da7bac7241c19744aa79b3310f951c520b570e448bc5a67",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c": {
+          "sha256": "a3d1690a5a38f2c116a106760f30db79badd3a4f86198d61501a05a250fdc5d4",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c": {
+          "sha256": "ead9f336a394e3dfdb82d9916d29a2f4e4cbc1db8cc5ebfc53cc75050917374e",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\console.c": {
+          "sha256": "4e66906f7ab938c2ea9e5b2d8d171c9ffe07da07f7ec5d588f596d1cd22e6678",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-fault-details\\render.c": {
+          "sha256": "a64b1bc44da5095e70d5a30c8e58af6305a14df3e270741a11334e1d9de8850e",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\native-web\\http-host.c": {
+          "sha256": "fdeb6fe2444ac89fc683481325d183790e6fb305534538c0c1535a3708341856",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\task-queue.c": {
+          "sha256": "2fa2f2457f2c308a2f641fdda713e3d1abeeb3e993a37818f9ad81c3f739dbfd",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c": {
+          "sha256": "5fb0d5de6265830e464a538704a043dfc911669f83fa4529b79f173fb8872d32",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\console.h": {
+          "sha256": "9a0669bebeb7e94e7e284cfa670327394c9d47bfe1c6b0a3482ae5b2a01b13d3",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\file-input.h": {
+          "sha256": "1d9417f18a7b6437aabdd19a5d1274b4b9d9a365ca88a71d6255140d31780753",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\file-output.h": {
+          "sha256": "fdd1420cdf244d11046883d67b11c221e905d328c266b27cd37ac95c35704e8f",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.h": {
+          "sha256": "791d698ec40abaaf6a199e90e4e4c9299c666c5d9d40f6375320ca9ccb75bcc6",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-stack.h": {
+          "sha256": "49849a834d7599685a8880bcdcda0505ce0465175eb7b38d841c660731d7610f",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.h": {
+          "sha256": "f9b59905e5167081517a1c142294df7485a619aec1332fced0ee25c2043b0698",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.h": {
+          "sha256": "ba7c4da1eba73be6a490ed40e8e19c8ab819dc5df43af54d101b8ba9a4c41b36",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-os.h": {
+          "sha256": "c2851391b925acf6a362906b835e14bdb28a562e999cc88479a11a0c65a9736e",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\string-unicode.h": {
+          "sha256": "99c078e3aacbb1de67b5253314ee53d65d5c2970de7677a9f7b01c98a72ef801",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\task-queue.h": {
+          "sha256": "e24e3209b496681302069ddd11725dff6255e05a1d4ba367c3dbe739f091828b",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.h": {
+          "sha256": "03e670e1cb6885096f1999dd5947f26088f45873f3a1ffa3bfeb2775c0560404",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-scalar\\abi.h": {
+          "sha256": "1f197432f88cdfc0df8652444ec6e06b5b677d513c3a3dd12f6b50dd25ee4512",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-scalar\\console.h": {
+          "sha256": "0cda9317577bacf03f2658bd9cee6bfb5b83b03f00e39bca11bc42f012a36393",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-fault-details\\fault-details.h": {
+          "sha256": "bb717fcf0645ee35682d6a05ec555c8824426f25bf0745c4368b34eb2964a6cb",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Markdig.dll": {
+          "sha256": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Microsoft.Build.Locator.dll": {
+          "sha256": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Microsoft.CodeAnalysis.CSharp.dll": {
+          "sha256": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Microsoft.CodeAnalysis.dll": {
+          "sha256": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Microsoft.NET.HostModel.dll": {
+          "sha256": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Mono.Cecil.dll": {
+          "sha256": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Mono.Cecil.Mdb.dll": {
+          "sha256": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Mono.Cecil.Pdb.dll": {
+          "sha256": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Mono.Cecil.Rocks.dll": {
+          "sha256": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\NeoCLR.Metadata.Experimental.dll": {
+          "sha256": "0f18156ebcc7b1fef3b2cf45feecc0945d64e1121ae6809974afa33aff52b7af",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Raven.CodeAnalysis.Console.dll": {
+          "sha256": "7e1f88357cae15c987104a9ce1a18e90eee9025d45e584d753aaecc0dcb3fe09",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Raven.CodeAnalysis.dll": {
+          "sha256": "a41d381370cffdf18d03aed5d96152c8060a288f7a573339eefa3fabc66e50aa",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Raven.CodeAnalysis.NeoClr.dll": {
+          "sha256": "50fa147bc7d0c28491cfa191444ecdfb8e5ad644e8aab6331d782cc18bee36f1",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Raven.Core.dll": {
+          "sha256": "9a661999845c8940fad5ed5eaaa2bdb00de1032b4f544ae754e7dd1066d7ffcf",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\RavenDoc.dll": {
+          "sha256": "fcc25ecd1736c05fada020a40737a54ed3b0accdc6e77b0814ca56dea8ec663f",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.dll": {
+          "sha256": "1e4697ee8febf7b997c05ceff081de2a3675273e2ec214f2430efc9679b26edb",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\Spectre.Console.dll": {
+          "sha256": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\System.Reflection.MetadataLoadContext.dll": {
+          "sha256": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\YamlDotNet.dll": {
+          "sha256": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\RavenDoc.deps.json": {
+          "sha256": "55692e59dead5358e32dc7b44924a4578bd194f8b56fe00481530cb568ab3a24",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\RavenDoc.runtimeconfig.json": {
+          "sha256": "7ed127d518025dc407a379eb73f23a389adcbbc780fde71314303e0ca1df615b",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.deps.json": {
+          "sha256": "60d5666dd3d7b82bfafd9ab71314b6f85838600cd4e89a6d67b47e1a1c8c495b",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-project-prerequisites\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.runtimeconfig.json": {
+          "sha256": "7ed127d518025dc407a379eb73f23a389adcbbc780fde71314303e0ca1df615b",
+          "verification": "bundle"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.h": {
+          "sha256": "f9e0d59e9b4811e6ea7f0f5fe5d13824d1e16c14f5c0532dbbe1357a75f8987e",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.h": {
+          "sha256": "370ec5f2a8d73db08144c70aa51fb8fe3704b038fd3b9dbb0b26630826c5f6c9",
+          "verification": "source"
+        },
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\server project with spaces\\App.rvnproj": {
+          "sha256": "1c2fdb556f3513d84bd0501dd9570083a19631cb69fd293181613c9a46077ba8",
+          "verification": "project"
+        }
+      },
+      "builds": [
+        {
+          "name": "fault native output",
+          "sha256": "956c1fa2b646914e84f801728f9446187c66c60a449150738827e46ca674268b",
+          "profile": "windows-x64-http-v1",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "artifacts": {
+            "app.dll": "b5126f0e7551eb5834b3e511ae28ec3b7ccf62e8ceaa64a804ae7a595f6d9be6",
+            "app.obj": "e8ee65fe3fbf31e18df06bca8ba0b2c49e051cdcb95fa028fbdf89b170215586",
+            "app.exe": "a7f1f1f704baeeb6931a4c973c59fddd01c5eb17fa569b14082024e472bd5afc"
+          }
+        },
+        {
+          "name": "server native output",
+          "sha256": "0312dd2301f9ff947bcc8c3981134c310eca8310b48af75e8f33dc82c3ca7fad",
+          "profile": "windows-x64-http-v1",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "artifacts": {
+            "app.dll": "27f597ab27213f5318b182b601163cdde410eb832d8cbd9b61aa032c7e1cb3bb",
+            "app.obj": "eec68b8adc787ff18b2f3480cc78a8394489820f4f41e19ea3cf8e0b43492b99",
+            "app.exe": "be3c4ddf478f1088bda5936edc6195059974ad03c91974e55b5d577cbff483f5"
+          }
+        }
+      ],
+      "cases": [
+        {
+          "name": "greeting",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "passed": true
+        },
+        {
+          "name": "fragmented",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "passed": true
+        },
+        {
+          "name": "duplicate-length",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "passed": true
+        },
+        {
+          "name": "handler-error",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "passed": true
+        },
+        {
+          "name": "callback-fault",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "Other work runs while HTTP accept is pending\n",
+            "stderr": "UserFault: HTTP callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_526573706F6E64 [instruction 1]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_4874747053657276654F7065726174696F6E.M_4F6E4163636570746564 [instruction 102]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 1,
+            "stdout": "Other work runs while HTTP accept is pending\n",
+            "stderr": "UserFault: HTTP callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_526573706F6E64 [instruction 1]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_4874747053657276654F7065726174696F6E.M_4F6E4163636570746564 [instruction 102]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n",
+            "responseHex": ""
+          },
+          "passed": true
+        }
+      ],
+      "standalone": true,
+      "existingOutputPreserved": true,
+      "staleOutputRejected": true
+    },
+    {
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "reportSha256": "d33f0eeb9ac615626344f1793770b9c7e69f145df89905569bb883c2a622eccc",
+      "verifiedArtifacts": 29,
+      "inputVerification": {
+        "local-input": 35,
+        "source": 25
+      },
+      "inputs": {
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py": {
+          "sha256": "01561128fe148d80979be18b64328f2a0dc2eb0906ff4c0a7470abe6d0f768b6",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/target/http-parity-project-local-2/fault project with spaces/App.rvnproj": {
+          "sha256": "1c2fdb556f3513d84bd0501dd9570083a19631cb69fd293181613c9a46077ba8",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/lib/bundle.json": {
+          "sha256": "dc8158cfecd8e78bad1abbefdfcb8a6ecb5ae333151f05665ce7a079067fae14",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": {
+          "sha256": "7b1123670cb3c54fe17d745ceb548ffed2b89f3c727761b328dbdffea21d7ee2",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/lib/System.Runtime.dll": {
+          "sha256": "48a1f70a5ec03a014513b9435143a522b899c7aa87360140f38b01aecdf0ad22",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/lib/System.Data.dll": {
+          "sha256": "a5aee2d42b20208a9ef98d84fdd0015d9eec19d5cfbbc6f0abac92817f55bf00",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/lib/System.Networking.dll": {
+          "sha256": "e1ec6f25882f29ebfaefdbf3eb6d737b8d6ae46dc7d7071b873b49a2474f66a2",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/lib/System.Web.dll": {
+          "sha256": "8db239ee54c899764552c365d6b1e5b21cc4c54c0cb9121cc64d5415875eaa32",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/lib/System.runtime.neox": {
+          "sha256": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/lib/NeoCLR.ClassLibrary.props": {
+          "sha256": "772a570a1ef9193e69fa646fe57a3ee90f220f23395892f4ba5c619c7db02112",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/lib/Core.dll": {
+          "sha256": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/lib/ownership.json": {
+          "sha256": "25d07114dc5f19fc2f97e66c4add67d63a9b5b831edcabfe841e45af431873dd",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c": {
+          "sha256": "0ff3ec85ea703f794b2045106cc04f3e2f55002eea242190ef2f9c00518b1465",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": {
+          "sha256": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": {
+          "sha256": "7c696716ed616f31d5833f225feae24508151405b381096683b10553459af5fa",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": {
+          "sha256": "911021e591a5dc8e3effed7007a540ba227ca5ac64d796696f49780c81e86efb",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": {
+          "sha256": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": {
+          "sha256": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": {
+          "sha256": "9f49363611400a570209716219c64ffb4df9f4d1c31185e163cd773d51a427b9",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c": {
+          "sha256": "e0d472372663f9c15b131144a83a451ef321342a397f93b61f4db8125e703502",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c": {
+          "sha256": "142d94033765ab413ab01f9616c47a03c1cde4e8ac1c6244baf9d356011954f8",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c": {
+          "sha256": "1f0189d7c8515b53b2b25166ac40bd71f16a7d3f9e63755dc2508fef895cdf97",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": {
+          "sha256": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": {
+          "sha256": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": {
+          "sha256": "142739de0dc239852a451d361bf3a7f573790d5224c151fa97341d0447e6e74b",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.h": {
+          "sha256": "e492bd4f34ec672cca12e15aba25ce83c3e2dc6c985eb6a173e030f57510531d",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.h": {
+          "sha256": "7bbbb18bea726a2f9c8e1a5cbc9b01c8b5f02ffaf7f5cb3487d3f0e3e20ff5c2",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.h": {
+          "sha256": "a1a9840482a2b50f20ba5080eb96453a46e4416238b3403343e03e9c2c84d3f4",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-os.h": {
+          "sha256": "a01419c62fa8a1d3d9131282c5af182f200ba149a440d52c81104e2a156f7ef0",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": {
+          "sha256": "f2dcc1dfcb410a919c25bd290a19149366a36426ca0683b704a4da0a8d06b355",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": {
+          "sha256": "fb7c79ba2ce8875fc6965df05d49ad357a2be9c4083eb62ec7bf43888bba1504",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": {
+          "sha256": "b4dbae37afe2b8e64b15a3cea1e5b55868aa487da44e7369ff2d063df5a2e99b",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-output.h": {
+          "sha256": "f13171699f402f05ea2ab0e4e1686f227bbe48d65c8b48a62e5f94200605e88e",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.h": {
+          "sha256": "d3db18f048ad9c214af9a22327f0dcfe45b91251e9c6d60827534c5d8fc642e1",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/abi.h": {
+          "sha256": "8fd166293a4d011efefc80fa8e3baa9baf8c10dc77c5cda6d596736779ebaa34",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": {
+          "sha256": "2bff27d6fbe97a06fa47bf7c2e286f2731fe2fa7f71a0d1cbb4e2fdd1e4690bd",
+          "verification": "source"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Mono.Cecil.Rocks.dll": {
+          "sha256": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Microsoft.NET.HostModel.dll": {
+          "sha256": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/System.Reflection.MetadataLoadContext.dll": {
+          "sha256": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/RavenDoc.dll": {
+          "sha256": "0e1c4c98e82700eb20268eb3a7fcf96c91971187c9e3bf064227c7795b209e6c",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Microsoft.Build.Locator.dll": {
+          "sha256": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Microsoft.CodeAnalysis.CSharp.dll": {
+          "sha256": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Spectre.Console.dll": {
+          "sha256": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.Console.dll": {
+          "sha256": "6e4c9ea7baa3565001fdb5d0c596437ecf41eb18de2f011175eb45350821ac20",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": {
+          "sha256": "1445c8e3d0ef3c7b50351738e9b807fba28a1504ab757fff29aa4213abbbe1b8",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/rvnc.dll": {
+          "sha256": "171b7602c5ac032995bfd81f62641a50c9a5f5349986d70bbbed91a11f2f451a",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Markdig.dll": {
+          "sha256": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": {
+          "sha256": "4aa209502721dac703cafd8bb841a9663abd267459ef3081f172eb681d045296",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Mono.Cecil.dll": {
+          "sha256": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.dll": {
+          "sha256": "276b715ab02cf1583ca31d98eb496e6fd4cb0d6034ec9ce900862e29363ee9bb",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Raven.Core.dll": {
+          "sha256": "abc6044036575d7a6e99c134a565db320daa1d73917aecbb0d61ab12b0c7526d",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/YamlDotNet.dll": {
+          "sha256": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Microsoft.CodeAnalysis.dll": {
+          "sha256": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Mono.Cecil.Pdb.dll": {
+          "sha256": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Mono.Cecil.Mdb.dll": {
+          "sha256": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/RavenDoc.runtimeconfig.json": {
+          "sha256": "32e94cb893827f13eef94d45bc329826a644e229dcceb1e1201ac973f003efb6",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/rvnc.runtimeconfig.json": {
+          "sha256": "32e94cb893827f13eef94d45bc329826a644e229dcceb1e1201ac973f003efb6",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/rvnc.deps.json": {
+          "sha256": "76cb5679b35497825f750bdfa519af9ed6b0c10bf7297b277af2704c3b463ee0",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/RavenDoc.deps.json": {
+          "sha256": "7557fd05b518e9104686f16f3988986222083740cb363e9937ffbcd7b04864fa",
+          "verification": "local-input"
+        },
+        "/Users/robert/Projects/neoclr/target/http-parity-project-local-2/server project with spaces/App.rvnproj": {
+          "sha256": "1c2fdb556f3513d84bd0501dd9570083a19631cb69fd293181613c9a46077ba8",
+          "verification": "local-input"
+        }
+      },
+      "builds": [
+        {
+          "name": "fault native output",
+          "sha256": "1b03739f72062f3d7c0e25d8c68a86b49b570244f8189846881a6bbfe3f6e9ed",
+          "profile": "macos-arm64-http-v1",
+          "dependencies": [
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "artifacts": {
+            "app.dll": "7e3774ab219a1ac983475c1e0a86e6283b286edbd4d40e67bafd550692009b8e",
+            "app.o": "3431d98f890c04cc0e547b1d6556ce24d39b8dd623b34c47fadee4260971bd75",
+            "app": "0587ea169b6392c6e05e5f385c9059b2a1bd99c323c92755ce10a0ca67091ca1"
+          }
+        },
+        {
+          "name": "server native output",
+          "sha256": "787e515efcca2526c70e253b239c9dfa27d6f23f7819890643db92e34c943f46",
+          "profile": "macos-arm64-http-v1",
+          "dependencies": [
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "artifacts": {
+            "app.dll": "7831ee7d70bddffdf6268c069c5b5072a75ddfcadb4be84425ba94c26d2a0c79",
+            "app.o": "004ba344de1cdcc682cb1d63a2b895e11386adfd3ab255973daeaa995e48e72b",
+            "app": "b07a4f4c4505de2c66e0baaffe3e71b97e044ab707d816757dc9f528970319c0"
+          }
+        }
+      ],
+      "cases": [
+        {
+          "name": "greeting",
+          "dependencies": [
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "passed": true
+        },
+        {
+          "name": "fragmented",
+          "dependencies": [
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "passed": true
+        },
+        {
+          "name": "duplicate-length",
+          "dependencies": [
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "passed": true
+        },
+        {
+          "name": "handler-error",
+          "dependencies": [
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "passed": true
+        },
+        {
+          "name": "callback-fault",
+          "dependencies": [
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "Other work runs while HTTP accept is pending\n",
+            "stderr": "UserFault: HTTP callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_526573706F6E64 [instruction 1]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_4874747053657276654F7065726174696F6E.M_4F6E4163636570746564 [instruction 102]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 1,
+            "stdout": "Other work runs while HTTP accept is pending\n",
+            "stderr": "UserFault: HTTP callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_526573706F6E64 [instruction 1]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_4874747053657276654F7065726174696F6E.M_4F6E4163636570746564 [instruction 102]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n",
+            "responseHex": ""
+          },
+          "passed": true
+        }
+      ],
+      "standalone": true,
+      "existingOutputPreserved": true,
+      "staleOutputRejected": true
+    }
+  ]
+}

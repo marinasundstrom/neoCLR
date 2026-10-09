@@ -57,3 +57,13 @@ compares one compiled artifact across interpreter/native execution for four requ
 cases, with response/output parity and native cleanup checks. This narrower evidence
 complements the interpreter verifier above; it does not carry over its entire case
 matrix to native mode or establish server throughput. The POC remains work in progress.
+
+## Native project showcase (2026-10-09 development)
+
+`Native.rvnproj` builds this same source with the selected native compiler/library
+bundle. Use `--profile http` on macOS ARM64 or `--profile windows-http` from a
+Windows x64 MSVC developer shell; see the [project instructions](../../native-poc-bundle.md#windows-http-project-profile-development).
+The five-case [project evidence](../../windows-native-http-project-validation.json)
+passes on both platforms, including executable-only deployment and callback faults.
+This qualification is for the bounded server; native HttpClient and Windows ARM64
+remain separate work.

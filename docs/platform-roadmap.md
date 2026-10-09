@@ -32,12 +32,16 @@ HTTP/network contract and qualify both platforms with the same scenarios. The
 [parity plan](native-http-parity.md) tracks the shared socket adapter, Windows
 server host and missing native DNS/outbound-connect bindings. The first
 [shared socket gate](native-network-parity-validation.json) passes all three
-listener/accept/transfer consumers on macOS ARM64 and Windows x64 at `da8ca1f2`;
-HTTP project/client qualification remains separate. The author also requests
+listener/accept/transfer consumers on macOS ARM64 and Windows x64 at `da8ca1f2`.
+The subsequent [Windows HTTP project gate](windows-native-http-project-validation.json)
+passes at `353188bf`: standalone greeting, fragmented input, duplicate-length
+rejection, handler errors and callback faults, with interpreter parity on Windows
+x64 and macOS ARM64. Native HttpClient DNS/connect remains open. The author also requests
 native Windows ARM64 support. Track it as an additional target, with explicit
 ABI, stack-probing, host/toolchain and native-execution gates; do not equate x64
-emulation with ARM64 qualification. Continue Windows HTTP project integration
-first, as explicitly prioritized for the showcase.
+emulation with ARM64 qualification. The author prioritized Windows HTTP project
+integration first; that bounded gate now passes. Next close the shared native
+HttpClient DNS/connect gap.
 
 **Author clarification (2026-10-09):** once the native compilation foundations are
 ready, let runtime suspension, runtime-owned scheduling and green threads co-evolve

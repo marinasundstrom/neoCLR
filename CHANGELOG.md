@@ -22,7 +22,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   remains planned. Add an opt-in Windows HTTP project profile
   with guarded heap/stack admission, shared HTTP callback loop, binary output and
   system-only KERNEL32/WS2_32 imports. Add paired interpreter/standalone request
-  and fault validation; Windows execution qualification is pending.
+  and fault validation. Windows run `37961490213` at `353188bf` passes all
+  five scenarios with exact interpreter parity, executable-only deployment and
+  overwrite/stale-output rejection; the same macOS cases pass. Verify 53 Windows
+  and 29 macOS artifact hashes, matching source and bundle inputs. Add the
+  validated HTTP project template and standalone showcase instructions.
 
 - Add explicit `x86_64-pc-windows-msvc` AOT target selection for the bounded scalar
   and literal-console profile, emitting x64 COFF with the target calling convention.

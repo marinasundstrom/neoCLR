@@ -334,7 +334,7 @@ From a Windows x64 MSVC developer shell, with the same pinned bundle and backend
 prerequisites as the console profile:
 
 ```powershell
-python scripts/build-native-project.py --profile windows-http --project path/to/App.rvnproj --bundle path/to/neoclr-native-poc --aot path/to/neoclr-aot-poc.exe --output path/to/new-output
+python scripts/build-native-project.py --profile windows-http --project docs/experiments/http-server/Native.rvnproj --bundle path/to/neoclr-native-poc --aot path/to/neoclr-aot-poc.exe --output path/to/new-output
 path/to/new-output/app.exe
 ```
 
@@ -342,4 +342,13 @@ This opt-in profile supports the bounded HttpServer showcase with the shared
 HTTP host, Winsock and guarded Windows collector/stack owner. Its only admitted
 dynamic dependencies are KERNEL32.dll and WS2_32.dll. Validation and remaining
 client/ARM64 boundaries are tracked in [HTTP parity](native-http-parity.md).
-Windows execution qualification is pending; this is not general HttpClient support.
+Windows run [37961490213](https://github.com/marinasundstrom/neoCLR/actions/runs/37961490213)
+passes greeting, fragmented requests, duplicate-length rejection, handler errors
+and callback faults with interpreter parity. The same cases pass on macOS ARM64.
+This is the bounded server showcase, not general HttpClient support.
+
+The sample prints an ephemeral loopback port and serves one request. In a second
+terminal run `curl.exe http://127.0.0.1:<printed-port>/greeting` on Windows (or
+`curl` on macOS). The body is `Café 🌍`; the server then closes. Select
+`--profile http` for the same sample on macOS. The checked-in project matches the
+validated project template and imports the bundle selected by the builder.

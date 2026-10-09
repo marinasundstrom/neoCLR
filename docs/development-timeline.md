@@ -12866,3 +12866,14 @@ claim follows from these focused checks.
 - **HTTP implementation action:** adds the opt-in Windows HTTP backend/project
   profile, shared macOS/Windows callback loop and standalone request/fault gate.
   Local backend admission tests pass; Windows execution evidence remains pending.
+
+- **HTTP outcome:** run [37961490213](https://github.com/marinasundstrom/neoCLR/actions/runs/37961490213)
+  at `353188bf` passes all five real-request/fault cases in standalone Windows
+  EXEs, matching the interpreter exactly. The same macOS cases pass. Only
+  KERNEL32/WS2_32 are imported; overwrite/stale-output rejection and host cleanup
+  exit checks pass. Verifies 53 Windows and 29 macOS artifacts and matching
+  source/bundle inputs in [the evidence](windows-native-http-project-validation.json).
+  Windows console regression run `37961490084` also passes.
+- **Remaining:** native HttpClient DNS/connect, Windows ARM64 qualification and
+  broader hosting/scheduling. The bounded Windows HTTP server project integration
+  requested for this slice is working.
