@@ -14,7 +14,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Prepare Windows x64 and macOS ARM64 release qualification. Apply Rust formatting
   and replace an equivalent metadata-version pattern to satisfy strict Clippy on
-  the current toolchain; no metadata admission behavior changes.
+  the current toolchain; remove an unnecessary cloned test expectation as well.
+  No metadata admission behavior changes.
 
 - Record the completed author-directed Raven website publication: validate shared
   RavenDoc Type extension presentation for .NET and introduce neoCLR as a related

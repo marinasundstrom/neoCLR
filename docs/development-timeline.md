@@ -12459,3 +12459,20 @@ claim follows from these focused checks.
   reports source commit `e56c810845cbdb4bf3940ddfe06edd38fa750197`. Verified the
   published neoCLR link and .NET target wording, plus the extension reference's
   receiver, assembly and desktop/mobile layout. No neoCLR package release was started.
+
+### 2026-10-09 — Windows and macOS release qualification
+
+- **Author:** requested continuation with the neoCLR release, calling this the
+  "Last chance to fix things" and specifying Windows and macOS.
+- **Assistant:** selected the next sequential preview candidate (Preview 13),
+  Windows x64 and macOS ARM64, and started fresh runtime, compiler, package and
+  hosted checks. The author previously clarified the bounded POC scope; complete
+  platform support is not inferred from this release request.
+- **Findings/actions:** fixed Rust formatting and strict-lint issues, and refreshed
+  the stale Preview 12 seed checksum for the added String.Replace service. The
+  website build passed. Initial local AOT link failures identified a mismatched
+  macOS SDK; checks were restarted with the matching Xcode SDK.
+- **Open:** source/host gates, extracted package and editor qualification, exact
+  release assets and publication. ARM64 AOT evidence does not establish Windows
+  x64 native-code generation. Full source-owned native core bootstrap remains
+  explicitly outside the completed String subset.

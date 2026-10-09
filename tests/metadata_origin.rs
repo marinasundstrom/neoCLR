@@ -193,7 +193,10 @@ fn constants_preserve_bits_and_reject_invalid_contracts() {
     module.assemblies[0].constants.push(constant.clone());
     let json = serde_json::to_string(&module).unwrap();
     let roundtrip = load(&json).unwrap();
-    assert_eq!(roundtrip.assemblies[0].constants, [constant.clone()]);
+    assert_eq!(
+        roundtrip.assemblies[0].constants.as_slice(),
+        std::slice::from_ref(&constant)
+    );
     for (field, value) in [
         ("bits", "7ff0000000000000"),
         ("bits", "XYZ"),
