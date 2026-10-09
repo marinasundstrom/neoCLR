@@ -59,6 +59,16 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   with a dedicated container icon and linked receiver types. Validates source,
   imported .NET and native reference rendering, preserving ordinary static classes.
 
+- **Author refinement:** requests a receiver section with separately clickable type
+  components, a Type parameters table like other generic types, and a separate
+  Type extensions group on module pages showing each receiver in the list. Then
+  directs renaming the visible Extension container label to Type extension and
+  placing Receiver above Type parameters.
+- **Assistant action:** reuses the shared contract-type formatter and type-parameter
+  documentation table, adds Operators' element-type description, and separates
+  extension listings from ordinary types. Original container parameter identity and
+  constraints lost by imported metadata are not inferred from method parameters.
+
 ## 2026-10-09 — Architecture and metadata explanations
 
 - **Author:** requests repository documentation and website pages for architecture

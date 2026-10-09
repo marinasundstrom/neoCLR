@@ -39,10 +39,20 @@ def main():
         assert f'field_{constant}.html' in navigation
         constant_link = re.search(r'<a[^>]*href="[^"]*System/Math/field_' + constant + r'\.html"[^>]*>.*?</a>', navigation, re.S)
         assert constant_link and 'symbol-icon--field' in constant_link[0]
+    linq_module = (source / 'System/Linq/index.html').read_text()
+    assert 'id="type-extensions"' in linq_module
+    assert 'Operators for Iterable&lt;T&gt;' in linq_module
+    extension_group = re.search(r'<section[^>]*aria-labelledby="type-extensions".*?</section>', linq_module, re.S)
+    assert extension_group and 'Operators' in extension_group[0] and 'SingleError' not in extension_group[0]
     operators = (source / 'System/Linq/Operators/index.html').read_text()
-    assert '<span>Extension container</span>' in operators
+    assert '<span>Type extension</span>' in operators
     assert 'extension Operators for Iterable&lt;T&gt;' in operators
-    assert '<strong>Receiver type</strong>' in operators
+    assert 'id="receiver"' in operators
+    assert 'id="type-parameters"' in operators
+    assert operators.index('id="receiver"') < operators.index('id="type-parameters"') < operators.index('id="remarks"')
+    assert 'The element type.' in operators
+    assert '>Iterable</a>&lt;<a href="#type-parameters">T</a>&gt;' in operators
+    assert '<strong>Receiver type</strong>' not in operators
     assert 'Iterable%601/index.html' in operators
     assert 'static class Operators' not in operators
     extension_link = re.search(r'<a[^>]*href="[^"]*System/Linq/Operators/index\.html"[^>]*>.*?</a>', navigation, re.S)

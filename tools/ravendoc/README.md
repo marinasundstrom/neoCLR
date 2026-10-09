@@ -50,8 +50,9 @@ API lists default to compact name-first signatures, including parameter lists,
 property/field types and method return types. Full Raven declarations remain on
 individual pages; `memberListStyle: signatures` opts into them in lists. Icons
 identify classes (C), interfaces (I), enums (E), unions (U), delegates (D) and structs (S), with
-a separate static-member badge. Extension containers use a puzzle-piece icon,
-receiver-aware declarations and linked receiver types. Navigation reuses the function glyph for free
+a separate static-member badge. Type extensions use a puzzle-piece icon, receiver-aware declarations and a
+dedicated receiver section with separately linked type components. Module pages
+group Type extensions separately and include receiver names in their entries. Navigation reuses the function glyph for free
 functions and the field glyph for constants, matching member lists. Module/namespace
 overviews place constants under Constants instead of the generic Members group. `apiNavigationRoot: docs` enables the section
 sidebar on authored pages under `docs` as well as generated reference pages.

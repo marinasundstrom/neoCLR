@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Give extension receivers a dedicated API section with separately linked type
+  components and type-parameter navigation. Document Operators' element type in
+  the same Type parameters table used by generic types. Module pages list Type
+  extensions separately and show their receivers. Use Type extension in page labels
+  and icon tooltips; place Receiver before Type parameters and Remarks. Share the
+  rendering with Raven.
+
 - Add native metadata `ValueIs` and `ValueUnpack` operands for typed inspection of
   runtime erased results, including generic extraction. Reject incompatible stacks
   and executable CLI emission; validate matching and mismatched UTF-8 slice results.

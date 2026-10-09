@@ -280,3 +280,28 @@ The production native audit, 21 website tests and full 3,490-page build/link che
 pass. Browser review confirms Operators' distinct icon, extension declaration and
 linked `Iterable<T>` receiver. Existing missing-description notices remain; website
 publication is separate.
+
+### Receiver and type-parameter sections
+
+Receiver expressions now have their own section, using the shared contract-type
+formatter to link nested named components independently. Documented parameters link
+to the existing Type parameters table. Operators' authored XML now documents T as
+the element type. This is a sidecar-only correction: the verified reference assembly
+and source fingerprints are unchanged, and only the XML input checksum is updated.
+Parameter constraints are not guessed from receiver usage or lifted method parameters.
+
+Module pages group Type extensions separately and show receiver names in each entry.
+Page labels and icon tooltips use Type extension.
+
+Shared implementation: Raven main `97b519bdc26ba6aeb8b7b6c27563a99654a003b1`;
+neoCLR publisher integration `17fc78ba9d441c7151b48c17894acc00fcadc90f`.
+All 42 focused RavenDoc/namespace tests pass, including source/metadata parameter
+descriptions, nested receiver links, multiple receivers and separate extension groups.
+The native audit inputs refresh Operators' XML entry from the reviewed sidecar;
+its original type identity and binaries remain unchanged.
+
+Receiver follows the introduction and precedes Type parameters and Remarks.
+Final validation: 42 focused publisher tests, 21 website tests, the reference snapshot
+check, production native audit and full 3,490-page build/link checks pass. Browser
+review confirms separate Type extensions, linked receiver components, the Type
+parameters table and Receiver-before-Type-parameters ordering. Publication is separate.
