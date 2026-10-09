@@ -481,3 +481,75 @@ x64 in [action 37988417870](https://github.com/marinasundstrom/neoCLR/actions/ru
 All fourteen reports and source/artifact hashes are verified in
 [array evidence](native-reflection-array-validation.json). This also qualifies the
 vector descriptor changes present in the earlier successful action 37986218456.
+
+## Public descriptor snapshots and first flat round trip — 2026-10-09
+
+TypeProperties now creates ordinary traced runtime descriptors for explicitly rooted
+property metadata. A feature-gated Rust bridge, private to the in-repository native
+compiler, obtains recipes from the interpreter's metadata queries. It preserves
+source member/accessor identities, metadata tokens, index and accessor parameters,
+visibility and optional module records. Standard Option case constructors and the
+existing runtime provider constructors materialize the snapshots; the backend does
+not invent a second JSON-specific descriptor format. Source metadata identities
+are assigned before canonical relocation so recipe handles remain resolvable.
+
+Original load-set access is verified first. The backend then gives internal access
+only to the exact scoped runtime snapshot constructors and mutable identity fields
+needed to finish these freshly allocated descriptors. The report lists these factory
+projections; user model fields/accessors are not promoted. Source origins remain
+unchanged. This is a temporary private materialization bridge, with constructor/layout
+coupling and generated code/allocation costs; image-owned descriptor tables remain
+the intended later representation. No public Raven API or compiler bridge change is
+required. The installed runtime does not enable the Rust native-metadata feature.
+
+Element lookup returns the existing Option<TypeInfo> for explicitly produced closed
+vector tokens. Nonarrays return None; an unknown vector fails explicitly. Generic
+flows that produce additional vectors still need retention-closure work. Property
+queries apply current public/nonpublic and instance/static flags and preserve the
+existing declared-only enumeration behavior; invalid flag bits fail explicitly.
+Fresh descriptor wrappers do not grant invocation rights.
+
+The expanded public Raven consumer discovers its property, reflects its getter/setter
+signatures and setter parameter/module metadata, performs GetValue/SetValue, checks
+filtering and resolves an array element. Interpreter/native macOS runs both print
+Report and exit zero. This exposed inherited interface implementations on descriptor
+providers: native selection now reuses VM conformance-anchor resolution for class
+inheritance. A focused test covers inherited and re-declared interface conformance.
+A separate generic-unboxing fix closes unbox.any method arguments before native box
+projection, validated through an executable generic helper and the typed serializer.
+
+The unchanged flat JSON round trip now executes natively on macOS with matching
+UTF-8 output and exit code. The console project driver now enables the existing
+checked stack budget and integer-text services consistently on both platforms,
+allowing the recursive mapper with the synchronous console host. Expanded tests add
+syntax/missing/null/wrong-type errors, validation before a faulting model constructor,
+escaping and Int32.MinValue. The serializer's canonical control-byte spelling is
+\\u00xx; comparing it with short input escapes was a test expectation error in both
+execution modes, corrected without changing serialization behavior.
+
+## Expanded author-directed milestone — 2026-10-09
+
+The author explicitly requests nested objects, arrays and collection types, and
+selects **typed lists/sequences and string-keyed maps** for this milestone. The flat
+round trip is therefore a foundation, not completion. Qualify the existing recursive
+object/vector paths natively, then define collection shape/construction policy in
+the shared mapper and validate both modes. Preserve element order; string-keyed maps
+map to JSON objects. Arbitrary custom collection construction, non-string keys,
+polymorphism and null/optional mapping are not silently implied by those choices.
+
+After that correctness gate, the author directs JSON benchmarking and publication of
+data, with .NET/other-framework comparisons later. Use the measurement protocol
+above, publish reproducible workload/toolchain/hardware details and retain raw data.
+No benchmark result, speed claim or publication is implied by the working flat probe.
+
+The low-level property gate and seven preceding gates pass on macOS ARM64 and
+Windows x64 in [action 37989124785](https://github.com/marinasundstrom/neoCLR/actions/runs/37989124785).
+All sixteen source/artifact reports are verified in
+[property evidence](native-reflection-property-validation.json). This is separate
+from the new public Raven JSON project workflow, whose Windows result is pending.
+
+The author additionally requires representative JSON documents to be deserialized
+and serialized both as JsonValue trees and typed objects. Use the same documents
+where shapes are supported; assert field/element values after round trips and test
+malformed documents. Compare semantic values, allowing documented canonical escape
+spelling. Include empty and nested containers, UTF-8, integer boundaries and ordering.

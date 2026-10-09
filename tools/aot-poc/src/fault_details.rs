@@ -123,7 +123,7 @@ impl Options {
                     .filter_map(|t| Some((t["typeCompiledIndex"].as_u64()? as usize, t["functionCompiledIndex"].as_u64()? as usize))).collect()))).collect(),
             boxed_int32_display: report.is_some_and(|r| r["boxedInt32Display"] == true),
             descriptor_queries: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
-                .filter(|r| matches!(r["implementation"].as_str(), Some("type-name-closed-v1" | "type-argument-count-closed-v1" | "type-shape-closed-v1" | "reflection-construction-retained-v1" | "reflection-array-closed-v1" | "reflection-property-retained-v1")))
+                .filter(|r| matches!(r["implementation"].as_str(), Some("type-name-closed-v1" | "type-argument-count-closed-v1" | "type-shape-closed-v1" | "reflection-construction-retained-v1" | "reflection-array-closed-v1" | "reflection-property-retained-v1" | "reflection-snapshot-retained-v1")))
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             reflection_array_sites: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| matches!(r["implementation"].as_str(), Some("reflection-array-closed-v1" | "reflection-property-retained-v1")))

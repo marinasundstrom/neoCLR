@@ -13004,3 +13004,30 @@ claim follows from these focused checks.
   Raven consumer and focused native/interpreter tests on macOS (`e01a0f97`); Windows
   qualification is pending. Typed JSON remains blocked by property reflection.
   The next milestone and the deferred benchmark direction remain in force.
+
+## 2026-10-09 — Nested/collection JSON and publication sequence
+
+- **Author:** requests serializing nested objects, arrays and collection types.
+- **Assistant:** proposes typed lists/sequences and string-keyed maps for the first
+  collection milestone, alongside native qualification of the existing nested/array
+  mapper paths. The author explicitly selects **lists/sequences and string-keyed maps**.
+- **Author follow-up:** after correctness, benchmark JSON and publish data, with
+  comparisons against .NET and other frameworks later.
+- **Assistant response:** first publish reproducible neoCLR interpreter/native
+  measurements, recording workloads, toolchain revisions, hardware and measurement
+  method; later comparisons must match behavior/configuration. No results or
+  publication are claimed yet. Public collection construction/shape policy remains
+  under evaluation in the pre-stable API review.
+- **Outcome so far:** the flat typed round trip and public property descriptor
+  consumer pass on macOS in both modes; broader collection correctness and Windows
+  project qualification remain open. The request expands the active native JSON
+  milestone rather than declaring the flat probe sufficient.
+
+### 2026-10-09 — Representative JSON document coverage
+
+- **Author:** requests testing serialization and deserialization of a couple of JSON
+  documents both as JsonValue and objects to establish good support.
+- **Assistant:** will use representative documents through both paths, check values
+  after round trips and malformed input in interpreted/native execution. Nested
+  objects, arrays, lists/sequences and string-keyed maps remain the expanded scope;
+  this new corpus is planned, not claimed complete by the earlier flat probe.

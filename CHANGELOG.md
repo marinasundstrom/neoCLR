@@ -77,7 +77,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   `37988417870`, verifying fourteen source/artifact reports. Add schema-2 property
   metadata/getter/setter policies and checked native accessor dispatch, preserving
   user effects, access/value validation and fault frames. Metadata-only roots exclude
-  accessor bodies; add the portable gate. JSON still awaits descriptor discovery.
+  accessor bodies; add the portable gate. Materialize rooted property descriptors
+  from interpreter-authored metadata recipes, including accessor/parameter identities
+  and module metadata; add closed vector element queries. Reuse VM inherited-interface
+  resolution and close generic unboxing operands. The public Raven reflection probe
+  and flat typed JSON round trip now run on macOS with interpreter parity; Windows
+  project qualification is pending. Enable checked console stack budgets/integer text
+  consistently across platforms. Add the project-level Windows JSON action.
+  Verify sixteen low-level property/prior-gate reports on macOS/Windows in action
+  `37989124785`. Record representative JsonValue/object document coverage plans.
+  Record expanded nested/array/list/sequence/string-keyed-map correctness scope and
+  benchmark/data-publication follow-up; the expanded milestone remains incomplete.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

@@ -5871,3 +5871,51 @@ fn native_property_metadata_roots_do_not_retain_accessor_bodies() {
         assert!(!functions.iter().any(|r| r["name"]=="Model.get_Secret" || r["name"]=="Model.set_Number"));
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_generic_unboxing_closes_method_arguments() {
+    let source = include_str!("../../../docs/experiments/aot-console/reflection-arrays.neoil")
+        .replace("unbox.any Int32", "call Extract<Int32>(System.Object)");
+    let source = format!("{source}\n.function Extract<T>(System.Object value) -> T\nldarg value\nunbox.any T\nret\n.end\n");
+    check_reflection_arrays(&source, 8, b"");
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_inherited_interface_dispatch_preserves_conformance_anchor() {
+    let source = r#"
+.module Inherited
+.interface Answer
+.method instance Read() -> Int32
+.end
+.end
+.type class Base
+.implements Answer
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance Read() -> Int32
+ldc.i4 42
+ret
+.end
+.end
+.type class Derived
+.extends Base
+.method instance .ctor() -> noresult
+ldarg 0
+call instance Base::.ctor()
+ret
+.end
+.end
+.function Calculate(Int32) -> Int32
+newobj.ctor instance Derived::.ctor()
+castclass Answer
+callvirt instance Answer::Read()
+ret
+.end
+"#;
+    check_reflection_arrays(source, 1, b"");
+    let reimplements = source.replace(".implements Answer\n", "").replace(".extends Base", ".extends Base\n.implements Answer");
+    check_reflection_arrays(&reimplements, 1, b"");
+}

@@ -45,7 +45,7 @@ fn allocate(
     }))
 }
 
-fn provider(module: &Module, contract: &Type, fields: &[Value]) -> Result<Type, Fault> {
+pub(crate) fn provider(module: &Module, contract: &Type, fields: &[Value]) -> Result<Type, Fault> {
     let definition = module
         .type_definition(contract)
         .ok_or_else(|| Fault::new("missing snapshot contract"))?;

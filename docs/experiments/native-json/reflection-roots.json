@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "types": [
+    {
+      "definition": {
+        "module": "NeoMetadata_474915C411CEB85AFF45C6C8950611ECD4C6403AE61ED249764685D9B4E944F6",
+        "revision": "1.0.0.0",
+        "index": 0
+      },
+      "construct": true,
+      "properties": true,
+      "getters": true,
+      "setters": true
+    },
+    {
+      "definition": {
+        "module": "NeoMetadata_474915C411CEB85AFF45C6C8950611ECD4C6403AE61ED249764685D9B4E944F6",
+        "revision": "1.0.0.0",
+        "index": 1
+      },
+      "construct": true,
+      "properties": true,
+      "getters": true,
+      "setters": true
+    }
+  ]
+}

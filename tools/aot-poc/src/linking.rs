@@ -112,7 +112,9 @@ pub fn prepare(
         }
     }
     // Keep original scope identities and property associations before relocation.
-    let source_metadata = joined.clone();
+    let mut source_metadata = joined.clone();
+    for (ty, id) in source_metadata.types.iter_mut().zip(&types) { ty.definition = Some(id.clone()); }
+    for (f, id) in source_metadata.functions.iter_mut().zip(&methods) { f.definition = Some(id.clone()); }
     let method_id = |i| MemberId {
         module: app.name.clone(),
         revision: app.revision.clone(),
@@ -187,6 +189,7 @@ pub fn prepare(
         }).collect::<Result<_, _>>()?;
     if let Some(retention) = reflection_retention.as_mut() {
         reflection_roots.extend(super::reflection_properties::bind(&mut joined, &source_metadata, &types, &methods, retention)?);
+        super::reflection_snapshots::bind(&mut joined, &source_metadata, &types, retention)?;
     }
     let source_conformance = joined.clone();
     let relationships: Vec<_> = joined
@@ -426,6 +429,10 @@ pub fn prepare(
         let rows: Vec<_> = report["functions"].as_array().unwrap().iter()
             .filter(|r| matches!(r["name"].as_str(), Some("neoCLR.Runtime.ReflectionConstructionCheck" | "neoCLR.Runtime.ReflectionConstruct")))
             .map(|r| json!({"compiledIndex":r["compiledIndex"],"name":r["name"],"implementation":"reflection-construction-retained-v1"})).collect();
+        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        let rows: Vec<_> = report["functions"].as_array().unwrap().iter()
+            .filter(|r| matches!(r["name"].as_str(),Some("neoCLR.Runtime.TypeProperties" | "neoCLR.Runtime.TypeElementType")))
+            .map(|r| json!({"compiledIndex":r["compiledIndex"],"name":r["name"],"implementation":"reflection-snapshot-retained-v1"})).collect();
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
         let bindings = report["reflectionRetention"]["propertyBindings"].as_array().unwrap().clone();
         for binding in bindings {

@@ -1,0 +1,151 @@
+{
+  "date": "2026-10-09",
+  "scope": "Retained checked property accessors and preceding native reflection gates; public JSON project qualification is separate",
+  "run": "https://github.com/marinasundstrom/neoCLR/actions/runs/37989124785",
+  "reports": [
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-object-types-validation",
+      "passed": true,
+      "reportSha256": "f8556b42edf74f036dbc483793ef4738da05569054aa200142c22a62417e5908",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-primitive-boxes-validation",
+      "passed": true,
+      "reportSha256": "0009b3e078bb5dad94b9c369df09cc6363b44162d81f4d08c372eb493c4018c9",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-reflection-arrays-validation",
+      "passed": true,
+      "reportSha256": "6077de3f465de38192bd89532c2ee36fad7a691784560bbb93f41b94b889316e",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-reflection-construction-validation",
+      "passed": true,
+      "reportSha256": "e1b03dd33e1b9592cb6c21b625614e46e91efe51cf663a8000e06af20d7cff21",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-reflection-properties-validation",
+      "passed": true,
+      "reportSha256": "60185e10a44eec385513470bfbbd0519a268b56c74a5402416da94419bfe2bb9",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-type-descriptors-validation",
+      "passed": true,
+      "reportSha256": "462b107c5873646421e8d7474d90a2c2a0217652031baa611b36d92b0701866f",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-type-equality-validation",
+      "passed": true,
+      "reportSha256": "f16375927b68f50974534a64db9b1022003000a0a9c6f1b9481f29ce5f539df8",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-type-tokens-validation",
+      "passed": true,
+      "reportSha256": "5a90a7c5429cbe10350804801cd90935824c48468c25aec7cfddac40a821ec67",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-object-types-validation",
+      "passed": true,
+      "reportSha256": "cd9e969165834a5f4cb7d25f86e1520e6771de8127d5d2155cbdd59bdca33e2d",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-primitive-boxes-validation",
+      "passed": true,
+      "reportSha256": "939421c43a30698c986a0829cdd66c80a8049c1c34b0af13516ce25875ade047",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-reflection-arrays-validation",
+      "passed": true,
+      "reportSha256": "a893b23438c6941a2fcda28b9d9f540e3135fff70e9ec3268f7141acf45b2db9",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-reflection-construction-validation",
+      "passed": true,
+      "reportSha256": "98a49648baf1f35f2714abb3cd678ddd9737fe7b27b677e9fd03a387b655a190",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-reflection-properties-validation",
+      "passed": true,
+      "reportSha256": "5f4656a362125cb879b8960eee4bddeede99fa9691bad6b2801304996deaa48d",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-type-descriptors-validation",
+      "passed": true,
+      "reportSha256": "0baabb90a9ea5742b029a33ab4d4aa4bc930fcaa7f5fc2f419e1bae2a945f5e7",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-type-equality-validation",
+      "passed": true,
+      "reportSha256": "9eaf2bb7f1b5f8bc8cb26ef8fc70fa8d08bf89cda69e30467b9efb553e43bbe8",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "6556f383148950edeb8ced50ff00f066aaa214d9",
+      "gate": "native-type-tokens-validation",
+      "passed": true,
+      "reportSha256": "70b96b147b46a8bfc966c923c87b83894079b268fc92a2c27726cfc6145204f6",
+      "sourceAndArtifactHashesVerified": true
+    }
+  ]
+}

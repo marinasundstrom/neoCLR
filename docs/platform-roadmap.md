@@ -78,8 +78,10 @@ support creation, readback, length and semantic GetType identity; the public Rav
 array consumer passes on macOS and the portable gate is qualified on macOS/Windows
 ([evidence](native-reflection-array-validation.json)). Explicit property metadata and
 getter/setter policies now generate checked accessor adapters; focused macOS tests
-cover access/value errors, real effects and user faults. Runtime property discovery,
-element-type queries and complete native JSON execution remain unfinished.
+cover access/value errors, real effects and user faults. Rooted property snapshots and vector element queries now execute through the public
+Raven facades, and the flat typed JSON round trip passes on macOS. The author expands
+the milestone to nested objects, arrays, typed lists/sequences and string-keyed maps;
+that coverage and Windows project parity remain unfinished.
 Evaluate the Introspection/Reflection API alongside implementation before stability,
 preserving its overall structure while keeping details revisable; see the
 [pre-stable review](introspection-design.md#pre-stable-api-evaluation--2026-10-09).

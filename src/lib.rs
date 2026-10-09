@@ -201,3 +201,7 @@ mod scheduler;
 mod socket_io;
 
 mod name_resolution;
+
+#[cfg(feature = "native-metadata")]
+#[doc(hidden)]
+pub mod native_metadata;

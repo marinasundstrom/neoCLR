@@ -126,7 +126,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             raise ValueError('Bundle catalog omits a required input')
         base = ROOT / 'docs/experiments/aot-console'
         adapters = [ROOT / 'tools/native/console-host.c', *[base / name for name in
-                    ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c')],
+                    ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c', 'native-stack.c')],
                     base.parent / 'aot-scalar/console.c', base.parent / 'aot-fault-details/render.c']
         if windows:
             adapters = [ROOT / 'tools/native' / name for name in
@@ -138,7 +138,6 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 adapters += [ROOT / 'benchmarks/native-web/http-host.c']
             else:
                 adapters[0] = ROOT / 'benchmarks/native-web/http-host.c'
-                adapters += [base / 'native-stack.c']
             adapters += [base / name for name in ('task-queue.c', 'socket-listener.c')]
         if bootstrap_root:
             adapters = [ROOT / 'benchmarks/native-web/http-session-host.c' if p == ROOT / 'benchmarks/native-web/http-host.c' else p for p in adapters]
@@ -163,14 +162,12 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                    '--object-root', libraries[0]]
         flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
                  '--bind-console-read-byte', '--bind-console-write-line', '--bind-console-stream-output',
-                 '--bind-int32-to-string', '--bind-utf8-text']
+                 '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text']
         if http:
-            flags += ['--native-stack-budget', '--bind-integer-text', '--bind-task-queue',
+            flags += ['--bind-task-queue',
                       '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-socket-client']
         if windows:
             flags += ['--target', 'x86_64-pc-windows-msvc', '--windows-http-experiment' if http else '--windows-console-experiment']
-            if not http:
-                flags += ['--native-stack-budget']
         selected_root = '@entry'
         if bootstrap_root:
             # Temporary Raven CLI bridge spells assembly-level functions as F_<UTF8 hex>.

@@ -926,7 +926,7 @@ impl<'a> Profile<'a> {
                     self.stored(t)?;
                 }
                 _ if flow::comparison(op).is_some() => (),
-                _ => return Err(fail(pc, "unsupported value instruction")),
+                _ => return Err(fail(pc, &format!("unsupported value instruction: {op:?}"))),
             }
         }
         let mut stacks: Stacks = vec![None; f.body.len()];

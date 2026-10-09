@@ -173,8 +173,7 @@ pub(super) fn display_override(input: &neoclr::Module, concrete: &Type, contract
     Ok((index, reference))
 }
 
-/// Traverse verified interface inheritance with closed owner arguments. Class base
-/// inheritance remains outside this profile; Object contributes no interfaces.
+/// Traverse verified class/interface inheritance with closed owner arguments.
 pub(super) fn implements_interface(input: &neoclr::Module, concrete: &Type, target: &Type) -> bool {
     let mut pending = vec![concrete.clone()];
     let mut seen = vec![];
@@ -185,7 +184,7 @@ pub(super) fn implements_interface(input: &neoclr::Module, concrete: &Type, targ
         seen.push(current.clone());
         let Some(definition) = input.type_definition(&current) else { continue; };
         let arguments = match &current { Type::Constructed { arguments, .. } => arguments.as_slice(), _ => &[] };
-        for interface in &definition.implements {
+        for interface in definition.base.iter().chain(&definition.implements) {
             if let Ok(closed) = interface.substitute_type_parameters(arguments) { pending.push(closed); }
         }
     }
@@ -201,6 +200,11 @@ pub(super) fn closed_signature(function: &neoclr::metadata::Function, arguments:
 }
 
 pub(super) fn implicit_implementation(input: &neoclr::Module, concrete: &Type, contract: &neoclr::metadata::Function) -> Result<(usize, FunctionRef), Error> {
+    if input.type_definition(concrete).is_some_and(|t| t.base.as_ref().is_some_and(|b| b.definition_name() != Some("System.Object"))) {
+        let method = neoclr::native_metadata::interface_implementation(input, concrete, contract).map_err(|e|e.to_string())?;
+        let index = input.functions.iter().position(|f| f.definition == method.definition && f.name == method.name).ok_or("missing inherited interface target")?;
+        return Ok((index,FunctionRef {definition:method.definition,name:method.name,owner:method.owner,instance:method.instance,generic_arguments:vec![],parameters:method.parameters}));
+    }
     let arguments = match concrete { Type::Constructed { arguments, .. } => arguments.as_slice(), _ => &[] };
     let member_name = |m: &neoclr::metadata::Function| m.origin.as_ref().map(|o| o.name.clone())
         .unwrap_or_else(|| m.name.rsplit('.').next().unwrap().to_owned());

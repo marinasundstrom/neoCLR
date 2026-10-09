@@ -115,8 +115,9 @@ The routing workbench also parses a route, extracts an integer parameter and pri
   length, readback and semantic `GetType()` identity; other compound queries remain unsupported.
   Explicit development reflection roots now support checked parameterless construction
   and property-access adapters;
-  runtime property discovery remains unfinished, so typed
-  JSON serialization is not yet a native capability.
+  rooted property descriptors and a flat typed JSON round trip now run in the
+  development macOS profile. Windows project qualification and nested/collection
+  coverage remain in progress; this is not yet a published native JSON capability.
   Broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.
 - **Async and hosting:** the HTTP profiles have a bounded completion loop, not a

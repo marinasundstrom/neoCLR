@@ -2,6 +2,7 @@ import System.*
 import System.Introspection.*
 import System.Runtime.Reflection.*
 import System.Result.*
+import System.Option.*
 
 public class Report {
     init() { }
@@ -24,6 +25,56 @@ func Main() -> int {
     }
     if !value.GetType().Equals(info) {
         return 5
+    }
+    let properties = info.GetProperties()
+    if properties.Count != 1 {
+        return 12
+    }
+    let property = properties[0]
+    if property.Name != "Name" || !property.PropertyType.Equals(typeof(string)) || !property.CanRead || !property.CanWrite {
+        return 13
+    }
+    if property.SetValue(value, "reflected") is Error(_) {
+        return 14
+    }
+    if property.GetValue(value) is Ok(let read) {
+        if read is string text {
+            if text != "reflected" || report.Name != text {
+                return 15
+            }
+        } else {
+            return 16
+        }
+    } else {
+        return 17
+    }
+    if let Some(getter) = property.GetGetMethod() {
+        if getter.Name != "get_Name" || !getter.IsPublic || !getter.ReturnType.Equals(typeof(string)) || getter.GetParameters().Count != 0 {
+            return 18
+        }
+    } else {
+        return 19
+    }
+    if let Some(setter) = property.GetSetMethod() {
+        let parameters = setter.GetParameters()
+        if setter.Name != "set_Name" || parameters.Count != 1 || parameters[0].Position != 0 || !parameters[0].ParameterType.Equals(typeof(string)) {
+            return 20
+        }
+        if parameters[0].MetadataToken is None || parameters[0].Module is None {
+            return 21
+        }
+    } else {
+        return 22
+    }
+    if info.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance).Count != 0 {
+        return 23
+    }
+    if typeof(int[]).GetElementType() is Some(let element) {
+        if !element.Equals(typeof(int)) {
+            return 24
+        }
+    } else {
+        return 25
     }
     let array = ArrayReflection.Create(typeof(int[]), [40, 2])
     if ArrayReflection.GetLength(array) != 2 || !array.GetType().Equals(typeof(int[])) {
