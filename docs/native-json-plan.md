@@ -590,3 +590,12 @@ The expanded project also cross-compiles to Windows x64 COFF with the corrected
 console gate. [Evidence](native-json-document-validation.json) records source,
 build and object hashes separately from macOS execution. Windows execution remains
 unverified until the project workflow passes.
+
+## Windows document project qualification — 2026-10-09
+
+[Action 37991724441](https://github.com/marinasundstrom/neoCLR/actions/runs/37991724441)
+passes both public projects at `91911ce9`: reflection and the nested/DOM/typed-vector
+JSON corpus. Each standalone Windows x64 executable matches the interpreter in
+exit code, UTF-8 stdout and empty stderr. All retained artifact/source hashes were
+verified; [evidence](windows-native-json-validation.json). This qualifies the
+existing corpus, not the still-unimplemented list/sequence/map mapping.

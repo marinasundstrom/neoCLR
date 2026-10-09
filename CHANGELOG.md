@@ -91,7 +91,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Admit closed vector generic arguments and checked reference unboxing; retain array
   element descriptors from generic calls and rooted property signatures. Validate
   typed scalar/object array JSON on macOS with interpreter parity. Correct the Windows
-  console profile gate for its linked integer-text services; Windows execution awaits CI.
+  console profile gate for its linked integer-text services. Qualify the public
+  reflection and expanded JSON projects on Windows x64 in action `37991724441`,
+  with interpreter parity and verified source/artifact hashes.
   Record expanded nested/array/list/sequence/string-keyed-map correctness scope and
   benchmark/data-publication follow-up; the expanded milestone remains incomplete.
 

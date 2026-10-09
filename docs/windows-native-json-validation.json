@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-09",
+  "revision": "91911ce94abba6dafa81c97ed87469ed8c137ceb",
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "run": "https://github.com/marinasundstrom/neoCLR/actions/runs/37991724441",
+  "passed": true,
+  "sourceAndArtifactHashesVerified": true,
+  "reportSha256": "9a10ab19dfc5ff9a4bcbafe5e00d02f1eddc1219e54a1833d281bd388f584da3",
+  "cases": [
+    {
+      "name": "introspection",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\introspection executable only\\app.exe"
+          ],
+          "exitCode": 0,
+          "stdout": "Report\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\bin\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\introspection native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "Report\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "name": "json",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\json executable only\\app.exe"
+          ],
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\bin\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\json native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ]
+}

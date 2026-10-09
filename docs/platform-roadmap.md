@@ -81,7 +81,9 @@ getter/setter policies now generate checked accessor adapters; focused macOS tes
 cover access/value errors, real effects and user faults. Rooted property snapshots and vector element queries now execute through the public
 Raven facades, and the flat typed JSON round trip passes on macOS. The author expands
 the milestone to nested objects, arrays, typed lists/sequences and string-keyed maps;
-that coverage and Windows project parity remain unfinished.
+lists/sequences and maps remain unfinished. The existing nested object, DOM and
+scalar/object vector corpus now passes on Windows x64 with interpreter parity
+([evidence](windows-native-json-validation.json)), alongside macOS ARM64.
 Evaluate the Introspection/Reflection API alongside implementation before stability,
 preserving its overall structure while keeping details revisable; see the
 [pre-stable review](introspection-design.md#pre-stable-api-evaluation--2026-10-09).
@@ -3303,4 +3305,5 @@ failure seen on the first build still needs investigation. See the documentation
 Native JSON evidence update (2026-10-09): the public
 [document corpus](experiments/native-json/README.md#representative-document-checks)
 now validates nested object and DOM round trips on macOS in both modes. This also covers typed scalar/object vectors. Lists/sequences, maps, jagged native
-arrays and Windows project qualification remain open.
+arrays remain open. Windows project qualification passes at `91911ce9`
+([evidence](windows-native-json-validation.json)).
