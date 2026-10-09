@@ -57,10 +57,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   collector/host-root regressions also pass.
   Add a private Windows remaining-stack probe and executable checks for small
   stack rejection, bounded deep calls, collection at the limit, GC-frame cleanup
-  and fiber rejection. Use fresh system bounds and reservation-based headroom;
-  The independent Windows probe passes 128 KiB rejection and safe return at
-  depths 15/46 on 512 KiB/1 MiB stacks. Wire the check into collector-host
-  admission so rejection happens before allocation; integrated execution pending.
+  and fiber rejection. Use fresh system bounds and reservation-based headroom.
+  Windows run `37955003321` at `78f62757` passes 128 KiB admission rejection
+  before allocation and safe return at depths 15/46 on 512 KiB/1 MiB stacks;
+  heap/collector regressions pass. Verify 31 artifact and 16 source hashes.
   Managed Windows code generation and project kits remain unsupported.
 
 - Add a development macOS ARM64 project-to-executable console command using the

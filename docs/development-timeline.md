@@ -12772,3 +12772,20 @@ claim follows from these focused checks.
 - **Boundary:** this is a working native C collector host, not yet managed Windows
   AOT execution. Stack protection and managed lowering remain separate gates;
   thread-affine roots are not green-thread or migration support.
+
+## 2026-10-09 — Windows stack admission solved for the native host
+
+- **Author:** asks to continue until the next issue is solved.
+- **Assistant action:** selects Windows stack protection, implements a fresh-bounds
+  remaining-stack check, and wires it into collector-host admission before heap
+  allocation. Keeps fibers outside the normal-thread contract and generated Windows
+  managed code behind its separate frame/probing gate.
+- **Outcome:** [run 37955003321](https://github.com/marinasundstrom/neoCLR/actions/runs/37955003321)
+  at `78f62757` rejects a 128 KiB stack without changing owner/output, and safely
+  returns from deep calls at depths 15/46 on 512 KiB/1 MiB stacks. Collection at
+  the limit, complete GC-frame cleanup and fiber rejection pass; heap and collector
+  regressions remain green. All 31 artifact and 16 source hashes match the
+  [report](windows-stack-validation.json).
+- **Remaining:** generated-code frame bounds, page probing and fault-return checks
+  before managed Windows lowering; C-host evidence does not establish guest SEH
+  interoperability, native stack walking or activation migration.

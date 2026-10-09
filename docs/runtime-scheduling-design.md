@@ -441,3 +441,9 @@ from another thread. Its executable consumer verifies retention across root
 handoff and reclamation after release. This establishes the current synchronous
 lifecycle, not activation-owned roots: suspension still needs explicit ownership
 that survives host returns before migration or deferred cleanup is allowed.
+
+The Windows host stack guard now refreshes system bounds per call and explicitly
+rejects fibers, including at collector-host admission. Small-stack and deep-call
+consumers pass with GC-frame cleanup. This is a normal OS-thread contract; future
+activation-owned stacks need their own bounds/root rules rather than bypassing
+the rejection or retaining stale system-thread bounds.

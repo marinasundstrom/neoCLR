@@ -1,0 +1,209 @@
+{
+  "passed": true,
+  "scope": "Private Windows x64 guarded heap and collector/root lifecycle; bounded native stack probe; no managed codegen qualification",
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "-C",
+        "D:\\a\\neoCLR\\neoCLR",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/O2",
+        "/MT",
+        "/Fe:host-memory.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory-test.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\host-memory.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/Fe:host-collector.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\host-collector.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/Fe:collector-contract.exe",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\collector-contract.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/Fe:host-stack.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\host-stack.exe"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "revision": "78f62757adf93b4a085b78bacdc4d9a40b499746",
+  "inputs": {
+    "tools/native/windows-host-memory.c": "774114602ce99ea6d2f69d613cb7b5c26f6d3f2af5fc91edebcb70c51db1d59d",
+    "tools/native/windows-host-memory.h": "370ec5f2a8d73db08144c70aa51fb8fe3704b038fd3b9dbb0b26630826c5f6c9",
+    "tools/native/windows-host-memory-test.c": "bffb4d15c8dc72ef82eb4611df83bdf0409efa28c664248bea00e2c26431792e",
+    "tools/native/windows-gc-host.c": "1af29df8568c25d43fc95c24be354e7486b09901878b5b99cb6e8b2d190ef03a",
+    "tools/native/windows-gc-host.h": "f9e0d59e9b4811e6ea7f0f5fe5d13824d1e16c14f5c0532dbbe1357a75f8987e",
+    "tools/native/windows-gc-host-test.c": "daacecfc7e71fce637e8b3ce9c96221a59864f00cf674c6b7eaca8936762759d",
+    "tools/native/windows-native-stack.c": "ae24c1a05235ec25e3df672d548d5b4ae75811ede0fbb7988efbbc859bbb9b84",
+    "docs/experiments/aot-console/native-gc.c": "a3d1690a5a38f2c116a106760f30db79badd3a4f86198d61501a05a250fdc5d4",
+    "docs/experiments/aot-console/native-gc-test.c": "29e46d68d8d31d79bc50c0ac6e7301863aa5bcdfdf2bae0750316552661f77e2",
+    "docs/experiments/aot-console/root-probe.c": "53c89bf572e362623da7bac7241c19744aa79b3310f951c520b570e448bc5a67",
+    "docs/experiments/aot-console/native-gc.h": "791d698ec40abaaf6a199e90e4e4c9299c666c5d9d40f6375320ca9ccb75bcc6",
+    "docs/experiments/aot-console/root-probe.h": "f9b59905e5167081517a1c142294df7485a619aec1332fced0ee25c2043b0698",
+    "docs/experiments/aot-console/text-arena.h": "03e670e1cb6885096f1999dd5947f26088f45873f3a1ffa3bfeb2775c0560404",
+    "docs/experiments/aot-console/native-stack.h": "49849a834d7599685a8880bcdcda0505ce0465175eb7b38d841c660731d7610f",
+    "docs/experiments/aot-fault-details/fault-details.h": "bb717fcf0645ee35682d6a05ec555c8824426f25bf0745c4368b34eb2964a6cb",
+    "tools/native/windows-native-stack-test.c": "910524f6d3bc61803b1f5038713f14e79c5db5860e6ff7bd28b8f2cf74054575"
+  },
+  "execution": {
+    "exitCode": 0,
+    "stdout": "Windows guarded heap: 12 allocation lifecycles passed\r\n",
+    "stderr": "",
+    "allocationLifecycles": 12
+  },
+  "collectorExecution": {
+    "exitCode": 0,
+    "stdout": "Windows collector: rooted graph, frame handoff, thread isolation, exhaustion and cleanup passed\r\n",
+    "stderr": ""
+  },
+  "collectorContract": {
+    "exitCode": 0
+  },
+  "stackExecution": {
+    "passed": true,
+    "smallStackRejected": true,
+    "fiberRejected": true,
+    "depth512KiB": 15,
+    "depth1MiB": 46
+  },
+  "files": {
+    "build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build.stdout.log": "6ffe2c3c4d89c5349ba24d6b40ca8a333e5f5b28a5d6df835247500ed75bc65d",
+    "collector-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-build.stdout.log": "b3b4b0b3d51951b35165d78c42c259072efb006962bc7e657344bd21a111e053",
+    "collector-contract-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-contract-build.stdout.log": "43382405b027e5d7f7422cba2a504c986e483141fddb9fde86cc2f4221f1a744",
+    "collector-contract-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-contract-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-contract.exe": "0fab33acab802e3afd62b6c157bb0469bdfc6b2118cfa9173076007e0d9cfde5",
+    "collector-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-execute.stdout.log": "989810d33565bee0a0e5bedb0354f266c94b27c562f190287b998bcaafa10277",
+    "execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "execute.stdout.log": "769b1c1e55d7c08aecd93a8931a9fc65e23bd1a41155eea41aa838d5a19982a4",
+    "host-collector.exe": "4296340da505dd14d2056338130d85d15a865180bfd6e24e12329a22b81cc676",
+    "host-memory.exe": "bb487718cd63b40eda13871c4aa238b8d929589f587c3a1f5fd47d62085fe943",
+    "host-stack.exe": "e795dc4013a50cd77fd2677b7e1e6d9c648ff9674cd6e06993290d1dfa0d58e5",
+    "native-gc-test.obj": "3c61e8ecfb7e064e093b80ea0f927d3527f2540eb06e08d334138d733a75fc84",
+    "native-gc.obj": "b4eec4aa83f67abd5862ab6a2e09751a754eb76e0180c1f5b0eb035a10c9606e",
+    "revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "revision.stdout.log": "f448a3c54fad01c1c0f5d33f7087ab45aa21d0d09c064f53880984c05e568d0c",
+    "root-probe.obj": "0a32996e301dfdb119d9b83ad69c0a0ede31a7c9591d38d32eeb06af3c160373",
+    "stack-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stack-build.stdout.log": "b10b3848e105e39e16a172887cd95148230376b4237a3b6b467ebee838451193",
+    "stack-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stack-execute.stdout.log": "b7bdceecbcb7e7e82b761cb872e6132505027b867ce59bc156f706eea8b282b6",
+    "windows-gc-host-test.obj": "672e6833cd46f7891df0ce76d7b0e29360bdc274a6dd76ad67bfe801c444a468",
+    "windows-gc-host.obj": "82ba21fe62a1f7deb1d1db22d2d03551cf8047e362910932016fc7b73ac8dc63",
+    "windows-host-memory-test.obj": "0a4eb1f2e56ae01dd5ab0be2501aa7f284ced29669bc32f0fdc5e60e8786a65a",
+    "windows-host-memory.obj": "02f5da533c907e967c6ab7cf20fe789692312aa1be46ba0a37b8712369db1ba4",
+    "windows-native-stack-test.obj": "9215b8869947bf5f2c9e0a398707c090d918e87f7e8874b9875e6e8b564ddfa7",
+    "windows-native-stack.obj": "41a0772f96dbeb07cf38d4af3eefcfa282243d0138acf4b4c0b6a5f4f0ce9596"
+  },
+  "date": "2026-10-09",
+  "githubRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/37955003321",
+  "artifact": "windows-native-host-37955003321-1",
+  "downloadedFileHashesVerified": true,
+  "sourceHashVerification": {
+    "tools/native/windows-host-memory.c": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-host-memory.h": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-host-memory-test.c": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-gc-host.c": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-gc-host.h": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-gc-host-test.c": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-native-stack.c": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/native-gc.c": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/native-gc-test.c": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/root-probe.c": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/native-gc.h": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/root-probe.h": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/text-arena.h": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-console/native-stack.h": "Git blob with Windows checkout CRLF",
+    "docs/experiments/aot-fault-details/fault-details.h": "Git blob with Windows checkout CRLF",
+    "tools/native/windows-native-stack-test.c": "Git blob with Windows checkout CRLF"
+  },
+  "priorProbeRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/37954770377"
+}

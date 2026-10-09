@@ -83,7 +83,9 @@ library and runtime artifacts; this is not a general publishing workflow for all
   native project kits remain unsupported. An independent Windows guarded-heap
   host passes allocation, guard-boundary and release tests. Its collector consumer
   also passes root retention, reclamation, thread isolation and guarded teardown.
-  Stack protection and managed Windows code generation remain open.
+  Host admission now rejects undersized stacks and fibers; deep-call checks
+  return safely with GC-frame cleanup. Generated-code stack probing and managed
+  Windows code generation remain open.
 - **Code and APIs:** broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.
 - **Async:** async entry points waiting for host I/O are unsupported; selected

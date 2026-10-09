@@ -89,7 +89,10 @@ allocation/release lifecycles and both guard boundaries. The
 [Windows collector consumer](windows-collector-validation.json) now retains rooted
 graphs, hands roots to published frames, reclaims cycles, rejects premature/foreign
 teardown and passes exhaustion/cleanup plus existing collector contracts. Next
-qualify stack protection and managed lowering against this working host.
+qualify generated-code stack probing, frame bounds and managed lowering against
+this working host. The [Windows host stack gate](windows-stack-validation.json)
+now rejects 128 KiB admission before allocation, rejects fibers and safely returns
+from deep calls on 512 KiB/1 MiB stacks with collection and GC-frame cleanup.
 Windows project kits and managed services remain unsupported. Full
 bootstrap, general hosting and reload remain open.
 

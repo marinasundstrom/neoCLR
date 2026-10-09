@@ -149,7 +149,19 @@ stack probing; it does not recover from an OS stack overflow. The independent
 probe passes [run 37954770377](https://github.com/marinasundstrom/neoCLR/actions/runs/37954770377)
 at `db2fd66b`, stopping at depths 15 and 46. The collector host now calls this
 check before allocating: small stacks and fibers return status 9 with the owner
-record unchanged. Integrated admission execution is pending.
+record unchanged.
+
+**Integrated stack admission qualified (2026-10-09):**
+[run 37955003321](https://github.com/marinasundstrom/neoCLR/actions/runs/37955003321)
+at `78f62757adf93b4a085b78bacdc4d9a40b499746` passes under MSVC `/W4 /WX /O2`.
+The 128 KiB stack rejects admission without allocating or changing the output;
+512 KiB and 1 MiB workers stop at depths 15 and 46 respectively, collect at the
+limit and return normally with every GC frame removed. Fiber admission rejects,
+and conversion back restores normal checks. Existing heap and collector consumers
+also pass. All 31 downloaded artifact hashes and 16 source hashes match the
+recorded revision with checkout line endings; see the
+[retained report](windows-stack-validation.json). These depths are evidence for
+this compiler/consumer, not a portable recursion-depth contract.
 
 Windows managed code generation still needs final-frame and outgoing-call bounds,
 Cranelift page-probing checks, guard placement and actual generated-code fault
@@ -178,6 +190,6 @@ first-fault propagation and exactly-once cleanup. Reuse the
 before adding migration or green threads. Current root TLS, callbacks and stack
 adapters remain replacement boundaries, not public scheduling policy.
 
-Next: execute the Windows host stack consumer, then qualify generated-code stack
-probing and managed lowering against the working collector host. Keep Windows managed profiles and project kits rejected until
+Next: qualify generated-code stack probing, frame bounds and managed lowering
+against the working collector host and admission guard. Keep Windows managed profiles and project kits rejected until
 those separate requirements have executable evidence.

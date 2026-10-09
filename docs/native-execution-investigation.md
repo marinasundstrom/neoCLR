@@ -461,8 +461,10 @@ allocation ownership, stack protection and suspension boundaries. Its independen
 guarded-heap C probe passes 12 Windows allocation/release lifecycles and both
 guard boundaries. Its subsequent collector consumer passes rooted retention,
 frame handoff, reclamation, exhaustion and teardown checks on Windows; see
-[collector evidence](windows-collector-validation.json). Managed lowering and stack
-qualification remain explicitly open.
+[collector evidence](windows-collector-validation.json). The [Windows host stack evidence](windows-stack-validation.json) also verifies
+small-stack/fiber admission rejection before allocation and bounded deep-call
+return with GC-frame cleanup. Managed lowering, generated-frame/probing integration
+and native unwind qualification remain explicitly open.
 
 ## Shared native contracts to establish
 
