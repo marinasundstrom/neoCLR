@@ -109,7 +109,8 @@ The routing workbench also parses a route, extracts an integer parameter and pri
   Web API surface, TLS, HTTP/2 or arbitrary concurrent servers. The native transport
   uses IPv4, bounded DNS workers and polled socket operations.
 - **Code and APIs:** development includes opaque closed type-token identity and the
-  runtime type-equality service as first steps toward native JSON. Property discovery and reflection invocation remain
+  runtime type-equality, name and generic-arity queries for primitive and closed
+  nominal token producers as first steps toward native JSON. Property discovery and reflection invocation remain
   unfinished, so typed JSON serialization is not yet a native capability.
   Broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.

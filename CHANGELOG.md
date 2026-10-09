@@ -30,6 +30,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   with interpreter parity and malformed-contract rejection tests. Extend the
   macOS/Windows type-token action with an executable runtime-equality consumer;
   general TypeInfo queries and reflection invocation remain unfinished.
+  Execute native TypeName/TypeArgumentCount queries over primitive and closed nominal
+  token producers using source semantic names and generic arity. Add a standalone
+  interpreter-parity consumer, GC/bounds checks and explicit missing-metadata/shape/
+  contract rejection tests. This uses bounded generated dispatch; general runtime
+  descriptor tables, property queries, invocation and JSON remain unfinished.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

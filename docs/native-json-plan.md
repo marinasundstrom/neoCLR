@@ -181,6 +181,38 @@ has a `--runtime-equality` mode included in both platform jobs. See the
 [service validation evidence](native-type-equality-validation.json). Runtime property
 queries, object-to-type mapping, invocation and native JSON remain unfinished.
 
+## Executable native descriptor queries — 2026-10-09
+
+The reference-arena profile now binds the exact TypeName and TypeArgumentCount
+InternalCalls for primitive and closed nominal token producers. Names come from
+validated source declarations/origins; two generic instantiations keep the same
+semantic definition name while retaining different identities. Generic arity comes
+from closed type arguments, not the spelling of a private native shape.
+
+The first backend implementation generates a bounded dispatch body over known token
+producers, using existing token comparisons and ordinary String literals. This
+composes existing allocation/root/fault lowering and avoids a separate descriptor
+pointer ABI at this stage. Dispatch is linear in the retained token set and code size
+grows with it; no performance improvement is claimed. Shared immutable descriptor
+tables remain the next representation step as query coverage grows. Names alone
+never authorize access or retain executable accessor bodies.
+
+The `type-descriptors.neoil` consumer obtains names for Int32, Account and two Model
+instantiations, checks generic arity and distinguishes the Model identities. Its
+standalone native host checks GC cleanup and buffer bounds; its output matches the
+interpreter. Run `scripts/validate-native-type-tokens.py` with `--descriptor-queries`
+to build and execute it on macOS ARM64 or Windows x64. The validator retains the
+executable and hashes its source/artifacts. The Windows job runs the same fixture.
+
+This is a closed descriptor-query subset, not general TypeInfo or JSON admission.
+Array/function signature queries reject explicitly for now, as do missing source
+metadata and malformed reserved contracts. All admitted token producers are covered;
+foreign or forged handles are unsupported and the generated fallback faults instead
+of inventing metadata. Object.GetType, generic argument retrieval, property queries,
+explicit metadata roots and checked invocation remain unfinished. The existing .NET
+and GraalVM retention comparisons above apply; these services implement existing
+neoCLR contracts without changing Raven emission or Runtime Contract configuration.
+
 ## Evidence
 
 The original typed probe rejects native specialization with

@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'docs/experiments/aot-console/type-tokens*'
+      - 'docs/experiments/aot-console/type-descriptors*'
       - 'docs/experiments/aot-console/native-gc*'
       - 'docs/experiments/aot-console/root-probe*'
       - 'tools/native/windows-native-stack.c'
@@ -13,6 +14,7 @@ on:
   pull_request:
     paths:
       - 'docs/experiments/aot-console/type-tokens*'
+      - 'docs/experiments/aot-console/type-descriptors*'
       - 'docs/experiments/aot-console/native-gc*'
       - 'docs/experiments/aot-console/root-probe*'
       - 'tools/native/windows-native-stack.c'
@@ -41,6 +43,7 @@ jobs:
         run: |
           python3 scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-type-tokens-validation
           python3 scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-type-equality-validation --runtime-equality
+          python3 scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-type-descriptors-validation --descriptor-queries
       - name: Run Windows type token contracts
         if: runner.os == 'Windows'
         shell: pwsh
@@ -51,6 +54,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc.exe --output target/native-type-equality-validation --runtime-equality"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc.exe --output target/native-type-descriptors-validation --descriptor-queries"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -58,6 +63,7 @@ jobs:
           path: |
             target/native-type-tokens-validation/
             target/native-type-equality-validation/
+            target/native-type-descriptors-validation/
           include-hidden-files: true
           retention-days: 14
           if-no-files-found: warn
