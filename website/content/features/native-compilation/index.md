@@ -76,8 +76,9 @@ library and runtime artifacts; this is not a general publishing workflow for all
   behavior and broader platform support remain open.
   A separate development Windows x64 scalar/literal-console profile now passes
   MSVC linking and native/interpreter comparisons, including standalone Hello World
-  from retained Raven PE/#Neo and NEOX metadata. Fresh Raven source builds on Windows
-  are not yet qualified. Windows managed services and
+  from both retained metadata and freshly compiled Raven source on Windows, through
+  PE/#Neo and NEOX. Fresh-source coverage is limited to the primitive/console Hello
+  World bootstrap. Windows managed services and
   native project kits remain unsupported.
 - **Code and APIs:** broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.

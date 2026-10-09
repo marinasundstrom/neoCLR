@@ -28,8 +28,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   That run qualifies the retained compiler fixture. Extend the gate to build pinned
   Raven `71cafd35` with the current metadata writer and compile Hello World source
   on Windows, requiring separate PE/#Neo and NEOX execution records. Retain
-  compiler revision/hashes, build diagnostics, source and emitted metadata; fresh
-  source execution qualification is pending. Select AnyCPU explicitly for the
+  compiler revision/hashes, build diagnostics, source and emitted metadata. Windows
+  run `37949899691` at `d80dd878` passes six tests with no skips: four standalone
+  executions (retained/fresh PE/#Neo and NEOX) and 32 scalar comparisons. Verify
+  all 91 downloaded artifact hashes. Select AnyCPU explicitly for the
   managed compiler build so MSVC’s Platform=x64 environment cannot redirect its
   output layout; native code still targets Windows x64.
 

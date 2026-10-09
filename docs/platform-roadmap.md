@@ -72,8 +72,12 @@ records the initial object-only boundary. The subsequent
 tests with no skips, including 32 MSVC-linked native/interpreter comparisons.
 The [Raven Hello World Windows run](windows-raven-hello-validation.json) now passes
 standalone PE/#Neo and NEOX execution with byte-exact interpreter output, alongside
-the 32 scalar comparisons (five tests, no skips). Next qualify a fresh Raven source
-build through this bounded Windows path. Windows project kits and managed services
+the 32 scalar comparisons (five tests, no skips). The subsequent
+[fresh-source Windows run](windows-fresh-raven-validation.json) builds pinned Raven
+`71cafd35` with the current metadata writer and compiles Hello World on Windows;
+both containers execute with interpreter parity (six tests, no skips). Next extend
+fresh-source coverage to calls/control flow and UTF-8 literals before Windows
+managed-service or project-kit work. Windows project kits and managed services
 remain unsupported. Full bootstrap, general hosting and
 reload remain open.
 

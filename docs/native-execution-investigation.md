@@ -415,9 +415,20 @@ pipeline for one bounded program, not its library or platform coverage.
 The gate records the compiler revision and four compiler/metadata assembly hashes,
 retains build/compile logs and source/metadata, and requires a separate fresh-source
 completion record for PE/#Neo and NEOX interpreter/native comparisons. It cannot
-fall back to the retained fixture. Local macOS checks pass; Windows execution of
-this extension is pending. Project kits, managed Windows services and unwinding
-remain outside this slice.
+fall back to the retained fixture.
+
+**Fresh-source execution qualified (2026-10-09):**
+[run 37949899691](https://github.com/marinasundstrom/neoCLR/actions/runs/37949899691)
+at neoCLR `d80dd8784d1cda01f7f26c5de0f4dfe7439f434a` builds the pinned compiler
+and passes all six tests without skips. Fresh and retained PE/#Neo and NEOX
+executables return zero with exact Hello World output and empty stderr; the 32
+scalar comparisons also pass. All 91 downloaded hashes match the
+[retained report](windows-fresh-raven-validation.json). The initial
+[attempt](https://github.com/marinasundstrom/neoCLR/actions/runs/37949522204) built
+Raven successfully but exposed the MSVC `Platform` output-layout interaction;
+explicit AnyCPU selection resolves it. No compiler semantic or bridge changes
+were needed. Project kits, managed Windows services and unwinding remain outside
+this slice; calls/control flow and UTF-8 source coverage are the next bounded checks.
 
 ## Shared native contracts to establish
 

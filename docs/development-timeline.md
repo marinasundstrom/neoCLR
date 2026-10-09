@@ -12717,4 +12717,12 @@ claim follows from these focused checks.
   at `ee0dac80` passes five tests without skips, including both Hello World
   executables and 32 scalar comparisons. Verifies all 66 downloaded evidence hashes;
   records the [report](windows-raven-hello-validation.json). Fresh Raven source
-  compilation on Windows remains unqualified.
+  compilation on Windows was still unqualified at that point.
+- **Next implementation outcome:** [run 37949899691](https://github.com/marinasundstrom/neoCLR/actions/runs/37949899691)
+  at neoCLR `d80dd878` builds Raven `71cafd35` and compiles Hello World source on
+  Windows. Six tests pass without skips, including fresh/retained PE/#Neo and NEOX
+  standalone execution and 32 scalar comparisons; all 91 artifact hashes match the
+  [report](windows-fresh-raven-validation.json). The first attempt exposed MSVC’s
+  `Platform=x64` changing the managed compiler output path, resolved with explicit
+  AnyCPU compiler selection. This establishes the primitive/console source path;
+  broader source consumers, Windows managed services and project kits remain open.
