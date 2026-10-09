@@ -13,7 +13,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Preserve default macOS ARM64 output; reject Windows managed/closed-world and
   inspection profiles. Cross-target object checks and macOS regressions pass.
   Add a Windows C consumer and focused CI job for calls, branches, faults and UTF-8
-  byte output; Windows linking/execution remains unqualified until that job runs.
+  byte output. The first dedicated Windows Server 2022 run now passes all four
+  tests with no skips, including 32 linked native/interpreter comparisons at
+  `7cfe2722`; downloaded artifact hashes are verified. This qualifies only the
+  bounded scalar/literal-console profile, not Windows GC/HTTP or project kits.
   Extend the dedicated GitHub Actions gate with exact-revision manual dispatch,
   explicit MSVC setup, retained objects/executables and compiler/linker/test logs,
   and a report that cannot pass when native execution is skipped or incomplete.

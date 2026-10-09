@@ -314,14 +314,14 @@ tools/aot-poc/target/debug/neoclr-aot-poc \
   --target x86_64-pc-windows-msvc
 ```
 
-Local cross-target tests inspect COFF architecture, exported entry symbol and
+Initial local cross-target tests inspect COFF architecture, exported entry symbol and
 relocations for scalar calls, control flow, arithmetic faults and literal-console
 output. They also reject unsupported targets/profiles and preserve existing output.
 The retained Raven-produced Hello World PE/#Neo artifact also emits an x64 COFF
 object through `@entry --console`; this reuses the recorded source/compiler fixture.
-This establishes object emission, **not Windows executable qualification**.
+Those initial checks establish object emission, not Windows executable qualification.
 [Evidence](experiments/windows-aot-scalar-validation.json) distinguishes those checks
-from the pending Windows run. The six existing inspection tests and seventeen scalar
+from the then-pending Windows run. The six existing inspection tests and seventeen scalar
 tests pass on macOS, including actual C-consumer/interpreter parity.
 
 On a Windows x64 MSVC developer command prompt, run:
@@ -336,7 +336,18 @@ results and fault codes. The bounded host locks stdout and sets redirected strea
 to binary mode, preserving UTF-8 bytes, LF and embedded NUL. Interactive console
 code-page/display policy is not qualified. The
 [focused Windows workflow](../.github/workflows/windows-aot-scalar.yml) runs this gate
-on relevant pushes/PRs or manual dispatch. It has not been run for this local slice.
+on relevant pushes/PRs or manual dispatch.
+
+**Windows execution qualified (2026-10-09):** the dedicated
+[GitHub run](https://github.com/marinasundstrom/neoCLR/actions/runs/37947583061)
+at `7cfe27222d875686f6ce5b0bfa052b8a64d05e88` passes all four tests with no skips
+on Windows Server 2022 x64. The MSVC-linked consumer passes 32 input comparisons
+covering calls, loops/branches, divide/overflow faults, UTF-8, NUL and LF output.
+The [retained report](windows-aot-execution-validation.json) includes toolchain
+identity, native outcomes and verified downloaded artifact hashes. The Raven Hello
+World fixture is object-emission-tested; its Windows executable run remains a
+separate next consumer. This supersedes the initial execution-pending status, not
+the managed-service/unwind limitations below.
 
 The dedicated job uses Windows Server 2022 with an explicit x64 MSVC developer
 environment. Manual dispatch accepts a `revision` commit/ref, and the report records
@@ -369,9 +380,10 @@ Those gaps must be addressed before broader native hosting/suspension qualificat
 Windows inspection, closed-world libraries, value/managed profiles, GC, task/socket
 services, native project kits and stack guards remain explicitly unsupported.
 The Windows C adapter is an acceptance host, not the Windows implementation of
-the macOS console/HTTP kit. Next qualify Windows linking/execution, then use actual
+the macOS console/HTTP kit. With bounded Windows linking/execution now qualified, use actual
 Raven-produced scalar/console metadata in execution before extending services or advertising
-Windows project publication. No local Windows host or emulator was available.
+Windows project publication. Windows execution was performed in GitHub Actions;
+no local Windows host or emulator was used.
 
 ## Shared native contracts to establish
 

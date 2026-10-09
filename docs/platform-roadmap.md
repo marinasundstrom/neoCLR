@@ -63,12 +63,14 @@ now packages the existing server and bounded host. Its
 [project/kit evidence](experiments/native-http-project-validation.json) covers
 greeting, fragmented requests, duplicate-length rejection, handler errors and guest
 callback faults with interpreter/native parity and standalone execution. The
-console profile remains separate. Next investigate the bounded Windows x64
-scalar/console portability slice, while reviewing suspension/scheduler lifecycle
+console profile remains separate. Continue reviewing suspension/scheduler lifecycle
 boundaries alongside native work. The first Windows slice now emits scalar/literal-
 console x64 COFF through explicit target selection; cross-target checks and macOS
 regressions pass. [Windows evidence](experiments/windows-aot-scalar-validation.json)
-keeps MSVC linking/execution pending the new focused Windows job. Windows project
+records the initial object-only boundary. The subsequent
+[dedicated Windows run](windows-aot-execution-validation.json) passes all four
+tests with no skips, including 32 MSVC-linked native/interpreter comparisons.
+Next run the Raven-produced Hello World as a Windows executable. Windows project
 kits and managed services remain unsupported. Full bootstrap, general hosting and
 reload remain open.
 

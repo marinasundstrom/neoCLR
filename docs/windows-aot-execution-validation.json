@@ -1,0 +1,347 @@
+{
+  "passed": true,
+  "scope": "Windows x64 scalar/literal-console AOT; no managed profiles or project kit qualification",
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "machine": "AMD64",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0,
+      "log": "revision.log"
+    },
+    {
+      "command": [
+        "rustc",
+        "-Vv"
+      ],
+      "exitCode": 0,
+      "log": "rustc.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "-V"
+      ],
+      "exitCode": 0,
+      "log": "cargo.log"
+    },
+    {
+      "command": [
+        "where.exe",
+        "cl"
+      ],
+      "exitCode": 0,
+      "log": "cl-location.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--manifest-path",
+        "tools/aot-poc/Cargo.toml",
+        "--test",
+        "windows_scalar",
+        "--",
+        "--nocapture"
+      ],
+      "exitCode": 0,
+      "log": "tests.log"
+    }
+  ],
+  "revision": "7cfe27222d875686f6ce5b0bfa052b8a64d05e88",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.0\nLLVM version: 23.1.1",
+  "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+  "cl": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+  "execution": {
+    "outcomes": [
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-3",
+        "exitCode": 0,
+        "input": -2147483648,
+        "stderr": "",
+        "stdout": "2\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-3",
+        "exitCode": 0,
+        "input": -2,
+        "stderr": "",
+        "stdout": "-2\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-3",
+        "exitCode": 0,
+        "input": -1,
+        "stderr": "",
+        "stdout": "0\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-3",
+        "exitCode": 0,
+        "input": 0,
+        "stderr": "",
+        "stdout": "2\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-3",
+        "exitCode": 0,
+        "input": 1,
+        "stderr": "",
+        "stdout": "4\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-3",
+        "exitCode": 0,
+        "input": 20,
+        "stderr": "",
+        "stdout": "42\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-3",
+        "exitCode": 0,
+        "input": 21,
+        "stderr": "",
+        "stdout": "44\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-3",
+        "exitCode": 0,
+        "input": 2147483647,
+        "stderr": "",
+        "stdout": "0\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-11",
+        "exitCode": 0,
+        "input": -2147483648,
+        "stderr": "",
+        "stdout": "-1\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-11",
+        "exitCode": 0,
+        "input": -2,
+        "stderr": "",
+        "stdout": "-1\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-11",
+        "exitCode": 0,
+        "input": -1,
+        "stderr": "",
+        "stdout": "-1\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-11",
+        "exitCode": 0,
+        "input": 0,
+        "stderr": "",
+        "stdout": "0\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-11",
+        "exitCode": 0,
+        "input": 1,
+        "stderr": "",
+        "stdout": "0\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-11",
+        "exitCode": 0,
+        "input": 20,
+        "stderr": "",
+        "stdout": "380\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-11",
+        "exitCode": 0,
+        "input": 21,
+        "stderr": "",
+        "stdout": "-2\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-11",
+        "exitCode": 0,
+        "input": 2147483647,
+        "stderr": "",
+        "stdout": "-2\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-13",
+        "exitCode": 0,
+        "input": -2147483648,
+        "stderr": "",
+        "stdout": "0\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-13",
+        "exitCode": 0,
+        "input": -2,
+        "stderr": "",
+        "stdout": "-100\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-13",
+        "exitCode": 1,
+        "input": -1,
+        "stderr": "DivideByZero\n",
+        "stdout": ""
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-13",
+        "exitCode": 0,
+        "input": 0,
+        "stderr": "",
+        "stdout": "100\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-13",
+        "exitCode": 0,
+        "input": 1,
+        "stderr": "",
+        "stdout": "50\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-13",
+        "exitCode": 0,
+        "input": 20,
+        "stderr": "",
+        "stdout": "4\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-13",
+        "exitCode": 0,
+        "input": 21,
+        "stderr": "",
+        "stdout": "4\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-13",
+        "exitCode": 1,
+        "input": 2147483647,
+        "stderr": "ArithmeticOverflow\n",
+        "stdout": ""
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-15",
+        "exitCode": 0,
+        "input": -2147483648,
+        "stderr": "",
+        "stdout": "Hello from ARM64 AOT \u2014 hej, \u05e9\u05dc\u05d5\u05dd, \ud83c\udf0d!\nnonzero\n\nNUL: A\u0000B; combining: e\u0301\n-2147483648\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-15",
+        "exitCode": 0,
+        "input": -2,
+        "stderr": "",
+        "stdout": "Hello from ARM64 AOT \u2014 hej, \u05e9\u05dc\u05d5\u05dd, \ud83c\udf0d!\nnonzero\n\nNUL: A\u0000B; combining: e\u0301\n-2\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-15",
+        "exitCode": 0,
+        "input": -1,
+        "stderr": "",
+        "stdout": "Hello from ARM64 AOT \u2014 hej, \u05e9\u05dc\u05d5\u05dd, \ud83c\udf0d!\nnonzero\n\nNUL: A\u0000B; combining: e\u0301\n-1\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-15",
+        "exitCode": 0,
+        "input": 0,
+        "stderr": "",
+        "stdout": "Hello from ARM64 AOT \u2014 hej, \u05e9\u05dc\u05d5\u05dd, \ud83c\udf0d!\nzero\n\nNUL: A\u0000B; combining: e\u0301\n0\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-15",
+        "exitCode": 0,
+        "input": 1,
+        "stderr": "",
+        "stdout": "Hello from ARM64 AOT \u2014 hej, \u05e9\u05dc\u05d5\u05dd, \ud83c\udf0d!\nnonzero\n\nNUL: A\u0000B; combining: e\u0301\n1\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-15",
+        "exitCode": 0,
+        "input": 20,
+        "stderr": "",
+        "stdout": "Hello from ARM64 AOT \u2014 hej, \u05e9\u05dc\u05d5\u05dd, \ud83c\udf0d!\nnonzero\n\nNUL: A\u0000B; combining: e\u0301\n20\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-15",
+        "exitCode": 0,
+        "input": 21,
+        "stderr": "",
+        "stdout": "Hello from ARM64 AOT \u2014 hej, \u05e9\u05dc\u05d5\u05dd, \ud83c\udf0d!\nnonzero\n\nNUL: A\u0000B; combining: e\u0301\n21\n"
+      },
+      {
+        "directory": "D:\\a\\neoCLR\\neoCLR\\target\\windows-aot-validation\\cases\\neoclr-windows-scalar-5900-15",
+        "exitCode": 0,
+        "input": 2147483647,
+        "stderr": "",
+        "stdout": "Hello from ARM64 AOT \u2014 hej, \u05e9\u05dc\u05d5\u05dd, \ud83c\udf0d!\nnonzero\n\nNUL: A\u0000B; combining: e\u0301\n2147483647\n"
+      }
+    ],
+    "passed": true
+  },
+  "files": {
+    "cargo.log": "1f88eaf7fe1aaec83184752cf4c944cd22f00184136ff36a3e4c318cc60ef566",
+    "cases/neoclr-windows-scalar-5900-0/input.neoil": "d21157fdba96d8ad24bcb7e59f462e592ed25a980e517e9f17b57b24ced59410",
+    "cases/neoclr-windows-scalar-5900-1/app.obj": "d8ccbae92053bbc573b802e25ebc37c952d73001d214be79e08343f4f8573fa3",
+    "cases/neoclr-windows-scalar-5900-1/RavenHello.pe": "7b3dc09c6979dd3fde39e4e2d541e847b0b2a7d8570a83f28b38da54bb70dbd2",
+    "cases/neoclr-windows-scalar-5900-10/app.obj": "6c12f0bdc4ce9f1e835ef409bf5c58a79214bedce42794bf3834606a93b4ab0a",
+    "cases/neoclr-windows-scalar-5900-10/input.neoil": "f051162b71b06e2d3793e1580b3669cee9251c89192dc97af0503d10202dfae5",
+    "cases/neoclr-windows-scalar-5900-11/app.exe": "2f72d8b1b9a1ec64d16832370ce4ec54a169733ce4d484aac0a13dbd3cb05e83",
+    "cases/neoclr-windows-scalar-5900-11/app.obj": "6c12f0bdc4ce9f1e835ef409bf5c58a79214bedce42794bf3834606a93b4ab0a",
+    "cases/neoclr-windows-scalar-5900-11/input.neoil": "f051162b71b06e2d3793e1580b3669cee9251c89192dc97af0503d10202dfae5",
+    "cases/neoclr-windows-scalar-5900-11/link.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cases/neoclr-windows-scalar-5900-11/link.stdout.log": "5d8b3b379ebf541e3b97066e1d1ac19a97fff7086d9923005e76c3e6689f439b",
+    "cases/neoclr-windows-scalar-5900-11/windows-scalar-host.obj": "f84c1537358a130804923d7f4619faddefb79864acdb0361ae60821d30c2308b",
+    "cases/neoclr-windows-scalar-5900-12/app.obj": "7d8f1521f1f224ce6768339427902c631b78071b558264d82624505754fd4ef0",
+    "cases/neoclr-windows-scalar-5900-12/input.neoil": "c47df09d936f59253e86ee5551a464c4c6372b6fd7b9fdd2749983d25463b8fd",
+    "cases/neoclr-windows-scalar-5900-13/app.exe": "b8cc215f4a41f761e2be8c217868fc9b9b0e2b041a40a0f905a553d4e7660f22",
+    "cases/neoclr-windows-scalar-5900-13/app.obj": "7d8f1521f1f224ce6768339427902c631b78071b558264d82624505754fd4ef0",
+    "cases/neoclr-windows-scalar-5900-13/input.neoil": "c47df09d936f59253e86ee5551a464c4c6372b6fd7b9fdd2749983d25463b8fd",
+    "cases/neoclr-windows-scalar-5900-13/link.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cases/neoclr-windows-scalar-5900-13/link.stdout.log": "5d8b3b379ebf541e3b97066e1d1ac19a97fff7086d9923005e76c3e6689f439b",
+    "cases/neoclr-windows-scalar-5900-13/windows-scalar-host.obj": "07c6aa770405ea273f77108cb859dd86649c932d29a94d9235d585ea1dd35565",
+    "cases/neoclr-windows-scalar-5900-14/app.obj": "968204feb25379e24f78ac2c4dfb2847588cac06ff25e1d504072b71444a8387",
+    "cases/neoclr-windows-scalar-5900-14/input.neoil": "bd96a225fc914eb48cb11ddf7b31a91234bcbdbc04207f999fc8b2541b423a9c",
+    "cases/neoclr-windows-scalar-5900-15/app.exe": "7801cdf1c312eaadaa209f6282ad3955c23442ffad9a95e89c4ae9cc7c5ff4a9",
+    "cases/neoclr-windows-scalar-5900-15/app.obj": "968204feb25379e24f78ac2c4dfb2847588cac06ff25e1d504072b71444a8387",
+    "cases/neoclr-windows-scalar-5900-15/input.neoil": "bd96a225fc914eb48cb11ddf7b31a91234bcbdbc04207f999fc8b2541b423a9c",
+    "cases/neoclr-windows-scalar-5900-15/link.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cases/neoclr-windows-scalar-5900-15/link.stdout.log": "5d8b3b379ebf541e3b97066e1d1ac19a97fff7086d9923005e76c3e6689f439b",
+    "cases/neoclr-windows-scalar-5900-15/windows-scalar-host.obj": "ef7adbc7a405268d5fb6a4e651c7bba6eae955b6e52299a8357ddb37bccde0bd",
+    "cases/neoclr-windows-scalar-5900-2/app.obj": "47a425af3c93cbb487ee6bd22e6b69cc523d91af302fc8b904d0fe858c16595e",
+    "cases/neoclr-windows-scalar-5900-2/input.neoil": "d21157fdba96d8ad24bcb7e59f462e592ed25a980e517e9f17b57b24ced59410",
+    "cases/neoclr-windows-scalar-5900-3/app.exe": "746a6e617c311da11997cd1e9a22e850ce40ba45e1a71fa0fab5b0123d516842",
+    "cases/neoclr-windows-scalar-5900-3/app.obj": "47a425af3c93cbb487ee6bd22e6b69cc523d91af302fc8b904d0fe858c16595e",
+    "cases/neoclr-windows-scalar-5900-3/input.neoil": "d21157fdba96d8ad24bcb7e59f462e592ed25a980e517e9f17b57b24ced59410",
+    "cases/neoclr-windows-scalar-5900-3/link.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cases/neoclr-windows-scalar-5900-3/link.stdout.log": "5d8b3b379ebf541e3b97066e1d1ac19a97fff7086d9923005e76c3e6689f439b",
+    "cases/neoclr-windows-scalar-5900-3/windows-scalar-host.obj": "308c26770a26942abd2cd48ab2bee729522464868819fe0374751e04d1ee0168",
+    "cases/neoclr-windows-scalar-5900-4/input.neoil": "d21157fdba96d8ad24bcb7e59f462e592ed25a980e517e9f17b57b24ced59410",
+    "cases/neoclr-windows-scalar-5900-5/input.neoil": "7dc89de4f960eaf315898b974679c437db7a926e0c294f90c3ff3215ab19b1be",
+    "cases/neoclr-windows-scalar-5900-6/input.neoil": "d21157fdba96d8ad24bcb7e59f462e592ed25a980e517e9f17b57b24ced59410",
+    "cases/neoclr-windows-scalar-5900-7/input.neoil": "d21157fdba96d8ad24bcb7e59f462e592ed25a980e517e9f17b57b24ced59410",
+    "cases/neoclr-windows-scalar-5900-8/input.neoil": "d21157fdba96d8ad24bcb7e59f462e592ed25a980e517e9f17b57b24ced59410",
+    "cases/neoclr-windows-scalar-5900-9/input.neoil": "d21157fdba96d8ad24bcb7e59f462e592ed25a980e517e9f17b57b24ced59410",
+    "cases/windows-execution.json": "98ac2ee16ca1281a9b7c4e315f9fcddaae10dbe0fb2adba06fa4929f0b09dfc6",
+    "cl-location.log": "ffe24ae01684abcfcb0816bd4ff464f54d7f6065395ca7248a11e465816ec1ff",
+    "revision.log": "dcae5463c9384ae7ff4dbed45ed8f263b143e03adfb7b2da0be36fe5f6a0170c",
+    "rustc.log": "5477f9bad65b15c4c5b31fc050fc72feba651ea1b330bc75cf356a4d6b0fbc80",
+    "tests.log": "21bf675af8ed339e1c95542c6dc7eaa49b509e8dd51b4f55a712a5a9524fb5f7"
+  },
+  "date": "2026-10-09",
+  "githubRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/37947583061",
+  "artifact": "windows-x64-aot-37947583061-1",
+  "downloadedFileHashesVerified": true,
+  "tests": {
+    "passed": 4,
+    "failed": 0,
+    "ignored": 0
+  }
+}

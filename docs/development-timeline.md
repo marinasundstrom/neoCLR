@@ -12694,3 +12694,20 @@ claim follows from these focused checks.
 - **Open:** stackful/stackless choice, carrier migration, preemption, public Scheduler
   shape and implementation scheduling remain unselected. The author clarification
   does not establish implemented green threads or expand the console kit's scope.
+
+## 2026-10-09 — Dedicated Windows AOT GitHub Action
+
+- **Author:** directs continued work and requests special actions for Windows
+  compilation, clarifying “GitHub action”.
+- **Assistant action:** expands the local Windows scalar workflow into an
+  exact-revision, manually dispatchable Windows Server 2022/MSVC gate with retained
+  compilation/link/execution artifacts and a native completion check. Pushes the
+  committed native slices and workflow so GitHub can execute the gate.
+- **Outcome:** [run 37947583061](https://github.com/marinasundstrom/neoCLR/actions/runs/37947583061)
+  at `7cfe27222d875686f6ce5b0bfa052b8a64d05e88` passes four tests, none skipped,
+  including 32 MSVC-linked native/interpreter comparisons. All 47 downloaded
+  evidence file hashes match the report. See the
+  [retained execution evidence](windows-aot-execution-validation.json).
+- **Boundary:** this closes the scalar/literal-console Windows execution gate.
+  Raven Hello World has Windows object emission evidence; its executable run,
+  Windows managed services/project kits and unwinding remain separate work.
