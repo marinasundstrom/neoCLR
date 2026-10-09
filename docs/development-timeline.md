@@ -25,6 +25,20 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-09 — Architecture and metadata explanations
+
+- **Author:** requests repository documentation and website pages for architecture
+  and metadata, and asks that the work be committed. Adds diagrams, specifically
+  suggesting runtime services shown as boxes in layers/levels.
+- **Assistant:** documents the implementation with shared diagrams for the source
+  pipeline, runtime/service layers and PE/NEOX/payload boundaries. Distinguishes
+  current transport, native execution limits and future CLI-derived direction,
+  and links the guides from the website and repository indexes.
+- **Scope:** documentation of existing behavior; no new runtime or format contract
+  and no change in roadmap priority. See [architecture](architecture.md) and
+  [metadata format](metadata-format.md). Validation and commit results are recorded
+  in the accompanying task response; website publication is a separate operation.
+
 ## 2026-10-09 — Implement the module foundation
 
 - **Author:** asks to implement module format and foundational neoCLR APIs, then

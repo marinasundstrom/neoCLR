@@ -2,6 +2,10 @@
   href: docs/index.md
 - name: Guides
   items:
+    - name: Architecture
+      href: architecture/index.md
+    - name: Metadata format
+      href: metadata/index.md
     - name: neoCLR and .NET
       href: comparison/index.md
     - name: Modules

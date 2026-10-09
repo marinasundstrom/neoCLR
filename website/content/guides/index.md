@@ -11,6 +11,11 @@ relevant differences from .NET. Use the [API reference](../docs/) to look up exa
 Coming from .NET? Start with the [platform comparison](../comparison/) for familiar
 concepts, different contracts and compatibility limits.
 
+## Platform foundations
+
+- [Architecture](../architecture/) — compiler, runtime layers, services and execution modes.
+- [Metadata format](../metadata/) — assembly ownership, PE/NEOX layers and validation.
+
 ## Cases: APIs in context
 
 Small, runnable examples show how APIs work together to solve a concrete problem.

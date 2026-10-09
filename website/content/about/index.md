@@ -10,6 +10,9 @@ neoCLR is an experimental application platform. It brings together application A
 TCP networking, streams, Storage, Tasks and isolated workers. The project is open
 source under the MIT license.
 
+Explore the [architecture](../architecture/) and [metadata format](../metadata/)
+for diagrams of the platform layers and compiled artifacts.
+
 ## Background
 
 The project starts from .NET’s managed-platform model: value and reference types, generics, interfaces, metadata and garbage collection. The question is which parts to preserve and which alternatives are worth testing when building an independent application platform.

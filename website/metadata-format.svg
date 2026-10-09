@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 615" role="img" aria-labelledby="title desc">
+<title id="title">Native artifact layers</title><desc id="desc">A PE image can contain a #Neo stream. That stream, or a standalone file, contains a NEOX envelope, a versioned execution section, and the format-5 module model.</desc>
+<rect width="660" height="615" rx="12" fill="#f5f7fb"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#365b86"/></marker></defs>
+<text x="330" y="35" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" fill="#14283e">Native artifact layers</text>
+<rect x="25" y="60" width="610" height="76" rx="8" fill="#ffffff" stroke="#5279a5"/>
+<text x="330" y="89" text-anchor="middle" font-family="system-ui, sans-serif" font-size="19" font-weight="600" fill="#14283e">Optional PE/CLI container</text>
+<text x="330" y="115" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" fill="#304b66">Recognition marker + metadata streams + binding digest</text>
+<path d="M330 138 V161" stroke="#365b86" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="25" y="165" width="610" height="76" rx="8" fill="#ffffff" stroke="#5279a5"/>
+<text x="330" y="194" text-anchor="middle" font-family="system-ui, sans-serif" font-size="19" font-weight="600" fill="#14283e">#Neo stream / standalone file begins here</text>
+<text x="330" y="220" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" fill="#304b66">NEOX 0.1 header and section directory</text>
+<path d="M330 243 V266" stroke="#365b86" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="25" y="270" width="610" height="76" rx="8" fill="#ffffff" stroke="#5279a5"/>
+<text x="330" y="299" text-anchor="middle" font-family="system-ui, sans-serif" font-size="19" font-weight="600" fill="#14283e">Required native execution section: kind 256</text>
+<text x="330" y="325" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" fill="#304b66">Schema 1: JSON; schemas 2, 3 and 4: bounded CBOR</text>
+<path d="M330 348 V371" stroke="#365b86" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="25" y="375" width="610" height="76" rx="8" fill="#ffffff" stroke="#5279a5"/>
+<text x="330" y="404" text-anchor="middle" font-family="system-ui, sans-serif" font-size="19" font-weight="600" fill="#14283e">Semantic module format 5</text>
+<text x="330" y="430" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" fill="#304b66">Assembly manifests, types, functions and references</text>
+<path d="M330 453 V476" stroke="#365b86" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="25" y="480" width="610" height="76" rx="8" fill="#ffffff" stroke="#5279a5"/>
+<text x="330" y="509" text-anchor="middle" font-family="system-ui, sans-serif" font-size="19" font-weight="600" fill="#14283e">Identity, signatures and instruction bodies</text>
+<text x="330" y="535" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" fill="#304b66">Decoded model feeds linking, verification and execution</text>
+</svg>

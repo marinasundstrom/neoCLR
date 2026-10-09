@@ -1,5 +1,9 @@
 # Platform execution and compilation architecture
 
+For a current implementation overview and service-layer diagrams, start with
+[neoCLR architecture](architecture.md). This document retains the architectural
+requirements and the sequence of native experiments.
+
 Status: architectural requirements and proposed implementation sequence. Interpretation
 is implemented; a separate [ARM64 scalar AOT experiment](experiments/aot-scalar/README.md)
 now emits a small native subset. General native AOT, JIT compilation and a general

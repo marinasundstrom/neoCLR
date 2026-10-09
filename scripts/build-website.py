@@ -261,7 +261,8 @@ def main():
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
     OUTPUT.mkdir(parents=True)
-    for name in ('custom.css', 'mark.svg', 'favicon.svg'):
+    for name in ('custom.css', 'mark.svg', 'favicon.svg', 'architecture.svg',
+                 'runtime-layers.svg', 'metadata-format.svg'):
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {

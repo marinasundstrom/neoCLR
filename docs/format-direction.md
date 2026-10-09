@@ -6,6 +6,10 @@ multiple backends, not a serialization of interpreter-only execution state. Nati
 artifacts and exports need additional target/linkage information; their schema remains
 open. Hosting consumes these contracts and does not define the execution modes.
 
+For the current reader/writer contract, see [metadata format](metadata-format.md).
+The early implementation and next-milestone descriptions below retain their original
+planning context; they do not describe the complete current native transport.
+
 ## Planned Raven integration experiment
 
 The [Raven target experiment](raven-target-experiment.md), planned 2026-09-12, tests

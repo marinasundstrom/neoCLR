@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 660" role="img" aria-labelledby="title desc">
+<title id="title">Runtime layers and services</title>
+<desc id="desc">Applications use Raven library APIs. Library code executes through the interpreter or supported AOT backend. Managed execution provides calls, storage and GC, text and numbers, and task scheduling. Service adapters connect console, files, sockets and native interop to OS resources. Layers show responsibilities, not separate processes.</desc>
+<rect width="720" height="660" rx="12" fill="#f5f7fb"/>
+<style>text{font-family:system-ui,sans-serif;fill:#14283e;text-anchor:middle}.label{font-size:18px;font-weight:600}.item{font-size:16px}.box{fill:white;stroke:#5279a5;stroke-width:1.5}.band{fill:#e5edf7;stroke:#b3c6dd}</style>
+<text x="360" y="32" class="label">Runtime layers and services</text>
+<rect class="box" x="20" y="52" width="680" height="57" rx="8"/>
+<text x="360" y="87" class="label">Applications · Raven programs</text>
+<path d="M360 111v18m-6-6 6 6 6-6" fill="none" stroke="#365b86" stroke-width="2"/>
+<rect class="band" x="20" y="135" width="680" height="95" rx="8"/>
+<text x="360" y="162" class="label">Raven class library</text>
+<rect class="box" x="34" y="175" width="210" height="40" rx="5"/><text class="item" x="139" y="201">Collections · JSON</text>
+<rect class="box" x="254" y="175" width="210" height="40" rx="5"/><text class="item" x="359" y="201">Tasks · Storage</text>
+<rect class="box" x="474" y="175" width="210" height="40" rx="5"/><text class="item" x="579" y="201">Networking · HTTP</text>
+<path d="M360 233v18m-6-6 6 6 6-6" fill="none" stroke="#365b86" stroke-width="2"/>
+<rect class="band" x="20" y="257" width="680" height="174" rx="8"/>
+<text x="360" y="284" class="label">Managed execution and runtime primitives</text>
+<text x="360" y="309" class="item">Interpreter / supported ARM64 AOT code + linked support</text>
+<rect class="box" x="34" y="323" width="320" height="42" rx="5"/><text class="item" x="194" y="350">Calls · dispatch · initialization</text>
+<rect class="box" x="366" y="323" width="320" height="42" rx="5"/><text class="item" x="526" y="350">Managed storage · roots · GC</text>
+<rect class="box" x="34" y="375" width="320" height="42" rx="5"/><text class="item" x="194" y="402">UTF-8 text · numeric operations</text>
+<rect class="box" x="366" y="375" width="320" height="42" rx="5"/><text class="item" x="526" y="402">Queues · scheduling · Faults</text>
+<path d="M360 434v18m-6-6 6 6 6-6" fill="none" stroke="#365b86" stroke-width="2"/>
+<rect class="band" x="20" y="458" width="680" height="93" rx="8"/>
+<text x="360" y="485" class="label">Host service and interop boundary</text>
+<rect class="box" x="34" y="499" width="210" height="38" rx="5"/><text class="item" x="139" y="524">Console · files</text>
+<rect class="box" x="254" y="499" width="210" height="38" rx="5"/><text class="item" x="359" y="524">DNS · sockets · clocks</text>
+<rect class="box" x="474" y="499" width="210" height="38" rx="5"/><text class="item" x="579" y="524">Native interop</text>
+<path d="M360 554v18m-6-6 6 6 6-6" fill="none" stroke="#365b86" stroke-width="2"/>
+<rect class="box" x="20" y="578" width="680" height="57" rx="8"/>
+<text x="360" y="612" class="label">Operating system and explicit foreign libraries</text>
+</svg>

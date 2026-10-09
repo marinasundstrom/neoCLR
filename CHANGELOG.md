@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Add architecture and metadata-format documentation and website guides, with
+  compilation, layered runtime-service and artifact-format diagrams. Document
+  current PE/NEOX encoding, ownership, admission boundaries and native execution
+  limits; link both guides through website and repository navigation.
+
 - Admit nonmatching Char box tests in the closed native profile, preserving null
   Object results while rejecting Char box producers. Production Option/Result
   string-payload descriptions now match project/interpreter/ARM64 execution,

@@ -26,6 +26,11 @@ are not evidence that an API is available.
 | [Contributing](contributing/README.md) | Research, changelog and release workflow |
 | [Experiments](experiments/README.md) | Executable probes and their supporting notes |
 
+## Platform foundations
+
+- [Architecture](architecture.md): source, runtime layers, services and execution modes.
+- [Metadata format](metadata-format.md): implemented PE/NEOX transport, payload and ownership.
+
 ## Organization and status
 
 The section indexes categorize the existing documents while preserving their paths.
