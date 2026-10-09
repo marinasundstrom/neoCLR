@@ -246,7 +246,7 @@ About and Guides link to this canonical comparison instead of maintaining copies
 ## Guides navigation (2026-10-09)
 
 `website/guides-toc.yml` owns the Guides article hierarchy; `website/toc.yml`
-contains only API overview/reference navigation. The build stages guide sources
+contains API overview/reference navigation and structural type contracts. The build stages guide sources
 under an explicit RavenDoc navigation section while preserving their published
 `/features/`, `/docs/` and other article URLs. This keeps saved links stable and
 lets Guides use the same visible article sidebar across folders. The API browser

@@ -23,6 +23,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Separate Guides from the API reference tree, using an independently visible
   article sidebar with current-page navigation while preserving existing URLs.
+  Keep structural type contracts (Array, Function, Tuple, Union and proposed
+  Intersection) in the API reference; usage articles remain Guides.
   Pin the shared RavenDoc section-navigation fix; check the complete site and
   desktop/mobile navigation before publication.
 

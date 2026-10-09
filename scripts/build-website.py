@@ -497,6 +497,8 @@ def main():
     guide_toc = (SOURCE / 'guides-toc.yml').read_text()
     guide_paths = {Path(path) for path in re.findall(r'^\s*href: (.+)$', guide_toc, re.M)}
     guide_outputs = []
+    structural_reference = {"structural-types.md", "arrays.md", "functions.md",
+                            "tuples.md", "unions.md", "intersections.md"}
     for source, relative in sources:
         template = source.read_text().replace('{{TOUR_OUTPUT}}', output_text).replace('{{ARRAY_OUTPUT}}', array_output)
         markdown = render(template, samples, html=source.suffix == '.html')
@@ -507,7 +509,8 @@ def main():
         source_relative = relative.with_suffix(source.suffix)
         is_guide = (source_relative in guide_paths or
                     relative.parts[0] in ('features', 'cases', 'guides') or
-                    source.parent == ROOT / 'api-docs' and source.name != 'index.md')
+                    source.parent == ROOT / 'api-docs' and
+                    source.name not in structural_reference | {'index.md'})
         staged = staging / ('guide-content' if is_guide else '') / source_relative
         if is_guide:
             guide_outputs.append(relative)

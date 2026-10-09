@@ -29,6 +29,8 @@ def main():
     assert (source / 'System/Object/method_GetHashCode.html').is_file()
     navigation = (source / 'api-navigation.html').read_text()
     assert 'method_Exp.html' in navigation
+    assert 'structural-types.html' in navigation and 'arrays.html' in navigation
+    assert 'Platform foundations' not in navigation, 'Guides leaked into the API tree'
     function_link = re.search(r'<a[^>]*href="[^"]*System/Math/method_Exp\.html"[^>]*>.*?</a>', navigation, re.S)
     assert function_link and 'symbol-icon--function' in function_link[0]
     module_page = (source / 'System/Math/index.html').read_text()

@@ -131,9 +131,17 @@ if (args.Length == 3)
     var links = theme.GetProperty("links").EnumerateArray()
         .Select(link => new DocumentationSiteLink(link.GetProperty("label").GetString()!, link.GetProperty("url").GetString()!)).ToArray();
     apiOutput = Path.Combine(site, "docs/api");
+    var websiteRoot = Path.Combine(repository, "website");
+    var navigationType = typeof(DocumentationGenerator).Assembly.GetType("DocumentationTableOfContents")!;
+    var loadNavigation = navigationType.GetMethod("Load", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!;
+    Func<string, string, string> resolveArticle = (source, _) =>
+        Path.ChangeExtension(Path.GetRelativePath(websiteRoot, source), ".html").Replace('\\', '/');
+    var navigation = (IReadOnlyList<DocumentationNavigationItem>)loadNavigation.Invoke(null,
+        [Path.Combine(websiteRoot, "toc.yml"), websiteRoot, resolveArticle])!;
     options = options with
     {
         Links = links,
+        Navigation = navigation,
         SiteRootDirectory = site,
         ProjectName = Setting("name"),
         Logo = Setting("logo"),

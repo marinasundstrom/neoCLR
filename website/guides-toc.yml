@@ -56,20 +56,6 @@
   items:
     - name: "Building a Http server app"
       href: cases/http-server/index.md
-- name: Structural types
-  items:
-    - name: "Structural types"
-      href: docs/structural-types.md
-    - name: "Array"
-      href: docs/arrays.md
-    - name: "Function"
-      href: docs/functions.md
-    - name: "Tuple"
-      href: docs/tuples.md
-    - name: "Union"
-      href: docs/unions.md
-    - name: "Intersection (proposed)"
-      href: docs/intersections.md
 - name: Development walkthroughs
   items:
     - name: "Storage providers"

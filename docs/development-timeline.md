@@ -12502,3 +12502,7 @@ claim follows from these focused checks.
   is on Raven main `6fae3c4e4` and the integration line `24a1a3716`. The neoCLR
   build checks all 3,491 pages; desktop/mobile review confirmed the visible sidebar,
   current-page links and separate API tree. Package qualification continues independently.
+
+- **Author correction:** structural types should remain in API reference. Restore
+  the structural overview and Array, Function, Tuple, Union and proposed Intersection
+  contracts to the API menu; retain the separate feature/usage guides in Guides.
