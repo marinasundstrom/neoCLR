@@ -75,6 +75,7 @@ pub(crate) enum Binding {
     Utf8Encode,
     Utf8Decode,
     StringConcat,
+    StringReplaceOrdinal,
     StringJoinParts,
     StringIntern,
     StringFromChars,
@@ -543,6 +544,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             "neoCLR.Runtime.StringJoinParts",
             [Type::ArrayRef(element), Type::Int32, Type::String, Type::Int32],
         ) if **element == Type::String => (Binding::StringJoinParts, Type::String),
+        ("neoCLR.Runtime.StringReplaceOrdinal", [Type::String, Type::String, Type::String]) => {
+            (Binding::StringReplaceOrdinal, Type::String)
+        }
         ("neoCLR.Runtime.StringConcat", [Type::String, Type::String]) => {
             (Binding::StringConcat, Type::String)
         }
@@ -1357,6 +1361,30 @@ impl Binding {
                     text.push_str(part);
                 }
                 Ok(Value::String(text.into()))
+            }
+            (Self::StringReplaceOrdinal, [Value::String(text), Value::String(old), Value::String(new)]) => {
+                let invalid = || Fault::coded(crate::FaultCode::RuntimeError, "Runtime error");
+                if old.is_empty() {
+                    return Err(invalid());
+                }
+                let count = text.matches(old.as_ref()).count();
+                if count == 0 || old == new {
+                    return Ok(Value::String(text.clone()));
+                }
+                let length = text.len()
+                    .checked_sub(count.checked_mul(old.len()).ok_or_else(invalid)?)
+                    .and_then(|n| n.checked_add(count.checked_mul(new.len())?))
+                    .ok_or_else(invalid)?;
+                let mut result = String::new();
+                result.try_reserve_exact(length).map_err(|_| invalid())?;
+                let mut start = 0;
+                for (at, _) in text.match_indices(old.as_ref()) {
+                    result.push_str(&text[start..at]);
+                    result.push_str(new);
+                    start = at + old.len();
+                }
+                result.push_str(&text[start..]);
+                Ok(Value::String(result.into()))
             }
             (Self::StringConcat, [Value::String(left), Value::String(right)]) => {
                 let length = left

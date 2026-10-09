@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.StringReplaceOrdinal(String text, String oldValue, String newValue) -> String
+    .methodimpl InternalCall
+.end

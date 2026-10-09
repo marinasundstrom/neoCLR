@@ -5134,3 +5134,108 @@ ret
         assert!(result.stdout.is_empty() && result.stderr.is_empty());
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn string_replace_ordinal_matches_interpreter_and_checks_admission() {
+    let seed = neoclr::assemble(&format!(
+        ".module System\n.references ()\n{}\n{}",
+        include_str!("../../../runtime/neoCLR/Runtime/StringReplaceOrdinal.neoil"),
+        include_str!("../../../runtime/neoCLR/Runtime/StringCompareOrdinal.neoil")
+    ))
+    .unwrap();
+    let cases = [
+        ("", "a", "x", ""),
+        ("abc", "z", "x", "abc"),
+        ("abc", "a", "a", "abc"),
+        ("aaaaa", "aa", "X", "XXa"),
+        ("a", "a", "aa", "aa"),
+        ("banana", "na", "", "ba"),
+        ("hé🙂\0hé", "hé", "é", "é🙂\0é"),
+        ("a\0b\0", "\0", "🙂", "a🙂b🙂"),
+        ("a\"b\\c", "\\", "\\\\", "a\"b\\\\c"),
+        ("a\"b", "\"", "\\\"", "a\\\"b"),
+        ("abc", "abcd", "", "abc"),
+        ("abc", "", "x", ""),
+    ];
+    for (text, old, new, expected) in cases {
+        let literal = |s: &str| serde_json::to_string(s).unwrap();
+        let source = format!(
+            ".module Replace\n.function Calculate(Int32 unused) -> Int32\nldstr {}\nldstr {}\nldstr {}\ncall neoCLR.Runtime.StringReplaceOrdinal(String,String,String)\nldstr {}\ncall neoCLR.Runtime.StringCompareOrdinal(String,String)\nret\n.end\n",
+            literal(text),
+            literal(old),
+            literal(new),
+            literal(expected)
+        );
+        let app = neoclr::assembler::read_modules(
+            &[neoclr::assembler::ModuleInput::Source(&source)],
+            &seed,
+        )
+        .unwrap()
+        .remove(0);
+        let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+        let method = program
+            .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
+            .unwrap();
+        let interpreted = method.invoke(vec![neoclr::Value::Int32(0)], neoclr::Limits::default());
+        if old.is_empty() {
+            assert_eq!(
+                interpreted.unwrap_err().code,
+                neoclr::FaultCode::RuntimeError
+            );
+        } else {
+            assert_eq!(interpreted.unwrap().value, neoclr::Value::Int32(0));
+        }
+        let dir = Temp::new();
+        let result = compile_linked_module(
+            &dir,
+            &seed,
+            &app,
+            &["--compile-system", "--reference-arena", "--bind-utf8-text"],
+        );
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+        let result = Command::new("clang")
+            .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror"])
+            .arg(base.join("aot-console/text-host.c"))
+            .arg(base.join("aot-console/text-arena.c"))
+            .arg(base.join("aot-fault-details/render.c"))
+            .arg(dir.0.join("app.o"))
+            .arg("-o")
+            .arg(dir.0.join("app"))
+            .output()
+            .unwrap();
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        let result = Command::new(dir.0.join("app"))
+            .env_clear()
+            .output()
+            .unwrap();
+        assert_eq!(
+            result.status.code(),
+            Some(if old.is_empty() { 1 } else { 0 })
+        );
+        if old.is_empty() {
+            assert!(
+                String::from_utf8_lossy(&result.stderr).starts_with("RuntimeError: Runtime error")
+            );
+        } else {
+            assert!(result.stdout.is_empty() && result.stderr.is_empty());
+        }
+        let rejected = Temp::new();
+        let result = compile_linked_module(
+            &rejected,
+            &seed,
+            &app,
+            &["--compile-system", "--reference-arena"],
+        );
+        assert!(!result.status.success() && !rejected.0.join("app.o").exists());
+    }
+}

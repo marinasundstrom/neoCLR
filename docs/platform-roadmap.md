@@ -20,8 +20,10 @@ payload display and full core bootstrap remain open.
 Immediate constructed value receivers now lower through single-evaluation temporary
 storage. The [escaping audit](experiments/native-core-bootstrap/README.md#constructed-receivers-and-escaping-audit-2026-10-09)
 confirms that quotes/backslashes remain unescaped in both modes because String.Replace
-is absent. Prioritize a real shared replacement/escaping contract; full core bootstrap
-remains open.
+is absent. The private interpreter/native replacement service now passes focused
+UTF-8 and fault checks; next expose the String member and qualify production union
+escaping. [Service contract](experiments/native-core-bootstrap/README.md#private-ordinal-replacement-service-2026-10-09).
+Full core bootstrap remains open.
 [Union source evidence](experiments/native-core-bootstrap/README.md#production-union-source-subset-2026-10-09).
 [Text-service evidence](experiments/native-core-bootstrap/README.md#native-text-services-and-module-projection-2026-10-09).
 

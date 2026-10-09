@@ -356,3 +356,49 @@ escaping checks. Cover quote/backslash ordering, Unicode, NUL, repeated/absent
 matches and output limits. A dedicated escaping service is an alternative with a
 smaller contract but additional compiler-target coupling; it should not be hidden
 in fixture-only formatting. Neither alternative is implemented by this slice.
+
+
+## Private ordinal replacement service (2026-10-09)
+
+`neoCLR.Runtime.StringReplaceOrdinal(String,String,String) -> String` is now a
+reserved InternalCall service, classified with shared String operations. The
+interpreter and ARM64 `--compile-system --reference-arena --bind-utf8-text` profile
+implement immutable, left-to-right, non-overlapping replacement. Replacement text
+is not searched again. Empty replacement deletes matches; no match or identical
+replacement returns the original String reference. Empty search faults with the
+standard RuntimeError message. This service requires non-null String arguments.
+
+This retains the ordinary immutable/ordinal behavior of the .NET Replace contract
+linked above, using exact UTF-8 matches rather than UTF-16 storage. Unlike .NET's
+null-as-deletion overload contract, the private service requires explicit empty
+replacement; it uses neoCLR faults instead of argument exceptions. Culture-aware
+matching and normalization are outside this contract. The public String facade is
+still pending, so the existing escaping audit remains a known-failure audit.
+
+The private native ABI `neoclr_string_replace_ordinal_v1` accepts three valid,
+readable immutable UTF-8 descriptors, an arena and an output slot. It counts matches
+and checks result size before a single allocation through the shared text allocator;
+it publishes output only after copying completes. Invalid arguments use RuntimeError;
+insufficient native arena space uses NativeMemoryLimit. Interpreter allocation
+failure uses RuntimeError, consistent with existing String allocation services.
+This is host allocation policy, not a promise of identical resource limits.
+The ABI trusts descriptor lengths and UTF-8 validity, as other private text kernels do.
+The AOT binding uses existing service root/safepoint handling. No public/stable ABI
+or throughput improvement is claimed; scanning is currently simple byte matching.
+
+Validation: `cargo test --manifest-path tools/aot-poc/Cargo.toml --test console
+string_replace_ordinal_matches_interpreter_and_checks_admission` passes twelve
+interpreter/native cases covering Unicode, NUL, deletion, nonrecursive and
+non-overlapping matching, quote/backslash replacement, empty search and missing
+binding rejection before object output. `cargo test --test native
+native_registry_checks_full_signature_and_implementation_shape` checks rejected
+signatures. The direct [kernel harness](../aot-console/replace-test.c) checks input
+immutability, unchanged-result identity, invalid arguments and exhausted arena
+without changing output/cursor; it passes with `clang -arch arm64 -Wall -Wextra
+-Werror -fsanitize=undefined` linked with `text-arena.c`. AddressSanitizer could
+not run on this host: sampling showed a sanitizer initialization deadlock before
+main in the macOS 27 allocator/dyld integration; no ASan pass is claimed.
+
+Next connect and document the production String.Replace member, then convert the
+union audit to positive escaping checks. No Raven compiler change is needed for
+this private service slice, and no new public website API is claimed yet.

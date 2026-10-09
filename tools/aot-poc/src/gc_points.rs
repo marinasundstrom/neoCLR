@@ -46,6 +46,7 @@ pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fau
                 &d.string_starts_with_ordinal,
                 &d.string_ends_with_ordinal,
                 &d.string_concat,
+                &d.string_replace_ordinal,
                 &d.string_join_parts,
                 &d.string_byte_count,
                 &d.utf8_decode,

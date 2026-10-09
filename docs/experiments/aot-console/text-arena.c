@@ -475,3 +475,49 @@ int32_t neoclr_path_file_name_unix_v1(const neoclr_aot_text *path,
     while (start && path->bytes[start - 1] != '/') start--;
     return store_text((const char *)path->bytes + start, (size_t)(path->length - start), arena, output);
 }
+
+
+int32_t neoclr_string_replace_ordinal_v1(const neoclr_aot_text *text,
+    const neoclr_aot_text *old_value, const neoclr_aot_text *new_value,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    if (!text || !old_value || !new_value || !old_value->length || !arena || !output ||
+        arena->used > arena->capacity || (arena->capacity && !arena->data) ||
+        ((uintptr_t)arena->data & 7)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (old_value->length > text->length ||
+        (old_value->length == new_value->length &&
+         !memcmp(old_value->bytes, new_value->bytes, (size_t)old_value->length))) {
+        *output = text;
+        return 0;
+    }
+    uint64_t length = text->length, count = 0;
+    for (uint64_t at = 0; at <= text->length - old_value->length;) {
+        if (memcmp(text->bytes + at, old_value->bytes, (size_t)old_value->length)) { ++at; continue; }
+        if (new_value->length >= old_value->length) {
+            uint64_t growth = new_value->length - old_value->length;
+            if (growth > UINT64_MAX - length) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+            length += growth;
+        } else { length -= old_value->length - new_value->length; }
+        ++count;
+        at += old_value->length;
+    }
+    if (!count) { *output = text; return 0; }
+    if (length > UINT64_MAX - 8) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    void *storage;
+    int32_t status = reserve_storage(arena, 8 + length, TEXT_STORAGE, &storage);
+    if (status) return status;
+    neoclr_aot_text *result = storage;
+    result->length = length;
+    uint64_t start = 0, written = 0;
+    for (uint64_t at = 0; at <= text->length - old_value->length;) {
+        if (memcmp(text->bytes + at, old_value->bytes, (size_t)old_value->length)) { ++at; continue; }
+        memcpy(result->bytes + written, text->bytes + start, (size_t)(at - start));
+        written += at - start;
+        memcpy(result->bytes + written, new_value->bytes, (size_t)new_value->length);
+        written += new_value->length;
+        at += old_value->length;
+        start = at;
+    }
+    memcpy(result->bytes + written, text->bytes + start, (size_t)(text->length - start));
+    *output = result;
+    return 0;
+}

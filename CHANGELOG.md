@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Add the private ordinal UTF-8 replacement service to interpreter and ARM64 native
+  text bindings, with non-overlapping replacement, deletion, unchanged-result
+  identity and checked allocation. Focused parity and failure-path checks pass.
+  The public String.Replace facade and production union escaping remain pending.
+
 - Qualify Raven's immediate constructed-value receiver fix with native-only union
   display and imported ordinary/generic/nested receiver checks. Add an explicitly
   failing-contract escaping audit: both modes still quote payloads without escaping

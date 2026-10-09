@@ -36,6 +36,8 @@ fn methodimpl_internalcall_round_trips_as_clr_flag() {
 #[test]
 fn native_registry_checks_full_signature_and_implementation_shape() {
     for declaration in [
+        ".function neoCLR.Runtime.StringReplaceOrdinal(String,String) -> String\n.methodimpl InternalCall",
+        ".function neoCLR.Runtime.StringReplaceOrdinal(String,String,String) -> Int32\n.methodimpl InternalCall",
         ".function neoCLR.Runtime.Int64ToString(UInt64) -> String\n.methodimpl InternalCall",
         ".function neoCLR.Runtime.UInt64ToString(Int64) -> String\n.methodimpl InternalCall",
         ".function neoCLR.Runtime.Int64ToString(Int64) -> Int64\n.methodimpl InternalCall",

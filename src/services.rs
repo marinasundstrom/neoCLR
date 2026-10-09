@@ -185,6 +185,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             | crate::native::Binding::StringGraphemeAt
             | crate::native::Binding::StringIntern
             | crate::native::Binding::StringConcat
+            | crate::native::Binding::StringReplaceOrdinal
             | crate::native::Binding::StringCompareOrdinal
             | crate::native::Binding::StringCompareOrdinalIgnoreCase
             | crate::native::Binding::StringHashOrdinalIgnoreCase

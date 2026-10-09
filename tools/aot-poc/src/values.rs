@@ -390,6 +390,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             (&d.utf8_encode, "neoclr_utf8_encode_v1", vec![types::I64, types::I64, types::I64]),
             (&d.utf8_decode, "neoclr_utf8_decode_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_join_parts, "neoclr_string_join_parts_v1", vec![types::I64, types::I32, types::I64, types::I32, types::I64, types::I64]),
+            (&d.string_replace_ordinal, "neoclr_string_replace_ordinal_v1", vec![types::I64, types::I64, types::I64, types::I64, types::I64]),
             (&d.string_concat, "neoclr_string_concat_v1", vec![types::I64, types::I64, types::I64, types::I64]),
             (&d.string_byte_count, "neoclr_string_byte_count_v1", vec![types::I64, types::I64]),
             (&d.string_slice_utf8, "neoclr_string_slice_utf8_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
@@ -898,7 +899,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 } else if details.unwrap().string_join_parts.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], parameters[2], parameters[3], arena, output]
-                } else if details.unwrap().string_slice_utf8.contains(&i) {
+                } else if details.unwrap().string_slice_utf8.contains(&i) || details.unwrap().string_replace_ordinal.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], parameters[2], arena, output]
                 } else if details.unwrap().string_concat.contains(&i) || details.unwrap().path_combine.contains(&i) {
