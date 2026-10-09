@@ -1,7 +1,7 @@
 # neoCLR
 
 [![CI](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml)
-[![Preview 12](https://img.shields.io/badge/release-v0.1.0--preview.12-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.12)
+[![Preview 13](https://img.shields.io/badge/release-v0.1.0--preview.13-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.13)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
 
@@ -15,7 +15,7 @@ classes and arrays have reference semantics, while values are copied. Managed by
 remain available for explicit slot access. Low-level typed pointers and native
 allocation provide a separate interop path.
 
-The native Raven target combines CLI-based NeoCLR metadata, direct native symbol
+The native Raven target combines neoCLR metadata in a PE container, direct native symbol
 import/emission and a standalone Rust interpreter with source-built library subsets.
 The older bounded CIL import bridge remains a separate legacy workflow. Recoverable errors use `Result`,
 absence uses `Option`, and `Void` can be a generic unit type while ordinary void calls
@@ -36,17 +36,17 @@ contracts wherever the deliberate differences permit; see [API policy](docs/api-
 
 Assembly source syntax is free to evolve. The intended emitted metadata and CIL
 remain based on the CLI model so existing parsing/tooling can be reused where
-possible; deviations should be driven by a semantic requirement. Preview 12 executes
+possible; deviations should be driven by a semantic requirement. The runtime executes
 native PE/#Neo metadata assemblies; JSON remains a legacy/intermediate input. See
 [format direction](docs/format-direction.md) and
 [assembler expressiveness](docs/assembler-design.md).
 
 ## Try the runtime and Raven experiment
 
-**Preview 12** supplies a matched macOS arm64 native bundle with Raven compiler,
+**Preview 13** supplies matched Windows x64 and macOS ARM64 bundles with Raven compiler,
 language server, VS Code extension, runtime, source-built libraries and executable
 collections, Tasks, JSON and HTTP samples. Install and verify using the
-[Preview 12 release notes](docs/preview-12-release-notes.md). Library symbols come
+[Preview 13 release notes](docs/preview-13-release-notes.md). Library symbols come
 from native metadata. The primitive core and retained runtime seed remain explicit
 bootstrap inputs; the full System library is not yet independently bootstrapped.
 

@@ -1,11 +1,13 @@
 {
   "subtitle": "Experimental application platform",
-  "footer": "neoCLR · Experimental application platform",
-  "notice": "Development documentation · Some APIs may be unreleased",
-  "releaseUrl": "https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.12",
+  "footer": "neoCLR \u00b7 Experimental application platform",
+  "notice": "Development documentation \u00b7 Some APIs may be unreleased",
+  "releaseUrl": "https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.13",
   "releaseLabel": "Published release \u2192",
   "apiPath": "docs/api",
-  "apiInputs": ["api-docs/reference/NeoCLR.CoreProbe.dll"],
+  "apiInputs": [
+    "api-docs/reference/NeoCLR.CoreProbe.dll"
+  ],
   "logo": "mark.svg",
   "stylesheet": "custom.css",
   "memberListStyle": "compact",
@@ -64,5 +66,11 @@
       "runtime/raven/src"
     ]
   },
-  "moduleTerminology": true
+  "moduleTerminology": true,
+  "navigationSections": [
+    {
+      "path": "guide-content",
+      "title": "Guides"
+    }
+  ]
 }

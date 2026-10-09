@@ -492,6 +492,11 @@ def main():
                 for source in sorted((ROOT / 'api-docs').glob('*.md')) if source.name != 'README.md']
     sources += [(ROOT / 'api-docs' / entry['source'], Path(entry['output']))
                 for entry in json.loads((ROOT / 'api-docs/manual-types.json').read_text()).values()]
+    # Source sections select RavenDoc's sidebar independently of published URLs.
+    # Existing /features/ and /docs/ guide links stay valid after the menu split.
+    guide_toc = (SOURCE / 'guides-toc.yml').read_text()
+    guide_paths = {Path(path) for path in re.findall(r'^\s*href: (.+)$', guide_toc, re.M)}
+    guide_outputs = []
     for source, relative in sources:
         template = source.read_text().replace('{{TOUR_OUTPUT}}', output_text).replace('{{ARRAY_OUTPUT}}', array_output)
         markdown = render(template, samples, html=source.suffix == '.html')
@@ -499,15 +504,28 @@ def main():
         markdown = re.sub(r'(?<=\])\(([^):]+)\.md([#?][^)]*)?\)',
                           lambda m: '(' + m[1] + '.html' + (m[2] or '') + ')', markdown)
         title = re.search(r'^# (.+)$', markdown, re.M)
-        staged = staging / relative.with_suffix(source.suffix)
+        source_relative = relative.with_suffix(source.suffix)
+        is_guide = (source_relative in guide_paths or
+                    relative.parts[0] in ('features', 'cases', 'guides') or
+                    source.parent == ROOT / 'api-docs' and source.name != 'index.md')
+        staged = staging / ('guide-content' if is_guide else '') / source_relative
+        if is_guide:
+            guide_outputs.append(relative)
         staged.parent.mkdir(parents=True, exist_ok=True)
         staged.write_text(markdown)
         config['pages'].append(dict(source=str(staged), output=str(relative), title=title[1].replace('*', '') if title else None))
+    (staging / 'guide-content/toc.yml').write_text(guide_toc)
     shutil.copyfile(SOURCE / 'toc.yml', staging / 'toc.yml')
     manifest = staging / 'site.json'
     manifest.write_text(json.dumps(config))
     subprocess.run([sys.executable, str(ROOT / 'scripts/ravendoc.py'), '--site', str(manifest)], check=True)
     shutil.copytree(publisher_output, OUTPUT, dirs_exist_ok=True)
+    for relative in guide_outputs:
+        page = (OUTPUT / relative).read_text()
+        navigation = re.search(r'<nav[^>]*class="[^"]*documentation-navigation[^"]*"[^>]*>.*?</nav>', page, re.S)
+        if ('<h2 id="api-browser-heading">Guides</h2>' not in page or
+                navigation is None or 'aria-current="page"' not in navigation[0]):
+            raise ValueError('Guide sidebar or current-page entry missing: ' + str(relative))
     register_manual_api_routes()
     register_manual_member_routes()
     check_api_coverage()

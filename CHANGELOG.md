@@ -16,6 +16,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Allow editor-only qualification of a previously built bundle, preserving the
   original package and consumer evidence instead of rebuilding unaffected tools.
 
+- Separate Guides from the API reference tree, using an independently visible
+  article sidebar with current-page navigation while preserving existing URLs.
+  Pin the shared RavenDoc section-navigation fix; check the complete site and
+  desktop/mobile navigation before publication.
+
 - Select Preview 13 for Windows x64/macOS ARM64 qualification. Pin the matching
   Raven packaging revision, version the Windows editor asset consistently with its
   SDK, and add installed-extension acceptance without a development-server override.

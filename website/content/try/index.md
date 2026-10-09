@@ -1,9 +1,9 @@
 # Install neoCLR
 
 The matched bundle includes the runtime, Raven compiler, VS Code extension and samples.
-The current native toolchain download supports **macOS on Apple silicon**.
-Windows support for this workflow is being qualified; there is no matching Windows
-native toolchain download yet.
+Preview 13 provides matching packages for **Windows x64** and **macOS on Apple silicon**.
+The interpreter and native-metadata compiler workflow are available on both.
+ARM64 ahead-of-time compilation remains a separate source-build POC on macOS.
 
 ## 1. Install prerequisites
 
@@ -15,7 +15,9 @@ Install the [.NET 11 SDK and .NET 10 SDK](https://dotnet.microsoft.com/download)
 
 ## 2. Download and extract
 
-[Download neoCLR for macOS arm64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.12/neoclr-preview12-osx-arm64.tar.gz).
+- [Download for macOS ARM64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/neoclr-preview13-osx-arm64.tar.gz)
+- [Download for Windows x64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/neoclr-preview13-win-x64.tar.gz)
+
 Extract the archive and keep its folders together.
 
 In VS Code, open **Extensions → ⋯ → Install from VSIX…** and select
@@ -63,8 +65,9 @@ To check the complete installation, run this optional command from the extracted
 python3 tools/verify-native-bundle.py --report ../acceptance.json
 ```
 
-It compiles and runs the bundled collections, Tasks, JSON and HTTP examples.
+On Windows, use `python` in place of `python3`. It compiles and runs the bundled
+collections, Tasks, JSON and HTTP examples.
 
-[Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.12)
+[Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.13)
 include the exact supported toolchain and limitations. Older installation instructions
 belong to their [matching release](https://github.com/marinasundstrom/neoCLR/releases).

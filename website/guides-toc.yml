@@ -1,0 +1,132 @@
+- name: Guides overview
+  href: guides/index.md
+- name: Platform foundations
+  items:
+    - name: "Architecture"
+      href: architecture/index.md
+    - name: "Metadata format"
+      href: metadata/index.md
+    - name: "neoCLR and .NET"
+      href: comparison/index.md
+    - name: "Modules"
+      href: features/modules/index.md
+    - name: "Library modules"
+      href: docs/namespaces.md
+- name: Everyday code
+  items:
+    - name: "Raven for neoCLR"
+      href: raven/index.md
+    - name: "Option and Result"
+      href: features/outcomes/index.md
+    - name: "Function types"
+      href: features/functions/index.md
+    - name: "Arrays"
+      href: features/arrays/index.md
+    - name: "Collections and queries"
+      href: features/collections/index.md
+    - name: "Strings and UTF-8"
+      href: features/strings/index.md
+    - name: "Dates, times and zones"
+      href: features/time/index.md
+    - name: "Globalization"
+      href: features/globalization/index.md
+- name: Runtime services
+  items:
+    - name: "Native compilation"
+      href: features/native-compilation/index.md
+    - name: "Native benchmarks"
+      href: benchmarks/index.md
+    - name: "Tasks and async"
+      href: features/tasks/index.md
+    - name: "Files and storage"
+      href: features/files/index.md
+    - name: "Console and streams"
+      href: features/console/index.md
+    - name: "Networking"
+      href: features/networking/index.md
+    - name: "Web and HTTP"
+      href: features/web/index.md
+    - name: "Introspection"
+      href: features/introspection/index.md
+    - name: "Reflection"
+      href: features/reflection/index.md
+    - name: "Garbage collection"
+      href: features/gc/index.md
+- name: Cases
+  items:
+    - name: "Building a Http server app"
+      href: cases/http-server/index.md
+- name: Structural types
+  items:
+    - name: "Structural types"
+      href: docs/structural-types.md
+    - name: "Array"
+      href: docs/arrays.md
+    - name: "Function"
+      href: docs/functions.md
+    - name: "Tuple"
+      href: docs/tuples.md
+    - name: "Union"
+      href: docs/unions.md
+    - name: "Intersection (proposed)"
+      href: docs/intersections.md
+- name: Development walkthroughs
+  items:
+    - name: "Storage providers"
+      href: docs/storage-experiment.md
+    - name: "File Transformer"
+      href: docs/file-transformer.md
+    - name: "Pending reads"
+      href: docs/pending-read.md
+    - name: "Objects and equality"
+      href: docs/objects.md
+    - name: "Terminal faults"
+      href: docs/faults.md
+- name: API contracts
+  items:
+    - name: "Public reference coverage"
+      href: docs/reference-support.md
+    - name: "JSON serialization"
+      href: docs/json.md
+    - name: "Streams"
+      href: docs/streams.md
+    - name: "Storage"
+      href: docs/storage-items.md
+    - name: "Transitional async compiler protocol"
+      href: docs/async-builders.md
+    - name: "Task callback methods"
+      href: docs/callbacks.md
+    - name: "Cloning with Self (development)"
+      href: docs/cloning.md
+    - name: "Console and standard streams"
+      href: docs/console.md
+    - name: "Optional DateTime union declaration"
+      href: docs/date-time-union.md
+    - name: "Experimental .NET metadata library"
+      href: docs/experimental-metadata.md
+    - name: "Garbage collection"
+      href: docs/gc.md
+    - name: "Introspection and Object contracts"
+      href: docs/introspection.md
+    - name: "JSON error payloads"
+      href: docs/json-error-payloads.md
+    - name: "Runtime reflection"
+      href: docs/reflection.md
+    - name: "Route matching and parameters"
+      href: docs/routes.md
+    - name: "Experimental runtime hosting"
+      href: docs/runtime-hosting.md
+    - name: "System.Runtime"
+      href: docs/runtime.md
+    - name: "TCP sockets and listeners"
+      href: docs/sockets.md
+    - name: "Storage metadata lookup"
+      href: docs/storage-lookup.md
+    - name: "Storage POC"
+      href: docs/storage-poc.md
+    - name: "Storage providers"
+      href: docs/storage-provider.md
+    - name: "Casing and decimal reporting (development)"
+      href: docs/text-numbers.md
+    - name: "Local time mapping payloads"
+      href: docs/time-zone-mappings.md

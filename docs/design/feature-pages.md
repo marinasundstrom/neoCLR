@@ -242,3 +242,13 @@ Update the relevant row and review date after checking evidence. Link to the
 feature page that owns details; avoid duplicating a full capability inventory.
 Keep primary .NET references, costs and benefits, and development labels current.
 About and Guides link to this canonical comparison instead of maintaining copies.
+
+## Guides navigation (2026-10-09)
+
+`website/guides-toc.yml` owns the Guides article hierarchy; `website/toc.yml`
+contains only API overview/reference navigation. The build stages guide sources
+under an explicit RavenDoc navigation section while preserving their published
+`/features/`, `/docs/` and other article URLs. This keeps saved links stable and
+lets Guides use the same visible article sidebar across folders. The API browser
+continues to list library symbols separately. A page's `toc: false` disables only
+its in-page outline, not the Guides sidebar.

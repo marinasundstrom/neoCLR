@@ -1,7 +1,7 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "b61d5dd3cef454fef68b38564993e80603807b278be8ef92d00bbd9633348397",
+  "sha256": "6053abbf263606e288109036b4d7a58af2862065916c1fecaefd2db1f919302e",
   "librarySourceRevision": "9fd8f6b8eb10b067c58127222833a6339696bae4",
   "compilerRevision": "c6d2137e34d11f0c8888c5e91f0c6257f53e6c87",
   "rendererRevision": "c6d2137e34d11f0c8888c5e91f0c6257f53e6c87",

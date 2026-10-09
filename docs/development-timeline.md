@@ -12489,3 +12489,16 @@ claim follows from these focused checks.
   refusal test also observed an unexpected successful connection after releasing
   its port; the candidate retains the Windows reservation to exclude parallel reuse.
   Windows validation remains required before treating that test repair as proven.
+
+### 2026-10-09 — Separate Guides navigation before publication
+
+- **Author:** asked to follow Raven's Language reference section: move the guides
+  currently mixed into the API tree to Guides, with a separate visible sidebar
+  and consistent navigation.
+- **Assistant:** separated the authored guide menu from API navigation while
+  retaining existing published article URLs. Identified RavenDoc's API-path
+  restriction hiding explicit article sections and prepared a shared renderer
+  correction with focused coverage (35 site-builder tests passed). The correction
+  is on Raven main `6fae3c4e4` and the integration line `24a1a3716`. The neoCLR
+  build checks all 3,491 pages; desktop/mobile review confirmed the visible sidebar,
+  current-page links and separate API tree. Package qualification continues independently.
