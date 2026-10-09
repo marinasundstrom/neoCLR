@@ -2465,22 +2465,25 @@
       "Object derived types and EquatableTo implementing types: five visible, expansion and keyboard collapse on desktop/mobile",
       "shared renderer derived interfaces fixture: five visible and all remaining links expandable",
       "all 24 module introductions present; System.Time desktop and HTTP JSON mobile",
-      "Tasks guide leads with Task.Run/await"
+      "Tasks guide leads with Task.Run/await",
+      "Shared extension semantics: E/SE badges, .NET instance signatures, desktop and mobile dark theme",
+      "Option and Result constrained/specialized extensions participate in ordinary member lists, grouping and toggle; native Result and collection receiver lists",
+      "Compact constrained-extension labels omit func and receiver-bound type parameters; applicability notes preserve concrete constraints"
     ],
     "nativeRoutes": [
       "System/Math/field_Pi.html",
       "System/Time/LocalDateTime/index.html",
       "System/Linq/Operators/method_All.html"
     ],
-    "rendererRevision": "68a027962ff951269863297a4e07d5b744242453",
-    "sharedRavenMainRevision": "0308f7b0400dc2f087bc0c5d2f030c41020041f8",
+    "rendererRevision": "6a678bdeb79d73a92e53f5ef1ac32ec0d84dcbaf",
+    "sharedRavenMainRevision": "55ccc9f47f334a2a1e4c419709d59ce0b6e3901c",
     "nativeSnapshot": {
       "format": 1,
       "archive": "native-reference.zip",
-      "sha256": "fcd37cb9204aa4818d492ca0eba82af190060ff346df46e10108686f2261b8c3",
+      "sha256": "7224b81755e7457ca29606e81ea014655382c9e652dd3e58416a209d19366a49",
       "librarySourceRevision": "9fd8f6b8eb10b067c58127222833a6339696bae4",
       "compilerRevision": "c6d2137e34d11f0c8888c5e91f0c6257f53e6c87",
-      "rendererRevision": "68a027962ff951269863297a4e07d5b744242453",
+      "rendererRevision": "6a678bdeb79d73a92e53f5ef1ac32ec0d84dcbaf",
       "libraryArtifacts": {
         "System.Runtime.dll": "48a1f70a5ec03a014513b9435143a522b899c7aa87360140f38b01aecdf0ad22",
         "System.Data.dll": "a5aee2d42b20208a9ef98d84fdd0015d9eec19d5cfbbc6f0abac92817f55bf00",
@@ -2505,7 +2508,12 @@
       "exitCode": 0,
       "browser": "first example uses await Task.Run; download matches source; isolated Thread example remains later"
     },
-    "websiteContractTests": 22
+    "websiteContractTests": 22,
+    "extensionRegressionTests": {
+      "passed": 3,
+      "scope": "RavenDoc source and emitted .NET metadata relationships, generic Option/Result constraints and receiver specialization, instance/static methods and properties, defaults, ordinary static icons",
+      "ravenRevision": "6a678bdeb79d73a92e53f5ef1ac32ec0d84dcbaf"
+    }
   },
   "sourceValidation": {
     "status": "passed",

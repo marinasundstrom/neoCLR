@@ -12552,3 +12552,42 @@ claim follows from these focused checks.
   The pass removes obsolete version labels and migration instructions, reconciles
   superseded Fault and TypeInfo notes, and preserves old anchors for incoming links.
   Benchmark configurations and evidence remain dated where the date is meaningful.
+
+
+## 2026-10-09 — Render extensions through Raven semantics on both targets
+
+- **Author:** requested equivalent RavenDoc presentation for .NET and neoCLR
+  metadata. Type extensions must not appear as static carrier types; static and
+  extension badges represent independent properties. Asked to check both the
+  extension page and receiver member lists, review Raven’s selected extension
+  namespaces, and explicitly verify `Option<T>` and `Result<T,E>`.
+- **Assistant:** found that Raven’s website did not opt into extension namespaces
+  and that .NET member declarations exposed synthetic receivers and `static`.
+  Proposed E for instance extensions, S for ordinary static members and SE for
+  static extensions, retaining semantic declarations and definition links.
+- **Action:** implemented shared renderer changes and source/.NET metadata
+  regressions, including generic constraints, specialized receivers, static
+  methods/properties, default parameters and static methods with an explicit
+  receiver-typed argument. Generic definition pages expose specialized and
+  constrained extensions with their conditions visible, rather than claiming
+  universal applicability. Raven’s configured namespaces cover its documented
+  core and compiler extension libraries.
+- **Author correction:** extensions must participate in the same member listing
+  and grouping mechanism, not separate sections. The author also reiterated that
+  the goal remains the neoCLR release.
+- **Assistant response:** replaced the separate specialized sections with entries
+  in the ordinary member groups, retaining receiver/constraint details on the rows.
+  The author then required the signatures to match the other member rows. Compact
+  labels now omit `func` and receiver-bound generic arguments; the applicability
+  note preserves concrete constraints. Browser checks confirm those labels,
+  grouping by declaring type and the extension toggle work for Option.Flatten and
+  Result.WithContext. Stopped expanding the scope and
+  returned to the already-qualified release assets.
+- **Validation so far:** focused tests pass; native metadata rendering passes.
+  Raven’s rebuilt Result page contains `WithContext` with `E: IError`; neoCLR’s
+  Result page includes ten ResultOperators members. Browser review, renderer
+  pinning completed at Raven integration `6a678bdeb` / main `55ccc9f47`.
+  neoCLR’s pinned site rebuild checks 3,491 pages, retaining 136 explicitly marked
+  legacy migration gaps; no generated page contains “Preview 11”. Browser checks
+  verify compact labels and member grouping/toggles on both targets. Publication
+  remains pending the release workflow; runtime qualification is unchanged.

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Align shared RavenDoc extension presentation across .NET and native metadata:
+  instance declarations omit carrier details, static extensions use an SE badge,
+  and constrained/specialized generic extensions remain discoverable with their
+  conditions in the ordinary member lists, with consistent compact signatures
+  and shared grouping/toggles. Pin the reviewed renderer and native snapshot after checking both
+  websites, including Option, Result and collection receiver member lists.
+
 - Rewrite current API and feature guides around usage and supported behavior,
   removing stale Preview 11 labels, upgrade instructions and superseded checkpoints.
   Preserve compatibility anchors, explicit POC limits and research/benchmark evidence.
