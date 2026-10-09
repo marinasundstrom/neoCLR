@@ -623,7 +623,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 for (index, token) in targets {
                     let matched = b.create_block();
                     let next = b.create_block();
-                    let exact = b.ins().icmp_imm(IntCC::Equal, tag, *index as i64);
+                    let exact = matches_type(&mut b, &p, tag, *index);
                     b.ins().brif(exact, matched, &[], next, &[]);
                     b.switch_to_block(matched);
                     let identity = type_tokens.iter().position(|t| t == token).expect("object token producer") + 1;
@@ -1254,6 +1254,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let top = || shape.last().unwrap();
                 let pop = |s: &mut Vec<ir::Value>| s.pop().expect("checked stack");
                 let mut site = diagnostic_data.as_ref().map(|d| d.site(&mut module, &mut b, fault_context.unwrap(), i, pc));
+                if let Some(&adapter_pc) = details.and_then(|d| d.reflection_array_sites.get(&(i, pc))) {
+                    if let Some(site) = site.as_mut() { site.remap_instruction(adapter_pc); }
+                }
                 if matches!(op, Op::Construct(_)) && details.is_some_and(|d| d.reflection_construction.contains(&i)) {
                     // The interpreter's checked construction adapter is newobj/ret.
                     if let Some(site) = site.as_mut() { site.remap_instruction(0); }

@@ -5738,3 +5738,76 @@ fn native_reflection_roots_separate_metadata_and_invocation_and_reject_stale_ide
         assert!(String::from_utf8_lossy(&result.stderr).contains("reflection root"), "{result:?}");
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_reflection_arrays_preserve_creation_values_and_checked_faults() {
+    check_reflection_arrays(include_str!("../../../docs/experiments/aot-console/reflection-arrays.neoil"), 8, b"");
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_reflection_arrays(source: &str, modes: i32, expected_stdout: &[u8]) {
+    let seed = neoclr::assemble(".module System\n.references ()\n.type System.Int32\n.end\n.type System.Boolean\n.end\n.type System.String\n.end\n").unwrap();
+    let app = neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &seed).unwrap().remove(0);
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    let dir = Temp::new();
+    let result = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena", "--native-gc", "--bind-console-write-line"]);
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    let host = fs::read_to_string(base.join("aot-console/text-host.c")).unwrap()
+        .replace("text-arena.h", "native-gc.h")
+        .replace("uint64_t storage[8192];", "uint64_t storage[8193]; storage[8192] = 1234567;")
+        .replace("sizeof(storage), 0", "sizeof(storage) - 8, 0")
+        .replace("    if (status) {", "    if (neoclr_root_probe_depth_v1() || neoclr_gc_collect_v1(&context, NULL) || context.text.used || storage[8192] != 1234567) return 97;\n    if (status) {");
+    fs::write(dir.0.join("host.c"), host).unwrap();
+    let result = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds"])
+        .arg("-I").arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/console.c")).arg(base.join("aot-scalar/console.c")).arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-console/native-gc.c")).arg(base.join("aot-console/root-probe.c"))
+        .arg(base.join("aot-fault-details/render.c")).arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    for mode in 0..modes {
+        let interpreted = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default());
+        let native = Command::new(dir.0.join("host")).arg(mode.to_string()).output().unwrap();
+        assert_eq!(native.stdout, expected_stdout);
+        if mode == 0 { assert_eq!(interpreted.as_ref().unwrap().stdout, expected_stdout); }
+        if mode == 0 {
+            assert_eq!(interpreted.unwrap().value, neoclr::Value::Int32(42));
+            assert_eq!(native.status.code(), Some(42), "{native:?}");
+            assert!(native.stderr.is_empty());
+        } else {
+            let error = interpreted.unwrap_err();
+            assert_eq!(native.status.code(), Some(1));
+            let text = String::from_utf8_lossy(&native.stderr);
+            assert_eq!(text.lines().skip(1).collect::<Vec<_>>(), error.diagnostic().to_string().lines().skip(1).collect::<Vec<_>>(), "{mode}: {text}");
+            let expected_header = if mode == 3 { error.diagnostic().to_string().lines().next().unwrap().to_owned() }
+                else { format!("{:?}: {}", error.code, error.message) };
+            assert_eq!(text.lines().next().unwrap(), expected_header, "{mode}");
+        }
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_reflection_arrays_preserve_boolean_string_and_reference_elements() {
+    let source = include_str!("../../../docs/experiments/aot-console/reflection-arrays.neoil");
+    let boolean = source.replace("arrayref<Int32>", "arrayref<Boolean>")
+        .replace("ldc.i4 40\nbox Int32", "ldc.bool true\nbox Boolean")
+        .replace("ldc.i4 2\nbox Int32", "ldc.bool false\nbox Boolean")
+        .replace("unbox.any Int32\nldloc result", "unbox.any Boolean\nbrfalse Failed\nldloc result")
+        .replace("unbox.any Int32\nadd\nret", "unbox.any Boolean\nbrtrue Failed\nldc.i4 42\nret");
+    check_reflection_arrays(&boolean, 1, b"");
+    let string = source.replace("arrayref<Int32>", "arrayref<String>")
+        .replace("ldc.i4 40\nbox Int32", "ldstr \"Café\"\nbox String")
+        .replace("ldc.i4 2\nbox Int32", "ldstr \"x\"\nbox String")
+        .replace("unbox.any Int32\nldloc result", "unbox.any String\ncall neoCLR.Runtime.WriteLine(String)\npop\nldloc result")
+        .replace("unbox.any Int32\nadd\nret", "unbox.any String\npop\nldc.i4 42\nret")
+        + "\n.function neoCLR.Runtime.WriteLine(String) -> Void\n.methodimpl InternalCall\n.end\n";
+    check_reflection_arrays(&string, 1, "Café\n".as_bytes());
+    let reference = source.replace("arrayref<Int32>", "arrayref<Cell>")
+        .replace("box Int32", "newobj.ctor instance Cell::.ctor(Int32)\ncastclass System.Object")
+        .replace("unbox.any Int32", "castclass Cell\nldfld Cell::Number")
+        + "\n.type class Cell\n.field Number Int32\n.method instance .ctor(Int32 value) -> noresult\nldarg 0\nldarg value\nstfld Cell::Number\nret\n.end\n.end\n";
+    check_reflection_arrays(&reference, 1, b"");
+}

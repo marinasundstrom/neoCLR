@@ -417,3 +417,33 @@ The preceding explicit-root construction gate is qualified on macOS ARM64 and
 Windows x64 in [action 37985103063](https://github.com/marinasundstrom/neoCLR/actions/runs/37985103063);
 all twelve reports and their source/artifact hashes were verified. See
 [construction evidence](native-reflection-construction-validation.json).
+
+## Checked vector reflection — 2026-10-09
+
+The native backend now binds ReflectionArrayCreate, ReflectionArrayGet and
+ReflectionArrayLength to ordinary checked array adapters. Explicit vector token
+producers retain the vector inventory; supported elements are Int32, Boolean, String
+and reference classes/interfaces. Exact primitive boxes, invariant array views,
+reference aliasing, default/null slots and bounds checks reuse the existing runtime
+contract. Retained vectors return their semantic vector token from Object.GetType,
+never their private storage-class identity. Unregistered vectors fail explicitly.
+
+Compared with CLR Array.CreateInstance/GetValue, this preserves the existing neoCLR
+vector-only API and invariant views, using closed dispatch instead of open runtime
+layout discovery. The cost is explicit token retention and linear generated dispatch;
+there is no performance claim or public API change. RuntimeTypeInfo's existing handle
+getter is an explicit support root when creation is selected; user bodies are not
+retained by that support root. Source verification remains required.
+
+Native/interpreter tests cover Int32/Boolean/String/class values, exact bad/null boxes,
+negative indices, invalid/null providers and nonarray receivers/types. They check
+adapter/caller fault frames, root balance, collection and heap canaries. The public
+Raven sample creates Int32 and Report vectors, checks GetType, observes a shared
+Report mutation and constructs an empty vector; both modes print Report and exit zero
+on macOS. The portable --reflection-arrays consumer passes locally and is included
+in both action jobs; Windows qualification is pending.
+
+The unchanged typed JSON assembly now reaches ReflectionPropertyGet admission.
+Property discovery, checked accessor dispatch and the end-to-end JSON milestone
+remain unfinished. The vector service binding is a private backend implementation
+of existing APIs and requires no Raven compiler or public API snapshot change.

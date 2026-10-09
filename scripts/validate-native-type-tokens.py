@@ -21,10 +21,11 @@ def main():
     parser.add_argument('--primitive-boxes', action='store_true', help='Exercise scalar box identity and checked unboxing')
     parser.add_argument('--object-types', action='store_true', help='Exercise concrete object type handles')
     parser.add_argument('--reflection-construction', action='store_true', help='Exercise retained reflection constructors')
+    parser.add_argument('--reflection-arrays', action='store_true', help='Exercise checked reflection vector adapters')
     args = parser.parse_args()
     aot, out = args.aot.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    report = dict(passed=False, platform=platform.platform(), machine=platform.machine(), commands=[], runtimeEquality=args.runtime_equality, descriptorQueries=args.descriptor_queries, primitiveBoxes=args.primitive_boxes, objectTypes=args.object_types, reflectionConstruction=args.reflection_construction)
+    report = dict(passed=False, platform=platform.platform(), machine=platform.machine(), commands=[], runtimeEquality=args.runtime_equality, descriptorQueries=args.descriptor_queries, primitiveBoxes=args.primitive_boxes, objectTypes=args.object_types, reflectionConstruction=args.reflection_construction, reflectionArrays=args.reflection_arrays)
     def run(command, name):
         r = subprocess.run(list(map(str, command)), cwd=out, capture_output=True, timeout=120)
         (out / (name + '.stdout')).write_bytes(r.stdout)
@@ -54,6 +55,9 @@ def main():
         if args.reflection_construction:
             sources[0] = base / 'reflection-construction-test.c'
             inputs += [sources[0], base / 'reflection-construction.neoil', base / 'reflection-construction-roots.json']
+        if args.reflection_arrays:
+            sources[0] = base / 'reflection-arrays-test.c'
+            inputs += [sources[0], base / 'reflection-arrays.neoil']
         if windows:
             sources += [ROOT / 'tools/native/windows-native-stack.c']
             inputs += [sources[-1]]
@@ -71,7 +75,7 @@ def main():
                 f.write('.type System.Int32\n.end\n.function neoCLR.Runtime.TypeName(RuntimeTypeHandle) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgumentCount(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32) -> Boolean\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String) -> Void\n.methodimpl InternalCall\n.end\n')
         if args.primitive_boxes:
             seed.write_text('.module System\n.references ()\n')
-        if args.object_types:
+        if args.object_types or args.reflection_arrays:
             seed.write_text('.module System\n.references ()\n.type System.Int32\n.end\n.type System.Boolean\n.end\n.type System.String\n.end\n')
         source = base / 'type-tokens.neoil'
         if args.runtime_equality:
@@ -86,6 +90,8 @@ def main():
             source = base / 'object-types.neoil'
         if args.reflection_construction:
             source = base / 'reflection-construction.neoil'
+        if args.reflection_arrays:
+            source = base / 'reflection-arrays.neoil'
         obj = out / ('guest.obj' if windows else 'guest.o')
         flags = ['--compile-system', '--reference-arena', '--native-gc']
         if args.reflection_construction:
@@ -106,6 +112,8 @@ def main():
             expected = b'Object types: 42\n'
         if args.reflection_construction:
             expected = b'Reflection construction: 42\n'
+        if args.reflection_arrays:
+            expected = b'Reflection arrays: 42\n'
         if r.stdout.replace(b'\r\n', b'\n') != expected or r.stderr:
             raise ValueError('Unexpected token identity result')
         if sha(aot) != report['aotSha256'] or any(sha(ROOT / n) != h for n, h in report['inputs'].items()):

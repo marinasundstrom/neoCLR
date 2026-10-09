@@ -7,6 +7,7 @@ mod linking;
 mod limits;
 mod reflection_metadata;
 mod reflection_construction;
+mod reflection_arrays;
 mod selection;
 mod specialization;
 mod string_projection;

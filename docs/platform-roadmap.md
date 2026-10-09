@@ -69,11 +69,13 @@ consumer executes descriptor queries with interpreter parity. A build-time
 source metadata catalogue now preserves
 selected nominal declarations and closed property signatures through specialization
 without rooting accessor bodies. Primitive boxing/unboxing and interface-valued arrays now advance the JSON
-probe past reflection construction to the array reflection service dependency. ObjectTypeHandle now maps source class
+probe through checked vector creation/readback to property reflection. ObjectTypeHandle now maps source class
 and primitive box identities; the public Raven GetType/typeof probe passes on macOS.
 Explicit source-identity roots and checked parameterless construction now run
 through the public Raven reflection wrapper on macOS, with the low-level constructor
-gate qualified on macOS/Windows. Property metadata retention,
+gate qualified on macOS/Windows. Retained Int32/Boolean/String/reference vectors now
+support creation, readback, length and semantic GetType identity; the public Raven
+array consumer passes on macOS and its portable Windows gate is pending. Property metadata retention,
 runtime discovery tables, checked accessor dispatch and complete native JSON execution
 remain unfinished.
 Once parity works, the author selects JSON serialization/deserialization as an

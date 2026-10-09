@@ -514,6 +514,17 @@ pub fn bind_object_type(input: &mut neoclr::Module, report: &mut Value) -> Resul
             targets.push(json!({"typeCompiledIndex":index,"token":Type::Named(t.name.clone())}));
         }
     }
+    let vector_tokens: Vec<_> = input.functions.iter().flat_map(|f| &f.body).filter_map(|op| {
+        if let Op::LoadTypeToken(t @ Type::ArrayRef(_)) = op { Some(t.clone()) } else { None }
+    }).collect();
+    for index in backings.iter().copied().chain(report["arrayBackingProjection"]["compiledIndex"].as_u64()) {
+        let index = index as usize;
+        if let Some(field) = input.types[index].fields.first() {
+            if vector_tokens.contains(&field.ty) {
+                targets.push(json!({"typeCompiledIndex":index,"token":field.ty}));
+            }
+        }
+    }
     for (key, primitive) in [("int32Boxes", Some(Type::Int32)), ("booleanBoxes", Some(Type::Boolean)), ("emptyRecordBoxes", None)] {
         for row in report[key].as_array().into_iter().flatten() {
             let index = row["typeCompiledIndex"].as_u64().ok_or("missing box tag")? as usize;
@@ -545,7 +556,7 @@ pub fn bind_object_type(input: &mut neoclr::Module, report: &mut Value) -> Resul
         f.body.push(Op::Fault("unreachable native object query body".into()));
         report["nativeBindings"].as_array_mut().unwrap().push(json!({"compiledIndex":index,
             "name":row["name"],"implementation":"object-type-closed-v1", "targets":targets,
-            "policy":"exact source class/box tags and intrinsic String; compound objects fail closed"}));
+            "policy":"source class/box tags, intrinsic String and retained vector tokens; other compounds fail closed"}));
     }
     Ok(())
 }

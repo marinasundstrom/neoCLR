@@ -65,7 +65,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   verifying twelve source/artifact reports. Extend native vector token name, arity
   and shape queries with source backing metadata and element visibility; validate
   102 interpreter/native cases with and without nominal backing metadata. Property
-  discovery/accessor invocation, array reflection operations and JSON remain unfinished.
+  discovery/accessor invocation and JSON remain unfinished. Add checked native vector
+  creation, length and readback for retained Int32/Boolean/String/reference vectors,
+  preserving exact boxes, null/bounds faults, aliasing and GC cleanup. Map retained
+  vector object identities to semantic array tokens. Validate public Raven array
+  reflection against the interpreter and add the portable macOS/Windows gate.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

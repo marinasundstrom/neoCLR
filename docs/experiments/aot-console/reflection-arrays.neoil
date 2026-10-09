@@ -1,0 +1,153 @@
+.module ArrayViews
+.assembly {"name":"ArrayViews","full_name":"ArrayViews","modules":["ArrayViews.neox"],"references":[],"array_backing":{"module":"ArrayViews","index":3}}
+.type class abstract System.Object
+.end
+.interface Info
+.origin {"assembly":"ArrayViews","module":"ArrayViews.neox","name":"System.Introspection.TypeInfo","token":33554434,"publicly_visible":true,"field_tokens":[],"field_access":[],"field_readonly":[]}
+.end
+.type class RuntimeInfo
+.origin {"assembly":"ArrayViews","module":"ArrayViews.neox","name":"System.Introspection.RuntimeTypeInfo","token":33554435,"publicly_visible":true,"field_tokens":[67108866],"field_access":["Public"],"field_readonly":[false]}
+.implements Info
+.field Handle RuntimeTypeHandle
+.method instance .ctor(RuntimeTypeHandle handle) -> noresult
+ldarg 0
+ldarg handle
+stfld RuntimeInfo::Handle
+ret
+.end
+.method internal instance get_ExecutionHandle() -> RuntimeTypeHandle
+ldarg 0
+ldfld RuntimeInfo::Handle
+ret
+.end
+.end
+.type class Storage<T>
+.origin {"assembly":"ArrayViews","module":"ArrayViews.neox","name":"Storage`1","token":33554436,"publicly_visible":true,"field_tokens":[67108865],"field_access":["Private"],"field_readonly":[false]}
+.field private Items arrayref<T>
+.end
+.function neoCLR.Runtime.ReflectionArrayCreate(Info, arrayref<System.Object>) -> System.Object
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionArrayLength(System.Object) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionArrayGet(System.Object, Int32) -> System.Object
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ObjectTypeHandle(System.Object) -> RuntimeTypeHandle
+.methodimpl InternalCall
+.end
+.function Calculate(Int32 mode) -> Int32
+.local arrayref<System.Object> input
+.local System.Object result
+.local System.Object empty
+.local Info missing
+ldarg mode
+ldc.i4 6
+beq NonArray
+ldarg mode
+ldc.i4 7
+beq NonArrayType
+ldarg mode
+ldc.i4 4
+beq NullArray
+ldarg mode
+ldc.i4 5
+beq NullType
+ldc.i4 2
+array.reserve System.Object
+stloc input
+ldloc input
+ldc.i4 0
+ldc.i4 40
+box Int32
+stelem System.Object
+ldloc input
+ldc.i4 1
+ldarg mode
+ldc.i4 1
+beq Wrong
+ldarg mode
+ldc.i4 2
+beq NullValue
+ldc.i4 2
+box Int32
+br Store
+Wrong:
+ldc.bool true
+box Boolean
+br Store
+NullValue:
+ldloca empty
+initobj System.Object
+ldloc empty
+Store:
+stelem System.Object
+ldtoken arrayref<Int32>
+newobj.ctor instance RuntimeInfo::.ctor(RuntimeTypeHandle)
+castclass Info
+ldloc input
+call neoCLR.Runtime.ReflectionArrayCreate(Info,arrayref<System.Object>)
+stloc result
+ldloc result
+call neoCLR.Runtime.ObjectTypeHandle(System.Object)
+ldtoken arrayref<Int32>
+ceq
+brfalse Failed
+ldloc result
+call neoCLR.Runtime.ReflectionArrayLength(System.Object)
+ldc.i4 2
+ceq
+brfalse Failed
+ldarg mode
+ldc.i4 3
+beq Bounds
+ldloc result
+ldc.i4 0
+call neoCLR.Runtime.ReflectionArrayGet(System.Object,Int32)
+unbox.any Int32
+ldloc result
+ldc.i4 1
+call neoCLR.Runtime.ReflectionArrayGet(System.Object,Int32)
+unbox.any Int32
+add
+ret
+Bounds:
+ldloc result
+ldc.i4 -1
+call neoCLR.Runtime.ReflectionArrayGet(System.Object,Int32)
+pop
+br Failed
+NullArray:
+ldloca empty
+initobj System.Object
+ldloc empty
+call neoCLR.Runtime.ReflectionArrayLength(System.Object)
+ret
+NullType:
+ldloca missing
+initobj Info
+ldloc missing
+ldc.i4 0
+array.reserve System.Object
+call neoCLR.Runtime.ReflectionArrayCreate(Info,arrayref<System.Object>)
+pop
+br Failed
+NonArray:
+ldtoken Int32
+newobj.ctor instance RuntimeInfo::.ctor(RuntimeTypeHandle)
+castclass System.Object
+call neoCLR.Runtime.ReflectionArrayLength(System.Object)
+ret
+NonArrayType:
+ldtoken Int32
+newobj.ctor instance RuntimeInfo::.ctor(RuntimeTypeHandle)
+castclass Info
+ldc.i4 0
+array.reserve System.Object
+call neoCLR.Runtime.ReflectionArrayCreate(Info,arrayref<System.Object>)
+pop
+Failed:
+ldc.i4 -1
+ret
+.end

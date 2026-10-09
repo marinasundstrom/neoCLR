@@ -244,6 +244,16 @@ pub fn prepare(
             (selected, report) = super::selection::select_inventory_with_host_roots(expanded, root, false, &host_roots, &super::selection::reference_array_backings(&specialized.as_ref().unwrap().1))?;
         }
     }
+    let array_handle_getter = if context.is_some_and(|c| c.reference_arena)
+        && selected.functions.iter().any(|f| f.name == "neoCLR.Runtime.ReflectionArrayCreate") {
+        let getter = super::reflection_arrays::support_root(&joined)?;
+        let mut roots: Vec<_> = report["hostRoots"].as_array().unwrap().iter().map(|r| r["sourceIndex"].as_u64().unwrap() as usize).collect();
+        if !roots.contains(&getter) { roots.push(getter); }
+        specialized = Some(super::specialization::expand_with_host_roots(&joined, root, &roots)?);
+        let expanded = &specialized.as_ref().unwrap().0;
+        (selected, report) = super::selection::select_inventory_with_host_roots(expanded, root, false, &roots, &super::selection::reference_array_backings(&specialized.as_ref().unwrap().1))?;
+        Some(methods[getter].clone())
+    } else { None };
     let input = specialized.as_ref().map_or(&joined, |(module, _)| module);
     // Retain original closed String conformance before private specialization
     // erases interface arguments and primitive declarations leave the inventory.
@@ -286,6 +296,7 @@ pub fn prepare(
     }
     report["sourceMetadata"] = super::reflection_metadata::catalogue(&source_metadata, &types, &methods, &report)?;
     if let Some(retention) = reflection_retention { report["reflectionRetention"] = retention; }
+    report["reflectionArrayHandleGetterDefinition"] = json!(array_handle_getter);
     if let Some(index) = report["arrayBackingProjection"]["compiledIndex"].as_u64() {
         if let Some(row) = report["types"].as_array().unwrap().iter().find(|r| r["compiledIndex"] == index).cloned() {
             report["arrayBackingProjection"]["definition"] = row["definition"].clone();
@@ -619,6 +630,7 @@ pub fn prepare(
     }
     report["sealedMemberProjections"] = json!(sealed_members.iter().map(|i| json!({"compiledIndex":i,
         "policy":"verified sealed owner or inherited display with one loaded implementation; retain callvirt null checks and ordinary body"})).collect::<Vec<_>>());
+    if reference_arena { super::reflection_arrays::bind(&mut selected, &mut report)?; }
     super::boxing::project(&mut selected, &mut report)?;
     super::boxing::project_scalar_queries(&mut selected, &mut report)?;
     super::boxing::project_char_tests(&mut selected, &mut report)?;

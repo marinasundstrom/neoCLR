@@ -25,5 +25,29 @@ func Main() -> int {
     if !value.GetType().Equals(info) {
         return 5
     }
+    let array = ArrayReflection.Create(typeof(int[]), [40, 2])
+    if ArrayReflection.GetLength(array) != 2 || !array.GetType().Equals(typeof(int[])) {
+        return 6
+    }
+    if ArrayReflection.GetValue(array, 0) is int number {
+        if number != 40 {
+            return 7
+        }
+    } else {
+        return 8
+    }
+    let references = ArrayReflection.Create(typeof(Report[]), [report, null])
+    if ArrayReflection.GetValue(references, 0) is Report shared {
+        shared.Name = "shared"
+    } else {
+        return 9
+    }
+    if report.Name != "shared" || ArrayReflection.GetValue(references, 1) != null {
+        return 10
+    }
+    let empty = ArrayReflection.Create(typeof(int[]), [])
+    if ArrayReflection.GetLength(empty) != 0 {
+        return 11
+    }
     return 0
 }
