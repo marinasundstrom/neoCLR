@@ -11,13 +11,16 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = 'macos-arm64-console-v1'
+PROFILES = {'console': PROFILE, 'http': 'macos-arm64-http-v1'}
 
 
 def support_files():
     base = ROOT / 'docs/experiments'
     return [ROOT / 'scripts/build-native-project.py', ROOT / 'tools/native/console-host.c',
+            ROOT / 'benchmarks/native-web/http-host.c',
             *[base / 'aot-console' / name for name in
-              ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c')],
+              ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c',
+               'native-stack.c', 'task-queue.c', 'socket-listener.c')],
             base / 'aot-scalar/console.c', base / 'aot-fault-details/render.c',
             *sorted((base / 'aot-console').glob('*.h')),
             *sorted((base / 'aot-scalar').glob('*.h')),
@@ -35,7 +38,7 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def build(project, bundle, aot, output):
+def build(project, bundle, aot, output, profile=PROFILE):
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':
         raise ValueError('This profile requires a macOS ARM64 build host; Windows AOT is not yet supported')
     compiler = bundle / 'sdk/tools/rvnc/rvnc.dll'
@@ -48,7 +51,7 @@ def build(project, bundle, aot, output):
         if shutil.which(tool) is None:
             raise ValueError('Required build tool is missing: ' + tool)
     output.mkdir(parents=True, exist_ok=False)
-    report = dict(profile=PROFILE, passed=False, project=str(project),
+    report = dict(profile=profile, passed=False, project=str(project),
                   host=platform.platform(), commands=[], inputs={})
 
     def save():
@@ -68,7 +71,8 @@ def build(project, bundle, aot, output):
         kit_path = ROOT / 'native-build-kit.json'
         if kit_path.exists():
             kit = json.loads(kit_path.read_text())
-            if kit.get('format') != 'neoclr-native-build-kit-v1' or kit.get('profile') != PROFILE:
+            if (kit.get('format') != 'neoclr-native-build-kit-v1'
+                    or profile not in kit.get('profiles', [kit.get('profile')])):
                 raise ValueError('Unsupported native build kit')
             if bundle != ROOT / 'bundle' or aot != ROOT / 'bin/neoclr-aot-poc':
                 raise ValueError('Packaged builds require the kit-owned bundle and AOT tool')
@@ -105,6 +109,9 @@ def build(project, bundle, aot, output):
         adapters = [ROOT / 'tools/native/console-host.c', *[base / name for name in
                     ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c')],
                     base.parent / 'aot-scalar/console.c', base.parent / 'aot-fault-details/render.c']
+        if profile == PROFILES['http']:
+            adapters[0] = ROOT / 'benchmarks/native-web/http-host.c'
+            adapters += [base / name for name in ('native-stack.c', 'task-queue.c', 'socket-listener.c')]
         inputs = [Path(__file__).resolve(), project, catalog_path, aot, *required, *adapters,
                   *base.glob('*.h'), *base.parent.joinpath('aot-scalar').glob('*.h'),
                   *base.parent.joinpath('aot-fault-details').glob('*.h'),
@@ -124,6 +131,9 @@ def build(project, bundle, aot, output):
         flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
                  '--bind-console-read-byte', '--bind-console-write-line', '--bind-console-stream-output',
                  '--bind-int32-to-string', '--bind-utf8-text']
+        if profile == PROFILES['http']:
+            flags += ['--native-stack-budget', '--bind-integer-text', '--bind-task-queue',
+                      '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer']
         obj = output / 'app.o'
         run([aot, '--closed-world', assembly, '@entry', obj, *context, *flags])
         # Publish the executable only after link and dependency checks succeed.
@@ -149,6 +159,8 @@ def build(project, bundle, aot, output):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--profile', choices=PROFILES, default='console',
+                        help='Explicit native service/host profile (default: console)')
     for name in ('project', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     packaged = (ROOT / 'native-build-kit.json').is_file()
@@ -156,7 +168,8 @@ def main():
     parser.add_argument('--aot', type=Path, required=not packaged, default=ROOT / 'bin/neoclr-aot-poc' if packaged else None)
     args = parser.parse_args()
     try:
-        print(build(*(getattr(args, name).resolve() for name in ('project', 'bundle', 'aot', 'output'))))
+        print(build(*(getattr(args, name).resolve() for name in ('project', 'bundle', 'aot', 'output')),
+                    profile=PROFILES[args.profile]))
     except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.SubprocessError) as error:
         print('native build: ' + str(error), file=sys.stderr)
         return 1

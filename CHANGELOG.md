@@ -23,6 +23,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Extracted-kit acceptance also passes an application build outside the checkout
   without Cargo and rejects modified adapter, backend and compiler configuration
   before invoking tools.
+  Add an explicit HTTP project/kit profile with the existing Raven server sample,
+  private socket/task host, native GC and guarded stack. Console remains the default;
+  HTTP uses a bounded cooperative host, not a production Scheduler or green threads.
+  Extracted acceptance matches the interpreter for greeting/fragmented requests,
+  malformed-request and handler rejection, and guest callback faults with host
+  cleanup checks and standalone execution.
 
 - Record the post-Preview 13 priority discussion and subsequent author selection:
   prioritize usable project-level native compilation, bounded Windows portability,

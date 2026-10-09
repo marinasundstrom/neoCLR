@@ -4,7 +4,7 @@
 
 ### Relocatable development kit
 
-The native console workflow can now be staged as a separate development kit with
+The native console and opt-in HTTP workflows can be staged as a separate development kit with
 the compiler/library bundle, a freshly built AOT tool, native adapters and a sample
 project. From a source checkout, using a qualified native POC bundle:
 
@@ -45,7 +45,9 @@ The extraction verifier builds from a temporary path with spaces outside the
 checkout, with Cargo removed from PATH, runs the executable alone with an empty
 environment, and checks that modified adapters, backend and compiler configuration
 are rejected before tool invocation. The synchronous console profile below is
-unchanged; HTTP project publication and Windows AOT remain separate work.
+unchanged; Windows AOT remains separate work.
+The opt-in HTTP profile described below has its own qualification; the default
+console profile does not acquire HTTP services or a task pump.
 The [2026-10-09 extracted-kit evidence](experiments/native-build-kit-validation.json)
 records the tested archive hash, source inputs, bundled-toolchain manifest and results.
 
@@ -107,11 +109,58 @@ division fault against the interpreter, executable-only deployment with an empty
 environment, unsupported-recursion rejection and preservation of existing output.
 The [2026-10-09 acceptance record](experiments/native-project-build-validation.json)
 passes those cases and rejects a failed rebuild despite its previously emitted DLL.
-The relocatable kit above packages this workflow with its backend/adapters; Windows
-native compilation and HTTP project publication remain separate qualification.
+The relocatable kit above packages this workflow with its backend/adapters. The
+HTTP profile has separate service and host contracts; Windows AOT remains open.
 This reuses the [.NET deployment comparison](native-execution-investigation.md):
 project-level native build ergonomics are familiar, while neoCLR's currently
 bounded runtime-service profile and explicit bootstrap dependencies remain costs.
+
+### Opt-in HTTP project profile (development)
+
+An extracted kit also contains `samples/http`, using the existing checked-in Raven
+HTTP server source unchanged. Build it with an explicit service profile:
+
+```sh
+python3 scripts/build-native-project.py --profile http \
+  --project samples/http/App.rvnproj --output ../http-native
+../http-native/app
+```
+
+The sample prints an ephemeral loopback port, serves one `GET /greeting` with the
+UTF-8 body `Café 🌍`, then closes. The helper compiles the evaluated project with the
+same native bundle and records `macos-arm64-http-v1` in the build report. Console
+remains the default; native HTTP support is not inferred from an application's
+references. Use `--http` with `scripts/verify-native-build-kit.py` to include the
+HTTP consumers in extracted-kit acceptance.
+
+This profile links the existing [HTTP correctness host](../benchmarks/native-web/http-host.c),
+with a 1 MiB native GC heap, scoped sockets/tasks, private default-queue draining,
+retained callback dispatch and the macOS ARM64 stack guard. It enables the existing
+listener, accept, transfer/deadline, TaskQueue and integer-text bindings. The host
+checks guest-frame balance, scope cleanup and collection at shutdown, and propagates
+guest faults. Its 15-second completion timeout is checked cooperatively between
+guest calls; it is not preemption or a bound on a guest call that never returns.
+The profile expects an application whose selected code emits the private queue and
+callback exports used by this host; it is not a universal replacement for console.
+
+This is the existing bounded server POC made accessible through projects and a kit,
+not a new public hosting ABI or a production server deployment profile. It adds no
+green threads, general runtime suspension, scheduler fairness, host-I/O async-entry
+support, Windows backend or performance claim. Runtime lifecycle contracts should
+co-evolve as described in [scheduling design](runtime-scheduling-design.md#co-evolution-with-native-foundations--2026-10-09):
+replace host queue pumping with scheduler admission/readiness, move root/stack
+ownership to activations when suspension exists, and retain code generations across
+callbacks/suspended work for future reload. Keep these replacements distinct from
+the library's observable Task/HTTP behavior.
+
+[Extracted HTTP project evidence](experiments/native-http-project-validation.json)
+records greeting and fragmented requests, duplicate-length and handler-error
+rejection, and a guest fault raised in the callback, all matching interpreter
+response bytes, output, faults and exit status. The host's existing scope/root/GC
+cleanup checks pass. Native runs use an executable-only directory and empty
+environment; no new throughput, concurrency or sanitizer claim is made. Existing
+[native HTTP sanitizer evidence](../benchmarks/native-web/http-validation.json)
+remains the supporting evidence for the unchanged host/adapters.
 
 ## Preview 13 qualification (2026-10-09)
 

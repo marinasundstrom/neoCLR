@@ -28,6 +28,11 @@ executable needs only the OS libraries. The kit is not included in Preview 13. S
 [development build instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md#development-project-to-executable-workflow-2026-10-09)
 for the supported console profile and prerequisites.
 
+The development kit also offers an explicit `--profile http` project build for the
+existing one-request HTTP sample. It links the bounded socket/task host and native
+GC support; the console profile remains the default. This makes the POC easier to
+build, without claiming a production scheduler, runtime suspension or green threads.
+
 ## A working HTTP proof of concept
 
 This library example parses a route, extracts an integer parameter and prints `42`

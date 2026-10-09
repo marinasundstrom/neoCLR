@@ -32,6 +32,7 @@ def main():
     metadata = json.loads(subprocess.check_output(['cargo', 'metadata', '--locked', '--offline',
         '--format-version', '1', '--manifest-path', str(cargo_manifest)], cwd=ROOT, text=True))
     sources = [*ROOT.joinpath('src').rglob('*.rs'), *ROOT.joinpath('tools/aot-poc/src').rglob('*.rs'),
+               ROOT / 'docs/experiments/http-server/Server.rvn',
                ROOT / 'Cargo.toml', ROOT / 'Cargo.lock', cargo_manifest, cargo_manifest.parent / 'Cargo.lock',
                Path(__file__).resolve(), *builder.support_files()]
     inputs = {str(p.relative_to(ROOT)): builder.sha(p) for p in sources}
@@ -67,6 +68,8 @@ def main():
         copy(source, source.relative_to(ROOT))
     for source in (ROOT / 'tools/native/samples/hello').iterdir():
         copy(source, 'samples/hello/' + source.name)
+    copy(ROOT / 'tools/native/samples/hello/App.rvnproj', 'samples/http/App.rvnproj')
+    copy(ROOT / 'docs/experiments/http-server/Server.rvn', 'samples/http/Main.rvn')
     copy(ROOT / 'LICENSE', 'LICENSE')
     copy(cargo_manifest.parent / 'Cargo.lock', 'aot-Cargo.lock')
     licenses = []
@@ -98,14 +101,21 @@ From this extracted directory:
   python3 scripts/build-native-project.py --project samples/hello/App.rvnproj --output ../hello-native
   ../hello-native/app
 
+For the bounded one-request HTTP sample:
+  python3 scripts/build-native-project.py --profile http --project samples/http/App.rvnproj --output ../http-native
+  ../http-native/app
+The server prints an ephemeral loopback port; request GET /greeting within 15 seconds.
+
 Requires Python 3, the bundled Raven compiler's .NET SDKs (net11 compiler host,
 net10 project reference packs), and Apple Clang/macOS SDK selected through xcrun.
 Building an application requires neither Cargo nor a neoCLR source checkout.
 The resulting app needs only macOS libSystem, not .NET or this kit.
 
 Experimental synchronous console profile: bounded 1 MiB nonmoving GC, UTF-8 text,
-Int32 formatting and fault diagnostics. No task pump, HTTP, command-line arguments,
-guarded recursion, general reflection or Windows native compilation. Import the
+Int32 formatting and fault diagnostics. The opt-in HTTP profile adds the existing
+private socket/task pump and guarded native stack, with a 15-second host deadline.
+It is a bounded correctness host, not a production server or runtime Scheduler.
+No guest command-line arguments, general reflection or Windows native compilation. Import the
 kit's bundle/lib/NeoCLR.ClassLibrary.props in your executable Raven project.
 The kit checks recorded hashes before building. Hashes establish consistency, not
 an authenticated signature or a complete reproducible MSBuild input inventory.
@@ -119,7 +129,7 @@ notices remain under bundle/. The runtime ABI and service profile are provisiona
 ''')
     if any(builder.sha(ROOT / path) != digest for path, digest in inputs.items()):
         raise ValueError('Sources changed while building the kit')
-    kit = dict(format='neoclr-native-build-kit-v1', profile=builder.PROFILE,
+    kit = dict(format='neoclr-native-build-kit-v1', profile=builder.PROFILE, profiles=list(builder.PROFILES.values()),
         revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         dirty=bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip()),
         inputs=inputs, aotBuild=dict(command=command, exitCode=result.returncode, stderr=result.stderr,

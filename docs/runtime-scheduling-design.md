@@ -425,3 +425,9 @@ also retain the appropriate code generation for later reload.
 These are proposed experiment boundaries, not implemented suspension or an approved
 public Scheduler API. The next native HTTP/hosting slices should report their
 replacement boundaries and any evidence that changes these choices.
+
+The subsequent [HTTP project profile](native-poc-bundle.md#opt-in-http-project-profile-development)
+packages the existing host unchanged. Its request and callback-fault checks validate
+today's scope cleanup and diagnostic behavior, not suspended activations. Queue
+draining/readiness dispatch, pthread stack guards and thread-local roots remain
+the explicit replacement boundaries for the co-evolving scheduler work.

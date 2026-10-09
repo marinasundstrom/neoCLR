@@ -57,8 +57,15 @@ rejection of stale project output after a failed rebuild. The subsequent
 matched backend/adapters and compiler/library bundle. Its
 [extracted acceptance](experiments/native-build-kit-validation.json) passes outside
 the checkout without Cargo, including standalone UTF-8 execution and pre-build
-rejection of modified adapter/backend/compiler inputs. Next extend the project path
-to HTTP. Windows AOT, full bootstrap, hosting and reload remain open.
+rejection of modified adapter/backend/compiler inputs. The opt-in
+[HTTP project profile](native-poc-bundle.md#opt-in-http-project-profile-development)
+now packages the existing server and bounded host. Its
+[project/kit evidence](experiments/native-http-project-validation.json) covers
+greeting, fragmented requests, duplicate-length rejection, handler errors and guest
+callback faults with interpreter/native parity and standalone execution. The
+console profile remains separate. Next investigate the bounded Windows x64
+scalar/console portability slice, while reviewing suspension/scheduler lifecycle
+boundaries alongside native work. Full bootstrap, general hosting and reload remain open.
 
 **Preview 13 published (2026-10-09):** after Raven's shared website publication,
 the author requested the next neoCLR POC release for Windows and macOS, with a
