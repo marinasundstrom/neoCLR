@@ -111,3 +111,10 @@ and [garbage collection](../gc/) for related topics.
 The [benchmark report](../../benchmarks/) compares recorded interpreter and native
 builds using routing and HTTP workloads. It includes the methodology, measurements
 and limitations. No performance ranking against .NET is established.
+
+### Development: HTTP platform parity
+
+The next native showcase targets both HttpClient and HttpServer on macOS and
+Windows, with shared cancellation, deadline and cleanup contracts. A shared
+socket adapter and paired platform checks are in development. Native client
+DNS/connect and the Windows HTTP project profile are not yet qualified.

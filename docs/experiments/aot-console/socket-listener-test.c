@@ -1,6 +1,4 @@
 #include "socket-listener.h"
-#include <errno.h>
-#include <fcntl.h>
 #include <string.h>
 #define CHECK(t) do { if (!(t)) return __LINE__; } while (0)
 static struct { uint64_t length; unsigned char bytes[32]; } address;
@@ -40,14 +38,29 @@ int main(void) {
     CHECK(!neoclr_socket_local_port_v1(handle, &a, out) && out[0] == 2 && out[1] == 1);
     for (unsigned i = 0; i < 64; i++) {
         CHECK(!neoclr_socket_listen_v1(text("127.0.0.1"), 0, 4, &a, out) && out[0] == 5 && out[1] != handle);
+#ifdef _WIN32
+        DWORD flags;
+        CHECK(GetHandleInformation((HANDLE)first.slots[i].descriptor, &flags) && !(flags & HANDLE_FLAG_INHERIT));
+#else
         CHECK((fcntl(first.slots[i].descriptor, F_GETFL) & O_NONBLOCK) != 0);
         CHECK((fcntl(first.slots[i].descriptor, F_GETFD) & FD_CLOEXEC) != 0);
+#endif
     }
     CHECK(!neoclr_socket_listen_v1(text("127.0.0.1"), 0, 4, &a, out) && out[0] == 2 && out[1] == 4);
-    int descriptors[64];
+    neoclr_socket_descriptor descriptors[64];
     for (unsigned i = 0; i < 64; i++) descriptors[i] = first.slots[i].descriptor;
     CHECK(!neoclr_socket_scope_leave_v1(&first));
-    for (unsigned i = 0; i < 64; i++) { errno = 0; CHECK(fcntl(descriptors[i], F_GETFD) == -1 && errno == EBADF); }
+    CHECK(!neoclr_os_start()); /* Keep Winsock initialized while checking closed handles. */
+    for (unsigned i = 0; i < 64; i++) {
+#ifdef _WIN32
+        struct sockaddr_in endpoint;
+        int size = sizeof(endpoint);
+        CHECK(getsockname(descriptors[i], (struct sockaddr *)&endpoint, &size) == SOCKET_ERROR && WSAGetLastError() == WSAENOTSOCK);
+#else
+        errno = 0; CHECK(fcntl(descriptors[i], F_GETFD) == -1 && errno == EBADF);
+#endif
+    }
+    CHECK(!neoclr_os_stop());
     CHECK(neoclr_socket_scope_leave_v1(&first) == 3);
     CHECK(!neoclr_socket_scope_enter_v1(&first, &a));
     CHECK(!neoclr_socket_listen_v1(text("127.0.0.1"), (int)port, 4, &a, out) && out[0] == 5);

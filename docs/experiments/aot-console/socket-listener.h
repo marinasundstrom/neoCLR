@@ -1,7 +1,8 @@
 #ifndef NEOCLR_AOT_SOCKET_LISTENER_H
 #define NEOCLR_AOT_SOCKET_LISTENER_H
+#include "socket-os.h"
 #include "text-arena.h"
-/* Private POSIX socket experiment; GC builds additionally support polled accept/transfers. Host enters one stack-owned scope
+/* Private macOS/Windows socket experiment; GC builds additionally support polled accept/transfers. Host enters one stack-owned scope
  * per invocation and leaves it on EVERY terminal success/fault path before resetting
  * the context. Async work may outlive entry return inside that scope.
  * No same-context reentry or cross-thread scope use. LIFO nested distinct contexts
@@ -11,7 +12,7 @@
 typedef struct neoclr_socket_scope {
     neoclr_aot_context *context;
     struct neoclr_socket_scope *previous;
-    struct { uint64_t id; int descriptor; int listener; } slots[64];
+    struct { uint64_t id; neoclr_socket_descriptor descriptor; int listener; } slots[64];
     /* Private operations: state 1 pending, 2 ready, 3 delivered; kind 1 accept,
      * 2 receive, 3 send. Transfer snapshots have a separate bounded native budget. */
     struct { uint64_t id, listener, callback, tag, value, buffer_root, deadline;

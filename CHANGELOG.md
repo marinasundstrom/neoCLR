@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Begin the author-directed macOS/Windows native HTTP parity work. Share socket
+  lifecycle, accept, transfer, cancellation and deadline policy behind a private
+  Winsock/POSIX boundary, preserving native-width Windows handles and balanced
+  Winsock ownership. Add identical listener/accept/transfer contract tests to a
+  two-platform GitHub Actions matrix. Local macOS sanitizer checks pass; Windows
+  qualification is pending. Native HttpClient DNS/connect and the Windows HTTP
+  project profile remain planned work, not implemented capabilities.
+
 - Add explicit `x86_64-pc-windows-msvc` AOT target selection for the bounded scalar
   and literal-console profile, emitting x64 COFF with the target calling convention.
   Preserve default macOS ARM64 output; reject Windows managed/closed-world and

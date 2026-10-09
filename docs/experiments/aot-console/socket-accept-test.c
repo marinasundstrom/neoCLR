@@ -1,8 +1,5 @@
 #include "socket-listener.h"
 #include "native-gc.h"
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <unistd.h>
 #define CHECK(x) do { if (!(x)) return __LINE__; } while (0)
 int main(void) {
     uint64_t buffer[129] = {0}; buffer[128] = 1234567;
@@ -27,10 +24,13 @@ int main(void) {
     CHECK(!neoclr_socket_accept_v1(listener, callback, &c, result) && result[0] == 2 && result[1] == 2);
     result[0] = result[1] = 99;
     CHECK(neoclr_socket_connect_result_v1(operation, &c, result) == 3 && result[0] == 99);
-    int peer = socket(AF_INET, SOCK_STREAM, 0);
-    CHECK(peer >= 0 && !connect(peer, (const void *)&endpoint, sizeof(endpoint)));
+    neoclr_socket_descriptor peer = socket(AF_INET, SOCK_STREAM, 0);
+    CHECK(peer != NEOCLR_INVALID_SOCKET && !connect(peer, (const void *)&endpoint, sizeof(endpoint)));
     int ready = 0;
-    for (unsigned retry = 0; retry < 1000 && !ready; retry++) ready = neoclr_socket_poll_v1(&c, &root);
+    for (unsigned retry = 0; retry < 5000 && !ready; retry++) {
+        ready = neoclr_socket_poll_v1(&c, &root);
+        if (!ready) neoclr_os_pause();
+    }
     CHECK(ready == 1);
     void *read = NULL;
     CHECK(!neoclr_gc_host_root_read_v1(&c, root, &read) && read == callback);
@@ -59,9 +59,9 @@ int main(void) {
     CHECK(neoclr_gc_entry_check_v1(&c) == 3);
     c.fault.code = 4; /* Host teardown must also release an abandoned pending accept. */
     CHECK(neoclr_socket_poll_v1(&c, &root) == -3);
+    neoclr_os_close(peer);
     CHECK(!neoclr_socket_scope_leave_v1(&scope));
     c.fault.code = 0;
-    close(peer);
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used && !neoclr_gc_entry_check_v1(&c));
     CHECK(buffer[128] == 1234567);
     return 0;

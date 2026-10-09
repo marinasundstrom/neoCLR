@@ -12833,3 +12833,18 @@ claim follows from these focused checks.
 - **Open:** Windows HTTP/non-console services, packaged native kits and general hosting. Default Object display
   with arrays exposes an existing backend restriction; the combined sample uses
   explicit Int32 formatting, and interpolation has a separate acceptance case.
+
+## 2026-10-09 — HTTP showcase with one macOS/Windows contract
+
+- **Author:** “Let's work towards making the HTTP case work, since its a showcase.
+  Both HttpClient and HttpServer.” Subsequently clarifies: “It should work on both
+  macOS and Windows in consistent and predictable ways”.
+- **Assistant proposal/action:** adopts paired platform qualification, beginning
+  with a shared socket lifecycle/transfer implementation and explicit OS boundary.
+  Adds a GitHub Actions matrix using the same native contract consumers. Records
+  the [acceptance sequence and research](native-http-parity.md).
+- **Outcome so far:** local macOS listener, deferred accept and transfer consumers
+  pass with sanitizers. Windows execution remains pending for this slice.
+- **Open:** Windows HTTP host/project integration and native DNS/outbound-connect
+  bindings for HttpClient on both platforms. Existing macOS server evidence does
+  not establish a working native client. Scheduling ownership remains provisional.

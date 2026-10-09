@@ -26,6 +26,12 @@ repairs support these consumers; broad structural types, a wholesale RavenDoc
 rewrite and JIT remain deferred until concrete needs justify them. Existing
 structural experiments retain their branch restrictions.
 
+**HTTP showcase clarification (2026-10-09):** next make both HttpClient and
+HttpServer work consistently and predictably on macOS and Windows. Use one shared
+HTTP/network contract and qualify both platforms with the same scenarios. The
+[parity plan](native-http-parity.md) tracks the shared socket adapter, Windows
+server host and missing native DNS/outbound-connect bindings.
+
 **Author clarification (2026-10-09):** once the native compilation foundations are
 ready, let runtime suspension, runtime-owned scheduling and green threads co-evolve
 with them. This is a cross-cutting design/implementation track alongside subsequent

@@ -1,0 +1,54 @@
+name: Native network parity
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'docs/experiments/aot-console/socket-*'
+      - 'docs/experiments/aot-console/native-gc*'
+      - 'docs/experiments/aot-console/root-probe*'
+      - 'docs/experiments/aot-console/text-arena*'
+      - 'docs/experiments/aot-fault-details/fault-details.h'
+      - 'scripts/validate-native-network.py'
+      - '.github/workflows/native-network.yml'
+  pull_request:
+    paths:
+      - 'docs/experiments/aot-console/socket-*'
+      - 'docs/experiments/aot-console/native-gc*'
+      - 'docs/experiments/aot-console/root-probe*'
+      - 'docs/experiments/aot-console/text-arena*'
+      - 'docs/experiments/aot-fault-details/fault-details.h'
+      - 'scripts/validate-native-network.py'
+      - '.github/workflows/native-network.yml'
+permissions:
+  contents: read
+jobs:
+  contracts:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run macOS socket contracts
+        if: runner.os == 'macOS'
+        run: python3 scripts/validate-native-network.py --output target/native-network-validation
+      - name: Run Windows socket contracts
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw 'MSVC x64 tools not found' }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-network.py --output target/native-network-validation"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-network-${{ matrix.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: target/native-network-validation/
+          retention-days: 14
+          if-no-files-found: warn

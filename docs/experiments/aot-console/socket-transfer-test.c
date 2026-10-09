@@ -1,8 +1,5 @@
 #include "socket-listener.h"
 #include "native-gc.h"
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <unistd.h>
 #include <string.h>
 #define CHECK(x) do { if (!(x)) return __LINE__; } while (0)
 int main(void) {
@@ -28,10 +25,13 @@ int main(void) {
     CHECK(!neoclr_socket_accept_v1(listener, callback, &c, result) && result[0] == 2 && result[1] == 2);
     result[0] = result[1] = 99;
     CHECK(neoclr_socket_connect_result_v1(operation, &c, result) == 3 && result[0] == 99);
-    int peer = socket(AF_INET, SOCK_STREAM, 0);
-    CHECK(peer >= 0 && !connect(peer, (const void *)&endpoint, sizeof(endpoint)));
+    neoclr_socket_descriptor peer = socket(AF_INET, SOCK_STREAM, 0);
+    CHECK(peer != NEOCLR_INVALID_SOCKET && !connect(peer, (const void *)&endpoint, sizeof(endpoint)));
     int ready = 0;
-    for (unsigned retry = 0; retry < 1000 && !ready; retry++) ready = neoclr_socket_poll_v1(&c, &root);
+    for (unsigned retry = 0; retry < 5000 && !ready; retry++) {
+        ready = neoclr_socket_poll_v1(&c, &root);
+        if (!ready) neoclr_os_pause();
+    }
     CHECK(ready == 1);
     void *read = NULL;
     CHECK(!neoclr_gc_host_root_read_v1(&c, root, &read) && read == callback);
@@ -70,7 +70,10 @@ int main(void) {
     CHECK(!neoclr_socket_poll_v1(&c, &root));
     CHECK(send(peer, "ping", 4, 0) == 4);
     ready = 0;
-    for (unsigned retry = 0; retry < 1000 && !ready; retry++) ready = neoclr_socket_poll_v1(&c, &root);
+    for (unsigned retry = 0; retry < 5000 && !ready; retry++) {
+        ready = neoclr_socket_poll_v1(&c, &root);
+        if (!ready) neoclr_os_pause();
+    }
     CHECK(ready == 1);
     CHECK(!neoclr_socket_transfer_result_v1(operation, &c, result) && result[0] == 1 && result[1] > 0 && result[1] <= 4);
     unsigned received = (unsigned)result[1];
@@ -86,8 +89,8 @@ int main(void) {
     CHECK(neoclr_socket_poll_v1(&c, &root) == 1);
     CHECK(!neoclr_socket_transfer_result_v1(operation, &c, result) && result[0] == 1 && result[1] > 0 && result[1] <= received);
     char echo[8];
-    ssize_t read_count = recv(peer, echo, (size_t)result[1], MSG_WAITALL);
-    CHECK(read_count == (ssize_t)result[1] && !memcmp(echo, "ping", (size_t)read_count));
+    int64_t read_count = recv(peer, echo, (int)result[1], MSG_WAITALL);
+    CHECK(read_count == (int64_t)result[1] && !memcmp(echo, "ping", (size_t)read_count));
     CHECK(!scope.transfer_bytes);
     /* Cancellation and deadline settling cannot write into the destination later. */
     CHECK(!neoclr_socket_receive_v1(accepted, array, 0, 1, callback, &c, result) && result[0] == 5);
@@ -108,12 +111,15 @@ int main(void) {
     CHECK(!neoclr_socket_transfer_result_v1(operation, &c, result) && result[0] == 1 && result[1] == 0);
     CHECK(!neoclr_socket_send_v1(accepted, array, 8, 1, callback, &c, result) && result[0] == 2 && result[1] == 3);
     CHECK(neoclr_socket_send_v1(accepted, array, 0, 1, callback, &c, result) == 3);
-    close(peer); peer = -1;
+    neoclr_os_close(peer); peer = NEOCLR_INVALID_SOCKET;
     unsigned eof = 0;
     for (unsigned attempt = 0; attempt < 5 && !eof; attempt++) {
         CHECK(!neoclr_socket_receive_v1(accepted, array, 0, 8, callback, &c, result) && result[0] == 5);
         operation = result[1]; ready = 0;
-        for (unsigned retry = 0; retry < 1000 && !ready; retry++) ready = neoclr_socket_poll_v1(&c, &root);
+        for (unsigned retry = 0; retry < 5000 && !ready; retry++) {
+            ready = neoclr_socket_poll_v1(&c, &root);
+            if (!ready) neoclr_os_pause();
+        }
         CHECK(ready == 1);
         CHECK(!neoclr_socket_transfer_result_v1(operation, &c, result) && result[0] == 1);
         eof = result[1] == 0;
@@ -123,9 +129,9 @@ int main(void) {
     CHECK(!neoclr_socket_receive_v1(accepted, array, 0, 1, callback, &c, result) && result[0] == 5);
     CHECK(!neoclr_gc_host_root_release_v1(&c, array_root));
     c.fault.code = 4;
+    if (peer != NEOCLR_INVALID_SOCKET) neoclr_os_close(peer);
     CHECK(!neoclr_socket_scope_leave_v1(&scope));
     c.fault.code = 0;
-    if (peer >= 0) close(peer);
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used && !neoclr_gc_entry_check_v1(&c));
     CHECK(buffer[128] == 1234567);
     return 0;
