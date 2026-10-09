@@ -11,11 +11,13 @@ import subprocess
 import sys
 from textwrap import dedent
 from urllib.parse import urlsplit, urlunsplit, unquote
+from native_api_snapshot import extract_snapshot
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'website'
 OUTPUT = ROOT / 'target/website'
 NATIVE_PREVIEW = ROOT / 'target/native-api-preview.json'
+NATIVE_SNAPSHOT = ROOT / 'api-docs/native-reference.json'
 
 
 def excerpt(path, start, end, include_end=True):
@@ -236,6 +238,8 @@ def write_legacy_routes():
 
 def selected_native_preview():
     if not NATIVE_PREVIEW.exists():
+        if NATIVE_SNAPSHOT.exists():
+            return extract_snapshot(NATIVE_SNAPSHOT, ROOT / 'target/native-api-publication')
         return None
     audit = Path(json.loads(NATIVE_PREVIEW.read_text())['audit'])
     if not audit.is_absolute() or not (audit / 'site/docs/api').is_dir():

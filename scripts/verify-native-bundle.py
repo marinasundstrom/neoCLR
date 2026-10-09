@@ -13,6 +13,7 @@ def main():
     parser.add_argument('bundle', nargs='?', type=Path, default=Path(__file__).resolve().parent.parent)
     parser.add_argument('--report', required=True, type=Path)
     args = parser.parse_args()
+    args.report = args.report.resolve()
     root = args.bundle.resolve()
     if args.report.exists():
         raise FileExistsError(args.report)

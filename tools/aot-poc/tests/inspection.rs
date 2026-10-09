@@ -180,17 +180,13 @@ fn closed_world_inspection_distinguishes_selection_and_body_failures() {
     assert!(report["selection"].is_null());
     assert_eq!(report["functions"].as_array().unwrap().len(), 3);
 
-    let mut module = neoclr::metadata_container::decode(include_bytes!(
-        "../../../docs/experiments/aot-values/ResultApp.pe"
-    ))
+    // Exercise a reachable operation requiring an omitted native capability.
+    // An instruction appended after ret is correctly discarded as unreachable.
+    let module = neoclr::assemble(
+        ".module Array\n.entry Main\n.function Main() -> Int32\nldc.i4 1\nnewarr Int32\nldlen\nconv.i4\nret\n.end",
+    )
     .unwrap();
-    module
-        .functions
-        .iter_mut()
-        .find(|f| f.name == module.entry)
-        .unwrap()
-        .body
-        .push(neoclr::metadata::Instruction::BitNot);
+    neoclr::LoadedProgram::new(&module).unwrap().verify().unwrap();
     let report = inspect_mode(
         &neoclr::metadata_container::write_module(&module).unwrap(),
         true,

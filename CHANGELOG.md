@@ -8,6 +8,23 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Resolve native-bundle verification report paths before invoking tools from the
+  extracted bundle, preserving relative report destinations. Reserve the Windows
+  refusal-test port for the test lifetime to prevent parallel listener reuse;
+  retain the macOS-specific released-port setup.
+
+- Make the reviewed native API rendering a checksum-pinned website publication
+  input, so clean builds retain declaring assemblies, module members and extension
+  presentation. Keep local preview selection and explicitly marked legacy coverage
+  gaps; reject corrupt snapshot inputs before replacing the visible site. Reserve
+  room for the Copy button in long mobile API declarations.
+
+- Align the native String by-reference rejection regression with the current
+  explicit-interface diagnostic. The test still requires failure before object
+  publication; no by-reference receiver support is added. Exercise a reachable
+  missing array capability in inspection tests instead of an unreachable instruction
+  that the compiler correctly discards, and check the current 256-type budget.
+
 - Refresh the release validator's native seed pin for the added String.Replace
   service. Keep Preview 12's published bootstrap evidence unchanged; candidate
   source and package execution must still pass before publication.

@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -101,6 +102,7 @@ def main():
         subprocess.run(['python3', str(ROOT / 'scripts/ravendoc.py'), '--finalize-site', str(config)], check=True)
         spec = importlib.util.spec_from_file_location('website_checks', ROOT / 'scripts/build-website.py')
         checks = importlib.util.module_from_spec(spec)
+        sys.path.insert(0, str(ROOT / 'scripts'))
         spec.loader.exec_module(checks)
         checks.OUTPUT = staging
         checks.make_reference_links_relative()

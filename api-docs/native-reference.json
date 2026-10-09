@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "archive": "native-reference.zip",
+  "sha256": "b61d5dd3cef454fef68b38564993e80603807b278be8ef92d00bbd9633348397",
+  "librarySourceRevision": "9fd8f6b8eb10b067c58127222833a6339696bae4",
+  "compilerRevision": "c6d2137e34d11f0c8888c5e91f0c6257f53e6c87",
+  "rendererRevision": "c6d2137e34d11f0c8888c5e91f0c6257f53e6c87",
+  "libraryArtifacts": {
+    "System.Runtime.dll": "48a1f70a5ec03a014513b9435143a522b899c7aa87360140f38b01aecdf0ad22",
+    "System.Data.dll": "a5aee2d42b20208a9ef98d84fdd0015d9eec19d5cfbbc6f0abac92817f55bf00",
+    "System.Networking.dll": "e1ec6f25882f29ebfaefdbf3eb6d737b8d6ae46dc7d7071b873b49a2474f66a2",
+    "System.Web.dll": "8db239ee54c899764552c365d6b1e5b21cc4c54c0cb9121cc64d5415875eaa32",
+    "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f"
+  },
+  "renderingEvidence": {
+    "normalized-sidecars.json": "e517cf5751f877fb90716e59b2d337289f32dacb2abda4d0bfff2e95d20ed57e",
+    "restored-xml-comments.json": "d7aa00b083b96e3a9ea00f909b020c1caab9c3833bd104087b2fbfbdb83a9756"
+  },
+  "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
+}

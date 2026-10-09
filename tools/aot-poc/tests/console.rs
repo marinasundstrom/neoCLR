@@ -2530,7 +2530,7 @@ fn string_interface_byref_receivers_reject_before_native_publication() {
     let dir=Temp::new();
     let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena","--bind-int32-to-string","--bind-console-write-line"]);
     assert!(!r.status.success() && !dir.0.join("app.o").exists(),"{r:?}");
-    assert!(String::from_utf8_lossy(&r.stderr).contains("String instance projection requires public nonvirtual ordinary wrappers"),"{r:?}");
+    assert!(String::from_utf8_lossy(&r.stderr).contains("String instance projection requires public or explicit-interface nonvirtual wrappers"),"{r:?}");
 }
 
 #[test]

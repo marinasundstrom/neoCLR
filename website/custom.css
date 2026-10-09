@@ -3,6 +3,7 @@
 .page-context { display: none; }
 .api-content { max-width: 78ch; }
 .api-content pre { overflow-x: auto; }
+.api-signature.with-copy-code { padding-inline-end: 5rem; }
 .api-content table { display: block; overflow-x: auto; }
 .api-content a { overflow-wrap: anywhere; }
 .skip-link { position: absolute; left: 1rem; top: -5rem; z-index: 10; padding: .8rem; background: var(--raven-surface, white); }

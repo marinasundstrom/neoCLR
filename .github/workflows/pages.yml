@@ -11,6 +11,8 @@ on:
       - 'runtime/raven/src/System/**'
       - 'docs/experiments/**'
       - 'scripts/build-website.py'
+      - 'scripts/*native-api-snapshot.py'
+      - 'scripts/*native_api_snapshot.py'
       - 'scripts/ravendoc.py'
       - 'scripts/update-ravendoc.py'
       - 'tools/ravendoc/**'
@@ -29,6 +31,8 @@ on:
       - 'runtime/raven/src/System/**'
       - 'docs/experiments/**'
       - 'scripts/build-website.py'
+      - 'scripts/*native-api-snapshot.py'
+      - 'scripts/*native_api_snapshot.py'
       - 'scripts/ravendoc.py'
       - 'scripts/update-ravendoc.py'
       - 'tools/ravendoc/**'
@@ -59,7 +63,9 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - name: Check website contracts
-        run: python -m unittest discover -s scripts -p test_build_website.py
+        run: |
+          python -m unittest discover -s scripts -p test_build_website.py
+          python -m unittest discover -s scripts -p test_native_api_snapshot.py
       - name: Build and check project site
         run: python scripts/build-website.py
       - name: Upload site

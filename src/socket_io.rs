@@ -2120,6 +2120,8 @@ mod tests {
     fn refused_connect_releases_socket_slot_but_retains_result_until_consumed() {
         // Select an ephemeral loopback port, then release it so the kernel refuses connect.
         // Keeping it bound without listen can silently drop SYN on macOS.
+        // On Windows retain the reservation so parallel tests cannot acquire
+        // this port while the refused connection is being observed.
         let reserved = socket2::Socket::new(
             socket2::Domain::IPV4,
             socket2::Type::STREAM,
@@ -2141,12 +2143,21 @@ mod tests {
             .unwrap()
             .port()
             .into();
+        #[cfg(not(windows))]
         drop(reserved);
         let mut sockets = Sockets::default();
         let heap = ManagedHeap::default();
         let id = sockets.connect("127.0.0.1", port, callback()).unwrap();
         deliver(&mut sockets, &heap);
-        assert!(sockets.sockets.is_empty());
+        assert!(
+            sockets.sockets.is_empty(),
+            "refused connection unexpectedly produced sockets: {:?}",
+            sockets
+                .sockets
+                .values()
+                .map(|s| (s.local_addr(), s.peer_addr()))
+                .collect::<Vec<_>>()
+        );
         assert!(sockets.connects[&id].stream.is_none());
         assert_eq!(
             connect_result(&mut sockets, &heap, id),

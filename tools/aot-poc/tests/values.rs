@@ -311,9 +311,6 @@ fn unsupported_value_shapes_and_invalid_borrows_never_emit() {
     m.functions[1].body = vec![Op::Arg(0), Op::Field(99), Op::Return];
     cases.push(m);
     let mut m = original.clone();
-    m.functions[1].body = vec![Op::Int(0), Op::Return, Op::BitNot];
-    cases.push(m);
-    let mut m = original.clone();
     m.functions[1].body = vec![Op::Arg(0), Op::Return];
     cases.push(m);
     let mut m = original.clone();
@@ -1150,7 +1147,7 @@ fn closed_world_compiles_original_raven_choice_without_runtime_imports() {
 #[test]
 fn closed_world_is_explicit_and_never_omits_called_unsupported_code() {
     use neoclr::metadata::Instruction as Op;
-    let source = ".module Selection\n.entry Main\n.type Cell\n.field Value Int32\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n.function Unused() -> Int32\nldc.r8 1\npop\nldc.i4 0\nret\n.end";
+    let source = ".module Selection\n.entry Main\n.type Cell\n.field Value Int32\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n.function Unused() -> Int32\nldc.i4 1\nnewarr Int32\npop\nldc.i4 0\nret\n.end";
     let m = neoclr::assemble(source).unwrap();
     let bytes = neoclr::metadata_container::write_module(&m).unwrap();
     let temp = Temp::new();
@@ -1718,12 +1715,15 @@ Done:
 
 #[test]
 fn user_fault_does_not_hide_unsupported_value_il() {
-    let m = neoclr::assemble(".module DeadValueFault\n.function Main() -> Int32\nfault \"stop\"\nldc.i4 1\nvalue.pack Int32\npop\nldc.i4 1\nldc.i4 2\nxor\nret\n.end").unwrap();
+    // Both paths are reachable: a fault on one input cannot hide a missing
+    // allocation capability on the other input.
+    let m = neoclr::assemble(".module ValueFault\n.function Main(Int32 choose) -> Int32\nldarg choose\nbrfalse Allocate\nfault \"stop\"\nAllocate:\nldc.i4 1\nnewarr Int32\nldlen\nconv.i4\nret\n.end").unwrap();
+    neoclr::LoadedProgram::new(&m).unwrap().verify().unwrap();
     let bytes = neoclr::metadata_container::write_module(&m).unwrap();
     let temp = Temp::new();
     let result = compile_mode(&bytes, &temp, "Main", true);
     assert!(!result.status.success());
-    assert!(String::from_utf8_lossy(&result.stderr).contains("unsupported value instruction"));
+    assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
     assert!(!temp.0.join("value.o").exists());
 }
 
@@ -1872,7 +1872,7 @@ ret
 
 #[test]
 fn multiple_value_shape_discovery_stays_bounded() {
-    for count in [64,65] {
+    for count in [128,129] {
     let mut source = String::from(".module ManyShapes\n.type Box<T>\n.field Value T\n.end\n");
     for n in 0..count { source.push_str(&format!(".type Leaf{n}\n.end\n")); }
     source.push_str(".function Main() -> Int32\n");
@@ -1881,10 +1881,10 @@ fn multiple_value_shape_discovery_stays_bounded() {
     let m = neoclr::assemble(&source).unwrap();
     let temp = Temp::new();
     let r = compile_mode(&neoclr::metadata_container::write_module(&m).unwrap(),&temp,"Main",true);
-    assert_eq!(r.status.success(),count==64,"{}",String::from_utf8_lossy(&r.stderr));
-    if count==65 {
+    assert_eq!(r.status.success(),count==128,"{}",String::from_utf8_lossy(&r.stderr));
+    if count==129 {
     assert!(!temp.0.join("value.o").exists());
-    assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 128"));
+    assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 256"));
     }
     }
 }

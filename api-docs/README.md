@@ -1350,6 +1350,35 @@ Publishing remains unchanged; regenerate a matching production bundle, sidecars 
 full coverage inventory before the upcoming release. See the audit README for the
 explicit local integration command and its complete HTML/link checks.
 
+### Release website input (2026-10-09)
+
+Clean website builds now select `native-reference.json` and its checksum-pinned
+`native-reference.zip` before publication. The archive contains reviewed rendered
+native API pages, not executable libraries. Its manifest records library artifact
+hashes, the source/compiler revisions and the renderer revision. This bounded
+snapshot avoids silently reverting published pages to CoreProbe when a local
+preview-selection file is absent. A corrupt snapshot fails before publication.
+
+Refresh it after rebuilding the four-library bundle and generating a fresh themed
+audit as documented in `docs/experiments/native-library-documentation-audit/README.md`:
+
+```sh
+python3 scripts/update-native-api-snapshot.py /absolute/path/to/audit \
+  --renderer-revision EXACT_RAVEN_REVISION
+python3 -m unittest discover -s scripts -p test_native_api_snapshot.py
+python3 -m unittest discover -s scripts -p test_build_website.py
+python3 scripts/build-website.py
+```
+
+For publication validation, use a clean checkout without the ignored
+`target/native-api-preview.json` override. Review the resulting website in a browser
+before committing the snapshot. Rendering still uses the explicit temporary
+primitive bootstrap and reviewed XML restoration described in the audit; this is
+not native-only core bootstrap. The 136 unmatched legacy pages remain visibly
+marked migration gaps. Keep the existing reference metadata and XML snapshot for
+that compatibility coverage. Regenerate the rendering when the release links,
+RavenDoc presentation, native APIs or authored documentation change.
+
 ### System.Time identity migration (2026-10-09)
 
 Date/time values, calendars, clocks, zones and their errors now appear under
