@@ -22,6 +22,9 @@ async func Main() -> Task<()> {
     }
     let client = HttpClient()
     let request = client.GetString(url, cancellation.Token)
+    if mode == "pending-fault" {
+        System.Fail("Client fault while request pending")
+    }
     if mode == "cancel" {
         cancellation.Cancel()
     }

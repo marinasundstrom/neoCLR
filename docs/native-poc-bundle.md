@@ -352,3 +352,24 @@ terminal run `curl.exe http://127.0.0.1:<printed-port>/greeting` on Windows (or
 `curl` on macOS). The body is `Café 🌍`; the server then closes. Select
 `--profile http` for the same sample on macOS. The checked-in project matches the
 validated project template and imports the bundle selected by the builder.
+
+## Rebuild development libraries for current HTTP samples
+
+Current source samples use `Task.CompletedTask` and `Task.FromResult`, which are not
+in the published Preview 13 libraries. From this checkout, prepare a separate
+matching development bundle before building those samples:
+
+```sh
+python3 scripts/prepare-native-development-bundle.py \
+  --bundle /path/to/neoclr-native-poc \
+  --compiler-revision 71cafd353900394a4f670a8ad8691597f6115091 \
+  --output target/http-development
+```
+
+Use `target/http-development/bundle` as `--bundle` for the HTTP project build or
+validation command. The command verifies the input manifest, rebuilds the metadata
+translator and all four Raven libraries, and records source/tool hashes and logs.
+It reuses the selected bundle's explicit primitive-only Core.dll and compiler;
+it does not claim to remove the primitive bootstrap. The output must be new and
+is a development artifact, not a reissued Preview 13 release. The Windows HTTP
+Actions perform this preparation automatically using the pinned archive.

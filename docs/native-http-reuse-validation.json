@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-09",
+  "scope": "macOS ARM64 native HTTP and serial stateless host recovery",
+  "reportSha256": "c86c04de528a5908eeba9deb69e59c3b4123481746319d6001289ff288b3dfdd",
+  "artifactHashesVerified": 32,
+  "sources": {
+    "scripts/validate-native-client-project.py": "d10abc6f90b7a0dc16409f01fd9bda280afa3b8202655b758d8e0d2ae29093ca",
+    "docs/experiments/native-http-client/Client.rvn": "11b252a94071dd892833ddd56d4ad3cc7a9c43f5e8dba6a0774825dc408efccd",
+    "docs/experiments/native-http-client/Native.rvnproj": "1c2fdb556f3513d84bd0501dd9570083a19631cb69fd293181613c9a46077ba8",
+    "docs/experiments/http-server/Server.rvn": "4b62d4eef313827b50a2bb46743aebbd1ad7a39682d6c3bc2bb4607266e5eec1",
+    "docs/experiments/http-server/Native.rvnproj": "1c2fdb556f3513d84bd0501dd9570083a19631cb69fd293181613c9a46077ba8"
+  },
+  "cases": [
+    {
+      "name": "task-factories",
+      "passed": true
+    },
+    {
+      "name": "greeting",
+      "passed": true
+    },
+    {
+      "name": "numeric",
+      "passed": true
+    },
+    {
+      "name": "fragmented",
+      "passed": true
+    },
+    {
+      "name": "malformed",
+      "passed": true
+    },
+    {
+      "name": "refused",
+      "passed": true
+    },
+    {
+      "name": "timeout",
+      "passed": true
+    },
+    {
+      "name": "pre-cancel",
+      "passed": true
+    },
+    {
+      "name": "cancel",
+      "passed": true
+    },
+    {
+      "name": "continuation-fault",
+      "passed": true
+    },
+    {
+      "name": "paired-raven-server",
+      "passed": true
+    },
+    {
+      "name": "continuation-fault-recovery",
+      "passed": true,
+      "invocations": 3,
+      "freshInterpreterExitCodes": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "name": "pending-fault-recovery",
+      "passed": true,
+      "invocations": 3,
+      "freshInterpreterExitCodes": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "name": "cancellation-recovery",
+      "passed": true,
+      "invocations": 3,
+      "freshInterpreterExitCodes": [
+        0,
+        1,
+        0
+      ]
+    }
+  ],
+  "windows": "Pending identical dedicated workflow gate; not yet qualified for reuse."
+}

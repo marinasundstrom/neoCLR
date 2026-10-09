@@ -21,6 +21,82 @@ http = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(http)
 sha = http.sha
 
+def qualify_reuse(run, out, build, commands, environment, response):
+    """Relink the same guest object into a three-invocation private test host."""
+    windows = platform.system() == 'Windows'
+    evidence = json.loads((build / 'build.json').read_text())
+    links = [row['command'] for row in evidence['commands']
+             if any(str(arg).endswith('http-host.c') for arg in row['command'])]
+    if len(links) != 1:
+        raise ValueError('Missing unambiguous native HTTP link command')
+    folder = out / 'reused host executable only'; folder.mkdir()
+    binary = folder / ('app.exe' if windows else 'app')
+    link = links[0].copy()
+    objects = out / 'reused host objects'; objects.mkdir()
+    if windows:
+        link = [('/Fe:' + str(binary)) if arg.startswith('/Fe:') else
+                ('/Fo' + str(objects) + '/') if arg.startswith('/Fo') else arg for arg in link]
+        link.insert(1, '/DNEOCLR_HTTP_INVOCATIONS=3')
+    else:
+        link[link.index('-o') + 1] = str(binary)
+        link.insert(1, '-DNEOCLR_HTTP_INVOCATIONS=3')
+    run(link, 'reuse-link')
+    rows = []
+    for name, action in [('continuation-fault-recovery', 'fault'), ('pending-fault-recovery', 'pending-fault'), ('cancellation-recovery', 'cancel')]:
+        row = dict(name=name, invocations=3, sameNativeHeapAndContext=True)
+        rows.append(row)
+        for mode in ('interpreter', 'native'):
+            listener = socket.socket(); listener.bind(('127.0.0.1', 0)); listener.listen(); listener.settimeout(30)
+            url = f'http://localhost:{listener.getsockname()[1]}/greeting'
+            expected_requests = 3 if action == 'fault' else 2
+            wire = dict(requests=[])
+            def fixture():
+                try:
+                    for _ in range(expected_requests):
+                        with listener.accept()[0] as peer:
+                            peer.settimeout(10); request = b''
+                            while b'\r\n\r\n' not in request:
+                                part = peer.recv(4096)
+                                if not part or len(request) + len(part) > 4096:
+                                    raise ValueError('Invalid reused-host request')
+                                request += part
+                            wire['requests'].append(request.hex())
+                            peer.sendall(response)
+                except Exception as error:
+                    wire['error'] = str(error)
+                finally:
+                    listener.close()
+            thread = threading.Thread(target=fixture); thread.start()
+            try:
+                inputs = [(url + '\n' + step + '\n').encode() for step in ('normal', action, 'normal')]
+                if mode == 'native':
+                    result = subprocess.run([str(binary)], input=b''.join(inputs), capture_output=True, timeout=60,
+                                            cwd=folder, env=environment)
+                    value = dict(exitCode=result.returncode, stdout=result.stdout.decode(), stderr=result.stderr.decode())
+                else:
+                    results = [subprocess.run(list(map(str, commands['interpreter'])), input=data, capture_output=True, timeout=25, cwd=ROOT) for data in inputs]
+                    value = dict(exitCode=next((r.returncode for r in results if r.returncode), 0),
+                                 stdout=b''.join(r.stdout for r in results).decode(), stderr=b''.join(r.stderr for r in results).decode())
+                    row['freshInterpreterExitCodes'] = [r.returncode for r in results]
+                row[mode] = value
+            finally:
+                thread.join(timeout=31)
+                if thread.is_alive():
+                    listener.close(); thread.join(timeout=1)
+            if thread.is_alive() or 'error' in wire or len(wire['requests']) != expected_requests:
+                raise ValueError(name + ': fixture failed: ' + repr(wire))
+            row[mode + 'Requests'] = wire['requests']
+        if row['native'] != row['interpreter'] or row['freshInterpreterExitCodes'] != [0, 1, 0]:
+            raise ValueError(name + ': repeated host differs from fresh invocations: ' + repr(row))
+        value = row['native']
+        expected_fault = 'Client continuation fault' if action == 'fault' else 'Client fault while request pending' if action == 'pending-fault' else 'cancel'
+        if value['stdout'] != 'Café 🌍\nCafé 🌍\n' or expected_fault not in value['stderr']:
+            raise ValueError(name + ': missing recovery or expected fault')
+        row['passed'] = True
+    if sorted(p.name for p in folder.iterdir()) != [binary.name]:
+        raise ValueError('Reused host is not executable-only')
+    return rows
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
@@ -159,9 +235,10 @@ def main():
                 if server.poll() is None: server.kill(); server.communicate()
             if row[mode] != dict(exitCode=0, stdout='Café 🌍\n', stderr='') or row[mode+'Server'] != dict(exitCode=0, stdout='Other work runs while HTTP accept is pending\nServed greeting; server closed\n', stderr=''): raise ValueError('Paired Raven server/client mismatch')
         row['passed'] = True
+        report['cases'].extend(qualify_reuse(run, out, builds['client'], commands, environment, response))
         for binary in isolated.values():
             if sorted(p.name for p in binary.parent.iterdir()) != [binary.name]: raise ValueError('Executable-only directory changed')
-        report.update(passed=len(report['cases']) == 11, standalone=True)
+        report.update(passed=len(report['cases']) == 14, standalone=True)
     except Exception as error: report['error'] = str(error)
     finally:
         report['files'] = {p.relative_to(out).as_posix(): sha(p) for p in sorted(out.rglob('*')) if p.is_file()}

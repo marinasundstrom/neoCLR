@@ -45,6 +45,8 @@ The client resolves `localhost`, connects and awaits a UTF-8 greeting. The serve
 accepts a loopback GET `/greeting`, sends `Café 🌍` and closes its listener. Both
 programs run as separate standalone executables. Application code uses `await`,
 including in `Main`; a unit-returning async function completes when it reaches the end.
+Current samples use the development Task completion helpers and require
+[rebuilt libraries](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md#rebuild-development-libraries-for-current-http-samples).
 
 The tested server awaits one exchange and reports its outcome:
 

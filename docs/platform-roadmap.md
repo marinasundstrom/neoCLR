@@ -36,12 +36,14 @@ listener/accept/transfer consumers on macOS ARM64 and Windows x64 at `da8ca1f2`.
 The subsequent [Windows HTTP project gate](windows-native-http-project-validation.json)
 passes at `353188bf`: standalone greeting, fragmented input, duplicate-length
 rejection, handler errors and callback faults, with interpreter parity on Windows
-x64 and macOS ARM64. Native HttpClient DNS/connect remains open. The author also requests
+x64 and macOS ARM64. The subsequent [await-based client/server gates](native-http-await-validation.json)
+pass at `fbd73677`: ten client cases and five server cases, including paired Raven
+processes and faults, on Windows x64; corresponding macOS cases pass. The author also requests
 native Windows ARM64 support. Track it as an additional target, with explicit
 ABI, stack-probing, host/toolchain and native-execution gates; do not equate x64
 emulation with ARM64 qualification. The author prioritized Windows HTTP project
-integration first; that bounded gate now passes. Next close the shared native
-HttpClient DNS/connect gap.
+integration first; that bounded gate now passes. Next qualify serial native host reuse across HTTP success, faults and cancellation,
+then address persistent state and broader hosting contracts.
 
 **Author clarification (2026-10-09):** once the native compilation foundations are
 ready, let runtime suspension, runtime-owned scheduling and green threads co-evolve

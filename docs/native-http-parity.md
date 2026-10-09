@@ -13,8 +13,8 @@ Windows console project work. It does not establish general native networking.
 2. Integrate the shared adapter with Windows guarded heap/stack admission and the
    HTTP project workflow. Compare the same Raven server and interpreter scenarios:
    greeting, fragmented input, duplicate lengths, handler errors and guest faults.
-3. Add native DNS and outbound-connect bindings. Both are currently absent from
-   the native backend, including macOS. Qualify success, refused connections,
+3. Add native DNS and outbound-connect bindings. These are now bound in
+   both native profiles. Qualify success, refused connections,
    deadline/cancellation races and cleanup before claiming native HttpClient.
 4. Run paired Raven client/server projects on both platforms with byte-exact
    responses and equivalent typed failures. Preserve standalone deployment and
@@ -151,7 +151,10 @@ retention, cancellation/timeout while workers are held, capacity retained after
 cancellation, context teardown before worker completion, address fallback,
 expired connect admission and connection refusal. macOS passes with sanitizers;
 Windows run `37963921861` also passes all four socket consumers on both platforms;
-end-to-end await-based Raven client qualification remains pending.
+end-to-end await-based Raven client and server gates also pass at `fbd73677`,
+with ten client and five server cases on Windows x64 and matching macOS cases.
+[Downloaded Windows evidence](native-http-await-validation.json) verifies 42 client
+and 53 server artifact hashes.
 
 
 ## Await-first native entry integration (2026-10-09, in development)
@@ -180,3 +183,31 @@ The private DNS snapshot tag and these backend admission rules do not change Rav
 Runtime Contract configuration or emitted CLI metadata. Compiler bridge ownership
 and replacement remain as documented above. Rebuild generated objects and native
 adapters together; their entry-scope ABI is private and has changed.
+
+## Serial host reuse and recovery (development)
+
+The next bounded hosting slice re-enters the same generated HTTP program three
+times on one native heap/context. The private correctness host renders each guest
+Fault before releasing its diagnostic roots, verifies scope/root teardown, clears
+that fault, collects the invocation heap and requires zero retained bytes before
+admitting the next entry. It preserves the first guest failure as process exit
+status while allowing later entries; a host lifecycle failure stops immediately.
+The default executable still invokes Main once. `NEOCLR_HTTP_INVOCATIONS=3` is a
+private qualification build option, not a public persistent-host API.
+
+The shared client validator compares success → fault/cancellation → success with
+three fresh interpreter processes. It covers a continuation fault, a fault while
+DNS/request completion remains pending, and entry cancellation. Late resolver
+workers own copied host memory only; teardown does not wait for a blocked resolver
+or allow it to retain guest pointers. The same fixture runs on macOS and Windows.
+Standalone execution still requires only OS libraries.
+
+This advances the lifecycle foundation in the [roadmap](platform-roadmap.md), not
+retained application state, concurrency, reload or green-thread scheduling. Relative
+to the .NET hosting/Native AOT baseline already reviewed in the roadmap, the useful
+new guarantee is explicit reusable entry cleanup; costs include full collection
+between entries and a deliberately stateless boundary. Persistent roots, retained
+code/data ownership and suspension migration remain separate design/validation work.
+
+[macOS reuse evidence](native-http-reuse-validation.json) records all 14 passing
+cases. Windows reuse qualification is pending the identical dedicated gate.

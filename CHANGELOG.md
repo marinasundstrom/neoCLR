@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Add a private serial-reuse HTTP host gate: preserve the first guest failure,
+  render then clear fault roots, release task/socket scopes and require an empty
+  collected heap before another entry. Compare success/fault-or-cancellation/
+  success on one native context with fresh interpreter invocations. This is
+  stateless reuse qualification, not a public persistent-host API. All 14 macOS
+  client/factory/recovery cases pass; Windows reuse qualification is pending. Record the
+  previous await-based Windows client/server successes at `fbd73677`, verifying
+  42 client and 53 server artifact hashes, and advance the roadmap to hosting.
+
 - Add development `Task.CompletedTask: Task<()>` and inferred
   `Task.FromResult<T>(value): Task<T>` with immediate successful completion,
   preserved result identity and normal deferred callback dispatch. Replace

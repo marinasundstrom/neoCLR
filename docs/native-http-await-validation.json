@@ -1,0 +1,323 @@
+{
+  "date": "2026-10-09",
+  "scope": "Windows x64 native async Main client and server before task-factory changes",
+  "revision": "fbd73677676d75830ff796328575f4689b061b54",
+  "runs": [
+    {
+      "name": "client",
+      "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/37967795548",
+      "reportSha256": "b9cc4b957fdd7bd35a66726b31291261bc36b53a70947fa16f16243773ce1f25",
+      "artifactHashesVerified": 42,
+      "sources": {
+        "scripts/validate-native-client-project.py": "45c0e62aee721bccc3bba608074e998a3c3cc5b7283eee48ba0c83348c2b89dc",
+        "docs/experiments/native-http-client/Client.rvn": "55914b1f034590f678bc8f656f68556d5bacc73d34c09d3a0dd73dd4143f765b",
+        "docs/experiments/native-http-client/Native.rvnproj": "1c2fdb556f3513d84bd0501dd9570083a19631cb69fd293181613c9a46077ba8",
+        "docs/experiments/http-server/Server.rvn": "57032125e68bfa17d79940ef8732b34786b13fedeae75156227dd281fc30ba68",
+        "docs/experiments/http-server/Native.rvnproj": "1c2fdb556f3513d84bd0501dd9570083a19631cb69fd293181613c9a46077ba8"
+      },
+      "cases": [
+        {
+          "name": "greeting",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "interpreterWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a35393735310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "nativeWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a35393735330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "passed": true
+        },
+        {
+          "name": "numeric",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "interpreterWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a203132372e302e302e313a35393735350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "nativeWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a203132372e302e302e313a35393736320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "passed": true
+        },
+        {
+          "name": "fragmented",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "interpreterWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a35393736340d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "nativeWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a35393736360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "passed": true
+        },
+        {
+          "name": "malformed",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Error: Invalid status line\n",
+            "stderr": ""
+          },
+          "interpreterWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a35393736380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Error: Invalid status line\n",
+            "stderr": ""
+          },
+          "nativeWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a35393737330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "passed": true
+        },
+        {
+          "name": "refused",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Error: ConnectionRefused\n",
+            "stderr": ""
+          },
+          "interpreterWire": {},
+          "native": {
+            "exitCode": 0,
+            "stdout": "Error: ConnectionRefused\n",
+            "stderr": ""
+          },
+          "nativeWire": {},
+          "passed": true
+        },
+        {
+          "name": "timeout",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Error: TimedOut\n",
+            "stderr": ""
+          },
+          "interpreterWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a35393738340d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Error: TimedOut\n",
+            "stderr": ""
+          },
+          "nativeWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a35393738370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "passed": true
+        },
+        {
+          "name": "pre-cancel",
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "UserFault: Task is cancelled; consume its Outcome\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_50726F6D6973656031.M_52656164 [instruction 4]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B6031.M_476574526573756C74 [instruction 2]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 2]\n"
+          },
+          "interpreterWire": {},
+          "native": {
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "UserFault: Task is cancelled; consume its Outcome\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_50726F6D6973656031.M_52656164 [instruction 4]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B6031.M_476574526573756C74 [instruction 2]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 2]\n"
+          },
+          "nativeWire": {},
+          "passed": true
+        },
+        {
+          "name": "cancel",
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "UserFault: Task is cancelled; consume its Outcome\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_50726F6D6973656031.M_52656164 [instruction 4]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B6031.M_476574526573756C74 [instruction 2]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 2]\n"
+          },
+          "interpreterWire": {},
+          "native": {
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "UserFault: Task is cancelled; consume its Outcome\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_50726F6D6973656031.M_52656164 [instruction 4]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B6031.M_476574526573756C74 [instruction 2]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 2]\n"
+          },
+          "nativeWire": {},
+          "passed": true
+        },
+        {
+          "name": "continuation-fault",
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "UserFault: Client continuation fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.T__3C3E635F5F4173796E6353746174654D616368696E6530.M_4D6F76654E657874 [instruction 151]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n"
+          },
+          "interpreterWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a35393739390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "native": {
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "UserFault: Client continuation fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.T__3C3E635F5F4173796E6353746174654D616368696E6530.M_4D6F76654E657874 [instruction 151]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n"
+          },
+          "nativeWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a35393830310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "passed": true
+        },
+        {
+          "name": "paired-raven-server",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "interpreterServer": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": ""
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "nativeServer": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": ""
+          },
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "server",
+      "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/37967795560",
+      "reportSha256": "2f8572675f17561495e20cc5a7cdd1bd983ab3134d500de3369cd4b78d214c78",
+      "artifactHashesVerified": 53,
+      "sources": {},
+      "cases": [
+        {
+          "name": "greeting",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "passed": true
+        },
+        {
+          "name": "fragmented",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "passed": true
+        },
+        {
+          "name": "duplicate-length",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "passed": true
+        },
+        {
+          "name": "handler-error",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "passed": true
+        },
+        {
+          "name": "callback-fault",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "Other work runs while HTTP accept is pending\n",
+            "stderr": "UserFault: HTTP callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_526573706F6E64 [instruction 1]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_4874747053657276654F7065726174696F6E.M_4F6E4163636570746564 [instruction 102]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 1,
+            "stdout": "Other work runs while HTTP accept is pending\n",
+            "stderr": "UserFault: HTTP callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_526573706F6E64 [instruction 1]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_4874747053657276654F7065726174696F6E.M_4F6E4163636570746564 [instruction 102]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n",
+            "responseHex": ""
+          },
+          "passed": true
+        }
+      ]
+    }
+  ]
+}
