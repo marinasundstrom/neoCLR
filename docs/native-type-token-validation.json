@@ -122,11 +122,248 @@
     "passed": 2,
     "failed": 0
   },
-  "windows": {
-    "status": "pending GitHub Actions qualification"
-  },
   "jsonProbe": {
     "interpreter": "Passed: UTF-8 string, Int32 and Boolean round trip",
     "native": "Rejected: Boolean boxing in ObjectMapper.ReadValue at instruction 110"
+  },
+  "github": {
+    "runId": 37978562111,
+    "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/37978562111",
+    "status": "success",
+    "artifacts": [
+      {
+        "artifact": "native-type-tokens-macos-latest-37978562111-1",
+        "reportSha256": "d2885b5293d3153a2543254e75f07434353bf53ce6d63ce87206551558e26259",
+        "verifiedArtifactHashes": 16,
+        "verifiedSourceHashes": 11,
+        "report": {
+          "passed": true,
+          "platform": "macOS-26.6.2-arm64-arm-64bit",
+          "machine": "arm64",
+          "commands": [
+            {
+              "command": [
+                "git",
+                "-C",
+                "/Users/runner/work/neoCLR/neoCLR",
+                "rev-parse",
+                "HEAD"
+              ],
+              "exitCode": 0
+            },
+            {
+              "command": [
+                "xcrun",
+                "--find",
+                "clang"
+              ],
+              "exitCode": 0
+            },
+            {
+              "command": [
+                "xcrun",
+                "--sdk",
+                "macosx",
+                "--show-sdk-path"
+              ],
+              "exitCode": 0
+            },
+            {
+              "command": [
+                "/Users/runner/work/neoCLR/neoCLR/tools/aot-poc/target/debug/neoclr-aot-poc",
+                "--closed-world",
+                "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console/type-tokens.neoil",
+                "Calculate",
+                "/Users/runner/work/neoCLR/neoCLR/target/native-type-tokens-validation/guest.o",
+                "--system",
+                "/Users/runner/work/neoCLR/neoCLR/target/native-type-tokens-validation/System.neoil",
+                "--module",
+                "/Users/runner/work/neoCLR/neoCLR/target/native-type-tokens-validation/Helpers.neoil",
+                "--compile-system",
+                "--reference-arena",
+                "--native-gc"
+              ],
+              "exitCode": 0
+            },
+            {
+              "command": [
+                "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+                "-isysroot",
+                "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+                "-std=c11",
+                "-O2",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-DNEOCLR_NATIVE_GC",
+                "-I",
+                "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console",
+                "-fsanitize=undefined,bounds",
+                "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console/type-tokens-test.c",
+                "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console/native-gc.c",
+                "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console/root-probe.c",
+                "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console/text-arena.c",
+                "/Users/runner/work/neoCLR/neoCLR/target/native-type-tokens-validation/guest.o",
+                "-o",
+                "/Users/runner/work/neoCLR/neoCLR/target/native-type-tokens-validation/host"
+              ],
+              "exitCode": 0
+            },
+            {
+              "command": [
+                "/Users/runner/work/neoCLR/neoCLR/target/native-type-tokens-validation/host"
+              ],
+              "exitCode": 0
+            }
+          ],
+          "revision": "3a8c315c295625b86c799503b907ecf6165d51d0",
+          "inputs": {
+            "docs/experiments/aot-console/type-tokens-test.c": "0c7f899ea60c01fd78788ae98ad934290257bfc68c30a5c2b576a23f5cd2c1dc",
+            "docs/experiments/aot-console/native-gc.c": "dfe3e554913e625e86f2a260e96999934fcf55b980c7c9e1a8dbf26dae4c6f10",
+            "docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+            "docs/experiments/aot-console/text-arena.c": "911021e591a5dc8e3effed7007a540ba227ca5ac64d796696f49780c81e86efb",
+            "docs/experiments/aot-console/type-tokens.neoil": "3ca5b3e4e252fa20ed85fe1d9901f53f0ff1631d1129fbf0f014a86a24608f7f",
+            "docs/experiments/aot-console/native-gc.h": "2710426be29f0e01061236dcc8dd82db92b0e92ef04633be07575cb4c53df721",
+            "docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+            "docs/experiments/aot-console/text-arena.h": "b4dbae37afe2b8e64b15a3cea1e5b55868aa487da44e7369ff2d063df5a2e99b",
+            "docs/experiments/aot-console/native-stack.h": "f2dcc1dfcb410a919c25bd290a19149366a36426ca0683b704a4da0a8d06b355",
+            "docs/experiments/aot-fault-details/fault-details.h": "2bff27d6fbe97a06fa47bf7c2e286f2731fe2fa7f71a0d1cbb4e2fdd1e4690bd",
+            "scripts/validate-native-type-tokens.py": "41176d5fe4963396fe284387f1cf0d6ae6b8e016626eae872911ced16a0b18cb"
+          },
+          "aotSha256": "0feef00873bad6ff6825d29609ba818b29cb2fa960f7383017a58dbd02896c9e",
+          "stdout": "Type tokens: 42\n",
+          "stderr": "",
+          "files": {
+            "Helpers.neoil": "279f7ffbe5d5b98f975b716da0301d80df99930c72813835f6a026e8a4ac85a3",
+            "System.neoil": "b3de629ea4ba552863c8df2a94a8787ae1505a49da4e890dacc23e49c75dbbbd",
+            "clang.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "clang.stdout": "76241ee955cbf21684ae742c82150bf7d9b3a3489e3ad28d908e003af6fbb61c",
+            "execute.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "execute.stdout": "c436b2caa52565080a34672ed71b3a05da7ffc8700334c0e6a669f538dbda9dd",
+            "guest-build.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "guest-build.stdout": "b63e60b88af589a30cde406c3f336de5eb4d6e2f28ce9deea4f422da025718ff",
+            "guest.o": "75dc711511b5160afbb92ade07c90cd3dc2b21d78a3cc32f9cce72a51755a4f8",
+            "host": "576633e611a57fc9f9ab0d14fa6c972cadd0c439b3bd1d2748eb103cc7292f3a",
+            "host-build.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "host-build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "revision.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "revision.stdout": "d5d73adc03069fb1ddcb5782542d3362a1980ab5039e443bb0c4026654053a5f",
+            "sdk.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sdk.stdout": "0f808f2e6b513e3677dcb3492d4b0577b7f2680ca95d988f4ea653b04edc4a89"
+          }
+        }
+      },
+      {
+        "artifact": "native-type-tokens-windows-2022-37978562111-1",
+        "reportSha256": "049714501225435217245f15b73b29682a07ec0a48f8f0d5f13390a32dbc1b18",
+        "verifiedArtifactHashes": 17,
+        "verifiedSourceHashes": 12,
+        "report": {
+          "passed": true,
+          "platform": "Windows-2022Server-10.0.20348-SP0",
+          "machine": "AMD64",
+          "commands": [
+            {
+              "command": [
+                "git",
+                "-C",
+                "D:\\a\\neoCLR\\neoCLR",
+                "rev-parse",
+                "HEAD"
+              ],
+              "exitCode": 0
+            },
+            {
+              "command": [
+                "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\debug\\neoclr-aot-poc.exe",
+                "--closed-world",
+                "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\type-tokens.neoil",
+                "Calculate",
+                "D:\\a\\neoCLR\\neoCLR\\target\\native-type-tokens-validation\\guest.obj",
+                "--system",
+                "D:\\a\\neoCLR\\neoCLR\\target\\native-type-tokens-validation\\System.neoil",
+                "--module",
+                "D:\\a\\neoCLR\\neoCLR\\target\\native-type-tokens-validation\\Helpers.neoil",
+                "--compile-system",
+                "--reference-arena",
+                "--native-gc",
+                "--target",
+                "x86_64-pc-windows-msvc",
+                "--windows-console-experiment",
+                "--native-stack-budget"
+              ],
+              "exitCode": 0
+            },
+            {
+              "command": [
+                "cl",
+                "/nologo",
+                "/W4",
+                "/WX",
+                "/std:c11",
+                "/experimental:c11atomics",
+                "/O2",
+                "/MT",
+                "/DNEOCLR_NATIVE_GC",
+                "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+                "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\type-tokens-test.c",
+                "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+                "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+                "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+                "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c",
+                "D:\\a\\neoCLR\\neoCLR\\target\\native-type-tokens-validation\\guest.obj",
+                "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-type-tokens-validation\\host.exe",
+                "/link",
+                "/STACK:1048576"
+              ],
+              "exitCode": 0
+            },
+            {
+              "command": [
+                "D:\\a\\neoCLR\\neoCLR\\target\\native-type-tokens-validation\\host.exe"
+              ],
+              "exitCode": 0
+            }
+          ],
+          "revision": "3a8c315c295625b86c799503b907ecf6165d51d0",
+          "inputs": {
+            "docs/experiments/aot-console/type-tokens-test.c": "8de6f7bb3f09730565fe5785c0c8657f9949bc2ac0b0079a01f273fc8d13ad64",
+            "docs/experiments/aot-console/native-gc.c": "c4505eca485f4b8f28b5fc58159614738a8b7b21a6efb6b1e753e08b6dbe60a4",
+            "docs/experiments/aot-console/root-probe.c": "53c89bf572e362623da7bac7241c19744aa79b3310f951c520b570e448bc5a67",
+            "docs/experiments/aot-console/text-arena.c": "ead9f336a394e3dfdb82d9916d29a2f4e4cbc1db8cc5ebfc53cc75050917374e",
+            "docs/experiments/aot-console/type-tokens.neoil": "57a572da5b43592b327eb753a80eabcc5d2ced0926f79acef6191e90c87c62fd",
+            "docs/experiments/aot-console/native-gc.h": "36ec94092e1744b9c57d205034cae8f162d8154b6bf50bccfcfacd6a83884ce3",
+            "docs/experiments/aot-console/root-probe.h": "f9b59905e5167081517a1c142294df7485a619aec1332fced0ee25c2043b0698",
+            "docs/experiments/aot-console/text-arena.h": "03e670e1cb6885096f1999dd5947f26088f45873f3a1ffa3bfeb2775c0560404",
+            "docs/experiments/aot-console/native-stack.h": "49849a834d7599685a8880bcdcda0505ce0465175eb7b38d841c660731d7610f",
+            "docs/experiments/aot-fault-details/fault-details.h": "bb717fcf0645ee35682d6a05ec555c8824426f25bf0745c4368b34eb2964a6cb",
+            "scripts/validate-native-type-tokens.py": "0ecaf78be78de3f405edcba124abe6e201ca2782dc55d475fe463c3686f34ee5",
+            "tools/native/windows-native-stack.c": "ae24c1a05235ec25e3df672d548d5b4ae75811ede0fbb7988efbbc859bbb9b84"
+          },
+          "aotSha256": "ce08ef4dee883204adf6398f71a43ec81439c79014b59fa63104530a88eaa08b",
+          "stdout": "Type tokens: 42\n",
+          "stderr": "",
+          "files": {
+            "execute.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "execute.stdout": "c860601481fc209e38473131817f7b1b10f89dab9b8e4da36b48932e67fabe3e",
+            "guest-build.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "guest-build.stdout": "b63e60b88af589a30cde406c3f336de5eb4d6e2f28ce9deea4f422da025718ff",
+            "guest.obj": "04f6bdab2646293b7618137b0baf41993558abc16c42bde8c0606e3491446220",
+            "Helpers.neoil": "f3d7b1c2b0901211a89b0363715c20faa9a8cf13393f31e38c258efafb358ba8",
+            "host-build.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "host-build.stdout": "b40a6e0e0c1c02b0e8d18f91dbaa30b4ed56f129fdff4fa740c655ed1e2c5b77",
+            "host.exe": "e5cf26f10d416688d78da8e9b05d3cc9abe98df9ae5bc46b019275e61c30bab6",
+            "native-gc.obj": "4ca5f92542b869388fe0cc4e3fc64b8c7476e353a5d956f40d1f0a80a17fe0de",
+            "revision.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "revision.stdout": "d5d73adc03069fb1ddcb5782542d3362a1980ab5039e443bb0c4026654053a5f",
+            "root-probe.obj": "09a90aeda89328a8276bc2309d01df108642358b2906a6179490760e8190d95e",
+            "System.neoil": "829e6008636e74f5346b855f3ef00280329d698b0956e6620cba7e3cecb45c28",
+            "text-arena.obj": "90dd523990dbda12970b56d8cc1f4218d315fed4cadbe54e4b8f7574295a6369",
+            "type-tokens-test.obj": "964131481c9ab56587bf12db69cf84f7d2f35fff80d18da232adf744ab4fb6b4",
+            "windows-native-stack.obj": "63a667730af576fcd54d18e5c6b98aff88944206c29c6cda12f604b1eafac24c"
+          }
+        }
+      }
+    ]
   }
 }

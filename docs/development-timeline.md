@@ -12963,3 +12963,9 @@ claim follows from these focused checks.
   boxing; property metadata retention and checked accessor/constructor execution
   remain required. No author approval of a particular token ABI or metadata-root
   configuration is inferred.
+- **Author clarification:** "We should implement reflection support for native compilation in a way that makes sense."
+- **Assistant response/action:** makes reusable native reflection the design boundary,
+  with JSON as its first consumer. Documents separate semantic metadata, retention
+  requirements and checked invocation adapters, plus an independent reflection
+  acceptance consumer. Explicit roots are an assistant-proposed first implementation
+  mechanism; no public configuration syntax or author approval is inferred.

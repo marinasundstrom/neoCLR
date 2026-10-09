@@ -40,6 +40,81 @@ alternative with potentially smaller metadata and less dispatch; they would add 
 second serialization path and do not supply the requested general introspection
 foundation. No performance advantage is claimed without measurements.
 
+## Native reflection architecture — author clarification
+
+On 2026-10-09 the author clarified: "We should implement reflection support for
+native compilation in a way that makes sense." Treat reflection as a reusable
+platform capability. JSON is the first acceptance consumer; JSON member names,
+model names and serializer-specific dispatch must not enter the backend.
+
+The following is the implementation direction, not a claim of completed support:
+
+- **Semantic metadata:** capture validated source identities, closed type arguments,
+  UTF-8 names, visibility, inheritance, property signatures and accessor/constructor
+  identities before specialization erases metadata. Keep these separate from native
+  object offsets, synthetic boxing tags and compiled-function indices. Generated
+  private helpers must never appear as user reflection members.
+- **Retention analysis:** maintain separate requirements for type identity, member
+  discovery and invocation. A type token alone must not retain every method body.
+  Invocation requirements add executable roots before specialization and selection;
+  dependencies of those bodies then follow ordinary reachability. Iterate until
+  both metadata and executable requirements stop growing. Report why each item
+  was retained. A metadata-only consumer must work without invocation support.
+- **First retention mechanism:** prototype explicit build-time roots keyed by source
+  identity, with member categories and invocation requirements. This avoids silently
+  guessing requirements from calls to the JSON library. The configuration syntax is
+  not settled. Later type-flow inference can supply the same requirements; Raven
+  annotations are a separate integration decision, not a prerequisite for the
+  first native implementation. Unknown flows must receive actionable diagnostics.
+- **Runtime representation:** emit immutable image-owned descriptor tables. Canonical
+  type identities must unite `typeof(T)`, `Object.GetType()` and property type queries;
+  primitive boxing tags map back to the primitive descriptor. The current token
+  ordinal is a private foundation, not the final metadata schema or a cross-image ABI.
+  Managed descriptor wrappers remain ordinary traced objects; immutable descriptor
+  storage has image lifetime. Image unloading/reload needs an explicit ownership
+  contract before handles can cross image boundaries.
+- **Execution:** generate typed invocation adapters for retained constructors and
+  accessors. Share normal argument lowering, allocation, GC roots, dispatch and fault
+  propagation. Call real accessors, preserving their effects and virtual dispatch;
+  do not substitute raw field writes. Validate visibility, receiver, argument count,
+  nullability and exact boxing/assignability before entering user code. Retaining
+  a body does not grant access to it.
+- **Failure semantics:** admitted reflection preserves the existing Introspection and
+  Reflection API contracts. Missing required retained metadata is an admission error,
+  never a fabricated empty member list. Queries for genuinely absent members and
+  invalid runtime receivers/values keep the existing error results. Unsupported
+  invocation shapes fail compilation without publishing an executable. Discovery
+  of a member does not automatically promise that its invocation is supported.
+
+The first independent reflection consumer must enumerate a model's properties,
+construct it, invoke a setter with an observable effect and read through its getter,
+without importing JSON. Compare it with the interpreter on macOS ARM64 and Windows
+x64. Include inherited/closed-generic identities, inaccessible or missing accessors,
+wrong receivers/boxed values, metadata-only retention, constructor/accessor faults
+and collection during invocation. Then run the unchanged JSON mapper and HTTP cases.
+This separates runtime correctness from serializer policy such as nesting limits.
+
+### Retention alternatives and research
+
+Microsoft's [trimming guidance](https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/fixing-warnings)
+uses member-preservation requirements for known types and propagates them through
+call chains. Retaining all members increases size and makes their dependencies
+reachable. This motivates separate discovery/invocation requirements and an
+inspectable retention report; no claim of better .NET ergonomics is made.
+[GraalVM's reachability metadata](https://www.graalvm.org/latest/reference-manual/native-image/metadata/)
+provides another shipped AOT approach combining build-time inference with explicit
+configuration for dynamically accessed elements. Its missing-registration diagnostics
+reinforce the need to distinguish omitted metadata from absent members. Sources
+reviewed 2026-10-09; these are design comparisons, not dependencies or copied ABIs.
+
+Keeping all source metadata and bodies would simplify initial discovery but defeats
+bounded native selection and exposes unsupported bodies unnecessarily. Aggressive
+inference alone would require reliable type-flow analysis before the first consumer.
+Explicit roots are the initial tradeoff: predictable behavior and auditable scope at
+the cost of configuration. Source-generated serializers remain a library alternative,
+but do not implement general reflection. Broader .NET ecosystem comparisons and
+measurements remain open before settling public preservation APIs or size claims.
+
 ## Bounded slices and admission
 
 1. **Implemented foundation:** preserve opaque RuntimeTypeHandle storage through

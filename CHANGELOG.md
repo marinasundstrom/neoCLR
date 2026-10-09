@@ -15,6 +15,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   handles from GC tracing and reject numeric casts. Identity is image-local and
   does not provide TypeInfo queries or reflection invocation. Improve unsupported
   boxing diagnostics for the next JSON admission gap; native JSON remains unfinished.
+  Refine the native reflection plan around semantic metadata, separate discovery/
+  invocation retention, checked adapters and an independent reflection consumer.
+  Explicit build-time roots remain a proposed first mechanism, not a public API.
+  Qualify native type identity on macOS ARM64 and Windows x64 in action
+  `37978562111` at `3a8c315c`, verifying both artifacts and their source inputs.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.
