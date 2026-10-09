@@ -7,6 +7,10 @@ maintain a second HTTP completion checklist here.
 
 ## Preview 13 qualification — 2026-10-09
 
+[Preview 13](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.13) is published
+for Windows x64 and macOS ARM64. Public bundle links return HTTP 200; all five
+uploaded asset digests match the qualified local artifacts.
+
 The author selected a bounded Windows x64/macOS ARM64 POC release after the native
 String milestone. Both extracted toolchain bundles pass collections, Tasks, JSON
 and live HTTP consumers; each installed VS Code extension passes 26 acceptance

@@ -12591,3 +12591,32 @@ claim follows from these focused checks.
   legacy migration gaps; no generated page contains “Preview 11”. Browser checks
   verify compact labels and member grouping/toggles on both targets. Publication
   remains pending the release workflow; runtime qualification is unchanged.
+
+
+## 2026-10-09 — Preview 13 publication
+
+- **Author:** reiterated that the goal remained the neoCLR release while directing
+  the final shared RavenDoc presentation corrections.
+- **Assistant action:** published [Preview 13](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.13) from tag
+  `v0.1.0-preview.13`, commit `0790b641`. Windows x64 and macOS ARM64 bundles,
+  the exact qualified source archive, validation record and SHA256SUMS are attached.
+  All five GitHub asset digests match the local qualified artifacts; both public
+  package links return HTTP 200, and downloaded evidence/checksums match byte-for-byte.
+- **Website:** neoCLR publication workflow
+  [37932391592](https://github.com/marinasundstrom/neoCLR/actions/runs/37932391592)
+  passed. Live browser checks cover the homepage release link, Guides, modules,
+  native compilation, Result extensions and instance-extension declarations.
+  Raven publication workflow
+  [37931914316](https://github.com/marinasundstrom/raven/actions/runs/37931914316)
+  also passed at main `55ccc9f47`. Live provenance and browser checks verify
+  Option.Flatten and Result.WithContext compact signatures in ordinary member
+  groups, extension toggles, SE static markers and instance declarations without
+  CLR carrier details. Both website deployments and the runtime release are complete.
+- **Scope:** this is the qualified POC, not full native core bootstrap. Bundled
+  run tasks use the interpreter; ARM64 AOT remains a separate source experiment.
+  The compiler/editor require the documented .NET SDKs; the interpreter does not.
+- **Post-publication mobile check:** the author reported an expanded header and a
+  misplaced Copy button. A fresh phone-sized browser load rendered both correctly;
+  the assets advertised a ten-minute cache lifetime. The assistant proposed asset
+  versioning, but the author chose to wait and then confirmed “Works om safari”.
+  No speculative CSS or cache-versioning change was made.

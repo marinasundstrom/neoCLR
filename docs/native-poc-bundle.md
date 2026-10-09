@@ -2,6 +2,10 @@
 
 ## Preview 13 qualification (2026-10-09)
 
+[Preview 13](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.13) is published
+for Windows x64 and macOS ARM64. Public bundle links return HTTP 200; all five
+uploaded asset digests match the qualified local artifacts.
+
 The author has requested Windows x64 and macOS ARM64 packages for the next POC.
 Both matching compiler/runtime/library/editor bundles pass extracted consumers
 and 26 installed-editor checks per host. Canonical source validation and focused

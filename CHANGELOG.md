@@ -6,6 +6,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-09
+
+- Record Preview 13 publication for Windows x64 and macOS ARM64, public asset
+  checksum verification and website deployment evidence. Published release notes
+  and qualification records remain unchanged.
+
 ## 0.1.0-preview.13 — 2026-10-09
 
 Windows x64 and macOS ARM64 toolchain bundles pass extracted consumer and installed

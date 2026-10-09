@@ -1,13 +1,14 @@
 # neoCLR platform roadmap
 
-**Release qualification (2026-10-09):** after Raven's shared website publication,
+**Preview 13 published (2026-10-09):** after Raven's shared website publication,
 the author requested the next neoCLR POC release for Windows and macOS, with a
 final pass over urgent issues. Qualify Windows x64 and macOS ARM64 packages from
 recorded revisions, including extracted consumers and editor integration. Keep
 native-only core bootstrap limits and the ARM64 AOT scope explicit; this does not
 make universal sample support or Windows x64 AOT a prerequisite. Preview 13 now
 passes source, extracted-package and installed-editor qualification on the selected
-platforms. See [release evidence](preview-13-validation.json) and
+platforms. [Preview 13](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.13) is published
+with both bundles, the qualified source archive, evidence and checksums. See [release evidence](preview-13-validation.json) and
 [bundle qualification](native-poc-bundle.md).
 
 **Native String POC (2026-10-09):** unchanged production String and its native-only
