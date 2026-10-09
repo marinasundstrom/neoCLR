@@ -8,7 +8,7 @@ on:
       raven_revision:
         description: Exact Raven commit to qualify with this neoCLR revision
         required: true
-        default: 70aea9a7e9e424159a48b0227869245a95bf2ec2
+        default: 71cafd353900394a4f670a8ad8691597f6115091
 permissions:
   contents: read
 jobs:
@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 60
     env:
       PYTHONUTF8: '1'
-      PACKAGE_VERSION: 0.1.13-neoclr.qualification
+      PACKAGE_VERSION: 0.1.14-neoclr.preview13
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: marinasundstrom/raven
-          ref: ${{ inputs.raven_revision || '70aea9a7e9e424159a48b0227869245a95bf2ec2' }}
+          ref: ${{ inputs.raven_revision || '71cafd353900394a4f670a8ad8691597f6115091' }}
           path: raven
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions/setup-dotnet@v4
@@ -70,7 +70,7 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           if (Test-Path server) { Remove-Item server -Recurse -Force }
           Copy-Item "$env:GITHUB_WORKSPACE/packages/raven-sdk-$env:PACKAGE_VERSION-win-x64/tools/language-server" server -Recurse -Force
-          npx --no-install vsce package --no-dependencies --out "$env:GITHUB_WORKSPACE/packages/raven-vscode.vsix"
+          npx --no-install vsce package "$env:PACKAGE_VERSION" --no-update-package-json --no-dependencies --out "$env:GITHUB_WORKSPACE/packages/raven-vscode.vsix"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Compile libraries, package and run extracted samples
         shell: pwsh
@@ -92,6 +92,26 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python 'target/extracted bundle/neoclr-native-poc/tools/verify-native-bundle.py' --report target/windows-native-acceptance.json
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Verify packaged extension in VS Code
+        shell: pwsh
+        working-directory: neoclr
+        run: |
+          $bundle = "$PWD/target/extracted bundle/neoclr-native-poc"
+          python scripts/prepare-native-editor.py --sdk "$bundle/sdk" --bundle "$bundle/lib" --runtime "$bundle/bin/neoclr.exe" --installed-editor --output target/editor-acceptance
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          Invoke-WebRequest https://update.code.visualstudio.com/latest/win32-x64-archive/stable -OutFile target/vscode.zip
+          Expand-Archive target/vscode.zip target/vscode
+          $code = "$PWD/target/vscode/bin/code.cmd"
+          $profile = "$PWD/target/vscode-profile"
+          $extensions = "$PWD/target/vscode-extensions"
+          & $code --user-data-dir $profile --extensions-dir $extensions --install-extension "$bundle/editor/raven-vscode.vsix" --force
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $installed = (Get-ChildItem $extensions -Directory -Filter 'raven.raven-vscode-*' | Select-Object -First 1).FullName
+          if (!$installed) { throw 'Packaged extension was not installed' }
+          & $code --new-window --user-data-dir $profile --extensions-dir $extensions --skip-welcome --skip-release-notes --disable-workspace-trust "--extensionDevelopmentPath=$installed" "--extensionTestsPath=$PWD/scripts/native-vscode-acceptance.cjs" "$PWD/target/editor-acceptance.code-workspace"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $acceptance = Get-Content target/editor-acceptance/vscode-acceptance.json | ConvertFrom-Json
+          if (!$acceptance.passed) { throw 'Installed editor acceptance failed' }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -101,3 +121,5 @@ jobs:
             neoclr/target/bootstrap/*.json
             neoclr/target/libraries/*evidence.json
             neoclr/target/distribution/*.tar.gz
+            neoclr/target/editor-acceptance/vscode-*.json
+            neoclr/target/vscode-profile/logs/**

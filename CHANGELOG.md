@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Select Preview 13 for Windows x64/macOS ARM64 qualification. Pin the matching
+  Raven packaging revision, version the Windows editor asset consistently with its
+  SDK, and add installed-extension acceptance without a development-server override.
+  Publication and final platform qualification remain pending.
+
 - Resolve native-bundle verification report paths before invoking tools from the
   extracted bundle, preserving relative report destinations. Reserve the Windows
   refusal-test port for the test lifetime to prevent parallel listener reuse;

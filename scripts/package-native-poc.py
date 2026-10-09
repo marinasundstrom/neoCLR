@@ -151,9 +151,9 @@ def main():
             label='neoCLR: Run', type='process', command='dotnet', args=[
                 '${workspaceFolder}/../../sdk/tools/rvnc/rvnc.dll', 'neoclr', '--project', '${workspaceFolder}/App.rvnproj',
                 '--run', '${workspaceFolder}/../../bin/' + executable], problemMatcher=[])]}, indent=2) + '\n')
-    (staged / 'README.md').write_text('''# Native neoCLR POC candidate
+    (staged / 'README.md').write_text('''# Native neoCLR POC bundle
 
-This is a development native POC candidate; it is not a published release. The host needs the
+This is an experimental native-metadata POC bundle. The host needs the
 .NET SDK/runtime required by the included Raven SDK (net11 compiler, net10 project
 reference packs), Python 3 and VS Code for editor use. This candidate is host-specific.
 

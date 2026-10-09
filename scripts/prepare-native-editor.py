@@ -10,6 +10,7 @@ p = argparse.ArgumentParser(description=__doc__)
 tooling = p.add_mutually_exclusive_group(required=True)
 tooling.add_argument('--raven', type=Path, help='Development Raven checkout')
 tooling.add_argument('--sdk', type=Path, help='Extracted native-enabled Raven SDK')
+p.add_argument('--installed-editor', action='store_true', help='Use the installed extension server without a development override')
 for name in ('runtime', 'output'):
     p.add_argument('--' + name, type=Path, required=True)
 for name in ('core', 'seed', 'ownership', 'bundle'):
@@ -68,8 +69,10 @@ else:
     compiler = a.raven.resolve() / 'src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll'
 vscode = out / '.vscode'
 vscode.mkdir()
-(vscode / 'settings.json').write_text(json.dumps({'raven.languageServerPath': str(server),
-    'raven.trace.server': 'verbose'}, indent=2))
+editor_settings = {'raven.trace.server': 'verbose'}
+if not a.installed_editor:
+    editor_settings['raven.languageServerPath'] = str(server)
+(vscode / 'settings.json').write_text(json.dumps(editor_settings, indent=2))
 tasks = []
 for name, tail in [('Build', []), ('Run', ['--run', str(a.runtime.resolve())])]:
     tasks.append(dict(label='neoCLR: ' + name, type='process', command='dotnet',
@@ -134,5 +137,5 @@ shutil.copyfile(root / 'docs/experiments/raven-target/samples/library-async.rvn'
 workspace = out.with_suffix('.code-workspace')
 workspace.write_text(json.dumps({'folders': [{'name': name, 'path': str(folder)}
     for name, folder in [('Native', out), ('DotNet', dotnet), ('Async', async_root)]],
-    'settings': {'raven.languageServerPath': str(server), 'raven.trace.server': 'verbose'}}, indent=2))
+    'settings': editor_settings}, indent=2))
 print(workspace)
