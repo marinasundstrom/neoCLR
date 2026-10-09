@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Capture VS Code acceptance output through a process task instead of Unix shell
+  quoting, preserving argument boundaries on Windows and macOS. Normalize only
+  CRLF/LF in exact-output comparisons; keep exit-code and stderr checks.
+
 - Wait for Windows VS Code acceptance to finish after its asynchronous launch.
   Allow editor-only qualification of a previously built bundle, preserving the
   original package and consumer evidence instead of rebuilding unaffected tools.

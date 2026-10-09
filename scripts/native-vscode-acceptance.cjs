@@ -215,13 +215,18 @@ exports.run = async function () {
     const build = tasks.find(t => t.name === 'neoCLR: Build');
     assert(build, 'configured native build task');
     assert.strictEqual(await taskExit(build), 0); record('configured VS Code native build task');
-    const quote = value => "'" + value.replace(/'/g, "'\\''") + "'";
-    const command = ['dotnet', config.compiler, 'neoclr', '--project', path.join(root, 'App.rvnproj'), '--run', config.runtime].map(quote).join(' ')
-      + ' > ' + quote(path.join(root, 'run.stdout')) + ' 2> ' + quote(path.join(root, 'run.stderr'));
-    const run = new vscode.Task({ type: 'shell' }, folder, 'neoCLR: Captured acceptance run', 'acceptance', new vscode.ShellExecution(command));
+    const capturedTask = (taskFolder, taskRoot, project, name) => {
+      const capture = 'import pathlib,subprocess,sys; r=subprocess.run(sys.argv[3:],capture_output=True); pathlib.Path(sys.argv[1]).write_bytes(r.stdout); pathlib.Path(sys.argv[2]).write_bytes(r.stderr); sys.exit(r.returncode)';
+      return new vscode.Task({ type: 'process' }, taskFolder, name, 'acceptance',
+        new vscode.ProcessExecution(process.platform === 'win32' ? 'python' : 'python3',
+          ['-c', capture, path.join(taskRoot, 'run.stdout'), path.join(taskRoot, 'run.stderr'),
+            'dotnet', config.compiler, 'neoclr', '--project', path.join(taskRoot, project), '--run', config.runtime]));
+    };
+    const normalizeLines = text => text.replace(/\r\n/g, '\n');
+    const run = capturedTask(folder, root, 'App.rvnproj', 'neoCLR: Captured acceptance run');
     assert.strictEqual(await taskExit(run), 0);
-    const stdout = fs.readFileSync(path.join(root, 'run.stdout'), 'utf8');
-    assert.strictEqual(stdout.split('\n').slice(1).join('\n'), fs.readFileSync(path.join(root, 'expected.txt'), 'utf8'));
+    const stdout = normalizeLines(fs.readFileSync(path.join(root, 'run.stdout'), 'utf8'));
+    assert.strictEqual(stdout.split('\n').slice(1).join('\n'), normalizeLines(fs.readFileSync(path.join(root, 'expected.txt'), 'utf8')));
     assert.strictEqual(fs.readFileSync(path.join(root, 'run.stderr'), 'utf8'), '');
     report.stdout = stdout; record('VS Code task executes exact broad-sample output on native runtime');
     const artifact = path.join(root, 'bin/neoclr/App.dll');
@@ -245,11 +250,9 @@ exports.run = async function () {
       const asyncRoot = asyncFolder.uri.fsPath;
       const doc = await vscode.workspace.openTextDocument(vscode.Uri.joinPath(asyncFolder.uri, 'Main.rvn'));
       await vscode.window.showTextDocument(doc);
-      const asyncCommand = ['dotnet', config.compiler, 'neoclr', '--project', path.join(asyncRoot, 'Async.rvnproj'), '--run', config.runtime].map(quote).join(' ')
-        + ' > ' + quote(path.join(asyncRoot, 'run.stdout')) + ' 2> ' + quote(path.join(asyncRoot, 'run.stderr'));
-      const asyncTask = new vscode.Task({type:'shell'}, asyncFolder, 'neoCLR: Async acceptance run', 'acceptance', new vscode.ShellExecution(asyncCommand));
+      const asyncTask = capturedTask(asyncFolder, asyncRoot, 'Async.rvnproj', 'neoCLR: Async acceptance run');
       assert.strictEqual(await taskExit(asyncTask), 0);
-      assert.strictEqual(fs.readFileSync(path.join(asyncRoot, 'run.stdout'), 'utf8').split('\n').slice(1).join('\n'), fs.readFileSync(path.join(asyncRoot, 'expected.txt'), 'utf8'));
+      assert.strictEqual(normalizeLines(fs.readFileSync(path.join(asyncRoot, 'run.stdout'), 'utf8')).split('\n').slice(1).join('\n'), normalizeLines(fs.readFileSync(path.join(asyncRoot, 'expected.txt'), 'utf8')));
       assert.strictEqual(fs.readFileSync(path.join(asyncRoot, 'run.stderr'), 'utf8'), '');
       assert(!vscode.languages.getDiagnostics(doc.uri).some(d => d.severity === 0));
       record('unchanged Tasks/await sample builds and executes from VS Code');
