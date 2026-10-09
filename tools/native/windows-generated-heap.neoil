@@ -1,0 +1,68 @@
+.module WindowsGeneratedHeap
+.function Churn(arrayref<Int32> argument) -> Int32
+.local Int32 iteration
+ldc.i4 0
+stloc iteration
+Loop:
+ldc.i4 32
+newarr Int32
+pop
+ldloc iteration
+ldc.i4 1
+add
+stloc iteration
+ldloc iteration
+ldc.i4 100
+clt
+brtrue Loop
+ldarg argument
+ldc.i4 0
+ldelem Int32
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local arrayref<Int32> retained
+.local arrayref<Int32> localOnly
+ldc.i4 2
+newarr Int32
+stloc retained
+ldc.i4 2
+newarr Int32
+stloc localOnly
+ldloc retained
+ldc.i4 0
+ldc.i4 40
+stelem Int32
+ldloc localOnly
+ldc.i4 0
+ldc.i4 2
+stelem Int32
+ldloc retained
+call Churn(arrayref<Int32>)
+ldloc localOnly
+ldc.i4 0
+ldelem Int32
+add
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Bounds
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Exhausted
+ret
+Bounds:
+pop
+ldloc retained
+ldc.i4 2
+ldelem Int32
+ret
+Exhausted:
+pop
+ldc.i4 1024
+newarr Int32
+ldlen
+conv.i4
+ret
+.end

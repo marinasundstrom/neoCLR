@@ -236,3 +236,20 @@ adapters remain replacement boundaries, not public scheduling policy.
 Next: qualify a bounded heap-allocating guest against the working collector host,
 including generated live-reference retention and fault cleanup. General managed profiles and
 project kits remain rejected until their separate requirements have evidence.
+
+## Generated heap experiment
+
+`--windows-heap-experiment` replaces `--windows-stack-experiment` for the next
+private profile; the same explicit target, reference arena, GC and stack-budget
+flags are required. It adds only Int32 arrays and their indexed read/write/length
+operations. The existing native scalar-array layout and nonmoving collection rules
+remain unchanged. This reuses the .NET array/root comparison from the
+[native collection research](native-execution-investigation.md); Windows changes
+calling conventions and host allocation, not Raven semantics or metadata.
+
+The consumer keeps a local array in the caller and an array argument in a callee
+while allocating 100 temporary arrays in a 2 KiB heap. It requires the retained
+values to sum to 42, counts successful collection/reclamation, exercises bounds
+and heap-exhaustion faults with unchanged output, collects after return and reuses
+the same context. Windows execution is pending for this slice. This does not admit
+arbitrary managed services, object graphs, reference arrays or an application SDK.

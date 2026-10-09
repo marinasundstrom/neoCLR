@@ -13,6 +13,7 @@ pub struct Options {
     pub native_gc: bool,
     pub native_stack_budget: bool,
     pub windows_stack_experiment: bool,
+    pub windows_heap_experiment: bool,
     pub user_faults: Vec<usize>,
     pub console_read_byte: Vec<usize>,
     pub console_write_line: Vec<usize>,
@@ -91,6 +92,7 @@ impl Options {
             native_gc: false,
             native_stack_budget: false,
             windows_stack_experiment: false,
+            windows_heap_experiment: false,
             string_dispatch: report.and_then(|r| r["stringInterfaceDispatch"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["contractCompiledIndex"].as_u64()? as usize, r["functionCompiledIndex"].as_u64()? as usize))).collect(),
             string_interfaces: report.and_then(|r| r["stringInterfaceViews"].as_array())

@@ -38,6 +38,11 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if windows_stack_count > 1 { return Err("duplicate --windows-stack-experiment option".into()); }
     let windows_stack = windows_stack_count == 1;
     args.retain(|a| a != "--windows-stack-experiment");
+    let windows_heap_count = args.iter().filter(|a| *a == "--windows-heap-experiment").count();
+    if windows_heap_count > 1 { return Err("duplicate --windows-heap-experiment option".into()); }
+    let windows_heap = windows_heap_count == 1;
+    args.retain(|a| a != "--windows-heap-experiment");
+    if windows_heap && windows_stack { return Err("select one Windows experiment".into()); }
     let probe_count = args.iter().filter(|a| *a == "--probe-stack-roots").count();
     if probe_count > 1 { return Err("duplicate --probe-stack-roots option".into()); }
     let gc_count = args.iter().filter(|a| *a == "--native-gc").count();
@@ -165,11 +170,11 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     args.retain(|a| a != "--reference-arena");
     if bind_socket_listener && !reference_arena { return Err("--bind-socket-listener requires --reference-arena".into()); }
     if native_gc && !reference_arena { return Err("--native-gc requires --reference-arena".into()); }
-    if windows_stack && (target != compiler::Target::WindowsX64 || !native_gc
+    if (windows_stack || windows_heap) && (target != compiler::Target::WindowsX64 || !native_gc
         || !native_stack_budget || !reference_arena || compile_system) {
-        return Err("--windows-stack-experiment requires Windows x64, --native-gc, --native-stack-budget and --reference-arena, without --compile-system".into());
+        return Err("Windows stack/heap experiments require Windows x64, --native-gc, --native-stack-budget and --reference-arena, without --compile-system".into());
     }
-    if reference_arena && !compile_system && !windows_stack {
+    if reference_arena && !compile_system && !windows_stack && !windows_heap {
         return Err("--reference-arena requires --compile-system".into());
     }
     if bind_console_stream_output && !reference_arena {
@@ -339,8 +344,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let compile_input = selection.as_ref().map_or(&input, |(module, _)| module);
     let details = fault_details.then(|| fault_details::Options::from_report(selection.as_ref().map(|(_, r)| r)));
     let details = details.map(|mut d| {
-        d.windows_stack_experiment = windows_stack;
-        if windows_stack { d.reference_arena = true; }
+        d.windows_stack_experiment = windows_stack || windows_heap;
+        d.windows_heap_experiment = windows_heap;
+        if windows_stack || windows_heap { d.reference_arena = true; }
         d.probe_stack_roots = probe_stack_roots;
         d.native_gc = native_gc;
         d.native_stack_budget = native_stack_budget;

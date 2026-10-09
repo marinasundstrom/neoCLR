@@ -16,7 +16,7 @@ def main():
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    report = dict(passed=False, scope='Private Windows x64 guarded heap and collector/root lifecycle; bounded native stack probe; integer-only generated stack experiment; no managed service qualification',
+    report = dict(passed=False, scope='Private Windows x64 guarded heap and collector/root lifecycle; bounded native stack probe; generated stack and Int32-array heap experiments; no managed console qualification',
                   platform=platform.platform(), commands=[])
 
     def run(command, name):
@@ -105,6 +105,25 @@ def main():
                 or not 5 < generated.get('snapshots512KiB', 0) < generated.get('snapshots1MiB', 0) < 512):
             raise ValueError('Generated stack acceptance did not complete fault, cleanup and reuse checks')
         report['generatedStackExecution'] = generated
+        heap_inputs = [ROOT / 'tools/native' / name for name in
+                       ('windows-generated-heap.neoil', 'windows-generated-heap-test.c')]
+        heap_inputs += [base / 'text-arena.c']
+        report['inputs'].update({p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in heap_inputs})
+        (out / heap_inputs[0].name).write_bytes(heap_inputs[0].read_bytes())
+        run([compiler, heap_inputs[0], 'Calculate', out / 'generated-heap.obj',
+             '--target', 'x86_64-pc-windows-msvc', '--windows-heap-experiment',
+             '--reference-arena', '--native-gc', '--native-stack-budget'], 'heap-compile')
+        run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
+             '/DNEOCLR_NATIVE_GC', '/Fe:generated-heap.exe', heap_inputs[1],
+             ROOT / 'tools/native/windows-gc-host.c', ROOT / 'tools/native/windows-native-stack.c',
+             inputs[0], base / 'native-gc.c', base / 'root-probe.c', base / 'text-arena.c',
+             out / 'generated-heap.obj'], 'heap-build')
+        result = run([out / 'generated-heap.exe'], 'heap-execute')
+        heap = json.loads(result.stdout)
+        if result.stderr or heap != dict(passed=True, invocations=4, allocations=408, heapBytes=2048,
+                                         liveRootsPreserved=True, faultCleanup=True, reusePassed=True):
+            raise ValueError('Generated heap acceptance did not complete root retention and cleanup checks')
+        report['generatedHeapExecution'] = heap
         report['passed'] = True
     except Exception as error:
         report['error'] = str(error)

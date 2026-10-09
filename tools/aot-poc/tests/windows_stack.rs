@@ -60,3 +60,25 @@ fn windows_stack_requires_explicit_complete_opt_in_and_rejects_managed_types() {
         assert!(!dir.0.join("app.obj").exists());
     }
 }
+
+#[test]
+fn heap_experiment_admits_only_int32_arrays_and_matches_interpreter() {
+    let source = include_str!("../../../tools/native/windows-generated-heap.neoil");
+    let flags: Vec<_> = FLAGS.iter().map(|f| if *f == "--windows-stack-experiment" { "--windows-heap-experiment" } else { *f }).collect();
+    let dir = Temp::new();
+    let result = compile(&dir, source, &flags);
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::new(&app).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    assert_eq!(method.invoke(vec![neoclr::Value::Int32(0)], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    assert!(method.invoke(vec![neoclr::Value::Int32(1)], neoclr::Limits::default()).is_err());
+    for (input, flags) in [(source.to_owned(), FLAGS.to_vec()),
+        (source.replace("arrayref<Int32>", "arrayref<String>"), flags.clone()),
+        (source.replace("newarr Int32", "newarr Byte"), flags)] {
+        let dir = Temp::new();
+        let result = compile(&dir, &input, &flags);
+        assert!(!result.status.success());
+        assert!(!dir.0.join("app.obj").exists());
+    }
+}

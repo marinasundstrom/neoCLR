@@ -69,6 +69,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   small-stack rejection, recursive fault return and successful context reuse,
   plus COFF/admission/final-frame tests and existing host regressions. Verify all
   49 artifact and 37 source hashes. Local macOS stack regression also passes.
+  Add a separately gated Windows Int32-array heap experiment with generated
+  local/argument roots, allocation churn, bounds/exhaustion faults and host reuse.
+  Extend Windows CI with a 2 KiB heap consumer; execution qualification is pending.
   General managed services and kits remain unsupported.
 
 - Add a development macOS ARM64 project-to-executable console command using the
