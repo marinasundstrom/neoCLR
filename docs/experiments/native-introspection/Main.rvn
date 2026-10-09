@@ -1,9 +1,11 @@
 import System.*
 import System.Introspection.*
+import System.Runtime.Reflection.*
+import System.Result.*
 
 public class Report {
     init() { }
-    var Name: string { get; set; } = ""
+    var Name: string { get; set; } = "constructed"
 }
 
 func Main() -> int {
@@ -12,9 +14,16 @@ func Main() -> int {
     if !info.IsNominalType {
         return 2
     }
-    let value = (object)Report()
+    let value = match info.CreateInstance() {
+        Ok(let created) => created
+        Error(_) => return 3
+    }
+    let report = (Report)value
+    if report.Name != "constructed" {
+        return 4
+    }
     if !value.GetType().Equals(info) {
-        return 3
+        return 5
     }
     return 0
 }

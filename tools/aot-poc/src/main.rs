@@ -6,6 +6,7 @@ mod inspection;
 mod linking;
 mod limits;
 mod reflection_metadata;
+mod reflection_construction;
 mod selection;
 mod specialization;
 mod string_projection;
@@ -230,6 +231,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if probe_stack_roots && !fault_details {
         return Err("--probe-stack-roots requires --fault-details or an existing context-enabled binding".into());
     }
+    let mut reflection_roots = None;
+    if args.iter().filter(|a| *a == "--reflection-roots").count() > 1 { return Err("duplicate --reflection-roots option".into()); }
+    if let Some(i) = args.iter().position(|a| a == "--reflection-roots") {
+        let path = args.get(i + 1).ok_or("--reflection-roots requires a JSON file")?;
+        reflection_roots = Some(serde_json::from_slice(&fs::read(path)?)?);
+        args.drain(i..=i + 1);
+        if !compile_system || !reference_arena { return Err("--reflection-roots requires --compile-system and --reference-arena".into()); }
+    }
     let dependency_args = args
         .iter()
         .position(|a| a == "--module" || a == "--system" || a == "--object-root")
@@ -268,7 +277,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
     {
         return Err(
-            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-paths binds exact lexical Unix path services; --bind-file-output binds bounded blocking UTF-8 file output; --bind-file-input binds bounded strict UTF-8 file input; --bind-utf8-text binds UTF-8 encoding/decoding, concatenation, ordinal predicates, byte counts and scalar-boundary slices with --reference-arena; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds Int32 parsing, signed/unsigned 64-bit formatting and native-width conversion services; --bind-socket-transfer binds Receive/Send/TransferResult and request-deadline services with --native-gc; --bind-socket-client binds bounded DNS/outbound connect with --native-gc and --bind-socket-accept; --bind-task-queue binds exact closed TaskQueue services with --native-gc; --bind-socket-accept binds Accept/ConnectResult/Cancel with --native-gc; --bind-socket-listener binds Listen/LocalPort/Close to an explicit host socket scope (requires --reference-arena); --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics; --probe-stack-roots adds a read-only pre-operation spill callback (requires a context-enabled profile, not a collector); --native-host-bootstrap exports an owned fn<Void> root handle instead of an ordinary entry (requires --native-gc); --native-gc enables experimental nonmoving collection with --reference-arena and a matching statically linked GC adapter; --native-stack-budget opts into guarded recursion with --native-gc and the matching macOS ARM64 stack adapter"
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --reflection-roots <file.json> admits explicit source-identity parameterless constructor retention with --compile-system and --reference-arena; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-paths binds exact lexical Unix path services; --bind-file-output binds bounded blocking UTF-8 file output; --bind-file-input binds bounded strict UTF-8 file input; --bind-utf8-text binds UTF-8 encoding/decoding, concatenation, ordinal predicates, byte counts and scalar-boundary slices with --reference-arena; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds Int32 parsing, signed/unsigned 64-bit formatting and native-width conversion services; --bind-socket-transfer binds Receive/Send/TransferResult and request-deadline services with --native-gc; --bind-socket-client binds bounded DNS/outbound connect with --native-gc and --bind-socket-accept; --bind-task-queue binds exact closed TaskQueue services with --native-gc; --bind-socket-accept binds Accept/ConnectResult/Cancel with --native-gc; --bind-socket-listener binds Listen/LocalPort/Close to an explicit host socket scope (requires --reference-arena); --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics; --probe-stack-roots adds a read-only pre-operation spill callback (requires a context-enabled profile, not a collector); --native-host-bootstrap exports an owned fn<Void> root handle instead of an ordinary entry (requires --native-gc); --native-gc enables experimental nonmoving collection with --reference-arena and a matching statically linked GC adapter; --native-stack-budget opts into guarded recursion with --native-gc and the matching macOS ARM64 stack adapter"
                 .into(),
         );
     }
@@ -330,6 +339,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             read_module(Path::new(path)).map(|system| linking::RuntimeContext {
                 system,
                 object_root,
+                reflection_roots,
                 compile_system,
                 bind_user_fault,
                 bind_console_read_byte,

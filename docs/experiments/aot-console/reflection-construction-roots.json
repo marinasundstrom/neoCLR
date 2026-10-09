@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "types": [
+    {
+      "definition": {
+        "module": "ReflectionConstruction",
+        "index": 1
+      },
+      "construct": true
+    },
+    {
+      "definition": {
+        "module": "ReflectionConstruction",
+        "index": 2
+      },
+      "construct": true
+    },
+    {
+      "definition": {
+        "module": "ReflectionConstruction",
+        "index": 3
+      },
+      "construct": true
+    },
+    {
+      "definition": {
+        "module": "ReflectionConstruction",
+        "index": 4
+      },
+      "construct": true
+    },
+    {
+      "definition": {
+        "module": "ReflectionConstruction",
+        "index": 5
+      },
+      "construct": true
+    }
+  ]
+}

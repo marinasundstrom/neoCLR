@@ -20,10 +20,11 @@ def main():
     parser.add_argument('--descriptor-queries', action='store_true', help='Exercise semantic names and generic arity')
     parser.add_argument('--primitive-boxes', action='store_true', help='Exercise scalar box identity and checked unboxing')
     parser.add_argument('--object-types', action='store_true', help='Exercise concrete object type handles')
+    parser.add_argument('--reflection-construction', action='store_true', help='Exercise retained reflection constructors')
     args = parser.parse_args()
     aot, out = args.aot.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    report = dict(passed=False, platform=platform.platform(), machine=platform.machine(), commands=[], runtimeEquality=args.runtime_equality, descriptorQueries=args.descriptor_queries, primitiveBoxes=args.primitive_boxes, objectTypes=args.object_types)
+    report = dict(passed=False, platform=platform.platform(), machine=platform.machine(), commands=[], runtimeEquality=args.runtime_equality, descriptorQueries=args.descriptor_queries, primitiveBoxes=args.primitive_boxes, objectTypes=args.object_types, reflectionConstruction=args.reflection_construction)
     def run(command, name):
         r = subprocess.run(list(map(str, command)), cwd=out, capture_output=True, timeout=120)
         (out / (name + '.stdout')).write_bytes(r.stdout)
@@ -50,6 +51,9 @@ def main():
         if args.object_types:
             sources[0] = base / 'object-types-test.c'
             inputs += [sources[0], base / 'object-types.neoil']
+        if args.reflection_construction:
+            sources[0] = base / 'reflection-construction-test.c'
+            inputs += [sources[0], base / 'reflection-construction.neoil', base / 'reflection-construction-roots.json']
         if windows:
             sources += [ROOT / 'tools/native/windows-native-stack.c']
             inputs += [sources[-1]]
@@ -80,8 +84,12 @@ def main():
             source = base / 'primitive-boxes.neoil'
         if args.object_types:
             source = base / 'object-types.neoil'
+        if args.reflection_construction:
+            source = base / 'reflection-construction.neoil'
         obj = out / ('guest.obj' if windows else 'guest.o')
         flags = ['--compile-system', '--reference-arena', '--native-gc']
+        if args.reflection_construction:
+            flags += ['--reflection-roots', base / 'reflection-construction-roots.json']
         if args.descriptor_queries:
             flags += ['--bind-console-write-line']
         if windows:
@@ -96,6 +104,8 @@ def main():
             expected = b'Primitive boxes: 42\n'
         if args.object_types:
             expected = b'Object types: 42\n'
+        if args.reflection_construction:
+            expected = b'Reflection construction: 42\n'
         if r.stdout.replace(b'\r\n', b'\n') != expected or r.stderr:
             raise ValueError('Unexpected token identity result')
         if sha(aot) != report['aotSha256'] or any(sha(ROOT / n) != h for n, h in report['inputs'].items()):

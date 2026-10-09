@@ -1254,6 +1254,11 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let top = || shape.last().unwrap();
                 let pop = |s: &mut Vec<ir::Value>| s.pop().expect("checked stack");
                 let mut site = diagnostic_data.as_ref().map(|d| d.site(&mut module, &mut b, fault_context.unwrap(), i, pc));
+                if matches!(op, Op::Construct(_)) && details.is_some_and(|d| d.reflection_construction.contains(&i)) {
+                    // The interpreter's checked construction adapter is newobj/ret.
+                    if let Some(site) = site.as_mut() { site.remap_instruction(0); }
+                }
+
                 if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
                     probes.emit(&mut module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
                 }

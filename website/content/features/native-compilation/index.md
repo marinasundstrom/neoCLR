@@ -111,8 +111,10 @@ The routing workbench also parses a route, extracts an integer parameter and pri
 - **Code and APIs:** development includes opaque closed type-token identity and the
   runtime type-equality, name, generic-arity and type-shape queries for primitive and closed
   nominal token producers, plus concrete source-class/primitive-box `GetType()` identity,
-  as first steps toward native JSON. Compound object queries remain unsupported. Property discovery and reflection invocation remain
-  unfinished, so typed JSON serialization is not yet a native capability.
+  as first steps toward native JSON. Compound object queries remain unsupported.
+  Explicit development reflection roots now support checked parameterless construction;
+  property discovery and reflective accessor invocation remain unfinished, so typed
+  JSON serialization is not yet a native capability.
   Broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.
 - **Async and hosting:** the HTTP profiles have a bounded completion loop, not a

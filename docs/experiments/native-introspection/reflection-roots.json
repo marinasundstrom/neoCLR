@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "types": [
+    {
+      "definition": {
+        "module": "NeoMetadata_860CD64E093A985075454DB00FC1B56E3BC5CAC897BB41DEE0977827CA0D0F64",
+        "revision": "1.0.0.0",
+        "index": 0
+      },
+      "construct": true
+    }
+  ]
+}

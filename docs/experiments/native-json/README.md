@@ -7,7 +7,7 @@ The interpreter succeeds with `{"Name":"Café","Count":3,"Active":true}`.
 Use a matching development bundle:
 
 ```sh
-python3 scripts/build-native-project.py --profile http \
+python3 scripts/build-native-project.py --profile console \
   --project docs/experiments/native-json/Native.rvnproj \
   --bundle /absolute/path/to/development/bundle \
   --aot tools/aot-poc/target/debug/neoclr-aot-poc \
@@ -16,6 +16,8 @@ python3 scripts/build-native-project.py --profile http \
 
 Native compilation currently fails admission and must not publish an executable.
 The first failure was RuntimeTypeHandle specialization; after the type-token
-foundation it advances to unsupported boxing. Type/property discovery and checked
-reflection invocation are still required. This probe is not a supported native
+foundation, boxing and object-type queries now pass admission. Explicit reflection
+roots support parameterless construction; property discovery and checked getter/setter
+invocation are still required. Use the console profile for this synchronous probe;
+the HTTP profile expects task-pump exports. This probe is not a supported native
 website example or a claim that JSON serialization already works in AOT.

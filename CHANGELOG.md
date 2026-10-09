@@ -55,7 +55,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   empty-record boxes and String, preserving null fault payload/location and excluding
   private array storage types. Add portable checks and a public Raven GetType/typeof
   parity probe; document its temporary explicit Object cast. JSON now reaches
-  reflection construction checks; property discovery/invocation remain unfinished.
+  reflection construction checks. Qualify object-type and preceding token/boxing gates
+  on macOS/Windows in action `37983989830`, verifying ten source/artifact reports.
+  Add private versioned source-identity reflection roots and checked parameterless
+  construction, separating availability metadata from constructor body retention.
+  Preserve real constructor effects, access/missing/abstract statuses and fault
+  frames; validate the public Raven CreateInstance consumer on macOS and add its
+  low-level portable gate. Property discovery/accessor invocation and JSON remain
+  unfinished.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

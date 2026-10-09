@@ -5643,3 +5643,76 @@ fn native_object_types_preserve_concrete_identity_and_null_faults() {
         }
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_retained_reflection_construction_executes_real_constructor() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/reflection-construction.neoil");
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    let dir = Temp::new();
+    let roots = serde_json::json!({"schemaVersion":1,"types":(1..6).map(|i| serde_json::json!({
+        "definition":{"module":"ReflectionConstruction","index":i},"construct":true})).collect::<Vec<_>>()});
+    let path = dir.0.join("roots.json");
+    fs::write(&path, serde_json::to_vec(&roots).unwrap()).unwrap();
+    let result = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena", "--native-gc", "--reflection-roots", path.to_str().unwrap()]);
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert_eq!(report["reflectionRetention"]["types"].as_array().unwrap().len(), 5);
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    let result = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds"])
+        .arg(base.join("aot-console/text-host.c")).arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-console/native-gc.c")).arg(base.join("aot-console/root-probe.c"))
+        .arg(base.join("aot-fault-details/render.c")).arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    for mode in 0..5 {
+        let interpreted = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default());
+        let native = Command::new(dir.0.join("host")).arg(mode.to_string()).output().unwrap();
+        assert!(native.stdout.is_empty());
+        if mode < 4 {
+            let expected = [42, 3, 4, 2][mode as usize];
+            assert_eq!(interpreted.unwrap().value, neoclr::Value::Int32(expected));
+            assert_eq!(native.status.code(), Some(expected), "{mode}: {native:?}");
+            assert!(native.stderr.is_empty());
+        } else {
+            let error = interpreted.unwrap_err();
+            assert_eq!(native.status.code(), Some(1));
+            assert_eq!(String::from_utf8_lossy(&native.stderr), error.diagnostic().to_string());
+        }
+    }
+}
+
+#[test]
+fn native_reflection_roots_separate_metadata_and_invocation_and_reject_stale_identity() {
+    use neoclr::metadata::{Instruction as Op, Type};
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let mut app = neoclr::assemble(include_str!("../../../docs/experiments/aot-console/reflection-construction.neoil")).unwrap();
+    let f = app.functions.iter_mut().find(|f| f.name == "Calculate").unwrap();
+    f.body = vec![Op::LoadTypeToken(Type::Named("Model".into())),
+        Op::Call(neoclr::assembler::parse_function_ref("neoCLR.Runtime.ReflectionConstructionCheck(RuntimeTypeHandle)").unwrap()), Op::Return];
+    for construct in [false, true] {
+        let dir = Temp::new();
+        let path = dir.0.join("roots.json");
+        let roots = serde_json::json!({"schemaVersion":1,"types":[{"definition":{"module":"ReflectionConstruction","index":1},"construct":construct}]});
+        fs::write(&path, serde_json::to_vec(&roots).unwrap()).unwrap();
+        let result = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena", "--native-gc", "--reflection-roots", path.to_str().unwrap()]);
+        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+        assert_eq!(report["functions"].as_array().unwrap().iter().any(|r| r["name"] == "Model..ctor"), construct);
+        assert_eq!(report["reflectionRetention"]["types"][0]["checkStatus"], 0);
+    }
+    for roots in [
+        serde_json::json!({"schemaVersion":1,"types":[{"definition":{"module":"ReflectionConstruction","revision":"stale","index":1},"construct":true}]}),
+        serde_json::json!({"schemaVersion":1,"types":[{"definition":{"module":"ReflectionConstruction","index":1},"construct":true,"unknown":true}]}),
+        serde_json::json!({"schemaVersion":2,"types":[]}),
+    ] {
+        let dir = Temp::new();
+        let path = dir.0.join("roots.json");
+        fs::write(&path, serde_json::to_vec(&roots).unwrap()).unwrap();
+        let result = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena", "--native-gc", "--reflection-roots", path.to_str().unwrap()]);
+        assert!(!result.status.success() && !dir.0.join("app.o").exists(), "{result:?}");
+        assert!(String::from_utf8_lossy(&result.stderr).contains("reflection root"), "{result:?}");
+    }
+}

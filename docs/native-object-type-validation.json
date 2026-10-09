@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-09",
+  "run": "https://github.com/marinasundstrom/neoCLR/actions/runs/37983989830",
+  "scope": "Concrete source-class and Int32/Boolean/empty-record box identity plus intrinsic String; no compound object descriptors or full JSON",
+  "reports": [
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "ff86b7f3f9016156318672176ef5ebb782cbfcaa",
+      "gate": "native-object-types-validation",
+      "passed": true,
+      "reportSha256": "c367b9ef426a93d876b536f931bad6e24a7ef3f5ba3962494dc7a4d1b09d1404",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "ff86b7f3f9016156318672176ef5ebb782cbfcaa",
+      "gate": "native-primitive-boxes-validation",
+      "passed": true,
+      "reportSha256": "13a881bd3382ffe888593fe64ed90ccf8f176df50b1c721de6070a4b9b744232",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "ff86b7f3f9016156318672176ef5ebb782cbfcaa",
+      "gate": "native-type-descriptors-validation",
+      "passed": true,
+      "reportSha256": "b52b1712b7664ad9fe35dc62178708be5b9e833bc44d3559628fa01e47be0fb1",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "ff86b7f3f9016156318672176ef5ebb782cbfcaa",
+      "gate": "native-type-equality-validation",
+      "passed": true,
+      "reportSha256": "3ffae7614cd5837fd466c0a7d222a36fa366a1e97dec4d0878c82679e54029c7",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "ff86b7f3f9016156318672176ef5ebb782cbfcaa",
+      "gate": "native-type-tokens-validation",
+      "passed": true,
+      "reportSha256": "5ad5875bbe48057a545d1cc42a8b0a859c3855eab9bb8a5486b0a15c66b8106a",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "ff86b7f3f9016156318672176ef5ebb782cbfcaa",
+      "gate": "native-object-types-validation",
+      "passed": true,
+      "reportSha256": "da7cbeeaad48bc07d60b09b25fadcc36ea733f19f34bbcc53acde0e921ee114a",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "ff86b7f3f9016156318672176ef5ebb782cbfcaa",
+      "gate": "native-primitive-boxes-validation",
+      "passed": true,
+      "reportSha256": "4e6aeacf6886eff5d5e8b72796eb5d0acd67fb92733882fed4213f23f8d08187",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "ff86b7f3f9016156318672176ef5ebb782cbfcaa",
+      "gate": "native-type-descriptors-validation",
+      "passed": true,
+      "reportSha256": "19852a63dda0a158c2959beed284869ee653f114aabd1d7738bf41766f6d41a0",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "ff86b7f3f9016156318672176ef5ebb782cbfcaa",
+      "gate": "native-type-equality-validation",
+      "passed": true,
+      "reportSha256": "5a9b9c18ced01b20c5cc77279643c6afc3714e1d71ca702d4ada7971710bace1",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "ff86b7f3f9016156318672176ef5ebb782cbfcaa",
+      "gate": "native-type-tokens-validation",
+      "passed": true,
+      "reportSha256": "05d76fce35d00a1fdaa1191ec1ee6de539218743c6291db0218df92e43ac6c89",
+      "sourceAndArtifactHashesVerified": true
+    }
+  ]
+}

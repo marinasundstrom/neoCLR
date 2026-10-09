@@ -7,6 +7,7 @@ type Error = Box<dyn std::error::Error>;
 pub struct RuntimeContext {
     pub system: neoclr::Module,
     pub object_root: Option<TypeDefId>,
+    pub reflection_roots: Option<Value>,
     pub compile_system: bool,
     pub bind_user_fault: bool,
     pub bind_console_read_byte: bool,
@@ -173,9 +174,17 @@ pub fn prepare(
             assembly.array_backing = Some(type_id(index));
         }
     }
+    let reflection_retention = context.and_then(|c| c.reflection_roots.as_ref())
+        .map(|roots| super::reflection_construction::bind(&mut joined, &source_metadata, &types, &methods, roots)).transpose()?;
     // Conformance was verified in original scopes. Metadata-only relationships
     // must not consume executable specialization shapes (Option and Result share
     // Propagatable with different arguments, including metadata-only Void).
+    let reflection_roots: Vec<usize> = reflection_retention.as_ref().and_then(|r| r["types"].as_array()).into_iter().flatten()
+        .filter(|r| r["construct"] == true && r["checkStatus"] == 0)
+        .map(|r| -> Result<usize, Error> {
+            let id: MemberId = serde_json::from_value(r["constructor"].clone())?;
+            methods.iter().position(|m| *m == id).ok_or_else(|| "missing retained constructor identity".into())
+        }).collect::<Result<_, _>>()?;
     let source_conformance = joined.clone();
     let relationships: Vec<_> = joined
         .types
@@ -199,13 +208,13 @@ pub fn prepare(
             .iter()
             .any(|f| !f.generic_parameters.is_empty())
     {
-        Some(super::specialization::expand(&joined, root)?)
+        Some(super::specialization::expand_with_host_roots(&joined, root, &reflection_roots)?)
     } else {
         None
     };
     let input = specialized.as_ref().map_or(&joined, |(module, _)| module);
     let reference_backings = specialized.as_ref().map(|(_, r)| super::selection::reference_array_backings(r)).unwrap_or_default();
-    let (mut selected, mut report) = super::selection::select_inventory_with_host_roots(input, root, false, &[], &reference_backings)?;
+    let (mut selected, mut report) = super::selection::select_inventory_with_host_roots(input, root, false, &reflection_roots, &reference_backings)?;
     if context.is_some_and(|c| c.bind_task_queue) {
         // Host pumping is an explicit additional reachability root, never a fake
         // call inserted into guest CIL. Only the verified source-owned queue type
@@ -229,6 +238,7 @@ pub fn prepare(
         }
         if host_roots.len() > 1 { return Err("host queue requires one TaskQueue type".into()); }
         if !host_roots.is_empty() {
+            host_roots.extend_from_slice(&reflection_roots);
             specialized = Some(super::specialization::expand_with_host_roots(&joined, root, &host_roots)?);
             let expanded = &specialized.as_ref().unwrap().0;
             (selected, report) = super::selection::select_inventory_with_host_roots(expanded, root, false, &host_roots, &super::selection::reference_array_backings(&specialized.as_ref().unwrap().1))?;
@@ -275,6 +285,7 @@ pub fn prepare(
         }
     }
     report["sourceMetadata"] = super::reflection_metadata::catalogue(&source_metadata, &types, &methods, &report)?;
+    if let Some(retention) = reflection_retention { report["reflectionRetention"] = retention; }
     if let Some(index) = report["arrayBackingProjection"]["compiledIndex"].as_u64() {
         if let Some(row) = report["types"].as_array().unwrap().iter().find(|r| r["compiledIndex"] == index).cloned() {
             report["arrayBackingProjection"]["definition"] = row["definition"].clone();
@@ -397,6 +408,13 @@ pub fn prepare(
     }
     let reference_arena = context.is_some_and(|c| c.reference_arena);
     report["referenceArena"] = json!(reference_arena);
+    if report["reflectionRetention"].is_object() {
+        let rows: Vec<_> = report["functions"].as_array().unwrap().iter()
+            .filter(|r| matches!(r["name"].as_str(), Some("neoCLR.Runtime.ReflectionConstructionCheck" | "neoCLR.Runtime.ReflectionConstruct")))
+            .map(|r| json!({"compiledIndex":r["compiledIndex"],"name":r["name"],"implementation":"reflection-construction-retained-v1"})).collect();
+        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+    }
+
     if reference_arena {
         let rows = super::bindings::type_equals(&mut selected, &report)?;
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);

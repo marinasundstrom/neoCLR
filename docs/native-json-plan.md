@@ -337,3 +337,62 @@ equality on macOS, with the documented temporary explicit Object cast.
 The unchanged JSON probe now reaches `ReflectionConstructionCheck`. Explicit
 metadata/invocation retention, property discovery and checked invocation are still
 required before the end-to-end JSON milestone can be claimed.
+
+## Explicit roots and checked construction — 2026-10-09
+
+The private AOT CLI and project driver accept `--reflection-roots roots.json`:
+
+```json
+{
+  "schemaVersion": 1,
+  "types": [
+    {
+      "definition": { "module": "Models", "revision": "r1", "index": 0 },
+      "construct": true
+    }
+  ]
+}
+```
+
+Use the definition identity from the matching source artifact, not a backend type
+index or display name. The source load set must contain that module/revision/index.
+The first schema admits one to 64 distinct nongeneric declarations; unknown fields,
+stale identities and unsupported schemas fail before native artifact publication.
+The project driver hashes the supplied configuration as a build input. This is a
+private development mechanism, not a new public preservation API or Raven annotation.
+
+Construction checks use original constructor/type access metadata. They retain the
+existing unsupported-type, inaccessible-constructor and missing-constructor statuses.
+`construct: false` preserves the availability check without adding a constructor
+execution root. `construct: true` adds an eligible public parameterless constructor
+root before specialization, even if only its availability is queried. Dependencies
+follow normal selection; the report records the exact source constructor identity
+and requested retention. Denied or missing constructors are never synthesized.
+
+The exact ReflectionConstruct binding dispatches to ordinary `newobj.ctor` and
+returns its Object view. It executes real initializer effects, uses ordinary roots
+and allocation, and preserves the interpreter adapter's constructor fault frames.
+An invocation omitted from the configuration faults explicitly. A type outside the
+configured metadata set also faults explicitly, rather than pretending that a
+constructor is absent. This bounded profile currently requires explicit registration
+of every type supplied to these construction services; broader inferred retention
+and compound/generic construction remain unimplemented.
+
+This compares with CLR Activator's runtime constructor lookup, but uses a closed
+source-identity dispatch table and explicit code retention. Predictable retained
+bodies and reuse of the current Result wrapper are the benefits; configuration,
+linear dispatch and limited shape coverage are the costs. No speed claim is made.
+
+The independent Raven introspection project now calls public `CreateInstance()`,
+checks a constructor-initialized property through a normal call, and verifies
+GetType/typeof identity. Interpreter/native macOS execution both print `Report` and
+exit zero. Focused tests cover metadata-only versus invocation retention, stale
+registration, access/missing/abstract statuses, real constructor effects and exact
+throwing-constructor diagnostics. A portable GC/canary/fault consumer is added to
+both platform jobs. Property discovery and reflective getter/setter invocation are
+still the next required work; this does not complete native JSON.
+
+Re-running the unchanged typed JSON assembly with its Report construction root now
+reaches the missing `ReflectionArrayCreate` service. The mapper's array branch is
+statically reachable even for the flat-model showcase; compound reflection and
+property discovery/invocation remain explicit gaps rather than stubbed successes.

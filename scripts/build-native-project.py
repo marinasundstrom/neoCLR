@@ -43,7 +43,7 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None):
+def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None):
     windows = profile in (PROFILES['windows-console'], PROFILES['windows-http'])
     http = profile in (PROFILES['http'], PROFILES['windows-http'])
     if bootstrap_root and not http:
@@ -54,7 +54,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None):
     elif platform.system() != 'Darwin' or platform.machine() != 'arm64':
         raise ValueError('This profile requires a macOS ARM64 build host')
     compiler = bundle / 'sdk/tools/rvnc/rvnc.dll'
-    for path in (project, compiler, aot):
+    for path in (project, compiler, aot, *([reflection_roots] if reflection_roots else [])):
         if not path.is_file():
             raise ValueError('Required input is missing: ' + str(path))
     if project.suffix != '.rvnproj':
@@ -185,6 +185,9 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None):
             report['resolvedBootstrapRoot'] = selected_root
             flags += ['--native-host-bootstrap']
         obj = output / ('app.obj' if windows else 'app.o')
+        if reflection_roots:
+            report['inputs'][str(reflection_roots)] = sha(reflection_roots)
+            flags += ['--reflection-roots', reflection_roots]
         run([aot, '--closed-world', assembly, selected_root, obj, *context, *flags])
         # Publish the executable only after link and dependency checks succeed.
         pending = output / ('app.pending.exe' if windows else 'app.pending')
@@ -222,6 +225,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile', choices=PROFILES, default='console',
                         help='Explicit native service/host profile (default: console)')
+    parser.add_argument('--reflection-roots', type=Path, help='Private versioned source-identity reflection retention JSON')
     parser.add_argument('--bootstrap-root', help='Private retained HTTP experiment: fn<Void> factory, three host dispatches')
     for name in ('project', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
@@ -231,7 +235,8 @@ def main():
     args = parser.parse_args()
     try:
         print(build(*(getattr(args, name).resolve() for name in ('project', 'bundle', 'aot', 'output')),
-                    profile=PROFILES[args.profile], bootstrap_root=args.bootstrap_root))
+                    profile=PROFILES[args.profile], bootstrap_root=args.bootstrap_root,
+                    reflection_roots=args.reflection_roots.resolve() if args.reflection_roots else None))
     except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.SubprocessError) as error:
         print('native build: ' + str(error), file=sys.stderr)
         return 1

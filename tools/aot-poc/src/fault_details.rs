@@ -84,6 +84,7 @@ pub struct Options {
     pub native_integer_to64: Vec<usize>,
     pub reference_arena: bool,
     pub descriptor_queries: Vec<usize>,
+    pub reflection_construction: Vec<usize>,
     pub object_type_queries: HashMap<usize, Vec<(usize, neoclr::metadata::Type)>>,
     pub scalar_box_queries: HashMap<usize, (Option<usize>, bool)>,
     pub boolean_boxes: HashMap<usize, usize>,
@@ -121,7 +122,10 @@ impl Options {
                     .filter_map(|t| Some((t["typeCompiledIndex"].as_u64()? as usize, t["functionCompiledIndex"].as_u64()? as usize))).collect()))).collect(),
             boxed_int32_display: report.is_some_and(|r| r["boxedInt32Display"] == true),
             descriptor_queries: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
-                .filter(|r| matches!(r["implementation"].as_str(), Some("type-name-closed-v1" | "type-argument-count-closed-v1" | "type-shape-closed-v1")))
+                .filter(|r| matches!(r["implementation"].as_str(), Some("type-name-closed-v1" | "type-argument-count-closed-v1" | "type-shape-closed-v1" | "reflection-construction-retained-v1")))
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            reflection_construction: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "reflection-construction-retained-v1" && r["name"] == "neoCLR.Runtime.ReflectionConstruct")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             object_type_queries: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "object-type-closed-v1")
@@ -494,6 +498,7 @@ pub struct Site {
     pub capture_frame: bool,
 }
 impl Site {
+    pub fn remap_instruction(&mut self, pc: usize) { self.pc = pc; }
     pub fn record(&self, b: &mut FunctionBuilder<'_>, status: ir::Value) {
         let count = b.ins().load(types::I32, MemFlags::new(), self.context, 4);
         let previous = b.ins().load(types::I32, MemFlags::new(), self.context, 0);
