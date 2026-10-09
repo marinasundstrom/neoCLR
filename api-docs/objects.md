@@ -1,6 +1,6 @@
 # Object and Value
 
-**Preview 11.** neoCLR distinguishes reference types from
+neoCLR distinguishes reference types from
 value types. Assigning a class instance shares its reference; assigning a value
 copies its fields. A reference field inside a copied value still refers to the same
 object. Neither assignment performs a deep clone.
@@ -15,7 +15,7 @@ null produces a terminal NullReference fault.
 
 ## Object display text
 
-`ToString() -> string` is now a virtual class method. Its default is the concrete
+`ToString() -> string` is a virtual class method. Its default is the concrete
 runtime type's FullName. A derived override is selected through an Object or base
 reference; an explicit base call uses the type-name fallback. Rootless nominal
 classes and arrays use the default Object slot. A null receiver faults.
@@ -90,18 +90,17 @@ and returns false. Static two-argument Object.Equals is not yet available.
 ## Direction under review
 
 The intended baseline is .NET-compatible reference/value semantics. Class display,
-reference identity and class equality/hash now have bounded implementations. General boxed-value dispatch still has coverage gaps. Raven record syntax
-now passes an end-to-end record-class sample with integer, string and nested components with generated equality,
-hashing, display and deconstruction. Generic/inherited records and
+reference identity and class equality/hash have bounded implementations. General
+boxed-value dispatch still has coverage gaps. Raven record classes support integer,
+string and nested components with generated equality, hashing, display and deconstruction. Generic/inherited records and
 nullable string/value and arbitrary component types are not supported by this target contract. See Microsoft's
 [Object contract](https://learn.microsoft.com/en-us/dotnet/api/system.object?view=net-10.0)
 for the comparison baseline; neoCLR does not yet provide that entire surface.
 
-System.Value remains until its dependent carriers and runtime boundaries have a
-verified replacement. Shallow cloning, finalization and broad implicit boxing are
-not part of the next small Object slice.
+System.Value remains the explicit erased-payload carrier described above. Shallow
+cloning, finalization and broad implicit boxing remain outside the supported surface.
 
-Migration: application classes now retain Object as their metadata base. A class
+Application classes retain Object as their metadata base. A class
 that supplies ToString should declare an override; same-name hiding is rejected by
 the current importer/runtime profile. Use matching reference/library artifacts.
 
@@ -176,7 +175,7 @@ These are bounded interpreter intrinsics for the System library's exact Object s
 It does not add typed primitive GetHashCode members, general struct equality, nullable
 boxing, or general primitive formatting. Int32, Int64 and Boolean boxed ToString
 use the bounded display contract above. Other primitive types still require
-explicit implementation. Named structs now dispatch their explicit overrides. System.Value is not involved in this dispatch.
+explicit implementation. Named structs dispatch their explicit overrides. System.Value is not involved in this dispatch.
 The [Object equality sample](/samples/object-equality.zip) demonstrates the behavior.
 
 
@@ -312,7 +311,7 @@ values. Explicitly authored operators retain their own contracts.
 
 ## Mixed Object map keys
 
-Supported generic API signatures now admit Object, including `HashMap<Object, Object>`.
+Supported generic API signatures admit Object, including `HashMap<Object, Object>`.
 Supply explicit callbacks: `(left, right) => left.Equals(right)` and
 `key => key.GetHashCode()`. Paths and type descriptors use their represented-value
 contracts; supported boxed Int32/Int64/Boolean/Single/Double/Char values use exact-type value equality, while
@@ -321,16 +320,15 @@ ordinary classes retain allocation identity. Equal keys must have equal hashes.
 The compiled sample checks duplicate keys, replacement, deliberate collisions,
 growth and reference-preserving Object values returned through `Option<Object>` under
 GC. The String slice also supports content keys through the existing Object conversion.
-This adds no default comparer, nullable-key policy
-or support for other boxed primitives. It is an importer coverage fix, not a new map
-algorithm or runtime layout.
+Default comparers, nullable-key policy and other boxed primitive keys remain
+outside this supported surface.
 
 
 <a id="string-through-object-development"></a>
 
 ## String through Object
 
-[String](xref:System.String) now supports Object equality, hashing and display through
+[String](xref:System.String) supports Object equality, hashing and display through
 the existing intrinsic-text wrappers. Equality compares exact contents with another
 String; null and other concrete types compare false. The UTF-8 content hash agrees
 for equal text. ToString returns the full text unchanged. Empty text, embedded NUL,

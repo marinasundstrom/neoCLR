@@ -1,22 +1,23 @@
 # Introspection and Object contracts
 
-Preview 11. [TypeInfo](xref:System.Introspection.TypeInfo) describes
-a type in the current loaded program. [MemberInfo](xref:System.Introspection.MemberInfo)
-provides its name, declaring type, module and token; the type interface adds shape,
-generic arguments and member queries. The [type reference](xref:System.Introspection.TypeInfo)
-lists each supported operation. These APIs describe metadata; they do not invoke
-methods, read fields or construct arbitrary objects.
+[TypeInfo](xref:System.Introspection.TypeInfo) describes a type's shape, generic
+arguments and supported member queries in the loaded program. Named declarations
+also provide [NominalTypeInfo](xref:System.Introspection.NominalTypeInfo), including
+the declaration metadata shared with [MemberInfo](xref:System.Introspection.MemberInfo).
 
-## Development: nominal and structural type descriptors
+These APIs inspect metadata. Use the separate [reflection operations](reflection.md)
+to construct objects, invoke methods or access fields within the supported subset.
 
-The development reference introduces [NominalTypeInfo](xref:System.Introspection.NominalTypeInfo).
-TypeInfo no longer inherits MemberInfo. Common code uses DisplayName and
+<a id="development-nominal-and-structural-type-descriptors"></a>
+
+## Nominal and structural type descriptors
+
+TypeInfo does not inherit MemberInfo. Common code uses DisplayName and
 IsNominalType; only a NominalTypeInfo view exposes Name, FullName, Namespace,
 module/token, declaring type and custom attributes. Arrays and structural Function
 shapes do not implement NominalTypeInfo or MemberInfo. Named declarations, including
 constructed generic types, do. General shape and member queries remain on TypeInfo.
-This is a breaking change from Preview 11: narrow to NominalTypeInfo for declaration
-metadata, or use DisplayName when only diagnostic text is needed.
+Use NominalTypeInfo for declaration metadata and DisplayName for diagnostic text.
 
 ## Type identity
 
@@ -79,7 +80,7 @@ one assembly.
 ## Field, method and property identity
 
 [FieldInfo](xref:System.Introspection.FieldInfo), [MethodInfo](xref:System.Introspection.MethodInfo)
-and [PropertyInfo](xref:System.Introspection.PropertyInfo) now implement Object equality
+and [PropertyInfo](xref:System.Introspection.PropertyInfo) implement Object equality
 using descriptor kind, closed declaring-type identity and definition index. Two queries
 for the same declaration compare equal even with separate wrappers. Different generic
 owners, different declarations and different descriptor kinds compare unequal. Null
@@ -98,14 +99,14 @@ Generic method-definition queries still fault; the current equality contract doe
 not add generic method instantiation support. Property accessor queries preserve the
 same method definition identity as direct method queries.
 
-All three interfaces now have generated member reference coverage. Queries describe
+All three interfaces have generated member reference coverage. Queries describe
 metadata only: they do not read fields, invoke methods or execute accessors. Public
 application property metadata projection remains limited.
 
 ## Parameters
 
 [ParameterInfo](xref:System.Introspection.ParameterInfo) describes explicit method
-parameters and property index parameters. Object equality now uses the closed declaring
+parameters and property index parameters. Object equality uses the closed declaring
 type, owner kind (method or property), definition index and zero-based position.
 Repeated queries compare equal; matching names/types/positions from different members
 do not. A property index parameter differs from its getter/setter parameter, including
@@ -126,12 +127,8 @@ without recursively materializing member/parameter graphs or enumerating unrelat
 members. Return parameters and optional/default values remain absent. Development attribute
 inspection is described below.
 
-The native layout changed: rebuild the development runtime, library and SDK together.
-Mixing new parameter fragments with an older runtime is unsupported. The archived
-value-descriptor profile retains its original layout.
-
-ParameterInfo and [BindingFlags](xref:System.Introspection.BindingFlags) now have
-generated member coverage, closing the descriptor-interface documentation gap. Binding
+ParameterInfo and [BindingFlags](xref:System.Introspection.BindingFlags) have
+generated member coverage. Binding
 flags select visibility and instance/static categories; they do not enable inherited
 traversal or grant member invocation access.
 
@@ -171,7 +168,7 @@ expose parameters and visibility, without a method return type. See the
 For admitted application interfaces, public instance defaults are virtual and have
 bodies (`IsAbstract` is false). Ordinary static helpers report `IsStatic` true and
 `IsVirtual`/`IsAbstract` false. Private helper visibility remains private; helpers do
-not create an implementation obligation on a class. This behavior is included in Preview 11. Reflection describes these methods; it does not enable general
+not create an implementation obligation on a class. This behavior is included in Reflection describes these methods; it does not enable general
 invocation of interface bodies or bypass their access checks.
 
 
@@ -211,7 +208,7 @@ There is no `GetCustomAttributes` instantiation API or inheritance option yet.
 
 Cache validated descriptions during startup for repeated mappings. Dynamic union
 case construction is a separate next step; this API alone does not install a route
-mapper. Rebuild the runtime, library, bridge and reference together.
+mapper.
 
 
 `TypeInfo.IsVisible: bool` reports public visibility including containing types,

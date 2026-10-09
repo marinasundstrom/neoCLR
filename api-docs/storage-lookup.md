@@ -1,8 +1,8 @@
 # Storage metadata lookup
 
-**Preview 11.** This synchronous host adapter queries a native path
-without opening its contents or retaining a stream handle. Use matching Preview 11
-artifacts. It is separate from the application-owned Storage provider experiment.
+System.Storage.Metadata queries the kind of a host path without opening its contents
+or retaining a stream handle. Use it for direct filesystem lookup; use StorageProvider
+when paths belong to an application-selected provider.
 
 - [Metadata](xref:System.Storage.Metadata): `GetKind(path: string) -> Result<EntryKind, StorageLookupError>`.
 - [EntryKind](xref:System.Storage.EntryKind): non-flags enum values File (1) and Directory (2). Zero is unnamed.

@@ -26,7 +26,7 @@ that actual managed collection retains the pending graph. After dispatch, the ch
 requires zero final live guest objects. Resource release is represented by a counter;
 OS-handle lifetime and concurrent native cancellation are not tested here.
 
-Download the [source and verifier](/samples/pending-read.zip). With matching Preview 11
+Download the [source and verifier](/samples/pending-read.zip). With matching
 artifacts, extract it and run:
 
 ```sh
@@ -125,7 +125,7 @@ UserFault and does not turn into Task cancellation. A separate compilation check
 rejects direct bootstrap-service calls through the normal reference core.
 
 Download the [adapter and consumer sources](/samples/worker-task-cancellation.zip).
-Run the shared harness from a matching Preview 11 checkout:
+Run the shared harness from a matching checkout:
 
 ```sh
 python3 docs/experiments/delayed-copy/verify.py --toolchain-root /path/to/development/bundle --consumer-root docs/experiments/worker-task-cancellation --adapter-source docs/experiments/worker-task-cancellation/Workers.rvn

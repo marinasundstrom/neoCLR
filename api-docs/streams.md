@@ -1,12 +1,12 @@
 # File byte streams
 
-**Preview 11.** System.IO now has blocking file input and
-output APIs. Use matching Preview 11 artifacts. These are a first working slice,
+System.IO provides blocking file input and output through directional stream
+interfaces. Use matching compiler and runtime artifacts. The supported surface is bounded,
 not a finalized provider model or asynchronous I/O contract.
 
 ## Browse the API
 
-- [System.IO](xref:System.IO) — namespace and types.
+- [System.IO](xref:System.IO) — module and types.
 - [InputStream](xref:System.IO.InputStream) — Read and Close contracts.
 - [OutputStream](xref:System.IO.OutputStream) — Write, Flush and Close contracts.
 - [FileInputStream](xref:System.IO.FileInputStream) — Open, Read and Close.
@@ -137,14 +137,13 @@ at most three incomplete sequence bytes between conversions. It still accumulate
 the returned String, so total memory is not constant. ReadLine retains its line
 buffer. Host resource budgets also apply.
 
-Malformed completed input is now rejected during chunk processing instead of waiting
+Malformed completed input is rejected during chunk processing instead of waiting
 for EOF. An underlying read may already have consumed bytes after the error; no
 partial text is returned. A size-limit failure takes precedence over decoding the
 read that exceeded the limit; stream errors encountered earlier remain stream errors.
-This changes how far failing reads can advance and which error is observed first
-compared with Preview 10's decode-at-EOF implementation. A final incomplete sequence
-returns InvalidUtf8. The development [Decoder](xref:System.Text.Decoder) interface exposes incremental
-conversion. The development Encoder and StreamWriter.Finish contracts are described below.
+A final incomplete sequence returns InvalidUtf8. The [Decoder](xref:System.Text.Decoder)
+interface exposes incremental conversion. Encoder and StreamWriter.Finish provide
+the corresponding output conversion and completion contracts described below.
 
 StreamReader(input) owns the input; StreamReader(input, true) leaves it open when
 closed. Close is idempotent, and reads after closing return Closed. Construction
@@ -161,12 +160,13 @@ same operations within its Int32-backed cursor range. Byte positions are not tex
 character positions. Close a leave-open reader before independently repositioning
 its input and creating another reader; TextReader has no repositioning API.
 
-## Development namespace migration
+<a id="development-namespace-migration"></a>
 
-Streams and text readers now use System.IO. Update System.Streams imports and type
-names to System.IO and regenerate applications with matching artifacts. System.Storage
-continues to own providers, files, directories and Path. Use matching Preview 11
-compiler, reference and runtime artifacts.
+## Streams and storage
+
+System.IO contains stream and text-reader contracts. System.Storage supplies paths,
+providers, files and directories. A storage item can open a stream without making
+the stream depend on that provider's concrete implementation.
 
 ## Future asynchronous reads
 
@@ -200,7 +200,7 @@ constructors keep UTF-8 defaults. Each reader owns its decoder; the encoding its
 can be reused. ReadLine recognizes LF and CRLF in decoded text and retains decoded
 suffixes supplied by a codec. Built-in codecs do not read ahead across lines.
 WriteLine encodes text plus LF together. Writer results count actual encoded bytes;
-strict built-in preflight finishes before output callbacks; the writer now drains
+strict built-in preflight finishes before output callbacks; the writer drains
 a bounded byte buffer before requesting further encoded bytes. Partial writes
 are retried. Conversion errors return InvalidEncoding, while malformed UTF-8 reads
 retain InvalidUtf8. Stream failures retain their existing cases.
@@ -253,7 +253,7 @@ unchanged. Use one session per consumer; concurrent/reentrant calls are unsuppor
 Built-ins keep a pending encoded chunk of at most 256 bytes plus the accepted text;
 conversion still allocates and normal host resource limits apply.
 
-StreamWriter now drains through an independent encoder with a 256-byte buffer.
+StreamWriter drains through an independent encoder with a 256-byte buffer.
 It retries partial writes before asking for more encoded output. WriteLine preflights
 text plus LF together. Existing constructors keep UTF-8 defaults and leaveOpen
 behavior. Write/WriteLine results still count encoded bytes actually written.
@@ -272,12 +272,12 @@ never sends over 65536 bytes per call. For a custom encoder that expands beyond 
 output bound, detection can occur after partial output; there is no rollback or
 implicit replay. Closed is checked first. Flush remains available until Close.
 
-**Development migration:** custom Encoding implementations must now implement
+Custom Encoding implementations must implement
 CreateEncoder and return fresh conversion state. Do not assume an arbitrary
 whole-value Encode implementation can safely be called separately for text fragments.
 Built-ins and the application custom-codec examples use the same public interface.
 EncoderProgress rejects negative byte counts and inactive states; providers must
-also respect the capacity offered to Drain. These APIs are included in Preview 11.
+also respect the capacity offered to Drain.
 
 Compared with .NET Encoder.Convert, this design retains valid text rather than
 reporting UTF-16 char consumption. It permits arbitrarily small byte destinations,

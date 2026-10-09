@@ -1,6 +1,6 @@
 # Storage providers
 
-**Preview 11.** [StorageProvider](xref:System.Storage.StorageProvider)
+[StorageProvider](xref:System.Storage.StorageProvider)
 resolves logical paths into provider-implemented item interfaces.
 
 | Member | Contract |
@@ -39,13 +39,13 @@ System.Storage.StorageProvider. The host provider and directory traversal are in
 bounded snapshot of direct child StorageItem values. The final creation model and
 async I/O remain follow-up work.
 
-## Development migration
+<a id="development-migration"></a>
 
-StorageLookup has been removed. Its GetFile/GetDirectory members now belong to
-StorageProvider, alongside GetItem. The former StorageProvider.OpenRead/CreateNew
-methods are removed from that contract; move byte routing into provider-owned File
-implementations or an implementation-specific helper. Use matching regenerated
-reference/runtime artifacts. Use matching Preview 11 artifacts.
+## Opening file contents
+
+StorageProvider handles lookup. File implementations own byte opening through
+OpenRead and CreateNew, keeping provider resolution separate from stream lifetime.
+Use the returned interface without depending on a provider's concrete class.
 
 ## Design comparison
 

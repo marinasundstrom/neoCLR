@@ -1,7 +1,7 @@
 # Structural type families
 
-Development after Preview 11. Structural types describe shapes without declaring a
-name or namespace. These family names organize the reference; they do not introduce
+Structural types describe shapes without declaring a
+name or declaring module. These family names organize the reference; they do not introduce
 nominal types. A shape can have members and applicable extension members.
 
 | Family | Current contract | Member reference |

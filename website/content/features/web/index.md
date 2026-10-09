@@ -132,7 +132,7 @@ retries need decisions about replaying requests and safe methods.
 ## Run the controlled example
 
 [Download the client, handler checks and verifier](/samples/http-client.zip).
-The archive includes run instructions and requires matching Preview 11
+The archive includes run instructions and requires matching
 artifacts. A local Python peer fragments headers and a `Café 🌍` body; the verifier
 also runs a .NET comparison client. The peer stays open until the client finishes,
 checking that completion follows Content-Length rather than waiting for EOF.

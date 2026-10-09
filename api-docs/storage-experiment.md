@@ -1,11 +1,11 @@
 # Storage provider experiment
 
-**Preview 11.** The sample imports platform
+The sample imports platform
 [StorageItem, File, Directory and StorageProvider](storage-items.md), Path and directional stream
 interfaces. Its concrete HostStorage, MemoryStorage and memory streams remain
 application-owned fixtures for comparing provider ownership and path interpretation.
 ProviderFile and ProviderDirectory are concrete sample implementations, not public platform classes.
-The platform API is provisional; use matching Preview 11 packages.
+The platform API is provisional; use matching packages.
 
 Download the tested [project file](/samples/storage-provider/StorageExplorer.rvnproj),
 [Storage.rvn](/samples/storage-provider/Storage.rvn),
@@ -176,7 +176,7 @@ Streams still transfer at most two bytes per call to exercise partial-transfer l
 
 ## Directional capability interfaces
 
-These are now platform interfaces in System.IO: [InputStream](xref:System.IO.InputStream) and [OutputStream](xref:System.IO.OutputStream). File and Directory are also platform interfaces; their ProviderFile/ProviderDirectory implementations remain application-owned.
+These are platform interfaces in System.IO: [InputStream](xref:System.IO.InputStream) and [OutputStream](xref:System.IO.OutputStream). File and Directory are also platform interfaces; their ProviderFile/ProviderDirectory implementations remain application-owned.
 
 | Member | Contract |
 | --- | --- |
@@ -193,7 +193,7 @@ host lifetime and error behavior.
 
 ## Supplied stream implementations
 
-The core file stream classes now implement these interfaces directly. The sample's
+The core file stream classes implement these interfaces directly. The sample's
 former DiskInput and DiskOutput forwarding adapters have been removed. Providers
 return the opened stream through its directional interface; Close through either
 reference closes the same stream.
@@ -224,7 +224,7 @@ Callers may optionally parse a Path, then pass Text to a string-taking API. The 
 metadata and file-stream APIs accept strings. String overloads on provider APIs
 remain an open ergonomic choice; this slice does not add them.
 
-GetFile now queries kind/existence and returns a provider-bound address. It does not
+GetFile queries kind/existence and returns a provider-bound address. It does not
 promise stable filesystem identity or later availability, nor does success grant
 read/write permission. Later opens perform their own checks and can fail. Metadata
 lookup adds an I/O operation; callers who only need bytes may still open directly.
@@ -282,14 +282,14 @@ remaining unequal Path values.
 
 Path is currently an immutable reference class with value comparison, avoiding a
 struct's invalid default value. That costs an allocation and does not yet supply
-value operators. Development Path now implements EquatableTo&lt;Path&gt;, matching Object
+value operators. Development Path implements EquatableTo&lt;Path&gt;, matching Object
 equality/hash/display to its typed comparison. Equals(Path) requires a non-null
 operand; EquatableTo&lt;T&gt; takes T, never an automatically introduced T?. The existing
 Object.Equals(Object?) overload is the explicit null-aware reference boundary. Additional operations are deferred;
 Directory owns child resolution and calls Parse to validate its result. The existing
 static Combine(string, string) and GetFileName(string) compatibility methods retain
 their native string behavior; they do not return or validate Path values.
-The downloaded Path.rvn now contains only `RequirePath(text)`, a sample fixture helper
+The downloaded Path.rvn contains only `RequirePath(text)`, a sample fixture helper
 for known paths: it calls
 Parse and terminates with UserFault on invalid syntax. It is not a second parser.
 
@@ -303,8 +303,8 @@ include the new type, narrower grammar and explicit parsing at call sites.
 
 ### Future path formats
 
-The author intends Path.Parse to support Unix and Windows formats and normalize
-accepted paths through the value object. This is future work: the current parser
+Support for Unix and Windows path formats and normalized value objects remains
+future work. The current parser
 still accepts only the documented logical slash grammar and preserves its spelling.
 Format selection, Windows drive/UNC roots, separator and dot-segment handling, and
 normalization/equality rules need an explicit contract. No overload spelling or
@@ -314,4 +314,4 @@ from filesystem existence, permissions, symlink resolution and item identity.
 
 Path-taking overloads of Combine and related helpers are also a future direction.
 For now these helpers keep their string contracts; no new overload signature is
-selected. The immediate goal is a minimal integrated Storage read/write/lookup POC.
+selected.

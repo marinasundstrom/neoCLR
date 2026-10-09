@@ -1,9 +1,9 @@
 # TCP sockets and listeners
 
-**Preview 11.** `System.Networking.Sockets` starts with an IPv4 TCP
-API. Connections can send and receive bytes; listeners accept new connections.
-The two-sided POC runs separate neoCLR server and client processes on loopback.
-This remains a provisional subset of a complete Socket API.
+System.Networking.Sockets provides IPv4 TCP connections and listeners. A connection
+sends and receives bytes; a listener accepts connections that the caller closes
+independently. The supported API is a bounded POC, demonstrated by separate server
+and client processes on loopback.
 
 [Socket](xref:System.Networking.Sockets.Socket) has these public operations:
 
@@ -62,12 +62,11 @@ ConnectionRefused and ConnectionReset. Unexpected native failures use IoFailure.
 Errors are Result values, separate from runtime Faults. No public native error-number
 contract is available. Development overloads accept CancellationToken.
 
-The development SocketError now uses normal union syntax. Use case patterns rather
-than the removed per-case `Is*` properties and `Get*` accessors. `default(SocketError)`
+SocketError is a Raven union. Match its cases to inspect an expected failure. `default(SocketError)`
 has no active case (`HasValue` is false) and formats as `Empty`; it does not represent
 a successful operation or a transport error. Its `Value` projection boxes an active
 case and returns null when inactive. This is compiler support; ordinary callers
-should match the union. Rebuild the library and applications together.
+should match the union.
 
 Connections belong to their invocation. Close promptly; teardown releases anything
 left open. The current backend allows 64 open-or-connecting sockets, 64 operations
@@ -87,7 +86,7 @@ gets at most one second; the final address gets the remaining time. Failed attem
 release their native socket before trying another. If all fail, the last error is
 returned. Overall expiry returns TimedOut. A committed success ends the search.
 
-Each nonempty Send/Receive now has its own provisional five-second deadline from
+Each nonempty Send/Receive has its own provisional five-second deadline from
 native admission. Expiry is checked before the next I/O attempt and returns TimedOut.
 It releases transfer storage and the receive destination root, without closing the
 connection. No bytes are transferred by the expired operation. Already committed
@@ -152,7 +151,7 @@ open independently. Send/Receive on a listener and Accept on a connected socket
 return InvalidOperation. Listener teardown closes remaining native resources.
 No public accept deadline is provided yet. Accept(CancellationToken) cancels an individual accept while preserving the listener.
 
-The default HTTP socket handler now supplies a shared 15-second exchange deadline
+The default HTTP socket handler supplies a shared 15-second exchange deadline
 through private lookup/connect/transfer paths. Each native operation uses the earlier
 of that deadline and its phase bound. Public Socket calls still use the independent
 bounds above; this adds no configurable Socket timeout overload. Token overloads are described below.
@@ -174,7 +173,7 @@ connection. Cancelling connect discards the pending connection and remaining add
 attempts. DNS cancellation cannot interrupt the host resolver; its bounded permit
 remains occupied until host work returns. Source disposal removes registrations
 without cancelling work. These tokens are invocation-local; the development HTTP
-client now forwards them through the same provider paths. See [Task cancellation contracts](xref:System.Concurrency.CancellationToken).
+client forwards them through the same provider paths. See [Task cancellation contracts](xref:System.Concurrency.CancellationToken).
 
 ## Shared deadlines (development, native assemblies)
 
@@ -188,9 +187,9 @@ Pass this value and a cancellation token to `Dns.GetHostAddressesUntil`, either
 Pre-requested cancellation wins over expiry. Otherwise an expired deadline returns
 `TimedOut` before admission. Existing shorter phase limits remain; using a larger budget
 does not extend them. Partial transfers require successive calls with the same deadline.
-HTTP now uses this boundary across separate Networking/Web assemblies and retains its
+HTTP uses this boundary across separate Networking/Web assemblies and retains its
 15-second exchange budget. Raw clock stamps and service adapters stay internal.
 
 The aggregate CLI reference includes declarations for documentation only. Execution of
-this new contract is supported through native metadata; legacy CLI-to-neoIL translation
+this contract is supported through native metadata; legacy CLI-to-neoIL translation
 has no typed-deadline mapping. Existing duration/default overloads remain available.

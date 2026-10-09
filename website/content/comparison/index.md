@@ -5,7 +5,7 @@ concepts and some different contracts. It is experimental: CLI metadata is a
 compiler boundary, not a promise that existing .NET applications or NuGet packages
 will run unchanged.
 
-**Reviewed 27 September 2026.** This page describes Preview 11. Use matching runtime and compiler
+This page compares the supported POC surface. Use matching runtime and compiler
 artifacts. See [installation and availability](../try/) before running an example.
 The comparison concerns modern .NET; language syntax, library policy and runtime
 behavior are distinguished below.
@@ -48,7 +48,7 @@ conversion or application work.
 | [Toolchain](../try/) | Raven compilation, the import bridge, MSBuild and language tooling use .NET. Guest execution uses neoCLR without a .NET runtime. The importer supports a bounded CLI subset; compile against the matching neoCLR reference library. |
 | Libraries | Collections, queries, text, time, streams, storage, tasks, networking and HTTP/JSON support useful small programs. The [guides](../guides/) and [API reference](../docs/) define the actual surface; familiar names do not imply full .NET API parity. |
 | Work submission | **Development:** `Task.Run` supports shared captures and returns an awaitable task. Guest instruction intervals share a managed graph gate, so this does not promise parallel guest CPU execution. Earlier isolated-worker APIs have different sharing rules. See [Tasks](../features/tasks/#task-run). |
-| Web applications | Preview 11 includes bounded typed JSON client/server exchanges, nested JSON, typed arrays and routing. Cleartext HTTP/1.1 and bounded payloads are not an ASP.NET Core replacement. See the [HTTP guide](../features/web/) and [server case](../cases/http-server/). |
+| Web applications | neoCLR supports bounded typed JSON client/server exchanges, nested JSON, typed arrays and routing. Cleartext HTTP/1.1 and bounded payloads are not an ASP.NET Core replacement. See the [HTTP guide](../features/web/) and [server case](../cases/http-server/). |
 | Readiness | Experimental contracts and bounded validation. Import coverage, async shapes, terminal-fault cleanup and packaging still need work. This is a platform to investigate through working cases, not a production compatibility layer. |
 
 ## Coming from .NET

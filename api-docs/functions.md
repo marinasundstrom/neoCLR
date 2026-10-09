@@ -1,6 +1,6 @@
 # Function shapes and objects
 
-Development after Preview 11. A Function type describes a callable shape. A
+A Function type describes a callable shape. A
 Function object is an instance of that shape, holding a checked method target and
 any bound receiver or captured environment. This page documents the structural
 family; “Function” is a documentation label, not a nominal type declaration.
@@ -80,10 +80,9 @@ Function fields before publication. Function objects inherit Object, support Obj
 their precise signature through GetType. Separate bindings have separate reference
 identity even when value-equal; copies retain reference identity.
 There is no multicast combination or native function-pointer interop contract.
-Legacy `.delegate`, `delegate.bind` and serialized Delegate representations are
-rejected. Rebuild applications with matching compiler, reference, library and
-runtime artifacts. Comparer adapters are now named FunctionComparer and
-FunctionEqualityComparer.
+Use FunctionComparer and FunctionEqualityComparer to adapt callable values to
+comparison contracts. The legacy `.delegate`, `delegate.bind` and serialized
+Delegate encodings are not accepted by this runtime contract.
 
 Common TypeInfo member queries include the synthesized public instance `Invoke`.
 `TypeInfo.IsFunctionType` identifies its structural signature descriptor. Narrow to
@@ -96,7 +95,7 @@ positions and modes come from the signature.
 Invoke and its parameters have no declaration module or metadata token: their
 optional properties return None, as does MethodInfo.DefinitionIndex. DeclaringType
 returns Some(the Function signature), and custom attributes are empty. Ordinary
-members now expose optional metadata too; consumers must pattern-match it.
+members expose optional metadata too; consumers must pattern-match it.
 This descriptive method does not support MethodReflectionExtensions.Invoke yet;
 use ordinary typed Function invocation to execute the bound target.
 

@@ -41,17 +41,15 @@ afterwards. The interpreter may retain local references until their frame return
 
 .NET's `System.GC` offers generation and byte-based diagnostics and more collection
 modes. neoCLR exposes the supported object counters under the author-selected
-`System.Runtime` namespace. Generations, finalizers, no-GC regions and tuning are
+`System.Runtime` module. Generations, finalizers, no-GC regions and tuning are
 future collector work. See the [GC reference](xref:System.Runtime.GC).
 
 
-## Native source checkpoint (2026-10-06)
+<a id="native-source-checkpoint-2026-10-06"></a>
 
-The source-built GC facade executes counters, collection and KeepAlive, including
-`KeepAlive(null)`, through separately compiled native consumers. Both unit and no-result
-runtime control signatures are supported. Matching development compiler/metadata tools
-preserve the callable nullable parameter annotation across assembly boundaries; older
-Preview 12 tooling does not include this fix. No runtime nullability semantics changed.
-See [native source GC evidence](https://github.com/marinasundstrom/neoCLR/blob/d622395e765b20d2f257e8c8a415db7bdb6743cd/docs/experiments/extended-cli-metadata/source-heap-2026-10-06.md)
-for the retained failing fixture and the passing retention checks. Published Preview 12
-artifacts have not changed.
+## Native metadata consumers
+
+Separately compiled consumers can use the source-built GC facade for counters,
+collection and KeepAlive, including `KeepAlive(null)`. The matching compiler and
+metadata tools preserve the nullable parameter annotation across assembly boundaries.
+This metadata contract does not add pinning or change the reachability rules above.

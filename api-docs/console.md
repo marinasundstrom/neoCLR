@@ -1,14 +1,12 @@
 # Console and standard streams
 
-Preview 11. `System.Console` is a static class. Its common
-methods are `Write(string/int)`, `WriteLine()`, `WriteLine(string/int/object?)` and Boolean, Char and integral overloads, `ReadByte()`
-and `ReadLine()`/`ReadLine(maxUtf8Bytes)`. Terminal key handling, colors, cursor
-movement, character-at-a-time text input and asynchronous calls are not implemented.
+System.Console reads standard input and writes standard output and error. Use
+Write or WriteLine for output, ReadLine for bounded UTF-8 text input, and the
+standard stream accessors when code needs an InputStream, OutputStream, TextReader
+or TextWriter.
 
-Development bootstrap validation (2026-10-06): these source declarations also compile
-into a separate native metadata assembly and execute with an artifact-only consumer.
-This requires the explicit source-Console core/seed profile; the older primitive
-bootstrap contains only limited Console declarations. Public API signatures are unchanged.
+Console is a static class. Terminal key handling, colors, cursor movement,
+character-at-a-time text input and asynchronous console calls are not implemented.
 
 | Member | Type or result | Purpose |
 | --- | --- | --- |
@@ -115,16 +113,15 @@ for member reference pages.
 
 The CLI opts into process standard streams. Rust Console implementations can add
 `write_bytes(error, bytes)` and `flush(error)`; `error = true` selects stderr.
-Their default implementations return Unsupported, preserving source compatibility
-with existing line-only hosts. Those hosts need to implement the new hooks before
-using Console.Write or stream-based output. The old WriteLine path is unchanged.
+Their default implementations return Unsupported. A host must implement these
+hooks to support Console.Write or stream-based output; line-only hosts can still
+support WriteLine.
 The current isolated-worker output host and debugger do not implement the byte
-output hooks; these calls return IoFailure there. No worker stream forwarding is
-claimed by this slice.
+output hooks; these calls return IoFailure there. Worker stream forwarding is not supported.
 
 Without a supplied host, Execution.stdout and Execution.stderr retain exact bytes.
-Execution.output retains the legacy line records from WriteLine and joined workers;
-it is not a complete rendering of the new byte channels. With live host I/O, captured
+Execution.output retains the line records from WriteLine and joined workers;
+it is not a complete rendering of the byte channels. With live host I/O, captured
 channels are empty. Neither channel is implicitly redirected to the other.
 
 ## Comparison with .NET

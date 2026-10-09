@@ -38,6 +38,12 @@ directions are welcome, clearly distinguished from implementation. Setup/downloa
 pages retain accurate package availability. Preserve changelog, published release
 notes and development history outside the feature narrative.
 
+Author clarification, 2026-10-09: apply the same style to API guides and reference
+prose. Lead with purpose and current usage; keep limits beside the relevant contract.
+Do not retain obsolete “Preview 11” labels or turn reference sections into a sequence
+of implementation updates. Keep meaningful benchmark/research dates and explicit
+experiment status. Preserve incoming anchors when replacing historical headings.
+
 ## Installation and language navigation — author direction, 2026-10-07
 
 Give installation one short path: prerequisites, download, install the editor extension,

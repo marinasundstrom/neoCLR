@@ -12541,3 +12541,14 @@ claim follows from these focused checks.
   full native-only core bootstrap, general AOT coverage and x64 AOT are unfinished.
   ARM64 AOT remains a separate source experiment. See the
   [release qualification record](preview-13-validation.json).
+
+### 2026-10-09 — Current documentation rather than release chronology
+
+- **Author:** reported historical change notes while browsing the API reference,
+  specifically pointed to “Preview 11” labels, and asked that those documents use
+  the same style as the other pages.
+- **Assistant response:** rewrite current guides around purpose, usage, contracts
+  and limitations. Keep release chronology in the changelog and development records.
+  The pass removes obsolete version labels and migration instructions, reconciles
+  superseded Fault and TypeInfo notes, and preserves old anchors for incoming links.
+  Benchmark configurations and evidence remain dated where the date is meaningful.

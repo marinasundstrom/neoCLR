@@ -98,7 +98,7 @@ experiment with `--mapped`.
 ## Run the client and server
 
 [Download and extract the projects](/samples/http-json.zip). From that directory,
-run with the matching Preview 11 runtime and SDK:
+run with the matching runtime and SDK:
 
 ```sh
 python3 http-json/verify.py \
@@ -159,7 +159,7 @@ response. See the [complete server](/samples/http-json/json-object-mapping/HttpS
 
 [Download the complete client/server projects](/samples/http-json.zip), extract
 them, and run from the extracted directory. Set these paths to a matching
-Preview 11 runtime bundle and Raven SDK.
+matching runtime bundle and Raven SDK.
 
 ```sh
 python3 http-json/verify.py \
@@ -289,14 +289,14 @@ responses; the station case above demonstrates typed JSON.
 
 The [source download](/samples/http-json.zip) includes `runtime-route-mapper`, its
 three projects, reusable mapper, typed application facade and verifier. With a
-matching Preview 11 runtime and SDK, run:
+matching runtime and SDK, run:
 
 ```sh
 python3 runtime-route-mapper/verify.py --toolchain-root /path/to/runtime \
   --sdk /path/to/raven-sdk --runner /path/to/runtime/tools/http-runner
 ```
 
-**Preview 11 sample source; not installed as an SDK mapper.**
+**Application-owned sample code; not installed as an SDK mapper.**
 One public nongeneric union, up to 16 cases and String/Int32 payloads are supported.
 Startup rejects invalid schemas and structurally overlapping patterns. Overlap
 checks conservatively ignore typed conversion domains and the total target byte

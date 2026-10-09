@@ -5,8 +5,7 @@ String exposes grapheme and scalar views. Char represents one grapheme cluster, 
 containing several scalar values. Scalar APIs currently use uint and UnicodeScalar helpers;
 a dedicated rune type is not implemented. Byte represents one encoded byte.
 
-These APIs are included in Preview 11 and require matching runtime, System library
-and compiler references.
+Use matching runtime, System library and compiler references.
 
 [String](xref:System.String) provides `ToUpperInvariant()` and `ToLowerInvariant()`.
 Both return String using **Unicode 17 full default casing**. They can expand text
@@ -64,7 +63,7 @@ arbitrary user-defined numeric types, generic classes, additional constraints or
 open runtime generic dispatch. General static/default/access-controlled interface
 support is further platform work, not a restriction inherent in the API design.
 
-Every listed numeric type now has concrete Parse; Boolean has Parse only. All numeric parsers use
+Every listed numeric type has concrete Parse; Boolean has Parse only. All numeric parsers use
 [NumberParseError](xref:System.NumberParseError), with InvalidFormat/Overflow.
 [BooleanParseError](xref:System.BooleanParseError) has InvalidFormat only.
 

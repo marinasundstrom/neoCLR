@@ -1,14 +1,10 @@
 # Terminal faults and codes
 
-**Preview 11.** Every host-visible runtime `Fault` now has a
+A host-visible runtime `Fault` carries a
 machine-readable code as well as its diagnostic message and execution location.
 This is a host API; guest programs cannot catch a Fault or select its code.
 
 ## Explicit faults from guest code
-
-**Development migration (2026-10-02):** use `System.Fail`, replacing the former
-`System.Fault` namespace function. The host `Fault` result is unchanged; rebuild callers
-with the matching compiler/reference/runtime bundle.
 
 `System.Fail(message: string) -> unit` terminates the invocation with **UserFault**.
 The explicit neoIL `fault "message"` instruction has the same code. There is no
@@ -20,10 +16,10 @@ Use Result for expected errors that callers can handle. A stream's Closed result
 or a Task's cancelled state is not a terminal Fault. These codes do not introduce
 exceptions, catch/finally behavior or a new guest error hierarchy.
 
-Development bootstrap (2026-10-06): independently emitted source System.Fail now raises
-this same UserFault through native metadata import. Its primitive profile removes the
-competing bridge declaration. Source-owned terminal-flow recognition in Raven remains
-open, so this execution gate does not yet qualify let-else uses of that source library.
+The native source library raises the same UserFault. Raven's RuntimeFailureContract
+identifies the terminal function so constructs such as let-else recognize that a
+Fail call does not return. Use the matching compiler and runtime contract; an
+incompatible terminal-function owner is rejected before output.
 
 ## Reading faults in an embedding host
 
@@ -86,29 +82,19 @@ claim to catch a Rust/OS stack overflow or an arbitrary host process failure.
 
 ## CLI and debugger
 
-**Development (2026-10-07):** CLI execution faults with a captured stack use the shared
+CLI execution faults with a captured stack use the shared
 `Fault::diagnostic()` format: `Code: message`, then `   at Function [instruction N]`.
 They exit 1. Normal completion preserves the program's exit code, including a deliberate
 1; diagnostic stderr distinguishes an unhandled fault. Standard runtime messages come
 from the code catalog; user messages are preserved. Loader/verifier errors before
-execution retain their detailed format. Tools parsing CLI execution text must migrate;
-embedding hosts should use fault fields instead.
-
-Earlier CLI versions used this format (also retained by legacy Fault Display):
-
-```text
-Fault: frame limit exceeded [code=StackOverflow] at Main:0
-```
+execution retain their detailed format. Embedding hosts should inspect the structured
+fault fields rather than parse CLI diagnostic text.
 
 Debugger snapshots retain the existing `fault` diagnostic and add
 `fault_code: "StackOverflow"`. `fault_code` is null when there is no terminal fault.
 It is populated for execution faults, pre-execution failures, cancellation and
 stopping. The terminal debugger displays the code separately. Tools should use
 this structured field or Rust's `Fault.code`, not parse the formatted message.
-
-Adding the public Rust field requires source changes for hosts that construct
-Fault with struct literals. The CLI diagnostic format also gains the code; raw
-message comparisons can continue to use `Fault.message`.
 
 ## .NET comparison
 
@@ -133,17 +119,12 @@ Empty text consumes an entry even though it consumes no payload bytes. These bud
 count unique retained UTF-8 payload, not table capacity, Arc headers, allocator
 metadata, temporary input Strings or total process memory. Setting the entry quota
 to zero prevents all insertions. Limits are terminal runtime budgets, not recoverable
-Storage errors or guest-selected Fault codes. Hosts constructing Limits exhaustively
-must supply the two new fields; using `..Limits::default()` picks up the defaults.
+Storage errors or guest-selected Fault codes. Use `..Limits::default()` when a host does not need to override these budgets.
 
 
-Development update (2026-10-07): the source-owned terminal-flow limitation described
-above is resolved with Raven's explicit RuntimeFailureContract. The selected native
-owner now works in let-else, including separate compilation. Ordinary .NET methods
-remain unchanged; missing or incompatible owners reject before output. This changes
-compiler configuration, not the public Fail signature or runtime fault behavior.
+<a id="development-shared-host-presentation-2026-10-07"></a>
 
-## Development: shared host presentation (2026-10-07)
+## Shared host presentation
 
 Rust `FaultCode::standard_message(self) -> Option<&'static str>` returns the standard
 English runtime message for that code. It returns None for UserFault, whose message

@@ -6,7 +6,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
-No changes yet.
+### 2026-10-09
+
+- Rewrite current API and feature guides around usage and supported behavior,
+  removing stale Preview 11 labels, upgrade instructions and superseded checkpoints.
+  Preserve compatibility anchors, explicit POC limits and research/benchmark evidence.
 
 ## 0.1.0-preview.13 — 2026-10-09
 

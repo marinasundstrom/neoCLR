@@ -1,6 +1,6 @@
 # Experimental .NET metadata library
 
-**Feature-branch development only; not part of Preview 11 or the neoCLR guest API.**
+**Experimental host tooling, separate from the neoCLR guest API.**
 Assembly and namespace: `NeoCLR.Metadata.Experimental`. Target: .NET 10.
 Source project: `tools/metadata/NeoCLR.Metadata.Experimental`.
 This is the first reusable reader/writer slice intended for Raven's future symbol
@@ -9,7 +9,7 @@ and derives structural identities/member contracts against an explicitly supplie
 Bounded PE32 recognition and a read-only manifest-module/TypeDef model are implemented;
 explicit AssemblyRef, nominal TypeRef and bounded method MemberRef resolution are
 implemented. A controlled primitive/root-object builder writes ordinary CLI PE and native
-format-5 assemblies, including native top-level functions. Direct PE/#Neo runtime loading now uses a transitional native execution section
+format-5 assemblies, including native top-level functions. Direct PE/#Neo runtime loading uses a transitional native execution section
 with a reference-only CLI projection. A bounded binary native payload now avoids JSON parsing at runtime. General rewriting
 and guest Introspection assembly loading remain pending.
 
@@ -1410,7 +1410,7 @@ MVID/token, are rejected. Repeated compatible imports return the same reference;
 MVID consistency is not content authentication. Null arguments throw
 `ArgumentNullException`. `Call` rejects references from another consumer with
 `ArgumentException`; stack validation still occurs at emission. A null literal passed
-to the overloaded `Call` now requires a cast to the intended target type.
+to the overloaded `Call` requires a cast to the intended target type.
 
 ```csharp
 var dependency = AssemblyDefinition.ReadAssembly(dependencyPe, expectedExtended: false);
@@ -1760,7 +1760,7 @@ that implicit System dependency; this is a bootstrap limit to replace with a gen
 native assembly binding contract.
 
 Compiled examples and failures: `NativeLibrarySymbolChecks.cs` in the metadata C# tests
-and Raven's `SystemSymbolChecks.cs` consumer. The builder now provides the bounded opcode/operand Emit API below. An editable
+and Raven's `SystemSymbolChecks.cs` consumer. The builder provides the bounded opcode/operand Emit API below. An editable
 instruction collection and full Cecil body-editing support remain future work.
 
 
@@ -1818,7 +1818,7 @@ main.Emit(OpCode.Ret);
 
 `EmitChecks.cs` proves helper/raw byte equivalence on the same graph, executes a CLI
 arithmetic/call entry point to 42, and checks imported/native operands and failures.
-Raven's native emitter now uses this surface; native runtime and translated-System
+Raven's native emitter uses this surface; native runtime and translated-System
 integration remain its executable consumer evidence.
 
 ## Int32 local slots (development, 2026-10-01)
@@ -2532,7 +2532,7 @@ consumer validates source-level aliasing too; see the [integration record](https
 
 ## Nominal signatures
 
-**Development 2026-10-01.** `NeoCLR.Metadata.Experimental.Model` now exposes:
+**Development 2026-10-01.** `NeoCLR.Metadata.Experimental.Model` exposes:
 
 ```csharp
 public sealed record SignatureType {
@@ -2734,7 +2734,7 @@ substituted `Signature`. `Call(GenericMethodInstance)` and
 ArgumentNullException; wrong arity, Void, foreign class/definition, wrong opcode,
 out-of-scope caller parameters and nested-array substitution throw ArgumentException.
 Body stack compatibility is validated on write. Only unconstrained static or ordinary instance definitions
-in the current output are supported. Bounded static imported methods now use the separate
+in the current output are supported. Bounded static imported methods use the separate
 [imported generic contract](#imported-generic-methods-development-2026-10-01).
 For example, `body.Call(identity.MakeGenericInstance(PrimitiveType.Int32))` consumes
 one Int32 for `Identity<T>(T)->T` and produces Int32. Forwarding may instead pass
@@ -3128,7 +3128,7 @@ bounded to 256. Exact consumption rejects trailing/truncated bytes, Void element
 jagged/multidimensional arrays, byrefs, nominal/generic types and other conventions.
 This reads declarations only; it neither resolves types nor validates bodies.
 
-`AssemblyBuilder.ImportReference` and `MemberReference.ResolveMethod` now use this
+`AssemblyBuilder.ImportReference` and `MemberReference.ResolveMethod` use this
 contract and distinguish full vector element signatures when resolving overloads.
 The existing explicit dependency/core identity, ownership and resolver restrictions
 remain. For example, a read-only `Identity(int[]) -> int[]` definition can be imported,
@@ -3471,7 +3471,7 @@ It implements only the assembly/type/field part of the definition-first plan abo
 | `FieldDefinition.Name` | Authored fields can be renamed with Unicode/name and duplicate checks. Loaded edits throw `InvalidOperationException`. |
 | `TypeBuilder.Definition` / `FieldBuilder.Definition` | Exact declaration object consumed by the facade. Builder field creation appends to the definition collection. |
 
-`ModuleDefinition.Types` and `TypeDefinition.Fields` now return `IList<T>` instead
+`ModuleDefinition.Types` and `TypeDefinition.Fields` return `IList<T>` instead
 of `IReadOnlyList<T>`: a development API source compatibility change. Authored lists
 support appending only. Insertion elsewhere, replacement, removal and clearing throw
 `NotSupportedException`. Ownership is exclusive; attach a type to its module and fields
@@ -3480,7 +3480,7 @@ remain zero until encoding and rereading; token lookup is a loaded-image operati
 `ModuleDefinition.Fields` reflects current authored fields.
 
 Method bodies, property associations and generic parameter declarations still use the
-existing builder representation. Authored method/function views and EntryPoint now expose canonical declarations;
+existing builder representation. Authored method/function views and EntryPoint expose canonical declarations;
 use the builder facade to create type methods and edit bodies. Other
 snapshot metadata views are not materialized authored views. Loaded definitions remain
 read-only, byte-preserving snapshots. Writers currently use builder encoding adapters;
@@ -3537,7 +3537,7 @@ invalid/reserved names and namespaces throw `ArgumentException`. Final Unicode/b
 validation remains at writing, preserving existing builder behavior.
 
 Append to `assembly.MainModule.Functions` to attach and validate signature ownership,
-uniqueness and the 256-function limit. This collection now returns `IList<MethodDefinition>`
+uniqueness and the 256-function limit. This collection returns `IList<MethodDefinition>`
 instead of `IReadOnlyList<MethodDefinition>` (development API change). Loaded collections
 reject appends; authored collections reject replacement/removal/reordering. Attached or
 loaded declarations cannot be attached again. A failed foreign-signature attachment does
@@ -3583,7 +3583,7 @@ their previous bounded contracts. Null signatures throw `ArgumentNullException`;
 flags, empty/overlong names and `.cctor` throw `ArgumentException`.
 
 Attach the declaring type to its authored module, then append the method to
-`TypeDefinition.Methods`. This property now returns `IList<MethodDefinition>` instead
+`TypeDefinition.Methods`. This property returns `IList<MethodDefinition>` instead
 of `IReadOnlyList<MethodDefinition>` (development source compatibility change). It is
 append-only for authored types and read-only for loaded types. Adding to a detached
 type throws `InvalidOperationException`. Attachment checks signature ownership and
@@ -3872,7 +3872,7 @@ imported instance/constructor calls and generic declaring-owner member calls rem
 unsupported. Importing a type does not import its members or implement Raven unions.
 
 Native format-5 signatures still use Named/Constructed types resolved by the loader.
-To retain the CLI category in metadata-only projection, the assembly manifest now has
+To retain the CLI category in metadata-only projection, the assembly manifest has
 an optional `value_type_references` array of canonical external native definition names.
 The writer emits it only for imported values. The reader bounds it to 4096 unique names,
 requires declared dependency scopes and restores value-category signatures in the PE
@@ -4025,7 +4025,7 @@ readonly/in contracts and Raven admission remain unsupported by this producer AP
 ### Managed value receivers (development, 2026-10-02)
 
 `TypeBuilder.AddInstanceMethod` and attached instance `MethodDefinition` declarations
-now admit value types as well as reference classes. On a value type, argument zero is
+admit value types as well as reference classes. On a value type, argument zero is
 an initialized managed reference to the exact open declaring type. Field reads/writes
 and typed LoadObject/StoreObject may use that receiver; field mutation affects caller
 storage. Static-type instance declarations and value constructors remain rejected.
@@ -4079,7 +4079,7 @@ accepts a literal only.
 ### Value and imported constructors (development, 2026-10-02)
 
 The existing `TypeBuilder.AddConstructor` overloads and authored `.ctor` definitions
-now admit value types, including unconstrained generic owners. CLI emission uses
+admit value types, including unconstrained generic owners. CLI emission uses
 ordinary instance constructor metadata/CIL without injecting an Object base call into
 a value constructor. Native emission uses the existing managed construction receiver.
 Every own field must be assigned on every normal return. Reading a field before its
@@ -4597,7 +4597,7 @@ resolver and returns the canonical local TypeDefinition. `ClassType` and `Import
 remain null for this category; no mutable builder is retained. `ToString()` provides a
 diagnostic namespace/name, not serialized identity. The getter performs no code loading.
 
-`AssemblyDefinition.ReadNativeAssembly` and `MethodDefinition.TryGetSignature` now support
+`AssemblyDefinition.ReadNativeAssembly` and `MethodDefinition.TryGetSignature` support
 nongeneric local root class parameter/result types as well as primitives, on namespace
 functions, class methods and constructors. The native format and opaque Write roundtrip
 are unchanged. Cross-dependency, generic, interface/value, array/byref signature categories,
@@ -4695,7 +4695,7 @@ Generic, constructed, value/interface and array signature profiles remain unsupp
 ### Native vector signatures (development, 2026-10-02)
 
 ReadNativeAssembly, MethodDefinition.TryGetSignature and FieldDefinition.TryGetSignature
-now admit one-dimensional zero-based vectors of supported primitives or nongeneric root
+admit one-dimensional zero-based vectors of supported primitives or nongeneric root
 reference classes. SignatureType.ArrayElement retains the primitive kind or immutable
 nominal reference; external class elements use the existing explicit resolver contract.
 Field and method signatures share the same nominal element identity. Opaque Write still
@@ -4878,12 +4878,12 @@ for loaded constructed signatures such as `Box<int>`; otherwise null. Its public
 - `GetHashCode()`: agrees with that equality; it is not a stable serialized identity.
 - `ToString()`: diagnostic display, not a serialized type name.
 
-`ReadNativeAssembly` now retains local closed generic root-class constructions in the
+`ReadNativeAssembly` retains local closed generic root-class constructions in the
 supported field/property/method signature categories, including vectors. Arguments can
 include bounded primitive, nominal, vector and nested closed construction signatures.
 Scoped parameters inside a local construction (`Box<T>`) are now retained, including
 method and owner parameters and vectors of constructions. Ordinals are validated against
-the declaring scope by the native reader. External generic constructions now retain exact assembly-scoped definition references
+the declaring scope by the native reader. External generic constructions retain exact assembly-scoped definition references
 and ordered arguments too. Resolving/importing them requires the explicit resolver
 overload, just like external nongeneric signatures. Missing or wrong-version dependencies
 throw InvalidDataException. Constraints and generic inheritance remain unsupported.
@@ -5242,7 +5242,7 @@ signature or metadata encoding is introduced.
 
 `ImportedFieldReference.MakeConstructedReference(params SignatureType[] typeArguments)`
 returns an immutable constructed field with `Definition`, `DeclaringType` and substituted
-`FieldType` properties. The definition may now contain owner type parameters (including
+`FieldType` properties. The definition may contain owner type parameters (including
 vectors and nominal constructions). Arguments are copied; wrong arity, nongeneric owner,
 Void or foreign arguments throw ArgumentException, and null arguments throw
 ArgumentNullException. Substitution is simultaneous and preserves caller parameters.
@@ -5268,7 +5268,7 @@ remains pending; no reflection facade or projection is introduced.
 
 ImportReference(MethodDefinition, core) supports abstract generic-owner interface
 methods; bind owner arguments with MakeConstructedReference and emit CallVirtual.
-ImportReference(FieldDefinition, core) now supports native generic-owner fields; bind
+ImportReference(FieldDefinition, core) supports native generic-owner fields; bind
 arguments with MakeConstructedReference and emit LoadField/StoreField. Native storage
 and dispatch encodings are unchanged. Reader-derived and explicitly authored interface
 conversion paths both substitute and validate invariant arguments.
@@ -5334,7 +5334,7 @@ var declaringAssembly = externalType.Module.Assembly;
 
 MetadataLoadContextChecks covers CLI/native navigation, exact versions, conflicts,
 missing dependencies, diamonds, legal cycles, foreign snapshot rejection, concurrency,
-context isolation and collection immutability. Raven now uses this context for nominal
+context isolation and collection immutability. Raven uses this context for nominal
 resolution; its emission remains based on symbols. This host-only namespace is manually
 documented here and is not included in the guest RavenDoc reference assembly.
 
@@ -5714,7 +5714,7 @@ CLI projection fallback, runtime implementation change or performance claim is n
 
 ## Native nested case metadata (development, 2026-10-03)
 
-`AssemblyDefinition.ReadNativeAssembly` now retains supported nested class/value
+`AssemblyDefinition.ReadNativeAssembly` retains supported nested class/value
 ownership beneath nongeneric declaring types, including generic nested value cases.
 Local signature lookup keys include the declaring token; external TypeRef rows use
 nested TypeRef scopes. Same-named cases beneath different companions remain distinct.
@@ -5763,7 +5763,7 @@ artifact executes using the runtime's existing Byte storage and conversion imple
 ## Value interfaces and constrained calls (development, 2026-10-03)
 
 `TypeBuilder.AddInterfaceImplementation(TypeBuilder|GenericTypeInstance|ImportedTypeReference)`
-and `TypeDefinition.Interfaces.Add` now admit value-type owners as well as root classes.
+and `TypeDefinition.Interfaces.Add` admit value-type owners as well as root classes.
 Owned, constructed and registered external relationships retain their existing ownership,
 completeness, signature and duplicate validation. The native reader retains these edges;
 CLI emission writes ordinary InterfaceImpl rows and implementation method flags.
@@ -6031,7 +6031,7 @@ signature API. Missing/wrong bindings fail before returning an image.
 These are existing runtime primitive representations, not new union semantics or wire
 categories. An executable C# fixture checks concatenation, a nonmatching boxed Int32/Char
 test, rejected owner/result/module changes and continued rejection of nominal String import.
-Method-body validation failures now include the declaring method for actionable diagnostics.
+Method-body validation failures include the declaring method for actionable diagnostics.
 
 
 ## Parameter names and authored value references (development, 2026-10-03)
@@ -6072,7 +6072,7 @@ snapshots, invalid names/positions/array lengths, and symbol-authored nested gen
 constructors executed by the CLR. The native Raven union consumer additionally executes
 these references on neoCLR. No metadata version change is required.
 
-Development validation, 2026-10-03: authored value-interface edges now retain the
+Development validation, 2026-10-03: authored value-interface edges retain the
 relationships needed by imported source Option/Result carriers. Unboxed value-to-interface
 assignment remains rejected; boxing or constrained dispatch is still required. C# tests
 cover idempotent value edges, wrong target kinds and foreign ownership. The unchanged
@@ -6363,7 +6363,7 @@ var declarations = AssemblyDefinition.ReadNativeAssembly(image);
 
 C# tests prove legacy writer rejection, >4 MiB library read/projection/native reimport,
 owned snapshots, over-budget rejection and linked execution. The malformed-schema
-fixture now uses unsupported schema 4, because schema 3 is deliberately supported.
+fixture uses unsupported schema 4, because schema 3 is deliberately supported.
 131 metadata groups pass. The combined-source compiler gate separately proves a
 53-source native library, unchanged broad application and MemoryStream execution.
 No public guest Raven signature changed; the manual development reference covers these
@@ -6648,7 +6648,7 @@ output rejects these native calls. `PrimitiveRepresentationChecks` now also save
 created through this symbol-facts-only path.
 
 
-Native primitive definitions and authored member references now use canonical runtime
+Native primitive definitions and authored member references use canonical runtime
 member names, such as `System.Int32.CompareTo`, so seed-facing primitive calls retain
 their ABI spelling. The native reader accepts the preceding encoded member spelling
 as well and retains each artifact's actual callable/accessor names. This does not
@@ -6763,7 +6763,7 @@ valid/invalid arguments and canonical external symbol identity without a CLI pro
 ### Open constrained static calls (development, 2026-10-04)
 
 The independent metadata `IILGenerator`, returned by `MethodBuilder.GetILGenerator()`,
-now exposes these additional overloads:
+exposes these additional overloads:
 
 ```csharp
 void CallConstrained(SignatureType implementingType, MethodBuilder target);
@@ -6961,7 +6961,7 @@ grapheme methods. The caller supplies complete signature facts; runtime linking 
 them against the actual dependency. Native binding tables retain the external assembly
 scope, and introspection resolves it through the explicit metadata catalog.
 
-Raven source-owned Char provider selection now uses this designation. This API does not silently
+Raven source-owned Char provider selection uses this designation. This API does not silently
 reinterpret an ordinary .NET Char reference as a grapheme.
 
 The API contract test authors the type and a managed receiver method, round-trips its
@@ -7003,7 +7003,7 @@ C# namespace `NeoCLR.Metadata.Experimental.Introspection`:
 
 C# namespace `NeoCLR.Metadata.Experimental.Model`:
 
-- Existing `TypeDefinition.BaseType: TypeReference?` now retains those loaded native
+- Existing `TypeDefinition.BaseType: TypeReference?` retains those loaded native
   bases as owned definition references. `Resolve()` returns the original parent
   definition. Authored behavior is unchanged; loaded CLI base decoding remains pending.
 - `AssemblyDefinition.ReadNativeAssembly(ReadOnlySpan<byte>)` also accepts standalone
@@ -7066,7 +7066,7 @@ Runtime `metadata::Visibility::Protected` serializes as `protected` in the nativ
 method row. It is admitted only for instance `.ctor` methods with a declaring type.
 The verifier and interpreter allow calls from that type or its descendants, using
 resolved definition identities. Unrelated callers and ordinary protected methods,
-fields, module functions or types reject. The C# authoring API now exposes `MethodVisibility.Protected` for both
+fields, module functions or types reject. The C# authoring API exposes `MethodVisibility.Protected` for both
 `TypeBuilder.AddConstructor` overloads. Manual `MethodDefinition` declarations accept
 CLI access bits `Family` (4) only on instance `.ctor` declarations. Both paths share
 signature/owner checks; unsupported protected members throw `ArgumentException` before
@@ -7315,7 +7315,7 @@ with InvalidOperationException. Manual `TypeDefinition` attributes may use the s
 flag, and `Introspection.NominalTypeInfo.IsSealed` reports it. Deriving from a sealed
 local class rejects before writing. This is finality, distinct from a closed hierarchy.
 
-`SetNativePrimitive(PrimitiveType.Boolean)` now supports the canonical fieldless
+`SetNativePrimitive(PrimitiveType.Boolean)` supports the canonical fieldless
 `System.Boolean` value declaration. It follows numeric primitive validation and
 ldobj/stobj scalar storage; native import and introspection preserve NativePrimitive.
 A name alone does not claim ownership. Executable CLI writing of runtime-owned
@@ -7323,7 +7323,7 @@ primitive implementations still rejects; explicit host ownership selects the pro
 
 ## Authored type-row budget (development, 2026-10-05)
 
-AssemblyBuilder type authoring and manual ModuleDefinition.Types attachment now admit
+AssemblyBuilder type authoring and manual ModuleDefinition.Types attachment admit
 4,095 declarations instead of 256. This shares the existing CLI reader budget of 4,096
 TypeDef rows, reserving row one for `<Module>`. Native rows omit that synthetic row and
 admit the same 4,095 declarations. Nested and top-level declarations share the budget.
@@ -7472,7 +7472,7 @@ instructions from the API, in addition to the existing source-assembled runtime 
 ### Overrides of an authored Object root
 
 `TypeBuilder.AddOverride(name, signature)` and manually attached
-`MethodDefinition(name, 0x46, signature)` now support the selected local Object root.
+`MethodDefinition(name, 0x46, signature)` support the selected local Object root.
 Equals must take the exact `AssemblyBuilder.ObjectType`; a bootstrap or foreign root
 argument throws `InvalidOperationException` on attachment. The root itself cannot
 claim an override of its own slot. Signature selection is revalidated on write, so
@@ -7545,7 +7545,7 @@ fields suffice; no version change or implicit dependency loading is introduced.
 
 ### Raven host catalog boundary (development, 2026-10-05)
 
-Raven's separate compiler adapter now provides `NeoClrReferenceCatalog` to read an
+Raven's separate compiler adapter provides `NeoClrReferenceCatalog` to read an
 explicit primitive core, native PE references and optional retained runtime seed.
 This is a compiler-host API, not a member of the metadata library or guest System API.
 It shares immutable reference instances between semantic import and emission and owns
@@ -7826,7 +7826,7 @@ a new guest class-library API for the RavenDoc assembly snapshot.
 
 ### Ordinary selected-root method references (development, 2026-10-07)
 
-`CreateMethodReference` on the explicitly selected external Object root now uses the
+`CreateMethodReference` on the explicitly selected external Object root uses the
 same canonical native owner/member names as authored root definitions. This includes
 nonvirtual `GetType`; it remains an ordinary instance call. Only
 `CreateObjectSlotReference` claims virtual-slot dispatch. Exact artifact identity and
@@ -7916,7 +7916,7 @@ implementation. No performance or complete CLR-reflection compatibility claim is
 
 ## Self-owned native core emission (development, 2026-10-08)
 
-`AssemblyBuilder(identity, coreLibrary)` may now use the same identity for both when
+`AssemblyBuilder(identity, coreLibrary)` may use the same identity for both when
 emitting a native PE/#Neo reference container through the builder overloads of
 `RuntimeAssemblyContainer.WriteBinary` or `WriteLibraryBinary`. Author an explicit
 `AddNativeObjectRoot()` and the core declarations required by the projection:

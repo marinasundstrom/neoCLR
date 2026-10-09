@@ -7,7 +7,7 @@ does not claim they have already become structural types.
 
 ## Current representation
 
-**Development after Preview 11.** `System.Tuple<T1,...,TN>` is neoCLR's value-tuple
+`System.Tuple<T1,...,TN>` is neoCLR's value-tuple
 family, corresponding to .NET `System.ValueTuple`. One through seven components
 are available. These are structs with mutable public `Item1` through `ItemN` fields
 and a constructor taking each component in order.

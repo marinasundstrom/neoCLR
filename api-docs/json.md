@@ -3,11 +3,14 @@ title: JSON serialization
 ---
 # JSON serialization
 
-**Preview 11.** [JsonSerializer](xref:System.Data.Json.JsonSerializer)
-reads/writes the closed JsonValue DOM and has provisional flat-object overloads.
-It also maps nested nongeneric reference objects, typed arrays and root String/Int32/Boolean values.
-Rebuild consumers with the matching Preview 11 reference and library; JsonError has
-new mapping cases. All operations are synchronous and return Result with [JsonError](xref:System.Data.Json.JsonError).
+[JsonSerializer](xref:System.Data.Json.JsonSerializer) reads and writes JSON values
+and maps supported objects and arrays. Use JsonValue for a document tree, or the
+typed overloads for nongeneric reference objects, typed arrays and root String,
+Int32 or Boolean values.
+
+Operations are synchronous and return Result with
+[JsonError](xref:System.Data.Json.JsonError). The mapping rules and size limits
+below define the supported subset.
 
 Use the explicit Node methods for the DOM boundary:
 
@@ -37,9 +40,7 @@ runtime-backed public nongeneric reference class with a public parameterless
 constructor. The serializer invokes real constructors/getters/setters through
 [runtime reflection](reflection.md); it never writes backing fields directly.
 JsonValue inputs to the Object overload still use the DOM codec, including when
-held as Object. Prefer SerializeNode when explicitly working with nodes. The earlier
-DOM Deserialize/Serialize signatures have been renamed; migrate DOM callers and
-rebuild with matching references and library artifacts.
+held as Object. Prefer SerializeNode when explicitly working with nodes.
 
 ## Provisional property rules
 

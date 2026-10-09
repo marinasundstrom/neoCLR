@@ -1,6 +1,6 @@
 # Storage item interfaces
 
-**Preview 11.** [StorageItem](xref:System.Storage.StorageItem) has
+[StorageItem](xref:System.Storage.StorageItem) has
 two permitted interface branches: [File](xref:System.Storage.File) and
 [Directory](xref:System.Storage.Directory). Providers implement these branches;
 the common model does not require native files, handles or filesystem attributes.
@@ -11,8 +11,8 @@ establish access or stable identity. Callers depend on the interfaces rather tha
 constructing File or Directory themselves.
 Provider methods return the interfaces, even when they instantiate concrete classes
 internally. StorageProvider.GetFile returns Result<File, StorageLookupError> and
-GetDirectory returns Result<Directory, StorageLookupError>. The product sample now
-obtains its root through GetDirectory; consumer functions accept Directory.
+GetDirectory returns Result<Directory, StorageLookupError>. The sample obtains its
+root through GetDirectory; consumer functions accept Directory.
 Generic item lookup and enumeration must preserve the same boundary.
 
 The Raven compiler and strict CIL importer enforce the closed root. Providers may
@@ -44,12 +44,11 @@ Directory implementation handles `/` and `.` prefixes without doubling separator
 `.` lookup normally returns WrongKind. String traversal accepts one child name.
 The memory fixture uses flat keys and does not model a full directory hierarchy.
 
-StorageProvider now resolves GetItem/GetFile/GetDirectory. GetItem returns the
-common StorageItem interface. The former StorageLookup split is removed; byte
-opening belongs to File implementations. Relative Directory.GetDirectory/GetItem and bounded GetItems are now implemented.
+StorageProvider resolves GetItem/GetFile/GetDirectory. GetItem returns the
+common StorageItem interface; byte opening belongs to File implementations.
+Relative Directory.GetDirectory/GetItem and bounded GetItems are implemented.
 FileSystem supplies the host-backed implementation.
-Creation/address factories will be aligned with resolved storage objects in that
-work; FileAt/CreateNew should not be treated as the final creation model. Async
+FileAt/CreateNew remains a provisional creation model. Async
 interaction needs scheduling and cancellation contracts before claiming nonblocking I/O.
 
 ## Additional information
@@ -60,18 +59,13 @@ capabilities and extensible queries remain alternatives. Availability, absent
 values, failures and freshness need explicit contracts. No general attribute-query
 API is implemented yet.
 
-## Development migration
+<a id="development-migration"></a>
 
-- StorageLookup is removed; StorageProvider now requires GetItem/GetFile/GetDirectory
-  instead of OpenRead/CreateNew. Byte routing is an implementation detail.
-- File and Directory are interfaces; providers supply concrete implementations.
-  The sample's former descriptor logic is now ProviderFile/ProviderDirectory.
-- Native static text callers use `System.Storage.FileText.ReadAllText/WriteAllText`
-  instead of the former static methods on File. The interface runtime does not
-  currently admit static methods. The legacy raw runtime profile retains the old
-  File helper aliases for existing artifacts; the development Raven profile uses FileText.
-- Existing stream, Path and typed-error behavior is unchanged. Use matching
-  regenerated core/runtime artifacts; Use matching Preview 11 artifacts.
+## Choosing the storage API
+
+Use StorageProvider to look up an item, then use File or Directory for operations
+on it. Providers supply the concrete implementations. For direct whole-file text
+operations on a host path, use System.Storage.FileText rather than a provider.
 
 ## Static native text helpers
 
