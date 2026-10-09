@@ -34,7 +34,7 @@ var markerCtor = core.AddClass("System.Runtime.CompilerServices", "ReferenceAsse
 markerCtor.GetILGenerator().LoadArgument(0);
 markerCtor.GetILGenerator().Call(attributeCtor);
 markerCtor.GetILGenerator().Return();
-foreach (var primitive in new[] { PrimitiveType.Int32, PrimitiveType.Int64, PrimitiveType.Double, PrimitiveType.Boolean, PrimitiveType.Void })
+foreach (var primitive in new[] { PrimitiveType.Byte, PrimitiveType.Int32, PrimitiveType.Int64, PrimitiveType.Double, PrimitiveType.Boolean, PrimitiveType.Void })
     core.AddValueType("System", primitive.ToString()).SetNativePrimitive(primitive);
 core.AddClass("System", "String", root).SetNativePrimitive(PrimitiveType.String);
 var bytes = RuntimeAssemblyContainer.WriteLibraryBinary(core);
@@ -60,7 +60,7 @@ if (errors.Length != 0)
     foreach (var error in errors) Console.Error.WriteLine(error);
     return 2;
 }
-foreach (var type in new[] { SpecialType.System_Int32, SpecialType.System_Boolean, SpecialType.System_Object })
+foreach (var type in new[] { SpecialType.System_Byte, SpecialType.System_Int32, SpecialType.System_Boolean, SpecialType.System_Object, SpecialType.System_ValueType })
 {
     var symbol = compilation.GetSpecialType(type);
     if (symbol.TypeKind == TypeKind.Error || symbol.SpecialType != type || symbol.ContainingAssembly.Name != identity.Name)

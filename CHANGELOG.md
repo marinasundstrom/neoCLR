@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Qualify native-only copied-struct execution after Raven's core ValueType identity
+  correction. Extend the minimal core fixture with Byte and retain the unchanged
+  production Option/Result frontier: missing String.Concat now reports a compiler
+  diagnostic without publishing output. Real native String/core completeness and
+  the general diagnostic repair's independent Raven-main port remain open.
+
 - Qualify Raven's native-only project core selection through a module consumer,
   project build/run and interpreter/ARM64 native parity. Reject mixed bridge/core
   configuration without replacing published output. The shared project provider

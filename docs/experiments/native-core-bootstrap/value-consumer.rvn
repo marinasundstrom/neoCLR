@@ -1,0 +1,21 @@
+module Example.Values
+
+struct Counter {
+    var Value: int = 0
+
+    func Add(value: int) -> int {
+        Value += value
+        return Value
+    }
+}
+
+func Main() -> int {
+    var original = Counter()
+    original.Add(40)
+    var copy = original
+    copy.Add(2)
+    if original.Value != 40 {
+        return 1
+    }
+    return copy.Value
+}

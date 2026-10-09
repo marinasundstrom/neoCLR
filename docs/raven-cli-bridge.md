@@ -7149,3 +7149,18 @@ The old bridge-backed project path remains for the incomplete production core.
 Bootstrap ownership/intrinsic/source-root/object-library/async-library switches
 cannot combine with this bounded native-only mode. Installed editor acceptance
 and complete library replacement remain open. See the [project evidence and checks](experiments/native-core-bootstrap/README.md#native-only-project-qualification-2026-10-09).
+
+## Native core values and union frontier (2026-10-09)
+
+Raven now classifies the selected native semantic core's nominal System.ValueType
+as the special base used for value declarations. Same-named non-core types retain
+ordinary identity. No primitive marker, host fallback or CLI bridge is added.
+A copied/mutated struct passes project/interpreter/ARM64 native checks without CLI
+semantic references.
+
+Unchanged production Option/Result now reaches missing native String.Concat support,
+reported as RAV1501 without publication instead of crashing during synthesized
+formatting. The shared diagnostic repair passes ordinary .NET checks on the Raven
+integration branch; porting it to main's differing emitter boundary is an explicitly
+deferred general candidate, not an intended neoCLR-only feature.
+See [source/evidence/limits](experiments/native-core-bootstrap/README.md#value-type-foundation-and-production-union-frontier-2026-10-09).

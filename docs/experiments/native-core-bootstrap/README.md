@@ -52,7 +52,7 @@ Raven commit `10dce0c3b` adds the explicit compiler API mode
 `MetadataImportOptions.WithNativeMetadata()`, which now
 bypasses that session. The current fixture uses its own `NativeCore` identity,
 explicit unit/Object contracts and native semantic references only. It includes
-Int32, Int64, Boolean, Void and String plus minimal Object slots and attribute support.
+Byte, Int32, Int64, Double, Boolean, Void and String plus minimal Object slots and attribute support.
 These are test fixtures; constant hash/display/Equals bodies are not production Object
 behavior. `consumer.rvn` exercises a static call into a separate native library,
 integer arithmetic and return. No fixture
@@ -133,3 +133,33 @@ runtime paths and nine invalid configurations. Existing bridge-backed project
 controls also pass. This is a compiler-target prerequisite, not full core/library,
 editor packaging or release qualification. No new IL semantics or performance
 claim is introduced. The native catalog research and alternatives above still apply.
+
+## Value-type foundation and production union frontier (2026-10-09)
+
+Native semantic loading now recognizes the selected core's System.ValueType as the
+special value-type base. The previous nominal symbol existed but had SpecialType.None,
+causing the portable type planner to reject ordinary structs and union carriers.
+A same-named non-core type remains ordinary; no host fallback is introduced.
+
+Pass `--driver /path/to/rvnc.dll --project --value-types` to verify.py. The
+[value consumer](value-consumer.rvn) mutates a struct, copies it, mutates the copy
+and checks the original stays 40 before returning 42. Project run, independent
+interpreter and ARM64 native execution agree, with libSystem-only native linkage.
+The fixture now includes Byte storage for union tags. This still has deliberately
+minimal Object/String behavior, not production System.Runtime implementations.
+
+The verifier also compiles unchanged production Propagatable, Option, Result and
+UnionAttribute sources. Initial attempts rejected the value-type contract, then the
+missing Byte tag, then crashed while synthesizing String.Concat. They now report
+RAV1501 and publish no union library. The shared compiler fix also passes 14 focused
+ordinary .NET interpolation/union checks, including missing-member rejection and
+normal formatting. [Value/frontier evidence](value-foundation-validation.json)
+contains source hashes, commands and diagnostic output.
+
+This follows CLR's nominal ValueType classification and explicit runtime-member
+requirements, reusing the native core/CLI comparisons above. It changes compiler
+classification and failure reporting, not IL execution semantics or performance.
+Next provide real native String/core member contracts and return to these production
+sources; do not substitute constant formatting to turn the fixture green.
+The general missing-Concat repair is a main-line candidate: its helper/tests match
+main, but its emitter-boundary port still needs independent validation on main.

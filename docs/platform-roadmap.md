@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Native core value prerequisite (2026-10-09):** selected native System.ValueType
+classification now admits ordinary value declarations, with copied/mutated struct
+parity in project run, interpreter and ARM64 native execution. Unchanged production
+Option/Result advances to missing native String.Concat support and fails diagnostically
+without publication. [Evidence and next work](experiments/native-core-bootstrap/README.md#value-type-foundation-and-production-union-frontier-2026-10-09).
+Full core bootstrap remains open; implement real string/core contracts next.
+
+
 **Release bootstrap prerequisite (2026-10-09):** Raven project mode now accepts
 native-only core metadata through RavenNeoClrNativeCoreReference. A module consumer
 passes project build/run, interpreter and ARM64 native execution with no CLI semantic

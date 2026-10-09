@@ -17,9 +17,12 @@ def main():
         parser.add_argument('--' + name, required=True, type=Path)
     parser.add_argument('--driver', type=Path, help='Optional native-enabled rvnc.dll; compile through the driver too.')
     parser.add_argument('--project', action='store_true', help='Validate native-only project selection; requires --driver.')
+    parser.add_argument('--value-types', action='store_true', help='With --project, check copied values and the production union core frontier.')
     args = parser.parse_args()
     if args.project and not args.driver:
         parser.error('--project requires --driver')
+    if args.value_types and not args.project:
+        parser.error('--value-types requires --project')
     output = args.output.resolve()
     if output.exists():
         raise FileExistsError(output)
@@ -68,7 +71,8 @@ def main():
     if args.project:
         directory = artifacts / 'project'
         directory.mkdir()
-        (directory / 'Main.rvn').write_text('module Example.App\n' + (HERE / 'consumer.rvn').read_text())
+        (directory / 'Main.rvn').write_text((HERE / 'value-consumer.rvn').read_text() if args.value_types
+            else 'module Example.App\n' + (HERE / 'consumer.rvn').read_text())
         project = directory / 'App.rvnproj'
         root = ET.Element('Project', Sdk='Microsoft.NET.Sdk')
         group = ET.SubElement(root, 'PropertyGroup')
@@ -97,6 +101,17 @@ def main():
         group.remove(invalid)
         ET.ElementTree(root).write(project, encoding='unicode')
         report['project'] = {'nativeOnly': True, 'runExit': 42, 'mixedSelectionPreservedOutput': True}
+    production_sources = []
+    if args.value_types:
+        production_sources = [ROOT / 'runtime/raven/src/System' / name for name in (
+            'Propagatable.rvn', 'Option.rvn', 'Result.rvn', 'Runtime/CompilerServices/UnionAttribute.rvn')]
+        rejected = artifacts / 'ProductionUnions.dll'
+        diagnostic = run(['dotnet', args.driver.resolve(), 'neoclr', '--native-core-reference', core,
+            '--library', '-o', rejected, *production_sources], expected=1, include_stderr=True)
+        if 'RAV1501' not in diagnostic or 'String.Concat' not in diagnostic or rejected.exists():
+            raise AssertionError('Union core frontier did not reject cleanly before publication: ' + diagnostic)
+        report['productionUnionFrontier'] = {'diagnostic': diagnostic.strip(),
+            'outputPublished': False, 'sourcesUnchanged': True}
     dependencies = ['--module', core, '--module', library, '--system', seed, '--object-root', core]
     interpreted = run([runtime, 'run', consumer, *dependencies, '--show-result'], expected=42, include_stderr=True)
     if interpreted.strip() != '=> Int32(42)':
@@ -116,7 +131,7 @@ def main():
                            for name, path in [('neoclr', ROOT), ('raven', args.raven)]}
     inputs = [runtime, aot, *[p for p in HERE.iterdir() if p.suffix in ('.cs', '.csproj', '.rvn', '.neoil', '.c', '.py')]]
     inputs += list((HERE / 'bin/Debug/net10.0').glob('*.dll'))
-    inputs += [core, library, consumer, seed, artifacts / 'consumer']
+    inputs += [core, library, consumer, seed, artifacts / 'consumer', *production_sources]
     if args.driver:
         inputs += list(args.driver.resolve().parent.glob('*.dll'))
     if args.project:

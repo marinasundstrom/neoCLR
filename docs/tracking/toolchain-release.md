@@ -15,6 +15,13 @@ Native-only project-provider checks reject nine invalid configurations; legacy
 bridge-backed project controls still pass. The shared provider watches the native
 core, but this is not installed VS Code qualification.
 
+A follow-up corrects native core ValueType classification and verifies copied-struct
+execution. Unchanged production Option/Result now identifies missing String.Concat
+as a clean compiler diagnostic; no union library is published.
+[Frontier evidence](../experiments/native-core-bootstrap/value-foundation-validation.json)
+keeps the real source failure visible. The shared diagnostic repair is a deferred
+main-line candidate pending independent emitter-boundary validation.
+
 Release remains gated on complete production source-runtime bootstrap without the
 CLI semantic bridge, matching SDK/editor/native artifacts and extracted-package
 acceptance. Next qualify core completeness with production sources; do not expand
