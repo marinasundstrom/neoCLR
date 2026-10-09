@@ -1,0 +1,72 @@
+namespace System.Collections
+
+import System.*
+import System.Option.*
+
+/// Unsynchronized array-backed LIFO stack. Iteration captures a shallow snapshot.
+public class ArrayStack<T> : Stack<T> {
+    private var slots: ArrayList<Option<T>> = ArrayList<Option<T>>()
+    private var count = 0
+
+    init() { }
+
+    init(capacity: int) {
+        if capacity < 0 {
+            System.Fail("Collection capacity must be non-negative")
+        }
+        slots = ArrayList<Option<T>>(capacity)
+    }
+
+    /// Number of allocated element slots.
+    val Capacity: int => slots.Capacity
+
+    val Count: int => count
+
+    func Push(value: T) {
+        if count == slots.Count {
+            slots.Add(Some(value))
+        } else {
+            slots[count] = Some(value)
+        }
+        count = count + 1
+    }
+
+    func Peek() -> Option<T> {
+        if count == 0 {
+            return None
+        }
+        return slots[count - 1]
+    }
+
+    func Pop() -> Option<T> {
+        if count == 0 {
+            return None
+        }
+        count = count - 1
+        let result = slots[count]
+        slots[count] = None
+        return result
+    }
+
+    func Clear() {
+        while count != 0 {
+            Pop()
+        }
+    }
+
+    /// Iterates a shallow snapshot in removal order.
+    func GetIterator() -> Iterator<T> {
+        let snapshot = ArrayList<T>(count)
+        var index = 0
+        while index < count {
+            let position = count - index - 1
+            if slots[position] is Some(let value) {
+                snapshot.Add(value)
+            } else {
+                System.Fail("Collection storage invariant violated")
+            }
+            index = index + 1
+        }
+        return snapshot.GetIterator()
+    }
+}

@@ -13152,3 +13152,17 @@ claim follows from these focused checks.
   matching output; the .NET baseline passes corresponding membership cases.
   [Evidence](experiments/sets/storage-validation.json). Windows, GC reclamation and
   hostile callbacks remain unqualified.
+
+## 2026-10-10 — Iterable Map and completing basic collections
+
+- **Author:** requests Map support for Iterable<KeyValuePair>, with KeyValuePair a
+  deconstructable record struct. Then directs continued collection work until a
+  basic set of interfaces/implementations exists, considering concurrent variants.
+- **Assistant action:** adds public Queue/Stack/Set contracts and array/hash library
+  implementations; separates concurrency guarantees from basic operation results.
+  HashSet removal now unlinks chains and reuses slots. Native macOS/interpreter
+  functional tests and interpreter queue GC release pass; API snapshots are updated.
+- **Open dependency:** exact generic record-struct source fails native emission with
+  NEOMETA001. Preserve the requested value-pair contract while addressing compiler
+  declaration/synthesized-member support. No iterable Map or concurrent collection
+  completion is claimed. Windows collections qualification is pending.

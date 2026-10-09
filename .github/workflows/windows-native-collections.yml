@@ -1,0 +1,77 @@
+name: Windows native collections
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'src/**'
+      - 'Cargo.*'
+      - 'tools/aot-poc/**'
+      - 'tools/aot-native-text/**'
+      - 'tools/native/windows-*'
+      - 'docs/experiments/aot-console/**'
+      - 'docs/experiments/aot-fault-details/**'
+      - 'samples/native-windows/**'
+      - 'runtime/raven/**'
+      - 'scripts/prepare-native-development-bundle.py'
+      - 'scripts/prepare-native-bootstrap.py'
+      - 'scripts/build-native-class-library.py'
+      - 'scripts/build-native-project.py'
+      - 'scripts/validate-windows-project.py'
+      - '.github/workflows/windows-native-collections.yml'
+      - 'scripts/validate-native-collections.py'
+      - 'docs/experiments/native-collections/**'
+      - 'scripts/validate-native-http-project.py'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'Cargo.*'
+      - 'tools/aot-poc/**'
+      - 'tools/aot-native-text/**'
+      - 'tools/native/windows-*'
+      - 'docs/experiments/aot-console/**'
+      - 'docs/experiments/aot-fault-details/**'
+      - 'samples/native-windows/**'
+      - 'runtime/raven/**'
+      - 'scripts/prepare-native-development-bundle.py'
+      - 'scripts/prepare-native-bootstrap.py'
+      - 'scripts/build-native-class-library.py'
+      - 'scripts/build-native-project.py'
+      - 'scripts/validate-windows-project.py'
+      - '.github/workflows/windows-native-collections.yml'
+      - 'scripts/validate-native-collections.py'
+      - 'docs/experiments/native-collections/**'
+      - 'scripts/validate-native-http-project.py'
+permissions:
+  contents: read
+jobs:
+  collections-project:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            11.0.100-rc.1.26425.128
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build and execute standalone Raven projects
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw 'MSVC x64 tools not found' }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-collections.py --output target/windows-native-collections-validation"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-native-collections-${{ github.run_id }}-${{ github.run_attempt }}
+          path: target/windows-native-collections-validation/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: warn

@@ -1,0 +1,13 @@
+namespace System.Collections
+
+/// A mutable LIFO collection. Thread safety is an implementation contract.
+public interface Stack<T> : Collection<T> {
+    /// Adds an element.
+    func Push(value: T)
+    /// Removes an element, or returns None when empty.
+    func Pop() -> System.Option<T>
+    /// Observes the next element without removing it, or returns None.
+    func Peek() -> System.Option<T>
+    /// Removes all elements.
+    func Clear()
+}

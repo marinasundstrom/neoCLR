@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add development Queue/ArrayQueue, Stack/ArrayStack and Set/MutableSet/HashSet
+  library APIs with Option removal/peek, explicit set equality, bucket-chain removal,
+  freed-slot reuse and shallow snapshot iteration. Refresh type/member references
+  and native API snapshot. Native macOS/interpreter consumer and interpreter queue
+  element-release checks pass; add a dedicated Windows action. Current implementations
+  are unsynchronized; future concurrency guarantees remain implementation-specific.
+  Record requested iterable Map with deconstructable record-struct pairs; native
+  record emission remains a dependency and is not claimed complete.
+
 - Add sets to the author-selected collection work and implement an application-local
   set prototype with read/mutation interfaces, explicit equality comparers, duplicate
   suppression, membership, removal and clearing. Removal rebuilds the map for now;

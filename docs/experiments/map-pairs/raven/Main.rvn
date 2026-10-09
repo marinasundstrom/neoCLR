@@ -1,0 +1,15 @@
+import System.*
+
+record struct KeyValuePair<K, V>(val Key: K, val Value: V)
+
+class Program {
+    static func Main() -> int {
+        let pair = KeyValuePair<string, int>("answer", 42)
+        let (key, value) = pair
+        if key != "answer" || value != 42 {
+            return 1
+        }
+        Console.WriteLine("map pair passed")
+        return 0
+    }
+}

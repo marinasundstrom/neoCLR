@@ -1454,3 +1454,12 @@ the JSON guide describe kind validation, JsonNull, Object non-inference and shar
 document limits. The matching bridge reference was regenerated (no public signature
 change), checked, and the native rendered snapshot refreshed from the rebuilt
 libraries with RavenDoc 6c90bf2c. No new API is excluded.
+
+### Basic collections (development, 2026-10-10)
+
+Queue/ArrayQueue, Stack/ArrayStack and Set/MutableSet/HashSet are selected in the
+reference with member XML and a matching native snapshot. Removal/peek Option
+results, bool membership-change results, explicit comparers, snapshot iteration and
+unsynchronized behavior are documented. No public type is excluded for this slice.
+Map pair iteration is requested but remains pending native record-struct support;
+it is not represented as implemented in the reference.

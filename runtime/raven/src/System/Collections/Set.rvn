@@ -1,0 +1,7 @@
+namespace System.Collections
+
+/// A collection of distinct elements under its implementation's equality policy.
+public interface Set<T> : Collection<T> {
+    /// Reports membership. No iteration order or immutability is implied.
+    func Contains(value: T) -> bool
+}

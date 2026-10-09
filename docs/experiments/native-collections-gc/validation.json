@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "mode": "interpreter",
+  "exitCode": 0,
+  "stdout": "collection GC passed\n",
+  "stderr": "",
+  "sourceSha256": "67f8aedde1f2229188d0d7c0261e40e02084194722e5099540b30de0745553b5",
+  "assemblySha256": "616fb221ed0311379876e4a5e0f13b2f759c6c776d13c44f8d154f6552d37d90"
+}

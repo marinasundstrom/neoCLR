@@ -1,0 +1,76 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "revision": "6c25135558655f45dded4bbff5f438dfb818bcbc",
+  "bundleManifestSha256": "0b68d2686661531e97e73a9b1b902b99c921626d6edcc213bdc11d02d3ac40a0",
+  "aotSha256": "50a1f5b6da12c6480864a738039fc899f3dff0c383685b22c564575c0d75c087",
+  "interpreterSha256": "16060f22b9caaef312c754bb571ba705ccd3092c4620b84d95c95b822351777d",
+  "cases": [
+    {
+      "name": "collections",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/native-collections-qualified/collections executable only/app"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/release/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/native-collections-qualified/collections native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/collections-library-typed/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/collections-library-typed/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/collections-library-typed/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/collections-library-typed/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/collections-library-typed/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/collections-library-typed/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "date": "2026-10-10",
+  "reportSha256": "78fcc21da98799b4206be28bbf8ffc5f179a42ad15c40ea5674c93a90bcec768",
+  "note": "The validator success label was corrected after this run; executable fixture and library sources are unchanged.",
+  "sourceSha256": {
+    "runtime/raven/src/System/Collections/ArrayList.rvn": "74262ea7362de107ebc583e6887578f3fa69ecef905da52a8c0a9d718b535dd4",
+    "runtime/raven/src/System/Collections/ArrayQueue.rvn": "1616f857f1d70dfef5f1849889cced16e82913789a2b4b6e8bc4080ee8b62f48",
+    "runtime/raven/src/System/Collections/ArrayStack.rvn": "d1749182ed8532a2a429bc406c53c92c3c1285fa14903c4d7f86aed069a3e527",
+    "runtime/raven/src/System/Collections/Collection.rvn": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db",
+    "runtime/raven/src/System/Collections/Comparer.rvn": "bea7287fddab87ad0716aab38e82eb9837a03c121d6dd4fde96ab2f87c793592",
+    "runtime/raven/src/System/Collections/EqualityComparer.rvn": "820c9ab4936879f8f60a4882c3ea0bd266c3de4f562c8f61c49b8aac9801258b",
+    "runtime/raven/src/System/Collections/FunctionComparer.rvn": "94baeb9bb46d745819df394c2a8e73a7cb82361fa2d81e4709eab51aac7f96d0",
+    "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn": "3f98957438834dcbac9d23eaea41927ff52d74f358edfc4fcb33490d0f3a15ff",
+    "runtime/raven/src/System/Collections/HashMap.rvn": "6018bde81a80d1e742bed28442ed499f843a3aaf177ae5103c0dfdc3a3b2486c",
+    "runtime/raven/src/System/Collections/HashSet.rvn": "ccf3a00affb601cef57f0e5782b24c666615ac682ab4d70696bf690e8cfe015f",
+    "runtime/raven/src/System/Collections/Iterable.rvn": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06",
+    "runtime/raven/src/System/Collections/Iterator.rvn": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14",
+    "runtime/raven/src/System/Collections/List.rvn": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2",
+    "runtime/raven/src/System/Collections/Map.rvn": "2e62350aec516e1f74eed496ec08375fe367af09655bd42397680b275636640d",
+    "runtime/raven/src/System/Collections/MutableMap.rvn": "109b64c49882b813d5c532e6cf7ccc06cb907d38cb5eb6e3ffdfaf2ca72af627",
+    "runtime/raven/src/System/Collections/MutableSequence.rvn": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8",
+    "runtime/raven/src/System/Collections/MutableSet.rvn": "badbc5255b6dbafcd3faa53156099d6a12fc4d36b059af73196757dc8cd0f816",
+    "runtime/raven/src/System/Collections/Queue.rvn": "615c34685ce30ff6407f20fe5dff69b8322c7b6b0fe7907dae5a286073b2b115",
+    "runtime/raven/src/System/Collections/Sequence.rvn": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a",
+    "runtime/raven/src/System/Collections/Set.rvn": "9bb798f29e16201c52ff0304f6aeb1b3cb258ebd69e0cfbbfed57b41d35a8618",
+    "runtime/raven/src/System/Collections/Stack.rvn": "735d30033b6694349276c2d8db9f5befa81f2e8909d7f5f8ded2b1941ae11ace"
+  }
+}

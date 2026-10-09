@@ -1,0 +1,105 @@
+namespace System.Collections
+
+import System.*
+import System.Option.*
+
+/// Unsynchronized array-backed FIFO queue. Iteration captures a shallow snapshot.
+public class ArrayQueue<T> : Queue<T> {
+    private var slots: ArrayList<Option<T>> = ArrayList<Option<T>>()
+    private var head = 0
+    private var count = 0
+
+    init() { }
+
+    init(capacity: int) {
+        if capacity < 0 {
+            System.Fail("Collection capacity must be non-negative")
+        }
+        slots = ArrayList<Option<T>>(capacity)
+        var index = 0
+        while index < capacity {
+            slots.Add(None)
+            index = index + 1
+        }
+    }
+
+    /// Number of allocated element slots.
+    val Capacity: int => slots.Count
+
+    val Count: int => count
+
+    private func Position(offset: int) -> int {
+        let remaining = slots.Count - head
+        if offset >= remaining {
+            return offset - remaining
+        }
+        return head + offset
+    }
+
+    func Enqueue(value: T) {
+        if count == slots.Count {
+            let capacity = slots.Count
+            if capacity > 1073741823 {
+                System.Fail("Queue capacity overflow")
+            }
+            var size = 4
+            if capacity != 0 {
+                size = capacity * 2
+            }
+            let expanded = ArrayList<Option<T>>(size)
+            var index = 0
+            while index < count {
+                expanded.Add(slots[Position(index)])
+                index = index + 1
+            }
+            while index < size {
+                expanded.Add(None)
+                index = index + 1
+            }
+            slots = expanded
+            head = 0
+        }
+        slots[Position(count)] = Some(value)
+        count = count + 1
+    }
+
+    func Peek() -> Option<T> {
+        if count == 0 {
+            return None
+        }
+        return slots[head]
+    }
+
+    func Dequeue() -> Option<T> {
+        if count == 0 {
+            return None
+        }
+        let result = slots[head]
+        slots[head] = None
+        head = (head + 1) % slots.Count
+        count = count - 1
+        return result
+    }
+
+    func Clear() {
+        while count != 0 {
+            Dequeue()
+        }
+    }
+
+    /// Iterates a shallow snapshot in removal order.
+    func GetIterator() -> Iterator<T> {
+        let snapshot = ArrayList<T>(count)
+        var index = 0
+        while index < count {
+            let position = Position(index)
+            if slots[position] is Some(let value) {
+                snapshot.Add(value)
+            } else {
+                System.Fail("Collection storage invariant violated")
+            }
+            index = index + 1
+        }
+        return snapshot.GetIterator()
+    }
+}

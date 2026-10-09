@@ -1,0 +1,43 @@
+import System.*
+import System.Collections.*
+
+class Item { }
+
+class Program {
+    static func Main() -> int {
+        if !CheckQueueRelease() {
+            return 1
+        }
+        Console.WriteLine("collection GC passed")
+        return 0
+    }
+
+    static func FillQueue(queue: Queue<Item>) {
+        var index = 0
+        while index < 8 {
+            queue.Enqueue(Item())
+            index = index + 1
+        }
+    }
+
+    static func DrainQueue(queue: Queue<Item>) {
+        while queue.Count != 0 {
+            queue.Dequeue()
+        }
+    }
+
+    static func CheckQueueRelease() -> bool {
+        let queue = ArrayQueue<Item>(8)
+        System.Runtime.GC.Collect()
+        let baseline = System.Runtime.GC.HeapObjectCount
+        FillQueue(queue)
+        System.Runtime.GC.Collect()
+        let populated = System.Runtime.GC.HeapObjectCount
+        DrainQueue(queue)
+        System.Runtime.GC.Collect()
+        let released = System.Runtime.GC.HeapObjectCount
+        System.Runtime.GC.KeepAlive(queue)
+        return populated >= baseline + 8 && released <= baseline
+    }
+
+}

@@ -1,0 +1,167 @@
+namespace System.Collections
+
+import System.*
+import System.Option.*
+
+/// An unsynchronized hash set with an explicit equality policy and snapshot iteration.
+public class HashSet<T> : MutableSet<T> {
+    // Explicit storage for constructor assignment with the current compiler bridge.
+    private field comparer: EqualityComparer<T>
+    private var buckets: int[] = [0, 0, 0, 0]
+    private var items: ArrayList<Option<T>> = ArrayList<Option<T>>()
+    private var hashes: ArrayList<int> = ArrayList<int>()
+    private var next: ArrayList<int> = ArrayList<int>()
+    private var free = -1
+    private var count = 0
+    private var busy = false
+
+    init(comparer: EqualityComparer<T>) {
+        self.comparer = comparer
+    }
+
+    val Count: int => count
+
+    private func Enter() {
+        if busy {
+            System.Fail("HashSet callbacks must not reenter the set")
+        }
+        busy = true
+    }
+
+    private func Leave() {
+        busy = false
+    }
+
+    private func Hash(value: T) -> int => comparer.GetHashCode(value) & 2147483647
+
+    private func Locate(value: T, hash: int) -> int {
+        var node = buckets[hash % buckets.Length]
+        while node != 0 {
+            let index = node - 1
+            if hashes[index] == hash {
+                if items[index] is Some(let stored) {
+                    if comparer.Equals(stored, value) {
+                        return index
+                    }
+                }
+            }
+            node = next[index]
+        }
+        return -1
+    }
+
+    func Contains(value: T) -> bool {
+        Enter()
+        let found = Locate(value, Hash(value)) >= 0
+        Leave()
+        return found
+    }
+
+    private func Grow() {
+        if count < buckets.Length {
+            return
+        }
+        if buckets.Length > 1073741823 {
+            System.Fail("HashSet capacity overflow")
+        }
+        let expanded = System.Runtime.CompilerServices.CheckedStorage.Reserve<int>(buckets.Length * 2)
+        var index = 0
+        while index < expanded.Length {
+            expanded[index] = 0
+            index = index + 1
+        }
+        index = 0
+        while index < items.Count {
+            if items[index] is Some(_) {
+                let bucket = hashes[index] % expanded.Length
+                next[index] = expanded[bucket]
+                expanded[bucket] = index + 1
+            }
+            index = index + 1
+        }
+        buckets = expanded
+    }
+
+    func Add(value: T) -> bool {
+        Enter()
+        let hash = Hash(value)
+        if Locate(value, hash) >= 0 {
+            Leave()
+            return false
+        }
+        Grow()
+        let bucket = hash % buckets.Length
+        var index = free
+        if index >= 0 {
+            free = next[index]
+            items[index] = Some(value)
+            hashes[index] = hash
+            next[index] = buckets[bucket]
+        } else {
+            index = items.Count
+            items.Add(Some(value))
+            hashes.Add(hash)
+            next.Add(buckets[bucket])
+        }
+        buckets[bucket] = index + 1
+        count = count + 1
+        Leave()
+        return true
+    }
+
+    func Remove(value: T) -> bool {
+        Enter()
+        let hash = Hash(value)
+        let bucket = hash % buckets.Length
+        var node = buckets[bucket]
+        var previous = -1
+        while node != 0 {
+            let index = node - 1
+            if hashes[index] == hash {
+                if items[index] is Some(let stored) {
+                    if comparer.Equals(stored, value) {
+                        if previous < 0 {
+                            buckets[bucket] = next[index]
+                        } else {
+                            next[previous] = next[index]
+                        }
+                        items[index] = None
+                        next[index] = free
+                        free = index
+                        count = count - 1
+                        Leave()
+                        return true
+                    }
+                }
+            }
+            previous = index
+            node = next[index]
+        }
+        Leave()
+        return false
+    }
+
+    func Clear() {
+        Enter()
+        buckets = [0, 0, 0, 0]
+        items = ArrayList<Option<T>>()
+        hashes = ArrayList<int>()
+        next = ArrayList<int>()
+        free = -1
+        count = 0
+        Leave()
+    }
+
+    /// Captures a shallow snapshot; the iteration order is unspecified.
+    func GetIterator() -> Iterator<T> {
+        Enter()
+        let snapshot = ArrayList<T>(count)
+        for item in items {
+            if item is Some(let value) {
+                snapshot.Add(value)
+            }
+        }
+        Leave()
+        return snapshot.GetIterator()
+    }
+}

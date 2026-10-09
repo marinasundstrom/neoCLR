@@ -1,0 +1,188 @@
+import System.*
+import System.Collections.*
+import System.Option.*
+
+class Item {
+    var Value: int { get; set; } = 7
+}
+
+class Program {
+    static func Main() -> int {
+        let queue = ArrayQueue<int>()
+        if queue.Dequeue() is Some(_) {
+            return 1
+        }
+        var index = 0
+        while index < 4 {
+            queue.Enqueue(index)
+            index = index + 1
+        }
+        if queue.Dequeue() is not Some(0) {
+            return 2
+        }
+        if queue.Dequeue() is not Some(1) {
+            return 3
+        }
+        while index < 12 {
+            queue.Enqueue(index)
+            index = index + 1
+        }
+        if queue.Peek() is not Some(2) || queue.Count != 10 {
+            return 4
+        }
+        index = 2
+        while index < 12 {
+            if queue.Dequeue() is Some(let value) {
+                if value != index {
+                    return 5
+                }
+            } else {
+                return 6
+            }
+            index = index + 1
+        }
+        if queue.Count != 0 {
+            return 7
+        }
+        let items = ArrayQueue<Item>()
+        let item = Item()
+        items.Enqueue(item)
+        if items.Dequeue() is Some(let alias) {
+            alias.Value = 8
+        } else {
+            return 8
+        }
+        if item.Value != 8 || items.Count != 0 {
+            return 9
+        }
+        items.Enqueue(item)
+        items.Clear()
+        if items.Count != 0 || items.Count != 0 {
+            return 10
+        }
+        items.Enqueue(item)
+        if items.Peek() is not Some(_) {
+            return 11
+        }
+        let stack = ArrayStack<int>()
+        if stack.Pop() is Some(_) || stack.Peek() is Some(_) {
+            return 12
+        }
+        index = 0
+        while index < 12 {
+            stack.Push(index)
+            index = index + 1
+        }
+        if stack.Peek() is not Some(11) || stack.Count != 12 {
+            return 13
+        }
+        while index > 0 {
+            index = index - 1
+            if stack.Pop() is Some(let value) {
+                if value != index {
+                    return 14
+                }
+            } else {
+                return 15
+            }
+        }
+        if stack.Count != 0 {
+            return 16
+        }
+        let references = ArrayStack<Item>()
+        references.Push(item)
+        if references.Pop() is Some(let alias) {
+            alias.Value = 9
+        } else {
+            return 17
+        }
+        if item.Value != 9 || references.Count != 0 {
+            return 18
+        }
+        references.Push(item)
+        references.Clear()
+        if references.Count != 0 || references.Count != 0 {
+            return 19
+        }
+        references.Push(item)
+        if references.Peek() is not Some(_) {
+            return 20
+        }
+        if !CheckSnapshots() || !CheckSets() {
+            return 21
+        }
+        Console.WriteLine("collections passed")
+        return 0
+    }
+    static func CheckSnapshots() -> bool {
+        let queue: Queue<int> = ArrayQueue<int>(3)
+        queue.Enqueue(1)
+        queue.Enqueue(2)
+        let snapshot = queue.GetIterator()
+        queue.Clear()
+        queue.Enqueue(3)
+        if !snapshot.MoveNext() || snapshot.Current != 1 || !snapshot.MoveNext() || snapshot.Current != 2 || snapshot.MoveNext() {
+            return false
+        }
+        snapshot.Dispose()
+        let stack: Stack<int> = ArrayStack<int>(3)
+        stack.Push(1)
+        stack.Push(2)
+        let reversed = stack.GetIterator()
+        stack.Clear()
+        if !reversed.MoveNext() || reversed.Current != 2 || !reversed.MoveNext() || reversed.Current != 1 || reversed.MoveNext() {
+            return false
+        }
+        reversed.Dispose()
+        return true
+    }
+
+    static func CheckSets() -> bool {
+        let concrete = HashSet<int>(CollidingIntegers())
+        let set: MutableSet<int> = concrete
+        let view: Set<int> = concrete
+        var index = 0
+        while index < 24 {
+            if !set.Add(index) || set.Add(index) {
+                return false
+            }
+            index = index + 1
+        }
+        // Remove chain head, middle and tail, then reuse all free slots.
+        if !set.Remove(23) || !set.Remove(12) || !set.Remove(0) || set.Remove(12) {
+            return false
+        }
+        if view.Count != 21 || view.Contains(23) || view.Contains(12) || view.Contains(0) {
+            return false
+        }
+        if !set.Add(24) || !set.Add(25) || !set.Add(26) || !set.Add(27) {
+            return false
+        }
+        index = 1
+        while index < 28 {
+            if index != 12 && index != 23 && !view.Contains(index) {
+                return false
+            }
+            index = index + 1
+        }
+        let snapshot = view.GetIterator()
+        set.Clear()
+        var captured = 0
+        while snapshot.MoveNext() {
+            captured = captured + 1
+        }
+        snapshot.Dispose()
+        if captured != 25 || view.Count != 0 || !set.Add(42) {
+            return false
+        }
+        let words = HashSet<string>(StringComparer.Ordinal)
+        return words.Add("Café") && !words.Add("Café") && words.Add("café") && words.Add("雪") && words.Remove("Café") && words.Contains("café")
+    }
+
+}
+
+
+class CollidingIntegers : EqualityComparer<int> {
+    func Equals(left: int, right: int) -> bool => left == right
+    func GetHashCode(value: int) -> int => 1
+}

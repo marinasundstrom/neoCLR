@@ -150,3 +150,17 @@ non-null compatible values in source order. The source type is inferred; matchin
 values are narrowed to the requested type without numeric conversions. Each
 iteration is independent, and completing or disposing the iterator releases its
 source. See the [OfType member reference](xref:System.Linq.Operators.OfType).
+
+## Queues, stacks and sets (development)
+
+The development library adds `Queue<T>`/`ArrayQueue<T>`, `Stack<T>`/`ArrayStack<T>`
+and `Set<T>`/`MutableSet<T>`/`HashSet<T>`. Queue and stack removal and peek return
+`Option<T>`; set insertion and removal report whether membership changed. HashSet
+uses an explicit equality comparer. These concrete types are unsynchronized and
+iterate shallow snapshots; queue/stack snapshots follow removal order and set order
+is unspecified. Count followed by another operation is not an atomic transaction.
+
+The public consumer passes native macOS and interpreted execution. Windows
+qualification and future concurrent implementations remain separate work. The
+requested iterable Map with a deconstructable record-struct pair is still in progress.
+See the type and member contracts in the [API reference](/docs/).

@@ -353,3 +353,50 @@ Set/MutableSet capabilities and a hash-based implementation using existing compa
 Membership, duplicate results, removal and clearing are in scope. Final storage,
 set algebra, JSON mapping and production API publication remain separate steps;
 this does not adopt the entire earlier consolidated collection proposal.
+
+## Basic library slice and future concurrency — 2026-10-10
+
+The author directs continued work until the library has a basic set of interfaces
+and implementations, taking future concurrent variants into account. Development
+Queue/ArrayQueue, Stack/ArrayStack and Set/MutableSet/HashSet now have ordinary source
+implementations and a [native/interpreter consumer](experiments/native-collections/).
+Public contracts remain pre-stable. The prior experiments remain historical evidence.
+
+Queue and Stack inherit Collection, not indexed Sequence. Dequeue/Pop/Peek return
+Option: empty is a normal result, distinct from a present nullable value. HashSet
+requires an explicit EqualityComparer, suppresses duplicates without replacing the
+stored representative, and returns bool for Add/Remove membership changes. It keeps
+key-only storage, unlinks bucket chains on removal and reuses freed optional slots.
+Equal values must hash equally and must not change equality/hash while stored.
+Comparer reentry faults under the current terminal-fault policy.
+
+Concrete implementations are unsynchronized. Iterators capture a shallow snapshot
+in FIFO/LIFO order for queues/stacks and unspecified order for sets. Snapshot copying
+costs time/storage and retains captured references; it does not make the collection
+thread-safe. ArrayList's existing iterator policy remains unchanged. Optional slots
+avoid manufacturing null/default values of arbitrary T. Native functional tests pass;
+an interpreter heap-count test verifies queue element release. Native heap-count
+services, hostile comparer callbacks and broader value/nullable shapes need further
+qualification. No allocation or speed improvement is claimed.
+
+For future concurrent implementations, separate operation results from sequences of
+calls. Count followed by Dequeue/Pop is not atomic; callers should use the removal
+result. Add/Remove results can express a concurrent implementation's linearized
+membership change without redesigning the interface. The interface alone does not
+promise linearizability: a future concurrent type must document its atomic operations,
+memory visibility and iteration consistency. Count is an observation, not a capacity
+reservation. Clear and enumeration must be defined by each concurrent type; do not
+promise an atomic multi-operation transaction or snapshot merely through Iterable.
+Bounded producer/consumer waiting and cancellation belong to distinct contracts.
+These points guide future design; no concurrent collection is implemented here.
+
+### Iterable Map and value pairs
+
+The author explicitly requests Map<K,V> : Iterable<KeyValuePair<K,V>>, with
+KeyValuePair a deconstructable record struct. Preserve value storage and named
+Key/Value properties alongside deconstruction; no separate Keys snapshot should be
+needed to traverse pairs. The exact record declaration is retained in
+[the reduced consumer](experiments/map-pairs/raven/Main.rvn). The pinned native
+emitter rejects record declarations (NEOMETA001); implementation requires native
+record declaration/synthesized-member support, not a reference-class substitution.
+This requested Map contract remains active work, not a shipped feature of this slice.

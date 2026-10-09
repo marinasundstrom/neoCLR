@@ -1,0 +1,11 @@
+namespace System.Collections
+
+/// A set supporting insertion, removal and clearing.
+public interface MutableSet<T> : Set<T> {
+    /// Adds an element and returns whether membership changed.
+    func Add(value: T) -> bool
+    /// Removes an equivalent element and returns whether membership changed.
+    func Remove(value: T) -> bool
+    /// Removes all elements.
+    func Clear()
+}

@@ -1,0 +1,13 @@
+namespace System.Collections
+
+/// A mutable FIFO collection. Thread safety is an implementation contract.
+public interface Queue<T> : Collection<T> {
+    /// Adds an element.
+    func Enqueue(value: T)
+    /// Removes an element, or returns None when empty.
+    func Dequeue() -> System.Option<T>
+    /// Observes the next element without removing it, or returns None.
+    func Peek() -> System.Option<T>
+    /// Removes all elements.
+    func Clear()
+}

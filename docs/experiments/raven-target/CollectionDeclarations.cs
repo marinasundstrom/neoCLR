@@ -13,6 +13,57 @@ static class CollectionDeclarations
         }
         public interface Disposable { void Dispose(); }
         namespace Collections {
+            public interface Queue<T> : Collection<T> {
+                void Enqueue(T value);
+                Option<T> Dequeue();
+                Option<T> Peek();
+                void Clear();
+            }
+            public class ArrayQueue<T> : Queue<T> {
+                public ArrayQueue() { }
+                public ArrayQueue(int capacity) { }
+                public int Count => default;
+                public int Capacity => default;
+                public void Enqueue(T value) { }
+                public Option<T> Dequeue() => default;
+                public Option<T> Peek() => default;
+                public void Clear() { }
+                public Iterator<T> GetIterator() => default;
+            }
+            public interface Stack<T> : Collection<T> {
+                void Push(T value);
+                Option<T> Pop();
+                Option<T> Peek();
+                void Clear();
+            }
+            public class ArrayStack<T> : Stack<T> {
+                public ArrayStack() { }
+                public ArrayStack(int capacity) { }
+                public int Count => default;
+                public int Capacity => default;
+                public void Push(T value) { }
+                public Option<T> Pop() => default;
+                public Option<T> Peek() => default;
+                public void Clear() { }
+                public Iterator<T> GetIterator() => default;
+            }
+            public interface Set<T> : Collection<T> {
+                bool Contains(T value);
+            }
+            public interface MutableSet<T> : Set<T> {
+                bool Add(T value);
+                bool Remove(T value);
+                void Clear();
+            }
+            public class HashSet<T> : MutableSet<T> {
+                public HashSet(EqualityComparer<T> comparer) { }
+                public int Count => default;
+                public bool Contains(T value) => default;
+                public bool Add(T value) => default;
+                public bool Remove(T value) => default;
+                public void Clear() { }
+                public Iterator<T> GetIterator() => default;
+            }
             public interface Map<K, V> {
                 int Count { get; }
                 Sequence<K> Keys { get; }
