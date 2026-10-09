@@ -46,6 +46,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   pages and a focused MSVC lifecycle/guard workflow. Windows run `37952512363`
   at `9c3c586e` passes 12 allocation lifecycles and both guard-boundary checks;
   verify nine artifact hashes and three source hashes with checkout line endings.
+  Add a Windows collector host over that heap, rejecting foreign-thread or
+  live-root/frame teardown. Extend the focused gate with cyclic-graph retention,
+  host-to-frame root handoff, reclamation, exhaustion/output preservation and
+  cleanup, plus the existing collector contract consumer. Execution pending.
   Managed Windows code generation and project kits remain unsupported.
 
 - Add a development macOS ARM64 project-to-executable console command using the

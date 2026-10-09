@@ -41,8 +41,8 @@ lifecycles at one byte, page size, page size plus one and 1 MiB, including zeroi
 alignment, page states, real access violations at both guard boundaries, overwrite
 rejection, release and repeated empty release. It also rejects zero, oversize,
 SIZE_MAX and null owners. Test-only SEH observes access violations; it establishes
-no generated-code SEH/unwind contract. OS allocation failure injection and GC
-integration remain open. Reports retain the source revision, input hashes, native
+no generated-code SEH/unwind contract. OS allocation failure injection remains open. Collector integration is tracked
+separately below. Reports retain the source revision, input hashes, native
 binary, build/execution logs and output hashes.
 
 **Windows evidence:** [run 37952512363](https://github.com/marinasundstrom/neoCLR/actions/runs/37952512363)
@@ -52,6 +52,37 @@ match; the three source hashes match the recorded Git revision with Windows chec
 CRLF line endings. See the [retained report](windows-host-memory-validation.json).
 This qualifies allocation and perimeter protection only; it does not qualify a
 Windows collector, guest memory faults or native stack safety.
+
+## Collector integration: implementation, execution pending
+
+The private [collector host](../tools/native/windows-gc-host.c) now owns the guarded
+heap and existing `neoclr_aot_context`. The creating thread must remain alive and
+all raw collector operations remain thread-affine. Close checks the creating thread
+and `neoclr_gc_entry_check_v1` before releasing storage, so registered host roots or
+published guest frames prevent teardown. Render fault diagnostics before close.
+Unregistered native pointers remain the trusted caller's responsibility. This does
+not enforce ownership for future suspended activations or allow carrier migration.
+
+Reuse the existing [nonmoving GC comparison and contracts](experiments/aot-console/native-gc.md)
+rather than introduce a separate Windows collector. Relative to .NET GC roots,
+this remains a bounded explicit root protocol, with conservative object scanning
+and stable addresses; it does not offer the CLR's general managed execution model.
+The new wrapper adds lifecycle enforcement at host teardown, not a new collector
+algorithm. Its thread-affinity cost is explicit and provisional for scheduler work.
+
+The Windows build enables MSVC's `/experimental:c11atomics` for the existing
+monotonic host-handle allocator. Microsoft's [C11 support announcement](https://devblogs.microsoft.com/visualstudio/visual-studio-2022-17-5-released/)
+describes the opt-in lock-free implementation (reviewed 2026-10-09). Keep that
+compiler requirement visible; validation must exercise handles on two native
+threads without reusing IDs. No atomicity is inferred for the context itself.
+
+The executable acceptance allocates a cyclic graph plus garbage, keeps the graph
+alive through a host handle, transfers ownership to a published frame, and
+reclaims it after the frame leaves. It rejects premature/foreign-thread close,
+checks TLS handle isolation, fills the heap to exhaustion with unchanged output
+on failure, and collects/releases all storage. The existing C collector contract
+consumer also runs on Windows, covering interior/fault roots, initialized array
+slots, reuse and malformed-descriptor recovery. Windows execution is pending.
 
 ## Stack protection: required, not implemented by this probe
 
@@ -89,7 +120,6 @@ first-fault propagation and exactly-once cleanup. Reuse the
 before adding migration or green threads. Current root TLS, callbacks and stack
 adapters remain replacement boundaries, not public scheduling policy.
 
-Next: exercise the existing collector/root-chain contracts against Windows-owned
-memory and identify toolchain portability gaps, then qualify stack protection and
-managed lowering. Keep Windows managed profiles and project kits rejected until
+Next: complete Windows execution of the collector/root-chain consumers, then
+qualify stack protection and managed lowering. Keep Windows managed profiles and project kits rejected until
 those separate requirements have executable evidence.

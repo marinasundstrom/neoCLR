@@ -16,7 +16,7 @@ def main():
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    report = dict(passed=False, scope='Private Windows x64 guarded heap; no managed execution or stack qualification',
+    report = dict(passed=False, scope='Private Windows x64 guarded heap and collector/root lifecycle; no managed codegen or stack qualification',
                   platform=platform.platform(), commands=[])
 
     def run(command, name):
@@ -42,6 +42,27 @@ def main():
         if result.stdout != expected or result.stderr:
             raise ValueError('Host memory acceptance did not report exact completion')
         report['execution'] = dict(exitCode=0, stdout=result.stdout.decode(), stderr='', allocationLifecycles=12)
+        base = ROOT / 'docs/experiments/aot-console'
+        collector_inputs = [ROOT / 'tools/native' / name for name in
+                            ('windows-gc-host.c', 'windows-gc-host.h', 'windows-gc-host-test.c')]
+        collector_inputs += [base / name for name in ('native-gc.c', 'native-gc-test.c', 'root-probe.c', 'native-gc.h', 'root-probe.h', 'text-arena.h')]
+        collector_inputs += [ROOT / 'docs/experiments/aot-fault-details/fault-details.h']
+        report['inputs'].update({p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in collector_inputs})
+        run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
+             '/Fe:host-collector.exe', ROOT / 'tools/native/windows-gc-host-test.c',
+             ROOT / 'tools/native/windows-gc-host.c', inputs[0], base / 'native-gc.c', base / 'root-probe.c'], 'collector-build')
+        result = run([out / 'host-collector.exe'], 'collector-execute')
+        expected = b'Windows collector: rooted graph, frame handoff, thread isolation, exhaustion and cleanup passed\r\n'
+        if result.stdout != expected or result.stderr:
+            raise ValueError('Collector acceptance did not report exact completion')
+        report['collectorExecution'] = dict(exitCode=0, stdout=result.stdout.decode(), stderr='')
+        # Existing collector semantics, independently of the new host wrapper.
+        run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
+             '/Fe:collector-contract.exe', base / 'native-gc-test.c', base / 'native-gc.c', base / 'root-probe.c'], 'collector-contract-build')
+        result = run([out / 'collector-contract.exe'], 'collector-contract-execute')
+        if result.stdout or result.stderr:
+            raise ValueError('Unexpected collector contract output')
+        report['collectorContract'] = dict(exitCode=0)
         report['passed'] = True
     except Exception as error:
         report['error'] = str(error)

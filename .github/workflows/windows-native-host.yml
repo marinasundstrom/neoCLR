@@ -4,11 +4,21 @@ on:
   push:
     paths:
       - 'tools/native/windows-host-memory*'
+      - 'tools/native/windows-gc-host*'
+      - 'docs/experiments/aot-console/native-gc*'
+      - 'docs/experiments/aot-console/root-probe*'
+      - 'docs/experiments/aot-console/text-arena.h'
+      - 'docs/experiments/aot-fault-details/fault-details.h'
       - 'scripts/validate-windows-host.py'
       - '.github/workflows/windows-native-host.yml'
   pull_request:
     paths:
       - 'tools/native/windows-host-memory*'
+      - 'tools/native/windows-gc-host*'
+      - 'docs/experiments/aot-console/native-gc*'
+      - 'docs/experiments/aot-console/root-probe*'
+      - 'docs/experiments/aot-console/text-arena.h'
+      - 'docs/experiments/aot-fault-details/fault-details.h'
       - 'scripts/validate-windows-host.py'
       - '.github/workflows/windows-native-host.yml'
 permissions:
