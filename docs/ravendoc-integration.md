@@ -232,3 +232,26 @@ source links, navigation and responsive controls.
 Validation of `7ad0f5817`: all 18 website tests and the full 1,803-page site
 build/link/anchor checks passed. This refresh is committed locally; it does not
 publish the neoCLR website.
+
+## Module member icons and grouping (2026-10-09)
+
+RavenDoc's shared navigation maps metadata function and constant labels to the same
+function and field glyphs used in member lists. Static classes keep their class icon.
+Module/namespace pages group constants under **Constants**, separate from **Functions**
+and ordinary **Fields** when present. URLs and declaration ownership do not change.
+
+This is publisher presentation only: no Runtime Contract, compiler binding, emitted
+metadata or runtime behavior changes. The native preview admission check verifies
+System.Math's function/constant icons and headings before installing an audit, so
+an older saved audit must be regenerated with the matching publisher.
+
+The shared publisher correction is on Raven main at `2f78deb9367a9abccd15ac53ac0a2ea729c48cc7`.
+neoCLR pins `cd3634f9c7f4faee88e1aee577be50fc92d3be69`, which includes the correction
+on the existing native-module integration line and recognizes its `Function` label.
+Validation: 46 focused RavenDoc/namespace tests, 21 website tests and the regenerated
+production native metadata audit pass. The API landing page now provides module
+browsing and subject entry points; it leaves change history in repository records.
+The full 3,490-page website build and link/anchor checks pass with the regenerated
+native preview; browser review confirms the member icons, groups and landing layout.
+Existing API description gaps remain reported by the build. No website publication
+is performed by this update.

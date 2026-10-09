@@ -44,6 +44,12 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   versioned runnable samples and links to implementation records. Repository contracts
   and published release history are not rewritten as part of this editorial change.
 
+- **Author follow-up:** asks for distinct sidebar icons for non-type module members,
+  correct constant grouping, and a better API reference landing page.
+- **Assistant action:** applies the existing member glyphs in RavenDoc navigation,
+  separates Constants from Functions, and replaces the API landing page's accumulated
+  change notes with module browsing, subject entry points and short reading guidance.
+
 ## 2026-10-09 — Architecture and metadata explanations
 
 - **Author:** requests repository documentation and website pages for architecture

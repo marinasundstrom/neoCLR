@@ -28,10 +28,17 @@ def main():
     assert (source / 'System/Object/method_GetHashCode.html').is_file()
     navigation = (source / 'api-navigation.html').read_text()
     assert 'method_Exp.html' in navigation
+    function_link = re.search(r'<a[^>]*href="[^"]*System/Math/method_Exp\.html"[^>]*>.*?</a>', navigation, re.S)
+    assert function_link and 'symbol-icon--function' in function_link[0]
+    module_page = (source / 'System/Math/index.html').read_text()
+    assert '>Constants</h2>' in module_page and '>Functions</h2>' in module_page
+    assert '>Members</h2>' not in module_page
     for constant in ('Pi', 'E', 'Tau'):
         page = (source / f'System/Math/field_{constant}.html').read_text()
         assert 'System.Runtime.dll' in page and 'CLR container' not in page
         assert f'field_{constant}.html' in navigation
+        constant_link = re.search(r'<a[^>]*href="[^"]*System/Math/field_' + constant + r'\.html"[^>]*>.*?</a>', navigation, re.S)
+        assert constant_link and 'symbol-icon--field' in constant_link[0]
     overloads = (source / 'System/Math/method_Abs.html').read_text()
     assert 'Abs(value: int)' in overloads and 'Abs(value: double)' in overloads
     destination = args.site.resolve() if args.site else ROOT / 'target/website'

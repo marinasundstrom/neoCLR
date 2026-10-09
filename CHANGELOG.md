@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Correct API sidebar icons for module functions and constants using RavenDoc's
+  existing member glyphs. Group module constants under Constants rather than
+  Members, preserve reference URLs, and validate the native Math module's rendering.
+  Rework the API landing page around browsing modules and finding APIs by task,
+  moving detailed contracts and development history out of the introduction.
+
 - Qualify the six unchanged production collection/equality interfaces needed by
   String through native-only compilation and imported generic dispatch in project,
   interpreter and ARM64 execution. Missing contract references reject before output;
