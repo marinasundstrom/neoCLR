@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Keep five entries visible in long derived-type, implementing-type and
+  derived-interface lists, with a shared RavenDoc Show more/Show less disclosure.
+  Preserve all links and short lists; document the tested .NET 11 RC1 toolchain.
+
 - Refresh source regressions for the current contracts: reject an unassigned
   metadata schema, recognize conflicting-signature diagnostics, preserve String
   owner identity through Object views, and check shared fault stack rendering.

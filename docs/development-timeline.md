@@ -12506,3 +12506,20 @@ claim follows from these focused checks.
 - **Author correction:** structural types should remain in API reference. Restore
   the structural overview and Array, Function, Tuple, Union and proposed Intersection
   contracts to the API menu; retain the separate feature/usage guides in Guides.
+
+
+### 2026-10-09 — Bound long reverse-type relationship lists
+
+- **Author:** noted that Derived types and Implementing types can grow very long,
+  proposing initially collapsed sections or a few visible entries with Show more.
+  The author explicitly added Derived interfaces to the scope.
+- **Assistant proposal:** retain five visible entries and use a native disclosure
+  for the remainder, with Show more/Show less, on shared RavenDoc output. Preserve
+  the full alphabetically ordered links and indirect-relationship labels, including
+  Derived interfaces. Four focused source/.NET metadata rendering tests passed;
+  browser checks confirmed initial collapse, expansion and keyboard operation.
+  The shared fix is on Raven main `0308f7b04` and integration `68a027962`.
+- **Performed validation:** refreshed the native API snapshot and checked real
+  Object and EquatableTo pages on desktop and mobile. Both keep five entries
+  visible; expansion and keyboard collapse preserve every remaining link.
+  Structural contracts remain in the API tree and Guides retains its own sidebar.

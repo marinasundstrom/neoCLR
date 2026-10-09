@@ -1,10 +1,10 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "8a09c333b441a0dc465cb0b5568e4b1d6460b70d5ed4bb0ae31fb9d29f20fe3b",
+  "sha256": "d98db91c6bd77bfb7999d8c88f482b5d995a08664524e30624d368f0e1537eee",
   "librarySourceRevision": "9fd8f6b8eb10b067c58127222833a6339696bae4",
   "compilerRevision": "c6d2137e34d11f0c8888c5e91f0c6257f53e6c87",
-  "rendererRevision": "24a1a371658558f955dc6191be88943745358930",
+  "rendererRevision": "68a027962ff951269863297a4e07d5b744242453",
   "libraryArtifacts": {
     "System.Runtime.dll": "48a1f70a5ec03a014513b9435143a522b899c7aa87360140f38b01aecdf0ad22",
     "System.Data.dll": "a5aee2d42b20208a9ef98d84fdd0015d9eec19d5cfbbc6f0abac92817f55bf00",

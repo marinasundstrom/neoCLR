@@ -9,7 +9,9 @@ ARM64 ahead-of-time compilation remains a separate source-build POC on macOS.
 
 Install the [.NET 11 SDK and .NET 10 SDK](https://dotnet.microsoft.com/download),
 [Python 3](https://www.python.org/downloads/) and [VS Code](https://code.visualstudio.com/).
-.NET is required by the Raven compiler and language server, not by neoCLR itself.
+The bundles were tested with .NET 11 SDK **11.0.100-rc.1.26425.128** (RC1)
+and a .NET 10 SDK. .NET is required by the Raven compiler and language server,
+not by neoCLR itself.
 
 <a id="install"></a>
 

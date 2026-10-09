@@ -10,8 +10,9 @@ explicit capability limits, not a stable platform or a drop-in .NET replacement.
 
 ## Install the matching toolchain
 
-Install .NET 11 and .NET 10 SDKs, Python 3 and VS Code. The Raven compiler and
-language server require .NET; the neoCLR interpreter does not.
+Install the .NET 11 SDK **11.0.100-rc.1.26425.128** (RC1), a .NET 10 SDK,
+Python 3 and VS Code. Both bundles were tested with that .NET 11 SDK. The Raven
+compiler and language server require .NET; the neoCLR interpreter does not.
 
 Extract the package for your OS and architecture and keep its folders together.
 From the extracted `neoclr-native-poc` directory, verify the installation:

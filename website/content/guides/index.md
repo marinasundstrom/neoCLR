@@ -59,7 +59,7 @@ They need only enough application context to explain the choices and results.
 These examples require the matching development toolchain. They are not promises
 about the latest downloadable bundle.
 
-- [Inspect compiled metadata](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/il-inspection.md): development `neoclr disassemble` reads native PE, NEOX and JSON artifacts without executing them; output is diagnostic, not reassemblable.
+- [Inspect compiled metadata](https://github.com/marinasundstrom/neoCLR/blob/main/docs/il-inspection.md): development `neoclr disassemble` reads native PE, NEOX and JSON artifacts without executing them; output is diagnostic, not reassemblable.
 - [Storage providers](../docs/storage-experiment.html): run the same workflow on disk
   and application-owned memory storage.
 - [File Transformer](../docs/file-transformer.html): combine byte streams, text and JSON.
