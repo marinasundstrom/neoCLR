@@ -12808,3 +12808,21 @@ claim follows from these focused checks.
   before broadening managed services. Native unwind/SEH interoperability and
   activation-owned stacks/roots remain open; this result does not select a green-thread
   implementation or remove fiber rejection.
+
+## 2026-10-09 — Carry Windows native compilation through project execution
+
+- **Author:** “Don't stop until you have Windows native compilation working”, while
+  the assistant is implementing generated Windows heap-root retention.
+- **Assistant commitment/action:** continues beyond the private heap probe to an
+  ordinary Raven project-to-EXE path, with explicit console scope and actual Windows
+  standalone execution as acceptance. Adds the guarded host, MSVC/static-CRT driver,
+  sample and dedicated Action; keeps scheduling/green-thread ownership boundaries.
+- **Outcome so far:** the heap gate passes at `cb12c7de` in run `37958065076`:
+  408 allocations in a 2 KiB heap across four calls, retained local/argument roots,
+  bounds/exhaustion faults, complete reclamation and reuse. All 60 artifact and 40
+  source hashes match [the evidence](windows-generated-heap-validation.json).
+  A canonical collector-kind mapping fixes MSVC's cross-enum assertion diagnostic.
+  Project source compiles to Windows COFF locally; macOS project regression passes.
+- **Open:** standalone Windows project execution is pending. Default Object display
+  with arrays exposes an existing backend restriction; the combined sample uses
+  explicit Int32 formatting, and interpolation has a separate acceptance case.

@@ -96,9 +96,12 @@ from deep calls on 512 KiB/1 MiB stacks with collection and GC-frame cleanup.
 The [generated integer-stack gate](windows-generated-stack-validation.json) now
 passes Windows execution with inline page probing, final-frame bounds, small-stack
 rejection, recursive diagnostic return, complete frame cleanup and context reuse.
-Next qualify a bounded heap-allocating guest with generated live-reference retention
-and fault cleanup. General Windows
-project kits and managed services remain unsupported. Full
+The [generated array-heap gate](windows-generated-heap-validation.json) now passes
+live local/argument retention, allocation churn, bounds/exhaustion faults, complete
+reclamation and reuse. The author then explicitly directs continuing until Windows
+native compilation works. A development Windows console project profile now builds
+ordinary Raven projects through the guarded host; its standalone execution gate is
+pending. Windows packaged project kits and non-console services remain unsupported. Full
 bootstrap, general hosting and reload remain open.
 
 **Preview 13 published (2026-10-09):** after Raven's shared website publication,

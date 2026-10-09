@@ -1,0 +1,24 @@
+import System.*
+
+func Churn(values: int[]) -> int {
+    var iteration = 0
+    while iteration < 1000 {
+        let scratch: int[] = [iteration, iteration + 1]
+        iteration = scratch[0] + 1
+    }
+    return values[0] + values[1]
+}
+
+func Main() -> int {
+    let values: int[] = [40, 2]
+    let answer = Churn(values)
+    Console.WriteLine("Hello, Café 🌍")
+    Console.WriteLine("Answer: " + answer.ToString())
+    let messages: string[] = ["first", "hé😀\u0000z"]
+    let alias = messages
+    alias[0] = messages[1]
+    messages[1] = "replacement"
+    Console.WriteLine(messages[0])
+    Console.WriteLine(alias[1])
+    return 0
+}

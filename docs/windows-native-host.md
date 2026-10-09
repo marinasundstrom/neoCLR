@@ -251,5 +251,25 @@ The consumer keeps a local array in the caller and an array argument in a callee
 while allocating 100 temporary arrays in a 2 KiB heap. It requires the retained
 values to sum to 42, counts successful collection/reclamation, exercises bounds
 and heap-exhaustion faults with unchanged output, collects after return and reuses
-the same context. Windows execution is pending for this slice. This does not admit
-arbitrary managed services, object graphs, reference arrays or an application SDK.
+the same context. [Run 37958065076](https://github.com/marinasundstrom/neoCLR/actions/runs/37958065076)
+at `cb12c7de` passes 408 allocations across four invocations, live-root retention,
+bounds/exhaustion faults, complete reclamation and reuse. All 60 artifact and 40
+source hashes are verified in the [report](windows-generated-heap-validation.json).
+This heap-only gate does not qualify arbitrary managed services or an application SDK.
+
+## Synchronous console project integration
+
+The development `windows-console` project profile now composes the existing
+closed-world value/reference backend, exact console/UTF-8 service bindings and the
+qualified guarded heap/stack host. It uses a 1 MiB heap, status-based fault rendering,
+collection and checked teardown, and a normal 1 MiB OS thread stack. Standard input,
+output and error are binary byte streams; terminal glyph/code-page display remains
+separate. Its dedicated project gate is pending. See the
+[build instructions](native-poc-bundle.md#windows-x64-console-source-checkout).
+
+The backend opt-in is `--windows-console-experiment` with explicit Windows target,
+closed-world System compilation, reference arena, native GC and stack budget. It
+reuses existing verifier/lowering restrictions; unsupported methods still fail
+compilation. File/path, task/socket, character and extended integer service switches
+are rejected. This is not general hosting, native unwind/SEH interoperability or
+suspendable/green-thread support. No Raven semantic or CLI bridge contract changes.

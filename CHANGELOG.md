@@ -71,10 +71,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   49 artifact and 37 source hashes. Local macOS stack regression also passes.
   Add a separately gated Windows Int32-array heap experiment with generated
   local/argument roots, allocation churn, bounds/exhaustion faults and host reuse.
-  Extend Windows CI with a 2 KiB heap consumer; execution qualification is pending.
+  Windows run `37958065076` at `cb12c7de` passes 408 allocations across four
+  invocations in a 2 KiB heap, generated live-root retention, bounds/exhaustion
+  faults, full reclamation and context reuse. Verify 60 artifact and 40 source hashes.
   Reuse canonical collector kind constants in the text/array adapter, avoiding
   MSVC's cross-enum static-assert warning without disabling warnings.
   General managed services and kits remain unsupported.
+
+- Add an explicit development `windows-console` profile to the project build command:
+  Raven project compilation, guarded GC/stack host, x64 COFF/MSVC linking, static CRT,
+  byte-preserving standard I/O and standalone dependency checks. Add a source sample
+  and dedicated Windows project Action with interpreter parity, standalone deployment,
+  existing-output protection and stale-build rejection. Windows execution is pending;
+  local COFF compilation, profile rejection and macOS project regression pass.
+  Keep HTTP, file/path, scheduler and extended text services outside this profile;
+  packaged development kits still advertise only their macOS profiles.
 
 - Add a development macOS ARM64 project-to-executable console command using the
   selected bundle's Raven project build, existing AOT backend and explicit native

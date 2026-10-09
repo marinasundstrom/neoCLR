@@ -80,14 +80,15 @@ library and runtime artifacts; this is not a general publishing workflow for all
   PE/#Neo and NEOX. Fresh-source coverage also passes calls, branches, empty/repeated
   loops and byte-exact UTF-8/NUL output. Scalar comparison results retain typed
   Boolean stack checks; this remains the primitive/console bootstrap. Windows managed services and
-  native project kits remain unsupported. An independent Windows guarded-heap
+  packaged native project kits remain unsupported. An independent Windows guarded-heap
   host passes allocation, guard-boundary and release tests. Its collector consumer
   also passes root retention, reclamation, thread isolation and guarded teardown.
   Host admission now rejects undersized stacks and fibers; deep-call checks
   return safely with GC-frame cleanup. An explicit integer-only generated-stack
   experiment now passes Windows execution with page probing, frame bounds,
-  diagnostic fault return and host reuse. Heap-allocating guest qualification and
-  general managed Windows code generation remain open.
+  diagnostic fault return and host reuse. Generated array roots now survive
+  allocation churn and fault cleanup. A source-checkout Windows console project
+  profile is in development, with standalone execution qualification pending.
 - **Code and APIs:** broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.
 - **Async:** async entry points waiting for host I/O are unsupported; selected

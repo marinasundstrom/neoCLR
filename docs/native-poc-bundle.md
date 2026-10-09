@@ -2,6 +2,52 @@
 
 ## Development project-to-executable workflow (2026-10-09)
 
+### Windows x64 console (source checkout)
+
+Development profile; Windows execution qualification is pending. Use a Windows x64
+**Developer PowerShell / x64 Native Tools prompt** with MSVC C tools, Rust/Cargo,
+Python 3.12 and the .NET SDK required by the selected Raven bundle. The pinned
+Preview 13 Windows bundle uses .NET 11 RC1 `11.0.100-rc.1.26425.128`; project evaluation
+also uses .NET 10. Download and extract
+[the Windows bundle](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/neoclr-preview13-win-x64.tar.gz)
+and verify its [published checksum](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/SHA256SUMS).
+From this source checkout:
+
+```powershell
+cargo build --locked --manifest-path tools/aot-poc/Cargo.toml
+python scripts/build-native-project.py --profile windows-console `
+  --project samples/native-windows/App.rvnproj `
+  --bundle C:/path/to/neoclr-native-poc `
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc.exe `
+  --output target/windows-native-app
+./target/windows-native-app/app.exe
+```
+
+The helper sets `NeoClrBundleRoot` for project imports, verifies bundle bytes,
+compiles the evaluated Raven project and links a static-CRT EXE with MSVC. The
+output directory must be new. `build.json` retains commands, diagnostics, input
+hashes and dependencies. Failed compilation/linking never publishes `app.exe`;
+an existing destination is preserved. Copy only `app.exe` to deploy: the intended
+runtime dependency is Windows' `KERNEL32.dll`, with no .NET, Raven bundle or helper
+DLL needed beside it. The dedicated Action checks executable-only deployment.
+
+The synchronous profile includes the existing bounded value/reference lowering,
+native GC, stack guards, console input/output, UTF-8 text and Int32 formatting.
+The sample exercises array allocation/churn, string aliases and UTF-8/NUL output.
+Interpolation is separately qualified; default Object display for arrays remains
+an existing backend restriction, so the combined sample formats Int32 explicitly.
+HTTP, file/path, task/scheduler, character segmentation and extended integer service
+bindings are excluded. Existing backend unsupported-feature diagnostics still apply.
+Windows native unwind/SEH, arbitrary reentry and green threads remain unqualified.
+This source workflow does not publish a Windows development kit or change Preview 13.
+
+Compared with .NET Native AOT's project publish workflow, this exposes neoCLR's
+existing UTF-8/Raven contracts through a source-checkout driver and explicit host
+profile. It needs more manual toolchain setup and supports a narrower subset; no
+performance superiority is claimed. Reuse the
+[host and stack research](windows-native-host.md) and the existing native-execution
+investigation. The macOS workflows below retain their separate contracts.
+
 ### Relocatable development kit
 
 The native console and opt-in HTTP workflows can be staged as a separate development kit with
@@ -45,7 +91,7 @@ The extraction verifier builds from a temporary path with spaces outside the
 checkout, with Cargo removed from PATH, runs the executable alone with an empty
 environment, and checks that modified adapters, backend and compiler configuration
 are rejected before tool invocation. The synchronous console profile below is
-unchanged; Windows AOT remains separate work.
+unchanged; Windows now has the separate source-checkout profile above.
 The opt-in HTTP profile described below has its own qualification; the default
 console profile does not acquire HTTP services or a task pump.
 The [2026-10-09 extracted-kit evidence](experiments/native-build-kit-validation.json)
@@ -110,7 +156,7 @@ environment, unsupported-recursion rejection and preservation of existing output
 The [2026-10-09 acceptance record](experiments/native-project-build-validation.json)
 passes those cases and rejects a failed rebuild despite its previously emitted DLL.
 The relocatable kit above packages this workflow with its backend/adapters. The
-HTTP profile has separate service and host contracts; Windows AOT remains open.
+HTTP profile has separate service and host contracts; Windows HTTP remains open.
 This reuses the [.NET deployment comparison](native-execution-investigation.md):
 project-level native build ergonomics are familiar, while neoCLR's currently
 bounded runtime-service profile and explicit bootstrap dependencies remain costs.

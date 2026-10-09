@@ -82,3 +82,19 @@ fn heap_experiment_admits_only_int32_arrays_and_matches_interpreter() {
         assert!(!dir.0.join("app.obj").exists());
     }
 }
+
+#[test]
+fn console_experiment_requires_windows_context_and_rejects_unqualified_services() {
+    let dir = Temp::new();
+    for flags in [
+        vec!["--target", "x86_64-pc-windows-msvc", "--windows-console-experiment"],
+        vec!["--target", "aarch64-apple-darwin", "--windows-console-experiment", "--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget"],
+        vec!["--target", "x86_64-pc-windows-msvc", "--windows-console-experiment", "--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget", "--bind-paths"],
+        vec!["--target", "x86_64-pc-windows-msvc", "--windows-console-experiment", "--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget", "--bind-task-queue"],
+    ] {
+        let result = compile(&dir, SOURCE, &flags);
+        assert!(!result.status.success());
+        assert!(String::from_utf8_lossy(&result.stderr).contains("Windows console experiment"));
+        assert!(!dir.0.join("app.obj").exists());
+    }
+}

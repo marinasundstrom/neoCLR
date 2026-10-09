@@ -129,7 +129,7 @@ notices remain under bundle/. The runtime ABI and service profile are provisiona
 ''')
     if any(builder.sha(ROOT / path) != digest for path, digest in inputs.items()):
         raise ValueError('Sources changed while building the kit')
-    kit = dict(format='neoclr-native-build-kit-v1', profile=builder.PROFILE, profiles=list(builder.PROFILES.values()),
+    kit = dict(format='neoclr-native-build-kit-v1', profile=builder.PROFILE, profiles=[builder.PROFILES[name] for name in ("console", "http")],
         revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         dirty=bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip()),
         inputs=inputs, aotBuild=dict(command=command, exitCode=result.returncode, stderr=result.stderr,

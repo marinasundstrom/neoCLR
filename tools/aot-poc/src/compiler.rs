@@ -67,10 +67,14 @@ pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bo
                 })
         })
     {
-        if target == Target::WindowsX64 && !details.is_some_and(|d| d.windows_stack_experiment) {
+        if target == Target::WindowsX64 && !details.is_some_and(|d| d.windows_stack_experiment || d.windows_console_experiment) {
             return Err("Windows x64 currently supports only scalar and literal-console lowering; value/managed profiles remain macOS ARM64-only".into());
         }
-        if target == Target::WindowsX64 {
+        if target == Target::WindowsX64 && details.is_some_and(|d| d.windows_console_experiment)
+            && !details.is_some_and(|d| d.native_gc && d.native_stack_budget && d.reference_arena && d.probe_stack_roots) {
+            return Err("Windows console requires published GC frames, reference arena and stack budget".into());
+        }
+        if target == Target::WindowsX64 && !details.is_some_and(|d| d.windows_console_experiment) {
             // Heap opt-in adds only Int32 arrays, not arbitrary managed services.
             let heap = details.is_some_and(|d| d.windows_heap_experiment);
             let admitted = |t: &Type| *t == Type::Int32 || heap && matches!(t, Type::ArrayRef(inner) if **inner == Type::Int32);
