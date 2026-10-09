@@ -1,9 +1,14 @@
 ---
 uid: N:System
 ---
-## Using the core namespace
+## Core values and contracts
 
-Start with the type list below to explore neoCLR's fundamental contracts and
-value types. Open a type to inspect its constructors, members, inherited contracts,
-and nested types. API availability follows the release notice and the limitations
-documented on each member.
+The core module contains Object and Value, primitive values, immutable String text,
+Array, tuples, Option and Result, and common equality, comparison and lifetime
+contracts. Console provides standard input and output; time-related values live
+in System.Time.
+
+Start with [objects and values](/docs/objects.html), [strings](/features/strings/),
+[arrays](/docs/arrays.html), [outcomes](/features/outcomes/) or
+[Console](/docs/console.html). The declarations below link to member contracts,
+including typed errors and execution-mode limitations.

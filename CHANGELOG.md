@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Document all 24 rendered API modules with purpose, current capabilities,
+  boundaries and guide links; refresh the native reference snapshot.
+
 - Keep five entries visible in long derived-type, implementing-type and
   derived-interface lists, with a shared RavenDoc Show more/Show less disclosure.
   Preserve all links and short lists; document the tested .NET 11 RC1 toolchain.

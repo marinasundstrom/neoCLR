@@ -1413,3 +1413,12 @@ qualified; complete native source-core bootstrap remains unfinished.
 2026-10-09: host primitive bootstrap references are documented in the
 [manual metadata reference](experimental-metadata.md#primitive-bootstrap-references-development-2026-10-09).
 This host authoring/reading API does not change guest String signatures or snapshots.
+
+### Module introductions (2026-10-09)
+
+All 24 modules in the current native API navigation have authored introductions in
+`website/api-content`. RavenDoc attaches them using `N:` documentation IDs for both
+module and legacy namespace projections. They explain existing capabilities and
+link to the relevant guides; they do not fill the separately recorded type/member
+summary gaps or qualify additional execution modes. Refresh the native rendered
+snapshot whenever this authored content changes.
