@@ -12476,3 +12476,16 @@ claim follows from these focused checks.
   release assets and publication. ARM64 AOT evidence does not establish Windows
   x64 native-code generation. Full source-owned native core bootstrap remains
   explicitly outside the completed String subset.
+- **Qualification follow-through:** fresh macOS SDK/libraries and an extracted
+  bundle passed collections, Tasks, JSON and live HTTP after repairing relative
+  verifier report paths. The isolated packaged VS Code extension passed 26 checks
+  without a development language-server override. Native website publication now
+  uses a pinned reviewed rendering; clean builds check 3,491 pages and preserve
+  136 explicitly marked compatibility gaps. Desktop/mobile review also corrected
+  a Copy-button overlap.
+- **Windows findings:** Git Bash supplied an invalid MSBuild compiler-host path;
+  the packaging correction was placed on Raven main (`53e414bca`) and integrated
+  into its neoCLR line (`71cafd353`, including an integration correction). A host
+  refusal test also observed an unexpected successful connection after releasing
+  its port; the candidate retains the Windows reservation to exclude parallel reuse.
+  Windows validation remains required before treating that test repair as proven.
