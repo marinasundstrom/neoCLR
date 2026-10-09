@@ -5,7 +5,7 @@ It reads a checked-in compiler reference assembly and the authored XML sidecar,
 then renders Raven signatures with the same layout, navigation and development
 notice as the Markdown guides. No DocFX build, metadata YAML or second site exists.
 
-The current site build is a development snapshot with a link to published Preview 11;
+The current site build is a development snapshot with a separate published-release link;
 new behavior and proposals remain labeled separately.
 Comparer policies, the HashMap policy constructor and explicit String comparison
 modes are included in Preview 11. StringComparison, both comparison methods and
@@ -1422,3 +1422,8 @@ module and legacy namespace projections. They explain existing capabilities and
 link to the relevant guides; they do not fill the separately recorded type/member
 summary gaps or qualify additional execution modes. Refresh the native rendered
 snapshot whenever this authored content changes.
+
+The legacy reference build stages four function-only module introductions against
+its static carrier types (Environment, FileText, Metadata and NativeMemory). Native
+rendering retains the original `N:` IDs and module pages. This adaptation belongs
+to the temporary website bridge, not the native documentation contract.

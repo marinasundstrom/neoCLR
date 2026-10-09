@@ -1,6 +1,5 @@
 import System.*
 import System.Tasks.*
-alias Task = System.Tasks.Task
 
 async func Main() -> Task<()> {
     await Task.Run(() => Console.WriteLine("completed"))

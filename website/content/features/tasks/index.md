@@ -2,7 +2,7 @@
 
 Task describes whether an operation produced a value. It does not imply a thread. Write async code around the operation you need, with expected errors as values and cancellation as a distinct outcome.
 
-[See a working example ↓](#await) · [Download the complete example](../../samples/library-async-default-queue.rvn)
+[See a working example ↓](#await) · [Download the complete example](../../samples/task-run-await.rvn)
 
 <a id="await"></a>
 
@@ -15,20 +15,20 @@ receiver identity survive suspension. Native `Task<unit>` and `Task<int>` entry 
 complete registered work before reading the result; cancellation and unresolved tasks
 fail explicitly. Generic async methods and `Task<Result<...>>` entry points are not supported.
 
-## Starting and awaiting a worker
+## Starting and awaiting work
 
-Direct async Main uses the matching compiler and runtime. See [supported entry points](../../raven/#entry-points)
+Use `Task.Run` to submit work and `await` to wait for its completion. Direct async
+Main uses the matching compiler and runtime; see [supported entry points](../../raven/#entry-points)
 for return types and process exit behavior.
 
 ```raven
-{{TASK_WORKER_SAMPLE}}
+{{TASK_RUN_SAMPLE}}
 ```
 
-This prints `Hello on a worker`. `Thread.Run` creates an isolated OS worker and returns a `Task<string>` for its completion. `await` obtains that string. Use `Task<unit>` when completion carries no additional value.
-
-The worker callback is a named function with owned text input and output. Guest objects are not shared. `ThreadPool.Queue` offers the same completion shape through a small reusable pool.
-
-This preview uses System.Concurrency.Thread: construct a Thread and call its instance Start(), or use Thread.Run for immediate submission. The retained Task observes completion, including native thread termination. DNS, sockets and HTTP also return Tasks without creating a thread per operation.
+This prints `completed`. The callback returns no additional value, so `Task.Run`
+returns `Task<()>`; `await` waits for that work to finish before Main returns.
+A value-producing callback returns `Task<T>` instead. The runtime chooses how to
+execute submitted work; application code does not need to create a Thread.
 
 <a id="task-run"></a>
 
@@ -140,6 +140,23 @@ connection before reporting cancellation. Source/token separation follows .NET, 
 synchronization and exception aggregation are outside this iteration.
 
 [CancellationToken API →](xref:System.Concurrency.CancellationToken)
+
+## Explicit isolated workers
+
+Use `Thread` when you specifically need the isolated worker contract. For ordinary
+shared-capture work, start with `Task.Run` above.
+
+```raven
+{{TASK_WORKER_SAMPLE}}
+```
+
+This prints `Hello on a worker`. `Thread.Run` creates an isolated OS worker and returns a `Task<string>` for its completion. `await` obtains that string. Use `Task<unit>` when completion carries no additional value.
+
+The worker callback is a named function with owned text input and output. Guest objects are not shared. `ThreadPool.Queue` offers the same completion shape through a small reusable pool.
+
+This preview uses System.Concurrency.Thread: construct a Thread and call its instance Start(), or use Thread.Run for immediate submission. The retained Task observes completion, including native thread termination. DNS, sockets and HTTP also return Tasks without creating a thread per operation.
+
+[Download the isolated-worker example](../../samples/library-async-default-queue.rvn)
 
 <a id="worker-limits"></a>
 

@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Lead the Tasks guide with the compiled Task.Run/await example; keep explicit
+  isolated Thread usage in its own later section. Adapt module documentation IDs
+  only in the temporary legacy-reference website pass.
+
 - Document all 24 rendered API modules with purpose, current capabilities,
   boundaries and guide links; refresh the native reference snapshot.
 

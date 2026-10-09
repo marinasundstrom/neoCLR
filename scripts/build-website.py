@@ -306,6 +306,7 @@ def main():
         'STORAGE_POC_SAMPLE': ('docs/experiments/storage-poc/Main.rvn', 'func Main()', '\n}', True),
         'ARRAY_TOUR': (raven + 'library-array-tour.rvn', 'import System.*', '\n}', True),
         'TASK_AWAIT_SAMPLE': (raven + 'library-async-default-queue.rvn', 'func Describe', '\n    return ()\n}', True),
+        'TASK_RUN_SAMPLE': ('docs/experiments/task-run/UnitAwait.rvn', 'import System.*', '\n}', True),
         'TASK_WORKER_SAMPLE': (raven + 'library-async-default-queue.rvn', 'import System.*', '\n    return ()\n}', True),
         'TASK_PROMISE_SAMPLE': (raven + 'library-task-producer.rvn', 'import System.*', '\n    promise.Complete(41)\n}', True),
         'TASK_PROPAGATION_SAMPLE': (raven + 'library-task-propagation.rvn', 'async func Read', '\n}\n', True),
@@ -360,6 +361,7 @@ def main():
     shutil.copyfile(ROOT / "docs/experiments/reflection-members/Main.rvn", downloads / "reflection-members.rvn")
     shutil.copyfile(ROOT / "docs/experiments/runtime-gc/Main.rvn", downloads / "runtime-gc.rvn")
     shutil.copyfile(ROOT / "docs/experiments/task-run/Main.rvn", downloads / "task-run.rvn")
+    shutil.copyfile(ROOT / "docs/experiments/task-run/UnitAwait.rvn", downloads / "task-run-await.rvn")
     for name in ('library-time-zones.rvn', 'library-date-formatting.rvn', 'library-comparers.rvn', 'library-array-tour.rvn', 'library-array-tour.expected.txt', 'library-task-propagation.rvn', 'library-task-result.rvn', 'library-async-default-queue.rvn', 'library-task-producer.rvn', 'library-async-cancellation.rvn', 'library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
         source_sample = ROOT / raven / name
         shutil.copyfile(source_sample, downloads / name)
@@ -482,8 +484,19 @@ def main():
         config['sourceRepository']['root'] = str((SOURCE / config['sourceRepository'].get('root', '.')).resolve())
     publisher_output = ROOT / 'target/website-rendered'
     config['apiInputs'] = [str((ROOT / path).resolve()) for path in config['apiInputs']]
+    # The legacy reference represents four function-only modules as static types.
+    # Native snapshots consume the original N: IDs; adapt only this bridge pass.
+    legacy_content = staging / 'legacy-api-content'
+    legacy_content.mkdir()
+    legacy_containers = {'System.Environment', 'System.Storage.FileText',
+                         'System.Storage.Metadata', 'System.Runtime.InteropServices.NativeMemory'}
+    for source in (SOURCE / 'api-content').glob('*.md'):
+        content = source.read_text()
+        for name in legacy_containers:
+            content = content.replace('uid: N:' + name + '\n', 'uid: T:' + name + '\n')
+        (legacy_content / source.name).write_text(content)
     config.update(output=str(publisher_output),
-                  apiContent=str(SOURCE / 'api-content'),
+                  apiContent=str(legacy_content),
                   types=None,  # Generate every public type, regardless of comment availability.
                   excludedMembers=list(json.loads((ROOT / 'api-docs/exclusions.json').read_text())), pages=[])
     sources = [(source, source.relative_to(SOURCE / 'content').with_suffix('.html'))
