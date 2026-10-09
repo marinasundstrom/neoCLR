@@ -52,7 +52,8 @@ def serve(command, targets, fragmented, cwd, env=None):
         stdout, stderr = process.communicate(timeout=20)
         # Both normal and terminal-fault teardown must close the one listener.
         try:
-            connection = socket.create_connection(('127.0.0.1', int(port)), timeout=1)
+            # Windows can report refusal after its initial SYN retry interval.
+            connection = socket.create_connection(('127.0.0.1', int(port)), timeout=5)
         except ConnectionRefusedError:
             pass
         else:

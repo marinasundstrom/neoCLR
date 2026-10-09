@@ -22,6 +22,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   three dispatches, collecting between exchanges and discarding the session after
   service teardown on success or faults. Add an explicit private project bootstrap
   option, interpreter/native parity checks and a Windows HTTP session action.
+  Allow five seconds for the post-exit refusal probe so Windows can report the
+  closed listener after its SYN retry interval; a timeout still fails the gate.
   Exchanges use await; only the documented unit callback adapter starts asynchronous
   work for the host to drain. General async export completion remains unfinished.
   Record a separate pinned-compiler async pattern-local hoisting issue; the final
