@@ -7209,3 +7209,21 @@ permission to shadow duplicate implementations. No CLI semantic import is used.
 The reference PE remains a temporary transport for native metadata, with no claim
 that executing its CLI bodies implements String. Production core bootstrap and
 project-driver selection of primitive ownership remain separate qualification work.
+
+## Public documentation and native extension visibility (2026-10-09)
+
+The Preview 13 native reader recognizes a container-level ExtensionAttribute and
+currently treats parameterized static methods in that container as instance
+extensions. This loses the distinction between an instance receiver and the first
+ordinary argument of a static extension. Internal ConsoleRuntimeServices exposed
+the limitation: ConsoleFlush(error: bool) was shown as a Boolean extension.
+RavenDoc must independently require public enclosing types before contributing
+members to public receiver pages, matching the .NET reference's visibility policy.
+The shared renderer fix and native audit exclude these internal helpers.
+
+Remaining compiler work: encode and read explicit static/instance extension and
+receiver identity, preserving static members with zero arguments or an explicit
+argument of the receiver's type. Do not infer that distinction from parameter
+names. Raven owns the emitter/reader contract; native metadata must retain the
+semantic information. This documentation fix does not change runtime binaries or
+claim to resolve the native reader's broader classification limitation.

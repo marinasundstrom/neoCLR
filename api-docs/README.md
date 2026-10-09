@@ -1427,3 +1427,12 @@ The legacy reference build stages four function-only module introductions agains
 its static carrier types (Environment, FileText, Metadata and NativeMemory). Native
 rendering retains the original `N:` IDs and module pages. This adaptation belongs
 to the temporary website bridge, not the native documentation contract.
+
+### Public extension visibility regression (2026-10-09)
+
+Receiver lists must exclude public methods declared by internal extension types.
+The production native audit checks that Boolean does not acquire ConsoleFlush or
+ConsoleWriteBytes. Shared RavenDoc regression coverage exercises source and .NET
+metadata, preserving genuine public extensions and excluding internal generic
+extensions as well. See the native reader limitation in
+[the integration contract](../docs/raven-cli-bridge.md#public-documentation-and-native-extension-visibility-2026-10-09).

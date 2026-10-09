@@ -162,4 +162,8 @@ if (args.Length == 3)
 // No inspected library is loaded or executed through reflection.
 typeof(DocumentationGenerator).GetMethod("ProcessAssemblies", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!
  .Invoke(null, [compilation, assemblies, apiOutput, options]);
+var booleanPage = File.ReadAllText(Path.Combine(apiOutput, "System/Boolean/index.html"));
+if (booleanPage.Contains("ConsoleFlush", StringComparison.Ordinal) ||
+    booleanPage.Contains("ConsoleWriteBytes", StringComparison.Ordinal))
+    throw new InvalidDataException("Internal console service extensions leaked into the Boolean reference.");
 Console.WriteLine("PASS production native metadata rendering, with explicit temporary CLI bootstrap");

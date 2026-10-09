@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Correct API extension visibility: internal runtime-service containers no longer
+  contribute public-looking members such as ConsoleFlush and ConsoleWriteBytes
+  to Boolean. Refresh the shared RavenDoc renderer and native reference snapshot;
+  retain a regression check and document the separate native extension metadata
+  classification limitation. Released runtime packages are unchanged.
+
 - Record Preview 13 publication for Windows x64 and macOS ARM64, public asset
   checksum verification and website deployment evidence. Published release notes
   and qualification records remain unchanged.
