@@ -4,7 +4,7 @@
 #include "root-probe.h"
 /* Private nonmoving heap in the caller buffer. No malloc, external runtime or
  * arbitrary native-stack scan. All entry/arena lifetime restrictions still apply. */
-enum { NEOCLR_GC_TEXT = 1, NEOCLR_GC_OBJECT = 2, NEOCLR_GC_BYTES = 3, NEOCLR_GC_STRINGS = 4, NEOCLR_GC_RECORDS = 5 };
+enum { NEOCLR_GC_TEXT = 1, NEOCLR_GC_OBJECT = 2, NEOCLR_GC_BYTES = 3, NEOCLR_GC_STRINGS = 4, NEOCLR_GC_RECORDS = 5, NEOCLR_GC_INTERN = 6 };
 typedef struct {
     uint64_t collections, allocations, reclaimed_allocations, reclaimed_bytes;
 } neoclr_gc_statistics;
@@ -36,4 +36,9 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *arena, uint64_t bytes,
 int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head);
 /* Thread-local cumulative diagnostics across contexts/entries, not heap state. */
 neoclr_gc_statistics neoclr_gc_statistics_v1(void);
+/* Per-entry strong String pool: 4096 entries / 1 MiB UTF-8 payload, matching
+ * interpreter defaults. Hits remain available at quota. No collection/reentry.
+ * Failure preserves output; reset at the next admitted entry releases the pool. */
+int32_t neoclr_string_intern_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
+                               const neoclr_aot_text **output);
 #endif

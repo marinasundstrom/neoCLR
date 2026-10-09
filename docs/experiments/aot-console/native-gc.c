@@ -20,7 +20,7 @@ static int blocks_valid(const neoclr_aot_text_arena *a) {
         if (b->span < sizeof(block) + 8 || (b->span & 7) || b->span > a->used - at ||
             b->state > 7 || (b->state && !(b->state & ALLOCATED)) ||
             (b->state && (!b->bytes || b->bytes > b->span - sizeof(block) ||
-                          b->kind < NEOCLR_GC_TEXT || b->kind > NEOCLR_GC_RECORDS))) return 0;
+                          b->kind < NEOCLR_GC_TEXT || b->kind > NEOCLR_GC_INTERN))) return 0;
         at += b->span;
     }
     return 1;
@@ -112,7 +112,7 @@ int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context) {
 }
 int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
                              uint32_t kind, void **output) {
-    if (!output || !blocks_valid(a) || !bytes || kind < NEOCLR_GC_TEXT || kind > NEOCLR_GC_RECORDS)
+    if (!output || !blocks_valid(a) || !bytes || kind < NEOCLR_GC_TEXT || kind > NEOCLR_GC_INTERN)
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (bytes > UINT64_MAX - sizeof(block) - 7) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
     uint64_t needed = sizeof(block) + ((bytes + 7) & ~UINT64_C(7));
@@ -195,6 +195,13 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
     block_index index;
     build_index(a, &index);
     block *pending = NULL;
+    // Intern entries and their exact original String owners live until entry reset.
+    for (uint64_t at = 0; at < a->used;) {
+        block *b = (void *)(a->data + at);
+        if ((b->state & ALLOCATED) && b->kind == NEOCLR_GC_INTERN)
+            mark(a, &index, (uintptr_t)(b + 1), &pending);
+        at += b->span;
+    }
     mark_slots(a, &index, fault, (uint32_t)count, &pending);
     for (host_root *root = host_head; root; root = root->next)
         if (root->context == context) mark(a, &index, (uintptr_t)root->value, &pending);
@@ -211,7 +218,11 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
         pending = (block *)(uintptr_t)(b->state & ~UINT64_C(7));
         b->state = ALLOCATED | MARKED | SCANNED;
         const unsigned char *data = (const void *)(b + 1);
-        if (b->kind == NEOCLR_GC_OBJECT) {
+        if (b->kind == NEOCLR_GC_INTERN) {
+            if (b->bytes != 8) goto invalid_descriptor;
+            uint64_t owner; memcpy(&owner, data, 8);
+            mark(a, &index, owner, &pending);
+        } else if (b->kind == NEOCLR_GC_OBJECT) {
             for (uint64_t offset = 8; offset + 8 <= b->bytes; offset += 8) {
                 uint64_t word; memcpy(&word, data + offset, 8); mark(a, &index, word, &pending);
             }
@@ -234,6 +245,7 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
             uint64_t kind, length;
             if (b->bytes < 16) goto invalid_descriptor;
             memcpy(&kind, data, 8); memcpy(&length, data + 8, 8);
+            kind &= UINT64_C(0xffffffff);
             int reserved = kind == UINT64_C(0x80000004);
             if ((!reserved && kind != UINT64_C(0x80000003)) ||
                 length > (b->bytes - 16) / (reserved ? 9 : 8)) goto invalid_descriptor;
@@ -276,3 +288,31 @@ invalid_descriptor:
     return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
 }
 neoclr_gc_statistics neoclr_gc_statistics_v1(void) { return statistics; }
+
+int32_t neoclr_string_intern_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
+                               const neoclr_aot_text **output) {
+    if (!text || !output || !blocks_valid(arena)) return 3;
+    uint64_t count = 0, bytes = 0;
+    for (uint64_t at = 0; at < arena->used;) {
+        const block *b = (const void *)(arena->data + at);
+        if ((b->state & ALLOCATED) && b->kind == NEOCLR_GC_INTERN) {
+            if (b->bytes != 8) return 3;
+            const neoclr_aot_text *owner;
+            memcpy(&owner, b + 1, 8);
+            if (!owner || owner->length > UINT64_C(1048576) - bytes) return 3;
+            if (owner->length == text->length && !memcmp(owner->bytes,text->bytes,(size_t)text->length)) {
+                *output = owner;
+                return 0;
+            }
+            bytes += owner->length; count++;
+        }
+        at += b->span;
+    }
+    if (count >= 4096 || text->length > UINT64_C(1048576) - bytes) return 10;
+    void *entry;
+    int32_t status = neoclr_gc_allocate_v1(arena,8,NEOCLR_GC_INTERN,&entry);
+    if (status) return status;
+    memcpy(entry,&text,8);
+    *output = text;
+    return 0;
+}

@@ -3846,6 +3846,9 @@ fn interpret_instructions_with_dispatch(
                                 | crate::native::Binding::EnvironmentArguments
                                 | crate::native::Binding::TimeZoneMapLocal
                                 | crate::native::Binding::StringSnapshot
+                                | crate::native::Binding::StringGraphemes
+                                | crate::native::Binding::StringScalars
+                                | crate::native::Binding::Utf8Encode
                         ) {
                             *arrays_used = true;
                         }
@@ -4068,6 +4071,9 @@ fn interpret_instructions_with_dispatch(
                             binding,
                             crate::native::Binding::EnvironmentArguments
                                 | crate::native::Binding::TimeZoneMapLocal
+                                | crate::native::Binding::StringGraphemes
+                                | crate::native::Binding::StringScalars
+                                | crate::native::Binding::Utf8Encode
                         ) && matches!(callee.returns, Type::ArrayRef(_))
                         {
                             let Value::Array { elements, .. } = &value else {

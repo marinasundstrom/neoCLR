@@ -1999,3 +1999,35 @@ and its Raven consumers. Function arrays now support real ArrayList growth/copy/
 [reserved value arrays](record-arrays.md) now support initialized snapshots and nested references;
 HTTP enum storage, bounded selection and asynchronous host completion remain open;
 this does not yet make the HTTP app executable natively.
+
+## Native String services (development, 2026-10-09)
+
+`string-unicode.c` and the statically linked `aot-native-text` library implement
+full invariant casing, simple-fold comparison, grapheme counting/indexing,
+grapheme/scalar vectors and construction from initialized Char slots. The kernels
+reuse the interpreter's pinned Unicode tables and segmentation. Strings remain
+immutable UTF-8 descriptors; Char remains an extended grapheme. This deliberately
+differs from .NET's UTF-16 code-unit indexing and invariant casing rules; see the
+existing [text design](../../design/text-abstraction.md) for benefits and costs.
+
+The private adapters never collect or reenter. They publish results only on success;
+a failed multi-allocation vector can leave unreachable allocations until collection.
+They are matched compiler/host services, not a stable public native ABI. Tagged array
+headers keep their storage kind in the low 32 bits and optional verified nominal
+backing identity in the upper 32 bits; text adapters and GC mask the storage kind.
+
+With native GC, String.Intern keeps the first exact UTF-8 owner strongly reachable
+for one entry/context. The pool is stored in that context's heap and resets with the
+next admitted entry. Default bounds are 4,096 strings and 1 MiB of payload, matching
+interpreter defaults; existing hits succeed at capacity. A miss beyond either bound
+reports InternPoolLimitExceeded. This is not CLR process-wide intern lifetime.
+Lookup currently scans allocated heap blocks linearly: a bounded baseline requiring
+optimization if real workloads intern many distinct strings.
+
+`string-unicode-test.c` checks Unicode, invalid input, snapshot construction, GC
+retention, independent contexts, reset, both pool quotas and allocation failure.
+It passes with UBSan and warnings-as-errors on macOS ARM64. The diagnostic
+`string-intern-bench.c` excludes guest dispatch, compilation and GC. One local
+optimized run on 2026-10-09 measured last-entry hits at 7.4 / 87.7 / 1,611.8 /
+23,408.8 ns for 1 / 16 / 256 / 4,096 entries (10,000 hits each). These single-run
+numbers characterize scaling, not a platform comparison or release performance claim.

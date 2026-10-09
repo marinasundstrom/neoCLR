@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Share Unicode casing/folding kernels with statically linked native String services,
+  including grapheme/scalar snapshots and character construction. Add a GC-rooted,
+  per-entry intern pool with explicit quotas; record its provisional linear lookup
+  cost. Preserve exact managed-vector service types and allocation limits in the
+  interpreter. Validate native ownership, quota and failure behavior with UBSan.
+
 - Add explicit memberless native primitive references for source-library bootstrap.
   Preserve them through metadata readers and require exactly one executable owner
   during loading; reject standalone execution and malformed storage declarations.

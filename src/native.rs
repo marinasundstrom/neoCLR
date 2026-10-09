@@ -910,7 +910,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             )));
         }
     };
-    if function.returns != returns {
+    let array_reference_result = matches!(binding, Binding::Utf8Encode | Binding::StringGraphemes | Binding::StringScalars)
+        && matches!((&returns, &function.returns), (Type::Array(expected), Type::ArrayRef(actual)) if expected == actual);
+    if function.returns != returns && !array_reference_result {
         return Err(Fault::new(format!(
             "runtime binding return type mismatch for {}",
             function.name

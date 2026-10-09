@@ -1,38 +1,12 @@
 //! Unicode 17 full default casing, independent of locale and host Unicode data.
+#[cfg(test)]
 use crate::string_casing_data::{CASE_IGNORABLE, CASED, LOWER, UPPER};
-
-fn has_property(value: char, ranges: &[(u32, u32)]) -> bool {
-    let value = value as u32;
-    let index = ranges.partition_point(|&(start, _)| start <= value);
-    index > 0 && value <= ranges[index - 1].1
-}
+#[cfg(test)]
+use crate::string_casing_kernel::has_property;
 
 pub(crate) fn convert(text: &str, uppercase: bool) -> String {
-    let mappings = if uppercase { UPPER } else { LOWER };
     let mut result = String::with_capacity(text.len());
-    let mut preceded_by_cased = false;
-    for (offset, value) in text.char_indices() {
-        // Context is evaluated in the original text, skipping Case_Ignorable.
-        let final_sigma = !uppercase
-            && value == 'Σ'
-            && preceded_by_cased
-            && !text[offset + value.len_utf8()..]
-                .chars()
-                .find(|&c| !has_property(c, CASE_IGNORABLE))
-                .is_some_and(|c| has_property(c, CASED));
-        if final_sigma {
-            result.push('ς');
-        } else if let Ok(index) =
-            mappings.binary_search_by_key(&(value as u32), |&(source, _)| source)
-        {
-            result.push_str(mappings[index].1);
-        } else {
-            result.push(value);
-        }
-        if !has_property(value, CASE_IGNORABLE) {
-            preceded_by_cased = has_property(value, CASED);
-        }
-    }
+    crate::string_casing_kernel::append_mapped(text, uppercase, |part| result.push_str(part));
     result
 }
 

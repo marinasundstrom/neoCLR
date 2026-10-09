@@ -110,6 +110,7 @@ int32_t neoclr_reserve_bytes_v1(neoclr_aot_text_arena *arena, int32_t length, vo
 int32_t neoclr_check_bytes_initialized_v1(const void *array, int32_t offset, int32_t count) {
     uint64_t kind, length;
     memcpy(&kind, array, 8);
+    kind &= UINT64_C(0xffffffff);
     memcpy(&length, (const unsigned char *)array + 8, 8);
     /* Preserve the service's range/limit errors before examining any slots. */
     if (kind != UINT64_C(0x80000002) || offset < 0 || count < 0 ||
@@ -202,6 +203,7 @@ int32_t neoclr_utf8_decode_v1(const void *array, neoclr_aot_text_arena *arena, v
     if (!array) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     uint64_t kind, length;
     memcpy(&kind, array, 8);
+    kind &= UINT64_C(0xffffffff);
     memcpy(&length, (const unsigned char *)array + 8, 8);
     if ((kind != UINT64_C(0x80000001) && kind != UINT64_C(0x80000002)) || length > 65536)
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -259,6 +261,7 @@ int32_t neoclr_string_join_parts_v1(const void *parts, int32_t count, const neoc
     const unsigned char *array = parts;
     uint64_t kind, capacity;
     memcpy(&kind, array, 8);
+    kind &= UINT64_C(0xffffffff);
     memcpy(&capacity, array + 8, 8);
     if ((kind != UINT64_C(0x80000003) && kind != UINT64_C(0x80000004)) ||
         capacity > 65536 || (uint64_t)count > capacity)
@@ -519,5 +522,19 @@ int32_t neoclr_string_replace_ordinal_v1(const neoclr_aot_text *text,
     }
     memcpy(result->bytes + written, text->bytes + start, (size_t)(text->length - start));
     *output = result;
+    return 0;
+}
+
+/* Private writable construction buffer. The caller initializes every byte before
+ * publishing; no collection/reentry is allowed while construction is in flight. */
+int32_t neoclr_text_allocate_v1(neoclr_aot_text_arena *arena, uint64_t length,
+                               neoclr_aot_text **output) {
+    if (!output || length > INT32_MAX) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    void *storage;
+    int32_t status = reserve_storage(arena, 8 + length, TEXT_STORAGE, &storage);
+    if (status) return status;
+    neoclr_aot_text *text = storage;
+    text->length = length;
+    *output = text;
     return 0;
 }

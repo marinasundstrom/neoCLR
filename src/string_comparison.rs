@@ -1,5 +1,5 @@
 //! Locale-independent Unicode 17 default simple case folding for string policies.
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 fn fold(value: char) -> char {
     let mappings = crate::string_case_folding::MAPPINGS;
