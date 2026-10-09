@@ -12987,3 +12987,20 @@ claim follows from these focused checks.
 - **Current open milestone:** the unchanged typed JSON mapper now reaches its array
   reflection dependency. Array operations, property discovery and accessor execution
   remain required; neither complete native JSON nor benchmark readiness is claimed.
+
+## 2026-10-09 — Evaluate Introspection/Reflection before stability
+
+- **Author:** "We should also evaluate the design of the Introspection and Reflection API design. The overall structure is what we want, but it might change as we develop the platform before a stable release."
+- **Assistant response:** retain the overall descriptive-model/execution separation,
+  while evaluating names, signatures, errors and capability boundaries alongside
+  the native JSON work. This is not an API freeze or a direction to replace the model.
+- **Action:** added an initial [pre-stable review](introspection-design.md#pre-stable-api-evaluation--2026-10-09)
+  grounded in current Raven sources: accessor presence versus execution capability,
+  missing retention, validation versus user faults, array/property error consistency,
+  discovery scope and identity/provider boundaries. Recorded .NET, Go and FastMember
+  comparisons and the outstanding executable comparison work. No public API redesign
+  is claimed or inferred as approved.
+- **Implementation outcome:** checked native vector reflection now passes the public
+  Raven consumer and focused native/interpreter tests on macOS (`e01a0f97`); Windows
+  qualification is pending. Typed JSON remains blocked by property reflection.
+  The next milestone and the deferred benchmark direction remain in force.

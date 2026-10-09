@@ -78,6 +78,9 @@ support creation, readback, length and semantic GetType identity; the public Rav
 array consumer passes on macOS and its portable Windows gate is pending. Property metadata retention,
 runtime discovery tables, checked accessor dispatch and complete native JSON execution
 remain unfinished.
+Evaluate the Introspection/Reflection API alongside implementation before stability,
+preserving its overall structure while keeping details revisable; see the
+[pre-stable review](introspection-design.md#pre-stable-api-evaluation--2026-10-09).
 Once parity works, the author selects JSON serialization/deserialization as an
 interpreter-versus-native benchmark case; see the protocol in the native JSON plan.
 

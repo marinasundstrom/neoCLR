@@ -732,3 +732,53 @@ prominent, as part of the [modules-as-namespaces exploration](design/module-syst
 Direct module discovery, executable binding, packaging identity and migration from
 ExecutingAssembly remain design questions. The current assembly/module APIs described
 above are unchanged; the supplied proposal is not an implemented reflection contract.
+
+## Pre-stable API evaluation — 2026-10-09
+
+The author reaffirmed the overall Introspection/Reflection structure while asking
+that its API design be evaluated as the platform develops before a stable release.
+Keep one descriptive Info model and separate execution operations as the direction.
+This is not an API freeze: names, signatures, errors, acquisition and capability
+boundaries may change when concrete consumers justify the migration. The native
+JSON milestone remains active; backend limitations do not become permanent API rules.
+
+Initial findings from the existing Raven sources and native work:
+
+| Question | Current behavior / evidence | Evaluation and next evidence |
+| --- | --- | --- |
+| Does an accessor exist, and can this program execute it? | PropertyInfo.CanRead/CanWrite report accessor presence; Reflection extensions separately validate access, receiver and value. Native metadata retention and executable retention are distinct. | Keep these facts distinct. Compare retaining familiar CanRead/CanWrite with HasGetter/HasSetter, or an explicit operation-binding result. A Boolean alone cannot explain private access, omitted code and unsupported shapes. Test a public getter/private setter and metadata-only native roots before choosing names. |
+| What does unavailable metadata mean? | Private native bindings fault on unregistered metadata/invocation; ReflectionError has UnboundMetadata and several shape/access errors but no explicit deployment-retention case. | Do not return an empty member list or MissingAccessor for trimmed data. Evaluate a typed availability/binding result versus build-time rejection for known missing roots. Dynamic unknown flows need a documented runtime outcome. This is a gap, not a new shipped error case. |
+| Are validation and invocation one operation? | Public GetValue/SetValue return Result for validation failure, then invoke real user accessors; terminal user faults propagate. Internally the wrapper checks before invoking, and the interpreter validates again. | Preserve no-user-code-on-invalid-input. Compare current direct operations with reusable checked operation objects; cache only stable member/access facts and recheck receiver/value constraints. A prepared operation adds API/lifetime complexity and must earn its place through JSON measurements. |
+| Are array operations consistent? | ArrayReflection.Create/GetValue/GetLength return direct values and fault on bad arguments, whereas property operations return Result. | Evaluate whether this is an intentional low-level boundary or inconsistent public error handling. Exercise bad array type, null receiver, bad box and bounds through the public facades. Do not silently change faults to Result in a backend-only patch. |
+| Does discovery describe the requested scope? | Current property discovery enumerates declared properties and accepts the supported BindingFlags subset. Descriptor signatures can describe more than the bounded execution adapter supports. | Document declared/inherited behavior explicitly; test base/derived hidden and overridden properties. Compare explicit declared-member operations with flags before promising CLR-compatible enumeration. Unsupported invocation must not erase metadata. |
+| Is identity independent of representation? | typeof and GetType use semantic handles; native ordinals are image-local. Some implementation paths require concrete runtime descriptor providers. | Keep provider classes/private storage out of public contracts. Evaluate binding diagnostics for other origins and image lifetimes; do not introduce another public Type/TypeInfo hierarchy. Cross-context Emit remains future work. |
+
+The current .NET 10 API baseline combines description and execution on
+[PropertyInfo.GetValue](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.propertyinfo.getvalue?view=net-10.0),
+including argument/access errors and TargetInvocationException for accessor failures.
+neoCLR's separate execution extensions and Result validation can make capability
+boundaries explicit; the cost is more imports/concepts and a fault policy callers must
+understand. Neither arrangement is inherently superior. Modern .NET also offers
+[MethodInvoker](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.methodinvoker?view=net-10.0)
+for cached invocation with deliberate compatibility differences, so preparation is
+not a capability absent from .NET. No neoCLR performance benefit is claimed.
+
+[Go reflect.Value](https://pkg.go.dev/reflect#Value.CanSet) distinguishes mutable
+value capabilities such as CanSet and CanInterface; Set can still panic for invalid
+operations. This supports testing capability separately from declaration shape,
+not copying Go's addressability or panic semantics into neoCLR. The independent
+[FastMember project](https://github.com/mgravell/fast-member) demonstrates a library
+accessor abstraction for name-based member access; it is a comparison candidate,
+not evidence that its code-generation strategy is suitable for this native backend.
+The [.NET ref-struct invocation discussion](https://github.com/dotnet/runtime/issues/45152)
+records pressure beyond Object-array invocation. It is an issue/proposal discussion,
+not evidence that every suggested API shipped, and does not justify adding byref
+invocation to the JSON slice. Sources reviewed 2026-10-09; implementation/performance
+comparisons and pinned executable .NET probes remain outstanding.
+
+Before stabilizing or changing a public signature, run the same small scenarios
+through the interpreter and native consumer, compare the relevant .NET behavior,
+and update the API reference and tested Raven examples with migration notes. Preserve
+previous decisions in the development timeline. Keep research findings and proposed
+changes separate from implemented API behavior; continuing implementation is not
+approval of every proposed redesign.

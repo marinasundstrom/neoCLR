@@ -70,6 +70,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   preserving exact boxes, null/bounds faults, aliasing and GC cleanup. Map retained
   vector object identities to semantic array tokens. Validate public Raven array
   reflection against the interpreter and add the portable macOS/Windows gate.
+  Record the author-directed pre-stable Introspection/Reflection API evaluation,
+  preserving the overall structure while identifying capability/error/discovery
+  questions and comparative validation needs; no public API redesign is implemented.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.
