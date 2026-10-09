@@ -11,6 +11,7 @@ on:
       - 'src/**'
       - 'Cargo.*'
       - 'tools/aot-poc/**'
+      - 'tools/metadata/**'
       - 'tools/native/windows-scalar-host.c'
       - 'scripts/validate-windows-aot.py'
       - 'scripts/test_validate_windows_aot.py'
@@ -22,6 +23,7 @@ on:
       - 'src/**'
       - 'Cargo.*'
       - 'tools/aot-poc/**'
+      - 'tools/metadata/**'
       - 'tools/native/windows-scalar-host.c'
       - 'scripts/validate-windows-aot.py'
       - 'scripts/test_validate_windows_aot.py'
@@ -40,6 +42,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.revision || github.sha }}
+      - name: Check out pinned native-enabled Raven compiler
+        uses: actions/checkout@v4
+        with:
+          repository: marinasundstrom/raven
+          ref: 71cafd353900394a4f670a8ad8691597f6115091
+          path: target/raven-source
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            11.0.100-rc.1.26425.128
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions/setup-python@v5
         with:
@@ -51,7 +64,7 @@ jobs:
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-windows-aot.py --output target/windows-aot-validation"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-windows-aot.py --output target/windows-aot-validation --raven-source target/raven-source"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()

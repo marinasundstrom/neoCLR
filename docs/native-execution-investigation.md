@@ -327,7 +327,7 @@ tests pass on macOS, including actual C-consumer/interpreter parity.
 On a Windows x64 MSVC developer command prompt, run:
 
 ```sh
-cargo test --locked --manifest-path tools/aot-poc/Cargo.toml --test windows_scalar
+python scripts/validate-windows-aot.py --raven-source PATH_TO_RAVEN_CHECKOUT --output target/windows-aot-validation
 ```
 
 The Windows-only execution test links a C consumer with MSVC's static CRT and
@@ -399,6 +399,23 @@ also pass. All 66 downloaded file hashes match the [retained report](windows-rav
 qualifies the retained compiler fixture, not a fresh Raven source build on Windows.
 Like .NET Native AOT, startup is native; this probe covers only literal console output
 and does not claim comparable library coverage. The C adapter remains provisional.
+
+The fresh-source extension builds Raven `71cafd353900394a4f670a8ad8691597f6115091`
+(the existing native-toolchain qualification pin) with the current neoCLR metadata
+writer, then compiles `docs/experiments/aot-hello/hello.rvn` using `rvnc neoclr`.
+`UseRavenCoreReference=false` selects the compiler bootstrap; this literal-console
+probe does not use the class-library SDK or change any compiler/bridge contract.
+The workflow installs the same .NET 10/11 SDK versions as native-toolchain CI.
+.NET hosts the build-time Raven compiler; deployed test directories contain only
+the native executable. Compared with .NET Native AOT, this establishes the source
+pipeline for one bounded program, not its library or platform coverage.
+
+The gate records the compiler revision and four compiler/metadata assembly hashes,
+retains build/compile logs and source/metadata, and requires a separate fresh-source
+completion record for PE/#Neo and NEOX interpreter/native comparisons. It cannot
+fall back to the retained fixture. Local macOS checks pass; Windows execution of
+this extension is pending. Project kits, managed Windows services and unwinding
+remain outside this slice.
 
 ## Shared native contracts to establish
 

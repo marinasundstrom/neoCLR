@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import shutil
 import subprocess
 import sys
 
@@ -33,19 +34,27 @@ def require_raven_execution(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--raven-source', type=Path, required=True,
+                        help='Checkout of the native-enabled Raven compiler to build')
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     evidence = out / 'cases'
     evidence.mkdir()
+    raven = args.raven_source.resolve()
+    fresh = out / 'fresh-source'
+    fresh.mkdir()
+    assembly = fresh / 'RavenHello.dll'
     report = dict(passed=False, scope='Windows x64 scalar/literal-console AOT; no managed profiles or project kit qualification',
                   platform=platform.platform(), machine=platform.machine(), commands=[])
 
-    def run(command, name):
+    def run(command, name, cwd=ROOT):
+        command = list(map(str, command))
         log = out / (name + '.log')
         with log.open('w', encoding='utf-8') as stream:
-            result = subprocess.run(command, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT,
-                env={**os.environ, 'NEOCLR_WINDOWS_AOT_EVIDENCE': str(evidence)}, timeout=1500)
+            result = subprocess.run(command, cwd=cwd, stdout=stream, stderr=subprocess.STDOUT,
+                env={**os.environ, 'NEOCLR_WINDOWS_AOT_EVIDENCE': str(evidence),
+                     'NEOCLR_WINDOWS_FRESH_RAVEN': str(assembly)}, timeout=1500)
         report['commands'].append(dict(command=command, exitCode=result.returncode, log=log.name))
         if result.returncode:
             raise RuntimeError(f'{name} failed with exit {result.returncode}; see {log}')
@@ -58,11 +67,29 @@ def main():
         report['rustc'] = run(['rustc', '-Vv'], 'rustc')
         report['cargo'] = run(['cargo', '-V'], 'cargo')
         report['cl'] = run(['where.exe', 'cl'], 'cl-location')
+        report['compilerRevision'] = run(['git', '-C', raven, 'rev-parse', 'HEAD'], 'raven-revision')
+        report['dotnet'] = run(['dotnet', '--info'], 'dotnet')
+        # The primitive/console bootstrap needs no Raven.Core or packaged SDK.
+        run(['dotnet', 'build', raven / 'src/Raven.Compiler/Raven.Compiler.csproj',
+             '-c', 'Release', '-f', 'net10.0', '-p:UseRavenCoreReference=false',
+             '-p:NeoClrMetadataProject=' + str(ROOT / 'tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj')],
+            'raven-build', cwd=raven)
+        compiler = raven / 'src/Raven.Compiler/bin/Release/net10.0/rvnc.dll'
+        compiler_files = ('rvnc.dll', 'Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll',
+                          'NeoCLR.Metadata.Experimental.dll')
+        report['compilerFiles'] = {name: hashlib.sha256((compiler.parent / name).read_bytes()).hexdigest()
+                                   for name in compiler_files}
+        source = fresh / 'hello.rvn'
+        shutil.copyfile(ROOT / 'docs/experiments/aot-hello/hello.rvn', source)
+        run(['dotnet', compiler, 'neoclr', '-o', assembly, source], 'raven-compile')
+        if not assembly.is_file():
+            raise ValueError('Raven compiler did not produce fresh native metadata')
         command = ['cargo', 'test', '--locked', '--manifest-path', 'tools/aot-poc/Cargo.toml',
                    '--test', 'windows_scalar', '--', '--nocapture']
         run(command, 'tests')
         report['execution'] = require_execution(evidence / 'windows-execution.json')
         report['ravenExecution'] = require_raven_execution(evidence / 'raven-execution.json')
+        report['freshRavenExecution'] = require_raven_execution(evidence / 'fresh-raven-execution.json')
         report['passed'] = True
     except Exception as error:
         report['error'] = str(error)
@@ -71,7 +98,7 @@ def main():
                            for p in sorted(out.rglob('*')) if p.is_file()}
         (out / 'report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
         summary = f"Windows scalar AOT: {'PASS' if report['passed'] else 'FAIL'}\n\nRevision: {report.get('revision', 'unavailable')}\n\n"
-        summary += '32 scalar comparisons and 2 standalone Raven Hello World executions passed.\n' if report['passed'] else report.get('error', 'Unknown failure') + '\n'
+        summary += '32 scalar comparisons and 4 standalone Raven Hello World executions (retained and fresh source) passed.\n' if report['passed'] else report.get('error', 'Unknown failure') + '\n'
         if os.environ.get('GITHUB_STEP_SUMMARY'):
             with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as stream:
                 stream.write(summary)

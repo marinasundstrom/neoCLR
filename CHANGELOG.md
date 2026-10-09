@@ -25,7 +25,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   compare UTF-8 stdout/stderr with the interpreter. Windows run `37948836623`
   at `ee0dac80` passes all five tests without skips, including both standalone
   containers and the 32 scalar comparisons; all 66 artifact hashes are verified.
-  This qualifies the retained compiler fixture, not a fresh Raven source build.
+  That run qualifies the retained compiler fixture. Extend the gate to build pinned
+  Raven `71cafd35` with the current metadata writer and compile Hello World source
+  on Windows, requiring separate PE/#Neo and NEOX execution records. Retain
+  compiler revision/hashes, build diagnostics, source and emitted metadata; fresh
+  source execution qualification is pending.
 
 - Add a development macOS ARM64 project-to-executable console command using the
   selected bundle's Raven project build, existing AOT backend and explicit native

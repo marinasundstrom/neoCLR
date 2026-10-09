@@ -299,6 +299,22 @@ fn windows_c_consumer_executes_calls_branches_faults_and_utf8() {
 )]
 fn raven_hello_runs_as_standalone_windows_executable() {
     let fixture = include_bytes!("../../../docs/experiments/aot-hello/RavenHello.pe");
+    assert_windows_hello(fixture, "raven-execution.json");
+}
+
+#[test]
+#[cfg_attr(
+    not(all(target_os = "windows", target_arch = "x86_64")),
+    ignore = "requires Windows x64, MSVC and freshly compiled Raven input"
+)]
+fn fresh_raven_source_runs_as_standalone_windows_executable() {
+    let input = std::env::var_os("NEOCLR_WINDOWS_FRESH_RAVEN")
+        .expect("run scripts/validate-windows-aot.py with --raven-source");
+    let bytes = fs::read(input).unwrap();
+    assert_windows_hello(&bytes, "fresh-raven-execution.json");
+}
+
+fn assert_windows_hello(fixture: &[u8], marker: &str) {
     let module = neoclr::metadata_container::decode(fixture).unwrap();
     let program = neoclr::LoadedProgram::new(&module).unwrap();
     let interpreted = program.run(neoclr::ExecutionOptions::default()).unwrap();
@@ -307,7 +323,7 @@ fn raven_hello_runs_as_standalone_windows_executable() {
     let save = |outcomes: &Vec<serde_json::Value>, passed| {
         if let Some(path) = std::env::var_os("NEOCLR_WINDOWS_AOT_EVIDENCE") {
             fs::write(
-                PathBuf::from(path).join("raven-execution.json"),
+                PathBuf::from(path).join(marker),
                 serde_json::to_vec_pretty(
                     &serde_json::json!({"passed": passed, "outcomes": outcomes}),
                 )

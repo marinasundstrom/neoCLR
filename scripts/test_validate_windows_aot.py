@@ -39,7 +39,8 @@ class ExecutionGateTests(unittest.TestCase):
             for report in ({'passed': False, 'outcomes': cases},
                            {'passed': True, 'outcomes': cases[:1]},
                            {'passed': True, 'outcomes': [cases[0], cases[0]]},
-                           {'passed': True, 'outcomes': [cases[0], {**cases[1], 'exitCode': 1}]}):
+                           {'passed': True, 'outcomes': [cases[0], {**cases[1], 'exitCode': 1}]},
+                           {'passed': True, 'outcomes': [cases[0], {**cases[1], 'stdout': 'stale output'}]}):
                 path.write_text(json.dumps(report))
                 with self.assertRaises(ValueError):
                     module.require_raven_execution(path)
