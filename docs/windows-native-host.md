@@ -105,7 +105,7 @@ and host-root tests pass after the shared-header compatibility change. No collec
 algorithm or Raven compiler changes were needed. These are working native C host
 consumers; managed Windows code generation remains separately gated.
 
-## Stack protection: required, not implemented by this probe
+## Stack protection: bounded Windows host implementation
 
 .NET's [EnsureSufficientExecutionStack](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.runtimehelpers.ensuresufficientexecutionstack?view=net-10.0)
 checks whether sufficient stack remains and can throw InsufficientExecutionStackException.
@@ -113,16 +113,46 @@ neoCLR's existing native experiment instead uses a status result, a 64 KiB maxim
 machine frame and a 256 KiB remaining-stack reserve for matched adapters and fault
 return. Those macOS measurements do not qualify Windows.
 
+The private [Windows stack helper](../tools/native/windows-native-stack.c) uses
 [GetCurrentThreadStackLimits](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentthreadstacklimits)
-reports system-allocated current-thread stack bounds; code can execute outside
-those bounds. It is a candidate input, not proof that any arbitrary stack is safe.
-Before admitting managed Windows execution, validate final machine frame sizes,
-Windows page probing, remaining-stack checks before host transitions, and enough
-headroom to return a status without touching the OS guard. Add small-stack and
-deep-call consumers on Windows. Keep the x64 unwind/SEH/native stack-walking gap
-explicit; a C heap guard test does not close it. See the existing
-[x64 ABI comparison](native-execution-investigation.md#shared-native-contracts-to-establish)
-and [macOS stack experiment](experiments/aot-console/native-stack.md).
+to validate the current native stack region and
+[VirtualQuery](https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualquery)
+to obtain its allocation base. It reads the address of the current return slot via
+[_AddressOfReturnAddress](https://learn.microsoft.com/en-us/cpp/intrinsics/addressofreturnaddress?view=msvc-170),
+not its contents. That address is just below the caller's position after the helper
+returns. Invalid bounds, unexpected memory state or a fiber return status 9.
+Bounds are refreshed on every call, with no TLS cache or activation ownership claim.
+
+Windows [thread stacks](https://learn.microsoft.com/en-us/windows/win32/procthread/thread-stack-size)
+commit pages as needed within a reservation. Checking only currently committed
+space would reject normal fresh stacks; this helper budgets from the allocation
+base and leaves 256 KiB plus one bottom guard-page margin. This tests address-space
+headroom, not whether future commitment will succeed under OS memory pressure.
+The helper itself requires a usable host stack. Arbitrary native reentry, manually
+switched stacks, modified stack guarantees and foreign code are outside its scope.
+Primary sources reviewed 2026-10-09; API behavior is not a pinned implementation claim.
+
+Compared with .NET's managed sufficient-stack check, this private helper returns a
+status and depends on a bounded caller/adapter contract. Reusing the existing
+status and reserve avoids inventing a second guest fault; OS queries add overhead
+and conservatively retain stack capacity. A cached threshold is deferred until
+ownership and measurements justify it. Neither this helper nor a depth count
+alone proves arbitrary generated frames safe.
+
+The Windows C consumer creates 128 KiB, 512 KiB and 1 MiB reserved worker stacks.
+The small stack must reject entry without changing output. The others descend
+through non-elided 16 KiB buffers, publish GC frames, stop with status 9, collect
+while a root is live, and return normally with every frame removed. It verifies
+headroom again and reclaims the object. A converted fiber must be rejected and
+normal-thread checks must work after conversion back. The build retains compiler
+stack probing; it does not recover from an OS stack overflow. Execution is pending.
+
+Windows managed code generation still needs final-frame and outgoing-call bounds,
+Cranelift page-probing checks, guard placement and actual generated-code fault
+return tests. MSVC C-frame success does not prove those properties or close the
+x64 unwind/SEH/native stack-walking gap. See the existing
+[macOS stack experiment](experiments/aot-console/native-stack.md). Windows managed
+profiles remain rejected until that separate integration is qualified.
 
 ## Suspension and scheduling ownership
 
@@ -144,6 +174,6 @@ first-fault propagation and exactly-once cleanup. Reuse the
 before adding migration or green threads. Current root TLS, callbacks and stack
 adapters remain replacement boundaries, not public scheduling policy.
 
-Next: qualify Windows stack protection and managed lowering against the working
-collector host. Keep Windows managed profiles and project kits rejected until
+Next: execute the Windows host stack consumer, then qualify generated-code stack
+probing and managed lowering against the working collector host. Keep Windows managed profiles and project kits rejected until
 those separate requirements have executable evidence.

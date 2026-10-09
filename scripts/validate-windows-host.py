@@ -16,7 +16,7 @@ def main():
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    report = dict(passed=False, scope='Private Windows x64 guarded heap and collector/root lifecycle; no managed codegen or stack qualification',
+    report = dict(passed=False, scope='Private Windows x64 guarded heap and collector/root lifecycle; bounded native stack probe; no managed codegen qualification',
                   platform=platform.platform(), commands=[])
 
     def run(command, name):
@@ -63,6 +63,20 @@ def main():
         if result.stdout or result.stderr:
             raise ValueError('Unexpected collector contract output')
         report['collectorContract'] = dict(exitCode=0)
+        stack_inputs = [ROOT / 'tools/native' / name for name in
+                        ('windows-native-stack.c', 'windows-native-stack-test.c')]
+        stack_inputs += [base / 'native-stack.h']
+        report['inputs'].update({p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in stack_inputs})
+        run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
+             '/Fe:host-stack.exe', *stack_inputs[:2], ROOT / 'tools/native/windows-gc-host.c',
+             inputs[0], base / 'native-gc.c', base / 'root-probe.c'], 'stack-build')
+        result = run([out / 'host-stack.exe'], 'stack-execute')
+        stack = json.loads(result.stdout)
+        if (result.stderr or stack.get('passed') is not True
+                or stack.get('smallStackRejected') is not True or stack.get('fiberRejected') is not True
+                or not 1 < stack.get('depth512KiB', 0) < stack.get('depth1MiB', 0) < 64):
+            raise ValueError('Stack acceptance did not complete boundary and return checks')
+        report['stackExecution'] = stack
         report['passed'] = True
     except Exception as error:
         report['error'] = str(error)

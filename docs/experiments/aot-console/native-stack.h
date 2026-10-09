@@ -1,7 +1,9 @@
 #ifndef NEOCLR_NATIVE_STACK_H
 #define NEOCLR_NATIVE_STACK_H
 #include <stdint.h>
-/* Private macOS ARM64 experiment. Not a green-thread or public callable ABI.
+/* Private macOS ARM64 guest helper and Windows x64 host probe.
+ * Windows managed-code admission is separately gated.
+ * Not a green-thread or public callable ABI.
  * The generated caller must cap every final machine frame at 64 KiB and check
  * before crossing a host entry and after publishing each guest frame. A passing
  * check leaves 256 KiB: one maximum guest frame plus 192 KiB for the matched

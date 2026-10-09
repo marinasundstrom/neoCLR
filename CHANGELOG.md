@@ -55,6 +55,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   passes the integrated collector consumer, existing collector contracts and
   12 guarded-heap lifecycles. Verify 24 artifacts and 13 source hashes; local
   collector/host-root regressions also pass.
+  Add a private Windows remaining-stack probe and executable checks for small
+  stack rejection, bounded deep calls, collection at the limit, GC-frame cleanup
+  and fiber rejection. Use fresh system bounds and reservation-based headroom;
+  Windows execution is pending.
   Managed Windows code generation and project kits remain unsupported.
 
 - Add a development macOS ARM64 project-to-executable console command using the

@@ -5,6 +5,8 @@ on:
     paths:
       - 'tools/native/windows-host-memory*'
       - 'tools/native/windows-gc-host*'
+      - 'tools/native/windows-native-stack*'
+      - 'docs/experiments/aot-console/native-stack.h'
       - 'docs/experiments/aot-console/native-gc*'
       - 'docs/experiments/aot-console/root-probe*'
       - 'docs/experiments/aot-console/text-arena.h'
@@ -15,6 +17,8 @@ on:
     paths:
       - 'tools/native/windows-host-memory*'
       - 'tools/native/windows-gc-host*'
+      - 'tools/native/windows-native-stack*'
+      - 'docs/experiments/aot-console/native-stack.h'
       - 'docs/experiments/aot-console/native-gc*'
       - 'docs/experiments/aot-console/root-probe*'
       - 'docs/experiments/aot-console/text-arena.h'
