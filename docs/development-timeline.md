@@ -46,6 +46,13 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   Windows x64. Persistent guest state and a public hosting API remain open. See the
   [factory contract](task-completion-factories.md) and
   [downloaded cross-platform evidence](native-http-reuse-validation.json).
+- **Assistant continuation:** implements a private retained-session owner around
+  existing host roots and generated callbacks. Unlike stateless recovery, retained
+  mutations are not assumed consistent after a guest fault: dispatch stays disabled
+  until explicit shutdown discards the session. Documents this implementation choice,
+  its thread/image lifetime constraints and the still-missing application bootstrap
+  handoff in [the retained-session contract](native-retained-sessions.md).
+
 
 ## 2026-10-09 — Website audience and editorial cleanup
 

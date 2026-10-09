@@ -14,6 +14,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   roots; preserve diagnostics until explicit whole-session discard, including intern
   pool teardown. Add portable lifecycle and generated-callback gates. This is an
   ownership experiment, not a public hosting API or an application export handoff.
+  Run `37972822432` at `c77e2b07` passes the same lifecycle and generated-callback
+  gates on macOS ARM64 and Windows x64; verify 21/25 artifact hashes and 15/16
+  source inputs respectively. Compiled callback faults also match the interpreter
+  in the focused Rust regression.
 
 - Add a private serial-reuse HTTP host gate: preserve the first guest failure,
   render then clear fault roots, release task/socket scopes and require an empty

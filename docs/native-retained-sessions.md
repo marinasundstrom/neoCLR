@@ -76,4 +76,9 @@ The website's existing statement that general reusable hosting is unfinished rem
 accurate; there is no new public API reference entry for this private C experiment.
 
 [Retained validation evidence](native-retained-session-validation.json) records the
-local passing gates. Cross-platform Action qualification is pending.
+local passing gates and
+[Action 37972822432](https://github.com/marinasundstrom/neoCLR/actions/runs/37972822432)
+at `c77e2b07`: both lifecycle and generated-callback consumers pass on macOS ARM64
+and Windows x64 with identical fault output. All 21 macOS and 25 Windows downloaded
+artifact hashes are verified; 15/16 tracked source inputs respectively match the
+commit, allowing Windows checkout line endings.

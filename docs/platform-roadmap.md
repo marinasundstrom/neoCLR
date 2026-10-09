@@ -49,8 +49,8 @@ retained state/root ownership and broader persistent-host contracts; the HTTP
 host gate is deliberately stateless. The next
 [private retained-session experiment](native-retained-sessions.md) now supplies
 owned roots, fail-closed dispatch after faults and explicit shutdown admission.
-Local sanitized lifecycle and generated-callback tests pass; Windows qualification
-is pending. Application bootstrap/export handoff and a retained-state HTTP consumer
+[Lifecycle and generated-callback gates](native-retained-session-validation.json)
+pass on macOS ARM64 and Windows x64 at `c77e2b07`, with matching fault output. Application bootstrap/export handoff and a retained-state HTTP consumer
 remain the next integration work.
 
 **Author clarification (2026-10-09):** once the native compilation foundations are

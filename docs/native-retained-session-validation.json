@@ -1,6 +1,6 @@
 {
   "date": "2026-10-09",
-  "scope": "Private retained native session; macOS ARM64 local qualification",
+  "scope": "Private retained native session; macOS ARM64 and Windows x64 qualification",
   "reportSha256": "0dfaa621871ef29b8ce8ff4efccdb1ce8bb9b207797fd028b03068611c415d7b",
   "artifactHashesVerified": 21,
   "inputs": {
@@ -38,5 +38,53 @@
     "Generated callback fault matches interpreter in focused Rust test",
     "Existing root context/thread/quota regression passes"
   ],
-  "windows": "Pending matching kernel and generated-callback workflow."
+  "github": {
+    "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/37972822432",
+    "reports": [
+      {
+        "platform": "macOS-26.6.2-arm64-arm-64bit",
+        "machine": "arm64",
+        "revision": "c77e2b0731edc53921338fff0d7cf8f5f49fd6cc",
+        "reportSha256": "53c247e0fb455f7bda2f47e040415b6e1a11bfc4dc2af9f6ec96015be6307597",
+        "artifactHashesVerified": 21,
+        "trackedSourceHashesVerified": 15,
+        "cases": [
+          {
+            "name": "kernel",
+            "passed": true,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "name": "compiled",
+            "passed": true,
+            "stdout": "",
+            "stderr": "DivideByZero: Division by zero\n   at Fail [instruction 2]\n"
+          }
+        ]
+      },
+      {
+        "platform": "Windows-2022Server-10.0.20348-SP0",
+        "machine": "AMD64",
+        "revision": "c77e2b0731edc53921338fff0d7cf8f5f49fd6cc",
+        "reportSha256": "708a2949552e82d80820bd882a30052a2469614f4cce39083af773f3bac5cfad",
+        "artifactHashesVerified": 25,
+        "trackedSourceHashesVerified": 16,
+        "cases": [
+          {
+            "name": "kernel",
+            "passed": true,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "name": "compiled",
+            "passed": true,
+            "stdout": "",
+            "stderr": "DivideByZero: Division by zero\n   at Fail [instruction 2]\n"
+          }
+        ]
+      }
+    ]
+  }
 }
