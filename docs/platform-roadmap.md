@@ -67,6 +67,8 @@ identity are implemented. A build-time source metadata catalogue now preserves
 selected nominal declarations and closed property signatures through specialization
 without rooting accessor bodies. Explicit metadata retention, runtime tables, checked
 accessor/constructor dispatch and complete native JSON execution remain unfinished.
+Once parity works, the author selects JSON serialization/deserialization as an
+interpreter-versus-native benchmark case; see the protocol in the native JSON plan.
 
 **Author clarification (2026-10-09):** once the native compilation foundations are
 ready, let runtime suspension, runtime-owned scheduling and green threads co-evolve

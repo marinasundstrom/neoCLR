@@ -12969,3 +12969,8 @@ claim follows from these focused checks.
   requirements and checked invocation adapters, plus an independent reflection
   acceptance consumer. Explicit roots are an assistant-proposed first implementation
   mechanism; no public configuration syntax or author approval is inferred.
+- **Author benchmark direction:** "JSON serialization across interpreted and native compilation will be a benchmarking case once it works"
+- **Assistant response/action:** records the workload after the correctness gate and
+  proposes shared models/payloads with separate serialization/deserialization,
+  startup, steady-state and memory measurements. The benchmark harness and results
+  remain future work; no performance outcome is reported.

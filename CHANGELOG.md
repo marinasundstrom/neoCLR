@@ -24,6 +24,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   member identities/access in a private build-time catalogue before native lowering.
   Keep accessor bodies excluded unless independently reachable; runtime metadata
   tables, explicit retention roots and reflection invocation remain unfinished.
+  Record the author-directed interpreter/native JSON benchmark case after correctness
+  parity, with a proposed measurement protocol; no benchmark results are claimed.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

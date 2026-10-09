@@ -179,3 +179,34 @@ native/interpreter execution with the same supplied System module and checks tha
 handles are absent from GC trace slots. Invalid numeric casts fail before an object
 is emitted. `scripts/validate-native-type-tokens.py` runs the same C consumer on
 macOS and Windows. See [validation evidence](native-type-token-validation.json).
+
+## Interpreter/native benchmark gate — author direction, 2026-10-09
+
+The author directs: "JSON serialization across interpreted and native compilation
+will be a benchmarking case once it works." This is a deferred acceptance workload,
+not a request to benchmark the currently rejected native consumer. Complete semantic
+parity first, including negative cases and reflection side effects.
+
+The proposed benchmark protocol uses the same Raven serializer, model definitions
+and immutable payload corpus in both execution modes, with matching library/compiler
+revisions. Validate output bytes and deserialized values outside measured regions;
+consume results so the work cannot be discarded. Measure serialization and
+deserialization independently, then the round trip. Cover the admitted flat model,
+UTF-8/escaping and payload sizes first; add nested models and arrays when qualified.
+
+Report cold process startup separately from warmed repeated-operation throughput
+and latency. Keep reflection metadata initialization/cache effects visible in first-use
+measurements. Record allocations/collections and peak process memory where reliable
+instrumentation exists; label unavailable counters rather than estimate them. Include
+native binary/metadata size, toolchain and optimization settings, machine/OS,
+iterations, warmup policy, repeat count and variability. Run modes on the same
+machine for each platform; do not conflate macOS ARM64 versus Windows x64 differences
+with interpreter versus native differences. A direct serializer benchmark precedes
+HTTP end-to-end measurements so networking does not obscure serialization cost.
+
+The primary comparison is neoCLR interpreted versus native execution. A future .NET
+System.Text.Json baseline should identify reflection versus source-generated mode
+and match behavior/payloads explicitly; it is not silently interchangeable with
+neoCLR's existing mapper. No speedup or memory improvement is claimed in advance.
+This protocol is an assistant proposal supporting the author's benchmark direction;
+the harness and results are not implemented yet.
