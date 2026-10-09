@@ -26,7 +26,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   five scenarios with exact interpreter parity, executable-only deployment and
   overwrite/stale-output rejection; the same macOS cases pass. Verify 53 Windows
   and 29 macOS artifact hashes, matching source and bundle inputs. Add the
-  validated HTTP project template and standalone showcase instructions.
+  validated HTTP project template and standalone showcase instructions. Add bounded
+  native DNS workers and ordered nonblocking IPv4 connect attempts, sharing
+  cancellation, phase/shared deadlines and owner-thread callback cleanup. Local
+  sanitizer contracts pass for DNS snapshots, held-worker cancellation/timeout,
+  worker limits, scope teardown, address fallback and refused connections;
+  Windows and the Raven HttpClient consumer remain under validation.
 
 - Add explicit `x86_64-pc-windows-msvc` AOT target selection for the bounded scalar
   and literal-console profile, emitting x64 COFF with the target calling convention.

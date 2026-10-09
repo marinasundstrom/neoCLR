@@ -34,18 +34,18 @@ def main():
             raise ValueError('Qualification requires macOS or Windows')
         report['revision'] = run(['git', '-C', ROOT, 'rev-parse', 'HEAD'], 'revision').stdout.decode().strip()
         base = ROOT / 'docs/experiments/aot-console'
-        inputs = [base / name for name in ('socket-os.h', 'socket-listener.h', 'socket-listener.c',
+        inputs = [base / name for name in ('socket-os.h', 'socket-client-internal.h', 'socket-client-test.c', 'socket-listener.h', 'socket-listener.c',
                   'socket-listener-test.c', 'socket-accept-test.c', 'socket-transfer-test.c',
                   'native-gc.c', 'native-gc.h', 'root-probe.c', 'root-probe.h', 'text-arena.c', 'text-arena.h')]
         inputs += [base.parent / 'aot-fault-details/fault-details.h', Path(__file__).resolve()]
         report['inputs'] = {p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
         if windows:
-            compiler = ['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT', '/DNEOCLR_NATIVE_GC']
+            compiler = ['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT', '/DNEOCLR_NATIVE_GC', '/DNEOCLR_CLIENT_TEST']
         else:
             clang = run(['xcrun', '--sdk', 'macosx', '--find', 'clang'], 'clang').stdout.decode().strip()
             sdk = run(['xcrun', '--sdk', 'macosx', '--show-sdk-path'], 'sdk').stdout.decode().strip()
-            compiler = [clang, '-isysroot', sdk, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-DNEOCLR_NATIVE_GC', '-fsanitize=undefined,bounds']
-        for name in ('listener', 'accept', 'transfer'):
+            compiler = [clang, '-isysroot', sdk, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-DNEOCLR_NATIVE_GC', '-DNEOCLR_CLIENT_TEST', '-fsanitize=undefined,bounds']
+        for name in ('listener', 'accept', 'transfer', 'client'):
             binary = out / (name + ('.exe' if windows else ''))
             sources = [base / ('socket-' + name + '-test.c'), base / 'socket-listener.c',
                        base / 'native-gc.c', base / 'root-probe.c', base / 'text-arena.c']
@@ -55,7 +55,7 @@ def main():
             if result.stdout or result.stderr:
                 raise ValueError('Unexpected contract output: ' + name)
             report['cases'].append(dict(name=name, passed=True))
-        report['passed'] = len(report['cases']) == 3
+        report['passed'] = len(report['cases']) == 4
     except Exception as error:
         report['error'] = str(error)
     finally:

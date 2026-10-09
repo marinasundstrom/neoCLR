@@ -117,3 +117,37 @@ tracked build inputs match the commit, including checkout line endings. The
 32 Windows bundle inputs match the pinned bundle and both build reports use
 the same recorded backend hash. The x64 console regression also passes in run
 `37961490084`. HttpClient DNS/connect and ARM64 qualification remain separate.
+
+## Native client adapter (in development)
+
+Reuse interpreter `src/name_resolution.rs` and `src/socket_io.rs` policy: four
+process-wide resolver workers, eight DNS operations per scope, sixteen unique
+IPv4 addresses and at most 256 resolver records. Name validation is ASCII
+alphanumeric/dot/hyphen with a 253-byte maximum. Blocking getaddrinfo runs only
+on detached workers owning copied names/results and a refcounted host allocation.
+Workers never touch guest pointers, callbacks or contexts. Cancellation/timeout
+retires delivery without joining the worker; its capacity permit lasts until
+completion. Workers balance their own Winsock startup, including after scope exit.
+This follows the existing bounded interpreter policy rather than claiming an
+improvement over .NET resolver scheduling. Native activation migration stays open.
+
+Connect snapshots/deduplicates addresses and tries them in order. Poll observes
+write/error readiness plus SO_ERROR, not getpeername. Each phase has a five-second
+cap, clamped to a supplied shared deadline; fallback attempts have a one-second
+cap while more addresses remain. A completed callback is delivered once, with
+results consumed on the owner thread. Scope exit closes in-flight connects and
+releases roots; late DNS completion owns no heap or scope storage.
+
+The private native ABI represents a successful DNS snapshot as erased tag 7 with
+a traced String[] pointer; DnsAddresses returns a fresh shallow array snapshot.
+This is an adapter-owned encoding, not a new public Value kind or CLI metadata
+rule. Existing string-array backing identities must be preserved at the generated
+service return. The eventual native metadata/runtime-service ABI should replace
+this private representation. No Raven compiler or public library API change is
+required. Exact reserved service signatures gate the backend binding.
+
+The focused native client consumer tests numeric resolution, rooted snapshot
+retention, cancellation/timeout while workers are held, capacity retained after
+cancellation, context teardown before worker completion, address fallback,
+expired connect admission and connection refusal. macOS passes with sanitizers;
+Windows and end-to-end Raven client qualification remain pending.

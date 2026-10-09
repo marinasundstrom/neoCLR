@@ -9,6 +9,9 @@
 static _Thread_local neoclr_socket_scope *head;
 static _Atomic uint64_t next_id = 1;
 #ifdef NEOCLR_NATIVE_GC
+static void release_client(neoclr_socket_scope *, unsigned);
+#endif
+#ifdef NEOCLR_NATIVE_GC
 static void release_transfer(neoclr_socket_scope *scope, unsigned i) {
     if (scope->operations[i].buffer_root) {
         neoclr_gc_host_root_release_v1(scope->context, scope->operations[i].buffer_root);
@@ -91,6 +94,7 @@ int32_t neoclr_socket_scope_leave_v1(neoclr_socket_scope *scope) {
 #ifdef NEOCLR_NATIVE_GC
     for (unsigned i = 0; i < 64; i++) {
         if (scope->operations[i].callback && neoclr_gc_host_root_release_v1(scope->context, scope->operations[i].callback)) status = 3;
+        release_client(scope, i);
         release_transfer(scope, i);
         memset(&scope->operations[i], 0, sizeof(scope->operations[i]));
     }
@@ -184,6 +188,7 @@ static uint64_t new_operation_id(void) {
                 memory_order_relaxed, memory_order_relaxed));
     return id;
 }
+#include "socket-client-internal.h"
 int32_t neoclr_socket_accept_v1(uint64_t listener, void *callback,
                                neoclr_aot_context *context, void *output) {
     neoclr_socket_scope *scope = find_scope(context);
@@ -194,7 +199,7 @@ int32_t neoclr_socket_accept_v1(uint64_t listener, void *callback,
     if (!scope->slots[socket].listener) return publish(output, 2, 12);
     for (unsigned i = 0; i < 64; i++) {
         resources += scope->slots[i].id != 0;
-        resources += scope->operations[i].state == 1 && scope->operations[i].kind == 1;
+        resources += scope->operations[i].state == 1 && (scope->operations[i].kind == 1 || scope->operations[i].kind == 4);
         if (scope->operations[i].state == 1 && scope->operations[i].kind == 1 && scope->operations[i].listener == listener)
             return publish(output, 2, 2);
     }
@@ -215,10 +220,12 @@ int32_t neoclr_socket_cancel_v1(uint64_t operation, neoclr_aot_context *context,
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !output) return 3;
     for (unsigned i = 0; i < 64; i++) if (operation && scope->operations[i].id == operation) {
+        if (scope->operations[i].kind == 5) return 3;
         *output = scope->operations[i].state == 1;
         if (*output) {
             scope->operations[i].state = 2;
             scope->operations[i].tag = 2; scope->operations[i].value = 5;
+            release_client(scope, i);
             release_transfer(scope, i);
         }
         return 0;
@@ -229,9 +236,10 @@ static int32_t take_result(uint64_t operation, neoclr_aot_context *context, void
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !output) return 3;
     for (unsigned i = 0; i < 64; i++) if (operation && scope->operations[i].id == operation) {
-        if (scope->operations[i].state != 3 || ((scope->operations[i].kind == 1) != accept_result)) return 3;
+        if (scope->operations[i].state != 3 || ((scope->operations[i].kind == 1 || scope->operations[i].kind == 4) != accept_result) || scope->operations[i].kind == 5) return 3;
         if (neoclr_gc_host_root_release_v1(context, scope->operations[i].callback)) return 3;
         publish(output, scope->operations[i].tag, scope->operations[i].value);
+        release_client(scope, i);
         release_transfer(scope, i);
         memset(&scope->operations[i], 0, sizeof(scope->operations[i]));
         return 0;
@@ -314,7 +322,10 @@ int32_t neoclr_socket_poll_v1(neoclr_aot_context *context, uint64_t *callback) {
         if (f->context == context) return -3;
     for (unsigned n = 0; n < 64; n++) {
         unsigned i = (scope->poll_cursor + n) % 64;
-        if (scope->operations[i].state == 1 && scope->operations[i].kind != 1) {
+        if (scope->operations[i].state == 1 && scope->operations[i].kind >= 4) {
+            if (poll_client(scope, i)) return -3;
+        }
+        if (scope->operations[i].state == 1 && (scope->operations[i].kind == 2 || scope->operations[i].kind == 3)) {
             unsigned slot = 0;
             while (slot < 64 && scope->slots[slot].id != scope->operations[i].listener) slot++;
             if (slot == 64) return -3;
