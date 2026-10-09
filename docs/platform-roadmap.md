@@ -83,7 +83,9 @@ Raven facades, and the flat typed JSON round trip passes on macOS. The author ex
 the milestone to nested objects, arrays, typed lists/sequences and string-keyed maps;
 the built-in list/sequence and string-keyed map mapper now passes macOS
 native/interpreter round trips, including nested collections and preflight before
-model code. Windows qualification of this collection slice is pending. The existing nested object, DOM and
+model code. Windows x64 native/interpreter collection qualification also passes at
+`9a8f07a7`; [verified evidence](windows-native-json-collection-validation.json)
+records the source inputs, downloaded artifacts and standalone dependency checks. The existing nested object, DOM and
 scalar/object vector corpus now passes on Windows x64 with interpreter parity
 ([evidence](windows-native-json-validation.json)), alongside macOS ARM64.
 Native GetGenericArgument now inspects retained closed collection type arguments,
@@ -109,8 +111,9 @@ ergonomics/behavior before selecting additions. The author clarifies that TaskQu
 is not necessarily connected; collection additions do not require scheduler changes.
 See the [Queue/Stack review](experiments/queue-stack/README.md): application-local
 Option-slot storage probes pass native macOS and interpreter execution; public
-contracts, GC reclamation and Windows collection qualification remain open. Finish the current JSON correctness
-and platform qualification first. The earlier interpreter/native JSON benchmark
+contracts, GC reclamation and Windows Queue/Stack qualification remain open. The
+bounded basic JSON correctness/platform gate now passes on macOS ARM64 and Windows
+x64; collection API work can proceed. The earlier interpreter/native JSON benchmark
 and later framework-comparison direction remains recorded in the native JSON plan;
 this new request makes the collection review the next author-selected topic.
 

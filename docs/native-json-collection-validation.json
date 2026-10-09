@@ -92,5 +92,5 @@
     "2 native API snapshot tests passed",
     "RavenDoc source/reference fingerprint check passed"
   ],
-  "windows": "Pending collection project action; earlier node-only action 37993972338 passed"
+  "windows": "Passed at 9a8f07a7; see windows-native-json-collection-validation.json for verified source/artifact evidence"
 }

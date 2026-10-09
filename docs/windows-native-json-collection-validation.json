@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-10",
+  "revision": "9a8f07a71747e4b39031ce87df1f660f10ad10eb",
+  "run": "https://github.com/marinasundstrom/neoCLR/actions/runs/37997514319",
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "passed": true,
+  "reportSha256": "3ea3cd148b837b35b1a4d960e8f214539951a746cd7b0222fb7fb8884a7e51d0",
+  "verified": {
+    "inputFiles": 11,
+    "gitTextCheckoutEncoding": {
+      "scripts/validate-native-json.py": "CRLF",
+      "scripts/build-native-project.py": "CRLF",
+      "scripts/validate-native-http-project.py": "CRLF",
+      "scripts/validate-windows-project.py": "CRLF",
+      "scripts/prepare-native-development-bundle.py": "CRLF",
+      "docs/experiments/native-introspection/Main.rvn": "CRLF",
+      "docs/experiments/native-introspection/Native.rvnproj": "CRLF",
+      "docs/experiments/native-introspection/reflection-roots.json": "CRLF",
+      "docs/experiments/native-json/Main.rvn": "CRLF",
+      "docs/experiments/native-json/Native.rvnproj": "CRLF",
+      "docs/experiments/native-json/reflection-roots.json": "CRLF"
+    },
+    "downloadedFiles": 1456,
+    "buildArtifactsAndIsolatedExecutables": true
+  },
+  "toolHashesReportedByCI": {
+    "aot": "426651bee4cb3052f7ec685d142ffbeb66657bc7d76e7dff4fbea4c7605798bd",
+    "interpreter": "d8623ae9819b2e7bb5e72864803a34b059bd4547549ea9571fe68f878a338189"
+  },
+  "toolHashLimit": "The newly built AOT/interpreter executables are outside the uploaded artifact; their hashes were checked for stability by the CI validator, not rehashed locally.",
+  "cases": [
+    {
+      "name": "introspection",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "Report\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "Report\n",
+          "stderr": ""
+        }
+      ],
+      "dependencies": [
+        "KERNEL32.dll"
+      ],
+      "artifacts": {
+        "app.dll": "9f70ffd9d89ba240cf5bdb16ebbde3eb40947b3bd601289be75ce45de5617eec",
+        "app.obj": "0c80a6e09d422dace0d607949eb04e41ecb0b0a54018893449c465aace111e8e",
+        "app.exe": "5470aa0333cbae46c8c8f16247ea03c2493d8acbefb222d9be5cefe81f68427f"
+      }
+    },
+    {
+      "name": "json",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        }
+      ],
+      "dependencies": [
+        "KERNEL32.dll"
+      ],
+      "artifacts": {
+        "app.dll": "fd06a3ec128006831a4e1f9ca0b3f999cb6ef3fae48e7ed632bd9960d0a8b46e",
+        "app.obj": "626fa32fb760f9b893d32aa1aa45a5f12e2e7db89e607c401e8828b5fa594f2a",
+        "app.exe": "1756f0418b87621403d9c70c089e5ee828f591dd67367ecf8a4c90ebbb59262c"
+      }
+    }
+  ]
+}

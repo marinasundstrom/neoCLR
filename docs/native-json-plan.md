@@ -759,7 +759,7 @@ boxing remains restricted to existing admitted value shapes.
 The project driver conditionally links the matched allocation-free native text
 archive when selected bindings require Unicode comparison/hashing. Source builds
 use Cargo; packaged macOS kits carry the archive. Windows uses the same source
-kernel, with execution qualification still required for this slice. The JSON
+kernel, now qualified by the Windows x64 project action. The JSON
 validator builds the current interpreter so new private services are compared
 against the matching implementation rather than an older bundled runtime.
 
@@ -767,5 +767,17 @@ against the matching implementation rather than an older bundled runtime.
 The complete reflection/JSON project corpus passes on macOS ARM64 in
 `target/native-json-collections-qualified/report.json`, including matching
 optimized interpreter results. Follow-up write-only retention checks also pass in both modes;
-[recorded evidence](native-json-collection-validation.json) includes source/binary hashes. Windows collection qualification and HTTP integration remain
-next; earlier Windows node/array evidence is not collection evidence.
+[recorded evidence](native-json-collection-validation.json) includes source/binary hashes.
+Windows x64 action [37997514319](https://github.com/marinasundstrom/neoCLR/actions/runs/37997514319)
+passes the complete introspection/JSON corpus at `9a8f07a7`, including collection
+and write-only cases in native and matching interpreter execution. The
+[Windows evidence](windows-native-json-collection-validation.json) verifies all 11
+reported source inputs against the commit (Windows CRLF checkout accounted for),
+1,456 downloaded file hashes, build artifacts and isolated executables. Both native
+programs depend only on KERNEL32.dll. The newly built AOT/interpreter binaries are
+outside the uploaded artifact: their hashes are CI-reported, not locally rehashed.
+
+This closes the bounded basic JSON platform gate on macOS ARM64 and Windows x64.
+It does not qualify Windows ARM64, remove document limits, add converters or prove
+the new collection corpus through HTTP. The author-selected collections review can
+proceed; HTTP integration and the earlier benchmark/publication follow-up remain open.

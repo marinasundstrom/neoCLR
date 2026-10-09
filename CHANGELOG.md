@@ -34,7 +34,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Record the author's decision to defer converter/inheritance/union wire-contract
   work until basic JSON is ready; these remain plans, not implemented APIs.
   Validate the expanded reflection/JSON corpus on macOS with the matching optimized
-  interpreter; Windows collection qualification remains pending.
+  interpreter and Windows x64 native/current-interpreter execution. Verify the
+  Windows action’s source and downloaded artifact hashes; both standalone consumers
+  link only KERNEL32.dll. Windows ARM64 and collection HTTP integration remain open.
   Record a subsequent collections review, with a queue interface/implementation
   as the author’s first candidate once basic JSON is sufficiently qualified.
 

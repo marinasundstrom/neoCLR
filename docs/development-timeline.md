@@ -13123,3 +13123,16 @@ claim follows from these focused checks.
   FIFO/LIFO, growth, peek, cleared tags and reuse/reference aliases. It does not
   prove GC reclamation, Windows execution or public API conformance. Scheduling
   code remains untouched.
+
+### Basic JSON Windows qualification outcome
+
+- **Performed:** Windows action 37997514319 at `9a8f07a7` passes the introspection
+  and expanded JSON collection/document corpus in native and current-interpreter
+  execution. Verified 11 source-input hashes against the commit with checkout line
+  endings accounted for and all 1,456 reported downloaded file hashes, including
+  build artifacts and isolated executables. See the
+  [evidence and tool-hash limitation](windows-native-json-collection-validation.json).
+- **Milestone:** bounded basic JSON qualification now passes on macOS ARM64 and
+  Windows x64. Windows ARM64, HTTP execution of the expanded collection corpus,
+  benchmarks and converters are not established by this result. The requested
+  general-purpose collections work can proceed independently of TaskQueue.
