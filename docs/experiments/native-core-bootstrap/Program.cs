@@ -63,6 +63,17 @@ if (args.Length == 2)
         il.Call(runtimeCall);
         il.Return();
     }
+    var replaceService = core.AddFunction("neoCLR.Runtime", "StringReplaceOrdinal",
+        new(PrimitiveType.String, [PrimitiveType.String, PrimitiveType.String, PrimitiveType.String]));
+    replaceService.SetInternalCall();
+    var replace = stringType.AddInstanceMethod("Replace",
+        new(PrimitiveType.String, [PrimitiveType.String, PrimitiveType.String]));
+    var replaceIl = replace.GetILGenerator();
+    replaceIl.LoadArgument(0);
+    replaceIl.LoadArgument(1);
+    replaceIl.LoadArgument(2);
+    replaceIl.Call(replaceService);
+    replaceIl.Return();
     var byteCount = core.AddFunction("neoCLR.Runtime", "StringByteCount", new(PrimitiveType.Int32, [PrimitiveType.String]));
     byteCount.SetInternalCall();
     var count = stringType.AddInstanceMethod("GetByteCount", new(PrimitiveType.Int32, []));

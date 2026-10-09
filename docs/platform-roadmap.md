@@ -14,15 +14,16 @@ values from Object dispatch candidates. [Evidence](experiments/native-core-boots
 String-payload union display now passes Some/None/Ok/Error across modes with bounded
 nonmatching Char-box tests. Int32 payloads also pass zero/negative/min/max and both
 Result cases with the explicit native integer formatter; missing binding publishes no object.
-[Integer display evidence](experiments/native-core-bootstrap/integer-display-validation.json). Matching Char boxes remain rejected; escaping, other primitive
+[Integer display evidence](experiments/native-core-bootstrap/integer-display-validation.json). Matching Char boxes remain rejected; other primitive
 payload display and full core bootstrap remain open.
 [Display evidence](experiments/native-core-bootstrap/README.md#nonmatching-char-tests-and-string-union-display-2026-10-09).
 Immediate constructed value receivers now lower through single-evaluation temporary
 storage. The [escaping audit](experiments/native-core-bootstrap/README.md#constructed-receivers-and-escaping-audit-2026-10-09)
-confirms that quotes/backslashes remain unescaped in both modes because String.Replace
-is absent. The private interpreter/native replacement service now passes focused
-UTF-8 and fault checks; next expose the String member and qualify production union
-escaping. [Service contract](experiments/native-core-bootstrap/README.md#private-ordinal-replacement-service-2026-10-09).
+previously confirmed missing quote/backslash escaping in both modes when String.Replace
+was absent. The private interpreter/native replacement service now passes focused
+UTF-8 and fault checks. The source-owned String.Replace member, bridge/reference
+and native fixture now expose it; production Option/Result escaping passes project,
+interpreter and ARM64 checks. [Service contract](experiments/native-core-bootstrap/README.md#private-ordinal-replacement-service-2026-10-09).
 Full core bootstrap remains open.
 [Union source evidence](experiments/native-core-bootstrap/README.md#production-union-source-subset-2026-10-09).
 [Text-service evidence](experiments/native-core-bootstrap/README.md#native-text-services-and-module-projection-2026-10-09).

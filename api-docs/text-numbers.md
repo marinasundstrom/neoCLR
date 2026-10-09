@@ -96,3 +96,14 @@ consumer. Direct operators, identities and ordering execute. This is a contract
 integration checkpoint, not completion of source-built numeric primitives or generic
 Number emission on that newer path; the older bridge's closed specialization evidence
 above remains distinct.
+
+
+## Ordinal replacement (development)
+
+[String.Replace(oldValue, newValue)](xref:System.String) returns immutable text after
+replacing exact, non-overlapping matches. Empty replacement deletes; unchanged text
+retains its reference. Both arguments must be non-null and the search must be
+non-empty; empty search faults with RuntimeError. Matching uses UTF-8 without culture
+or normalization. Unlike .NET's nullable replacement overload, use empty text for
+deletion. The shared service has interpreter and experimental ARM64 coverage; full
+native core bootstrap remains work in progress.

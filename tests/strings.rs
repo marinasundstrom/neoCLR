@@ -393,3 +393,34 @@ fn raven_slice_preserves_native_statuses_and_rejects_unknown_status() {
         }
     }
 }
+
+#[test]
+fn replacement_uses_source_owned_string_member() {
+    let program = program();
+    let replace = program
+        .resolve_function(
+            &parse_function_ref("instance System.String::Replace(String,String)").unwrap(),
+        )
+        .unwrap();
+    for (input, old, new, expected) in [
+        ("hé\0hé", "hé", "🙂", "🙂\0🙂"),
+        ("aaaaa", "aa", "X", "XXa"),
+        ("banana", "na", "", "ba"),
+        ("abc", "z", "x", "abc"),
+    ] {
+        assert_eq!(
+            replace
+                .invoke_instance(text(input), vec![text(old), text(new)], Limits::default())
+                .unwrap()
+                .value,
+            text(expected)
+        );
+    }
+    assert_eq!(
+        replace
+            .invoke_instance(text("abc"), vec![text(""), text("x")], Limits::default())
+            .unwrap_err()
+            .code,
+        neoclr::FaultCode::RuntimeError
+    );
+}

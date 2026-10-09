@@ -322,6 +322,9 @@ contract changes in this slice.
 
 ## Constructed receivers and escaping audit (2026-10-09)
 
+Historical audit before the String.Replace facade below. The current command requires
+positive escaping; the old evidence is retained to show the defect that was fixed.
+
 `--project --text-services --unions --escaping-audit` deliberately reproduces a
 known defect, not a formatting pass. The [audit](escaping-audit.rvn) compares a
 quote/backslash payload against both the correctly escaped description and the
@@ -402,3 +405,36 @@ main in the macOS 27 allocator/dyld integration; no ASan pass is claimed.
 Next connect and document the production String.Replace member, then convert the
 union audit to positive escaping checks. No Raven compiler change is needed for
 this private service slice, and no new public website API is claimed yet.
+
+
+## String.Replace facade and positive escaping (2026-10-09)
+
+The source-owned String.Replace(oldValue, newValue) now forwards to the shared
+service. Its bridge signature catalog, native bootstrap service catalog, retained
+seed and generated String implementation are updated together. The API reference
+includes its non-null arguments, empty-search fault, deletion and allocation limits.
+No Runtime Contract configuration or IL encoding changes are needed. CLI bridge
+references still represent the method as System.String.Replace; translation uses
+the existing String receiver adapter and exact runtime-service signature. Native
+metadata represents the ordinary instance member directly.
+
+The native core fixture now supplies that same real forwarding method. Raven's
+existing synthesized union formatter finds it and escapes backslashes before
+quotes. `--escaping-audit` now requires correct output: Some and Error text with
+quotes, backslashes, Unicode and NUL; direct non-overlapping replacement and deletion.
+[Positive evidence](escaping-positive-validation.json) records project run,
+interpreter and ARM64 result 42, with only libSystem dynamically linked. The prior
+[known-failure evidence](escaping-validation.json) is retained as historical evidence.
+This qualifies unchanged production Option/Result over the fixture, not complete
+native source-owned String/bootstrap or arbitrary value formatting.
+
+The production String source compiled and regenerated through the existing bridge;
+`replacement_uses_source_owned_string_member` exercises that generated member and
+its empty-search fault in the interpreter. The API reference snapshot was refreshed
+from the matching bridge. Next qualify production String as part of the native-only
+core composition; matching Char boxes and general Object formatting remain open.
+
+Facade validation also passes all six opaque-library admission cases, including exact
+Replace export/service checks and existing rejected storage/signature mutations. The
+website build checks 3490 pages; the Replace page was inspected in the browser with
+signature, XML text, parameter links and the existing bridge migration notice intact.

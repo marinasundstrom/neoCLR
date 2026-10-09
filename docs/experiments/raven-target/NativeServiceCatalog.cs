@@ -9,7 +9,7 @@ static partial class RuntimeServiceBindings
         "Int32ToString", "Int64ToString", "TypeName", "TypeEquals", "TypeArgumentCount", "TypeArgument",
         "TypeShape", "TypeDisplayName", "TypeMetadataToken", "ObjectTypeHandle",
         "ReflectionConstructionCheck", "ReflectionConstruct",
-        "StringEquals", "StringFromChars", "StringGraphemeAt", "StringIntern", "StringConcat",
+        "StringEquals", "StringFromChars", "StringGraphemeAt", "StringIntern", "StringConcat", "StringReplaceOrdinal",
         "StringCompareOrdinal", "StringCompareOrdinalIgnoreCase", "StringContainsOrdinal",
         "StringStartsWithOrdinal", "StringEndsWithOrdinal", "StringGraphemeCount",
         "CharFromString", "CharText", "CharCategory", "StringGraphemes", "StringScalars",

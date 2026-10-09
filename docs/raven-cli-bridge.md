@@ -7177,3 +7177,17 @@ change. Imported ordinary/generic/nested mutating/out receiver checks pass, and 
 [native-only escaping audit](experiments/native-core-bootstrap/README.md#constructed-receivers-and-escaping-audit-2026-10-09)
 executes immediate union-case display in both modes. That audit records the still
 unresolved shared String.Replace/escaping gap rather than claiming correct display.
+
+
+### String replacement facade (2026-10-09)
+
+System.String.Replace(String,String) now forwards to the real shared ordinal UTF-8
+service. StringBindings owns exact CLI member/parameter mapping and the existing
+instance receiver adapter; RuntimeServiceBindings owns its three-String InternalCall
+signature. NativeServiceCatalog and the retained seed carry the same service.
+No Runtime Contract configuration or metadata encoding changes. The CLI reference
+is still a temporary declaration, not a .NET implementation of replacement; native
+metadata/source codegen replaces the bridge adapter with the ordinary instance body.
+Non-null arguments, empty-search RuntimeError and explicit empty replacement deletion
+are neoCLR contracts; do not infer .NET nullable/culture overloads from the name.
+See [validation and remaining native core work](experiments/native-core-bootstrap/README.md#stringreplace-facade-and-positive-escaping-2026-10-09).

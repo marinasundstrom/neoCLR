@@ -74,6 +74,7 @@ static partial class RuntimeServiceBindings
             ("StringGraphemeAt", ["String", "Int32"], "Char"),
             ("StringIntern", ["String"], "String"),
             ("StringJoinParts", ["arrayref<String>", "Int32", "String", "Int32"], "String"),
+            ("StringReplaceOrdinal", ["String", "String", "String"], "String"),
             ("StringConcat", ["String", "String"], "String"),
             ("StringCompareOrdinalIgnoreCase", ["String", "String"], "Int32"),
             ("StringHashOrdinalIgnoreCase", ["String"], "Int32"),

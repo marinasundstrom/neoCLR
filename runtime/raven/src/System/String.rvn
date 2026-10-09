@@ -114,6 +114,13 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         return RuntimeServices.StringToLowerInvariant(m_value)
     }
 
+    /// Replaces exact, non-overlapping matches without modifying this string.
+    /// Empty replacement deletes matches; empty search faults with RuntimeError.
+    /// Arguments must be non-null. Matching uses UTF-8 without culture or normalization.
+    func Replace(oldValue: string, newValue: string) -> string {
+        return RuntimeServices.StringReplaceOrdinal(m_value, oldValue, newValue)
+    }
+
     func ContainsOrdinal(substring: string) -> bool {
         return RuntimeServices.StringContainsOrdinal(m_value, substring)
     }

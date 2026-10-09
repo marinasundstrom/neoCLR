@@ -59,5 +59,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
             assert '.type System.String\n' in emitted
             assert '.method instance readonly byref Equals(String other)' in emitted
             assert '.method instance GetUtf8ByteCount()' in emitted
+            assert '.method instance Replace(String oldValue,String newValue)' in emitted
+            assert 'call neoCLR.Runtime.StringReplaceOrdinal(String,String,String)' in emitted
             assert '.field ' not in emitted
     print(f'{len(cases)} opaque library admission cases passed')

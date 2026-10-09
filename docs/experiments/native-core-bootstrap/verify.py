@@ -22,7 +22,7 @@ def main():
     parser.add_argument('--unions', action='store_true', help='With --text-services, execute unchanged production Option/Result and pattern controls.')
     parser.add_argument('--string-boxing', action='store_true', help='With --unions, check generic String boxing/display and reference identity.')
     parser.add_argument('--union-display', action='store_true', help='With --unions, check String/Int32 union display and formatter binding; excludes --string-boxing.')
-    parser.add_argument('--escaping-audit', action='store_true', help='With --unions, reproduce the known missing String.Replace escaping gap, not formatting success.')
+    parser.add_argument('--escaping-audit', action='store_true', help='With --unions, Verify union quote/backslash escaping through real String.Replace services.')
     args = parser.parse_args()
     if args.project and not args.driver:
         parser.error('--project requires --driver')
@@ -183,10 +183,9 @@ def main():
         report.pop('unionChecks', None)
         report['displayChecks'] = ['Some Unicode/NUL', 'None', 'Ok String', 'Error String', 'Some Int32 zero/negative/min/max', 'Ok Int32', 'Error Int32', 'missing formatter rejection']
     if args.escaping_audit:
-        report['scope'] = 'Known escaping defect reproduction in both modes, not successful union escaping or full bootstrap qualification.'
+        report['scope'] = 'Production Option/Result escaping over native fixture String.Replace; not full core bootstrap qualification.'
         report.pop('unionChecks', None)
-        report['knownFailure'] = {'correctEscapedOutput': False, 'rawQuotedPayloadConfirmed': True,
-            'cause': 'native core and production String lack Replace(String,String); Raven synthesized formatter falls back to raw quoting'}
+        report['escapingChecks'] = ['Some and Error quote/backslash ordering', 'Unicode and embedded NUL preserved', 'non-overlapping replacement', 'empty replacement deletion']
     report['revisions'] = {name: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip()
                            for name, path in [('neoclr', ROOT), ('raven', args.raven)]}
     inputs = [runtime, aot, *[p for p in HERE.iterdir() if p.suffix in ('.cs', '.csproj', '.rvn', '.neoil', '.c', '.py')]]
@@ -200,7 +199,7 @@ def main():
         inputs += [project, directory / 'Main.rvn']
     report['sha256'] = {str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs}
     (output / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')
-    print('REPRODUCED known escaping gap in both modes; not a formatting pass' if args.escaping_audit
+    print('PASS union escaping: project/interpreter/native=42; full core bootstrap remains open' if args.escaping_audit
           else 'PASS native-only core consumer: interpreter=42, native=42, libSystem only')
 
 

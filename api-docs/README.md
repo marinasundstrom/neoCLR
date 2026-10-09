@@ -1368,3 +1368,12 @@ procedure above; no deployment is implied by local website validation.
 2026-10-09: logical declaration-module host APIs are covered in the
 [manual metadata reference](experimental-metadata.md#declaration-modules-development-2026-10-09).
 They do not change guest ModuleInfo or require a new guest reference snapshot.
+
+
+### String replacement (2026-10-09)
+
+Development String.Replace(String,String) is included in the existing String type
+selection, with argument, result, fault and ordinal UTF-8 documentation. The matching
+bridge reference and source snapshot are refreshed. It requires non-null arguments;
+empty replacement deletes and empty search faults. Native fixture union escaping is
+qualified; complete native source-core bootstrap remains unfinished.

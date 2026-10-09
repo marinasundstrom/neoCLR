@@ -236,6 +236,13 @@ ldarg arg1
 call neoCLR.Runtime.StringCompareOrdinalIgnoreCase(String,String)
 ret
 .end
+.method static StringReplaceOrdinal(String arg0,String arg1,String arg2) -> String
+ldarg arg0
+ldarg arg1
+ldarg arg2
+call neoCLR.Runtime.StringReplaceOrdinal(String,String,String)
+ret
+.end
 .method static StringContainsOrdinal(String arg0,String arg1) -> Boolean
 ldarg arg0
 ldarg arg1
@@ -602,6 +609,9 @@ ret
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.StringIntern(String arg0) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringReplaceOrdinal(String arg0,String arg1,String arg2) -> String
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.StringContainsOrdinal(String arg0,String arg1) -> Boolean
