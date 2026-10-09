@@ -99,7 +99,7 @@ def main():
         link = ['/Fe:' + str(exe), '/link', '/STACK:1048576'] if windows else ['-o', exe]
         run([*cc, *sources, obj, *link], 'host-build')
         r = run([exe], 'execute')
-        expected = (b'System.Int32\nAccount\nModel\nModel\n' if args.descriptor_queries else b'') + b'Type tokens: 42\n'
+        expected = (b'System.Int32\nAccount\nModel\nModel\narrayref<System.Int32>\narrayref<Model<System.Int32>>\n' if args.descriptor_queries else b'') + b'Type tokens: 42\n'
         if args.primitive_boxes:
             expected = b'Primitive boxes: 42\n'
         if args.object_types:

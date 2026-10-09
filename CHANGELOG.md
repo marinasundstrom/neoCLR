@@ -61,8 +61,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   construction, separating availability metadata from constructor body retention.
   Preserve real constructor effects, access/missing/abstract statuses and fault
   frames; validate the public Raven CreateInstance consumer on macOS and add its
-  low-level portable gate. Property discovery/accessor invocation and JSON remain
-  unfinished.
+  low-level portable gate. Qualify it on macOS/Windows in action `37985103063`,
+  verifying twelve source/artifact reports. Extend native vector token name, arity
+  and shape queries with source backing metadata and element visibility; validate
+  102 interpreter/native cases with and without nominal backing metadata. Property
+  discovery/accessor invocation, array reflection operations and JSON remain unfinished.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

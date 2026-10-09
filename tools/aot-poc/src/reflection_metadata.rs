@@ -158,17 +158,47 @@ fn visible(source: &neoclr::Module, ty: &Type) -> bool {
     }
 }
 
+fn semantic_token(input: &neoclr::Module, report: &Value, token: &Type) -> Result<Type, Error> {
+    if token.is_primitive() { return Ok(token.clone()); }
+    if let Type::ArrayRef(element) = token {
+        return Ok(Type::ArrayRef(Box::new(semantic_token(input, report, element)?)));
+    }
+    let Type::Named(name) = token else { return Err("native semantic token requires a closed nominal or vector type".into()); };
+    let index = input.types.iter().position(|t| t.name == *name).ok_or("missing token type")?;
+    let row = report["sourceMetadata"]["types"].as_array().ok_or("missing source catalogue")?.iter()
+        .find(|r| r["compiledTypeIndex"] == index).ok_or("missing source token descriptor")?;
+    let definition = row["name"].as_str().ok_or("missing source type name")?.to_owned();
+    let arguments: Vec<Type> = serde_json::from_value(row["typeArguments"].clone())?;
+    Ok(if arguments.is_empty() { Type::Named(definition) } else { Type::Constructed { definition, arguments } })
+}
+
+fn signature_name(ty: &Type) -> Result<String, Error> {
+    Ok(match ty {
+        Type::ArrayRef(element) => format!("arrayref<{}>", signature_name(element)?),
+        Type::Constructed { definition, arguments } => format!("{}<{}>", definition,
+            arguments.iter().map(signature_name).collect::<Result<Vec<_>, _>>()?.join(",")),
+        _ => ty.definition_name().ok_or("unsupported descriptor signature")?.to_owned(),
+    })
+}
+
 fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 14], Error> {
     use neoclr::metadata::Representation;
-    let d = source
-        .type_definition(ty)
-        .ok_or("native shape queries require source declaration")?;
+    let Some(d) = source.type_definition(ty) else {
+        if matches!(ty, Type::ArrayRef(_)) {
+            let mut result = [false; 14];
+            result[0] = true;
+            result[11] = visible(source, ty);
+            return Ok(result);
+        }
+        return Err("native shape queries require source declaration".into());
+    };
     let interface = d.representation == Representation::Interface;
     let mut result = [false; 14];
+    result[0] = matches!(ty, Type::ArrayRef(_));
     result[3] = interface;
     result[5] = d.is_abstract || interface;
     result[6] = d.enum_info.is_some();
-    result[7] = if ty.is_primitive() {
+    result[7] = if matches!(ty, Type::ArrayRef(_)) { false } else if ty.is_primitive() {
         *ty != Type::String
     } else {
         !d.is_reference_type && !interface
@@ -181,7 +211,7 @@ fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 14], Error> {
                 == Some("System.Runtime.CompilerServices.UnionAttribute")
     });
     result[11] = visible(source, ty);
-    result[12] = true;
+    result[12] = !matches!(ty, Type::ArrayRef(_));
     Ok(result)
 }
 
@@ -266,8 +296,15 @@ pub fn bind_queries(
                 }
             };
             (name.to_owned(), arguments.len(), semantic)
+        } else if matches!(token, Type::ArrayRef(_)) {
+            let semantic = semantic_token(input, report, token)?;
+            let declaration = source.type_definition(&semantic);
+            let name = if let Some(origin) = declaration.and_then(|d| d.origin.as_ref()) {
+                origin.name.clone()
+            } else { signature_name(&semantic)? };
+            (name, usize::from(declaration.is_some()), semantic)
         } else {
-            return Err(format!("native type queries currently require primitive or closed nominal tokens; found {token:?}").into());
+            return Err(format!("native type queries currently require primitive, closed nominal or vector tokens; found {token:?}").into());
         };
         let shapes = if queries
             .iter()
@@ -421,12 +458,12 @@ mod tests {
                 .contains("no source descriptor")
         );
         let (mut input, report) = query();
-        input.functions[1].body[0] = Op::LoadTypeToken(Type::ArrayRef(Box::new(Type::Int32)));
+        input.functions[1].body[0] = Op::LoadTypeToken(Type::ByRef(Box::new(Type::Int32)));
         assert!(
             bind_queries(&mut input, &source, &report)
                 .unwrap_err()
                 .to_string()
-                .contains("primitive or closed nominal")
+                .contains("primitive, closed nominal or vector")
         );
     }
 }

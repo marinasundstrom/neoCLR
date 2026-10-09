@@ -5496,7 +5496,7 @@ fn native_type_descriptors_execute_with_interpreter_parity() {
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
     assert!(r.status.success(), "{r:?}");
-    assert_eq!(interpreted.stdout, b"System.Int32\nAccount\nModel\nModel\n");
+    assert_eq!(interpreted.stdout, b"System.Int32\nAccount\nModel\nModel\narrayref<System.Int32>\narrayref<Model<System.Int32>>\n");
     let mut expected = interpreted.stdout;
     expected.extend_from_slice(b"Type tokens: 42\n");
     assert_eq!(r.stdout, expected);
@@ -5506,8 +5506,21 @@ fn native_type_descriptors_execute_with_interpreter_parity() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_type_shapes_match_interpreter_and_faults() {
+    check_type_shapes(&["Int32", "String", "ShapeOpen", "ShapeClosed", "ShapeAbstract", "ShapeHidden", "ShapeValue", "ShapeContract", "ShapeState", "ShapeBox<ShapeHidden>"], false);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_vector_type_shapes_match_interpreter_and_faults() {
+    for backing in [false, true] {
+        check_type_shapes(&["arrayref<Int32>", "arrayref<ShapeHidden>", "arrayref<ShapeBox<Int32>>"], backing);
+    }
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_type_shapes(names: &[&str], backing: bool) {
     let seed = neoclr::library::system().unwrap();
-    for name in ["Int32", "String", "ShapeOpen", "ShapeClosed", "ShapeAbstract", "ShapeHidden", "ShapeValue", "ShapeContract", "ShapeState", "ShapeBox<ShapeHidden>"] {
+    for name in names {
         let source = format!(r#"
 .module Shapes
 .type class ShapeOpen
@@ -5529,6 +5542,9 @@ fn native_type_shapes_match_interpreter_and_faults() {
 .type class ShapeBox<T>
 .end
 .function Calculate(Int32 selector) -> Int32
+ldarg selector
+ldc.i4 15
+beq Arity
 ldtoken {name}
 ldarg selector
 call neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32)
@@ -5538,9 +5554,15 @@ ret
 No:
 ldc.i4 0
 ret
+Arity:
+ldtoken {name}
+call neoCLR.Runtime.TypeArgumentCount(RuntimeTypeHandle)
+ret
 .end
 "#);
-        let mut app = neoclr::assemble(&source).unwrap();
+        let mut app = if backing {
+            array_views_source(&(source + "\n.type class Storage<T>\n.field private Items arrayref<T>\n.end\n"))
+        } else { neoclr::assemble(&source).unwrap() };
         app.types.iter_mut().find(|t| t.name == "ShapeClosed").unwrap().is_sealed = true;
         app.types.iter_mut().find(|t| t.name == "ShapeAbstract").unwrap().is_abstract = true;
         let program = neoclr::LoadedProgram::with_library(&app, seed).unwrap();
@@ -5553,11 +5575,11 @@ ret
             .arg(base.join("aot-console/text-host.c")).arg(base.join("aot-console/text-arena.c"))
             .arg(base.join("aot-fault-details/render.c")).arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host")).output().unwrap();
         assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
-        for selector in -1..=14 {
+        for selector in -1..=15 {
             let interpreted = method.invoke(vec![neoclr::Value::Int32(selector)], neoclr::Limits::default());
             let native = Command::new(dir.0.join("host")).arg(selector.to_string()).output().unwrap();
             assert!(native.stdout.is_empty());
-            if (0..14).contains(&selector) {
+            if (0..14).contains(&selector) || selector == 15 {
                 let neoclr::Value::Int32(value) = interpreted.unwrap().value else { panic!("expected Boolean projection") };
                 assert_eq!(native.status.code(), Some(value), "{name}/{selector}: {native:?}");
                 assert!(native.stderr.is_empty());
@@ -5566,7 +5588,7 @@ ret
                 assert_eq!(error.code, neoclr::FaultCode::RuntimeError);
                 assert_eq!(error.message, "unknown type shape query");
                 assert_eq!(native.status.code(), Some(1));
-                assert_eq!(String::from_utf8_lossy(&native.stderr), "RuntimeError: unknown type shape query\n   at Calculate [instruction 2]\n", "{name}/{selector}");
+                assert_eq!(String::from_utf8_lossy(&native.stderr), "RuntimeError: unknown type shape query\n   at Calculate [instruction 5]\n", "{name}/{selector}");
             }
         }
     }

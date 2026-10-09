@@ -396,3 +396,24 @@ Re-running the unchanged typed JSON assembly with its Report construction root n
 reaches the missing `ReflectionArrayCreate` service. The mapper's array branch is
 statically reachable even for the flat-model showcase; compound reflection and
 property discovery/invocation remain explicit gaps rather than stubbed successes.
+
+## Vector descriptors — 2026-10-09
+
+TypeName, TypeArgumentCount and TypeShape now admit closed vector tokens, using
+source element identities. A vector is an array and not a nominal type; when the
+source module supplies a nominal vector backing, its semantic name, generic arity
+and declaration flags are preserved, without replacing the vector's identity.
+Unbacked vectors keep their signature name and zero generic arguments. Visibility
+follows the element type. Byrefs, pointers and function descriptors remain outside
+this query subset.
+
+Native/interpreter tests cover 102 vector selector/arity cases: primitive elements,
+private elements and closed generic class elements, each with/without backing
+metadata, including invalid selector faults. The portable descriptor consumer adds
+vector names, array classification and visibility checks. These metadata queries
+do not yet supply reflective array creation/access or property invocation.
+
+The preceding explicit-root construction gate is qualified on macOS ARM64 and
+Windows x64 in [action 37985103063](https://github.com/marinasundstrom/neoCLR/actions/runs/37985103063);
+all twelve reports and their source/artifact hashes were verified. See
+[construction evidence](native-reflection-construction-validation.json).

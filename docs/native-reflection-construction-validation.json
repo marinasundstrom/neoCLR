@@ -1,0 +1,158 @@
+{
+  "date": "2026-10-09",
+  "scope": "Explicit nongeneric source identity roots and parameterless constructor invocation; no property invocation or native JSON",
+  "run": "https://github.com/marinasundstrom/neoCLR/actions/runs/37985103063",
+  "reports": [
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "49da2ff5d181d9d0e16ee236dc25f096101c8bfd",
+      "gate": "native-object-types-validation",
+      "passed": true,
+      "reportSha256": "240c5c2bf817579a3833fc28ec715f3af59a58c057654af24d4cc38bf4277b8d",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "49da2ff5d181d9d0e16ee236dc25f096101c8bfd",
+      "gate": "native-primitive-boxes-validation",
+      "passed": true,
+      "reportSha256": "ec185089035084dff86a93fb7333b63f48399744660a47efc5372bbf6e561e67",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "49da2ff5d181d9d0e16ee236dc25f096101c8bfd",
+      "gate": "native-reflection-construction-validation",
+      "passed": true,
+      "reportSha256": "e58988d623062be5eb1a0f9390df4cad530dfff57c40eccaf1106929376fb1c5",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "49da2ff5d181d9d0e16ee236dc25f096101c8bfd",
+      "gate": "native-type-descriptors-validation",
+      "passed": true,
+      "reportSha256": "e7d9a3cf37f511a7ccc331c20ce08e50949dc92f3ed4aa8992f9818ddb37a1e1",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "49da2ff5d181d9d0e16ee236dc25f096101c8bfd",
+      "gate": "native-type-equality-validation",
+      "passed": true,
+      "reportSha256": "28281d94cbfc7d3568242663070984d0ef85e07cde18c8d0ed85bd84aa4d16f4",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "49da2ff5d181d9d0e16ee236dc25f096101c8bfd",
+      "gate": "native-type-tokens-validation",
+      "passed": true,
+      "reportSha256": "6bd4f76345481ae67c8fc5dbb3a288c2e686006ae16eccfe771ec7b6ce9b5d88",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "49da2ff5d181d9d0e16ee236dc25f096101c8bfd",
+      "gate": "native-object-types-validation",
+      "passed": true,
+      "reportSha256": "00889dc18e2ccb64d4082e51327a1e87bfdf3dc00f66396c60a916c54db575bd",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "49da2ff5d181d9d0e16ee236dc25f096101c8bfd",
+      "gate": "native-primitive-boxes-validation",
+      "passed": true,
+      "reportSha256": "94ecb556a5d17f04d0d4e3682ef1f4aacf96e1a57b799d526a85126b28939ef3",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "49da2ff5d181d9d0e16ee236dc25f096101c8bfd",
+      "gate": "native-reflection-construction-validation",
+      "passed": true,
+      "reportSha256": "2963133eda4a5b1499e008ab20f772c90c294d50d32e9e68c96302aaf849dda5",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "49da2ff5d181d9d0e16ee236dc25f096101c8bfd",
+      "gate": "native-type-descriptors-validation",
+      "passed": true,
+      "reportSha256": "a1bfa828ead9afe9d919fbde5e4853a373a1c157f829c331514374502490382e",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "49da2ff5d181d9d0e16ee236dc25f096101c8bfd",
+      "gate": "native-type-equality-validation",
+      "passed": true,
+      "reportSha256": "ec2961e1e31a7496a98e1b774fbac56aed0d5ed6f568edc2164c758ef2af2f40",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "49da2ff5d181d9d0e16ee236dc25f096101c8bfd",
+      "gate": "native-type-tokens-validation",
+      "passed": true,
+      "reportSha256": "3301aefc9c1d9e882507bb43ca971b447b6060651133ffd1338e776782270852",
+      "sourceAndArtifactHashesVerified": true
+    }
+  ],
+  "publicRaven": {
+    "platform": "macOS ARM64",
+    "results": [
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/bin/neoclr",
+          "run",
+          "/Users/robert/Projects/neoclr/target/native-reflection-construction-raven/app.dll",
+          "--system",
+          "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.runtime.neox",
+          "--module",
+          "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Runtime.dll",
+          "--module",
+          "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Data.dll",
+          "--module",
+          "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Networking.dll",
+          "--module",
+          "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Web.dll",
+          "--object-root",
+          "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Runtime.dll",
+          "--instructions",
+          "100000000"
+        ],
+        "exitCode": 0,
+        "stdout": "Report\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/native-reflection-construction-raven/app"
+        ],
+        "exitCode": 0,
+        "stdout": "Report\n",
+        "stderr": ""
+      }
+    ],
+    "artifacts": {
+      "app.dll": "480efa2fe8677619a332a11fad31308b542e9d7ff03141a2266fafbb845af48f",
+      "app.o": "4a716a6e167c3d3e34fbd52fa2660eefa8764cc15e2834887a2c37fbcfdd4936",
+      "app": "0b7329eaff6863f5c46afb22749265f913d84ef8346c680453b7b42644d31663"
+    },
+    "aotSha256": "be12e817c71990432b11044d11dc8bf111c1254204aef05df73121e357eac4bc"
+  }
+}

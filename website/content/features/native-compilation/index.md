@@ -110,7 +110,7 @@ The routing workbench also parses a route, extracts an integer parameter and pri
   uses IPv4, bounded DNS workers and polled socket operations.
 - **Code and APIs:** development includes opaque closed type-token identity and the
   runtime type-equality, name, generic-arity and type-shape queries for primitive and closed
-  nominal token producers, plus concrete source-class/primitive-box `GetType()` identity,
+  nominal/vector token producers, plus concrete source-class/primitive-box `GetType()` identity,
   as first steps toward native JSON. Compound object queries remain unsupported.
   Explicit development reflection roots now support checked parameterless construction;
   property discovery and reflective accessor invocation remain unfinished, so typed

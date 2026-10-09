@@ -12974,3 +12974,16 @@ claim follows from these focused checks.
   proposes shared models/payloads with separate serialization/deserialization,
   startup, steady-state and memory measurements. The benchmark harness and results
   remain future work; no performance outcome is reported.
+
+- **Assistant implementation follow-through (2026-10-09):** implements the proposed
+  explicit-root mechanism as private source-identity configuration for nongeneric
+  constructor checks/invocation. A public Raven `CreateInstance()` consumer verifies
+  actual initialization and GetType/typeof equality on macOS; the lower-level
+  constructor gate passes macOS ARM64 and Windows x64, including denial/missing/
+  abstract cases and constructor fault frames ([evidence](native-reflection-construction-validation.json)).
+  Metadata-only checks do not retain constructor bodies; an invocation request adds
+  an execution root before specialization. This is an implementation choice within
+  authorized work, not inferred author approval of a permanent preservation API.
+- **Current open milestone:** the unchanged typed JSON mapper now reaches its array
+  reflection dependency. Array operations, property discovery and accessor execution
+  remain required; neither complete native JSON nor benchmark readiness is claimed.

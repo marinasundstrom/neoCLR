@@ -24,6 +24,29 @@ pop
 ldtoken Model<String>
 call Show(RuntimeTypeHandle)
 pop
+ldtoken arrayref<Int32>
+call Show(RuntimeTypeHandle)
+pop
+ldtoken arrayref<Model<Int32>>
+call Show(RuntimeTypeHandle)
+pop
+ldtoken arrayref<Int32>
+call neoCLR.Runtime.TypeArgumentCount(RuntimeTypeHandle)
+ldc.i4 0
+ceq
+brfalse Fail
+ldtoken arrayref<Int32>
+ldc.i4 0
+call neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32)
+brfalse Fail
+ldtoken arrayref<Int32>
+ldc.i4 12
+call neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32)
+brtrue Fail
+ldtoken arrayref<Concealed>
+ldc.i4 11
+call neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32)
+brtrue Fail
 ldtoken Account
 call neoCLR.Runtime.TypeArgumentCount(RuntimeTypeHandle)
 ldc.i4 0
