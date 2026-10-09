@@ -83,6 +83,7 @@ pub struct Options {
     pub uint64_to_string: Vec<usize>,
     pub native_integer_to64: Vec<usize>,
     pub reference_arena: bool,
+    pub descriptor_queries: Vec<usize>,
     pub int32_boxes: HashMap<usize, usize>,
     pub boxed_int32_display: bool,
     pub empty_record_boxes: HashMap<usize, usize>,
@@ -116,6 +117,9 @@ impl Options {
                 .filter_map(|r| Some((r["contractCompiledIndex"].as_u64()? as usize, r["targets"].as_array()?.iter()
                     .filter_map(|t| Some((t["typeCompiledIndex"].as_u64()? as usize, t["functionCompiledIndex"].as_u64()? as usize))).collect()))).collect(),
             boxed_int32_display: report.is_some_and(|r| r["boxedInt32Display"] == true),
+            descriptor_queries: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| matches!(r["implementation"].as_str(), Some("type-name-closed-v1" | "type-argument-count-closed-v1" | "type-shape-closed-v1")))
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             int32_boxes: report.and_then(|r| r["int32Boxes"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),
             empty_record_boxes: report.and_then(|r| r["emptyRecordBoxes"].as_array()).into_iter().flatten()

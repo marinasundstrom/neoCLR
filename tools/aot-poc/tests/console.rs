@@ -5467,3 +5467,72 @@ fn native_type_descriptors_execute_with_interpreter_parity() {
     assert_eq!(r.stdout, expected);
     assert!(r.stderr.is_empty());
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_type_shapes_match_interpreter_and_faults() {
+    let seed = neoclr::library::system().unwrap();
+    for name in ["Int32", "String", "ShapeOpen", "ShapeClosed", "ShapeAbstract", "ShapeHidden", "ShapeValue", "ShapeContract", "ShapeState", "ShapeBox<ShapeHidden>"] {
+        let source = format!(r#"
+.module Shapes
+.type class ShapeOpen
+.end
+.type class ShapeClosed
+.end
+.type class ShapeAbstract
+.end
+.type internal ShapeHidden
+.end
+.type ShapeValue
+.end
+.interface ShapeContract
+.end
+.type ShapeState
+.enum Int32
+.field private Bits Int32
+.end
+.type class ShapeBox<T>
+.end
+.function Calculate(Int32 selector) -> Int32
+ldtoken {name}
+ldarg selector
+call neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32)
+brfalse No
+ldc.i4 1
+ret
+No:
+ldc.i4 0
+ret
+.end
+"#);
+        let mut app = neoclr::assemble(&source).unwrap();
+        app.types.iter_mut().find(|t| t.name == "ShapeClosed").unwrap().is_sealed = true;
+        app.types.iter_mut().find(|t| t.name == "ShapeAbstract").unwrap().is_abstract = true;
+        let program = neoclr::LoadedProgram::with_library(&app, seed).unwrap();
+        let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+        let dir = Temp::new();
+        let result = compile_linked_module(&dir, seed, &app, &["--compile-system", "--reference-arena"]);
+        assert!(result.status.success(), "{name}: {}", String::from_utf8_lossy(&result.stderr));
+        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+        let result = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror"])
+            .arg(base.join("aot-console/text-host.c")).arg(base.join("aot-console/text-arena.c"))
+            .arg(base.join("aot-fault-details/render.c")).arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host")).output().unwrap();
+        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        for selector in -1..=14 {
+            let interpreted = method.invoke(vec![neoclr::Value::Int32(selector)], neoclr::Limits::default());
+            let native = Command::new(dir.0.join("host")).arg(selector.to_string()).output().unwrap();
+            assert!(native.stdout.is_empty());
+            if (0..14).contains(&selector) {
+                let neoclr::Value::Int32(value) = interpreted.unwrap().value else { panic!("expected Boolean projection") };
+                assert_eq!(native.status.code(), Some(value), "{name}/{selector}: {native:?}");
+                assert!(native.stderr.is_empty());
+            } else {
+                let error = interpreted.unwrap_err();
+                assert_eq!(error.code, neoclr::FaultCode::RuntimeError);
+                assert_eq!(error.message, "unknown type shape query");
+                assert_eq!(native.status.code(), Some(1));
+                assert_eq!(String::from_utf8_lossy(&native.stderr), "RuntimeError: unknown type shape query\n   at Calculate [instruction 2]\n", "{name}/{selector}");
+            }
+        }
+    }
+}

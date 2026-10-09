@@ -1,6 +1,8 @@
 .module NativeIntrospection
 .type class Account
 .end
+.type internal Concealed
+.end
 .type class Model<T>
 .end
 .function Show(RuntimeTypeHandle type) -> Void
@@ -35,6 +37,34 @@ brfalse Fail
 ldtoken Model<Int32>
 ldtoken Model<String>
 call neoCLR.Runtime.TypeEquals(RuntimeTypeHandle,RuntimeTypeHandle)
+brtrue Fail
+ldtoken Int32
+ldc.i4 7
+call neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32)
+brfalse Fail
+ldtoken Account
+ldc.i4 7
+call neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32)
+brtrue Fail
+ldtoken Account
+ldc.i4 8
+call neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32)
+brfalse Fail
+ldtoken Account
+ldc.i4 11
+call neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32)
+brfalse Fail
+ldtoken Account
+ldc.i4 12
+call neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32)
+brfalse Fail
+ldtoken Account
+ldc.i4 13
+call neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32)
+brtrue Fail
+ldtoken Model<Concealed>
+ldc.i4 11
+call neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32)
 brtrue Fail
 ldc.i4 42
 ret

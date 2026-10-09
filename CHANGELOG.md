@@ -38,6 +38,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Qualify the descriptor consumer on macOS ARM64 and Windows x64 at `ba871e0d`
   in action `37980244735`, verifying all six direct-token/equality/descriptor reports
   and their source/artifact hashes. Add runnable consumer instructions.
+  Add native TypeShape inspection from source metadata, preserving all existing
+  selectors within the primitive/closed nominal subset, including generic/source
+  visibility. Invalid selectors preserve RuntimeError and caller frames. Validate
+  160 interpreter/native cases, closed-union/imported-visibility facts and unchanged
+  ordinary user-fault behavior; extend the portable descriptor consumer.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

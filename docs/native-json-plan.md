@@ -216,6 +216,34 @@ explicit metadata roots and checked invocation remain unfinished. The existing .
 and GraalVM retention comparisons above apply; these services implement existing
 neoCLR contracts without changing Raven emission or Runtime Contract configuration.
 
+## Native type-shape inspection — 2026-10-09
+
+The exact TypeShape(RuntimeTypeHandle, Int32) service now reads the preserved source
+facts for primitive and closed nominal tokens. It implements all existing selectors:
+array/byref/pointer/readonly flags (false within this admitted subset), interface,
+abstract, enum, value type, open/closed hierarchy, union, public visibility, nominal
+and function classification. Visibility includes generic arguments and imported
+source visibility; native storage layout and synthetic helper names are irrelevant.
+`IsOpen` retains the existing extensible-hierarchy meaning, not generic-parameter
+openness. Discovery still grants no execution/access rights.
+
+An invalid selector produces RuntimeError with the interpreter's message and caller
+frame, not UserFault or an artificial generated-helper frame. This error mapping is
+restricted to the generated descriptor-query bodies; ordinary guest faults keep their
+existing behavior. Arrays, pointers, byrefs and function tokens remain unadmitted
+for descriptor queries rather than being reported as nominal types.
+
+Validation compares every selector plus -1 and 14 against the interpreter for ten
+primitive/nominal shapes (160 native executions), including interfaces, enums,
+abstract/sealed classes and a generic type containing an internal argument. Focused
+metadata tests cover closed unions and imported visibility. The ordinary UTF-8 line
+output/user-fault regression and the descriptor consumer pass. The portable consumer
+now checks representative shape/visibility facts on both platform jobs. See
+[shape validation](native-type-shape-validation.json). Full TypeInfo wrappers,
+property discovery, invocation and native JSON remain unqualified. This implements
+the existing neoCLR reflection contract; the earlier .NET/retention comparison and
+provisional dispatch-size tradeoff remain applicable.
+
 ## Evidence
 
 The original typed probe rejects native specialization with

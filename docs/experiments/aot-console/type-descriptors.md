@@ -1,9 +1,11 @@
 # Executable native introspection subset
 
 `type-descriptors.neoil` exercises the existing TypeName, TypeArgumentCount and
-TypeEquals runtime services. It prints semantic names, checks generic arity and
+TypeEquals and TypeShape runtime services. It prints semantic names, checks generic arity and
 verifies that Model<Int32> and Model<String> have distinct identities despite
-sharing the definition name Model. The host checks collection and buffer bounds.
+sharing the definition name Model. It also checks value/reference, nominal and
+visibility facts, including a generic type with an internal argument. The host
+checks collection and buffer bounds.
 
 From the repository root, using a freshly built native compiler:
 

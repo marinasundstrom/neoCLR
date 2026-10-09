@@ -63,7 +63,7 @@ native HTTP, including the introspection and reflection support it needs. The
 [native JSON plan](native-json-plan.md) takes priority over further general hosting
 and reload slices. Reuse the existing serializer and qualify typed client/server
 payloads consistently on macOS ARM64 and Windows x64. Closed type-token storage and
-identity and exact runtime TypeEquals, TypeName and TypeArgumentCount services
+identity and exact runtime TypeEquals, TypeName, TypeArgumentCount and TypeShape services
 for primitive/closed nominal token producers are implemented. A standalone native
 consumer executes descriptor queries with interpreter parity. A build-time
 source metadata catalogue now preserves

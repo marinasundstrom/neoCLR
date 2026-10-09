@@ -56,7 +56,7 @@ def main():
         seed.write_text('.module System\n.references ()\n' + ('.function neoCLR.Runtime.TypeEquals(RuntimeTypeHandle,RuntimeTypeHandle) -> Boolean\n.methodimpl InternalCall\n.end\n' if args.runtime_equality or args.descriptor_queries else ''))
         if args.descriptor_queries:
             with seed.open('a') as f:
-                f.write('.type System.Int32\n.end\n.function neoCLR.Runtime.TypeName(RuntimeTypeHandle) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgumentCount(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String) -> Void\n.methodimpl InternalCall\n.end\n')
+                f.write('.type System.Int32\n.end\n.function neoCLR.Runtime.TypeName(RuntimeTypeHandle) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgumentCount(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32) -> Boolean\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String) -> Void\n.methodimpl InternalCall\n.end\n')
         source = base / 'type-tokens.neoil'
         if args.runtime_equality:
             source = out / 'type-equality.neoil'

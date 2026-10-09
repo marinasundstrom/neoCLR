@@ -1761,7 +1761,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             // artificial frame for an InternalCall implementation.
                             site.as_mut().unwrap().capture_frame = false;
                         }
-                        let status = b.ins().iconst(types::I32, 4);
+                        let descriptor_query = details.is_some_and(|d| d.descriptor_queries.contains(&i));
+                        if descriptor_query {
+                            // InternalCall errors belong to the managed call site.
+                            if let Some(site) = site.as_mut() { site.capture_frame = false; }
+                        }
+                        let status = b.ins().iconst(types::I32, if descriptor_query { 3 } else { 4 });
                         if let Some(site) = &site { site.record(&mut b, status); }
                         b.ins().return_(&[status]);
                         continue;
