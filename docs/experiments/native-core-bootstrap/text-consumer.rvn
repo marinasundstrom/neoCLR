@@ -1,0 +1,24 @@
+module Example.Text
+
+func Main() -> int {
+    let text = System.String.Concat("hé", "🙂")
+    if System.String.CompareOrdinal(text, "hé🙂") != 0 {
+        return 1
+    }
+    if System.String.CompareOrdinal(System.String.Concat("", text), text) != 0 {
+        return 2
+    }
+    if System.String.CompareOrdinal(System.String.Concat(text, ""), text) != 0 {
+        return 3
+    }
+    if System.String.CompareOrdinal(System.String.Concat("a\u0000", "b"), "a\u0000b") != 0 {
+        return 4
+    }
+    if System.String.CompareOrdinal(System.String.Concat("a", "b"), "ac") >= 0 {
+        return 5
+    }
+    if text.GetByteCount() != 7 {
+        return 6
+    }
+    return 42
+}

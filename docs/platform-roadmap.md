@@ -3,9 +3,11 @@
 **Native core value prerequisite (2026-10-09):** selected native System.ValueType
 classification now admits ordinary value declarations, with copied/mutated struct
 parity in project run, interpreter and ARM64 native execution. Unchanged production
-Option/Result advances to missing native String.Concat support and fails diagnostically
-without publication. [Evidence and next work](experiments/native-core-bootstrap/README.md#value-type-foundation-and-production-union-frontier-2026-10-09).
-Full core bootstrap remains open; implement real string/core contracts next.
+Option/Result initially reached missing native String.Concat support. Real UTF-8
+fixture wrappers now pass both modes after an AOT module-ownership projection fix;
+the four-source union/attribute build reaches imported class-base admission. [Evidence and next work](experiments/native-core-bootstrap/README.md#value-type-foundation-and-production-union-frontier-2026-10-09).
+Full core bootstrap remains open; qualify the remaining core/inheritance contracts next.
+[Text-service evidence](experiments/native-core-bootstrap/README.md#native-text-services-and-module-projection-2026-10-09).
 
 
 **Release bootstrap prerequisite (2026-10-09):** Raven project mode now accepts

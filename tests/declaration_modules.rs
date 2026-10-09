@@ -40,3 +40,12 @@ fn legacy_metadata_remains_readable() {
     old["assemblies"][0].as_object_mut().unwrap().remove("declaration_modules");
     assert!(load(&old.to_string()).unwrap().assemblies[0].declaration_modules.is_none());
 }
+
+#[test]
+fn missing_module_diagnostic_identifies_owner_and_assembly() {
+    let mut bad = image();
+    bad["assemblies"][0]["declaration_modules"]["names"] = json!(["Example.Empty"]);
+    let message = load(&bad.to_string()).unwrap_err().to_string();
+    assert!(message.contains("Example.Math"), "{message}");
+    assert!(message.contains(bad["assemblies"][0]["full_name"].as_str().unwrap()), "{message}");
+}

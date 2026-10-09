@@ -163,3 +163,34 @@ Next provide real native String/core member contracts and return to these produc
 sources; do not substitute constant formatting to turn the fixture green.
 The general missing-Concat repair is a main-line candidate: its helper/tests match
 main, but its emitter-boundary port still needs independent validation on main.
+
+## Native text services and module projection (2026-10-09)
+
+`verify.py --driver /path/to/rvnc.dll --project --text-services` selects an
+optional fixture core with native grapheme Char and real runtime-service wrappers
+for String.Concat, String.CompareOrdinal and instance GetByteCount. The last is a
+fixture test member, not a new public String API. The default fixture still checks
+the missing-Concat diagnostic. No CLI semantic reference is introduced.
+
+The [text consumer](text-consumer.rvn) checks Unicode concatenation, empty operands,
+embedded NUL, ordinal inequality and instance UTF-8 byte count. Project run,
+independent interpreter and ARM64 native code return 42; the native executable
+links only libSystem. [Evidence](text-services-validation.json) records source/tool
+hashes and commands. Native execution uses existing UTF-8 kernels and a bounded
+caller-owned arena; it does not replace the production String implementation.
+
+This exposed an AOT projection regression: stripping a primitive method's type
+owner created an assembly function with an empty module name. Preserve its canonical
+System module for static, borrowed primitive and String instance projections.
+Original-scope verification and declaration-module validation remain mandatory;
+missing-owner diagnostics now identify the module and assembly. Compared with CLR,
+this is an internal AOT projection concern, not an IL or public API divergence.
+The existing UTF-8 service contracts remain unchanged; no performance claim.
+
+Compiling the four unchanged production union/attribute sources now reaches the
+portable emitter's imported class-base restriction at UnionAttribute : Attribute,
+with NEOMETA001 and no output. Imported inheritance is the next full-source blocker.
+The fixture still lacks real Object display/equality and String.Replace; synthesized
+quoted display without Replace does not escape quotes/backslashes. This evidence
+therefore does not qualify full union formatting, production core bootstrap or release
+readiness. Website capability claims stay unchanged.

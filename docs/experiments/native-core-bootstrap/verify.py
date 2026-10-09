@@ -18,11 +18,14 @@ def main():
     parser.add_argument('--driver', type=Path, help='Optional native-enabled rvnc.dll; compile through the driver too.')
     parser.add_argument('--project', action='store_true', help='Validate native-only project selection; requires --driver.')
     parser.add_argument('--value-types', action='store_true', help='With --project, check copied values and the production union core frontier.')
+    parser.add_argument('--text-services', action='store_true', help='With --project, verify native UTF-8 wrappers and production union frontier.')
     args = parser.parse_args()
     if args.project and not args.driver:
         parser.error('--project requires --driver')
     if args.value_types and not args.project:
         parser.error('--value-types requires --project')
+    if args.text_services and (not args.project or args.value_types):
+        parser.error('--text-services requires --project and cannot combine with --value-types')
     output = args.output.resolve()
     if output.exists():
         raise FileExistsError(output)
@@ -42,7 +45,7 @@ def main():
 
     metadata = ROOT / 'tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj'
     run(['dotnet', 'run', '--project', HERE / 'Probe.csproj', '-p:RavenRoot=' + str(args.raven.resolve()),
-         '-p:NeoClrMetadataProject=' + str(metadata), '-p:WarningLevel=0', '--', artifacts])
+         '-p:NeoClrMetadataProject=' + str(metadata), '-p:WarningLevel=0', '--', artifacts, *(['--text-services'] if args.text_services else [])])
     runtime = args.runtime.resolve()
     aot = args.aot.resolve()
     core = artifacts / 'NativeCore.dll'
@@ -71,7 +74,8 @@ def main():
     if args.project:
         directory = artifacts / 'project'
         directory.mkdir()
-        (directory / 'Main.rvn').write_text((HERE / 'value-consumer.rvn').read_text() if args.value_types
+        (directory / 'Main.rvn').write_text((HERE / 'text-consumer.rvn').read_text() if args.text_services
+            else (HERE / 'value-consumer.rvn').read_text() if args.value_types
             else 'module Example.App\n' + (HERE / 'consumer.rvn').read_text())
         project = directory / 'App.rvnproj'
         root = ET.Element('Project', Sdk='Microsoft.NET.Sdk')
@@ -102,13 +106,14 @@ def main():
         ET.ElementTree(root).write(project, encoding='unicode')
         report['project'] = {'nativeOnly': True, 'runExit': 42, 'mixedSelectionPreservedOutput': True}
     production_sources = []
-    if args.value_types:
+    if args.value_types or args.text_services:
         production_sources = [ROOT / 'runtime/raven/src/System' / name for name in (
             'Propagatable.rvn', 'Option.rvn', 'Result.rvn', 'Runtime/CompilerServices/UnionAttribute.rvn')]
         rejected = artifacts / 'ProductionUnions.dll'
         diagnostic = run(['dotnet', args.driver.resolve(), 'neoclr', '--native-core-reference', core,
             '--library', '-o', rejected, *production_sources], expected=1, include_stderr=True)
-        if 'RAV1501' not in diagnostic or 'String.Concat' not in diagnostic or rejected.exists():
+        expected_diagnostic = ('NEOMETA001', 'class UnionAttribute') if args.text_services else ('RAV1501', 'String.Concat')
+        if not all(part in diagnostic for part in expected_diagnostic) or rejected.exists():
             raise AssertionError('Union core frontier did not reject cleanly before publication: ' + diagnostic)
         report['productionUnionFrontier'] = {'diagnostic': diagnostic.strip(),
             'outputPublished': False, 'sourcesUnchanged': True}
@@ -116,9 +121,11 @@ def main():
     interpreted = run([runtime, 'run', consumer, *dependencies, '--show-result'], expected=42, include_stderr=True)
     if interpreted.strip() != '=> Int32(42)':
         raise AssertionError(interpreted)
-    selection = run([aot, '--closed-world', consumer, '@entry', artifacts / 'consumer.o', *dependencies])
+    selection = run([aot, '--closed-world', consumer, '@entry', artifacts / 'consumer.o', *dependencies,
+        *(['--compile-system', '--reference-arena', '--bind-utf8-text'] if args.text_services else [])])
     (output / 'selection.json').write_text(selection)
-    run(['clang', '-arch', 'arm64', '-Wall', '-Wextra', '-Werror', HERE / 'host.c', artifacts / 'consumer.o', '-o', artifacts / 'consumer'])
+    adapters = [HERE / 'text-host.c', HERE.parent / 'aot-console/text-arena.c'] if args.text_services else [HERE / 'host.c']
+    run(['clang', '-arch', 'arm64', '-Wall', '-Wextra', '-Werror', *adapters, artifacts / 'consumer.o', '-o', artifacts / 'consumer'])
     native = run([artifacts / 'consumer'])
     if native.strip() != '42':
         raise AssertionError(native)
@@ -127,11 +134,14 @@ def main():
     if dependencies_found != ['/usr/lib/libSystem.B.dylib']:
         raise AssertionError(dependencies_found)
     report['result'] = {'interpreter': 42, 'native': 42, 'nativeLibraries': dependencies_found}
+    if args.text_services:
+        report['scope'] = 'Native-only fixture UTF-8 static and instance wrappers; unchanged production union emission frontier. Not production Object or String completeness.'
+        report['textChecks'] = ['Unicode concatenation', 'empty left/right', 'embedded NUL', 'ordinal inequality', 'instance UTF-8 byte count']
     report['revisions'] = {name: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip()
                            for name, path in [('neoclr', ROOT), ('raven', args.raven)]}
     inputs = [runtime, aot, *[p for p in HERE.iterdir() if p.suffix in ('.cs', '.csproj', '.rvn', '.neoil', '.c', '.py')]]
     inputs += list((HERE / 'bin/Debug/net10.0').glob('*.dll'))
-    inputs += [core, library, consumer, seed, artifacts / 'consumer', *production_sources]
+    inputs += [core, library, consumer, seed, artifacts / 'consumer', *production_sources, *adapters]
     if args.driver:
         inputs += list(args.driver.resolve().parent.glob('*.dll'))
     if args.project:

@@ -20,7 +20,11 @@ execution. Unchanged production Option/Result now identifies missing String.Conc
 as a clean compiler diagnostic; no union library is published.
 [Frontier evidence](../experiments/native-core-bootstrap/value-foundation-validation.json)
 keeps the real source failure visible. The shared diagnostic repair is a deferred
-main-line candidate pending independent emitter-boundary validation.
+main-line candidate pending independent emitter-boundary validation. Real native UTF-8
+fixture wrappers now pass project/interpreter/ARM64 execution after preserving System
+module ownership during AOT primitive-method projection. The four-source build now
+reaches imported Attribute inheritance; full formatting/core remain unqualified.
+[Text evidence](../experiments/native-core-bootstrap/text-services-validation.json).
 
 Release remains gated on complete production source-runtime bootstrap without the
 CLI semantic bridge, matching SDK/editor/native artifacts and extracted-package

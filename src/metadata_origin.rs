@@ -208,12 +208,15 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                         .is_some_and(|origin| origin.assembly == assembly.full_name)
                 })
                 .map(|f| f.namespace.as_str());
-            if type_owners
+            if let Some(owner) = type_owners
                 .chain(function_owners)
                 .chain(assembly.constants.iter().map(|c| c.namespace.as_str()))
-                .any(|owner| !names.contains(owner))
+                .find(|owner| !names.contains(owner))
             {
-                return Err(Fault::new("missing declaration module owner"));
+                return Err(Fault::new(format!(
+                    "missing declaration module owner {owner:?} in {}",
+                    assembly.full_name
+                )));
             }
         }
         for constant in &assembly.constants {

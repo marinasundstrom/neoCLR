@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Preserve System module ownership when AOT projects verified primitive methods to
+  private functions; native-only static and String instance wrappers now pass
+  interpreter/ARM64 UTF-8 checks. Missing declaration-owner diagnostics identify
+  the module and assembly. The optional native core fixture advances the unchanged
+  four-source union build to imported Attribute inheritance; production core and
+  complete union formatting remain unqualified.
+
 - Qualify native-only copied-struct execution after Raven's core ValueType identity
   correction. Extend the minimal core fixture with Byte and retain the unchanged
   production Option/Result frontier: missing String.Concat now reports a compiler

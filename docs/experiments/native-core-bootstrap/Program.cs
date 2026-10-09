@@ -4,7 +4,7 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.NeoClr;
 using Raven.CodeAnalysis.Syntax;
 
-if (args.Length != 1) throw new ArgumentException("Specify a fresh output directory.");
+if (args.Length is < 1 or > 2 || args.Length == 2 && args[1] != "--text-services") throw new ArgumentException("Specify a fresh output directory and optional --text-services.");
 var output = Path.GetFullPath(args[0]);
 if (Directory.Exists(output)) throw new IOException("Output directory already exists.");
 Directory.CreateDirectory(output);
@@ -36,7 +36,32 @@ markerCtor.GetILGenerator().Call(attributeCtor);
 markerCtor.GetILGenerator().Return();
 foreach (var primitive in new[] { PrimitiveType.Byte, PrimitiveType.Int32, PrimitiveType.Int64, PrimitiveType.Double, PrimitiveType.Boolean, PrimitiveType.Void })
     core.AddValueType("System", primitive.ToString()).SetNativePrimitive(primitive);
-core.AddClass("System", "String", root).SetNativePrimitive(PrimitiveType.String);
+var stringType = core.AddClass("System", "String", root);
+stringType.SetNativePrimitive(PrimitiveType.String);
+if (args.Length == 2)
+{
+    core.AddValueType("System", "Char").SetNativeGrapheme();
+    foreach (var (member, service, result) in new[] {
+        ("Concat", "StringConcat", PrimitiveType.String),
+        ("CompareOrdinal", "StringCompareOrdinal", PrimitiveType.Int32) })
+    {
+        var signature = new MethodSignature(result, [PrimitiveType.String, PrimitiveType.String]);
+        var runtimeCall = core.AddFunction("neoCLR.Runtime", service, signature);
+        runtimeCall.SetInternalCall();
+        var wrapper = stringType.AddMethod(member, signature);
+        var il = wrapper.GetILGenerator();
+        il.LoadArgument(0);
+        il.LoadArgument(1);
+        il.Call(runtimeCall);
+        il.Return();
+    }
+    var byteCount = core.AddFunction("neoCLR.Runtime", "StringByteCount", new(PrimitiveType.Int32, [PrimitiveType.String]));
+    byteCount.SetInternalCall();
+    var count = stringType.AddInstanceMethod("GetByteCount", new(PrimitiveType.Int32, []));
+    count.GetILGenerator().LoadArgument(0);
+    count.GetILGenerator().Call(byteCount);
+    count.GetILGenerator().Return();
+}
 var bytes = RuntimeAssemblyContainer.WriteLibraryBinary(core);
 File.WriteAllBytes(Path.Combine(output, "NativeCore.dll"), bytes);
 var input = new AssemblyBuilder(new("Input", new(1, 0, 0, 0)), identity);

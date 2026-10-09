@@ -395,6 +395,9 @@ pub fn prepare(
         .any(|r| matches!(r["implementation"].as_str(), Some("int32-to-string-v1" | "int64-to-string-v1" | "uint64-to-string-v1"))) {
         json!("caller-owned-text-arena-v4")
     } else { json!("no-text-arena") };
+    // Projected primitive members remain in their canonical System declaration
+    // module after losing their type owner. An empty namespace would invent a
+    // global module that native core assemblies need not declare.
     // Static primitive wrappers have no receiver/storage. Preserve their verified
     // source identity in the report, then use private free-function bodies: the
     // backend's bundled primitive declarations belong to a different verification module.
@@ -405,7 +408,10 @@ pub fn prepare(
         "compiledIndex": i, "owner": selected.functions[*i].owner, "lowering": "verified static wrapper to private free function"
     })).collect::<Vec<_>>());
     for (i, f) in selected.functions.iter_mut().enumerate() {
-        if primitive_static.contains(&i) { f.owner = None; }
+        if primitive_static.contains(&i) {
+            f.owner = None;
+            f.namespace = "System".into();
+        }
         for op in &mut f.body {
             if let Op::Call(target) = op {
                 if target.definition.as_ref().is_some_and(|id| primitive_static.contains(&(id.index as usize))) {
@@ -433,6 +439,7 @@ pub fn prepare(
     for (i, f) in selected.functions.iter_mut().enumerate() {
         if let Some(owner) = primitive_members.get(&i) {
             f.owner = None;
+            f.namespace = "System".into();
             f.instance = false;
             f.receiver_byref = false;
             f.parameters.insert(0, neoclr::metadata::Type::ByRef(Box::new(owner.clone())));
@@ -478,6 +485,7 @@ pub fn prepare(
     for (i, f) in selected.functions.iter_mut().enumerate() {
         if string_members.contains(&i) {
             f.owner = None;
+            f.namespace = "System".into();
             f.instance = false;
             f.parameters.insert(0, neoclr::metadata::Type::String);
             if !f.parameter_names.is_empty() { f.parameter_names.insert(0, None); }
