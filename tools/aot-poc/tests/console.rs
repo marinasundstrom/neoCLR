@@ -5811,3 +5811,63 @@ fn native_reflection_arrays_preserve_boolean_string_and_reference_elements() {
         + "\n.type class Cell\n.field Number Int32\n.method instance .ctor(Int32 value) -> noresult\nldarg 0\nldarg value\nstfld Cell::Number\nret\n.end\n.end\n";
     check_reflection_arrays(&reference, 1, b"");
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_retained_property_access_preserves_checks_effects_and_faults() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/reflection-properties.neoil");
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    let dir = Temp::new();
+    let roots = serde_json::json!({"schemaVersion":2,"types":[{"definition":{"module":"Properties","index":1},"construct":false,"properties":true,"getters":true,"setters":true}]});
+    let path = dir.0.join("roots.json");
+    fs::write(&path, serde_json::to_vec(&roots).unwrap()).unwrap();
+    let result = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena", "--native-gc", "--reflection-roots", path.to_str().unwrap()]);
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert_eq!(report["reflectionRetention"]["types"].as_array().unwrap().len(), 1);
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    let result = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds"])
+        .arg(base.join("aot-console/text-host.c")).arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-console/native-gc.c")).arg(base.join("aot-console/root-probe.c"))
+        .arg(base.join("aot-fault-details/render.c")).arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    for mode in 0..10 {
+        let interpreted = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default());
+        let native = Command::new(dir.0.join("host")).arg(mode.to_string()).output().unwrap();
+        assert!(native.stdout.is_empty());
+        if !matches!(mode, 7 | 8) {
+            let expected = [42, 3, 5, 4, 6, 7, 7, 0, 0, 4][mode as usize];
+            assert_eq!(interpreted.unwrap().value, neoclr::Value::Int32(expected));
+            assert_eq!(native.status.code(), Some(expected), "{mode}: {native:?}");
+            assert!(native.stderr.is_empty());
+        } else {
+            let error = interpreted.unwrap_err();
+            assert_eq!(native.status.code(), Some(1));
+            assert_eq!(String::from_utf8_lossy(&native.stderr), error.diagnostic().to_string());
+        }
+    }
+}
+
+#[test]
+fn native_property_metadata_roots_do_not_retain_accessor_bodies() {
+    use neoclr::metadata::{Instruction as Op, Type};
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let mut app = neoclr::assemble(include_str!("../../../docs/experiments/aot-console/reflection-properties.neoil")).unwrap();
+    let f = app.functions.iter_mut().find(|f| f.name == "Calculate").unwrap();
+    f.locals = vec![Type::from_name("System.Object")]; f.local_names.clear();
+    f.body = vec![Op::LocalAddress(0),Op::InitializeObject(Type::from_name("System.Object")),Op::LoadTypeToken(Type::from_name("Model")),Op::Int(0),Op::Load(0),
+        Op::Call(neoclr::assembler::parse_function_ref("neoCLR.Runtime.ReflectionPropertyGetCheck(RuntimeTypeHandle,Int32,System.Object)").unwrap()),Op::Return];
+    for invoke in [false,true] {
+        let dir=Temp::new(); let path=dir.0.join("roots.json");
+        fs::write(&path,serde_json::to_vec(&serde_json::json!({"schemaVersion":2,"types":[{"definition":{"module":"Properties","index":1},"construct":false,"properties":true,"getters":invoke,"setters":false}]})).unwrap()).unwrap();
+        let result=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena","--native-gc","--reflection-roots",path.to_str().unwrap()]);
+        assert!(result.status.success(),"{}",String::from_utf8_lossy(&result.stderr));
+        let report:serde_json::Value=serde_json::from_slice(&result.stdout).unwrap();
+        let functions=report["functions"].as_array().unwrap();
+        assert_eq!(functions.iter().any(|r| r["name"]=="Model.get_Number"),invoke);
+        assert!(!functions.iter().any(|r| r["name"]=="Model.get_Secret" || r["name"]=="Model.set_Number"));
+    }
+}

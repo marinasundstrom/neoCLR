@@ -447,3 +447,37 @@ The unchanged typed JSON assembly now reaches ReflectionPropertyGet admission.
 Property discovery, checked accessor dispatch and the end-to-end JSON milestone
 remain unfinished. The vector service binding is a private backend implementation
 of existing APIs and requires no Raven compiler or public API snapshot change.
+
+## Checked property invocation — 2026-10-09
+
+The private roots schema now also accepts version 2, whose type entries require
+Boolean construct, properties, getters and setters policies alongside definition.
+Version 1 remains supported without property retention. Getter/setter roots require
+properties=true; metadata checks and executable roots remain independent. The first
+property adapter subset is nongeneric reference owners with nonindexed instance
+Int32, Boolean or reference-valued properties. It invokes real accessors with ordinary
+virtual dispatch and never substitutes raw user-field writes.
+
+The existing private property services now preserve access/missing/index/receiver/
+value checks, exact boxed primitives, nullable reference values and terminal accessor
+faults. Configured metadata without invocation rights can be checked without retaining
+accessor bodies; attempting unretained invocation fails explicitly. Original source
+visibility and source member identities determine access. The generated adapter/caller
+frames match interpreter execution. This implements the current Reflection extension
+contract, not a new public capability API; the [pre-stable review](introspection-design.md#pre-stable-api-evaluation--2026-10-09)
+tracks its design questions independently. CLR PropertyInfo access is the baseline;
+neoCLR retains its bounded Result-validation/terminal-fault split, with explicit
+code retention and linear dispatch costs.
+
+Focused tests cover real setter effects, denied/missing accessors, invalid/negative
+property indices, null receivers, wrong/null value boxes, user getter/setter faults
+and metadata-only body exclusion. The portable property consumer passes on macOS
+and is added to both action jobs; Windows qualification is pending. JSON admission
+now reaches TypeElementType; TypeProperties and descriptor materialization are still
+required before JSON can run. No public API or compiler contract changed.
+
+The preceding vector gate and all six earlier gates pass on macOS ARM64 and Windows
+x64 in [action 37988417870](https://github.com/marinasundstrom/neoCLR/actions/runs/37988417870).
+All fourteen reports and source/artifact hashes are verified in
+[array evidence](native-reflection-array-validation.json). This also qualifies the
+vector descriptor changes present in the earlier successful action 37986218456.

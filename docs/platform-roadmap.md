@@ -75,9 +75,11 @@ Explicit source-identity roots and checked parameterless construction now run
 through the public Raven reflection wrapper on macOS, with the low-level constructor
 gate qualified on macOS/Windows. Retained Int32/Boolean/String/reference vectors now
 support creation, readback, length and semantic GetType identity; the public Raven
-array consumer passes on macOS and its portable Windows gate is pending. Property metadata retention,
-runtime discovery tables, checked accessor dispatch and complete native JSON execution
-remain unfinished.
+array consumer passes on macOS and the portable gate is qualified on macOS/Windows
+([evidence](native-reflection-array-validation.json)). Explicit property metadata and
+getter/setter policies now generate checked accessor adapters; focused macOS tests
+cover access/value errors, real effects and user faults. Runtime property discovery,
+element-type queries and complete native JSON execution remain unfinished.
 Evaluate the Introspection/Reflection API alongside implementation before stability,
 preserving its overall structure while keeping details revisable; see the
 [pre-stable review](introspection-design.md#pre-stable-api-evaluation--2026-10-09).

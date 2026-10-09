@@ -22,10 +22,11 @@ def main():
     parser.add_argument('--object-types', action='store_true', help='Exercise concrete object type handles')
     parser.add_argument('--reflection-construction', action='store_true', help='Exercise retained reflection constructors')
     parser.add_argument('--reflection-arrays', action='store_true', help='Exercise checked reflection vector adapters')
+    parser.add_argument('--reflection-properties', action='store_true', help='Exercise checked retained property accessors')
     args = parser.parse_args()
     aot, out = args.aot.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    report = dict(passed=False, platform=platform.platform(), machine=platform.machine(), commands=[], runtimeEquality=args.runtime_equality, descriptorQueries=args.descriptor_queries, primitiveBoxes=args.primitive_boxes, objectTypes=args.object_types, reflectionConstruction=args.reflection_construction, reflectionArrays=args.reflection_arrays)
+    report = dict(passed=False, platform=platform.platform(), machine=platform.machine(), commands=[], runtimeEquality=args.runtime_equality, descriptorQueries=args.descriptor_queries, primitiveBoxes=args.primitive_boxes, objectTypes=args.object_types, reflectionConstruction=args.reflection_construction, reflectionArrays=args.reflection_arrays, reflectionProperties=args.reflection_properties)
     def run(command, name):
         r = subprocess.run(list(map(str, command)), cwd=out, capture_output=True, timeout=120)
         (out / (name + '.stdout')).write_bytes(r.stdout)
@@ -58,6 +59,9 @@ def main():
         if args.reflection_arrays:
             sources[0] = base / 'reflection-arrays-test.c'
             inputs += [sources[0], base / 'reflection-arrays.neoil']
+        if args.reflection_properties:
+            sources[0] = base / 'reflection-properties-test.c'
+            inputs += [sources[0], base / 'reflection-properties.neoil', base / 'reflection-properties-roots.json']
         if windows:
             sources += [ROOT / 'tools/native/windows-native-stack.c']
             inputs += [sources[-1]]
@@ -92,10 +96,14 @@ def main():
             source = base / 'reflection-construction.neoil'
         if args.reflection_arrays:
             source = base / 'reflection-arrays.neoil'
+        if args.reflection_properties:
+            source = base / 'reflection-properties.neoil'
         obj = out / ('guest.obj' if windows else 'guest.o')
         flags = ['--compile-system', '--reference-arena', '--native-gc']
         if args.reflection_construction:
             flags += ['--reflection-roots', base / 'reflection-construction-roots.json']
+        if args.reflection_properties:
+            flags += ['--reflection-roots', base / 'reflection-properties-roots.json']
         if args.descriptor_queries:
             flags += ['--bind-console-write-line']
         if windows:
@@ -114,6 +122,8 @@ def main():
             expected = b'Reflection construction: 42\n'
         if args.reflection_arrays:
             expected = b'Reflection arrays: 42\n'
+        if args.reflection_properties:
+            expected = b'Reflection properties: 42\n'
         if r.stdout.replace(b'\r\n', b'\n') != expected or r.stderr:
             raise ValueError('Unexpected token identity result')
         if sha(aot) != report['aotSha256'] or any(sha(ROOT / n) != h for n, h in report['inputs'].items()):

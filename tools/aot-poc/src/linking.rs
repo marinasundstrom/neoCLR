@@ -174,17 +174,20 @@ pub fn prepare(
             assembly.array_backing = Some(type_id(index));
         }
     }
-    let reflection_retention = context.and_then(|c| c.reflection_roots.as_ref())
+    let mut reflection_retention = context.and_then(|c| c.reflection_roots.as_ref())
         .map(|roots| super::reflection_construction::bind(&mut joined, &source_metadata, &types, &methods, roots)).transpose()?;
     // Conformance was verified in original scopes. Metadata-only relationships
     // must not consume executable specialization shapes (Option and Result share
     // Propagatable with different arguments, including metadata-only Void).
-    let reflection_roots: Vec<usize> = reflection_retention.as_ref().and_then(|r| r["types"].as_array()).into_iter().flatten()
+    let mut reflection_roots: Vec<usize> = reflection_retention.as_ref().and_then(|r| r["types"].as_array()).into_iter().flatten()
         .filter(|r| r["construct"] == true && r["checkStatus"] == 0)
         .map(|r| -> Result<usize, Error> {
             let id: MemberId = serde_json::from_value(r["constructor"].clone())?;
             methods.iter().position(|m| *m == id).ok_or_else(|| "missing retained constructor identity".into())
         }).collect::<Result<_, _>>()?;
+    if let Some(retention) = reflection_retention.as_mut() {
+        reflection_roots.extend(super::reflection_properties::bind(&mut joined, &source_metadata, &types, &methods, retention)?);
+    }
     let source_conformance = joined.clone();
     let relationships: Vec<_> = joined
         .types
@@ -424,6 +427,14 @@ pub fn prepare(
             .filter(|r| matches!(r["name"].as_str(), Some("neoCLR.Runtime.ReflectionConstructionCheck" | "neoCLR.Runtime.ReflectionConstruct")))
             .map(|r| json!({"compiledIndex":r["compiledIndex"],"name":r["name"],"implementation":"reflection-construction-retained-v1"})).collect();
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        let bindings = report["reflectionRetention"]["propertyBindings"].as_array().unwrap().clone();
+        for binding in bindings {
+            let row = report["functions"].as_array().unwrap().iter().find(|r| r["definition"] == binding["definition"]);
+            if let Some(row) = row {
+                let entry = json!({"compiledIndex":row["compiledIndex"],"name":row["name"],"implementation":"reflection-property-retained-v1","instructionMap":binding["instructionMap"]});
+                report["nativeBindings"].as_array_mut().unwrap().push(entry);
+            }
+        }
     }
 
     if reference_arena {

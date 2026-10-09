@@ -113,8 +113,9 @@ The routing workbench also parses a route, extracts an integer parameter and pri
   nominal/vector token producers, plus concrete source-class/primitive-box `GetType()` identity,
   as first steps toward native JSON. Retained vectors support checked creation,
   length, readback and semantic `GetType()` identity; other compound queries remain unsupported.
-  Explicit development reflection roots now support checked parameterless construction;
-  property discovery and reflective accessor invocation remain unfinished, so typed
+  Explicit development reflection roots now support checked parameterless construction
+  and property-access adapters;
+  runtime property discovery remains unfinished, so typed
   JSON serialization is not yet a native capability.
   Broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.

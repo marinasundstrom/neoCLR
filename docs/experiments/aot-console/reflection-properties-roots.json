@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 2,
+  "types": [{
+    "definition": {"module": "Properties", "index": 1},
+    "construct": false,
+    "properties": true,
+    "getters": true,
+    "setters": true
+  }]
+}

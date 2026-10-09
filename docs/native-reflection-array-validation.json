@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-09",
+  "scope": "Retained native vector reflection, object vector identity and preceding token/boxing/construction gates; native JSON incomplete",
+  "run": "https://github.com/marinasundstrom/neoCLR/actions/runs/37988417870",
+  "reports": [
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-object-types-validation",
+      "passed": true,
+      "reportSha256": "595e31786a378ff42f93897549a4579a1ba3260fd994d0ceeeb0c9b4e9740acd",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-primitive-boxes-validation",
+      "passed": true,
+      "reportSha256": "a56e69544ed537ff85e42f0dcc0562044e0b06ee380eafcf46a1a187654443c2",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-reflection-arrays-validation",
+      "passed": true,
+      "reportSha256": "6dcb0d10d2eab11fd92560b1cede70b5e9a880747980020beb5dccbc2f8d0be7",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-reflection-construction-validation",
+      "passed": true,
+      "reportSha256": "abd5e2a7f72a75561b03d1f0743040d14d7b633494782e164b858ae20e6caf60",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-type-descriptors-validation",
+      "passed": true,
+      "reportSha256": "af40711407bce2ce4414de833126c0d2150b9039ee95677b7b25b34e918488fd",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-type-equality-validation",
+      "passed": true,
+      "reportSha256": "2d1d724997b08c2c20f1d9e71d021f7fff2be179d89675223297488bb11fb563",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-type-tokens-validation",
+      "passed": true,
+      "reportSha256": "87ab4d1c44d656b2ee266ec83565a79b69bbbc7fb7bf5ddcb4e6584031e64962",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-object-types-validation",
+      "passed": true,
+      "reportSha256": "2f9c86f43d40a50f107397f03b82266e3c602978ca2f3c4811178f2ccf436f89",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-primitive-boxes-validation",
+      "passed": true,
+      "reportSha256": "a0afbba7f82bb8250c6f57cb648b65a3e431f2e8f52d3c1205423eeba22ad0fa",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-reflection-arrays-validation",
+      "passed": true,
+      "reportSha256": "8a8402ec605c73347de04a8052e14c5d1b2217462328c9617234e9e2219e5991",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-reflection-construction-validation",
+      "passed": true,
+      "reportSha256": "50acd0e009dfa6ca275a106d7790c724c8e7ee6835b8fe1ff55ce184c42f5335",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-type-descriptors-validation",
+      "passed": true,
+      "reportSha256": "7650a1f20a7d4d92ca311de0db07e5683045cf8c454bda2b2c791372e7742f30",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-type-equality-validation",
+      "passed": true,
+      "reportSha256": "035e887022188a04483158129d3128153189715b731291a8858bcfb9ac3fd6f6",
+      "sourceAndArtifactHashesVerified": true
+    },
+    {
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "machine": "AMD64",
+      "revision": "e01a0f970287c605d81e2e74dd3a5cb219221f30",
+      "gate": "native-type-tokens-validation",
+      "passed": true,
+      "reportSha256": "ca325c0be951dd45d38fb9888b297f794fac448c66b103e5b75c7e9f45a398e5",
+      "sourceAndArtifactHashesVerified": true
+    }
+  ]
+}

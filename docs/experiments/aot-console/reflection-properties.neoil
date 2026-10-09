@@ -1,0 +1,170 @@
+.module Properties
+.type class abstract System.Object
+.end
+.type class Model
+.field Number Int32
+.method instance .ctor() -> noresult
+ldarg 0
+ldc.i4 1
+stfld Model::Number
+ret
+.end
+.method instance get_Number() -> Int32
+ldarg 0
+ldfld Model::Number
+ret
+.end
+.method instance set_Number(Int32) -> noresult
+ldarg 0
+ldarg 1
+ldc.i4 2
+add
+stfld Model::Number
+ret
+.end
+.method private instance get_Secret() -> Int32
+ldc.i4 99
+ret
+.end
+.method instance get_Broken() -> Int32
+fault "getter failed"
+.end
+.method instance set_Broken(Int32) -> noresult
+fault "setter failed"
+.end
+.property instance Number() -> Int32
+.get instance Model::get_Number()
+.set instance Model::set_Number(Int32)
+.end
+.property instance Secret() -> Int32
+.get instance Model::get_Secret()
+.end
+.property instance WriteOnly() -> Int32
+.set instance Model::set_Number(Int32)
+.end
+.property instance Broken() -> Int32
+.get instance Model::get_Broken()
+.set instance Model::set_Broken(Int32)
+.end
+.end
+.function neoCLR.Runtime.ReflectionPropertyGetCheck(RuntimeTypeHandle,Int32,System.Object) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionPropertySetCheck(RuntimeTypeHandle,Int32,System.Object,System.Object) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionPropertyGet(RuntimeTypeHandle,Int32,System.Object) -> System.Object
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionPropertySet(RuntimeTypeHandle,Int32,System.Object,System.Object) -> noresult
+.methodimpl InternalCall
+.end
+.function Calculate(Int32 mode) -> Int32
+.local System.Object model
+.local System.Object empty
+ldloca empty
+initobj System.Object
+newobj.ctor instance Model::.ctor()
+castclass System.Object
+stloc model
+ldarg mode
+ldc.i4 1
+beq Mode1
+ldarg mode
+ldc.i4 2
+beq Mode2
+ldarg mode
+ldc.i4 3
+beq Mode3
+ldarg mode
+ldc.i4 4
+beq Mode4
+ldarg mode
+ldc.i4 5
+beq Mode5
+ldarg mode
+ldc.i4 6
+beq Mode6
+ldarg mode
+ldc.i4 7
+beq Mode7
+ldarg mode
+ldc.i4 8
+beq Mode8
+ldarg mode
+ldc.i4 9
+beq Mode9
+ldtoken Model
+ldc.i4 0
+ldloc model
+ldc.i4 40
+box Int32
+call neoCLR.Runtime.ReflectionPropertySet(RuntimeTypeHandle,Int32,System.Object,System.Object)
+ldtoken Model
+ldc.i4 0
+ldloc model
+call neoCLR.Runtime.ReflectionPropertyGet(RuntimeTypeHandle,Int32,System.Object)
+unbox.any Int32
+ret
+Mode1:
+ldtoken Model
+ldc.i4 1
+ldloc model
+call neoCLR.Runtime.ReflectionPropertyGetCheck(RuntimeTypeHandle,Int32,System.Object)
+ret
+Mode2:
+ldtoken Model
+ldc.i4 2
+ldloc model
+call neoCLR.Runtime.ReflectionPropertyGetCheck(RuntimeTypeHandle,Int32,System.Object)
+ret
+Mode3:
+ldtoken Model
+ldc.i4 99
+ldloc model
+call neoCLR.Runtime.ReflectionPropertyGetCheck(RuntimeTypeHandle,Int32,System.Object)
+ret
+Mode4:
+ldtoken Model
+ldc.i4 0
+ldloc empty
+call neoCLR.Runtime.ReflectionPropertyGetCheck(RuntimeTypeHandle,Int32,System.Object)
+ret
+Mode5:
+ldtoken Model
+ldc.i4 0
+ldloc model
+ldc.bool true
+box Boolean
+call neoCLR.Runtime.ReflectionPropertySetCheck(RuntimeTypeHandle,Int32,System.Object,System.Object)
+ret
+Mode6:
+ldtoken Model
+ldc.i4 0
+ldloc model
+ldloc empty
+call neoCLR.Runtime.ReflectionPropertySetCheck(RuntimeTypeHandle,Int32,System.Object,System.Object)
+ret
+Mode7:
+ldtoken Model
+ldc.i4 3
+ldloc model
+call neoCLR.Runtime.ReflectionPropertyGet(RuntimeTypeHandle,Int32,System.Object)
+unbox.any Int32
+ret
+Mode8:
+ldtoken Model
+ldc.i4 3
+ldloc model
+ldc.i4 1
+box Int32
+call neoCLR.Runtime.ReflectionPropertySet(RuntimeTypeHandle,Int32,System.Object,System.Object)
+ldc.i4 -1
+ret
+Mode9:
+ldtoken Model
+ldc.i4 -1
+ldloc model
+call neoCLR.Runtime.ReflectionPropertyGetCheck(RuntimeTypeHandle,Int32,System.Object)
+ret
+.end

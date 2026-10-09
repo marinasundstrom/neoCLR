@@ -73,6 +73,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Record the author-directed pre-stable Introspection/Reflection API evaluation,
   preserving the overall structure while identifying capability/error/discovery
   questions and comparative validation needs; no public API redesign is implemented.
+  Qualify the vector reflection gate and earlier gates on macOS/Windows in action
+  `37988417870`, verifying fourteen source/artifact reports. Add schema-2 property
+  metadata/getter/setter policies and checked native accessor dispatch, preserving
+  user effects, access/value validation and fault frames. Metadata-only roots exclude
+  accessor bodies; add the portable gate. JSON still awaits descriptor discovery.
 
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.

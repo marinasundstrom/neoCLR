@@ -15,8 +15,12 @@ pub fn bind(
     let config = config
         .as_object()
         .ok_or("reflection roots must be an object")?;
-    if config.len() != 2 || config.get("schemaVersion") != Some(&json!(1)) {
-        return Err("reflection roots require schemaVersion 1 and types".into());
+    let version = config
+        .get("schemaVersion")
+        .and_then(Value::as_u64)
+        .unwrap_or(0);
+    if config.len() != 2 || !matches!(version, 1 | 2) {
+        return Err("reflection roots require schemaVersion 1 or 2 and types".into());
     }
     let roots = config
         .get("types")
@@ -31,16 +35,31 @@ pub fn bind(
         let fields = root
             .as_object()
             .ok_or("reflection root must be an object")?;
-        if fields.len() != 2
+        if fields.len() != if version == 1 { 2 } else { 5 }
             || !fields.contains_key("definition")
             || !fields.contains_key("construct")
+            || (version == 2
+                && ["properties", "getters", "setters"]
+                    .iter()
+                    .any(|k| !fields.contains_key(*k)))
         {
-            return Err("reflection root requires only definition and construct".into());
+            return Err("reflection root fields do not match the requested schema".into());
         }
         let definition: TypeDefId = serde_json::from_value(root["definition"].clone())?;
         let construct = root["construct"]
             .as_bool()
             .ok_or("construct must be Boolean")?;
+        let mut property_policy = [false; 3];
+        if version == 2 {
+            for (i, key) in ["properties", "getters", "setters"].iter().enumerate() {
+                property_policy[i] = root[*key]
+                    .as_bool()
+                    .ok_or("reflection property root policy must be Boolean")?;
+            }
+            if !property_policy[0] && (property_policy[1] || property_policy[2]) {
+                return Err("reflection accessor roots require property metadata".into());
+            }
+        }
         let index = definitions
             .iter()
             .position(|d| *d == definition)
@@ -112,6 +131,7 @@ pub fn bind(
             }
         }
         rows.push(json!({"definition":definition,"sourceName":ty.name,"construct":construct,
+            "properties":property_policy[0],"getters":property_policy[1],"setters":property_policy[2],
             "checkStatus":status,"constructor":target.as_ref().and_then(|_| candidates.first()).map(|i| &methods[*i]),
             "policy":"explicit source identity; metadata check does not retain constructor body unless invocation is requested"}));
         selected.push((index, construct, status, target));
@@ -191,5 +211,5 @@ pub fn bind(
         ));
         f.body = body;
     }
-    Ok(json!({"schemaVersion":1,"types":rows}))
+    Ok(json!({"schemaVersion":version,"types":rows}))
 }

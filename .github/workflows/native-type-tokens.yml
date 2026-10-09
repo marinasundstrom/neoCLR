@@ -9,6 +9,7 @@ on:
       - 'docs/experiments/aot-console/object-types*'
       - 'docs/experiments/aot-console/reflection-construction*'
       - 'docs/experiments/aot-console/reflection-arrays*'
+      - 'docs/experiments/aot-console/reflection-properties*'
       - 'docs/experiments/aot-console/native-gc*'
       - 'docs/experiments/aot-console/root-probe*'
       - 'tools/native/windows-native-stack.c'
@@ -23,6 +24,7 @@ on:
       - 'docs/experiments/aot-console/object-types*'
       - 'docs/experiments/aot-console/reflection-construction*'
       - 'docs/experiments/aot-console/reflection-arrays*'
+      - 'docs/experiments/aot-console/reflection-properties*'
       - 'docs/experiments/aot-console/native-gc*'
       - 'docs/experiments/aot-console/root-probe*'
       - 'tools/native/windows-native-stack.c'
@@ -56,6 +58,7 @@ jobs:
           python3 scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-object-types-validation --object-types
           python3 scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-reflection-construction-validation --reflection-construction
           python3 scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-reflection-arrays-validation --reflection-arrays
+          python3 scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-reflection-properties-validation --reflection-properties
       - name: Run Windows type token contracts
         if: runner.os == 'Windows'
         shell: pwsh
@@ -76,6 +79,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc.exe --output target/native-reflection-arrays-validation --reflection-arrays"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot tools/aot-poc/target/debug/neoclr-aot-poc.exe --output target/native-reflection-properties-validation --reflection-properties"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -88,6 +93,7 @@ jobs:
             target/native-object-types-validation/
             target/native-reflection-construction-validation/
             target/native-reflection-arrays-validation/
+            target/native-reflection-properties-validation/
           include-hidden-files: true
           retention-days: 14
           if-no-files-found: warn
