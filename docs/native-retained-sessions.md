@@ -105,8 +105,10 @@ The generated fixture now receives its callback through the explicit export, wit
 heap scanning. It collects before adoption and checks reset rejection, foreign-root
 admission, stale handles, bootstrap faults and atomic root-quota failures at export
 and adoption. Focused compiler tests reject missing/duplicate opt-in and wrong root
-shapes, and inspect-mode reporting records the capability. The local macOS handoff
-gate passes; cross-platform evidence for this extension is recorded separately in
+shapes, and inspect-mode reporting records the capability. The handoff gate passes locally and on both macOS ARM64 and Windows x64 in
+[Action 37974336464](https://github.com/marinasundstrom/neoCLR/actions/runs/37974336464)
+at `201f567b`, with matching fault output. All 21/25 artifact hashes and 15/16 source
+hashes respectively are verified (allowing Windows checkout line endings), recorded in
 [native-bootstrap-handoff-validation.json](native-bootstrap-handoff-validation.json).
 A retained-state HTTP consumer remains the next integration work.
 The website's existing statement that general reusable hosting is unfinished remains

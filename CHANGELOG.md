@@ -18,7 +18,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   scanning with an owned handle. Preserve output and existing session diagnostics
   on rejected handoff; check collection before adoption, bootstrap faults, foreign
   roots and root-quota exhaustion. Ordinary entry ABI and Raven contracts remain
-  unchanged; a retained-state HTTP consumer remains pending.
+  unchanged; a retained-state HTTP consumer remains pending. Handoff Action
+  `37974336464` at `201f567b` passes on macOS ARM64 and Windows x64 with matching
+  faults; verify 21/25 artifact hashes and 15/16 source inputs respectively.
   Run `37972822432` at `c77e2b07` passes the same lifecycle and generated-callback
   gates on macOS ARM64 and Windows x64; verify 21/25 artifact hashes and 15/16
   source inputs respectively. Compiled callback faults also match the interpreter

@@ -52,7 +52,7 @@ owned roots, fail-closed dispatch after faults and explicit shutdown admission.
 [Lifecycle and generated-callback gates](native-retained-session-validation.json)
 pass on macOS ARM64 and Windows x64 at `c77e2b07`, with matching fault output. An explicit opt-in callback bootstrap now transfers a strong handle into the session
 without heap scanning; the [handoff gate](native-bootstrap-handoff-validation.json)
-records its qualification separately. A retained-state HTTP consumer remains the
+passes on macOS ARM64 and Windows x64 at `201f567b`. A retained-state HTTP consumer remains the
 next integration work.
 
 **Author clarification (2026-10-09):** once the native compilation foundations are

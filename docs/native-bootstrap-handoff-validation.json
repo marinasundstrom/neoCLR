@@ -43,5 +43,53 @@
     "Generated callback fault matches interpreter",
     "Ordinary unit entry still publishes zero only on success"
   ],
-  "github": "Pending qualification of this extension; earlier session lifecycle evidence remains in native-retained-session-validation.json"
+  "github": {
+    "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/37974336464",
+    "reports": [
+      {
+        "platform": "macOS-26.6.2-arm64-arm-64bit",
+        "machine": "arm64",
+        "revision": "201f567b89c7a4bb14c68b956ad198de32c2d908",
+        "reportSha256": "343d40233f08e4df4dc7069319e0122e45f102f02a1a11cb1d1e7a6fc81c4998",
+        "artifactHashesVerified": 21,
+        "trackedSourceHashesVerified": 15,
+        "cases": [
+          {
+            "name": "kernel",
+            "passed": true,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "name": "compiled",
+            "passed": true,
+            "stdout": "",
+            "stderr": "DivideByZero: Division by zero\n   at Fail [instruction 2]\n"
+          }
+        ]
+      },
+      {
+        "platform": "Windows-2022Server-10.0.20348-SP0",
+        "machine": "AMD64",
+        "revision": "201f567b89c7a4bb14c68b956ad198de32c2d908",
+        "reportSha256": "18ad4b5e096b0b107708669297a304139c0303e47b04cf21098e62b9d408130e",
+        "artifactHashesVerified": 25,
+        "trackedSourceHashesVerified": 16,
+        "cases": [
+          {
+            "name": "kernel",
+            "passed": true,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "name": "compiled",
+            "passed": true,
+            "stdout": "",
+            "stderr": "DivideByZero: Division by zero\n   at Fail [instruction 2]\n"
+          }
+        ]
+      }
+    ]
+  }
 }
