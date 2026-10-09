@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Add a development macOS ARM64 project-to-executable console command using the
+  selected bundle's Raven project build, existing AOT backend and explicit native
+  runtime adapters. Record build inputs/diagnostics and publish only after linking
+  and OS-dependency checks; preserve existing output directories. This synchronous
+  1 MiB GC profile still requires a source checkout and separately built AOT tool;
+  it does not add native compilation to the released bundles or support Windows.
+  Focused acceptance passes UTF-8/interpolation and fault parity, isolated execution,
+  unsupported recursion rejection and stale/existing-output protection. Select a
+  matching Apple Clang/macOS SDK explicitly through xcrun.
+
 - Record the post-Preview 13 priority discussion and subsequent author selection:
   prioritize usable project-level native compilation, bounded Windows portability,
   then hosting and reload; implement and validate in individually committed slices.

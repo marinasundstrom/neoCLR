@@ -36,6 +36,16 @@ subset. No performance superiority is established. Reuse the
 supersedes older immediate-priority notes below; their completed evidence and open
 technical gaps remain valid. No release date or version is selected.
 
+**First implementation slice:** the source-checkout
+[project-to-executable console workflow](native-poc-bundle.md#development-project-to-executable-workflow-2026-10-09)
+now builds ordinary projects with a selected bundle and links a bounded macOS
+ARM64 executable. [Focused evidence](experiments/native-project-build-validation.json)
+covers UTF-8/interpolation, interpreter/native fault parity, executable-only
+deployment, unsupported recursion rejection, existing-output preservation and
+rejection of stale project output after a failed rebuild. Next package the matched
+backend/adapters and workflow for checkout-independent use, then extend the project
+path to HTTP. Windows AOT, full bootstrap, hosting and reload remain open.
+
 **Preview 13 published (2026-10-09):** after Raven's shared website publication,
 the author requested the next neoCLR POC release for Windows and macOS, with a
 final pass over urgent issues. Qualify Windows x64 and macOS ARM64 packages from

@@ -18,6 +18,14 @@ AOT moves compilation work to build time and produces an architecture-specific b
 Memory management, text, I/O and fault handling still require runtime implementations
 linked into that binary. See [architecture](../../architecture/) for those layers.
 
+Development builds now have a bounded project-to-executable console workflow on
+macOS ARM64. It builds an ordinary Raven project with a selected native bundle,
+links a standalone executable and records build diagnostics and dependencies.
+It currently requires a source checkout and a separately built AOT tool; it is
+not included in Preview 13. See the
+[development build instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md#development-project-to-executable-workflow-2026-10-09)
+for the supported console profile and prerequisites.
+
 ## A working HTTP proof of concept
 
 This library example parses a route, extracts an integer parameter and prints `42`

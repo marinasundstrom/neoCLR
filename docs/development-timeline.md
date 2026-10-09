@@ -12662,3 +12662,14 @@ claim follows from these focused checks.
   a bounded ordinary-project native build workflow using existing backend contracts.
   Implementation outcomes follow in the linked roadmap/evidence and changelog;
   this decision alone does not establish packaging or native platform qualification.
+
+- **First implementation outcome:** committed direction separately, then added
+  a source-checkout ordinary-project console build command with the bundled Raven
+  compiler, current AOT backend and bounded native GC host. Focused acceptance
+  passes three standalone consumers (UTF-8, interpolation and a guest fault),
+  interpreter parity, unsupported recursion rejection and stale/existing-output
+  protection. A mismatched inherited SDK exposed a local link failure; explicitly
+  selecting Apple's macOS SDK/toolchain resolved it. See
+  [recorded evidence](experiments/native-project-build-validation.json).
+  The helper is not yet a packaged AOT release; matched tool/adapters packaging
+  and the HTTP project path are next.

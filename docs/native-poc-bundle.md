@@ -1,5 +1,69 @@
 # Native POC bundle
 
+## Development project-to-executable workflow (2026-10-09)
+
+From a neoCLR source checkout on macOS ARM64, build the current AOT tool and use
+an ordinary executable `.rvnproj` importing the selected split bundle's
+`lib/NeoCLR.ClassLibrary.props`:
+
+```sh
+cargo build --locked --manifest-path tools/aot-poc/Cargo.toml
+python3 scripts/build-native-project.py \
+  --project /path/to/App.rvnproj \
+  --bundle /path/to/neoclr-native-poc \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --output /path/to/new-native-output
+/path/to/new-native-output/app
+```
+
+The output directory must be new. The command uses the bundle's compiler to
+evaluate/build the project, compiles the resulting neoCLR metadata/IL, then links
+the console host and selected runtime adapters. Apple `xcrun` selects Clang and
+the SDK explicitly. The compiler still needs its documented .NET SDKs; the
+resulting executable needs only macOS libSystem. This source-checkout helper is
+development work, not a new capability in the published Preview 13 bundle.
+
+The explicit `macos-arm64-console-v1` profile supports synchronous console entry,
+selected UTF-8 text operations and Int32 formatting, using the existing private
+ABI v4, native root reporting and a bounded 1 MiB nonmoving managed heap. It
+renders guest faults, checks that guest root frames have unwound and collects at
+quiescent shutdown. It supplies no guest command-line arguments, task pump, socket
+services, file services, guarded recursion or general native reflection. Unsupported
+reachable services/instructions fail through the backend's existing diagnostics.
+This is a bounded deployment policy, not a permanent platform restriction or a
+stable public hosting ABI.
+
+`build.json` records commands, diagnostics, selected compiler/backend/library and
+adapter hashes, SDK/compiler identification, emitted artifact hashes and dynamic
+dependencies. Library catalog hashes are checked before compilation. The project
+must reference the same bundle; arbitrary extra project-reference assemblies are
+not yet added to the AOT dependency catalog. The helper currently consumes Raven's
+`Native build output:` line (last output after reference builds); a structured
+compiler output contract is future work. Recorded hashes establish input consistency,
+not a signed provenance chain or a complete reproducible MSBuild input inventory.
+
+An unsuccessful build retains its report and intermediate files but publishes no
+`app`. Existing output directories are rejected without replacing their contents.
+The command does not run the application. The focused acceptance harness does:
+
+```sh
+python3 scripts/verify-native-project-build.py \
+  --bundle /path/to/neoclr-native-poc \
+  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --output /path/to/new-qualification-directory
+```
+
+It checks projects/output paths with spaces, UTF-8 and interpolation, a guest
+division fault against the interpreter, executable-only deployment with an empty
+environment, unsupported-recursion rejection and preservation of existing output.
+The [2026-10-09 acceptance record](experiments/native-project-build-validation.json)
+passes those cases and rejects a failed rebuild despite its previously emitted DLL.
+Packaging this workflow with matching backend/adapters is the next slice; Windows
+native compilation and HTTP project publication remain separate qualification.
+This reuses the [.NET deployment comparison](native-execution-investigation.md):
+project-level native build ergonomics are familiar, while neoCLR's currently
+bounded runtime-service profile and explicit bootstrap dependencies remain costs.
+
 ## Preview 13 qualification (2026-10-09)
 
 [Preview 13](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.13) is published

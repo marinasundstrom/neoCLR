@@ -1,0 +1,918 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "name": "utf8",
+      "source": "func Main() -> int {\n    System.Console.WriteLine(\"Hello, Caf\u00e9 \ud83c\udf0d\")\n    return 0\n}\n",
+      "buildExit": 0,
+      "build": {
+        "profile": "macos-arm64-console-v1",
+        "passed": true,
+        "project": "/Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 project with spaces/App.rvnproj",
+        "host": "macOS-27.0-arm64-arm-64bit",
+        "commands": [
+          {
+            "command": [
+              "xcrun",
+              "--sdk",
+              "macosx",
+              "--find",
+              "clang"
+            ],
+            "exitCode": 0,
+            "stdout": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "xcrun",
+              "--sdk",
+              "macosx",
+              "--show-sdk-path"
+            ],
+            "exitCode": 0,
+            "stdout": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+              "--version"
+            ],
+            "exitCode": 0,
+            "stdout": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 project with spaces/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: /Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 project with spaces/bin/neoclr/App.dll\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+              "--closed-world",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 native output/app.dll",
+              "@entry",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 native output/app.o",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--compile-system",
+              "--bind-user-fault",
+              "--reference-arena",
+              "--native-gc",
+              "--bind-console-read-byte",
+              "--bind-console-write-line",
+              "--bind-console-stream-output",
+              "--bind-int32-to-string",
+              "--bind-utf8-text"
+            ],
+            "exitCode": 0,
+            "stdout": "{\n  \"arrayBackingProjection\": null,\n  \"boxedInt32Display\": false,\n  \"excludedFunctions\": [\n    {\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.ConsoleReadByte\",\n      \"sourceIndex\": 1\n    },\n    {\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.ConsoleWriteBytes\",\n      \"sourceIndex\": 2\n    },\n    {\n      \"definition\": {\n        \"index\": 2,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.ConsoleFlush\",\n      \"sourceIndex\": 3\n    },\n    {\n      \"definition\": {\n        \"index\": 4,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894\n[compacted; full stream hash recorded]\nrs\": [],\n  \"stringConstructorProjections\": [],\n  \"stringInstanceProjections\": [],\n  \"stringInterfaceDispatch\": [],\n  \"stringInterfaceViews\": [],\n  \"types\": [\n    {\n      \"compiledIndex\": 0,\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C65\",\n      \"sourceIndex\": 0\n    },\n    {\n      \"compiledIndex\": 1,\n      \"definition\": {\n        \"index\": 127,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573\",\n      \"sourceIndex\": 127\n    }\n  ],\n  \"valueDisplayProjections\": [],\n  \"verifiedInterfaceRelationships\": []\n}\n",
+            "stderr": "",
+            "stdoutSha256": "1cc66cfca4ee5a2a3e84ed5146bcd898377742347f91d7794cecaf667bf572b4",
+            "stdoutOriginalBytes": 1244129
+          },
+          {
+            "command": [
+              "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+              "-isysroot",
+              "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+              "-arch",
+              "arm64",
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-DNEOCLR_NATIVE_GC",
+              "-I",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+              "/Users/robert/Projects/neoclr/tools/native/console-host.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 native output/app.o",
+              "-o",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 native output/app.pending"
+            ],
+            "exitCode": 0,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "xcrun",
+              "otool",
+              "-L",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 native output/app.pending"
+            ],
+            "exitCode": 0,
+            "stdout": "/Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 native output/app.pending:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+            "stderr": ""
+          }
+        ],
+        "inputs": {
+          "/Users/robert/Projects/neoclr/scripts/build-native-project.py": "93e6e01e7c9d8851073bb126d5f623429b8167d2ba2e2b2d32e99f38dde42f93",
+          "/Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 project with spaces/App.rvnproj": "e69c4c294d8596d58bd01af4c60da1c86a2d247da216bc12f588295431e07993",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/bundle.json": "dc8158cfecd8e78bad1abbefdfcb8a6ecb5ae333151f05665ce7a079067fae14",
+          "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "5f447583e029406c121b26d83709ef8578da88d7020010d2b26ce0c51c15db89",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll": "48a1f70a5ec03a014513b9435143a522b899c7aa87360140f38b01aecdf0ad22",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll": "a5aee2d42b20208a9ef98d84fdd0015d9eec19d5cfbbc6f0abac92817f55bf00",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll": "e1ec6f25882f29ebfaefdbf3eb6d737b8d6ae46dc7d7071b873b49a2474f66a2",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll": "8db239ee54c899764552c365d6b1e5b21cc4c54c0cb9121cc64d5415875eaa32",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/NeoCLR.ClassLibrary.props": "772a570a1ef9193e69fa646fe57a3ee90f220f23395892f4ba5c619c7db02112",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/ownership.json": "25d07114dc5f19fc2f97e66c4add67d63a9b5b831edcabfe841e45af431873dd",
+          "/Users/robert/Projects/neoclr/tools/native/console-host.c": "9b7f569994df69759b93c4d20c6302341baa071ebcd72baed47c559991d22c96",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "7c696716ed616f31d5833f225feae24508151405b381096683b10553459af5fa",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "8822e755910ed57b8245ff93b3f18d360ca25d9281a83450fe6ae9b9c3694bf2",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "9f49363611400a570209716219c64ffb4df9f4d1c31185e163cd773d51a427b9",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "c09fec95a830bcec3e75d0a158a112c8b7d3831ae61807a0aade5537695be672",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.h": "e492bd4f34ec672cca12e15aba25ce83c3e2dc6c985eb6a173e030f57510531d",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.h": "7bbbb18bea726a2f9c8e1a5cbc9b01c8b5f02ffaf7f5cb3487d3f0e3e20ff5c2",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.h": "a1a9840482a2b50f20ba5080eb96453a46e4416238b3403343e03e9c2c84d3f4",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": "d2644b95bb3241e12533399d7b90e038635b96ce0217ba6d2d7ed8f94208d546",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "fb7c79ba2ce8875fc6965df05d49ad357a2be9c4083eb62ec7bf43888bba1504",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "b4dbae37afe2b8e64b15a3cea1e5b55868aa487da44e7369ff2d063df5a2e99b",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-output.h": "f13171699f402f05ea2ab0e4e1686f227bbe48d65c8b48a62e5f94200605e88e",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.h": "d3db18f048ad9c214af9a22327f0dcfe45b91251e9c6d60827534c5d8fc642e1",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/abi.h": "8fd166293a4d011efefc80fa8e3baa9baf8c10dc77c5cda6d596736779ebaa34",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "26ea46ca8a29153547692b417b66bc0941c286306d014fce7dc658b2a8d40455",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.dll": "0e1c4c98e82700eb20268eb3a7fcf96c91971187c9e3bf064227c7795b209e6c",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.Console.dll": "6e4c9ea7baa3565001fdb5d0c596437ecf41eb18de2f011175eb45350821ac20",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "1445c8e3d0ef3c7b50351738e9b807fba28a1504ab757fff29aa4213abbbe1b8",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "171b7602c5ac032995bfd81f62641a50c9a5f5349986d70bbbed91a11f2f451a",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "4aa209502721dac703cafd8bb841a9663abd267459ef3081f172eb681d045296",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "276b715ab02cf1583ca31d98eb496e6fd4cb0d6034ec9ce900862e29363ee9bb",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.Core.dll": "abc6044036575d7a6e99c134a565db320daa1d73917aecbb0d61ab12b0c7526d",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.runtimeconfig.json": "32e94cb893827f13eef94d45bc329826a644e229dcceb1e1201ac973f003efb6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.runtimeconfig.json": "32e94cb893827f13eef94d45bc329826a644e229dcceb1e1201ac973f003efb6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.deps.json": "76cb5679b35497825f750bdfa519af9ed6b0c10bf7297b277af2704c3b463ee0",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.deps.json": "7557fd05b518e9104686f16f3988986222083740cb363e9937ffbcd7b04864fa"
+        },
+        "toolchain": {
+          "clang": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+          "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+          "version": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n"
+        },
+        "dependencies": [
+          "/usr/lib/libSystem.B.dylib"
+        ],
+        "artifacts": {
+          "app.dll": "0bc40cb36037a0b20a77a1919e37c3e02bd315a096dd6538ff70706cdb28dcec",
+          "app.o": "d0ccc91bff03d5334ea68965f58d54d18f82b981f5129b338f1aab9ba65654fe",
+          "app": "9226d85822ac9707708f3d9c049229d58a23d5ba5b13f2e82d569d40dbadb738"
+        }
+      },
+      "execution": {
+        "exit": 0,
+        "stdout": "Hello, Caf\u00e9 \ud83c\udf0d\n",
+        "stderr": "",
+        "matchesInterpreter": true,
+        "emptyEnvironment": true,
+        "executableOnlyDirectory": true
+      },
+      "existingOutputPreserved": true
+    },
+    {
+      "name": "interpolation",
+      "source": "import System.*\n\nfunc Display(value: int) {\n    Console.WriteLine(\"Value: $value\")\n    Console.WriteLine(\"${value}\")\n    Console.WriteLine(\"Value: \" + value)\n}\n\nfunc Main() -> int {\n    Display(42)\n    Display(-2147483648)\n    Display(2147483647)\n    let absent: object? = null\n    Console.WriteLine(\"Null: ${absent}\")\n    return 0\n}\n",
+      "buildExit": 0,
+      "build": {
+        "profile": "macos-arm64-console-v1",
+        "passed": true,
+        "project": "/Users/robert/Projects/neoclr/target/native-project-qualification-3/interpolation project with spaces/App.rvnproj",
+        "host": "macOS-27.0-arm64-arm-64bit",
+        "commands": [
+          {
+            "command": [
+              "xcrun",
+              "--sdk",
+              "macosx",
+              "--find",
+              "clang"
+            ],
+            "exitCode": 0,
+            "stdout": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "xcrun",
+              "--sdk",
+              "macosx",
+              "--show-sdk-path"
+            ],
+            "exitCode": 0,
+            "stdout": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+              "--version"
+            ],
+            "exitCode": 0,
+            "stdout": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/interpolation project with spaces/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: /Users/robert/Projects/neoclr/target/native-project-qualification-3/interpolation project with spaces/bin/neoclr/App.dll\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+              "--closed-world",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/interpolation native output/app.dll",
+              "@entry",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/interpolation native output/app.o",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--compile-system",
+              "--bind-user-fault",
+              "--reference-arena",
+              "--native-gc",
+              "--bind-console-read-byte",
+              "--bind-console-write-line",
+              "--bind-console-stream-output",
+              "--bind-int32-to-string",
+              "--bind-utf8-text"
+            ],
+            "exitCode": 0,
+            "stdout": "{\n  \"arrayBackingProjection\": null,\n  \"boxedInt32Display\": true,\n  \"emptyRecordBoxSites\": [],\n  \"emptyRecordBoxes\": [],\n  \"excludedFunctions\": [\n    {\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.ConsoleReadByte\",\n      \"sourceIndex\": 2\n    },\n    {\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.ConsoleWriteBytes\",\n      \"sourceIndex\": 3\n    },\n    {\n      \"definition\": {\n        \"index\": 2,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.ConsoleFlush\",\n      \"sourceIndex\": 4\n    },\n    {\n      \"definition\": {\n        \"index\": 4,\n        \"module\": \"\n[compacted; full stream hash recorded]\n},\n    {\n      \"compiledIndex\": 1,\n      \"compiledName\": \"$aot_ObjectBase\",\n      \"definition\": {\n        \"index\": 2,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"System.Object\",\n      \"sourceIndex\": 2\n    },\n    {\n      \"compiledIndex\": 2,\n      \"definition\": {\n        \"index\": 127,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_436F6E736F6C6552756E74696D655365727669636573\",\n      \"sourceIndex\": 127\n    },\n    {\n      \"compiledIndex\": 3,\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"System\"\n      },\n      \"name\": \"System.Runtime.CompilerServices.RuntimeServices\",\n      \"sourceIndex\": 448\n    }\n  ],\n  \"valueDisplayProjections\": [],\n  \"verifiedInterfaceRelationships\": []\n}\n",
+            "stderr": "",
+            "stdoutSha256": "eb0ff472f386a50fa3625d9657a2d446c586f047c7f97079eaca1be26acb5c8a",
+            "stdoutOriginalBytes": 1246145
+          },
+          {
+            "command": [
+              "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+              "-isysroot",
+              "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+              "-arch",
+              "arm64",
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-DNEOCLR_NATIVE_GC",
+              "-I",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+              "/Users/robert/Projects/neoclr/tools/native/console-host.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/interpolation native output/app.o",
+              "-o",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/interpolation native output/app.pending"
+            ],
+            "exitCode": 0,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "xcrun",
+              "otool",
+              "-L",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/interpolation native output/app.pending"
+            ],
+            "exitCode": 0,
+            "stdout": "/Users/robert/Projects/neoclr/target/native-project-qualification-3/interpolation native output/app.pending:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+            "stderr": ""
+          }
+        ],
+        "inputs": {
+          "/Users/robert/Projects/neoclr/scripts/build-native-project.py": "93e6e01e7c9d8851073bb126d5f623429b8167d2ba2e2b2d32e99f38dde42f93",
+          "/Users/robert/Projects/neoclr/target/native-project-qualification-3/interpolation project with spaces/App.rvnproj": "e69c4c294d8596d58bd01af4c60da1c86a2d247da216bc12f588295431e07993",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/bundle.json": "dc8158cfecd8e78bad1abbefdfcb8a6ecb5ae333151f05665ce7a079067fae14",
+          "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "5f447583e029406c121b26d83709ef8578da88d7020010d2b26ce0c51c15db89",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll": "48a1f70a5ec03a014513b9435143a522b899c7aa87360140f38b01aecdf0ad22",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll": "a5aee2d42b20208a9ef98d84fdd0015d9eec19d5cfbbc6f0abac92817f55bf00",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll": "e1ec6f25882f29ebfaefdbf3eb6d737b8d6ae46dc7d7071b873b49a2474f66a2",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll": "8db239ee54c899764552c365d6b1e5b21cc4c54c0cb9121cc64d5415875eaa32",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/NeoCLR.ClassLibrary.props": "772a570a1ef9193e69fa646fe57a3ee90f220f23395892f4ba5c619c7db02112",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/ownership.json": "25d07114dc5f19fc2f97e66c4add67d63a9b5b831edcabfe841e45af431873dd",
+          "/Users/robert/Projects/neoclr/tools/native/console-host.c": "9b7f569994df69759b93c4d20c6302341baa071ebcd72baed47c559991d22c96",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "7c696716ed616f31d5833f225feae24508151405b381096683b10553459af5fa",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "8822e755910ed57b8245ff93b3f18d360ca25d9281a83450fe6ae9b9c3694bf2",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "9f49363611400a570209716219c64ffb4df9f4d1c31185e163cd773d51a427b9",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "c09fec95a830bcec3e75d0a158a112c8b7d3831ae61807a0aade5537695be672",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.h": "e492bd4f34ec672cca12e15aba25ce83c3e2dc6c985eb6a173e030f57510531d",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.h": "7bbbb18bea726a2f9c8e1a5cbc9b01c8b5f02ffaf7f5cb3487d3f0e3e20ff5c2",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.h": "a1a9840482a2b50f20ba5080eb96453a46e4416238b3403343e03e9c2c84d3f4",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": "d2644b95bb3241e12533399d7b90e038635b96ce0217ba6d2d7ed8f94208d546",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "fb7c79ba2ce8875fc6965df05d49ad357a2be9c4083eb62ec7bf43888bba1504",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "b4dbae37afe2b8e64b15a3cea1e5b55868aa487da44e7369ff2d063df5a2e99b",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-output.h": "f13171699f402f05ea2ab0e4e1686f227bbe48d65c8b48a62e5f94200605e88e",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.h": "d3db18f048ad9c214af9a22327f0dcfe45b91251e9c6d60827534c5d8fc642e1",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/abi.h": "8fd166293a4d011efefc80fa8e3baa9baf8c10dc77c5cda6d596736779ebaa34",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "26ea46ca8a29153547692b417b66bc0941c286306d014fce7dc658b2a8d40455",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.dll": "0e1c4c98e82700eb20268eb3a7fcf96c91971187c9e3bf064227c7795b209e6c",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.Console.dll": "6e4c9ea7baa3565001fdb5d0c596437ecf41eb18de2f011175eb45350821ac20",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "1445c8e3d0ef3c7b50351738e9b807fba28a1504ab757fff29aa4213abbbe1b8",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "171b7602c5ac032995bfd81f62641a50c9a5f5349986d70bbbed91a11f2f451a",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "4aa209502721dac703cafd8bb841a9663abd267459ef3081f172eb681d045296",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "276b715ab02cf1583ca31d98eb496e6fd4cb0d6034ec9ce900862e29363ee9bb",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.Core.dll": "abc6044036575d7a6e99c134a565db320daa1d73917aecbb0d61ab12b0c7526d",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.runtimeconfig.json": "32e94cb893827f13eef94d45bc329826a644e229dcceb1e1201ac973f003efb6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.runtimeconfig.json": "32e94cb893827f13eef94d45bc329826a644e229dcceb1e1201ac973f003efb6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.deps.json": "76cb5679b35497825f750bdfa519af9ed6b0c10bf7297b277af2704c3b463ee0",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.deps.json": "7557fd05b518e9104686f16f3988986222083740cb363e9937ffbcd7b04864fa"
+        },
+        "toolchain": {
+          "clang": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+          "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+          "version": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n"
+        },
+        "dependencies": [
+          "/usr/lib/libSystem.B.dylib"
+        ],
+        "artifacts": {
+          "app.dll": "834333a503dd3d1f9d6aa6cad1977d2be05b3d6f420777f7f1a68d929ff389ee",
+          "app.o": "d68e5bc5a3291ced1649cee3c775b1d8ceff3b4176851e03d063aa48f38ef905",
+          "app": "576927560d0d076d5fed500442a68c60664eab5fb9cb79cfdab95caa628087b2"
+        }
+      },
+      "execution": {
+        "exit": 0,
+        "stdout": "Value: 42\n42\nValue: 42\nValue: -2147483648\n-2147483648\nValue: -2147483648\nValue: 2147483647\n2147483647\nValue: 2147483647\nNull: \n",
+        "stderr": "",
+        "matchesInterpreter": true,
+        "emptyEnvironment": true,
+        "executableOnlyDirectory": true
+      },
+      "existingOutputPreserved": true
+    },
+    {
+      "name": "fault",
+      "source": "func Main() -> int {\n    return Divide(0)\n}\nfunc Divide(value: int) -> int {\n    return 42 / value\n}\n",
+      "buildExit": 0,
+      "build": {
+        "profile": "macos-arm64-console-v1",
+        "passed": true,
+        "project": "/Users/robert/Projects/neoclr/target/native-project-qualification-3/fault project with spaces/App.rvnproj",
+        "host": "macOS-27.0-arm64-arm-64bit",
+        "commands": [
+          {
+            "command": [
+              "xcrun",
+              "--sdk",
+              "macosx",
+              "--find",
+              "clang"
+            ],
+            "exitCode": 0,
+            "stdout": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "xcrun",
+              "--sdk",
+              "macosx",
+              "--show-sdk-path"
+            ],
+            "exitCode": 0,
+            "stdout": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+              "--version"
+            ],
+            "exitCode": 0,
+            "stdout": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/fault project with spaces/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: /Users/robert/Projects/neoclr/target/native-project-qualification-3/fault project with spaces/bin/neoclr/App.dll\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+              "--closed-world",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/fault native output/app.dll",
+              "@entry",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/fault native output/app.o",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--compile-system",
+              "--bind-user-fault",
+              "--reference-arena",
+              "--native-gc",
+              "--bind-console-read-byte",
+              "--bind-console-write-line",
+              "--bind-console-stream-output",
+              "--bind-int32-to-string",
+              "--bind-utf8-text"
+            ],
+            "exitCode": 0,
+            "stdout": "{\n  \"arrayBackingProjection\": null,\n  \"boxedInt32Display\": false,\n  \"excludedFunctions\": [\n    {\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.ConsoleReadByte\",\n      \"sourceIndex\": 2\n    },\n    {\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.ConsoleWriteBytes\",\n      \"sourceIndex\": 3\n    },\n    {\n      \"definition\": {\n        \"index\": 2,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.ConsoleFlush\",\n      \"sourceIndex\": 4\n    },\n    {\n      \"definition\": {\n        \"index\": 3,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894\n[compacted; full stream hash recorded]\n reflection, dynamic loading or general class virtual dispatch\",\n  \"primitiveInstanceProjections\": [],\n  \"referenceArena\": true,\n  \"referenceArrayBackingProjections\": [],\n  \"root\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n  \"schema\": \"neoclr-aot-selection-v1\",\n  \"sealedMemberProjections\": [],\n  \"specialization\": {\n    \"functionCloneCount\": 0,\n    \"functionCount\": 2,\n    \"methods\": [],\n    \"policy\": \"up to 256 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 256 function clones and 1024 selected functions; no constraints\",\n    \"referenceArrayBackings\": [],\n    \"typeCount\": 0,\n    \"types\": []\n  },\n  \"staticOwnerProjections\": [],\n  \"staticPrimitiveOwners\": [],\n  \"stringConstructorProjections\": [],\n  \"stringInstanceProjections\": [],\n  \"stringInterfaceDispatch\": [],\n  \"stringInterfaceViews\": [],\n  \"types\": [],\n  \"valueDisplayProjections\": [],\n  \"verifiedInterfaceRelationships\": []\n}\n",
+            "stderr": "",
+            "stdoutSha256": "a41adbca8a1f985fa82babd9cda00dcb372b6751349d55907b3904a3debe96f7",
+            "stdoutOriginalBytes": 1243948
+          },
+          {
+            "command": [
+              "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+              "-isysroot",
+              "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+              "-arch",
+              "arm64",
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-DNEOCLR_NATIVE_GC",
+              "-I",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+              "/Users/robert/Projects/neoclr/tools/native/console-host.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/fault native output/app.o",
+              "-o",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/fault native output/app.pending"
+            ],
+            "exitCode": 0,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "xcrun",
+              "otool",
+              "-L",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/fault native output/app.pending"
+            ],
+            "exitCode": 0,
+            "stdout": "/Users/robert/Projects/neoclr/target/native-project-qualification-3/fault native output/app.pending:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+            "stderr": ""
+          }
+        ],
+        "inputs": {
+          "/Users/robert/Projects/neoclr/scripts/build-native-project.py": "93e6e01e7c9d8851073bb126d5f623429b8167d2ba2e2b2d32e99f38dde42f93",
+          "/Users/robert/Projects/neoclr/target/native-project-qualification-3/fault project with spaces/App.rvnproj": "e69c4c294d8596d58bd01af4c60da1c86a2d247da216bc12f588295431e07993",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/bundle.json": "dc8158cfecd8e78bad1abbefdfcb8a6ecb5ae333151f05665ce7a079067fae14",
+          "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "5f447583e029406c121b26d83709ef8578da88d7020010d2b26ce0c51c15db89",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll": "48a1f70a5ec03a014513b9435143a522b899c7aa87360140f38b01aecdf0ad22",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll": "a5aee2d42b20208a9ef98d84fdd0015d9eec19d5cfbbc6f0abac92817f55bf00",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll": "e1ec6f25882f29ebfaefdbf3eb6d737b8d6ae46dc7d7071b873b49a2474f66a2",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll": "8db239ee54c899764552c365d6b1e5b21cc4c54c0cb9121cc64d5415875eaa32",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/NeoCLR.ClassLibrary.props": "772a570a1ef9193e69fa646fe57a3ee90f220f23395892f4ba5c619c7db02112",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/ownership.json": "25d07114dc5f19fc2f97e66c4add67d63a9b5b831edcabfe841e45af431873dd",
+          "/Users/robert/Projects/neoclr/tools/native/console-host.c": "9b7f569994df69759b93c4d20c6302341baa071ebcd72baed47c559991d22c96",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "7c696716ed616f31d5833f225feae24508151405b381096683b10553459af5fa",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "8822e755910ed57b8245ff93b3f18d360ca25d9281a83450fe6ae9b9c3694bf2",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "9f49363611400a570209716219c64ffb4df9f4d1c31185e163cd773d51a427b9",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "c09fec95a830bcec3e75d0a158a112c8b7d3831ae61807a0aade5537695be672",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.h": "e492bd4f34ec672cca12e15aba25ce83c3e2dc6c985eb6a173e030f57510531d",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.h": "7bbbb18bea726a2f9c8e1a5cbc9b01c8b5f02ffaf7f5cb3487d3f0e3e20ff5c2",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.h": "a1a9840482a2b50f20ba5080eb96453a46e4416238b3403343e03e9c2c84d3f4",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": "d2644b95bb3241e12533399d7b90e038635b96ce0217ba6d2d7ed8f94208d546",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "fb7c79ba2ce8875fc6965df05d49ad357a2be9c4083eb62ec7bf43888bba1504",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "b4dbae37afe2b8e64b15a3cea1e5b55868aa487da44e7369ff2d063df5a2e99b",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-output.h": "f13171699f402f05ea2ab0e4e1686f227bbe48d65c8b48a62e5f94200605e88e",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.h": "d3db18f048ad9c214af9a22327f0dcfe45b91251e9c6d60827534c5d8fc642e1",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/abi.h": "8fd166293a4d011efefc80fa8e3baa9baf8c10dc77c5cda6d596736779ebaa34",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "26ea46ca8a29153547692b417b66bc0941c286306d014fce7dc658b2a8d40455",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.dll": "0e1c4c98e82700eb20268eb3a7fcf96c91971187c9e3bf064227c7795b209e6c",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.Console.dll": "6e4c9ea7baa3565001fdb5d0c596437ecf41eb18de2f011175eb45350821ac20",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "1445c8e3d0ef3c7b50351738e9b807fba28a1504ab757fff29aa4213abbbe1b8",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "171b7602c5ac032995bfd81f62641a50c9a5f5349986d70bbbed91a11f2f451a",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "4aa209502721dac703cafd8bb841a9663abd267459ef3081f172eb681d045296",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "276b715ab02cf1583ca31d98eb496e6fd4cb0d6034ec9ce900862e29363ee9bb",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.Core.dll": "abc6044036575d7a6e99c134a565db320daa1d73917aecbb0d61ab12b0c7526d",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.runtimeconfig.json": "32e94cb893827f13eef94d45bc329826a644e229dcceb1e1201ac973f003efb6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.runtimeconfig.json": "32e94cb893827f13eef94d45bc329826a644e229dcceb1e1201ac973f003efb6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.deps.json": "76cb5679b35497825f750bdfa519af9ed6b0c10bf7297b277af2704c3b463ee0",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.deps.json": "7557fd05b518e9104686f16f3988986222083740cb363e9937ffbcd7b04864fa"
+        },
+        "toolchain": {
+          "clang": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+          "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+          "version": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n"
+        },
+        "dependencies": [
+          "/usr/lib/libSystem.B.dylib"
+        ],
+        "artifacts": {
+          "app.dll": "b801e6e1af58248e6d6e192191a56d21dd93519e53e8e0ce334bd8dcb0587d1a",
+          "app.o": "2da3b6e1f51cc95bbbf4bc87110267bcfaac13e22aa6ce1338054aef78c24b17",
+          "app": "9d9156e6429e741e9124e8098a5bab67b2400c9c93b7728f2af50e7107d0d380"
+        }
+      },
+      "execution": {
+        "exit": 1,
+        "stdout": "",
+        "stderr": "DivideByZero: Division by zero\n   at NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_446976696465 [instruction 2]\n   at NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E [instruction 1]\n",
+        "matchesInterpreter": true,
+        "emptyEnvironment": true,
+        "executableOnlyDirectory": true
+      },
+      "existingOutputPreserved": true
+    },
+    {
+      "name": "unsupported",
+      "source": "func Main() -> int {\n    return Loop(2)\n}\nfunc Loop(value: int) -> int {\n    if value == 0 {\n        return 0\n    }\n    return Loop(value - 1)\n}\n",
+      "buildExit": 1,
+      "build": {
+        "profile": "macos-arm64-console-v1",
+        "passed": false,
+        "project": "/Users/robert/Projects/neoclr/target/native-project-qualification-3/unsupported project with spaces/App.rvnproj",
+        "host": "macOS-27.0-arm64-arm-64bit",
+        "commands": [
+          {
+            "command": [
+              "xcrun",
+              "--sdk",
+              "macosx",
+              "--find",
+              "clang"
+            ],
+            "exitCode": 0,
+            "stdout": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "xcrun",
+              "--sdk",
+              "macosx",
+              "--show-sdk-path"
+            ],
+            "exitCode": 0,
+            "stdout": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+              "--version"
+            ],
+            "exitCode": 0,
+            "stdout": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/unsupported project with spaces/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "stdout": "Native build output: /Users/robert/Projects/neoclr/target/native-project-qualification-3/unsupported project with spaces/bin/neoclr/App.dll\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+              "--closed-world",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/unsupported native output/app.dll",
+              "@entry",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/unsupported native output/app.o",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll",
+              "--compile-system",
+              "--bind-user-fault",
+              "--reference-arena",
+              "--native-gc",
+              "--bind-console-read-byte",
+              "--bind-console-write-line",
+              "--bind-console-stream-output",
+              "--bind-int32-to-string",
+              "--bind-utf8-text"
+            ],
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "aot-poc: recursive calls require a native stack-budget contract: Loop [#1] -> Loop [#1]\n"
+          }
+        ],
+        "inputs": {
+          "/Users/robert/Projects/neoclr/scripts/build-native-project.py": "93e6e01e7c9d8851073bb126d5f623429b8167d2ba2e2b2d32e99f38dde42f93",
+          "/Users/robert/Projects/neoclr/target/native-project-qualification-3/unsupported project with spaces/App.rvnproj": "e69c4c294d8596d58bd01af4c60da1c86a2d247da216bc12f588295431e07993",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/bundle.json": "dc8158cfecd8e78bad1abbefdfcb8a6ecb5ae333151f05665ce7a079067fae14",
+          "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "5f447583e029406c121b26d83709ef8578da88d7020010d2b26ce0c51c15db89",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll": "48a1f70a5ec03a014513b9435143a522b899c7aa87360140f38b01aecdf0ad22",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll": "a5aee2d42b20208a9ef98d84fdd0015d9eec19d5cfbbc6f0abac92817f55bf00",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll": "e1ec6f25882f29ebfaefdbf3eb6d737b8d6ae46dc7d7071b873b49a2474f66a2",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll": "8db239ee54c899764552c365d6b1e5b21cc4c54c0cb9121cc64d5415875eaa32",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/NeoCLR.ClassLibrary.props": "772a570a1ef9193e69fa646fe57a3ee90f220f23395892f4ba5c619c7db02112",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/ownership.json": "25d07114dc5f19fc2f97e66c4add67d63a9b5b831edcabfe841e45af431873dd",
+          "/Users/robert/Projects/neoclr/tools/native/console-host.c": "9b7f569994df69759b93c4d20c6302341baa071ebcd72baed47c559991d22c96",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "7c696716ed616f31d5833f225feae24508151405b381096683b10553459af5fa",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "8822e755910ed57b8245ff93b3f18d360ca25d9281a83450fe6ae9b9c3694bf2",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "9f49363611400a570209716219c64ffb4df9f4d1c31185e163cd773d51a427b9",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "c09fec95a830bcec3e75d0a158a112c8b7d3831ae61807a0aade5537695be672",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.h": "e492bd4f34ec672cca12e15aba25ce83c3e2dc6c985eb6a173e030f57510531d",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.h": "7bbbb18bea726a2f9c8e1a5cbc9b01c8b5f02ffaf7f5cb3487d3f0e3e20ff5c2",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.h": "a1a9840482a2b50f20ba5080eb96453a46e4416238b3403343e03e9c2c84d3f4",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": "d2644b95bb3241e12533399d7b90e038635b96ce0217ba6d2d7ed8f94208d546",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "fb7c79ba2ce8875fc6965df05d49ad357a2be9c4083eb62ec7bf43888bba1504",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "b4dbae37afe2b8e64b15a3cea1e5b55868aa487da44e7369ff2d063df5a2e99b",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-output.h": "f13171699f402f05ea2ab0e4e1686f227bbe48d65c8b48a62e5f94200605e88e",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.h": "d3db18f048ad9c214af9a22327f0dcfe45b91251e9c6d60827534c5d8fc642e1",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/abi.h": "8fd166293a4d011efefc80fa8e3baa9baf8c10dc77c5cda6d596736779ebaa34",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "26ea46ca8a29153547692b417b66bc0941c286306d014fce7dc658b2a8d40455",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.dll": "0e1c4c98e82700eb20268eb3a7fcf96c91971187c9e3bf064227c7795b209e6c",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.Console.dll": "6e4c9ea7baa3565001fdb5d0c596437ecf41eb18de2f011175eb45350821ac20",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "1445c8e3d0ef3c7b50351738e9b807fba28a1504ab757fff29aa4213abbbe1b8",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "171b7602c5ac032995bfd81f62641a50c9a5f5349986d70bbbed91a11f2f451a",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "4aa209502721dac703cafd8bb841a9663abd267459ef3081f172eb681d045296",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "276b715ab02cf1583ca31d98eb496e6fd4cb0d6034ec9ce900862e29363ee9bb",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.Core.dll": "abc6044036575d7a6e99c134a565db320daa1d73917aecbb0d61ab12b0c7526d",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.runtimeconfig.json": "32e94cb893827f13eef94d45bc329826a644e229dcceb1e1201ac973f003efb6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.runtimeconfig.json": "32e94cb893827f13eef94d45bc329826a644e229dcceb1e1201ac973f003efb6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.deps.json": "76cb5679b35497825f750bdfa519af9ed6b0c10bf7297b277af2704c3b463ee0",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.deps.json": "7557fd05b518e9104686f16f3988986222083740cb363e9937ffbcd7b04864fa"
+        },
+        "toolchain": {
+          "clang": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+          "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+          "version": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n"
+        },
+        "error": "aot-poc: recursive calls require a native stack-budget contract: Loop [#1] -> Loop [#1]\n"
+      }
+    },
+    {
+      "name": "failed-rebuild",
+      "build": {
+        "profile": "macos-arm64-console-v1",
+        "passed": false,
+        "project": "/Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 project with spaces/App.rvnproj",
+        "host": "macOS-27.0-arm64-arm-64bit",
+        "commands": [
+          {
+            "command": [
+              "xcrun",
+              "--sdk",
+              "macosx",
+              "--find",
+              "clang"
+            ],
+            "exitCode": 0,
+            "stdout": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "xcrun",
+              "--sdk",
+              "macosx",
+              "--show-sdk-path"
+            ],
+            "exitCode": 0,
+            "stdout": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+              "--version"
+            ],
+            "exitCode": 0,
+            "stdout": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+            "stderr": ""
+          },
+          {
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 project with spaces/App.rvnproj"
+            ],
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "error RAV0103: 'missingValue' is not in scope.\n"
+          }
+        ],
+        "inputs": {
+          "/Users/robert/Projects/neoclr/scripts/build-native-project.py": "93e6e01e7c9d8851073bb126d5f623429b8167d2ba2e2b2d32e99f38dde42f93",
+          "/Users/robert/Projects/neoclr/target/native-project-qualification-3/utf8 project with spaces/App.rvnproj": "e69c4c294d8596d58bd01af4c60da1c86a2d247da216bc12f588295431e07993",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/bundle.json": "dc8158cfecd8e78bad1abbefdfcb8a6ecb5ae333151f05665ce7a079067fae14",
+          "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "5f447583e029406c121b26d83709ef8578da88d7020010d2b26ce0c51c15db89",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Runtime.dll": "48a1f70a5ec03a014513b9435143a522b899c7aa87360140f38b01aecdf0ad22",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Data.dll": "a5aee2d42b20208a9ef98d84fdd0015d9eec19d5cfbbc6f0abac92817f55bf00",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Networking.dll": "e1ec6f25882f29ebfaefdbf3eb6d737b8d6ae46dc7d7071b873b49a2474f66a2",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.Web.dll": "8db239ee54c899764552c365d6b1e5b21cc4c54c0cb9121cc64d5415875eaa32",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/NeoCLR.ClassLibrary.props": "772a570a1ef9193e69fa646fe57a3ee90f220f23395892f4ba5c619c7db02112",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/lib/ownership.json": "25d07114dc5f19fc2f97e66c4add67d63a9b5b831edcabfe841e45af431873dd",
+          "/Users/robert/Projects/neoclr/tools/native/console-host.c": "9b7f569994df69759b93c4d20c6302341baa071ebcd72baed47c559991d22c96",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "7c696716ed616f31d5833f225feae24508151405b381096683b10553459af5fa",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "8822e755910ed57b8245ff93b3f18d360ca25d9281a83450fe6ae9b9c3694bf2",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "9f49363611400a570209716219c64ffb4df9f4d1c31185e163cd773d51a427b9",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "c09fec95a830bcec3e75d0a158a112c8b7d3831ae61807a0aade5537695be672",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.h": "e492bd4f34ec672cca12e15aba25ce83c3e2dc6c985eb6a173e030f57510531d",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.h": "7bbbb18bea726a2f9c8e1a5cbc9b01c8b5f02ffaf7f5cb3487d3f0e3e20ff5c2",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.h": "a1a9840482a2b50f20ba5080eb96453a46e4416238b3403343e03e9c2c84d3f4",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": "d2644b95bb3241e12533399d7b90e038635b96ce0217ba6d2d7ed8f94208d546",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "fb7c79ba2ce8875fc6965df05d49ad357a2be9c4083eb62ec7bf43888bba1504",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "b4dbae37afe2b8e64b15a3cea1e5b55868aa487da44e7369ff2d063df5a2e99b",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-output.h": "f13171699f402f05ea2ab0e4e1686f227bbe48d65c8b48a62e5f94200605e88e",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.h": "d3db18f048ad9c214af9a22327f0dcfe45b91251e9c6d60827534c5d8fc642e1",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/abi.h": "8fd166293a4d011efefc80fa8e3baa9baf8c10dc77c5cda6d596736779ebaa34",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "26ea46ca8a29153547692b417b66bc0941c286306d014fce7dc658b2a8d40455",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.dll": "0e1c4c98e82700eb20268eb3a7fcf96c91971187c9e3bf064227c7795b209e6c",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.Console.dll": "6e4c9ea7baa3565001fdb5d0c596437ecf41eb18de2f011175eb45350821ac20",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "1445c8e3d0ef3c7b50351738e9b807fba28a1504ab757fff29aa4213abbbe1b8",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "171b7602c5ac032995bfd81f62641a50c9a5f5349986d70bbbed91a11f2f451a",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "4aa209502721dac703cafd8bb841a9663abd267459ef3081f172eb681d045296",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "276b715ab02cf1583ca31d98eb496e6fd4cb0d6034ec9ce900862e29363ee9bb",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Raven.Core.dll": "abc6044036575d7a6e99c134a565db320daa1d73917aecbb0d61ab12b0c7526d",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.runtimeconfig.json": "32e94cb893827f13eef94d45bc329826a644e229dcceb1e1201ac973f003efb6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.runtimeconfig.json": "32e94cb893827f13eef94d45bc329826a644e229dcceb1e1201ac973f003efb6",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.deps.json": "76cb5679b35497825f750bdfa519af9ed6b0c10bf7297b277af2704c3b463ee0",
+          "/Users/robert/Projects/neoclr/target/preview13-candidate/final extracted macos/neoclr-native-poc/sdk/tools/rvnc/RavenDoc.deps.json": "7557fd05b518e9104686f16f3988986222083740cb363e9937ffbcd7b04864fa"
+        },
+        "toolchain": {
+          "clang": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+          "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+          "version": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n"
+        },
+        "error": "error RAV0103: 'missingValue' is not in scope.\n"
+      },
+      "staleOutputRejected": true
+    }
+  ],
+  "date": "2026-10-09",
+  "baseRevision": "a7ac652a978d236d1d4426cdd102e7bc8f69b6c4",
+  "scope": "Source-checkout synchronous macOS ARM64 project build; not packaged AOT or Windows qualification",
+  "rawReportSha256": "7942ad1646a24d1a80ddbecb33ab9d3506b06ed610a548c46683161439a68b20",
+  "verifierSha256": "163a6423f701cf094218d59db86d93a2febc27af042df3c2306cfccba856ac97"
+}
