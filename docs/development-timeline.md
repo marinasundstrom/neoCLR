@@ -13103,3 +13103,16 @@ claim follows from these focused checks.
   parser gaps, and suspension/scheduler policies are not selected by this request.
   The list does not establish a delivery order among all five areas or cancel the
   earlier benchmark direction. No implementation outcome is claimed here.
+
+### Queue/Stack scope clarification and review
+
+- **Assistant:** initially examines TaskQueue as a possible consumer while reviewing
+  FIFO/LIFO interfaces and generic slot clearing.
+- **Author correction:** “TaskQueue is not necessarily connected to this”.
+- **Assistant action:** makes the review independent of TaskQueue and scheduling;
+  uses general-purpose traversal worklists as proposed consumers. Records .NET,
+  Rust and C5 comparisons, library-only storage alternatives and provisional APIs
+  in the [review](experiments/queue-stack/README.md).
+- **Performed:** the .NET baseline probe passes FIFO/LIFO, growth, peek, mutation,
+  clear and empty/null cases. neoCLR Queue/Stack implementation remains next work;
+  no prototype success or final public contract is claimed by this review.

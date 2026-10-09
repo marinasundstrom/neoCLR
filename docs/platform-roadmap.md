@@ -104,8 +104,10 @@ preserving its overall structure while keeping details revisable; see the
 **Author follow-up (2026-10-10):** once basic JSON serialization is good enough,
 review the collection API and identify useful additions. A queue interface and
 implementation are the first named candidate, not yet a settled API. Evaluate
-actual HTTP/runtime scheduling consumers, existing collection contracts and .NET
-ergonomics/behavior before selecting additions. Finish the current JSON correctness
+general-purpose collection consumers, existing collection contracts and .NET
+ergonomics/behavior before selecting additions. The author clarifies that TaskQueue
+is not necessarily connected; collection additions do not require scheduler changes.
+See the [Queue/Stack review](experiments/queue-stack/README.md). Finish the current JSON correctness
 and platform qualification first. The earlier interpreter/native JSON benchmark
 and later framework-comparison direction remains recorded in the native JSON plan;
 this new request makes the collection review the next author-selected topic.

@@ -336,3 +336,11 @@ abstract member every implementation must supply, and does not require new runti
 allocation semantics. Raven binding, reference metadata and importer support for that
 placement must be tested before promising the syntax. No factory was implemented in
 this discussion.
+
+## Queue and Stack review — 2026-10-10
+
+The author selects a post-JSON review of useful collections, naming Queue and Stack,
+and clarifies that TaskQueue is not necessarily connected. The
+[bounded review and .NET comparison](experiments/queue-stack/README.md) recommends
+small general-purpose FIFO/LIFO contracts and array-backed prototypes. These remain
+proposals; no scheduler migration, new public collection or JSON admission is claimed.

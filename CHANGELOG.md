@@ -12,6 +12,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Queue/Stack collections, a database-backed web sample with a Dapper-like mapper,
   and missing Time Parse methods. Keep JSON qualification first; provider, API and
   runtime-policy choices remain investigations rather than implemented features.
+  Add a Queue/Stack design review and passing .NET behavior probe; record the
+  author’s clarification that general-purpose collections are independent of
+  TaskQueue. Proposed APIs and storage experiments remain unimplemented.
 
 - Add recursive built-in Sequence/List/ArrayList and string-keyed
   Map/MutableMap/HashMap JSON mapping, constructing ArrayList and ordinal HashMap
