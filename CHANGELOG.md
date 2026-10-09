@@ -94,6 +94,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   console profile gate for its linked integer-text services. Qualify the public
   reflection and expanded JSON projects on Windows x64 in action `37991724441`,
   with interpreter parity and verified source/artifact hashes.
+  Implement native generic argument queries over selected semantic type metadata,
+  preserving closed argument identity and invalid-index faults without retaining
+  unrelated library bodies. Add nested collection-type introspection checks;
+  collection serialization/construction remains unfinished.
   Record expanded nested/array/list/sequence/string-keyed-map correctness scope and
   benchmark/data-publication follow-up; the expanded milestone remains incomplete.
 

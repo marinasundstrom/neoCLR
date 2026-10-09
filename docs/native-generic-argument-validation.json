@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-09",
+  "scope": "Public closed generic argument introspection plus existing JSON corpus; collection mapping not implemented",
+  "baseRevision": "04914e895b49da7e92306787fe3527de3b89898d",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "passed": true,
+  "sourceSha256": {
+    "src/native_metadata.rs": "050c8e3d9d7efdaa71b45a2b88807c061c051e5d5dc10006b27dc7747abc9cd9",
+    "tools/aot-poc/src/reflection_metadata.rs": "1cddae845a9502516bae1b85a677237de90d729dcadfa0c20cf83e4097fc593c",
+    "tools/aot-poc/src/fault_details.rs": "1d4c9a4b68c0561e2c702c9d52e2e7c9ec82618352659695cfd5265c36c2067e",
+    "docs/experiments/native-introspection/Main.rvn": "5b38560ba82fe55b8685e78d2c1b9852cc9c1d1e170b70d018dd3ad17e8cfd34"
+  },
+  "reportSha256": "cf143ff392ef30adc068864d4e420fe9febd84f9426fcb9590a75c5c92ecaa7d",
+  "cases": [
+    {
+      "name": "introspection",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/native-generic-introspection-selected/introspection executable only/app"
+          ],
+          "exitCode": 0,
+          "stdout": "Report\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/bin/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/native-generic-introspection-selected/introspection native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "Report\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "name": "json",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/native-generic-introspection-selected/json executable only/app"
+          ],
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/bin/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/native-generic-introspection-selected/json native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ]
+}

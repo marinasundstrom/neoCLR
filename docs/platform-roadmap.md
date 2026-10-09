@@ -84,6 +84,9 @@ the milestone to nested objects, arrays, typed lists/sequences and string-keyed 
 lists/sequences and maps remain unfinished. The existing nested object, DOM and
 scalar/object vector corpus now passes on Windows x64 with interpreter parity
 ([evidence](windows-native-json-validation.json)), alongside macOS ARM64.
+Native GetGenericArgument now inspects retained closed collection type arguments,
+with nested generic identity and invalid-index parity checks on macOS. Collection
+construction and shared JSON list/map mapping remain the next bounded work.
 Evaluate the Introspection/Reflection API alongside implementation before stability,
 preserving its overall structure while keeping details revisable; see the
 [pre-stable review](introspection-design.md#pre-stable-api-evaluation--2026-10-09).

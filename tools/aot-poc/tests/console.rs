@@ -5920,3 +5920,52 @@ ret
     let reimplements = source.replace(".implements Answer\n", "").replace(".extends Base", ".extends Base\n.implements Answer");
     check_reflection_arrays(&reimplements, 1, b"");
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_generic_argument_queries_match_identity_and_faults() {
+    let seed = neoclr::library::system().unwrap();
+    let source = r#"
+.module GenericArguments
+.type class Model<T>
+.end
+.function Calculate(Int32 index) -> Int32
+ldtoken Model<Int32>
+ldarg index
+call neoCLR.Runtime.TypeArgument(RuntimeTypeHandle,Int32)
+ldtoken Int32
+ceq
+brfalse Fail
+ldc.i4 42
+ret
+Fail:
+ldc.i4 0
+ret
+.end
+"#;
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    let dir = Temp::new();
+    let result = compile_linked_module(&dir, seed, &app, &["--compile-system", "--reference-arena"]);
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    let result = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror"])
+        .arg(base.join("aot-console/text-host.c")).arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-fault-details/render.c")).arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    for index in [-1, 0, 1] {
+        let interpreted = method.invoke(vec![neoclr::Value::Int32(index)], neoclr::Limits::default());
+        let native = Command::new(dir.0.join("host")).arg(index.to_string()).output().unwrap();
+        assert!(native.stdout.is_empty());
+        if index == 0 {
+            assert_eq!(interpreted.unwrap().value, neoclr::Value::Int32(42));
+            assert_eq!(native.status.code(), Some(42));
+            assert!(native.stderr.is_empty());
+        } else {
+            assert_eq!(interpreted.unwrap_err().message, "generic argument index out of range");
+            assert_eq!(native.status.code(), Some(1));
+            assert_eq!(String::from_utf8_lossy(&native.stderr), "RuntimeError: generic argument index out of range\n   at Calculate [instruction 2]\n");
+        }
+    }
+}

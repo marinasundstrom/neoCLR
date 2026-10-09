@@ -30,3 +30,8 @@ if the project’s assembly identity/type ordering changes. It is private develo
 configuration, not a Raven annotation or a public preservation API. An earlier
 GetType-only probe required an explicit Object cast to bridge an implicit-upcast
 projection limitation; reflection construction already returns Object here.
+
+The generic-argument follow-up checks Sequence<Report> and nested
+Map<string, ArrayList<Report>> through the existing GetGenericArgument API. The
+native query uses the selected semantic type inventory, preserves source argument
+identity and validates indices. It does not grant collection construction rights.

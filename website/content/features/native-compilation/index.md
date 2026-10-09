@@ -148,5 +148,5 @@ performance ranking against .NET.
 
 The development JSON corpus additionally exercises two nested documents through
 JsonValue and typed objects, plus typed scalar/object vectors, with macOS
-interpreter/native parity. Lists/sequences, maps and Windows project execution
+interpreter/native parity. The same corpus now passes Windows x64 project execution. Lists/sequences and maps
 remain under development; no comparative benchmark results are published yet.

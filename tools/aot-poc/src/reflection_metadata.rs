@@ -172,6 +172,18 @@ fn semantic_token(input: &neoclr::Module, report: &Value, token: &Type) -> Resul
     Ok(if arguments.is_empty() { Type::Named(definition) } else { Type::Constructed { definition, arguments } })
 }
 
+fn native_token(input: &neoclr::Module, report: &Value, semantic: &Type) -> Result<Type, Error> {
+    if semantic.is_primitive() { return Ok(semantic.clone()); }
+    if let Type::ArrayRef(element) = semantic {
+        return Ok(Type::ArrayRef(Box::new(native_token(input, report, element)?)));
+    }
+    for t in &input.types {
+        let token = Type::Named(t.name.clone());
+        if semantic_token(input, report, &token).ok().as_ref() == Some(semantic) { return Ok(token); }
+    }
+    Err(format!("generic argument type metadata was not retained: {semantic:?}").into())
+}
+
 fn signature_name(ty: &Type) -> Result<String, Error> {
     Ok(match ty {
         Type::ArrayRef(element) => format!("arrayref<{}>", signature_name(element)?),
@@ -233,6 +245,7 @@ pub fn bind_queries(
                 Some(
                     "neoCLR.Runtime.TypeName"
                         | "neoCLR.Runtime.TypeArgumentCount"
+                        | "neoCLR.Runtime.TypeArgument"
                         | "neoCLR.Runtime.TypeShape"
                 )
             )
@@ -251,6 +264,26 @@ pub fn bind_queries(
                 }
             }
         }
+    }
+    // Argument queries produce more tokens; close this selected inventory before
+    // generating any name/shape/argument dispatch. Unselected library bodies do
+    // not contribute to retention.
+    let arguments_needed = queries.iter().any(|r| r["name"] == "neoCLR.Runtime.TypeArgument");
+    let mut argument_rows = vec![];
+    let mut next = 0;
+    while next < tokens.len() {
+        let token = tokens[next].clone();
+        let mut arguments = vec![];
+        if arguments_needed {
+            let semantic = semantic_token(input, report, &token)?;
+            for argument in neoclr::native_metadata::generic_arguments(source, &semantic).map_err(|e| e.to_string())? {
+                let lowered = native_token(input, report, &argument)?;
+                if !tokens.contains(&lowered) { tokens.push(lowered.clone()); }
+                arguments.push(lowered);
+            }
+        }
+        argument_rows.push(arguments);
+        next += 1;
     }
     let mut descriptors = vec![];
     for token in &tokens {
@@ -322,14 +355,17 @@ pub fn bind_queries(
         let f = &mut input.functions[index];
         let names = row["name"] == "neoCLR.Runtime.TypeName";
         let shapes = row["name"] == "neoCLR.Runtime.TypeShape";
+        let arguments = row["name"] == "neoCLR.Runtime.TypeArgument";
         let result = if names {
             Type::String
+        } else if arguments {
+            Type::RuntimeTypeHandle
         } else if shapes {
             Type::Boolean
         } else {
             Type::Int32
         };
-        let parameters = if shapes {
+        let parameters = if shapes || arguments {
             vec![Type::RuntimeTypeHandle, Type::Int32]
         } else {
             vec![Type::RuntimeTypeHandle]
@@ -357,10 +393,10 @@ pub fn bind_queries(
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
         {
-            return Err("native descriptor query requires exact reserved TypeName/TypeArgumentCount/TypeShape InternalCall contract".into());
+            return Err("native descriptor query requires exact reserved TypeName/TypeArgumentCount/TypeArgument/TypeShape InternalCall contract".into());
         }
         let mut body = vec![];
-        for (token, name, count, flags) in &descriptors {
+        for (descriptor, (token, name, count, flags)) in descriptors.iter().enumerate() {
             let branch = body.len() + 3;
             body.extend([
                 Op::Arg(0),
@@ -368,7 +404,14 @@ pub fn bind_queries(
                 Op::Equal,
                 Op::BranchFalse(0),
             ]);
-            if shapes {
+            if arguments {
+                for (index, token) in argument_rows[descriptor].iter().enumerate() {
+                    let next = body.len() + 6;
+                    body.extend([Op::Arg(1), Op::Int(index as i32), Op::Equal,
+                        Op::BranchFalse(next), Op::LoadTypeToken(token.clone()), Op::Return]);
+                }
+                body.push(Op::Fault("generic argument index out of range".into()));
+            } else if shapes {
                 for (selector, value) in flags.iter().enumerate() {
                     let next = body.len() + 6;
                     body.extend([
@@ -399,7 +442,7 @@ pub fn bind_queries(
         f.impl_flags = 0;
         f.body = body;
         bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,
-            "implementation":if names { "type-name-closed-v1" } else if shapes { "type-shape-closed-v1" } else { "type-argument-count-closed-v1" },
+            "implementation":if names { "type-name-closed-v1" } else if shapes { "type-shape-closed-v1" } else if arguments { "type-argument-closed-v1" } else { "type-argument-count-closed-v1" },
             "descriptorCount":descriptors.len(),"policy":"closed token producers; semantic source names; no accessor reachability"}));
     }
     Ok(bindings)

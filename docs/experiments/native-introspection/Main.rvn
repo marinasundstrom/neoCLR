@@ -1,5 +1,6 @@
 import System.*
 import System.Introspection.*
+import System.Collections.*
 import System.Runtime.Reflection.*
 import System.Result.*
 import System.Option.*
@@ -10,6 +11,18 @@ public class Report {
 }
 
 func Main() -> int {
+    let sequence = typeof(Sequence<Report>)
+    if sequence.GenericArgumentCount != 1 || !sequence.GetGenericArgument(0).Equals(typeof(Report)) {
+        return 26
+    }
+    let map = typeof(Map<string, ArrayList<Report>>)
+    if map.GenericArgumentCount != 2 || !map.GetGenericArgument(0).Equals(typeof(string)) {
+        return 27
+    }
+    let list = map.GetGenericArgument(1)
+    if !list.Equals(typeof(ArrayList<Report>)) || !list.GetGenericArgument(0).Equals(typeof(Report)) {
+        return 28
+    }
     let info = (NominalTypeInfo)typeof(Report)
     Console.WriteLine(info.Name)
     if !info.IsNominalType {

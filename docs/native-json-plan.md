@@ -599,3 +599,29 @@ JSON corpus. Each standalone Windows x64 executable matches the interpreter in
 exit code, UTF-8 stdout and empty stderr. All retained artifact/source hashes were
 verified; [evidence](windows-native-json-validation.json). This qualifies the
 existing corpus, not the still-unimplemented list/sequence/map mapping.
+
+## Generic collection metadata prerequisite — 2026-10-09
+
+Implement native TypeArgument behind the existing TypeInfo.GetGenericArgument API.
+Use the same source type identity as the VM, mapped back to retained native shapes;
+close argument-token production before generating descriptor dispatch. This runs
+after executable/type selection, avoiding a source-wide scan that retained unrelated
+HTTP error layouts and unsupported floating-point types in an initial local attempt.
+That attempt was discarded, not shipped. Missing argument storage metadata fails
+at compilation; unknown descriptors and negative/out-of-range indices fail explicitly.
+No constructor, getter or setter is retained merely by requesting generic arguments.
+
+This fills an implementation gap relative to CLR generic type argument inspection,
+using the existing neoCLR index-query contract and terminal fault behavior. It does
+not introduce a new API or claim an ergonomic improvement over .NET. The costs are
+linear generated dispatch and bounded image metadata; general dynamic generic
+construction remains outside this slice. The public reflection consumer checks
+Sequence<Report> and Map<string, ArrayList<Report>>, while a focused executable
+checks identity and index-fault/caller parity. This is a prerequisite for the shared
+collection mapper, which remains unfinished.
+
+Validation: the expanded public introspection and unchanged JSON projects pass
+standalone native/interpreter parity on macOS ARM64. The focused native argument
+query consumer passes valid identity, negative and out-of-range checks with matching
+RuntimeError text and caller instruction. Windows qualification of this new query
+will follow the project action; prior Windows JSON corpus evidence remains valid.

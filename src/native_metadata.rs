@@ -52,3 +52,10 @@ pub fn interface_implementation(
         .ok_or_else(|| Fault::new("missing interface owner"))?;
     crate::interfaces::implementation(module, concrete, interface, contract)
 }
+
+/// Resolve closed generic argument handles using the interpreter's type identity.
+pub fn generic_arguments(module: &Module, owner: &Type) -> Result<Vec<Type>, Fault> {
+    crate::type_identity::describe_loaded(module, owner)?
+        .generic_arguments.iter()
+        .map(|handle| handle_type(module, handle)).collect()
+}
