@@ -12944,3 +12944,22 @@ claim follows from these focused checks.
   assistant selects repeated native HTTP invocation and guest-fault recovery as
   the next bounded prerequisite for the roadmap's reusable native host. This is
   a plan; persistent application state and a public hosting API are not claimed.
+
+
+## 2026-10-09 — Native JSON as the next showcase requirement
+
+- **Author:** "We need to get JSON serialization working. That requires introspection and reflection support."
+- **Assistant response:** proposes using typed HTTP request/response payloads to drive
+  the required metadata support, retaining the existing serializer rather than
+  creating a separate native codec. Records this priority ahead of further general
+  hosting/reload work in the [roadmap](platform-roadmap.md).
+- **Actions:** completes retained HTTP qualification on macOS ARM64 and Windows x64
+  ([evidence](native-retained-http-validation.json)); adds a typed JSON round-trip
+  probe, verifies interpreter success and reproduces native RuntimeTypeHandle
+  specialization rejection. Implements the first closed type-token foundation and
+  records the [metadata/reflection sequence](native-json-plan.md).
+- **Outcome and open work:** type-token storage/identity is a foundation, not complete
+  introspection or JSON support. The typed native consumer still rejects unsupported
+  boxing; property metadata retention and checked accessor/constructor execution
+  remain required. No author approval of a particular token ABI or metadata-root
+  configuration is inferred.

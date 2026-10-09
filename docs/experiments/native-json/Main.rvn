@@ -1,0 +1,24 @@
+import System.*
+import System.Data.Json.*
+import System.Result.*
+
+public class Report {
+    init() { }
+    var Name: string { get; set; } = ""
+    var Count: int { get; set; } = 0
+    var Active: bool { get; set; } = false
+}
+
+func Main() -> int {
+    let input = "{\"Name\":\"Café\",\"Count\":3,\"Active\":true}"
+    if let Ok(report) = JsonSerializer.Deserialize<Report>(input) {
+        if report.Name != "Café" || report.Count != 3 || !report.Active {
+            return 1
+        }
+        if let Ok(text) = JsonSerializer.Serialize(report) {
+            Console.WriteLine(text)
+            return 0
+        }
+    }
+    return 2
+}

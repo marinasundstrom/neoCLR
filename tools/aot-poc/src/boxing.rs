@@ -41,7 +41,7 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
                 index
             }
         } else { input.types.iter().position(|t| Type::Named(t.name.clone()) == ty)
-            .ok_or("record boxing requires Int32 or a local closed empty value record")? };
+            .ok_or_else(|| format!("record boxing requires Int32 or a local closed empty value record; found {ty:?} in {} at instruction {pc}", input.functions[caller].name))? };
         let t = &input.types[index];
         if t.is_reference_type || t.representation != Representation::Record || !t.fields.is_empty()
             || t.base.is_some() || t.enum_info.is_some() || !t.generic_parameters.is_empty() {

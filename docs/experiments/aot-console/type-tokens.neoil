@@ -1,0 +1,60 @@
+.module TypeTokens
+.type class Left
+.end
+.type class Right
+.end
+.type class Cell<T>
+.field Value T
+.method instance .ctor(T value) -> noresult
+ldarg 0
+ldarg value
+stfld 0
+ret
+.end
+.method instance Get() -> T
+ldarg 0
+ldfld 0
+ret
+.end
+.end
+.function Token<T>() -> RuntimeTypeHandle
+ldtoken T
+ret
+.end
+.function Calculate() -> Int32
+.local Cell<RuntimeTypeHandle> held
+call Token<Int32>()
+ldtoken Int32
+ceq
+brfalse Fail
+call Token<String>()
+ldtoken Int32
+ceq
+brtrue Fail
+ldtoken Left
+newobj.ctor instance Cell<RuntimeTypeHandle>::.ctor(RuntimeTypeHandle)
+stloc held
+ldloc held
+call instance Cell<RuntimeTypeHandle>::Get()
+ldtoken Left
+ceq
+brfalse Fail
+ldloc held
+call instance Cell<RuntimeTypeHandle>::Get()
+ldtoken Right
+ceq
+brtrue Fail
+ldtoken Cell<Int32>
+ldtoken Cell<String>
+ceq
+brtrue Fail
+ldtoken Cell<Int32>
+call Token<Cell<Int32>>()
+ceq
+brfalse Fail
+ldc.i4 42
+ret
+Fail:
+ldc.i4 -1
+ret
+.end

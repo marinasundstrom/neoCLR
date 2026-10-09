@@ -23,6 +23,7 @@ pub(super) enum Ty {
     StringArray, // Invocation-owned pointer slots; verified nominal backing enables views.
     ByteValues, // Immutable native-produced value-array snapshot; no element addresses.
     Size,
+    TypeToken, // Image-local opaque type identity, never a native address.
     Wide,
     Double,
     ReferenceArray(usize), // Default-null or reserved slots retaining nominal object identity.
@@ -134,7 +135,7 @@ impl<'a> Profile<'a> {
                 || t.fields.len() > 16
                 || t.fields.iter().any(|f| {
                     f.deferred
-                        || !(matches!(f.ty, Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::Void | Type::String | Type::Char | Type::Named(_))
+                        || !(matches!(f.ty, Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::RuntimeTypeHandle | Type::Boolean | Type::Void | Type::String | Type::Char | Type::Named(_))
                             || (references && matches!(&f.ty, Type::Function(_)))
                             || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Char | Type::Function(_) | Type::Named(_)) || crate::selection::scalar_array_element(t))))
                 })
@@ -442,6 +443,7 @@ impl<'a> Profile<'a> {
             Type::String => Ty::Literal,
             Type::Char => Ty::Character,
             Type::IntPtr | Type::UIntPtr => Ty::Size,
+            Type::RuntimeTypeHandle => Ty::TypeToken,
             Type::Int64 | Type::UInt64 => Ty::Wide,
             Type::Double => Ty::Double,
             Type::Array(t) if **t == Type::Byte && self.references => Ty::ByteValues,
@@ -494,7 +496,7 @@ impl<'a> Profile<'a> {
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
             Ty::Erased => vec![false, true],
-            Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::Callable(_) | Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray | Ty::ByteValues | Ty::Size | Ty::Wide => vec![true],
+            Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::Callable(_) | Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray | Ty::ByteValues | Ty::Size | Ty::Wide | Ty::TypeToken => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
             _ => vec![false; self.lanes(t)],
@@ -778,6 +780,7 @@ impl<'a> Profile<'a> {
                 | Op::String(_)
                 | Op::Bool(_)
                 | Op::Void
+                | Op::LoadTypeToken(_)
                 | Op::Load(_)
                 | Op::LocalAddress(_)
                 | Op::ArgumentAddress(_) => state.stack.push(None),
@@ -860,6 +863,7 @@ impl<'a> Profile<'a> {
                 | Op::ConvertUInt16
                 | Op::Bool(_)
                 | Op::Void
+                | Op::LoadTypeToken(_)
                 | Op::Dup
                 | Op::Pop
                 | Op::Field(_)
@@ -957,6 +961,11 @@ impl<'a> Profile<'a> {
                 }
                 Op::Bool(_) => stack.push(Ty::Bool),
                 Op::Void => stack.push(Ty::Unit),
+                Op::LoadTypeToken(t) => {
+                    // A token cannot introduce open or unsupported type shapes.
+                    self.ty(t)?;
+                    stack.push(Ty::TypeToken);
+                }
                 Op::PackValue(t) => {
                     take(&mut stack, &self.ty(t)?)?;
                     stack.push(Ty::Erased);
@@ -1192,8 +1201,8 @@ impl<'a> Profile<'a> {
                 }
                 Op::Equal => {
                     let t = pop(&mut stack)?;
-                    if !matches!(t, Ty::Int | Ty::Wide | Ty::Double | Ty::Bool | Ty::Literal) {
-                        return Err(fail(pc, "equality requires Int32, Int64/UInt64, Double, Boolean or String"));
+                    if !matches!(t, Ty::Int | Ty::Wide | Ty::Double | Ty::Bool | Ty::Literal | Ty::TypeToken) {
+                        return Err(fail(pc, "equality requires Int32, Int64/UInt64, Double, Boolean, String or RuntimeTypeHandle"));
                     }
                     take(&mut stack, &t)?;
                     stack.push(Ty::Bool);

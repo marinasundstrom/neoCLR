@@ -435,7 +435,7 @@ pub(super) fn select_inventory_with_host_roots(
             | Op::StoreObject(t)
             | Op::PackValue(t)
             | Op::IsValue(t)
-            | Op::UnpackValue(t) | Op::BoxValue(t) | Op::IsInstance(t) | Op::CastClass(t)
+            | Op::LoadTypeToken(t) | Op::UnpackValue(t) | Op::BoxValue(t) | Op::IsInstance(t) | Op::CastClass(t)
             | Op::NewArray(t) | Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t) | Op::ArrayAddress(t) = op
             {
                 pending_types.push(t.clone());
@@ -488,7 +488,7 @@ pub(super) fn select_inventory_with_host_roots(
             Type::ArrayRef(t) if *t == Type::Byte => {
                 if let Some(owner) = byte_array_owner(input) { pending_types.push(owner); }
             },
-            Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr => (),
+            Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::RuntimeTypeHandle => (),
             _ => {
                 return Err(
                     "closed-world selection requires reference-free nongeneric value signatures"

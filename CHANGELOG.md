@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Prioritize native JSON through the existing introspection/reflection-backed mapper.
+  Add an interpreter-validated typed round-trip probe and a staged native plan.
+  Implement closed native RuntimeTypeHandle storage and ldtoken identity across
+  generic specialization, calls and fields; retain token-only type shapes, exclude
+  handles from GC tracing and reject numeric casts. Identity is image-local and
+  does not provide TypeInfo queries or reflection invocation. Improve unsupported
+  boxing diagnostics for the next JSON admission gap; native JSON remains unfinished.
+
 - Add a private retained native session with explicit root ownership, an entry-reset
   anchor, bounded callback retention and fail-closed dispatch after guest faults.
   Reject copied/wrong-thread sessions, reentry and shutdown with foreign service

@@ -73,7 +73,8 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
         | Ty::Unit
         | Ty::Size
         | Ty::Wide
-        | Ty::Double => return vec![],
+        | Ty::Double
+        | Ty::TypeToken => return vec![],
     };
     vec![Slot { lane: 0, trace }]
 }

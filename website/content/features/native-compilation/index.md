@@ -108,7 +108,10 @@ The routing workbench also parses a route, extracts an integer parameter and pri
 - **HTTP:** these bounded showcases do not establish native support for the entire
   Web API surface, TLS, HTTP/2 or arbitrary concurrent servers. The native transport
   uses IPv4, bounded DNS workers and polled socket operations.
-- **Code and APIs:** broader generic/virtual dispatch, native introspection/reflection,
+- **Code and APIs:** development includes opaque closed type-token identity as a
+  first step toward native JSON. Property discovery and reflection invocation remain
+  unfinished, so typed JSON serialization is not yet a native capability.
+  Broader generic/virtual dispatch, native introspection/reflection,
   Single operations, floating conversions and floating Math services are incomplete.
 - **Async and hosting:** the HTTP profiles have a bounded completion loop, not a
   public scheduler. General suspension, green threads, stack migration and reusable

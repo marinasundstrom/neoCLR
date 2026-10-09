@@ -257,6 +257,16 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         return Err("native host bootstrap requires native GC".into());
     }
     let root = p.root(root, bootstrap)?;
+    // Identity is scoped to this linked image. No pointer or persistent numeric
+    // value is exposed by the guest RuntimeTypeHandle contract.
+    let mut type_tokens = Vec::new();
+    for f in &input.functions {
+        for op in &f.body {
+            if let Op::LoadTypeToken(t) = op {
+                if !type_tokens.contains(t) { type_tokens.push(t.clone()); }
+            }
+        }
+    }
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))
         .collect::<Result<_, _>>()?;
@@ -1253,6 +1263,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     }
                     Op::Bool(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
                     Op::Void => stack.push(b.ins().iconst(types::I32, 0)),
+                    Op::LoadTypeToken(t) => {
+                        let identity = type_tokens.iter().position(|v| v == t).expect("collected token") + 1;
+                        stack.push(b.ins().iconst(types::I64, identity as i64));
+                    }
                     Op::PackValue(t) => {
                         let payload = pop(&mut stack);
                         let payload = normalize(&mut b, &p, &p.ty(t)?, &[payload])[0];

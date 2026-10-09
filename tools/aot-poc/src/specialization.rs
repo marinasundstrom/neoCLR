@@ -57,7 +57,7 @@ impl Specializer<'_> {
     }
     fn lower_inner(&mut self, ty: &Type) -> Result<Type, Error> {
         let (name, arguments) = match ty {
-            Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr => {
+            Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::RuntimeTypeHandle => {
                 return Ok(ty.clone());
             }
             Type::Function(shape) => {
@@ -387,7 +387,7 @@ impl Specializer<'_> {
                 | Op::StoreObject(t)
                 | Op::PackValue(t)
                 | Op::IsValue(t)
-                | Op::UnpackValue(t) | Op::BoxValue(t) | Op::IsInstance(t) | Op::CastClass(t)
+                | Op::LoadTypeToken(t) | Op::UnpackValue(t) | Op::BoxValue(t) | Op::IsInstance(t) | Op::CastClass(t)
                 | Op::NewArray(t) | Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t) | Op::ArrayAddress(t) => {
                     *t =
                         self.lower(&substitute(t, arguments, methods).map_err(|e| e.to_string())?)?
@@ -418,7 +418,7 @@ fn validate_argument(ty: &Type, depth: usize) -> Result<(), Error> {
         return Err("generic argument nesting exceeds 16".into());
     }
     match ty {
-        Type::Int32 | Type::UInt32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String | Type::Char | Type::Int64 | Type::UInt64 | Type::Named(_) => Ok(()),
+        Type::Int32 | Type::UInt32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::String | Type::Char | Type::Int64 | Type::UInt64 | Type::RuntimeTypeHandle | Type::Named(_) => Ok(()),
         Type::Function(shape) => {
             for t in shape.parameters.iter().chain([&shape.returns]) { validate_argument(t, depth + 1)?; }
             Ok(())

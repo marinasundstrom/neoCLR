@@ -5270,3 +5270,54 @@ fn inherited_display_rejects_unselected_overrides() {
     assert!(!r.status.success());
     assert!(!dir.0.join("app.o").exists());
 }
+
+#[test]
+fn native_type_tokens_preserve_closed_shapes_and_reject_numeric_casts() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/type-tokens.neoil");
+    let flags = ["--compile-system", "--reference-arena", "--native-gc"];
+    let dir = Temp::new();
+    let r = compile_source(&dir, &seed, source, &flags, true);
+    assert!(r.status.success(), "{r:?}");
+    let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["admission"]["accepted"], true, "{report}");
+    let functions = report["traceLayout"]["functions"].as_array().unwrap();
+    let tokens: Vec<_> = functions.iter().filter(|f| f["name"].as_str().unwrap().starts_with("Token$")).collect();
+    assert_eq!(tokens.len(), 3);
+    for function in tokens {
+        assert_eq!(function["result"]["storageBytes"], 8);
+        assert_eq!(function["result"]["traceSlots"], serde_json::json!([]));
+    }
+    for conversion in ["conv.i4", "conv.u8"] {
+        let dir = Temp::new();
+        let source = format!(".module Invalid\n.function Calculate() -> Int32\nldtoken Int32\n{conversion}\npop\nldc.i4 0\nret\n.end\n");
+        let r = compile_source(&dir, &seed, &source, &flags, false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists(), "{r:?}");
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_type_tokens_execute_with_interpreter_identity_parity() {
+    let seed = neoclr::library::system().unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/type-tokens.neoil");
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, seed).unwrap();
+    let function = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate()").unwrap()).unwrap();
+    assert_eq!(function.invoke(vec![], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    let dir = Temp::new();
+    let r = compile_source(&dir, seed, source, &["--compile-system", "--reference-arena", "--native-gc"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(base.join("type-tokens-test.c"))
+        .arg(base.join("native-gc.c")).arg(base.join("root-probe.c")).arg(base.join("text-arena.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host"))
+        .output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
+    assert!(r.status.success(), "{r:?}");
+    assert_eq!(r.stdout, b"Type tokens: 42\n");
+    assert!(r.stderr.is_empty());
+}

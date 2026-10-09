@@ -58,11 +58,11 @@ pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bo
                 .chain(&f.locals)
                 .chain([&f.returns])
                 .any(|t| {
-                    matches!(t, Type::Value | Type::String | Type::Double)
+                    matches!(t, Type::Value | Type::String | Type::Double | Type::RuntimeTypeHandle)
                         || matches!(t, Type::ByRef(inner) if matches!(**inner, Type::Value | Type::String))
                 })
                 || f.body.iter().any(|op| {
-                    matches!(op, Op::Float64 { .. } | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
+                    matches!(op, Op::LoadTypeToken(_) | Op::Float64 { .. } | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
                         || matches!(op, Op::Call(target) if target.definition.is_some())
                 })
         })

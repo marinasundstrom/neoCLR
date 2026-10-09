@@ -58,6 +58,14 @@ shutdown. Its [qualification](native-retained-http-validation.json) passes three
 matching scenarios on macOS ARM64 and Windows x64 (`84b6e425`). General async export completion and broader persistent-host contracts
 remain open before reusable hosting or hot reload can be claimed.
 
+**Author JSON direction (2026-10-09):** next make typed JSON serialization work in
+native HTTP, including the introspection and reflection support it needs. The
+[native JSON plan](native-json-plan.md) takes priority over further general hosting
+and reload slices. Reuse the existing serializer and qualify typed client/server
+payloads consistently on macOS ARM64 and Windows x64. Closed type-token storage and
+identity are the first implemented foundation; property metadata, checked accessor/
+constructor dispatch and complete native JSON execution remain unfinished.
+
 **Author clarification (2026-10-09):** once the native compilation foundations are
 ready, let runtime suspension, runtime-owned scheduling and green threads co-evolve
 with them. This is a cross-cutting design/implementation track alongside subsequent
