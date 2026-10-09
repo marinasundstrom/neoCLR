@@ -1,0 +1,18 @@
+module Example.EscapingAudit
+
+import System.*
+
+func Main() -> int {
+    let payload = "quote\"slash\\end"
+    let actual = Option<string>.Some(payload).ToString()
+    let escaped = "Option.Some(\"quote\\\"slash\\\\end\")"
+    if String.CompareOrdinal(actual, escaped) == 0 {
+        // The gap has closed: update this audit and qualify the real implementation.
+        return 1
+    }
+    let unescaped = String.Concat(String.Concat("Option.Some(\"", payload), "\")")
+    if String.CompareOrdinal(actual, unescaped) != 0 {
+        return 2
+    }
+    return 42
+}

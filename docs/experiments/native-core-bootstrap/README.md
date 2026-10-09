@@ -319,3 +319,40 @@ Boolean, Char and wider primitive boxes are not qualified by this sample. Escapi
 matching Char tests and full production String/Object bootstrap remain open. The
 website's bounded development description stays accurate; no public API or compiler
 contract changes in this slice.
+
+## Constructed receivers and escaping audit (2026-10-09)
+
+`--project --text-services --unions --escaping-audit` deliberately reproduces a
+known defect, not a formatting pass. The [audit](escaping-audit.rvn) compares a
+quote/backslash payload against both the correctly escaped description and the
+current raw-quoted description. Project/interpreter/native execution all confirm
+the latter. [Evidence](escaping-validation.json) labels this `knownFailure` and
+preserves exact tool/input hashes; its result 42 means the defect was reproduced.
+When the implementation is fixed, update this audit into a positive assertion.
+
+The first run exposed a separate portable compiler rejection for a freshly
+constructed value receiver: Option<string>.Some(payload).ToString(). Raven
+`1190d03d3` on codex/source-object-metadata-resolution now evaluates that result
+once into temporary storage before method arguments, using existing value-call
+lowering. It preserves mutation on the temporary and existing construction guards.
+Ordinary/generic/nested imported constructor receiver checks verify/run with 42;
+the audit proves native-only project/interpreter/ARM64 execution. The evidence run
+preceded that commit; recorded compiler hashes include the tested correction.
+No Runtime Contract configuration or CLI/native encoding changes. Raven main does
+not contain this portable-emitter file, so there is no independent main-file port.
+
+The remaining escaping cause is shared: production System.String has no
+Replace(string,string), and Raven's CreateQuotedStringValue falls back to raw
+quoting when that member is unavailable. This is not an AOT-only discrepancy.
+[.NET's Replace contract](https://learn.microsoft.com/dotnet/api/system.string.replace)
+(consulted 2026-10-09) supplies replacement text without modifying the original,
+rejects an empty search string, and permits null replacement as removal. neoCLR's
+non-null UTF-8 service contracts require an explicit design for those argument and
+fault policies before claiming equivalent support.
+
+Next implement real replacement support shared by interpreter/native paths, expose
+and document the appropriate String member, and convert this audit to positive
+escaping checks. Cover quote/backslash ordering, Unicode, NUL, repeated/absent
+matches and output limits. A dedicated escaping service is an alternative with a
+smaller contract but additional compiler-target coupling; it should not be hidden
+in fixture-only formatting. Neither alternative is implemented by this slice.

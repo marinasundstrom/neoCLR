@@ -41,7 +41,10 @@ escaped-string/primitive display and full production Object/bootstrap remain ope
 Int32 union descriptions now also pass zero/negative/min/max and integer Result
 payloads with the explicit native formatter; omitted binding rejects before output.
 [Integer evidence](../experiments/native-core-bootstrap/integer-display-validation.json).
-Other primitive boxes and escaping remain outside this qualification.
+Other primitive boxes and escaping remain outside this qualification. The explicit
+[escaping audit](../experiments/native-core-bootstrap/escaping-validation.json)
+reproduces raw quoting in both modes, not correct escaping. Its initial constructor
+receiver rejection is fixed in Raven 1190d03d3; real String replacement remains next.
 
 Release remains gated on complete production source-runtime bootstrap without the
 CLI semantic bridge, matching SDK/editor/native artifacts and extracted-package

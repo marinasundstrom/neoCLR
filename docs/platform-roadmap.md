@@ -17,7 +17,11 @@ Result cases with the explicit native integer formatter; missing binding publish
 [Integer display evidence](experiments/native-core-bootstrap/integer-display-validation.json). Matching Char boxes remain rejected; escaping, other primitive
 payload display and full core bootstrap remain open.
 [Display evidence](experiments/native-core-bootstrap/README.md#nonmatching-char-tests-and-string-union-display-2026-10-09).
-Expand production primitive/String/Object contracts next.
+Immediate constructed value receivers now lower through single-evaluation temporary
+storage. The [escaping audit](experiments/native-core-bootstrap/README.md#constructed-receivers-and-escaping-audit-2026-10-09)
+confirms that quotes/backslashes remain unescaped in both modes because String.Replace
+is absent. Prioritize a real shared replacement/escaping contract; full core bootstrap
+remains open.
 [Union source evidence](experiments/native-core-bootstrap/README.md#production-union-source-subset-2026-10-09).
 [Text-service evidence](experiments/native-core-bootstrap/README.md#native-text-services-and-module-projection-2026-10-09).
 

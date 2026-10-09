@@ -7164,3 +7164,16 @@ formatting. The shared diagnostic repair passes ordinary .NET checks on the Rave
 integration branch; porting it to main's differing emitter boundary is an explicitly
 deferred general candidate, not an intended neoCLR-only feature.
 See [source/evidence/limits](experiments/native-core-bootstrap/README.md#value-type-foundation-and-production-union-frontier-2026-10-09).
+
+
+## Immediate constructed value receivers (2026-10-09)
+
+Raven 1190d03d3 on the shared integration branch now admits constructor results as
+value-method receivers, spilling the result once before arguments through existing
+temporary-receiver lowering. Existing type/capability/constructor checks remain.
+No Runtime Contract options, CLI bridge representation or native metadata change.
+The portable emitter is not on Raven main; this correction is not a CLI semantic
+change. Imported ordinary/generic/nested mutating/out receiver checks pass, and the
+[native-only escaping audit](experiments/native-core-bootstrap/README.md#constructed-receivers-and-escaping-audit-2026-10-09)
+executes immediate union-case display in both modes. That audit records the still
+unresolved shared String.Replace/escaping gap rather than claiming correct display.

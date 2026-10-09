@@ -22,6 +22,7 @@ def main():
     parser.add_argument('--unions', action='store_true', help='With --text-services, execute unchanged production Option/Result and pattern controls.')
     parser.add_argument('--string-boxing', action='store_true', help='With --unions, check generic String boxing/display and reference identity.')
     parser.add_argument('--union-display', action='store_true', help='With --unions, check String/Int32 union display and formatter binding; excludes --string-boxing.')
+    parser.add_argument('--escaping-audit', action='store_true', help='With --unions, reproduce the known missing String.Replace escaping gap, not formatting success.')
     args = parser.parse_args()
     if args.project and not args.driver:
         parser.error('--project requires --driver')
@@ -35,6 +36,8 @@ def main():
         parser.error('--string-boxing requires --unions')
     if args.union_display and (not args.unions or args.string_boxing):
         parser.error('--union-display requires --unions and excludes --string-boxing')
+    if args.escaping_audit and (not args.unions or args.union_display or args.string_boxing):
+        parser.error('--escaping-audit requires --unions and excludes other display modes')
     output = args.output.resolve()
     if output.exists():
         raise FileExistsError(output)
@@ -90,7 +93,8 @@ def main():
     if args.project:
         directory = artifacts / 'project'
         directory.mkdir()
-        (directory / 'Main.rvn').write_text((HERE / 'display-consumer.rvn').read_text() if args.union_display
+        (directory / 'Main.rvn').write_text((HERE / 'escaping-audit.rvn').read_text() if args.escaping_audit
+            else (HERE / 'display-consumer.rvn').read_text() if args.union_display
             else (HERE / 'boxing-consumer.rvn').read_text() if args.string_boxing
             else (HERE / 'union-consumer.rvn').read_text() if args.unions
             else (HERE / 'text-consumer.rvn').read_text() if args.text_services
@@ -178,6 +182,11 @@ def main():
         report['scope'] = 'Native-only production Option/Result String and Int32 display over fixture core; explicit integer formatter. No Char box producers, escaped strings or general Object display qualification.'
         report.pop('unionChecks', None)
         report['displayChecks'] = ['Some Unicode/NUL', 'None', 'Ok String', 'Error String', 'Some Int32 zero/negative/min/max', 'Ok Int32', 'Error Int32', 'missing formatter rejection']
+    if args.escaping_audit:
+        report['scope'] = 'Known escaping defect reproduction in both modes, not successful union escaping or full bootstrap qualification.'
+        report.pop('unionChecks', None)
+        report['knownFailure'] = {'correctEscapedOutput': False, 'rawQuotedPayloadConfirmed': True,
+            'cause': 'native core and production String lack Replace(String,String); Raven synthesized formatter falls back to raw quoting'}
     report['revisions'] = {name: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip()
                            for name, path in [('neoclr', ROOT), ('raven', args.raven)]}
     inputs = [runtime, aot, *[p for p in HERE.iterdir() if p.suffix in ('.cs', '.csproj', '.rvn', '.neoil', '.c', '.py')]]
@@ -191,7 +200,8 @@ def main():
         inputs += [project, directory / 'Main.rvn']
     report['sha256'] = {str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs}
     (output / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')
-    print('PASS native-only core consumer: interpreter=42, native=42, libSystem only')
+    print('REPRODUCED known escaping gap in both modes; not a formatting pass' if args.escaping_audit
+          else 'PASS native-only core consumer: interpreter=42, native=42, libSystem only')
 
 
 if __name__ == '__main__':

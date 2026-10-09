@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Qualify Raven's immediate constructed-value receiver fix with native-only union
+  display and imported ordinary/generic/nested receiver checks. Add an explicitly
+  failing-contract escaping audit: both modes still quote payloads without escaping
+  quotes/backslashes because String.Replace is absent. This records the shared gap,
+  not a successful escaping implementation.
+
 - Add architecture and metadata-format documentation and website guides, with
   compilation, layered runtime-service and artifact-format diagrams. Document
   current PE/NEOX encoding, ownership, admission boundaries and native execution
