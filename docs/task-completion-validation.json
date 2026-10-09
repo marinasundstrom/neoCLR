@@ -1,0 +1,173 @@
+{
+  "date": "2026-10-09",
+  "scope": "Task.CompletedTask and Task.FromResult interpreter, sanitized and standalone native behavior",
+  "reportSha256": "87d6225f9a908ab7271c2b7c7cf0c48ee365c1226168c3ceb01350b817180afd",
+  "case": {
+    "status": 0,
+    "output": "42\nCaf\u00e9 \ud83c\udf0d\nFactories passed\n",
+    "fault": "",
+    "heapCapacity": 65536,
+    "bindings": [
+      {
+        "compiledIndex": 14,
+        "definition": {
+          "index": 100,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+        "implementation": "terminal-user-fault-v1",
+        "name": "neoCLR.Runtime.Fail",
+        "status": 4
+      },
+      {
+        "compiledIndex": 13,
+        "definition": {
+          "index": 72,
+          "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+          "revision": "1.0.0.0"
+        },
+        "implementation": "console-write-line-v1",
+        "name": "neoCLR.Runtime.WriteLine",
+        "symbol": "neoclr_console_write_line_utf8_v1"
+      },
+      {
+        "compiledIndex": 67,
+        "definition": {
+          "index": 6,
+          "module": "System"
+        },
+        "implementation": "int32-to-string-v1",
+        "name": "neoCLR.Runtime.Int32ToString",
+        "storage": "caller-owned-text-arena-v4",
+        "symbol": "neoclr_int32_to_string_v1"
+      },
+      {
+        "compiledIndex": 75,
+        "definition": {
+          "index": 135,
+          "module": "System"
+        },
+        "implementation": "task-queue-register-v1",
+        "name": "neoCLR.Runtime.RegisterTaskQueue",
+        "queueType": {
+          "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+        },
+        "symbol": "neoclr_task_queue_register_v1"
+      },
+      {
+        "compiledIndex": 76,
+        "definition": {
+          "index": 133,
+          "module": "System"
+        },
+        "implementation": "task-queue-default-v1",
+        "name": "neoCLR.Runtime.GetDefaultTaskQueue",
+        "queueType": {
+          "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+        },
+        "symbol": "neoclr_task_queue_default_v1"
+      },
+      {
+        "compiledIndex": 77,
+        "definition": {
+          "index": 134,
+          "module": "System"
+        },
+        "implementation": "task-queue-current-v1",
+        "name": "neoCLR.Runtime.GetCurrentTaskQueue",
+        "queueType": {
+          "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+        },
+        "symbol": "neoclr_task_queue_current_v1"
+      },
+      {
+        "compiledIndex": 70,
+        "definition": {
+          "index": 132,
+          "module": "System"
+        },
+        "implementation": "entry-task-drain-v1",
+        "name": "neoCLR.Runtime.DrainEntryTasks",
+        "requiresHostIo": false
+      }
+    ]
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/verify_callbacks.py": "ee7580be61e8bc8c17b836dd7b44d6f319f921ef1b812fa5816b5b046e296899",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/rvnc.dll": "171b7602c5ac032995bfd81f62641a50c9a5f5349986d70bbbed91a11f2f451a",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/bin/neoclr": "a4c18a72d7a971314b990c13adea35fdcd5b89244771f92c0e82b60f84470560",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "d75fd9acd132c4fed43f9e036504bd32b53969fdf6c44463d217b219ab333882",
+    "/Users/robert/Projects/neoclr/target/task-factories-libraries/Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f",
+    "/Users/robert/Projects/neoclr/target/task-factories-libraries/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/task-factories-libraries/ownership.json": "25d07114dc5f19fc2f97e66c4add67d63a9b5b831edcabfe841e45af431873dd",
+    "/Users/robert/Projects/neoclr/target/task-factories-libraries/System.Runtime.dll": "5ccb1d74e9ac2fbbecf7b16fdd0466fa5f4c735e3e558a835514316bc3025d37",
+    "/Users/robert/Projects/neoclr/target/task-factories-libraries/System.Web.dll": "46ce5c9221524d57964311666f31cb5bc436ac4452b86d891af5bc2fd12abf3e",
+    "/Users/robert/Projects/neoclr/target/task-factories-libraries/System.Networking.dll": "763023079d215dca9dd88020975bd551bdcc70705e780aa22726eecf6d2f9ff8",
+    "/Users/robert/Projects/neoclr/target/task-factories-libraries/System.Data.dll": "94e59bb4ab1c4da1b8e641e2492ce4107195c56bc962ddf68c9fb25c3a7b0d6d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.c": "c9faa25b39d483e1c7b3c358eb062b278656ae57449c224f386c806126b8675d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-output.c": "0ee9827a162e9f3894012930688e4ee39a7a663582d056e16ac3237037138c97",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue-host.c": "d710811ab31d662ad99fdad39c149f304a2e756f64f5efa6dfb8541bfd1bb76a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "9ff0d0b7c018c248a33b243808bd302567f954c1d3e55ade08da4264e11a6a45",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c": "9f7b3800fa6778867c9d7af9bbb791c64287a9b0aeb419bee03a08de81757aac",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c": "e0d472372663f9c15b131144a83a451ef321342a397f93b61f4db8125e703502",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "911021e591a5dc8e3effed7007a540ba227ca5ac64d796696f49780c81e86efb",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "9f49363611400a570209716219c64ffb4df9f4d1c31185e163cd773d51a427b9",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/flow.rs": "a92d791a2f398ec6030a1513ae9bf0ccb8ad2102bf47375f5a7db47b0e6a9a60",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/string_projection.rs": "a9b03b668445b819ea762046913aa2e5c391a534e56532dd93a575aa671ac7c5",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/boxing.rs": "212f87302ed661c123f3915285dc4bdcac0563684bb082ad907116e37571229a",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_layout.rs": "a3593055d7a2170ff6a1a5107971e93f2fd37da948607bf79a316bf814156f24",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/fault_details.rs": "4406f68f7706f5521e726558a769f3a203f669a572b4b8ac5b157a7accf7234d",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/compiler.rs": "d57fdaf0d85565b34bb103421c01f21b5ebabeb424a4b5159b7737e743d6d139",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_probe.rs": "a162c14ac728cc1433e1fe79eb3deb35bf5a5014e27ea75aa98b6168dd3e2e78",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/values.rs": "8463c8d94d23b1d1cdd32d4ff2f04682d24966f8716f546198ddd8f805c77753",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/limits.rs": "2ad7e86f59dc2034afe1b5bc8551855d3e76b773fe7047fb4ba71faadea71470",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/specialization.rs": "18fffe418b1098a9f5f34fe99003497be454aede885fe4d8b0fc5ec617ab9991",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_points.rs": "3e1bb94198acb31dbade3f1fcfdd81b44886c37a37324086e81b9f1aa5a728a4",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/value_profile.rs": "6e7b166ab53ffd5fcc41bd21cb88b387682adcead05759c53f2606234ac3d0aa",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/selection.rs": "0e04852d2218994c537a62295fb479a82e635bf01c05993536efc32cd361cbda",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/main.rs": "11b5668f62434144a36a35d6248520fafaa6f21ea95ac0a5652a1ed5bcf9152f",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/linking.rs": "6842272d9df2ca61673f183d0209ee6f482208b98fcfaf2807f736762c70468a",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/bindings.rs": "0b8940e435d6e385602ca5ea5869790dc9862de33b7acc3f8be53fecf27ca11b",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/inspection.rs": "29336902e21a86b602262b2d1d1ffae85e14dd157c5551283f1de74dd5effca4",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "808cee2a08c381adb92cce1f18a54b7369cb2550149f4db791a6af3f8c4f395e",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.h": "e492bd4f34ec672cca12e15aba25ce83c3e2dc6c985eb6a173e030f57510531d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.h": "2d8239fe7ec7bebe637c7761dd903d15a6ee6d8955ee481a5bdbee4c4225f5b3",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.h": "a1a9840482a2b50f20ba5080eb96453a46e4416238b3403343e03e9c2c84d3f4",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-client-internal.h": "e2771ecbe8b74c0e696af297651cd5158755c8ed6e6cc25b1d9bde837a57dddb",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-os.h": "a01419c62fa8a1d3d9131282c5af182f200ba149a440d52c81104e2a156f7ef0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": "f2dcc1dfcb410a919c25bd290a19149366a36426ca0683b704a4da0a8d06b355",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "5ddaab55d68a166430f61ee6db772f2bc7a02eb3b36f46632708595f279a42a2",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "b4dbae37afe2b8e64b15a3cea1e5b55868aa487da44e7369ff2d063df5a2e99b",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-output.h": "f13171699f402f05ea2ab0e4e1686f227bbe48d65c8b48a62e5f94200605e88e",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "2bff27d6fbe97a06fa47bf7c2e286f2731fe2fa7f71a0d1cbb4e2fdd1e4690bd",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/RavenDoc.dll": "0e1c4c98e82700eb20268eb3a7fcf96c91971187c9e3bf064227c7795b209e6c",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.Console.dll": "6e4c9ea7baa3565001fdb5d0c596437ecf41eb18de2f011175eb45350821ac20",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "1445c8e3d0ef3c7b50351738e9b807fba28a1504ab757fff29aa4213abbbe1b8",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "4aa209502721dac703cafd8bb841a9663abd267459ef3081f172eb681d045296",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "276b715ab02cf1583ca31d98eb496e6fd4cb0d6034ec9ce900862e29363ee9bb",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Raven.Core.dll": "abc6044036575d7a6e99c134a565db320daa1d73917aecbb0d61ab12b0c7526d",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/neoclr/target/native-build-kit-slice/neoclr-native-build-kit/bundle/sdk/tools/rvnc/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/TaskFactories.rvn": "fb25140b9e3ec5dd02c134436ef562ca64c02b23ed56469653f2655a0dbb8465",
+    "/Users/robert/Projects/neoclr/target/task-factories-final/TaskFactories.dll": "2eab3affa851fc886a5277e6183c88369d596bb9bab5af2242a5748d680d46b7",
+    "/Users/robert/Projects/neoclr/target/task-factories-final/TaskFactories.o": "978b3cdb7139f46d6ffd9b120eed9b91afc39008077e9aee7c4005c310f41706",
+    "/Users/robert/Projects/neoclr/target/task-factories-final/TaskFactories-standalone": "e8fd30cd2a8ce27e158d1d09ac1fc141212bae92b59a495657cdb81f4e31b452"
+  },
+  "httpServerReportSha256": "4668ef1fa6a3a815d2aca5851813ae6fe06deb6519f9bc16ba05f645e5626a85"
+}

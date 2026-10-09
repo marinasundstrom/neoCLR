@@ -1436,3 +1436,12 @@ ConsoleWriteBytes. Shared RavenDoc regression coverage exercises source and .NET
 metadata, preserving genuine public extensions and excluding internal generic
 extensions as well. See the native reader limitation in
 [the integration contract](../docs/raven-cli-bridge.md#public-documentation-and-native-extension-visibility-2026-10-09).
+
+### Completed task factories (2026-10-09)
+
+`System.Tasks.Task.CompletedTask` and `Task.FromResult<T>(value)` are development
+APIs in System.Runtime. Their public property/method pages are rendered in the
+native snapshot, with matching XML help and legacy bridge reference. The temporary
+CLI unit projection now covers property signatures as well as accessors; no public
+API is excluded. See [the contract](../docs/task-completion-factories.md). Published
+Preview 13 libraries must be rebuilt before compiling consumers of these helpers.

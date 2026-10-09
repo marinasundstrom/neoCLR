@@ -7257,3 +7257,17 @@ reproduced against the pinned native-build-kit compiler and deferred for indepen
 compiler regression fixes on the shared line, not permanent neoCLR rules. This
 sample change alters no compiler encoding. Qualification commands are in
 `scripts/validate-native-client-project.py` and `scripts/validate-await-samples.py`.
+
+## Completed task factories — development, 2026-10-09
+
+The non-generic System.Tasks.Task helper owns CompletedTask (Task of unit) and
+FromResult<T>(value). They are ordinary Raven library implementations, with no new
+Runtime Contract switch or native backend intrinsic. The reference-only CLI bridge
+uses PropagationUnit during C# construction, then projects it to the existing
+System.Void unit representation in property metadata and accessor signatures alike.
+The actual native library owns System.Void through the existing explicit ownership
+manifest. No user value is inferred as default(T), and ordinary .NET compilation is
+unchanged. The bridge's exact static signature bindings and matching reference
+snapshot are updated together. This temporary projection belongs to neoCLR's bridge;
+native metadata/library consumers already read the real unit owner directly.
+See [semantics and focused validation](task-completion-factories.md).

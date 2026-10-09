@@ -1,0 +1,37 @@
+import System.*
+import System.Tasks.*
+
+class Payload {
+    var Value: int = 41
+    var Observed: bool = false
+}
+
+async func Main() -> Task<()> {
+    let completed = Task.CompletedTask
+    if !completed.IsCompleted || completed.IsCancelled {
+        System.Fail("Unit task must be successfully completed")
+    }
+    await completed
+    let number = Task.FromResult(42)
+    if !number.IsCompleted || number.IsCancelled {
+        System.Fail("Value task must be successfully completed")
+    }
+    Console.WriteLine(await number)
+    Console.WriteLine(await Task.FromResult("Café 🌍"))
+    let payload = Payload()
+    let same = await Task.FromResult(payload)
+    same.Value = 42
+    if payload.Value != 42 {
+        System.Fail("Result must retain reference identity")
+    }
+    // Intentional callback test: registration on a completed task remains deferred.
+    number.OnCompleted(() => { payload.Observed = true })
+    if payload.Observed {
+        System.Fail("Completion callback ran inline")
+    }
+    TaskQueue.Default.Drain()
+    if !payload.Observed {
+        System.Fail("Completion callback was lost")
+    }
+    Console.WriteLine("Factories passed")
+}

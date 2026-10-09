@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import shutil
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -36,7 +37,10 @@ def retained_model(model):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('probe', 'runtime', 'translator', 'output'):
+    source_core = parser.add_mutually_exclusive_group(required=True)
+    source_core.add_argument('--probe', type=Path)
+    source_core.add_argument('--core-reference', type=Path, help='Reuse an explicitly selected primitive-only Core.dll from a qualified native bundle')
+    for name in ('runtime', 'translator', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     args = parser.parse_args()
     ownership_path = ROOT / 'runtime/raven/projects/System.Runtime/ownership.json'
@@ -53,7 +57,7 @@ def main():
         if seed_text.count(declaration) != 1:
             raise ValueError('Expected exactly one retained declaration: ' + name)
         seed_text = seed_text.replace(declaration, '')
-    for path in (args.probe, args.runtime, args.translator):
+    for path in (args.probe or args.core_reference, args.runtime, args.translator):
         if not path.is_file():
             raise FileNotFoundError(path)
     output = args.output.resolve()
@@ -70,7 +74,11 @@ def main():
 
     core = output / 'Core.dll'
     # This narrow CLI bootstrap excludes Fail and Math: the native source library owns them.
-    run(['dotnet', args.probe.resolve(), '--reference-source-runtime-core', core])
+    if args.probe:
+        run(['dotnet', args.probe.resolve(), '--reference-source-runtime-core', core])
+    else:
+        shutil.copyfile(args.core_reference.resolve(), core)
+        report['reusedPrimitiveCore'] = str(args.core_reference.resolve())
     seed_source = output / 'System.neoil'
     seed_source.write_text(seed_text)
     bootstrap_json = output / 'System.bootstrap.json'
@@ -79,9 +87,11 @@ def main():
     retained.write_text(json.dumps(retained_model(json.loads(bootstrap_json.read_text())), separators=(',', ':')))
     seed = output / 'System.neox'
     run(['dotnet', args.translator.resolve(), retained, seed])
-    inputs = [Path(__file__), source, ownership_path, args.probe, args.runtime, args.translator]
-    inputs += list((ROOT / 'docs/experiments/raven-target').glob('*.cs'))
-    inputs += list(args.probe.parent.glob('*.dll')) + list(args.translator.parent.glob('*.dll'))
+    inputs = [Path(__file__), source, ownership_path, args.probe or args.core_reference, args.runtime, args.translator]
+    if args.probe:
+        inputs += list((ROOT / 'docs/experiments/raven-target').glob('*.cs'))
+        inputs += list(args.probe.parent.glob('*.dll'))
+    inputs += list(args.translator.parent.glob('*.dll'))
     outputs = [core, seed_source, bootstrap_json, retained, seed]
     report['hashes'] = {str(path.resolve()): sha(path) for path in inputs + outputs}
     (output / 'preparation-evidence.json').write_text(json.dumps(report, indent=2) + '\n')

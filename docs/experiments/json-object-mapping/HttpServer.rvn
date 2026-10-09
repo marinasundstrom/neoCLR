@@ -79,12 +79,12 @@ func StartServer(arguments: string[]) -> Task<()> {
     }
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
         System.Fail("Listen failed")
-        return Promise<()>().Task
+        return Task.CompletedTask
     }
     let Ok(port) = server.GetLocalPort() else {
         server.Close()
         System.Fail("Local port unavailable")
-        return Promise<()>().Task
+        return Task.CompletedTask
     }
     Console.WriteLine(port)
     let serving = ReportServer().Serve(server, count)

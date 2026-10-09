@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 p = argparse.ArgumentParser(description=__doc__)
 for key in ('compiler', 'runtime', 'aot', 'bundle', 'output'):
     p.add_argument('--' + key, type=Path, required=True)
-p.add_argument('--case', action='append', choices=('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault', 'PrimitiveMembers', 'AsyncEntry', 'AsyncEntryFault', 'AsyncEntryPending', 'AsyncEntryCancelled', 'AsyncEntryDiscard', 'ReferenceArrays', 'OrderCollections', 'Paths', 'Strings', 'MathConstants', 'FileOutput', 'Files'))
+p.add_argument('--case', action='append', choices=('TaskFactories', 'Callbacks', 'CallbackFault', 'CallbackList', 'ResultList', 'TaskResultList', 'EnumValues', 'ReferenceList', 'ValueDisplay', 'TaskQueue', 'QueuePump', 'QueuePumpFault', 'PrimitiveMembers', 'AsyncEntry', 'AsyncEntryFault', 'AsyncEntryPending', 'AsyncEntryCancelled', 'AsyncEntryDiscard', 'ReferenceArrays', 'OrderCollections', 'Paths', 'Strings', 'MathConstants', 'FileOutput', 'Files'))
 a = p.parse_args()
 compiler, runtime, aot, bundle, output = (getattr(a, k).resolve() for k in ('compiler', 'runtime', 'aot', 'bundle', 'output'))
 output.mkdir(parents=True, exist_ok=False)
@@ -74,6 +74,8 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultLis
     run(['clang', '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
          '-fsanitize=undefined,bounds', '-DNEOCLR_NATIVE_GC', *host_flags, *adapters, obj, '-o', native])
     executed = run([native], expected, cwd=workdirs[1])
+    if name == 'TaskFactories':
+        assert executed.stdout == '42\nCafé 🌍\nFactories passed\n'
     if name == 'Files':
         assert executed.stdout == 'Written\nCompleted\nHello, värld!\nWrite too large\nHello, värld!\nRead too large\n'
     if name == 'FileOutput':
@@ -114,17 +116,18 @@ for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultLis
     for f in (assembly, obj, plain):
         report['inputs'][str(f)] = hashlib.sha256(f.read_bytes()).hexdigest()
     save()
-# Recompile the HTTP driver to record the next admission boundary, without claiming execution.
-source = ROOT / 'docs/experiments/http-server/Server.rvn'
-report['inputs'][str(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
-assembly = output / 'Server.dll'
-run(['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
-     *[x for lib in libs for x in ('--reference', lib)], '--bootstrap-intrinsics', '--bootstrap-ownership',
-     ownership, '--object-library', 'System.Runtime', '--async-library', 'System.Runtime', '-o', assembly, source])
-inspection = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world', *flags,
-                            '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-integer-text']).stdout)
-report['serverAdmission'] = inspection['admission']
+if not a.case:
+    # Recompile the HTTP driver to record the next admission boundary, without claiming execution.
+    source = ROOT / 'docs/experiments/http-server/Server.rvn'
+    report['inputs'][str(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
+    assembly = output / 'Server.dll'
+    run(['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
+         *[x for lib in libs for x in ('--reference', lib)], '--bootstrap-intrinsics', '--bootstrap-ownership',
+         ownership, '--object-library', 'System.Runtime', '--async-library', 'System.Runtime', '-o', assembly, source])
+    inspection = json.loads(run([aot, '--inspect', assembly, '@entry', '--closed-world', *flags,
+                                '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-integer-text']).stdout)
+    report['serverAdmission'] = inspection['admission']
 if hashlib.sha256(aot.read_bytes()).hexdigest() != report['inputs'][str(aot)]:
     raise RuntimeError('AOT executable changed during validation; rerun with a stable build')
 save()
-print(json.dumps({'cases': report['cases'], 'serverAdmission': report['serverAdmission']}, indent=2))
+print(json.dumps({'cases': report['cases'], 'serverAdmission': report.get('serverAdmission')}, indent=2))

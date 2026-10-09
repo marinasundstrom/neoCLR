@@ -58,13 +58,15 @@ def main():
             run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'], 'aot-build')
         aot = ROOT / ('tools/aot-poc/target/debug/neoclr-aot-poc' + ('.exe' if windows else ''))
         report['aotSha256'] = sha(aot)
+        if windows and not args.bundle:
+            bundle = http.rebuild_libraries(run, bundle, out / 'development toolchain')
         lib = bundle / 'lib'; catalog = json.loads((lib / 'bundle.json').read_text())
         vm = bundle / ('bin/neoclr.exe' if windows else 'bin/neoclr')
         report['interpreterSha256'] = sha(vm)
         context = ['--system', lib / catalog['runtimeSeed'], *[arg for name in catalog['assemblyNames'] for arg in ('--module', lib / (name + '.dll'))], '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']
         environment = {k: v for k, v in os.environ.items() if k.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
         builds = {}; isolated = {}
-        for name, directory, reuse in [('client', 'native-http-client', args.client_build), ('server', 'http-server', args.server_build)]:
+        for name, directory, reuse in [('client', 'native-http-client', args.client_build), ('server', 'http-server', args.server_build), ('factories', 'task-factories', None)]:
             project = ROOT / 'docs/experiments' / directory / 'Native.rvnproj'
             if reuse:
                 build = reuse.resolve(); b = json.loads((build / 'build.json').read_text())
@@ -78,6 +80,14 @@ def main():
             folder = out / (name + ' executable only'); folder.mkdir()
             binary = folder / ('app.exe' if windows else 'app'); shutil.copy2(build / binary.name, binary)
             isolated[name] = binary
+        row = dict(name='task-factories')
+        report['cases'].append(row)
+        for mode, command in [('interpreter', [vm, 'run', builds['factories'] / 'app.dll', *context]), ('native', [isolated['factories']])]:
+            result = run(command, 'factories-' + mode)
+            row[mode] = dict(stdout=result.stdout.decode(), stderr=result.stderr.decode(), exitCode=result.returncode)
+            if row[mode] != dict(stdout='42\nCafé 🌍\nFactories passed\n', stderr='', exitCode=0):
+                raise ValueError('Completed task factory contract failed')
+        row['passed'] = True
         report['sources'] = {p.relative_to(ROOT).as_posix(): sha(p) for p in [Path(__file__).resolve(), ROOT / 'docs/experiments/native-http-client/Client.rvn', ROOT / 'docs/experiments/native-http-client/Native.rvnproj', ROOT / 'docs/experiments/http-server/Server.rvn', ROOT / 'docs/experiments/http-server/Native.rvnproj']}
         commands = {'interpreter': [vm, 'run', builds['client'] / 'app.dll', *context], 'native': [isolated['client']]}
         def client(mode, url, action):
@@ -151,7 +161,7 @@ def main():
         row['passed'] = True
         for binary in isolated.values():
             if sorted(p.name for p in binary.parent.iterdir()) != [binary.name]: raise ValueError('Executable-only directory changed')
-        report.update(passed=len(report['cases']) == 10, standalone=True)
+        report.update(passed=len(report['cases']) == 11, standalone=True)
     except Exception as error: report['error'] = str(error)
     finally:
         report['files'] = {p.relative_to(out).as_posix(): sha(p) for p in sorted(out.rglob('*')) if p.is_file()}

@@ -126,8 +126,20 @@
       <remarks>Does not create entries or open content. An unsupported native entry kind can return WrongKind. Success does not guarantee later access or stable identity. Consumers can inspect the closed File/Directory branches without depending on concrete implementation classes.</remarks>
     </member>
     <member name="T:System.Tasks.Task">
-      <summary>Submits work with shared captures and runtime-selected execution (development).</summary>
+      <summary>Creates completed tasks or submits work with runtime-selected execution (development).</summary>
       <remarks>Run currently starts bounded native-thread work in the calling invocation. Captured objects retain identity. Importing System.Tasks.* supports Task.Run alongside Task&lt;T&gt; without an alias. Inline block callbacks infer value results, and direct unit await is supported; generic async callers still require unsupported constructed application state-machine import (see the callback guide). Work uses the default dispatcher; arbitrary shared read-modify-write operations are not atomic. Invocation limits and cancellation apply. A callback Fault terminates the invocation, not a task error case.</remarks>
+    </member>
+    <member name="P:System.Tasks.Task.CompletedTask">
+      <summary>Returns a successfully completed Task of unit (development).</summary>
+      <value>A Task&lt;()&gt; whose IsCompleted is true and IsCancelled is false.</value>
+      <remarks>Awaiting needs no scheduled work. Uses the current dispatcher; explicit OnCompleted callbacks remain deferred. Task identity is not guaranteed and no instance is shared across invocations. Use FromResult for a value-bearing task. Does not start work or suppress a Fault.</remarks>
+    </member>
+    <member name="M:System.Tasks.Task.FromResult``1(``0)">
+      <summary>Returns a successfully completed task containing the supplied value (development).</summary>
+      <typeparam name="T">The result type, inferred from value when possible.</typeparam>
+      <param name="value">The completed result. Reference values retain their identity.</param>
+      <returns>A Task&lt;T&gt; whose IsCompleted is true and IsCancelled is false.</returns>
+      <remarks>Completion occurs before return, without scheduling work. Uses the current dispatcher; explicit OnCompleted callbacks remain deferred. An Error Result remains an ordinary successful task result. No implicit default value or cross-invocation task cache is used.</remarks>
     </member>
     <member name="M:System.Tasks.Task.Run(System.Func{System.Void})">
       <summary>Submits completion-only work with shared captures (development).</summary>
@@ -151,7 +163,7 @@
     </member>
     <member name="T:System.Tasks.Task`1">
       <summary>A consumer handle for one eventual value or cancellation.</summary>
-      <remarks>Obtain a task from `Promise&lt;T&gt;`.Task or an async method. Consumers cannot complete it. Expected failures belong in the result type; there is no faulted Task state. This provisional API is confined to one guest invocation. Callback methods using Func&lt;System.Void&gt; are described in the [callback guide](/docs/callbacks.html).</remarks>
+      <remarks>Obtain a task from `Promise&lt;T&gt;`.Task, an async method, Task.CompletedTask or Task.FromResult(value). Consumers cannot complete it. Expected failures belong in the result type; there is no faulted Task state. This provisional API is confined to one guest invocation. Callback methods using Func&lt;System.Void&gt; are described in the [callback guide](/docs/callbacks.html).</remarks>
       <typeparam name="T">The value type carried by successful completion, including Result values for expected failures.</typeparam>
     </member>
     <member name="P:System.Tasks.Task`1.State">

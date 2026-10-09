@@ -29,6 +29,13 @@ read_port = load('http_json', ROOT / 'scripts/verify-native-http-json.py').read_
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
+def rebuild_libraries(run, bundle, output):
+    # Preview 13 supplies the pinned compiler and primitive bootstrap. Public
+    # development APIs come from this checkout, not the published library payload.
+    run([sys.executable, ROOT / 'scripts/prepare-native-development-bundle.py', '--bundle', bundle,
+         '--output', output, '--compiler-revision', '71cafd353'], 'development-libraries')
+    return output / 'bundle'
+
 def serve(command, request, fragmented, cwd, env=None):
     process = subprocess.Popen(list(map(str, command)), cwd=cwd, env=env,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
@@ -103,6 +110,8 @@ def main():
         run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'], 'aot-build')
         aot = ROOT / ('tools/aot-poc/target/debug/neoclr-aot-poc' + ('.exe' if windows else ''))
         report['aotSha256'] = sha(aot)
+        if windows and not args.bundle:
+            bundle = rebuild_libraries(run, bundle, out / 'development toolchain')
         lib = bundle / 'lib'
         catalog = json.loads((lib / 'bundle.json').read_text())
         context = ['--system', lib / catalog['runtimeSeed'],
@@ -120,7 +129,7 @@ def main():
             project = out / (name + ' project with spaces')
             project.mkdir()
             (project / 'App.rvnproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>HttpShowcase</AssemblyName></PropertyGroup></Project>')
-            code = source.replace('    let source = Promise<Result<HttpResponse, HttpError>>()', '    System.Fail("HTTP callback fault")\n    let source = Promise<Result<HttpResponse, HttpError>>()') if fault else source
+            code = source.replace('func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {', 'func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {\n    System.Fail("HTTP callback fault")') if fault else source
             (project / 'Main.rvn').write_text(code, encoding='utf-8')
             destination = out / (name + ' native output')
             command = [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile', 'windows-http' if windows else 'http',

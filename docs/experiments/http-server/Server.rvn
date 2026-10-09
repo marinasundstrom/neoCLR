@@ -6,15 +6,14 @@ import System.Text.*
 import System.Web.Http.*
 
 func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    let source = Promise<Result<HttpResponse, HttpError>>()
     if request.Method != "GET" || request.Target != "/greeting" || request.Headers.Count == 0 {
-        _ = source.Complete(Error(HttpError.Handler("Unexpected request")))
-        return source.Task
+        let errorResult: Result<HttpResponse, HttpError> = Error(HttpError.Handler("Unexpected request"))
+        return Task.FromResult(errorResult)
     }
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
-    _ = source.Complete(Ok(HttpResponse(200, headers, Utf8.Encode("Café 🌍"))))
-    return source.Task
+    let result: Result<HttpResponse, HttpError> = Ok(HttpResponse(200, headers, Utf8.Encode("Café 🌍")))
+    return Task.FromResult(result)
 }
 
 async func Start(server: HttpServer) -> Task<()> {
@@ -39,7 +38,7 @@ func ListenAndServe() -> Task<()> {
         System.Fail("Local port unavailable")
     }
     System.Fail("Listen failed")
-    return Promise<()>().Task
+    return Task.CompletedTask
 }
 
 async func Main() -> Task<()> {

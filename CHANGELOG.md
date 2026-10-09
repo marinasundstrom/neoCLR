@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-09
 
+- Add development `Task.CompletedTask: Task<()>` and inferred
+  `Task.FromResult<T>(value): Task<T>` with immediate successful completion,
+  preserved result identity and normal deferred callback dispatch. Replace
+  completed-Promise boilerplate and pending fallback tasks in HTTP samples.
+  Project unit property types in the temporary CLI reference and refresh public
+  API documentation. Windows HTTP gates rebuild source libraries with the pinned
+  compiler and primitive bootstrap so development APIs are tested together.
+
 - Record requested Windows ARM64 qualification and its ABI/stack/toolchain gates;
   keep Windows HTTP project integration as the immediate showcase priority.
   ARM64 native support remains planned.

@@ -15,6 +15,18 @@ receiver identity survive suspension. Native `Task<unit>` and `Task<int>` entry 
 complete registered work before reading the result; cancellation and unresolved tasks
 fail explicitly. Generic async methods and `Task<Result<...>>` entry points are not supported.
 
+## Already completed work
+
+`Task.CompletedTask` returns an already successful `Task<()>`. For a value, use
+`Task.FromResult(42)`, which infers `Task<int>`. Neither schedules work; explicit
+completion callbacks still use the task dispatcher. Use `Promise<T>` when completion
+will happen later. These helpers are development APIs and require rebuilt libraries.
+
+```raven
+await Task.CompletedTask
+let answer = await Task.FromResult(42)
+```
+
 ## Starting and awaiting work
 
 Use `Task.Run` to submit work and `await` to wait for its completion. Direct async

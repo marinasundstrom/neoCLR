@@ -7,6 +7,19 @@ import System.Tasks.TaskOutcome.*
 
 // Submission owns no public thread handle; all overloads use the default dispatcher.
 public static class Task {
+    /// Returns an already successfully completed unit task.
+    /// Each access uses the current dispatcher; task identity is not guaranteed.
+    static val CompletedTask: Task<()> => FromResult(())
+
+    /// Returns an already successfully completed task containing value.
+    /// Awaiting the task needs no scheduled work. Explicit completion callbacks
+    /// retain normal deferred dispatch through the current task queue.
+    static func FromResult<T>(value: T) -> Task<T> {
+        let source = Promise<T>()
+        _ = source.Complete(value)
+        return source.Task
+    }
+
     static func Run(callback: () -> System.Void) -> Task<System.Void> {
         let source = Promise<System.Void>(TaskQueue.Default)
         let work = TaskRunWork<System.Void>(callback, source)

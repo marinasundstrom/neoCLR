@@ -25,6 +25,24 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-09 — Completed task factories and native HTTP follow-through
+
+- **Author:** notices `Promise<()>().Task` in failure paths and asks for
+  `Task<T>.CompletedTask`. Selects unit-only completion with an explicit value
+  factory, then asks whether both helpers belong on non-generic `Task`.
+- **Assistant:** agrees to `Task.CompletedTask: Task<()>` and
+  `Task.FromResult<T>(value): Task<T>`, alongside `Task.Run`. `Task<T>` remains the
+  result handle; non-generic Task remains a static helper, not a new base class.
+  This supersedes the earlier specialized-extension proposal without changing
+  the author's requirement for explicit non-unit values.
+- **Author:** directs implementation, followed by continuation of the main work.
+- **Assistant implementation:** completes a Promise before publishing its Task,
+  preserves current-dispatcher callback ordering and reference identity, and
+  replaces the HTTP samples' pending placeholders. There is no cross-invocation
+  cache or default(T) completion. Native HTTP repeated invocation/fault recovery
+  remains the next bounded hosting slice. See the
+  [factory contract and validation](task-completion-factories.md).
+
 ## 2026-10-09 — Website audience and editorial cleanup
 
 - **Author:** asks for a concise website with detail where it matters, observing that

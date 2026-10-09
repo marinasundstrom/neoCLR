@@ -108,6 +108,11 @@ static class CoreDeclarations
             foreach (var type in module.Types)
             {
                 foreach (var contract in type.Interfaces) contract.InterfaceType = Project(contract.InterfaceType);
+                foreach (var property in type.Properties)
+                {
+                    property.PropertyType = Project(property.PropertyType);
+                    foreach (var parameter in property.Parameters) parameter.ParameterType = Project(parameter.ParameterType);
+                }
                 foreach (var method in type.Methods)
                 {
                     method.ReturnType = Project(method.ReturnType);

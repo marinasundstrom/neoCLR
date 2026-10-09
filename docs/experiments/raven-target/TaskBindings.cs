@@ -42,6 +42,8 @@ static class TaskBindings
                 public void Run(Func<PropagationUnit> callback) { }
             }
             public static class Task {
+                public static Task<PropagationUnit> CompletedTask => default;
+                public static Task<T> FromResult<T>(T value) => default;
                 public static Task<PropagationUnit> Run(Func<PropagationUnit> callback) => default;
                 public static Task<T> Run<T>(Func<T> callback) => default;
                 public static Task<T> Run<T>(Func<Task<T>> callback) => default;
@@ -193,7 +195,7 @@ static class TaskBindings
         bool construct, bool library)
     {
         if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || construct
-            || reference.HasThis || reference.Name != "Run" || !definition.IsPublic
+            || reference.HasThis || reference.Name is not ("Run" or "FromResult" or "get_CompletedTask") || !definition.IsPublic
             || !definition.IsStatic || definition.IsVirtual || definition.ExplicitThis
             || !definition.DeclaringType.IsSealed || !definition.DeclaringType.IsAbstract || definition.DeclaringType.IsInterface
             || definition.DeclaringType.HasGenericParameters || definition.DeclaringType.HasInterfaces
@@ -207,6 +209,18 @@ static class TaskBindings
         if (payload is null) throw new InvalidDataException("Unsupported Task.Run payload.");
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type,
             allowOpenMethodParameters: library || GenericUnionBindings.ParameterMap is not null);
+        if (reference.Name == "get_CompletedTask")
+        {
+            if (generic is not null || args.Length != 0 || result != Prefix + "Task<Void>")
+                throw new InvalidDataException("Unsupported Task.CompletedTask signature.");
+            return new(args, result, $"call {Prefix}Task::get_CompletedTask()");
+        }
+        if (reference.Name == "FromResult")
+        {
+            if (generic is null || args.Length != 1 || args[0] != payload || result != Prefix + "Task<" + payload + ">")
+                throw new InvalidDataException("Unsupported Task.FromResult signature.");
+            return new(args, result, $"call {Prefix}Task::FromResult<{payload}>({payload})");
+        }
         if (args.Length != 1 || result != Prefix + "Task<" + payload + ">"
             || (args[0] != "fn<" + payload + ">"
                 && (generic is null || args[0] != "fn<" + result + ">")))

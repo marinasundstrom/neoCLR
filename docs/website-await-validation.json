@@ -2,7 +2,7 @@
   "date": "2026-10-09",
   "scope": "Await-first website Task and HTTP examples with implicit unit completion",
   "compiler": "native-build-kit compiler 71cafd353; no compiler changes",
-  "reportSha256": "55654df8ba7057e0c0da42f10ff2785ca7c0cc5cdcd68da6971534dae90533cd",
+  "reportSha256": "39210e62e7fdee494af116f563b03106e103a041badaddfcfa97e42ad34836b4",
   "artifactHashesVerified": 67,
   "cases": [
     {
@@ -115,5 +115,31 @@
     "Interpreter/library sample checks do not qualify native JSON/reflection support.",
     "Explicit cancellation observation retains a documented OnCompleted callback.",
     "Synchronous setup helpers avoid pinned compiler pattern-hoisting limitations recorded in docs/raven-cli-bridge.md."
-  ]
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/scripts/validate-await-samples.py": "04bcb509ed068256d1031cdb6906fdb9fa069340bea7a74b2b99185134262247",
+    "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/sdk/tools/rvnc/rvnc.dll": "171b7602c5ac032995bfd81f62641a50c9a5f5349986d70bbbed91a11f2f451a",
+    "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/bin/neoclr": "a4c18a72d7a971314b990c13adea35fdcd5b89244771f92c0e82b60f84470560",
+    "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f",
+    "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/ownership.json": "25d07114dc5f19fc2f97e66c4add67d63a9b5b831edcabfe841e45af431873dd",
+    "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Runtime.dll": "58226883c8d2bc73391a9153f3d182f95c947dcfa415444927e13e67655408c0",
+    "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Data.dll": "b8404b84ea67ae7ae618bb3db2b2084aa7ae9583b1b0cb48afef19037d2aff2d",
+    "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Networking.dll": "291a6451294d7037399cee6c1b7aa2041ac7567685fc0672f22132d20ebd7a09",
+    "/Users/robert/Projects/neoclr/target/task-factories-development/bundle/lib/System.Web.dll": "8b3059114eea55a36f89d250ac00f1a13a9b1b50d2a3882337e002bc02de5853",
+    "docs/experiments/raven-target/samples/library-task-producer.rvn": "782afa44459debcb7a8a522128df0fd864508a001faf9f5df0e8d1704133f888",
+    "docs/experiments/raven-target/samples/library-task-result.rvn": "65306410a99383e1935dea4f49b4e4b4959b0846175ce7cc1091d5d66c203cab",
+    "docs/experiments/raven-target/samples/library-async-cancellation.rvn": "d13ed93eee12072c3048865e8a9fedff67afe8f7dda63fe0c766f691ea5fc5da",
+    "docs/experiments/http-client/Overview.rvn": "0d1377b16fe37be55a038823b53d2075290003c7c4673316a23957a771eb6f18",
+    "docs/experiments/http-json/Client.rvn": "db50a47ed23e10167c1e9401b2331ccf36ef66cf7c3ce079232cfed3fe908382",
+    "docs/experiments/http-json/Application.rvn": "4c0d11318a51325c706a88efb349e8a41ccb384027712424a284ab0dcfdcd0c6",
+    "docs/experiments/http-json/Server.rvn": "bd0663c0751d93dfb67f26cfcb531853b904fe33b6980bf680901732dc7abfbc",
+    "docs/experiments/json-object-mapping/HttpClient.rvn": "7fe7ef6dbc0f167231e0b6be9385f5650c686db67d833079553fbac011090852",
+    "docs/experiments/json-object-mapping/HttpApplication.rvn": "76f5e0ec5cd523b424d7f76794e2894fcf3802f96ee9a290e18d732932df25bd",
+    "docs/experiments/json-object-mapping/HttpServer.rvn": "2a3959b6b485d955c3602b3be883b1de6a1d64fbc00edfed9c7715275ba6d2da",
+    "docs/experiments/http-routing/Client.rvn": "a068abb6442948e09ed3a7a95672b70472cc525ee3110a1b74db05819a7ac50e",
+    "docs/experiments/json-object-mapping/NestedHttpApplication.rvn": "610a98ae139867b7f4a868cae4c5179bd88dfbcf10f661c43644c4d707fa0218",
+    "docs/experiments/http-routing/Server.rvn": "99f646c9609c88328eade7831297f154c81e9aedca2b875d17a0bc2129dfc8c9",
+    "docs/experiments/http-routing/Routes.rvn": "1a2a4b9341d47a992e991a90a117eef0b2368fce2c3ffddffe22f81650a14cfe"
+  }
 }
