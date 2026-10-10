@@ -8088,3 +8088,18 @@ returning 42 in the interpreter and macOS ARM64 AOT. Invalid class usage and unr
 consumers fail with no output. See the [fixture and evidence](experiments/friend-runtime/README.md).
 Runtime Contract settings and compiler semantics are unchanged. Native identity gaps,
 Windows execution and Utf8 migration remain explicit; no runtime bundle pin changes.
+
+
+### Host callback ABI without reachable guest callbacks (2026-10-10)
+
+A buffered HttpContent.ReadText consumer exposed a native HTTP host link failure:
+its task needs queue services, but no inhabited-Void guest callback is reachable.
+The host still links neoclr_invoke_void_callback_v1. The native GC value backend now
+emits this dispatcher even for an empty target set, rejecting invalid handles.
+Two macOS ARM64 regression tests cover empty-target linking/rejection and existing
+rooted callback dispatch/fault behavior. Windows qualification remains pending.
+
+This is an AOT host ABI fix owned by neoCLR. Raven Runtime Contract settings,
+semantic analysis/emission, CLI signatures and native metadata are unchanged. A
+future backend must preserve the advertised host entry points independently of
+whether closed-world pruning leaves callable targets. No public guest API is added.

@@ -6389,3 +6389,37 @@ fn time_zone_binding_requires_explicit_context() {
         assert!(String::from_utf8_lossy(&result.stderr).contains(message));
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_host_callback_dispatcher_exists_without_guest_targets() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = ".module App\n.function Calculate() -> Int32\nldc.i4 42\nret\n.end";
+    let r = compile_source(&dir, &seed, source,
+        &["--compile-system", "--reference-arena", "--native-gc"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+int main(void) {
+    uint64_t storage[128] = {0};
+    neoclr_aot_context context = {.text = {(unsigned char *)storage, sizeof(storage), 0}};
+    int32_t result = 0;
+    if (neoclr_entry_v4(0, &result, &context) || result != 42) return 1;
+    /* The host ABI remains linkable without any inhabited callback targets.
+     * Invalid handles must be rejected, never dispatched or silently accepted. */
+    if (neoclr_invoke_void_callback_v1(0, &context) != 3) return 2;
+    return neoclr_root_probe_depth_v1() ? 3 : 0;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-I"])
+        .arg(&base).arg(dir.0.join("host.c"))
+        .arg(base.join("root-probe.c")).arg(base.join("native-gc.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host"))
+        .output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
+    assert!(r.status.success(), "{r:?}");
+}

@@ -2280,7 +2280,8 @@ fn compile_host_callbacks(module: &mut ObjectModule, p: &Profile<'_>, ids: &[cra
         out_parameters: vec![], out_when_true: vec![],
     }));
     let targets = p.callable_targets(&shape)?;
-    if targets.is_empty() && !entry_pump { return Ok(()); }
+    // Hosts link this ABI even when no guest callback is reachable. Keep the
+    // rejecting dispatcher so synchronous task-only programs can link as well.
     let mut signature = module.make_signature();
     signature.params.extend([types::I64, types::I64, types::I64].map(AbiParam::new));
     signature.returns.push(AbiParam::new(types::I32));

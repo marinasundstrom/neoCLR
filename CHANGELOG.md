@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Keep the native host callback dispatcher linkable when a program has no reachable
+  guest callbacks. Such a dispatcher rejects invalid handles instead of omitting the
+  host ABI; synchronous task-only HTTP consumers can link with the HTTP host. Two
+  focused macOS ARM64 callback regressions pass, including existing rooted dispatch.
+
 - Enforce directed native runtime friend grants for internal types, methods and fields
   using a lazy per-linked-snapshot index; preserve public/same-module fast paths and
   private/protected restrictions. The current profile admits unsigned assemblies and
