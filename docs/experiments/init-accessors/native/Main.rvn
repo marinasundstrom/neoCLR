@@ -1,0 +1,37 @@
+import System.*
+import System.Collections.*
+
+class Settings {
+    val Port: int { init; } = 0
+    private var stored: int = 0
+
+    val Checked: int {
+        get => stored
+        init {
+            stored = value + 1
+        }
+    }
+}
+
+record struct LocalPair(val Key: int, val Value: int)
+
+class Program {
+    static func Main() -> int {
+        let settings = Settings() {
+            Port = 42
+            Checked = 41
+        }
+        let local = LocalPair(1, 2) {
+            Value = 41
+        }
+        let imported = KeyValuePair<int, int>(1, 2) {
+            Value = 41
+        }
+        let (key, value) = imported
+        if settings.Port != 42 || settings.Checked != 42 || local.Key + local.Value != 42 || key + value != 42 {
+            return 1
+        }
+        Console.WriteLine("Init accessors passed")
+        return 0
+    }
+}

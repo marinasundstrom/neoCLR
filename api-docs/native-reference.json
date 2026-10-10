@@ -1,21 +1,21 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "92681cf3c0e2535acadbe87ecf08f64c563ee286b62b54b269e32b8d735312fb",
-  "librarySourceRevision": "a5378b4402d4af369cfb6144165310ef8a1a8878",
-  "compilerRevision": "d5fadf968feaea2c1073255ef5cb04f997fc5604",
-  "rendererRevision": "6c90bf2c48d9d60480476433f90ddc4d0cee4a0d",
+  "sha256": "85c55f9901170d4ca39162e61e5b7094630ca5ad520999177cb665e48f556ec0",
+  "librarySourceRevision": "84df378d27c6225403d90d5739b085b2b8fe3de6",
+  "compilerRevision": "b939cd6964d57829fb00c4e058bf43309de39628",
+  "rendererRevision": "b939cd6964d57829fb00c4e058bf43309de39628",
   "libraryArtifacts": {
-    "System.Runtime.dll": "3a0cd5c92428d4dfb377deba21eebf53bed47f22ff4bd55add931f47eaa7a527",
-    "System.Data.dll": "a6e203e502d4bdaccce6aa61661d2399db8eb182724e5f78830d560b85fbb65a",
-    "System.Networking.dll": "f3cf0103d951bf0410921c1f7e83a4fed8ab0f8efc4f0dc31b6aeb096d4d980f",
-    "System.Web.dll": "df799c3887bc0f0fc40f3c2c144e39aed85716bf72429ab758b5ac16589998a6",
+    "System.Runtime.dll": "ec114d945b6b439934fa4d2f639dfb5aa007bfd8bbbf3d39986254a690e39bc6",
+    "System.Data.dll": "6129ea8181b9144746d47723b5f8a5bd243d69d2b1a649f36fdfb39e9f49d2f6",
+    "System.Networking.dll": "69a15c1cbe5d48cbc3d065365a85001f85ab554908af47936aca4004604c4e0f",
+    "System.Web.dll": "59d225a33fd9dc5a6c74497c72c900717df0fdc73c527e4f5ed95ed2a72dfde7",
     "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
     "Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f"
   },
   "renderingEvidence": {
     "normalized-sidecars.json": "cf58bb80a302fa6d608e72f7bf1dd08b6000456f3d505a077601db5b7440d51f",
-    "restored-xml-comments.json": "8b8e1b10f4bcad0468c4222d49b12d27690b5e2e9fbe66f0230c927ebff41953"
+    "restored-xml-comments.json": "5fcc2470684b1cc70711ca2dce207e49af434a9600237e313088b7000e861e32"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

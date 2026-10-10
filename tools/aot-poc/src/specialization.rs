@@ -585,6 +585,8 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
     let mut at = 0;
     let mut field_rid = input.types.iter().filter_map(|t| t.origin.as_ref())
         .flat_map(|o| &o.field_tokens).map(|t| t & 0x00ff_ffff).max().unwrap_or(0);
+    let mut property_rid = input.types.iter().filter_map(|t| t.origin.as_ref())
+        .flat_map(|o| &o.property_tokens).map(|t| t & 0x00ff_ffff).max().unwrap_or(0);
     let type_rid = input.types.iter().filter_map(|t| t.origin.as_ref())
         .map(|o| o.token & 0x00ff_ffff).max().unwrap_or(0);
     while at < context.shapes.len() {
@@ -596,12 +598,43 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
         for field in &mut t.fields { field.ty = context.close(&field.ty, &shape.arguments)?; }
         t.base = t.base.as_ref().map(|t| context.close(t, &shape.arguments)).transpose()?;
         t.implements = t.implements.iter().map(|t| context.close(t, &shape.arguments)).collect::<Result<_, _>>()?;
-        t.properties.clear();
+        // Keep construction authority attached to the exact specialized setter.
+        // Do not discover methods just because their property exists.
+        let mut properties = vec![];
+        let mut property_tokens = vec![];
+        for (index, property) in t.properties.iter().enumerate().filter(|(_, p)| p.init_only) {
+            let setter = property.setter.as_ref().ok_or("init property lacks setter")?;
+            let source = super::selection::resolve(input, setter)?;
+            let Some(instance) = context.instances.iter().find(|instance| instance.source == source
+                && instance.types == shape.arguments && instance.methods.is_empty() && visited.contains(&instance.row)) else { continue; };
+            let method = &expanded.functions[instance.row];
+            let mut target = setter.clone();
+            target.name = method.name.clone();
+            target.owner = method.owner.clone();
+            target.parameters = method.parameters.clone();
+            target.definition = method.definition.clone();
+            target.generic_arguments.clear();
+            let mut property = property.clone();
+            property.ty = method.parameters.last().ok_or("init setter lacks value")?.clone();
+            property.parameters = method.parameters[..method.parameters.len() - 1].to_vec();
+            property.getter = None;
+            property.setter = Some(target);
+            properties.push(property);
+            if let Some(origin) = &t.origin {
+                if shape.row == shape.source { property_tokens.push(origin.property_tokens[index]); }
+                else {
+                    property_rid += 1;
+                    if property_rid > 0x00ff_ffff { return Err("private property token range exhausted".into()); }
+                    property_tokens.push(0x1700_0000 | property_rid);
+                }
+            }
+        }
+        t.properties = properties;
         t.definition = Some(neoclr::metadata::TypeDefId {
             module: input.name.clone(), revision: input.revision.clone(), index: shape.row as u32,
         });
         if let Some(origin) = &mut t.origin {
-            origin.property_tokens.clear();
+            origin.property_tokens = property_tokens;
             if shape.row != shape.source {
                 let rid = type_rid + (shape.row - input.types.len()) as u32 + 1;
                 if rid > 0x00ff_ffff { return Err("private type token range exhausted".into()); }
@@ -728,5 +761,79 @@ mod tests {
                 assert!(result.err().unwrap().to_string().contains("specialized type count exceeds 512"));
             }
         }
+    }
+    #[test]
+    fn init_accessor_authority_survives_specialization_and_selection() {
+        let source = ".module InitAuthority
+.entry Main
+.type class Counter<T>
+.field Number T
+.property instance Value() -> T
+.get instance Counter<T>::Read()
+.set instance Counter<T>::Write(T)
+.end
+.property instance Unused() -> T
+.set instance Counter<T>::Unused(T)
+.end
+.method instance .ctor(T value) -> noresult
+ldarg 0
+ldarg value
+stfld Counter<T>::Number
+ret
+.end
+.method instance Read() -> T
+ldarg 0
+ldfld Counter<T>::Number
+ret
+.end
+.method instance Write(T value) -> Void
+ldarg 0
+ldarg value
+stfld Counter<T>::Number
+ldvoid
+ret
+.end
+.method instance Unused(T value) -> Void
+ldarg 0
+ldarg value
+stfld Counter<T>::Number
+ldvoid
+ret
+.end
+.end
+.function Main() -> Int32
+ldc.i4 1
+newobj instance Counter<Int32>::.ctor(Int32)
+dup
+ldc.i4 42
+call instance Counter<Int32>::Write(Int32)
+pop
+call instance Counter<Int32>::Read()
+ldc.i8 1
+newobj instance Counter<Int64>::.ctor(Int64)
+dup
+ldc.i8 2
+call instance Counter<Int64>::Write(Int64)
+pop
+call instance Counter<Int64>::Read()
+pop
+ret
+.end";
+        let mut value = serde_json::to_value(neoclr::assemble(source).unwrap()).unwrap();
+        value["assemblies"] = json!([{"name":"InitAuthority", "full_name":"InitAuthority", "modules":["InitAuthority.dll"], "references":[]}]);
+        value["types"][0]["origin"] = json!({"assembly":"InitAuthority", "module":"InitAuthority.dll", "name":"Counter", "token":0x02000001,
+            "field_tokens":[0x04000001], "field_readonly":[true], "property_tokens":[0x17000001, 0x17000002]});
+        value["types"][0]["properties"][0]["init_only"] = json!(true);
+        value["types"][0]["properties"][1]["init_only"] = json!(true);
+        let input = serde_json::from_value(value).unwrap();
+        let (selected, _) = crate::selection::prepare(&input, "Main").unwrap();
+        neoclr::verify(&selected).unwrap();
+        assert_eq!(neoclr::run(&selected, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(selected.types.len(), 2);
+        assert!(selected.types.iter().all(|t| t.properties.len() == 1 && t.properties[0].init_only));
+        assert!(!selected.functions.iter().any(|f| f.name.contains("Unused")));
+        let mut unmarked = selected.clone();
+        for t in &mut unmarked.types { t.properties[0].init_only = false; }
+        assert!(neoclr::verify(&unmarked).unwrap_err().message.contains("readonly"));
     }
 }

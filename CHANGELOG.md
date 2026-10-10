@@ -13,7 +13,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Keep raw/reflection calls executable and reject malformed static/missing-setter
   contracts. Matching metadata readers/runtime are required; no runtime freezing
   or published-release support is claimed. Focused metadata and runtime tests cover
-  preservation, ordinary-call bypass and readonly-write rejection.
+  preservation, ordinary-call bypass and readonly-write rejection. Pin Raven
+  b939cd696 for source/native-import support and rejection of direct named accessor
+  calls. Preserve reached init associations through AOT specialization/trimming,
+  without rooting unused accessors. Automatic/implemented properties, local records
+  and imported KeyValuePair initializers pass macOS native/interpreter validation;
+  a separate-library consumer rejects later writes. Refresh API snapshots and extend
+  the Windows collections action with the same coverage (Windows run pending).
 
 - Build and hash-check the current release interpreter for native HTTP server,
   client and retained-session comparisons. Development libraries require services
@@ -35,7 +41,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add Map pair iteration and deconstructable KeyValuePair value storage with shallow
   HashMap snapshots. Custom Map implementations must now supply GetIterator. Native
   positional records require the matching development compiler and omit equality,
-  hashing, formatting and init-only helpers; full record support remains open.
+  hashing and formatting helpers; the init follow-up above removes the original
+  getter-only limitation. Full record support remains open.
   Native macOS/interpreter pair checks, four compiler rejection cases and the
   focused JSON collection regression pass. Pin the shared Windows development-library
   workflow to the exact Raven integration compiler revision and build it reproducibly

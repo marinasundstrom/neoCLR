@@ -1,0 +1,19 @@
+import System.*
+
+import InitExamples.*
+
+class Program {
+    static func Main() -> int {
+        let settings = Settings() {
+            Port = 42
+        }
+        let pair = Pair<int, int>(1, 2) {
+            Value = 41
+        }
+        if settings.Port != 42 || pair.Key + pair.Value != 42 {
+            return 1
+        }
+        Console.WriteLine("Init accessors passed")
+        return 0
+    }
+}

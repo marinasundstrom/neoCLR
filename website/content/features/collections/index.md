@@ -162,10 +162,12 @@ is unspecified. Count followed by another operation is not an atomic transaction
 
 Queue, Stack and Set pass native macOS, Windows x64 and interpreted checks.
 Development `Map<K,V>` also implements `Iterable<KeyValuePair<K,V>>`. Each pair has
-read-only `Key` and `Value` properties and supports `let (key, value) = pair`.
+`Key` and `Value` properties with initialization-only setters and supports `let (key, value) = pair`.
 HashMap iteration captures a shallow snapshot in unspecified order. Pair iteration
 passes native macOS, Windows x64 and interpreted checks.
 The native pair supports construction, copying and deconstruction; full record
-equality, hashing, formatting and init-only updates remain unsupported.
+equality, hashing and formatting remain unsupported. Development object initializers
+can set pair components; ordinary later assignments are rejected. This is a compiler
+restriction, not runtime object freezing.
 Future concurrent implementations remain separate work.
 See the type and member contracts in the [API reference](/docs/).

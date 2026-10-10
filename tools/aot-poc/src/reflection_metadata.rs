@@ -34,6 +34,7 @@ fn property(source: &Property, arguments: &[Type]) -> Result<Property, Error> {
     Ok(Property {
         name: source.name.clone(),
         instance: source.instance,
+        init_only: source.init_only,
         ty: close(&source.ty, arguments)?,
         parameters: source
             .parameters

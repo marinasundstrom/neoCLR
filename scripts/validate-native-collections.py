@@ -42,7 +42,8 @@ def main():
         if not windows and platform.system() != 'Darwin':
             raise ValueError('Requires macOS ARM64 or Windows x64')
         report['revision'] = run(['git', 'rev-parse', 'HEAD'], 'revision').stdout.decode().strip()
-        samples = [('collections', 'native-collections', 'collections passed\n')]
+        samples = [('collections', 'native-collections', 'collections passed\n'),
+                   ('init-accessors', 'init-accessors/native', 'Init accessors passed\n')]
         inputs = [Path(__file__).resolve(), ROOT / 'scripts/build-native-project.py',
                   ROOT / 'scripts/validate-native-http-project.py', ROOT / 'scripts/validate-windows-project.py',
                   ROOT / 'scripts/prepare-native-development-bundle.py']
@@ -50,6 +51,9 @@ def main():
             inputs += [ROOT / 'docs/experiments' / sample / n for n in ('Main.rvn', 'Native.rvnproj')]
         rejections = sorted((ROOT / 'docs/experiments/map-pairs/rejections').glob('*.rvn'))
         inputs += rejections
+        inputs += [ROOT / 'scripts/validate-native-init-import.py']
+        inputs += [p for folder in ('library', 'raven')
+                   for p in (ROOT / 'docs/experiments/init-accessors' / folder).iterdir() if p.is_file()]
         report['inputs'] = {p.relative_to(ROOT).as_posix(): sha(p) for p in inputs}
         if args.bundle:
             bundle = args.bundle.resolve()
@@ -109,6 +113,8 @@ def main():
                 if (result.returncode, stdout, stderr) != (0, expected, ''):
                     raise ValueError(name + ' ' + mode + ' result mismatch')
             report['cases'].append(dict(name=name, passed=True, results=results))
+        run([sys.executable, ROOT / 'scripts/validate-native-init-import.py', '--bundle', bundle,
+             '--runtime', runtime, '--output', out / 'init-import'], 'init-import')
         report['rejections'] = []
         for fixture in rejections:
             project = out / ('reject-' + fixture.stem)

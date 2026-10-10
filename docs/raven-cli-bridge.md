@@ -7308,6 +7308,13 @@ The runtime validates instance setter associations and grants only the declaring
 init accessor/constructor readonly-field-write privilege. Raw/reflection calls remain
 ordinary calls, matching the documented compiler-enforced boundary. Metadata tests
 cover both native containers, CLI projection/import execution and malformed shapes;
-Rust tests cover property preservation and readonly-write permissions. Raven source
-emission/import qualification follows in the next slice; no runtime-freeze or full
-record-semantics claim is made.
+Rust tests cover property preservation and readonly-write permissions. Raven
+`b939cd696` now emits/imports automatic and implemented init properties and positional
+record components. Imported accessor methods are hidden from ordinary named-member
+lookup, matching PE import. 62 focused Raven tests pass; separate-library consumers
+initialize successfully and reject ordinary writes (RAV0200) and named setter calls
+(RAV0117). macOS native/interpreter qualification is in the
+[init experiment](experiments/init-accessors/); Windows is pending. AOT now preserves
+reached init associations through specialization/selection because they carry readonly
+write authority; unused accessors do not become roots. Source metadata catalogues also
+retain the flag. No runtime-freeze or full record-semantics claim is made.

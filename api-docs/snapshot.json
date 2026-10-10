@@ -1,7 +1,7 @@
 {
-  "assemblySha256": "cfbd0e4ed090577169a28821c786b945714f32af150b91ae8fa0b7cc1aa9b84a",
+  "assemblySha256": "0bef33a70f7a4ff6b1a601e23a85f55d201715c2c8d0b5051b4454eacbc4af5c",
   "inputs": {
-    "api-docs/NeoCLR.CoreProbe.xml": "7f1053f289fc21fe40dac549fe210f5ca18226087e4d168b8f589355ec2ae486",
+    "api-docs/NeoCLR.CoreProbe.xml": "a989738c3779219cf5c77ae25c4e24db8c1b0e3f6c276cee39127ecde1fb4457",
     "api-docs/exclusions.json": "dfbbab53935ec02fec642d8b5281a5bb01f12ff30d27d2fe47900430c26e642a",
     "api-docs/manual-members.json": "0e873d90c2e2b1a78b111265459ff9998aa0b8a6ef1eb8aca2b393d6fc277ecf",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
@@ -25,7 +25,7 @@
     "docs/experiments/raven-target/CheckedStorageBindings.cs": "efa6916abaca9d68a84a901be5d46ea90a5d7d63269213f30a3f4e6b07e9966f",
     "docs/experiments/raven-target/ClosureAudit.cs": "2955102d4966f3cc7c76256e58db87dc61bf9f1bf7faff75b51d1923ca8822c8",
     "docs/experiments/raven-target/CollectionBindings.cs": "fd86c8fa3408b13bbf8207808854344aa1d965b0b05cfea5ae73bf146c59a6e8",
-    "docs/experiments/raven-target/CollectionDeclarations.cs": "1c55638d0724b9807755ffbdbf9a524e0f9f7c6d429713275d818fef2929904b",
+    "docs/experiments/raven-target/CollectionDeclarations.cs": "74f6548aff2947be9692db3621e4408681540788f39c0aeff454be4ae4e9f3b7",
     "docs/experiments/raven-target/CollectionImportChecks.cs": "fbcb8c767309f4fca155b3f492bc6188ff176945eb42f0bfb9adf04aafc71247",
     "docs/experiments/raven-target/ComparerBindings.cs": "70ba15b58295bdd3d91578d32e0c6d6f080d54580ef6d9f02e7f4d57181f02f2",
     "docs/experiments/raven-target/ComparerChecks.cs": "a3717753f277a5ec4a11b7593a49d425ddfa86a00c98e74a943ee1ea2e1a8cda",
@@ -160,7 +160,7 @@
     "runtime/raven/src/System/Collections/HashSet.rvn": "ccf3a00affb601cef57f0e5782b24c666615ac682ab4d70696bf690e8cfe015f",
     "runtime/raven/src/System/Collections/Iterable.rvn": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06",
     "runtime/raven/src/System/Collections/Iterator.rvn": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14",
-    "runtime/raven/src/System/Collections/KeyValuePair.rvn": "02f6961292969587c695475f243af12cf2c1777ed41f5e03a547c402995b79e7",
+    "runtime/raven/src/System/Collections/KeyValuePair.rvn": "31ac2b98125224d26a988b6eb144aa95cfc973c52f6ca0da0c2119780007abe3",
     "runtime/raven/src/System/Collections/List.rvn": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2",
     "runtime/raven/src/System/Collections/Map.rvn": "b9f915bd626106b03f072d8a500d241f8304aecdeb4e2e85e045c2662eddec0c",
     "runtime/raven/src/System/Collections/MutableMap.rvn": "109b64c49882b813d5c532e6cf7ccc06cb907d38cb5eb6e3ffdfaf2ca72af627",

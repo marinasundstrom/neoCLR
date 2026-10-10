@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>InitAccessorProbe</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="InitContracts">
+      <HintPath>$(InitContractsPath)</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

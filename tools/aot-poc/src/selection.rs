@@ -67,7 +67,7 @@ pub(super) fn callable_invoke(target: &FunctionRef) -> Option<&neoclr::metadata:
     }
 }
 
-fn resolve(input: &neoclr::Module, target: &FunctionRef) -> Result<usize, Error> {
+pub(super) fn resolve(input: &neoclr::Module, target: &FunctionRef) -> Result<usize, Error> {
     if !target.generic_arguments.is_empty() {
         return Err("closed-world selection does not support generic calls".into());
     }
@@ -547,11 +547,25 @@ pub(super) fn select_inventory_with_host_roots(
         }
     }
     for (i, t) in projected.types.iter_mut().enumerate() {
-        if let Some(origin) = &mut t.origin {
-            origin.property_tokens.clear();
+        // Init associations are executable readonly-write authority, not merely
+        // descriptions. Preserve only setters already reached through calls.
+        let mut retained = vec![];
+        let mut property_tokens = vec![];
+        for (index, property) in t.properties.iter().enumerate().filter(|(_, p)| p.init_only) {
+            let setter = property.setter.as_ref().ok_or("init property lacks setter")?;
+            let old = resolve(input, setter)?;
+            let Ok(new) = rows.binary_search(&old) else { continue; };
+            let mut property = property.clone();
+            property.getter = None;
+            property.setter.as_mut().unwrap().definition = Some(MemberId {
+                module: input.name.clone(), revision: input.revision.clone(), index: new as u32,
+            });
+            retained.push(property);
+            if let Some(origin) = &t.origin { property_tokens.push(origin.property_tokens[index]); }
         }
+        if let Some(origin) = &mut t.origin { origin.property_tokens = property_tokens; }
         t.custom_attributes.clear();
-        t.properties.clear(); // Accessor bodies are selected through actual calls.
+        t.properties = retained;
         t.definition = Some(TypeDefId {
             module: input.name.clone(),
             revision: input.revision.clone(),

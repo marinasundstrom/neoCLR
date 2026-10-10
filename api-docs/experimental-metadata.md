@@ -7992,3 +7992,24 @@ library identity resolution: neoCLR explicitly separates the bootstrap storage
 reference from its executable owner. The benefit is native-only source bootstrap;
 the cost is an additional load-set validation rule. It does not grant arbitrary
 cross-assembly primitive replacement or promise a stable native ABI.
+
+## Init accessors (development, 2026-10-10)
+
+`PropertyDefinition(name, propertyType, getter = null, setter = null, isInitOnly = false)`
+and `TypeBuilder.AddProperty(name, type, getter = null, setter = null, isInitOnly = false)`
+accept a trailing initialization-only flag. True requires an instance setter and
+retains normal signature, ownership, duplicate-association and index checks; missing
+or static setters throw ArgumentException. The default preserves ordinary setters.
+
+`PropertyDefinition.IsInitOnly` and metadata `Introspection.PropertyInfo.IsInitOnly`
+are immutable Boolean queries. They survive native JSON/binary reading and generic
+property projection. CLI property reading recognizes the standard required return
+modifier; CLI transport/reference writing and imported calls preserve it. Native
+metadata uses its own `init_only` field, with no CLI PropertyAttributes bit reuse.
+
+Only the declaring constructor or associated init setter may write the type's
+readonly fields. Ordinary method calls, including reflection calls after construction,
+remain executable. The flag is a compiler usage contract, not a runtime freeze.
+This metadata-tooling API is distinct from the Raven runtime PropertyInfo surface;
+no new query or invocation restriction is added there. See the
+[design and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/init-accessors.md).

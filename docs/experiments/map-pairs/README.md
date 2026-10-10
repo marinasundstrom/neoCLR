@@ -10,5 +10,6 @@ is retained with that consumer.
 Historical baseline: compiler 71cafd353 rejected raven/Main.rvn with NEOMETA001 at
 the record declaration. The new explicit positional-storage compiler capability
 removes that blocker, without claiming full native record support. Generated record
-equality, hashing, formatting and init-only updates remain unsupported. See
+equality, hashing and formatting remain unsupported. The init-accessor follow-up now
+supports initialization-only updates; see ../init-accessors/ and
 ../../raven-cli-bridge.md and ../../collection-contracts.md for scope and costs.

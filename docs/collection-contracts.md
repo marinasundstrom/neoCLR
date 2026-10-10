@@ -413,11 +413,12 @@ mutation; snapshots were selected for predictable current behavior, not a perfor
 claim. Future concurrent implementations must select and document their consistency.
 
 Raven's explicit native positional-record storage capability is bounded: constructors,
-copying, getters and simple deconstruction work; equality, hashing, display helpers and
-init accessors are not exported. Metadata currently carries a normal value type, not
+copying, getters, init accessors and simple deconstruction work; equality, hashing and
+display helpers are not exported. Metadata currently carries a normal value type, not
 full record semantics. The .NET compiler target retains ordinary record behavior.
-This is a temporary development restriction, with native equality/hash/init metadata
-work still required. See the [integration contract](raven-cli-bridge.md#native-positional-record-storage--2026-10-10)
+This is a temporary development restriction, with native equality/hash/record metadata
+work still required. The [init follow-up](init-accessors.md) allows object-initializer
+updates while retaining ordinary-assignment rejection. See the [integration contract](raven-cli-bridge.md#native-positional-record-storage--2026-10-10)
 and [passing consumer](experiments/native-collections/). Adding Iterable is a source
 compatibility change for custom Map implementations: they must implement GetIterator.
 Map removal/clear and advanced operations remain subsequent API work.

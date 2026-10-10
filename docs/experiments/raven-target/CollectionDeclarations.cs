@@ -66,8 +66,8 @@ static class CollectionDeclarations
             }
             public readonly struct KeyValuePair<K, V> {
                 public KeyValuePair(K Key, V Value) { this.Key = Key; this.Value = Value; }
-                public K Key { get; }
-                public V Value { get; }
+                public K Key { get; init; }
+                public V Value { get; init; }
                 public void Deconstruct(out K Key, out V Value) { Key = this.Key; Value = this.Value; }
             }
             public interface Map<K, V> : Iterable<KeyValuePair<K, V>> {

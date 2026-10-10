@@ -1,0 +1,7 @@
+namespace InitExamples
+
+public class Settings {
+    val Port: int { init; } = 0
+}
+
+public record struct Pair<K, V>(val Key: K, val Value: V)

@@ -1462,7 +1462,15 @@ reference with member XML and a matching native snapshot. Removal/peek Option
 results, bool membership-change results, explicit comparers, snapshot iteration and
 unsynchronized behavior are documented. No public type is excluded for this slice.
 Map now inherits Iterable of KeyValuePair, with its public constructor,
-getters and Deconstruct selected and documented. HashMap.GetIterator documents
+getters/init accessors and Deconstruct selected and documented. HashMap.GetIterator documents
 snapshot cost, lifetime and concurrency limits. The native positional-record storage
-restriction is explicit; equality/hash/display/init helpers are not native APIs.
+restriction is explicit; equality/hash/display helpers are not native APIs.
 The matching compiler is required to rebuild the native library snapshot.
+
+### Native init accessor metadata (development, 2026-10-10)
+
+The [metadata manual](experimental-metadata.md#init-accessors-development-2026-10-10)
+covers IsInitOnly definition/introspection queries and optional authoring arguments.
+KeyValuePair Key/Value reference signatures now expose init accessors; native and
+CLI snapshots must use the matching init-aware compiler. No new runtime reflection
+query was added; its ordinary getter/setter invocation policy remains unchanged.

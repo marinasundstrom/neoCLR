@@ -124,7 +124,11 @@ Queue/Stack/Set also pass the [Windows x64 action](experiments/native-collection
 Map now supports iterable, deconstructable KeyValuePair values through a bounded native
 positional-record storage contract. The [Windows x64 Map run](experiments/native-collections/windows-map-validation.json)
 and [JSON regression](experiments/native-collections/windows-json-map-validation.json) now pass,
-with source and artifact hashes checked. Full native record semantics remain open.
+with source and artifact hashes checked. The author next requested [init accessor
+support](init-accessors.md): metadata and compiler import/emission are implemented;
+macOS native/interpreter and cross-library rejection qualification pass; Windows
+init validation is tracked in the linked experiment. Full
+native record semantics remain open.
 Future concurrent variants retain implementation-specific atomicity/iteration contracts; see the [contracts and concurrency boundaries](collection-contracts.md#basic-library-slice-and-future-concurrency--2026-10-10).
 
 ### Follow-up review areas — author direction, 2026-10-10
