@@ -97,7 +97,7 @@ public class ProbeSink : OutputStream {
 }
 
 public func Text(bytes: Sequence<byte>) -> string {
-    return match Utf8.Decode(bytes) {
+    return match Encodings.Utf8.Decode(bytes) {
         Ok(let value) => value
         Error(_) => {
             System.Fail("Unexpected encoded bytes")

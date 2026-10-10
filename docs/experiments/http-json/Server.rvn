@@ -7,7 +7,7 @@ import System.Web.Http.*
 
 func ErrorContent(message: string) -> HttpContent {
     // Messages passed here are application-owned constants, not unescaped input.
-    return HttpContent(Utf8.Encode(message), "application/json; charset=utf-8")
+    return HttpContent(HttpContent.FromText(message).Bytes, "application/json; charset=utf-8")
 }
 
 class ReportServer {
@@ -18,7 +18,7 @@ class ReportServer {
             let content = JsonContent(report)?
             context.Respond(HttpStatusCode.OK, content)
         } else if request.Method == "POST" && request.Target == "/reports" {
-            let body = Utf8.Decode(request.Content.Bytes)
+            let body = Encodings.Utf8.Decode(request.Content.Bytes)
             // This boundary handles invalid input as an HTTP response, rather than propagating it.
             if let Ok(text) = body {
                 if let Ok(reply) = Acknowledge(text) {

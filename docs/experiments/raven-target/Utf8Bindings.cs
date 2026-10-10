@@ -5,7 +5,7 @@ static class Utf8Bindings
     public const string Owner = "System.Text.Utf8";
     public const string Bytes = "System.Collections.Sequence<Byte>";
     public const string Decoded = "System.Result<String,System.Text.InvalidUtf8Error>";
-    public const string Declarations = "namespace Text { public static class Encodings { public static Encoding Utf8 => default; public static Encoding Ascii => default; } public static class Utf8 { public static Collections.Sequence<byte> Encode(string text) => default; public static Result<string, InvalidUtf8Error> Decode(Collections.Sequence<byte> bytes) => default; } }";
+    public const string Declarations = "namespace Text { public static class Encodings { public static Encoding Utf8 => default; public static Encoding Ascii => default; } internal static class Utf8 { public static Collections.Sequence<byte> Encode(string text) => default; public static Result<string, InvalidUtf8Error> Decode(Collections.Sequence<byte> bytes) => default; } }";
 
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {

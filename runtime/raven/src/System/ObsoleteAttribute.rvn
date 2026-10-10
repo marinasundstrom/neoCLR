@@ -1,0 +1,33 @@
+module System
+
+/// Marks a declaration as obsolete without removing it from the runtime contract.
+/// Compilers report a warning by default, or an error when IsError is true.
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Interface | AttributeTargets.Delegate, Inherited: false)]
+public class ObsoleteAttribute : System.Attribute {
+    private val message: string?
+    private val isError: bool
+
+    /// Creates an obsolete warning with no explanatory message.
+    init() {
+        message = null
+        isError = false
+    }
+
+    /// Creates an obsolete warning with the supplied migration message.
+    init(message: string?) {
+        self.message = message
+        isError = false
+    }
+
+    /// Creates an obsolete warning or error with the supplied migration message.
+    init(message: string?, error: bool) {
+        self.message = message
+        isError = error
+    }
+
+    /// Gets the migration message, or null when none was supplied.
+    val Message: string? => message
+
+    /// Gets whether a compiler must reject use instead of reporting a warning.
+    val IsError: bool => isError
+}

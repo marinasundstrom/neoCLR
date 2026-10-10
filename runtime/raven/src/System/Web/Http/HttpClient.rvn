@@ -26,7 +26,7 @@ public class HttpHeader {
 
     internal static func FindValues(headers: Sequence<HttpHeader>, name: string) -> Sequence<string> {
         let values = ArrayList<string>()
-        let query = Utf8.Encode(name)
+        let query = HttpText.Encode(name)
         if query.Count == 0 {
             return values
         }
@@ -43,7 +43,7 @@ public class HttpHeader {
             index += 1
         }
         for header in headers {
-            let candidate = Utf8.Encode(header.Name)
+            let candidate = HttpText.Encode(header.Name)
             if candidate.Count == query.Count {
                 var matches = true
                 index = 0
@@ -318,7 +318,7 @@ internal class HttpResponseDecoder {
             bytes.Add(value)
             index += 1
         }
-        if let Ok(text) = Utf8.Decode(bytes) {
+        if let Ok(text) = HttpText.Decode(bytes) {
             return Ok(text)
         }
         return Error(HttpError.Protocol("Invalid header text"))
@@ -583,7 +583,7 @@ public class HttpContent : Disposable {
 
     /// Encodes text as UTF-8 and selects text/plain; charset=utf-8 for outbound requests.
     static func FromText(text: string) -> HttpContent {
-        return HttpContent(Utf8.Encode(text), "text/plain; charset=utf-8")
+        return HttpContent(HttpText.Encode(text), "text/plain; charset=utf-8")
     }
 
     func ReadText() -> Task<Result<string, string>> {
@@ -592,7 +592,7 @@ public class HttpContent : Disposable {
             _ = source.Complete(Error("Stream content is not buffered"))
             return source.Task
         }
-        if let Ok(text) = Utf8.Decode(Bytes) {
+        if let Ok(text) = HttpText.Decode(Bytes) {
             _ = source.Complete(Ok(text))
         } else {
             _ = source.Complete(Error("Invalid UTF-8 body"))
@@ -793,7 +793,7 @@ public class HttpRequest {
     }
 
     private static func HeaderName(name: string) -> Result<string, HttpError> {
-        let bytes = Utf8.Encode(name)
+        let bytes = HttpText.Encode(name)
         if bytes.Count == 0 || bytes.Count > 2048 {
             return Error(HttpError.InvalidRequest("Invalid request header name"))
         }
@@ -808,14 +808,14 @@ public class HttpRequest {
             }
             lower.Add(if value >= 65 && value <= 90 { (byte)((int)value + 32) } else { value })
         }
-        if let Ok(text) = Utf8.Decode(lower) {
+        if let Ok(text) = HttpText.Decode(lower) {
             return Ok(text)
         }
         return Error(HttpError.InvalidRequest("Invalid request header name"))
     }
 
     private static func HeaderValueValid(value: string) -> bool {
-        let bytes = Utf8.Encode(value)
+        let bytes = HttpText.Encode(value)
         if bytes.Count > 2048 {
             return false
         }
@@ -872,7 +872,7 @@ public class HttpRequest {
             wire = String.Concat(wire, String.Concat(header.Name, ": "))
             wire = String.Concat(wire, String.Concat(header.Value, "\r\n"))
         }
-        let encoded = Utf8.Encode(String.Concat(wire, "\r\n"))
+        let encoded = HttpText.Encode(String.Concat(wire, "\r\n"))
         if encoded.Count > 2048 {
             return Error(HttpError.LimitExceeded("Request header limit exceeded"))
         }
@@ -900,7 +900,7 @@ public class HttpRequest {
             part.Add(bytes[index])
             index += 1
         }
-        if let Ok(text) = Utf8.Decode(part) {
+        if let Ok(text) = HttpText.Decode(part) {
             return Ok(text)
         }
         return Error(HttpError.InvalidRequest("Invalid URL text"))
@@ -927,7 +927,7 @@ public class HttpRequest {
         if !url.StartsWithOrdinal("http://") {
             return Error(HttpError.Unsupported("Only plain http:// URLs are supported"))
         }
-        let bytes = Utf8.Encode(url)
+        let bytes = HttpText.Encode(url)
         if bytes.Count > 1024 {
             return Error(HttpError.LimitExceeded("URL limit exceeded"))
         }
@@ -1363,7 +1363,7 @@ public class HttpClient {
         if !response.Content.IsBuffered {
             return Error(HttpError.Unsupported("Response content is not buffered"))
         }
-        if let Ok(text) = Utf8.Decode(response.Content.Bytes) {
+        if let Ok(text) = HttpText.Decode(response.Content.Bytes) {
             return Ok(text)
         }
         return Error(HttpError.Protocol("Invalid UTF-8 body"))

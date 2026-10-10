@@ -9,7 +9,7 @@ import System.Web.Http.Json.*
 
 func ErrorContent(message: string) -> HttpContent {
     // Messages passed here are application-owned constants, not unescaped input.
-    return HttpContent(Utf8.Encode(message), "application/json; charset=utf-8")
+    return HttpContent(HttpContent.FromText(message).Bytes, "application/json; charset=utf-8")
 }
 
 class ReportServer {

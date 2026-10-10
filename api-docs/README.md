@@ -1662,3 +1662,19 @@ with strict errors, the built-in 65536-byte bound, BOM preservation and stateles
 retry behavior. Custom Encoding providers must implement the new method. The
 aggregate bridge adds its declaration; native libraries implement UTF-8 and ASCII.
 Utf8 remains public until production consumer migration is complete.
+
+
+### Internal UTF-8 implementation (2026-10-10)
+
+Utf8 is now internal and removed from both public type selections and member pages.
+Consumers use Encodings.Utf8.Encode/Decode, or incremental sessions for larger values.
+System.Data and System.Web use public contracts with no friend grants. JSON checks
+its existing quotas before encoding. HTTP composes bounded codec calls to preserve
+larger buffered content, Unicode boundaries and strict decoding failures. The
+aggregate declaration retains the internal helper for the temporary bridge only;
+no public type exclusion is used to conceal it.
+
+Obsolete annotations (2026-10-10): the source runtime and aggregate projection
+expose the three basic constructors, Message and IsError. String byte-oriented
+members remain callable with migration warnings. DiagnosticId/UrlFormat are
+tracked gaps. The type is selected for generated reference documentation.

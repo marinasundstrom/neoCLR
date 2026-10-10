@@ -397,14 +397,33 @@ returns 42 as native macOS ARM64 code; denied grants/private access produce no o
 The source-runtime attribute now has its constructor, AssemblyName and repeatable
 assembly usage policy; [real source-grant consumers](experiments/friend-runtime/README.md)
 pass interpreted and native macOS ARM64 execution after all four libraries rebuild.
-Full identity semantics, Windows qualification and Utf8 internalization remain open.
+Full identity semantics and Windows qualification remain open.
 The author subsequently clarified that grants should be sparse and mainly serve
 internal tooling and testing assemblies. Runtime libraries should consume supported
 public APIs; do not grant System.Data/System.Web internal access to complete the Utf8
 migration. Preserve existing conversion contracts while migrating those consumers.
 Public conversion migration now has paired one-shot Encoding.Decode with strict
 UTF-8/ASCII results and a 65536-byte bound; custom policies must implement Decode.
-Production consumers and Utf8 visibility still require a separate migration.
+System.Data and System.Web now use public codecs without grants; Utf8 is internal.
+HTTP composes bounded conversions to retain larger buffered-body behavior.
+Author-directed next work (2026-10-10): immediately after this encoding migration,
+address HttpClient's configurable request timeout and Disposable/client-handler
+ownership gaps, including use support and macOS/Windows cancellation/cleanup parity.
+The [lifetime and timeout design note](design/http-client-lifetime.md) records the
+.NET baseline, current timer/deadline constraints and required qualification.
+The current transport has a fixed 15-second exchange deadline; the client has no
+Dispose method. These are incomplete contracts, not deliberate .NET divergences.
+The subsequent string API direction keeps encoding explicit: public string operations
+should describe text, not byte storage. GetUtf8ByteCount/SliceUtf8 remain migration
+debt; replace their uses with appropriate encoding contracts before removing them,
+without friend grants. ObsoleteAttribute now marks those two methods with warnings.
+This does not displace the next HttpClient work.
+Author-directed follow-up after HttpClient (2026-10-10): add compatible Index and
+Range runtime types and connect Raven's existing indexing/slicing syntax to arrays,
+strings and sequences. Compare .NET from-end indexing, half-open ranges, bounds,
+copy/view behavior and sequence capabilities; preserve the established text-index
+unit for strings rather than exposing UTF-8 storage through syntax. This is queued
+work, not an implemented API or a decision that every Iterable supports indexing.
 The host metadata model and native manifests now preserve assembly annotations through
 CLI/native snapshots and CLI reference projection. Loader checks validate constructor
 shape, member-target rejection, limits and declared dependencies without execution.

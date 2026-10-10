@@ -69,3 +69,6 @@ These references are for runtime control, host integration and compiler tooling:
 <a id="terminal-failures"></a>
 <a id="reading-generated-declarations"></a>
 <a id="how-this-differs-from-net"></a>
+
+Development API migration annotations use [ObsoleteAttribute](xref:System.ObsoleteAttribute),
+with nullable migration messages and compiler warning/error severity.

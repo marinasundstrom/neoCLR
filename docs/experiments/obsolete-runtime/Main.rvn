@@ -1,0 +1,33 @@
+import System.*
+
+func Main() -> int {
+    let empty = ObsoleteAttribute()
+    if empty.Message != null || empty.IsError {
+        return 1
+    }
+    let warning = ObsoleteAttribute("Migrate to the new API")
+    if warning.Message != "Migrate to the new API" || warning.IsError {
+        return 2
+    }
+    let error = ObsoleteAttribute("Removed", true)
+    if error.Message != "Removed" || !error.IsError {
+        return 3
+    }
+    let explicitNull = ObsoleteAttribute(null, false)
+    if explicitNull.Message != null || explicitNull.IsError {
+        return 4
+    }
+    // The imported source-runtime member must emit a warning and remain executable.
+    if "é".GetUtf8ByteCount() != 2 {
+        return 5
+    }
+    match "xé".SliceUtf8(1, 2) {
+        .Ok(let value) => {
+            if value != "é" {
+                return 6
+            }
+        }
+        .Error(_) => return 7
+    }
+    return 42
+}

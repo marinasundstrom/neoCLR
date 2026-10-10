@@ -601,3 +601,12 @@ Public one-shot decoding qualification: [44 focused cases](encoding-public-valid
 cover encoding, quotas, reader/writer boundaries and JSON streams in interpreted
 and macOS ARM64 native execution. The evidence records original aggregate guard
 failures separately from the passing selected executions.
+
+The [public encoding boundary](public-encoding-surface-validation.json),
+[41 consumer cases](encoding-consumer-validation.json) and
+[three buffered HTTP text cases](http-text-validation.json) qualify internal Utf8
+without friend grants. The large HTTP cases have a 600-second execution budget;
+the interpreter stress run is slow and is not a throughput benchmark. Ordinary
+transport/JSON bounds remain unchanged. Windows checks are configured, not locally
+qualified. [Obsolete annotations](../../../docs/experiments/obsolete-runtime/README.md)
+have separate compiler/interpreter/native evidence.

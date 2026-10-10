@@ -21,7 +21,7 @@ class ReplyHandler : HttpHandler {
     private var pending: bool
 
     init(status: int, text: string, pending: bool) {
-        Response = HttpResponse(status, ArrayList<HttpHeader>(), Utf8.Encode(text))
+        Response = HttpResponse(status, ArrayList<HttpHeader>(), HttpContent.FromText(text).Bytes)
         self.pending = pending
     }
 

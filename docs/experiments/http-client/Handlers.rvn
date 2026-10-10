@@ -46,7 +46,7 @@ class FakeHandler : HttpHandler {
         if fail {
             _ = source.Complete(Error(HttpError.Handler("Fake failure")))
         } else {
-            _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), Utf8.Encode("Café 🌍"))))
+            _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpContent.FromText("Café 🌍").Bytes)))
         }
         return source.Task
     }

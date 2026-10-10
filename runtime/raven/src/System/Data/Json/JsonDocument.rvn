@@ -13,7 +13,7 @@ internal class DocumentReader {
 
     init(text: string) {
         source = text
-        bytes = Utf8.Encode(text)
+        bytes = JsonSyntax.EncodeToken(text)
         position = 0
         nodes = 0
     }

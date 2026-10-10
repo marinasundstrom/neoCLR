@@ -25,7 +25,7 @@ class CaptureHandler : HttpHandler {
         Port = request.Port
         Target = request.Target
         let source = Promise<Result<HttpResponse, HttpError>>()
-        _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), Utf8.Encode(Target))))
+        _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpContent.FromText(Target).Bytes)))
         return source.Task
     }
 }

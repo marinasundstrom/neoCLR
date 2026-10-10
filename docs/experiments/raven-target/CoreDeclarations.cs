@@ -23,6 +23,7 @@ static class CoreDeclarations
         if (libraryBootstrap) declarations += RuntimeFailureBindings.Declarations + NativeAllocationBindings.Declarations + ParameterSnapshotBindings.Declarations + CheckedStorageBindings.Declarations + RuntimeServiceBindings.Declarations + ValueStorageBindings.Declarations;
         var source = Source.Replace("public struct Double { }", unionProbe ? DoubleBindings.Declarations : "public struct Double { }").Replace("public struct Int32 { }", unionProbe ? Int32Bindings.Declarations : "public struct Int32 { }").Replace("public sealed class String { }", StringBindings.Declarations(unionProbe, collectionProbe))
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
+            .Replace("// Obsolete attribute", collectionProbe ? "[System.AttributeUsage((System.AttributeTargets)6140, Inherited = false)] public sealed class ObsoleteAttribute : System.Attribute { public ObsoleteAttribute() {} public ObsoleteAttribute(string? message) {} public ObsoleteAttribute(string? message, bool error) {} public string? Message => default; public bool IsError => default; }" : "")
             .Replace("// Friend assembly attribute", collectionProbe ? "[System.AttributeUsage(System.AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)] public sealed class InternalsVisibleToAttribute : System.Attribute { public InternalsVisibleToAttribute(string assemblyName) { } public string AssemblyName => default; }" : "")
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
         if (comparerStorage)
@@ -188,6 +189,7 @@ static class CoreDeclarations
             // Metadata-only dependency of Raven's extension marker stub. Throwing
             // or constructing it in executable code remains unsupported.
             public class NotImplementedException { }
+            // Obsolete attribute
             public sealed class FlagsAttribute : Attribute { }
             public sealed class ParamArrayAttribute : Attribute { public ParamArrayAttribute() { } }
             [Flags]

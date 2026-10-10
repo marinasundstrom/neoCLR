@@ -14,6 +14,11 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / 'runtime/raven/tests'
+HTTP_TEXT_NAMES = [
+    'HTTP buffered text preserves scalars beyond the one-shot codec quota',
+    'HTTP buffered text rejects malformed and truncated large bodies',
+    'HTTP buffered text preserves empty BOM and NUL data',
+]
 ENCODING_BUFFER_NAMES = [
     'UTF-8 decoder quota rejection preserves an incomplete scalar',
     'ASCII decoder accepts the maximum input after rejecting an oversized call',
@@ -297,7 +302,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-text', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -314,6 +319,7 @@ def main():
     validation = importlib.util.module_from_spec(validation_spec)
     validation_spec.loader.exec_module(validation)
     expected = [
+        ('http-text', 0, ''.join('PASS ' + n + '\n' for n in HTTP_TEXT_NAMES) + f'Tests: {len(HTTP_TEXT_NAMES)}, passed: {len(HTTP_TEXT_NAMES)}, failed: 0, skipped: 0\n'),
         ('collections', 0, ''.join('PASS ' + n + '\n' for n in COLLECTION_NAMES) + f'Tests: {len(COLLECTION_NAMES)}, passed: {len(COLLECTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('collection-construction', 0, ''.join('PASS ' + n + '\n' for n in CONSTRUCTION_NAMES) + f'Tests: {len(CONSTRUCTION_NAMES)}, passed: {len(CONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('collection-iteration', 0, ''.join('PASS ' + n + '\n' for n in ITERATION_NAMES) + f'Tests: {len(ITERATION_NAMES)}, passed: {len(ITERATION_NAMES)}, failed: 0, skipped: 0\n'),
@@ -351,10 +357,13 @@ def main():
             if name != 'runner-contract':
                 registry = DISCOVERY.discover(TESTS / name / 'Tests.rvnproj', bundle, out / (name + '-discovery'))
                 environment['NeoClrTestRegistry'] = str(registry)
+            profile = 'http' if name == 'http-text' else 'console'
+            if os.name == 'nt':
+                profile = 'windows-' + profile
             command = [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile',
-                       'windows-console' if os.name == 'nt' else 'console', '--project', TESTS / name / 'Tests.rvnproj',
+                       profile, '--project', TESTS / name / 'Tests.rvnproj',
                        '--bundle', bundle, '--aot', args.aot.resolve(), '--output', build]
-            if name == "encoding-buffer-limits":
+            if name in ("encoding-buffer-limits", "http-text"):
                 command += ["--byte-array-limit", "131072"]
             result = subprocess.run(list(map(str, command)), cwd=ROOT, env=environment, capture_output=True, timeout=600)
             (out / (name + '-build.stdout.log')).write_bytes(result.stdout)
@@ -372,14 +381,14 @@ def main():
             interpreter = [args.runtime.resolve(), 'run', build / 'app.dll', '--system', lib / catalog['runtimeSeed'],
                            *[arg for a in catalog['assemblyNames'] for arg in ('--module', lib / (a + '.dll'))],
                            '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']
-            if name == "encoding-buffer-limits":
+            if name in ("encoding-buffer-limits", "http-text"):
                 interpreter += ["--array-elements", "1048576", "--array-bytes", "268435456"]
                 report["encodingBufferBudgets"] = dict(nativeByteArrayElements=131072, interpretedLiveArrayElements=1048576, interpretedLogicalArrayBytes=268435456)
             env = {k: v for k, v in os.environ.items() if k.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
             executions = [('native', [exe], isolated, env), ('interpreter', interpreter, ROOT, None)]
             for mode, command, cwd, environment in executions:
                 started = time.perf_counter()
-                result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=180)
+                result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=600 if name == "http-text" else 180)
                 record = dict(suite=name, mode=mode, exitCode=result.returncode,
                               elapsedSeconds=round(time.perf_counter() - started, 3),
                               stdout=result.stdout.decode('utf-8').replace('\r\n', '\n'),
@@ -409,7 +418,7 @@ def main():
             for arguments, selected_exit, selected_stdout in selections:
                 for mode, command, cwd, environment in [('native', [exe, *arguments], isolated, env),
                                                         ('interpreter', [*interpreter, '--', *arguments], ROOT, None)]:
-                    result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=180)
+                    result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=600 if name == "http-text" else 180)
                     record = dict(suite=name, mode=mode, arguments=arguments, exitCode=result.returncode,
                                   stdout=result.stdout.decode('utf-8').replace('\r\n', '\n'),
                                   stderr=result.stderr.decode('utf-8').replace('\r\n', '\n'))

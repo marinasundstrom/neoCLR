@@ -297,6 +297,12 @@ Guest traversal through the executing assembly is now qualified in the interpret
 
 ## Development: general custom attributes
 
+`System.ObsoleteAttribute` supplies migration messages and warning/error policy.
+Raven diagnoses uses while the existing implementation remains executable in both
+interpreted and native programs. The basic constructors, `Message` and `IsError`
+follow the .NET contract; custom diagnostic IDs and URLs remain unsupported.
+See the [attribute reference](/docs/api/System/ObsoleteAttribute/index.html).
+
 Host metadata tooling now preserves and inspects annotations on types, callables,
 fields, properties and parameters across native and CLI snapshots. Inspection runs
 no attribute constructors. Host enum constructor arguments and primitive named

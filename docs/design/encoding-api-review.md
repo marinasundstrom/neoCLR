@@ -319,3 +319,46 @@ UTF-8/ASCII, BOM data and the existing 65536-byte conversion quota; larger input
 use incremental sessions. Empty input succeeds, malformed/truncated input fails,
 and errors do not poison subsequent calls. Custom policies must implement Decode.
 Utf8 visibility and production consumer migration are a separate follow-up.
+
+
+### Consumer migration and helper visibility (2026-10-10)
+
+Utf8 becomes internal after System.Data and System.Web migrate to public encoding
+contracts. No Runtime friend grants are needed. JSON preflights existing document
+and token limits before one-shot encoding; malformed decoding retains JsonError.
+HTTP buffered content has no one-shot codec quota, so its internal adapter encodes
+scalar-aligned chunks and decodes scalar-aligned byte chunks through bounded
+one-shot calls. The initial streaming-decoder composition exceeded a ten-minute
+interpreter test budget; it is not the buffered-content path. Pairwise text
+joining avoids quadratic repeated-prefix copies. Transport/header/JSON limits and
+host resource budgets remain independent and unchanged. This adapter costs extra
+copies for large buffered content; a future streaming HTTP path can avoid whole-body
+materialization. Small bodies retain the one-shot fast path.
+
+The supported UTF-8 sample and HTTP showcase consumers use public policies/content
+factories. Older experimental codec implementations under docs/experiments remain
+historical inputs tied to their recorded reference bundles; they are not claims of
+compatibility with the new internal helper. Migrate those experiments if revived.
+
+
+### Author direction: string exposes text, encoding exposes bytes (2026-10-10)
+
+The author questioned SliceUtf8's name, then clarified that string should not expose
+bytes directly: encoding is explicit. This supersedes the assistant's initial proposal
+to rename it SliceBytes. Keep public text operations character-oriented; byte counts
+belong to an explicit encoding and byte slicing belongs to encoded buffers.
+
+GetUtf8ByteCount and SliceUtf8 still exist in the current public API and remain
+migration debt. Do not internalize them by granting other runtime libraries friend
+access. First provide suitable public encoding/counting and incremental conversion
+contracts, then migrate consumers and references together. In particular, the HTTP
+adapter currently uses these operations to split large input without breaking scalars;
+its replacement must consume large text through public encoding contracts without
+requiring callers to expose string storage. Revisit per-input encoder limits as part
+of that design, preserving host-budget checks and validation of large graphemes.
+No rename or removal is claimed here. The author-directed HttpClient lifetime and
+request-timeout work follows the current helper migration before this additional
+string-surface cleanup.
+
+The legacy string byte methods now carry Obsolete warnings. This records migration
+intent without removing the methods or inventing replacement APIs.

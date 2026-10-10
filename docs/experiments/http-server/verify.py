@@ -155,7 +155,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-server-') as folder:
         ('invalid-status', source.replace('HttpResponse(200,', 'HttpResponse(600,'), 'A final response status from 200 through 599 is required'),
         ('header-limit', source.replace('text/plain; charset=utf-8', 'x' * 2047), 'Response header limit exceeded'),
         ('body-limit', source.replace('Café 🌍', 'x' * 1025), 'Response body limit exceeded'),
-        ('handler-error', source.replace('source.Complete(Ok(HttpResponse(200, headers, Utf8.Encode("Café 🌍"))))', 'source.Complete(Error(HttpError.Handler("Handler rejected request")))'), 'Handler rejected request'),
+        ('handler-error', source.replace('Ok(HttpResponse(200, headers, HttpContent.FromText("Café 🌍").Bytes))', 'Error(HttpError.Handler("Handler rejected request"))'), 'Handler rejected request'),
     ]
     for name, code, error in ([] if args.requests_only else variants):
         if args.case and name not in args.case:

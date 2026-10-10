@@ -35,7 +35,7 @@ class ItemServer {
                 body = "{\"error\":\"Invalid route\"}"
             }
         }
-        context.Respond(status, HttpContent(Utf8.Encode(body), "application/json; charset=utf-8"))
+        context.Respond(status, HttpContent(HttpContent.FromText(body).Bytes, "application/json; charset=utf-8"))
     }
 
     async func Serve(server: HttpServer, count: int) -> Task<Result<unit, HttpError>> {

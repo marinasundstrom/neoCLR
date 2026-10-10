@@ -14,12 +14,12 @@ public class JsonContent {
 
     static func Create(value: Object) -> Result<HttpContent, JsonError> {
         let text = JsonSerializer.Serialize(value)?
-        return Ok(HttpContent(Utf8.Encode(text), "application/json; charset=utf-8"))
+        return Ok(HttpContent(HttpText.Encode(text), "application/json; charset=utf-8"))
     }
 
     static func CreateNode(value: JsonValue) -> Result<HttpContent, JsonError> {
         let text = JsonSerializer.SerializeNode(value)?
-        return Ok(HttpContent(Utf8.Encode(text), "application/json; charset=utf-8"))
+        return Ok(HttpContent(HttpText.Encode(text), "application/json; charset=utf-8"))
     }
 
     static func ReadNode(content: HttpContent) -> Result<JsonValue, JsonError> {
@@ -44,7 +44,7 @@ public class JsonContent {
         if content.Bytes.Count > 1024 {
             return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
-        return match Utf8.Decode(content.Bytes) {
+        return match HttpText.Decode(content.Bytes) {
             Ok(let text) => Ok(text)
             Error(_) => Error(JsonError.Read(TextReadError.InvalidUtf8))
         }

@@ -8,6 +8,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Internalize Utf8 after migrating System.Data/System.Web and active HTTP samples
+  to public encoding APIs, without friend grants. Preserve large buffered HTTP text
+  with scalar-aligned bounded conversions and private byte views; 41 JSON/HTTP
+  consumer cases and three large-text cases pass interpreted and native macOS ARM64.
+  The large interpreted stress run remains slow; timings are retained, not advertised
+  as release benchmarks. Add public-surface/visibility checks and Windows CI steps.
+- Add the basic .NET-shaped System.ObsoleteAttribute constructors, nullable Message
+  and IsError, with non-repeatable/non-inherited usage. Mark String.GetUtf8ByteCount
+  and SliceUtf8 with migration warnings while retaining their behavior. Qualify
+  warnings, errors, invalid/repeated usage and constructor values, including native
+  macOS ARM64 execution. Refresh both API snapshots. DiagnosticId/UrlFormat remain
+  unsupported. Matching source builds now require Raven 0a5e145a0, including shared
+  Int32 attribute-constant folding and native nullable-signature fixes. Windows CI
+  is configured but unexecuted and requires publishing that compiler revision.
+
 - Add public one-shot `Encoding.Decode` for strict UTF-8 and ASCII, with independent
   calls, a 65,536-byte quota and preserved BOM/NUL data. Cover malformed input,
   immutable results and stream integration: 44 cases pass interpreted and native
@@ -35,7 +50,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   references. Record the author convention to use friend grants sparingly, mainly
   for internal tooling and tests; migrate production library consumers through public
   encoding APIs before internalizing Utf8. No Runtime grants for System.Data/System.Web
-  are introduced. Windows qualification and making Utf8 internal remain pending.
+  are introduced. Windows qualification remains pending; the encoding migration now internalizes Utf8.
 
 - Retain assembly custom attributes in the host metadata model and CLI writer/reader,
   including ordered repeated InternalsVisibleTo grants, bounded ownership-checked

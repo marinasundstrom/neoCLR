@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/obsolete-bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/obsolete-public-encoding/public/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/obsolete-public-encoding/public/bin/neoclr/EncodingSurfaceConsumer.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/obsolete-public-encoding/public/bin/neoclr/EncodingSurfaceConsumer.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/obsolete-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/obsolete-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/obsolete-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/obsolete-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/obsolete-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/obsolete-bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "Round trip\nRound trip\nRound trip\nRound trip\nRound trip\nRound trip\n7\nNo preamble\nAB\nInvalidUtf8\nInvalidUtf8\nInvalidUtf8\nInvalidUtf8\nInvalidUtf8\nInvalidUtf8\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/obsolete-bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/obsolete-public-encoding/internal/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error RAV0500: The type 'Utf8' is inaccessible due to its visibility\n"
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/scripts/validate-public-encoding.py": "9054016a494de8296a35ade3a47ca54bf0bcb50d9c06604bc4149801f720f8b0",
+    "/Users/robert/Projects/neoclr/docs/experiments/raven-target/samples/library-utf8.rvn": "ac1494fa5c2bfe08b5cdd2d523ded415c04daf80cebb803ca00c76c16cb10a29",
+    "/Users/robert/Projects/neoclr/docs/experiments/raven-target/samples/library-utf8.expected.txt": "53859bd0c68ebdbcf2ceefd715342044ae702b0e44aeccb1bbf4a81ac5dbe275",
+    "/Users/robert/Projects/neoclr/target/obsolete-bundle/sdk/tools/rvnc/rvnc.dll": "582a4bf70cbc7088f930ef2fdaf3cea537373508e13c74a796643860e28c5f82",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "e707811a28b7d1c6ac426f2d056da888edb93cf4d1161726f4b37b5f3bb1dadb",
+    "/Users/robert/Projects/neoclr/target/obsolete-bundle/manifest.json": "a988dc89df2935efca333f6c43c0b9cb17e1527965f291ad70d24993cd42a208"
+  }
+}

@@ -14076,3 +14076,67 @@ claim completion of in-process test discovery.
   compiler/runtime friend-access semantics and conformance fixtures remain intact.
 - **Open work:** the one-shot decoding and consumer migration draft still requires
   completion, focused execution tests and matching API documentation before commit.
+
+
+## 2026-10-10 — HttpClient timeout and disposal follow encoding migration
+
+- **Author questions:** “Btw. Can we set any request timeout for HttpClient?” and
+  “And does HttpClient implement Disposable interface?”
+- **Assistant inspection:** the built-in HttpExchange starts one fixed 15000 ms
+  deadline across DNS, connect and transfers. Public operations accept cancellation
+  tokens, but HttpClient exposes no configurable timeout. HttpClient does not
+  implement Disposable; each built-in exchange closes its own connection, while
+  client/handler ownership and disposal remain gaps.
+- **Author direction:** “We should focus on those HttpClient gaps directly after
+  this”. The assistant committed to making configurable timeouts and client/handler
+  disposal the next bounded work after the current encoding migration, including
+  use support and consistent cancellation/cleanup across macOS and Windows.
+- **Status:** recorded sequencing, not an implementation claim. Determine the exact
+  .NET-shaped API, ownership rules and timeout outcomes during that work. The current
+  encoding slice remains active; this does not permanently reorder other milestones.
+
+
+## 2026-10-10 — Naming the string byte-slicing operation
+
+- **Author question:** “text.SliceUtf8 could be renamed to something better...
+  text.SliceChars? or just .Slice”.
+- **Assistant response/proposal:** the existing offset/count measure UTF-8 bytes and
+  reject boundaries inside a Unicode scalar, whereas Raven char represents a
+  grapheme. Propose SliceBytes for this operation and reserve Slice for character-
+  based slicing consistent with string indexing. SliceChars would misdescribe the
+  current byte-based contract.
+- **Status:** a naming proposal, not an approved rename or an implemented API. Keep
+  the current encoding migration and subsequent HttpClient priorities unchanged.
+
+- **Subsequent author correction:** “I also think that we shouldn't really expose
+  bytes directly on string. Encoding is an explicit matter”.
+- **Revised assistant direction:** withdraw the public SliceBytes proposal on string.
+  Public strings describe text; encoding determines byte counts and encoded buffers
+  expose byte operations. Record GetUtf8ByteCount/SliceUtf8 as migration debt rather
+  than renaming them in place. Character-based Slice remains a future text operation.
+  No API removal is implemented by this exchange; HttpClient remains next.
+
+### 2026-10-10 — Mark APIs before migration
+
+- **Author:** asked to define an Obsolete attribute and apply it to public methods
+  planned for change, following the direction that strings should not expose byte
+  operations and encoding should be explicit.
+- **Assistant:** proposed the .NET constructor/message/error contract, compiler
+  warnings for the existing string byte methods, and retained runtime behavior.
+  Native validation exposed combined enum attribute constants stored at the wrong
+  numeric width; the shared fix is committed on Raven local main (`76fb04c76`, 17 focused tests).
+  A native-only follow-up (`0a5e145a0`) matches nullable attribute signatures and
+  passes the native annotation reimport probe.
+- **Scope:** deprecation does not supply or imply completed replacement APIs.
+  HttpClient timeout and disposal remain the next feature work after this migration.
+  [Contract and validation](experiments/obsolete-runtime/README.md).
+
+### 2026-10-10 — Index and Range after HttpClient
+
+- **Author:** directed slicing support with compatible Index and Range types after
+  HttpClient, using Raven's existing syntax for arrays, strings and sequences.
+- **Assistant:** queued it immediately after timeout/disposal work, with .NET as
+  the baseline for bounds/from-end/range behavior and the existing neoCLR text
+  indexing contract retained. No implementation is claimed; obsolete annotations
+  and encoding qualification remain the current slice. Exact signatures and
+  allocation/view behavior need design and target-compiler validation.

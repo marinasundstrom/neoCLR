@@ -12,7 +12,7 @@ func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     }
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
-    let result: Result<HttpResponse, HttpError> = Ok(HttpResponse(200, headers, Utf8.Encode("Café 🌍")))
+    let result: Result<HttpResponse, HttpError> = Ok(HttpResponse(200, headers, HttpContent.FromText("Café 🌍").Bytes))
     return Task.FromResult(result)
 }
 

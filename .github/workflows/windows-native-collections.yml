@@ -20,6 +20,10 @@ on:
       - '.github/workflows/windows-native-collections.yml'
       - 'scripts/validate-native-collections.py'
       - 'scripts/test-runtime-library.py'
+      - 'scripts/validate-public-encoding.py'
+      - 'scripts/validate-runtime-obsolete.py'
+      - 'docs/experiments/obsolete-runtime/**'
+      - 'docs/experiments/raven-target/samples/library-utf8*'
       - 'scripts/discover-runtime-tests.py'
       - 'scripts/validate-test-discovery.py'
       - 'tools/testing/**'
@@ -52,6 +56,10 @@ on:
       - '.github/workflows/windows-native-collections.yml'
       - 'scripts/validate-native-collections.py'
       - 'scripts/test-runtime-library.py'
+      - 'scripts/validate-public-encoding.py'
+      - 'scripts/validate-runtime-obsolete.py'
+      - 'docs/experiments/obsolete-runtime/**'
+      - 'docs/experiments/raven-target/samples/library-utf8*'
       - 'scripts/discover-runtime-tests.py'
       - 'scripts/validate-test-discovery.py'
       - 'tools/testing/**'
@@ -97,6 +105,16 @@ jobs:
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/test-runtime-library.py --bundle `"target/windows-native-collections-validation/development toolchain/bundle`" --output target/windows-native-collections-validation/runtime-library-tests"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify public encoding sample and internal helper boundary
+        shell: pwsh
+        run: |
+          python scripts/validate-public-encoding.py --bundle "target/windows-native-collections-validation/development toolchain/bundle" --runtime target/release/neoclr.exe --output target/windows-native-collections-validation/public-encoding
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify obsolete API diagnostics and constructor behavior
+        shell: pwsh
+        run: |
+          python scripts/validate-runtime-obsolete.py --skip-native --compiler "target/windows-native-collections-validation/development toolchain/bundle/sdk/tools/rvnc/rvnc.dll" --libraries "target/windows-native-collections-validation/development toolchain/bundle/lib" --runtime target/release/neoclr.exe --aot tools/aot-poc/target/debug/neoclr-aot-poc.exe --output target/windows-native-collections-validation/obsolete
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Compare native and interpreted host culture
         shell: pwsh

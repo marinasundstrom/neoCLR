@@ -6,17 +6,28 @@ import System.Result.*
 import System.Text.*
 
 internal class JsonSyntax {
+    // Callers preflight JSON's 1024-byte document/token bound before conversion.
+    internal static func EncodeToken(text: string) -> Sequence<byte> {
+        return match Encodings.Utf8.Encode(text) {
+            Ok(let bytes) => bytes
+            Error(_) => {
+                System.Fail("Prevalidated JSON token encoding failed")
+                ArrayList<byte>()
+            }
+        }
+    }
+
     static func Digit(value: byte) -> bool {
         return value >= 48 && value <= 57
     }
 
     // Preserve number text: recognizing JSON grammar must not round to a host number.
     static func ValidNumber(text: string) -> bool {
-        let bytes = Utf8.Encode(text)
-        let count = bytes.Count
+        let count = text.GetUtf8ByteCount()
         if count == 0 || count > 1024 {
             return false
         }
+        let bytes = JsonSyntax.EncodeToken(text)
         var index = 0
         if bytes[index] == 45 {
             index += 1
@@ -78,12 +89,12 @@ internal class JsonSyntax {
     }
 
     static func WriteMessage(text: string) -> Result<string, JsonError> {
-        let input = Utf8.Encode(text)
-        if input.Count > 1022 {
+        if text.GetUtf8ByteCount() > 1022 {
             return Error(JsonError.LimitExceeded("Message exceeds payload limit"))
         }
+        let input = JsonSyntax.EncodeToken(text)
         let output = ArrayList<byte>(input.Count + 2)
-        let hex = Utf8.Encode("0123456789abcdef")
+        let hex = JsonSyntax.EncodeToken("0123456789abcdef")
         output.Add((byte)34)
         for value in input {
             if value == 34 || value == 92 {
@@ -104,7 +115,7 @@ internal class JsonSyntax {
             }
         }
         output.Add((byte)34)
-        match Utf8.Decode(output) {
+        match Encodings.Utf8.Decode(output) {
             Ok(let payload) => return Ok(payload)
             Error(_) => return Error(JsonError.Syntax("Invalid UTF-8"))
         }
@@ -116,7 +127,7 @@ internal class MessageReader {
     private var position: int
 
     init(text: string) {
-        bytes = Utf8.Encode(text)
+        bytes = JsonSyntax.EncodeToken(text)
         position = 0
     }
 
@@ -223,7 +234,7 @@ internal class MessageReader {
         if position != bytes.Count {
             return Error(JsonError.Syntax("Trailing content"))
         }
-        match Utf8.Decode(output) {
+        match Encodings.Utf8.Decode(output) {
             Ok(let text) => return Ok(text)
             Error(_) => return Error(JsonError.Syntax("Invalid UTF-8"))
         }

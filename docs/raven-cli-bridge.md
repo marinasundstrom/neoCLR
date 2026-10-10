@@ -8103,3 +8103,44 @@ This is an AOT host ABI fix owned by neoCLR. Raven Runtime Contract settings,
 semantic analysis/emission, CLI signatures and native metadata are unchanged. A
 future backend must preserve the advertised host entry points independently of
 whether closed-world pruning leaves callable targets. No public guest API is added.
+
+
+### Public encoding consumer migration (2026-10-10)
+
+The reference-only Encoding declaration adds Decode(Sequence<byte>), matching the
+native library. Utf8's reference declaration is internal, with native metadata owning
+visibility; no new Runtime Contract option, intrinsic or native representation is
+introduced. System.Data and System.Web consume public encoding APIs without grants.
+Native imports are validated with Raven integration revision 5b72e3dd9; the existing
+Windows compiler pin is unchanged and CI execution remains pending.
+
+The migrated boundary fixture exposed a remaining portable lowering gap for `?`
+inside nested constructor arguments: `StreamReader(ShortInput(EncodedBytes(...)?, ...))`
+reports `value block cannot exit its enclosing expression`. Binding the checked bytes
+before construction compiles and retains error propagation. This is a compiler gap,
+not a language restriction; retain it as a general lowering candidate for independent
+Raven validation. No compiler semantics are changed by this migration.
+
+### Obsolete API migration annotations (2026-10-10)
+
+The source runtime owns `System.ObsoleteAttribute` with the basic .NET constructors,
+nullable Message and IsError. Raven consumes fixed string/bool values to issue
+RAV0505 warnings or errors. No Runtime Contract setting changes. Native retained
+metadata owns the annotation; the temporary CLI reference projection preserves
+constructor identity, argument data and AttributeUsage flags. Compiler checks do
+not invoke constructors; AOT does not remove obsolete members or change dispatch.
+DiagnosticId/UrlFormat customization remains a compiler/API gap.
+
+Combined Int32 enum constants exposed a shared Raven constant-folding width defect.
+The shared-line fix keeps the Int32 payload instead of an Int64 accumulator. This
+allows the exact non-inherited .NET Obsolete usage mask, rather than widening it
+to All. The migration consumer checks nullable properties, native imported warning
+metadata, error/usage rejection and interpreted/native execution; see
+[the validation contract](experiments/obsolete-runtime/README.md).
+
+The matching compiler is Raven native integration `0a5e145a0466e06145673dee11d816ea63577aa2`,
+including shared fix `76fb04c76` (on local main; integrated as `716e35ec8`). The
+Windows/source-development helper pins that revision. Publishing the compiler
+revision is a prerequisite to running CI on another machine; local validation does
+not imply Windows execution or a published toolchain. Nullable attribute signature
+matching is a native adapter fix; source signatures keep nullable information.

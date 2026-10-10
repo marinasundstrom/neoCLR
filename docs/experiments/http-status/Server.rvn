@@ -36,7 +36,7 @@ func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         status = 204
     }
     let empty = (status == 204 || status == 205 || status == 304) && request.Target != "/bad-body"
-    let body = Utf8.Encode(if empty { "" } else { "body" })
+    let body = HttpContent.FromText(if empty { "" } else { "body" }).Bytes
     let result = Promise<Result<HttpResponse, HttpError>>()
     _ = result.Complete(Ok(HttpResponse(status, ArrayList<HttpHeader>(), body)))
     return result.Task

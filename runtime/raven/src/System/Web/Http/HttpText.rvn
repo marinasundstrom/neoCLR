@@ -1,0 +1,147 @@
+module System.Web.Http
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+
+// Compose public codecs without imposing their per-call quota on buffered HTTP
+// content. Transport/header/JSON limits remain the responsibility of each caller.
+internal static class HttpText {
+    static func Encode(text: string) -> Sequence<byte> {
+        let size = text.GetUtf8ByteCount()
+        if size <= 65536 {
+            return EncodeChunk(text)
+        }
+        let output = ArrayList<byte>(size)
+        var offset = 0
+        while offset < size {
+            var count = size - offset
+            if count > 65536 {
+                count = 65536
+            }
+            var chunk = ""
+            // A byte boundary may fall inside a Unicode scalar; back up at most
+            // three bytes. This loop selects a boundary, not collection traversal.
+            while count > 0 {
+                if let Ok(part) = text.SliceUtf8(offset, count) {
+                    chunk = part
+                    break
+                }
+                count -= 1
+            }
+            if count == 0 {
+                System.Fail("Invalid HTTP text scalar boundary")
+            }
+            for value in EncodeChunk(chunk) {
+                output.Add(value)
+            }
+            offset += count
+        }
+        return output
+    }
+
+    private static func EncodeChunk(text: string) -> Sequence<byte> {
+        return match Encodings.Utf8.Encode(text) {
+            Ok(let bytes) => bytes
+            Error(_) => {
+                System.Fail("Prevalidated HTTP text encoding failed")
+                ArrayList<byte>()
+            }
+        }
+    }
+
+    static func Decode(bytes: Sequence<byte>) -> Result<string, EncodingError> {
+        let size = bytes.Count
+        if size <= 65536 {
+            return Encodings.Utf8.Decode(bytes)
+        }
+        let parts = ArrayList<string>()
+        var offset = 0
+        while offset < size {
+            var count = size - offset
+            if count > 65536 {
+                count = 65536
+                // Keep a scalar wholly within one codec call. At most three
+                // continuation bytes can precede the next scalar boundary.
+                var backedUp = 0
+                while bytes[offset + count] >= 128 && bytes[offset + count] <= 191 {
+                    if backedUp == 3 {
+                        return Error(EncodingError.InvalidUtf8)
+                    }
+                    count -= 1
+                    backedUp += 1
+                }
+            }
+            let chunk = HttpByteWindow(bytes, offset, count)
+            parts.Add(Encodings.Utf8.Decode(chunk)?)
+            offset += count
+        }
+        // Pairwise joining avoids repeatedly copying an ever-growing prefix.
+        var partCount = parts.Count
+        while partCount > 1 {
+            var source = 0
+            var destination = 0
+            while source < partCount {
+                var part = parts[source]
+                if source + 1 < partCount {
+                    part = String.Concat(part, parts[source + 1])
+                }
+                parts[destination] = part
+                destination += 1
+                source += 2
+            }
+            partCount = destination
+        }
+        return Ok(parts[0])
+    }
+}
+
+// Borrow a bounded view for a synchronous codec call; the codec owns the snapshot.
+internal class HttpByteWindow : Sequence<byte> {
+    private val source: Sequence<byte>
+    private val start: int
+    private val count: int
+
+    init(source: Sequence<byte>, start: int, count: int) {
+        self.source = source
+        self.start = start
+        self.count = count
+    }
+
+    val Count: int => count
+
+    val self[index: int]: byte {
+        get {
+            if index < 0 || index >= count {
+                System.Fail("HTTP byte window index is out of range")
+            }
+            return source[start + index]
+        }
+    }
+
+    func GetIterator() -> Iterator<byte> => HttpByteWindowIterator(self)
+}
+
+internal class HttpByteWindowIterator : Iterator<byte> {
+    private val source: Sequence<byte>
+    private var position: int = -1
+
+    init(source: Sequence<byte>) {
+        self.source = source
+    }
+
+    func MoveNext() -> bool {
+        if position >= source.Count {
+            return false
+        }
+        position += 1
+        return position < source.Count
+    }
+
+    val Current: byte => source[position]
+
+    func Dispose() {
+        position = source.Count
+    }
+}

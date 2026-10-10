@@ -82,7 +82,7 @@ internal class HttpRequestDecoder {
             bytes.Add(value)
             index += 1
         }
-        if let Ok(text) = Utf8.Decode(bytes) {
+        if let Ok(text) = HttpText.Decode(bytes) {
             return Ok(text)
         }
         return Error(HttpError.Protocol("Invalid header text"))
@@ -310,7 +310,7 @@ public class HttpServer {
             if header.Name.GetUtf8ByteCount() > 2046 || header.Value.GetUtf8ByteCount() > 2046 {
                 return Error(HttpError.LimitExceeded("Response header limit exceeded"))
             }
-            let name = Utf8.Encode(header.Name)
+            let name = HttpText.Encode(header.Name)
             if name.Count == 0 {
                 return Error(HttpError.Protocol("Empty response header name"))
             }
@@ -331,7 +331,7 @@ public class HttpServer {
             if normalized == "content-length" || normalized == "connection" || normalized == "transfer-encoding" || normalized == "content-encoding" {
                 return Error(HttpError.Protocol("Response framing headers are server-owned"))
             }
-            let valueBytes = Utf8.Encode(header.Value)
+            let valueBytes = HttpText.Encode(header.Value)
             part = 0
             while part < valueBytes.Count {
                 let value = valueBytes[part]
@@ -348,7 +348,7 @@ public class HttpServer {
         }
         wire = String.Concat(wire, "\r\n")
         let result = ArrayList<byte>()
-        let head = Utf8.Encode(wire)
+        let head = HttpText.Encode(wire)
         index = 0
         while index < head.Count {
             result.Add(head[index])
@@ -364,7 +364,7 @@ public class HttpServer {
     }
 
     private static func DecodeAscii(bytes: Sequence<byte>) -> Result<string, HttpError> {
-        if let Ok(text) = Utf8.Decode(bytes) {
+        if let Ok(text) = HttpText.Decode(bytes) {
             return Ok(text)
         }
         return Error(HttpError.Protocol("Invalid response header"))

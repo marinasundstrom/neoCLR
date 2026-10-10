@@ -21,7 +21,7 @@ class HttpSession {
         let headers = ArrayList<HttpHeader>()
         headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
         let body = String.Concat("Request ", count.ToString())
-        let result: Result<HttpResponse, HttpError> = Ok(HttpResponse(200, headers, Utf8.Encode(body)))
+        let result: Result<HttpResponse, HttpError> = Ok(HttpResponse(200, headers, HttpContent.FromText(body).Bytes))
         return Task.FromResult(result)
     }
 

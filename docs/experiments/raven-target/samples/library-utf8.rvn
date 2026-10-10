@@ -1,11 +1,15 @@
 import System.*
 import System.Text.*
 import System.Collections.*
+import System.Result.*
 import System.Console.*
 
 func RoundTrip(text: string) {
-    let bytes: Sequence<byte> = Utf8.Encode(text)
-    match Utf8.Decode(bytes) {
+    let Ok(bytes) = Encodings.Utf8.Encode(text) else {
+        WriteLine("Encoding failed")
+        return
+    }
+    match Encodings.Utf8.Decode(bytes) {
         .Ok(let decoded) => {
             if decoded.Equals(text) {
                 WriteLine("Round trip")
@@ -16,7 +20,7 @@ func RoundTrip(text: string) {
 }
 
 func Reject(bytes: byte[]) {
-    match Utf8.Decode(bytes) {
+    match Encodings.Utf8.Decode(bytes) {
         .Ok(let text) => WriteLine("Unexpected text")
         .Error(let error) => WriteLine(error.ToString())
     }
@@ -29,13 +33,16 @@ func Main() {
     RoundTrip("a\u0000b")
     RoundTrip("é")
     RoundTrip("\uFEFFtext")
-    let encoded = Utf8.Encode("Aé🌍")
+    let Ok(encoded) = Encodings.Utf8.Encode("Aé🌍") else {
+        WriteLine("Encoding failed")
+        return
+    }
     WriteLine(encoded.Count)
     if encoded[0] == (byte)65 {
         WriteLine("No preamble")
     }
     let source: byte[] = [(byte)65, (byte)66]
-    let result = Utf8.Decode(source)
+    let result = Encodings.Utf8.Decode(source)
     source[0] = (byte)90
     match result {
         .Ok(let text) => WriteLine(text)

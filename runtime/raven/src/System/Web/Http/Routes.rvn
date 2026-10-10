@@ -68,7 +68,7 @@ public class RoutePattern {
     }
 
     private static func Decode(text: string) -> Result<string, string> {
-        let bytes = Utf8.Encode(text)
+        let bytes = HttpText.Encode(text)
         let decoded = ArrayList<byte>()
         var index = 0
         while index < bytes.Count {
@@ -92,14 +92,14 @@ public class RoutePattern {
             decoded.Add((byte)value)
             index += 1
         }
-        if let Ok(value) = Utf8.Decode(decoded) {
+        if let Ok(value) = HttpText.Decode(decoded) {
             return Ok(value)
         }
         return Error("Invalid route UTF-8")
     }
 
     private static func Segments(path: string) -> Result<Sequence<string>, string> {
-        let bytes = Utf8.Encode(path)
+        let bytes = HttpText.Encode(path)
         if bytes.Count == 0 || bytes[0] != 47 {
             return Error("Route path must start with /")
         }
@@ -131,7 +131,7 @@ public class RoutePattern {
         let parts = ArrayList<string>()
         let names = ArrayList<string>()
         for segment in source {
-            let bytes = Utf8.Encode(segment)
+            let bytes = HttpText.Encode(segment)
             if bytes.Count > 0 && bytes[0] == 123 {
                 if bytes.Count < 3 || bytes[bytes.Count - 1] != 125 {
                     return Error("Invalid route parameter")
@@ -202,7 +202,7 @@ public class RoutePattern {
         if target.GetUtf8ByteCount() > 1024 {
             return Error("Route target exceeds 1024 bytes")
         }
-        let bytes = Utf8.Encode(target)
+        let bytes = HttpText.Encode(target)
         var end = bytes.Count
         for index in 0..<bytes.Count {
             if bytes[index] == 35 {

@@ -215,7 +215,10 @@ public func LineAndRangeChecks() {
     let utf8 = Encodings.Utf8
     let ascii = Encodings.Ascii
     for content in ["", "a", "é", "😀", "é", "a\rb"] {
-        let encoded = Utf8.Encode(content + "\r\n")
+        let Ok(encoded) = Encodings.Utf8.Encode(content + "\r\n") else {
+            System.Fail("Fixture text encoding failed")
+            return
+        }
         let lineInput = MemoryStream()
         let storage: byte[] = [(byte)0]
         for value in encoded {
@@ -252,7 +255,7 @@ public func WriterSelectionChecks() {
         Ok(let count) => Check(count == 6 && sink.Bytes.Count == 6, "Actual encoded byte count")
         _ => System.Fail("Default UTF-8 write")
     }
-    match Utf8.Decode(sink.Bytes) {
+    match Encodings.Utf8.Decode(sink.Bytes) {
         Ok(let text) => Check(text.Equals("é😀"), "Partial write retry")
         _ => System.Fail("Written UTF-8")
     }
