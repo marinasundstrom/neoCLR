@@ -13,10 +13,18 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / 'runtime/raven/tests'
+MAP_NAMES = [
+    'Map materialization handles collisions and empty input',
+    'HashMap copies sequences and maps independently',
+    'Map iteration snapshots pairs before mutation',
+    'ToMap materializes pair queries and selectors',
+    'HashMap copies preserve reference values and comparer',
+]
 COLLECTION_NAMES = [
     'Any does not read Current',
     'For break disposes its iterator',
     'ArrayList copy has independent storage',
+    *MAP_NAMES,
     'Predicate Any stops at its first match',
     'ArrayQueue preserves FIFO',
     'HashSet applies its comparer',
@@ -54,14 +62,14 @@ def main():
     validation = importlib.util.module_from_spec(validation_spec)
     validation_spec.loader.exec_module(validation)
     expected = [
-        ('collections', 0, ''.join('PASS ' + n + '\n' for n in COLLECTION_NAMES) + 'Tests: 7, passed: 7, failed: 0, skipped: 0\n'),
+        ('collections', 0, ''.join('PASS ' + n + '\n' for n in COLLECTION_NAMES) + f'Tests: {len(COLLECTION_NAMES)}, passed: {len(COLLECTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n'),
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]
     try:
         selected = [case for case in expected if not args.suite or case[0] in args.suite]
         report['suites'] = [case[0] for case in selected]
-        if any(case[0] != 'runner-contract' for case in selected):
+        if not args.suite:
             validation.validate(bundle, out / 'discovery-signatures')
         for name, exit_code, stdout in selected:
             build = out / (name + '-build')
@@ -99,7 +107,8 @@ def main():
                 if (record['exitCode'], record['stdout'], record['stderr']) != (exit_code, stdout, ''):
                     raise RuntimeError(name + ' ' + mode + ' did not match the runner contract')
             selections = {
-                'collections': [(['--filter', 'ArrayQueue'], 0, 'PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n')],
+                'collections': [(['--filter', 'ArrayQueue'], 0, 'PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
+                                (['--filter', 'Map'], 0, ''.join('PASS ' + n + '\n' for n in MAP_NAMES) + f'Tests: {len(MAP_NAMES)}, passed: {len(MAP_NAMES)}, failed: 0, skipped: 0\n')],
                 'discovery-contract': [(['--id', 'manual'], 0, 'PASS manually registered companion\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
                                        (['--filter', 'after discovered'], 0, 'PASS after discovered failure\nTests: 1, passed: 1, failed: 0, skipped: 0\n')],
                 'runner-contract': [

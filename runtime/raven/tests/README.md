@@ -280,7 +280,8 @@ including discovered and manual cases, selected failures/skips, registration ord
 case sensitivity, no matches and malformed command lines. It preserves the original
 no-argument suite expectations alongside these checks. Use the host harness option
 `--suite runner-contract` for a focused runner check (`--suite` is repeatable);
-omitting it runs all suites. A Raven assertion case also
+omitting it runs all suites and the fixed discovery-signature rejection checks.
+Focused suite runs still discover and verify their actual test registrations. A Raven assertion case also
 checks argument count, empty strings, spaces, quotes, backslashes and non-ASCII text.
 
 
@@ -294,3 +295,24 @@ working test infrastructure all at once.
 [Filtering and entry-argument qualification](filtering-validation.json) records 32
 native/interpreted executions and five discovery-signature rejection cases. Windows
 execution is covered by the existing action and remains pending for this revision.
+
+## Porting existing checks
+
+Start with observable library behavior in existing standalone consumers. Split
+large Boolean/exit-code programs into focused module functions marked `[Test]`,
+use descriptive assertions, and propagate failures with `?`. Preserve ordering,
+ownership and mutation scenarios from the original rather than merely copying a
+final success message. New library behavior belongs here by default.
+
+The first port takes `CheckMaps` and `CheckMapConstruction` from
+[the standalone collection consumer](../../../docs/experiments/native-collections/Main.rvn)
+into [five map tests](collections/MapMaterialization.rvn): pair snapshots and
+iteration/deconstruction, independent copy construction, ToMap queries/selectors,
+collisions/empty input, and reference values/comparer behavior. The old executable
+remains a broader integration smoke test pending cross-platform equivalence; it
+should not gain duplicate behavior tests. Duplicate-key terminal failures and
+compiler rejection cases remain separate process/compiler tests.
+
+[First migration qualification](map-migration-validation.json): all 12 collection
+cases pass natively on macOS ARM64 and in the interpreter, and `--filter Map`
+selects exactly the five ported tests. Windows execution is pending its action.

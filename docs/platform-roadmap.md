@@ -37,6 +37,11 @@ expression parsing and case-insensitive substring matching are explicit future g
 Author follow-up: use this framework for new runtime-library behavior tests and add
 focused tests alongside feature/fix work. Preserve compiler/backend coverage where
 behavior is not observable in Raven; migrate existing tests as their areas are touched.
+Author follow-up explicitly starts migration of existing program-form checks. The
+[first five map ports](../runtime/raven/tests/collections/MapMaterialization.rvn) pass
+within the 12-case native/interpreted collection suite and through `--filter Map`.
+[Migration evidence](../runtime/raven/tests/map-migration-validation.json); retain the
+old integration smoke consumer until Windows equivalence is qualified.
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

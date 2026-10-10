@@ -1,0 +1,113 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Linq.*
+import System.Option.*
+import System.Result.*
+import NeoClr.Testing.*
+
+// Ported from native-collections/Main.rvn: CheckMaps/CheckMapConstruction.
+[Test("Map iteration snapshots pairs before mutation")]
+func MapPairSnapshots() -> Result<unit, TestFailure> {
+    let map: MutableMap<string, int> = HashMap<string, int>(StringComparer.Ordinal)
+    _ = Assert.True(map.TryAdd("answer", 42), "First key must be added")?
+    _ = Assert.True(!map.TryAdd("answer", 99), "Duplicate key must be rejected")?
+    _ = Assert.True(map.TryAdd("雪", 7), "Unicode key must be added")?
+    let view: Map<string, int> = map
+    let iterable: Iterable<KeyValuePair<string, int>> = view
+    use snapshot = iterable.GetIterator()
+    map.Set("answer", 99)
+    map.Set("later", 100)
+    var total = 0
+    var count = 0
+    // The iterator was captured before mutation; a new for loop would not test that.
+    while snapshot.MoveNext() {
+        let (key, value) = snapshot.Current
+        _ = Assert.True(key == "answer" || key == "雪", "Snapshot must exclude inserted keys")?
+        let expected = if key == "answer" {
+            42
+        } else {
+            7
+        }
+        _ = Assert.Equal(expected, value)?
+        total = total + value
+        count = count + 1
+    }
+    _ = Assert.Equal(2, count)?
+    _ = Assert.Equal(49, total)?
+    _ = Assert.Equal(3, view.Count)?
+    total = 0
+    for pair in iterable {
+        let (key, value) = pair
+        total = total + value
+    }
+    _ = Assert.Equal(206, total)?
+    let original = KeyValuePair<string, int>("copy", 12)
+    let copy = original
+    let (key, value) = copy
+    _ = Assert.Equal("copy", key)?
+    _ = Assert.Equal(12, value)?
+    _ = Assert.Equal(original.Key, key)?
+    return Assert.Equal(original.Value, value)
+}
+
+[Test("HashMap copies sequences and maps independently")]
+func MapCopyConstruction() -> Result<unit, TestFailure> {
+    let pairs = ArrayList<KeyValuePair<string, int>>()
+    pairs.Add(KeyValuePair<string, int>("Café", 7))
+    pairs.Add(KeyValuePair<string, int>("雪", 9))
+    let sequence: Sequence<KeyValuePair<string, int>> = pairs
+    let copy = HashMap<string, int>(sequence, StringComparer.Ordinal)
+    pairs[0] = KeyValuePair<string, int>("changed", 50)
+    _ = Assert.Equal(2, copy.Count)?
+    _ = Assert.True(copy.Find("Café") is Some(7), "Sequence mutation must not change the copy")?
+    let copiedMap = HashMap<string, int>(copy, StringComparer.Ordinal)
+    copy.Set("Café", 70)
+    return Assert.True(copiedMap.Find("Café") is Some(7), "Map mutation must not change its copy")
+}
+
+[Test("ToMap materializes pair queries and selectors")]
+func MapQueryMaterialization() -> Result<unit, TestFailure> {
+    let pairs = ArrayList<KeyValuePair<string, int>>()
+    pairs.Add(KeyValuePair<string, int>("Café", 7))
+    pairs.Add(KeyValuePair<string, int>("雪", 9))
+    let source = HashMap<string, int>(pairs, StringComparer.Ordinal)
+    let materialized = source.Filter(pair => pair.Value > 7).ToMap(StringComparer.Ordinal)
+    _ = Assert.Equal(1, materialized.Count)?
+    _ = Assert.True(materialized.Find("雪") is Some(9), "Pair query must retain the selected pair")?
+    pairs[0] = KeyValuePair<string, int>("changed", 50)
+    let selected = pairs.ToMap(pair => pair.Key, pair => pair.Value + 1, StringComparer.Ordinal)
+    _ = Assert.True(selected.Find("changed") is Some(51), "Key and value selectors must both run")?
+    return Assert.True(selected.Find("雪") is Some(10), "Selectors must preserve Unicode keys")
+}
+
+[Test("Map materialization handles collisions and empty input")]
+func MapCollisionAndEmptyConstruction() -> Result<unit, TestFailure> {
+    let integers = ArrayList<KeyValuePair<int, int>>()
+    integers.Add(KeyValuePair<int, int>(1, 2))
+    integers.Add(KeyValuePair<int, int>(2, 3))
+    let map = HashMap<int, int>(integers, (left, right) => left == right, key => 1)
+    _ = Assert.Equal(2, map.Count)?
+    _ = Assert.True(map.Find(1) is Some(2), "First colliding entry must survive")?
+    _ = Assert.True(map.Find(2) is Some(3), "Second colliding entry must survive")?
+    let empty = ArrayList<KeyValuePair<string, int>>()
+    return Assert.Equal(0, empty.ToMap(StringComparer.Ordinal).Count)
+}
+
+[Test("HashMap copies preserve reference values and comparer")]
+func MapSharedReferences() -> Result<unit, TestFailure> {
+    let objects = ArrayList<KeyValuePair<string, MapItem>>()
+    let item = MapItem()
+    objects.Add(KeyValuePair<string, MapItem>("item", item))
+    let shared = HashMap<string, MapItem>(objects, StringComparer.OrdinalIgnoreCase)
+    item.Value = 42
+    if shared.Find("ITEM") is Some(let value) {
+        return Assert.Equal(42, value.Value)
+    }
+    return Assert.True(false, "Copied map must apply its case-insensitive comparer")
+}
+
+class MapItem {
+    var Value: int { get; set; } = 7
+}

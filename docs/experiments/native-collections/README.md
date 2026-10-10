@@ -139,3 +139,19 @@ and the native API snapshot are refreshed; public signatures remain unchanged.
 passes all five native/interpreter cases at 4d34f35b, with 1,694 artifact files and
 24 source inputs checked. This qualifies the compiler fix and iterable constructors;
 it predates the final runtime source simplification commit.
+
+
+## Migration to the Raven test framework — 2026-10-10
+
+The Map iteration/materialization checks in `CheckMaps` and `CheckMapConstruction`
+now also live as five focused `[Test]` module functions in
+[MapMaterialization.rvn](../../../runtime/raven/tests/collections/MapMaterialization.rvn).
+They report individual assertion failures through the Raven runner, and can be
+selected with `--filter Map`. The first port preserves snapshot timing, comparer
+behavior, independent storage and shared reference values; it also uses `use` for
+captured iterator lifetime and `for` for ordinary traversal.
+
+Keep this larger executable as an integration smoke test until the migrated cases
+have Windows equivalence evidence. New behavior tests should be added to the Raven
+suite rather than duplicated here. Terminal duplicate-key fault/disposal programs
+and compiler rejection cases still require their specialized harnesses.

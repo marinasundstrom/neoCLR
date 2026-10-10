@@ -13,5 +13,6 @@
     <Compile Include="$(NeoClrTestRegistry)" />
     <Compile Include="Main.rvn" />
     <Compile Include="Collections.rvn" />
+    <Compile Include="MapMaterialization.rvn" />
   </ItemGroup>
 </Project>

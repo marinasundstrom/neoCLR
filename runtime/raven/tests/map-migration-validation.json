@@ -1,0 +1,95 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "suite": "collections",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS Any does not read Current\nPASS For break disposes its iterator\nPASS ArrayList copy has independent storage\nPASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nPASS Predicate Any stops at its first match\nPASS ArrayQueue preserves FIFO\nPASS HashSet applies its comparer\nPASS ArrayStack preserves LIFO\nTests: 12, passed: 12, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS Any does not read Current\nPASS For break disposes its iterator\nPASS ArrayList copy has independent storage\nPASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nPASS Predicate Any stops at its first match\nPASS ArrayQueue preserves FIFO\nPASS HashSet applies its comparer\nPASS ArrayStack preserves LIFO\nTests: 12, passed: 12, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "native",
+      "arguments": [
+        "--filter",
+        "ArrayQueue"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "arguments": [
+        "--filter",
+        "ArrayQueue"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "native",
+      "arguments": [
+        "--filter",
+        "Map"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "arguments": [
+        "--filter",
+        "Map"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "scripts/test-runtime-library.py": "4f1794feb096d92df8f61058768f61eca633de2eeca62f6dbba6c82323b34975",
+    "scripts/build-native-project.py": "2f60d4e65f913495167054edd435a34ef0c70897a752b3b56152010b04c89188",
+    "scripts/discover-runtime-tests.py": "0f7c22b1a3e46879654d29d4ad5cd292ed36adced2958f0d00a811a7342dd699",
+    "scripts/validate-test-discovery.py": "83f6cd15cc0a9fbaa4fd2a6a0fbca22d57da5d5edd1e2f248daacf3416088167",
+    "tools/testing/NeoCLR.TestDiscovery/Program.cs": "56f628771e941905d800f0793260558028bec25f4aeafe3eb310477511f63613",
+    "tools/testing/NeoCLR.TestDiscovery/NeoCLR.TestDiscovery.csproj": "87d0d17b301773d1a73666a6163a6049a06319ea651b9b9c9df34e199707f4ee",
+    "runtime/raven/tests/collections/Collections.rvn": "0fd2661cd5e234dd741602156c2162c011f0c0f4eeca4e94dd4e66cdd2e5bf17",
+    "runtime/raven/tests/collections/Main.rvn": "e0d4d6b296788027744cc6f4e5db76e85d99381c5cbd7f14c64727bc48ff0c8d",
+    "runtime/raven/tests/collections/MapMaterialization.rvn": "363ee1bc09ec13e638cd7abbad69b2f96c15597fea44d9a2b137ce110124cc8e",
+    "runtime/raven/tests/discovery-contract/OtherAttribute.rvn": "78d87fb89024c33a52dc817347bd983c9f389da46d135571f711618b744c880a",
+    "runtime/raven/tests/discovery-contract/Tests.rvn": "72e0dcdb877c6100bf8cb9ab2073df92a7d3c087f44e7c9d024d738c9a4a9f28",
+    "runtime/raven/tests/framework/Assertions.rvn": "75b24edb65dd3c9bc6af7a211966feda795c9834adea0f3d9d064e05049072eb",
+    "runtime/raven/tests/framework/TestAttribute.rvn": "a20f0d5f981985e52a384937a1dba70670a01507143a6949972978546c6204cd",
+    "runtime/raven/tests/framework/TestSuite.rvn": "de0c1c8e5491ba22d6c3964142c81e12f210b567c61b02a3ebf58fc4acad3f07",
+    "runtime/raven/tests/runner-contract/Main.rvn": "6aa7515a6b2bd4eaccbd296e80348c869fab9f8f74e89e067f72530f3ce55d0f",
+    "runtime/raven/tests/collections/Tests.rvnproj": "b1c2ca688d4e0cdba3fd369b3585e932b19c2ccc9d251b0b72e5cf1670d78138",
+    "runtime/raven/tests/discovery-contract/Tests.rvnproj": "138cbef1c75af0c870d1cf93998f95d0b2c6056c13c82800c7b12faf9d460cdc",
+    "runtime/raven/tests/runner-contract/Tests.rvnproj": "3061ec4816a7c6dc3025e6cd5775cd2b62fd7a230daabdf6de1709a9541e999e"
+  },
+  "bundleManifestSha256": "febe0d6b510ca36c19a82ec21305097467a3185611328c701b5ef158251d59d2",
+  "aotSha256": "efaa7b7b5908b681c297eda8e56482d76e0f279f9405e57f76434e5d0ad689f1",
+  "interpreterSha256": "d403d020488209b1afae459b63b4d4f60edb4c7d7cf92f9b6cdcb0eb9e692e1b",
+  "suites": [
+    "collections"
+  ],
+  "date": "2026-10-10",
+  "codeBaseline": "a9910357 plus collection migration",
+  "compilerRevision": "1a0c4e62734b2d4f17dc9f8af1f5d02c566f8cf4",
+  "scope": "12 collection tests and focused ArrayQueue/Map selectors in native/interpreter; fixed discovery-signature rejection evidence reused from filtering-validation.json",
+  "windowsStatus": "Pending GitHub action"
+}

@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Begin porting program-form library checks into the Raven test framework: split
+  map iteration/materialization checks into five discoverable tests with descriptive
+  assertions for snapshots, independent copies, ToMap, collisions/empty input and
+  reference/comparer behavior. All 12 collection cases and focused Map/ArrayQueue
+  selections pass native macOS ARM64 and interpreter execution with rebuilt libraries.
+  Keep the original integration consumer pending Windows equivalence, and keep
+  terminal-fault/compiler rejection checks in their specialized harnesses. Focused
+  host --suite runs verify actual registration without repeating fixed discovery
+  rejection fixtures; the default full gate still runs those fixtures.
+
 - Restore AOT nominal-member attribute inspection with the rebuilt guest-function
   libraries. A shared descriptor branch reached an unbound module-member service;
   bind its exact contract to an explicit unsupported-retention fault while preserving

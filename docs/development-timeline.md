@@ -13675,3 +13675,21 @@ claim completion of in-process test discovery.
 - **Validation:** 32 native/interpreted executions and five discovery-signature
   rejection cases pass. [Evidence](../runtime/raven/tests/filtering-validation.json)
   records reuse of completed suite checks and the corrected runner-only rerun. Grouping and AOT reflective registration remain follow-ups.
+
+## 2026-10-10 — Start porting program-form checks to Raven tests
+
+- **Author:** “We should commence port existing tests or tests in program form to
+  this new framework”. This explicitly asks to begin migration, beyond adding tests
+  for future work.
+- **Assistant action:** starts with Map pair iteration and materialization checks
+  from native-collections/Main.rvn, splitting two Boolean helpers into five
+  discoverable module-function tests with descriptive assertions. Preserves explicit
+  captured-iterator semantics with `use`/`while`; ordinary traversal uses `for`.
+- **Scope:** port observable collection behavior first. Keep compiler rejection,
+  terminal-fault process and native hosting checks in their specialized harnesses.
+  Retain the old standalone integration consumer until cross-platform equivalence
+  is qualified; it is not the template for new library behavior tests.
+- **Outcome:** all 12 collection tests pass native macOS ARM64 and interpreter
+  execution, along with Map-only and ArrayQueue-only selection.
+  [Evidence](../runtime/raven/tests/map-migration-validation.json) records hashes and
+  exact results. Windows equivalence is pending its action.
