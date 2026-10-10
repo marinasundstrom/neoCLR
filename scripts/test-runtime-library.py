@@ -19,6 +19,7 @@ NATIVE_ADMISSION_GAPS = {
     # Inspection resolves this private index to neoCLR.Runtime.ParseInt64.
     # A changed linked index deliberately requires fresh inspection/qualification.
     'int64-parsing': '$aot_linked_114: unsupported value member contract',
+    'primitive-parsing': 'unsupported closed generic argument: Single',
 }
 MAP_NAMES = [
     'Map materialization handles collisions and empty input',
@@ -137,6 +138,20 @@ INT64_PARSING_NAMES = [
     'Int64 parsing distinguishes overflow from invalid trailing text',
     'Int64 parsing accepts signs leading zeros and values beyond Int32',
 ]
+PRIMITIVE_PARSING_NAMES = [
+    'Boolean parsing accepts mixed case and rejects numeric aliases',
+    'Byte parsing preserves values and reports overflow',
+    'Byte parsing preserves distinct small values',
+    'Double parsing preserves values and reports overflow',
+    'Primitive parsers distinguish invalid format from overflow',
+    'Int16 parsing preserves values and reports overflow',
+    'Int32 parsing preserves values and reports overflow',
+    'SByte parsing preserves values and reports overflow',
+    'Single parsing preserves values and reports overflow',
+    'UInt16 parsing preserves values and reports overflow',
+    'UInt32 parsing preserves values and reports overflow',
+    'UInt64 parsing preserves values and reports overflow',
+]
 DISCOVERY_SPEC = importlib.util.spec_from_file_location('test_discovery', ROOT / 'scripts/discover-runtime-tests.py')
 DISCOVERY = importlib.util.module_from_spec(DISCOVERY_SPEC)
 DISCOVERY_SPEC.loader.exec_module(DISCOVERY)
@@ -152,7 +167,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'int64-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'int64-parsing', 'primitive-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -178,6 +193,7 @@ def main():
         ('string-construction', 0, ''.join('PASS ' + n + '\n' for n in STRING_CONSTRUCTION_NAMES) + f'Tests: {len(STRING_CONSTRUCTION_NAMES)}, passed: {len(STRING_CONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('unicode-casing', 0, ''.join('PASS ' + n + '\n' for n in UNICODE_CASING_NAMES) + f'Tests: {len(UNICODE_CASING_NAMES)}, passed: {len(UNICODE_CASING_NAMES)}, failed: 0, skipped: 0\n'),
         ('int64-parsing', 0, ''.join('PASS ' + n + '\n' for n in INT64_PARSING_NAMES) + f'Tests: {len(INT64_PARSING_NAMES)}, passed: {len(INT64_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
+        ('primitive-parsing', 0, ''.join('PASS ' + n + '\n' for n in PRIMITIVE_PARSING_NAMES) + f'Tests: {len(PRIMITIVE_PARSING_NAMES)}, passed: {len(PRIMITIVE_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n'),
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]

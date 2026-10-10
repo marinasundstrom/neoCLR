@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Migrate primitive numeric and Boolean parsing values, format errors and overflow into 12 attributed Raven tests in `primitive-parsing`.
+  Release-interpreted execution passes; native admission remains unsupported. Default gates include
+  the suite. Original integration consumers remain; Windows qualification is pending.
+
 - Migrate Int64 boundary parsing, lexical errors, overflow and formatting into 5 attributed Raven tests in `int64-parsing`.
   Release-interpreted execution passes; native admission remains unsupported. Default gates include
   the suite. Original integration consumers remain; Windows qualification is pending.

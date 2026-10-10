@@ -65,6 +65,8 @@ Batch `unicode-casing` adds 6 tests for Unicode casing expansions, contextual si
 ([evidence](../runtime/raven/tests/unicode-casing-validation.json)).
 Batch `int64-parsing` adds 5 tests for Int64 boundary parsing, lexical errors, overflow and formatting qualified in release-interpreted execution; native admission remains unsupported
 ([evidence](../runtime/raven/tests/int64-parsing-validation.json)).
+Batch `primitive-parsing` adds 12 tests for primitive numeric and Boolean parsing values, format errors and overflow qualified in release-interpreted execution; native admission remains unsupported
+([evidence](../runtime/raven/tests/primitive-parsing-validation.json)).
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

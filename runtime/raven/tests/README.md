@@ -426,3 +426,11 @@ The Int64 suite admission gap is the unbound `neoCLR.Runtime.ParseInt64` service
 Evidence includes the inspected source member behind the private linked index.
 That exact rejection is pinned deliberately: a changed index requires inspection
 rather than accepting an arbitrary unsupported-member failure.
+
+Batch `primitive-parsing`: primitive numeric and Boolean parsing values, format errors and overflow; 12 tests pass release-interpreted execution; native admission remains unsupported ([evidence](primitive-parsing-validation.json)).
+Source: [docs/experiments/numeric-contracts/Main.rvn](../../../docs/experiments/numeric-contracts/Main.rvn). Windows remains pending.
+
+The primitive parser suite currently rejects native closed generic `Single` results
+at selection. Its twelve cases pass interpreted; this records the first admission
+gap rather than claiming all later parser bindings are implemented. Generic numeric
+operator and JSON conversion checks remain in the original numeric consumer.

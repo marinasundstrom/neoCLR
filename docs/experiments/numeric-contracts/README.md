@@ -42,3 +42,7 @@ Boolean numeric arguments and extra constraints. See
 The shared Self integration runs this consumer on the nominal main-based runtime,
 with `RavenTargetPlatform=NeoCLR`. It does not depend on structural Function types.
 Refresh `native-self-validation.json` from matching rebuilt artifacts.
+
+Development test migration (2026-10-10): primitive numeric and Boolean parsing values, format errors and overflow now also run as 12
+attributed framework tests in `runtime/raven/tests/primitive-parsing`. The framework README
+links native/interpreted evidence. This original consumer retains its integration purpose.
