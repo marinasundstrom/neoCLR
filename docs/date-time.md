@@ -152,6 +152,41 @@ introduce platform-dependent accepted forms; implementing the bounded grammar in
 Raven provides the same explicit-culture behavior on all targets. These preview
 choices may evolve before a stable release.
 
-Instant, Duration, TimeOffset and ZonedDateTime parsing remain separate gaps: their
-wire formats, offset precision and named-zone ambiguity policies are not settled by
-this civil slice. Timezone conversion remains an explicit operation after parsing.
+Instant and ZonedDateTime parsing remain separate gaps. Timezone conversion remains
+an explicit operation after civil parsing.
+
+
+### Duration and offset parsing (development, 2026-10-10)
+
+`Duration.Parse(value)` returns `Result<Duration, DateTimeParseError>` for invariant
+`[-][d.]hh:mm:ss[.fraction]`. Days have 1–8 ASCII digits (leading zeros accepted),
+clock fields exactly two digits, and optional fractions 1–7 digits. Hours are 0–23,
+minutes/seconds 0–59. The complete signed Int64 tick range is supported, including
+`-10675199.02:48:05.4775808`; a tick beyond either boundary returns OutOfRange.
+Input is bounded to 26 UTF-8 bytes before materialization. Negative accumulation
+avoids trying to represent the positive magnitude of Int64.MinValue.
+
+`TimeOffset.Parse(value)` returns `Result<TimeOffset, DateTimeParseError>` for `Z`
+or `±HH:mm[:ss]`. Minutes/seconds are 0–59 and the existing inclusive ±18-hour
+range applies. `-00:00` means zero; the model has no unknown-offset sentinel.
+The parser rejects fractions, named zones, incomplete fields and whitespace.
+Both parsers use ASCII digits, consume complete input, and report InvalidFormat
+for unsupported grammar and OutOfRange for numeric ranges. No host parser or
+ambient culture participates. Grammar is bounded; excess day/fraction width is
+InvalidFormat even when a shorter equivalent could represent a valid value.
+
+Reviewed against [.NET TimeSpan constant formatting and parsing](https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-timespan-format-strings)
+and [DateTimeOffset constructor constraints](https://learn.microsoft.com/en-us/dotnet/api/system.datetimeoffset.-ctor?view=net-10.0).
+Duration adopts the constant-format shape and 100 ns resolution; general culture
+patterns, whitespace styles and ParseExact remain gaps, not a replacement contract
+for .NET's broader Parse surface. Result errors retain neoCLR's existing adaptation.
+TimeOffset is a standalone displacement, unlike DateTimeOffset: its pre-existing
+second precision and ±18-hour range exceed DateTimeOffset's whole-minute ±14-hour
+constraint. Preserving that domain supports existing zone data, at the cost of
+requiring range/precision checks when exchanging values with DateTimeOffset.
+
+Next, scope Instant parsing around an explicit numeric offset or Z, with checked
+conversion and civil/tick bounds; do not silently use the machine zone. A future
+ZonedDateTime parser must additionally define zone identifiers, offset consistency,
+gaps and repeated-local-time resolution. These are review directions, not implemented
+APIs. A parser must not lose a zone identifier by treating it as a fixed offset.

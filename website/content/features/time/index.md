@@ -71,8 +71,11 @@ second-level historical offsets. Precision is 100 ns; leap seconds are unsupport
 interop needs validation. .NET TimeZoneInfo already handles rule conversions; this API
 makes the zero/one/two mapping explicit, following the distinction also used by Noda Time.
 
-Parsing, serialization, richer resolvers, custom rule providers, broader zone ranges
-and scheduling remain future work. Resource localization remains separate from culture.
+Development parsing now covers Date, TimeOfDay and LocalDateTime numeric culture
+formats, Duration's invariant day/clock form, and TimeOffset's signed numeric form
+or Z. Parsers return typed Result errors and preserve 100 ns precision where relevant.
+Instant and named-zone parsing, serialization, richer resolvers, custom rule providers,
+broader zone ranges and scheduling remain future work. Resource localization remains separate from culture.
 
 [API reference →](../../docs/namespaces.html)
 · [Detailed contracts and evidence →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/time-zones.md)

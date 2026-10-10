@@ -1596,3 +1596,13 @@ cases are selected in RavenDoc. The aggregate reference compiles the error from 
 ordinary Raven union source; no new manual carrier or renderer exclusion is added.
 The native library snapshot exposes the same members. This is bounded numeric
 culture parsing, not a full .NET parsing API or a time-zone parser.
+
+
+## Duration and offset parsing development snapshot (2026-10-10)
+
+Duration.Parse(String) and TimeOffset.Parse(String) have aggregate and native
+member pages, typed results and bounded grammar/error documentation. Existing
+DateTimeParseError cases are reused. The aggregate bridge remains declaration-only;
+no new Runtime Contract option is required. The native snapshot uses the matching
+Duration/offset bundle and the same renderer code revision as the civil slice.
+General duration patterns and named-zone parsing remain tracked gaps.

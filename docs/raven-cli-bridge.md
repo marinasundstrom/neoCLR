@@ -7820,3 +7820,23 @@ Eight framework cases and a standalone host-preference parity probe pass native
 macOS ARM64 and interpreted execution. Exact-signature and missing-context checks
 pass. The Windows action includes both consumers; Windows execution remains pending.
 See runtime/raven/tests/time-parsing-validation.json and the time-parsing probe.
+
+
+### Duration/offset Parse and native negation (2026-10-10)
+
+Duration.Parse(String) and TimeOffset.Parse(String) return standard
+Result<T, DateTimeParseError> values. The aggregate reference adds declaration-only
+methods; native metadata retains executable Raven bodies. Runtime Contract settings,
+Raven binding and CLI emission are unchanged. The compiler code pin remains
+b2f3ba0f8b8e92f0c516155f563b332b0a6fad54; matching reference/runtime libraries are
+required. General culture-pattern parsing and named-zone parsing remain gaps.
+
+The parser exposed missing Negate admission in neoCLR's native value profile.
+neoCLR now checks integer/Double operands, preserves unary stack and output-borrow
+flow, and emits Cranelift integer/floating negation. Integer minimum values wrap
+as in the existing interpreter and CLI neg semantics; parser overflow is checked
+separately before accumulation. This is a backend gap fix, not a new Raven language
+rule. neoCLR owns native lowering; Raven's CLI neg remains the temporary transport
+until the native compiler emits the equivalent instruction directly. The primitive
+Int32/Int64/Double execution probe compares native results with the interpreter;
+framework tests exercise dynamic signed offsets and full Duration tick bounds.

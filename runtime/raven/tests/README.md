@@ -508,10 +508,23 @@ malformed versus range errors, all seven fractional widths, invalid clock fields
 three explicit numeric cultures, culture mismatches, local civil boundaries and
 current-culture defaults. [Qualification](time-parsing-validation.json) passes native
 macOS ARM64 and interpreted execution. This brings the library suite to 152 cases
-across 16 projects. General patterns and offset/zone parsing are not covered APIs.
+across 16 projects at that slice. General patterns and named-zone parsing remain gaps.
 
 The separate [culture parity probe](../../../docs/experiments/time-parsing/README.md)
 compares the reported host preference and bounded culture resolution in both modes.
 It passes locally; the Windows workflow runs it after the attributed suite. Native
 host-culture lookup is explicit through --bind-system-culture; native project builds
 enable that capability and link its adapter only when reached.
+
+
+### Duration and offset parsing
+
+`--suite duration-offset-parsing` adds eight attributed tests for signed Duration
+bounds, tick overflow, all fraction widths, strict grammar, fixed-offset bounds,
+negative zero and arithmetic/conversion consumers. All eight pass native macOS ARM64
+and interpreted execution. The library now contains 160 cases across 17 projects.
+The parser exposed missing native unary negation: its value-profile admission and
+lowering are fixed, with an additional Int32/Int64/Double comparison probe. The
+[qualification](duration-offset-parsing-validation.json) also reruns civil parsing.
+Windows execution of this slice remains pending; the Windows action selects this
+suite by default. Prior suite evidence remains applicable to unaffected behavior.

@@ -6295,3 +6295,39 @@ fn system_culture_binding_requires_explicit_host_context() {
         assert!(String::from_utf8_lossy(&result.stderr).contains(message));
     }
 }
+
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_unary_negation_matches_interpreter_boundaries() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let dir = Temp::new();
+    let mut source = String::from(".module UnaryNegation\n.function Calculate() -> Int32\n");
+    for (load, input, expected) in [
+        ("ldc.i4", "0", "0"),
+        ("ldc.i4", "1", "-1"),
+        ("ldc.i4", "-2147483648", "-2147483648"),
+        ("ldc.i8", "9223372036854775807", "-9223372036854775807"),
+        ("ldc.i8", "-9223372036854775808", "-9223372036854775808"),
+        ("ldc.i8", "-1", "1"),
+        ("ldc.r8", "1.5", "-1.5"),
+    ] {
+        source.push_str(&format!("{load} {input}\nneg\n{load} {expected}\nceq\nbrfalse Bad\n"));
+    }
+    source.push_str("ldc.i4 42\nret\nBad:\nldc.i4 1\nret\n.end\n");
+    let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    let r = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(base.join("text-host.c")).arg(base.join("text-arena.c"))
+        .arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+        .arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).output().unwrap();
+    assert_eq!(r.status.code(), Some(42), "{r:?}");
+    assert!(r.stdout.is_empty() && r.stderr.is_empty());
+    let app = neoclr::assemble(&source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate()").unwrap()).unwrap();
+    assert_eq!(method.invoke(vec![], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+}

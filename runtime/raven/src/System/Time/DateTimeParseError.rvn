@@ -1,9 +1,9 @@
 module System.Time
 
-/// A failure to parse a supported numeric civil date/time representation.
+/// A failure to parse a supported numeric date/time, duration or offset representation.
 public union DateTimeParseError {
-    /// The text does not match the supported culture-specific numeric grammar.
+    /// The text does not match the supported numeric grammar.
     case InvalidFormat
-    /// Numeric fields match the grammar but do not form a valid civil value.
+    /// Numeric fields match the grammar but do not form a valid temporal value.
     case OutOfRange
 }

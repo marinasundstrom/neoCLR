@@ -1987,6 +1987,14 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         b.ins().return_(&[success]);
                         continue;
                     }
+                    Op::Negate => {
+                        let value = pop(&mut stack);
+                        stack.push(if matches!(top(), Ty::Double) {
+                            b.ins().fneg(value)
+                        } else {
+                            b.ins().ineg(value)
+                        });
+                    }
                     Op::BitNot => {
                         let value = pop(&mut stack);
                         stack.push(b.ins().bnot(value));

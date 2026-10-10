@@ -703,7 +703,7 @@ impl<'a> Profile<'a> {
                         .filter(|n| f.out_parameters.contains(n)),
                 ),
                 Op::ConvertFloat32 | Op::ConvertFloat64 | Op::ConvertFloatUnsigned | Op::ConvertInt32 | Op::ConvertUInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 | Op::ConvertInt64 | Op::ConvertUInt64 | Op::ConvertNativeInt | Op::ConvertNativeUInt => (),
-                Op::BitNot | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_)
+                Op::Negate | Op::BitNot | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_)
                 | Op::IsInstance(_) | Op::CastClass(_) | Op::ReferenceIsNull | Op::NewArray(_) | Op::ReserveArray(_) | Op::ArrayLength => {
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
                     state.stack.push(None);
@@ -898,7 +898,7 @@ impl<'a> Profile<'a> {
                 | Op::Less
                 | Op::GreaterUnsigned
                 | Op::LessUnsigned
-                | Op::BitAnd | Op::BitOr | Op::BitXor | Op::BitNot
+                | Op::BitAnd | Op::BitOr | Op::BitXor | Op::BitNot | Op::Negate
                 | Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned
                 | Op::Add
                 | Op::Sub
@@ -1205,6 +1205,13 @@ impl<'a> Profile<'a> {
                     if !matches!(pop(&mut stack)?, Ty::Int | Ty::Bool) {
                         return Err(fail(pc, "branch requires Int32 or Boolean"));
                     }
+                }
+                Op::Negate => {
+                    let value = pop(&mut stack)?;
+                    if !matches!(value, Ty::Int | Ty::Wide | Ty::Size | Ty::Double) {
+                        return Err(fail(pc, "negation requires an integer or Double"));
+                    }
+                    stack.push(value);
                 }
                 Op::BitNot => {
                     take(&mut stack, &Ty::Int)?;

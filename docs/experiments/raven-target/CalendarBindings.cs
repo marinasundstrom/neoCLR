@@ -8,6 +8,8 @@ static class CalendarBindings
     public const string TimeResult = "System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>";
     sealed record Member(string Owner, string Name, string[] Args, string Result, bool Instance = false);
     static readonly Member[] Members = [
+        new("Duration", "Parse", ["String"], "System.Result<System.Time.Duration,System.Time.DateTimeParseError>"),
+        new("TimeOffset", "Parse", ["String"], "System.Result<System.Time.TimeOffset,System.Time.DateTimeParseError>"),
         new("Date", "Parse", ["String"], "System.Result<System.Time.Date,System.Time.DateTimeParseError>"),
         new("Date", "Parse", ["String", "System.Globalization.Culture"], "System.Result<System.Time.Date,System.Time.DateTimeParseError>"),
         new("TimeOfDay", "Parse", ["String"], "System.Result<System.Time.TimeOfDay,System.Time.DateTimeParseError>"),

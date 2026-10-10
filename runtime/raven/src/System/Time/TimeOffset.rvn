@@ -24,6 +24,12 @@ public struct TimeOffset : EquatableTo<TimeOffset>, ComparableTo<TimeOffset> {
         return Ok(TimeOffset(seconds))
     }
 
+    /// Parses Z or signed HH:mm[:ss], within the existing inclusive ±18-hour range.
+    /// Negative zero denotes zero; malformed text and invalid ranges return DateTimeParseError.
+    static func Parse(value: string) -> Result<TimeOffset, DateTimeParseError> {
+        return CivilParser.ParseOffset(value)
+    }
+
     val Seconds: int => StoredSeconds
 
     /// Projects to the civil range 0001-01-01 through 9999-12-31.

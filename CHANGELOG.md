@@ -13,7 +13,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and Hebrew-Israel numeric Gregorian formats, with optional 1–7 fractional digits.
   Reject malformed input and invalid civil ranges without throwing. Eight framework
   tests pass native macOS ARM64 and interpreted execution; refresh both API snapshots.
-  General patterns, non-Gregorian and Instant/Duration/offset/zone parsing remain gaps.
+  Extend parsing with Duration's invariant day/clock form and TimeOffset's signed
+  whole-second form, preserving full Int64 tick bounds and the existing ±18-hour
+  offset domain. Eight additional framework cases pass both local execution modes.
+  Fix native value-profile unary negation exposed by the parsers, with integer-limit
+  and Double native/interpreter comparison coverage. General patterns, non-Gregorian
+  and Instant/named-zone parsing remain gaps.
 - Add the explicit native SystemCultureName host adapter, matching the interpreter's
   preferred-language APIs on macOS and Windows. Project builds enable the binding;
   only consumers that retain it link CoreFoundation on macOS. Local host-preference

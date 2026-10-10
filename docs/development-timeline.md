@@ -13872,3 +13872,24 @@ claim completion of in-process test discovery.
   now runs the parser suite and parity probe; Windows execution is still pending.
   Evidence: [framework](../runtime/raven/tests/time-parsing-validation.json) and
   [host parity](experiments/time-parsing/validation.json).
+
+
+## 2026-10-10 — Duration/offset parsing and negation gap
+
+- **Author direction:** continue time/library work, then continue after this slice.
+- **Assistant choice:** add bounded Duration and TimeOffset parsers before an
+  explicit-offset Instant parser. Adopt the TimeSpan constant-form shape and reuse
+  Result errors; preserve TimeOffset's existing whole-second ±18-hour domain.
+  [Comparison and limitations](date-time.md) distinguish these development subsets
+  from .NET's broader parsing surface; no new author endorsement of each format is inferred.
+- **Implementation:** reuse ASCII clock parsing, validate signed tick limits without
+  positive-magnitude overflow, and add eight discoverable framework cases. Tests
+  exposed missing native unary negation; implement value-profile type/flow checks
+  and Cranelift lowering instead of avoiding ordinary unary syntax in Raven.
+- **Outcome:** all eight new cases pass native macOS ARM64 and interpreter execution;
+  a separate native/interpreter Int32/Int64/Double boundary probe also passes. Both
+  API references are refreshed. Windows qualification remains separate; the earlier
+  Map-indexer Windows action now reports success without an independent artifact audit.
+- **Next:** the author asked to continue after this slice. Implement Instant parsing
+  with an explicit offset or Z; named-zone identifiers and ambiguity policies need
+  a separate bounded review. The current slice does not implement that parser.

@@ -139,4 +139,100 @@ internal class CivilParser {
         let time = TimePart(text, 11, culture)?
         return Ok(LocalDateTime.Create(date, time))
     }
+
+    static func ParseDuration(value: string) -> Result<Duration, DateTimeParseError> {
+        let length = value.GetUtf8ByteCount()
+        if length < 8 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        if length > 26 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let text = Utf8.Encode(value)
+        var start = 0
+        let negative = text[0] == 45
+        if negative {
+            start = 1
+        }
+        var days = 0
+        var clockStart = start
+        // A day separator must precede the first clock colon.
+        var cursor = start
+        while cursor < length && text[cursor] != 58 {
+            if text[cursor] == 46 {
+                let count = cursor - start
+                if count < 1 {
+                    return Error(DateTimeParseError.InvalidFormat)
+                }
+                if count > 8 {
+                    return Error(DateTimeParseError.InvalidFormat)
+                }
+                days = Digits(text, start, count)
+                if days < 0 {
+                    return Error(DateTimeParseError.InvalidFormat)
+                }
+                clockStart = cursor + 1
+                break
+            }
+            cursor += 1
+        }
+        let time = TimePart(text, clockStart, Culture.Invariant)?
+        if days > 10675199 {
+            return Error(DateTimeParseError.OutOfRange)
+        }
+        let dayTicks = days * 864000000000L
+        // Accumulate negatively so Int64.MinValue never needs a positive magnitude.
+        var limit = -9223372036854775807L
+        if negative {
+            limit -= 1L
+        }
+        if -time.Ticks < limit + dayTicks {
+            return Error(DateTimeParseError.OutOfRange)
+        }
+        let ticks = -dayTicks - time.Ticks
+        if negative {
+            return Ok(Duration.FromTicks(ticks))
+        }
+        return Ok(Duration.FromTicks(-ticks))
+    }
+
+    static func ParseOffset(value: string) -> Result<TimeOffset, DateTimeParseError> {
+        if value.Equals("Z") {
+            return Ok(TimeOffset.Zero)
+        }
+        let length = value.GetUtf8ByteCount()
+        if length != 6 && length != 9 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let text = Utf8.Encode(value)
+        if text[0] != 43 && text[0] != 45 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        if text[3] != 58 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let hour = Digits(text, 1, 2)
+        let minute = Digits(text, 4, 2)
+        var second = 0
+        if length == 9 {
+            if text[6] != 58 {
+                return Error(DateTimeParseError.InvalidFormat)
+            }
+            second = Digits(text, 7, 2)
+        }
+        if hour < 0 || minute < 0 || second < 0 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        if minute > 59 || second > 59 {
+            return Error(DateTimeParseError.OutOfRange)
+        }
+        var seconds = hour * 3600 + minute * 60 + second
+        if text[0] == 45 {
+            seconds = -seconds
+        }
+        let Ok(offset) = TimeOffset.FromSeconds(seconds) else {
+            return Error(DateTimeParseError.OutOfRange)
+        }
+        return Ok(offset)
+    }
 }

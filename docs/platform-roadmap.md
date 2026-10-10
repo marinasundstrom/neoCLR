@@ -83,7 +83,10 @@ library tests. The Windows action at 898fc8a4 subsequently completed successfull
 its artifacts have not yet been independently audited. Gaps exposed by these tests were fixed rather than retained as native
 admission exceptions. Final Object-slot/shift checks and Windows object emission pass;
 Windows runtime qualification remains pending. A subsequent slice adds Map getter
-indexers and MutableMap/HashMap setters, preserving safe Find lookup. JsonObject now also implements a read-only Map view with safe lookup, a faulting
+indexers and MutableMap/HashMap setters, preserving safe Find lookup. Its Windows
+[gate at ee21653d](https://github.com/marinasundstrom/neoCLR/actions/runs/38067619388)
+now reports success; artifacts have not been independently audited. Later JsonObject
+and civil-parser Windows runs are still in progress as of this review. JsonObject now also implements a read-only Map view with safe lookup, a faulting
 string indexer and ordered snapshots. Its expanded 16-case JSON suite passes both
 local modes ([evidence](../runtime/raven/tests/json-map-validation.json)), with four
 isolated missing-field checks. Native serializer fallback admission and retained-type
@@ -340,7 +343,7 @@ continue to co-evolve with native foundations.
 | Runtime scheduling | Review runnable work, I/O wakeups, cancellation and host ownership against the existing [scheduler design](runtime-scheduling-design.md). | Compare .NET Task/ThreadPool responsibilities with runtime-owned execution; preserve interpreter/native lifecycle consistency. |
 | Queue, Stack and sets | Review FIFO/LIFO and set interfaces and concrete implementations against [current collection contracts](collection-contracts.md) and actual consumers. | Compare .NET Queue/Stack/HashSet ergonomics, equality, duplicates, removal, empty results, iteration, growth and reference release; select useful additions without treating the broader [collection proposal](proposals/collections-api.md) as implemented. |
 | Database-backed web sample | Select a provider and a small parameterized query/update scenario with a Dapper-like typed object mapper. | Evaluate Dapper/ADO.NET responsibilities, UTF-8 conversion, null/type mapping, connection/transaction lifetime and native macOS/Windows dependencies. Provider choice, mapping strategy and public contracts remain open. |
-| Time Parse methods | Civil Date/TimeOfDay/LocalDateTime numeric parsers now pass eight local native/interpreted tests. Next scope Instant/Duration/TimeOffset/ZonedDateTime inputs separately. | Current/explicit culture and typed Result errors are implemented; general patterns, non-Gregorian parsing and offset/zone policies remain gaps. |
+| Time Parse methods | Civil Date/TimeOfDay/LocalDateTime numeric parsers now pass eight local native/interpreted tests. Duration/TimeOffset add bounded invariant forms; next scope Instant/ZonedDateTime inputs separately. | Current/explicit culture and typed Result errors are implemented; general patterns, non-Gregorian parsing and offset/zone policies remain gaps. |
 | Runtime suspension | Review safe suspension/resumption boundaries, retained roots and host-resource lifetime alongside scheduling. | Compare CLR suspension/GC coordination and cooperative execution approaches; distinguish runtime suspension from awaiting I/O and leave the stack/preemption model open. |
 
 **Author clarification (2026-10-10):** explicitly include Parse methods for Date,
@@ -350,7 +353,8 @@ The [civil parsing slice](date-time.md#development-parsing-2026-10-10) now imple
 Parse(value) and Parse(value, culture), with a shared standard error union. Eight
 framework cases pass both local modes, and native/interpreted host-preference output
 matches. General formatting patterns, non-Gregorian parsing and parsers for Instant,
-Duration, TimeOffset and ZonedDateTime remain open. No TryParse alias is added.
+ZonedDateTime remain open. Duration and TimeOffset now add invariant parsing with
+full tick-boundary checks and the existing offset domain. No TryParse alias is added.
 Windows validation includes the new suite and host-culture parity probe.
 
 A separate native gap observed during implementation: String.GetScalars exposes an
