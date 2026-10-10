@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Extend experimental metadata authoring with complete external class-base contracts,
+  inherited virtual/abstract methods and interfaces, cross-assembly base edges and
+  direct concrete base calls. Keep dependency storage in its defining assembly and
+  defer external override verification to linking. Generic bases and protected
+  ordinary methods remain unsupported. Add CLR execution and rejection regressions.
+
+
 - Internalize Utf8 after migrating System.Data/System.Web and active HTTP samples
   to public encoding APIs, without friend grants. Preserve large buffered HTTP text
   with scalar-aligned bounded conversions and private byte views; 41 JSON/HTTP

@@ -8190,6 +8190,40 @@ artifact returns 42 in the interpreter. A Raven `TestAttribute : Attribute` samp
 also returns 42 in interpreter and macOS ARM64 AOT with the matched compiler.
 
 
+## External class storage and virtual slots (development 2026-10-10)
+
+The fieldless contract above remains available. The new host-only
+`AssemblyBuilder.CompleteClassBaseReference(ImportedTypeReference type,
+IEnumerable<ImportedMethodReference> methods)` additionally admits ordinary nongeneric,
+top-level reference bases with dependency-owned instance storage, interfaces and virtual
+methods. Supply every declared public instance method and property accessor, excluding
+constructors, plus direct base/interface edges. Null arguments throw ArgumentNullException;
+foreign, duplicate, unsupported or conflicting contracts throw ArgumentException.
+The compiler supplies resolved facts; this API does not load or copy dependency fields.
+
+`CreateMethodReference` adds optional `bool isVirtual = false` and
+`bool isAbstract = false`. Class slots require nongeneric instance signatures; abstract
+slots require virtual and cannot also be overrides. `isOverride` reuses an inherited
+slot. Conflicting repeated contracts throw InvalidDataException. Interface contracts
+keep their existing implicit abstract/virtual behavior. Protected visibility remains
+constructor-only; protected ordinary methods and generic bases are still gaps.
+
+`DeclareClassBase` now permits edges across explicitly registered dependency assemblies.
+Identity, ownership, cycle and conflicting-base checks remain. `AddClass` accepts either
+a fieldless declaration or a completed class contract. Overrides must match inherited
+virtual signatures, and concrete classes must implement inherited abstract members.
+Inherited interface contracts participate in conversions and implementation validation.
+An imported public concrete virtual member permits direct `Call`, including calls
+from a synthesized async state machine; normal dispatch uses `Callvirt`. Receiver
+assignability is still checked. Source-language base access remains a compiler check. Standalone metadata cannot resolve an
+external override: linking validates it against the actual dependency definition.
+
+This follows CLR storage ownership, slot reuse and direct base-call semantics, within
+the stated nongeneric/public-member subset. The focused `--external-class-base` regression
+executes a field-bearing abstract base and concrete override on the CLR, returns 42,
+and rejects a missing abstract implementation. Guest native qualification is recorded
+with the HTTP pipeline consumer when complete.
+
 ## Assembly custom attributes (development 2026-10-10)
 
 Host-only `NeoCLR.Metadata.Experimental.Model`; these are physical assembly annotations,

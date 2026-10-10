@@ -1678,3 +1678,12 @@ Obsolete annotations (2026-10-10): the source runtime and aggregate projection
 expose the three basic constructors, Message and IsError. String byte-oriented
 members remain callable with migration warnings. DiagnosticId/UrlFormat are
 tracked gaps. The type is selected for generated reference documentation.
+
+### External class-base contracts (2026-10-10)
+
+The host-only CompleteClassBaseReference API, virtual/abstract CreateMethodReference
+options and cross-assembly DeclareClassBase behavior are documented in the manual
+[experimental metadata reference](experimental-metadata.md#external-class-storage-and-virtual-slots-development-2026-10-10).
+They are not guest APIs and do not require RavenDoc type selection. CLR execution
+and negative authoring tests cover external storage, slot reuse and abstract-member
+requirements. Native HTTP consumers use the matching integration compiler.

@@ -87,7 +87,9 @@ public sealed partial class TypeBuilder
         var declared = Methods.SingleOrDefault(m => m.IsStatic == isStatic && m.Visibility == MethodVisibility.Public &&
             m.Name == name && m.Signature.GenericParameterNames.Count == 0 && m.Signature.Matches(signature));
         if (declared is not null) return declared;
-        var inherited = LocalBase?.FindInterfaceImplementation(name, signature, isStatic, owner);
+        var inherited = LocalBase?.FindInterfaceImplementation(name, signature, isStatic, owner)
+            ?? (ExternalBase is { } external ? Assembly.ExternalClassMethods(external).FirstOrDefault(m =>
+                m.IsStatic == isStatic && m.Visibility == MethodVisibility.Public && m.Name == name && m.Signature.Matches(signature)) : null);
         if (inherited?.Definition.ExplicitInterfaceImplementations.Count > 0)
             throw new InvalidDataException("inherited explicit interface reimplementation is not supported");
         return inherited;

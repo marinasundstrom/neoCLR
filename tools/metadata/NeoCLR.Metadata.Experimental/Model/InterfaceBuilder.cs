@@ -129,7 +129,8 @@ public sealed partial class TypeBuilder
             foreach (var parent in owner.InterfaceSignatures)
                 foreach (var inherited in Visit(Substitute(parent))) yield return inherited;
         }
-        return InterfaceSignatures.Concat(LocalBase?.InheritedContracts() ?? []).SelectMany(Visit);
+        return InterfaceSignatures.Concat(LocalBase?.InheritedContracts() ?? [])
+            .Concat(ExternalBase is { } external ? Assembly.ExternalClassInterfaces(external) : []).SelectMany(Visit);
     }
     internal IEnumerable<(string Name, MethodSignature Signature, bool IsStatic, MethodBuilder Declaration, SignatureType Owner)> RequiredInterfaceMethods =>
         InheritedContracts().SelectMany(owner =>

@@ -3,6 +3,46 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class AssemblyBuilder
 {
     private readonly HashSet<ImportedTypeReference> fieldlessClassBases = [];
+    private readonly Dictionary<ImportedTypeReference, ImportedMethodReference[]> externalClassContracts = [];
+
+    /// <summary>Completes a nongeneric external class base contract from resolved dependency member facts.</summary>
+    /// <param name="type">Owned public, nonsealed, nongeneric top-level class reference.</param>
+    /// <param name="methods">All declared public instance methods, including abstract/virtual slots and property accessors; excludes constructors.</param>
+    /// <remarks>The host supplies validated symbol facts, including direct base and interface edges. Fields remain owned by the dependency and are laid out only after linking its exact artifact. This does not copy storage or infer it from names.</remarks>
+    /// <exception cref="ArgumentException">Foreign, unsupported, duplicate or conflicting contracts.</exception>
+    public void CompleteClassBaseReference(ImportedTypeReference type, IEnumerable<ImportedMethodReference> methods)
+    {
+        ArgumentNullException.ThrowIfNull(type); ArgumentNullException.ThrowIfNull(methods);
+        if (!ReferenceEquals(type.Owner, this) || type.IsValueType || IsAuthoredInterface(type) ||
+            type.GenericArity != 0 || type.TypeArguments.Count != 0 || type.DeclaringType is not null)
+            throw new ArgumentException("external base requires a nongeneric top-level class reference", nameof(type));
+        var members = methods.ToArray();
+        if (members.Length > 4096 || members.Distinct().Count() != members.Length || members.Any(m =>
+            !ReferenceEquals(m.Owner, this) || !Equals(m.DeclaringReference, type) || m.IsStatic || m.IsConstructor))
+            throw new ArgumentException("invalid external class member contract", nameof(methods));
+        if (externalClassContracts.TryGetValue(type, out var existing))
+        {
+            if (!existing.SequenceEqual(members)) throw new ArgumentException("conflicting external class contract");
+            return;
+        }
+        externalClassContracts.Add(type, members);
+    }
+
+    internal bool HasClassBaseContract(ImportedTypeReference type) => fieldlessClassBases.Contains(type) || externalClassContracts.ContainsKey(type);
+
+    internal IEnumerable<MethodBuilder> ExternalClassMethods(ImportedTypeReference type)
+    {
+        for (ImportedTypeReference? current = type; current is not null; current = declaredClassBases.GetValueOrDefault(current))
+            if (externalClassContracts.TryGetValue(current, out var methods))
+                foreach (var method in methods) yield return method.Target;
+    }
+
+    internal IEnumerable<SignatureType> ExternalClassInterfaces(ImportedTypeReference type)
+    {
+        for (ImportedTypeReference? current = type; current is not null; current = declaredClassBases.GetValueOrDefault(current))
+            if (authoredInterfaceBases.TryGetValue(current, out var interfaces))
+                foreach (var contract in interfaces) yield return contract;
+    }
 
     /// <summary>Declares an explicitly imported public, nonsealed, fieldless class hierarchy as an external base contract.</summary>
     /// <remarks>The compiler host supplies validated dependency facts: no instance storage, generic/nested owners,
@@ -19,18 +59,18 @@ public sealed partial class AssemblyBuilder
         fieldlessClassBases.Add(type);
     }
 
-    /// <summary>Adds a class with an explicitly declared fieldless external base.</summary>
+    /// <summary>Adds a class with an explicitly declared external base contract.</summary>
     /// <param name="namespace">Metadata namespace.</param>
     /// <param name="name">Unique metadata name.</param>
-    /// <param name="baseType">An output-owned base registered with DeclareFieldlessClassBase.</param>
+    /// <param name="baseType">An output-owned base registered with CompleteClassBaseReference or DeclareFieldlessClassBase.</param>
     /// <param name="visibility">Public or Internal visibility.</param>
     /// <returns>The owned derived class.</returns>
     /// <exception cref="ArgumentException">Invalid visibility, name, ownership or undeclared base contract.</exception>
     public TypeBuilder AddClass(string @namespace, string name, ImportedTypeReference baseType, TypeVisibility visibility = TypeVisibility.Public)
     {
         ArgumentNullException.ThrowIfNull(baseType);
-        if (!Enum.IsDefined(visibility) || !fieldlessClassBases.Contains(baseType))
-            throw new ArgumentException("external base requires an explicit fieldless contract", nameof(baseType));
+        if (!Enum.IsDefined(visibility) || !HasClassBaseContract(baseType))
+            throw new ArgumentException("external base requires a complete explicit contract", nameof(baseType));
         var definition = new TypeDefinition(@namespace, name, visibility == TypeVisibility.Public ? 1u : 0u,
             Definition.MainModule.ImportReference(baseType.AssemblyIdentity, baseType.Namespace, baseType.Name))
         { AuthoredExternalBase = baseType };

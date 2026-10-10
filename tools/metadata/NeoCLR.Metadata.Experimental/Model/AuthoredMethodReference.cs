@@ -18,25 +18,27 @@ public sealed partial class AssemblyBuilder
     }
     internal ImportedTypeReference? ExternalPrimitive(PrimitiveType primitive) => authoredPrimitiveOwners.SingleOrDefault(p => p.Value == primitive).Key;
     internal PrimitiveType? AuthoredPrimitiveOwner(ImportedTypeReference type) => authoredPrimitiveOwners.TryGetValue(type, out var primitive) ? primitive : null;
-    /// <summary>Authors a public nonvirtual member, bounded value override or abstract interface method reference without a reader definition.</summary>
+    /// <summary>Authors a public member, class virtual slot, bounded value override or abstract interface method reference without a reader definition.</summary>
     /// <param name="declaringType">Output-owned class/value/interface definition, not a construction.</param>
     /// <param name="name">Simple member name, or .ctor for a constructor.</param>
     /// <param name="signature">Primitive, scoped parameter, external nominal construction, vector or bounded function signature; Self is admitted only for an interface contract.</param>
     /// <param name="isStatic">Whether the member has no receiver. Constructors must be instance members.</param>
-    /// <param name="isOverride">Reuse the inherited slot; bounded instance Object.ToString/GetHashCode/Equals contracts are supported.</param>
+    /// <param name="isOverride">Reuse an inherited class slot with isVirtual; value overrides support Object.ToString/GetHashCode/Equals.</param>
     /// <param name="nativePrimitive">Explicit canonical numeric or String owner representation, or null for an ordinary owner.</param>
     /// <param name="visibility">Public by default; Protected is admitted only for constructors and requires a direct derived constructor call.</param>
+    /// <param name="isVirtual">True for an ordinary nongeneric reference-class slot.</param>
+    /// <param name="isAbstract">True for a bodyless new class slot; requires isVirtual.</param>
     /// <returns>An interned output-owned method contract. Construct generic owners before calling.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Invalid owner, name, constructor or signature scope.</exception>
     /// <exception cref="InvalidDataException">Unsupported signature, conflicting contract or reference limit.</exception>
     /// <exception cref="InvalidOperationException">A new method is added after interface completion.</exception>
-    /// <remarks>The caller supplies public nonvirtual class semantics or an abstract interface contract. No dependency is loaded or verified.
+    /// <remarks>The caller supplies resolved class member semantics or an abstract interface contract. No dependency is loaded or verified.
     /// Authored interfaces require nongeneric abstract contracts. Instance contracts use virtual dispatch; static contracts have no receiver. Writable ref/out parameters are supported; byref constructors, instance generic methods are unsupported. Value/nested owners retain managed receiver and physical scope semantics.
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
     public ImportedMethodReference CreateMethodReference(ImportedTypeReference declaringType, string name,
-        MethodSignature signature, bool isStatic = false, bool isOverride = false, PrimitiveType? nativePrimitive = null, MethodVisibility visibility = MethodVisibility.Public)
-        => CreateMethodReferenceCore(declaringType, name, signature, isStatic, isOverride, nativePrimitive, false, visibility);
+        MethodSignature signature, bool isStatic = false, bool isOverride = false, PrimitiveType? nativePrimitive = null, MethodVisibility visibility = MethodVisibility.Public, bool isVirtual = false, bool isAbstract = false)
+        => CreateMethodReferenceCore(declaringType, name, signature, isStatic, isOverride, nativePrimitive, false, visibility, isVirtual, isAbstract);
 
     /// <summary>Authors a virtual ToString, GetHashCode or Equals reference on the explicitly selected external Object root.</summary>
     /// <remarks>No dependency is loaded. The host supplies the selected root; runtime linking validates its actual slot. Use Callvirt, not Call.</remarks>
@@ -53,7 +55,7 @@ public sealed partial class AssemblyBuilder
     }
 
     private ImportedMethodReference CreateMethodReferenceCore(ImportedTypeReference declaringType, string name,
-        MethodSignature signature, bool isStatic, bool isOverride, PrimitiveType? nativePrimitive, bool isObjectSlot, MethodVisibility visibility = MethodVisibility.Public)
+        MethodSignature signature, bool isStatic, bool isOverride, PrimitiveType? nativePrimitive, bool isObjectSlot, MethodVisibility visibility = MethodVisibility.Public, bool isVirtual = false, bool isAbstract = false)
     {
         ArgumentNullException.ThrowIfNull(declaringType);
         ArgumentNullException.ThrowIfNull(name);
@@ -67,7 +69,11 @@ public sealed partial class AssemblyBuilder
             declaringType.IsValueType != (primitive != PrimitiveType.String) || declaringType.Namespace != "System" || declaringType.Name != primitive.ToString() ||
             declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name == ".cctor" || name == ".ctor" && primitive != PrimitiveType.String || isOverride))
             throw new ArgumentException("invalid native primitive member owner", nameof(nativePrimitive));
-        if (isOverride && (isStatic || !declaringType.IsValueType && declaringType.GenericArity != 0 || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot)))
+        if ((isVirtual || isAbstract) && (isStatic || declaringType.IsValueType || IsAuthoredInterface(declaringType) ||
+            declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name is ".ctor" or ".cctor" ||
+            signature.GenericParameterNames.Count != 0 || isAbstract && (!isVirtual || isOverride)))
+            throw new ArgumentException("class slot requires an ordinary nongeneric instance method");
+        if (isOverride && !isVirtual && (isStatic || !declaringType.IsValueType && declaringType.GenericArity != 0 || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot)))
             throw new ArgumentException("override reference requires an exact instance Object slot signature");
         if (IsNativeGrapheme(declaringType) && (name is ".ctor" or ".cctor" || isOverride || nativePrimitive is not null))
             throw new ArgumentException("grapheme members require ordinary methods without primitive reinterpretation");
@@ -89,7 +95,7 @@ public sealed partial class AssemblyBuilder
             if (!Equals(existing.DeclaringReference, declaringType) || existing.Name != name ||
                 existing.Signature.GenericParameterNames.Count != signature.GenericParameterNames.Count ||
                 !existing.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)) continue;
-            if (existing.Target.Visibility != visibility || existing.Target.NativeImportObjectSlot != isObjectSlot || existing.Target.DeclaringType?.NativePrimitive != nativePrimitive || existing.Target.NativeValueOverride != isOverride || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
+            if (existing.Target.Visibility != visibility || existing.Target.NativeImportObjectSlot != isObjectSlot || existing.Target.DeclaringType?.NativePrimitive != nativePrimitive || existing.Target.NativeValueOverride != isOverride || existing.Target.IsAbstract != (isAbstract || isInterface) || (existing.Target.IsVirtual != (isVirtual || isInterface)) || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
                 throw new InvalidDataException("conflicting method contract");
             return existing;
         }
@@ -107,8 +113,10 @@ public sealed partial class AssemblyBuilder
         var owner = MaterializeOwner(declaringType);
         if (nativePrimitive is { } scalar) owner.SetNativePrimitive(scalar);
         if (IsNativeGrapheme(declaringType)) owner.SetNativeGrapheme();
-        var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, owner, name, signature, visibility: visibility, isStatic: isStatic))
-        { DeclaringReference = declaringType, RequiresVirtualDispatch = (isObjectSlot || isInterface || isOverride && !declaringType.IsValueType) && !isStatic };
+        var reference = new ImportedMethodReference(this, isVirtual
+            ? new MethodBuilder(graph.Graph, new MethodDefinition(name, (ushort)(6 | 0x40 | (isOverride ? 0 : 0x100) | (isAbstract ? 0x400 : 0)), signature), owner)
+            : new MethodBuilder(graph.Graph, owner, name, signature, visibility: visibility, isStatic: isStatic))
+        { DeclaringReference = declaringType, RequiresVirtualDispatch = (isObjectSlot || isInterface || isVirtual || isOverride && !declaringType.IsValueType) && !isStatic };
         reference.Target.NativeValueOverride = isOverride;
         reference.Target.NativeImportObjectSlot = isObjectSlot;
         reference.Target.NativeImportObjectOwner = Equals(ExternalObjectRoot, declaringType);

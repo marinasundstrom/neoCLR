@@ -518,10 +518,12 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         var baseConstructor = operand.IsConstructor && opCode == OpCode.Call && bodyBuilder.IsConstructor &&
             operand.DeclaringReference is { } declaringReference &&
             DeclaringType?.IsDirectBaseConstructor(operand.Target, declaringReference) == true;
-        if (!baseConstructor && opCode != (operand.IsConstructor ? OpCode.Newobj : operand.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("wrong dispatch opcode", nameof(opCode));
+        var baseMethod = opCode == OpCode.Call && !operand.IsConstructor && !operand.IsStatic &&
+            operand.RequiresVirtualDispatch && !operand.Target.IsAbstract && operand.Target.Visibility == MethodVisibility.Public;
+        if (!baseConstructor && !baseMethod && opCode != (operand.IsConstructor ? OpCode.Newobj : operand.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("wrong dispatch opcode", nameof(opCode));
         if (!ReferenceEquals(operand.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(operand));
         if (operand.Signature.GenericParameterNames.Count != 0 || operand.Target.DeclaringType?.GenericParameterNames.Count > 0) throw new ArgumentException("generic import must be instantiated", nameof(operand));
-        Append(new(baseConstructor ? "call" : operand.IsConstructor ? "new.object" : operand.RequiresVirtualDispatch ? "call.virtual" : "call", Target: operand.Target, Type: operand.IsStatic ? null : operand.Target.NativeImportPrimitiveOwner is { } primitive ? (SignatureType)primitive : (SignatureType)operand.DeclaringReference!));
+        Append(new(baseConstructor || baseMethod ? "call" : operand.IsConstructor ? "new.object" : operand.RequiresVirtualDispatch ? "call.virtual" : "call", Target: operand.Target, Type: operand.IsStatic ? null : operand.Target.NativeImportPrimitiveOwner is { } primitive ? (SignatureType)primitive : (SignatureType)operand.DeclaringReference!));
     }
 
     public void Emit(OpCode opCode, NativeFunctionDefinition operand)

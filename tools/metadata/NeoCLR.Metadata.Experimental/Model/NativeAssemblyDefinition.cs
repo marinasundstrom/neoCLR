@@ -840,13 +840,16 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var method in methods.Where(m => m.Override))
             {
                 MethodRow? inherited = null;
+                bool hasExternalBase = types[method.Owner].ExternalBase is not null;
                 for (int parent = types[method.Owner].BaseIndex; parent >= 0; parent = types[parent].BaseIndex)
                 {
+                    hasExternalBase |= types[parent].ExternalBase is not null;
                     inherited = methods.SingleOrDefault(m => m.Owner == parent && m.Instance && m.Name == method.Name &&
                         m.Signature.ParameterTypes.SequenceEqual(method.Signature.ParameterTypes));
                     if (inherited is not null) break;
                 }
-                Require(inherited is not null ? inherited.Virtual && inherited.Signature.Matches(method.Signature) :
+                // External slots are checked against exact dependency definitions by the native linker.
+                Require(inherited is not null ? inherited.Virtual && inherited.Signature.Matches(method.Signature) : hasExternalBase ||
                     MethodDefinition.IsObjectOverride(method.Name, method.Signature, signatureGraph.NativeObjectRoot is null ? externalRootAlias?.Assembly : identity, signatureGraph.NativeObjectRoot) &&
                     (signatureGraph.NativeObjectRoot is not null || externalRootAlias is not null || nativeModuleAliases.Values.Count(m => m.Module == "System") == 1), "unsupported or incompatible native override");
             }

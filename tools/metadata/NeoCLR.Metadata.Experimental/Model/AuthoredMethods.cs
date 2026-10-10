@@ -161,7 +161,7 @@ public sealed partial class TypeBuilder
     public MethodBuilder AddOverride(string name, MethodSignature signature)
     {
         ArgumentNullException.ThrowIfNull(signature);
-        if (LocalBase is null && !MethodDefinition.IsObjectOverride(name, signature))
+        if (!HasExplicitClassBase && !MethodDefinition.IsObjectOverride(name, signature))
             throw new ArgumentException("unsupported Object override signature");
         var definition = new MethodDefinition(name, (ushort)(MethodAttributes.Public | MethodAttributes.Virtual), signature);
         Definition.Methods.Add(definition);
@@ -186,16 +186,21 @@ public sealed partial class TypeBuilder
         return MethodBuilder.ForDefinition(definition);
     }
 
-    internal MethodBuilder? FindInheritedMethod(string name, MethodSignature signature)
+    private IEnumerable<MethodBuilder> InheritedClassMethods()
     {
-        for (var parent = LocalBase; parent is not null; parent = parent.LocalBase)
+        var current = this;
+        while (current.LocalBase is { } parent)
         {
-            var method = parent.Methods.SingleOrDefault(m => !m.IsStatic && m.Name == name &&
-                m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes));
-            if (method is not null) return method;
+            foreach (var method in parent.Methods) yield return method;
+            current = parent;
         }
-        return null;
+        if (current.ExternalBase is { } external)
+            foreach (var method in Assembly.ExternalClassMethods(external)) yield return method;
     }
+
+    internal MethodBuilder? FindInheritedMethod(string name, MethodSignature signature)
+        => InheritedClassMethods().FirstOrDefault(m => !m.IsStatic && m.Name == name &&
+            m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes));
 
     internal void ValidateClassSlots()
     {
@@ -212,14 +217,13 @@ public sealed partial class TypeBuilder
             else if (inherited is not null) throw new InvalidDataException("inherited method hiding is unsupported");
         }
         if (IsAbstract) return;
-        for (var owner = LocalBase; owner is not null; owner = owner.LocalBase)
-            foreach (var contract in owner.Methods.Where(m => m.IsAbstract))
-            {
-                var implementation = Methods.SingleOrDefault(m => m.Name == contract.Name && m.Signature.Matches(contract.Signature))
-                    ?? FindInheritedMethod(contract.Name, contract.Signature);
-                if (implementation is null || implementation.IsAbstract)
-                    throw new InvalidDataException("concrete class must implement inherited abstract methods");
-            }
+        foreach (var contract in InheritedClassMethods().Where(m => m.IsAbstract))
+        {
+            var implementation = Methods.SingleOrDefault(m => m.Name == contract.Name && m.Signature.Matches(contract.Signature))
+                ?? FindInheritedMethod(contract.Name, contract.Signature);
+            if (implementation is null || implementation.IsAbstract)
+                throw new InvalidDataException("concrete class must implement inherited abstract methods");
+        }
     }
 
     internal void AttachMethod(MethodDefinition definition)
@@ -229,7 +233,7 @@ public sealed partial class TypeBuilder
             throw new ArgumentException("method must belong to this type or be a detached authored type method");
         var slotFlags = definition.DeclarationAttributes & 0x540;
         if (slotFlags == 0x40 && (IsInterface || IsStatic || IsNativeObjectRoot ||
-            (LocalBase is null || MethodDefinition.IsObjectOverride(definition.Name, signature)) &&
+            (!HasExplicitClassBase || MethodDefinition.IsObjectOverride(definition.Name, signature)) &&
             !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot, Assembly.ExternalObjectRoot)))
             throw new InvalidOperationException("override requires a class owner and the exact inherited contract");
         if (IsNativeObjectRoot && slotFlags != 0 && (slotFlags != 0x140 || !MethodDefinition.IsNativeObjectSlot(definition.Name, signature, this)))
