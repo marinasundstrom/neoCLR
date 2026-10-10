@@ -63,6 +63,8 @@ Batch `string-construction` adds 5 tests for String character-sequence copying, 
 ([evidence](../runtime/raven/tests/string-construction-validation.json)).
 Batch `unicode-casing` adds 6 tests for Unicode casing expansions, contextual sigma and text preservation qualified in native macOS ARM64 and release-interpreted execution
 ([evidence](../runtime/raven/tests/unicode-casing-validation.json)).
+Batch `int64-parsing` adds 5 tests for Int64 boundary parsing, lexical errors, overflow and formatting qualified in release-interpreted execution; native admission remains unsupported
+([evidence](../runtime/raven/tests/int64-parsing-validation.json)).
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

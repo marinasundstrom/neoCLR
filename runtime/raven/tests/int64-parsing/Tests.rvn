@@ -1,0 +1,57 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import System.Option.*
+import NeoClr.Testing.*
+
+[Test("Int64 parsing accepts both signed boundaries")]
+func Int64Bounds() -> Result<unit, TestFailure> {
+    _ = Assert.True(Int64.MinValue == -9223372036854775807L - 1L, "Minimum constant")?
+    _ = Assert.True(Int64.MaxValue == 9223372036854775807L, "Maximum constant")?
+    _ = ParsedLong("9223372036854775807", Int64.MaxValue)?
+    return ParsedLong("-9223372036854775808", Int64.MinValue)
+}
+
+[Test("Int64 parsing accepts signs leading zeros and values beyond Int32")]
+func Int64Signs() -> Result<unit, TestFailure> {
+    _ = ParsedLong("+42", 42L)?
+    _ = ParsedLong("-0", 0L)?
+    _ = ParsedLong("000000000000000000000000000000001", 1L)?
+    return ParsedLong("4294967296", 4294967296L)
+}
+
+[Test("Int64 parsing rejects noncanonical lexical inputs")]
+func Int64InvalidFormat() -> Result<unit, TestFailure> {
+    for text in ["", "+", "-", " 1", "1 ", "1\u0000", "１２", "1,000", "0x10", "++1"] {
+        _ = Assert.True(Int64.Parse(text) is Error(NumberParseError.InvalidFormat), "Invalid integer text must report format error: " + text)?
+    }
+    return Assert.True(true, "All malformed forms rejected")
+}
+
+[Test("Int64 parsing distinguishes overflow from invalid trailing text")]
+func Int64Overflow() -> Result<unit, TestFailure> {
+    for text in ["9223372036854775808", "-9223372036854775809", "99999999999999999999999999999"] {
+        _ = Assert.True(Int64.Parse(text) is Error(NumberParseError.Overflow), "Out-of-range integer must report overflow")?
+    }
+    return Assert.True(Int64.Parse("99999999999999999999999999999x") is Error(NumberParseError.InvalidFormat), "Malformed suffix takes precedence over overflow")
+}
+
+[Test("Int64 decimal formatting round trips signed boundaries")]
+func Int64Formatting() -> Result<unit, TestFailure> {
+    let minimum = Int64.MinValue
+    let maximum = Int64.MaxValue
+    let zero = 0L
+    _ = Assert.Equal("-9223372036854775808", minimum.ToString())?
+    _ = Assert.Equal("9223372036854775807", maximum.ToString())?
+    _ = Assert.Equal("0", zero.ToString())?
+    _ = ParsedLong(minimum.ToString(), minimum)?
+    return ParsedLong(maximum.ToString(), maximum)
+}
+
+func ParsedLong(text: string, expected: long) -> Result<unit, TestFailure> {
+    if Int64.Parse(text) is Ok(let value) {
+        return Assert.True(value == expected, "Parsed Int64 value: " + text)
+    }
+    return Assert.True(false, "Expected successful Int64 parse: " + text)
+}
