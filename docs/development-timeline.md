@@ -13710,3 +13710,9 @@ claim completion of in-process test discovery.
   execution, plus existing selectors ([evidence](../runtime/raven/tests/collection-batch-validation.json)).
   Windows equivalence remains pending. The next selected batch is public JSON DOM
   behavior from the existing JSON programs.
+- **Next batch outcome:** 12 public JSON DOM/document tests pass native macOS ARM64
+  and interpreted execution ([evidence](../runtime/raven/tests/json-dom-batch-validation.json)).
+  Initial compilation exposed native string-literal pattern rejection (NEOMETA001);
+  tests extract union payloads and compare through Assert.Equal instead. This does
+  not fix or redefine the compiler gap. Stream and reflection-mapping checks remain
+  in their specialized consumers; Windows qualification is pending.

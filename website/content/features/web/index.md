@@ -476,7 +476,10 @@ JSON null. Numbers retain their JSON spelling until an explicit conversion is re
 ```
 
 The tested example adds an acknowledgement to an object and propagates failures.
-`JsonSerializer.DeserializeNode` and `SerializeNode` read and write the DOM.
+`JsonSerializer.DeserializeNode` and `SerializeNode` read and write the DOM. Development
+[framework tests](https://github.com/marinasundstrom/neoCLR/tree/main/runtime/raven/tests/json-dom)
+cover node access, duplicate fields, document round trips and error handling in both
+native and interpreted execution.
 Object mapping uses `Deserialize<T>` and `Serialize`. The stream overloads use
 StreamReader/StreamWriter and leave supplied streams open;
 the caller controls flushing and closing. The sample also runs through

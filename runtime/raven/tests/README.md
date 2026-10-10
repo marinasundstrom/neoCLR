@@ -354,3 +354,22 @@ snapshot, Option/Result and UTF-8 contracts remain the subjects of the tests.
 [Collection batch qualification](collection-batch-validation.json): all 46 tests pass native macOS ARM64
 and interpreted execution; the existing Map/ArrayQueue filters also pass. Windows
 qualification remains pending.
+
+## JSON DOM migration batch
+
+`--suite json-dom` runs 12 attributed module tests ported from the public
+`json-dom/DomContracts` and `native-json` document checks. They cover array bounds,
+object order, explicit null versus missing fields, duplicate insertion atomicity,
+escaped duplicate names, scalar properties, fractional number conversion, malformed
+input, nested Unicode documents, all root kinds, canonical round trips and cycles.
+The default gate includes this suite in native and interpreted execution.
+
+The tests use the public System.Data.Json implementation. Reflection-based object
+mapping, stream ownership/partial I/O, quota boundaries and terminal faults remain
+in their existing consumers and are not claimed as migrated by this batch. String
+union payloads are extracted and compared through Assert.Equal: native emission
+currently rejects string-literal BoundConstantPattern (NEOMETA001). This is a compiler
+gap, not a restriction on JSON field names or on the testing contract.
+
+[JSON batch qualification](json-dom-batch-validation.json): all 12 tests pass native
+macOS ARM64 and interpreted execution. Windows qualification remains pending.

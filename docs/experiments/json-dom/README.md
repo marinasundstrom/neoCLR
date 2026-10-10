@@ -72,3 +72,12 @@ UTF-8, escaped output, one-byte overflow, borrowed input ownership and output
 remaining untouched on validation failure. Shape limits remain unchanged. See
 [payload validation](../json-object-mapping/payload-validation.json) for this run;
 earlier results above describe their original, smaller fixtures.
+
+## Raven framework migration — 2026-10-10
+
+The in-memory DOM assertions in `DomContracts` now also run as focused attributed
+module functions in [the JSON DOM suite](../../../runtime/raven/tests/json-dom/JsonDom.rvn),
+alongside document round trips from the native JSON consumer. The framework reports
+individual assertion failures and runs the same source in native and interpreted
+modes. Stream failures, ownership, memory stream behavior and quota boundaries remain
+in this consumer; this migration does not replace its broader integration coverage.

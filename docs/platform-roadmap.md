@@ -51,6 +51,9 @@ encoder envelope. This packaging limit remains a separate gap, not a test API ru
 [Batch qualification](../runtime/raven/tests/collection-batch-validation.json): all 46
 tests and existing selectors pass native macOS ARM64 and interpreted execution.
 Windows qualification remains pending.
+The next batch ports 12 public JSON DOM/document checks; all pass native macOS ARM64
+and interpreted execution ([evidence](../runtime/raven/tests/json-dom-batch-validation.json)).
+Stream and reflection-mapping migration remain follow-ups.
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

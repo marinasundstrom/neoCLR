@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Batch-port 12 public JSON DOM/document checks into attributed Raven tests: node
+  access, null/missing fields, insertion order, duplicate preservation and escaped
+  aliases, scalar/number behavior, malformed input, Unicode document round trips,
+  root kinds and cycles. Include the suite in the default native/interpreted gate.
+  Stream and reflection-mapping consumers retain their separate coverage. Extract
+  string error payloads for assertions around the current native constant-pattern gap.
+  All 12 pass native macOS ARM64 and interpreted execution; Windows remains pending.
+
 - Begin porting program-form library checks into the Raven test framework: split
   map iteration/materialization checks into five discoverable tests with descriptive
   assertions for snapshots, independent copies, ToMap, collisions/empty input and

@@ -73,6 +73,20 @@ ITERATION_NAMES = [
     'ToList materializes and disposes its input',
 ]
 
+JSON_NAMES = [
+    'JSON arrays report invalid indices',
+    'JSON serialization rejects cyclic node graphs',
+    'JSON nested documents round trip with Unicode and number spelling',
+    'JSON document round trip removes surrounding whitespace',
+    'JSON parsing rejects escaped aliases of duplicate names',
+    'JSON parsing rejects trailing commas and truncated input',
+    'JSON numbers preserve spelling and reject fractional Int32 conversion',
+    'JSON duplicate insertion preserves the original value',
+    'JSON objects distinguish present null from missing fields',
+    'JSON object indexed access preserves insertion order',
+    'JSON documents support every root node kind',
+    'JSON scalar nodes expose their typed values',
+]
 DISCOVERY_SPEC = importlib.util.spec_from_file_location('test_discovery', ROOT / 'scripts/discover-runtime-tests.py')
 DISCOVERY = importlib.util.module_from_spec(DISCOVERY_SPEC)
 DISCOVERY_SPEC.loader.exec_module(DISCOVERY)
@@ -88,7 +102,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -108,6 +122,7 @@ def main():
         ('collections', 0, ''.join('PASS ' + n + '\n' for n in COLLECTION_NAMES) + f'Tests: {len(COLLECTION_NAMES)}, passed: {len(COLLECTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('collection-construction', 0, ''.join('PASS ' + n + '\n' for n in CONSTRUCTION_NAMES) + f'Tests: {len(CONSTRUCTION_NAMES)}, passed: {len(CONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('collection-iteration', 0, ''.join('PASS ' + n + '\n' for n in ITERATION_NAMES) + f'Tests: {len(ITERATION_NAMES)}, passed: {len(ITERATION_NAMES)}, failed: 0, skipped: 0\n'),
+        ('json-dom', 0, ''.join('PASS ' + n + '\n' for n in JSON_NAMES) + f'Tests: {len(JSON_NAMES)}, passed: {len(JSON_NAMES)}, failed: 0, skipped: 0\n'),
         ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n'),
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]
@@ -179,7 +194,8 @@ def main():
                     report['cases'].append(record)
                     if (record['exitCode'], record['stdout'], record['stderr']) != (selected_exit, selected_stdout, ''):
                         raise RuntimeError(name + ' ' + mode + ' selection did not match: ' + repr(record))
-            print(name + ': filtering checks passed', flush=True)
+            if selections:
+                print(name + ': filtering checks passed', flush=True)
         for name, digest in report['inputs'].items():
             if sha(ROOT / name) != digest:
                 raise RuntimeError('Input changed during validation: ' + name)

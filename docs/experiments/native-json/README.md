@@ -80,3 +80,8 @@ The project driver links matching native Unicode helpers only when selected.
 Run a focused consumer with `validate-native-json.py --case json`; the default
 continues to run both reflection and JSON projects. The validator builds the current
 interpreter for matching private service support.
+
+The public DOM/document portion also has focused tests in the
+[Raven JSON DOM suite](../../../runtime/raven/tests/json-dom/JsonDom.rvn).
+Typed object mapping and reflection retention checks remain in this acceptance
+consumer. The framework migration does not imply those checks have moved yet.

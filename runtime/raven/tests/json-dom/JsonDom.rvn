@@ -1,0 +1,132 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Data.Json.*
+import System.Result.*
+import NeoClr.Testing.*
+
+// Ported from json-dom/DomContracts and native-json document checks.
+
+[Test("JSON arrays report invalid indices")]
+func JsonArrayBounds() -> Result<unit, TestFailure> {
+    let array = JsonArray()
+    _ = Assert.True(array.Add(JsonBoolean(true)) is Ok(_), "Add array element")?
+    _ = Assert.Equal(1, array.Count)?
+    _ = Assert.True(array.Item(0) is Ok(JsonBoolean), "Read array element")?
+    _ = Assert.True(array.Item(-1) is Error(JsonError.InvalidIndex(-1)), "Negative index must preserve its value")?
+    return Assert.True(array.Item(1) is Error(JsonError.InvalidIndex(1)), "Past-end index must be rejected")
+}
+
+[Test("JSON objects distinguish present null from missing fields")]
+func JsonObjectNull() -> Result<unit, TestFailure> {
+    let document = JsonObject()
+    _ = Assert.True(document.Add("note", JsonNull()) is Ok(_), "Add explicit null")?
+    _ = Assert.True(document.Field("note") is Ok(JsonNull), "Present null must remain a node")?
+    if document.Field("missing") is Error(JsonError.MissingField(let name)) {
+        return Assert.Equal("missing", name)
+    }
+    return Assert.True(false, "Missing field must preserve its name")
+}
+
+[Test("JSON duplicate insertion preserves the original value")]
+func JsonObjectDuplicate() -> Result<unit, TestFailure> {
+    let document = JsonObject()
+    _ = Assert.True(document.Add("note", JsonNull()) is Ok(_), "Add original value")?
+    if document.Add("note", JsonBoolean(false)) is Error(JsonError.DuplicateField(let name)) {
+        _ = Assert.Equal("note", name)?
+    } else {
+        return Assert.True(false, "Reject duplicate name")
+    }
+    _ = Assert.Equal(1, document.Count)?
+    return Assert.True(document.Field("note") is Ok(JsonNull), "Rejected insertion must preserve original null")
+}
+
+[Test("JSON object indexed access preserves insertion order")]
+func JsonObjectOrder() -> Result<unit, TestFailure> {
+    let document = JsonObject()
+    let array = JsonArray()
+    _ = Assert.True(array.Add(JsonBoolean(true)) is Ok(_), "Populate child array")?
+    _ = Assert.True(document.Add("readings", array) is Ok(_), "Add first member")?
+    _ = Assert.True(document.Add("note", JsonNull()) is Ok(_), "Add second member")?
+    _ = Assert.Equal(2, document.Count)?
+    if document.Name(0) is Ok(let first) && document.Name(1) is Ok(let second) {
+        _ = Assert.Equal("readings", first)?
+        _ = Assert.Equal("note", second)?
+    } else {
+        return Assert.True(false, "Indexed names must be present")
+    }
+    return Assert.True(document.Item(0) is Ok(JsonArray), "Indexed child must retain its kind")
+}
+
+[Test("JSON numbers preserve spelling and reject fractional Int32 conversion")]
+func JsonNumberFraction() -> Result<unit, TestFailure> {
+    let Ok(number) = JsonNumber.Parse("22.5") else {
+        return Assert.True(false, "Valid decimal must parse")
+    }
+    _ = Assert.Equal("22.5", number.Text)?
+    return Assert.True(number.AsInt32() is Error(JsonError.NumberOutOfRange), "Fraction must not silently truncate")
+}
+
+[Test("JSON scalar nodes expose their typed values")]
+func JsonScalarProperties() -> Result<unit, TestFailure> {
+    _ = Assert.Equal("hello", JsonString("hello").Value)?
+    _ = Assert.True(JsonBoolean(true).Value, "Boolean true must be preserved")?
+    return Assert.True(!JsonBoolean(false).Value, "Boolean false must be preserved")
+}
+
+[Test("JSON parsing rejects escaped aliases of duplicate names")]
+func JsonEscapedDuplicate() -> Result<unit, TestFailure> {
+    if JsonSerializer.DeserializeNode("{\"a\":1,\"\\u0061\":2}") is Error(JsonError.DuplicateField(let name)) {
+        return Assert.Equal("a", name)
+    }
+    return Assert.True(false, "Escaped aliases must compare after decoding")
+}
+
+[Test("JSON parsing rejects trailing commas and truncated input")]
+func JsonMalformed() -> Result<unit, TestFailure> {
+    _ = Assert.True(JsonSerializer.DeserializeNode("[1,]") is Error(_), "Trailing comma must fail")?
+    return Assert.True(JsonSerializer.DeserializeNode("[1,") is Error(_), "Truncated array must fail")
+}
+
+[Test("JSON nested documents round trip with Unicode and number spelling")]
+func JsonDocumentRoundTrip() -> Result<unit, TestFailure> {
+    let input = "{\"station\":\"Café\",\"readings\":[1,-2,0],\"flags\":[true,false,null],\"empty\":[],\"metadata\":{},\"detail\":{\"text\":\"雪\",\"decimal\":1.25e2}}"
+    return CheckJsonDocument(input, input)
+}
+
+[Test("JSON document round trip removes surrounding whitespace")]
+func JsonDocumentWhitespace() -> Result<unit, TestFailure> {
+    return CheckJsonDocument(" {\"text\":\"Café 😀\",\"values\":[true,null,22.5]} ", "{\"text\":\"Café 😀\",\"values\":[true,null,22.5]}")
+}
+
+[Test("JSON documents support every root node kind")]
+func JsonRootKinds() -> Result<unit, TestFailure> {
+    for text in ["null", "true", "1.25e2", "\"雪\"", "[]", "{}"] {
+        _ = CheckJsonDocument(text, text)?
+    }
+    return Assert.True(true, "All root kinds round trip")
+}
+
+[Test("JSON serialization rejects cyclic node graphs")]
+func JsonCycle() -> Result<unit, TestFailure> {
+    let cycle = JsonArray()
+    _ = Assert.True(cycle.Add(cycle) is Ok(_), "Construct cycle for serialization validation")?
+    return Assert.True(JsonSerializer.SerializeNode(cycle) is Error(JsonError.LimitExceeded(_)), "Cycle must return a bounded serialization error")
+}
+
+func CheckJsonDocument(input: string, canonical: string) -> Result<unit, TestFailure> {
+    let Ok(tree) = JsonSerializer.DeserializeNode(input) else {
+        return Assert.True(false, "Document must parse")
+    }
+    let Ok(text) = JsonSerializer.SerializeNode(tree) else {
+        return Assert.True(false, "Parsed document must serialize")
+    }
+    _ = Assert.Equal(canonical, text)?
+    let Ok(copy) = JsonSerializer.DeserializeNode(text) else {
+        return Assert.True(false, "Serialized document must parse again")
+    }
+    let Ok(copiedText) = JsonSerializer.SerializeNode(copy) else {
+        return Assert.True(false, "Restored document must serialize again")
+    }
+    return Assert.Equal(canonical, copiedText)
+}
