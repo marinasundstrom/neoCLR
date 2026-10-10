@@ -836,6 +836,8 @@ async body contract, and connection-per-request is not a permanent design decisi
 
 ## Future HttpMethod type — proposal, 2026-10-08
 
+Historical proposal; the implemented choices are recorded in the 2026-10-11 section below.
+
 The author suggests considering an equivalent to .NET HttpMethod later. This is
 a design candidate, not an implemented API or a change to the native HTTP priority.
 HttpRequest.Method currently exposes a string and existing factories select supported
@@ -867,3 +869,40 @@ registration. Validate standard/custom methods, invalid and non-ASCII tokens, ca
 equality/hash consistency, wire preservation and unsupported-method handling in both
 interpreter and native execution before adopting the public API. No performance
 improvement is claimed and no implementation is scheduled by this proposal.
+
+
+## HttpMethod implementation — development, 2026-10-11
+
+The author now explicitly requests a class with predefined properties, Parse and a
+constructor accepting custom tokens. `System.Web.Http.HttpMethod` implements that
+surface, including Get, Head, Post, Put, Patch, Delete, Options, Trace, Connect and Query.
+Construction preserves spelling and faults for invalid ASCII token syntax. Parse
+returns Result<HttpMethod, HttpError>, canonicalizes known names case-insensitively,
+and preserves unknown method spelling. Whitespace, controls, separators and non-ASCII
+characters are rejected; input is not trimmed. There is no additional method-length
+limit, though request headers retain their transport quota.
+
+The earlier case-sensitive identity preference remains recorded above as a proposal.
+The implemented choice follows the later default-to-.NET author direction: Equals and
+GetHashCode are ordinal-ignore-case, as in the pinned .NET 10 source cited above. The
+benefit is familiar method-value/set behavior; the cost is conflating custom tokens
+that differ only by case. RFC 9110 wire tokens are case-sensitive, so exact protocol
+checks can use Method or ToString. Constructor and incoming-request spelling is
+preserved; server HEAD framing retains its exact wire-token comparison. The API does
+not promise singleton object identity for predefined values. Equality operators are
+not supplied in this slice; use Equals for value comparison. Parse uses a typed error
+instead of throwing a .NET exception, following neoCLR's existing parser contracts.
+
+`HttpRequest.Method` now returns HttpMethod; callers needing text use Method.Method.
+Existing samples are migrated. Four Create overloads accept method plus URL or Uri,
+with optional content. Custom requests use ordinary origin-form HTTP/1.1 with existing
+body/framing quotas; the server validates and accepts method tokens rather than a
+fixed six-verb whitelist. This does not implement CONNECT tunnelling, OPTIONS asterisk
+form or protocol-specific QUERY behavior. The client rejects CONNECT with Unsupported
+instead of sending an origin-form request pretending to establish a tunnel.
+
+The model is an ordinary library class. It adds no compiler, runtime contract,
+metadata format or AOT-specific method semantics. Focused framework tests cover
+predefined tokens, canonicalization, constructor spelling, invalid parsing, equality,
+hashing/set behavior, and request authoring. Separate interpreted/native client/server
+consumers exercise custom method wire spelling and constructor/CONNECT fault boundaries.

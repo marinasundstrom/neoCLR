@@ -13,11 +13,11 @@ func ErrorContent(message: string) -> HttpContent {
 class ReportServer {
     func Configure(context: HttpContext) -> Result<unit, AppError> {
         let request = context.Request
-        if request.Method == "GET" && request.Target == "/report" {
+        if request.Method.Method == "GET" && request.Target == "/report" {
             let report = CreateReport()?
             let content = JsonContent(report)?
             context.Respond(HttpStatusCode.OK, content)
-        } else if request.Method == "POST" && request.Target == "/reports" {
+        } else if request.Method.Method == "POST" && request.Target == "/reports" {
             let body = Encodings.Utf8.Decode(request.Content.Bytes)
             // This boundary handles invalid input as an HTTP response, rather than propagating it.
             if let Ok(text) = body {

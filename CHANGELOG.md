@@ -29,6 +29,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   socket/DNS phase bounds remain provisional limits. AOT size diagnostics now identify
   the oversized type and flattened width. Windows execution remains pending.
 
+- Add immutable HttpMethod with predefined method properties, typed parsing, custom
+  construction and .NET-style ordinal-ignore-case equality/hashing. HttpRequest.Method
+  now returns HttpMethod; use Method.Method for text. Add Create overloads for URL/Uri
+  and optional content, accept valid custom request methods on the server, and keep
+  CONNECT tunnelling explicitly unsupported. Migrate existing consumers and refresh
+  both API references; add framework and native/interpreted wire-contract tests.
+
 - Add bounded AOT virtual dispatch for nongeneric reference classes. Resolve targets
   with interpreter ancestry rules, retain required base slots, and generate separate
   dispatch methods so direct base calls keep their original bodies. Preserve null

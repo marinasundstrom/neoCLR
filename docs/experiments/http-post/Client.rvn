@@ -28,7 +28,7 @@ class InspectHandler : HttpHandler {
     var Calls: int = 0
     override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Calls += 1
-        Check(request.Method == "POST")
+        Check(request.Method.Method == "POST")
         Check(request.Target == "/base/echo")
         Check(request.Content.Bytes.Count == 10)
         Check(request.Headers.Count == 1)

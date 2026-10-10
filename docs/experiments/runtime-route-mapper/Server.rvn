@@ -15,7 +15,7 @@ class ItemServer {
         var status = HttpStatusCode.NotFound
         var body = "{\"error\":\"Not found\"}"
         // Method policy and item lookup belong to the application.
-        if context.Request.Method == "GET" {
+        if context.Request.Method.Method == "GET" {
             let parsed = routes.Parse(context.Request.Target)
             if let Ok(route) = parsed {
                 match route {

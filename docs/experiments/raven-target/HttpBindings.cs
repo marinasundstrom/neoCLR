@@ -4,7 +4,7 @@ using Mono.Cecil;
 static class HttpBindings
 {
     public const string Prefix = "System.Web.Http.";
-    public static readonly string[] Names = ["RoutePattern", "RouteMatch", "HttpClient", "HttpHandler", "DelegatingHandler", "HttpRequest", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation"];
+    public static readonly string[] Names = ["RoutePattern", "RouteMatch", "HttpClient", "HttpHandler", "DelegatingHandler", "HttpRequest", "HttpMethod", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation"];
     public static bool IsName(string name) => Names.Any(n => name == Prefix + n);
     public static bool IsProvider(TypeDefinition type) => type.FullName is Prefix + "HttpResponseDecoder" or Prefix + "HttpExchange" or Prefix + "HttpRequestDecoder" or Prefix + "HttpServerExchange" or Prefix + "HttpServeOperation";
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
@@ -89,7 +89,30 @@ static class HttpBindings
                 public string Value => default;
                 public static Collections.Sequence<string> FindValues(Collections.Sequence<HttpHeader> headers, string name) => default;
             }
+            public sealed class HttpMethod : EquatableTo<HttpMethod> {
+                public HttpMethod(string method) { }
+                public string Method => default;
+                public static HttpMethod Get => default;
+                public static HttpMethod Head => default;
+                public static HttpMethod Post => default;
+                public static HttpMethod Put => default;
+                public static HttpMethod Patch => default;
+                public static HttpMethod Delete => default;
+                public static HttpMethod Options => default;
+                public static HttpMethod Trace => default;
+                public static HttpMethod Connect => default;
+                public static HttpMethod Query => default;
+                public static Result<HttpMethod, HttpError> Parse(string method) => default;
+                public bool Equals(HttpMethod other) => default;
+                public override bool Equals(object other) => default;
+                public override int GetHashCode() => default;
+                public override string ToString() => default;
+            }
             public sealed class HttpRequest {
+                public static Result<HttpRequest, HttpError> Create(HttpMethod method, string url) => default;
+                public static Result<HttpRequest, HttpError> Create(HttpMethod method, string url, HttpContent content) => default;
+                public static Result<HttpRequest, HttpError> Create(HttpMethod method, Uri uri) => default;
+                public static Result<HttpRequest, HttpError> Create(HttpMethod method, Uri uri, HttpContent content) => default;
                 private HttpRequest(string host, int port, string target) { }
                 public static Result<HttpRequest, HttpError> Get(string url) => default;
                 public static Result<HttpRequest, HttpError> Get(Uri uri) => default;
@@ -110,7 +133,7 @@ static class HttpBindings
                 public Result<HttpRequest, HttpError> WithDefaults(Collections.Sequence<HttpHeader> defaults) => default;
                 public Result<Collections.Sequence<byte>, HttpError> Encode() => default;
                 public static Result<HttpRequest, HttpError> FromIncoming(string method, string target, string host, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) => default;
-                public string Method => default;
+                public HttpMethod Method => default;
                 public string Host => default;
                 public int Port => default;
                 public string Target => default;
@@ -296,7 +319,15 @@ static class HttpBindings
             ("HttpHeader", ".ctor") => ("String,String", "noresult", false),
             ("HttpHeader", "get_Name" or "get_Value") => ("", "String", false),
             ("HttpRequest", "Get" or "Delete" or "Head") => (args.Length == 1 && args[0] == "String" ? "String" : "System.Uri", $"System.Result<{request},System.Web.Http.HttpError>", true),
-            ("HttpRequest", "get_Method" or "get_Host" or "get_Target") => ("", "String", false),
+            ("HttpRequest", "get_Host" or "get_Target") => ("", "String", false),
+            ("HttpMethod", ".ctor") => ("String", "noresult", false),
+            ("HttpMethod", "get_Method" or "ToString") => ("", "String", false),
+            ("HttpMethod", "get_Get" or "get_Head" or "get_Post" or "get_Put" or "get_Patch" or "get_Delete" or "get_Options" or "get_Trace" or "get_Connect" or "get_Query") => ("", Prefix + "HttpMethod", true),
+            ("HttpMethod", "Parse") => ("String", "System.Result<System.Web.Http.HttpMethod,System.Web.Http.HttpError>", true),
+            ("HttpMethod", "Equals") => (args.Length == 1 && args[0] == "System.Object" ? "System.Object" : Prefix + "HttpMethod", "Boolean", false),
+            ("HttpMethod", "GetHashCode") => ("", "Int32", false),
+            ("HttpRequest", "Create") => (Prefix + "HttpMethod," + (args.Length > 1 && args[1] == "String" ? "String" : "System.Uri") + (args.Length == 3 ? "," + Prefix + "HttpContent" : ""), $"System.Result<{request},System.Web.Http.HttpError>", true),
+            ("HttpRequest", "get_Method") => ("", Prefix + "HttpMethod", false),
             ("HttpRequest", "get_Port") => ("", "Int32", false),
             ("HttpResponse", ".ctor") => ($"{(definition.Parameters[0].ParameterType.FullName == Prefix + "HttpStatusCode" ? Prefix + "HttpStatusCode" : "Int32")},System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", "noresult", false),
             ("HttpResponse", "get_IsSuccessStatusCode") => ("", "Boolean", false),
@@ -319,6 +350,8 @@ static class HttpBindings
             expected.Item1 += "," + CancellationBindings.Token;
         var virtualMember = (owner == Prefix + "HttpHandler" || owner == Prefix + "DelegatingHandler") && definition.Name is "Send" or "Dispose" || (owner == Prefix + "HttpContext" || owner == Prefix + "HttpContent" || owner == Prefix + "HttpClient" || owner == Prefix + "HttpSocketHandler") && definition.Name == "Dispose" || owner == Prefix + "HttpSocketHandler"
             && definition.Name == "Send" && args.Length == 2;
+        var typedEquality = owner == Prefix + "HttpMethod" && definition.Name == "Equals" && expected.Item1 == Prefix + "HttpMethod";
+        virtualMember |= owner == Prefix + "HttpMethod" && definition.Name is "Equals" or "GetHashCode" or "ToString";
         if (definition.IsConstructor != construct || definition.IsStatic != expected.Item3
             || !(definition.IsPublic || construct && definition.IsFamily || library && definition.IsAssembly)
             || definition.IsVirtual != virtualMember || definition.HasGenericParameters
@@ -328,6 +361,6 @@ static class HttpBindings
             throw new InvalidDataException("Unsupported HTTP signature: " + reference.FullName);
         return construct ? new(args, owner, $"newobj instance {owner}::.ctor({string.Join(',', args)})")
             : new(definition.IsStatic ? args : new[] { owner }.Concat(args).ToArray(), result,
-                $"{(virtualMember ? "callvirt" : "call")} {(definition.IsStatic ? "" : "instance ")}{owner}::{definition.Name}({string.Join(',', args)})");
+                $"{(virtualMember && !typedEquality ? "callvirt" : "call")} {(definition.IsStatic ? "" : "instance ")}{owner}::{definition.Name}({string.Join(',', args)})");
     }
 }

@@ -1,0 +1,123 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Web.Http.*
+import NeoClr.Testing.*
+
+[Test("HTTP predefined method values use canonical tokens")]
+func PredefinedMethods() -> Result<unit, TestFailure> {
+    _ = Assert.Equal("GET", HttpMethod.Get.Method)?
+    _ = Assert.Equal("HEAD", HttpMethod.Head.Method)?
+    _ = Assert.Equal("POST", HttpMethod.Post.Method)?
+    _ = Assert.Equal("PUT", HttpMethod.Put.Method)?
+    _ = Assert.Equal("PATCH", HttpMethod.Patch.Method)?
+    _ = Assert.Equal("DELETE", HttpMethod.Delete.Method)?
+    _ = Assert.Equal("OPTIONS", HttpMethod.Options.Method)?
+    _ = Assert.Equal("TRACE", HttpMethod.Trace.Method)?
+    _ = Assert.Equal("CONNECT", HttpMethod.Connect.Method)?
+    return Assert.Equal("QUERY", HttpMethod.Query.Method)
+}
+
+[Test("HTTP method parsing canonicalizes every known name")]
+func ParseKnownMethods() -> Result<unit, TestFailure> {
+    for name in ["get", "head", "post", "put", "patch", "delete", "options", "trace", "connect", "query"] {
+        let Ok(method) = HttpMethod.Parse(name) else {
+            return Assert.True(false, "Known method parses")
+        }
+        _ = Assert.Equal(name.ToUpperInvariant(), method.Method)?
+    }
+    return Assert.True(true, "All known names canonicalized")
+}
+
+[Test("HTTP custom method construction and parsing preserve spelling")]
+func CustomMethods() -> Result<unit, TestFailure> {
+    let method = HttpMethod("m-SEARCH")
+    _ = Assert.Equal("m-SEARCH", method.Method)?
+    _ = Assert.Equal("m-SEARCH", method.ToString())?
+    let Ok(parsed) = HttpMethod.Parse("m-SEARCH") else {
+        return Assert.True(false, "Custom method parses")
+    }
+    _ = Assert.Equal("m-SEARCH", parsed.Method)?
+    return Assert.Equal("get", HttpMethod("get").Method)
+}
+
+[Test("HTTP method validation admits token punctuation and rejects separators")]
+func MethodTokenValidation() -> Result<unit, TestFailure> {
+    let punctuation = "!#$%&'*+-.^_`|~09AZaz"
+    let Ok(valid) = HttpMethod.Parse(punctuation) else {
+        return Assert.True(false, "HTTP token punctuation is valid")
+    }
+    _ = Assert.Equal(punctuation, valid.Method)?
+    for invalid in ["", " GET", "GET ", "GE\tT", "GET\r\nX: y", "a/b", "a:b", "a(b)", "é", "😀"] {
+        let Error(HttpError.InvalidRequest(_)) = HttpMethod.Parse(invalid) else {
+            return Assert.True(false, "Invalid method is rejected")
+        }
+    }
+    return Assert.True(true, "Invalid methods rejected")
+}
+
+[Test("HTTP method equality and hashes ignore ASCII case")]
+func MethodEquality() -> Result<unit, TestFailure> {
+    let left = HttpMethod("m-search")
+    let right = HttpMethod("M-SEARCH")
+    _ = Assert.True(left.Equals(right), "Typed equality")?
+    _ = Assert.Equal(left.GetHashCode(), right.GetHashCode())?
+    let boxed: Object = left
+    _ = Assert.True(boxed.Equals(right), "Object equality dispatch")?
+    _ = Assert.True(!boxed.Equals(null), "Null is unequal")?
+    return Assert.True(!left.Equals(HttpMethod.Get), "Different methods differ")
+}
+
+class MethodComparer : EqualityComparer<HttpMethod> {
+    func Equals(left: HttpMethod, right: HttpMethod) -> bool => left.Equals(right)
+    func GetHashCode(value: HttpMethod) -> int => value.GetHashCode()
+}
+
+[Test("HTTP methods retain case-insensitive identity in a set")]
+func MethodSetEquality() -> Result<unit, TestFailure> {
+    let methods = HashSet<HttpMethod>(MethodComparer())
+    methods.Add(HttpMethod("fetch"))
+    methods.Add(HttpMethod("FETCH"))
+    _ = Assert.Equal(1, methods.Count)?
+    return Assert.True(methods.Contains(HttpMethod("Fetch")), "Case insensitive set lookup")
+}
+
+[Test("HTTP request factories retain predefined and custom methods")]
+func RequestMethods() -> Result<unit, TestFailure> {
+    let Ok(get) = HttpRequest.Get("http://example.test/") else {
+        return Assert.True(false, "GET construction")
+    }
+    _ = Assert.True(get.Method.Equals(HttpMethod.Get), "GET method value")?
+    let custom = HttpMethod("FETCH")
+    let Ok(request) = HttpRequest.Create(custom, "http://example.test/", HttpContent.FromText("body")) else {
+        return Assert.True(false, "Custom request construction")
+    }
+    _ = Assert.True(Object.ReferenceEquals(custom, request.Method), "Method retained")?
+    _ = Assert.Equal(4, request.Content.Bytes.Count)?
+    let Ok(copy) = request.WithHeader("X-Test", "value") else {
+        return Assert.True(false, "Header copy")
+    }
+    return Assert.True(copy.Method.Equals(custom), "Copy retains method")
+}
+
+[Test("HTTP URI request factories support custom methods and empty content")]
+func UriRequestMethods() -> Result<unit, TestFailure> {
+    let Ok(uri) = Uri.Parse("http://example.test/") else {
+        return Assert.True(false, "URI parse")
+    }
+    let Ok(request) = HttpRequest.Create(HttpMethod.Options, uri) else {
+        return Assert.True(false, "URI request construction")
+    }
+    _ = Assert.Equal("OPTIONS", request.Method.Method)?
+    _ = Assert.Equal(0, request.Content.Bytes.Count)?
+    let Ok(withContent) = HttpRequest.Create(HttpMethod("FETCH"), uri, HttpContent.FromText("body")) else {
+        return Assert.True(false, "URI content construction")
+    }
+    let Ok(empty) = HttpRequest.Create(HttpMethod("FETCH"), "http://example.test/") else {
+        return Assert.True(false, "URL empty construction")
+    }
+    _ = Assert.Equal(0, empty.Content.Bytes.Count)?
+    return Assert.Equal(4, withContent.Content.Bytes.Count)
+}

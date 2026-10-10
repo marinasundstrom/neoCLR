@@ -1,0 +1,42 @@
+import System.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+func Request(url: string) -> HttpRequest {
+    let Ok(request) = HttpRequest.Create(HttpMethod("m-SEARCH"), url, HttpContent.FromText("body")) else {
+        System.Fail("Custom request construction failed")
+    }
+    return request
+}
+
+func ConnectRequest() -> HttpRequest {
+    let Ok(request) = HttpRequest.Create(HttpMethod.Connect, "http://example.test/") else {
+        System.Fail("CONNECT request construction failed")
+    }
+    return request
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    if arguments[0] == "invalid" {
+        _ = HttpMethod(arguments[1])
+        Console.WriteLine("ERROR invalid method constructor returned")
+        return
+    }
+    if arguments[0] == "connect" {
+        let connectClient = HttpClient()
+        let connectResult = await connectClient.Send(ConnectRequest())
+        connectClient.Dispose()
+        let Error(HttpError.Unsupported(_)) = connectResult else { System.Fail("CONNECT must not pretend to tunnel") }
+        Console.WriteLine("PASS CONNECT remains unsupported")
+        return
+    }
+    let client = HttpClient()
+    let result = await client.Send(Request(arguments[0]))
+    client.Dispose()
+    let Ok(response) = result else { System.Fail("Custom method request failed") }
+    if (int)response.StatusCode != 200 || response.Content.Bytes.Count != 4 {
+        System.Fail("Custom method response mismatch")
+    }
+    Console.WriteLine("PASS custom method client")
+}

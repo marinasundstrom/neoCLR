@@ -388,6 +388,7 @@
   "System.Web.Http.HttpError.Unsupported",
   "System.Web.Http.HttpHandler",
   "System.Web.Http.HttpHeader",
+  "System.Web.Http.HttpMethod",
   "System.Web.Http.HttpRequest",
   "System.Web.Http.HttpResponse",
   "System.Web.Http.HttpServer",

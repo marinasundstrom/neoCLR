@@ -1,0 +1,29 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+func OpenServer() -> HttpServer {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else { System.Fail("Listen failed") }
+    let Ok(port) = server.GetLocalPort() else { System.Fail("Port unavailable") }
+    Console.WriteLine(port)
+    return server
+}
+
+func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    if request.Method.Method != "m-SEARCH" || request.Content.Bytes.Count != 4 {
+        System.Fail("Custom method request mismatch")
+    }
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("X-Method", request.Method.Method))
+    return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(HttpResponse(200, headers, request.Content.Bytes)))
+}
+
+async func Main() -> Task<()> {
+    let server = OpenServer()
+    let result = await server.ServeOne(Echo)
+    server.Close()
+    let Ok(_) = result else { System.Fail("Custom method server failed") }
+    Console.WriteLine("PASS custom method server")
+}

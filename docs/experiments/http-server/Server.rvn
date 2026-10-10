@@ -6,7 +6,7 @@ import System.Text.*
 import System.Web.Http.*
 
 func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    if request.Method != "GET" || request.Target != "/greeting" || request.Headers.Count == 0 {
+    if request.Method.Method != "GET" || request.Target != "/greeting" || request.Headers.Count == 0 {
         let errorResult: Result<HttpResponse, HttpError> = Error(HttpError.Handler("Unexpected request"))
         return Task.FromResult(errorResult)
     }

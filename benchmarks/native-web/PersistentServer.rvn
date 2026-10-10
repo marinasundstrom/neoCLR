@@ -7,7 +7,7 @@ import System.Web.Http.*
 
 func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     let source = Promise<Result<HttpResponse, HttpError>>()
-    if request.Method != "GET" || request.Target != "/greeting" || request.Headers.Count == 0 {
+    if request.Method.Method != "GET" || request.Target != "/greeting" || request.Headers.Count == 0 {
         _ = source.Complete(Error(HttpError.Handler("Unexpected request")))
         return source.Task
     }

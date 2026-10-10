@@ -1,0 +1,121 @@
+module System.Web.Http
+
+import System.*
+import System.Result.*
+
+/// An immutable HTTP method token. Construction preserves spelling, including custom methods.
+/// Equality and hashing are ordinal-ignore-case, matching .NET HttpMethod.
+public class HttpMethod : EquatableTo<HttpMethod> {
+    private val text: string
+
+    /// Creates a method from a nonempty ASCII HTTP token; invalid values fault.
+    init(method: string) {
+        if !Valid(method) {
+            System.Fail("Invalid HTTP method")
+        }
+        text = method
+    }
+
+    private init(method: string, known: bool) {
+        text = method
+    }
+
+    /// The validated method spelling, as supplied to the constructor.
+    val Method: string => text
+
+    /// The GET method.
+    static val Get: HttpMethod => HttpMethod("GET", true)
+    /// The HEAD method.
+    static val Head: HttpMethod => HttpMethod("HEAD", true)
+    /// The POST method.
+    static val Post: HttpMethod => HttpMethod("POST", true)
+    /// The PUT method.
+    static val Put: HttpMethod => HttpMethod("PUT", true)
+    /// The PATCH method.
+    static val Patch: HttpMethod => HttpMethod("PATCH", true)
+    /// The DELETE method.
+    static val Delete: HttpMethod => HttpMethod("DELETE", true)
+    /// The OPTIONS method.
+    static val Options: HttpMethod => HttpMethod("OPTIONS", true)
+    /// The TRACE method.
+    static val Trace: HttpMethod => HttpMethod("TRACE", true)
+    /// The CONNECT method. A method value alone does not enable tunnelling.
+    static val Connect: HttpMethod => HttpMethod("CONNECT", true)
+    /// The QUERY method.
+    static val Query: HttpMethod => HttpMethod("QUERY", true)
+
+    /// Parses a method token. Known names are canonicalized case-insensitively;
+    /// custom spelling is retained. Invalid tokens return HttpError.InvalidRequest.
+    static func Parse(method: string) -> Result<HttpMethod, HttpError> {
+        if !Valid(method) {
+            return Error(HttpError.InvalidRequest("Invalid HTTP method"))
+        }
+        if String.CompareOrdinalIgnoreCase(method, "GET") == 0 {
+            return Ok(Get)
+        }
+        if String.CompareOrdinalIgnoreCase(method, "HEAD") == 0 {
+            return Ok(Head)
+        }
+        if String.CompareOrdinalIgnoreCase(method, "POST") == 0 {
+            return Ok(Post)
+        }
+        if String.CompareOrdinalIgnoreCase(method, "PUT") == 0 {
+            return Ok(Put)
+        }
+        if String.CompareOrdinalIgnoreCase(method, "PATCH") == 0 {
+            return Ok(Patch)
+        }
+        if String.CompareOrdinalIgnoreCase(method, "DELETE") == 0 {
+            return Ok(Delete)
+        }
+        if String.CompareOrdinalIgnoreCase(method, "OPTIONS") == 0 {
+            return Ok(Options)
+        }
+        if String.CompareOrdinalIgnoreCase(method, "TRACE") == 0 {
+            return Ok(Trace)
+        }
+        if String.CompareOrdinalIgnoreCase(method, "CONNECT") == 0 {
+            return Ok(Connect)
+        }
+        if String.CompareOrdinalIgnoreCase(method, "QUERY") == 0 {
+            return Ok(Query)
+        }
+        return Ok(HttpMethod(method))
+    }
+
+    internal static func Valid(method: string) -> bool {
+        let bytes = HttpText.Encode(method)
+        if bytes.Count == 0 {
+            return false
+        }
+        for value in bytes {
+            if !((value >= 48 && value <= 57) || (value >= 65 && value <= 90) ||
+                (value >= 97 && value <= 122) || value == 33 || value == 35 || value == 36 ||
+                value == 37 || value == 38 || value == 39 || value == 42 || value == 43 ||
+                value == 45 || value == 46 || value == 94 || value == 95 || value == 96 ||
+                value == 124 || value == 126) {
+                return false
+            }
+        }
+        return true
+    }
+
+    /// Compares method names using ordinal-ignore-case equality.
+    func Equals(other: HttpMethod) -> bool {
+        return String.CompareOrdinalIgnoreCase(text, other.text) == 0
+    }
+
+    /// Compares a method value; null and other object types are unequal.
+    override func Equals(other: Object?) -> bool {
+        if other is HttpMethod method {
+            return Equals(method)
+        }
+        return false
+    }
+
+    /// Returns a hash consistent with case-insensitive method equality.
+    override func GetHashCode() -> int => StringComparer.OrdinalIgnoreCase.GetHashCode(text)
+
+    /// Returns the method token for the wire.
+    override func ToString() -> string => text
+}

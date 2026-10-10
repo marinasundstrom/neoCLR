@@ -37,3 +37,8 @@
 
 /docs/experiments/http-timeout/bin/
 /docs/experiments/http-timeout/obj/
+
+/docs/experiments/http-method/bin/
+/docs/experiments/http-method/obj/
+/runtime/raven/tests/http-method-values/bin/
+/runtime/raven/tests/http-method-values/obj/

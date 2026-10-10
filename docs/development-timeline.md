@@ -14239,3 +14239,12 @@ claim completion of in-process test discovery.
   while retaining custom values through its constructor. **Assistant plan:** implement
   this as the next slice, integrate request authoring and compare .NET validation and
   equality. This follow-up is not claimed implemented by the timeout slice.
+
+- **HttpMethod outcome:** added the requested class, ten predefined properties, custom
+  construction and typed Parse, then integrated request authoring and incoming custom
+  methods. Following the later .NET-default direction, equality/hash ignore case; exact
+  spelling remains available for protocol decisions. The earlier case-sensitive proposal
+  remains recorded, with the tradeoff explained in the [design](http-client-design.md#httpmethod-implementation--development-2026-10-11).
+  Eight discoverable tests and six wire/guard cases pass in each local execution mode.
+  Both API references and existing method-text consumers are updated. Windows CI is
+  configured but not executed; CONNECT tunnelling and equality operators remain gaps.

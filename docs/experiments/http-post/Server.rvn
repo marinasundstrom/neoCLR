@@ -6,7 +6,7 @@ import System.Web.Http.*
 
 // A buffered echo handler: the same content contract is used in each direction.
 func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    let status = if request.Method == "POST" { HttpStatusCode.Created } else { HttpStatusCode.OK }
+    let status = if request.Method.Method == "POST" { HttpStatusCode.Created } else { HttpStatusCode.OK }
     let source = Promise<Result<HttpResponse, HttpError>>()
     _ = source.Complete(Ok(HttpResponse(status, ArrayList<HttpHeader>(), request.Content.Bytes)))
     return source.Task

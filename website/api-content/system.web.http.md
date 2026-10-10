@@ -17,3 +17,8 @@ None disables the client countdown. Configure it before sending. Expiry requests
 cancellation and waits for handler cleanup before returning HttpError.TimedOut; caller
 or disposal cancellation remains task cancellation. Independent transport phase bounds
 still apply. See [HTTP contracts](/features/web/) for limits and handler responsibilities.
+
+HttpMethod provides canonical method properties, custom token construction and typed
+Parse. HttpRequest.Method returns HttpMethod; Create accepts it with URL/Uri and optional
+content. Exact spelling is available through Method.Method; value equality ignores
+ASCII case. CONNECT is representable but the socket transport does not implement tunnelling.

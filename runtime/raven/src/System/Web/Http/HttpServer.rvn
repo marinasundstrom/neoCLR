@@ -112,8 +112,8 @@ internal class HttpRequestDecoder {
                     return Error(HttpError.Unsupported("Unsupported request line"))
                 }
                 method = Text(0, methodEnd, 0)?
-                if method != "GET" && method != "POST" && method != "PUT" && method != "PATCH" && method != "DELETE" && method != "HEAD" {
-                    return Error(HttpError.Unsupported("Unsupported request method"))
+                if !HttpMethod.Valid(method) {
+                    return Error(HttpError.Protocol("Invalid request method"))
                 }
                 let parsedTarget = Text(methodEnd + 1, end - 9, 0)?
                 target = parsedTarget
@@ -453,7 +453,7 @@ public class HttpContext : Disposable {
             _ = source.Cancel()
             return source.Task
         }
-        let encoded = HttpServer.EncodeResponse(response, if request.Method == "HEAD" { 1 } else { 0 })
+        let encoded = HttpServer.EncodeResponse(response, if request.Method.Method == "HEAD" { 1 } else { 0 })
         if let Ok(bytes) = encoded {
             outgoing = bytes
             deadline = NetworkDeadline.AfterMilliseconds(15000)

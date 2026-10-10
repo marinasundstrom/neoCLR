@@ -15,7 +15,7 @@ func Check(condition: bool) {
 class InspectHandler : HttpHandler {
 
     override func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
-        Check(request.Method == "POST")
+        Check(request.Method.Method == "POST")
         Check(request.GetHeaderValues("accept")[0] == "text/plain")
         Check(request.GetHeaderValues("X-REQUEST-ID")[0] == "sample-42")
         Check(request.GetHeaderValues("content-type")[0] == "text/plain; charset=utf-8")

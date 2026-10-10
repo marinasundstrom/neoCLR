@@ -415,13 +415,14 @@ The client and handler now implement Disposable with explicit ownership and coop
 pending-request cancellation. The abstract handler and DelegatingHandler pipeline pass
 ten functional cases and eight guard cases interpreted and on macOS ARM64 AOT;
 [dispatch evidence](design/native-class-dispatch.md) records the bounded support.
-Windows CI is configured but unexecuted. Configurable timeout is next: the transport still has a
-fixed 15-second exchange deadline, an incomplete contract rather than a deliberate
-.NET divergence. A private interpreter timer source now has cancellation, bounded
-monotonic deadlines and traced callback handoff. Native one-shot binding and macOS
-qualification are now in place. Author clarification (2026-10-11): build sensible
-Raven Timer and timed-cancellation APIs rather than copying .NET mechanically;
-these library layers precede the HTTP adapter. Public Timer/Timeout remain pending.
+Windows CI is configured but unexecuted. The private monotonic timer source and native
+binding now support public Timer, serialized async callbacks and replaceable CancelAfter.
+HttpClient.Timeout composes those layers with cancellation acknowledgement, a 100-second
+default and explicit None disabling. The independent 15-second client/host budgets are
+removed; five-second transport phase bounds remain gaps. See the
+[focused timeout evidence](experiments/http-timeout/validation.json).
+Author clarification (2026-10-11): build sensible Raven Timer and timed-cancellation
+APIs rather than copying .NET mechanically. Those layers are implemented locally.
 The subsequent string API direction keeps encoding explicit: public string operations
 should describe text, not byte storage. GetUtf8ByteCount/SliceUtf8 remain migration
 debt; replace their uses with appropriate encoding contracts before removing them,
@@ -693,8 +694,9 @@ contracts and backend-specific adapters.
 
 **Future HTTP library candidate (author suggestion, 2026-10-08):** consider an
 [HttpMethod abstraction](http-client-design.md#future-httpmethod-type--proposal-2026-10-08)
-with standard and extension tokens. API shape and scheduling remain open; this does
-not reprioritize the native HTTP execution work.
+with standard and extension tokens. This began as a proposal; the author explicitly
+requested implementation on 2026-10-11. The implemented contract and evidence are
+[recorded separately](http-client-design.md#httpmethod-implementation--development-2026-10-11).
 
 **Next-release teaser (author clarification, 2026-10-08):** native compilation is a
 central source of platform value. Prioritize a reproducible standalone ARM64 HTTP demo,
@@ -3693,3 +3695,12 @@ interpreter/macOS modes ([evidence](experiments/http-timeout/validation.json),
 The independent 15-second client/host limits are removed; shorter transport phase
 bounds remain tracked gaps. Author follow-up is HttpMethod with predefined values,
 parsing and custom construction before returning to Index/Range.
+
+**HTTP method values (2026-10-11):** HttpMethod supplies predefined tokens, a custom
+constructor, typed Parse and .NET-style case-insensitive value equality. HttpRequest
+now exposes the value and Create overloads; custom wire spelling survives client and
+server processing. Eight framework cases and six wire/guard cases pass in each local
+mode ([values](../runtime/raven/tests/http-method-values/validation.json),
+[wire](experiments/http-method/validation.json)). CONNECT tunnelling remains unsupported.
+Windows CI is configured, execution pending. The requested timeout/HttpMethod increment
+is complete locally; Index/Range remains the next author-directed feature.

@@ -672,8 +672,9 @@ public class HttpRequest {
     func GetHeaderValues(name: string) -> Sequence<string> {
         return HttpHeader.FindValues(storedHeaders, name)
     }
-    private var storedMethod: string
-    val Method: string => storedMethod
+    private var storedMethod: HttpMethod
+    /// The validated method value. Its Method property preserves the wire spelling.
+    val Method: HttpMethod => storedMethod
     private var storedHost: string
     val Host: string => storedHost
     private var storedPort: int
@@ -683,7 +684,7 @@ public class HttpRequest {
 
     private init(host: string, port: int, target: string) {
         storedHeaders = ArrayList<HttpHeader>()
-        storedMethod = "GET"
+        storedMethod = HttpMethod.Get
         storedHost = host
         storedPort = port
         storedTarget = target
@@ -696,7 +697,7 @@ public class HttpRequest {
             return Error(HttpError.InvalidRequest("Invalid Host authority"))
         }
         request.storedHeaders = headers
-        request.storedMethod = method
+        request.storedMethod = HttpMethod(method)
         request.storedContent = HttpContent(body)
         for header in headers {
             if header.Name == "content-type" {
@@ -706,10 +707,40 @@ public class HttpRequest {
         return Ok(request)
     }
 
+    /// Constructs a request using a predefined or custom method, without performing I/O.
+    static func Create(method: HttpMethod, url: string) -> Result<HttpRequest, HttpError> {
+        return Create(method, url, HttpContent(ArrayList<byte>()))
+    }
+
+    /// Constructs a request with explicit method and content; transport bounds apply when sent.
+    static func Create(method: HttpMethod, url: string, content: HttpContent) -> Result<HttpRequest, HttpError> {
+        if method is null {
+            return Error(HttpError.InvalidRequest("HTTP method cannot be null"))
+        }
+        let request = Post(url, content)?
+        request.storedMethod = method
+        return Ok(request)
+    }
+
+    /// Constructs a URI-based request using a predefined or custom method.
+    static func Create(method: HttpMethod, uri: Uri) -> Result<HttpRequest, HttpError> {
+        return Create(method, uri, HttpContent(ArrayList<byte>()))
+    }
+
+    /// Constructs a URI-based request with explicit method and content.
+    static func Create(method: HttpMethod, uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
+        if method is null {
+            return Error(HttpError.InvalidRequest("HTTP method cannot be null"))
+        }
+        let request = Post(uri, content)?
+        request.storedMethod = method
+        return Ok(request)
+    }
+
     /// Constructs a POST request without performing I/O.
     static func Post(url: string, content: HttpContent) -> Result<HttpRequest, HttpError> {
         let request = Get(url)?
-        request.storedMethod = "POST"
+        request.storedMethod = HttpMethod.Post
         request.storedContent = content
         let headers = ArrayList<HttpHeader>()
         if let Some(contentType) = content.MediaType {
@@ -722,7 +753,7 @@ public class HttpRequest {
     /// Constructs a POST request from an absolute HTTP URI.
     static func Post(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
         let request = Get(uri)?
-        request.storedMethod = "POST"
+        request.storedMethod = HttpMethod.Post
         request.storedContent = content
         let headers = ArrayList<HttpHeader>()
         if let Some(contentType) = content.MediaType {
@@ -735,56 +766,56 @@ public class HttpRequest {
     /// Constructs an absolute HTTP PUT request with buffered content.
     static func Put(url: string, content: HttpContent) -> Result<HttpRequest, HttpError> {
         let request = Post(url, content)?
-        request.storedMethod = "PUT"
+        request.storedMethod = HttpMethod.Put
         return Ok(request)
     }
 
     /// Constructs an absolute HTTP PUT request with buffered content.
     static func Put(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
         let request = Post(uri, content)?
-        request.storedMethod = "PUT"
+        request.storedMethod = HttpMethod.Put
         return Ok(request)
     }
 
     /// Constructs an absolute HTTP PATCH request with buffered content.
     static func Patch(url: string, content: HttpContent) -> Result<HttpRequest, HttpError> {
         let request = Post(url, content)?
-        request.storedMethod = "PATCH"
+        request.storedMethod = HttpMethod.Patch
         return Ok(request)
     }
 
     /// Constructs an absolute HTTP PATCH request with buffered content.
     static func Patch(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
         let request = Post(uri, content)?
-        request.storedMethod = "PATCH"
+        request.storedMethod = HttpMethod.Patch
         return Ok(request)
     }
 
     /// Constructs an absolute HTTP DELETE request without content.
     static func Delete(url: string) -> Result<HttpRequest, HttpError> {
         let request = Get(url)?
-        request.storedMethod = "DELETE"
+        request.storedMethod = HttpMethod.Delete
         return Ok(request)
     }
 
     /// Constructs an absolute HTTP DELETE request without content.
     static func Delete(uri: Uri) -> Result<HttpRequest, HttpError> {
         let request = Get(uri)?
-        request.storedMethod = "DELETE"
+        request.storedMethod = HttpMethod.Delete
         return Ok(request)
     }
 
     /// Constructs an absolute HTTP HEAD request without content.
     static func Head(url: string) -> Result<HttpRequest, HttpError> {
         let request = Get(url)?
-        request.storedMethod = "HEAD"
+        request.storedMethod = HttpMethod.Head
         return Ok(request)
     }
 
     /// Constructs an absolute HTTP HEAD request without content.
     static func Head(uri: Uri) -> Result<HttpRequest, HttpError> {
         let request = Get(uri)?
-        request.storedMethod = "HEAD"
+        request.storedMethod = HttpMethod.Head
         return Ok(request)
     }
 
@@ -894,19 +925,26 @@ public class HttpRequest {
     }
 
     internal func Encode() -> Result<Sequence<byte>, HttpError> {
+        if (String.CompareOrdinalIgnoreCase(storedMethod.Method, "CONNECT") == 0) {
+            return Error(HttpError.Unsupported("CONNECT tunnelling is not supported"))
+        }
         let count = storedContent.Length
         if storedContent.IsBuffered && count > 1024 {
             return Error(HttpError.LimitExceeded("Request body limit exceeded"))
         }
-        if (storedMethod == "GET" || storedMethod == "DELETE" || storedMethod == "HEAD") && count != 0 {
+        let method = storedMethod.Method
+        let noBody = String.CompareOrdinalIgnoreCase(method, "GET") == 0 ||
+            String.CompareOrdinalIgnoreCase(method, "DELETE") == 0 ||
+            String.CompareOrdinalIgnoreCase(method, "HEAD") == 0
+        if noBody && count != 0 {
             return Error(HttpError.InvalidRequest("This request method cannot contain content"))
         }
         let port = storedPort
-        var wire = String.Concat(String.Concat(storedMethod, " "), storedTarget)
+        var wire = String.Concat(String.Concat(storedMethod.Method, " "), storedTarget)
         wire = String.Concat(wire, String.Concat(" HTTP/1.1\r\nHost: ", storedHost))
         wire = String.Concat(wire, String.Concat(":", port.ToString()))
         wire = String.Concat(wire, "\r\nConnection: close\r\n")
-        if storedMethod == "POST" || storedMethod == "PUT" || storedMethod == "PATCH" {
+        if !noBody {
             wire = String.Concat(wire, String.Concat("Content-Length: ", count.ToString()))
             wire = String.Concat(wire, "\r\n")
         }
@@ -1630,7 +1668,7 @@ internal class HttpExchange {
         outgoing = ArrayList<byte>()
         sent = 0
         buffer = CheckedStorage.Reserve<byte>(256)
-        decoder = HttpResponseDecoder(request.Method == "HEAD")
+        decoder = HttpResponseDecoder(String.CompareOrdinalIgnoreCase(request.Method.Method, "HEAD") == 0)
     }
 
     internal func Execute() -> Task<Result<HttpResponse, HttpError>> {

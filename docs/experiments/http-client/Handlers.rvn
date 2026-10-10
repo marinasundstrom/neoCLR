@@ -37,7 +37,7 @@ class FakeHandler : HttpHandler {
 
     override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Calls += 1
-        Check(request.Method == "GET")
+        Check(request.Method.Method == "GET")
         Check(request.Host == "example.test")
         Check(request.Port == 80)
         Check(request.Target == "/greeting")

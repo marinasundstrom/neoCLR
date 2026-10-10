@@ -546,3 +546,20 @@ Object-typed properties do not infer nodes. Whole-document limits still apply.
 The [tested NodeEnvelope consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-json/Main.rvn)
 uses JsonValue, JsonObject and JsonValue[]; see the [API rules](/docs/json.html).
 List/map mapping remains under development.
+
+
+## Method values in development
+
+`HttpMethod` provides Get, Head, Post, Put, Patch, Delete, Options, Trace, Connect and
+Query. Its constructor accepts custom ASCII HTTP tokens and preserves spelling.
+`HttpMethod.Parse` returns a typed result, canonicalizing known names without changing
+custom spelling. Equality and hashing follow .NET's ordinal-ignore-case behavior;
+read `.Method` or `.ToString()` when exact wire spelling matters.
+
+`HttpRequest.Method` now returns this type. Use `request.Method.Method` for text.
+`HttpRequest.Create(method, url)` and its Uri/content overloads support custom requests;
+the bounded server also accepts valid custom tokens. CONNECT tunnelling and OPTIONS
+asterisk-form requests remain unsupported. A method value does not enable those protocols.
+
+See the [HttpMethod reference](/docs/api/System/Web/Http/HttpMethod/index.html) and the
+[tested custom-method client](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/http-method/Client.rvn).

@@ -21,7 +21,7 @@ class ReportServer {
 
     func Configure(context: HttpContext) -> Result<unit, AppError> {
         let request = context.Request
-        let Ok(route) = ParseStationRoute(pattern, request.Method, request.Target) else {
+        let Ok(route) = ParseStationRoute(pattern, request.Method.Method, request.Target) else {
             context.Respond(HttpStatusCode.BadRequest, ErrorContent("{\"error\":\"Invalid route parameter\"}"))
             return Ok(())
         }

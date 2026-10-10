@@ -1,6 +1,6 @@
 # HTTP client/server capability tracker and POC finish line
 
-**Updated 2026-09-27.** The author asks to reach a point where this POC is “done for
+**Updated 2026-10-11.** The author asks to reach a point where this POC is “done for
 now” and to track HTTP work on both client and server. This is the shared status
 record, subordinate to the [platform roadmap](platform-roadmap.md).
 
@@ -45,6 +45,8 @@ WebApplication, configurable limits and SQL remain deferred.
 | Capability | Client | Server | Evidence / next boundary |
 | --- | --- | --- | --- |
 | HTTP/1.1 GET/HEAD/POST/PUT/PATCH/DELETE | Implemented | Implemented | [Verbs](experiments/http-verbs/README.md), [framing](http-client-design.md#bounded-response-framing-and-head--2026-09-25); bounded subset, not full conformance |
+| Method values and custom tokens | Implemented: HttpMethod and Create overloads; custom wire spelling | Implemented: validates token syntax and preserves spelling | [Contract](http-client-design.md#httpmethod-implementation--development-2026-10-11), [wire evidence](experiments/http-method/validation.json); CONNECT tunnelling and OPTIONS asterisk form remain unsupported |
+| Request timeout | Implemented: 100-second default, None disabling, cooperative cancellation/cleanup | Existing server phase budgets | [Timeout evidence](experiments/http-timeout/validation.json); independent five-second transport phase limits remain |
 | Statuses and headers | Implemented: named/numeric status, defaults, request fields, case-insensitive lookup | Implemented: request lookup, response status/fields, no-body rules | [Statuses](experiments/http-status/README.md), [headers](experiments/http-headers/README.md), [request fields](experiments/http-request-headers/README.md) |
 | Buffered bodies | Implemented, at most 1,024 bytes | Implemented, at most 1,024 bytes for request/response bodies | [POST](experiments/http-post/README.md) |
 | Known-length source uploads | Implemented in current increment, at most 65,536 bytes, synchronous source and bounded chunks | Receives only within its existing 1,024-byte buffered limit | [Upload fixture](experiments/http-stream-upload/README.md); larger upload evidence uses an independent peer, not a claim of larger neoCLR server admission |

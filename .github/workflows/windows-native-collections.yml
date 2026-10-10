@@ -27,6 +27,8 @@ on:
       - 'docs/experiments/timers/**'
       - 'docs/experiments/cancel-after/**'
       - 'docs/experiments/http-timeout/**'
+      - 'docs/experiments/http-method/**'
+      - 'scripts/validate-http-method.py'
       - 'scripts/validate-http-timeout-network.py'
       - 'benchmarks/native-web/http-host.c'
       - 'docs/experiments/http-lifetime/**'
@@ -71,6 +73,8 @@ on:
       - 'docs/experiments/timers/**'
       - 'docs/experiments/cancel-after/**'
       - 'docs/experiments/http-timeout/**'
+      - 'docs/experiments/http-method/**'
+      - 'scripts/validate-http-method.py'
       - 'scripts/validate-http-timeout-network.py'
       - 'benchmarks/native-web/http-host.c'
       - 'docs/experiments/http-lifetime/**'
@@ -150,6 +154,13 @@ jobs:
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-timers.py --suite http-timeout --bundle `"target/windows-native-collections-validation/development toolchain/bundle`" --output target/windows-native-collections-validation/http-timeout"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-http-timeout-network.py --bundle `"target/windows-native-collections-validation/development toolchain/bundle`" --output target/windows-native-collections-validation/http-timeout-network"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify custom HTTP method client and server contracts
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-http-method.py --bundle `"target/windows-native-collections-validation/development toolchain/bundle`" --output target/windows-native-collections-validation/http-method"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Verify public encoding sample and internal helper boundary

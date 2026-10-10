@@ -81,7 +81,7 @@ func JsonVerbs() {
     let Some(postRequest) = postResponse.Request else {
         System.Fail("POST origin missing")
     }
-    Check(postRequest.Method == "POST")
+    Check(postRequest.Method.Method == "POST")
     Check(postRequest.GetHeaderValues("x-client")[0] == "json-sample")
     Check(postRequest.GetHeaderValues("content-type")[0] == "application/json; charset=utf-8")
     let Ok(postedReport) = JsonContent.Read<Report>(postRequest.Content) else {

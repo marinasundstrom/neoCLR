@@ -1712,3 +1712,12 @@ HttpClient.Timeout is included in both development snapshots as Option<Duration>
 defaulting to Some(100 seconds), with None disabling the per-request countdown.
 Configuration freezes on send; cancellation acknowledgement precedes typed timeout
 completion. Five-second transport phase bounds remain independent limitations.
+
+## HttpMethod development API (2026-10-11)
+
+HttpMethod and all predefined properties, constructor, Parse, equality, hashing and
+ToString are selected in both references. HttpRequest.Method changes from string to
+HttpMethod, and four Create overloads accept URL/Uri with optional content. Use
+Method.Method for wire text. Parse returns HttpError.InvalidRequest; invalid direct
+construction faults. Predefined values do not promise singleton identity. CONNECT
+is a representable token but tunnelling remains unsupported by the socket handler.
