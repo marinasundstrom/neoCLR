@@ -375,9 +375,16 @@ Eight further [stream adapter cases](../runtime/raven/tests/encoding-streams-val
 cover writer completion/failure and selected readers in both local modes. Eight [boundary cases](../runtime/raven/tests/encoding-boundaries-validation.json)
 also pass both local modes: Unicode reader boundaries, custom decoded output,
 zero-progress transfers, failures and maximum input/write quotas. Direct decoder/drain
-buffer-limit fixtures and Windows qualification remain. Paired one-shot
-decoding and general writer completion follow as proposals. This review does not
-approve additional codecs or permanently reprioritize the roadmap.
+buffer-limit fixtures now add five passing native/interpreted cases
+([evidence](../runtime/raven/tests/encoding-buffer-limits-validation.json)), with explicit
+host budgets and a byte-write accounting fix exposed by the large inputs. Windows
+qualification remains. Paired one-shot decoding and general writer completion follow
+as proposals. This review does not
+approve additional codecs or permanently reprioritize the roadmap. The author then
+selected internal visibility for Utf8 and proposed InternalsVisibleToAttribute for
+controlled implementation sharing. The [follow-up design](design/encoding-api-review.md#author-follow-up-internal-helpers-and-friend-assemblies-2026-10-10)
+records the cross-assembly callers, .NET comparison and required compiler/runtime/AOT
+access checks; neither API change is complete yet.
 
 A separate native gap observed during implementation: String.GetScalars exposes an
 immutable UInt32 array that current native specialization rejects. This parser uses

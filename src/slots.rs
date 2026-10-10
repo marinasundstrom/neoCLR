@@ -11,7 +11,7 @@ use std::{
 pub(crate) struct Slot {
     ty: Type,
     value: Option<Value>,
-    // Invalidate on every successful value mutation, including interior aliases.
+    // Invalidate on payload-changing mutations, including interior aliases.
     // Numeric summaries contain no references and never cache quota permission.
     array_usage: std::cell::Cell<Option<crate::arrays::Usage>>,
     writes: u64,
@@ -564,11 +564,20 @@ impl SlotReference {
             return Err(Fault::new("managed field reference type mismatch"));
         }
         crate::arrays::check_replacement(field, &value)?;
+        // Byte leaves have fixed logical payload and cannot have descendant paths.
+        // Preserve the summary and avoid scanning all sibling replacement records
+        // for each byte written to a large buffer. Assignment epochs still advance.
+        let byte_leaf = matches!(
+            (&*field, &value),
+            (Value::Byte(_) | Value::Uninitialized(Type::Byte), Value::Byte(_))
+        );
         *field = value;
-        slot.array_usage.set(None);
+        if !byte_leaf {
+            slot.array_usage.set(None);
+            slot.replacements
+                .retain(|path, _| !path.starts_with(&self.path));
+        }
         slot.writes = next_write;
-        slot.replacements
-            .retain(|path, _| !path.starts_with(&self.path));
         slot.replacements.insert(self.path.clone(), next_write);
         Ok(())
     }
@@ -753,6 +762,35 @@ mod tests {
         budget(&cell, 1, size + 5).unwrap();
         field.write(text_array("z")).unwrap();
         budget(&cell, 1, size + 1).unwrap();
+    }
+
+    #[test]
+    fn byte_array_writes_preserve_quotas_initialization_and_output_epochs() {
+        let size = std::mem::size_of::<Value>();
+        let cell = Slot::cell(Type::Array(Box::new(Type::Byte)), Some(Value::Array {
+            element: Type::Byte,
+            elements: vec![Value::Uninitialized(Type::Byte); 3],
+        }));
+        let root = SlotReference::new(&cell);
+        let first = root.element(0, &Type::Byte).unwrap();
+        let second = root.element(1, &Type::Byte).unwrap();
+        let output = first.output().unwrap();
+        budget(&cell, 3, size * 3).unwrap();
+        assert!(first.read().is_err());
+        second.write(Value::Byte(7)).unwrap();
+        assert!(output.assigned().is_err());
+        first.write(Value::Byte(42)).unwrap();
+        output.assigned().unwrap();
+        assert_eq!(first.read().unwrap(), Value::Byte(42));
+        assert!(budget(&cell, 2, size * 3).is_err());
+        assert!(budget(&cell, 3, size * 3 - 1).is_err());
+        budget(&cell, 3, size * 3).unwrap();
+        assert!(root.element(2, &Type::Byte).unwrap().read().is_err());
+        let again = first.output().unwrap();
+        assert!(again.assigned().is_err());
+        first.write(Value::Byte(43)).unwrap();
+        again.assigned().unwrap();
+        budget(&cell, 3, size * 3).unwrap();
     }
 
     #[test]

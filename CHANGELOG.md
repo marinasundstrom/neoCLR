@@ -25,6 +25,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Record the subsequent author decision to internalize Utf8 and the proposed .NET-style
   InternalsVisibleTo capability, including cross-assembly consumers and validation gaps.
 
+- Qualify codec buffer limits with explicit host budgets. Add run options for live
+  array elements and logical array bytes, and a native builder byte-array limit;
+  defaults and codec/stream quotas stay unchanged. Native UTF-8 snapshots preserve
+  full initialization checks under larger byte-array budgets. Avoid repeated payload
+  and descendant-path scans on interpreter byte-leaf writes while retaining quota,
+  initialization and output-assignment checks. Pin Raven's bounded
+  constant-range array comprehension lowering and inclusive endpoint fix; retain
+  explicit unsupported cases for dynamic/filtered native comprehensions. Five new
+  framework cases pass native macOS ARM64 and interpreted execution; the local
+  interpreted run completes within the existing 180-second gate after previously
+  timing out. Windows qualification remains pending.
+
 - Add Date, TimeOfDay and LocalDateTime Parse overloads using current or explicit
   Culture and Result<T, DateTimeParseError>. Support the existing invariant, Swedish
   and Hebrew-Israel numeric Gregorian formats, with optional 1–7 fractional digits.

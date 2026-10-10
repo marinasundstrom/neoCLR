@@ -11,7 +11,7 @@ const USAGE: &str = "Usage:
   neoclr disassemble <metadata-input> [output]
   neoclr emit-il <source.neo> [output.neoil]
   neoclr assemble <source.neoil> <output> [--format json|neox] [--module <input>]... [--system <input>]
-  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [--show-result] [--instructions <positive-count>] [-- <guest-argument>...]
+  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [--show-result] [--instructions <positive-count>] [--array-elements <positive-count>] [--array-bytes <positive-count>] [-- <guest-argument>...]
   neoclr debug <input> [--module <input>]... [--system <input>] [-- <guest-argument>...]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
@@ -135,6 +135,8 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
     let mut show_result = false;
     let mut output_format = None;
     let mut instruction_limit = None;
+    let mut array_element_limit = None;
+    let mut array_byte_limit = None;
     let mut options = args[required..].iter();
     while let Some(option) = options.next() {
         match option.as_str() {
@@ -160,6 +162,30 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
                         .flatten()
                         .filter(|count| *count > 0)
                         .ok_or("Expected a positive integer count for --instructions")?,
+                );
+            }
+            "--array-elements" if command == "run" && array_element_limit.is_none() => {
+                let value = options.next().ok_or("Missing count for --array-elements")?;
+                array_element_limit = Some(
+                    value
+                        .bytes()
+                        .all(|byte| byte.is_ascii_digit())
+                        .then(|| value.parse::<usize>().ok())
+                        .flatten()
+                        .filter(|count| *count > 0)
+                        .ok_or("Expected a positive integer count for --array-elements")?,
+                );
+            }
+            "--array-bytes" if command == "run" && array_byte_limit.is_none() => {
+                let value = options.next().ok_or("Missing count for --array-bytes")?;
+                array_byte_limit = Some(
+                    value
+                        .bytes()
+                        .all(|byte| byte.is_ascii_digit())
+                        .then(|| value.parse::<usize>().ok())
+                        .flatten()
+                        .filter(|count| *count > 0)
+                        .ok_or("Expected a positive integer count for --array-bytes")?,
                 );
             }
             "--show-result" if command == "run" && !show_result => show_result = true,
@@ -351,6 +377,10 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
                 program.run_with_native(ExecutionOptions {
                     arguments: guest_arguments,
                     limits: neoclr::Limits {
+                        array_elements: array_element_limit
+                            .unwrap_or(neoclr::Limits::default().array_elements),
+                        array_bytes: array_byte_limit
+                            .unwrap_or(neoclr::Limits::default().array_bytes),
                         instructions: instruction_limit
                             .unwrap_or(neoclr::Limits::default().instructions),
                         ..neoclr::Limits::default()

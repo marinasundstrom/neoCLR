@@ -217,7 +217,10 @@ and error contracts; preserve those contracts when internalizing the helper.
 
 Follow [the .NET attribute contract](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.internalsvisibletoattribute?view=net-10.0)
 (primary source, reviewed 2026-10-10): an assembly-level, repeatable attribute grants
-a named assembly access to internals. The grant is one-way and non-transitive;
+a named assembly access to internals. Keep the type in
+`System.Runtime.CompilerServices`, with a string constructor argument and read-only
+`AssemblyName` property. Its usage is Assembly-only, AllowMultiple=true and
+Inherited=false. The grant is one-way and non-transitive;
 private access does not change. It targets assembly identity, never a namespace or
 neoCLR logical module. The benefit is implementation sharing and focused tests
 without public API commitments; the cost is deliberate coupling between friend
@@ -225,7 +228,10 @@ assemblies and additional identity/access validation. It is not a security sandb
 
 Current inspection: Raven's `AccessibilityUtilities.IsAccessibleFromInternalScope`
 only compares containing assemblies. The CLI library import contract also excludes
-friend access. Declaring the attribute alone is insufficient. A future slice must
+friend access. The resolved runtime checks in `src/access.rs` also admit internal
+access only within the same definition origin; they need the same explicit friend
+identity grant for calls, fields and owner types. Declaring the attribute alone is
+insufficient. A future slice must
 cover attribute declaration/usage, source and imported assembly attributes, Raven
 access checks, CLI bridge/import validation and native metadata retention. AOT must
 apply the same access decision before code generation; no runtime reflection or
@@ -239,3 +245,22 @@ regressions. Specify identity parsing and signed-assembly behavior explicitly;
 .NET's full-public-key rule must not silently degrade to simple-name matching.
 Unsupported identity forms must be diagnosed until implemented. No new permanent
 identity semantics or feature-completion claim is made here.
+
+
+### Buffer qualification exposed host-accounting costs
+
+The new maximum-buffer fixtures require explicit host budgets to reach the codec's
+own 64 KiB request boundaries. Native packed byte-array allocation is per array;
+interpreter budgets cover aggregate live elements and logical payload bytes, including
+its value representation. Both defaults remain unchanged. These bounded POC resource
+policies are deliberate platform constraints, not .NET Encoding semantics.
+
+The first budget-enabled interpreted run exceeded the runner's unchanged 180-second
+timeout while native cases passed. Byte writes invalidated a whole-array accounting
+cache and scanned all recorded sibling paths. Byte leaves have fixed logical payload
+and no descendant paths, so their writes can retain the numeric summary and skip
+that cleanup scan. Assignment epochs still advance, other mutations still invalidate,
+and each use checks current quota limits. Focused slot tests cover aliased mutations,
+initialization, output assignments, quota reductions and concurrent updates. The
+large-buffer consumer is the performance regression check; per-case wall time is
+recorded as qualification evidence, not a cross-platform or .NET benchmark claim.

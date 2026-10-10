@@ -7884,3 +7884,37 @@ neoCLR owns rule semantics and ABI replacement; a future native host-service con
 replaces the private C/text-arena transport. Ordinary .NET compiler behavior is
 unchanged. Focused contract/CLI and rule-kernel checks accompany framework DST,
 historical-second, alias and range cases; Windows execution remains separately gated.
+
+
+### Constant-range array comprehensions and host byte budgets (2026-10-10)
+
+Raven compiler pin `3489d43a368abd5d220fb2d0f9597e7fa19d4a40` admits one
+unfiltered array comprehension over explicit literal Int32 range endpoints in the
+native portable body contract. Existing array and range capabilities must both be
+enabled; no implicit target mapping or ordinary .NET default changes. Selectors run
+once per element; empty/reversed ascending ranges allocate empty arrays. Inclusive
+Int32.MaxValue terminates without incrementing past the endpoint. Cardinality above
+Int32.MaxValue, dynamic bounds, filters and mixed collection elements remain outside
+this bounded native lowering. General .NET collection/dictionary comprehensions
+also now stop before incrementing their inclusive endpoint, including filtered ends.
+
+Native semantic intent is ordinary array construction. The temporary bridge uses
+existing NewArray, local and element-store operations, not a new metadata shape or
+runtime helper. Raven owns semantic/emission support; native metadata/backend work
+can replace the transport while retaining these behaviors. The shared compiler's
+13 focused checks include positive portable admission, explicit unsupported cases
+and ordinary .NET endpoint execution. neoCLR's encoding-buffer-limits consumer
+exercises emitted arrays and endpoints through interpreted and AOT execution.
+
+The native project builder now accepts `--byte-array-limit` (positive Int32, default
+65,536), applying `NEOCLR_NATIVE_BYTE_ARRAY_LIMIT` consistently to packed byte
+allocation and UTF-8 snapshot adapters on Clang and MSVC. The arena/heap budget is
+independent; scalar/reference array limits and codec/stream 64 KiB request limits
+are unchanged. Full UTF-8 snapshot decoding still checks every reserved slot before
+validating content, including slots beyond 64 KiB under an expanded host budget.
+The interpreter's `run --array-elements` controls aggregate live array elements,
+not a per-byte-array limit; `--array-bytes` independently bounds logical payload
+bytes, including runtime value representation. These host policies are not described
+as identical. Defaults remain unchanged. Explicit larger fixture budgets let tests
+reach codec quota rejection and carry output beyond one input chunk's size. This
+private host configuration is not a new guest API or metadata contract.

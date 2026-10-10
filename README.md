@@ -168,7 +168,10 @@ operand validation only. `run` accepts either `.neoil` source or a JSON artifact
 it does not automatically run the opt-in typed verifier.
 
 Development CLI runs can select a larger existing instruction budget with
-`--instructions 1000000`; the default remains 100,000 and other limits stay unchanged.
+`--instructions 1000000`; the default remains 100,000.
+`--array-elements 1048576` similarly overrides the aggregate live-array element
+budget (default 65,536); `--array-bytes 268435456` adjusts its logical payload
+byte budget (default 16 MiB). Other limits stay unchanged.
 See [execution-budget options](docs/cli-module-sets.md#explicit-run-instruction-budget-development).
 
 ### Build the runtime library explicitly (optional)

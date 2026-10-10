@@ -113,3 +113,15 @@ behavior. Output extension does not select the format. Only one format option is
 accepted, and it is available only for `assemble`. Standalone native assemblies require
 a schema-3-capable runtime, with 8 MiB envelope and 2,097,152-item limits. Debug/source
 text and a .NET compiler reference projection are not embedded.
+
+
+## Explicit run array budget (development)
+
+`run --array-elements <positive-count>` overrides `Limits.array_elements`, the
+aggregate live-array element budget (default 65,536). It accepts one positive
+host-sized decimal integer before `--`, on `run` only.
+`run --array-bytes <positive-count>` separately overrides the logical array payload
+byte budget (default 16 MiB), with the same parsing rules. This counts the runtime
+value representation, not just packed byte content. Instructions and other limits
+stay unchanged. This permits targeted large-buffer qualification
+without weakening defaults; it does not lift library codec request quotas.

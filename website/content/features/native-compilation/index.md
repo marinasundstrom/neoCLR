@@ -109,6 +109,12 @@ qualification.
 | Arithmetic | Integer operations and a bounded Double arithmetic/comparison subset |
 
 This describes tested workloads, not universal support for every API in those areas.
+Development array comprehensions support a single unfiltered range with explicit
+constant Int32 endpoints. Empty/reversed ascending ranges produce empty arrays;
+inclusive maximum endpoints terminate correctly. Dynamic bounds, filters and mixed
+collection elements remain unsupported by this native lowering. These are compiler
+coverage gaps; the intended language semantics remain shared with Raven/.NET.
+
 The compiler reports unsupported contracts. Use matching development compiler,
 library and runtime artifacts; this is not a general publishing workflow for all apps.
 

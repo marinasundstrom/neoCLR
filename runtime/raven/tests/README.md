@@ -582,5 +582,17 @@ total 24 cases; the library reaches 198 cases across 22 projects. Windows remain
 pending and runs all three suites by default. Existing MemoryStream and JSON stream
 suites retain their own storage, seek, document and ownership coverage.
 
-Direct decoder/drain maximum-buffer fixtures and broader file/socket host scenarios
+Broader file/socket host scenarios
 remain separate; these cases do not claim every codec, stream or platform is covered.
+
+
+`--suite encoding-buffer-limits` adds five cases for oversized decoder/drain retry,
+maximum ASCII input, UTF-8 carry beyond a maximum new-input chunk, and native
+constant-range array construction endpoints. The suite explicitly requests a native
+131,072-element byte-array limit and interpreter budgets of 1,048,576 live elements
+and 256 MiB logical array payload. These have different accounting rules; neither
+changes library codec quotas or default host limits. The new suite brings the
+library to 203 cases across 23 projects. Qualification is recorded separately in
+[encoding-buffer-limits-validation.json](encoding-buffer-limits-validation.json):
+all five pass native macOS ARM64 and interpreted execution. Windows uses the same
+default suite list; its result remains pending.

@@ -10,9 +10,18 @@ import platform
 import shutil
 import subprocess
 import sys
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / 'runtime/raven/tests'
+ENCODING_BUFFER_NAMES = [
+    'UTF-8 decoder quota rejection preserves an incomplete scalar',
+    'ASCII decoder accepts the maximum input after rejecting an oversized call',
+    'Encoder drain quotas preserve accepted text and destination bytes',
+    'UTF-8 decoder maximum input counts new bytes separately from carried bytes',
+    'Native buffer comprehensions preserve selector indices and range endpoints',
+]
+
 ENCODING_BOUNDARY_NAMES = [
     'StreamReader decodes Unicode lines across single-byte reads',
     'StreamReader distinguishes empty lines EOF and lone carriage returns',
@@ -285,7 +294,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'encoding-boundaries', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -309,6 +318,7 @@ def main():
         ('json-streams', 0, ''.join('PASS ' + n + '\n' for n in JSON_STREAM_NAMES) + f'Tests: {len(JSON_STREAM_NAMES)}, passed: {len(JSON_STREAM_NAMES)}, failed: 0, skipped: 0\n'),
         ('memory-stream', 0, ''.join('PASS ' + n + '\n' for n in MEMORY_STREAM_NAMES) + f'Tests: {len(MEMORY_STREAM_NAMES)}, passed: {len(MEMORY_STREAM_NAMES)}, failed: 0, skipped: 0\n'),
         ('string-construction', 0, ''.join('PASS ' + n + '\n' for n in STRING_CONSTRUCTION_NAMES) + f'Tests: {len(STRING_CONSTRUCTION_NAMES)}, passed: {len(STRING_CONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
+        ('encoding-buffer-limits', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_BUFFER_NAMES) + f'Tests: {len(ENCODING_BUFFER_NAMES)}, passed: {len(ENCODING_BUFFER_NAMES)}, failed: 0, skipped: 0\n'),
         ('encoding-boundaries', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_BOUNDARY_NAMES) + f'Tests: {len(ENCODING_BOUNDARY_NAMES)}, passed: {len(ENCODING_BOUNDARY_NAMES)}, failed: 0, skipped: 0\n'),
         ('encoding-streams', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_STREAM_NAMES) + f'Tests: {len(ENCODING_STREAM_NAMES)}, passed: {len(ENCODING_STREAM_NAMES)}, failed: 0, skipped: 0\n'),
         ('encoding', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_NAMES) + f'Tests: {len(ENCODING_NAMES)}, passed: {len(ENCODING_NAMES)}, failed: 0, skipped: 0\n'),
@@ -341,6 +351,8 @@ def main():
             command = [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile',
                        'windows-console' if os.name == 'nt' else 'console', '--project', TESTS / name / 'Tests.rvnproj',
                        '--bundle', bundle, '--aot', args.aot.resolve(), '--output', build]
+            if name == "encoding-buffer-limits":
+                command += ["--byte-array-limit", "131072"]
             result = subprocess.run(list(map(str, command)), cwd=ROOT, env=environment, capture_output=True, timeout=600)
             (out / (name + '-build.stdout.log')).write_bytes(result.stdout)
             (out / (name + '-build.stderr.log')).write_bytes(result.stderr)
@@ -357,11 +369,16 @@ def main():
             interpreter = [args.runtime.resolve(), 'run', build / 'app.dll', '--system', lib / catalog['runtimeSeed'],
                            *[arg for a in catalog['assemblyNames'] for arg in ('--module', lib / (a + '.dll'))],
                            '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']
+            if name == "encoding-buffer-limits":
+                interpreter += ["--array-elements", "1048576", "--array-bytes", "268435456"]
+                report["encodingBufferBudgets"] = dict(nativeByteArrayElements=131072, interpretedLiveArrayElements=1048576, interpretedLogicalArrayBytes=268435456)
             env = {k: v for k, v in os.environ.items() if k.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
             executions = [('native', [exe], isolated, env), ('interpreter', interpreter, ROOT, None)]
             for mode, command, cwd, environment in executions:
+                started = time.perf_counter()
                 result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=180)
                 record = dict(suite=name, mode=mode, exitCode=result.returncode,
+                              elapsedSeconds=round(time.perf_counter() - started, 3),
                               stdout=result.stdout.decode('utf-8').replace('\r\n', '\n'),
                               stderr=result.stderr.decode('utf-8').replace('\r\n', '\n'))
                 report['cases'].append(record)

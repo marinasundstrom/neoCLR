@@ -204,6 +204,68 @@ fn cli_rejects_invalid_instruction_budget_before_loading() {
 }
 
 #[test]
+fn cli_array_budget_is_explicit_and_preserves_default() {
+    let path = std::env::temp_dir().join(format!("neoclr-array-budget-{}.neoil", std::process::id()));
+    std::fs::write(&path, ".module Budget\n.entry Main\n.function Main() -> Int32\nldc.i4 65537\nnewarr Byte\npop\nldc.i4 42\nret\n.end\n").unwrap();
+    let run = |extra: &[&str]| Command::new(env!("CARGO_BIN_EXE_neoclr"))
+        .arg("run").arg(&path).args(extra).output().unwrap();
+    let default = run(&[]);
+    assert_eq!(default.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&default.stderr).contains("ArrayLimitExceeded"), "{default:?}");
+    let small_bytes = run(&["--array-elements", "131072", "--array-bytes", "1"]);
+    assert_eq!(small_bytes.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&small_bytes.stderr).contains("ArrayLimitExceeded"), "{small_bytes:?}");
+    let large = run(&["--array-elements", "131072", "--array-bytes", "67108864"]);
+    assert_eq!(large.status.code(), Some(42), "{large:?}");
+    assert!(large.stdout.is_empty() && large.stderr.is_empty());
+    std::fs::remove_file(path).unwrap();
+}
+
+#[test]
+fn cli_rejects_invalid_array_budget_before_loading() {
+    for args in [
+        vec!["run", "missing.neoil", "--array-elements"],
+        vec!["run", "missing.neoil", "--array-elements", "0"],
+        vec!["run", "missing.neoil", "--array-elements", "-1"],
+        vec!["run", "missing.neoil", "--array-elements", "+1"],
+        vec!["run", "missing.neoil", "--array-elements", "abc"],
+        vec!["run", "missing.neoil", "--array-elements", "999999999999999999999999999999"],
+        vec!["run", "missing.neoil", "--array-elements", "1", "--array-elements", "2"],
+        vec!["verify", "missing.neoil", "--array-elements", "1"],
+        vec!["debug", "missing.neoil", "--array-elements", "1"],
+    ] {
+        let output = Command::new(env!("CARGO_BIN_EXE_neoclr"))
+            .args(args).output().unwrap();
+        assert_eq!(output.status.code(), Some(1));
+        let error = String::from_utf8_lossy(&output.stderr);
+        assert!(error.contains("--array-elements") && !error.contains("Cannot read"), "{error}");
+        assert!(output.stdout.is_empty());
+    }
+}
+
+#[test]
+fn cli_rejects_invalid_array_byte_budget_before_loading() {
+    for args in [
+        vec!["run", "missing.neoil", "--array-bytes"],
+        vec!["run", "missing.neoil", "--array-bytes", "0"],
+        vec!["run", "missing.neoil", "--array-bytes", "-1"],
+        vec!["run", "missing.neoil", "--array-bytes", "+1"],
+        vec!["run", "missing.neoil", "--array-bytes", "abc"],
+        vec!["run", "missing.neoil", "--array-bytes", "999999999999999999999999999999"],
+        vec!["run", "missing.neoil", "--array-bytes", "1", "--array-bytes", "2"],
+        vec!["verify", "missing.neoil", "--array-bytes", "1"],
+        vec!["debug", "missing.neoil", "--array-bytes", "1"],
+    ] {
+        let output = Command::new(env!("CARGO_BIN_EXE_neoclr"))
+            .args(args).output().unwrap();
+        assert_eq!(output.status.code(), Some(1));
+        let error = String::from_utf8_lossy(&output.stderr);
+        assert!(error.contains("--array-bytes") && !error.contains("Cannot read"), "{error}");
+        assert!(output.stdout.is_empty());
+    }
+}
+
+#[test]
 fn cli_execution_faults_share_host_presentation_and_exit_one() {
     let path =
         std::env::temp_dir().join(format!("neoclr-common-fault-{}.neoil", std::process::id()));

@@ -1566,6 +1566,50 @@ int main(void) {
 
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn utf8_text_arena_explicit_byte_budget_preserves_initialization_and_outputs() {
+    let dir = Temp::new();
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "text-arena.h"
+#include <string.h>
+int main(void) {
+    static uint64_t storage[50000];
+    neoclr_aot_text_arena arena={(unsigned char *)storage,sizeof(storage),0};
+    void *bytes=0;
+    if (neoclr_reserve_bytes_v1(&arena,65539,&bytes)) return 1;
+    unsigned char *data=(unsigned char *)bytes+16;
+    unsigned char *initialized=data+65539;
+    memset(data,'x',65539);
+    memset(initialized,1,65538);
+    uint64_t result[2]={99,99}, saved[2]={99,99};
+    uint64_t used=arena.used;
+    /* Even an invalid leading byte cannot hide an uninitialized slot past 64 KiB. */
+    data[0]=0xff;
+    if (neoclr_utf8_decode_v1(bytes,&arena,result)!=3 || arena.used!=used || memcmp(result,saved,sizeof(result))) return 2;
+    initialized[65538]=1;
+    if (neoclr_utf8_decode_v1(bytes,&arena,result) || (uint32_t)result[0]!=2 || arena.used!=used) return 3;
+    data[0]='x';
+    if (neoclr_utf8_decode_v1(bytes,&arena,result) || (uint32_t)result[0]!=4) return 4;
+    const neoclr_aot_text *text=(const neoclr_aot_text *)(uintptr_t)result[1];
+    if (text->length!=65539 || memcmp(text->bytes,data,65539)) return 5;
+    const void *encoded=0;
+    if (neoclr_utf8_encode_v1(text,&arena,&encoded) || memcmp((const unsigned char *)encoded+16,data,65539)) return 6;
+    used=arena.used;
+    void *unchanged=bytes;
+    if (neoclr_allocate_bytes_v1(&arena,131073,&bytes)!=7 || bytes!=unchanged || arena.used!=used) return 7;
+    return 0;
+}
+"#).unwrap();
+    let result = Command::new("clang").args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=131072", "-I"])
+        .arg(&base).arg(dir.0.join("host.c")).arg(base.join("text-arena.c"))
+        .arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    assert!(Command::new(dir.0.join("app")).env_clear().status().unwrap().success());
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn utf8_encoding_snapshots_and_managed_copy_match_interpreter() {
     let dir=Temp::new();
     let seed=neoclr::assemble(UTF8_SEED).unwrap();

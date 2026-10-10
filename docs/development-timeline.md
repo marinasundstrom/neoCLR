@@ -13993,3 +13993,25 @@ claim completion of in-process test discovery.
 - **Action/status:** record scope, costs, identity questions and interpreter/AOT
   acceptance in the [encoding review](design/encoding-api-review.md#author-follow-up-internal-helpers-and-friend-assemblies-2026-10-10).
   Neither Utf8 internalization nor friend access is claimed implemented by this note.
+
+## 2026-10-10 — Encoding buffer qualification and interpreter accounting
+
+- **Context:** continue the author-directed encoding/stream test coverage while the
+  Utf8 visibility and friend-assembly discussion is recorded separately above.
+- **Actions:** add five framework cases for codec quotas/retries, maximum input with
+  carry and range-based buffer construction. A Raven compiler gap required bounded
+  constant-range array lowering; its endpoint case also exposed a general .NET
+  comprehension overflow, fixed on the shared compiler line (`3489d43a`).
+- **Host constraints:** explicitly raise fixture array budgets instead of changing
+  defaults. The interpreter separately limits live elements and logical payload
+  bytes; the native host limits packed byte arrays per allocation.
+- **Observed gap and fix:** the budget-enabled interpreted batch exceeded the
+  unchanged 180-second timeout. Byte writes repeatedly scanned payload and sibling
+  path records. Preserve fixed byte-leaf accounting and skip impossible descendant
+  cleanup while retaining quota, initialization and assignment-epoch checks.
+- **Outcome:** five framework cases pass native macOS ARM64 and interpreted modes;
+  [retained evidence](../runtime/raven/tests/encoding-buffer-limits-validation.json)
+  includes measured execution durations and binary/source hashes. Eleven focused
+  slot tests, three CLI budget cases, three native C adapter checks and thirteen
+  Raven compiler cases pass. Windows remains pending. No public Encoding/Utf8 API
+  change or InternalsVisibleTo implementation is claimed by this slice.

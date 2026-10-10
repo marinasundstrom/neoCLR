@@ -88,7 +88,7 @@ int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
 
 static int32_t allocate_bytes(neoclr_aot_text_arena *arena, int32_t length, int reserved, void **output) {
     if (length < 0) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    if (length > 65536) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
+    if (length > NEOCLR_NATIVE_BYTE_ARRAY_LIMIT) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
     if (arena->used > arena->capacity || (arena->capacity && !arena->data) ||
         ((uintptr_t)arena->data & 7)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     void *storage;
@@ -110,20 +110,26 @@ int32_t neoclr_reserve_bytes_v1(neoclr_aot_text_arena *arena, int32_t length, vo
     return allocate_bytes(arena, length, 1, output);
 }
 
-int32_t neoclr_check_bytes_initialized_v1(const void *array, int32_t offset, int32_t count) {
+static int32_t check_bytes_initialized(const void *array, int32_t offset, int32_t count) {
     uint64_t kind, length;
     memcpy(&kind, array, 8);
     kind &= UINT64_C(0xffffffff);
     memcpy(&length, (const unsigned char *)array + 8, 8);
     /* Preserve the service's range/limit errors before examining any slots. */
     if (kind != UINT64_C(0x80000002) || offset < 0 || count < 0 ||
-        (uint64_t)offset > length || (uint64_t)count > length - (uint64_t)offset || count > 65536)
+        (uint64_t)offset > length || (uint64_t)count > length - (uint64_t)offset)
         return NEOCLR_AOT_FAULT_NONE;
     const unsigned char *initialized = (const unsigned char *)array + 16 + length;
     for (int32_t i = 0; i < count; i++) {
         if (!initialized[(uint64_t)offset + (uint64_t)i]) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     }
     return NEOCLR_AOT_FAULT_NONE;
+}
+
+int32_t neoclr_check_bytes_initialized_v1(const void *array, int32_t offset, int32_t count) {
+    /* Stream services retain their own 64 KiB request limit and error precedence. */
+    if (count > 65536) return NEOCLR_AOT_FAULT_NONE;
+    return check_bytes_initialized(array, offset, count);
 }
 
 int32_t neoclr_string_byte_count_v1(const neoclr_aot_text *text, int32_t *output) {
@@ -162,7 +168,7 @@ int32_t neoclr_string_slice_utf8_v1(const neoclr_aot_text *text, int32_t start, 
 int32_t neoclr_utf8_encode_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
                              const void **output) {
     if (!text) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    if (text->length > 65536) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
+    if (text->length > NEOCLR_NATIVE_BYTE_ARRAY_LIMIT) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
     void *array;
     int32_t status = allocate_bytes(arena, (int32_t)text->length, 0, &array);
     if (status) return status;
@@ -208,11 +214,11 @@ int32_t neoclr_utf8_decode_v1(const void *array, neoclr_aot_text_arena *arena, v
     memcpy(&kind, array, 8);
     kind &= UINT64_C(0xffffffff);
     memcpy(&length, (const unsigned char *)array + 8, 8);
-    if ((kind != UINT64_C(0x80000001) && kind != UINT64_C(0x80000002)) || length > 65536)
+    if ((kind != UINT64_C(0x80000001) && kind != UINT64_C(0x80000002)) || length > NEOCLR_NATIVE_BYTE_ARRAY_LIMIT)
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     /* The interpreter reads every slot before checking UTF-8, even after an
      * invalid leading byte. Preserve that failure precedence. */
-    int32_t status = neoclr_check_bytes_initialized_v1(array, 0, (int32_t)length);
+    int32_t status = check_bytes_initialized(array, 0, (int32_t)length);
     if (status) return status;
     const unsigned char *bytes = (const unsigned char *)array + 16;
     return neoclr_text_decode_utf8_bytes_v1(bytes, length, arena, output);
