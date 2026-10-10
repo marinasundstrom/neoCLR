@@ -551,3 +551,13 @@ interpreted execution, alongside all six Instant cases
 ([qualification](zoned-time-parsing-validation.json)). The library now contains
 174 cases across 19 projects. Windows runs this suite by default; qualification
 is pending. Native local-time mapping and machine-zone discovery remain separate.
+
+### Encoding conversion and sessions
+
+`--suite encoding` adds eight attributed cases migrated from the text-boundary
+probes. Strict providers, every UTF-8 byte split, malformed input, copied carry,
+independent sessions, retryable errors and bounded encoder drains pass native
+macOS ARM64 and interpreted execution
+([qualification](encoding-validation.json)). The library reaches 182 cases across
+20 projects. Windows qualification is pending; the default gate includes this suite.
+Custom writer, reader and quota probe migration remains separate.

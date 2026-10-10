@@ -139,3 +139,21 @@ Add small .NET comparison cases when changing completion, replacement or progres
 semantics. Update public API references with implementation changes. Benchmark
 allocation/copying only after a concrete performance question emerges; this review
 makes no throughput claim.
+
+## First migration slice
+
+The new [encoding framework project](../../runtime/raven/tests/encoding/Tests.rvn)
+translates the provider/decoder and encoder-progress probes into eight discoverable
+tests. It covers all byte split positions of Aé€😀, strict malformed input,
+copied pending bytes, independent sessions, preserved BOM/NUL data, retryable
+range/preflight errors, terminal states and bounded drains at the internal chunk
+boundary. It uses recoverable assertions rather than terminating the whole probe.
+
+This is a partial migration. Custom writer trailers, partial-output failures,
+reader integration and 65536-byte quota fixtures remain in the historical probes
+until their own attributed batch is qualified. Conversion symmetry and completion
+API proposals are unchanged.
+
+All eight cases pass native macOS ARM64 and interpreter execution
+([qualification](../../runtime/raven/tests/encoding-validation.json)); no library
+implementation changes were needed. Windows qualification remains pending.

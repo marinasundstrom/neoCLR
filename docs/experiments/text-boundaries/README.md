@@ -242,3 +242,12 @@ selection/line behavior and a migrated custom Encoding implementation.
 
 [Public integration evidence](public-encoder-validation.json) is separate from the
 earlier application-only Encoder probe. No full suite or website build is needed.
+
+## Attributed encoding migration — 2026-10-10
+
+Provider/decoder and encoder-progress checks from EncodingMain.rvn and
+PublicEncoderMain.rvn now have an attributed counterpart in the
+[encoding suite](../../../runtime/raven/tests/encoding/Tests.rvn). The new batch
+also exercises every byte split of a mixed-width UTF-8 string. Retain these
+historical programs: writer completion, quotas and reader integration have not
+all migrated. See the [API review](../../design/encoding-api-review.md).

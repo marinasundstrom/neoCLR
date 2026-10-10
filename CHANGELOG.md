@@ -11,7 +11,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Record the author-requested encoding API review against .NET and other primary
   contracts. Identify paired decoding, generic writer completion and conformance
   coverage as priorities; preserve strict UTF-8/ASCII. The proposed sequence adds
-  no APIs or codecs in this documentation slice.
+  no APIs or codecs in the review slice. Migrate eight provider/session encoding
+  checks into attributed framework tests, including every mixed-width UTF-8 split,
+  strict errors, copied carry, independent sessions and bounded drains. All pass
+  native macOS ARM64 and interpreted execution; Windows qualification is pending.
 
 - Add Date, TimeOfDay and LocalDateTime Parse overloads using current or explicit
   Culture and Result<T, DateTimeParseError>. Support the existing invariant, Swedish

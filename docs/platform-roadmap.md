@@ -370,7 +370,9 @@ host-culture parity probe.
 [review](design/encoding-api-review.md) is recorded after the time-zone slice. It
 retains the established UTF-8/strict-ASCII baseline and compares role, completion,
 error, quota and buffer contracts with System.Text. The recommended next bounded
-slice migrates existing encoding probes into attributed tests; paired one-shot
+slice has migrated eight provider/session checks into attributed tests; all pass
+both local modes ([evidence](../runtime/raven/tests/encoding-validation.json)).
+Custom writer, reader and quota coverage remains to migrate. Paired one-shot
 decoding and general writer completion follow as proposals. This review does not
 approve additional codecs or permanently reprioritize the roadmap.
 

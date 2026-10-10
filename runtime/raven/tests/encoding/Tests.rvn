@@ -1,0 +1,186 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+import NeoClr.Testing.*
+
+func Decoded(result: Result<string, EncodingError>, expected: string) -> Result<unit, TestFailure> {
+    let Ok(text) = result else {
+        return Error(TestFailure("Decode", expected, "Error"))
+    }
+    return Assert.Equal(expected, text)
+}
+
+func Invalid(bytes: byte[]) -> Result<unit, TestFailure> {
+    let decoder = Encodings.Utf8.CreateDecoder()
+    _ = Assert.True(decoder.Decode(bytes, 0, bytes.Length, true) is Error(EncodingError.InvalidUtf8), "Malformed UTF-8 rejected")?
+    return Assert.True(decoder.Decode(bytes, 0, 0, false) is Error(EncodingError.Finished), "Malformed decoder is terminal")
+}
+
+[Test("Encoding providers preserve UTF-8 and reject non-ASCII text")]
+func AProviders() -> Result<unit, TestFailure> {
+    let source = "\u0000Aé😀é\u007f"
+    let Ok(bytes) = Encodings.Utf8.Encode(source) else {
+        return Error(TestFailure("UTF-8 encode", "Ok", "Error"))
+    }
+    let Ok(text) = Utf8.Decode(bytes) else {
+        return Error(TestFailure("UTF-8 round trip", "Ok", "Error"))
+    }
+    _ = Assert.Equal(source, text)?
+    let Ok(ascii) = Encodings.Ascii.Encode("\u0000A\u007f") else {
+        return Error(TestFailure("ASCII encode", "Ok", "Error"))
+    }
+    _ = Assert.Equal(3, ascii.Count)?
+    _ = Assert.True(ascii[0] == 0 && ascii[1] == 65 && ascii[2] == 127, "ASCII byte identity")?
+    return Assert.True(Encodings.Ascii.Encode("prefix é") is Error(EncodingError.UnrepresentableText), "Strict ASCII")
+}
+
+[Test("UTF-8 decoding preserves text at every byte split")]
+func BSplitPoints() -> Result<unit, TestFailure> {
+    let bytes: byte[] = [(byte)65, (byte)195, (byte)169, (byte)226, (byte)130, (byte)172, (byte)240, (byte)159, (byte)152, (byte)128]
+    for split in 0..(bytes.Length) {
+        let decoder = Encodings.Utf8.CreateDecoder()
+        let Ok(first) = decoder.Decode(bytes, 0, split, false) else {
+            return Error(TestFailure("First fragment", "Ok", "Error"))
+        }
+        let Ok(last) = decoder.Decode(bytes, split, bytes.Length - split, true) else {
+            return Error(TestFailure("Last fragment", "Ok", "Error"))
+        }
+        _ = Assert.Equal("Aé€😀", first + last)?
+    }
+    return Assert.True(true, "All split points")
+}
+
+[Test("UTF-8 decoders reject malformed scalars and truncated final input")]
+func CMalformed() -> Result<unit, TestFailure> {
+    _ = Invalid([(byte)128])?
+    _ = Invalid([(byte)192, (byte)175])?
+    _ = Invalid([(byte)224, (byte)128, (byte)128])?
+    _ = Invalid([(byte)237, (byte)160, (byte)128])?
+    _ = Invalid([(byte)244, (byte)144, (byte)128, (byte)128])?
+    _ = Invalid([(byte)65, (byte)226, (byte)65])?
+    return Invalid([(byte)240, (byte)159, (byte)152])
+}
+
+[Test("Decoder sessions copy pending input and preserve BOM data")]
+func DOwnership() -> Result<unit, TestFailure> {
+    let first = Encodings.Utf8.CreateDecoder()
+    let second = Encodings.Utf8.CreateDecoder()
+    let head: byte[] = [(byte)195]
+    let tail: byte[] = [(byte)169]
+    _ = Decoded(first.Decode(head, 0, 1, false), "")?
+    head[0] = (byte)65
+    _ = Decoded(second.Decode(head, 0, 1, true), "A")?
+    _ = Decoded(first.Decode(tail, 0, 1, true), "é")?
+    _ = Assert.True(first.Decode(tail, 0, 0, false) is Error(EncodingError.Finished), "Final decode is terminal")?
+    let bom: byte[] = [(byte)239, (byte)187, (byte)191, (byte)65]
+    return Decoded(Encodings.Utf8.CreateDecoder().Decode(bom, 0, 4, true), "\ufeffA")
+}
+
+[Test("Decoder range errors are retryable and ASCII errors are terminal")]
+func ERanges() -> Result<unit, TestFailure> {
+    let bytes: byte[] = [(byte)0, (byte)65, (byte)127]
+    let decoder = Encodings.Ascii.CreateDecoder()
+    _ = Assert.True(decoder.Decode(bytes, -1, 1, true) is Error(EncodingError.InvalidRange), "Negative offset")?
+    _ = Assert.True(decoder.Decode(bytes, 0, -1, true) is Error(EncodingError.InvalidRange), "Negative count")?
+    _ = Assert.True(decoder.Decode(bytes, 1, 2147483647, true) is Error(EncodingError.InvalidRange), "Overflow-safe range")?
+    _ = Decoded(decoder.Decode(bytes, 0, 3, false), "\u0000A\u007f")?
+    _ = Decoded(decoder.Decode(bytes, 3, 0, true), "")?
+    let strict = Encodings.Ascii.CreateDecoder()
+    let invalid: byte[] = [(byte)65, (byte)128]
+    _ = Assert.True(strict.Decode(invalid, 0, 2, false) is Error(EncodingError.InvalidData), "Strict ASCII bytes")?
+    return Assert.True(strict.Decode(bytes, 0, 1, false) is Error(EncodingError.Finished), "Invalid ASCII is terminal")
+}
+
+[Test("Encoders preserve accepted input through one-byte drains")]
+func FProgress() -> Result<unit, TestFailure> {
+    let encoder = Encodings.Utf8.CreateEncoder()
+    var source = "é😀é"
+    _ = Assert.True(encoder.Accept(source, false) is Ok(_), "Accept source")?
+    source = "changed"
+    _ = Assert.True(encoder.Accept("other", false) is Error(EncodingError.Busy), "Pending input cannot be overwritten")?
+    let buffer: byte[] = [(byte)99, (byte)99, (byte)99]
+    _ = Assert.True(encoder.Drain(buffer, 3, 1) is Error(EncodingError.InvalidRange), "Destination range")?
+    let Ok(zero) = encoder.Drain(buffer, 1, 0) else {
+        return Error(TestFailure("Zero drain", "Ok", "Error"))
+    }
+    _ = Assert.True(zero.BytesWritten == 0 && zero.State is EncoderState.NeedsOutput, "Explicit zero progress")?
+    let output = ArrayList<byte>()
+    for index in 0..<9 {
+        let Ok(step) = encoder.Drain(buffer, 1, 1) else {
+            return Error(TestFailure("Drain", "Ok", "Error"))
+        }
+        _ = Assert.True(step.BytesWritten == 1 && buffer[0] == 99 && buffer[2] == 99, "Only offered byte changed")?
+        output.Add(buffer[1])
+        if index == 8 {
+            _ = Assert.True(step.State is EncoderState.Ready, "All bytes drained")?
+        } else {
+            _ = Assert.True(step.State is EncoderState.NeedsOutput, "More bytes pending")?
+        }
+    }
+    let Ok(text) = Utf8.Decode(output) else {
+        return Error(TestFailure("Drained bytes", "UTF-8", "Error"))
+    }
+    _ = Assert.Equal("é😀é", text)?
+    _ = Assert.True(encoder.Accept("", true) is Ok(_), "Empty final input")?
+    let Ok(final) = encoder.Drain(buffer, 0, 0) else {
+        return Error(TestFailure("Final drain", "Ok", "Error"))
+    }
+    _ = Assert.True(final.State is EncoderState.Finished && final.BytesWritten == 0, "Empty final completion")?
+    _ = Assert.True(encoder.Accept("", false) is Error(EncodingError.Finished), "Accept after finish")?
+    return Assert.True(encoder.Drain(buffer, 0, 1) is Error(EncodingError.Finished), "Drain after finish")
+}
+
+[Test("Encoder chunks preserve scalars across the internal byte boundary")]
+func GChunkBoundary() -> Result<unit, TestFailure> {
+    var prefix = "x"
+    for index in 0..<8 {
+        prefix = prefix + prefix
+    }
+    let Ok(head) = prefix.SliceUtf8(0, 255) else {
+        return Error(TestFailure("Prefix", "255 bytes", "Error"))
+    }
+    let source = head + "😀é"
+    let encoder = Encodings.Utf8.CreateEncoder()
+    _ = Assert.True(encoder.Accept(source, true) is Ok(_), "Accept boundary text")?
+    let buffer: byte[] = [(byte)0, (byte)0, (byte)0]
+    let output = ArrayList<byte>()
+    var finished = false
+    for attempt in 0..<88 {
+        if !finished {
+            let Ok(step) = encoder.Drain(buffer, 0, 3) else {
+                return Error(TestFailure("Boundary drain", "Ok", "Error"))
+            }
+            for index in 0..<step.BytesWritten {
+                output.Add(buffer[index])
+            }
+            finished = step.State is EncoderState.Finished
+        }
+    }
+    _ = Assert.True(finished, "Bounded drain must complete")?
+    let Ok(text) = Utf8.Decode(output) else {
+        return Error(TestFailure("Boundary bytes", "UTF-8", "Error"))
+    }
+    return Assert.Equal(source, text)
+}
+
+[Test("ASCII encoder preflight is retryable and factories are independent")]
+func HAsciiSessions() -> Result<unit, TestFailure> {
+    let provider = Encodings.Ascii
+    let first = provider.CreateEncoder()
+    let second = provider.CreateEncoder()
+    _ = Assert.True(first.Accept("prefix é", true) is Error(EncodingError.UnrepresentableText), "Strict preflight")?
+    _ = Assert.True(first.Accept("A", true) is Ok(_), "Retry after preflight")?
+    _ = Assert.True(second.Accept("B", true) is Ok(_), "Independent acceptance")?
+    let buffer: byte[] = [(byte)0]
+    let Ok(a) = first.Drain(buffer, 0, 1) else {
+        return Error(TestFailure("First drain", "Ok", "Error"))
+    }
+    _ = Assert.True(a.BytesWritten == 1 && a.State is EncoderState.Finished && buffer[0] == 65, "First session")?
+    let Ok(b) = second.Drain(buffer, 0, 1) else {
+        return Error(TestFailure("Second drain", "Ok", "Error"))
+    }
+    return Assert.True(b.BytesWritten == 1 && b.State is EncoderState.Finished && buffer[0] == 66, "Second session")
+}
