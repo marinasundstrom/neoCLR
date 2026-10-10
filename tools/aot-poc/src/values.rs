@@ -341,6 +341,18 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             }
         }
     }
+    let mut default_display_literals = vec![];
+    if let Some(details) = details {
+        for (index, text) in &details.object_default_display {
+            let id = module.declare_data(&format!("neoclr_default_display_{index}"), Linkage::Local, false, false)?;
+            let mut data = DataDescription::new();
+            let mut bytes = (text.len() as u64).to_le_bytes().to_vec();
+            bytes.extend_from_slice(text.as_bytes());
+            data.define(bytes.into_boxed_slice()); data.set_align(8);
+            module.define_data(id, &data)?;
+            default_display_literals.push((*index, id));
+        }
+    }
     let text_copy = if text_identity {
         let id = module.declare_data("neoclr_identity_empty", Linkage::Local, false, false)?;
         let mut data = DataDescription::new();
@@ -741,7 +753,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             if let Some(targets) = p.dispatch.get(&i) {
                 // Caller checks null. Forward the original receiver, result slot and
                 // context; no synthetic interface frame enters the managed trace.
-                let display = details.is_some_and(|d| d.object_display.contains_key(&i));
+                let value_kind = details.and_then(|d| d.object_value_kinds.get(&i));
+                let display = details.is_some_and(|d| d.object_display.contains_key(&i)) && value_kind.is_none();
                 let string_target = details.and_then(|d| d.string_dispatch.get(&i));
                 if text_identity {
                     let text = b.create_block();
@@ -810,13 +823,57 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     b.ins().return_(&[status]);
                     b.switch_to_block(next);
                 }
-                let status = b.ins().iconst(types::I32, 3);
-                if let Some(d) = &diagnostic_data {
-                    let mut site = d.site(&mut module, &mut b, fault_context.unwrap(), i, 0);
-                    site.capture_frame = false;
-                    site.record(&mut b, status);
+                if display {
+                    for &(index, literal) in &default_display_literals {
+                        let matched = b.create_block();
+                        let next = b.create_block();
+                        let equal = matches_type(&mut b, &p, tag, index);
+                        b.ins().brif(equal, matched, &[], next, &[]);
+                        b.switch_to_block(matched);
+                        let data = module.declare_data_in_func(literal, b.func);
+                        let pointer = b.ins().global_value(types::I64, data);
+                        write(&mut b, output, &[pointer]);
+                        let zero = b.ins().iconst(types::I32, 0);
+                        b.ins().return_(&[zero]);
+                        b.switch_to_block(next);
+                    }
                 }
-                b.ins().return_(&[status]);
+                if let Some(kind) = value_kind {
+                    // Do not silently apply reference identity to value boxes.
+                    // Their Object-slot value semantics need explicit adapters.
+                    let d = details.unwrap();
+                    let mut boxes: Vec<_> = d.int32_boxes.values().chain(d.boolean_boxes.values())
+                        .chain(d.empty_record_boxes.values()).copied().collect();
+                    boxes.sort_unstable(); boxes.dedup();
+                    for index in boxes {
+                        let boxed = matches_type(&mut b, &p, tag, index);
+                        let status = b.ins().iconst(types::I32, 3);
+                        let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                        site.capture_frame = false;
+                        return_if_detailed(&mut b, boxed, status, Some(&site));
+                    }
+                    let value = if kind == "Equals" {
+                        let equal = b.ins().icmp(IntCC::Equal, parameters[0], parameters[1]);
+                        b.ins().uextend(types::I32, equal)
+                    } else {
+                        // The native collector is nonmoving: this hash is stable
+                        // for the object's lifetime, with no cross-process promise.
+                        let high = b.ins().ushr_imm(parameters[0], 32);
+                        let mixed = b.ins().bxor(parameters[0], high);
+                        b.ins().ireduce(types::I32, mixed)
+                    };
+                    write(&mut b, output, &[value]);
+                    let status = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[status]);
+                } else {
+                    let status = b.ins().iconst(types::I32, 3);
+                    if let Some(d) = &diagnostic_data {
+                        let mut site = d.site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                        site.capture_frame = false;
+                        site.record(&mut b, status);
+                    }
+                    b.ins().return_(&[status]);
+                }
                 b.seal_all_blocks();
                 b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
@@ -1929,6 +1986,17 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     Op::BitNot => {
                         let value = pop(&mut stack);
                         stack.push(b.ins().bnot(value));
+                    }
+                    Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned => {
+                        let count = pop(&mut stack);
+                        let value = pop(&mut stack);
+                        let mask = b.func.dfg.value_type(value).bits() - 1;
+                        let count = b.ins().band_imm(count, i64::from(mask));
+                        stack.push(match op {
+                            Op::ShiftLeft => b.ins().ishl(value, count),
+                            Op::ShiftRight => b.ins().sshr(value, count),
+                            _ => b.ins().ushr(value, count),
+                        });
                     }
                     Op::BitAnd | Op::BitOr | Op::BitXor => {
                         let right = pop(&mut stack);

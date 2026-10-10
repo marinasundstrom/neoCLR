@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Fix native Object equality/hash dispatch, inherited override admission and default
+  type-name display exposed by Path/IPAddress tests. Preserve source metadata names,
+  null-receiver faults and ordinary class identity semantics. Add native Int32/Int64
+  shifts with interpreter-compatible count masking; remove native-admission test
+  exemptions. Five Path and seven IP-address cases pass both local execution modes;
+  intrinsic boxed/String Object equality/hash adapters remain a native gap.
+
 - Record the author-requested JsonObject map/indexer review, including missing-key,
   JSON-null, iteration and mutation contracts. The author specifies faulting getter
   indexers on Map and insert-or-replace setters on MutableMap; Find remains the
@@ -19,6 +26,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   tests pass native macOS ARM64 and interpreted execution. Pin the Windows development
   compiler to the fix; Windows requalification remains pending.
 
+- Migrate public IPAddress parsing corpus, canonical formatting, equality and allocation churn into 7 attributed Raven tests in `ip-address-values`.
+  Native macOS ARM64 and release-interpreted execution pass; default gates include
+  the suite. Original integration consumers remain; Windows qualification is pending.
+
 - Migrate HTTP route parsing, captures, decoding, numeric conversion and quotas into 8 attributed Raven tests in `http-route-matching`.
   Native macOS ARM64 and release-interpreted execution pass; default gates include
   the suite. Original integration consumers remain; Windows qualification is pending.
@@ -28,7 +39,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the suite. Original integration consumers remain; Windows qualification is pending.
 
 - Migrate Path equality, hashing, display and colliding map behavior into 5 attributed Raven tests in `path-values`.
-  Release-interpreted execution passes; native admission remains unsupported. Default gates include
+  Native macOS ARM64 and release-interpreted execution pass; default gates include
   the suite. Original integration consumers remain; Windows qualification is pending.
 
 - Migrate primitive numeric and Boolean parsing values, format errors and overflow into 12 attributed Raven tests in `primitive-parsing`.

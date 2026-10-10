@@ -159,7 +159,7 @@ fn visible(source: &neoclr::Module, ty: &Type) -> bool {
     }
 }
 
-fn semantic_token(input: &neoclr::Module, report: &Value, token: &Type) -> Result<Type, Error> {
+pub(super) fn semantic_token(input: &neoclr::Module, report: &Value, token: &Type) -> Result<Type, Error> {
     if token.is_primitive() { return Ok(token.clone()); }
     if let Type::ArrayRef(element) = token {
         return Ok(Type::ArrayRef(Box::new(semantic_token(input, report, element)?)));

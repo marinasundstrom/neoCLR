@@ -95,6 +95,7 @@ pub struct Options {
     pub boolean_boxes: HashMap<usize, usize>,
     pub int32_boxes: HashMap<usize, usize>,
     pub boxed_int32_display: bool,
+    pub object_default_display: Vec<(usize, String)>,
     pub empty_record_boxes: HashMap<usize, usize>,
     pub object_base: Option<usize>,
     pub array_backing: Option<usize>,
@@ -102,6 +103,7 @@ pub struct Options {
     pub string_dispatch: HashMap<usize, usize>,
     pub primitive_receivers: Vec<usize>,
     pub string_interfaces: Option<Vec<usize>>,
+    pub object_value_kinds: HashMap<usize, String>,
     pub object_display: HashMap<usize, Vec<(usize, usize)>>,
     pub frame_names: HashMap<usize, String>,
 }
@@ -122,9 +124,14 @@ impl Options {
                 .filter_map(|r| Some((r["contractCompiledIndex"].as_u64()? as usize, r["functionCompiledIndex"].as_u64()? as usize))).collect(),
             string_interfaces: report.and_then(|r| r["stringInterfaceViews"].as_array())
                 .map(|rows| rows.iter().filter_map(|i| i.as_u64().map(|i| i as usize)).collect()),
+            object_value_kinds: report.and_then(|r| r["objectDisplayDispatch"].as_array()).into_iter().flatten()
+                .filter(|r| matches!(r["kind"].as_str(), Some("Equals" | "GetHashCode")))
+                .filter_map(|r| Some((r["contractCompiledIndex"].as_u64()? as usize, r["kind"].as_str()?.to_owned()))).collect(),
             object_display: report.and_then(|r| r["objectDisplayDispatch"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["contractCompiledIndex"].as_u64()? as usize, r["targets"].as_array()?.iter()
                     .filter_map(|t| Some((t["typeCompiledIndex"].as_u64()? as usize, t["functionCompiledIndex"].as_u64()? as usize))).collect()))).collect(),
+            object_default_display: report.and_then(|r| r["objectDefaultDisplay"].as_array()).into_iter().flatten()
+                .filter_map(|r| Some((r["typeCompiledIndex"].as_u64()? as usize, r["name"].as_str()?.to_owned()))).collect(),
             boxed_int32_display: report.is_some_and(|r| r["boxedInt32Display"] == true),
             descriptor_queries: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| matches!(r["implementation"].as_str(), Some("type-name-closed-v1" | "type-argument-count-closed-v1" | "type-argument-closed-v1" | "type-shape-closed-v1" | "reflection-construction-retained-v1" | "reflection-array-closed-v1" | "reflection-property-retained-v1" | "reflection-snapshot-retained-v1" | "reflection-collection-retained-v1")))

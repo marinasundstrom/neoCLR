@@ -899,6 +899,7 @@ impl<'a> Profile<'a> {
                 | Op::GreaterUnsigned
                 | Op::LessUnsigned
                 | Op::BitAnd | Op::BitOr | Op::BitXor | Op::BitNot
+                | Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned
                 | Op::Add
                 | Op::Sub
                 | Op::Mul
@@ -1208,6 +1209,14 @@ impl<'a> Profile<'a> {
                 Op::BitNot => {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(Ty::Int);
+                }
+                Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned => {
+                    take(&mut stack, &Ty::Int)?;
+                    let value = pop(&mut stack)?;
+                    if !matches!(value, Ty::Int | Ty::Wide) {
+                        return Err(fail(pc, "shift requires Int32 or Int64 and an Int32 count"));
+                    }
+                    stack.push(value);
                 }
                 Op::BitAnd | Op::BitOr | Op::BitXor => {
                     take(&mut stack, &Ty::Int)?;

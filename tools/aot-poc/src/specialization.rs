@@ -277,8 +277,8 @@ impl Specializer<'_> {
             );
         }
         let mut result = f.clone();
-        if super::selection::object_display_contract(f) {
-            result.body = vec![Op::String(String::new()), Op::Return];
+        if super::selection::object_dispatch_contract(f) {
+            result.body = super::selection::object_placeholder(f);
             result.locals.clear(); result.local_names.clear();
         }
         result.generic_parameters.clear();
@@ -352,11 +352,11 @@ impl Specializer<'_> {
                     }
                     let instance = self.resolve(&closed)?;
                     let callee = &self.source.functions[instance.source];
-                    if virtual_call && !super::selection::interface_contract(self.source, callee) && !super::selection::object_display_contract(callee) && !super::selection::sealed_member(self.source, callee) && !super::selection::inherited_display_member(self.source, callee) && (callee.is_virtual || callee.is_abstract || callee.is_override) {
+                    if virtual_call && !super::selection::interface_contract(self.source, callee) && !super::selection::object_dispatch_contract(callee) && !super::selection::sealed_member(self.source, callee) && !super::selection::inherited_object_member(self.source, callee) && (callee.is_virtual || callee.is_abstract || callee.is_override) {
                         return Err(format!("virtual calls requiring dispatch need a later specialization profile: {}", callee.name).into());
                     }
-                    if !virtual_call && super::selection::object_display_contract(callee) {
-                        return Err("direct Object.ToString calls require default display metadata support".into());
+                    if !virtual_call && super::selection::object_dispatch_contract(callee) {
+                        return Err("direct Object.ToString/Equals/GetHashCode calls require base-call lowering".into());
                     }
                     target.definition = Some(neoclr::metadata::MemberId {
                         module: self.source.name.clone(),
@@ -528,7 +528,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
         let mut contracts = vec![];
         for instance in &context.instances {
             let original = &input.functions[instance.source];
-            let display = super::selection::object_display_contract(original);
+            let display = super::selection::object_dispatch_contract(original);
             if super::selection::interface_contract(input, original) || display {
                 if !original.instance || original.receiver_byref || (!display && !original.body.is_empty()) || !original.generic_parameters.is_empty() {
                     return Err("interface dispatch requires a bodyless nongeneric instance contract".into());
@@ -555,7 +555,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
             }
         }
         for contract in contracts {
-            if !super::selection::object_display_contract(&contract)
+            if !super::selection::object_dispatch_contract(&contract)
                 && super::selection::implements_interface(input, &Type::String, contract.owner.as_ref().unwrap()) {
                 let (_, reference) = super::selection::implicit_implementation(input, &Type::String, &contract)?;
                 let instance = context.resolve(&reference)?;
@@ -563,16 +563,17 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
             }
             for owner in &constructed {
                 if *owner == Type::String { continue; }
-                if !super::selection::object_display_contract(&contract) && !super::selection::implements_interface(input, owner, contract.owner.as_ref().unwrap()) { continue; }
+                if !super::selection::object_dispatch_contract(&contract) && !super::selection::implements_interface(input, owner, contract.owner.as_ref().unwrap()) { continue; }
                 let definition = input.type_definition(owner).ok_or("constructed interface implementor requires local definition")?;
                 // Unboxed value construction does not create an Object receiver.
                 // Boxed-value admission remains checked independently during selection.
-                if super::selection::object_display_contract(&contract) && !definition.is_reference_type { continue; }
+                if super::selection::object_dispatch_contract(&contract) && !definition.is_reference_type { continue; }
                 if !definition.is_reference_type || definition.representation != neoclr::metadata::Representation::Record {
                     return Err("interface dispatch requires constructed classes".into());
                 }
-                let (_, reference) = if super::selection::object_display_contract(&contract) {
-                    super::selection::display_override(input, owner, &contract)?
+                let (_, reference) = if super::selection::object_dispatch_contract(&contract) {
+                    let Some(target) = super::selection::object_value_override(input, owner, &contract)? else { continue; };
+                    target
                 } else { super::selection::implicit_implementation(input, owner, &contract)? };
                 let instance = context.resolve(&reference)?;
                 if !visited.contains(&instance.row) { pending.push(instance); }

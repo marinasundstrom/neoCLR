@@ -7712,3 +7712,34 @@ The matching compiler remains b2f3ba0f8b8e92f0c516155f563b332b0a6fad54. All twel
 both local modes. Three interpreter parser tests, six adapter tests, eight erased
 transport tests and one five-case conversion check pass; no-std release linking
 and Windows x64 object emission succeed. Windows execution remains pending.
+
+### Object value dispatch and hashing gaps found by migration (2026-10-10)
+
+The Path and IPAddress test migrations require the same class contracts as the
+interpreter and .NET: virtual Object equality/hash overrides, reference identity
+for ordinary classes, stable per-object identity hashes, and type-name display
+when no ToString override exists. Native closed-world selection now walks verified
+class ancestry for these Object slots. Direct calls to inherited overrides remain
+monomorphic only when no loaded descendant replaces them; callvirt null checks
+remain active. Ordinary rootless hiding does not replace an Object slot. General
+class virtual dispatch and explicit base-slot calls remain separate gaps.
+
+The temporary native projection clears verified slot flags only in its private
+image. The legacy `objectDisplayDispatch` report now identifies each slot with a
+`kind` (ToString, Equals or GetHashCode); it is not a public metadata contract.
+Default display names come from the same source metadata query as TypeInfo.DisplayName,
+including array backing views, rather than private specialization names. Ordinary
+class identity hashes use nonmoving native addresses and are stable only within
+an object's lifetime; values need not match another process or the interpreter.
+Boxed primitive and String receivers for Object equality/hash still require native
+adapters and fault rather than silently receiving reference-identity semantics.
+
+HashCode additionally needs signed/unsigned right shifts. Native value lowering
+now handles left, arithmetic-right and logical-right shifts for Int32/Int64 with
+Int32 counts, masking counts to 31/63 as the interpreter does. This closes a native
+backend gap; it does not define a new Raven operator or numeric contract.
+
+Raven's Runtime Contract configuration, binding and CLI representation are unchanged;
+the matching compiler code remains b2f3ba0f8b8e92f0c516155f563b332b0a6fad54. neoCLR owns
+these private dispatch tables and their eventual native metadata/codegen replacement.
+Validation is linked from the runtime-test README; Windows execution remains pending.

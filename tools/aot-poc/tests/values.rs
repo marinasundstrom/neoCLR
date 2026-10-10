@@ -2166,3 +2166,21 @@ fn floating_conversions_preserve_rounding_and_unsigned_range() {
         "ldc.i8 -1\nconv.r.un\nldc.r8 18446744073709551616\nceq",
     ] { double_check(body, true); }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn integer_shifts_match_interpreter_at_width_boundaries() {
+    for (load, equal, width) in [("ldc.i4", "ldc.i4", 32), ("ldc.i8", "ldc.i8", 64)] {
+        for count in [-1, 0, 1, width - 1, width, width + 1] {
+            let masked = (count as u32) & (width as u32 - 1);
+            for op in ["shl", "shr", "shr.un"] {
+                let expected = if width == 32 {
+                    match op { "shl" => (-3i32).wrapping_shl(masked) as i64, "shr" => (-3i32 >> masked) as i64, _ => ((-3i32 as u32) >> masked) as i32 as i64 }
+                } else {
+                    match op { "shl" => (-3i64).wrapping_shl(masked), "shr" => -3i64 >> masked, _ => ((-3i64 as u64) >> masked) as i64 }
+                };
+                double_check(&format!("{load} -3\nldc.i4 {count}\n{op}\n{equal} {expected}\nceq"), true);
+            }
+        }
+    }
+}

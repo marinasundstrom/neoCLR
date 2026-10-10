@@ -1,0 +1,83 @@
+.module ObjectValues
+.type class Plain
+.method instance .ctor() -> noresult
+ret
+.end
+.end
+.type class Overridden
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance override Equals(System.Object other) -> Boolean
+ldc.bool true
+ret
+.end
+.method instance override GetHashCode() -> Int32
+ldc.i4 42
+ret
+.end
+.end
+.function Calculate(Int32 mode) -> Int32
+.local System.Object first
+.local System.Object second
+.local System.Object absent
+ldloca absent
+initobj System.Object
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Null
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Override
+newobj.ctor instance Plain::.ctor()
+castclass System.Object
+stloc first
+newobj.ctor instance Plain::.ctor()
+castclass System.Object
+stloc second
+ldloc first
+ldloc first
+callvirt instance System.Object::Equals(System.Object)
+brfalse Fail
+ldloc first
+ldloc second
+callvirt instance System.Object::Equals(System.Object)
+brtrue Fail
+ldloc first
+ldloc absent
+callvirt instance System.Object::Equals(System.Object)
+brtrue Fail
+ldloc first
+callvirt instance System.Object::GetHashCode()
+ldloc first
+callvirt instance System.Object::GetHashCode()
+ceq
+brfalse Fail
+ldc.i4 1
+ret
+Override:
+newobj.ctor instance Overridden::.ctor()
+castclass System.Object
+stloc first
+ldloc first
+ldloc absent
+callvirt instance System.Object::Equals(System.Object)
+brfalse Fail
+ldloc first
+callvirt instance System.Object::GetHashCode()
+ldc.i4 42
+ceq
+brfalse Fail
+ldc.i4 1
+ret
+Null:
+ldloc absent
+ldloc absent
+callvirt instance System.Object::Equals(System.Object)
+pop
+Fail:
+ldc.i4 0
+ret
+.end

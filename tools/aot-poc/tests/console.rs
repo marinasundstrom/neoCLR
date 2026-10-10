@@ -2100,14 +2100,13 @@ int main(int argc,char **argv) {
 }
 
 #[test]
-fn object_display_rejects_fallback_base_calls_and_unverified_overrides() {
+fn object_display_rejects_base_calls_and_unverified_overrides() {
     let seed=neoclr::assemble(OBJECT_DISPLAY_SEED).unwrap();
     let source=include_str!("../../../docs/experiments/aot-console/object-display.neoil");
     let original=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)],&seed).unwrap().remove(0);
-    for mode in 0..9 {
+    for mode in [1, 3, 4, 6, 7, 8] {
         let mut app=original.clone();
         match mode {
-            0=>app.functions.retain(|f| f.name!="B.ToString"),
             1=>{
                 let root=app.functions.iter_mut().find(|f|f.name=="Calculate").unwrap();
                 for op in &mut root.body {
@@ -2116,12 +2115,7 @@ fn object_display_rejects_fallback_base_calls_and_unverified_overrides() {
                     }
                 }
             }
-            2=>app.functions.iter_mut().find(|f|f.name=="B.ToString").unwrap().is_override=false,
             3=>app.functions.iter_mut().find(|f|f.name=="B.ToString").unwrap().visibility=neoclr::metadata::Visibility::Private,
-            5=>{
-                let root=app.functions.iter_mut().find(|f|f.name=="Calculate").unwrap();
-                root.body.splice(0..0,[neoclr::metadata::Instruction::Int(0),neoclr::metadata::Instruction::NewArray(neoclr::metadata::Type::Byte),neoclr::metadata::Instruction::Pop]);
-            }
             6=>{
                 let mut marker=neoclr::assemble(".module Marker\n.type Marker\n.end").unwrap().types[0].clone();
                 marker.definition=None;
@@ -2144,7 +2138,7 @@ fn object_display_rejects_fallback_base_calls_and_unverified_overrides() {
             }
             _=>(),
         }
-        if matches!(mode,5|6) {
+        if mode==6 {
             for op in &mut app.functions.iter_mut().find(|f|f.name=="Calculate").unwrap().body {
                 if let neoclr::metadata::Instruction::Branch(pc) | neoclr::metadata::Instruction::BranchTrue(pc)=op {*pc+=3;}
             }
@@ -2157,11 +2151,9 @@ fn object_display_rejects_fallback_base_calls_and_unverified_overrides() {
         assert!(!r.status.success() && !dir.0.join("app.o").exists(),"{mode}: {r:?}");
         let error=String::from_utf8_lossy(&r.stderr);
         assert!(!error.contains("panicked"),"{mode}: {r:?}");
-        if mode==0 {assert!(error.contains("default display"),"{r:?}");}
         if mode==1 {assert!(error.contains("direct Object.ToString"),"{r:?}");}
-        if mode==2 {assert!(error.contains("verified concrete override"),"{r:?}");}
         if mode==3 {assert!(error.contains("Fault:"),"source validation must reject before projection: {r:?}");}
-        if matches!(mode,5|6) {assert!(error.contains("boxing or arrays"),"{r:?}");}
+        if mode==6 {assert!(error.contains("boxing or arrays"),"{r:?}");}
         if mode==7 {assert!(error.contains("leading base constructor"),"{r:?}");}
         if mode==8 {assert!(error.contains("single leading base initializer"),"{r:?}");}
         if mode==4 {assert!(error.contains("requires --reference-arena"),"{r:?}");}
@@ -6175,5 +6167,117 @@ fn character_value_snapshots_reject_mutation_and_borrows() {
         let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena", "--bind-utf8-text", "--bind-character-text"], false);
         assert!(!r.status.success() && !dir.0.join("app.o").exists(), "{operations}: {r:?}");
         if !operations.contains("initobj") { assert!(!String::from_utf8_lossy(&r.stderr).contains("Fault:"), "source must verify before native rejection: {r:?}"); }
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn object_default_display_uses_source_name_and_ignores_ordinary_hiding() {
+    let seed=neoclr::assemble(&OBJECT_DISPLAY_SEED.replace("ldstr \"default\"", "ldstr \"B\"")).unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/object-display.neoil");
+    for hiding in [false, true] {
+    let declared_base = false;
+    let mut app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)],&seed).unwrap().remove(0);
+    if hiding { app.functions.iter_mut().find(|f| f.name == "B.ToString").unwrap().is_override = false; }
+    else { app.functions.retain(|f| f.name != "B.ToString"); }
+    for f in &mut app.functions { f.definition = None; }
+    app.assemblies=vec![serde_json::from_value(serde_json::json!({
+        "name":"ObjectDisplay","full_name":"ObjectDisplay","modules":["ObjectDisplay.neox"],"references":[]
+    })).unwrap()];
+    app.functions.iter_mut().find(|f|f.name=="A.ToString").unwrap().origin=Some(serde_json::from_value(serde_json::json!({
+        "assembly":"ObjectDisplay","module":"ObjectDisplay.neox","name":"SourceDisplayName","token":100663297,"member_access":"Public"
+    })).unwrap());
+    if declared_base {
+        for ty in &mut app.types {ty.base=Some(neoclr::metadata::Type::Named("System.Object".into()));}
+        for f in &mut app.functions {
+            if f.name.ends_with("..ctor") {
+                f.body.splice(0..0,[neoclr::metadata::Instruction::Arg(0),neoclr::metadata::Instruction::Call(neoclr::assembler::parse_function_ref("instance System.Object::.ctor()").unwrap())]);
+            }
+        }
+    }
+    let dir=Temp::new();
+    let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena","--bind-user-fault"]);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let report:serde_json::Value=serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["objectDisplayDispatch"][0]["targets"].as_array().unwrap().len(),2);
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc,char **argv) {
+    uint64_t storage[32];neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    int32_t result=-99;int status=neoclr_entry_v4(argc>1?atoi(argv[1]):0,&result,&ctx);
+    if (!status || result!=-99) return 92;
+    neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in [1] {
+        let fault = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default()).unwrap_err();
+        let r=Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        assert_eq!(r.status.code(),Some(1));assert!(r.stdout.is_empty());
+        assert_eq!(String::from_utf8_lossy(&r.stderr), fault.diagnostic().to_string());
+    }
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn object_value_dispatch_preserves_identity_overrides_and_null_faults() {
+    let dir=Temp::new();
+    let seed_text = OBJECT_DISPLAY_SEED
+        .replace("ldc.bool false\nret", "ldarg 0\nldarg 1\ncall neoCLR.Runtime.ObjectEquals(System.Object,System.Object)\nret")
+        .replace("ldc.i4 -1\nret", "ldarg 0\ncall neoCLR.Runtime.ObjectIdentityHash(System.Object)\nret");
+    let seed_text = format!("{seed_text}\n.function neoCLR.Runtime.ObjectEquals(System.Object,System.Object) -> Boolean\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.ObjectIdentityHash(System.Object) -> Int32\n.methodimpl InternalCall\n.end\n");
+    let seed=neoclr::assemble(&seed_text).unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/object-values.neoil");
+    let app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &seed).unwrap().remove(0);
+    let r=compile_linked_module(&dir,&seed,&app,&["--compile-system","--reference-arena","--bind-user-fault","--bind-utf8-text"]);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc, char **argv) {
+    uint64_t storage[128];
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    int32_t result=-99;
+    int status=neoclr_entry_v4(argc>1 ? atoi(argv[1]) : 0,&result,&ctx);
+    if (status) {
+        if (result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
+        neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
+    }
+    printf("%d\n",result);return 0;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &seed).unwrap().remove(0);
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in 0..3 {
+        let reference=method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default());
+        let r=Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        match reference {
+            Ok(result)=>{
+                assert_eq!(r.status.code(),Some(0),"{mode}: {r:?}");
+                let neoclr::Value::Int32(value)=result.value else {panic!("expected Int32")};
+                assert_eq!(r.stdout,format!("{value}\n").as_bytes());
+                assert!(r.stderr.is_empty());
+            }
+            Err(fault)=>{
+                assert_eq!(r.status.code(),Some(1),"{mode}: {r:?}");
+                assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(),"{mode}");
+            }
+        }
     }
 }

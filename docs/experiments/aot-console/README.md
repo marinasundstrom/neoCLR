@@ -2059,3 +2059,15 @@ borrows and defaults. String(sequence) project qualification remains incomplete:
 character literals additionally need the character-text binding, and the sequence-only
 consumer reaches the separate reference-constructor call admission limit. Keep the
 String.rvn cleanup candidate unchanged until that consumer passes both modes.
+
+### Object slots and hashing migration follow-up (2026-10-10)
+
+Native class Object.Equals/GetHashCode calls now select verified overrides across
+inheritance or use ordinary reference identity. Callvirt keeps null faults.
+Default ToString uses the source TypeInfo display query; unrelated collection arrays
+no longer block selection. `object-values.neoil` checks identity, override and null
+behavior. Object/default-display and inherited-display tests cover the projection;
+36 shift cases compare Int32/Int64 left, signed-right and unsigned-right behavior
+with the interpreter. See [bridge details](../../raven-cli-bridge.md#object-value-dispatch-and-hashing-gaps-found-by-migration-2026-10-10)
+for remaining limits and [runtime tests](../../../runtime/raven/tests/README.md) for
+Path/IPAddress qualification. Windows execution remains pending.

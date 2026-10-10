@@ -62,7 +62,7 @@ pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bo
                         || matches!(t, Type::ByRef(inner) if matches!(**inner, Type::Value | Type::String))
                 })
                 || f.body.iter().any(|op| {
-                    matches!(op, Op::LoadTypeToken(_) | Op::Float32 { .. } | Op::Float64 { .. } | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
+                    matches!(op, Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned | Op::LoadTypeToken(_) | Op::Float32 { .. } | Op::Float64 { .. } | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
                         || matches!(op, Op::Call(target) if target.definition.is_some())
                 })
         })

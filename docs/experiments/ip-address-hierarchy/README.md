@@ -94,3 +94,7 @@ allocations and 10 collections. Both finish with zero live objects. Public sourc
 closure rejection is RAV0306; the local same-file probe uses RAV0334. Signature
 checks reject malformed public calls and external inheritance metadata. Generated
 library and API snapshot checks pass. No website build was run.
+
+Development test migration (2026-10-10): public IPAddress parsing corpus, canonical formatting, equality and allocation churn now also run as 7
+attributed framework tests in `runtime/raven/tests/ip-address-values`. The framework README
+links native/interpreted evidence. This original consumer retains its integration purpose.

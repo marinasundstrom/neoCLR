@@ -3,17 +3,17 @@
   "platform": "macOS-27.0-arm64-arm-64bit",
   "cases": [
     {
-      "suite": "path-values",
+      "suite": "ip-address-values",
       "mode": "native",
       "exitCode": 0,
-      "stdout": "PASS Path Object equality distinguishes colliding map keys\nPASS Equal paths share hashes and virtual display\nPASS Path maps replace equal keys and retain lookup through growth\nPASS Path equality distinguishes case roots and normalization\nPASS Path equality agrees across typed interface and Object dispatch\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stdout": "PASS IPAddress values survive subsequent parse allocations\nPASS IPv4 parsing rejects malformed and unsupported corpus forms\nPASS IPv6 parsing rejects malformed and unsupported corpus forms\nPASS IPAddress Object dispatch preserves value equality hashes and family distinctions\nPASS IPAddress parsing distinguishes unsupported scope from invalid format\nPASS IPv4 parsing and canonical formatting round trip\nPASS IPv6 parsing and canonical formatting round trip\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
       "stderr": ""
     },
     {
-      "suite": "path-values",
+      "suite": "ip-address-values",
       "mode": "interpreter",
       "exitCode": 0,
-      "stdout": "PASS Path Object equality distinguishes colliding map keys\nPASS Equal paths share hashes and virtual display\nPASS Path maps replace equal keys and retain lookup through growth\nPASS Path equality distinguishes case roots and normalization\nPASS Path equality agrees across typed interface and Object dispatch\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stdout": "PASS IPAddress values survive subsequent parse allocations\nPASS IPv4 parsing rejects malformed and unsupported corpus forms\nPASS IPv6 parsing rejects malformed and unsupported corpus forms\nPASS IPAddress Object dispatch preserves value equality hashes and family distinctions\nPASS IPAddress parsing distinguishes unsupported scope from invalid format\nPASS IPv4 parsing and canonical formatting round trip\nPASS IPv6 parsing and canonical formatting round trip\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
       "stderr": ""
     }
   ],
@@ -74,12 +74,12 @@
   "aotSha256": "d80785c06b97546f502d0c08d1eac8657421f0f9d2e9db1e7e116c1b042c268c",
   "interpreterSha256": "12516b4780dbc636bb0fe5b717826e046d931422153e823239e6ddadf5769fc6",
   "suites": [
-    "path-values"
+    "ip-address-values"
   ],
   "date": "2026-10-10",
   "codeBaseline": "aa13b5fbb3f9b1fd921e534e71418d1aacf4536f plus Object slot/shift fixes and final migration batches",
-  "scope": "Path equality, hashing, display and colliding map behavior",
-  "sourceConsumer": "docs/experiments/path-object/Main.rvn",
+  "scope": "public IPAddress parsing corpus, canonical formatting, equality and allocation churn",
+  "sourceConsumer": "docs/experiments/ip-address-hierarchy/Public.rvn",
   "windowsStatus": "Windows execution pending; local x64 object emission checked separately",
   "gateSuites": [
     "path-values",

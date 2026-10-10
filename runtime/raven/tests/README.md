@@ -432,12 +432,12 @@ values and primitive erased payloads are supported, and exact parser bindings sh
 the interpreter kernel. Scalar/tag, NaN, negative-zero and conversion checks pass.
 Generic numeric operator and JSON conversion checks remain in the original consumer.
 
-Batch `path-values`: Path equality, hashing, display and colliding map behavior; 5 tests pass release-interpreted execution; native admission remains unsupported ([evidence](path-values-validation.json)).
+Batch `path-values`: Path equality, hashing, display and colliding map behavior; 5 tests pass native macOS ARM64 and release-interpreted execution ([evidence](path-values-validation.json)).
 Source: [docs/experiments/path-object/Main.rvn](../../../docs/experiments/path-object/Main.rvn). Windows remains pending.
 
-The Path suite preserves Object/interface dispatch assertions. Native selection
-currently rejects `System.Object.Equals` virtual dispatch; its exact diagnostic is
-recorded as an admission gap, while all five tests execute interpreted.
+The Path suite preserves Object/interface dispatch assertions. All five tests now
+pass both modes after implementing native Object slots and default source-name
+display. No native-admission exception remains in the gate.
 
 Batch `http-header-values`: HTTP header repetition, lookup validation, snapshots and request metadata; 5 tests pass native macOS ARM64 and release-interpreted execution ([evidence](http-header-values-validation.json)).
 Source: [docs/experiments/http-headers/Main.rvn](../../../docs/experiments/http-headers/Main.rvn). Windows remains pending.
@@ -447,6 +447,15 @@ Source: [docs/experiments/http-routing/Main.rvn](../../../docs/experiments/http-
 
 The route suite ports RoutePattern/RouteMatch behavior; application-specific helper
 and route-to-union mapping checks remain in the original routing consumer.
+
+Batch `ip-address-values`: public IPAddress parsing corpus, canonical formatting, equality and allocation churn; 7 tests pass native macOS ARM64 and release-interpreted execution ([evidence](ip-address-values-validation.json)).
+Source: [docs/experiments/ip-address-hierarchy/Public.rvn](../../../docs/experiments/ip-address-hierarchy/Public.rvn). Windows remains pending.
+
+The address suite uses the public parser and its complete 13-valid/29-invalid literal
+corpus. It preserves hash/equality round trips and allocation churn, but does not
+claim a new forced-GC or socket test. Native inherited Object-slot admission and
+integer shifts now support its hashing path. Socket operations and the historical
+private-byte-array representation probe remain separate.
 
 The literal-pattern workaround is removed from MemoryStream, and JSON DOM now
 uses a nested String constant pattern. Both suites pass with Raven

@@ -208,6 +208,16 @@ pub fn type_token(module: &Module, owner: &Type) -> Result<i32, Fault> {
     crate::metadata_tokens::type_token(module, &handle.identity)
 }
 
+/// Return the same logical display name as TypeInfo.DisplayName for native lowering.
+pub fn display_name(module: &Module, owner: &Type) -> Result<Value, Fault> {
+    crate::reflection::Query::DisplayName.invoke_profile(
+        module,
+        &[Value::RuntimeTypeHandle(Box::new(crate::type_identity::describe_loaded(module, owner)?)), Value::Int32(0)],
+        &Limits::default(),
+        true,
+    )
+}
+
 #[cfg(test)]
 mod module_function_tests {
     use super::*;

@@ -604,6 +604,26 @@ pub fn prepare(
             }
         }
     }
+    if report["objectDisplayDispatch"].as_array().is_some_and(|rows| rows.iter().any(|row| row["kind"] == "ToString")) {
+        let mut defaults = vec![];
+        for (index, ty) in selected.types.iter().enumerate() {
+            if !ty.is_reference_type || ty.representation != neoclr::metadata::Representation::Record { continue; }
+            // The Object base has already received a private name; its abstract
+            // definition can never be a concrete receiver.
+            if ty.is_abstract { continue; }
+            let backing = report["arrayBackingProjection"]["compiledIndex"] == index
+                || report["referenceArrayBackingProjections"].as_array().is_some_and(|rows| rows.iter().any(|r| r["compiledIndex"] == index));
+            let native_type = if backing {
+                ty.fields.first().ok_or("array display requires backing storage")?.ty.clone()
+            } else { neoclr::metadata::Type::Named(ty.name.clone()) };
+            let token = super::reflection_metadata::semantic_token(&selected, &report, &native_type)?;
+            let neoclr::Value::String(name) = neoclr::native_metadata::display_name(&source_metadata, &token).map_err(|e| e.to_string())? else {
+                return Err("Object default display requires a String descriptor".into());
+            };
+            defaults.push(json!({"typeCompiledIndex":index,"name":name.to_string()}));
+        }
+        report["objectDefaultDisplay"] = json!(defaults);
+    }
     if let Some(rows) = report["objectDisplayDispatch"].as_array() {
         if !rows.is_empty() && !reference_arena { return Err("Object display dispatch requires --reference-arena".into()); }
         for row in rows {
@@ -626,7 +646,7 @@ pub fn prepare(
             // relationship when the original owner is a declared Object base.
             f.name = name;
             f.is_virtual = false; f.is_override = false;
-            f.body = vec![Op::String(String::new()), Op::Return];
+            f.body = super::selection::object_placeholder(f);
             f.locals.clear(); f.local_names.clear();
             for target in row["targets"].as_array().ok_or("invalid Object display targets")? {
                 let i = target["functionCompiledIndex"].as_u64().ok_or("invalid Object display target")? as usize;
@@ -655,14 +675,14 @@ pub fn prepare(
     report["valueDisplayProjections"] = json!(value_display.iter().map(|i| json!({"compiledIndex":i,
         "policy":"verified value ToString override; preserve direct by-reference receiver and original CIL"})).collect::<Vec<_>>());
     let sealed_members: Vec<_> = selected.functions.iter().enumerate()
-        .filter(|(_, f)| (f.is_virtual || f.is_override) && (super::selection::sealed_member(&selected, f) || super::selection::inherited_display_member(&selected, f)))
+        .filter(|(_, f)| (f.is_virtual || f.is_override) && (super::selection::sealed_member(&selected, f) || super::selection::inherited_object_member(&selected, f)))
         .map(|(i, _)| i).collect();
     for &i in &sealed_members {
         selected.functions[i].is_virtual = false;
         selected.functions[i].is_override = false;
     }
     report["sealedMemberProjections"] = json!(sealed_members.iter().map(|i| json!({"compiledIndex":i,
-        "policy":"verified sealed owner or inherited display with one loaded implementation; retain callvirt null checks and ordinary body"})).collect::<Vec<_>>());
+        "policy":"verified sealed owner or inherited Object override with one loaded implementation; retain callvirt null checks and ordinary body"})).collect::<Vec<_>>());
     if reference_arena { super::reflection_arrays::bind(&mut selected, &mut report)?; }
     super::boxing::project(&mut selected, &mut report)?;
     super::boxing::project_scalar_queries(&mut selected, &mut report)?;
@@ -673,13 +693,13 @@ pub fn prepare(
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
     }
     let boxed_display = report["int32Boxes"].as_array().is_some_and(|r| !r.is_empty())
-        && report["objectDisplayDispatch"].as_array().is_some_and(|r| !r.is_empty());
+        && report["objectDisplayDispatch"].as_array().is_some_and(|r| r.iter().any(|row| row["kind"] == "ToString"));
     if boxed_display && !bind_int32_to_string {
         return Err("boxed Int32 display requires --bind-int32-to-string".into());
     }
     report["boxedInt32Display"] = json!(boxed_display);
     if report["booleanBoxes"].as_array().is_some_and(|r| !r.is_empty())
-        && report["objectDisplayDispatch"].as_array().is_some_and(|r| !r.is_empty()) {
+        && report["objectDisplayDispatch"].as_array().is_some_and(|r| r.iter().any(|row| row["kind"] == "ToString")) {
         return Err("boxed Boolean display is not yet admitted".into());
     }
     let system_type_names: std::collections::BTreeSet<_> = neoclr::library::system()

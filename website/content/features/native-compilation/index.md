@@ -34,7 +34,10 @@ The development project workflow builds an ordinary Raven project with a matchin
 compiler/library bundle, links its executable and records diagnostics and dependencies.
 The development runtime tests also exercise primitive numeric and Boolean parsing
 in native macOS ARM64 and interpreted modes, using the same culture-independent
-parser. Windows execution of this newly migrated suite remains pending.
+parser. Path and IP-address tests also cover class equality/hash overrides and
+display through Object. General virtual dispatch and intrinsic boxed/String
+Object equality/hash adapters remain incomplete. Windows execution of these newly
+migrated suites remains pending.
 
 Choose the profile for the host and workload:
 

@@ -1,0 +1,104 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import System.Option.*
+import NeoClr.Testing.*
+
+import System.Networking.*
+
+[Test("IPv4 parsing and canonical formatting round trip")]
+func IpValidIPv4() -> Result<unit, TestFailure> {
+    _ = CheckAddress("0.0.0.0", "0.0.0.0", false)?
+    _ = CheckAddress("127.0.0.1", "127.0.0.1", false)?
+    _ = CheckAddress("255.255.255.255", "255.255.255.255", false)?
+    return Assert.True(true, "Valid address corpus completed")
+}
+
+[Test("IPv4 parsing rejects malformed and unsupported corpus forms")]
+func IpInvalidIPv4() -> Result<unit, TestFailure> {
+    for text in ["", "127.1", "0xffffffff", "1.1.1.010", "256.0.0.1", "1.2.3.-1", "1.2.3.4.", ".1.2.3.4", "1..2.3", "1.2.3.4.5", " 127.0.0.1", "127.0.0.1\n", "é.0.0.1"] {
+        _ = Assert.True(IPAddress.Parse(text) is Error(_), "Invalid address must fail: " + text)?
+    }
+    return Assert.True(true, "Invalid address corpus rejected")
+}
+
+[Test("IPv6 parsing and canonical formatting round trip")]
+func IpValidIPv6() -> Result<unit, TestFailure> {
+    _ = CheckAddress("::", "::", true)?
+    _ = CheckAddress("::1", "::1", true)?
+    _ = CheckAddress("1::", "1::", true)?
+    _ = CheckAddress("2001:0DB8:0:0:1:0:0:1", "2001:db8::1:0:0:1", true)?
+    _ = CheckAddress("1:2:0:4:5:6:7:8", "1:2:0:4:5:6:7:8", true)?
+    _ = CheckAddress("1:2:3:4:5:6:0:0", "1:2:3:4:5:6::", true)?
+    _ = CheckAddress("0:0:1:2:0:0:3:4", "::1:2:0:0:3:4", true)?
+    _ = CheckAddress("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff", "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff", true)?
+    _ = CheckAddress("::ffff:192.0.2.1", "::ffff:192.0.2.1", true)?
+    _ = CheckAddress("1:2:3:4:5:6:192.0.2.1", "1:2:3:4:5:6:c000:201", true)?
+    return Assert.True(true, "Valid address corpus completed")
+}
+
+[Test("IPv6 parsing rejects malformed and unsupported corpus forms")]
+func IpInvalidIPv6() -> Result<unit, TestFailure> {
+    for text in [":", ":1", "1:", ":::1", "1:::2", "1::2::3", "1:2:3:4:5:6:7", "1:2:3:4:5:6:7:8:9", "1:2:3:4:5:6:7:8::", "12345::", "gggg::", "[::1]", "fe80::1%3", "::ffff:192.0.2.999", "::192.0.2.1:1", "1:2:3:4:5:6:7:192.0.2.1"] {
+        _ = Assert.True(IPAddress.Parse(text) is Error(_), "Invalid address must fail: " + text)?
+    }
+    return Assert.True(true, "Invalid address corpus rejected")
+}
+
+[Test("IPAddress Object dispatch preserves value equality hashes and family distinctions")]
+func IpObject() -> Result<unit, TestFailure> {
+    let first = RequiredAddress("127.0.0.1")?
+    let second = RequiredAddress("127.0.0.1")?
+    let mapped = RequiredAddress("::ffff:127.0.0.1")?
+    let boxed: Object = first
+    _ = Assert.True(!Object.ReferenceEquals(first, second), "Equal parses have distinct identity")?
+    _ = Assert.True(boxed.Equals(second), "Object equality uses address values")?
+    _ = Assert.True(!boxed.Equals(null) && !boxed.Equals("127.0.0.1"), "Null and text are not equal addresses")?
+    _ = Assert.Equal(second.GetHashCode(), boxed.GetHashCode())?
+    return Assert.True(!first.Equals(mapped) && !mapped.Equals(first), "Mapped IPv6 remains a distinct family")
+}
+
+[Test("IPAddress values survive subsequent parse allocations")]
+func IpAllocationChurn() -> Result<unit, TestFailure> {
+    let first = RequiredAddress("127.0.0.1")?
+    var index = 0
+    while index < 100 {
+        let churn = RequiredAddress("127.0.0.1")?
+        _ = Assert.True(first.Equals(churn), "Retained address remains equal during churn")?
+        index += 1
+    }
+    return Assert.Equal("127.0.0.1", first.ToString())
+}
+
+[Test("IPAddress parsing distinguishes unsupported scope from invalid format")]
+func IpTypedErrors() -> Result<unit, TestFailure> {
+    if IPAddress.Parse("fe80::1%3") is Error(let error) {
+        _ = Assert.True(error is IPAddressError.UnsupportedScope, "Scope reports unsupported capability")?
+    } else {
+        return Assert.True(false, "Scoped address must fail")
+    }
+    if IPAddress.Parse("127.1") is Error(let error) {
+        return Assert.True(error is IPAddressError.InvalidFormat, "Abbreviated IPv4 reports format error")
+    }
+    return Assert.True(false, "Abbreviated IPv4 must fail")
+}
+
+func RequiredAddress(text: string) -> Result<IPAddress, TestFailure> {
+    if IPAddress.Parse(text) is Ok(let value) {
+        return Ok(value)
+    }
+    return Error(TestFailure("Expected valid address", text, "parse failure"))
+}
+
+func CheckAddress(text: string, expected: string, ipv6: bool) -> Result<unit, TestFailure> {
+    let address = RequiredAddress(text)?
+    _ = Assert.Equal(expected, address.ToString())?
+    let roundTrip = RequiredAddress(address.ToString())?
+    _ = Assert.True(address.Equals(roundTrip), "Formatted address parses to equal value")?
+    _ = Assert.Equal(address.GetHashCode(), roundTrip.GetHashCode())?
+    if ipv6 {
+        return Assert.True(address is IPv6Address, "IPv6 family type")
+    }
+    return Assert.True(address is IPv4Address, "IPv4 family type")
+}

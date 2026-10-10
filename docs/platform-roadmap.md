@@ -67,12 +67,14 @@ Batch `int64-parsing` adds 5 tests for Int64 boundary parsing, lexical errors, o
 ([evidence](../runtime/raven/tests/int64-parsing-validation.json)).
 Batch `primitive-parsing` adds 12 tests for primitive numeric and Boolean parsing values, format errors and overflow qualified in native macOS ARM64 and release-interpreted execution after fixing floating generic storage and parser bindings
 ([evidence](../runtime/raven/tests/primitive-parsing-validation.json)).
-Batch `path-values` adds 5 tests for Path equality, hashing, display and colliding map behavior qualified in release-interpreted execution; native admission remains unsupported
+Batch `path-values` adds 5 tests for Path equality, hashing, display and colliding map behavior qualified in native macOS ARM64 and release-interpreted execution
 ([evidence](../runtime/raven/tests/path-values-validation.json)).
 Batch `http-header-values` adds 5 tests for HTTP header repetition, lookup validation, snapshots and request metadata qualified in native macOS ARM64 and release-interpreted execution
 ([evidence](../runtime/raven/tests/http-header-values-validation.json)).
 Batch `http-route-matching` adds 8 tests for HTTP route parsing, captures, decoding, numeric conversion and quotas qualified in native macOS ARM64 and release-interpreted execution
 ([evidence](../runtime/raven/tests/http-route-matching-validation.json)).
+Batch `ip-address-values` adds 7 tests for public IPAddress parsing corpus, canonical formatting, equality and allocation churn qualified in native macOS ARM64 and release-interpreted execution
+([evidence](../runtime/raven/tests/ip-address-values-validation.json)).
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 
