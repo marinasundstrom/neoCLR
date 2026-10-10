@@ -94,6 +94,53 @@ reader updates. It does not claim faster execution or stronger access isolation.
 Compiler-only syntax would be cheaper but could not preserve empty native containers;
 repurposing physical module rows would conflate organization with loading identity.
 
+## Soundness review — 2026-10-10
+
+The author asks whether the diverging module semantics are sound. The assistant's
+assessment is yes for the implemented scope: an assembly packages declarations,
+and an assembly-owned logical module gives their namespace an inspectable identity.
+Types, free functions and constants share a natural container. A flat table avoids
+making dotted naming conventions into access rights or runtime lifetimes. This is
+a deliberate semantic difference from .NET, not a claim of Module API compatibility.
+
+Microsoft's [System.Reflection.Module contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.module?view=net-10.0)
+describes a physical metadata module: it may contain multiple namespaces, and a
+namespace may span modules. The [C# namespace specification](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/namespaces)
+describes open-ended namespace declaration spaces. Sources checked 2026-10-10.
+neoCLR instead makes exact assembly identity plus module name the ownership key,
+with descriptors belonging to a metadata/runtime context. Multiple source files
+can contribute to that same owner; a module is not a source-file identity.
+
+The central unresolved issue is **lookup across dependencies**. Assembly A's
+`Example.Data` and assembly B's `Example.Data` remain distinct owners. That does
+not by itself prohibit overlapping names or decide whether an import combines
+public lookup candidates. The model encourages intentional distribution; it does
+not yet enforce globally exclusive namespace ownership. As a follow-up recommendation,
+preserve distinct owners, diagnose ambiguous references deterministically, and
+provide an explicit qualification/alias route when needed. This is an assistant
+recommendation, not an adopted new compiler policy.
+
+Other boundaries should remain explicit:
+
+- Dotted prefixes imply neither recursive membership nor parent-private access.
+- Assembly binding remains the packaging/versioning boundary; independently loading,
+  unloading or scheduling modules would require separate contracts.
+- Module ownership does not create module-private visibility or a security boundary.
+  Existing accessibility rules remain in effect.
+- CLI adapters must retain physical token provenance separately. Empty logical
+  modules and any future module-only metadata need an explicit projection policy;
+  they must not silently become physical CLI module semantics.
+- AOT enumeration needs a documented retention/completeness contract. A module
+  descriptor alone does not retain every declaration or executable implementation.
+
+The benefit is coherent declaration ownership and discovery, particularly for
+module-level functions such as tests. The costs are compiler/adapter work, different
+reflection expectations, and explicit decisions about lookup and metadata retention.
+There is no demonstrated execution-performance benefit. The assistant recommends
+keeping this bounded design and validating cross-assembly lookup before adding more
+module semantics. Existing host/interpreter and retained native ownership evidence
+supports feasibility; it does not establish completion of those open contracts.
+
 ## Next boundaries
 
 Module-private visibility, re-exports, module-specific ambiguity diagnostics, guest

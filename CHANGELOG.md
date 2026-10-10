@@ -21,7 +21,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Consolidate host introspection around logical ModuleInfo: assemblies package flat
   named modules, with dotted root/submodule names as convention and no hierarchy
-  metadata. Replace DeclarationModuleInfo/GetDeclarationModules with ModuleInfo/
+  metadata. Record a .NET comparison and soundness assessment, distinguishing owned
+  module identity from unresolved cross-dependency lookup, visibility and lifetime
+  policies. Replace DeclarationModuleInfo/GetDeclarationModules with ModuleInfo/
   GetModules and logical member ownership; expose physical token scopes separately.
   Migrate Raven's native importer to traverse all modules and test discovery IDs to
   use logical module names. Rebuild host tools and compiler together. Cover both

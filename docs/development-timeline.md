@@ -13509,3 +13509,21 @@ CLI regeneration failure (`Incompatible map contract: Map`) and distinguishes it
 the successful source-native-library and reference-only builds. Evidence is linked
 from [the guest module consumer](experiments/guest-modules/README.md); this does not
 claim completion of in-process test discovery.
+
+## 2026-10-10 — Assessing the module divergence
+
+- **Author:** “Is the approach with modules sound? Our diverging semantics”.
+- **Assistant assessment:** the bounded assembly-owned, flat namespace-module model
+  is coherent and useful for declaration discovery. Compared with .NET physical
+  modules and open namespaces, it carries tooling and interoperability costs;
+  no performance advantage is claimed.
+- **Assistant qualification:** distinct assembly-qualified owners do not prohibit
+  overlapping names across dependencies. Deterministic ambiguity handling and an
+  explicit qualification/alias route are recommended follow-up design work, not
+  newly adopted compiler policy. Ownership must not implicitly establish module
+  privacy, independent loading or scheduling, or complete AOT metadata retention.
+- **Action/outcome:** checked Microsoft's Module and C# namespace documentation and
+  recorded the [soundness review](declaration-modules.md#soundness-review--2026-10-10).
+  No implementation or roadmap reprioritization is part of this assessment; the
+  native traversal and guest discovery work remains open. No subsequent author
+  decision on these recommendations is recorded.
