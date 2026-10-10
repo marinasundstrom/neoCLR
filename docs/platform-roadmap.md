@@ -3671,3 +3671,10 @@ constant-pattern emission is also fixed; restored payload patterns pass the five
 MemoryStream and twelve JSON DOM cases in both local modes. Primitive parsing is also fixed;
 Object equality/hash dispatch remains implementation work before the ten-batch
 migration can be called complete. Windows execution of these fixes remains pending.
+
+**Timer layer (2026-10-11):** public Timer accepts synchronous and `Task<()>` callbacks,
+with fixed-delay non-overlapping scheduling across restart, stop and disposal. Ten
+interpreter/macOS ARM64 scenarios pass; Windows CI is configured, execution pending.
+See [the contract](design/http-client-lifetime.md#public-timer-and-asynchronous-callbacks-2026-10-11).
+Author direction is to continue through timed cancellation and HttpClient.Timeout
+before returning to Index/Range.

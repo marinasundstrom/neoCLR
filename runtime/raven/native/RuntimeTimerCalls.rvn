@@ -1,0 +1,9 @@
+module neoCLR.Runtime
+
+import System.Runtime.CompilerServices.*
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TimerStart(milliseconds: int, callback: () -> System.Void) -> long;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TimerCancel(handle: long) -> bool;

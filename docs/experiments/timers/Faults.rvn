@@ -1,0 +1,21 @@
+import System.*
+import System.Concurrency.*
+import System.Time.*
+
+func Main(arguments: string[]) {
+    use timer = Timer(() => { })
+    let mode = arguments[0]
+    if mode == "negative" {
+        timer.Start(Duration.FromTicks(-1L))
+    } else if mode == "excessive" {
+        timer.Start(Duration.FromTicks(21474836470001L))
+    } else if mode == "zero-interval" {
+        timer.Start(Duration.FromTicks(0L), Duration.FromTicks(0L))
+    } else if mode == "negative-interval" {
+        timer.Start(Duration.FromTicks(0L), Duration.FromTicks(-1L))
+    } else if mode == "disposed" {
+        timer.Dispose()
+        timer.Start(Duration.FromTicks(0L))
+    }
+    Console.WriteLine("ERROR invalid timer operation returned")
+}

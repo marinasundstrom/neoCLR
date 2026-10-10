@@ -193,7 +193,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                  '--bind-console-read-byte', '--bind-console-write-line', '--bind-console-stream-output',
                  '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text', '--bind-character-text', '--bind-system-culture', '--bind-time-zone-rules']
         if http:
-            flags += ['--bind-task-queue',
+            flags += ['--bind-task-queue', '--bind-timers',
                       '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-socket-client']
         if windows:
             flags += ['--target', 'x86_64-pc-windows-msvc', '--windows-http-experiment' if http else '--windows-console-experiment']

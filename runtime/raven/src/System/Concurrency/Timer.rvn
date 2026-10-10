@@ -1,0 +1,184 @@
+module System.Concurrency
+
+import System.*
+import System.Tasks.*
+import System.Time.*
+
+/// An invocation-local timer. Callbacks run serially on the invocation's completion queue.
+/// Repeating timers wait their interval after each callback completes; missed ticks do not accumulate.
+public class Timer : Disposable {
+    private val callback: () -> Task<()>
+    private var registration: TimerRegistration? = null
+    private var disposed = false
+    private var invoking = false
+    private var waiting: TimerRegistration? = null
+
+    /// Creates a stopped timer. The callback may capture its own state.
+    init(callback: () -> Void) {
+        self.callback = () => {
+            callback()
+            return Task.CompletedTask
+        }
+    }
+
+    /// Creates a stopped timer whose callback may await asynchronous work.
+    /// Cancelled callbacks stop their schedule. Stop and Dispose do not cancel callback work.
+    init(callback: () -> Task<()>) {
+        self.callback = callback
+    }
+
+    /// Whether scheduling or callback completion is pending. Stop immediately makes this false.
+    val IsRunning: bool {
+        get {
+            let current = registration
+            if current is TimerRegistration active {
+                return active.IsActive
+            }
+            return false
+        }
+    }
+
+    /// Replaces the current schedule with one callback after delay.
+    /// Zero runs at a later completion boundary; negative or excessive delays fault.
+    func Start(delay: Duration) {
+        Schedule(Milliseconds(delay, false), 0)
+    }
+
+    /// Replaces the schedule, then repeats with a positive interval after each callback completes.
+    /// Starting or stopping inside a callback takes precedence over the old schedule.
+    func Start(delay: Duration, interval: Duration) {
+        Schedule(Milliseconds(delay, false), Milliseconds(interval, true))
+    }
+
+    /// Stops scheduling and suppresses callbacks not yet started. Harmless after disposal.
+    func Stop() {
+        let current = registration
+        registration = null
+        if current is TimerRegistration active {
+            active.Cancel()
+        }
+    }
+
+    /// Stops scheduling permanently. Repeated disposal is harmless.
+    func Dispose() {
+        if disposed {
+            return
+        }
+        disposed = true
+        Stop()
+    }
+
+    private func Schedule(delay: int, interval: int) {
+        if disposed {
+            System.Fail("Timer is disposed")
+        }
+        // Ensure a completion destination exists before the runtime retains the callback.
+        let queue = TaskQueue.Default
+        Stop()
+        let next = TimerRegistration(self, interval)
+        registration = next
+        next.Schedule(delay)
+    }
+
+    internal func TryEnter(next: TimerRegistration) -> bool {
+        if invoking {
+            waiting = next
+            return false
+        }
+        invoking = true
+        return true
+    }
+
+    internal func Invoke() -> Task<()> => callback()
+
+    internal func Leave() {
+        invoking = false
+        let next = waiting
+        waiting = null
+        if next is TimerRegistration pending {
+            pending.Tick()
+        }
+    }
+
+    internal static func Milliseconds(value: Duration, positive: bool) -> int {
+        let ticks = value.Ticks
+        if ticks < 0L {
+            System.Fail("Timer duration is out of range")
+        }
+        if ticks > 21474836470000L {
+            System.Fail("Timer duration is out of range")
+        }
+        if positive && ticks == 0L {
+            System.Fail("Timer duration is out of range")
+        }
+        var milliseconds = ticks / 10000L
+        if ticks % 10000L != 0 {
+            milliseconds += 1L
+        }
+        return (int)milliseconds
+    }
+}
+
+// Each schedule owns a separate callback registration so already-queued callbacks
+// cannot resurrect an old schedule after Stop, Start or Dispose.
+internal class TimerRegistration {
+    private val owner: Timer
+    private val interval: int
+    private var active = true
+    private var handle: long = 0L
+    private var pending: Task<()>? = null
+
+    internal init(owner: Timer, interval: int) {
+        self.owner = owner
+        self.interval = interval
+    }
+
+    internal val IsActive: bool => active
+
+    internal func Schedule(delay: int) {
+        handle = neoCLR.Runtime.TimerStart(delay, Tick)
+    }
+
+    internal func Cancel() {
+        active = false
+        if handle != 0L {
+            neoCLR.Runtime.TimerCancel(handle)
+            handle = 0L
+        }
+    }
+
+    internal func Tick() {
+        handle = 0L
+        if !active {
+            return
+        }
+        if !owner.TryEnter(self) {
+            return
+        }
+        let task = owner.Invoke()
+        pending = task
+        if task.IsCompleted {
+            Complete()
+        } else {
+            // Outcome adapter: awaiting a cancelled task would bypass schedule cleanup.
+            task.OnCompleted(Complete)
+        }
+    }
+
+    private func Complete() {
+        let task = pending
+        pending = null
+        if task is Task<()> completed {
+            if completed.IsCancelled {
+                active = false
+            }
+        }
+        if interval == 0 {
+            active = false
+        }
+        if active {
+            Schedule(interval)
+        }
+        owner.Leave()
+    }
+}

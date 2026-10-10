@@ -14215,3 +14215,13 @@ claim completion of in-process test discovery.
   timed cancellation and HttpClient integration are not yet implemented. See
   [the timer/lifetime design](design/http-client-lifetime.md) for the API proposal
   and the invocation scheduler's remaining concurrency limitations.
+
+### 2026-10-11 — Async timer callbacks and completion of HTTP layers
+
+- **Author:** suggested callbacks returning `Task<()>`, then directed continuation
+  until the layers through HttpClient timeout are implemented.
+- **Assistant decision:** support synchronous and async callbacks; repeat after task
+  completion, serialize callbacks even across restart, and let in-flight work finish
+  after Stop/Dispose. A cancelled callback stops its schedule.
+- **Outcome:** ten callback scenarios pass interpreter and macOS ARM64 AOT. Five guards also pass in both modes; Windows CI is configured but unexecuted. Timed cancellation and HTTP timeout
+  remain the next layers, not claimed complete by the Timer implementation.

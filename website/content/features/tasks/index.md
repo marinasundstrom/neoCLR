@@ -249,3 +249,15 @@ Questions, sample programs and documentation corrections are welcome. See [how t
 ## API reference
 
 [System.Tasks](xref:System.Tasks) · [System.Concurrency](xref:System.Concurrency)
+
+## Timers in development
+
+`System.Concurrency.Timer` accepts either `() -> ()` or `() -> Task<()>`. Start it
+with a `Duration` delay, optionally followed by a positive repeating interval.
+Repeats wait for callback completion before starting the next interval. Restart,
+Stop and Dispose do not overlap or cancel in-flight callback work. A cancelled
+callback stops its schedule. Zero delay is deferred; positive fractional milliseconds
+round upward. This is invocation-local scheduling, not thread-pool execution.
+
+See the [Timer API](/docs/api/System/Concurrency/Timer/index.html) and the
+[tested async scenarios](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/timers/Main.rvn).

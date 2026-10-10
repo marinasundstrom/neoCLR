@@ -23,6 +23,8 @@ on:
       - 'scripts/validate-public-encoding.py'
       - 'scripts/validate-runtime-obsolete.py'
       - 'scripts/validate-http-lifetime.py'
+      - 'scripts/validate-timers.py'
+      - 'docs/experiments/timers/**'
       - 'docs/experiments/http-lifetime/**'
       - 'docs/experiments/obsolete-runtime/**'
       - 'docs/experiments/raven-target/samples/library-utf8*'
@@ -61,6 +63,8 @@ on:
       - 'scripts/validate-public-encoding.py'
       - 'scripts/validate-runtime-obsolete.py'
       - 'scripts/validate-http-lifetime.py'
+      - 'scripts/validate-timers.py'
+      - 'docs/experiments/timers/**'
       - 'docs/experiments/http-lifetime/**'
       - 'docs/experiments/obsolete-runtime/**'
       - 'docs/experiments/raven-target/samples/library-utf8*'
@@ -115,6 +119,13 @@ jobs:
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-http-lifetime.py --bundle `"target/windows-native-collections-validation/development toolchain/bundle`" --output target/windows-native-collections-validation/http-lifetime"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify synchronous and asynchronous Timer callbacks
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-timers.py --bundle `"target/windows-native-collections-validation/development toolchain/bundle`" --output target/windows-native-collections-validation/timers"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Verify public encoding sample and internal helper boundary

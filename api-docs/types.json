@@ -46,6 +46,7 @@
   "System.Concurrency.CancellationTokenSource",
   "System.Concurrency.Thread",
   "System.Concurrency.ThreadPool",
+  "System.Concurrency.Timer",
   "System.Console",
   "System.ConsoleReadError",
   "System.ConsoleReadError.ReadFailed",

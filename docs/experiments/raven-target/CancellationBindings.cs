@@ -3,12 +3,13 @@ using Mono.Cecil;
 // Application contracts over invocation-local request state; no scheduler handles.
 static class CancellationBindings
 {
+    public const string Timer = "System.Concurrency.Timer";
     public const string Token = "System.Concurrency.CancellationToken";
     public const string Source = "System.Concurrency.CancellationTokenSource";
     public const string Registration = "System.Concurrency.CancellationRegistration";
-    public static readonly string[] Names = [Token, Source, Registration];
+    public static readonly string[] Names = [Token, Source, Registration, Timer];
     public static bool IsName(string name) => Names.Contains(name);
-    public static bool IsReference(string name) => name is Source or Registration;
+    public static bool IsReference(string name) => name is Source or Registration or Timer;
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope)
         && IsName(type.FullName) && type.IsValueType == (type.FullName == Token) ? type.FullName : null;
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
@@ -18,6 +19,15 @@ static class CancellationBindings
     public const string Declarations = "\n" + """
         #nullable enable annotations
         namespace Concurrency {
+            public sealed class Timer : Disposable {
+                public Timer(Func<PropagationUnit> callback) { }
+                public Timer(Func<Tasks.Task<PropagationUnit>> callback) { }
+                public bool IsRunning => default;
+                public void Start(Time.Duration delay) { }
+                public void Start(Time.Duration delay, Time.Duration interval) { }
+                public void Stop() { }
+                public void Dispose() { }
+            }
             public struct CancellationToken {
                 private CancellationTokenSource? source;
                 public CancellationToken() { source = null; }
@@ -76,6 +86,10 @@ static class CancellationBindings
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type, allowInternal: library);
         var expected = (owner, definition.Name) switch {
+            (Timer, ".ctor") => (args.Length == 1 && args[0] == "fn<System.Tasks.Task<Void>>" ? "fn<System.Tasks.Task<Void>>" : "fn<Void>", "noresult", false),
+            (Timer, "get_IsRunning") => ("", "Boolean", false),
+            (Timer, "Start") => (args.Length == 1 ? "System.Time.Duration" : "System.Time.Duration,System.Time.Duration", "noresult", false),
+            (Timer, "Stop" or "Dispose") => ("", "noresult", false),
             (Token, ".ctor") when args.Length == 0 => ("", "noresult", false),
             (Token, ".ctor") when library => (Source, "noresult", false),
             (Token, "get_None") => ("", Token, true),

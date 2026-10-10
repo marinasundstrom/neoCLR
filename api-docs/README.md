@@ -1694,3 +1694,12 @@ DelegatingHandler supplies a nullable InnerHandler property and protected constr
 The selected type list, aggregate reference and native reference include this surface;
 existing protected-constructor manual coverage rules still apply. Timeout remains a gap.
 The host-only native class slot resolver is documented in [introspection](introspection.md).
+
+## Timer development API (2026-10-11)
+
+System.Concurrency.Timer is selected in the aggregate reference and native snapshot,
+including both synchronous and Task-returning constructors, IsRunning, Start overloads,
+Stop and Dispose. Native RavenDoc currently spells the nested unit result `Task<void>`;
+the authored constructor summary specifies the source spelling `Task<()>`. No API is
+excluded. Fixed-delay repetition includes async completion; Stop/Dispose do not join or
+cancel callback work. See the timer section in docs/design/http-client-lifetime.md.

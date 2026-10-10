@@ -28,3 +28,6 @@
 
 /docs/experiments/http-lifetime/bin/
 /docs/experiments/http-lifetime/obj/
+
+/docs/experiments/timers/bin/
+/docs/experiments/timers/obj/

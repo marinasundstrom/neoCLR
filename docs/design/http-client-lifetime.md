@@ -172,3 +172,39 @@ uses a duration-based Timer with captured callback state and explicit start/stop
 then timed cancellation, then HttpClient.Timeout. Exact periodic cadence, rescheduling
 and disposal behavior must be qualified before exposing those APIs. Invocation-local
 callbacks are not a claim of .NET timer thread-pool or concurrent callback support.
+
+## Public Timer and asynchronous callbacks (2026-10-11)
+
+`System.Concurrency.Timer` now accepts either `() -> ()` or `() -> Task<()>`.
+Construction leaves it stopped. `Start(delay)` replaces the schedule with one run;
+`Start(delay, interval)` repeats, measuring each interval **after callback completion**.
+Durations use ticks, round positive fractional milliseconds upward, and are bounded
+by Int32.MaxValue milliseconds. Initial zero delay is deferred; intervals must be positive.
+`Stop` suppresses unstarted callbacks; `Dispose` additionally forbids restarting.
+Neither cancels a callback's own work. `IsRunning` includes awaiting completion until
+stopped; a cancelled callback task stops its schedule. Runtime Faults remain terminal.
+
+Restarting while a callback awaits replaces its future schedule but cannot overlap
+that callback, even if the new deadline arrives first. Old completion cannot resurrect
+an old schedule. An outcome-observation adapter uses OnCompleted specifically to
+clean up cancelled callbacks; consumer async functions use await.
+
+Compared with System.Threading.Timer, the deliberately different cadence prevents
+async callback overlap and dropped task outcomes. Captured state and Duration avoid
+object-state casts and numeric disabled-delay sentinels. Costs: no thread-pool execution,
+no fixed-rate cadence, and progress depends on the invocation scheduler; synchronous
+callbacks must return promptly. Disposal is nonblocking and does not join callback work.
+The current Task API has success/cancellation outcomes, not recoverable exception tasks.
+
+The [consumer](../experiments/timers/Main.rvn) covers ten sync/async scenarios and
+[guards](../experiments/timers/Faults.rvn) cover five invalid operations. The validator
+runs both interpreter and AOT; Windows CI uses the same fixtures. The test framework
+currently accepts synchronous tests, so this asynchronous consumer remains separate.
+Native `use` in async functions and state machines beyond the current sixteen-field
+AOT value profile remain compiler/backend gaps; small test functions use explicit disposal.
+A combined comparison/OR parser failure seen in validation also reproduces on ordinary
+Raven CLI. Separate validation statements avoid it; a shared compiler regression/fix
+remains deferred rather than defining a native language restriction.
+
+[Local qualification](../experiments/timers/validation.json): all ten callback scenarios
+and five guards pass in interpreter and macOS ARM64 AOT. Windows remains unexecuted.

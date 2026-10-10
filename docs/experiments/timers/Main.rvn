@@ -1,0 +1,223 @@
+import System.*
+import System.Concurrency.*
+import System.Tasks.*
+import System.Time.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fail("Timer check failed")
+    }
+}
+
+class Counter {
+    var Value = 0
+}
+
+class RepeatingCheck {
+    var Current: Timer? = null
+    var Count: int = 0
+    val Done: Promise<()> = Promise<()>()
+
+    func Tick() {
+        Count += 1
+        if Count == 3 {
+            let timer = Current
+            if timer is Timer active {
+                active.Stop()
+            }
+            Done.Complete(())
+        }
+        Check(Count <= 3)
+    }
+}
+
+class RescheduleCheck {
+    var Current: Timer? = null
+    var Count: int = 0
+    val Done: Promise<()> = Promise<()>()
+
+    func Tick() {
+        Count += 1
+        if Count == 1 {
+            let timer = Current
+            if timer is Timer active {
+                active.Start(Duration.FromTicks(0L))
+            }
+        } else {
+            Check(Count == 2)
+            Done.Complete(())
+        }
+    }
+}
+
+async func Pause() -> Task<()> {
+    let done = Promise<()>()
+    let timer = Timer(() => { done.Complete(()) })
+    timer.Start(Duration.FromTicks(10000L))
+    await done.Task
+    timer.Dispose()
+}
+
+// Explicit disposal below is temporary: native exception-free `use` lowering
+// currently supports synchronous functions only. All asynchronous work uses await.
+class AsyncCheck {
+    var Current: Timer? = null
+    var Count = 0
+    var Active = 0
+    val Started: Promise<()> = Promise<()>()
+    val Release: Promise<()> = Promise<()>()
+    val Done: Promise<()> = Promise<()>()
+
+    async func Tick() -> Task<()> {
+        Active += 1
+        Check(Active == 1)
+        Count += 1
+        if Count == 1 {
+            Started.Complete(())
+            await Release.Task
+        }
+        await Pause()
+        Active -= 1
+        if Count == 2 {
+            let timer = Current
+            if timer is Timer current {
+                current.Stop()
+            }
+            Done.Complete(())
+        }
+    }
+}
+
+func CancelledCallback() -> Task<()> {
+    let done = Promise<()>()
+    done.Cancel()
+    return done.Task
+}
+
+async func SynchronousChecks() -> Task<()> {
+    let done = Promise<()>()
+    let count = Counter()
+    let once = Timer(() => {
+        count.Value += 1
+        done.Complete(())
+    })
+    Check(!once.IsRunning)
+    once.Start(Duration.FromTicks(0L))
+    await done.Task
+    Check(count.Value == 1 && !once.IsRunning)
+    Console.WriteLine("PASS one shot")
+
+    once.Start(Duration.FromTicks(21474836470000L))
+    once.Stop()
+    await Pause()
+    Check(count.Value == 1 && !once.IsRunning)
+    Console.WriteLine("PASS stop")
+
+    once.Start(Duration.FromTicks(0L))
+    once.Dispose()
+    once.Dispose()
+    await Pause()
+    Check(count.Value == 1 && !once.IsRunning)
+    Console.WriteLine("PASS disposal")
+
+    let repeated = RepeatingCheck()
+    let periodic = Timer(repeated.Tick)
+    repeated.Current = periodic
+    periodic.Start(Duration.FromTicks(0L), Duration.FromTicks(1L))
+    await repeated.Done.Task
+    await Pause()
+    Check(repeated.Count == 3 && !periodic.IsRunning)
+    Console.WriteLine("PASS repeat and stop inside callback")
+
+    let changed = RescheduleCheck()
+    let rescheduled = Timer(changed.Tick)
+    changed.Current = rescheduled
+    rescheduled.Start(Duration.FromTicks(0L), Duration.FromTicks(10000L))
+    await changed.Done.Task
+    await Pause()
+    Check(changed.Count == 2 && !rescheduled.IsRunning)
+    periodic.Dispose()
+    rescheduled.Dispose()
+    Console.WriteLine("PASS reschedule inside callback")
+
+}
+
+async func AsyncRepeat() -> Task<()> {
+    let asynchronous = AsyncCheck()
+    let asyncTimer = Timer(asynchronous.Tick)
+    asynchronous.Current = asyncTimer
+    asyncTimer.Start(Duration.FromTicks(0L), Duration.FromTicks(10000L))
+    await asynchronous.Started.Task
+    await Pause()
+    Check(asynchronous.Count == 1 && asyncTimer.IsRunning)
+    asynchronous.Release.Complete(())
+    await asynchronous.Done.Task
+    await Pause()
+    Check(asynchronous.Count == 2 && !asyncTimer.IsRunning)
+    asyncTimer.Dispose()
+    Console.WriteLine("PASS async repeat waits for completion")
+
+}
+
+async func AsyncRestart() -> Task<()> {
+    let restarted = AsyncCheck()
+    let restartedTimer = Timer(restarted.Tick)
+    restarted.Current = restartedTimer
+    restartedTimer.Start(Duration.FromTicks(0L))
+    await restarted.Started.Task
+    restartedTimer.Start(Duration.FromTicks(0L))
+    await Pause()
+    Check(restarted.Count == 1 && restarted.Active == 1)
+    restarted.Release.Complete(())
+    await restarted.Done.Task
+    restartedTimer.Dispose()
+    Console.WriteLine("PASS async restart does not overlap")
+
+}
+
+async func AsyncDispose() -> Task<()> {
+    let stopped = AsyncCheck()
+    let stoppedTimer = Timer(stopped.Tick)
+    stoppedTimer.Start(Duration.FromTicks(0L), Duration.FromTicks(10000L))
+    await stopped.Started.Task
+    stoppedTimer.Stop()
+    stoppedTimer.Dispose()
+    Check(!stoppedTimer.IsRunning && stopped.Active == 1)
+    stopped.Release.Complete(())
+    await Pause()
+    await Pause()
+    Check(stopped.Count == 1 && stopped.Active == 0)
+    Console.WriteLine("PASS disposal allows async callback to finish")
+
+}
+
+async func AsyncCancellation() -> Task<()> {
+    let cancelledTimer = Timer(CancelledCallback)
+    cancelledTimer.Start(Duration.FromTicks(0L), Duration.FromTicks(10000L))
+    await Pause()
+    Check(!cancelledTimer.IsRunning)
+    cancelledTimer.Dispose()
+    Console.WriteLine("PASS cancelled callback stops repeating")
+}
+
+async func PendingCancellation() -> Task<()> {
+    let cancelled = AsyncCheck()
+    let timer = Timer(cancelled.Tick)
+    timer.Start(Duration.FromTicks(0L), Duration.FromTicks(10000L))
+    await cancelled.Started.Task
+    cancelled.Release.Cancel()
+    await Pause()
+    await Pause()
+    Check(cancelled.Count == 1 && !timer.IsRunning)
+    timer.Dispose()
+    Console.WriteLine("PASS pending callback cancellation stops repeating")
+}
+
+async func Main() -> Task<()> {
+    await SynchronousChecks()
+    await AsyncRepeat()
+    await AsyncRestart()
+    await AsyncDispose()
+    await AsyncCancellation()
+    await PendingCancellation()
+}

@@ -17,8 +17,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   cancellable monotonic deadlines, bounded capacity and traced scheduler handoff.
   Add explicit AOT timer binding and rooted native one-shot delivery through the
   macOS/Windows host kernel; focused macOS kernel and compiled consumer checks pass.
-  Windows execution remains pending. Configurable timeout still requires the library adapter;
-  no public Timeout/Timer/CancelAfter API is introduced by this foundation.
+  Add public Duration-based Timer with synchronous and Task-returning callbacks,
+  non-overlapping fixed-delay repetition, safe restart and idempotent stop/disposal.
+  Callback cancellation stops its schedule; disposal permits in-flight work to finish.
+  Refresh both API references and add shared interpreter/native Windows CI fixtures.
+  Windows execution remains pending. Timeout/CancelAfter are the next layers.
 
 - Add bounded AOT virtual dispatch for nongeneric reference classes. Resolve targets
   with interpreter ancestry rules, retain required base slots, and generate separate
