@@ -13928,3 +13928,17 @@ claim completion of in-process test discovery.
 - **Next:** review Encoding/Encoder/Decoder and stream completion against .NET and
   the established UTF-8/strict-ASCII decisions. Additional codecs or a permanent
   roadmap reprioritization are not inferred from this request.
+
+### Encoding review outcome
+
+- **Assistant action:** inspect the current provider/session and stream contracts,
+  revisit the author's strict-ASCII selection, and compare .NET 10, WHATWG Encoding
+  and encoding_rs primary sources in the [review](design/encoding-api-review.md).
+- **Findings:** Encoding lacks paired whole-value decoding; concrete StreamWriter
+  completion is unavailable through TextWriter; per-call quota units and terminal
+  versus retryable errors need clear coverage. Existing probes are historical
+  evidence, not current native qualification.
+- **Recommendation:** migrate the encoding probes into the attributed framework,
+  then validate paired conversion and general completion with custom providers.
+  These are assistant proposals; no subsequent author selection or implementation
+  is claimed. Additional codecs and a new runtime mechanism are not inferred.

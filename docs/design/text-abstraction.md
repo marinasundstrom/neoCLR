@@ -995,3 +995,12 @@ Unicode casing and Int64 parsing/formatting, with missing bounds as companion wo
 casing deferral for these two methods only. String identity, grapheme Char, encoding,
 normalization and case-insensitive equality/hash remain unchanged. The report is a
 bounded API consumer, not completion of the Activity Report milestone.
+
+## Encoding API reassessment — 2026-10-10
+
+The author requested an encoding review after time parsing. The
+[bounded review](encoding-api-review.md) preserves the earlier strict UTF-8/ASCII
+selection, identifies whole-value decode and generic writer completion gaps, and
+compares .NET, WHATWG and encoding_rs contracts. Its implementation sequence is
+provisional: first migrate existing probes to attributed tests, then address
+conversion symmetry and completion. No codec or public signature changes here.

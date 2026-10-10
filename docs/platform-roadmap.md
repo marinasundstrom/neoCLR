@@ -366,10 +366,13 @@ kernel through optional native archive variants. Native MapLocal and machine-zon
 discovery remain separate gaps. Windows validation includes the parsing suites and
 host-culture parity probe.
 
-**Next author-directed review (2026-10-10):** after the time-zone slice, review the
-encoding API. Preserve the established UTF-8/strict-ASCII baseline and compare role,
-completion, error, quota and buffer contracts with System.Text. This is a bounded
-review request, not a permanent reprioritization or approval of additional codecs.
+**Author-directed encoding review (2026-10-10):** the
+[review](design/encoding-api-review.md) is recorded after the time-zone slice. It
+retains the established UTF-8/strict-ASCII baseline and compares role, completion,
+error, quota and buffer contracts with System.Text. The recommended next bounded
+slice migrates existing encoding probes into attributed tests; paired one-shot
+decoding and general writer completion follow as proposals. This review does not
+approve additional codecs or permanently reprioritize the roadmap.
 
 A separate native gap observed during implementation: String.GetScalars exposes an
 immutable UInt32 array that current native specialization rejects. This parser uses

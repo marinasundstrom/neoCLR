@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Record the author-requested encoding API review against .NET and other primary
+  contracts. Identify paired decoding, generic writer completion and conformance
+  coverage as priorities; preserve strict UTF-8/ASCII. The proposed sequence adds
+  no APIs or codecs in this documentation slice.
+
 - Add Date, TimeOfDay and LocalDateTime Parse overloads using current or explicit
   Culture and Result<T, DateTimeParseError>. Support the existing invariant, Swedish
   and Hebrew-Israel numeric Gregorian formats, with optional 1–7 fractional digits.
