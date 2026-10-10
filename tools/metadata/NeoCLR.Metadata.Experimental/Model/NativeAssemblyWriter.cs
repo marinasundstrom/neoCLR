@@ -25,6 +25,8 @@ public sealed partial class AssemblyBuilder
 
     private byte[] WriteNativeCore(int maxImageSize)
     {
+        if (Definition.CustomAttributes.Count != 0)
+            throw new NotSupportedException("native assembly-level custom attribute retention is not implemented");
         var methods = ValidateGraph();
         if (externalGrapheme is not null && types.Any(t => t.NativeGrapheme))
             throw new InvalidDataException("native Char cannot have both a local and external owner");

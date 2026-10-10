@@ -33,6 +33,8 @@ if (args is ["--aot-attribute-fixture", var attributeInput, var attributeImage, 
     NativeAttributeAotFixture.Write(attributeInput, attributeImage, attributeRoots); return 0;
 }
 
+if (args is ["--assembly-attributes"]) { AssemblyAttributeChecks.Run(); return 0; }
+
 if (args is ["--member-attributes"]) { MemberAttributeChecks.Run(); return 0; }
 if (args is ["--member-attributes", var attributeOutput]) { MemberAttributeChecks.Run(attributeOutput); return 0; }
 

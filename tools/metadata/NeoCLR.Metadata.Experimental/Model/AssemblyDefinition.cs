@@ -395,6 +395,7 @@ public sealed partial class AssemblyDefinition
                 }
                 return attributes;
             }
+            result.SetLoadedAttributes(ReadAttributes(reader.GetAssemblyDefinition().GetCustomAttributes()));
             foreach (var handle in reader.TypeDefinitions)
                 result.MainModule.GetTypeDefinition((uint)MetadataTokens.GetToken(handle))!.SetLoadedAttributes(ReadAttributes(reader.GetTypeDefinition(handle).GetCustomAttributes()));
             foreach (var handle in reader.MethodDefinitions)

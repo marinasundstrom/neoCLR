@@ -516,7 +516,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     {
         ArgumentNullException.ThrowIfNull(operand);
         var baseConstructor = operand.IsConstructor && opCode == OpCode.Call && bodyBuilder.IsConstructor &&
-            DeclaringType?.IsDirectBaseConstructor(operand.Target, operand.DeclaringReference) == true;
+            operand.DeclaringReference is { } declaringReference &&
+            DeclaringType?.IsDirectBaseConstructor(operand.Target, declaringReference) == true;
         if (!baseConstructor && opCode != (operand.IsConstructor ? OpCode.Newobj : operand.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("wrong dispatch opcode", nameof(opCode));
         if (!ReferenceEquals(operand.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(operand));
         if (operand.Signature.GenericParameterNames.Count != 0 || operand.Target.DeclaringType?.GenericParameterNames.Count > 0) throw new ArgumentException("generic import must be instantiated", nameof(operand));

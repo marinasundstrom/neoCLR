@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Retain assembly custom attributes in the host metadata model and CLI writer/reader,
+  including ordered repeated InternalsVisibleTo grants, bounded ownership-checked
+  authoring and read-only snapshots. Native writing explicitly rejects assembly
+  annotations until manifest retention is implemented. Add CLR-comparison and
+  metadata-only regression checks. Guard imported base-constructor dispatch when
+  its nominal declaring reference is absent, fixing a nullable build error.
+
 - Record the author-requested encoding API review against .NET and other primary
   contracts. Identify paired decoding, generic writer completion and conformance
   coverage as priorities; preserve strict UTF-8/ASCII. The proposed sequence adds
@@ -27,6 +34,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Record the general Raven source/CLI accessibility fix landed independently on main
   at 52dc10011 with 56 focused tests passing; native
   attribute retention/import/runtime enforcement and Utf8 migration remain pending.
+  Record the subsequent resolution-cost requirement and Raven main 562a4491e cache:
+  repeated positive/negative friend checks avoid metadata parsing and allocation.
 
 - Qualify codec buffer limits with explicit host budgets. Add run options for live
   array elements and logical array bytes, and a native builder byte-array limit;

@@ -7946,3 +7946,20 @@ metadata/backend support will replace CLI attribute transport without changing t
 friend contract. Signed source emission and dedicated malformed-grant declaration
 diagnostics are not added by this slice. See the
 [encoding follow-up](design/encoding-api-review.md#shared-raven-implementation-precedes-native-integration).
+
+
+The next metadata prerequisite adds assembly-level custom attribute collections to the
+host metadata model and preserves them through CLI authoring/readback. Repeated friend
+grants round-trip and agree with CLR metadata inspection; no constructors run. Native
+writing rejects graphs containing assembly annotations until native manifest retention
+is implemented. This explicit boundary prevents silent loss; it does not admit native
+friends. No Runtime Contract setting changes. Raven's adapter must eventually forward
+source assembly attributes, and the native provider/runtime must consume preserved grants.
+
+
+Raven main `562a4491e` caches positive and negative friend decisions per immutable
+assembly-symbol pair, with weak-key lifetime and thread-safe publication. Existing
+public/same-assembly fast paths are unchanged. All 58 focused main tests pass; the
+two new cases each measure zero allocations across 100,000 warmed checks. This is
+not a whole-compiler throughput claim. Native access checks should follow the same
+principle when implemented: resolve metadata once, not repeatedly per member access.

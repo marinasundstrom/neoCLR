@@ -8188,3 +8188,36 @@ Validation: `NeoCLR.Metadata.Experimental.Tests --external-class-base <output>`
 checks metadata, actual CLR execution and negative constructor cases. Its native
 artifact returns 42 in the interpreter. A Raven `TestAttribute : Attribute` sample
 also returns 42 in interpreter and macOS ARM64 AOT with the matched compiler.
+
+
+## Assembly custom attributes (development 2026-10-10)
+
+Host-only `NeoCLR.Metadata.Experimental.Model`; these are physical assembly annotations,
+not logical namespace/module annotations or guest reflection APIs.
+
+| Member | Contract |
+| --- | --- |
+| `AssemblyDefinition.CustomAttributes : IList<CustomAttributeDefinition>` | Declared assembly attributes. Authored lists accept up to 256 output-module-owned attributes; loaded lists are read-only. Reading never executes constructors. |
+| `AssemblyBuilder.AddCustomAttribute(CustomAttributeDefinition attribute) : void` | Appends through the definition's ownership validation. Foreign ownership throws `ArgumentException`; exceeding 256 attributes throws `InvalidDataException`. |
+
+`AssemblyBuilder.Write()` emits these attributes on the CLI assembly manifest.
+`AssemblyDefinition.ReadAssembly()` retains ordered repeated attributes and shares the
+existing bounded attribute-blob decoding budget with member attributes. Primitive,
+nominal enum and named argument restrictions match `CustomAttributeDefinition`.
+Unsupported argument data can be retained raw but still rejects typed decoding.
+Loaded snapshots remain immutable and `Write()` preserves their original bytes.
+
+For example, author a friend grant with a module-owned reference:
+
+```csharp
+var marker = assembly.Definition.MainModule.ImportReference(coreIdentity,
+    "System.Runtime.CompilerServices", "InternalsVisibleToAttribute");
+assembly.AddCustomAttribute(new CustomAttributeDefinition(marker,
+    [new CustomAttributeArgument(PrimitiveType.String, "Library.Tests")]));
+```
+
+This retains metadata; it does not add friend access enforcement to the native runtime
+or general AttributeUsage validation to the authoring library. Native writing of a graph
+with assembly attributes throws `NotSupportedException` until its manifest can retain
+them, instead of silently dropping annotations. Existing native member-attribute support
+is unchanged. CLI reference emission uses the same assembly-attribute writer.

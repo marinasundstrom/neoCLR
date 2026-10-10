@@ -283,3 +283,11 @@ import admission only for an exact friend, and update resolved method/field/type
 access checks. Current imported-type admission rejects nonpublic external types
 before code generation. Keep Utf8 public until that work and consumer/API migration
 are validated together, rather than committing a broken intermediate library.
+
+
+The metadata prerequisite now preserves CLI assembly attributes in the host model,
+including repeated friend grants. Native graphs carrying them fail explicitly until
+native manifest retention is implemented. This does not change Utf8 visibility yet.
+The author's resolution-cost requirement is tracked separately: cache granted and
+refused friend access per immutable assembly pair, preserving public/same-assembly
+fast paths and avoiding repeated parsing or allocations during member lookup.

@@ -267,6 +267,30 @@ public sealed class CustomAttributeDefinition
     }
 }
 
+public sealed partial class AssemblyDefinition
+{
+    private IList<CustomAttributeDefinition>? customAttributes;
+    /// <summary>Gets assembly-level custom attributes; physical-module attributes are separate.</summary>
+    /// <remarks>Authored lists accept at most 256 output-module-owned attributes. Loaded snapshots
+    /// are read-only. Reading data never executes constructors. Native retention is not yet supported.</remarks>
+    public IList<CustomAttributeDefinition> CustomAttributes => customAttributes ??= Producer is null
+        ? Array.AsReadOnly(Array.Empty<CustomAttributeDefinition>())
+        : new DefinitionCollection<CustomAttributeDefinition>([], attribute =>
+        {
+            if (customAttributes!.Count >= 256) throw new InvalidDataException("too many assembly attributes");
+            attribute.ValidateOwner(MainModule);
+        });
+    internal void SetLoadedAttributes(IEnumerable<CustomAttributeDefinition> attributes) => customAttributes = Array.AsReadOnly(attributes.ToArray());
+}
+
+public sealed partial class AssemblyBuilder
+{
+    /// <summary>Adds an assembly attribute using output-module ownership validation.</summary>
+    /// <exception cref="ArgumentException">The attribute belongs to another output module.</exception>
+    /// <exception cref="InvalidDataException">The 256-attribute limit is exceeded.</exception>
+    public void AddCustomAttribute(CustomAttributeDefinition attribute) => Definition.CustomAttributes.Add(attribute);
+}
+
 public sealed partial class TypeDefinition
 {
     private IList<CustomAttributeDefinition>? customAttributes;

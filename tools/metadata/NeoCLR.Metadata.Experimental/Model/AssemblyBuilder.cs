@@ -362,7 +362,7 @@ public sealed partial class AssemblyBuilder
         var metadata = new MetadataBuilder();
         // A stable per-builder MVID preserves snapshot scope; PE content IDs/timestamps are deterministic.
         metadata.AddModule(0, metadata.GetOrAddString(Identity.Name + ".dll"), metadata.GetOrAddGuid(mvid), default, default);
-        metadata.AddAssembly(metadata.GetOrAddString(Identity.Name), Identity.Version, metadata.GetOrAddString(Identity.Culture), default, 0, AssemblyHashAlgorithm.None);
+        var assemblyHandle = metadata.AddAssembly(metadata.GetOrAddString(Identity.Name), Identity.Version, metadata.GetOrAddString(Identity.Culture), default, 0, AssemblyHashAlgorithm.None);
         var assemblyRefs = new Dictionary<AssemblyIdentity, AssemblyReferenceHandle>();
         AssemblyReferenceHandle ImportAssembly(AssemblyIdentity identity)
         {
@@ -701,6 +701,7 @@ public sealed partial class AssemblyBuilder
                 metadata.AddCustomAttribute(target, constructor, metadata.GetOrAddBlob(attribute.GetValue()));
             }
         }
+        WriteAttributes(assemblyHandle, Definition.CustomAttributes);
         void EmitMethod(MethodBuilder method)
         {
             WriteAttributes(MetadataTokens.MethodDefinitionHandle(nextMethod), method.Definition.CustomAttributes);

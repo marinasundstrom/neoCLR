@@ -1625,3 +1625,13 @@ and explicit offset, overlap, gap and range rules. The new case is additive but
 exhaustive error consumers must handle it. TimeZone lookup, offset and database
 version have native bindings; MapLocal and system-zone discovery remain native gaps.
 No inline zone-ID syntax or offset-free resolver is introduced.
+
+
+## Assembly attribute host metadata (2026-10-10)
+
+The C# host-only `AssemblyDefinition.CustomAttributes` and
+`AssemblyBuilder.AddCustomAttribute` APIs have XML and a
+[manual reference](experimental-metadata.md#assembly-custom-attributes-development-2026-10-10).
+They remain outside guest RavenDoc type selection under the existing host API exclusion;
+no guest API signature or runtime reference snapshot changes. The snapshot check passes.
+Native assembly retention and guest assembly attribute introspection remain pending.

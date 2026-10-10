@@ -14033,3 +14033,21 @@ claim completion of in-process test discovery.
   tests pass, including emitted separate-library execution on .NET. The integration
   branch mirror `1a40d61d6` passes 57 focused tests. Native support
   and Utf8 internalization remain pending; no .NET test result is treated as AOT evidence.
+
+
+## 2026-10-10 — Friend access must preserve resolution performance
+
+- **Author direction:** “Friend-assembly support shouldn’t make resolution slower”.
+- **Assistant action:** preserve the existing public and same-assembly fast paths;
+  cache positive and negative cross-assembly internal access by immutable assembly
+  symbol pair, using weak keys and thread-safe lazy publication. Distinct snapshots
+  with identical names must not share access decisions.
+- **Outcome:** Raven main `562a4491e` passes 58 focused tests. Two new cases exercise
+  concurrent initialization and 100,000 warmed lookups each, measuring zero thread
+  allocations for both grants and denials. This bounds hot-path behavior; it is not
+  an end-to-end compilation benchmark or a claim of zero first-lookup cost.
+- **Parallel dependency work in this chat:** the host metadata library now authors
+  and reads CLI assembly attributes, with ordered repeated grants checked against
+  CLR inspection, immutable loaded snapshots, ownership and count limits. Native
+  emission rejects annotated graphs rather than dropping them. Native manifest
+  retention, import/access enforcement and Utf8 internalization remain open.
