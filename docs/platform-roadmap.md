@@ -16,7 +16,10 @@ and the imported function-reference emitter gap remain separately scoped follow-
 The runtime definition selector now validates exact assembly/module ownership and
 preserves source function order without execution; its native bridge requires an
 explicit module catalog. Four focused checks pass. This is backend groundwork only:
-guest ownerless method/attribute snapshots and public GetFunctions remain next.
+ownerless method/parameter and method-attribute recipes now pass focused backend
+checks, including absent DeclaringType, fixed/named descriptions and excluded parameter
+targets. Guest enumeration/attribute services and public GetFunctions remain next;
+open generic signature snapshots are still explicitly unsupported.
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

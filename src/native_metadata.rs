@@ -90,6 +90,42 @@ pub fn module_function_definitions(
         .collect()
 }
 
+fn module_function<'a>(
+    module: &'a Module,
+    identity: &str,
+    name: &str,
+    definition: &crate::metadata::MemberId,
+) -> Result<&'a crate::metadata::Function, Fault> {
+    // Require the same explicit catalog and ambiguity checks as enumeration.
+    if !module_function_definitions(module, identity, name)?.contains(definition) {
+        return Err(Fault::new("function does not belong to assembly module"));
+    }
+    crate::assembly_info::module_functions(module, identity, name)?
+        .into_iter().find(|function| function.definition.as_ref() == Some(definition))
+        .ok_or_else(|| Fault::new("missing module function definition"))
+}
+
+/// Describe an admitted module function without binding or executing it.
+/// Open generic method signatures currently fault rather than being omitted.
+pub fn module_function_snapshot(
+    module: &Module,
+    identity: &str,
+    name: &str,
+    definition: &crate::metadata::MemberId,
+) -> Result<Value, Fault> {
+    crate::reflection::module_function_snapshot(module, module_function(module, identity, name, definition)?)
+}
+
+/// Read method-level attribute data, without invoking constructors or test bodies.
+pub fn module_function_attributes(
+    module: &Module,
+    identity: &str,
+    name: &str,
+    definition: &crate::metadata::MemberId,
+) -> Result<Value, Fault> {
+    crate::reflection::module_function_attributes(module, module_function(module, identity, name, definition)?)
+}
+
 /// Describe the assembly of a verified lexical caller, using the VM facade rules.
 pub fn executing_assembly(
     module: &Module,
@@ -170,4 +206,95 @@ pub fn custom_attributes(module: &Module, owner: &Type, token: i32) -> Result<Va
 pub fn type_token(module: &Module, owner: &Type) -> Result<i32, Fault> {
     let handle = crate::type_identity::describe_loaded(module, owner)?;
     crate::metadata_tokens::type_token(module, &handle.identity)
+}
+
+#[cfg(test)]
+mod module_function_tests {
+    use super::*;
+
+    fn fixture() -> Module {
+        let mut module = crate::assemble(r#"
+.module Functions
+.type IntegerMetadata
+.end
+.type StringMetadata
+.end
+.type UnitMetadata
+.end
+.type System.Introspection.CustomAttributeNamedArgument
+.end
+.type Marker
+.field public Tag String
+.method instance .ctor(String description) -> Void
+fault "attribute constructor must not execute"
+.end
+.end
+.function Probe(Int32 input) -> Int32
+.custom instance Marker::.ctor(String) = [{"String":"a discovered test"}]
+fault "test body must not execute"
+.end
+"#).unwrap();
+        for (definition, name) in module.types.iter_mut().zip(["System.Int32", "System.String", "System.Void"]) {
+            definition.name = name.into();
+        }
+        module.functions.iter_mut().find(|f| f.owner.is_none()).unwrap().namespace = "Example.Tests".into();
+        module.assemblies = vec![serde_json::from_value(serde_json::json!({
+            "name":"Package", "full_name":"Package", "modules":["Functions"], "references":[],
+            "declaration_modules":{"version":1,"names":["", "Example.Tests", "Other"]}
+        })).unwrap()];
+        module
+    }
+
+    fn fields(value: &Value) -> &[Value] {
+        let Value::Object { fields, .. } = value else { panic!("expected descriptor"); };
+        fields
+    }
+
+    #[test]
+    fn ownerless_snapshot_preserves_signature_and_module_without_a_declaring_type() {
+        let module = fixture();
+        let ids = module_function_definitions(&module, "Package", "Example.Tests").unwrap();
+        assert_eq!(ids.len(), 1);
+        let snapshot = module_function_snapshot(&module, "Package", "Example.Tests", &ids[0]).unwrap();
+        let values = fields(&snapshot);
+        assert_eq!(values[0], Value::String("Probe".into()));
+        assert!(matches!(values[1], Value::NullObjectReference(_)));
+        assert_eq!(fields(&values[3])[0], Value::Boolean(true));
+        assert_eq!(fields(&fields(&values[3])[1]), [Value::String("Package".into()), Value::String("Example.Tests".into())]);
+        assert_eq!(values[5], Value::Boolean(true)); // Static.
+        let Value::Array { elements, .. } = &values[11] else { panic!("expected parameters"); };
+        assert_eq!(elements.len(), 1);
+        let parameter = fields(&elements[0]);
+        assert_eq!(parameter[0], Value::String("input".into()));
+        assert_eq!(parameter[1], Value::Int32(0));
+        assert_eq!(parameter[9], Value::Int32(4)); // Ownerless member identity.
+        assert_eq!(fields(&parameter[7]), fields(&values[3]));
+        assert!(module_function_snapshot(&module, "Package", "Other", &ids[0]).is_err());
+    }
+
+    #[test]
+    fn module_attribute_recipes_preserve_descriptions_and_exclude_parameter_annotations() {
+        let mut module = fixture();
+        let index = module.functions.iter().position(|f| f.owner.is_none()).unwrap();
+        let id = module.functions[index].definition.clone().unwrap();
+        module.functions[index].custom_attributes[0].named_arguments.push(crate::metadata::CustomAttributeNamedArgument {
+            name: "Tag".into(), is_field: true,
+            value: crate::metadata::AttributeArgument::String(Some("named description".into())),
+        });
+        let mut parameter_attribute = module.functions[index].custom_attributes[0].clone();
+        parameter_attribute.target_token = Some(0x08000001);
+        module.functions[index].custom_attributes.push(parameter_attribute);
+        let result = module_function_attributes(&module, "Package", "Example.Tests", &id).unwrap();
+        let Value::Array { elements, .. } = result else { panic!("expected attributes"); };
+        assert_eq!(elements.len(), 1);
+        let Value::Array { elements: arguments, .. } = &fields(&elements[0])[2] else { panic!("expected arguments"); };
+        assert_eq!(fields(&arguments[0])[1], Value::Erased(Box::new(Value::String("a discovered test".into()))));
+        let Value::Array { elements: named, .. } = &fields(&elements[0])[3] else { panic!("expected named arguments"); };
+        assert_eq!(named.len(), 1);
+        assert_eq!(fields(&named[0])[0], Value::String("Tag".into()));
+        module.functions[index].generic_parameters = vec![Some("T".into())];
+        assert!(module_function_snapshot(&module, "Package", "Example.Tests", &id).unwrap_err().to_string().contains("generic method definition"));
+        // Attributes remain available even when signature materialization is unsupported.
+        assert!(module_function_attributes(&module, "Package", "Example.Tests", &id).is_ok());
+    }
 }

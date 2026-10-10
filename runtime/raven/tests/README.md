@@ -200,7 +200,15 @@ remains Module.GetMethods for global callables, with neoCLR's intentional namesp
 scope in place of a physical CLI module; signature inspection stays separate from
 execution. This is not a new public guest API or in-process test registration.
 
-Next: build ownerless MethodInfo/ParameterInfo and attribute snapshots without a
-synthetic declaring type, expose guest GetFunctions, then qualify explicit native
-retention and callable registration. Current host-generated registrations remain the
+Ownerless MethodInfo/ParameterInfo and method-level attribute recipes now exist in
+the unstable backend bridge. They preserve names, signatures, module ownership and
+fixed/named descriptions without invoking bodies or constructors. Public DeclaringType
+is absent; a structural signature is only the private parameter identity key already
+used by bound-function descriptors. Open generic signature materialization remains
+an explicit fault, while its attributes remain inspectable. Two additional recipe
+checks pass alongside the two module-selection checks; this is not a guest API or
+native executable discovery qualification.
+
+Next: connect these recipes to guest GetFunctions and ownerless attribute queries,
+then qualify explicit native retention and callable registration. Current host-generated registrations remain the
 working discovery path throughout that work.

@@ -359,3 +359,23 @@ invocation rights. It supplies the definition keys needed for later signature an
 attribute descriptors. Guest ModuleInfo.GetFunctions and in-process TestAttribute
 registration are not implemented by this helper. This backend API is documented here
 manually; it is outside RavenDoc's guest class-library assembly.
+
+
+The same unstable backend module also exposes:
+
+- `module_function_snapshot(&Module, identity: &str, name: &str, definition: &MemberId)
+  -> Result<Value, Fault>`: a source-library MethodInfo recipe for an admitted free
+  function, including its signature, parameter descriptors, token and module owner.
+  DeclaringType is absent. A structural signature is used only as a private parameter
+  identity key, matching the existing bound-function descriptor path.
+- `module_function_attributes(&Module, identity: &str, name: &str, definition: &MemberId)
+  -> Result<Value, Fault>`: declared method-level CustomAttributeData recipes,
+  including fixed and supported named arguments. Explicit parameter/return targets
+  are excluded. Constructors and test bodies are never executed.
+
+Both validate the definition against the explicit assembly-local module catalog and
+fault for foreign definitions. Open generic method signature snapshots currently
+fault explicitly; their attribute data can still be inspected. Unsupported attribute
+payloads or provider contracts retain the existing snapshot diagnostics. Recipes
+must pass the existing provider/materialization checks before becoming guest values;
+these helpers alone do not expose guest GetFunctions or change native retention.

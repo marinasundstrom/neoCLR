@@ -14,7 +14,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   instantiations. Reject missing/duplicate identities and ambiguous legacy scopes.
   The unstable native backend helper requires explicit module metadata and grants
   no body execution or retention. Four focused assembly-info checks pass. Guest
-  GetFunctions, attribute snapshots and in-process registration remain follow-ups.
+  GetFunctions and in-process registration remain follow-ups. Add ownerless method/
+  parameter and method-level attribute recipes with absent DeclaringType and explicit
+  module ownership, preserving fixed/named arguments without constructor execution.
+  Reject foreign definition keys and open generic signature snapshots; attribute-only
+  queries still work for generic definitions. Four focused selection/recipe checks
+  pass; guest enumeration/attribute services and native retention are not added.
 
 - Migrate guest module traversal and type/member/parameter ownership to flat logical
   names, preserving explicit empty modules and nested-type ownership. Remove physical

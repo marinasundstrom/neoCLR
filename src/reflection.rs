@@ -1116,6 +1116,45 @@ fn method(
     Ok(result)
 }
 
+/// Source recipes for ownerless function discovery, without creating a live binding.
+#[cfg(feature = "native-metadata")]
+pub(crate) fn module_function_snapshot(
+    module: &Module,
+    target: &Function,
+) -> Result<Value, Fault> {
+    if target.owner.is_some() || target.instance {
+        return Err(Fault::new("module function snapshot requires a static ownerless definition"));
+    }
+    let context = QueryContext { module, source: true };
+    // Reuse the bound-function signature key privately. It is not a declaring type.
+    let shape = Type::Function(Box::new(crate::metadata::FunctionType {
+        parameters: target.argument_types(),
+        returns: target.returns.clone(),
+        no_result: target.no_result,
+        out_parameters: target.out_parameters.clone(),
+        out_when_true: target.out_when_true.clone(),
+    }));
+    let mut result = method(&context, &shape, target, &[], &Limits::default())?;
+    if let Value::Object { fields, .. } = &mut result {
+        fields[1] = Value::NullObjectReference(Type::from_name("System.Introspection.TypeInfo"));
+        fields[3] = option(&context, "System.Introspection.ModuleInfo",
+            Some(crate::assembly_info::function_module_value(module, target)?))?;
+    }
+    Ok(result)
+}
+
+/// Method-level annotations only; parameter/return annotations are separate targets.
+#[cfg(feature = "native-metadata")]
+pub(crate) fn module_function_attributes(module: &Module, target: &Function) -> Result<Value, Fault> {
+    let context = QueryContext { module, source: true };
+    let token = crate::metadata_tokens::method(target)? as u32;
+    array("System.Introspection.CustomAttributeData",
+        target.custom_attributes.iter()
+            .filter(|attribute| attribute.target_token.is_none_or(|target| target == token))
+            .map(|attribute| attribute_data(&context, attribute, &Limits::default())),
+        &Limits::default())
+}
+
 /// The binding's target descriptor, never the signature's synthesized Invoke.
 pub(crate) fn bound_function(
     module: &Module,
