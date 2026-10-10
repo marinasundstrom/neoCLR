@@ -34,6 +34,12 @@ static class AssemblyAttributeChecks
         {
             var retained = AssemblyDefinition.ReadNativeAssembly(bytes);
             Check(retained.CustomAttributes.Select(a => (string)a.GetArguments().Single().Value!).SequenceEqual(new[] { "FirstFriend", "SecondFriend" }), "native assembly grants lost");
+            var metadata = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([retained]);
+            var view = metadata.Resolve(retained.Identity);
+            var annotationsView = view.GetCustomAttributes();
+            Check(ReferenceEquals(annotationsView, view.GetCustomAttributes()), "assembly views must be cached");
+            Check(annotationsView.Count == 2 && annotationsView.All(a => a.GetAttributeType().Name == "InternalsVisibleToAttribute"), "assembly attribute views lost identity");
+            Reject<NotSupportedException>(() => ((IList<NeoCLR.Metadata.Experimental.Introspection.CustomAttributeInfo>)annotationsView).Clear());
             Reject<NotSupportedException>(() => retained.CustomAttributes.Clear());
             Check(retained.Write().SequenceEqual(bytes), "native loaded snapshot changed");
         }
@@ -68,6 +74,10 @@ static class AssemblyAttributeChecks
             graph.AddCustomAttribute(new(reference, [new(PrimitiveType.String, "RepeatedFriend")]));
         Check(AssemblyDefinition.ReadAssembly(graph.Write(), false).CustomAttributes.Count == 256, "assembly attribute limit boundary failed");
         Reject<InvalidDataException>(() => graph.AddCustomAttribute(new(reference, [new(PrimitiveType.String, "Overflow")])));
+        var testAssembly = AssemblyDefinition.ReadAssembly(File.ReadAllBytes(typeof(AssemblyAttributeChecks).Assembly.Location), false);
+        var testContext = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([testAssembly]);
+        var property = testContext.Resolve(testAssembly.Identity).GetTypes().Single(t => t.Name == nameof(EnumPropertyFixture)).GetProperties().Single();
+        Check(property.PropertyType is NeoCLR.Metadata.Experimental.Introspection.NominalTypeInfo { IsEnum: true, Name: nameof(PropertyTargets) }, "CLI enum property identity lost");
         Console.WriteLine("PASS assembly attribute CLI authoring/readback, repeated grants, CLR comparison, read-only snapshots, ownership, bounds and native retention");
     }
 
@@ -82,4 +92,11 @@ static class AssemblyAttributeChecks
         catch (T) { return; }
         throw new Exception("Expected " + typeof(T).Name);
     }
+}
+
+
+enum PropertyTargets { Assembly = 1 }
+sealed class EnumPropertyFixture
+{
+    public PropertyTargets ValidOn => PropertyTargets.Assembly;
 }

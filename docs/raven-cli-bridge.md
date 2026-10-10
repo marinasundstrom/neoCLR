@@ -7983,3 +7983,26 @@ existing CLI assembly-attribute representation remains a temporary compiler-refe
 transport; native manifest data is authoritative. Signed dependency import/full-public-key
 native identity remains a separate gap; strings containing keys do not authorize access.
 This slice adds no guest AssemblyInfo attribute API or AOT reflection roots.
+
+
+### Native compiler assembly annotation adapters (2026-10-10)
+
+Raven's native emitter now forwards source assembly annotations using the same bounded
+attribute encoder as other declarations. Native assembly symbols lazily expose immutable
+attribute data through a cached host AssemblyInfo annotation view, and validation checks
+assembly constructors/named assignments before publishing the metadata contract. Malformed
+assembly annotations produce RAVT003. Runtime Contract configuration and ordinary .NET
+emission are unchanged; module/return-value annotation gaps remain explicit.
+
+Unsigned native friend grants now participate in Raven's existing cached shared binding
+check. The native probe admits Consumer and SecondConsumer to an internal type, rejects
+Unrelated, and round-trips a source assembly grant to FutureConsumer. It also exercises
+malformed assembly constructor rejection. This does not yet admit native imports or
+runtime calls to internal declarations; those checks and full-key native identity remain
+separate work. No bundle pin is advanced in this slice.
+
+The current bootstrap exposed a pre-existing host reader gap: non-indexed nominal CLI
+properties were rejected, including AttributeUsage.ValidOn. Reusing the existing bounded
+signature decoder preserves its enum identity. Host assembly view/read-only/cache tests,
+the native attribute probe against a freshly generated unstripped primitive Core, and
+existing member-attribute checks pass. No constructor executes during this inspection.

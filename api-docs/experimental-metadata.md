@@ -8225,3 +8225,20 @@ target tokens and more than 256 annotations per assembly. Existing native member
 attribute support is unchanged. CLI reference emission uses the same assembly writer.
 Native signed dependency import remains restricted; retaining a friend string containing
 a public key does not implement full-key native assembly identity or grant access.
+
+
+### Host assembly annotation views and CLI property decoding
+
+`NeoCLR.Metadata.Experimental.Introspection.AssemblyInfo.GetCustomAttributes()` returns
+`IReadOnlyList<CustomAttributeInfo>` containing declared assembly annotations, cached per
+assembly view. The list is read-only; metadata inspection never invokes constructors or
+named assignments. `GetAttributeType()` resolves through the context's explicit catalog
+and reports missing/mismatched types with `InvalidDataException`, as other annotation
+views do. This is a host API; no guest AssemblyInfo method is introduced.
+
+`PropertyDefinition.TryGetSignature` now accepts bounded non-indexed CLI nominal results
+through the existing method-signature decoder, preserving enum/type identity without
+loading code. This supports enum-valued `AttributeUsage.ValidOn`. Indexed CLI properties
+remain outside this reader profile; native/authored indexers remain supported. CLI void
+results, unsupported encodings and malformed blobs return false. Primitive-only callers
+can continue using `TryGetPrimitiveSignature`.

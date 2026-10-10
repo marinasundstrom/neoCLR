@@ -41,21 +41,32 @@ public sealed partial class PropertyDefinition
     /// <summary>Reads a supported non-indexed logical property type and staticness without resolving dependencies.</summary>
     /// <param name="type">Authored or snapshot-owned type on success; null otherwise.</param>
     /// <param name="isStatic">True for a static property on success; false otherwise.</param>
-    /// <returns>True for authored non-indexed properties, supported native properties and primitive non-indexed CLI properties.</returns>
+    /// <returns>True for authored non-indexed properties, supported native properties and bounded primitive/nominal non-indexed CLI properties.</returns>
     public bool TryGetSignature(out SignatureType? type, out bool isStatic)
     {
         type = (nativeParameters is { Count: > 0 } ? null : nativeType) ?? (ParameterTypes is { Count: 0 } ? PropertyType : null);
         isStatic = false;
         if (type is not null) { isStatic = (GetMethod ?? SetMethod)!.IsStatic; return true; }
-        if (!TryGetPrimitiveSignature(out var primitive, out isStatic)) return false;
-        type = primitive;
+        if (TryGetPrimitiveSignature(out var primitive, out isStatic))
+        {
+            type = primitive;
+            return true;
+        }
+        if (signature.Length < 3 || signature[0] is not (0x08 or 0x28) || signature[1] != 0) return false;
+        // A non-indexed property uses the method result encoding after its header.
+        var callable = (byte[])signature.Clone();
+        callable[0] = (byte)(signature[0] & 0x20);
+        if (!MethodDefinition.TryDecodeValueSignature(callable, out var decoded, nominalModule: Module,
+            instance: callable[0] != 0) || decoded!.ReturnType.Primitive == PrimitiveType.Void) return false;
+        type = decoded.ReturnType;
+        isStatic = callable[0] == 0;
         return true;
     }
     /// <summary>Reads a supported logical property signature including ordered index parameters.</summary>
     /// <param name="type">Property value type on success; null otherwise.</param>
     /// <param name="parameters">Immutable index types on success; empty otherwise. Excludes the setter value.</param>
     /// <param name="isStatic">True for static accessors on success; false otherwise.</param>
-    /// <returns>True for authored/native properties and the bounded non-indexed primitive CLI profile.</returns>
+    /// <returns>True for authored/native properties and the bounded non-indexed CLI signature profile.</returns>
     public bool TryGetSignature(out SignatureType? type, out IReadOnlyList<SignatureType> parameters, out bool isStatic)
     {
         type = nativeType ?? PropertyType;

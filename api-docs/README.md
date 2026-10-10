@@ -1637,3 +1637,9 @@ no guest API signature or runtime reference snapshot changes. The snapshot check
 Native assembly retention and native-to-CLI reference projection now preserve these
 annotations. Guest assembly attribute introspection and native friend enforcement remain
 pending. No guest reference snapshot changes are required.
+
+
+Host `AssemblyInfo.GetCustomAttributes()` and the expanded bounded CLI property-signature
+reader are documented in the [host manual](experimental-metadata.md#host-assembly-annotation-views-and-cli-property-decoding).
+These C# APIs use the existing host-only exclusion from guest RavenDoc selection. No guest
+reference artifact changes; the existing snapshot check passes.

@@ -7,11 +7,13 @@ public sealed class AssemblyInfo
 {
     private readonly MetadataLoadContext context;
     private readonly Lazy<IReadOnlyList<ModuleInfo>> modules;
+    private readonly Lazy<IReadOnlyList<CustomAttributeInfo>> attributes;
     private readonly Lazy<IReadOnlyList<AssemblyInfo>> references;
     internal AssemblyInfo(MetadataLoadContext context, AssemblyDefinition definition)
     {
         this.context = context;
         Definition = definition;
+        attributes = new(() => Array.AsReadOnly(definition.CustomAttributes.Select(a => new CustomAttributeInfo(context, a)).ToArray()));
         modules = new(() => Array.AsReadOnly(definition.GetModules().Select(context.Resolve).ToArray()));
         references = new(() => Array.AsReadOnly(definition.MainModule.AssemblyReferences.Select(context.Resolve).ToArray()));
     }
@@ -20,6 +22,9 @@ public sealed class AssemblyInfo
     /// the initial reader supports a single manifest module.</remarks>
     public IReadOnlyList<AssemblyMemberInfo> GetMembers() => Array.AsReadOnly(Definition.GetMembers()
         .Select(member => new AssemblyMemberInfo(context, this, member)).ToArray());
+    /// <summary>Gets cached declared assembly annotations without executing constructors or named assignments.</summary>
+    /// <remarks>The returned list is read-only; attribute type resolution uses this context's explicit dependency catalog.</remarks>
+    public IReadOnlyList<CustomAttributeInfo> GetCustomAttributes() => attributes.Value;
     internal AssemblyDefinition Definition { get; }
     /// <summary>Gets the simple metadata name.</summary>
     public string Name => Definition.Name;

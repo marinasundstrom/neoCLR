@@ -292,3 +292,10 @@ does not change Utf8 visibility or native friend access yet.
 The author's resolution-cost requirement is tracked separately: cache granted and
 refused friend access per immutable assembly pair, preserving public/same-assembly
 fast paths and avoiding repeated parsing or allocations during member lookup.
+
+
+Raven's native adapters now forward source assembly annotations and expose retained
+annotations on native assembly symbols. Friend/non-friend semantic binding and source
+grant round trips pass the native attribute probe. Native import admission and runtime
+checks still reject friend-only calls; Utf8 internalization waits for that executable
+path. Host assembly annotation views are cached and preserve metadata-only inspection.

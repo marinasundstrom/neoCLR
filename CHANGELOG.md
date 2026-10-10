@@ -13,7 +13,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   authoring and read-only snapshots. Extend retention to native manifests, PE/#Neo
   and NEOX readback and CLI reference projection. Validate annotation constructor
   scopes/dependencies, count limits and absence of member target tokens without
-  executing constructors. Native friend authorization remains pending. Add CLR-comparison and
+  executing constructors. Add cached host AssemblyInfo annotation views for Raven
+  native symbol import. Decode bounded non-indexed nominal CLI properties, preserving
+  AttributeUsage.ValidOn enum identity. Raven native annotation forwarding and
+  friend/non-friend binding are qualified; import/runtime friend authorization remains pending. Add CLR-comparison and
   metadata-only regression checks. Guard imported base-constructor dispatch when
   its nominal declaring reference is absent, fixing a nullable build error.
 
