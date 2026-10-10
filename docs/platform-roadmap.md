@@ -398,6 +398,10 @@ The source-runtime attribute now has its constructor, AssemblyName and repeatabl
 assembly usage policy; [real source-grant consumers](experiments/friend-runtime/README.md)
 pass interpreted and native macOS ARM64 execution after all four libraries rebuild.
 Full identity semantics, Windows qualification and Utf8 internalization remain open.
+The author subsequently clarified that grants should be sparse and mainly serve
+internal tooling and testing assemblies. Runtime libraries should consume supported
+public APIs; do not grant System.Data/System.Web internal access to complete the Utf8
+migration. Preserve existing conversion contracts while migrating those consumers.
 Public conversion migration also requires paired one-shot decoding; Encoding currently
 exposes only incremental decoding.
 The host metadata model and native manifests now preserve assembly annotations through

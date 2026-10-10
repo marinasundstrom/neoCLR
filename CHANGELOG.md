@@ -22,7 +22,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   non-inherited usage, a string constructor and read-only AssemblyName. Rebuild all
   four libraries and qualify real source grants, property behavior and access/usage
   rejection in interpreted and native macOS ARM64 consumers. Refresh both API
-  references. Windows qualification and making Utf8 internal remain pending.
+  references. Record the author convention to use friend grants sparingly, mainly
+  for internal tooling and tests; migrate production library consumers through public
+  encoding APIs before internalizing Utf8. No Runtime grants for System.Data/System.Web
+  are introduced. Windows qualification and making Utf8 internal remain pending.
 
 - Retain assembly custom attributes in the host metadata model and CLI writer/reader,
   including ordered repeated InternalsVisibleTo grants, bounded ownership-checked

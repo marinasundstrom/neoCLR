@@ -57,6 +57,15 @@
 - Prefer expression-bodied properties (`val Name: string => expression`) when
   a property has only a getter expression.
 
+## Friend-assembly conventions
+
+- Use `InternalsVisibleTo` sparingly and avoid a grant when a supported public
+  contract meets the need. Grants are mainly for internal tooling and testing
+  assemblies; they are not the default dependency mechanism for runtime libraries.
+- For a necessary exception, document the concrete need and coupling. Do not make
+  implementation helpers public merely to avoid a grant; migrate production
+  consumers to suitable public APIs before internalizing those helpers.
+
 ## Changelog required for every commit
 
 - Include a staged `CHANGELOG.md` update in every commit, including code, tests,

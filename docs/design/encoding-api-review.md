@@ -215,6 +215,15 @@ cross-assembly accessibility capability, not an excuse to publish runtime helper
 Replacing those calls blindly with the bounded Encoding provider can change limits
 and error contracts; preserve those contracts when internalizing the helper.
 
+**Subsequent author clarification (2026-10-10):** use friend grants sparingly, mainly
+for internal tooling and test assemblies. Prefer supported public contracts between
+runtime libraries. The assistant's uncommitted proposal to grant `System.Data` and
+`System.Web` access to Runtime internals was removed. Migrate their Utf8 calls to
+public encoding APIs, preserving supported limits and error behavior, before making
+Utf8 internal. Keep its existing visibility during that migration. This is a usage
+convention; it does not restrict the .NET-shaped attribute's target semantics or
+remove the existing friend-access conformance fixtures.
+
 Follow [the .NET attribute contract](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.internalsvisibletoattribute?view=net-10.0)
 (primary source, reviewed 2026-10-10): an assembly-level, repeatable attribute grants
 a named assembly access to internals. Keep the type in

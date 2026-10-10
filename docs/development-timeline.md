@@ -14059,3 +14059,20 @@ claim completion of in-process test discovery.
   returns 42 without invoking its deliberately faulting attribute constructor. The
   remaining friend-access work is native compiler forwarding/exposure, import/runtime
   enforcement and full-public-key identity; AOT friend access is not yet qualified.
+
+
+## 2026-10-10 — Friend grants are mainly for tooling and tests
+
+- **Author direction:** “Friend grants should be used sparingly. We want to avoid
+  them if we can”, followed by “Friend grants should mainly be for internal
+  libraries, like tooling and testing projects”.
+- **Assistant proposal and correction:** an uncommitted Utf8 internalization draft
+  used Runtime grants for System.Data and System.Web. Remove those grants and
+  migrate the libraries to supported public encoding APIs instead. Keep Utf8's
+  current public visibility until that migration preserves their conversion limits
+  and error behavior; the author's internalization goal remains unchanged.
+- **Action/outcome:** remove the draft grant source and defer the visibility change.
+  Record the usage convention in AGENTS.md and the encoding review/roadmap. Existing
+  compiler/runtime friend-access semantics and conformance fixtures remain intact.
+- **Open work:** the one-shot decoding and consumer migration draft still requires
+  completion, focused execution tests and matching API documentation before commit.
