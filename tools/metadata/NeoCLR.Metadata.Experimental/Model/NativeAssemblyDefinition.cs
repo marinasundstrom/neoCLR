@@ -27,7 +27,7 @@ public sealed partial class NativeAssemblyDefinition
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
-    private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
+    private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters, bool IsInitOnly);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
     private readonly HashSet<string> valueTypeReferences;
@@ -784,7 +784,10 @@ public sealed partial class NativeAssemblyDefinition
                 var names = new HashSet<string>();
                 foreach (var property in typeElements[owner].TryGetProperty("properties", out _) ? Array(typeElements[owner], "properties", 256) : [])
                 {
-                    Shape(property, "name", "instance", "parameters", "ty", "getter", "setter");
+                    Shape(property, property.TryGetProperty("init_only", out var initOnlyValue)
+                        ? ["name", "instance", "parameters", "ty", "getter", "setter", "init_only"]
+                        : ["name", "instance", "parameters", "ty", "getter", "setter"]);
+                    var initOnly = initOnlyValue.ValueKind != JsonValueKind.Undefined && initOnlyValue.GetBoolean();
                     var name = Text(property, "name"); CheckName(name);
                     var indices = Array(property, "parameters", 256).Select(p => ReadType(p, false, allowSelf: types[owner].IsInterface)).ToArray();
                     Require(name.Length <= 1024 && names.Add(name + "(" + string.Join(",", indices.Select(TypeKey)) + ")"), "invalid or duplicate property");
@@ -825,7 +828,8 @@ public sealed partial class NativeAssemblyDefinition
                     }
                     var getter = Accessor("getter", false); var setter = Accessor("setter", true);
                     Require(getter >= 0 || setter >= 0, "property needs an accessor");
-                    properties.Add(new(owner, name, valueType, getter, setter, indices));
+                    Require(!initOnly || instance && setter >= 0, "init requires an instance setter");
+                    properties.Add(new(owner, name, valueType, getter, setter, indices, initOnly));
                 }
             }
             var entry = Text(root, "entry");
@@ -948,7 +952,7 @@ public sealed partial class NativeAssemblyDefinition
             projectedMethods.Add(output);
         }
         foreach (var property in properties)
-            owners[property.Owner].AddProperty(property.Name, Remap(property.Type), property.Getter < 0 ? null : projectedMethods[property.Getter], property.Setter < 0 ? null : projectedMethods[property.Setter]);
+            owners[property.Owner].AddProperty(property.Name, Remap(property.Type), property.Getter < 0 ? null : projectedMethods[property.Getter], property.Setter < 0 ? null : projectedMethods[property.Setter], property.IsInitOnly);
         for (int i = 0; i < types.Length; i++)
             foreach (var attribute in types[i].Attributes)
             {

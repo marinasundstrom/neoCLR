@@ -269,3 +269,14 @@ and `Emit(OpCode.ValueUnpack, type)`. Both require an erased Value input; only t
 first returns Boolean. Extraction faults on a mismatched tag. Executable CLI
 emission rejects these native storage operations. Run the focused metadata test
 mode `--erased-values <fresh-directory>` for admission and round-trip checks.
+
+### Initialization-only property accessors (development)
+
+`PropertyDefinition` and `TypeBuilder.AddProperty` accept the optional trailing
+`isInitOnly` Boolean (default false). True requires an instance setter and preserves
+all normal ownership/signature checks. Immutable `PropertyDefinition.IsInitOnly`
+and introspection `PropertyInfo.IsInitOnly` expose the native fact. Both containers
+retain it; CLI projection writes the setter-return `IsExternalInit` modreq, which
+the CLI property reader recognizes. Native imports retain it in CLI member references.
+The ordinary-call API remains usable: this is a source restriction, not a runtime
+freeze. See [the contract and validation](../../docs/init-accessors.md).

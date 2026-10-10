@@ -13183,3 +13183,15 @@ claim follows from these focused checks.
 - Evidence: [collection contracts](collection-contracts.md),
   [executable consumer](experiments/native-collections/),
   [Windows Queue/Stack/Set report](experiments/native-collections/windows-validation.json).
+
+### 2026-10-10 — Init accessor follow-up
+
+- Author: “We should add init accessor support.” This explicitly selects the next
+  slice after native positional record storage excluded its generated init setters.
+- Assistant proposal and action: preserve a native initialization-only property fact,
+  import it into Raven's existing assignment rules, and retain normal method calls
+  for runtime/reflection use. Implement metadata and readonly-field validation first,
+  then qualify source emission and separate-library consumers. This is not an author
+  decision to add runtime freezing or full native record semantics.
+- Evidence and remaining limits: [init contract](init-accessors.md); native execution
+  and compiler qualification are recorded as they complete in the linked experiment.

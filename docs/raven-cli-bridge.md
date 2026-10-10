@@ -7296,3 +7296,18 @@ Tested compiler: `d5fadf968feaea2c1073255ef5cb04f997fc5604` on Raven
 `codex/source-object-metadata-resolution` (not Raven main). The standalone
 instance-deconstruction lowering is a general integration candidate; native record
 admission depends on that line’s existing portable/native adapter.
+
+## Init accessor metadata — 2026-10-10
+
+The [native init contract](init-accessors.md) adds an explicit property `init_only`
+fact, immutable metadata/introspection queries and authoring arguments. Native
+readers retain it; the CLI reference/transport setter return uses the standard
+required `System.Runtime.CompilerServices.IsExternalInit` modifier. Native semantics
+do not depend on resolving that CLI marker. Imported CLI call signatures retain it.
+The runtime validates instance setter associations and grants only the declaring
+init accessor/constructor readonly-field-write privilege. Raw/reflection calls remain
+ordinary calls, matching the documented compiler-enforced boundary. Metadata tests
+cover both native containers, CLI projection/import execution and malformed shapes;
+Rust tests cover property preservation and readonly-write permissions. Raven source
+emission/import qualification follows in the next slice; no runtime-freeze or full
+record-semantics claim is made.

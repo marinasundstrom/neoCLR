@@ -71,3 +71,63 @@ fn declaring_constructor_can_initialize_through_managed_address() {
         Value::Int32(42)
     );
 }
+
+#[test]
+fn associated_init_accessor_can_write_its_declaring_readonly_storage() {
+    let text = ".module ReadOnly
+.entry Main
+.type class Counter
+.field Number Int32
+.property instance Value() -> Int32
+.get instance Counter::Read()
+.set instance Counter::Write(Int32)
+.end
+.method instance .ctor() -> noresult
+ldarg 0
+ldc.i4 42
+stfld Counter::Number
+ret
+.end
+.method instance Read() -> Int32
+ldarg 0
+ldfld Counter::Number
+ret
+.end
+.method instance Write(Int32 value) -> Void
+ldarg 0
+ldarg value
+stfld Counter::Number
+ldvoid
+ret
+.end
+.end
+.function Main() -> Int32
+newobj instance Counter::.ctor()
+dup
+ldc.i4 7
+call instance Counter::Write(Int32)
+pop
+call instance Counter::Read()
+ret
+.end";
+    let mut value = serde_json::to_value(assemble(text).unwrap()).unwrap();
+    value["assemblies"] = json!([{"name":"ReadOnly", "full_name":"ReadOnly", "modules":["ReadOnly.dll"], "references":[]}]);
+    value["types"][0]["origin"] = json!({"assembly":"ReadOnly", "module":"ReadOnly.dll", "name":"Counter", "token":0x02000001,
+        "field_tokens":[0x04000001], "field_readonly":[true], "property_tokens":[0x17000001]});
+    value["types"][0]["properties"][0]["init_only"] = json!(true);
+    let module = serde_json::from_value(value.clone()).unwrap();
+    verify(&module).unwrap();
+    assert_eq!(
+        run(&module, Limits::default()).unwrap().value,
+        Value::Int32(7)
+    );
+    value["types"][0]["properties"][0]["init_only"] = json!(false);
+    let ordinary = serde_json::from_value(value).unwrap();
+    assert!(verify(&ordinary).unwrap_err().message.contains("readonly"));
+    assert!(
+        run(&ordinary, Limits::default())
+            .unwrap_err()
+            .message
+            .contains("readonly")
+    );
+}

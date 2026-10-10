@@ -13,6 +13,7 @@ public sealed class PropertyInfo
         MetadataToken = definition.MetadataToken;
         DeclaringType = owner;
         IsStatic = isStatic;
+        IsInitOnly = definition.IsInitOnly;
         PropertyType = context.ResolveMemberSignature(type!, arguments, [], owner);
         IndexParameterTypes = Array.AsReadOnly(indices.Select(t => context.ResolveMemberSignature(t, arguments, [], owner)).ToArray());
         GetMethod = definition.GetMethod is { } getter ? context.GetMethod(getter, owner) : null;
@@ -32,6 +33,8 @@ public sealed class PropertyInfo
     public MethodInfo? GetMethod { get; }
     /// <summary>Gets the canonical setter, including non-public accessors; null when absent.</summary>
     public MethodInfo? SetMethod { get; }
+    /// <summary>Gets whether the native setter is initialization-only for source consumers.</summary>
+    public bool IsInitOnly { get; }
     /// <summary>Gets whether the metadata accessors are static.</summary>
     public bool IsStatic { get; }
 }

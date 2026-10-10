@@ -293,6 +293,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         ty: parse_type(ty)?,
                         getter: None,
                         setter: None,
+                        init_only: false,
                     };
                     pending.map_types(|ty| {
                         Ok(bind_type_parameters(ty.clone(), &def.generic_parameters))

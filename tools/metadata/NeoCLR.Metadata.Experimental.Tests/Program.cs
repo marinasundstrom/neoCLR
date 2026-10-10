@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--init-accessors"]) { NativeInitAccessorChecks.Run(); return 0; }
+
 if (args is ["--check-module-consumer", var moduleConsumer])
 {
     var assembly = AssemblyDefinition.ReadNativeAssembly(File.ReadAllBytes(moduleConsumer));
@@ -516,6 +518,7 @@ var tests = new (string Name, Action Body)[]
     ("External native signature resolution", ExternalNativeSignatureChecks.Run),
     ("Native array signature materialization and import", NativeArraySignatureChecks.Run),
     ("Native property definitions and accessor imports", NativePropertyChecks.Run),
+    ("Native init accessors", NativeInitAccessorChecks.Run),
     ("Native interface definitions and dispatch imports", NativeInterfaceDefinitionChecks.Run),
     ("Imported primitive field operands", ImportedFieldChecks.Run),
     ("Local core nominal and Function signatures", LocalCoreSignatureChecks.Run),

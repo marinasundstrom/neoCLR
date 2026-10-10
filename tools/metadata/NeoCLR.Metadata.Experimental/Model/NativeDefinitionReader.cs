@@ -100,7 +100,7 @@ public sealed partial class NativeAssemblyDefinition
         var propertyRows = properties.Select((property, index) => new AssemblyDefinition.PropertyRow(
             0x17000001u + (uint)index, 0x02000002u + (uint)property.Owner, property.Name, 0, [],
             property.Getter < 0 ? 0 : 0x06000001u + (uint)property.Getter,
-            property.Setter < 0 ? 0 : 0x06000001u + (uint)property.Setter, [], Copy(property.Type), property.Parameters.Select(Copy).ToArray())).ToArray();
+            property.Setter < 0 ? 0 : 0x06000001u + (uint)property.Setter, [], Copy(property.Type), property.Parameters.Select(Copy).ToArray(), property.IsInitOnly)).ToArray();
         var references = References.Select((identity, index) => new AssemblyDefinition.ReferenceRow(0x23000001u + (uint)index, identity)).ToArray();
         var attributes = types.Select(type => type.Attributes.Select(a => (Owner: Copy(a.Owner), a.Arguments)).ToArray()).ToArray();
         var explicitRows = methods.Select(m => m.ExplicitInterfaces.Select(e => (Owner: Copy(e.Owner), e.Name)).ToArray()).ToArray();

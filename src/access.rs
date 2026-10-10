@@ -160,7 +160,26 @@ pub(crate) fn field_is_readonly(
         && declaring_type(module, caller)
             .zip(definition.definition.as_ref())
             .is_some_and(|(a, b)| a == b);
-    Ok(readonly && !constructor)
+    if !readonly || constructor {
+        return Ok(false);
+    }
+    let init_accessor = caller.instance
+        && declaring_type(module, caller)
+            .zip(definition.definition.as_ref())
+            .is_some_and(|(a, b)| a == b)
+        && definition.properties.iter().any(|p| {
+            p.init_only
+                && p.setter.as_ref().is_some_and(|setter| {
+                    crate::vm::resolve(module, setter).is_ok_and(|method| {
+                        method
+                            .definition
+                            .as_ref()
+                            .zip(caller.definition.as_ref())
+                            .is_some_and(|(a, b)| a == b)
+                    })
+                })
+        });
+    Ok(readonly && !constructor && !init_accessor)
 }
 
 pub(crate) fn check_field_store(
@@ -173,7 +192,7 @@ pub(crate) fn check_field_store(
     if field_is_readonly(module, caller, owner, index)? {
         return Err(Fault::coded(
             crate::FaultCode::InvalidProgram,
-            "readonly field can be assigned only by its declaring constructor",
+            "readonly field can be assigned only by its declaring constructor or init accessor",
         ));
     }
     Ok(())

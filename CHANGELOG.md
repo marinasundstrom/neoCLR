@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add development native init-accessor metadata, authoring/introspection flags,
+  CLI IsExternalInit projection and declaring-type readonly-write privileges.
+  Keep raw/reflection calls executable and reject malformed static/missing-setter
+  contracts. Matching metadata readers/runtime are required; no runtime freezing
+  or published-release support is claimed. Focused metadata and runtime tests cover
+  preservation, ordinary-call bypass and readonly-write rejection.
+
 - Build and hash-check the current release interpreter for native HTTP server,
   client and retained-session comparisons. Development libraries require services
   absent from the published bootstrap VM, including StringHashOrdinal. The macOS

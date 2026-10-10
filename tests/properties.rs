@@ -218,3 +218,40 @@ Value",
         assert!(LoadedProgram::new(&module).is_err());
     }
 }
+
+#[test]
+fn init_metadata_survives_loading_without_claiming_runtime_freezing() {
+    let source = SAMPLE.replace(".get instance Box<T>::Read()", ".get instance Box<T>::Read()\n.set instance Box<T>::Write(T)")
+        .replace("    .method instance Read()", "    .method instance Write(T value) -> Void\nldvoid\nret\n.end\n    .method instance Read()");
+    let source = source.replace("    call instance Box<Int32>::Read()", "    dup\n    ldc.i4 7\n    call instance Box<Int32>::Write(Int32)\n    pop\n    call instance Box<Int32>::Read()");
+    let mut module = assemble(&source).unwrap();
+    module.types[0].properties[0].init_only = true;
+    let encoded = serde_json::to_string(&module).unwrap();
+    let loaded = neoclr::load(&encoded).unwrap();
+    assert!(loaded.types[0].properties[0].init_only);
+    let program = LoadedProgram::new(&loaded).unwrap();
+    program.verify().unwrap();
+    assert_eq!(program.run(Limits::default()).unwrap().output[0], "42");
+}
+
+#[test]
+fn init_metadata_requires_instance_setter() {
+    for missing_setter in [false, true] {
+        let mut module = assemble(SAMPLE).unwrap();
+        let property = &mut module.types[0].properties[0];
+        property.init_only = true;
+        if missing_setter {
+            property.setter = None;
+        } else {
+            property.instance = false;
+        }
+        let error = LoadedProgram::new(&module)
+            .and_then(|p| p.verify())
+            .unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains("init requires an instance setter")
+        );
+    }
+}

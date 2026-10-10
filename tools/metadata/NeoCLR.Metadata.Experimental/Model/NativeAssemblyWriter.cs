@@ -14,6 +14,9 @@ public sealed partial class AssemblyBuilder
     /// This is the current native JSON format, not the experimental NEOX PE transport.</remarks>
     public byte[] WriteNativeAssembly() => WriteNativeCore(MetadataArtifactReader.MaxImageSize);
 
+    private sealed record NativeProperty(string name, bool instance, object[] parameters, object ty, object? getter, object? setter,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)] bool init_only);
+
     // Schema 2 is signed-integer-only; high binary64 bits require the existing schema 3 profile.
     internal bool RequiresWideNumericPayload => functions.Concat(types.SelectMany(t => t.Methods))
         .Any(m => m.Instructions.Any(i => i.Op == "constantDouble" && i.LongValue < 0));
@@ -378,7 +381,7 @@ public sealed partial class AssemblyBuilder
                 TypeOrigin(type, index), type.Definition.IsNativePrimitiveReference, type.LocalBase is { } baseType ? SignatureValue(baseType.OpenSignature) : null, type.IsInterface ? "Interface" : (type.NativePrimitive is not null || type.NativeGrapheme) ? "Runtime" : null,
                 !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
-                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, !type.Definition.CustomAttributes.Any(a => !type.Definition.IsFlagsAttribute(a)) ? null : type.Definition.CustomAttributes.Where(a => !type.Definition.IsFlagsAttribute(a)).Select(a => Attribute(a)).ToArray(), type.IsEnum ? new { underlying = "Int32", flags = type.IsFlagsEnum, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null)).ToArray(),
+                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new NativeProperty(p.Name, !p.IsStatic, p.ParameterTypes.Select(SignatureValue).ToArray(), SignatureValue(p.PropertyType), Accessor(p.GetMethod), Accessor(p.SetMethod), p.Definition.IsInitOnly)).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, !type.Definition.CustomAttributes.Any(a => !type.Definition.IsFlagsAttribute(a)) ? null : type.Definition.CustomAttributes.Where(a => !type.Definition.IsFlagsAttribute(a)).Select(a => Attribute(a)).ToArray(), type.IsEnum ? new { underlying = "Int32", flags = type.IsFlagsEnum, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null)).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),

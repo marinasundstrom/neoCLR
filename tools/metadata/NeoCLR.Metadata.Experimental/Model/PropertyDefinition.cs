@@ -9,6 +9,7 @@ public sealed partial class PropertyDefinition
     private readonly uint owner, getter, setter;
     internal PropertyDefinition(ModuleDefinition module, AssemblyDefinition.PropertyRow row)
     {
+        IsInitOnly = row.IsInitOnly;
         Module = module; MetadataToken = row.Token; Name = row.Name; Attributes = row.Attributes;
         nativeType = row.NativeType?.Materialize(module);
         nativeParameters = row.NativeParameters is null ? null : Array.AsReadOnly(row.NativeParameters.Select(p => p.Materialize(module)).ToArray());
@@ -23,6 +24,8 @@ public sealed partial class PropertyDefinition
     public TypeDefinition DeclaringType => PropertyType is null ? Module.GetTypeDefinition(owner)! : AuthoredOwner ?? throw new InvalidOperationException("property is detached");
     /// <summary>Gets the stored metadata name.</summary>
     public string Name { get; }
+    /// <summary>Gets whether the native setter is initialization-only. This is a compiler contract, not a runtime write barrier.</summary>
+    public bool IsInitOnly { get; }
     /// <summary>Gets physical PropertyAttributes flags.</summary>
     public ushort Attributes { get; }
     /// <summary>Gets the getter from this snapshot, or null when absent.</summary>
@@ -73,9 +76,24 @@ public sealed partial class PropertyDefinition
             isStatic = type != PrimitiveType.Void && (GetMethod ?? SetMethod)!.IsStatic;
             return type != PrimitiveType.Void;
         }
-        type = signature.Length == 3 && signature[0] is 0x08 or 0x28 && signature[1] == 0 ? signature[2] switch {
-            0x08 => PrimitiveType.Int32, 0x0c => PrimitiveType.Single, 0x0d => PrimitiveType.Double, 0x05 => PrimitiveType.Byte, 0x04 => PrimitiveType.SByte, 0x06 => PrimitiveType.Int16, 0x07 => PrimitiveType.UInt16, 0x09 => PrimitiveType.UInt32, 0x0b => PrimitiveType.UInt64, 0x18 => PrimitiveType.IntPtr, 0x19 => PrimitiveType.UIntPtr,  0x0a => PrimitiveType.Int64, 0x02 => PrimitiveType.Boolean, 0x0e => PrimitiveType.String,
-            _ => PrimitiveType.Void } : PrimitiveType.Void;
+        type = signature.Length == 3 && signature[0] is 0x08 or 0x28 && signature[1] == 0 ? signature[2] switch
+        {
+            0x08 => PrimitiveType.Int32,
+            0x0c => PrimitiveType.Single,
+            0x0d => PrimitiveType.Double,
+            0x05 => PrimitiveType.Byte,
+            0x04 => PrimitiveType.SByte,
+            0x06 => PrimitiveType.Int16,
+            0x07 => PrimitiveType.UInt16,
+            0x09 => PrimitiveType.UInt32,
+            0x0b => PrimitiveType.UInt64,
+            0x18 => PrimitiveType.IntPtr,
+            0x19 => PrimitiveType.UIntPtr,
+            0x0a => PrimitiveType.Int64,
+            0x02 => PrimitiveType.Boolean,
+            0x0e => PrimitiveType.String,
+            _ => PrimitiveType.Void
+        } : PrimitiveType.Void;
         isStatic = type != PrimitiveType.Void && signature[0] == 0x08;
         return type != PrimitiveType.Void;
     }

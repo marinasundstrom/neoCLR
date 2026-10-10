@@ -1288,6 +1288,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             if property.getter.is_none() && property.setter.is_none() {
                 return Err(Fault::new("property requires an accessor"));
             }
+            if property.init_only && (!property.instance || property.setter.is_none()) {
+                return Err(Fault::new("init requires an instance setter"));
+            }
             for (target, setter) in property
                 .getter
                 .iter()

@@ -204,62 +204,62 @@ public sealed partial class AssemblyDefinition
                 int? parameterArray = null;
                 var nullableAnnotations = new Dictionary<int, NullableAnnotation>();
                 foreach (var parameter in method.GetParameters().Select(reader.GetParameter))
-                foreach (var attributeHandle in parameter.GetCustomAttributes())
-                {
-                    var attribute = reader.GetCustomAttribute(attributeHandle);
-                    EntityHandle markerOwner;
-                    BlobHandle markerSignature;
-                    StringHandle markerConstructorName;
-                    if (attribute.Constructor.Kind == HandleKind.MemberReference)
+                    foreach (var attributeHandle in parameter.GetCustomAttributes())
                     {
-                        var constructor = reader.GetMemberReference((MemberReferenceHandle)attribute.Constructor);
-                        markerOwner = constructor.Parent; markerSignature = constructor.Signature; markerConstructorName = constructor.Name;
-                    }
-                    else if (attribute.Constructor.Kind == HandleKind.MethodDefinition)
-                    {
-                        var constructor = reader.GetMethodDefinition((MethodDefinitionHandle)attribute.Constructor);
-                        markerOwner = constructor.GetDeclaringType(); markerSignature = constructor.Signature; markerConstructorName = constructor.Name;
-                    }
-                    else continue;
-                    var markerName = markerOwner.Kind switch
-                    {
-                        HandleKind.TypeReference => reader.GetString(reader.GetTypeReference((TypeReferenceHandle)markerOwner).Namespace) + "." + reader.GetString(reader.GetTypeReference((TypeReferenceHandle)markerOwner).Name),
-                        HandleKind.TypeDefinition => reader.GetString(reader.GetTypeDefinition((TypeDefinitionHandle)markerOwner).Namespace) + "." + reader.GetString(reader.GetTypeDefinition((TypeDefinitionHandle)markerOwner).Name),
-                        _ => ""
-                    };
-                    if (markerName == "System.Runtime.CompilerServices.NullableAttribute")
-                    {
-                        var constructorSignature = reader.GetBlobBytes(markerSignature);
-                        var blob = reader.GetBlobReader(attribute.Value);
-                        if (reader.GetString(markerConstructorName) != ".ctor" || blob.RemainingBytes < 5 || blob.ReadUInt16() != 1)
-                            throw new InvalidDataException("invalid nullable annotation attribute");
-                        byte[] flags;
-                        bool uniform = constructorSignature.AsSpan().SequenceEqual(new byte[] { 0x20, 1, 1, 5 });
-                        if (uniform)
-                            flags = [blob.ReadByte()];
-                        else if (constructorSignature.AsSpan().SequenceEqual(new byte[] { 0x20, 1, 1, 0x1d, 5 }))
+                        var attribute = reader.GetCustomAttribute(attributeHandle);
+                        EntityHandle markerOwner;
+                        BlobHandle markerSignature;
+                        StringHandle markerConstructorName;
+                        if (attribute.Constructor.Kind == HandleKind.MemberReference)
                         {
-                            if (blob.RemainingBytes < 6) throw new InvalidDataException("truncated nullable annotation");
-                            int count = blob.ReadInt32();
-                            if (count is < 1 or > 4096 || count > blob.RemainingBytes - 2) throw new InvalidDataException("invalid nullable annotation length");
-                            flags = blob.ReadBytes(count);
+                            var constructor = reader.GetMemberReference((MemberReferenceHandle)attribute.Constructor);
+                            markerOwner = constructor.Parent; markerSignature = constructor.Signature; markerConstructorName = constructor.Name;
                         }
-                        else throw new InvalidDataException("unsupported nullable annotation constructor");
-                        if (flags.Any(f => f > 2) || blob.ReadUInt16() != 0 || blob.RemainingBytes != 0 ||
-                            !nullableAnnotations.TryAdd(parameter.SequenceNumber - 1, new NullableAnnotation(flags, uniform)))
-                            throw new InvalidDataException("invalid or duplicate nullable annotation");
-                        continue;
+                        else if (attribute.Constructor.Kind == HandleKind.MethodDefinition)
+                        {
+                            var constructor = reader.GetMethodDefinition((MethodDefinitionHandle)attribute.Constructor);
+                            markerOwner = constructor.GetDeclaringType(); markerSignature = constructor.Signature; markerConstructorName = constructor.Name;
+                        }
+                        else continue;
+                        var markerName = markerOwner.Kind switch
+                        {
+                            HandleKind.TypeReference => reader.GetString(reader.GetTypeReference((TypeReferenceHandle)markerOwner).Namespace) + "." + reader.GetString(reader.GetTypeReference((TypeReferenceHandle)markerOwner).Name),
+                            HandleKind.TypeDefinition => reader.GetString(reader.GetTypeDefinition((TypeDefinitionHandle)markerOwner).Namespace) + "." + reader.GetString(reader.GetTypeDefinition((TypeDefinitionHandle)markerOwner).Name),
+                            _ => ""
+                        };
+                        if (markerName == "System.Runtime.CompilerServices.NullableAttribute")
+                        {
+                            var constructorSignature = reader.GetBlobBytes(markerSignature);
+                            var blob = reader.GetBlobReader(attribute.Value);
+                            if (reader.GetString(markerConstructorName) != ".ctor" || blob.RemainingBytes < 5 || blob.ReadUInt16() != 1)
+                                throw new InvalidDataException("invalid nullable annotation attribute");
+                            byte[] flags;
+                            bool uniform = constructorSignature.AsSpan().SequenceEqual(new byte[] { 0x20, 1, 1, 5 });
+                            if (uniform)
+                                flags = [blob.ReadByte()];
+                            else if (constructorSignature.AsSpan().SequenceEqual(new byte[] { 0x20, 1, 1, 0x1d, 5 }))
+                            {
+                                if (blob.RemainingBytes < 6) throw new InvalidDataException("truncated nullable annotation");
+                                int count = blob.ReadInt32();
+                                if (count is < 1 or > 4096 || count > blob.RemainingBytes - 2) throw new InvalidDataException("invalid nullable annotation length");
+                                flags = blob.ReadBytes(count);
+                            }
+                            else throw new InvalidDataException("unsupported nullable annotation constructor");
+                            if (flags.Any(f => f > 2) || blob.ReadUInt16() != 0 || blob.RemainingBytes != 0 ||
+                                !nullableAnnotations.TryAdd(parameter.SequenceNumber - 1, new NullableAnnotation(flags, uniform)))
+                                throw new InvalidDataException("invalid or duplicate nullable annotation");
+                            continue;
+                        }
+                        if (markerName != "System.ParamArrayAttribute") continue;
+                        var signatureReader = reader.GetBlobReader(method.Signature);
+                        if (signatureReader.ReadSignatureHeader().IsGeneric) _ = signatureReader.ReadCompressedInteger();
+                        int parameterCount = signatureReader.ReadCompressedInteger();
+                        if (reader.GetString(markerConstructorName) != ".ctor" || parameterArray is not null || parameter.SequenceNumber == 0 || parameter.SequenceNumber != parameterCount ||
+                            !reader.GetBlobBytes(markerSignature).AsSpan().SequenceEqual(new byte[] { 0x20, 0, 1 }) ||
+                            !reader.GetBlobBytes(attribute.Value).AsSpan().SequenceEqual(new byte[] { 1, 0, 0, 0 }))
+                            throw new InvalidDataException("invalid parameter-array attribute");
+                        parameterArray = parameter.SequenceNumber - 1;
                     }
-                    if (markerName != "System.ParamArrayAttribute") continue;
-                    var signatureReader = reader.GetBlobReader(method.Signature);
-                    if (signatureReader.ReadSignatureHeader().IsGeneric) _ = signatureReader.ReadCompressedInteger();
-                    int parameterCount = signatureReader.ReadCompressedInteger();
-                    if (reader.GetString(markerConstructorName) != ".ctor" || parameterArray is not null || parameter.SequenceNumber == 0 || parameter.SequenceNumber != parameterCount ||
-                        !reader.GetBlobBytes(markerSignature).AsSpan().SequenceEqual(new byte[] { 0x20, 0, 1 }) ||
-                        !reader.GetBlobBytes(attribute.Value).AsSpan().SequenceEqual(new byte[] { 1, 0, 0, 0 }))
-                        throw new InvalidDataException("invalid parameter-array attribute");
-                    parameterArray = parameter.SequenceNumber - 1;
-                }
                 var names = new Dictionary<int, string>();
                 foreach (var parameter in method.GetParameters().Select(reader.GetParameter))
                 {
@@ -328,8 +328,34 @@ public sealed partial class AssemblyDefinition
                     return token;
                 }
                 var accessors = property.GetAccessors();
+                bool InitOnlySetter()
+                {
+                    if (accessors.Setter.IsNil) return false;
+                    var signature = reader.GetBlobReader(reader.GetMethodDefinition(accessors.Setter).Signature);
+                    var header = signature.ReadSignatureHeader();
+                    if (header.IsGeneric) signature.ReadCompressedInteger();
+                    signature.ReadCompressedInteger(); // parameter count
+                    while (signature.RemainingBytes > 0)
+                    {
+                        var code = signature.ReadByte();
+                        if (code is not (0x1f or 0x20)) break; // required/optional custom modifier
+                        var modifier = signature.ReadTypeHandle();
+                        if (code != 0x1f) continue;
+                        if (modifier.Kind == HandleKind.TypeReference)
+                        {
+                            var marker = reader.GetTypeReference((TypeReferenceHandle)modifier);
+                            if (ReadName(marker.Namespace) == "System.Runtime.CompilerServices" && ReadName(marker.Name) == "IsExternalInit") return true;
+                        }
+                        else if (modifier.Kind == HandleKind.TypeDefinition)
+                        {
+                            var marker = reader.GetTypeDefinition((TypeDefinitionHandle)modifier);
+                            if (ReadName(marker.Namespace) == "System.Runtime.CompilerServices" && ReadName(marker.Name) == "IsExternalInit") return true;
+                        }
+                    }
+                    return false;
+                }
                 properties.Add(new((uint)MetadataTokens.GetToken(handle), owner, ReadName(property.Name), (ushort)property.Attributes,
-                    reader.GetBlobBytes(property.Signature), Accessor(accessors.Getter), Accessor(accessors.Setter), accessors.Others.Select(Accessor).ToArray()));
+                    reader.GetBlobBytes(property.Signature), Accessor(accessors.Getter), Accessor(accessors.Setter), accessors.Others.Select(Accessor).ToArray(), IsInitOnly: InitOnlySetter()));
             }
             var memberReferences = new List<MemberReferenceRow>();
             foreach (var handle in reader.MemberReferences)
@@ -377,7 +403,7 @@ public sealed partial class AssemblyDefinition
         }
     }
     internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
-    internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others, NativeSignatureTypeRow? NativeType = null, NativeSignatureTypeRow[]? NativeParameters = null);
+    internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others, NativeSignatureTypeRow? NativeType = null, NativeSignatureTypeRow[]? NativeParameters = null, bool IsInitOnly = false);
     internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, NativeSignatureTypeRow? NativeType = null, int? Constant = null);
     internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null, int? MethodParameter = null, int? TypeParameter = null, NativeSignatureTypeRow[]? Arguments = null, bool IsSelf = false, bool IsByReference = false, NativeMethodSignatureRow? Function = null, bool IsPointer = false)
     {

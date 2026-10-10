@@ -10,14 +10,17 @@ public sealed partial class PropertyDefinition
     /// <param name="propertyType">Non-Void supported signature.</param>
     /// <param name="getter">Authored getter, or null for a write-only property.</param>
     /// <param name="setter">Authored setter, or null for a read-only property.</param>
+    /// <param name="isInitOnly">Marks the instance setter as initialization-only for source compilers; calls are not runtime-restricted.</param>
     /// <exception cref="ArgumentNullException">Property type is null.</exception>
     /// <exception cref="ArgumentException">Missing or loaded accessors.</exception>
     /// <remarks>Attach to an attached authored type after attaching its accessors. Ownership and signatures are validated on attachment.</remarks>
-    public PropertyDefinition(string name, SignatureType propertyType, MethodDefinition? getter = null, MethodDefinition? setter = null)
+    public PropertyDefinition(string name, SignatureType propertyType, MethodDefinition? getter = null, MethodDefinition? setter = null, bool isInitOnly = false)
     {
         ArgumentNullException.ThrowIfNull(propertyType);
         if (getter is null && setter is null || getter is not null && getter.AuthoredSignature is null || setter is not null && setter.AuthoredSignature is null)
             throw new ArgumentException("property requires authored accessors");
+        if (isInitOnly && (setter is null || setter.IsStatic)) throw new ArgumentException("init requires an instance setter");
+        IsInitOnly = isInitOnly;
         Name = name; PropertyType = propertyType; authoredGetter = getter; authoredSetter = setter;
         ParameterTypes = Array.AsReadOnly(getter is not null ? getter.AuthoredSignature!.ParameterTypes.ToArray()
             : setter!.AuthoredSignature!.ParameterTypes.Take(Math.Max(0, setter.AuthoredSignature.ParameterTypes.Count - 1)).ToArray());

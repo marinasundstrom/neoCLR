@@ -137,3 +137,13 @@ intended direction. The current object payload makes experiments and direct mode
 round trips practical, but requires coordinated reader/writer updates and does not
 provide standard CLR execution, full CLI tooling interoperability or a frozen ABI.
 See the [design comparison and migration limits](design/extended-cli-metadata.md).
+
+## Init accessor extension (development, 2026-10-10)
+
+Native property declarations optionally carry `init_only: true` (missing is false).
+It requires an instance setter; the accessor association identifies a compiler-only
+initialization restriction and grants that method the declaring type's readonly
+field-write privilege. It adds no runtime freeze or new call instruction. Older
+strict readers reject the new field. Both container codecs preserve the semantic
+model. See [init accessors](init-accessors.md) for CLI projection, enforcement limits
+and migration requirements.

@@ -348,6 +348,9 @@ pub struct Property {
     pub getter: Option<FunctionRef>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub setter: Option<FunctionRef>,
+    /// Source-language construction restriction; ordinary calls remain executable.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub init_only: bool,
 }
 
 impl Property {

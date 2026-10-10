@@ -33,13 +33,14 @@ public sealed partial class TypeBuilder
     /// <param name="type">Supported non-Void value signature, including declaring-type parameters; method parameters are invalid.</param>
     /// <param name="getter">Owned method (including an abstract interface method) whose parameters define the indices and whose result is the property type, or null.</param>
     /// <param name="setter">Owned method (including an abstract interface method) with matching index parameters followed by a property-value parameter and Void result, or null.</param>
+    /// <param name="isInitOnly">Marks an instance setter as initialization-only; native callers remain ordinary method calls.</param>
     /// <returns>An immutable association owned by this type.</returns>
     /// <exception cref="ArgumentNullException">Type is null.</exception>
     /// <exception cref="ArgumentException">Invalid name/type, missing or incompatible accessors, duplicate name, reused accessor or exceeded limit.</exception>
     /// <remarks>At least one accessor is required. Index parameters are inferred from accessors and copied. Both must agree on index types and instance/static shape; visibility stays on each accessor. At most 256 properties per type and 4096 per assembly.</remarks>
-    public PropertyBuilder AddProperty(string name, SignatureType type, MethodBuilder? getter = null, MethodBuilder? setter = null)
+    public PropertyBuilder AddProperty(string name, SignatureType type, MethodBuilder? getter = null, MethodBuilder? setter = null, bool isInitOnly = false)
     {
-        var definition = new PropertyDefinition(name, type, getter?.Definition, setter?.Definition);
+        var definition = new PropertyDefinition(name, type, getter?.Definition, setter?.Definition, isInitOnly);
         Definition.Properties.Add(definition);
         return definition.Producer!;
     }
@@ -70,6 +71,7 @@ public sealed partial class TypeBuilder
             throw new ArgumentException("incompatible property accessor signature");
         if (properties.Any(p => p.Name == name && p.ParameterTypes.SequenceEqual(indices)))
             throw new ArgumentException("duplicate property signature");
+        if (definition.IsInitOnly) setter!.IsInitOnlySetter = true;
         var property = new PropertyBuilder(this, definition);
         properties.Add(property);
         definition.AuthoredOwner = Definition; definition.Module = Definition.Module; definition.Producer = property;

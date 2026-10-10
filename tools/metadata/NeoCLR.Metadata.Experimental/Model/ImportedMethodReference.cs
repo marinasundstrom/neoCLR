@@ -147,6 +147,7 @@ public sealed partial class AssemblyBuilder
             if (definition.GenericArity != 0) throw new InvalidDataException("generic internal-call imports are unsupported");
             reference.Target.SetInternalCall();
         }
+        reference.Target.IsInitOnlySetter = type?.Properties.Any(p => p.IsInitOnly && ReferenceEquals(p.SetMethod, definition)) == true;
         reference.Target.NativeImportPrimitiveOwner = type?.NativePrimitive;
         reference.Target.NativeImportCharOwner = type?.NativeGrapheme == true;
         reference.Target.IsCoreObjectToString = isObjectToString;

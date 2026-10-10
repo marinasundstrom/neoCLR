@@ -541,6 +541,9 @@ public sealed partial class AssemblyBuilder
             new BlobEncoder(signature).MethodSignature(SignatureCallingConvention.Default, method.Signature.GenericParameterNames.Count, !method.IsStatic).Parameters(method.ParameterCount,
                 result =>
                 {
+                    if (method.IsInitOnlySetter)
+                        result.CustomModifiers().AddModifier(metadata.AddTypeReference(ImportAssembly(CoreLibrary),
+                            metadata.GetOrAddString("System.Runtime.CompilerServices"), metadata.GetOrAddString("IsExternalInit")), isOptional: false);
                     if (!method.ReturnsValue) result.Void();
                     else EncodeType(result.Type(), method.Signature.ReturnType);
                 }, parameters =>
@@ -1098,6 +1101,7 @@ public sealed partial class MethodBuilder
     public MethodVisibility Visibility => (Definition.DeclarationAttributes & 7) switch { 6 => MethodVisibility.Public, 3 => MethodVisibility.Internal, 4 => MethodVisibility.Protected, _ => MethodVisibility.Private };
     /// <summary>Gets the immutable primitive/owned-class method signature.</summary>
     public MethodSignature Signature => Definition.AuthoredSignature!;
+    internal bool IsInitOnlySetter { get; set; }
     /// <summary>Gets the owning assembly, including for top-level functions.</summary>
     public AssemblyBuilder Assembly { get; }
     /// <summary>Gets the declaring type, or null for a top-level function.</summary>

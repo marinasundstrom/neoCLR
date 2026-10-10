@@ -138,8 +138,8 @@ public sealed partial class MethodBuilder
                 case "field.store":
                     if (instruction.Op == "field.store")
                     {
-                        if (instruction.Field!.IsReadOnly && (!IsConstructor || !ReferenceEquals(DeclaringType, instruction.Field.DeclaringType)))
-                            throw new InvalidDataException("readonly field requires its declaring constructor");
+                        if (instruction.Field!.IsReadOnly && (!(IsConstructor || IsInitOnlySetter) || !ReferenceEquals(DeclaringType, instruction.Field.DeclaringType)))
+                            throw new InvalidDataException("readonly field requires its declaring constructor or init accessor");
                         Pop(instruction.ConstructedField?.FieldType ?? instruction.Field.FieldType);
                     }
                     SignatureType fieldOwner = instruction.ConstructedField is { } fieldReference
