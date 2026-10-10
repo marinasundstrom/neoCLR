@@ -12,7 +12,7 @@ not qualify the later guest-function discovery changes or complete native intros
 **Discovery progress:** the testing-framework follow-up establishes
 the guest module-function metadata enumeration contract needed to discover TestAttribute
 methods, reusing host discovery behavior and retaining manual registration. Native type
-enumeration, general callable invocation, grouping/filtering, broader context discovery
+enumeration, general callable invocation, grouping, broader context discovery
 and the imported function-reference emitter gap remain separately scoped follow-ups.
 The runtime definition selector now validates exact assembly/module ownership and
 preserves source function order without execution; its native bridge requires an
@@ -25,8 +25,15 @@ retention and in-process callable registration are still open.
 
 **Author priority correction (2026-10-10):** after making guest discovery work, focus
 on making the test framework useful through runner filtering before grouping.
-The next bounded slice is runner selection using existing test IDs/names, keeping
-manual registration. Grouping attributes remain later work.
+The runner now implements exact ID and literal ordinal ID/name substring selection,
+keeping manual registration and validating all registrations before filtering.
+Author-directed dependency: close native Main(string[]) admission/host support so
+filtering uses explicit entry arguments. [Native/interpreter qualification](../runtime/raven/tests/filtering-validation.json)
+passes 32 executions and five discovery-signature rejection cases. Windows is pending. Grouping attributes remain later work;
+expression parsing and case-insensitive substring matching are explicit future gaps.
+Author follow-up: use this framework for new runtime-library behavior tests and add
+focused tests alongside feature/fix work. Preserve compiler/backend coverage where
+behavior is not observable in Raven; migrate existing tests as their areas are touched.
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

@@ -13643,3 +13643,35 @@ claim completion of in-process test discovery.
   gate is added but not yet qualified; AOT discovery/retention and in-process callable
   registration remain open. Runner filtering is the next bounded task; grouping is
   deferred. [Evidence](experiments/guest-functions/validation.json).
+
+
+## 2026-10-10 — Use the framework for ongoing runtime development
+
+- **Author:** once the testing framework exists, use it for tests and add tests for
+  what is built.
+- **Assistant response:** make Raven framework tests the normal place for observable
+  runtime-library behavior as features/fixes are developed. Retain compiler/backend
+  contract tests for behavior the Raven consumer cannot observe; migrate existing
+  coverage as those areas are changed rather than through an unrelated bulk rewrite.
+- **Action:** records this development/testing direction in the roadmap and framework
+  guidance. The current runner work already adds its own selection regressions.
+
+
+## 2026-10-10 — Runner filtering and native entry arguments
+
+- **Author direction:** prioritize filtering tests through the runner before grouping
+  attributes, then explicitly asked to fix the native entry-point limitation.
+- **Assistant proposal/implementation:** first selection contract is literal ordinal
+  ID/name substring (`--filter`) or exact stable ID (`--id`); invalid syntax and no
+  matches are configuration errors. These are provisional bounded capabilities, not
+  VSTest expression compatibility. Manual and discovered cases share the same path.
+- **Correction during validation:** both Main(string[]) and the proposed fallback
+  through Environment.GetCommandLineArgs exposed AOT gaps. The author directed fixing
+  entry arguments rather than retaining the workaround. Native code now copies host
+  arguments into managed String[] after entry admission, excluding the executable;
+  Windows uses wide CRT arguments with strict UTF-8 conversion. Source runner entry
+  points receive arguments explicitly. Environment.GetCommandLineArgs AOT binding
+  remains a separate gap.
+- **Validation:** 32 native/interpreted executions and five discovery-signature
+  rejection cases pass. [Evidence](../runtime/raven/tests/filtering-validation.json)
+  records reuse of completed suite checks and the corrected runner-only rerun. Grouping and AOT reflective registration remain follow-ups.

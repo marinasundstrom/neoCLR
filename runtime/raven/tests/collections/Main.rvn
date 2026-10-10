@@ -2,10 +2,8 @@ module NeoClr.RuntimeTests
 
 import NeoClr.Testing.*
 
-func Main() -> int {
+func Main(arguments: string[]) -> int {
     let suite = TestSuite()
     RegisterDiscoveredTests(suite)
-    let report = suite.Run()
-    ConsoleReporter.Write(report)
-    return report.ExitCode
+    return TestRunner.Run(suite, arguments)
 }

@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add test-runner selection through `--filter <text>` (literal ordinal ID/name
+  substring) and `--id <id>` (exact stable ID), plus TestSuite.Run(filter)/RunId.
+  Keep unfiltered runs and manual/discovered registration on the same path; validate
+  registrations before selecting, preserve order and skip/failure behavior, and
+  return configuration error 2 for invalid arguments or zero matches. Excluded
+  tests do not execute or count as skipped. This development subset is case-sensitive
+  and does not implement .NET filter expressions or grouping. All three suites pass
+  32 native/interpreted executions plus five discovery-signature rejection checks;
+  source Main(String[]) also preserves empty, quoted and Unicode arguments.
+
 - Admit native Main(String[]) roots and copy process arguments excluding the executable
   into managed storage after entry admission. Console/HTTP hosts share this path;
   Windows uses wide CRT arguments and strict UTF-8 conversion, avoiding ANSI code-page

@@ -50,7 +50,7 @@ can falsely pass a test; the current compiler does not enforce this convention.
 The explicit discard before `?` is the currently qualified native spelling.
 Terminal runtime Faults abort the suite process and are not converted into assertion
 failures. Isolation is currently per suite, not per test. Async tests, data cases,
-fixtures, filtering and generic/collection assertions are not implemented yet.
+fixtures and generic/collection assertions are not implemented yet.
 
 ## TestAttribute discovery (development)
 
@@ -108,8 +108,7 @@ call `RegisterDiscoveredTests`, or combine them. Duplicate IDs still fail regist
 Future grouping (author direction, 2026-10-10): evaluate repeatable category/trait
 attributes, separately from descriptions and stable IDs. Group/filter at discovery
 or reporting rather than requiring classes. Compare .NET testing category/trait
-conventions before selecting the public attribute contract. No grouping attribute
-or filtering API is implemented yet; manual registration remains an option. Groups
+conventions before selecting the public attribute contract. No grouping attribute is implemented yet; runner filtering is described below; manual registration remains an option. Groups
 should enable selective execution, not merely presentation. Keep selection separate
 from discovery so a future compiler source generator can supply equivalent cases
 and group metadata without changing the runner contract.
@@ -224,3 +223,74 @@ Author priority (2026-10-10): runner filtering comes before grouping attributes 
 this discovery slice. Keep stable IDs and display names separate, preserve manual
 registration, and make selection available through the runner. Grouping remains a
 later extension, not a prerequisite for selecting tests.
+
+
+## Selecting tests through the runner
+
+Development (2026-10-10): collection and discovery suite entry points now call
+`TestRunner.Run(suite, arguments)` from `Main(arguments: string[])`, which parses the selection,
+writes the report and returns its exit code. The contract probe also accepts these
+arguments; its no-argument run retains its internal framework checks.
+
+```sh
+./app --filter ArrayQueue
+./app --id manual
+neoclr run app.dll --system System.runtime.neox --module System.Runtime.dll --object-root System.Runtime.dll -- --filter ArrayQueue
+```
+
+Supply the appropriate library paths/dependencies when invoking the interpreter.
+The filter is passed after `--` so it reaches the guest runner.
+
+- No arguments runs all registered cases, in registration order.
+- `--filter <text>` selects a literal, case-sensitive ordinal substring of either
+  the stable ID or the display name. No wildcard or expression syntax is interpreted.
+- `--id <id>` selects an exact, case-sensitive ordinal ID. IDs can be taken from the
+  discovery `tests.json` manifest or supplied by manual registration. Description
+  changes do not affect this selection.
+- Exactly one selector is accepted. Unknown flags, missing/empty values, additional
+  arguments and zero matches produce a configuration error and exit code 2.
+- Filtering occurs after registration validation and before any selected body runs.
+  Excluded tests do not run and are not reported as skipped. Selected skip records
+  remain skipped; selected failures still return 1 and permit later selected tests
+  to execute. Selected passing/all-skipped runs return 0. Duplicate registration
+  errors cannot be hidden by filtering.
+
+Programmatic APIs are `TestSuite.Run()` (all), `Run(filter: string)` (substring; empty
+means all), and `RunId(id: string)` (exact; empty is a configuration error). Each
+returns a fresh TestRunReport and does not mutate registrations. Console parsing
+and reporting stay in TestRunner/ConsoleReporter. `TestRunner.Run(suite, arguments)`
+accepts guest arguments excluding the executable name. Native and interpreted
+entry points supply the array directly. Both host-discovered typed adapters
+and manually registered cases use this same execution path; runtime reflection is
+not required for filtering. Grouping attributes and listing are not added.
+
+.NET comparison, reviewed 2026-10-10: [VSTest filtering](https://learn.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests)
+provides property/operator expressions, case-insensitive matching and Boolean
+composition; a bare expression selects by fully qualified name. This first neoCLR
+runner is explicitly a smaller development contract, not a compatible parser.
+It matches IDs and display names because those are the framework's current stable
+selection fields. It uses the runtime's existing ordinal substring operation rather
+than embedding a second Unicode matching implementation in the framework. The cost
+is case-sensitive name searches and no expression/category support. Richer filtering
+and consistent case-insensitive substring support remain gaps to evaluate, not
+claims of improvement over .NET. Exact IDs provide reproducible selection now.
+
+The runtime test harness checks selectors in both interpreter and native execution,
+including discovered and manual cases, selected failures/skips, registration order,
+case sensitivity, no matches and malformed command lines. It preserves the original
+no-argument suite expectations alongside these checks. Use the host harness option
+`--suite runner-contract` for a focused runner check (`--suite` is repeatable);
+omitting it runs all suites. A Raven assertion case also
+checks argument count, empty strings, spaces, quotes, backslashes and non-ASCII text.
+
+
+Author development direction (2026-10-10): add focused Raven framework tests alongside
+new runtime-library features and fixes. Use module-level TestAttribute functions for
+observable behavior; manual registration remains useful for runner contracts and
+adapters. Keep lower-level compiler/backend tests where guest code cannot observe the
+contract. Extend/migrate coverage as areas are developed, not by replacing unrelated
+working test infrastructure all at once.
+
+[Filtering and entry-argument qualification](filtering-validation.json) records 32
+native/interpreted executions and five discovery-signature rejection cases. Windows
+execution is covered by the existing action and remains pending for this revision.

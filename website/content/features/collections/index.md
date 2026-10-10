@@ -211,5 +211,9 @@ Development runtime-library tests now use ordinary Raven module functions and a
 Raven runner, with native/interpreter checks for collection ordering, copying,
 comparers and iterator ownership. The
 [test contract and executable suites](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/README.md)
-separate discovery from execution; TestAttribute introspection discovery is the next
-planned layer.
+separate discovery from execution. Host TestAttribute discovery generates typed
+registration adapters; interpreted module metadata can also inspect descriptions.
+Development runners accept `--filter <text>` for literal case-sensitive ID/name
+substring selection and `--id <id>` for exact IDs, including manual registrations.
+No matches or invalid arguments are configuration errors. Grouping attributes and
+.NET-style filter expressions remain future work.

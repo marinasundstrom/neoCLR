@@ -14,12 +14,31 @@ func Failure() -> Result<unit, TestFailure> {
 
 func After() -> Result<unit, TestFailure> => Assert.True(true, "Runner continued")
 
-func Main() -> int {
+func CheckArguments(arguments: string[]) -> Result<unit, TestFailure> {
+    _ = Assert.Equal(6, arguments.Length)?
+    _ = Assert.Equal("", arguments[1])?
+    _ = Assert.Equal("two words", arguments[2])?
+    _ = Assert.Equal("Räven ☕ 😀", arguments[3])?
+    _ = Assert.Equal("quote\"slash\\", arguments[4])?
+    return Assert.Equal("--id", arguments[5])
+}
+
+func Main(arguments: string[]) -> int {
+    if arguments.Length > 0 && arguments[0] == "--entry-probe" {
+        let probe = TestSuite()
+        probe.Add("entry.arguments", "entry arguments preserve text", () => CheckArguments(arguments))
+        let probeReport = probe.Run()
+        ConsoleReporter.Write(probeReport)
+        return probeReport.ExitCode
+    }
     let suite = TestSuite()
     suite.Add("runner.before", "before failure", Before)
     suite.Add("runner.failure", "intentional assertion failure", Failure)
     suite.Add("runner.after", "after failure", After)
     suite.Skip("runner.skipped", "intentional skip", "contract probe")
+    if arguments.Length > 0 {
+        return TestRunner.Run(suite, arguments)
+    }
     let report = suite.Run()
     ConsoleReporter.Write(report)
     if report.ExitCode != 1 || report.Passed != 2 || report.Failed != 1 || report.Skipped != 1 {
@@ -41,6 +60,16 @@ func Main() -> int {
     duplicate.Add("same", "second", After)
     let invalid = duplicate.Run()
     if invalid.ExitCode != 2 || invalid.Results.Count != 0 || TestSuite().Run().ExitCode != 2 {
+        return 2
+    }
+    if duplicate.RunId("same").ExitCode != 2 || suite.RunId("").ExitCode != 2 {
+        return 2
+    }
+    let selected = suite.RunId("runner.after")
+    if selected.Results.Count != 1 || selected.Passed != 1 || selected.Results[0].Id != "runner.after" {
+        return 2
+    }
+    if suite.Run("missing").ExitCode != 2 || suite.Run().Results.Count != 4 {
         return 2
     }
     return report.ExitCode

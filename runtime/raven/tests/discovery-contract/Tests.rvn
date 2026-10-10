@@ -37,11 +37,9 @@ func WrongMarker() -> Result<unit, TestFailure> {
     return Assert.True(false, "not our marker")
 }
 
-func Main() -> int {
+func Main(arguments: string[]) -> int {
     let suite = TestSuite()
     RegisterDiscoveredTests(suite)
     suite.Add("manual", "manually registered companion", () => Ok(()))
-    let report = suite.Run()
-    ConsoleReporter.Write(report)
-    return report.ExitCode
+    return TestRunner.Run(suite, arguments)
 }

@@ -100,7 +100,18 @@ class TestSuite {
         Register(TestCase(id, name, () => Ok(()), Some(reason)))
     }
 
-    func Run() -> TestRunReport {
+    func Run() -> TestRunReport => RunSelected("", false)
+
+    func Run(filter: string) -> TestRunReport => RunSelected(filter, false)
+
+    func RunId(id: string) -> TestRunReport {
+        if id == "" {
+            return TestRunReport(ArrayList<TestExecution>(), 0, 0, 0, "Test ID must be nonempty")
+        }
+        return RunSelected(id, true)
+    }
+
+    private func RunSelected(filter: string, exactId: bool) -> TestRunReport {
         let results = ArrayList<TestExecution>()
         if registrationError != "" {
             return TestRunReport(results, 0, 0, 0, registrationError)
@@ -112,6 +123,14 @@ class TestSuite {
         var failed = 0
         var skipped = 0
         for test in cases {
+            let selected = if exactId {
+                test.Id == filter
+            } else {
+                filter == "" || test.Id.ContainsOrdinal(filter) || test.Name.ContainsOrdinal(filter)
+            }
+            if !selected {
+                continue
+            }
             if let Some(reason) = test.SkipReason {
                 results.Add(TestExecution(test.Id, test.Name, TestOutcome.Skipped(reason)))
                 skipped = skipped + 1
@@ -127,6 +146,9 @@ class TestSuite {
                     }
                 }
             }
+        }
+        if results.Count == 0 {
+            return TestRunReport(results, 0, 0, 0, "No tests matched the selection")
         }
         return TestRunReport(results, passed, failed, skipped, "")
     }
@@ -146,5 +168,30 @@ static class ConsoleReporter {
             }
         }
         Console.WriteLine("Tests: " + report.Results.Count.ToString() + ", passed: " + report.Passed.ToString() + ", failed: " + report.Failed.ToString() + ", skipped: " + report.Skipped.ToString())
+    }
+}
+
+
+static class TestRunner {
+    static func Run(suite: TestSuite, arguments: string[]) -> int {
+        return RunArguments(suite, arguments, 0)
+    }
+    private static func RunArguments(suite: TestSuite, arguments: string[], start: int) -> int {
+        if arguments.Length == start {
+            let all = suite.Run()
+            ConsoleReporter.Write(all)
+            return all.ExitCode
+        }
+        if arguments.Length != start + 2 || (arguments[start] != "--filter" && arguments[start] != "--id") || arguments[start + 1] == "" {
+            Console.WriteLine("ERROR Expected --filter <text> or --id <id>")
+            return 2
+        }
+        let report = if arguments[start] == "--id" {
+            suite.RunId(arguments[start + 1])
+        } else {
+            suite.Run(arguments[start + 1])
+        }
+        ConsoleReporter.Write(report)
+        return report.ExitCode
     }
 }

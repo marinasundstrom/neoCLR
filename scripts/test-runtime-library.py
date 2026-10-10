@@ -37,6 +37,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
+    parser.add_argument('--suite', action='append', choices=('collections', 'discovery-contract', 'runner-contract'),
+                        help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -57,8 +59,11 @@ def main():
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]
     try:
-        validation.validate(bundle, out / 'discovery-signatures')
-        for name, exit_code, stdout in expected:
+        selected = [case for case in expected if not args.suite or case[0] in args.suite]
+        report['suites'] = [case[0] for case in selected]
+        if any(case[0] != 'runner-contract' for case in selected):
+            validation.validate(bundle, out / 'discovery-signatures')
+        for name, exit_code, stdout in selected:
             build = out / (name + '-build')
             environment = dict(os.environ)
             if name in ('collections', 'discovery-contract'):
@@ -93,6 +98,34 @@ def main():
                 print(name + ' (' + mode + '):\n' + record['stdout'], end='', flush=True)
                 if (record['exitCode'], record['stdout'], record['stderr']) != (exit_code, stdout, ''):
                     raise RuntimeError(name + ' ' + mode + ' did not match the runner contract')
+            selections = {
+                'collections': [(['--filter', 'ArrayQueue'], 0, 'PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n')],
+                'discovery-contract': [(['--id', 'manual'], 0, 'PASS manually registered companion\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
+                                       (['--filter', 'after discovered'], 0, 'PASS after discovered failure\nTests: 1, passed: 1, failed: 0, skipped: 0\n')],
+                'runner-contract': [
+                    (['--entry-probe', '', 'two words', 'Räven ☕ 😀', 'quote"slash\\', '--id'], 0, 'PASS entry arguments preserve text\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
+                    (['--id', 'runner.after'], 0, 'PASS after failure\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
+                    (['--id', 'runner.failure'], 1, 'FAIL intentional assertion failure: Expected 1, actual 2\nTests: 1, passed: 0, failed: 1, skipped: 0\n'),
+                    (['--id', 'runner.skipped'], 0, 'SKIP intentional skip: contract probe\nTests: 1, passed: 0, failed: 0, skipped: 1\n'),
+                    (['--filter', 'failure'], 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nTests: 3, passed: 2, failed: 1, skipped: 0\n'),
+                    (['--filter', 'RUNNER'], 2, 'ERROR No tests matched the selection\n'),
+                    (['--filter'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
+                    (['--filter', ''], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
+                    (['--unknown', 'after'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
+                    (['--id', 'runner.after', '--filter', 'after'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
+                ],
+            }[name]
+            for arguments, selected_exit, selected_stdout in selections:
+                for mode, command, cwd, environment in [('native', [exe, *arguments], isolated, env),
+                                                        ('interpreter', [*interpreter, '--', *arguments], ROOT, None)]:
+                    result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=180)
+                    record = dict(suite=name, mode=mode, arguments=arguments, exitCode=result.returncode,
+                                  stdout=result.stdout.decode('utf-8').replace('\r\n', '\n'),
+                                  stderr=result.stderr.decode('utf-8').replace('\r\n', '\n'))
+                    report['cases'].append(record)
+                    if (record['exitCode'], record['stdout'], record['stderr']) != (selected_exit, selected_stdout, ''):
+                        raise RuntimeError(name + ' ' + mode + ' selection did not match: ' + repr(record))
+            print(name + ': filtering checks passed', flush=True)
         for name, digest in report['inputs'].items():
             if sha(ROOT / name) != digest:
                 raise RuntimeError('Input changed during validation: ' + name)
