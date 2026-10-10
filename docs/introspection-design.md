@@ -826,3 +826,26 @@ snapshots, direct-member exclusions and legacy projections. See
 assembly traversal and physical modules only. Guest declaration descriptors,
 module-function metadata/attributes, checked callable invocation and explicit AOT
 retention remain the next implementation boundaries; host views do not complete them.
+
+#### Author clarification: one semantic module model (2026-10-10)
+
+The author corrects the compatibility premise of the first ownership slice:
+“We shouldn’t worry about breaking compatibility. Our concept of a module is
+different from .NET. It’s a unit and namespace of members within an assembly.”
+
+The intended public `ModuleInfo` therefore describes that semantic unit, with its
+owning assembly, qualified name and members. Assembly and RuntimeContext traversal
+should expose this model directly. The separate DeclarationModuleInfo facade and
+physical ModuleInfo split above describe the implemented intermediate state, not
+the desired API structure. Compatibility with those development APIs is not a
+constraint on consolidation; update their consumers together instead of retaining
+parallel APIs solely for compatibility.
+
+Physical image names and metadata-token scopes remain necessary reader/backend
+facts. Keep them explicit where needed for binding or metadata inspection, without
+making them the platform's public module concept. This is an author-directed
+divergence from .NET's physical Module semantics: it makes declaration ownership
+and discovery match Raven source modules, at the cost of API migration and explicit
+translation at the CLI boundary. It does not add separate loading, scheduling or
+access-isolation semantics. Consolidating host and guest APIs, preserving source
+ownership and validating interpreter/AOT traversal are still implementation work.

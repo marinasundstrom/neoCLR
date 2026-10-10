@@ -43,6 +43,12 @@ assembly traversal and direct member ownership, with physical modules unchanged.
 Focused PE/NEOX and context-identity checks pass. Guest declaration-module traversal,
 function discovery/invocation and AOT retention remain open; see
 [the implemented host contract](declaration-modules.md#api-foundation).
+**Author clarification (2026-10-10):** modules are units and namespaces of members
+within an assembly; public ModuleInfo should represent that concept. Compatibility
+with development APIs is not a constraint. Consolidate the temporary declaration/
+physical-module facade split, retaining physical metadata scopes as explicit
+reader/backend facts. Apply this model to host and guest traversal, including AOT;
+see [the corrected direction](introspection-design.md#author-clarification-one-semantic-module-model-2026-10-10).
 
 ## Active direction: usable native compilation (2026-10-09)
 

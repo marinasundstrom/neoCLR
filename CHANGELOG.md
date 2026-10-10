@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Record the author's module-model correction: a module is a unit and namespace
+  of members within an assembly. Plan to consolidate public introspection around
+  that concept without preserving compatibility with the temporary facade split;
+  physical metadata scopes remain reader/backend facts. API migration is pending.
+
 - Add canonical host declaration-module introspection views, assembly traversal and
   direct member ownership. Preserve physical ModuleInfo and existing definition
   enumeration contracts. Validate empty/global/child modules, separate assemblies

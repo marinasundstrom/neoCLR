@@ -9,6 +9,14 @@ This implements the first ownership/format slice of the
 [module assessment](design/module-system-assessment.md). The original proposal's
 artifact extensions, private-access rules and independent loading are not adopted.
 
+**Author clarification, 2026-10-10:** a module is a unit and namespace of members
+within an assembly. The intended public `ModuleInfo` models this concept directly;
+compatibility with the current physical-module API is not a constraint. The
+DeclarationModuleInfo/physical ModuleInfo split described below is an intermediate
+implementation to consolidate, not a permanent public design. Physical image and
+token-scope facts remain explicit metadata/backend details. See the
+[updated design direction](introspection-design.md#author-clarification-one-semantic-module-model-2026-10-10).
+
 ## Format and identity
 
 Native format-5 assembly manifests now include:
@@ -35,10 +43,11 @@ The Rust runtime validates these contracts before execution. Older readers rejec
 the unknown manifest field; rebuild tools together. Older input without the table
 remains readable as a marked projection, not an explicit module declaration.
 
-The existing manifest `modules` list and `ModuleDefinition`/`ModuleInfo` describe
-physical metadata images and retain their meaning. Logical modules do not acquire
+The existing manifest `modules` list and current `ModuleDefinition`/`ModuleInfo` describe
+physical metadata images. That is the current implementation, pending public API
+consolidation under the author's clarification above. Logical modules do not acquire
 separate files, token scopes, loading, scheduling or collection lifetimes. This
-explicit distinction avoids silently changing current introspection contracts.
+distinction must remain expressible in metadata without dictating the public module API.
 
 ## API foundation
 

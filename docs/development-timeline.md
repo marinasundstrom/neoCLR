@@ -13454,3 +13454,21 @@ consumer remain open at this entry. See the [attribute plan](custom-attributes.m
   declaration shapes, descriptions and manual/discovered registration together.
   Raven 9b04250e2 contains the lookup consistency fix; 83 focused compiler checks
   pass. Windows qualification of the new gate remains pending.
+
+
+## 2026-10-10 — Module semantics take precedence over compatibility
+
+- **Author:** “We shouldn’t worry about breaking compatibility. Our concept of a
+  module is different from .NET. It’s a unit and namespace of members within an assembly.”
+- **Assistant correction:** the prior slice preserved physical ModuleInfo and added
+  DeclarationModuleInfo partly to avoid breaking existing APIs. That compatibility
+  rationale should not determine neoCLR's public model. ModuleInfo should describe
+  the author's semantic unit directly; physical image/token scopes remain explicit
+  reader/backend facts.
+- **Action:** updated the roadmap and module design to prioritize consolidation,
+  including host and guest traversal, with coordinated consumer migration rather
+  than compatibility aliases. This is an explicit exception to the default .NET
+  API alignment, not an inference about unrelated APIs.
+- **Outcome/open work:** direction recorded; the implementation from `7d54aa4d`
+  still has separate facades. Public API consolidation and interpreter/AOT
+  validation remain to be implemented.
