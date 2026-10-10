@@ -553,6 +553,9 @@ pub(super) fn select_inventory_with_host_roots(
     // signatures, storage and instruction bodies remain; non-executable descriptions
     // stay in the original artifact. Report the original-to-projection row map.
     for assembly in &mut projected.assemblies {
+        // Original access was checked before selection. Attribute constructors are
+        // descriptive metadata, not executable roots in this private projection.
+        assembly.custom_attributes.clear();
         assembly.references.clear();
         assembly.value_type_references.clear();
         assembly.native_module_bindings.clear();

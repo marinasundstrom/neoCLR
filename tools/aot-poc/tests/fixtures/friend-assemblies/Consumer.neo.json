@@ -1,0 +1,128 @@
+{
+  "format": 5,
+  "name": "NeoMetadata_C5106A954FC4029534362A9C8FCF1537C0E36272A2DDFF31FBD51437905E786C",
+  "revision": "1.0.0.0",
+  "references": [
+    {
+      "name": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9",
+      "revision": "1.0.0.0"
+    }
+  ],
+  "entry": "NeoMetadata_C5106A954FC4029534362A9C8FCF1537C0E36272A2DDFF31FBD51437905E786C.F_4D61696E",
+  "assemblies": [
+    {
+      "name": "FriendConsumer",
+      "full_name": "[\"FriendConsumer\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+      "modules": [
+        "FriendConsumer.dll"
+      ],
+      "references": [
+        "[\"FriendProvider\",\"1.0.0.0\",\"\",\"\",\"0\"]"
+      ],
+      "declaration_modules": {
+        "version": 1,
+        "names": [
+          ""
+        ]
+      }
+    }
+  ],
+  "types": [],
+  "functions": [
+    {
+      "name": "NeoMetadata_C5106A954FC4029534362A9C8FCF1537C0E36272A2DDFF31FBD51437905E786C.F_4D61696E",
+      "owner": null,
+      "parameters": [],
+      "locals": [
+        {
+          "Named": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_5465737473_48696464656E"
+        },
+        {
+          "Named": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_5465737473_48696464656E"
+        },
+        "Int32"
+      ],
+      "returns": "Int32",
+      "no_result": false,
+      "origin": {
+        "assembly": "[\"FriendConsumer\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "module": "FriendConsumer.dll",
+        "name": "Main",
+        "token": 100663297,
+        "member_access": "Assembly",
+        "parameter_tokens": []
+      },
+      "body": [
+        {
+          "op": "newobj.ctor",
+          "arg": {
+            "name": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_5465737473_48696464656E..ctor",
+            "owner": {
+              "Named": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_5465737473_48696464656E"
+            },
+            "instance": true,
+            "parameters": []
+          }
+        },
+        {
+          "op": "stloc",
+          "arg": 0
+        },
+        {
+          "op": "ldloc",
+          "arg": 0
+        },
+        {
+          "op": "stloc",
+          "arg": 1
+        },
+        {
+          "op": "ldc.i4",
+          "arg": 7
+        },
+        {
+          "op": "stloc",
+          "arg": 2
+        },
+        {
+          "op": "ldloc",
+          "arg": 1
+        },
+        {
+          "op": "ldloc",
+          "arg": 2
+        },
+        {
+          "op": "stfld",
+          "arg": 0
+        },
+        {
+          "op": "ldloc",
+          "arg": 0
+        },
+        {
+          "op": "ldfld",
+          "arg": 0
+        },
+        {
+          "op": "call",
+          "arg": {
+            "name": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_5465737473_48696464656E.M_416E73776572",
+            "owner": {
+              "Named": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_5465737473_48696464656E"
+            },
+            "instance": false,
+            "parameters": []
+          }
+        },
+        {
+          "op": "add"
+        },
+        {
+          "op": "ret"
+        }
+      ],
+      "visibility": "internal"
+    }
+  ]
+}

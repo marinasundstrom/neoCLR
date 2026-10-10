@@ -8053,3 +8053,23 @@ Tested compiler revision: Raven `codex/source-object-metadata-resolution` at
 100,000 positive/negative warmed checks and clone invalidation. The API reference
 snapshot check passes. This demonstrates cache reuse, not a whole-program performance
 comparison; native compiled/AOT and Windows qualification remain separate work.
+
+
+### Native compiled friend consumer (2026-10-10)
+
+The `a3be45460` Raven friend consumer also passes native macOS ARM64 compilation,
+linking and execution, returning 42. Qualification exposed a neoCLR AOT pruning bug:
+assembly annotations remained in the private executable verification projection after
+their attribute classes were removed. `selection.rs` now clears those annotations,
+matching existing type/member annotation pruning. Original assembly scopes and friend
+access are validated before projection; source metadata is retained separately. The
+faulting attribute constructor remains unreachable and is never executed.
+
+This changes AOT projection only: Runtime Contract configuration, Raven syntax and
+emission, temporary CLI encoding and native manifest representation are unchanged.
+The native backend owns the fix; future metadata/backend replacement must preserve
+original-scope authorization before executable pruning. Tests require missing, wrong,
+qualified grants and private-member access to fail without producing an object file.
+The [fixture record](../tools/aot-poc/tests/fixtures/friend-assemblies/README.md) includes
+compiler/runtime revisions and regeneration instructions. No bundle pin changes;
+Windows execution, full-key/Unicode identities and the Utf8 migration remain pending.

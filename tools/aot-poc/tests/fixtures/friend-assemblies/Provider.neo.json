@@ -1,0 +1,173 @@
+{
+  "format": 5,
+  "name": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9",
+  "revision": "1.0.0.0",
+  "references": [],
+  "entry": "",
+  "assemblies": [
+    {
+      "name": "FriendProvider",
+      "full_name": "[\"FriendProvider\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+      "modules": [
+        "FriendProvider.dll"
+      ],
+      "references": [],
+      "declaration_modules": {
+        "version": 1,
+        "names": [
+          "System.Runtime.CompilerServices",
+          "Tests"
+        ]
+      },
+      "custom_attributes": [
+        {
+          "constructor": {
+            "name": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_496E7465726E616C7356697369626C65546F417474726962757465..ctor",
+            "owner": {
+              "Named": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_496E7465726E616C7356697369626C65546F417474726962757465"
+            },
+            "instance": true,
+            "parameters": [
+              "String"
+            ]
+          },
+          "arguments": [
+            {
+              "String": "FriendConsumer"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_496E7465726E616C7356697369626C65546F417474726962757465",
+      "fields": [],
+      "is_reference_type": true,
+      "is_abstract": false,
+      "is_sealed": false,
+      "origin": {
+        "assembly": "[\"FriendProvider\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "module": "FriendProvider.dll",
+        "name": "System.Runtime.CompilerServices.InternalsVisibleToAttribute",
+        "token": 33554434,
+        "publicly_visible": true
+      }
+    },
+    {
+      "name": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_5465737473_48696464656E",
+      "fields": [
+        {
+          "name": "Value",
+          "ty": "Int32",
+          "visibility": "internal"
+        }
+      ],
+      "is_reference_type": true,
+      "is_abstract": false,
+      "is_sealed": false,
+      "origin": {
+        "assembly": "[\"FriendProvider\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "module": "FriendProvider.dll",
+        "name": "Tests.Hidden",
+        "token": 33554435,
+        "publicly_visible": false,
+        "field_tokens": [
+          67108865
+        ],
+        "field_access": [
+          "Assembly"
+        ],
+        "field_readonly": [
+          false
+        ]
+      },
+      "visibility": "internal"
+    }
+  ],
+  "functions": [
+    {
+      "name": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_496E7465726E616C7356697369626C65546F417474726962757465..ctor",
+      "owner": {
+        "Named": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_496E7465726E616C7356697369626C65546F417474726962757465"
+      },
+      "parameters": [
+        "String"
+      ],
+      "locals": [],
+      "returns": "Void",
+      "no_result": true,
+      "origin": {
+        "assembly": "[\"FriendProvider\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "module": "FriendProvider.dll",
+        "name": ".ctor",
+        "token": 100663297,
+        "member_access": "Public",
+        "parameter_tokens": [
+          0
+        ]
+      },
+      "body": [
+        {
+          "op": "fault",
+          "arg": "Friend metadata must not execute its constructor"
+        }
+      ],
+      "instance": true
+    },
+    {
+      "name": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_5465737473_48696464656E.M_416E73776572",
+      "owner": {
+        "Named": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_5465737473_48696464656E"
+      },
+      "parameters": [],
+      "locals": [],
+      "returns": "Int32",
+      "no_result": false,
+      "origin": {
+        "assembly": "[\"FriendProvider\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "module": "FriendProvider.dll",
+        "name": "Answer",
+        "token": 100663298,
+        "member_access": "Assembly",
+        "parameter_tokens": []
+      },
+      "body": [
+        {
+          "op": "ldc.i4",
+          "arg": 35
+        },
+        {
+          "op": "ret"
+        }
+      ],
+      "visibility": "internal"
+    },
+    {
+      "name": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_5465737473_48696464656E..ctor",
+      "owner": {
+        "Named": "NeoMetadata_8604FA4FAB00B4FF6BF3492F3D037252F5E5A1F1CD76DE60C028F19736BA01C9.T_5465737473_48696464656E"
+      },
+      "parameters": [],
+      "locals": [],
+      "returns": "Void",
+      "no_result": true,
+      "origin": {
+        "assembly": "[\"FriendProvider\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "module": "FriendProvider.dll",
+        "name": ".ctor",
+        "token": 100663299,
+        "member_access": "Assembly",
+        "parameter_tokens": []
+      },
+      "body": [
+        {
+          "op": "ret"
+        }
+      ],
+      "visibility": "internal",
+      "instance": true
+    }
+  ]
+}

@@ -433,3 +433,17 @@ for cache lifetime, identity restrictions and pending AOT/platform qualification
 A Raven-emitted consumer now uses an internal constructor, local type, field and method
 and returns 42; unrelated consumers fail before emission.
 This does not yet make Utf8 internal or introduce a guest assembly-reflection API.
+
+
+### AOT friend-access qualification (2026-10-10)
+
+The Raven friend consumer now compiles and executes on macOS ARM64, returning 42.
+AOT validates access against original assembly scopes before creating its private
+executable projection. That projection now clears assembly custom attributes along
+with type/member descriptions, preventing dangling references to pruned attribute
+classes. Original metadata is preserved; attribute constructors are not executable
+roots. This follows the .NET distinction between metadata-based friend authorization
+and executing attribute constructors, without implying CLR-style dynamic loading or
+unrestricted AOT reflection. Missing/wrong/qualified grants and private access must
+fail before object emission. See the [reproducible fixtures](../tools/aot-poc/tests/fixtures/friend-assemblies/README.md).
+Windows execution, full identity semantics and runtime-library integration remain open.

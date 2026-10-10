@@ -14,7 +14,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   simple ASCII names only; qualified, escaped and non-ASCII grants fail closed pending
   full identity support. Raven native imports now admit cached friend-approved types,
   constructors, fields and methods; an emitted consumer returns 42 under interpreted
-  execution. AOT/platform qualification and making Utf8 internal remain pending.
+  execution. Qualify the same consumer as native macOS ARM64 code, with denied grants
+  and private access producing no object file. Clear assembly annotations from the
+  private AOT verification projection after original access validation, matching
+  existing type/member pruning and preventing dangling attribute-type references.
+  Windows qualification and making Utf8 internal remain pending.
 
 - Retain assembly custom attributes in the host metadata model and CLI writer/reader,
   including ordered repeated InternalsVisibleTo grants, bounded ownership-checked
