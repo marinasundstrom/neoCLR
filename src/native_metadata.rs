@@ -72,6 +72,24 @@ pub fn assembly_modules(module: &Module, identity: &str) -> Result<Value, Fault>
     )
 }
 
+/// Select free-function definition identities in metadata order, without invocation.
+/// Requires an explicit assembly-local module catalog, not a legacy projection.
+/// This unstable backend bridge grants no AOT body or attribute retention rights.
+pub fn module_function_definitions(
+    module: &Module,
+    identity: &str,
+    name: &str,
+) -> Result<Vec<crate::metadata::MemberId>, Fault> {
+    if crate::assembly_info::lookup(module, identity)?.declaration_modules.is_none() {
+        return Err(Fault::new("native module function discovery requires explicit declaration metadata"));
+    }
+    crate::assembly_info::module_functions(module, identity, name)?
+        .into_iter()
+        .map(|function| function.definition.clone()
+            .ok_or_else(|| Fault::new("module function requires definition identity")))
+        .collect()
+}
+
 /// Describe the assembly of a verified lexical caller, using the VM facade rules.
 pub fn executing_assembly(
     module: &Module,

@@ -181,3 +181,26 @@ rediscover exactly the same registration source and manifest as their inspection
 build. The deliberate failing suites are successful contract checks only when their
 expected output and exit code 1 match. The Windows action now runs this same gate;
 qualification of this revision is pending.
+
+
+## Guest discovery foundation (2026-10-10)
+
+The runtime now has a shared metadata selector for exact assembly/module free-function
+definitions, exposed to the native backend as an unstable definition-key helper.
+It preserves metadata order, private functions and generic definitions so the test
+framework can diagnose unsupported tests rather than silently skipping them. It
+excludes type-owned methods, child namespaces and instantiated generic bodies.
+Selection never invokes bodies and does not retain them for AOT.
+
+Four focused assembly-info checks pass with native metadata enabled, including
+same-namespace assembly isolation, empty modules, unknown scopes, missing/duplicate
+identities, ambiguous legacy scopes and rejection of legacy catalogs by the native
+bridge. Existing host GetFunctions is the behavioral baseline. The .NET comparison
+remains Module.GetMethods for global callables, with neoCLR's intentional namespace
+scope in place of a physical CLI module; signature inspection stays separate from
+execution. This is not a new public guest API or in-process test registration.
+
+Next: build ownerless MethodInfo/ParameterInfo and attribute snapshots without a
+synthetic declaring type, expose guest GetFunctions, then qualify explicit native
+retention and callable registration. Current host-generated registrations remain the
+working discovery path throughout that work.

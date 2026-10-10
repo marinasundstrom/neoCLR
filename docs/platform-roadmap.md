@@ -13,6 +13,10 @@ the guest module-function metadata enumeration contract needed to discover TestA
 methods, reusing host discovery behavior and retaining manual registration. Native type
 enumeration, general callable invocation, grouping/filtering, broader context discovery
 and the imported function-reference emitter gap remain separately scoped follow-ups.
+The runtime definition selector now validates exact assembly/module ownership and
+preserves source function order without execution; its native bridge requires an
+explicit module catalog. Four focused checks pass. This is backend groundwork only:
+guest ownerless method/attribute snapshots and public GetFunctions remain next.
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

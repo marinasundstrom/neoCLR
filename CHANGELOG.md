@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add runtime module-function definition selection as groundwork for guest test
+  discovery. Preserve exact assembly/namespace scope, metadata order, all visibility
+  levels and generic definitions; exclude type members, child namespaces and generic
+  instantiations. Reject missing/duplicate identities and ambiguous legacy scopes.
+  The unstable native backend helper requires explicit module metadata and grants
+  no body execution or retention. Four focused assembly-info checks pass. Guest
+  GetFunctions, attribute snapshots and in-process registration remain follow-ups.
+
 - Migrate guest module traversal and type/member/parameter ownership to flat logical
   names, preserving explicit empty modules and nested-type ownership. Remove physical
   ModuleInfo.MetadataToken and rebuild source libraries and the API reference. Add

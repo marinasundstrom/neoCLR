@@ -227,6 +227,44 @@ pub(crate) fn module_names(
     Ok(names)
 }
 
+/// Select source free-function definitions in an exact assembly-local namespace.
+/// This is descriptive discovery: all access levels and generic definitions survive;
+/// type-owned methods and instantiated generic bodies do not become module members.
+#[cfg(any(feature = "native-metadata", test))]
+pub(crate) fn module_functions<'a>(
+    module: &'a Module,
+    identity: &str,
+    name: &str,
+) -> Result<Vec<&'a crate::metadata::Function>, Fault> {
+    let assembly = lookup(module, identity)?;
+    if !module_names(module, assembly)?.iter().any(|candidate| candidate == name) {
+        return Err(Fault::new("module does not belong to assembly"));
+    }
+    let mut functions = Vec::new();
+    let mut definitions = std::collections::HashSet::new();
+    for function in &module.functions {
+        if function.owner.is_some() || function.namespace != name || !function.generic_arguments.is_empty() {
+            continue;
+        }
+        let belongs = function.origin.as_ref().map_or_else(
+            || function.definition.as_ref().is_some_and(|id| assembly.modules.contains(&id.module)),
+            |origin| origin.assembly == identity,
+        );
+        if !belongs {
+            continue;
+        }
+        // Reuse ownership validation, including ambiguous legacy physical scopes.
+        function_module_value(module, function)?;
+        let definition = function.definition.as_ref()
+            .ok_or_else(|| Fault::new("module function requires definition identity"))?;
+        if !definitions.insert(definition.clone()) {
+            return Err(Fault::new("duplicate module function definition identity"));
+        }
+        functions.push(function);
+    }
+    Ok(functions)
+}
+
 pub(crate) fn type_module_name(module: &Module, definition: &TypeDef) -> Result<String, Fault> {
     let mut root = definition;
     // Metadata admission rejects cycles; retain a bound for descriptor queries on unverified graphs.
@@ -428,6 +466,72 @@ mod tests {
             module_names(&module, &module.assemblies[0]).unwrap(),
             ["Acme.CoffeeMaker", "Acme.CoffeeMaker.Factories"]
         );
+    }
+
+    fn function_catalog() -> Module {
+        let mut module = crate::assemble(".module Image\n.function First() -> Int32\nldc.i4 0\nret\n.end\n.function Second() -> Int32\nldc.i4 0\nret\n.end").unwrap();
+        for (index, function) in module.functions.iter_mut().enumerate() {
+            function.origin = Some(origin("Package", &format!("Function{index}")));
+            function.namespace = "Example".into();
+            // Discovery must not execute even an unconditionally failing body.
+            function.body = vec![crate::metadata::Instruction::Fault("must not execute".into())];
+        }
+        module.functions[1].generic_parameters = vec![Some("T".into())];
+        module.functions[1].visibility = crate::metadata::Visibility::Private;
+        module.assemblies = ["Package", "Other"].into_iter().map(|identity| {
+            serde_json::from_value(serde_json::json!({
+                "name": identity, "full_name": identity, "modules": ["Image"], "references": [],
+                "declaration_modules": {"version": 1, "names": ["Example", "Example.Child", "Empty", ""]}
+            })).unwrap()
+        }).collect();
+        module
+    }
+
+    #[test]
+    fn module_functions_preserve_source_order_and_exact_namespace_ownership() {
+        let mut module = function_catalog();
+        let expected: Vec<_> = module.functions.iter().map(|f| f.definition.clone().unwrap()).collect();
+        let seed = module.functions[0].clone();
+        for index in 0..4 {
+            let mut excluded = seed.clone();
+            match index {
+                0 => excluded.origin.as_mut().unwrap().assembly = "Other".into(),
+                1 => excluded.namespace = "Example.Child".into(),
+                2 => excluded.owner = Some(Type::from_name("Example.Owner")),
+                _ => excluded.generic_arguments = vec![Type::Int32],
+            }
+            module.functions.push(excluded);
+        }
+        let selected = module_functions(&module, "Package", "Example").unwrap();
+        assert_eq!(selected.iter().map(|f| f.definition.clone().unwrap()).collect::<Vec<_>>(), expected);
+        assert_eq!(selected[1].generic_parameters.len(), 1);
+        assert_eq!(module_functions(&module, "Other", "Example").unwrap().len(), 1);
+        assert_eq!(module_functions(&module, "Package", "Example.Child").unwrap().len(), 1);
+        assert!(module_functions(&module, "Package", "Empty").unwrap().is_empty());
+        assert!(module_functions(&module, "Package", "").unwrap().is_empty());
+        assert!(module_functions(&module, "Package", "Exam").is_err());
+        assert!(module_functions(&module, "Missing", "Example").is_err());
+        #[cfg(feature = "native-metadata")]
+        assert_eq!(crate::native_metadata::module_function_definitions(&module, "Package", "Example").unwrap(), expected);
+    }
+
+    #[test]
+    fn module_functions_reject_missing_duplicate_and_ambiguous_identity() {
+        let module = function_catalog();
+        let mut missing = module.clone();
+        missing.functions[0].definition = None;
+        assert!(module_functions(&missing, "Package", "Example").unwrap_err().to_string().contains("definition identity"));
+        let mut duplicate = module.clone();
+        duplicate.functions.push(duplicate.functions[0].clone());
+        assert!(module_functions(&duplicate, "Package", "Example").unwrap_err().to_string().contains("duplicate"));
+        let mut legacy = module.clone();
+        for function in &mut legacy.functions { function.origin = None; }
+        assert!(module_functions(&legacy, "Package", "Example").unwrap_err().to_string().contains("ambiguous physical"));
+        legacy.assemblies.pop();
+        legacy.assemblies[0].declaration_modules = None;
+        assert_eq!(module_functions(&legacy, "Package", "Example").unwrap().len(), 2);
+        #[cfg(feature = "native-metadata")]
+        assert!(crate::native_metadata::module_function_definitions(&legacy, "Package", "Example").unwrap_err().to_string().contains("explicit declaration"));
     }
 
     #[test]

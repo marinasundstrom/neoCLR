@@ -340,3 +340,22 @@ primitives. There are no public constructors or mutation APIs on these descripto
 Use matching runtime/library artifacts: the descriptor layout now includes the
 named snapshot. Older libraries retain fixed-only inspection and explicitly reject
 named data. See the [tested consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-attributes/README.md).
+
+
+### Module function selection bridge (development)
+
+`native_metadata::module_function_definitions(&Module, identity: &str, name: &str)
+-> Result<Vec<metadata::MemberId>, Fault>` is an unstable Rust backend helper, not
+a guest ModuleInfo member. It returns ownerless function definition identities in
+loaded metadata order for the exact assembly identity and module namespace.
+It includes all visibility levels and generic definitions, but excludes type-owned
+methods, child namespaces and instantiated generic bodies. Empty declared modules
+return an empty list. Unknown assemblies/modules, missing or duplicate definition
+identities and ambiguous legacy physical scopes fault. The native bridge requires
+an explicit declaration-module table; inferred legacy namespace catalogs are rejected.
+
+Selection executes no bodies, loads no dependencies and grants no AOT retention or
+invocation rights. It supplies the definition keys needed for later signature and
+attribute descriptors. Guest ModuleInfo.GetFunctions and in-process TestAttribute
+registration are not implemented by this helper. This backend API is documented here
+manually; it is outside RavenDoc's guest class-library assembly.
