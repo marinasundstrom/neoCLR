@@ -8194,10 +8194,13 @@ also returns 42 in interpreter and macOS ARM64 AOT with the matched compiler.
 
 The fieldless contract above remains available. The new host-only
 `AssemblyBuilder.CompleteClassBaseReference(ImportedTypeReference type,
-IEnumerable<ImportedMethodReference> methods)` additionally admits ordinary nongeneric,
+IEnumerable<ImportedMethodReference> methods, int declaredInstanceFieldCount)` additionally admits ordinary nongeneric,
 top-level reference bases with dependency-owned instance storage, interfaces and virtual
 methods. Supply every declared public instance method and property accessor, excluding
-constructors, plus direct base/interface edges. Null arguments throw ArgumentNullException;
+constructors, plus direct base/interface edges. Supply the own instance storage count
+(including private fields, 0–256); derived native field ordinals include all external
+ancestor counts. Invalid counts throw ArgumentOutOfRangeException. Missing ancestor
+layout contracts fail emission with InvalidDataException. Null arguments throw ArgumentNullException;
 foreign, duplicate, unsupported or conflicting contracts throw ArgumentException.
 The compiler supplies resolved facts; this API does not load or copy dependency fields.
 
@@ -8221,7 +8224,9 @@ external override: linking validates it against the actual dependency definition
 This follows CLR storage ownership, slot reuse and direct base-call semantics, within
 the stated nongeneric/public-member subset. The focused `--external-class-base` regression
 executes a field-bearing abstract base and concrete override on the CLR, returns 42,
-and rejects a missing abstract implementation. Guest native qualification is recorded
+and rejects a missing abstract implementation and conflicting layout counts. A derived
+field has native ordinal 1 after the base’s private field, and CLR execution observes
+both independently. Guest native qualification is recorded
 with the HTTP pipeline consumer when complete.
 
 ## Assembly custom attributes (development 2026-10-10)

@@ -4,31 +4,47 @@ public sealed partial class AssemblyBuilder
 {
     private readonly HashSet<ImportedTypeReference> fieldlessClassBases = [];
     private readonly Dictionary<ImportedTypeReference, ImportedMethodReference[]> externalClassContracts = [];
+    private readonly Dictionary<ImportedTypeReference, int> externalClassFieldCounts = [];
 
     /// <summary>Completes a nongeneric external class base contract from resolved dependency member facts.</summary>
     /// <param name="type">Owned public, nonsealed, nongeneric top-level class reference.</param>
     /// <param name="methods">All declared public instance methods, including abstract/virtual slots and property accessors; excludes constructors.</param>
+    /// <param name="declaredInstanceFieldCount">The dependency class’s own instance storage count, including private fields; 0–256.</param>
     /// <remarks>The host supplies validated symbol facts, including direct base and interface edges. Fields remain owned by the dependency and are laid out only after linking its exact artifact. This does not copy storage or infer it from names.</remarks>
     /// <exception cref="ArgumentException">Foreign, unsupported, duplicate or conflicting contracts.</exception>
-    public void CompleteClassBaseReference(ImportedTypeReference type, IEnumerable<ImportedMethodReference> methods)
+    /// <exception cref="ArgumentOutOfRangeException">The declared instance storage count is outside 0–256.</exception>
+    public void CompleteClassBaseReference(ImportedTypeReference type, IEnumerable<ImportedMethodReference> methods, int declaredInstanceFieldCount)
     {
         ArgumentNullException.ThrowIfNull(type); ArgumentNullException.ThrowIfNull(methods);
         if (!ReferenceEquals(type.Owner, this) || type.IsValueType || IsAuthoredInterface(type) ||
             type.GenericArity != 0 || type.TypeArguments.Count != 0 || type.DeclaringType is not null)
             throw new ArgumentException("external base requires a nongeneric top-level class reference", nameof(type));
+        if (declaredInstanceFieldCount is < 0 or > 256) throw new ArgumentOutOfRangeException(nameof(declaredInstanceFieldCount));
         var members = methods.ToArray();
         if (members.Length > 4096 || members.Distinct().Count() != members.Length || members.Any(m =>
-            !ReferenceEquals(m.Owner, this) || !Equals(m.DeclaringReference, type) || m.IsStatic || m.IsConstructor))
+            m is null || !ReferenceEquals(m.Owner, this) || !Equals(m.DeclaringReference, type) || m.IsStatic || m.IsConstructor))
             throw new ArgumentException("invalid external class member contract", nameof(methods));
         if (externalClassContracts.TryGetValue(type, out var existing))
         {
-            if (!existing.SequenceEqual(members)) throw new ArgumentException("conflicting external class contract");
+            if (!existing.SequenceEqual(members) || externalClassFieldCounts[type] != declaredInstanceFieldCount) throw new ArgumentException("conflicting external class contract");
             return;
         }
         externalClassContracts.Add(type, members);
+        externalClassFieldCounts.Add(type, declaredInstanceFieldCount);
     }
 
     internal bool HasClassBaseContract(ImportedTypeReference type) => fieldlessClassBases.Contains(type) || externalClassContracts.ContainsKey(type);
+
+    internal int ExternalClassFieldCount(ImportedTypeReference type)
+    {
+        int count = 0;
+        for (ImportedTypeReference? current = type; current is not null; current = declaredClassBases.GetValueOrDefault(current))
+        {
+            if (!HasClassBaseContract(current)) throw new InvalidDataException("external ancestor requires a complete layout contract");
+            count = checked(count + externalClassFieldCounts.GetValueOrDefault(current));
+        }
+        return count;
+    }
 
     internal IEnumerable<MethodBuilder> ExternalClassMethods(ImportedTypeReference type)
     {

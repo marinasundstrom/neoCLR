@@ -211,7 +211,7 @@ public sealed partial class AssemblyBuilder
 public sealed partial class TypeBuilder
 {
     internal TypeBuilder? LocalBase => Definition.BaseType is { ExplicitScope: null } reference ? reference.Resolve().Producer : null;
-    internal int InheritedFieldCount => LocalBase is { } parent ? parent.InheritedFieldCount + parent.Fields.Count : 0;
+    internal int InheritedFieldCount => LocalBase is { } parent ? parent.InheritedFieldCount + parent.Fields.Count : ExternalBase is { } external ? Assembly.ExternalClassFieldCount(external) : 0;
     internal bool DerivesFrom(TypeBuilder target)
     {
         for (var parent = LocalBase; parent is not null; parent = parent.LocalBase)

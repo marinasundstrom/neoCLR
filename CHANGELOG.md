@@ -13,6 +13,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   direct concrete base calls. Keep dependency storage in its defining assembly and
   defer external override verification to linking. Generic bases and protected
   ordinary methods remain unsupported. Add CLR execution and rejection regressions.
+  Include explicit dependency storage counts when computing derived native field
+  ordinals, so private base fields and derived fields keep separate slots.
 
 
 - Internalize Utf8 after migrating System.Data/System.Web and active HTTP samples

@@ -76,21 +76,30 @@ internal static class ExternalClassBaseAuthoringChecks
         var baseExtra = app.CreateMethodReference(imported, "Extra", signature, isVirtual: true, isAbstract: true);
         Reject<InvalidDataException>(() => app.CreateMethodReference(imported, "Value", signature));
         Reject<ArgumentException>(() => app.CreateMethodReference(imported, "Bad", signature, isAbstract: true));
-        Reject<ArgumentException>(() => app.CompleteClassBaseReference(imported, [baseValue, baseValue]));
-        app.CompleteClassBaseReference(imported, [baseValue, baseExtra]);
-        Reject<ArgumentException>(() => app.CompleteClassBaseReference(imported, [baseValue]));
+        Reject<ArgumentException>(() => app.CompleteClassBaseReference(imported, [baseValue, baseValue], 1));
+        app.CompleteClassBaseReference(imported, [baseValue, baseExtra], 1);
+        Reject<ArgumentException>(() => app.CompleteClassBaseReference(imported, [baseValue], 1));
+        Reject<ArgumentOutOfRangeException>(() => app.CompleteClassBaseReference(imported, [], -1));
+        Reject<ArgumentException>(() => app.CompleteClassBaseReference(imported, [baseValue, baseExtra], 0));
         var derived = app.AddClass("Example", "Derived", imported);
+        var ownField = derived.AddField("Own", PrimitiveType.Int32, FieldVisibility.Private);
         var derivedConstructor = derived.AddConstructor([]);
         var baseConstructor = app.CreateMethodReference(imported, ".ctor", new MethodSignature(PrimitiveType.Void, []), visibility: MethodVisibility.Protected);
-        derivedConstructor.LoadArgument(0); derivedConstructor.GetILGenerator().Emit(OpCode.Call, baseConstructor); derivedConstructor.Return();
+        derivedConstructor.LoadArgument(0); derivedConstructor.GetILGenerator().Emit(OpCode.Call, baseConstructor);
+        derivedConstructor.LoadArgument(0); derivedConstructor.LoadConstant(2); derivedConstructor.StoreField(ownField); derivedConstructor.Return();
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         main.NewObject(derivedConstructor); main.GetILGenerator().Emit(OpCode.Callvirt, baseValue); main.Return();
         Reject<InvalidDataException>(() => app.WriteNativeAssembly());
-        var extra = derived.AddOverride("Extra", signature); extra.LoadConstant(2); extra.Return();
+        var extra = derived.AddOverride("Extra", signature); extra.LoadArgument(0); extra.LoadField(ownField); extra.Return();
         var overridden = derived.AddOverride("Value", signature);
         overridden.LoadArgument(0); overridden.GetILGenerator().Emit(OpCode.Call, baseValue);
         overridden.LoadArgument(0); overridden.Call(extra); overridden.Emit(OpCode.Add); overridden.Return();
         var image = RuntimeAssemblyContainer.WriteLibraryBinary(app);
+        using var native = System.Text.Json.JsonDocument.Parse(app.WriteNativeAssembly());
+        var store = native.RootElement.GetProperty("functions").EnumerateArray()
+            .SelectMany(f => f.GetProperty("body").EnumerateArray())
+            .Single(i => i.GetProperty("op").GetString() == "stfld");
+        Check(store.GetProperty("arg").GetInt32() == 1, "derived field must follow external private storage");
         var context = new AssemblyLoadContext("virtual-external-base", true);
         try
         {
