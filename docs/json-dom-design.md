@@ -544,3 +544,15 @@ and serialization/deserialization after map access in interpreted and native mod
 Review serializer dispatch precedence so JsonObject remains a JSON node even when
 it also implements Map; generic collection handling must not reinterpret it.
 Public API reference and matching compiler/library snapshots must accompany implementation.
+
+### Author clarification: faulting map indexers
+
+The author subsequently specifies that Map should have indexers: getting a missing
+value may fault, which is why lookup methods are preferred; setting through
+MutableMap is normally straightforward. The agreed design is `Map<K,V>` getter
+indexing returning V, with a missing-key fault, and a MutableMap setter using the
+existing insert-or-replace semantics. Find remains the safe Option-returning path.
+Apply the same missing-key distinction to JsonObject: JsonNull is an existing node,
+not an absent entry. This resolves the indexer return-type question above. General
+map indexers and JsonObject conformance are still implementation work; JSON setter
+quota failures must remain explicit in its documentation and tests.

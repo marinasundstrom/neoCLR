@@ -13767,3 +13767,11 @@ claim completion of in-process test discovery.
 - **Outcome:** record [the API review scope](json-dom-design.md#jsonobject-as-an-indexable-map--author-follow-up-2026-10-10)
   and .NET baseline. No public API change is claimed. This joins the JSON follow-up
   work; the active migration-gap fixes continue. Indexer and mutation contracts remain open.
+
+- **Author clarification:** “Map should have Indexers. But the operation is unsafe
+  since it may fault when getting the value. That is why the methods are preferred
+  then. Setting as in MutableMap is usually no problem”.
+- **Accepted direction:** a V-returning getter on Map faults for absent keys;
+  MutableMap adds insert-or-replace assignment, while Find remains the preferred
+  safe lookup. Apply this to JsonObject without confusing missing keys and JsonNull.
+  This resolves the earlier open return-type question; implementation remains pending.

@@ -9,7 +9,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 ### 2026-10-10
 
 - Record the author-requested JsonObject map/indexer review, including missing-key,
-  JSON-null, iteration and mutation contracts. This is planned API work.
+  JSON-null, iteration and mutation contracts. The author specifies faulting getter
+  indexers on Map and insert-or-replace setters on MutableMap; Find remains the
+  preferred safe lookup. This is planned API work.
 
 - Close the compiler gap exposed by MemoryStream/JSON migration: the matching Raven
   compiler now emits full-width long and null-safe String constant patterns.
