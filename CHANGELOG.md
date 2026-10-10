@@ -26,6 +26,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   client and retained-session comparisons. Development libraries require services
   absent from the published bootstrap VM, including StringHashOrdinal. The macOS
   retained-session, server and client validators pass 3, 5 and 14 cases respectively.
+  Verify the matching Windows runs at 8bf89b57: all 22 cases pass, with 4,729
+  downloaded file hashes and tracked source inputs checked. Retain the evidence
+  and correct stale native-page/JSON-probe qualification text.
 
 - Repair the JSON guide/sample website links and apply Rust formatting to existing
   reflection/collection adapters so website and source-format validation can proceed.

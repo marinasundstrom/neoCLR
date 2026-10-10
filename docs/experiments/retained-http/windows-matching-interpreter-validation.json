@@ -1,0 +1,712 @@
+{
+  "verifiedOn": "2026-10-10",
+  "note": "Downloaded report/artifact hashes and source inputs (allowing Windows checkout line endings) verified locally. Outside-artifact AOT/interpreter tool binaries were stability-checked by the validators, not rehashed on this host. Runs qualify the matching-interpreter fix before the later init-accessor compiler update.",
+  "runs": [
+    {
+      "name": "server",
+      "workflowRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/38032782122",
+      "revision": "8bf89b579bf4f0a2bc542a042553295b0d760f6c",
+      "passed": true,
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "reportSha256": "7c372b7728df77d81fe9079aad5fa34263b739f9fd69e4bc030039fe656cd725",
+      "verifiedDownloadedFiles": 1575,
+      "verifiedSourceInputs": [
+        "scripts/build-native-project.py",
+        "tools/native/windows-console-host.c",
+        "tools/native/windows-gc-host.c",
+        "tools/native/windows-host-memory.c",
+        "tools/native/windows-native-stack.c",
+        "docs/experiments/aot-console/root-probe.c",
+        "docs/experiments/aot-console/native-gc.c",
+        "docs/experiments/aot-console/text-arena.c",
+        "docs/experiments/aot-console/console.c",
+        "docs/experiments/aot-fault-details/render.c",
+        "benchmarks/native-web/http-host.c",
+        "docs/experiments/aot-console/task-queue.c",
+        "docs/experiments/aot-console/socket-listener.c",
+        "docs/experiments/aot-console/console.h",
+        "docs/experiments/aot-console/file-input.h",
+        "docs/experiments/aot-console/file-output.h",
+        "docs/experiments/aot-console/native-gc.h",
+        "docs/experiments/aot-console/native-session.h",
+        "docs/experiments/aot-console/native-stack.h",
+        "docs/experiments/aot-console/root-probe.h",
+        "docs/experiments/aot-console/socket-client-internal.h",
+        "docs/experiments/aot-console/socket-listener.h",
+        "docs/experiments/aot-console/socket-os.h",
+        "docs/experiments/aot-console/string-unicode.h",
+        "docs/experiments/aot-console/task-queue.h",
+        "docs/experiments/aot-console/text-arena.h",
+        "docs/experiments/aot-scalar/abi.h",
+        "docs/experiments/aot-scalar/console.h",
+        "docs/experiments/aot-fault-details/fault-details.h",
+        "tools/native/windows-gc-host.h",
+        "tools/native/windows-host-memory.h"
+      ],
+      "verifiedIsolatedExecutables": 2,
+      "buildArtifacts": [
+        {
+          "path": "fault native output",
+          "hashes": {
+            "app.dll": "8f9cad53739f99c229d1d41ce1440685708130368acfb4e7acb73207e58f426b",
+            "app.obj": "14e1ba6634a3acbc9f3f1beab30cf16f79a5aed6ed2156abefe53a98443ebe93",
+            "app.exe": "95d4ae9b2d6ba810874779358195fd210b053c90017e8edb02e094be11a1aa54"
+          },
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ]
+        },
+        {
+          "path": "server native output",
+          "hashes": {
+            "app.dll": "f5d273b934e8edfd13af5dae0e3e12bb6ab182f2de9b2f82b0e2133f27003637",
+            "app.obj": "b9ffa377ca7cb27c9d98213fc1e5ffb3d4a007a6d8617a8dbeb078023391f40f",
+            "app.exe": "a6c1502a5e4cb66e241e4fde2f779269cef3731c8c0ac079f5f235b37926f49e"
+          },
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ]
+        }
+      ],
+      "directLinkedExecutables": [],
+      "aotSha256": "22d59a488fca87d4abab5244ece7835515846d35d92bdf6957849a39c0442c4c",
+      "interpreterSha256": "bf3349d7e6a4bd607ea9852e1c799ec403689f9fc00aa598eff1719e4b033193",
+      "cases": [
+        {
+          "name": "greeting",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "passed": true
+        },
+        {
+          "name": "fragmented",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "passed": true
+        },
+        {
+          "name": "duplicate-length",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "passed": true
+        },
+        {
+          "name": "handler-error",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "passed": true
+        },
+        {
+          "name": "callback-fault",
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ],
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "Other work runs while HTTP accept is pending\n",
+            "stderr": "UserFault: HTTP callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_526573706F6E64 [instruction 1]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_4874747053657276654F7065726174696F6E.M_4F6E4163636570746564 [instruction 102]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 1,
+            "stdout": "Other work runs while HTTP accept is pending\n",
+            "stderr": "UserFault: HTTP callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_526573706F6E64 [instruction 1]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_4874747053657276654F7065726174696F6E.M_4F6E4163636570746564 [instruction 102]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n",
+            "responseHex": ""
+          },
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "client",
+      "workflowRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/38032782148",
+      "revision": "8bf89b579bf4f0a2bc542a042553295b0d760f6c",
+      "passed": true,
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "reportSha256": "4156f8ce90641d110360c6ab98cbc9aa356c164b1633774b0de7ea34df3a4710",
+      "verifiedDownloadedFiles": 1602,
+      "verifiedSourceInputs": [
+        "scripts/validate-native-client-project.py",
+        "docs/experiments/native-http-client/Client.rvn",
+        "docs/experiments/native-http-client/Native.rvnproj",
+        "docs/experiments/http-server/Server.rvn",
+        "docs/experiments/http-server/Native.rvnproj",
+        "scripts/build-native-project.py",
+        "docs/experiments/task-factories/Native.rvnproj",
+        "tools/native/windows-console-host.c",
+        "tools/native/windows-gc-host.c",
+        "tools/native/windows-host-memory.c",
+        "tools/native/windows-native-stack.c",
+        "docs/experiments/aot-console/root-probe.c",
+        "docs/experiments/aot-console/native-gc.c",
+        "docs/experiments/aot-console/text-arena.c",
+        "docs/experiments/aot-console/console.c",
+        "docs/experiments/aot-fault-details/render.c",
+        "benchmarks/native-web/http-host.c",
+        "docs/experiments/aot-console/task-queue.c",
+        "docs/experiments/aot-console/socket-listener.c",
+        "docs/experiments/aot-console/console.h",
+        "docs/experiments/aot-console/file-input.h",
+        "docs/experiments/aot-console/file-output.h",
+        "docs/experiments/aot-console/native-gc.h",
+        "docs/experiments/aot-console/native-session.h",
+        "docs/experiments/aot-console/native-stack.h",
+        "docs/experiments/aot-console/root-probe.h",
+        "docs/experiments/aot-console/socket-client-internal.h",
+        "docs/experiments/aot-console/socket-listener.h",
+        "docs/experiments/aot-console/socket-os.h",
+        "docs/experiments/aot-console/string-unicode.h",
+        "docs/experiments/aot-console/task-queue.h",
+        "docs/experiments/aot-console/text-arena.h",
+        "docs/experiments/aot-scalar/abi.h",
+        "docs/experiments/aot-scalar/console.h",
+        "docs/experiments/aot-fault-details/fault-details.h",
+        "tools/native/windows-gc-host.h",
+        "tools/native/windows-host-memory.h"
+      ],
+      "verifiedIsolatedExecutables": 4,
+      "buildArtifacts": [
+        {
+          "path": "factories native output",
+          "hashes": {
+            "app.dll": "b7ad7dcf9b92a6fce634dc474af16c4d8101de94290f9fe287e32e8ea05c44fd",
+            "app.obj": "ab233487ff35e61157699d5d143938fbac75eb1ea61dd523dd5d1813e6f13fde",
+            "app.exe": "599f06c2517227f91170dc44bd9ca3c018fbe315ee63f5f74055e1638c013ebd"
+          },
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ]
+        },
+        {
+          "path": "client native output",
+          "hashes": {
+            "app.dll": "8f855df077af3e82771547f79c3e0ddbcd6e29b797950e6c0b41774516813e7c",
+            "app.obj": "6216e23afd8eb822207d493df9a42de900030c92fe65eafa01b3747d6069c135",
+            "app.exe": "cf3e58f37a6d4e7bdc91703107c8717c6ae144c796401d4ef3c06e9665dcf80c"
+          },
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ]
+        },
+        {
+          "path": "server native output",
+          "hashes": {
+            "app.dll": "cc71f49c8768774d46afdf2646233241cfa0537512cc445a93b75d744b4f938f",
+            "app.obj": "aa4e86524d08ccd529e9c42dcfcd398b34962ca5111b62e03e9711a88d6af0fa",
+            "app.exe": "6f85d8c09401df54664f17f310752ed9ce0cd072561c377d35b2cc94e48f5022"
+          },
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ]
+        }
+      ],
+      "directLinkedExecutables": [
+        {
+          "path": "reused host executable only/app.exe",
+          "sha256": "59d3c3965b2f7fd29ff20d08eb65ff85dc41fd94a0db3cf6126cfd5515ed85b7",
+          "linkedDirectlyInIsolationDirectory": true
+        }
+      ],
+      "aotSha256": "fd2172ef18da899e7773294c3988d2948a939f2245b635ae01c73211a5231783",
+      "interpreterSha256": "09f898beeb0c226ea6cb67748b7ba700bb0b906112102551ebbc211702903b7b",
+      "cases": [
+        {
+          "name": "task-factories",
+          "interpreter": {
+            "stdout": "42\nCaf\u00e9 \ud83c\udf0d\nFactories passed\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "native": {
+            "stdout": "42\nCaf\u00e9 \ud83c\udf0d\nFactories passed\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "passed": true
+        },
+        {
+          "name": "greeting",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "interpreterWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303535380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "nativeWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303536300d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "passed": true
+        },
+        {
+          "name": "numeric",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "interpreterWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a203132372e302e302e313a36303536320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "nativeWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a203132372e302e302e313a36303536360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "passed": true
+        },
+        {
+          "name": "fragmented",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "interpreterWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303536380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "nativeWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303537360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "passed": true
+        },
+        {
+          "name": "malformed",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Error: Invalid status line\n",
+            "stderr": ""
+          },
+          "interpreterWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303537380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Error: Invalid status line\n",
+            "stderr": ""
+          },
+          "nativeWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303538300d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "passed": true
+        },
+        {
+          "name": "refused",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Error: ConnectionRefused\n",
+            "stderr": ""
+          },
+          "interpreterWire": {},
+          "native": {
+            "exitCode": 0,
+            "stdout": "Error: ConnectionRefused\n",
+            "stderr": ""
+          },
+          "nativeWire": {},
+          "passed": true
+        },
+        {
+          "name": "timeout",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Error: TimedOut\n",
+            "stderr": ""
+          },
+          "interpreterWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303538370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Error: TimedOut\n",
+            "stderr": ""
+          },
+          "nativeWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303539350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "passed": true
+        },
+        {
+          "name": "pre-cancel",
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "UserFault: Task is cancelled; consume its Outcome\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_50726F6D6973656031.M_52656164 [instruction 4]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B6031.M_476574526573756C74 [instruction 2]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 2]\n"
+          },
+          "interpreterWire": {},
+          "native": {
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "UserFault: Task is cancelled; consume its Outcome\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_50726F6D6973656031.M_52656164 [instruction 4]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B6031.M_476574526573756C74 [instruction 2]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 2]\n"
+          },
+          "nativeWire": {},
+          "passed": true
+        },
+        {
+          "name": "cancel",
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "UserFault: Task is cancelled; consume its Outcome\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_50726F6D6973656031.M_52656164 [instruction 4]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B6031.M_476574526573756C74 [instruction 2]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 2]\n"
+          },
+          "interpreterWire": {},
+          "native": {
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "UserFault: Task is cancelled; consume its Outcome\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_50726F6D6973656031.M_52656164 [instruction 4]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B6031.M_476574526573756C74 [instruction 2]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 2]\n"
+          },
+          "nativeWire": {},
+          "passed": true
+        },
+        {
+          "name": "continuation-fault",
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "UserFault: Client continuation fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.T__3C3E635F5F4173796E6353746174654D616368696E6530.M_4D6F76654E657874 [instruction 159]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n"
+          },
+          "interpreterWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303630380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "native": {
+            "exitCode": 1,
+            "stdout": "",
+            "stderr": "UserFault: Client continuation fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.T__3C3E635F5F4173796E6353746174654D616368696E6530.M_4D6F76654E657874 [instruction 159]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n"
+          },
+          "nativeWire": {
+            "requestHex": "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303631300d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          },
+          "passed": true
+        },
+        {
+          "name": "paired-raven-server",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "interpreterServer": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": ""
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+            "stderr": ""
+          },
+          "nativeServer": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": ""
+          },
+          "passed": true
+        },
+        {
+          "name": "continuation-fault-recovery",
+          "invocations": 3,
+          "sameNativeHeapAndContext": true,
+          "freshInterpreterExitCodes": [
+            0,
+            1,
+            0
+          ],
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\nCaf\u00e9 \ud83c\udf0d\n",
+            "stderr": "UserFault: Client continuation fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.T__3C3E635F5F4173796E6353746174654D616368696E6530.M_4D6F76654E657874 [instruction 159]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n"
+          },
+          "interpreterRequests": [
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303632320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a",
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303632320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a",
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303632320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          ],
+          "native": {
+            "exitCode": 1,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\nCaf\u00e9 \ud83c\udf0d\n",
+            "stderr": "UserFault: Client continuation fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.T__3C3E635F5F4173796E6353746174654D616368696E6530.M_4D6F76654E657874 [instruction 159]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n"
+          },
+          "nativeRequests": [
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303633320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a",
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303633320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a",
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303633320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          ],
+          "passed": true
+        },
+        {
+          "name": "pending-fault-recovery",
+          "invocations": 3,
+          "sameNativeHeapAndContext": true,
+          "freshInterpreterExitCodes": [
+            0,
+            1,
+            0
+          ],
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\nCaf\u00e9 \ud83c\udf0d\n",
+            "stderr": "UserFault: Client fault while request pending\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.T__3C3E635F5F4173796E6353746174654D616368696E6530.M_4D6F76654E657874 [instruction 61]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_4173796E635461736B4D6574686F644275696C6465726031.M_5374617274 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_4D61696E [instruction 19]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 0]\n"
+          },
+          "interpreterRequests": [
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303633360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a",
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303633360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          ],
+          "native": {
+            "exitCode": 1,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\nCaf\u00e9 \ud83c\udf0d\n",
+            "stderr": "UserFault: Client fault while request pending\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.T__3C3E635F5F4173796E6353746174654D616368696E6530.M_4D6F76654E657874 [instruction 61]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_4173796E635461736B4D6574686F644275696C6465726031.M_5374617274 [instruction 1]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_4D61696E [instruction 19]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 0]\n"
+          },
+          "nativeRequests": [
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303634350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a",
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303634350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          ],
+          "passed": true
+        },
+        {
+          "name": "cancellation-recovery",
+          "invocations": 3,
+          "sameNativeHeapAndContext": true,
+          "freshInterpreterExitCodes": [
+            0,
+            1,
+            0
+          ],
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\nCaf\u00e9 \ud83c\udf0d\n",
+            "stderr": "UserFault: Task is cancelled; consume its Outcome\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_50726F6D6973656031.M_52656164 [instruction 4]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B6031.M_476574526573756C74 [instruction 2]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 2]\n"
+          },
+          "interpreterRequests": [
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303634380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a",
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303634380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          ],
+          "native": {
+            "exitCode": 1,
+            "stdout": "Caf\u00e9 \ud83c\udf0d\nCaf\u00e9 \ud83c\udf0d\n",
+            "stderr": "UserFault: Task is cancelled; consume its Outcome\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_50726F6D6973656031.M_52656164 [instruction 4]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B6031.M_476574526573756C74 [instruction 2]\n   at NeoMetadata_5CDB0F5BA85CDEEFD131DE557F67FEC537820941BBB191358102EDA6B1A9932A.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 2]\n"
+          },
+          "nativeRequests": [
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303635330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a",
+            "474554202f6772656574696e6720485454502f312e310d0a486f73743a206c6f63616c686f73743a36303635330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a"
+          ],
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "retained",
+      "workflowRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/38032782133",
+      "revision": "8bf89b579bf4f0a2bc542a042553295b0d760f6c",
+      "passed": true,
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "reportSha256": "5c4e67f9e8763713bde878860d525df253fcbdd0080a73abc8a7168dfe1ccd3f",
+      "verifiedDownloadedFiles": 1552,
+      "verifiedSourceInputs": [
+        "scripts/validate-retained-http.py",
+        "scripts/validate-native-http-project.py",
+        "scripts/verify-native-http-json.py",
+        "docs/experiments/retained-http/Server.rvn",
+        "docs/experiments/retained-http/Native.rvnproj",
+        "scripts/build-native-project.py",
+        "benchmarks/native-web/http-session-host.c",
+        "docs/experiments/aot-console/native-session.c",
+        "tools/native/windows-console-host.c",
+        "tools/native/windows-gc-host.c",
+        "tools/native/windows-host-memory.c",
+        "tools/native/windows-native-stack.c",
+        "docs/experiments/aot-console/root-probe.c",
+        "docs/experiments/aot-console/native-gc.c",
+        "docs/experiments/aot-console/text-arena.c",
+        "docs/experiments/aot-console/console.c",
+        "docs/experiments/aot-fault-details/render.c",
+        "docs/experiments/aot-console/task-queue.c",
+        "docs/experiments/aot-console/socket-listener.c",
+        "docs/experiments/aot-console/console.h",
+        "docs/experiments/aot-console/file-input.h",
+        "docs/experiments/aot-console/file-output.h",
+        "docs/experiments/aot-console/native-gc.h",
+        "docs/experiments/aot-console/native-session.h",
+        "docs/experiments/aot-console/native-stack.h",
+        "docs/experiments/aot-console/root-probe.h",
+        "docs/experiments/aot-console/socket-client-internal.h",
+        "docs/experiments/aot-console/socket-listener.h",
+        "docs/experiments/aot-console/socket-os.h",
+        "docs/experiments/aot-console/string-unicode.h",
+        "docs/experiments/aot-console/task-queue.h",
+        "docs/experiments/aot-console/text-arena.h",
+        "docs/experiments/aot-scalar/abi.h",
+        "docs/experiments/aot-scalar/console.h",
+        "docs/experiments/aot-fault-details/fault-details.h",
+        "tools/native/windows-gc-host.h",
+        "tools/native/windows-host-memory.h"
+      ],
+      "verifiedIsolatedExecutables": 1,
+      "buildArtifacts": [
+        {
+          "path": "native output",
+          "hashes": {
+            "app.dll": "efd670ddc1513efbb1a115a295a7b7afc25c007c90ef7199feeeb891731be877",
+            "app.obj": "341a991c0d6e3b931be2c291163091b0e93d272fe66660c43c7b682f4419c58f",
+            "app.exe": "2a6dbc675de256d357c40e92a1f170bf73ea70e4edd5c138e6e8d5028e55e748"
+          },
+          "dependencies": [
+            "WS2_32.dll",
+            "KERNEL32.dll"
+          ]
+        }
+      ],
+      "directLinkedExecutables": [],
+      "aotSha256": "f1a163354517d83fe27d08fb656fd14c998330cb13d4b1e6ea560894f06403d9",
+      "interpreterSha256": "e9e542691c37b27b96e9ebb3e876cd0f3f9614073c4e5858d890c8127ecd6f9a",
+      "cases": [
+        {
+          "name": "three-requests",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Completed 1\nCompleted 2\nCompleted 3\n",
+            "stderr": "",
+            "responses": [
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742031",
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742032",
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742033"
+            ]
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Completed 1\nCompleted 2\nCompleted 3\n",
+            "stderr": "",
+            "responses": [
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742031",
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742032",
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742033"
+            ]
+          },
+          "passed": true
+        },
+        {
+          "name": "fragmented",
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Completed 1\nCompleted 2\nCompleted 3\n",
+            "stderr": "",
+            "responses": [
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742031",
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742032",
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742033"
+            ]
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Completed 1\nCompleted 2\nCompleted 3\n",
+            "stderr": "",
+            "responses": [
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742031",
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742032",
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742033"
+            ]
+          },
+          "passed": true
+        },
+        {
+          "name": "fault-after-success",
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "Completed 1\n",
+            "stderr": "UserFault: Retained HTTP handler fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_7B67EA38E60672DFAF584268CDF88133E17563EE74B884CD802777C178439702.T__4874747053657373696F6E.M_526573706F6E64 [instruction 16]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_4874747053657276654F7065726174696F6E.M_4F6E4163636570746564 [instruction 102]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_7B67EA38E60672DFAF584268CDF88133E17563EE74B884CD802777C178439702.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n",
+            "responses": [
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742031",
+              ""
+            ]
+          },
+          "native": {
+            "exitCode": 1,
+            "stdout": "Completed 1\n",
+            "stderr": "UserFault: Retained HTTP handler fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_7B67EA38E60672DFAF584268CDF88133E17563EE74B884CD802777C178439702.T__4874747053657373696F6E.M_526573706F6E64 [instruction 16]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_4874747053657276654F7065726174696F6E.M_4F6E4163636570746564 [instruction 102]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n",
+            "responses": [
+              "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20390d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a526571756573742031",
+              ""
+            ]
+          },
+          "expectedInterpreterBoundary": "   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_7B67EA38E60672DFAF584268CDF88133E17563EE74B884CD802777C178439702.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n",
+          "passed": true
+        }
+      ]
+    }
+  ]
+}

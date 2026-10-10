@@ -25,8 +25,9 @@ Run `scripts/validate-native-json.py --output target/my-json-validation --bundle
 /absolute/path/to/development/bundle` for standalone native/interpreter parity and
 the public introspection consumer. The Windows workflow rebuilds current libraries
 from the pinned development compiler and runs the same projects. The earlier
-nested-object/vector/node slices pass Windows; the new collection slice awaits
-its Windows action. macOS native and interpreter collection round trips pass. This development probe is not a published capability or benchmark.
+nested-object/vector/node and collection slices now pass Windows; the
+[verified JSON/collection regression](../native-collections/windows-json-map-validation.json)
+records the matching compiler run. macOS native and interpreter collection round trips pass. This development probe is not a published capability or benchmark.
 
 ## Representative document checks
 

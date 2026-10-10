@@ -99,3 +99,11 @@ not HTTP runtime semantics or the published bundle.
 [Matching-interpreter evidence](matching-interpreter-validation.json) records passing
 macOS native/interpreter runs: three retained-session cases, five ordinary server
 cases and fourteen client/factory/reuse cases.
+
+[Verified Windows matching-interpreter evidence](windows-matching-interpreter-validation.json)
+now records the same 3 retained, 5 server and 14 client cases at `8bf89b57`.
+All pass; local verification checked 4,729 downloaded files and the tracked source
+inputs (allowing checkout line endings). Isolated executable hashes match the build
+outputs; the reused-client host was linked directly in its isolation directory.
+The native executables depend on KERNEL32/WS2_32. These runs predate the init-accessor
+compiler update and qualify the matching-interpreter repair specifically.
