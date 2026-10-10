@@ -297,8 +297,8 @@ fields, properties and parameters across native and CLI snapshots. Inspection ru
 no attribute constructors. Host enum constructor arguments and primitive named
 field/property data also survive native/CLI projection. Raven native import now
 applies usage policies across assemblies. Source annotation emission now passes focused
-compiler checks; source annotation bundle integration remains a prerequisite
-for attributed test discovery. These are not yet released
+compiler checks. A development TestAttribute consumer now discovers module tests
+through host introspection and produces typed Raven registration adapters. These are not yet released
 runtime capabilities. See the [API contract](../../docs/experimental-metadata.html#member-custom-attributes-development-2026-10-10)
 and [implementation plan](https://github.com/marinasundstrom/neoCLR/blob/main/docs/custom-attributes.md).
 
@@ -309,11 +309,13 @@ arguments, Int32 enum values and member/parameter annotations are covered by a
 Named field/property argument snapshots also pass on macOS in both modes with the
 updated source library. The [Windows action](https://github.com/marinasundstrom/neoCLR/actions/runs/38045805683) also succeeds at 96ad94e2; independent artifact-hash verification remains open.
 See the [named argument API](/docs/introspection.html#named-attribute-arguments-development-2026-10-10).
-Compiler-produced source annotations through AOT and automatic discovery remain open.
+The [testing helper reference](/docs/testing.html) covers descriptions, signature
+validation, manual registration and the host/AOT boundary. Guest in-process test
+discovery remains open.
 
 Development source libraries also expose AttributeTargets and AttributeUsageAttribute
 with .NET flag values and policy defaults (AllowMultiple=false, Inherited=true).
 Imported target validation is covered by the
 [usage consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/attribute-usage/README.md).
-Inherited guest queries and automatic discovery remain future work. See the
+Inherited guest queries and guest in-process discovery remain future work. See the
 [AttributeUsageAttribute reference](/docs/api/System.AttributeUsageAttribute.html).

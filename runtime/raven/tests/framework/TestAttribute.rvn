@@ -1,0 +1,19 @@
+module NeoClr.Testing
+
+import System.*
+
+/// Marks a parameterless module function returning Result<unit, TestFailure>.
+/// Discovery reads metadata without executing this constructor or the test.
+[AttributeUsage(AttributeTargets.Method)]
+public class TestAttribute : Attribute {
+    /// Human-readable test description; empty selects the qualified function name.
+    var Description: string { get; set; }
+
+    init() {
+        Description = ""
+    }
+
+    init(description: string) {
+        Description = description
+    }
+}

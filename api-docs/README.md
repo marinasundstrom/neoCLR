@@ -1523,3 +1523,13 @@ ValidOn, constructor defaults and mutable options in the matching reference snap
 These declarations now have executable source-runtime implementations. Inherited
 queries and some annotation targets remain gaps; enum membership is not a support
 claim. Primitive bootstrap pruning is separate from this complete API reference.
+
+### Test framework source surface (2026-10-10)
+
+`NeoClr.Testing.TestAttribute` belongs to the source-included test framework, not
+System.Runtime/CoreProbe. It is therefore outside the guest RavenDoc type selection;
+[the linked manual reference](testing.md) covers both constructors, Description,
+discovery errors/limits, and the existing assembly-internal runner contract.
+No guest reference assembly/XML changed. Packaging the framework will require its
+own reference assembly/XML and generated navigation; this is an explicit coverage
+boundary rather than a silently excluded runtime API.

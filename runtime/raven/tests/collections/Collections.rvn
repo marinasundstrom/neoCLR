@@ -7,16 +7,7 @@ import System.Option.*
 import System.Result.*
 import NeoClr.Testing.*
 
-func RegisterCollectionTests(suite: TestSuite) {
-    suite.Add("NeoClr.RuntimeTests.ListCopy", "ArrayList copy has independent storage", ListCopy)
-    suite.Add("NeoClr.RuntimeTests.QueueOrder", "ArrayQueue preserves FIFO", QueueOrder)
-    suite.Add("NeoClr.RuntimeTests.StackOrder", "ArrayStack preserves LIFO", StackOrder)
-    suite.Add("NeoClr.RuntimeTests.SetEquality", "HashSet applies its comparer", SetEquality)
-    suite.Add("NeoClr.RuntimeTests.AnyWithoutCurrent", "Any does not read Current", AnyWithoutCurrent)
-    suite.Add("NeoClr.RuntimeTests.PredicateAny", "Predicate Any stops at its first match", PredicateAny)
-    suite.Add("NeoClr.RuntimeTests.ForBreak", "For break disposes its iterator", ForBreak)
-}
-
+[Test("ArrayList copy has independent storage")]
 func ListCopy() -> Result<unit, TestFailure> {
     let source = ArrayList<int>()
     source.Add(4)
@@ -26,6 +17,7 @@ func ListCopy() -> Result<unit, TestFailure> {
     return Assert.Equal(4, copy[0])
 }
 
+[Test("ArrayQueue preserves FIFO")]
 func QueueOrder() -> Result<unit, TestFailure> {
     let queue = ArrayQueue<int>()
     queue.Enqueue(4)
@@ -35,6 +27,7 @@ func QueueOrder() -> Result<unit, TestFailure> {
     return Assert.True(queue.Dequeue() is None, "Drained queue must be empty")
 }
 
+[Test("ArrayStack preserves LIFO")]
 func StackOrder() -> Result<unit, TestFailure> {
     let stack = ArrayStack<int>()
     stack.Push(4)
@@ -44,6 +37,7 @@ func StackOrder() -> Result<unit, TestFailure> {
     return Assert.True(stack.Pop() is None, "Drained stack must be empty")
 }
 
+[Test("HashSet applies its comparer")]
 func SetEquality() -> Result<unit, TestFailure> {
     let set = HashSet<string>(StringComparer.OrdinalIgnoreCase)
     _ = Assert.True(set.Add("Raven"), "First item must be added")?
@@ -51,6 +45,7 @@ func SetEquality() -> Result<unit, TestFailure> {
     return Assert.Equal(1, set.Count)
 }
 
+[Test("Any does not read Current")]
 func AnyWithoutCurrent() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     _ = Assert.True(input.Any(), "Input is nonempty")?
@@ -59,6 +54,7 @@ func AnyWithoutCurrent() -> Result<unit, TestFailure> {
     return Assert.Equal(1, input.Disposals)
 }
 
+[Test("Predicate Any stops at its first match")]
 func PredicateAny() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     _ = Assert.True(input.Any(value => value == 2), "Second element matches")?
@@ -67,6 +63,7 @@ func PredicateAny() -> Result<unit, TestFailure> {
     return Assert.Equal(1, input.Disposals)
 }
 
+[Test("For break disposes its iterator")]
 func ForBreak() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     for value in input {

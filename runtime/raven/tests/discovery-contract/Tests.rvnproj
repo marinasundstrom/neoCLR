@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <AssemblyName>RuntimeLibraryTests</AssemblyName>
+    <AssemblyName>TestDiscoveryContract</AssemblyName>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
@@ -11,7 +11,7 @@
     <Compile Include="../framework/TestSuite.rvn" />
     <Compile Include="../framework/TestAttribute.rvn" />
     <Compile Include="$(NeoClrTestRegistry)" />
-    <Compile Include="Main.rvn" />
-    <Compile Include="Collections.rvn" />
+    <Compile Include="Tests.rvn" />
+    <Compile Include="OtherAttribute.rvn" />
   </ItemGroup>
 </Project>

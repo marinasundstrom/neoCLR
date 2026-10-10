@@ -2,6 +2,7 @@
 """Build and run the Raven runtime-library suite and runner contract in both modes."""
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -13,14 +14,17 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / 'runtime/raven/tests'
 COLLECTION_NAMES = [
-    'ArrayList copy has independent storage',
-    'ArrayQueue preserves FIFO',
-    'ArrayStack preserves LIFO',
-    'HashSet applies its comparer',
     'Any does not read Current',
-    'Predicate Any stops at its first match',
     'For break disposes its iterator',
+    'ArrayList copy has independent storage',
+    'Predicate Any stops at its first match',
+    'ArrayQueue preserves FIFO',
+    'HashSet applies its comparer',
+    'ArrayStack preserves LIFO',
 ]
+DISCOVERY_SPEC = importlib.util.spec_from_file_location('test_discovery', ROOT / 'scripts/discover-runtime-tests.py')
+DISCOVERY = importlib.util.module_from_spec(DISCOVERY_SPEC)
+DISCOVERY_SPEC.loader.exec_module(DISCOVERY)
 
 
 def sha(path):
@@ -36,27 +40,40 @@ def main():
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    inputs = [Path(__file__).resolve(), ROOT / 'scripts/build-native-project.py',
+    inputs = [Path(__file__).resolve(), ROOT / 'scripts/build-native-project.py', ROOT / 'scripts/discover-runtime-tests.py', ROOT / 'scripts/validate-test-discovery.py',
+              *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.cs')),
+              *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.csproj')),
               *sorted(TESTS.rglob('*.rvn')), *sorted(TESTS.rglob('*.rvnproj'))]
     report = dict(passed=False, platform=platform.platform(), cases=[],
                   inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},
                   bundleManifestSha256=sha(bundle / 'manifest.json'),
                   aotSha256=sha(args.aot.resolve()), interpreterSha256=sha(args.runtime.resolve()))
+    validation_spec = importlib.util.spec_from_file_location('discovery_validation', ROOT / 'scripts/validate-test-discovery.py')
+    validation = importlib.util.module_from_spec(validation_spec)
+    validation_spec.loader.exec_module(validation)
     expected = [
         ('collections', 0, ''.join('PASS ' + n + '\n' for n in COLLECTION_NAMES) + 'Tests: 7, passed: 7, failed: 0, skipped: 0\n'),
+        ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n'),
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]
     try:
+        validation.validate(bundle, out / 'discovery-signatures')
         for name, exit_code, stdout in expected:
             build = out / (name + '-build')
+            environment = dict(os.environ)
+            if name in ('collections', 'discovery-contract'):
+                registry = DISCOVERY.discover(TESTS / name / 'Tests.rvnproj', bundle, out / (name + '-discovery'))
+                environment['NeoClrTestRegistry'] = str(registry)
             command = [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile',
                        'windows-console' if os.name == 'nt' else 'console', '--project', TESTS / name / 'Tests.rvnproj',
                        '--bundle', bundle, '--aot', args.aot.resolve(), '--output', build]
-            result = subprocess.run(list(map(str, command)), cwd=ROOT, capture_output=True, timeout=600)
+            result = subprocess.run(list(map(str, command)), cwd=ROOT, env=environment, capture_output=True, timeout=600)
             (out / (name + '-build.stdout.log')).write_bytes(result.stdout)
             (out / (name + '-build.stderr.log')).write_bytes(result.stderr)
             if result.returncode:
                 raise RuntimeError(name + ' build failed; see retained logs')
+            if name in ('collections', 'discovery-contract'):
+                DISCOVERY.verify_registration(build / 'app.dll', bundle, out / (name + '-discovery'))
             isolated = out / (name + '-isolated')
             isolated.mkdir()
             exe = isolated / ('app.exe' if os.name == 'nt' else 'app')

@@ -1,0 +1,47 @@
+module NeoClr.DiscoveryTests
+
+import System.*
+import System.Result.*
+import NeoClr.Testing.*
+
+// Source order deliberately differs from declaration-name order.
+[Test("after discovered failure")]
+func CAfter() -> Result<unit, TestFailure> {
+    return Ok(())
+}
+
+[Test(Description: "first discovered test")]
+func ABefore() -> Result<unit, TestFailure> {
+    return Ok(())
+}
+
+[Test("discovered failure")]
+func BFailure() -> Result<unit, TestFailure> {
+    return Assert.Equal(1, 2)
+}
+
+[Test]
+func DWithoutDescription() -> Result<unit, TestFailure> {
+    return Ok(())
+}
+
+// Neither ordinary functions nor another namespace's TestAttribute are tests.
+func Unmarked() -> Result<unit, TestFailure> {
+    Console.WriteLine("UNEXPECTED unmarked test executed")
+    return Assert.True(false, "not a test")
+}
+
+[Other.Test]
+func WrongMarker() -> Result<unit, TestFailure> {
+    Console.WriteLine("UNEXPECTED wrong marker executed")
+    return Assert.True(false, "not our marker")
+}
+
+func Main() -> int {
+    let suite = TestSuite()
+    RegisterDiscoveredTests(suite)
+    suite.Add("manual", "manually registered companion", () => Ok(()))
+    let report = suite.Run()
+    ConsoleReporter.Write(report)
+    return report.ExitCode
+}

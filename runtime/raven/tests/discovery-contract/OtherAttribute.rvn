@@ -1,0 +1,10 @@
+module Other
+
+import System.*
+
+[AttributeUsage(AttributeTargets.Method)]
+public class TestAttribute : Attribute {
+    init() {
+        Console.WriteLine("UNEXPECTED attribute constructor executed")
+    }
+}

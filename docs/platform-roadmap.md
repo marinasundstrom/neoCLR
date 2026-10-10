@@ -12,19 +12,23 @@ parameter annotations alongside types. Int32 enum fixed arguments and primitive 
 arguments now round-trip through host metadata and native/CLI projection. Raven's
 native importer now exposes these attributes and applies existing usage target and
 multiplicity checks across assemblies. Native source annotation emission now passes
-focused compiler round trips on the shared Raven integration line; the development Windows compiler pin now advances to Raven 0f09c350a. Runtime usage
+focused compiler round trips on the shared Raven integration line; the development Windows compiler pin now advances to Raven 9b04250e2. Runtime usage
 declarations pass the [usage consumer](experiments/attribute-usage/README.md) on
-macOS interpreter/AOT, including imported target rejection; Windows is pending.
+macOS interpreter/AOT, including imported target rejection. Windows usage action
+[38047067362](https://github.com/marinasundstrom/neoCLR/actions/runs/38047067362) succeeds at 4455880d; its artifact hashes are not independently checked.
 External base identity, bounded fieldless authoring and constructor chaining now
-pass host metadata and Raven interpreter/macOS AOT checks. Continue through working TestAttribute discovery
-and registration, as explicitly requested, including the separate-library inheritance
-prerequisite, without changing execution contracts. Named field/property argument
+pass host metadata and Raven interpreter/macOS AOT checks. TestAttribute supplies
+constructor/named descriptions. The first [discovery adapter](../runtime/raven/tests/README.md)
+uses host introspection over compiled native metadata and generates typed Raven
+registrations; explicit registration remains supported. This is not guest in-process
+module discovery or a compiler source-generator contract. Grouping with selective
+execution is an author-requested follow-up; keep groups separate from IDs and descriptions.
+Named field/property argument
 snapshots now pass the expanded macOS interpreter/AOT consumer with source-built
 libraries; the expanded [Windows action](https://github.com/marinasundstrom/neoCLR/actions/runs/38045805683) succeeds at 96ad94e2; its artifact hashes have not yet been independently checked. Explicit attribute-data retention now passes a standalone macOS ARM64
 [public Raven consumer](experiments/native-attributes/README.md), using metadata-authored
 annotations and no user constructor roots. The matching [Windows x64 gate](experiments/native-attributes/windows-validation.json)
-passes at 6ae823c0, with available input hashes checked. Compiler-produced AOT
-annotations and callable adapters remain open before claiming native automatic discovery. This supports the native/collection milestone; it does not
+passes at 6ae823c0, with available input hashes checked. Guest module scanning and general reflective callable adapters remain open. This supports the native/collection milestone; it does not
 permanently reprioritize the rest of the platform roadmap.
 
 **Author follow-up (2026-10-10):** after attributes support and the testing framework,

@@ -354,3 +354,20 @@ pass; this does not yet enable authoring or invoking a constructor across an ass
 boundary. See the [reader contract](../api-docs/experimental-metadata.md#scoped-external-class-base-readers-development-2026-10-10).
 The author now explicitly requests continuing through working TestAttribute discovery
 and registration; metadata work is a prerequisite, not the completion criterion.
+
+
+## TestAttribute discovery consumer (development 2026-10-10)
+
+The separate-library base prerequisite is now implemented for explicit fieldless
+public external hierarchies, including System.Attribute. Source TestAttribute is a
+normal Method-targeted attribute with constructor/named descriptions. Host
+introspection discovers parameterless Result-returning module tests by exact type
+identity, validates their signatures and emits typed Raven registrations. Manual
+registration remains available. See the [framework/API contract](../api-docs/testing.md).
+
+This closes a host discovery consumer, not guest runtime module scanning or general
+reflective method invocation. Typed adapters supply explicit AOT call roots; test
+metadata does not indiscriminately retain unrelated code. Future grouping should
+enable selective execution; compiler source generators may later replace adapter
+production while preserving case identity and execution contracts. The requested
+module Introspection/RuntimeContext completion remains follow-up work.

@@ -13414,3 +13414,33 @@ the existing runner. Scoped external-base metadata reading now passes focused te
 that is an intermediate result, not completion of the requested discovery workflow.
 Constructor chaining, callable retention/invocation and the executable discovery
 consumer remain open at this entry. See the [attribute plan](custom-attributes.md).
+
+## 2026-10-10 — Test descriptions and future grouping
+
+- **Author:** “The TestAttribute should be able to supply a description.”
+- **Assistant response/action:** added an optional string constructor and writable
+  Description property (including named attribute assignment), using it for display while keeping identity/order based on
+  the declaration. Plain `[Test]` uses the qualified function name. Validation is
+  being completed with real metadata discovery and Raven runner execution.
+- **Author:** “We should think about a way of grouping test methods in the future.
+  Perhaps also by attribute. Manually registering tests will remain an option.”
+- **Assistant proposal:** evaluate a category/trait attribute separately from
+  descriptions, stable IDs and optional fixture classes. Keep manual Add/Skip
+  alongside discovery. Grouping remains a future contract, not implemented behavior.
+- **Implementation boundary:** first discovery runs on the host through neoCLR
+  introspection and generates typed Raven registrations for interpreter/AOT.
+  Guest runtime module discovery/late loading remain open. See the
+  [framework contract](../runtime/raven/tests/README.md).
+
+- **Author follow-up:** future source generators could register tests instead;
+  having a framework is important, and grouping should support selective execution.
+  **Assistant clarification:** first host introspection plus generated typed adapters
+  is a temporary AOT integration, not a compiler source-generator contract or guest
+  runtime scanning. Group-based selection should be separate from discovery,
+  stable IDs and descriptions. No selection syntax is committed yet.
+
+- **Outcome:** the [discovery milestone](../runtime/raven/tests/discovery-validation.json)
+  passes all three suites in interpreter/macOS ARM64 AOT, including five rejected
+  declaration shapes, descriptions and manual/discovered registration together.
+  Raven 9b04250e2 contains the lookup consistency fix; 83 focused compiler checks
+  pass. Windows qualification of the new gate remains pending.

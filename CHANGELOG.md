@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add source TestAttribute with constructor/named descriptions and host introspection
+  discovery of parameterless Result-returning module tests. Generate typed Raven
+  registrations for interpreter/AOT, keep manual Add/Skip, stable IDs and deterministic
+  ordering, and reject invalid or empty discovery. Collection tests no longer maintain
+  a registration list. Document guest runtime scanning, grouping/selective execution
+  and compiler source generators as future work. Add the manual framework API reference
+  and Windows discovery gate; qualify its compiler's canonical namespace lookup fix.
+  All three macOS ARM64 interpreter/AOT suites and five rejection cases pass, with
+  83 focused compiler checks; Windows qualification for this slice is pending.
+
 - Add explicit fieldless external class-base authoring and protected base-constructor
   chaining. Preserve scoped CLI/native bases, reject missing/double initialization
   and protected allocation outside a derived constructor. Raven's native adapter
@@ -29,8 +39,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   enum identity and CLI/native projection. Compare decoding with CLR AttributeUsage
   metadata and reject malformed native assignments without executing user code.
   CustomAttributeArgument.Type is now SignatureType; existing PrimitiveType inputs
-  still convert implicitly. Named guest inspection and automatic Raven test
-  discovery are not yet implemented. Extend host logical CLI signature inspection
+  still convert implicitly. Named guest inspection and host Raven test discovery
+  now have dedicated validated slices; guest in-process discovery remains open. Extend host logical CLI signature inspection
   to bounded nongeneric instance/static methods with nominal types, allowing
   metadata-only bootstrap constructor validation. Raven's native importer now
   preserves attributes on supported declaration kinds and applies existing usage
@@ -73,7 +83,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   preflight. Seven collection tests and deliberate failure/continuation checks pass
   macOS native/interpreter execution. Wire matching Windows CI; qualification is
   pending. Document the intended stable source contract and next TestAttribute
-  introspection adapter; automatic discovery is not implemented yet.
+  introspection adapter; the host adapter is now implemented above.
 
 - Admit immutable native-produced Char[] snapshots in AOT, matching the existing
   interpreter StringGraphemes contract instead of the incorrect mutable-array

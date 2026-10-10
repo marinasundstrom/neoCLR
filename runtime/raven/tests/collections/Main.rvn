@@ -4,7 +4,7 @@ import NeoClr.Testing.*
 
 func Main() -> int {
     let suite = TestSuite()
-    RegisterCollectionTests(suite)
+    RegisterDiscoveredTests(suite)
     let report = suite.Run()
     ConsoleReporter.Write(report)
     return report.ExitCode

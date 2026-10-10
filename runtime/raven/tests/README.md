@@ -1,8 +1,8 @@
 # Raven runtime-library tests
 
 Development tooling, written in Raven and executed by neoCLR. Tests are ordinary
-module-level functions; a class is not required to group them. The Python script
-only builds and launches suite processes and verifies their output. Assertions,
+module-level functions; a class is not required to group them. The host tooling compiles, discovers metadata, builds adapters, launches suites
+and verifies their output. Assertions,
 execution and reporting live in Raven.
 
 ## Core contract v1
@@ -34,6 +34,7 @@ support grow; incompatible changes require an explicit migration.
 From the compiled collection suite:
 
 ```raven
+[Test("ArrayList copy has independent storage")]
 func ListCopy() -> Result<unit, TestFailure> {
     let source = ArrayList<int>()
     source.Add(4)
@@ -51,43 +52,78 @@ Terminal runtime Faults abort the suite process and are not converted into asser
 failures. Isolation is currently per suite, not per test. Async tests, data cases,
 fixtures, filtering and generic/collection assertions are not implemented yet.
 
-## TestAttribute and introspection: next layer
+## TestAttribute discovery (development)
 
-General [custom attributes and AttributeUsage](../../../docs/custom-attributes.md)
-are prerequisites. Host metadata support now spans callables, fields, properties
-and parameters alongside types. Raven native import now preserves those annotations
-and usage policies; native source emission and guest discovery still need qualification.
+`NeoClr.Testing.TestAttribute : System.Attribute` is now source-included with the
+framework. Its `[AttributeUsage(AttributeTargets.Method)]` contract rejects other
+targets and duplicate annotations. Use `[Test]` or `[Test("human-readable description")]`.
+`var Description: string { get; set; }` exposes the supplied text; the parameterless constructor
+sets an empty string. Empty descriptions select the qualified function name.
+Descriptions affect reporting, never test identity or ordering.
+`[Test(Description: "text")]` is also supported; named assignment overrides a
+constructor description, matching normal attribute construction order.
 
-Author-selected direction: discover attributed test functions using introspection,
-then adapt them to the same case, invocation and report contracts. Explicit
-registration remains useful and supported. Classes may eventually provide fixtures,
-but must not become mandatory containers for module-level tests.
+```raven
+[Test("ArrayQueue preserves FIFO")]
+func QueueOrder() -> Result<unit, TestFailure> {
+    let queue = ArrayQueue<int>()
+    queue.Enqueue(4)
+    return Assert.True(queue.Dequeue() is Some(4), "First input must be removed first")
+}
+```
 
-The proposed marker is `NeoClr.Testing.TestAttribute`. It is **not implemented in
-this slice**. Discover it by attribute type identity through custom attribute data,
-without executing attribute constructors or test bodies. Introspection discovers
-and validates declarations; reflective invocation or a generated typed adapter
-provides execution. These responsibilities remain separate.
+The host tool `tools/testing/NeoCLR.TestDiscovery` dynamically discovers annotations
+in a compiled native assembly through neoCLR's metadata/introspection model. It
+uses exact catalog-owned attribute and result-type identities, not an attribute
+name alone. It never loads the test assembly into the CLR or executes attribute
+constructors/test bodies. The framework currently lives in the test assembly;
+separately packaged marker libraries remain future work.
 
-The first discovery slice should accept parameterless, non-generic module functions
-with the existing Result return type. Derive IDs from assembly/module/function
-identity, never metadata row numbers or display text; document overload identity
-before accepting overloads. Invalid attributed signatures and duplicate IDs must
-produce configuration errors, not silently disappear. Establish deterministic
-ordering instead of relying on metadata enumeration order.
+Discovery accepts accessible parameterless, nongeneric **module functions** returning
+`Result<unit, TestFailure>`. Attributed class methods, unsupported signatures,
+repeated markers, duplicate IDs and empty discovery are configuration errors.
+Overloads/data rows/async/fixtures remain unsupported. The current generated source
+adapter requires ordinary ASCII Raven identifiers. Function IDs use length-prefixed
+assembly name, physical module name and qualified function name plus `()`; they do
+not include metadata row numbers, descriptions or assembly versions. This keeps IDs
+stable across recompilation; they are scoped to the selected test assembly, not a
+global package/version identity. Tests sort by ordinal qualified function name.
 
-Existing `MethodInfo` and `GetCustomAttributesData` describe the public introspection
-surface. Before claiming native discovery, qualify compiler emission for attributed
-module functions, selected-module enumeration, attribute identity retention through
-trimming, callable-body retention and invocation of the Result return value.
-AOT requires an explicit discovery/rooting policy. Test metadata should not root
-unrelated application code. A generated registry is a possible AOT adapter, not a
-substitute for silently ignoring missing metadata. Record any bridge changes in
-both compiler and integration documentation.
+`scripts/discover-runtime-tests.py` first compiles with an empty registry, then
+reads the artifact and writes `TestRegistry.rvn` and `tests.json`. The final compile
+includes the generated `RegisterDiscoveredTests(suite)` function. Typed method
+references explicitly retain the test bodies for AOT; there is no general reflective
+invocation ABI or blanket metadata root. Discovery occurs **on the host before final
+compilation**, not inside a running native executable. Guest module scanning and
+late-loaded test assemblies remain gaps, not new runtime semantics. A source change
+requires rediscovery and recompilation; the validation harness always performs both.
 
-Async invocation, data rows and optional fixtures should be additional adapters;
-they must preserve synchronous tests, IDs and pass/fail/skip semantics. Attribute
-options, fixture lifetime and async signatures remain future design decisions.
+The checked collection suite uses this path with no handwritten registration list.
+The contract suite checks constructor/named descriptions, fallback names, ordering, ignoring unmarked
+functions/another marker, no discovery-time test execution, and continuation after
+failure alongside a manually registered case. Both run through the same Raven TestSuite contract in interpreter and AOT.
+`TestSuite.Add` and `Skip` remain supported: callers can register cases manually,
+call `RegisterDiscoveredTests`, or combine them. Duplicate IDs still fail registration.
+
+Future grouping (author direction, 2026-10-10): evaluate repeatable category/trait
+attributes, separately from descriptions and stable IDs. Group/filter at discovery
+or reporting rather than requiring classes. Compare .NET testing category/trait
+conventions before selecting the public attribute contract. No grouping attribute
+or filtering API is implemented yet; manual registration remains an option. Groups
+should enable selective execution, not merely presentation. Keep selection separate
+from discovery so a future compiler source generator can supply equivalent cases
+and group metadata without changing the runner contract.
+
+Description research (2026-10-10): [NUnit TestAttribute](https://docs.nunit.org/api/NUnit.Framework.TestAttribute.html)
+exposes a writable Description property; the named-property form follows that
+structure. The string constructor is a Raven convenience. Unlike NUnit's separate
+name/description UI, this console runner currently uses the description as its
+single display label. Empty nonnullable text replaces null as the fallback signal.
+This simplifies the small runner, at the cost of conflating those display fields;
+future richer reports should preserve both. Grouping candidates include NUnit's
+[repeatable CategoryAttribute](https://docs.nunit.org/api/NUnit.Framework.CategoryAttribute.html)
+and [property bags](https://docs.nunit.org/articles/nunit/writing-tests/attributes/property.html);
+the contract is deliberately still open.
 
 ## .NET comparison and tradeoffs
 
@@ -103,9 +139,9 @@ a test recoverably without runtime exception unwinding or ambient assertion stat
 The cost is additional syntax, ignored-result risk and no automatic exception stack
 trace. This is a platform accommodation, not a claim of better ergonomics or speed.
 
-Explicit registration works with current typed calls and AOT reachability. Attribute
-discovery removes repetitive registration but requires retained metadata and safe
-invocation. The execution contract lets us add that capability without rewriting
+Explicit registration works with current typed calls and AOT reachability. Host attribute
+discovery removes repetitive registration; generated typed adapters supply AOT
+reachability and invocation without runtime assembly loading. The execution contract lets us add that capability without rewriting
 existing tests. There is no claim of Microsoft.Testing.Platform compatibility.
 
 ## Running and evidence
@@ -123,16 +159,25 @@ The output directory must be new. On macOS, select the installed SDK with
 requires the MSVC x64 tools environment. The Windows collections action runs this
 script after creating its matching development bundle.
 
-The seven collection tests cover copies, FIFO/LIFO, comparer equality, query
+The seven discovered collection tests cover copies, FIFO/LIFO, comparer equality, query
 traversal and iterator disposal. The runner-contract suite deliberately produces
 one failure and exits 1: the host harness requires exactly that outcome, the
 subsequent pass, skip, structured expected/actual values, and rejection of empty
-suites and duplicate IDs. Both suites run natively and with the same assemblies
+suites and duplicate IDs. All suites run natively and with the same assemblies
 in the interpreter. A successful harness ends with `Runtime library tests: PASS`.
 [Initial macOS ARM64 evidence](validation.json) records source and tool hashes.
-Windows action [38039487454](https://github.com/marinasundstrom/neoCLR/actions/runs/38039487454)
+The initial Windows action [38039487454](https://github.com/marinasundstrom/neoCLR/actions/runs/38039487454)
 succeeds at 9db8eb4c; artifact hashes have not yet been independently checked.
 
 This source-included test helper is not part of System.Runtime or its public API
 reference assembly. This document covers its complete initial contract. Packaging
 it as a reusable library will require public XML/API reference documentation.
+
+
+[Discovery milestone evidence](discovery-validation.json) records the matching
+compiler, source/tool hashes, all three suites in interpreter/macOS ARM64 AOT, five
+rejected discovery shapes, and discovered IDs/descriptions. Both final artifacts
+rediscover exactly the same registration source and manifest as their inspection
+build. The deliberate failing suites are successful contract checks only when their
+expected output and exit code 1 match. The Windows action now runs this same gate;
+qualification of this revision is pending.
