@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Close the compiler gap exposed by MemoryStream/JSON migration: the matching Raven
+  compiler now emits full-width long and null-safe String constant patterns.
+  Restore direct union-payload literal assertions; five stream and twelve JSON DOM
+  tests pass native macOS ARM64 and interpreted execution. Pin the Windows development
+  compiler to the fix; Windows requalification remains pending.
+
 - Migrate HTTP route parsing, captures, decoding, numeric conversion and quotas into 8 attributed Raven tests in `http-route-matching`.
   Native macOS ARM64 and release-interpreted execution pass; default gates include
   the suite. Original integration consumers remain; Windows qualification is pending.

@@ -13749,3 +13749,10 @@ claim completion of in-process test discovery.
 - **Open work:** Char wrappers, primitive parser transport, virtual equality/hash
   dispatch and native literal-pattern emission; finish the IP-address and URI batches.
   Windows qualification is pending. These are implementation gaps, not new contracts.
+
+- **Subsequent outcomes:** Char receiver projection and String factory initialization
+  are fixed; all five String tests now run in both local modes. Five character
+  backend checks and two factory checks pass; Windows object emission succeeds,
+  without a Windows execution claim. Raven's long/String constant-pattern gap is
+  also fixed: six compiler checks and the restored five MemoryStream/twelve JSON DOM
+  runtime cases pass. These replace the earlier literal-pattern workarounds.

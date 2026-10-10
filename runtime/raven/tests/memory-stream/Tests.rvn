@@ -11,11 +11,11 @@ import System.IO.*
 func MemoryOverwrite() -> Result<unit, TestFailure> {
     let stream = MemoryStream()
     let bytes: byte[] = [(byte)65, (byte)66, (byte)67]
-    _ = Assert.True(LongEquals(stream.GetLength(), 0L), "New stream must have zero length")?
+    _ = Assert.True(stream.GetLength() is Ok(0L), "New stream must have zero length")?
     _ = Assert.True(stream.Write(bytes, 0, 3) is Ok(3), "Write complete buffer")?
     _ = Assert.True(stream.Seek(1) is Ok(_), "Seek inside content")?
     _ = Assert.True(stream.Write(bytes, 0, 1) is Ok(1), "Overwrite one byte")?
-    _ = Assert.True(LongEquals(stream.GetLength(), 3L), "Overwrite must not grow length")?
+    _ = Assert.True(stream.GetLength() is Ok(3L), "Overwrite must not grow length")?
     _ = Assert.True(stream.Seek(0) is Ok(_), "Rewind")?
     let output: byte[] = [(byte)0, (byte)0, (byte)0]
     _ = Assert.True(stream.Read(output, 0, 3) is Ok(3), "Read stored bytes")?
@@ -30,7 +30,7 @@ func MemoryGap() -> Result<unit, TestFailure> {
     _ = Assert.True(stream.Write(bytes, 0, 3) is Ok(3), "Write initial content")?
     _ = Assert.True(stream.Seek(5) is Ok(_), "Seek beyond end")?
     _ = Assert.True(stream.Write(bytes, 0, 0) is Ok(0), "Empty write succeeds")?
-    _ = Assert.True(LongEquals(stream.GetLength(), 3L), "Empty write must not extend the stream")?
+    _ = Assert.True(stream.GetLength() is Ok(3L), "Empty write must not extend the stream")?
     _ = Assert.True(stream.Write(bytes, 2, 1) is Ok(1), "Write after gap")?
     _ = Assert.True(stream.Seek(0) is Ok(_), "Rewind")?
     let output: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9, (byte)9, (byte)9, (byte)9, (byte)9]
@@ -50,8 +50,8 @@ func MemoryInvalidRanges() -> Result<unit, TestFailure> {
     _ = Assert.True(stream.Write(bytes, 2147483647, 1) is Error(StreamError.InvalidRange), "Overflowing write range")?
     _ = Assert.True(stream.Read(bytes, -1, 1) is Error(StreamError.InvalidRange), "Negative read offset")?
     _ = Assert.True(stream.Seek(-1) is Error(StreamError.InvalidRange), "Negative seek")?
-    _ = Assert.True(LongEquals(stream.GetPosition(), 0L), "Rejected operations must preserve position")?
-    _ = Assert.True(LongEquals(stream.GetLength(), 0L), "Rejected operations must preserve length")?
+    _ = Assert.True(stream.GetPosition() is Ok(0L), "Rejected operations must preserve position")?
+    _ = Assert.True(stream.GetLength() is Ok(0L), "Rejected operations must preserve length")?
     stream.Close()
     return Assert.True(true, "Range checks completed")
 }
@@ -62,11 +62,11 @@ func MemoryCapacity() -> Result<unit, TestFailure> {
     let bytes: byte[] = [(byte)1]
     _ = Assert.True(stream.Write(bytes, 0, 1) is Ok(1), "Write initial byte")?
     _ = Assert.True(stream.Seek(65537) is Error(StreamError.LimitExceeded), "Seek beyond quota")?
-    _ = Assert.True(LongEquals(stream.GetPosition(), 1L), "Rejected seek must not move")?
+    _ = Assert.True(stream.GetPosition() is Ok(1L), "Rejected seek must not move")?
     _ = Assert.True(stream.Seek(65536) is Ok(_), "Exact boundary seek")?
     _ = Assert.True(stream.Write(bytes, 0, 1) is Error(StreamError.LimitExceeded), "Write beyond quota")?
-    _ = Assert.True(LongEquals(stream.GetLength(), 1L), "Rejected write must not extend length")?
-    _ = Assert.True(LongEquals(stream.GetPosition(), 65536L), "Rejected write must not move")?
+    _ = Assert.True(stream.GetLength() is Ok(1L), "Rejected write must not extend length")?
+    _ = Assert.True(stream.GetPosition() is Ok(65536L), "Rejected write must not move")?
     stream.Close()
     return Assert.True(true, "Quota checks completed")
 }
@@ -89,9 +89,3 @@ func MemoryClosed() -> Result<unit, TestFailure> {
     return Assert.True(seek.Seek(0) is Error(StreamError.Closed), "Closed seek")
 }
 
-func LongEquals(result: Result<long, StreamError>, expected: long) -> bool {
-    if result is Ok(let value) {
-        return value == expected
-    }
-    return false
-}

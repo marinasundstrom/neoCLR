@@ -447,3 +447,10 @@ Source: [docs/experiments/http-routing/Main.rvn](../../../docs/experiments/http-
 
 The route suite ports RoutePattern/RouteMatch behavior; application-specific helper
 and route-to-union mapping checks remain in the original routing consumer.
+
+The literal-pattern workaround is removed from MemoryStream, and JSON DOM now
+uses a nested String constant pattern. Both suites pass with Raven
+`b2f3ba0f8b8e92f0c516155f563b332b0a6fad54`; see their refreshed validation reports.
+The compiler's six focused pattern checks include full-width mismatches, null and
+dynamically constructed strings. Libraries retain the previous compatible metadata
+snapshot; the bundle manifest records the compiler replacement and all file hashes.

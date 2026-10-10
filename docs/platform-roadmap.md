@@ -3545,3 +3545,10 @@ Native JSON evidence update (2026-10-09): the public
 now validates nested object and DOM round trips on macOS in both modes. This also covers typed scalar/object vectors. Lists/sequences, maps, jagged native
 arrays remain open. Windows project qualification passes at `91911ce9`
 ([evidence](windows-native-json-validation.json)).
+
+**Migration gap closure (2026-10-10):** missing Int64 native parsing and Char/String
+factory projection are fixed and their native exclusions removed. Raven long/String
+constant-pattern emission is also fixed; restored payload patterns pass the five
+MemoryStream and twelve JSON DOM cases in both local modes. Primitive parsing and
+Object equality/hash dispatch remain implementation work before the ten-batch
+migration can be called complete. Windows execution of these fixes remains pending.

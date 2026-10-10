@@ -22,10 +22,8 @@ func JsonObjectNull() -> Result<unit, TestFailure> {
     let document = JsonObject()
     _ = Assert.True(document.Add("note", JsonNull()) is Ok(_), "Add explicit null")?
     _ = Assert.True(document.Field("note") is Ok(JsonNull), "Present null must remain a node")?
-    if document.Field("missing") is Error(JsonError.MissingField(let name)) {
-        return Assert.Equal("missing", name)
-    }
-    return Assert.True(false, "Missing field must preserve its name")
+    return Assert.True(document.Field("missing") is Error(JsonError.MissingField("missing")),
+        "Missing field must preserve its name")
 }
 
 [Test("JSON duplicate insertion preserves the original value")]

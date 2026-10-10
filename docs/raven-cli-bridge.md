@@ -7667,3 +7667,21 @@ are required. Compiler pin 1a0c4e62734b2d4f17dc9f8af1f5d02c566f8cf4 remains vali
 neoCLR's native linker owns these private receiver/factory transformations; eventual
 intrinsic native String construction will replace them. General chained String
 constructors remain unsupported. See [test evidence](../runtime/raven/tests/string-construction-validation.json).
+
+### Literal-pattern compiler gap closure — 2026-10-10
+
+Raven revision `b2f3ba0f8b8e92f0c516155f563b332b0a6fad54` fixes portable lowering
+of long and String constant patterns. Long equality retains 64 bits; String
+matching guards null and calls the target's ordinary String equality operator.
+This restores ordinary .NET-style pattern behavior, without changes to binding,
+semantic-model types, Runtime Contract configuration or public library APIs.
+The planner owns this shared fix; the native adapter uses existing comparisons,
+calls and branches. CLI reference encoding and its information limits are unchanged;
+native metadata/codegen replacement requires no separate pattern encoding.
+
+Six focused Raven checks pass. The five MemoryStream tests now use `Ok(0L)`-style
+patterns directly and the twelve JSON DOM tests include a nested String constant.
+Both suites pass native macOS ARM64 and interpreted execution with a hashed bundle
+containing the rebuilt compiler and unchanged compatible source-library metadata.
+Windows development qualification now selects the same compiler revision; execution
+is pending. Broader constant-pattern types remain separate compiler work.
