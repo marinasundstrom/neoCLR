@@ -49,6 +49,14 @@ Segmentation is pinned to Unicode 16. Length scans the text; iteration currently
 
 ## UTF-8 encoding and decoding
 
+Development builds also expose `Encodings.Utf8.Encode(text)` and
+`Encodings.Utf8.Decode(bytes)` through the public `Encoding` interface. Both return
+`Result` with `EncodingError`; one-shot input is limited to 65536 bytes. Decoding
+preserves BOM data and rejects malformed or truncated UTF-8. ASCII is available
+through `Encodings.Ascii`. Custom providers must implement both operations.
+
+The existing helper remains public while its consumers migrate:
+
 `Utf8.Encode(text)` returns `Sequence<byte>`, with Count, indexed access and iteration. `Utf8.Decode(bytes)` accepts that same collection interface and returns `Result<string, InvalidUtf8Error>`.
 
 ```raven

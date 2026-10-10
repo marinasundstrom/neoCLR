@@ -8,6 +8,15 @@ import System.Text.*
 
 // A deliberately expanding test codec proves that adapters consume decoded text.
 class ExpandedEncoding : Encoding {
+    func Decode(bytes: Sequence<byte>) -> Result<string, EncodingError> {
+        if bytes.Count > 65536 {
+            return Error(EncodingError.LimitExceeded)
+        }
+        if bytes.Count == 0 {
+            return Ok("")
+        }
+        return Ok("A\nB")
+    }
     func CreateEncoder() -> Encoder {
         return ExpandedEncoder()
     }

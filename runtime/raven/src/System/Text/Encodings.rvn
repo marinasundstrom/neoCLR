@@ -10,6 +10,16 @@ public static class Encodings {
 }
 
 internal class Utf8Encoding : Encoding {
+    func Decode(bytes: Sequence<byte>) -> Result<string, EncodingError> {
+        if bytes.Count > 65536 {
+            return Error(EncodingError.LimitExceeded)
+        }
+        return match Utf8.Decode(bytes) {
+            Ok(let text) => Ok(text)
+            Error(_) => Error(EncodingError.InvalidUtf8)
+        }
+    }
+
     func CreateEncoder() -> Encoder {
         return TextEncoder(false)
     }
@@ -25,6 +35,21 @@ internal class Utf8Encoding : Encoding {
 }
 
 internal class AsciiEncoding : Encoding {
+    func Decode(bytes: Sequence<byte>) -> Result<string, EncodingError> {
+        if bytes.Count > 65536 {
+            return Error(EncodingError.LimitExceeded)
+        }
+        for value in bytes {
+            if value > 127 {
+                return Error(EncodingError.InvalidData)
+            }
+        }
+        return match Utf8.Decode(bytes) {
+            Ok(let text) => Ok(text)
+            Error(_) => Error(EncodingError.InvalidData)
+        }
+    }
+
     func CreateEncoder() -> Encoder {
         return TextEncoder(true)
     }

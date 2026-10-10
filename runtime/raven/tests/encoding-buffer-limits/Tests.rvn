@@ -78,3 +78,19 @@ func EArrayRanges() -> Result<unit, TestFailure> {
     let limit: int[] = [for index in 2147483647..2147483647 => index]
     return Assert.True(limit.Length == 1 && limit[0] == 2147483647, "Inclusive maximum does not overflow")
 }
+
+[Test("One-shot decoding enforces byte limits and accepts the maximum")]
+func ZOneShotLimits() -> Result<unit, TestFailure> {
+    let oversized: byte[] = [for index in 0..<65537 => (byte)120]
+    _ = Assert.True(Encodings.Utf8.Decode(oversized) is Error(EncodingError.LimitExceeded), "UTF-8 quota")?
+    _ = Assert.True(Encodings.Ascii.Decode(oversized) is Error(EncodingError.LimitExceeded), "ASCII quota")?
+    let maximum: byte[] = [for index in 0..<65536 => (byte)120]
+    let Ok(utf8) = Encodings.Utf8.Decode(maximum) else {
+        return Error(TestFailure("Maximum UTF-8 decode", "Ok", "Error"))
+    }
+    let Ok(ascii) = Encodings.Ascii.Decode(maximum) else {
+        return Error(TestFailure("Maximum ASCII decode", "Ok", "Error"))
+    }
+    _ = Assert.Equal(65536, utf8.GetUtf8ByteCount())?
+    return Assert.Equal(utf8, ascii)
+}

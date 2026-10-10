@@ -1,0 +1,152 @@
+{
+  "passed": true,
+  "scope": "44 cases in five suites, interpreted and macOS ARM64 native",
+  "qualification": "Scoped execution evidence. Original aggregate reports retained under target; release-validation stopped on a subsequently fixed compiler-expression fixture; remaining-validation global guard detected only an unrelated, unselected http-text fixture edit. JSON uses an optimized interpreter after the debug runner exceeded its timeout.",
+  "sources": [
+    {
+      "path": "target/public-decoding-json-recheck/report.json",
+      "sha256": "aa6904406cc03e713ad74587ac1dc44ddebc0a24243a0394b10c9b70a594cc64",
+      "originalPassed": true,
+      "selectedSuites": [
+        "json-streams"
+      ],
+      "verifiedInputs": {
+        "runtime/raven/tests/framework/Assertions.rvn": "75b24edb65dd3c9bc6af7a211966feda795c9834adea0f3d9d064e05049072eb",
+        "runtime/raven/tests/framework/TestAttribute.rvn": "a20f0d5f981985e52a384937a1dba70670a01507143a6949972978546c6204cd",
+        "runtime/raven/tests/framework/TestSuite.rvn": "de0c1c8e5491ba22d6c3964142c81e12f210b567c61b02a3ebf58fc4acad3f07",
+        "runtime/raven/tests/json-streams/JsonStreams.rvn": "92c4b869d5378c53a9b8fbd3fc1167eedd2391d9acbb8af47d09e5122cb9bdc8",
+        "runtime/raven/tests/json-streams/ShortStreams.rvn": "1fbda3bbe9b9aa4cc1cc7f57988b15ff7b9a2ba9ef15a55b4a78fc8daa1cfe86",
+        "runtime/raven/tests/json-streams/Tests.rvnproj": "e430d27261d4f3c26d7c8f638ad4e54c983872e0a1e774de56887c86db7da1c5"
+      },
+      "bundleManifestSha256": "dd3acf283ffd75b2588f86fc65536eb22e455ed1a9d19468a7a23a00f723649e",
+      "aotSha256": "3ae24f027c95b2d3b29f40613bc8924731e578f5ad9c7a8eafc6deb0003f6e80",
+      "interpreterSha256": "e707811a28b7d1c6ac426f2d056da888edb93cf4d1161726f4b37b5f3bb1dadb"
+    },
+    {
+      "path": "target/public-decoding-release-validation/report.json",
+      "sha256": "ca337e87ac3ad84b458066bd02dc309164169b1b03aa16e3e76691243e557486",
+      "originalPassed": false,
+      "selectedSuites": [
+        "encoding-buffer-limits"
+      ],
+      "verifiedInputs": {
+        "runtime/raven/tests/encoding-buffer-limits/Tests.rvn": "dbb7c3cfd87eb743611352e8199f4b56f0872686913ae2833283c358422c226b",
+        "runtime/raven/tests/framework/Assertions.rvn": "75b24edb65dd3c9bc6af7a211966feda795c9834adea0f3d9d064e05049072eb",
+        "runtime/raven/tests/framework/TestAttribute.rvn": "a20f0d5f981985e52a384937a1dba70670a01507143a6949972978546c6204cd",
+        "runtime/raven/tests/framework/TestSuite.rvn": "de0c1c8e5491ba22d6c3964142c81e12f210b567c61b02a3ebf58fc4acad3f07",
+        "runtime/raven/tests/encoding-buffer-limits/Tests.rvnproj": "3753b7dfbfb917363cbb08a843a599cfa36700d4d3dd6a4a5fa3849077c48244"
+      },
+      "bundleManifestSha256": "dd3acf283ffd75b2588f86fc65536eb22e455ed1a9d19468a7a23a00f723649e",
+      "aotSha256": "3ae24f027c95b2d3b29f40613bc8924731e578f5ad9c7a8eafc6deb0003f6e80",
+      "interpreterSha256": "e707811a28b7d1c6ac426f2d056da888edb93cf4d1161726f4b37b5f3bb1dadb"
+    },
+    {
+      "path": "target/public-decoding-remaining-validation-v2/report.json",
+      "sha256": "45265794fbe47e4c919c7462dab8bcda63456c6d089abc415261830a08978d8e",
+      "originalPassed": false,
+      "selectedSuites": [
+        "encoding-boundaries",
+        "encoding-streams",
+        "encoding"
+      ],
+      "verifiedInputs": {
+        "runtime/raven/tests/encoding/Tests.rvn": "e4bfec20e6ff2311f03feee07150a1642e6e65aac2a4facca483a7eb9ef433a2",
+        "runtime/raven/tests/encoding-boundaries/Fixtures.rvn": "c6c5d11390b778013c34c44067f71215cb7527a8672b18ed075f56eef77d1b26",
+        "runtime/raven/tests/encoding-boundaries/Tests.rvn": "a25c6f975b92bce629f0f4dcf3eb650ef381ef2791d4a3cfdfd3b1895dc9392f",
+        "runtime/raven/tests/encoding-streams/Fixtures.rvn": "32b0a1bbac2784dce51cd502c110653b88ef7a2dac51329ad52aca344e7e8f1d",
+        "runtime/raven/tests/encoding-streams/Tests.rvn": "25aa83a4c0519fc4b4ce2df12e3e9b64694ff36d9fb031f467593748f20685ec",
+        "runtime/raven/tests/framework/Assertions.rvn": "75b24edb65dd3c9bc6af7a211966feda795c9834adea0f3d9d064e05049072eb",
+        "runtime/raven/tests/framework/TestAttribute.rvn": "a20f0d5f981985e52a384937a1dba70670a01507143a6949972978546c6204cd",
+        "runtime/raven/tests/framework/TestSuite.rvn": "de0c1c8e5491ba22d6c3964142c81e12f210b567c61b02a3ebf58fc4acad3f07",
+        "runtime/raven/tests/encoding/Tests.rvnproj": "76a9551bab7ddefc98291a4ccbfccba1df20e1bf066245b2e891b6c87f9d4673",
+        "runtime/raven/tests/encoding-boundaries/Tests.rvnproj": "856ba10ba0dad773eca9d4f896f8f023362ac99478b4185c33571b7d37b30157",
+        "runtime/raven/tests/encoding-streams/Tests.rvnproj": "04c4dc37b436fb98aef5cf89982fb1059c7de4e3d3af2fd57d39e8b3b77ac5e3"
+      },
+      "bundleManifestSha256": "dd3acf283ffd75b2588f86fc65536eb22e455ed1a9d19468a7a23a00f723649e",
+      "aotSha256": "b59535cd13e21cf7dd95cef14be4144496cdb7c65c45ece9bd70438648775553",
+      "interpreterSha256": "e707811a28b7d1c6ac426f2d056da888edb93cf4d1161726f4b37b5f3bb1dadb"
+    }
+  ],
+  "cases": [
+    {
+      "suite": "json-streams",
+      "mode": "native",
+      "exitCode": 0,
+      "elapsedSeconds": 0.968,
+      "stdout": "PASS JSON stream serialization detects cycles before writing\nPASS JSON stream output quota includes escaping and validates before writes\nPASS JSON stream reads reject split invalid UTF-8\nPASS JSON memory stream round trip preserves document content\nPASS JSON number document quota preserves long number spelling\nPASS JSON streams retry single-byte reads and writes without taking ownership\nPASS JSON stream reads preserve the underlying I/O failure\nPASS JSON stream input quota counts bytes and preserves ownership\nPASS JSON stream reads reject a truncated document\nPASS JSON stream boundary counts UTF-8 bytes rather than characters\nPASS JSON stream writes preserve partial output and failure cause\nPASS JSON stream writes reject zero progress without looping\nTests: 12, passed: 12, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "json-streams",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS JSON stream serialization detects cycles before writing\nPASS JSON stream output quota includes escaping and validates before writes\nPASS JSON stream reads reject split invalid UTF-8\nPASS JSON memory stream round trip preserves document content\nPASS JSON number document quota preserves long number spelling\nPASS JSON streams retry single-byte reads and writes without taking ownership\nPASS JSON stream reads preserve the underlying I/O failure\nPASS JSON stream input quota counts bytes and preserves ownership\nPASS JSON stream reads reject a truncated document\nPASS JSON stream boundary counts UTF-8 bytes rather than characters\nPASS JSON stream writes preserve partial output and failure cause\nPASS JSON stream writes reject zero progress without looping\nTests: 12, passed: 12, failed: 0, skipped: 0\n",
+      "stderr": "",
+      "elapsedSeconds": 80.98
+    },
+    {
+      "suite": "encoding-buffer-limits",
+      "mode": "native",
+      "exitCode": 0,
+      "elapsedSeconds": 1.362,
+      "stdout": "PASS UTF-8 decoder quota rejection preserves an incomplete scalar\nPASS ASCII decoder accepts the maximum input after rejecting an oversized call\nPASS Encoder drain quotas preserve accepted text and destination bytes\nPASS UTF-8 decoder maximum input counts new bytes separately from carried bytes\nPASS Native buffer comprehensions preserve selector indices and range endpoints\nPASS One-shot decoding enforces byte limits and accepts the maximum\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "encoding-buffer-limits",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "elapsedSeconds": 110.118,
+      "stdout": "PASS UTF-8 decoder quota rejection preserves an incomplete scalar\nPASS ASCII decoder accepts the maximum input after rejecting an oversized call\nPASS Encoder drain quotas preserve accepted text and destination bytes\nPASS UTF-8 decoder maximum input counts new bytes separately from carried bytes\nPASS Native buffer comprehensions preserve selector indices and range endpoints\nPASS One-shot decoding enforces byte limits and accepts the maximum\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "encoding-boundaries",
+      "mode": "native",
+      "exitCode": 0,
+      "elapsedSeconds": 0.436,
+      "stdout": "PASS StreamReader decodes Unicode lines across single-byte reads\nPASS StreamReader distinguishes empty lines EOF and lone carriage returns\nPASS StreamReader delimits custom decoded output and bounds expansion\nPASS StreamWriter reports zero progress and preserves flush failures\nPASS StreamReader rejects invalid limits before consuming its input\nPASS Encoding input quotas reject oversized chunks without poisoning sessions\nPASS StreamWriter accepts its maximum byte count and preflights oversized lines\nPASS StreamReader preserves input failures and rejects truncated UTF-8 at EOF\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "encoding-boundaries",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "elapsedSeconds": 27.138,
+      "stdout": "PASS StreamReader decodes Unicode lines across single-byte reads\nPASS StreamReader distinguishes empty lines EOF and lone carriage returns\nPASS StreamReader delimits custom decoded output and bounds expansion\nPASS StreamWriter reports zero progress and preserves flush failures\nPASS StreamReader rejects invalid limits before consuming its input\nPASS Encoding input quotas reject oversized chunks without poisoning sessions\nPASS StreamWriter accepts its maximum byte count and preflights oversized lines\nPASS StreamReader preserves input failures and rejects truncated UTF-8 at EOF\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "encoding-streams",
+      "mode": "native",
+      "exitCode": 0,
+      "elapsedSeconds": 0.54,
+      "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "encoding-streams",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "elapsedSeconds": 7.437,
+      "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "encoding",
+      "mode": "native",
+      "exitCode": 0,
+      "elapsedSeconds": 1.285,
+      "stdout": "PASS Encoding providers preserve UTF-8 and reject non-ASCII text\nPASS UTF-8 decoding preserves text at every byte split\nPASS UTF-8 decoders reject malformed scalars and truncated final input\nPASS Decoder sessions copy pending input and preserve BOM data\nPASS Decoder range errors are retryable and ASCII errors are terminal\nPASS Encoders preserve accepted input through one-byte drains\nPASS Encoder chunks preserve scalars across the internal byte boundary\nPASS ASCII encoder preflight is retryable and factories are independent\nPASS One-shot decoding preserves Unicode BOM NUL and empty sequences\nPASS One-shot errors do not poison providers and results are snapshots\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "encoding",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "elapsedSeconds": 8.991,
+      "stdout": "PASS Encoding providers preserve UTF-8 and reject non-ASCII text\nPASS UTF-8 decoding preserves text at every byte split\nPASS UTF-8 decoders reject malformed scalars and truncated final input\nPASS Decoder sessions copy pending input and preserve BOM data\nPASS Decoder range errors are retryable and ASCII errors are terminal\nPASS Encoders preserve accepted input through one-byte drains\nPASS Encoder chunks preserve scalars across the internal byte boundary\nPASS ASCII encoder preflight is retryable and factories are independent\nPASS One-shot decoding preserves Unicode BOM NUL and empty sequences\nPASS One-shot errors do not poison providers and results are snapshots\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+      "stderr": ""
+    }
+  ]
+}

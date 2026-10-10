@@ -54,7 +54,7 @@ func StreamMemoryRoundTrip() -> Result<unit, TestFailure> {
 
 [Test("JSON stream reads preserve the underlying I/O failure")]
 func StreamReadFailure() -> Result<unit, TestFailure> {
-    let input = ShortInput(Utf8.Encode("{}"), 1)
+    let input = ShortInput(EncodedBytes("{}")?, 1)
     let result = JsonSerializer.DeserializeNode(input)
     _ = Assert.True(!input.Closed, "Failure must not close borrowed input")?
     input.Close()
@@ -73,7 +73,7 @@ func StreamInvalidUtf8() -> Result<unit, TestFailure> {
 
 [Test("JSON stream reads reject a truncated document")]
 func StreamTruncated() -> Result<unit, TestFailure> {
-    let input = ShortInput(Utf8.Encode("[1,"), -1)
+    let input = ShortInput(EncodedBytes("[1,")?, -1)
     let result = JsonSerializer.DeserializeNode(input)
     _ = Assert.True(!input.Closed, "Failure must not close borrowed input")?
     input.Close()
@@ -139,7 +139,7 @@ func StreamUnicodeBoundary() -> Result<unit, TestFailure> {
     let content = Repeat511("é")
     let text = "\"" + content + "\""
     _ = Assert.Equal(1024, text.GetUtf8ByteCount())?
-    let input = ShortInput(Utf8.Encode(text), -1)
+    let input = ShortInput(EncodedBytes(text)?, -1)
     let result = JsonSerializer.DeserializeNode(input)
     _ = Assert.True(!input.Closed, "Boundary success must preserve ownership")?
     input.Close()
@@ -185,7 +185,7 @@ func StreamNumberBoundary() -> Result<unit, TestFailure> {
         digits = digits + digits
         index = index + 1
     }
-    let input = ShortInput(Utf8.Encode(digits), -1)
+    let input = ShortInput(EncodedBytes(digits)?, -1)
     let result = JsonSerializer.DeserializeNode(input)
     input.Close()
     if result is Ok(let value) {
@@ -212,4 +212,11 @@ func Repeat511(value: string) -> string {
         index = index + 1
     }
     return result
+}
+
+func EncodedBytes(text: string) -> Result<Sequence<byte>, TestFailure> {
+    let Ok(bytes) = Encodings.Utf8.Encode(text) else {
+        return Error(TestFailure("UTF-8 encode", "Ok", "Error"))
+    }
+    return Ok(bytes)
 }

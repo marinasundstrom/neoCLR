@@ -1653,3 +1653,12 @@ non-transitive access and the current unsigned/simple-ASCII native identity limi
 The native reference was rendered from rebuilt Runtime/Data/Networking/Web libraries;
 the aggregate bridge adds a reference-only declaration. No public helper is removed
 in this slice: Utf8 remains public pending migration of public conversion consumers.
+
+
+### One-shot decoding (2026-10-10)
+
+Encoding.Decode(Sequence<byte>) is included in both development reference snapshots,
+with strict errors, the built-in 65536-byte bound, BOM preservation and stateless
+retry behavior. Custom Encoding providers must implement the new method. The
+aggregate bridge adds its declaration; native libraries implement UTF-8 and ASCII.
+Utf8 remains public until production consumer migration is complete.

@@ -25,7 +25,7 @@ func AProviders() -> Result<unit, TestFailure> {
     let Ok(bytes) = Encodings.Utf8.Encode(source) else {
         return Error(TestFailure("UTF-8 encode", "Ok", "Error"))
     }
-    let Ok(text) = Utf8.Decode(bytes) else {
+    let Ok(text) = Encodings.Utf8.Decode(bytes) else {
         return Error(TestFailure("UTF-8 round trip", "Ok", "Error"))
     }
     _ = Assert.Equal(source, text)?
@@ -120,7 +120,7 @@ func FProgress() -> Result<unit, TestFailure> {
             _ = Assert.True(step.State is EncoderState.NeedsOutput, "More bytes pending")?
         }
     }
-    let Ok(text) = Utf8.Decode(output) else {
+    let Ok(text) = Encodings.Utf8.Decode(output) else {
         return Error(TestFailure("Drained bytes", "UTF-8", "Error"))
     }
     _ = Assert.Equal("é😀é", text)?
@@ -160,7 +160,7 @@ func GChunkBoundary() -> Result<unit, TestFailure> {
         }
     }
     _ = Assert.True(finished, "Bounded drain must complete")?
-    let Ok(text) = Utf8.Decode(output) else {
+    let Ok(text) = Encodings.Utf8.Decode(output) else {
         return Error(TestFailure("Boundary bytes", "UTF-8", "Error"))
     }
     return Assert.Equal(source, text)
@@ -183,4 +183,34 @@ func HAsciiSessions() -> Result<unit, TestFailure> {
         return Error(TestFailure("Second drain", "Ok", "Error"))
     }
     return Assert.True(b.BytesWritten == 1 && b.State is EncoderState.Finished && buffer[0] == 66, "Second session")
+}
+
+[Test("One-shot decoding preserves Unicode BOM NUL and empty sequences")]
+func IOneShotRoundTrip() -> Result<unit, TestFailure> {
+    let text = "\uFEFF\u0000Aé😀"
+    let Ok(bytes) = Encodings.Utf8.Encode(text) else {
+        return Error(TestFailure("One-shot encode", "Ok", "Error"))
+    }
+    _ = Decoded(Encodings.Utf8.Decode(bytes), text)?
+    let empty = ArrayList<byte>()
+    _ = Decoded(Encodings.Utf8.Decode(empty), "")?
+    _ = Decoded(Encodings.Ascii.Decode(empty), "")?
+    let ascii: byte[] = [(byte)0, (byte)65, (byte)127]
+    return Decoded(Encodings.Ascii.Decode(ascii), "\u0000A\u007f")
+}
+
+[Test("One-shot errors do not poison providers and results are snapshots")]
+func JOneShotErrors() -> Result<unit, TestFailure> {
+    let bad: byte[] = [(byte)195]
+    let overlong: byte[] = [(byte)192, (byte)128]
+    _ = Assert.True(Encodings.Utf8.Decode(bad) is Error(EncodingError.InvalidUtf8), "Truncated scalar rejected")?
+    _ = Assert.True(Encodings.Utf8.Decode(overlong) is Error(EncodingError.InvalidUtf8), "Overlong scalar rejected")?
+    _ = Assert.True(Encodings.Ascii.Decode(bad) is Error(EncodingError.InvalidData), "Non-ASCII byte rejected")?
+    let good: byte[] = [(byte)65]
+    let Ok(text) = Encodings.Utf8.Decode(good) else {
+        return Error(TestFailure("Retry after one-shot error", "Ok", "Error"))
+    }
+    good[0] = (byte)66
+    _ = Assert.Equal("A", text)?
+    return Decoded(Encodings.Ascii.Decode(good), "B")
 }

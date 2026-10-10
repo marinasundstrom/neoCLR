@@ -20,6 +20,7 @@ ENCODING_BUFFER_NAMES = [
     'Encoder drain quotas preserve accepted text and destination bytes',
     'UTF-8 decoder maximum input counts new bytes separately from carried bytes',
     'Native buffer comprehensions preserve selector indices and range endpoints',
+    'One-shot decoding enforces byte limits and accepts the maximum',
 ]
 
 ENCODING_BOUNDARY_NAMES = [
@@ -53,6 +54,8 @@ ENCODING_NAMES = [
     'Encoders preserve accepted input through one-byte drains',
     'Encoder chunks preserve scalars across the internal byte boundary',
     'ASCII encoder preflight is retryable and factories are independent',
+    'One-shot decoding preserves Unicode BOM NUL and empty sequences',
+    'One-shot errors do not poison providers and results are snapshots',
 ]
 
 ZONED_TIME_PARSING_NAMES = [

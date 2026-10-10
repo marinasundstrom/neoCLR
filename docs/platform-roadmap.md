@@ -402,8 +402,9 @@ The author subsequently clarified that grants should be sparse and mainly serve
 internal tooling and testing assemblies. Runtime libraries should consume supported
 public APIs; do not grant System.Data/System.Web internal access to complete the Utf8
 migration. Preserve existing conversion contracts while migrating those consumers.
-Public conversion migration also requires paired one-shot decoding; Encoding currently
-exposes only incremental decoding.
+Public conversion migration now has paired one-shot Encoding.Decode with strict
+UTF-8/ASCII results and a 65536-byte bound; custom policies must implement Decode.
+Production consumers and Utf8 visibility still require a separate migration.
 The host metadata model and native manifests now preserve assembly annotations through
 CLI/native snapshots and CLI reference projection. Loader checks validate constructor
 shape, member-target rejection, limits and declared dependencies without execution.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add public one-shot `Encoding.Decode` for strict UTF-8 and ASCII, with independent
+  calls, a 65,536-byte quota and preserved BOM/NUL data. Cover malformed input,
+  immutable results and stream integration: 44 cases pass interpreted and native
+  macOS ARM64 execution. Refresh both API references; Windows remains CI work.
+
 - Keep the native host callback dispatcher linkable when a program has no reachable
   guest callbacks. Such a dispatcher rejects invalid handles instead of omitting the
   host ABI; synchronous task-only HTTP consumers can link with the HTTP host. Two

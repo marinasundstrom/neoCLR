@@ -184,8 +184,13 @@ the standard channels, line endings, byte bounds and manual Flush reference.
 ## Selected encodings (development)
 
 `System.Text.Encoding` is the reusable conversion policy: `Encode(string)` returns
-`Result<Sequence<byte>, EncodingError>` and `CreateDecoder()` creates independent
+`Result<Sequence<byte>, EncodingError>`, `Decode(Sequence<byte>)` returns
+`Result<string, EncodingError>`, and `CreateDecoder()` creates independent
 state. `Encodings.Utf8` and `Encodings.Ascii` supply the first implementations.
+One-shot decoding accepts at most 65536 bytes, preserves BOM data and returns empty
+text for empty input. UTF-8 rejects malformed or truncated scalars with InvalidUtf8;
+ASCII rejects bytes above 127 with InvalidData. No session state survives a call.
+Custom Encoding implementations must now supply Decode as well as the factories.
 `Decoder.Decode(byte[], offset, count, final)` returns valid text. Success accepts
 all offered bytes; an incomplete UTF-8 scalar is copied into decoder-owned carry
 and may produce empty text. The caller may immediately reuse its array. Invalid

@@ -7,8 +7,11 @@ import System.Result.*
 import System.Text.*
 
 class TrailerEncoding : Encoding {
+    func Decode(bytes: Sequence<byte>) -> Result<string, EncodingError> {
+        return Encodings.Utf8.Decode(bytes)
+    }
     func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {
-        return Ok(Utf8.Encode(text + "<end>"))
+        return Encodings.Utf8.Encode(text + "<end>")
     }
     func CreateDecoder() -> Decoder {
         return Encodings.Utf8.CreateDecoder()

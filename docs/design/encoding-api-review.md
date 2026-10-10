@@ -308,3 +308,14 @@ annotations on native assembly symbols. Friend/non-friend semantic binding and s
 grant round trips pass the native attribute probe. Native import admission and runtime
 checks still reject friend-only calls; Utf8 internalization waits for that executable
 path. Host assembly annotation views are cached and preserve metadata-only inspection.
+
+
+### Paired one-shot decoding (2026-10-10)
+
+The public Encoding policy now pairs Encode with Decode(Sequence<byte>), returning
+Result<string, EncodingError>. This fills the role of .NET Encoding.GetString using
+the existing neoCLR naming and typed-error conventions. Built-ins preserve strict
+UTF-8/ASCII, BOM data and the existing 65536-byte conversion quota; larger inputs
+use incremental sessions. Empty input succeeds, malformed/truncated input fails,
+and errors do not poison subsequent calls. Custom policies must implement Decode.
+Utf8 visibility and production consumer migration are a separate follow-up.

@@ -596,3 +596,8 @@ library to 203 cases across 23 projects. Qualification is recorded separately in
 [encoding-buffer-limits-validation.json](encoding-buffer-limits-validation.json):
 all five pass native macOS ARM64 and interpreted execution. Windows uses the same
 default suite list; its result remains pending.
+
+Public one-shot decoding qualification: [44 focused cases](encoding-public-validation.json)
+cover encoding, quotas, reader/writer boundaries and JSON streams in interpreted
+and macOS ARM64 native execution. The evidence records original aggregate guard
+failures separately from the passing selected executions.
