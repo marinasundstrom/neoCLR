@@ -1,21 +1,21 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "12a23dc8ad8fc5aae441604eeaf5cbdee3ecb76c9cab92d2de9f59f40faca04e",
-  "librarySourceRevision": "4d34f35b74e7015c5be8f0a72d406016aeccb160",
-  "compilerRevision": "494dede841bc09c9e4876ab51f8ba91c74d64ab7",
-  "rendererRevision": "494dede841bc09c9e4876ab51f8ba91c74d64ab7",
+  "sha256": "0f10605c7c92e8b85a465cd7336e63b1b2a0d15e504041bd4b2bbe1ecae5887f",
+  "librarySourceRevision": "898fc8a4d8b676ed3751d8cbf1d494de05836ccb",
+  "compilerRevision": "b2f3ba0f8b8e92f0c516155f563b332b0a6fad54",
+  "rendererRevision": "cf45f8691eba0d05c1ed462d2c497cf14b3753e8",
   "libraryArtifacts": {
-    "System.Runtime.dll": "75d881c3170dd4ca1be32fdd266075e9cd1c9649903888743e0e3e214d5bd069",
-    "System.Data.dll": "101422c8bcaa746b2befbf34e8e17bdd68b61af42db53b50e558d2565cd0fbf0",
-    "System.Networking.dll": "54017acd0833a579cb69a78707879fa33b60502c1ae41b4078ef495308e3bb0a",
-    "System.Web.dll": "7f8d3d89c88b2b97f4d9fba4ebe57324030deac05f8c7c944c0b85aafa49d8e8",
+    "System.Runtime.dll": "e3b6c6a999ac44794479b74cee9872cc8f0ca1a45bf781fc9dcbe5d69a62d945",
+    "System.Data.dll": "0e2af4f9dbafaf7490238880d5edbc344eea7b31175fc496ad572d13b893841a",
+    "System.Networking.dll": "a971f39162db81e18179addd8ed7a701e3ec80b4fb04bb9adf6f3f587335aa89",
+    "System.Web.dll": "1b875fceb861a9b7127a4a76cdb634e995c94b8f67fcf71863d297a78a0ea7d4",
     "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
-    "Core.dll": "132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f"
+    "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
   },
   "renderingEvidence": {
-    "normalized-sidecars.json": "2409998a8166bbe4d55f4feabcfd9efb40d10afc7fbda13260bfd1d28ca7619d",
-    "restored-xml-comments.json": "f07e50eb11d960f50af36667b7cda9d1ed2c43fe3f82d95d176f0c84543339a1"
+    "normalized-sidecars.json": "4282e7d7e02ed479d45b8082c63ec0e6fe4fc4b687b75b6093da56d259ef9952",
+    "restored-xml-comments.json": "96f68f8f47b573d23a003059f4b22b2ff4981f5e55061f5953bd7fa314cccb5c"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

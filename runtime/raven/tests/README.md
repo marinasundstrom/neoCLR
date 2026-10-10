@@ -478,3 +478,10 @@ migrated suite has passing local native/interpreter evidence; no expected native
 admission failures remain. The gate requires both modes. Windows x64 object emission
 passes for the final Path/IPAddress/URI suites; this does not qualify Windows linking
 or execution. The Windows action runs the expanded suite with a 90-minute job budget.
+
+Development map indexers add one case to `collection-construction` (10 cases,
+140 library tests overall). Concrete and interface reads/writes, comparer equality,
+preserved keys, Set interoperability and colliding growth pass both local modes
+([evidence](map-indexers-validation.json)). Six isolated missing-key executions
+also pass ([terminal-fault probe](../../../docs/experiments/map-indexers/README.md));
+these cannot run inside the continuation-oriented runner because Fault is terminal.

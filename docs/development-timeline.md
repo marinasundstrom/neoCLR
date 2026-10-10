@@ -13796,3 +13796,29 @@ claim completion of in-process test discovery.
   conformance and reference documentation. This milestone does not claim those API
   changes, arbitrary native virtual dispatch or boxed/String Object equality/hash
   adapters. Original integration and forced-GC consumers remain available.
+
+
+### Map indexer implementation follow-up
+
+- **Assistant action:** implement the author's settled getter/setter contract on
+  Map, MutableMap and HashMap using ordinary Raven indexers. Document missing-key
+  terminal faults, comparer semantics, preserved keys and migration for custom maps.
+  Refresh the aggregate reference and native API pages; JsonObject conformance is
+  kept as the next distinct API slice.
+- **Validation:** the new positive framework case covers interface and concrete
+  access, updates, comparer equality and collision/growth behavior; isolated programs
+  exercise missing-key reads through all three views in both modes. Evidence is
+  retained in [the indexer probe](experiments/map-indexers/README.md).
+
+
+## 2026-10-10 — Date and time parsing coverage
+
+- **Author:** “We should also make sure ro have parse methods for Date TimeOfDay etc LocalDateTime etc”.
+- **Assistant response:** finish the active map-indexer slice, then review Date,
+  TimeOfDay, LocalDateTime and related types against .NET parsing APIs and existing
+  neoCLR result/error conventions. Mentioned TryParse as a comparison to review,
+  not a settled second API requirement.
+- **Inspection:** none of Date, TimeOfDay, LocalDateTime, Instant, Duration, TimeOffset
+  or ZonedDateTime currently declares Parse/TryParse. Date and TimeOfDay do expose
+  culture-aware formatting. Record these concrete gaps in the roadmap; parser code,
+  accepted formats, culture/zone behavior and validation remain to be implemented.

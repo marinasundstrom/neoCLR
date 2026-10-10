@@ -20,7 +20,8 @@ All three types are invariant in both K and V:
 `Find` distinguishes absence from a present zero/default value. `TryAdd` returns
 false without changing the stored key or value if an equivalent key already exists.
 `Set` inserts or replaces the value and retains the originally stored equivalent key.
-There is no throwing indexer or `Add`. A duplicate is the sole normal rejection
+The original prototype omitted indexers; the development contract below now adds
+them. There is still no `Add`. A duplicate is the sole normal rejection
 outcome of TryAdd, so a Boolean suffices; a new Result error hierarchy adds no
 information for this operation. Faults still terminate execution.
 
@@ -234,3 +235,27 @@ It shares Unicode 17 default simple folding across equality, ordering and hashin
 HashMap retains the original spelling when a differently cased key replaces its
 value. See the [text contract](ordinal-text.md#explicit-comparison-modes-development)
 for .NET differences, normalization/expansion limits and matching-runtime requirements.
+
+## Indexers — development, 2026-10-10
+
+Map now declares a read-only `self[key: K]: V` indexer. MutableMap redeclares it
+with a setter, and HashMap implements both accessors. The getter uses the same
+comparer and lookup rules as Find but causes a terminal Fault when the key is
+absent. Prefer Find when absence is part of normal control flow. This is a fallible
+lookup convenience, not a memory-unsafe operation.
+
+The setter has Set's insert-or-replace behavior and preserves an existing key.
+It does not fail merely because a key is new; allocation/capacity and comparer or
+reentry faults remain possible. No atomic read-modify-write or concurrency guarantee
+is added. Existing third-party Map/MutableMap implementations must add the appropriate
+indexer accessors; use a matching reference/runtime library bundle.
+
+This follows the indexer shape of .NET IReadOnlyDictionary/IDictionary and
+[Dictionary](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.item?view=net-10.0).
+The missing-key channel follows neoCLR's existing terminal Fault model rather than
+.NET's catchable KeyNotFoundException. That makes Find especially important for
+recoverable lookup. No new error type or exception subsystem is introduced.
+
+Validation: [framework tests](../runtime/raven/tests/collection-construction/MapIndexers.rvn)
+and [missing-key probe](experiments/map-indexers/README.md). JsonObject's proposed map
+conformance remains a separate follow-up.

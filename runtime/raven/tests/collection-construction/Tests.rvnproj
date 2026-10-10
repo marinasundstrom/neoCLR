@@ -14,6 +14,7 @@
     <Compile Include="../collections/Main.rvn" />
     <Compile Include="../collections/ObservedNumbers.rvn" />
     <Compile Include="Construction.rvn" />
+    <Compile Include="MapIndexers.rvn" />
     <Compile Include="Sets.rvn" />
   </ItemGroup>
 </Project>

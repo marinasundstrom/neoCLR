@@ -1565,3 +1565,13 @@ Matching XML, reference signatures and source snapshot are refreshed. The manual
 introspection guide documents interpreter-only support, open generic and parameter
 attribute gaps, and absence of native retention/invocation. Legacy CLI implementation
 regeneration remains separately blocked by the existing Map contract issue.
+
+### Map indexers (development, 2026-10-10)
+
+Map declares a getter indexer, MutableMap adds a setter, and HashMap implements both.
+Missing-key reads terminate with Fault; Find remains the safe alternative. Setters
+insert or replace using the existing comparer and preserve the stored key. Existing
+implementations must add the accessors. All three existing selected public types
+have Item property XML summaries, parameter/value descriptions and native source
+comments. Refresh both the aggregate reference and native snapshot with this API.
+No public type exclusion or renderer workaround is needed.

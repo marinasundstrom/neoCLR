@@ -74,16 +74,19 @@ static class CollectionDeclarations
                 public void Deconstruct(out K Key, out V Value) { Key = this.Key; Value = this.Value; }
             }
             public interface Map<K, V> : Iterable<KeyValuePair<K, V>> {
+                V this[K key] { get; }
                 int Count { get; }
                 Sequence<K> Keys { get; }
                 Option<V> Find(K key);
                 bool ContainsKey(K key);
             }
             public interface MutableMap<K, V> : Map<K, V> {
+                new V this[K key] { get; set; }
                 bool TryAdd(K key, V value);
                 void Set(K key, V value);
             }
             public sealed class HashMap<K, V> : MutableMap<K, V> {
+                public V this[K key] { get => default; set { } }
                 public HashMap(Func<K, K, bool> equal, Func<K, int> hash) { }
                 public HashMap(EqualityComparer<K> comparer) { }
                 public HashMap(Iterable<KeyValuePair<K, V>> items, EqualityComparer<K> comparer) { }

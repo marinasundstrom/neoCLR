@@ -1,0 +1,17 @@
+module MapIndexerFaults
+
+import System.*
+import System.Collections.*
+
+func Main(args: string[]) -> int {
+    let storage = HashMap<string, int>(StringComparer.Ordinal)
+    if args.Length == 0 {
+        return storage["missing"]
+    }
+    if args[0] == "mutable" {
+        let writer: MutableMap<string, int> = storage
+        return writer["missing"]
+    }
+    let reader: Map<string, int> = storage
+    return reader["missing"]
+}

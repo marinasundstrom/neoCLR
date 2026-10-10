@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Record the author's time-parsing follow-up: Date, TimeOfDay and LocalDateTime,
+  with a related-type audit. Existing source has no Parse/TryParse on the reviewed
+  time values; formats, culture behavior and parser implementation remain planned.
+
+- Add getter indexers to Map and read/write indexers to MutableMap and HashMap.
+  Missing keys cause a terminal Fault on read; Find remains the safe lookup.
+  Setters insert or replace using the existing comparer and preserve stored keys.
+  Existing custom map implementations must add the accessors. Add positive framework
+  and six isolated missing-key executions; refresh aggregate/native API references. This does
+  not yet add JsonObject map conformance or a concurrency guarantee.
+
 - Finish the ten-batch runtime test migration with eleven URI tests covering the
   resolution corpus, grammar errors, equality/dispatch and byte quotas. All eleven
   pass native macOS ARM64 and interpreted execution; Windows x64 object emission
@@ -24,7 +35,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Record the author-requested JsonObject map/indexer review, including missing-key,
   JSON-null, iteration and mutation contracts. The author specifies faulting getter
   indexers on Map and insert-or-replace setters on MutableMap; Find remains the
-  preferred safe lookup. This is planned API work.
+  preferred safe lookup. Map indexers are now implemented; JsonObject conformance
+  remains planned API work.
 
 - Close the compiler gap exposed by MemoryStream/JSON migration: the matching Raven
   compiler now emits full-width long and null-safe String constant patterns.

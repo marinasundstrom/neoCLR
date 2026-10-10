@@ -47,6 +47,7 @@ CONSTRUCTION_NAMES = [
     'List construction materializes filtered input independently',
     'Collection copies preserve element reference identity',
     'Set copy retains values and explicit comparer after source clear',
+    'Map indexers share comparer lookup and insert-or-replace semantics',
     'Set collision chains survive removal growth and slot reuse',
     'Set snapshot retains values across clear and reuse',
     'Set ordinal string equality preserves case and Unicode',

@@ -7743,3 +7743,14 @@ Raven's Runtime Contract configuration, binding and CLI representation are uncha
 the matching compiler code remains b2f3ba0f8b8e92f0c516155f563b332b0a6fad54. neoCLR owns
 these private dispatch tables and their eventual native metadata/codegen replacement.
 Validation is linked from the runtime-test README; Windows execution remains pending.
+
+### Map indexer declarations (2026-10-10)
+
+Map's getter and MutableMap/HashMap's getter/setter use the existing Raven indexer
+contract, emitted as CLI Item properties with get_Item/set_Item methods. Native
+metadata imports those ordinary properties and methods; no new target capability,
+Runtime Contract configuration or emitter behavior is required. The legacy aggregate
+compiler/documentation reference mirrors these signatures with declaration-only
+bodies; it is not an executable library. Use matching rebuilt runtime/reference
+artifacts. Native source property metadata is the replacement for that aggregate
+CLI reference; neoCLR owns the projection. Safe Find lookup remains unchanged.

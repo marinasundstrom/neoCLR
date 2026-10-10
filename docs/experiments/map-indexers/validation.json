@@ -1,0 +1,117 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "date": "2026-10-10",
+  "cases": [
+    {
+      "mode": "native",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/map-indexer-missing/app"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: HashMap key not found\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_6765745F4974656D [instruction 16]\n   at NeoMetadata_2D6839500CB85B8FC6F4AA69D4833CE62A77CE698691549B35C3AA93BEB06056.F_3C4E656F46756E6374696F6E3E34443631373034393645363436353738363537323436363137353643373437335F3444363136393645 [instruction 12]\n"
+    },
+    {
+      "mode": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/map-indexer-missing/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Runtime.dll",
+        "--"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: HashMap key not found\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_6765745F4974656D [instruction 16]\n   at NeoMetadata_2D6839500CB85B8FC6F4AA69D4833CE62A77CE698691549B35C3AA93BEB06056.F_3C4E656F46756E6374696F6E3E34443631373034393645363436353738363537323436363137353643373437335F3444363136393645 [instruction 12]\n"
+    },
+    {
+      "mode": "native",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/map-indexer-missing/app",
+        "mutable"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: HashMap key not found\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_6765745F4974656D [instruction 16]\n   at NeoMetadata_2D6839500CB85B8FC6F4AA69D4833CE62A77CE698691549B35C3AA93BEB06056.F_3C4E656F46756E6374696F6E3E34443631373034393645363436353738363537323436363137353643373437335F3444363136393645 [instruction 25]\n"
+    },
+    {
+      "mode": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/map-indexer-missing/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Runtime.dll",
+        "--",
+        "mutable"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: HashMap key not found\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_6765745F4974656D [instruction 16]\n   at NeoMetadata_2D6839500CB85B8FC6F4AA69D4833CE62A77CE698691549B35C3AA93BEB06056.F_3C4E656F46756E6374696F6E3E34443631373034393645363436353738363537323436363137353643373437335F3444363136393645 [instruction 25]\n"
+    },
+    {
+      "mode": "native",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/map-indexer-missing/app",
+        "map"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: HashMap key not found\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_6765745F4974656D [instruction 16]\n   at NeoMetadata_2D6839500CB85B8FC6F4AA69D4833CE62A77CE698691549B35C3AA93BEB06056.F_3C4E656F46756E6374696F6E3E34443631373034393645363436353738363537323436363137353643373437335F3444363136393645 [instruction 32]\n"
+    },
+    {
+      "mode": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/map-indexer-missing/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/map-indexer-bundle/bundle/lib/System.Runtime.dll",
+        "--",
+        "map"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: HashMap key not found\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_6765745F4974656D [instruction 16]\n   at NeoMetadata_2D6839500CB85B8FC6F4AA69D4833CE62A77CE698691549B35C3AA93BEB06056.F_3C4E656F46756E6374696F6E3E34443631373034393645363436353738363537323436363137353643373437335F3444363136393645 [instruction 32]\n"
+    }
+  ],
+  "passed": true,
+  "sha256": {
+    "target/map-indexer-missing/app": "ec0f149e94661f7c3abcc01c6b72a9d34c89f37b5f044ddb043ba11d6f1a6b5c",
+    "target/map-indexer-missing/app.dll": "e2c15dff9d5f06ad1073a43dd496fdbe2f33cb56c2c702ad86bf3d4d74197943",
+    "docs/experiments/map-indexers/Missing.rvn": "64c62f284391b48b31f398136374e81619138bef1d0657f6b4318bdedeebb57c",
+    "target/map-indexer-bundle/bundle/manifest.json": "29bf36caef34013a3ca1866a46de22ac83b82ed7b2c7a60e6e35aabcebd95051",
+    "target/release/neoclr": "12516b4780dbc636bb0fe5b717826e046d931422153e823239e6ddadf5769fc6"
+  }
+}

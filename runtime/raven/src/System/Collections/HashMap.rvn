@@ -76,6 +76,24 @@ public class HashMap<K, V> : MutableMap<K, V> {
         iterator.Dispose()
     }
 
+    /// <summary>Gets an existing value, or inserts/replaces the value associated with a key.</summary>
+    /// <param name="key">The key to look up or update using this map's comparer.</param>
+    /// <remarks>The getter causes a terminal Fault for a missing key. Prefer Find when absence is expected. The setter preserves an existing key and delegates to Set; comparer, reentry and capacity faults remain possible.</remarks>
+    var self[key: K]: V {
+        get {
+            Enter()
+            let index = Locate(key, HashKey(key))
+            Leave()
+            if index < 0 {
+                System.Fail("HashMap key not found")
+            }
+            return values[index]
+        }
+        set {
+            Set(key, value)
+        }
+    }
+
     val Count: int => keys.Count
     val Keys: Sequence<K> => keys.Copy()
 

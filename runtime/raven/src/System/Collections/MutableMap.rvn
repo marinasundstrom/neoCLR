@@ -1,6 +1,10 @@
 module System.Collections
 
 public interface MutableMap<K, V> : Map<K, V> {
+    /// <summary>Gets an existing value, or inserts/replaces a value through the setter.</summary>
+    /// <param name="key">The key to look up or update.</param>
+    /// <remarks>The getter faults for a missing key; prefer Find for safe lookup. The setter has Set semantics.</remarks>
+    var self[key: K]: V { get; set }
     func TryAdd(key: K, value: V) -> bool
     func Set(key: K, value: V)
 }

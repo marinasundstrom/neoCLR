@@ -80,8 +80,9 @@ grammar, equality and byte quotas ([evidence](../runtime/raven/tests/uri-resolut
 This completes local migration of the ten selected batches: 69 added cases, 139 total
 library tests. Gaps exposed by these tests were fixed rather than retained as native
 admission exceptions. Final Object-slot/shift checks and Windows object emission pass;
-Windows runtime qualification remains pending. Map/MutableMap indexers and JsonObject
-map conformance remain the agreed follow-up API work, not completed by this migration.
+Windows runtime qualification remains pending. A subsequent slice adds Map getter
+indexers and MutableMap/HashMap setters, preserving safe Find lookup. JsonObject map
+conformance remains the agreed follow-up API work.
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 
@@ -332,6 +333,16 @@ continue to co-evolve with native foundations.
 | Database-backed web sample | Select a provider and a small parameterized query/update scenario with a Dapper-like typed object mapper. | Evaluate Dapper/ADO.NET responsibilities, UTF-8 conversion, null/type mapping, connection/transaction lifetime and native macOS/Windows dependencies. Provider choice, mapping strategy and public contracts remain open. |
 | Missing Time Parse methods | Audit existing time types and parsers, then select missing methods needed by real inputs. | Compare .NET parsing and existing neoCLR Result/error conventions; decide invariant round trips, culture, offset/zone ambiguity and invalid-input behavior before extending APIs. |
 | Runtime suspension | Review safe suspension/resumption boundaries, retained roots and host-resource lifetime alongside scheduling. | Compare CLR suspension/GC coordination and cooperative execution approaches; distinguish runtime suspension from awaiting I/O and leave the stack/preemption model open. |
+
+**Author clarification (2026-10-10):** explicitly include Parse methods for Date,
+TimeOfDay and LocalDateTime, then audit Instant, Duration and TimeOffset rather than
+leaving time parsing implicit. Source inspection finds no Parse/TryParse methods on
+these six value types; ZonedDateTime also has none. Date/TimeOfDay formatting already
+uses culture, so define invariant round trips and culture behavior explicitly. Compare
+.NET Parse/TryParse with neoCLR's existing Result-based parsing before selecting
+signatures; TryParse was an assistant review suggestion, not an author requirement.
+This is the next time-API review after the current collection/indexer work; it does
+not commit to a zone grammar or resolving ambiguous local times.
 
 No database provider, converter extension, green-thread implementation or new Time
 parsing contract is claimed by this list. The JSON benchmark/publication follow-up

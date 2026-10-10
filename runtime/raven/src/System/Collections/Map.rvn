@@ -1,6 +1,10 @@
 module System.Collections
 
 public interface Map<K, V> : Iterable<KeyValuePair<K, V>> {
+    /// <summary>Gets the value associated with a key; faults when the key is absent.</summary>
+    /// <param name="key">The key to look up.</param>
+    /// <remarks>Prefer Find when absence is expected. A missing key causes a terminal Fault.</remarks>
+    val self[key: K]: V { get }
     val Count: int { get }
     val Keys: Sequence<K> { get }
     func Find(key: K) -> System.Option<V>
