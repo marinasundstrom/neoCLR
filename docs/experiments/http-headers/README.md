@@ -30,3 +30,7 @@ lookup. Run it as Program.cs in a net10.0 console project.
 Validation on 2026-09-25: target build and execution passed (138 allocations, 3
 collections, zero live objects). Public/internal signature checks and the regenerated
 library/API snapshot checks passed. Website build skipped by author direction.
+
+Development test migration (2026-10-10): HTTP header repetition, lookup validation, snapshots and request metadata now also run as 5
+attributed framework tests in `runtime/raven/tests/http-header-values`. The framework README
+links native/interpreted evidence. This original consumer retains its integration purpose.

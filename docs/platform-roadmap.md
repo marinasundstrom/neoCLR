@@ -69,6 +69,8 @@ Batch `primitive-parsing` adds 12 tests for primitive numeric and Boolean parsin
 ([evidence](../runtime/raven/tests/primitive-parsing-validation.json)).
 Batch `path-values` adds 5 tests for Path equality, hashing, display and colliding map behavior qualified in release-interpreted execution; native admission remains unsupported
 ([evidence](../runtime/raven/tests/path-values-validation.json)).
+Batch `http-header-values` adds 5 tests for HTTP header repetition, lookup validation, snapshots and request metadata qualified in native macOS ARM64 and release-interpreted execution
+([evidence](../runtime/raven/tests/http-header-values-validation.json)).
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

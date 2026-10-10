@@ -441,3 +441,6 @@ Source: [docs/experiments/path-object/Main.rvn](../../../docs/experiments/path-o
 The Path suite preserves Object/interface dispatch assertions. Native selection
 currently rejects `System.Object.Equals` virtual dispatch; its exact diagnostic is
 recorded as an admission gap, while all five tests execute interpreted.
+
+Batch `http-header-values`: HTTP header repetition, lookup validation, snapshots and request metadata; 5 tests pass native macOS ARM64 and release-interpreted execution ([evidence](http-header-values-validation.json)).
+Source: [docs/experiments/http-headers/Main.rvn](../../../docs/experiments/http-headers/Main.rvn). Windows remains pending.

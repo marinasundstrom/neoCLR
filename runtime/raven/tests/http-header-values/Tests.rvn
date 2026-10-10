@@ -1,0 +1,76 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import System.Option.*
+import NeoClr.Testing.*
+
+import System.Collections.*
+import System.Web.Http.*
+
+[Test("HTTP header lookup preserves repeated values without splitting commas")]
+func HeadersRepeated() -> Result<unit, TestFailure> {
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("Set-Cookie", "a=1; Expires=Wed, 21 Oct 2030 07:28:00 GMT"))
+    headers.Add(HttpHeader("set-cookie", "b=2"))
+    headers.Add(HttpHeader("X-List", "one, two"))
+    headers.Add(HttpHeader("x-list", "three"))
+    let response = HttpResponse(HttpStatusCode.OK, headers, ArrayList<byte>())
+    let cookies = response.GetHeaderValues("sEt-CoOkIe")
+    _ = Assert.Equal(2, cookies.Count)?
+    _ = Assert.Equal(headers[0].Value, cookies[0])?
+    _ = Assert.Equal("b=2", cookies[1])?
+    let values = response.GetHeaderValues("X-LIST")
+    _ = Assert.Equal(2, values.Count)?
+    _ = Assert.Equal("one, two", values[0])?
+    return Assert.Equal("three", values[1])
+}
+
+[Test("HTTP header lookup distinguishes empty values from absent fields")]
+func HeadersEmpty() -> Result<unit, TestFailure> {
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("X-Empty", ""))
+    let response = HttpResponse(HttpStatusCode.OK, headers, ArrayList<byte>())
+    let values = response.GetHeaderValues("x-empty")
+    _ = Assert.Equal(1, values.Count)?
+    _ = Assert.Equal("", values[0])?
+    return Assert.Equal(0, response.GetHeaderValues("missing").Count)
+}
+
+[Test("HTTP header lookup rejects invalid names")]
+func HeadersInvalid() -> Result<unit, TestFailure> {
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("X-List", "one"))
+    headers.Add(HttpHeader("X-İ", "invalid name"))
+    let response = HttpResponse(HttpStatusCode.OK, headers, ArrayList<byte>())
+    for name in ["", " X-List", "X-List:", "X-İ", "X-List\r\n"] {
+        _ = Assert.Equal(0, response.GetHeaderValues(name).Count)?
+    }
+    return Assert.True(true, "Invalid lookup names never match")
+}
+
+[Test("HTTP header lookup snapshots remain independent of later additions")]
+func HeadersSnapshot() -> Result<unit, TestFailure> {
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("Set-Cookie", "a=1"))
+    headers.Add(HttpHeader("set-cookie", "b=2"))
+    let response = HttpResponse(HttpStatusCode.OK, headers, ArrayList<byte>())
+    let snapshot = response.GetHeaderValues("set-cookie")
+    headers.Add(HttpHeader("SET-COOKIE", "c=3"))
+    _ = Assert.Equal(2, snapshot.Count)?
+    return Assert.Equal(3, response.GetHeaderValues("set-cookie").Count)
+}
+
+[Test("HTTP request lookup exposes content headers without inventing provider headers")]
+func HeadersRequest() -> Result<unit, TestFailure> {
+    let Ok(post) = HttpRequest.Post("http://example.test/echo", HttpContent.FromText("Hello")) else {
+        return Assert.True(false, "Construct POST request")
+    }
+    let types = post.GetHeaderValues("content-type")
+    _ = Assert.Equal(1, types.Count)?
+    _ = Assert.Equal("text/plain; charset=utf-8", types[0])?
+    let Ok(get) = HttpRequest.Get("http://example.test/") else {
+        return Assert.True(false, "Construct GET request")
+    }
+    return Assert.Equal(0, get.GetHeaderValues("Host").Count)
+}
