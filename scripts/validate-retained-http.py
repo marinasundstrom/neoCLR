@@ -121,6 +121,8 @@ def main():
         run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'], 'aot-build')
         aot = ROOT / ('tools/aot-poc/target/debug/neoclr-aot-poc' + ('.exe' if windows else ''))
         report['aotSha256'] = sha(aot)
+        interpreter = common.build_interpreter(run, windows)
+        report['interpreterSha256'] = sha(interpreter)
         project = out / 'project with spaces'
         project.mkdir()
         for name in ('Server.rvn', 'Native.rvnproj'):
@@ -138,7 +140,7 @@ def main():
         shutil.copy2(destination / executable.name, executable)
         lib = bundle / 'lib'
         catalog = json.loads((lib / 'bundle.json').read_text())
-        vm = [bundle / ('bin/neoclr.exe' if windows else 'bin/neoclr'), 'run', destination / 'app.dll',
+        vm = [interpreter, 'run', destination / 'app.dll',
               '--system', lib / catalog['runtimeSeed'],
               *[arg for name in catalog['assemblyNames'] for arg in ('--module', lib / (name + '.dll'))],
               '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']
@@ -178,7 +180,7 @@ def main():
             row['passed'] = True
         if any(sha(Path(p)) != h for p, h in build['inputs'].items()) or any(sha(ROOT / p) != h for p, h in report['inputs'].items()):
             raise ValueError('Inputs changed during validation')
-        if sha(aot) != report['aotSha256'] or sorted(p.name for p in isolated.iterdir()) != [executable.name]:
+        if sha(interpreter) != report['interpreterSha256'] or sha(aot) != report['aotSha256'] or sorted(p.name for p in isolated.iterdir()) != [executable.name]:
             raise ValueError('AOT or standalone directory changed during validation')
         report.update(passed=True, dependencies=build['dependencies'], standalone=True)
     except Exception as error:

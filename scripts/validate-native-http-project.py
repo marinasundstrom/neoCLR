@@ -29,6 +29,11 @@ read_port = load('http_json', ROOT / 'scripts/verify-native-http-json.py').read_
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
+def build_interpreter(run, windows):
+    # Source libraries may require services newer than the bootstrap bundle's VM.
+    run(['cargo', 'build', '--locked', '--release', '--bin', 'neoclr'], 'interpreter-build')
+    return ROOT / ('target/release/neoclr' + ('.exe' if windows else ''))
+
 def rebuild_libraries(run, bundle, output):
     # Preview 13 supplies the primitive bootstrap. Build the exact development
     # compiler required by positional map pairs, then this checkout’s libraries.
@@ -110,6 +115,8 @@ def main():
         run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'], 'aot-build')
         aot = ROOT / ('tools/aot-poc/target/debug/neoclr-aot-poc' + ('.exe' if windows else ''))
         report['aotSha256'] = sha(aot)
+        interpreter = build_interpreter(run, windows)
+        report['interpreterSha256'] = sha(interpreter)
         if windows and not args.bundle:
             bundle = rebuild_libraries(run, bundle, out / 'development toolchain')
         lib = bundle / 'lib'
@@ -143,7 +150,7 @@ def main():
             executable = isolated / ('app.exe' if windows else 'app')
             shutil.copy2(destination / executable.name, executable)
             env = {key: value for key, value in os.environ.items() if key.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
-            vm = [bundle / ('bin/neoclr.exe' if windows else 'bin/neoclr'), 'run', destination / 'app.dll', *context, '--instructions', '100000000']
+            vm = [interpreter, 'run', destination / 'app.dll', *context, '--instructions', '100000000']
             for label, request, fragmented, error in ([('callback-fault', valid, False, None)] if fault else cases):
                 row = dict(name=label, dependencies=build['dependencies'])
                 report['cases'].append(row)
@@ -173,6 +180,8 @@ def main():
                 if (failed / executable.name).exists() or list(failed.glob('app.pending*')):
                     raise ValueError('Failed rebuild published executable')
                 (project / 'Main.rvn').write_text(code, encoding='utf-8')
+        if sha(interpreter) != report['interpreterSha256'] or sha(aot) != report['aotSha256']:
+            raise ValueError('Interpreter or AOT changed during validation')
         report.update(passed=len(report['cases']) == 5, standalone=True, existingOutputPreserved=True, staleOutputRejected=True)
     except Exception as error:
         report['error'] = str(error)

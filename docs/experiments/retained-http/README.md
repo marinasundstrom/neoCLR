@@ -85,3 +85,17 @@ recovery, persistent-host supervision and code-generation lifetimes remain open.
 Investigation also exposed a [deferred async pattern-local compiler candidate](async-pattern-local.md).
 The final Main uses a normal lexical binding; the pattern-hoisting issue is not fixed
 by this hosting slice.
+
+## Matching interpreter qualification (2026-10-10)
+
+The retained, ordinary server and client project validators build the current
+checkout’s release interpreter, record its hash and check it remains unchanged
+through the run. Source-built development libraries can require services absent
+from the published bootstrap VM (for example StringHashOrdinal). The bundle still
+supplies the selected compiler/libraries and primitive bootstrap; its older VM is
+not used as the development behavior reference. This repairs the comparison harness,
+not HTTP runtime semantics or the published bundle.
+
+[Matching-interpreter evidence](matching-interpreter-validation.json) records passing
+macOS native/interpreter runs: three retained-session cases, five ordinary server
+cases and fourteen client/factory/reuse cases.

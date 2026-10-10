@@ -1,0 +1,124 @@
+{
+  "platform": "macOS ARM64",
+  "scope": "Development HTTP comparison validators built the current release interpreter instead of executing the published bootstrap VM. Runs include uncommitted validator changes; reported revision is their base, not a claim that the old commit contained the fix. Runtime source formatting changed no semantics. All checks use the same interpreter binary and pinned d5fadf968 compiler bundle.",
+  "runs": [
+    {
+      "consumer": "retained-http-matching-interpreter",
+      "reportedRevision": "bb262359eb0fb06cd62ece2bb6b7a9d55dd9e279",
+      "reportSha256": "362f02404e0ff493e257f3a4ffe75dedf30aa8a3358ac635ae73c57e494d2722",
+      "passed": true,
+      "interpreterSha256": "6ef8a0cfa633c2fc9e22a3deedc85d10b1eff57c661b471035e1ea73e800d116",
+      "aotSha256": "8d8ddad488ec8c45add9b64a4e851a3d50310b84cdf53b3b95078d658df969bd",
+      "cases": [
+        {
+          "name": "three-requests",
+          "passed": true
+        },
+        {
+          "name": "fragmented",
+          "passed": true
+        },
+        {
+          "name": "fault-after-success",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "consumer": "http-matching-interpreter",
+      "reportedRevision": "bb262359eb0fb06cd62ece2bb6b7a9d55dd9e279",
+      "reportSha256": "7551c1f9d48609e680f6659b845f0b48aa1d7220df7c8fdf01cb2d7f2e123cb7",
+      "passed": true,
+      "interpreterSha256": "6ef8a0cfa633c2fc9e22a3deedc85d10b1eff57c661b471035e1ea73e800d116",
+      "aotSha256": "8d8ddad488ec8c45add9b64a4e851a3d50310b84cdf53b3b95078d658df969bd",
+      "cases": [
+        {
+          "name": "greeting",
+          "passed": true
+        },
+        {
+          "name": "fragmented",
+          "passed": true
+        },
+        {
+          "name": "duplicate-length",
+          "passed": true
+        },
+        {
+          "name": "handler-error",
+          "passed": true
+        },
+        {
+          "name": "callback-fault",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "consumer": "http-client-matching-interpreter",
+      "reportedRevision": "bb262359eb0fb06cd62ece2bb6b7a9d55dd9e279",
+      "reportSha256": "d5eac4b3572924db212dc1bb53cf2dd9a9222762cc60a8fb991373cb52003fb8",
+      "passed": true,
+      "interpreterSha256": "6ef8a0cfa633c2fc9e22a3deedc85d10b1eff57c661b471035e1ea73e800d116",
+      "aotSha256": "8d8ddad488ec8c45add9b64a4e851a3d50310b84cdf53b3b95078d658df969bd",
+      "cases": [
+        {
+          "name": "task-factories",
+          "passed": true
+        },
+        {
+          "name": "greeting",
+          "passed": true
+        },
+        {
+          "name": "numeric",
+          "passed": true
+        },
+        {
+          "name": "fragmented",
+          "passed": true
+        },
+        {
+          "name": "malformed",
+          "passed": true
+        },
+        {
+          "name": "refused",
+          "passed": true
+        },
+        {
+          "name": "timeout",
+          "passed": true
+        },
+        {
+          "name": "pre-cancel",
+          "passed": true
+        },
+        {
+          "name": "cancel",
+          "passed": true
+        },
+        {
+          "name": "continuation-fault",
+          "passed": true
+        },
+        {
+          "name": "paired-raven-server",
+          "passed": true
+        },
+        {
+          "name": "continuation-fault-recovery",
+          "passed": true
+        },
+        {
+          "name": "pending-fault-recovery",
+          "passed": true
+        },
+        {
+          "name": "cancellation-recovery",
+          "passed": true
+        }
+      ]
+    }
+  ]
+}

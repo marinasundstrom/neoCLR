@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Build and hash-check the current release interpreter for native HTTP server,
+  client and retained-session comparisons. Development libraries require services
+  absent from the published bootstrap VM, including StringHashOrdinal. The macOS
+  retained-session, server and client validators pass 3, 5 and 14 cases respectively.
+
 - Repair the JSON guide/sample website links and apply Rust formatting to existing
   reflection/collection adapters so website and source-format validation can proceed.
   The website build checks 3,543 pages; these repairs do not change runtime behavior.

@@ -137,7 +137,7 @@ def main():
         if windows and not args.bundle:
             bundle = http.rebuild_libraries(run, bundle, out / 'development toolchain')
         lib = bundle / 'lib'; catalog = json.loads((lib / 'bundle.json').read_text())
-        vm = bundle / ('bin/neoclr.exe' if windows else 'bin/neoclr')
+        vm = http.build_interpreter(run, windows)
         report['interpreterSha256'] = sha(vm)
         context = ['--system', lib / catalog['runtimeSeed'], *[arg for name in catalog['assemblyNames'] for arg in ('--module', lib / (name + '.dll'))], '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']
         environment = {k: v for k, v in os.environ.items() if k.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
@@ -238,6 +238,8 @@ def main():
         report['cases'].extend(qualify_reuse(run, out, builds['client'], commands, environment, response))
         for binary in isolated.values():
             if sorted(p.name for p in binary.parent.iterdir()) != [binary.name]: raise ValueError('Executable-only directory changed')
+        if sha(vm) != report['interpreterSha256'] or sha(aot) != report['aotSha256']:
+            raise ValueError('Interpreter or AOT changed during validation')
         report.update(passed=len(report['cases']) == 14, standalone=True)
     except Exception as error: report['error'] = str(error)
     finally:
