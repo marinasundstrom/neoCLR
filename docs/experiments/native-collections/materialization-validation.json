@@ -1,0 +1,431 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "name": "collections",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/map-materialization-validation2/collections executable only/app"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/release/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/map-materialization-validation2/collections native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "name": "init-accessors",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/map-materialization-validation2/init-accessors executable only/app"
+          ],
+          "exitCode": 0,
+          "stdout": "Init accessors passed\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/release/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/map-materialization-validation2/init-accessors native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "Init accessors passed\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "name": "duplicate-constructor",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/map-materialization-validation2/duplicate-constructor executable only/app"
+          ],
+          "exitCode": 1,
+          "stdout": "disposed\n",
+          "stderr": "UserFault: HashMap input contains a duplicate key\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_436F70794974656D73 [instruction 19]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032..ctor [instruction 70]\n   at NeoMetadata_F8151B18AAC8274562154E6F3303CFCA9F109C255292FCA8930068D024FDFF83.T__50726F6772616D.M_4D61696E [instruction 6]\n"
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/release/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/map-materialization-validation2/duplicate-constructor native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 1,
+          "stdout": "disposed\n",
+          "stderr": "UserFault: HashMap input contains a duplicate key\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_436F70794974656D73 [instruction 19]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032..ctor [instruction 70]\n   at NeoMetadata_F8151B18AAC8274562154E6F3303CFCA9F109C255292FCA8930068D024FDFF83.T__50726F6772616D.M_4D61696E [instruction 6]\n"
+        }
+      ]
+    },
+    {
+      "name": "duplicate-pairs",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/map-materialization-validation2/duplicate-pairs executable only/app"
+          ],
+          "exitCode": 1,
+          "stdout": "disposed\n",
+          "stderr": "UserFault: HashMap input contains a duplicate key\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_436F70794974656D73 [instruction 19]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032..ctor [instruction 70]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E4C696E71_4D61704F70657261746F7273.M_546F4D6170 [instruction 2]\n   at NeoMetadata_F8151B18AAC8274562154E6F3303CFCA9F109C255292FCA8930068D024FDFF83.T__50726F6772616D.M_4D61696E [instruction 6]\n"
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/release/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/map-materialization-validation2/duplicate-pairs native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 1,
+          "stdout": "disposed\n",
+          "stderr": "UserFault: HashMap input contains a duplicate key\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_436F70794974656D73 [instruction 19]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032..ctor [instruction 70]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E4C696E71_4D61704F70657261746F7273.M_546F4D6170 [instruction 2]\n   at NeoMetadata_F8151B18AAC8274562154E6F3303CFCA9F109C255292FCA8930068D024FDFF83.T__50726F6772616D.M_4D61696E [instruction 6]\n"
+        }
+      ]
+    },
+    {
+      "name": "duplicate-selectors",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/map-materialization-validation2/duplicate-selectors executable only/app"
+          ],
+          "exitCode": 1,
+          "stdout": "disposed\n",
+          "stderr": "UserFault: HashMap input contains a duplicate key\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E4C696E71_4F70657261746F7273.M_546F4D6170 [instruction 28]\n   at NeoMetadata_F8151B18AAC8274562154E6F3303CFCA9F109C255292FCA8930068D024FDFF83.T__50726F6772616D.M_4D61696E [instruction 8]\n"
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/release/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/map-materialization-validation2/duplicate-selectors native output/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Web.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/map-materialization/bundle/lib/System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 1,
+          "stdout": "disposed\n",
+          "stderr": "UserFault: HashMap input contains a duplicate key\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E4C696E71_4F70657261746F7273.M_546F4D6170 [instruction 28]\n   at NeoMetadata_F8151B18AAC8274562154E6F3303CFCA9F109C255292FCA8930068D024FDFF83.T__50726F6772616D.M_4D61696E [instruction 8]\n"
+        }
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--manifest-path",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/Cargo.toml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--bin",
+        "neoclr"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "console",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/map-materialization-validation2/collections project with spaces/Native.rvnproj",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/map-materialization/bundle",
+        "--aot",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/map-materialization-validation2/collections native output"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "console",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/map-materialization-validation2/init-accessors project with spaces/Native.rvnproj",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/map-materialization/bundle",
+        "--aot",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/map-materialization-validation2/init-accessors native output"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "console",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/map-materialization-validation2/duplicate-constructor project with spaces/Native.rvnproj",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/map-materialization/bundle",
+        "--aot",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/map-materialization-validation2/duplicate-constructor native output"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "console",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/map-materialization-validation2/duplicate-pairs project with spaces/Native.rvnproj",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/map-materialization/bundle",
+        "--aot",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/map-materialization-validation2/duplicate-pairs native output"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "console",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/map-materialization-validation2/duplicate-selectors project with spaces/Native.rvnproj",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/map-materialization/bundle",
+        "--aot",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/map-materialization-validation2/duplicate-selectors native output"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/validate-native-init-import.py",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/map-materialization/bundle",
+        "--runtime",
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/map-materialization-validation2/init-import"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "revision": "616a53da5b535fcdfbb66fee349fe3c030c3034b",
+  "inputs": {
+    "scripts/validate-native-collections.py": "bcdae1aa2e56c295939cc312b65544c1a77a0e6e35152805632daaee2b5d9f41",
+    "scripts/build-native-project.py": "782379cfbeaaa706c0921c0dea02061d23f9e31c735be004bd78031a7267359a",
+    "scripts/validate-native-http-project.py": "4ca1a3cc25329d1a20f174df81935baafa36b577bce26e77beb8ece1845e63b3",
+    "scripts/validate-windows-project.py": "9ea2ab50b5d6bb88c96ace264d742249da42210f91aae2c6e877bb1d72a58959",
+    "scripts/prepare-native-development-bundle.py": "f08c9192209d348d0f7b26f85041c1ac8d56afe016bede6944546473813ab465",
+    "docs/experiments/native-collections/Main.rvn": "ed470fe7d68564adf7d489e15a6c9466cd7825cb32dd9c35f3ee390bf947c014",
+    "docs/experiments/native-collections/Native.rvnproj": "bf0967a9a414a5334ee5edea71d1ffddca4c46e25154c13b05b19c65ed4fac1d",
+    "docs/experiments/init-accessors/native/Main.rvn": "649a83aeb0540406c1ac210ac71c54f6d702c0f494ef0e33b834a9ed1e766d0a",
+    "docs/experiments/init-accessors/native/Native.rvnproj": "2ed1eadf6b4ee16254d40d537445f8340189888831db8f19d2d2740139b3773e",
+    "docs/experiments/native-collections/duplicate-constructor/Main.rvn": "2a92607ca0bf71c66aa6429155408057786a61a7f4dd6e763b630eb44907f8e5",
+    "docs/experiments/native-collections/duplicate-constructor/Native.rvnproj": "bf0967a9a414a5334ee5edea71d1ffddca4c46e25154c13b05b19c65ed4fac1d",
+    "docs/experiments/native-collections/duplicate-pairs/Main.rvn": "faa600c1d6a39838011f24afcda9f2add87c47e3aa33b6308cd5a3239e8e0690",
+    "docs/experiments/native-collections/duplicate-pairs/Native.rvnproj": "bf0967a9a414a5334ee5edea71d1ffddca4c46e25154c13b05b19c65ed4fac1d",
+    "docs/experiments/native-collections/duplicate-selectors/Main.rvn": "6806d4cbbd81833bad8e9e96d5a8f9f8457f263184fb7aaf660e707c089add46",
+    "docs/experiments/native-collections/duplicate-selectors/Native.rvnproj": "bf0967a9a414a5334ee5edea71d1ffddca4c46e25154c13b05b19c65ed4fac1d",
+    "docs/experiments/map-pairs/rejections/generated-equality.rvn": "617c8707017cb6fac465242253110e1f5aaafbef165fb71b5735dadad23d35a5",
+    "docs/experiments/map-pairs/rejections/imported-update.rvn": "ce8d66abca0508688225e1dcf7d0345ab558cf8dad575ff0c7c4be2d0a590a03",
+    "docs/experiments/map-pairs/rejections/mutable-component.rvn": "920431efacbe7bca768b1dbff97a89805b6ae5caee52c20936240b0513a6a9e0",
+    "docs/experiments/map-pairs/rejections/record-class.rvn": "71b0599bed035e7be182a0c55562640af79eaa84d785bcde493c33ad32035605",
+    "scripts/validate-native-init-import.py": "b58b15ff6d41569a998e259afa1414b77962aef79e5bf2e6fe651a4ad62f7758",
+    "docs/experiments/init-accessors/library/Contracts.rvn": "d986332362587e2b3a54bb9f4ef43eda54cd24ecb81161c6a123c18fe4915ae8",
+    "docs/experiments/init-accessors/library/Native.rvnproj": "88c4a0c314dd783ac731f5b429133ccf1ada470d049c656d0ade86da6d0b48e5",
+    "docs/experiments/init-accessors/raven/Main.rvn": "24a9da420c1611baa5844de50adea651ea62ae55f85b8ef6ffd0bbc89a82b695",
+    "docs/experiments/init-accessors/raven/Native.rvnproj": "deaef0aee13eaea8e923811f660abe7f967d097f9a3349a03a1e4771c39f1c48"
+  },
+  "bundleManifestSha256": "58952097dac2b038c7ccf695b9ce2eee7deec3ecf81c0dbccca7c77158124038",
+  "aotSha256": "437bae4bdf3e247e1eeac079d28079b0074423468580f9c72eaf15934463b81b",
+  "interpreterSha256": "b9848dad02ccba0fc333b7c4070d27c2c2873a380c9438f42a4d82a24a844ad8",
+  "rejections": [
+    {
+      "name": "generated-equality",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support unregistered dependency: NativeCollections for struct Pair.func Equals(other: Pair) -> bool.\n"
+    },
+    {
+      "name": "imported-update",
+      "exitCode": 1,
+      "diagnostic": "error RAV0200: 'Key' is read-only and cannot be assigned to.\n"
+    },
+    {
+      "name": "mutable-component",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support constructor-initialized positional val components.\n"
+    },
+    {
+      "name": "record-class",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support positional record structs without additional members.\n"
+    }
+  ],
+  "fullReportSha256": "c998f261e94e627c6a22b2e1a9313bfb2b5c92adde3ef9eceb9be61eb23f6e72",
+  "date": "2026-10-10",
+  "compilerRevision": "b939cd6964d57829fb00c4e058bf43309de39628",
+  "notes": [
+    "Working-tree implementation atop the recorded parent revision; source/binary hashes identify the tested inputs.",
+    "The first full run used the implementation bundle. The final bundle adds XML help and completes the Tasks module spelling; the separate positive execution below verifies that final build.",
+    "The final sample project selects Main.rvn explicitly to exclude nested duplicate programs. Direct root-project compilation also passed. Negative source programs are unchanged.",
+    "Windows qualification of the new overloads is pending; the existing action runs these same cases.",
+    "A raw KeyValuePair array literal passed the interpreter but AOT rejected NewArray(record). Pair lists/sequences, queries and map copies are the qualified native inputs."
+  ],
+  "finalBundleExecution": {
+    "passed": true,
+    "results": [
+      {
+        "mode": "native",
+        "exitCode": 0,
+        "stdout": "collections passed\n",
+        "stderr": ""
+      },
+      {
+        "mode": "interpreter",
+        "exitCode": 0,
+        "stdout": "collections passed\n",
+        "stderr": ""
+      }
+    ],
+    "bundleManifestSha256": "a49f8ed97e00ba3aeab7950a2f2339fbbdf345a203870ea8220b2fa6ece4a283",
+    "assemblySha256": "43d2e182c8a65adae87c285c59d443ad0793a6e906c75123fd36ca211f21b5a3",
+    "executableSha256": "a9d01a8d80b9c8731e9165f8b7949d95d391cab65be041c26f9755c2a5074328",
+    "projectSha256": "306d4de933b78d2707624e27a81fa2b0e3a092941d9b0b069c8fbb6109b7ed84",
+    "sourceSha256": "ed470fe7d68564adf7d489e15a6c9466cd7825cb32dd9c35f3ee390bf947c014"
+  },
+  "finalSourceInputs": {
+    "runtime/raven/src/System/Collections/HashMap.rvn": "d0d4eef250dfc29772908899879863a8a4e1157c5fe2005ff04a5025b9f5963b",
+    "runtime/raven/src/System/Linq/Operators.rvn": "f8ac2d290ab92b1a80cea0eedc01cd0a0f0b9282dffe04cbcfe771adabbcacb9",
+    "runtime/raven/src/System/Linq/MapOperators.rvn": "d7cd368daa9be07bbf1df64683e9ecf8bbee02bd175046b1d2928277bea74773",
+    "runtime/raven/src/System/Tasks/Tasks.rvn": "d73d98877dc6f198096baaad38911db9e8809ec34706769cbea15ec0cd5c740f",
+    "docs/experiments/native-collections/Native.rvnproj": "306d4de933b78d2707624e27a81fa2b0e3a092941d9b0b069c8fbb6109b7ed84"
+  },
+  "dotnetBaseline": {
+    "runtime": ".NET 10.0.0",
+    "output": "duplicate rejected\nduplicate rejected\nduplicate rejected\nshallow independent storage passed\n.NET 10.0.0\n",
+    "sourceSha256": "312d63edd15571554eeda7c535657060ba8f005792862820970ed3f69ca0e5e3"
+  }
+}

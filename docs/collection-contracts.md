@@ -422,3 +422,48 @@ updates while retaining ordinary-assignment rejection. See the [integration cont
 and [passing consumer](experiments/native-collections/). Adding Iterable is a source
 compatibility change for custom Map implementations: they must implement GetIterator.
 Map removal/clear and advanced operations remain subsequent API work.
+
+## Iterable construction and ToMap — development, 2026-10-10
+
+Author direction: collection initialization/copy constructors are a general convention,
+following .NET. This slice implements HashMap; iterable constructors for the other
+concrete collection types remain follow-ups, not implied existing overloads.
+`HashMap<K,V>(items, comparer)` and `(items, equal, hash)` accept
+`Iterable<KeyValuePair<K,V>>`. Sequence, arrays, queries and existing maps already
+satisfy that capability; separate overloads would add no behavior.
+
+`pairs.ToMap(comparer)` and `items.ToMap(keySelector, valueSelector, comparer)`
+materialize eagerly in one pass. Selectors run key first, once per visited element.
+Storage is independent; referenced keys/values remain shared. Empty input is valid.
+The explicit comparer determines uniqueness and is never inferred from an input map.
+The source must remain valid during enumeration; these unsynchronized APIs do not
+promise an atomic snapshot under concurrent mutation.
+
+Primary .NET 10 API contracts checked 2026-10-10:
+[Dictionary constructors](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-10.0)
+and [Enumerable.ToDictionary](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.todictionary?view=net-10.0).
+They support iterable initialization/materialization and reject duplicate keys.
+This is a library convenience gap in neoCLR, not a .NET limitation. We retain the
+existing explicit comparer policy rather than invent a default generic equality
+contract. Allocation and hashing are ordinary HashMap costs; no performance gain
+is claimed. Existing collection research above remains applicable.
+
+Duplicate keys are rejected rather than silently choosing first/last wins. Unlike
+.NET's recoverable ArgumentException, the current constructor and ToMap cause a
+terminal System.Fail Fault; use an explicit TryAdd loop when duplicates are expected.
+They dispose the iterator on normal completion and detected duplicates. Provider,
+selector, comparer or Dispose Faults remain terminal, with no general cleanup or
+side-effect rollback guarantee. A future TryToMap with a structured duplicate error
+is an alternative if a consumer needs it; this slice does not add it. Selector
+materialization follows the same policy as pair construction. No new VM intrinsic,
+metadata representation or compiler capability is required.
+
+Validation boundary: an attempted pair-array literal reached the existing AOT
+`NewArray(record)` rejection. Array values satisfy the iterable contract, but native
+record-array literal allocation is not qualified here. Pair ArrayList/Sequence,
+query and Map inputs exercise the supported native path. Supporting value-record
+array default allocation is a separate backend task, not a constructor restriction.
+A focused .NET 10.0.0 console comparison confirms all three duplicate entry points
+throw ArgumentException and that collection storage is independent while a List
+value stays shared. This confirms the selected .NET library baseline, not equivalence
+between .NET exception recovery and neoCLR terminal Faults.

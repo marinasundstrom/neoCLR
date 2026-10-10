@@ -267,7 +267,7 @@ public class Promise<T> {
 
 }
 
-namespace System.Runtime.CompilerServices {
+module System.Runtime.CompilerServices {
     import System.*
     import System.Option.*
     import System.Tasks.*

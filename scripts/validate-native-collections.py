@@ -44,6 +44,8 @@ def main():
         report['revision'] = run(['git', 'rev-parse', 'HEAD'], 'revision').stdout.decode().strip()
         samples = [('collections', 'native-collections', 'collections passed\n'),
                    ('init-accessors', 'init-accessors/native', 'Init accessors passed\n')]
+        samples += [('duplicate-' + name, 'native-collections/duplicate-' + name, None)
+                    for name in ('constructor', 'pairs', 'selectors')]
         inputs = [Path(__file__).resolve(), ROOT / 'scripts/build-native-project.py',
                   ROOT / 'scripts/validate-native-http-project.py', ROOT / 'scripts/validate-windows-project.py',
                   ROOT / 'scripts/prepare-native-development-bundle.py']
@@ -110,7 +112,10 @@ def main():
                 record = dict(mode=mode, command=list(map(str, command)), exitCode=result.returncode, stdout=stdout, stderr=stderr)
                 results.append(record)
                 (out / (name + '-' + mode + '.json')).write_text(json.dumps(record, indent=2) + '\n')
-                if (result.returncode, stdout, stderr) != (0, expected, ''):
+                if expected is None:
+                    if result.returncode != 1 or stdout != 'disposed\n' or 'HashMap input contains a duplicate key' not in stderr:
+                        raise ValueError(name + ' ' + mode + ' did not reject duplicate keys')
+                elif (result.returncode, stdout, stderr) != (0, expected, ''):
                     raise ValueError(name + ' ' + mode + ' result mismatch')
             report['cases'].append(dict(name=name, passed=True, results=results))
         run([sys.executable, ROOT / 'scripts/validate-native-init-import.py', '--bundle', bundle,

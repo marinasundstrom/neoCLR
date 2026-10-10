@@ -112,6 +112,29 @@ public extension Operators<T> for Iterable<T> {
         return result
     }
 
+    /// <summary>Materializes selected keys and values into a new map.</summary>
+    /// <param name="self">Input to enumerate once.</param>
+    /// <param name="keySelector">Key selector, invoked once per visited element before the value selector.</param>
+    /// <param name="valueSelector">Value selector, invoked once per visited element.</param>
+    /// <param name="comparer">Explicit stable key equality and hash policy.</param>
+    /// <returns>A new shallow map; empty for empty input.</returns>
+    /// <remarks>Native development API. Eager and single-pass. Duplicate keys cause a terminal Fault after iterator disposal. Provider/callback Faults do not guarantee cleanup or rollback. No concurrent snapshot guarantee.</remarks>
+    func ToMap<K, V>(keySelector: (T) -> K, valueSelector: (T) -> V, comparer: EqualityComparer<K>) -> HashMap<K, V> {
+        let result = HashMap<K, V>(comparer)
+        let iterator = self.GetIterator()
+        while iterator.MoveNext() {
+            let item = iterator.Current
+            let key = keySelector(item)
+            let value = valueSelector(item)
+            if !result.TryAdd(key, value) {
+                iterator.Dispose()
+                System.Fail("HashMap input contains a duplicate key")
+            }
+        }
+        iterator.Dispose()
+        return result
+    }
+
     func First() -> System.Option<T> {
         let iterator = self.GetIterator()
         if iterator.MoveNext() {

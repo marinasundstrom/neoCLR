@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add native development HashMap constructors from iterable KeyValuePair values
+  with explicit comparer/callback policies, plus pair and selector LINQ ToMap
+  operators. Materialization is eager, single-pass and shallow; duplicate keys
+  fault rather than overwrite. Other collection copy constructors remain follow-ups. Complete the module spelling
+  migration for the second declaration block in Tasks.rvn. Native macOS/interpreter
+  checks pass, including duplicate rejection/disposal; extend the Windows action
+  coverage and refresh both API reference snapshots. Record the separate AOT
+  record-array-literal allocation limitation.
+
 - Use explicit module declarations throughout the native Raven runtime library and
   document that source convention. Qualified API names and assembly owners remain
   unchanged; legacy namespace spelling remains accepted. All four native library

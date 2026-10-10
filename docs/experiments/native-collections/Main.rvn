@@ -1,5 +1,6 @@
 import System.*
 import System.Collections.*
+import System.Linq.*
 import System.Option.*
 
 class Item {
@@ -111,7 +112,7 @@ class Program {
         if !CheckSnapshots() || !CheckSets() {
             return 21
         }
-        if !CheckMaps() {
+        if !CheckMaps() || !CheckMapConstruction() {
             return 30
         }
         Console.WriteLine("collections passed")
@@ -173,6 +174,52 @@ class Program {
         let copy = original
         let (key, value) = copy
         return total == 206 && key == "copy" && value == 12 && original.Key == key && original.Value == value
+    }
+
+    static func CheckMapConstruction() -> bool {
+        let pairs = ArrayList<KeyValuePair<string, int>>()
+        pairs.Add(KeyValuePair<string, int>("Café", 7))
+        pairs.Add(KeyValuePair<string, int>("雪", 9))
+        let sequence: Sequence<KeyValuePair<string, int>> = pairs
+        let copy = HashMap<string, int>(sequence, StringComparer.Ordinal)
+        pairs[0] = KeyValuePair<string, int>("changed", 50)
+        if copy.Find("Café") is not Some(7) || copy.Count != 2 {
+            return false
+        }
+        let copiedMap = HashMap<string, int>(copy, StringComparer.Ordinal)
+        copy.Set("Café", 70)
+        if copiedMap.Find("Café") is not Some(7) {
+            return false
+        }
+        let query = copiedMap.Filter(pair => pair.Value > 7)
+        let materialized = query.ToMap(StringComparer.Ordinal)
+        if materialized.Count != 1 || materialized.Find("雪") is not Some(9) {
+            return false
+        }
+        let selected = sequence.ToMap(pair => pair.Key, pair => pair.Value + 1, StringComparer.Ordinal)
+        if selected.Find("changed") is not Some(51) || selected.Find("雪") is not Some(10) {
+            return false
+        }
+        let integers = ArrayList<KeyValuePair<int, int>>()
+        integers.Add(KeyValuePair<int, int>(1, 2))
+        integers.Add(KeyValuePair<int, int>(2, 3))
+        let callbacks = HashMap<int, int>(integers, (left, right) => left == right, key => 1)
+        if callbacks.Find(2) is not Some(3) || callbacks.Count != 2 {
+            return false
+        }
+        let empty = ArrayList<KeyValuePair<string, int>>()
+        if empty.ToMap(StringComparer.Ordinal).Count != 0 {
+            return false
+        }
+        let objects = ArrayList<KeyValuePair<string, Item>>()
+        let item = Item()
+        objects.Add(KeyValuePair<string, Item>("item", item))
+        let shared = HashMap<string, Item>(objects, StringComparer.OrdinalIgnoreCase)
+        item.Value = 42
+        if shared.Find("ITEM") is Some(let value) {
+            return value.Value == 42
+        }
+        return false
     }
 
     static func CheckSets() -> bool {

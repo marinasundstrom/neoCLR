@@ -59,3 +59,27 @@ hashes, and a standalone dependency list containing only KERNEL32.dll. The sibli
 [reflection/JSON run](windows-json-map-validation.json) also passes; 1,571 downloaded
 file hashes and 11 source-input hashes were checked. Interpreter/AOT executables
 outside the uploaded artifacts were stability-checked in CI, not rehashed locally.
+
+## Iterable construction and ToMap (development, 2026-10-10)
+
+The consumer additionally checks HashMap copying from a Sequence of pairs and an
+existing map, callback comparer construction, pair queries, key/value selectors,
+empty input, independent storage, shared reference values and case-insensitive
+lookup. Three duplicate consumers exercise constructor, pair ToMap and selector
+ToMap rejection. Their iterator prints `disposed` exactly once; reading beyond the
+duplicate faults differently, detecting accidental continued enumeration.
+
+Run the same collections validator for native/interpreter checks on macOS and the
+existing Windows collections action. The source now uses the `module` convention.
+[.NET comparison source](dotnet-baseline/Program.cs) runs with
+`dotnet run --project docs/experiments/native-collections/dotnet-baseline/Baseline.csproj`;
+.NET 10.0.0 rejects duplicates in all three entry points and confirms shallow
+independent storage. The neoCLR duplicate failure is terminal, unlike ArgumentException.
+
+A pair-array literal passed the interpreter but exposed the separate native
+`NewArray(record)` allocation rejection. The native consumer uses ArrayList/Sequence
+pairs; record-array literals remain an explicit backend follow-up.
+
+[Materialization validation](materialization-validation.json) records the macOS checks.
+The root sample project explicitly includes Main.rvn so nested rejection fixtures
+remain separate programs. Windows qualification for these overloads is pending.

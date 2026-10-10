@@ -1,0 +1,15 @@
+module System.Linq
+
+import System.Collections.*
+
+/// <summary>Materialization operators for key/value pair iterables.</summary>
+public extension MapOperators<K, V> for Iterable<KeyValuePair<K, V>> {
+    /// <summary>Copies pairs into a new map using an explicit key comparer.</summary>
+    /// <param name="self">Pairs to enumerate once.</param>
+    /// <param name="comparer">Explicit stable key equality and hash policy.</param>
+    /// <returns>An independently stored shallow map; empty for empty input.</returns>
+    /// <remarks>Native development API. Eager. Duplicate keys cause a terminal Fault after iterator disposal. Provider/comparer Faults do not guarantee cleanup. Source policy is not inferred. No concurrent snapshot guarantee.</remarks>
+    func ToMap(comparer: EqualityComparer<K>) -> HashMap<K, V> {
+        return HashMap<K, V>(self, comparer)
+    }
+}

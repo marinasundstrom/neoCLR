@@ -1,0 +1,40 @@
+import System.*
+import System.Collections.*
+import System.Linq.*
+
+class Program {
+    static func Main() -> int {
+        let pairs = DuplicatePairs()
+        let map = pairs.ToMap(StringComparer.OrdinalIgnoreCase)
+        return 99
+    }
+}
+
+class DuplicatePairs : Iterable<KeyValuePair<string, int>> {
+    func GetIterator() -> Iterator<KeyValuePair<string, int>> => DuplicateIterator()
+}
+
+class DuplicateIterator : Iterator<KeyValuePair<string, int>> {
+    private var index: int = 0
+
+    func MoveNext() -> bool {
+        index = index + 1
+        if index > 2 {
+            System.Fail("Enumerated beyond duplicate")
+        }
+        return true
+    }
+
+    val Current: KeyValuePair<string, int> {
+        get {
+            if index == 1 {
+                return KeyValuePair<string, int>("key", 1)
+            }
+            return KeyValuePair<string, int>("KEY", 2)
+        }
+    }
+
+    func Dispose() {
+        Console.WriteLine("disposed")
+    }
+}

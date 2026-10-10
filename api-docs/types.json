@@ -149,6 +149,7 @@
   "System.Introspection.PropertyInfo",
   "System.Introspection.TypeInfo",
   "System.InvalidRangeError",
+  "System.Linq.MapOperators",
   "System.Linq.Operators",
   "System.Linq.SingleError",
   "System.Linq.SingleError.Empty",

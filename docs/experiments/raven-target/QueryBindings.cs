@@ -5,6 +5,9 @@ static class QueryBindings
 {
     public const string Declarations = """
         namespace Linq {
+            public static class MapOperators {
+                public static Collections.HashMap<K,V> ToMap<K,V>(this Collections.Iterable<Collections.KeyValuePair<K,V>> self, Collections.EqualityComparer<K> comparer) => default;
+            }
             public static class Operators {
                 public static Collections.Iterable<U> OfType<T,U>(this Collections.Iterable<T> self) => default;
                 public static Collections.Iterable<T> Filter<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
@@ -25,6 +28,7 @@ static class QueryBindings
                 public static Option<T> Last<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
                 public static Result<T, SingleError> Single<T>(this Collections.Iterable<T> self) => default;
                 public static Result<T, SingleError> Single<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
+                public static Collections.HashMap<K,V> ToMap<T,K,V>(this Collections.Iterable<T> self, Func<T,K> keySelector, Func<T,V> valueSelector, Collections.EqualityComparer<K> comparer) => default;
                 public static Collections.ArrayList<T> ToList<T>(this Collections.Iterable<T> self) => default;
             }
         }

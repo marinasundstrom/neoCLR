@@ -83,6 +83,8 @@ static class CollectionDeclarations
             public sealed class HashMap<K, V> : MutableMap<K, V> {
                 public HashMap(Func<K, K, bool> equal, Func<K, int> hash) { }
                 public HashMap(EqualityComparer<K> comparer) { }
+                public HashMap(Iterable<KeyValuePair<K, V>> items, EqualityComparer<K> comparer) { }
+                public HashMap(Iterable<KeyValuePair<K, V>> items, Func<K, K, bool> equal, Func<K, int> hash) { }
                 public int Count => default;
                 public Sequence<K> Keys => default;
                 public Option<V> Find(K key) => default;

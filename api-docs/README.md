@@ -1474,3 +1474,11 @@ covers IsInitOnly definition/introspection queries and optional authoring argume
 KeyValuePair Key/Value reference signatures now expose init accessors; native and
 CLI snapshots must use the matching init-aware compiler. No new runtime reflection
 query was added; its ordinary getter/setter invocation policy remains unchanged.
+
+## Iterable map materialization (development, 2026-10-10)
+
+HashMap's iterable constructors and pair/selector ToMap overloads have generated
+native type/member pages, XML parameter/result/error documentation and matching
+reference declarations. MapOperators is included in the public type inventory.
+These additions target the native metadata library; the historical bounded CLI
+application importer is not extended with these new pair-materialization calls.

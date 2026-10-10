@@ -171,3 +171,21 @@ can set pair components; ordinary later assignments are rejected. This is a comp
 restriction, not runtime object freezing. Init checks pass on macOS and Windows x64.
 Future concurrent implementations remain separate work.
 See the type and member contracts in the [API reference](/docs/).
+
+## Development: map initialization
+
+`HashMap<K,V>(items, comparer)` accepts an iterable of `KeyValuePair<K,V>`,
+including sequences and existing maps. `pairs.ToMap(comparer)` provides the query
+form; `items.ToMap(keySelector, valueSelector, comparer)` selects both components.
+Import `System.Linq.*` for these operators. The callback constructor also accepts
+`items, equal, hash`.
+
+Each eagerly builds independent storage in one pass. Referenced objects stay shared.
+The explicit comparer defines key uniqueness; duplicate keys cause a terminal fault.
+Use an explicit `TryAdd` loop for recoverable duplicates. Current collections are
+unsynchronized. These additions require rebuilt development libraries.
+
+[Executable collection checks](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-collections/Main.rvn)
+
+The new materialization checks pass on macOS ARM64 and the interpreter. Windows
+qualification of these overloads is pending in the collections action.

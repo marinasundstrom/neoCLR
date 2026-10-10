@@ -32,6 +32,49 @@ public class HashMap<K, V> : MutableMap<K, V> {
         busy = false
     }
 
+    /// <summary>Copies pairs into independent storage using the supplied key policy.</summary>
+    /// <param name="items">Pairs to enumerate once, including sequences, queries and existing maps.</param>
+    /// <param name="comparer">Explicit stable key policy; never inferred from the source.</param>
+    /// <remarks>Native development API. Shallow independent storage. Duplicate keys cause a terminal Fault after iterator disposal. Use TryAdd for recoverable duplicates. Provider/comparer Faults do not guarantee cleanup. No concurrent snapshot guarantee.</remarks>
+    init(items: Iterable<KeyValuePair<K, V>>, comparer: EqualityComparer<K>) {
+        self.comparer = comparer
+        buckets = [0, 0, 0, 0]
+        keys = ArrayList<K>()
+        values = ArrayList<V>()
+        hashes = ArrayList<int>()
+        next = ArrayList<int>()
+        busy = false
+        CopyItems(items)
+    }
+
+    /// <summary>Copies pairs using explicit equality and hash callbacks.</summary>
+    /// <param name="items">Pairs to enumerate once.</param>
+    /// <param name="equal">Stable key equality callback.</param>
+    /// <param name="hash">Stable hash callback; equal keys must have equal hashes.</param>
+    /// <remarks>Native development API. Uses the same shallow-copy, terminal duplicate Fault and disposal contract as the comparer overload.</remarks>
+    init(items: Iterable<KeyValuePair<K, V>>, equal: (K, K) -> bool, hash: (K) -> int) {
+        comparer = FunctionEqualityComparer<K>(equal, hash)
+        buckets = [0, 0, 0, 0]
+        keys = ArrayList<K>()
+        values = ArrayList<V>()
+        hashes = ArrayList<int>()
+        next = ArrayList<int>()
+        busy = false
+        CopyItems(items)
+    }
+
+    private func CopyItems(items: Iterable<KeyValuePair<K, V>>) {
+        let iterator = items.GetIterator()
+        while iterator.MoveNext() {
+            let pair = iterator.Current
+            if !TryAdd(pair.Key, pair.Value) {
+                iterator.Dispose()
+                System.Fail("HashMap input contains a duplicate key")
+            }
+        }
+        iterator.Dispose()
+    }
+
     val Count: int => keys.Count
     val Keys: Sequence<K> => keys.Copy()
 

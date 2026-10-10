@@ -129,6 +129,11 @@ support](init-accessors.md): metadata and compiler import/emission are implement
 macOS and Windows x64 native/interpreter and cross-library rejection qualification
 pass ([verified Windows evidence](experiments/init-accessors/windows-validation.json)). Full
 native record semantics remain open.
+The author-selected iterable/copy construction and LINQ ToMap slice now implements
+HashMap constructors and pair/selector materialization, with macOS native/interpreter
+positive and duplicate/disposal checks passing. The Windows action covers these cases;
+qualification of the new overloads is pending. Other collection constructors remain
+follow-ups; see [the contract](collection-contracts.md#iterable-construction-and-tomap--development-2026-10-10).
 Future concurrent variants retain implementation-specific atomicity/iteration contracts; see the [contracts and concurrency boundaries](collection-contracts.md#basic-library-slice-and-future-concurrency--2026-10-10).
 
 ### Follow-up review areas — author direction, 2026-10-10

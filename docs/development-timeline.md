@@ -13216,3 +13216,12 @@ claim follows from these focused checks.
   and recorded the native-source convention; existing .NET spelling remains valid.
 - Module spelling validation: all four native library projects compile with Raven
   b939cd696; API reference fingerprints pass. No public signature changed.
+- Collection outcome: implement comparer/callback iterable HashMap constructors,
+  pair ToMap and key/value-selector ToMap. Native macOS ARM64 and interpreter
+  collection/init consumers and three duplicate/disposal consumers pass, together
+  with cross-library init checks and four existing compiler rejections. Update API
+  snapshots and the website; extend the existing Windows action with these cases.
+- Open: other collection copy constructors and recoverable TryToMap remain future
+  additions. An attempted record-pair array literal passes the interpreter but is
+  rejected by AOT NewArray(record); the native iterable/sequence checks use pair lists.
+  See [materialization evidence](experiments/native-collections/materialization-validation.json).
