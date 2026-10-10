@@ -24,6 +24,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   ordinary public conversion through Encoding; no API removal is implemented.
   Record the subsequent author decision to internalize Utf8 and the proposed .NET-style
   InternalsVisibleTo capability, including cross-assembly consumers and validation gaps.
+  Record the general Raven source/CLI accessibility fix landed independently on main
+  at 52dc10011 with 56 focused tests passing; native
+  attribute retention/import/runtime enforcement and Utf8 migration remain pending.
 
 - Qualify codec buffer limits with explicit host budgets. Add run options for live
   array elements and logical array bytes, and a native builder byte-array limit;

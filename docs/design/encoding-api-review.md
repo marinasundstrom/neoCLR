@@ -264,3 +264,22 @@ and each use checks current quota limits. Focused slot tests cover aliased mutat
 initialization, output assignments, quota reductions and concurrent updates. The
 large-buffer consumer is the performance regression check; per-case wall time is
 recorded as qualification evidence, not a cross-platform or .NET benchmark claim.
+
+
+### Shared Raven implementation precedes native integration
+
+The author explicitly clarified that missing InternalsVisibleTo support should be
+a general Raven fix on main. The shared checker now has source/CLI friend-assembly
+support landed on Raven main at `52dc10011`, qualified independently on a current-main
+checkout without merging the broader native integration branch. All 56 focused
+checks pass (27 friend-assembly cases and 29 existing accessibility cases). Existing assembly attribute syntax/emission
+is reused. Normal .NET execution tests exercise internal types, constructors,
+fields, properties and methods; negative checks cover private access, unrelated
+assemblies, reciprocal/transitive assumptions and public-signature exposure.
+
+This does not yet authorize native cross-assembly calls. The next integration slice
+must preserve assembly-level attribute data in the native model/provider, relax
+import admission only for an exact friend, and update resolved method/field/type
+access checks. Current imported-type admission rejects nonpublic external types
+before code generation. Keep Utf8 public until that work and consumer/API migration
+are validated together, rather than committing a broken intermediate library.

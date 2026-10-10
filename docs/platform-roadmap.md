@@ -384,7 +384,10 @@ approve additional codecs or permanently reprioritize the roadmap. The author th
 selected internal visibility for Utf8 and proposed InternalsVisibleToAttribute for
 controlled implementation sharing. The [follow-up design](design/encoding-api-review.md#author-follow-up-internal-helpers-and-friend-assemblies-2026-10-10)
 records the cross-assembly callers, .NET comparison and required compiler/runtime/AOT
-access checks; neither API change is complete yet.
+access checks; neither runtime API change is complete yet. The general Raven
+source/CLI friend-access fix is now on main at `52dc10011`, with 56 focused tests
+passing independently of the native integration branch. Native assembly grant
+retention, import admission and runtime/AOT enforcement remain the next dependency.
 
 A separate native gap observed during implementation: String.GetScalars exposes an
 immutable UInt32 array that current native specialization rejects. This parser uses

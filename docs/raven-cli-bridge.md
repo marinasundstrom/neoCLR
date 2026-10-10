@@ -7918,3 +7918,31 @@ bytes, including runtime value representation. These host policies are not descr
 as identical. Defaults remain unchanged. Explicit larger fixture budgets let tests
 reach codec quota rejection and carry output beyond one input chunk's size. This
 private host configuration is not a new guest API or metadata contract.
+
+
+### Shared friend-assembly compiler support (2026-10-10)
+
+Raven main commit [`52dc10011`](https://github.com/marinasundstrom/raven/commit/52dc10011)
+adds general source/CLI `InternalsVisibleToAttribute` access checking. Runtime Contract
+configuration is unchanged. The existing CLI assembly attribute carries the friend
+identity; emission remains ordinary member references. The shared checker grants
+internal access only to the named assembly, preserves private/protected and public
+signature restrictions, and compares full public keys without token fallback. Grants
+are one-way and non-transitive. Attribute constructors are not executed.
+
+Validation on current Raven main: 56 focused tests pass, including separate emitted
+Raven libraries/consumers executed on .NET, negative access and identity checks.
+The same change is mirrored on the integration branch at `1a40d61d6`, where all 57
+focused tests pass. This is not native/AOT qualification. The current neoCLR bundle remains pinned to
+`3489d43a368abd5d220fb2d0f9597e7fa19d4a40`; the main fix alone does not update that bundle.
+
+Native semantic intent is the same assembly-level internal-access grant. The native
+metadata model/provider must retain assembly attributes and full identity information;
+metadata import admission and neoCLR resolved method/field/type access checks must
+consume them consistently. Those layers currently lack this integration, and missing
+grants must not authorize access. Raven owns compiler checking/provider consumption;
+neoCLR owns metadata retention/import policy and interpreter/AOT enforcement. Native
+metadata/backend support will replace CLI attribute transport without changing the
+friend contract. Signed source emission and dedicated malformed-grant declaration
+diagnostics are not added by this slice. See the
+[encoding follow-up](design/encoding-api-review.md#shared-raven-implementation-precedes-native-integration).

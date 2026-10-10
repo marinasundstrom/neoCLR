@@ -14015,3 +14015,21 @@ claim completion of in-process test discovery.
   slot tests, three CLI budget cases, three native C adapter checks and thirteen
   Raven compiler cases pass. Windows remains pending. No public Encoding/Utf8 API
   change or InternalsVisibleTo implementation is claimed by this slice.
+
+## 2026-10-10 — InternalsVisibleTo belongs in Raven's general compiler
+
+- **Author clarification:** “I don’t know if Raven has support for InternalsVisibleTo
+  but that might have to be a general Raven fix to also place on main”.
+- **Assistant findings:** Raven already parses/emits assembly attributes; the shared
+  internal-access check only compared assembly equality. Native assembly grant
+  retention, metadata import admission and neoCLR enforcement are separate gaps.
+- **Action:** implement the general source/CLI check with ordinary .NET positive and
+  negative consumers. Validate independently from current Raven main in a separate
+  checkout, rather than merging the unrelated integration-branch changes. Preserve
+  private/protected rules and public-signature restrictions; compare full public
+  keys and deny unsupported identity qualifiers.
+- **Outcome:** the general fix is committed and pushed to Raven main at
+  [`52dc10011`](https://github.com/marinasundstrom/raven/commit/52dc10011). All 56 focused
+  tests pass, including emitted separate-library execution on .NET. The integration
+  branch mirror `1a40d61d6` passes 57 focused tests. Native support
+  and Utf8 internalization remain pending; no .NET test result is treated as AOT evidence.
