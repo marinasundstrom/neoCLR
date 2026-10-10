@@ -31,7 +31,7 @@ pub(crate) fn static_owner(t: &neoclr::metadata::TypeDef) -> bool {
 /// Shared preparation for native emission and read-only admission inspection.
 pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Value), Error> {
     validate_source(input, true)?;
-    if input.functions.iter().any(object_dispatch_contract) {
+    if input.functions.iter().any(|f| object_dispatch_contract(f) || class_contract(input, f)) {
         neoclr::LoadedProgram::new(input).and_then(|p| p.verify()).map_err(|e| e.to_string())?;
     }
     if input.types.iter().any(|t| !t.generic_parameters.is_empty())
@@ -97,6 +97,35 @@ pub(super) fn interface_contract(input: &neoclr::Module, f: &neoclr::metadata::F
 
 /// Sealing is descriptive metadata today: also check the complete loaded type set.
 /// Keep callvirt for its null check; only the private native projection loses slots.
+pub(super) fn class_contract(input: &neoclr::Module, f: &neoclr::metadata::Function) -> bool {
+    f.instance && !f.receiver_byref && f.is_virtual && f.generic_parameters.is_empty()
+        && !object_dispatch_contract(f) && !inherited_object_member(input, f)
+        && f.owner.as_ref().and_then(|t| input.type_definition(t)).is_some_and(|t|
+            t.is_reference_type && t.representation == neoclr::metadata::Representation::Record && t.generic_parameters.is_empty())
+}
+
+pub(super) fn virtual_base_contracts(input: &neoclr::Module, f: &neoclr::metadata::Function) -> Vec<usize> {
+    if !class_contract(input, f) || !f.is_override { return vec![]; }
+    let mut parent = f.owner.as_ref().and_then(|t| input.type_definition(t)).and_then(|t| t.base.as_ref());
+    for _ in 0..64 {
+        let Some(owner) = parent else { break; };
+        if let Some((index, _)) = input.functions.iter().enumerate().find(|(_, candidate)|
+            candidate.owner.as_ref() == Some(owner) && candidate.instance && candidate.is_virtual
+                && candidate.name.rsplit('.').next() == f.name.rsplit('.').next() && candidate.parameters == f.parameters) {
+            return vec![index];
+        }
+        parent = input.type_definition(owner).and_then(|t| t.base.as_ref());
+    }
+    vec![]
+}
+
+pub(super) fn class_implementation(input: &neoclr::Module, concrete: &Type, contract: &neoclr::metadata::Function) -> Result<(usize, FunctionRef), Error> {
+    let method = neoclr::native_metadata::class_implementation(input, concrete, contract).map_err(|e| e.to_string())?;
+    let index = input.functions.iter().position(|f| f.definition == method.definition && f.name == method.name).ok_or("missing class virtual target")?;
+    Ok((index, FunctionRef { definition: method.definition, name: method.name, owner: method.owner,
+        instance: method.instance, generic_arguments: vec![], parameters: method.parameters }))
+}
+
 pub(super) fn sealed_member(input: &neoclr::Module, f: &neoclr::metadata::Function) -> bool {
     f.instance && !f.is_abstract && !f.receiver_byref && f.impl_flags == 0
         && f.owner.as_ref().and_then(|t| input.type_definition(t))
@@ -289,8 +318,9 @@ fn string_dispatch_target(input: &neoclr::Module, contract: usize) -> Result<Opt
 pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>, array_backing: Option<usize>, reference_backings: &[usize], conformance_types: Option<&BTreeSet<usize>>) -> Result<Vec<(usize, usize)>, Error> {
     let f = &input.functions[contract];
     let display = object_dispatch_contract(f);
-    if !interface_contract(input, f) && !display { return Ok(vec![]); }
-    if !f.instance || f.receiver_byref || (!display && !f.body.is_empty()) || !f.generic_parameters.is_empty() {
+    let class = class_contract(input, f);
+    if !interface_contract(input, f) && !display && !class { return Ok(vec![]); }
+    if !f.instance || f.receiver_byref || (!display && !class && !f.body.is_empty()) || !f.generic_parameters.is_empty() {
         return Err("interface dispatch requires a bodyless nongeneric instance contract".into());
     }
     let mut constructed = BTreeSet::new();
@@ -341,7 +371,8 @@ pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usiz
         let (target, _) = if object_dispatch_contract(f) {
             let Some(target) = object_value_override(input, &Type::Named(t.name.clone()), f)? else { continue; };
             target
-        } else { implicit_implementation(input, &Type::Named(t.name.clone()), f)? };
+        } else if class { class_implementation(input, &Type::Named(t.name.clone()), f)? }
+        else { implicit_implementation(input, &Type::Named(t.name.clone()), f)? };
         targets.push((ti, target));
     }
     Ok(targets)
@@ -513,6 +544,7 @@ pub(super) fn select_inventory_with_host_roots(
             if functions.len() > crate::limits::FUNCTIONS {
                 return Err("selected functions exceed the value profile limit".into());
             }
+            pending.extend(virtual_base_contracts(input, &input.functions[i]));
             if object_dispatch_contract(&input.functions[i]) { continue; }
             for op in &input.functions[i].body {
                 match op {
@@ -520,7 +552,7 @@ pub(super) fn select_inventory_with_host_roots(
                         if callable_invoke(target).is_some() { continue; }
                         let callee = resolve(input, target)?;
                         let f = &input.functions[callee];
-                        if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && !object_dispatch_contract(f) && !sealed_member(input, f) && !inherited_object_member(input, f) && (f.is_virtual || f.is_abstract || f.is_override) {
+                        if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && !class_contract(input, f) && !object_dispatch_contract(f) && !sealed_member(input, f) && !inherited_object_member(input, f) && (f.is_virtual || f.is_abstract || f.is_override) {
                             return Err("virtual calls requiring dispatch need a later selection profile".into());
                         }
                         if matches!(op, Op::Call(_)) && object_dispatch_contract(f) {
@@ -625,15 +657,17 @@ pub(super) fn select_inventory_with_host_roots(
     }
     let mut dispatch = vec![];
     let mut object_dispatch = vec![];
+    let mut class_dispatch = vec![];
     let mut string_dispatch = vec![];
     for (compiled, source) in rows.iter().enumerate() {
         if let Some(target) = string_dispatch_target(input, *source)? {
             string_dispatch.push(json!({"contractCompiledIndex":compiled,"functionCompiledIndex":rows.binary_search(&target).unwrap()}));
         }
         let display = object_dispatch_contract(&input.functions[*source]);
-        if interface_contract(input, &input.functions[*source]) || display {
+        let class = class_contract(input, &input.functions[*source]);
+        if interface_contract(input, &input.functions[*source]) || display || class {
             let targets = dispatch_targets_with_array(input, *source, &functions, None, reference_backings, None)?;
-            let inventory = if display { &mut object_dispatch } else { &mut dispatch };
+            let inventory = if display { &mut object_dispatch } else if class { &mut class_dispatch } else { &mut dispatch };
             inventory.push(json!({"contractCompiledIndex":compiled,"contractSourceIndex":source, "kind":input.functions[*source].name.rsplit('.').next(),
                 "targets":targets.iter().map(|(ty, method)| json!({"typeCompiledIndex":type_rows.binary_search(ty).unwrap(),"functionCompiledIndex":rows.binary_search(method).unwrap()})).collect::<Vec<_>>() }));
         }
@@ -644,8 +678,8 @@ pub(super) fn select_inventory_with_host_roots(
     let report = json!({"schema":"neoclr-aot-selection-v1", "module":input.name, "root":root,
         "entryArguments": matches!(input.functions[*root_index].parameters.as_slice(), [Type::ArrayRef(t)] if **t == Type::String),
         "hostRoots": host_roots.iter().map(|i| json!({"sourceIndex":i,"compiledIndex":rows.binary_search(i).unwrap(),"name":input.functions[*i].name,"reason":"explicit runtime adapter"})).collect::<Vec<_>>(),
-        "policy":"explicit closed world with constructed-class implicit interface dispatch; ordinary selected bodies retained; verified Object-slot dispatch replaces private slot bodies; no reflection, dynamic loading or general class virtual dispatch",
-        "stringInterfaceDispatch":string_dispatch, "interfaceDispatch":dispatch, "objectDisplayDispatch":object_dispatch, "arrayBackingProjection":array_backing,
+        "policy":"explicit closed world with constructed-class implicit interface dispatch; ordinary selected bodies retained; verified Object-slot dispatch replaces private slot bodies; bounded class virtual dispatch; no dynamic loading",
+        "stringInterfaceDispatch":string_dispatch, "interfaceDispatch":dispatch, "objectDisplayDispatch":object_dispatch, "classVirtualDispatch":class_dispatch, "arrayBackingProjection":array_backing,
         "referenceArrayBackingProjections": reference_backings.iter().filter_map(|source| type_rows.binary_search(source).ok().map(|compiled| json!({"sourceIndex":source,"compiledIndex":compiled}))).collect::<Vec<_>>(),
         "metadataPolicy":"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
         "functions": rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.functions[*old].definition,"name":input.functions[*old].name})).collect::<Vec<_>>(),

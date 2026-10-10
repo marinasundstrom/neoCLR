@@ -4,7 +4,7 @@ use cranelift_frontend::FunctionBuilder;
 use cranelift_module::{DataDescription, DataId, Linkage, Module};
 use cranelift_object::ObjectModule;
 use neoclr::metadata::Instruction as Op;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 type Error = Box<dyn std::error::Error>;
 
 #[derive(Default)]
@@ -110,10 +110,13 @@ pub struct Options {
     pub object_value_kinds: HashMap<usize, String>,
     pub object_display: HashMap<usize, Vec<(usize, usize)>>,
     pub frame_names: HashMap<usize, String>,
+    pub class_dispatch_thunks: HashSet<usize>,
 }
 impl Options {
     pub fn from_report(report: Option<&serde_json::Value>) -> Self {
         Self {
+            class_dispatch_thunks: report.and_then(|r| r["classVirtualDispatch"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["thunkCompiledIndex"].as_u64().map(|i| i as usize)).collect(),
             primitive_receivers: report.and_then(|r| r["primitiveInstanceProjections"].as_array()).into_iter().flatten()
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             probe_stack_roots: false,
@@ -439,6 +442,7 @@ impl Options {
     }
 }
 pub struct Data {
+    hidden_frames: HashSet<usize>,
     frames: Vec<DataId>,
     messages: HashMap<(usize, usize), DataId>,
     defaults: [DataId; 9],
@@ -503,6 +507,7 @@ impl Data {
             literal(module, "fault_intern", neoclr::FaultCode::InternPoolLimitExceeded.standard_message().unwrap())?,
         ];
         Ok(Self {
+            hidden_frames: options.class_dispatch_thunks.clone(),
             frames,
             messages,
             defaults,
@@ -529,7 +534,7 @@ impl Data {
             pc,
             defaults,
             message,
-            capture_frame: true,
+            capture_frame: !self.hidden_frames.contains(&i),
         }
     }
 }

@@ -6,6 +6,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-11
+
+- Add bounded AOT virtual dispatch for nongeneric reference classes. Resolve targets
+  with interpreter ancestry rules, retain required base slots, and generate separate
+  dispatch methods so direct base calls keep their original bodies. Preserve null
+  checks, inherited storage and GC roots. Sealed classes now reject derived
+  definitions across the complete load set, including unreachable definitions.
+  Focused macOS ARM64 dispatch and HTTP pipeline tests pass; Windows is unexecuted.
+
 ### 2026-10-10
 
 - Extend experimental metadata authoring with complete external class-base contracts,

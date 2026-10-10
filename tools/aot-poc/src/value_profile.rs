@@ -212,8 +212,9 @@ impl<'a> Profile<'a> {
                 let reached = (0..input.functions.len()).collect();
                 p.dispatch.insert(i, crate::selection::dispatch_targets_with_array(input, i, &reached, array_backing, reference_backings, None)?);
             }
-            if ((f.is_virtual || f.is_abstract) && !interface)
-                || f.is_override
+            let class = references && crate::selection::class_contract(input, f);
+            if ((f.is_virtual || f.is_abstract) && !interface && !class)
+                || f.is_override && !class
                 || f.impl_flags != 0
                 || f.pinvoke.is_some()
                 || !f.generic_parameters.is_empty()

@@ -398,3 +398,18 @@ GetFunctions to fault; ownerless parameter/return attribute queries remain a gap
 The [compiled consumer](../docs/experiments/guest-functions/README.md) demonstrates
 TestAttribute inspection. Interpreter support is qualified; AOT enumeration/retention
 and dynamic invocation are not added. The inherited attribute API signature is unchanged.
+
+
+## Host class dispatch helper (development 2026-10-11)
+
+`neoclr::native_metadata::class_implementation(module: &Module, concrete: &metadata::Type,
+contract: &metadata::Function) -> Result<metadata::Function, Fault>` resolves a class
+virtual slot using the interpreter's ancestry rules. Use a verified complete load set.
+It returns the concrete or inherited implementation, preserving the declaring owner;
+invalid receiver ancestry, a nonvirtual contract or an unimplemented abstract slot
+returns a Fault. It does not invoke the method or permit dynamic loading.
+
+This host-only helper supports AOT target selection and is not a guest reflection
+member. AOT keeps direct base calls separate from virtual dispatch, matching CLR
+call/callvirt semantics. Native metadata's `TypeDef.is_sealed` now means the type
+cannot be inherited; verification checks all definitions, even unreachable ones.

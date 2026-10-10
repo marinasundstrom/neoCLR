@@ -1,3 +1,4 @@
+mod class_dispatch;
 mod bindings;
 mod boxing;
 mod compiler;

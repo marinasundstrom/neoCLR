@@ -672,7 +672,7 @@ int main(void) {
 }
 
 #[test]
-fn reference_arena_is_explicit_and_does_not_admit_virtual_calls() {
+fn reference_arena_is_explicit_and_admits_closed_world_virtual_calls() {
     let source = include_str!("../../../docs/experiments/aot-console/reference-cell.neoil");
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     for flags in [
@@ -696,7 +696,9 @@ fn reference_arena_is_explicit_and_does_not_admit_virtual_calls() {
         &["--compile-system", "--reference-arena"],
         false,
     );
-    assert!(!r.status.success() && !dir.0.join("app.o").exists());
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert!(!report["classVirtualDispatch"].as_array().unwrap().is_empty());
 }
 
 #[test]
@@ -3658,25 +3660,26 @@ int main(int argc, char **argv) {
 }
 
 #[test]
-fn unsealed_virtual_calls_still_require_dispatch() {
+fn unsealed_virtual_calls_use_closed_world_dispatch() {
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let source = include_str!("../../../docs/experiments/aot-console/sealed-member.neoil").replace(".sealed\n", "");
     let dir = Temp::new();
     let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
-    assert!(!r.status.success());
-    assert!(String::from_utf8_lossy(&r.stderr).contains("virtual calls requiring dispatch"), "{r:?}");
-    assert!(!dir.0.join("app.o").exists());
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["classVirtualDispatch"].as_array().unwrap().len(), 1);
+    assert!(dir.0.join("app.o").exists());
 }
 
 #[test]
-fn descriptive_sealing_does_not_hide_an_unselected_derived_type() {
+fn sealed_base_rejects_even_an_unselected_derived_type() {
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let source = format!("{}\n.type class Derived\n.extends Answer\n.end\n",
         include_str!("../../../docs/experiments/aot-console/sealed-member.neoil"));
     let dir = Temp::new();
     let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
     assert!(!r.status.success());
-    assert!(String::from_utf8_lossy(&r.stderr).contains("virtual calls requiring dispatch"), "{r:?}");
+    assert!(String::from_utf8_lossy(&r.stderr).contains("sealed class cannot be inherited"), "{r:?}");
     assert!(!dir.0.join("app.o").exists());
 }
 
@@ -5398,16 +5401,17 @@ int main(int argc, char **argv) {
 }
 
 #[test]
-fn inherited_display_rejects_unselected_overrides() {
+fn inherited_display_retains_only_constructed_override_targets() {
     let seed = neoclr::assemble(OBJECT_DISPLAY_SEED).unwrap();
     let source = include_str!("../../../docs/experiments/aot-console/inherited-display.neoil");
     let source = format!("{source}\n.type class Other\n.extends Base\n.method instance override ToString() -> String\nldstr \"other\"\nret\n.end\n.end\n");
     let dir = Temp::new();
     let app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)], &seed).unwrap().remove(0);
     let r = compile_linked_module(&dir, &seed, &app, &["--compile-system", "--reference-arena", "--bind-user-fault"]);
-    assert!(String::from_utf8_lossy(&r.stderr).contains("virtual calls requiring dispatch"), "{r:?}");
-    assert!(!r.status.success());
-    assert!(!dir.0.join("app.o").exists());
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert!(report["classVirtualDispatch"].as_array().unwrap().iter().any(|r| r["kind"] == "ToString"));
+    assert!(!report["functions"].as_array().unwrap().iter().any(|f| f["name"] == "Other.ToString"));
 }
 
 #[test]
@@ -5851,6 +5855,11 @@ fn native_reflection_arrays_preserve_creation_values_and_checked_faults() {
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn check_reflection_arrays(source: &str, modes: i32, expected_stdout: &[u8]) {
+    check_reference_execution(source, modes, expected_stdout, &[0]);
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_reference_execution(source: &str, modes: i32, expected_stdout: &[u8], success_modes: &[i32]) {
     let seed = neoclr::assemble(".module System\n.references ()\n.type System.Int32\n.end\n.type System.Boolean\n.end\n.type System.String\n.end\n").unwrap();
     let app = neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &seed).unwrap().remove(0);
     let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
@@ -5875,8 +5884,8 @@ fn check_reflection_arrays(source: &str, modes: i32, expected_stdout: &[u8]) {
         let interpreted = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default());
         let native = Command::new(dir.0.join("host")).arg(mode.to_string()).output().unwrap();
         assert_eq!(native.stdout, expected_stdout);
-        if mode == 0 { assert_eq!(interpreted.as_ref().unwrap().stdout, expected_stdout); }
-        if mode == 0 {
+        if success_modes.contains(&mode) { assert_eq!(interpreted.as_ref().unwrap().stdout, expected_stdout); }
+        if success_modes.contains(&mode) {
             assert_eq!(interpreted.unwrap().value, neoclr::Value::Int32(42));
             assert_eq!(native.status.code(), Some(42), "{native:?}");
             assert!(native.stderr.is_empty());
@@ -6422,4 +6431,11 @@ int main(void) {
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
     assert!(r.status.success(), "{r:?}");
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn class_virtual_dispatch_preserves_base_calls_fields_inheritance_and_null_faults() {
+    let source = include_str!("../../../docs/experiments/aot-console/class-virtual-calls.neoil");
+    check_reference_execution(source, 5, b"", &[0, 1, 2]);
 }

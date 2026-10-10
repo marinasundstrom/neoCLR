@@ -38,8 +38,10 @@ in native macOS ARM64 and interpreted modes, using the same culture-independent
 parser. Development civil date/time parsing also passes local native/interpreted
 tests for three numeric culture profiles, with a host-preference parity probe.
 Windows validation is configured; its result remains pending. Path and IP-address tests also cover class equality/hash overrides and
-display through Object. General virtual dispatch and intrinsic boxed/String
-Object equality/hash adapters remain incomplete. Windows execution of these newly
+display through Object. Development AOT now also supports nongeneric reference-class
+virtual dispatch, inherited implementations and direct base calls. The HTTP handler
+pipeline exercises this on macOS ARM64. Generic class virtual dispatch and intrinsic
+boxed/String Object equality/hash adapters remain incomplete. Windows execution of these newly
 migrated suites remains pending.
 
 Choose the profile for the host and workload:

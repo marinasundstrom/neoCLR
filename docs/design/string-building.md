@@ -71,12 +71,13 @@ The service rechecks the sum rather than trusting arbitrary CIL or bridge caller
 No native mutable-buffer handle or special StringBuilder opcode is introduced.
 
 The native backend now admits direct virtual calls whose declared owner is a verified
-sealed reference class with no derived type in the complete loaded set. The current
-sealing flag is descriptive, so the backend explicitly checks that no descendant
-can provide a different implementation instead of trusting that flag alone. The private projection
+sealed reference class with no derived type in the complete loaded set. As of 2026-10-11, verification rejects derivation from sealed classes across
+the complete load set. The backend also checks for descendants before choosing
+a direct implementation. The private projection
 removes the virtual flags while preserving method bodies and callvirt null checks.
-Unsealed virtual dispatch remains unsupported by this path. This is required for
-ordinary StringBuilder.ToString calls; it does not add general class dispatch.
+This original path supports ordinary StringBuilder.ToString calls. The subsequent
+2026-10-11 class-dispatch slice adds nongeneric reference-class dispatch through
+separate generated dispatch methods while keeping direct base bodies available.
 
 ## Validation and remaining scope
 

@@ -352,7 +352,7 @@ impl Specializer<'_> {
                     }
                     let instance = self.resolve(&closed)?;
                     let callee = &self.source.functions[instance.source];
-                    if virtual_call && !super::selection::interface_contract(self.source, callee) && !super::selection::object_dispatch_contract(callee) && !super::selection::sealed_member(self.source, callee) && !super::selection::inherited_object_member(self.source, callee) && (callee.is_virtual || callee.is_abstract || callee.is_override) {
+                    if virtual_call && !super::selection::interface_contract(self.source, callee) && !super::selection::class_contract(self.source, callee) && !super::selection::object_dispatch_contract(callee) && !super::selection::sealed_member(self.source, callee) && !super::selection::inherited_object_member(self.source, callee) && (callee.is_virtual || callee.is_abstract || callee.is_override) {
                         return Err(format!("virtual calls requiring dispatch need a later specialization profile: {}", callee.name).into());
                     }
                     if !virtual_call && super::selection::object_dispatch_contract(callee) {
@@ -484,6 +484,13 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
             if !visited.insert(instance.row) {
                 continue;
             }
+            for base in super::selection::virtual_base_contracts(input, &input.functions[instance.source]) {
+                let f = &input.functions[base];
+                let reference = FunctionRef { definition: f.definition.clone(), name: f.name.clone(), owner: f.owner.clone(),
+                    instance: true, generic_arguments: vec![], parameters: f.parameters.clone() };
+                let inherited = context.resolve(&reference)?;
+                if !visited.contains(&inherited.row) { pending.push(inherited); }
+            }
             let mut function = context.function(
                 &input.functions[instance.source],
                 &instance.types,
@@ -529,8 +536,9 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
         for instance in &context.instances {
             let original = &input.functions[instance.source];
             let display = super::selection::object_dispatch_contract(original);
-            if super::selection::interface_contract(input, original) || display {
-                if !original.instance || original.receiver_byref || (!display && !original.body.is_empty()) || !original.generic_parameters.is_empty() {
+            let class = super::selection::class_contract(input, original);
+            if super::selection::interface_contract(input, original) || display || class {
+                if !original.instance || original.receiver_byref || (!display && !class && !original.body.is_empty()) || !original.generic_parameters.is_empty() {
                     return Err("interface dispatch requires a bodyless nongeneric instance contract".into());
                 }
                 contracts.push(super::selection::closed_signature(original, &instance.types)?);
@@ -555,7 +563,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
             }
         }
         for contract in contracts {
-            if !super::selection::object_dispatch_contract(&contract)
+            if super::selection::interface_contract(input, &contract)
                 && super::selection::implements_interface(input, &Type::String, contract.owner.as_ref().unwrap()) {
                 let (_, reference) = super::selection::implicit_implementation(input, &Type::String, &contract)?;
                 let instance = context.resolve(&reference)?;
@@ -586,7 +594,8 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
                 let (_, reference) = if super::selection::object_dispatch_contract(&contract) {
                     let Some(target) = super::selection::object_value_override(input, owner, &contract)? else { continue; };
                     target
-                } else { super::selection::implicit_implementation(input, owner, &contract)? };
+                } else if super::selection::class_contract(input, &contract) { super::selection::class_implementation(input, owner, &contract)? }
+                else { super::selection::implicit_implementation(input, owner, &contract)? };
                 let instance = context.resolve(&reference)?;
                 if !visited.contains(&instance.row) { pending.push(instance); }
             }

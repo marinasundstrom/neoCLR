@@ -287,3 +287,25 @@ ret
         .is_err()
     );
 }
+
+#[test]
+fn sealed_base_rejects_unreachable_derived_definitions() {
+    let source = r#"
+.module SealedBase
+.entry Main
+.type class Base
+.sealed
+.end
+.type class Derived
+.extends Base
+.end
+.function Main() -> Int32
+ldc.i4 42
+ret
+.end
+"#;
+    assert!(assemble(source).unwrap_err().message.contains("sealed class cannot be inherited"));
+    let mut m = assemble(&source.replace(".sealed\n", "")).unwrap();
+    m.types[0].is_sealed = true;
+    assert!(verify(&m).unwrap_err().message.contains("sealed class cannot be inherited"));
+}

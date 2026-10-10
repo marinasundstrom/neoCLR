@@ -160,6 +160,16 @@ pub fn interface_implementation(
     crate::interfaces::implementation(module, concrete, interface, contract)
 }
 
+/// Resolve a class virtual slot using the same ancestry rules as interpreted calls.
+/// Returns a concrete inherited implementation or a fault for an invalid receiver/slot.
+pub fn class_implementation(
+    module: &Module,
+    concrete: &Type,
+    contract: &crate::metadata::Function,
+) -> Result<crate::metadata::Function, Fault> {
+    crate::inheritance::dispatch(module, concrete, contract)
+}
+
 /// Resolve closed generic argument handles using the interpreter's type identity.
 pub fn generic_arguments(module: &Module, owner: &Type) -> Result<Vec<Type>, Fault> {
     crate::type_identity::describe_loaded(module, owner)?

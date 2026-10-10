@@ -282,7 +282,7 @@ pub struct TypeDef {
     pub base: Option<Type>,
     #[serde(default)]
     pub is_abstract: bool,
-    /// Descriptive inheritance metadata; does not itself enforce derivation.
+    /// A non-inheritable class leaf; verification rejects every derived type in the load set.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub is_sealed: bool,
     /// Declared closed family, independent of a non-inheritable leaf.

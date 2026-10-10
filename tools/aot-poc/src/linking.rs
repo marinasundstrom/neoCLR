@@ -695,8 +695,9 @@ pub fn prepare(
     }
     report["valueDisplayProjections"] = json!(value_display.iter().map(|i| json!({"compiledIndex":i,
         "policy":"verified value ToString override; preserve direct by-reference receiver and original CIL"})).collect::<Vec<_>>());
+    super::class_dispatch::project(&mut selected, &mut report)?;
     let sealed_members: Vec<_> = selected.functions.iter().enumerate()
-        .filter(|(_, f)| (f.is_virtual || f.is_override) && (super::selection::sealed_member(&selected, f) || super::selection::inherited_object_member(&selected, f)))
+        .filter(|(_, f)| !super::selection::class_contract(&selected, f) && (f.is_virtual || f.is_override) && (super::selection::sealed_member(&selected, f) || super::selection::inherited_object_member(&selected, f)))
         .map(|(i, _)| i).collect();
     for &i in &sealed_members {
         selected.functions[i].is_virtual = false;

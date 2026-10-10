@@ -1,0 +1,99 @@
+.module ClassVirtualCalls
+.type class Base
+.field private Number Int32
+.method instance .ctor() -> noresult
+ldarg 0
+ldc.i4 40
+stfld Base::Number
+ret
+.end
+.method instance virtual Read() -> Int32
+ldarg 0
+ldfld Base::Number
+ret
+.end
+.end
+.type class Derived
+.extends Base
+.field private Extra Int32
+.method instance .ctor() -> noresult
+ldarg 0
+call instance Base::.ctor()
+ldarg 0
+ldc.i4 2
+stfld Derived::Extra
+ret
+.end
+.method instance override Read() -> Int32
+ldarg 0
+call instance Base::Read()
+ldarg 0
+ldfld Derived::Extra
+add
+ret
+.end
+.end
+.type class Leaf
+.extends Derived
+.method instance .ctor() -> noresult
+ldarg 0
+call instance Derived::.ctor()
+ret
+.end
+.end
+.type class Throwing
+.extends Base
+.method instance .ctor() -> noresult
+ldarg 0
+call instance Base::.ctor()
+ret
+.end
+.method instance override Read() -> Int32
+fault "virtual failure"
+.end
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Base receiver
+ldarg mode
+ldc.i4 4
+ceq
+brtrue Throw
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Leaf
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Base
+ldarg mode
+ldc.i4 3
+ceq
+brtrue Null
+newobj.ctor instance Derived::.ctor()
+stloc receiver
+br Read
+Leaf:
+newobj.ctor instance Leaf::.ctor()
+stloc receiver
+br Read
+Base:
+newobj.ctor instance Base::.ctor()
+stloc receiver
+ldloc receiver
+callvirt instance Base::Read()
+ldc.i4 2
+add
+ret
+Throw:
+newobj.ctor instance Throwing::.ctor()
+stloc receiver
+br Read
+Null:
+ldloca receiver
+initobj Base
+Read:
+ldloc receiver
+callvirt instance Base::Read()
+ret
+.end

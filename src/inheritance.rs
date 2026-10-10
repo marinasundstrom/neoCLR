@@ -136,6 +136,9 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         fields(module, &definition.open_type())?;
         for (level, base) in chain.iter().skip(1).enumerate() {
             let parent = module.type_definition(base).unwrap();
+            if parent.is_sealed {
+                return Err(Fault::new("sealed class cannot be inherited"));
+            }
             if level == 0
                 && parent.is_closed_hierarchy
                 && !definition
@@ -333,7 +336,7 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
         if method.is_override {
             let parent = inherited
                 .or(boxed_parent)
-                .ok_or_else(|| Fault::new("override requires an inherited virtual method"))?;
+                .ok_or_else(|| Fault::new(format!("override requires an inherited virtual method: {}", method.name)))?;
             if !parent.is_virtual
                 || (adapted_receiver && !method.generic_parameters.is_empty())
                 || parent.returns != method.returns
