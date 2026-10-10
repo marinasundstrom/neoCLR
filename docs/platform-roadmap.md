@@ -135,8 +135,9 @@ positive and duplicate/disposal checks passing. [Verified Windows evidence](expe
 now covers those map overloads. Iterable constructors now also cover
 ArrayList, ArrayQueue, ArrayStack and HashSet, with explicit ordering/copy contracts; see [the contract](collection-contracts.md#iterable-construction-and-tomap--development-2026-10-10).
 Native for-loop iterator disposal is repaired in Raven 494dede84, using the same
-scope-exit cleanup as use. Next audit runtime .rvn sources for for/use conversions,
-preserving explicit long-lived ownership and disposal before terminal faults.
+scope-exit cleanup as use. The runtime .rvn source audit now applies selective
+for/use conversions while preserving explicit long-lived ownership, advance-only
+iteration and disposal before terminal faults; see the [audit](raven-conventions.md#runtime-source-audit).
 Future concurrent variants retain implementation-specific atomicity/iteration contracts; see the [contracts and concurrency boundaries](collection-contracts.md#basic-library-slice-and-future-concurrency--2026-10-10).
 
 ### Follow-up review areas — author direction, 2026-10-10

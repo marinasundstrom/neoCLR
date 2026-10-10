@@ -18,36 +18,29 @@ public extension Operators<T> for Iterable<T> {
     }
 
     func Any() -> bool {
-        let iterator = self.GetIterator()
-        let result = iterator.MoveNext()
-        iterator.Dispose()
-        return result
+        use iterator = self.GetIterator()
+        return iterator.MoveNext()
     }
 
     func Any(predicate: (T) -> bool) -> bool {
-        let iterator = self.GetIterator()
-        while iterator.MoveNext() {
-            if predicate(iterator.Current) {
-                iterator.Dispose()
+        for value in self {
+            if predicate(value) {
                 return true
             }
         }
-        iterator.Dispose()
         return false
     }
 
     func All(predicate: (T) -> bool) -> bool {
-        let iterator = self.GetIterator()
-        while iterator.MoveNext() {
-            if !predicate(iterator.Current) {
-                iterator.Dispose()
+        for value in self {
+            if !predicate(value) {
                 return false
             }
         }
-        iterator.Dispose()
         return true
     }
 
+    // Keep advance-only iteration and explicit cleanup before the terminal overflow Fault.
     func Count() -> int {
         let iterator = self.GetIterator()
         var count = 0
@@ -79,12 +72,10 @@ public extension Operators<T> for Iterable<T> {
     }
 
     func Fold<U>(seed: U, accumulator: (U, T) -> U) -> U {
-        let iterator = self.GetIterator()
         var result = seed
-        while iterator.MoveNext() {
-            result = accumulator(result, iterator.Current)
+        for value in self {
+            result = accumulator(result, value)
         }
-        iterator.Dispose()
         return result
     }
 
@@ -121,6 +112,7 @@ public extension Operators<T> for Iterable<T> {
     /// <remarks>Native development API. Eager and single-pass. Duplicate keys cause a terminal Fault after iterator disposal. Provider/callback Faults do not guarantee cleanup or rollback. No concurrent snapshot guarantee.</remarks>
     func ToMap<K, V>(keySelector: (T) -> K, valueSelector: (T) -> V, comparer: EqualityComparer<K>) -> HashMap<K, V> {
         let result = HashMap<K, V>(comparer)
+        // Duplicate rejection must dispose before raising a terminal Fault.
         let iterator = self.GetIterator()
         while iterator.MoveNext() {
             let item = iterator.Current
@@ -136,39 +128,33 @@ public extension Operators<T> for Iterable<T> {
     }
 
     func First() -> System.Option<T> {
-        let iterator = self.GetIterator()
+        use iterator = self.GetIterator()
         if iterator.MoveNext() {
             let value = iterator.Current
-            iterator.Dispose()
             return Some(value)
         }
-        iterator.Dispose()
         return None
     }
 
     func Last() -> System.Option<T> {
-        let iterator = self.GetIterator()
+        use iterator = self.GetIterator()
         if !iterator.MoveNext() {
-            iterator.Dispose()
             return None
         }
         var value = iterator.Current
         while iterator.MoveNext() {
             value = iterator.Current
         }
-        iterator.Dispose()
         return Some(value)
     }
 
     func Single() -> System.Result<T, SingleError> {
-        let iterator = self.GetIterator()
+        use iterator = self.GetIterator()
         if !iterator.MoveNext() {
-            iterator.Dispose()
             return Error(SingleError.Empty())
         }
         let value = iterator.Current
         let multiple = iterator.MoveNext()
-        iterator.Dispose()
         if multiple {
             return Error(SingleError.Multiple())
         }
@@ -176,20 +162,16 @@ public extension Operators<T> for Iterable<T> {
     }
 
     func First(predicate: (T) -> bool) -> System.Option<T> {
-        let iterator = self.GetIterator()
-        while iterator.MoveNext() {
-            let value = iterator.Current
+        for value in self {
             if predicate(value) {
-                iterator.Dispose()
                 return Some(value)
             }
         }
-        iterator.Dispose()
         return None
     }
 
     func Last(predicate: (T) -> bool) -> System.Option<T> {
-        let iterator = self.GetIterator()
+        use iterator = self.GetIterator()
         while iterator.MoveNext() {
             var value = iterator.Current
             if predicate(value) {
@@ -199,30 +181,25 @@ public extension Operators<T> for Iterable<T> {
                         value = current
                     }
                 }
-                iterator.Dispose()
                 return Some(value)
             }
         }
-        iterator.Dispose()
         return None
     }
 
     func Single(predicate: (T) -> bool) -> System.Result<T, SingleError> {
-        let iterator = self.GetIterator()
+        use iterator = self.GetIterator()
         while iterator.MoveNext() {
             let value = iterator.Current
             if predicate(value) {
                 while iterator.MoveNext() {
                     if predicate(iterator.Current) {
-                        iterator.Dispose()
                         return Error(SingleError.Multiple())
                     }
                 }
-                iterator.Dispose()
                 return Ok(value)
             }
         }
-        iterator.Dispose()
         return Error(SingleError.Empty())
     }
 }

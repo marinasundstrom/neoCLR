@@ -1486,3 +1486,12 @@ application importer is not extended with these new pair-materialization calls.
 The follow-up iterable constructors for ArrayList, ArrayQueue, ArrayStack and HashSet
 are covered by their existing type selections, matching reference declarations,
 source XML parameter/ordering/error contracts and refreshed native member pages.
+
+
+### Scoped iteration implementation refresh (2026-10-10)
+
+The runtime source audit changes implementation bodies only; public signatures
+and XML contracts are unchanged, so the existing compiler reference assembly is
+reused with refreshed source fingerprints. The native documentation snapshot is
+rendered from the matching source libraries and compiler/renderer 494dede84.
+No website build or publication is implied.

@@ -33,6 +33,27 @@ leave a loop/scope before raising a deliberate fault when disposal is required.
 Compiler b939cd696 omitted native for cleanup; that historical gap is fixed in
 the pinned integration compiler. Ordinary .NET iteration retains its behavior.
 
+### Runtime source audit
+
+The 2026-10-10 review applies the author's semantic/performance constraint:
+
+| Source/operation | Decision | Reason |
+| --- | --- | --- |
+| ArrayList/ArrayQueue/ArrayStack/HashSet iterable construction | for | Each visited element is copied once, in the same order. |
+| String character snapshot | Deferred; existing explicit iterator retained | It is a natural for candidate, but the added executable check hit the native `Array(Char)` specialization limit. Qualify the character path before changing it. |
+| Any(predicate), All, Fold, First(predicate) | for | Element consumption and early exit express the query directly. |
+| Any(), First(), Last(), Single(), predicate Last/Single | use with explicit iterator | Preserve advance-only probes or the existing stateful first-match/remainder algorithm. |
+| Count overloads, HashMap.CopyItems, selector ToMap | Explicit disposal retained | Deliberate overflow/duplicate Faults must occur after disposal; terminal Faults do not unwind. Count() also avoids Current reads. |
+| Lazy query iterator Dispose and Concat/FlatMap transitions | Explicit disposal retained | Sources live across MoveNext calls; inner sources end at transition boundaries. |
+| HTTP, DNS, sockets and cancellation registrations | Explicit disposal retained | Callback/state-machine ownership spans method calls; cleanup timing precedes completion/cancellation. |
+
+The review does not mechanically replace index loops or linked-list walks. It
+adds no collection materialization or per-element allocation. The qualification
+consumer checks exact acquisition, MoveNext, Current and disposal counts for
+queries, including early exits. These checks establish equivalent iteration work;
+they are not timing or allocation benchmarks. .NET foreach/using remains the
+structured-ownership comparison; the native terminal-Fault distinction is unchanged.
+
 ## Native module declarations (2026-10-10)
 
 Use `module System.Collections` (or the appropriate qualified module name) in

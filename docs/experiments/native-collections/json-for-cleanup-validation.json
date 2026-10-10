@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "revision": "8ce62d7843ff06b3ddb39570b065d46db2a08941",
+  "inputs": {
+    "scripts/validate-native-json.py": "fc1e74e797227593aade3911c9b15a044b64958fa81e3845665775f1579b4961",
+    "scripts/build-native-project.py": "782379cfbeaaa706c0921c0dea02061d23f9e31c735be004bd78031a7267359a",
+    "scripts/validate-native-http-project.py": "ef984790b92b7bda9b69ca205422da446290e72dec6155e6b55da35425175904",
+    "scripts/validate-windows-project.py": "9ea2ab50b5d6bb88c96ace264d742249da42210f91aae2c6e877bb1d72a58959",
+    "scripts/prepare-native-development-bundle.py": "f08c9192209d348d0f7b26f85041c1ac8d56afe016bede6944546473813ab465",
+    "docs/experiments/native-json/Main.rvn": "3afe13db7bf226a1d34ba2348d4b9d75b2d3d1ec5d339abffe8c78e848513f00",
+    "docs/experiments/native-json/Native.rvnproj": "0850f3b745334e38184a1bcb685f854693fe861780c1d9561c8b61054bd24681",
+    "docs/experiments/native-json/reflection-roots.json": "a4625cf1de5683cd08aa45561ff98b5bb876155b397518af521f3854d7674c3a"
+  },
+  "bundleManifestSha256": "c8f9d285665dca2d38eabeb7ee6fadb27986b1ac78c8d11293cde0f100e51589",
+  "aotSha256": "972c02e779772b2c5318935dda8d1f6b41beaa0ed0a21c0501233815b0014d24",
+  "interpreterSha256": "b9848dad02ccba0fc333b7c4070d27c2c2873a380c9438f42a4d82a24a844ad8",
+  "compilerRevision": "494dede841bc09c9e4876ab51f8ba91c74d64ab7",
+  "reportSha256": "b45712b7186b6721d455e0a00455d335140dd238f223ce99a7675e9a27810fc4",
+  "cases": [
+    {
+      "name": "json",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ]
+}

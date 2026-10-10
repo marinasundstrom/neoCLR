@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Review runtime Raven iterator ownership after the compiler cleanup fix. Use `for`
+  for collection copying and element-consuming queries; use scoped explicit iterators for advance-only/stateful queries. Keep
+  manual disposal before terminal faults and for long-lived asynchronous/lazy
+  ownership. Preserve MoveNext/Current counts and short-circuit behavior; no
+  performance improvement is claimed. Native macOS/interpreter checks pass for
+  the final sources; API snapshots are refreshed. Character snapshot conversion
+  is deferred because native Array(Char) specialization blocks its qualification.
+
 - Extend native development iterable construction to ArrayList, ArrayQueue,
   ArrayStack and HashSet. Copy storage shallowly in one pass; preserve list/queue
   order, push stack inputs in order, and discard set duplicates under the explicit

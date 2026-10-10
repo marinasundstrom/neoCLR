@@ -499,6 +499,8 @@ and allocation counts are not promised, and no speed claim is made. Optimized
 count-aware copying can be considered if measurement motivates it. A special
 stack-preserving clone would be a distinct API, not an implicit constructor rule.
 
-Implementation uses scoped `use` iterator resources. Compiler 494dede84 repairs
-the native portable for cleanup omitted by b939cd696. Library loop simplification
-is the next slice. Terminal Faults do not unwind use scopes.
+Iterable construction now uses element-consuming for loops. Compiler 494dede84
+repairs the native portable for cleanup omitted by b939cd696. Explicit iterator
+control remains where it better represents the operation or guarantees disposal
+before a deliberate terminal Fault; see the [source audit](raven-conventions.md#runtime-source-audit).
+Terminal Faults do not unwind scopes.

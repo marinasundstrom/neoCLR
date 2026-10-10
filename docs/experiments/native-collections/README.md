@@ -117,3 +117,20 @@ without reading it. These are behavioral checks, not a throughput benchmark.
 
 [Scope-exit evidence](for-cleanup-validation.json) records passing macOS ARM64
 native and matching interpreter execution against the exact compiler revision.
+
+## Selective runtime loop simplification (2026-10-10)
+
+The follow-up converts collection-copy loops and element-consuming queries to for;
+advance-only/stateful query operations use scoped explicit iterators. Count and map
+duplicate rejection retain explicit disposal before terminal Faults. The same
+consumer checks exact MoveNext/Current/disposal counts, now also asserting Single
+results, predicate multiple-match short-circuiting and no-match First completion.
+[Audit decisions](../../raven-conventions.md#runtime-source-audit) explain retained
+manual ownership and the deferred character-snapshot candidate.
+
+The [JSON regression](json-for-cleanup-validation.json) passes native and interpreted
+execution with the corrected compiler before these library-body simplifications.
+
+[Refactored-library evidence](scoped-library-validation.json) records macOS ARM64
+native/interpreter success against the final source hashes. Reference fingerprints
+and the native API snapshot are refreshed; public signatures remain unchanged.

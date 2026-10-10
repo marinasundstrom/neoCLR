@@ -64,6 +64,7 @@ public class HashMap<K, V> : MutableMap<K, V> {
     }
 
     private func CopyItems(items: Iterable<KeyValuePair<K, V>>) {
+        // Keep explicit cleanup before duplicate-key Faults, which do not unwind.
         let iterator = items.GetIterator()
         while iterator.MoveNext() {
             let pair = iterator.Current

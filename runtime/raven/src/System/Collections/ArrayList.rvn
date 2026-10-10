@@ -25,9 +25,8 @@ public open class ArrayList<T> : List<T> {
     init(items: Iterable<T>) {
         data = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
         count = 0
-        use iterator = items.GetIterator()
-        while iterator.MoveNext() {
-            Add(iterator.Current)
+        for item in items {
+            Add(item)
         }
     }
 

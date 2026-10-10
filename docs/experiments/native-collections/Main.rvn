@@ -2,6 +2,7 @@ import System.*
 import System.Collections.*
 import System.Linq.*
 import System.Option.*
+import System.Result.*
 
 class Item {
     var Value: int { get; set; } = 7
@@ -252,8 +253,7 @@ class Program {
             return false
         }
         let single = ObservedNumbers()
-        _ = single.Single()
-        if !Counts(single, 2, 1) {
+        if single.Single() is not Error(SingleError.Multiple) || !Counts(single, 2, 1) {
             return false
         }
         let selectedFirst = ObservedNumbers()
@@ -265,8 +265,7 @@ class Program {
             return false
         }
         let selectedSingle = ObservedNumbers()
-        _ = selectedSingle.Single(value => value == 2)
-        if !Counts(selectedSingle, 5, 4) {
+        if selectedSingle.Single(value => value == 2) is not Ok(2) || !Counts(selectedSingle, 5, 4) {
             return false
         }
         let count = ObservedNumbers()
@@ -283,7 +282,18 @@ class Program {
         }
         let empty = ObservedNumbers()
         empty.Limit = 0
-        return !empty.Any() && Counts(empty, 1, 0)
+        if empty.Any() || !Counts(empty, 1, 0) {
+            return false
+        }
+        let multiple = ObservedNumbers()
+        if multiple.Single(value => value < 3) is not Error(SingleError.Multiple) || !Counts(multiple, 2, 2) {
+            return false
+        }
+        let noMatch = ObservedNumbers()
+        if noMatch.First(value => value > 4) is not None || !Counts(noMatch, 5, 4) {
+            return false
+        }
+        return true
     }
 
     static func FirstFromLoop(input: Iterable<int>) -> int {

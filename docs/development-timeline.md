@@ -13271,3 +13271,19 @@ The follow-up compiler revision 494dede84 also preserves return expressions outs
 active scopes; native Runtime/Data/Networking/Web builds pass. The collection
 consumer passes macOS ARM64 AOT and interpreter cleanup and query read-count checks
 ([evidence](experiments/native-collections/for-cleanup-validation.json)).
+
+The subsequent source audit selects for for collection constructors and element-consuming queries, and use for explicit query iterators.
+Count overflow, duplicate-key failures, asynchronous registrations and lazy
+iterator ownership retain explicit disposal. No blanket index-loop conversion
+or performance claim is made; the [audit decisions](raven-conventions.md#runtime-source-audit)
+record the reasons and validation boundary.
+
+A character-snapshot candidate was reverted before commit: an added native consumer
+hit `specialization requires closed reference-free local value types: Array(Char)`.
+The source audit records this qualification limit rather than expanding the slice
+into character-array backend work or claiming native validation for that conversion.
+
+The final selective refactor passes macOS native and matching interpreter execution,
+including exact query traversal/disposal counts and the new constructor paths
+([evidence](experiments/native-collections/scoped-library-validation.json)). API
+fingerprint and native snapshot checks pass; Windows CI qualification is pending.
