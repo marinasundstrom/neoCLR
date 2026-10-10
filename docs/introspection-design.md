@@ -849,3 +849,25 @@ and discovery match Raven source modules, at the cost of API migration and expli
 translation at the CLI boundary. It does not add separate loading, scheduling or
 access-isolation semantics. Consolidating host and guest APIs, preserving source
 ownership and validating interpreter/AOT traversal are still implementation work.
+
+
+#### Flat module names and packaging clarification (2026-10-10)
+
+The author describes a common root-module/submodule naming convention, then clarifies:
+“This is mainly convention by namespace names, we shouldn’t create module hierarchies
+in metadata”. The assembly owns a flat set of modules. Qualified names carry the
+convention; neither parent links nor implicit parent declarations are introduced.
+The author's concrete examples are recorded in [declaration modules](declaration-modules.md).
+Modules may reference one another through existing qualified declarations and assembly
+binding; this slice adds no explicit module-reference graph or new ambiguity policy.
+The author's intent is to tie namespaces to understandable module ownership and
+library distribution with minimal metadata adaptation, leaving name resolution to
+compiler work rather than imposing a physical-file model.
+
+Implemented host consolidation: ModuleInfo now denotes a logical module; assembly
+and context GetModules return canonical views. Removed the temporary declaration
+facade API. Type/method/member Module properties return logical owners, and physical
+scope names remain explicit on type/method metadata descriptors. Raven's native
+importer now scans all logical modules in an assembly. Guest APIs still require
+migration; the host change and existing typed AOT registrations do not provide guest
+in-process module discovery.

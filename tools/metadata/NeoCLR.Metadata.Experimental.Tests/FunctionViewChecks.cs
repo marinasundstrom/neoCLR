@@ -34,15 +34,15 @@ internal static class FunctionViewChecks
         var constructed = (FunctionTypeInfo)closed.ReturnType;
         Check(ReferenceEquals(integer, constructed.ParameterTypes.Single()), "constructed parameter substitution");
         Check(ReferenceEquals(constructed, closed.GetParameters().Single().ParameterType), "constructed canonical signature");
-        var genericView = context.Resolve(snapshot.Identity).GetModules().Single().GetFunctions().Single(m => m.Name == "Transform");
+        var genericView = context.Resolve(snapshot.Identity).GetModules().SelectMany(module => module.GetFunctions()).Single(m => m.Name == "Transform");
         var openMethodFunction = (FunctionTypeInfo)genericView.ReturnType;
         Check(ReferenceEquals(openMethodFunction.ReturnType, genericView.GetGenericArguments().Single()), "method parameter scope");
         var closedMethodFunction = (FunctionTypeInfo)genericView.MakeGenericMethod(integer).ReturnType;
         Check(ReferenceEquals(closedMethodFunction.ReturnType, integer) && ReferenceEquals(closedMethodFunction.ParameterTypes.Single(), integer), "method substitution");
-        var externalView = (FunctionTypeInfo)context.Resolve(snapshot.Identity).GetModules().Single().GetFunctions().Single(m => m.Name == "External").ReturnType;
+        var externalView = (FunctionTypeInfo)context.Resolve(snapshot.Identity).GetModules().SelectMany(module => module.GetFunctions()).Single(m => m.Name == "External").ReturnType;
         Check(ReferenceEquals(externalView.ReturnType, context.Resolve(externalSnapshot.Identity).GetTypes().Single(t => t.Name == "Payload")), "external identity inside callback");
         var missing = new MetadataLoadContext([snapshot]);
-        try { _ = missing.Resolve(snapshot.Identity).GetModules().Single().GetFunctions().Single(m => m.Name == "External").ReturnType; throw new Exception("missing callback dependency admitted"); } catch (InvalidDataException) { }
+        try { _ = missing.Resolve(snapshot.Identity).GetModules().SelectMany(module => module.GetFunctions()).Single(m => m.Name == "External").ReturnType; throw new Exception("missing callback dependency admitted"); } catch (InvalidDataException) { }
         var noResult = (FunctionTypeInfo)context.ResolveSignature(SignatureType.Function(new(PrimitiveType.Void, [])));
         Check(noResult.NoResult && noResult.ParameterTypes.Count == 0, "explicit no-result");
         Check(ReferenceEquals(noResult, context.ResolveSignature(SignatureType.Function(new(PrimitiveType.Void, [])))), "canonical no-result shape");

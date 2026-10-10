@@ -106,7 +106,7 @@ internal static class MemberAttributeChecks
             Check(usageView.GetNamedArguments().Count == 2 && usageView.GetNamedArguments()[0].TypedValue.Value is true &&
                 usageView.GetNamedArguments()[1].TypedValue.Value is false && !usageView.GetNamedArguments()[0].IsField, "native named data lost");
             Check(expectedType.GetConstructors().Single().GetCustomAttributes().Single().GetAttributeType() == expectedType, "constructor attribute lost");
-            var discovered = assembly.GetModules().Single().GetFunctions()
+            var discovered = assembly.GetModules().SelectMany(module => module.GetFunctions())
                 .Where(f => f.GetCustomAttributes().Any(a => ReferenceEquals(a.GetAttributeType(), expectedType)))
                 .Select(f => f.Name).Order(StringComparer.Ordinal).ToArray();
             Check(discovered.SequenceEqual(new[] { "First", "Last" }), "classless discovery lost method attributes");

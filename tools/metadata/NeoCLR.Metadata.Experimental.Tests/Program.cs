@@ -27,7 +27,16 @@ if (args is ["--check-module-consumer", var moduleConsumer])
         throw new Exception("Raven module names or empty module were lost");
     if (modules[2].GetMembers().Count != 0 || modules[1].GetMembers().Single().Name != "Answer")
         throw new Exception("Raven module ownership mismatch");
-    Console.WriteLine("PASS Raven explicit and empty declaration modules"); return 0;
+    var context = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([assembly]);
+    var views = context.GetModules();
+    if (!views.Select(module => module.Name).SequenceEqual(modules.Select(module => module.Name)) ||
+        views.Any(module => module.Assembly.Name != assembly.Name || module.IsProjection))
+        throw new Exception("Raven logical module introspection mismatch");
+    foreach (var view in views)
+        if (view.GetMembers().Any(member => !ReferenceEquals(member.Module, view)) ||
+            view.GetFunctions().Any(function => !ReferenceEquals(function.Module, view)))
+            throw new Exception("Raven logical member ownership mismatch");
+    Console.WriteLine("PASS Raven explicit and empty logical modules through host introspection"); return 0;
 }
 
 if (args.Length >= 1 && args[0] == "--declaration-modules") { DeclarationModuleChecks.Run(args.Length > 1 ? args[1] : null); return 0; }

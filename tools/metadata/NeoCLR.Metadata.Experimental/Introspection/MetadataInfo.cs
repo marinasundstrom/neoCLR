@@ -6,20 +6,20 @@ namespace NeoCLR.Metadata.Experimental.Introspection;
 public sealed class AssemblyInfo
 {
     private readonly MetadataLoadContext context;
-    private readonly IReadOnlyList<ModuleInfo> modules;
+    private readonly Lazy<IReadOnlyList<ModuleInfo>> modules;
     private readonly Lazy<IReadOnlyList<AssemblyInfo>> references;
     internal AssemblyInfo(MetadataLoadContext context, AssemblyDefinition definition)
     {
         this.context = context;
         Definition = definition;
-        modules = Array.AsReadOnly(new[] { new ModuleInfo(context, this, definition.MainModule) });
+        modules = new(() => Array.AsReadOnly(definition.GetModules().Select(context.Resolve).ToArray()));
         references = new(() => Array.AsReadOnly(definition.MainModule.AssemblyReferences.Select(context.Resolve).ToArray()));
     }
     /// <summary>Gets assembly-level type, function and constant views with qualified names and ownership.</summary>
     /// <remarks>Matches AssemblyDefinition.GetMembers ordering and exclusions. Returned lists are read-only;
     /// the initial reader supports a single manifest module.</remarks>
     public IReadOnlyList<AssemblyMemberInfo> GetMembers() => Array.AsReadOnly(Definition.GetMembers()
-        .Select(member => new AssemblyMemberInfo(context, this, modules[0], member)).ToArray());
+        .Select(member => new AssemblyMemberInfo(context, this, member)).ToArray());
     internal AssemblyDefinition Definition { get; }
     /// <summary>Gets the simple metadata name.</summary>
     public string Name => Definition.Name;
@@ -28,37 +28,12 @@ public sealed class AssemblyInfo
     /// <summary>Gets resolved direct dependencies; missing catalog entries throw InvalidDataException on access.</summary>
     /// <remarks>Traversal is one edge at a time. Legal dependency cycles return the existing assembly views.</remarks>
     public IReadOnlyList<AssemblyInfo> ReferencedAssemblies => references.Value;
-    /// <summary>Gets modules. The current reader supports one main module only.</summary>
-    public IReadOnlyList<ModuleInfo> GetModules() => modules;
-    /// <summary>Gets logical declaration modules in ordinal name order, including explicit empty modules.</summary>
-    /// <remarks>Views are canonical within this metadata context. Physical metadata modules remain available through GetModules.</remarks>
-    public IReadOnlyList<DeclarationModuleInfo> GetDeclarationModules() => Array.AsReadOnly(
-        Definition.GetModules().Select(context.Resolve).ToArray());
-    /// <summary>Gets nominal definitions including nested types, excluding the CLI module pseudo-type.</summary>
-    public IReadOnlyList<NominalTypeInfo> GetTypes() => modules[0].GetTypes();
-}
-
-/// <summary>A metadata-only module facade, with its stable owning assembly.</summary>
-public sealed class ModuleInfo
-{
-    private readonly ModuleDefinition definition;
-    private readonly MetadataLoadContext context;
-    private readonly Lazy<IReadOnlyList<NominalTypeInfo>> types;
-    internal ModuleInfo(MetadataLoadContext context, AssemblyInfo assembly, ModuleDefinition definition)
-    {
-        this.context = context;
-        Assembly = assembly;
-        this.definition = definition;
-        types = new(() => Array.AsReadOnly(definition.Types.Where(t => t.Name != "<Module>").Select(context.GetType).ToArray()));
-    }
-    /// <summary>Gets the metadata module name.</summary>
-    public string Name => definition.Name;
-    /// <summary>Gets the canonical owning assembly view.</summary>
-    public AssemblyInfo Assembly { get; }
-    /// <summary>Gets declared nominal types in metadata order, including nested types.</summary>
-    public IReadOnlyList<NominalTypeInfo> GetTypes() => types.Value;
-    /// <summary>Gets assembly-level functions in metadata order.</summary>
-    public IReadOnlyList<MethodInfo> GetFunctions() => Array.AsReadOnly(definition.Functions.Select(context.Resolve).ToArray());
+    /// <summary>Gets logical modules in ordinal name order, including explicit empty modules.</summary>
+    /// <remarks>Each module is a namespace of members within this assembly, not a physical metadata image.</remarks>
+    public IReadOnlyList<ModuleInfo> GetModules() => modules.Value;
+    /// <summary>Gets all nominal definitions including nested types, excluding the CLI module pseudo-type.</summary>
+    public IReadOnlyList<NominalTypeInfo> GetTypes() => Array.AsReadOnly(Definition.MainModule.Types
+        .Where(type => type.Name != "<Module>").Select(context.GetType).ToArray());
 }
 
 /// <summary>The initial metadata-only type facade; additional type families will extend this model.</summary>
@@ -138,11 +113,11 @@ public sealed class NominalTypeInfo : TypeInfo
     public bool IsClosedHierarchy => definition.IsClosedHierarchy;
     /// <summary>Gets the native or core-attribute flags-enum classification without loading dependencies.</summary>
     public bool IsFlagsEnum => definition.IsFlagsEnum;
-    /// <summary>Gets the canonical direct children recorded in this closed family's defining module.</summary>
+    /// <summary>Gets the canonical direct children recorded in this closed family's defining assembly.</summary>
     /// <returns>Direct children in metadata order, or an empty list for an ordinary class.</returns>
     /// <exception cref="NotSupportedException">CLI closed-family attributes are not materialized.</exception>
     public IReadOnlyList<NominalTypeInfo> GetPermittedDirectSubtypes() => IsClosedHierarchy
-        ? Array.AsReadOnly(Module.GetTypes().Where(type => ReferenceEquals(type.BaseType, this) || type.GetDeclaredInterfaces().Any(contract => ReferenceEquals(contract, this))).ToArray())
+        ? Array.AsReadOnly(Module.Assembly.GetTypes().Where(type => ReferenceEquals(type.BaseType, this) || type.GetDeclaredInterfaces().Any(contract => ReferenceEquals(contract, this))).ToArray())
         : Array.Empty<NominalTypeInfo>();
     /// <summary>Gets the CLI Abstract declaration flag.</summary>
     public bool IsAbstract => (definition.Attributes & 0x80) != 0;
@@ -163,7 +138,9 @@ public sealed class NominalTypeInfo : TypeInfo
     /// <summary>Gets the reader's module-local definition token, including native-origin tokens.</summary>
     public uint MetadataToken => definition.MetadataToken;
     /// <summary>Gets the canonical declaring module.</summary>
-    public ModuleInfo Module => context.RequireSnapshot(definition.Module.Assembly).GetModules()[0];
+    public ModuleInfo Module => context.GetModule(definition);
+    /// <summary>Gets the physical metadata scope name for interpreting MetadataToken; not a logical module identity.</summary>
+    public string MetadataScopeName => definition.Module.Name;
     /// <summary>Gets the enclosing declaration, or null for top-level types.</summary>
     public NominalTypeInfo? DeclaringType => definition.DeclaringType is { } parent ? context.GetType(parent) : null;
     /// <summary>Gets the declaration's generic parameter count, not constructed argument count.</summary>

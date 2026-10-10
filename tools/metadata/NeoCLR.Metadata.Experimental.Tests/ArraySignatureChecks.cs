@@ -38,7 +38,7 @@ internal static class ArraySignatureChecks
         if (!ReferenceEquals(nested, nestedIdentity.Invoke(null, [nested]))) throw new Exception("nested vector identity");
         var native = AssemblyDefinition.ReadNativeAssembly(NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(graph));
         var context = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([native]);
-        var function = context.Resolve(native.Identity).GetModules().Single().GetFunctions().Single(m => m.Name == "IdentityNestedArray");
+        var function = context.Resolve(native.Identity).GetModules().SelectMany(module => module.GetFunctions()).Single(m => m.Name == "IdentityNestedArray");
         if (function.ReturnType is not NeoCLR.Metadata.Experimental.Introspection.ArrayTypeInfo { ElementType: NeoCLR.Metadata.Experimental.Introspection.ArrayTypeInfo })
             throw new Exception("nested vector introspection roundtrip");
         SignatureType depth = PrimitiveType.Int32;

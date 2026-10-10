@@ -79,7 +79,7 @@ These source-included helpers are currently assembly-internal:
 - `ConsoleReporter.Write(report)` writes human-readable results. Its text is not a
   versioned machine protocol.
 
-Test IDs use length-prefixed assembly name, physical module name and qualified
+Test IDs use length-prefixed assembly name, logical module name and qualified
 function name followed by `()`. IDs are scoped to the selected assembly; descriptions,
 metadata tokens and assembly versions are excluded. Discovery sorts ordinally by
 qualified function name; manual additions retain their chosen registration order.

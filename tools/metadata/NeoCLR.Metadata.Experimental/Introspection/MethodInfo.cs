@@ -18,7 +18,8 @@ public sealed class MethodInfo
         if (!definition.TryGetSignature(out var signature)) throw new InvalidDataException("unsupported method metadata signature: " + definition.Name);
         Context = context; Definition = definition; this.genericDefinition = genericDefinition;
         Name = definition.Name; Namespace = definition.Namespace ?? ""; MetadataToken = definition.MetadataToken;
-        DeclaringType = owner; Module = context.RequireSnapshot(definition.Module.Assembly).GetModules()[0];
+        DeclaringType = owner; Module = definition.DeclaringType is { } declaring ? context.GetModule(declaring)
+            : context.Resolve(definition.Module.Assembly.GetDeclarationModule(Namespace));
         Accessibility = MetadataAccess.Member(definition.Attributes);
         IsStatic = definition.IsStatic; IsAbstract = (definition.Attributes & 0x400) != 0; IsVirtual = (definition.Attributes & 0x40) != 0; IsNewSlot = (definition.Attributes & 0x100) != 0;
         GenericParameterNames = Array.AsReadOnly(signature!.GenericParameterNames.ToArray());
@@ -46,6 +47,8 @@ public sealed class MethodInfo
     public uint MetadataToken { get; }
     /// <summary>Gets the declaring module view.</summary>
     public ModuleInfo Module { get; }
+    /// <summary>Gets the physical metadata scope name for interpreting MetadataToken; not a logical module identity.</summary>
+    public string MetadataScopeName => Definition.Module.Name;
     /// <summary>Gets the open/constructed declaring type; null for assembly-level functions.</summary>
     public TypeInfo? DeclaringType { get; }
     /// <summary>Gets the return signature projected in both generic scopes.</summary>

@@ -56,11 +56,11 @@ internal static class GraphemeRepresentationChecks
                 var consumerSnapshot = AssemblyDefinition.ReadNativeAssembly(consumerImage);
                 var context = new MetadataLoadContext([snapshot, consumerSnapshot]);
                 var target = context.Resolve(snapshot.Identity).GetTypes().Single();
-                var function = context.Resolve(consumerSnapshot.Identity).GetModules().Single().GetFunctions().Single();
+                var function = context.Resolve(consumerSnapshot.Identity).GetModules().SelectMany(module => module.GetFunctions()).Single();
                 if (!ReferenceEquals(function.ReturnType, target)) throw new Exception("external grapheme identity lost");
                 Reject(() => consumer.Write());
                 var missing = new MetadataLoadContext([consumerSnapshot]);
-                Reject(() => _ = missing.Resolve(consumerSnapshot.Identity).GetModules().Single().GetFunctions().Single().ReturnType);
+                Reject(() => _ = missing.Resolve(consumerSnapshot.Identity).GetModules().SelectMany(module => module.GetFunctions()).Single().ReturnType);
                 Reject(() => graph.SetNativeGrapheme(reference));
                 Reject(() => consumer.SetNativeGrapheme(consumer.CreateValueTypeReference(
                     new("WrongOwner", new Version(1, 0, 0, 0)), graph.CoreLibrary, new string('a', 64), "System", "Char")));

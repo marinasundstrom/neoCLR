@@ -84,7 +84,7 @@ Discovery accepts accessible parameterless, nongeneric **module functions** retu
 repeated markers, duplicate IDs and empty discovery are configuration errors.
 Overloads/data rows/async/fixtures remain unsupported. The current generated source
 adapter requires ordinary ASCII Raven identifiers. Function IDs use length-prefixed
-assembly name, physical module name and qualified function name plus `()`; they do
+assembly name, logical module name and qualified function name plus `()`; they do
 not include metadata row numbers, descriptions or assembly versions. This keeps IDs
 stable across recompilation; they are scoped to the selected test assembly, not a
 global package/version identity. Tests sort by ordinal qualified function name.

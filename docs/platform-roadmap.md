@@ -38,17 +38,23 @@ module-level function discovery and context traversal across interpreter and AOT
 Compare .NET metadata modules with Raven source modules explicitly before choosing
 any additional API. This is the next sequenced task, not a claim of completed support;
 see [the module follow-up](introspection-design.md#module-model-completion--author-direction-2026-10-10).
-The first ownership slice now provides canonical host declaration-module views,
-assembly traversal and direct member ownership, with physical modules unchanged.
-Focused PE/NEOX and context-identity checks pass. Guest declaration-module traversal,
-function discovery/invocation and AOT retention remain open; see
-[the implemented host contract](declaration-modules.md#api-foundation).
-**Author clarification (2026-10-10):** modules are units and namespaces of members
-within an assembly; public ModuleInfo should represent that concept. Compatibility
-with development APIs is not a constraint. Consolidate the temporary declaration/
-physical-module facade split, retaining physical metadata scopes as explicit
-reader/backend facts. Apply this model to host and guest traversal, including AOT;
-see [the corrected direction](introspection-design.md#author-clarification-one-semantic-module-model-2026-10-10).
+Host introspection now exposes logical modules directly through ModuleInfo and
+assembly/context GetModules(), consolidating the temporary physical/declaration
+facade split. Members and nested types retain canonical logical ownership; physical
+token scopes remain explicit reader details. Raven's importer traverses every module. The [host migration evidence](experiments/declaration-modules/host-validation.json)
+covers metadata contracts, a real compiled consumer and all three interpreter/macOS
+AOT suites. Windows uses the coordinated Raven 1a0c4e627 pin; validation is pending.
+Guest RuntimeContext/module migration and AOT metadata retention remain open.
+
+**Author clarifications (2026-10-10):** a module is a unit and namespace of members
+within an assembly. Assemblies package one or more modules. Root namespaces and
+submodule names are conventions based on qualified names, with **no hierarchy in
+metadata**. Preserve the existing flat module table; do not synthesize parent modules.
+The author supplies System.Runtime → System/System.Networking and Acme.CoffeeMaker →
+Acme.CoffeeMaker/Acme.CoffeeMaker.Factories as examples. Compatibility with development
+APIs is not a constraint. Namespace/module ownership should guide understandable
+library distribution; new reference/ambiguity policies remain separate work.
+See [the corrected direction](introspection-design.md#author-clarification-one-semantic-module-model-2026-10-10).
 
 ## Active direction: usable native compilation (2026-10-09)
 

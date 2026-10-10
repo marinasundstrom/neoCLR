@@ -29,7 +29,7 @@ internal static class UnitRepresentationChecks
         if (declaration.NativePrimitive != PrimitiveType.Void) throw new Exception("unit designation lost");
         var context = new MetadataLoadContext([loaded]);
         var assembly = context.Resolve(loaded.Identity);
-        var roundTrip = assembly.GetModules().Single().GetFunctions().Single(f => f.Name == "Apply");
+        var roundTrip = assembly.GetModules().SelectMany(module => module.GetFunctions()).Single(f => f.Name == "Apply");
         var function = (FunctionTypeInfo)roundTrip.GetParameters().Single().ParameterType;
         if (function.NoResult) throw new Exception("unit callback round trip lost value");
         if (!ReferenceEquals(function.ReturnType, roundTrip.ReturnType)) throw new Exception("unit result identity differs inside callback");
@@ -55,7 +55,7 @@ internal static class UnitRepresentationChecks
         var consumerImage = RuntimeAssemblyContainer.WriteBinary(consumer);
         var consumerSnapshot = AssemblyDefinition.ReadNativeAssembly(consumerImage);
         var importedContext = new MetadataLoadContext([loaded, consumerSnapshot]);
-        var importedEcho = importedContext.Resolve(consumerSnapshot.Identity).GetModules().Single().GetFunctions().Single(f => f.Name == "Echo");
+        var importedEcho = importedContext.Resolve(consumerSnapshot.Identity).GetModules().SelectMany(module => module.GetFunctions()).Single(f => f.Name == "Echo");
         if (!ReferenceEquals(importedEcho.ReturnType, importedContext.Resolve(loaded.Identity).GetTypes().Single(t => t.Name == "Void")))
             throw new Exception("imported unit lost canonical owner");
         if (Environment.GetEnvironmentVariable("NEOCLR_UNIT_ARTIFACT") is { } path)

@@ -288,9 +288,10 @@ and the transitional bound-target Function property.
 
 The separate [C# metadata API](/docs/experimental-metadata.html) reads and authors native
 assemblies on the host. It is distinct from the guest introspection APIs described here.
-Development host tooling also exposes canonical declaration-module views, including
-empty modules and direct member ownership. Physical metadata modules retain their
-existing meaning. See the [host module API](/docs/experimental-metadata.html#context-owned-declaration-views-development-2026-10-10).
+Development host tooling exposes logical modules directly through `ModuleInfo`,
+including empty modules and direct member ownership. Dotted names are a convention;
+module metadata is flat. Assemblies package one or several modules. Physical token
+scopes remain separate reader details. See the [host module API](/docs/experimental-metadata.html#context-owned-declaration-views-development-2026-10-10).
 Guest declaration-module traversal and its AOT retention remain future work.
 
 

@@ -13472,3 +13472,25 @@ consumer remain open at this entry. See the [attribute plan](custom-attributes.m
 - **Outcome/open work:** direction recorded; the implementation from `7d54aa4d`
   still has separate facades. Public API consolidation and interpreter/AOT
   validation remain to be implemented.
+
+
+## 2026-10-10 — Flat module namespaces and distribution
+
+- **Author:** proposes tying a module to a particular namespace within an assembly;
+  one module per assembly is common, with multiple modules allowed for distribution.
+  Then suggests a root namespace/module with submodules.
+- **Assistant proposal:** described a hierarchy separate from packaging.
+- **Author correction:** “This is mainly convention by namespace names, we shouldn’t
+  create module hierarchies in metadata”. Supplied System.Runtime with System and
+  System.Networking, and Acme.CoffeeMaker with Acme.CoffeeMaker and
+  Acme.CoffeeMaker.Factories as concrete examples.
+- **Author intent:** minimal metadata adaptation; compiler namespace resolution
+  should make module ownership clear and encourage intentional packaging of libraries
+  and APIs, rather than treating an assembly as an arbitrary collection of namespaces.
+- **Assistant action:** kept the flat table and exact qualified names, added tests for
+  both examples without synthesized parents, consolidated host ModuleInfo and traversal,
+  migrated member ownership and Raven's assembly importer, and updated API documentation.
+  Existing assembly-qualified binding still separates same-name module views; no new
+  reference graph, access policy or ambiguity rule is claimed.
+- **Remaining work:** guest RuntimeContext and module descriptors, callable discovery
+  and AOT retention. Host consolidation is not completion of those capabilities.

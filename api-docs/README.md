@@ -1398,12 +1398,13 @@ procedure above; no deployment is implied by local website validation.
 [manual metadata reference](experimental-metadata.md#declaration-modules-development-2026-10-09).
 They do not change guest ModuleInfo or require a new guest reference snapshot.
 
-2026-10-10: host `DeclarationModuleInfo`, `AssemblyInfo.GetDeclarationModules`,
-`MetadataLoadContext.Resolve(DeclarationModuleDefinition)` and
-`AssemblyMemberInfo.DeclaringModule` have XML summaries and complete
+2026-10-10: host logical `ModuleInfo`, assembly/context `GetModules()`,
+`Resolve(DeclarationModuleDefinition)`, member `Module` and type/method
+`MetadataScopeName` have XML summaries and complete
 [manual reference coverage](experimental-metadata.md#context-owned-declaration-views-development-2026-10-10).
-These C# host types remain outside the guest RavenDoc selection; the guest reference
-assembly and signature snapshot are unchanged.
+The temporary DeclarationModuleInfo facade is removed. These C# host APIs remain
+outside the guest RavenDoc selection; the guest reference and signature snapshot
+are unchanged pending their separate migration.
 
 
 ### String replacement (2026-10-09)

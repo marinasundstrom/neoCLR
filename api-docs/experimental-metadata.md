@@ -30,43 +30,56 @@ names, duplicate members and existing builder bounds produce the corresponding
 
 `AssemblyDefinition.GetModules()` returns logical modules in ordinal name order;
 `AssemblyMemberDefinition.DeclaringModule` identifies each direct owner.
-`MetadataLoadContext.GetDeclarationModules()` discovers all registered logical modules
-without resolving dependencies; callers must include assembly identity when names
-collide. Existing `AssemblyInfo.GetModules()` and `ModuleDefinition` still describe
-physical images. Empty logical modules survive native emission but not CLI projection.
+`MetadataLoadContext.GetModules()` discovers canonical module views in registered
+assembly order, then ordinal module-name order, without loading dependencies.
+`AssemblyInfo.GetModules()` enumerates the logical modules in one assembly.
+Empty logical modules survive native emission but not CLI projection.
 See [format, limits and migration](https://github.com/marinasundstrom/neoclr/blob/main/docs/declaration-modules.md).
 
 ### Context-owned declaration views (development, 2026-10-10)
 
-Namespace `NeoCLR.Metadata.Experimental.Introspection`. These host APIs inspect
-immutable snapshots; they do not load dependencies or invoke guest code.
+Namespace `NeoCLR.Metadata.Experimental.Introspection`. A `ModuleInfo` is a named
+unit of members within an assembly. Its name is the namespace of its declarations.
+Dotted names express a naming convention; metadata remains flat, with no parent
+links or synthesized parent modules. An assembly may package one or several modules.
 
 | API | Contract |
 | --- | --- |
-| `AssemblyInfo.GetDeclarationModules(): IReadOnlyList<DeclarationModuleInfo>` | All logical modules in ordinal name order, including explicit empty modules. Returns a read-only list of canonical context-owned views. |
-| `MetadataLoadContext.Resolve(DeclarationModuleDefinition definition): DeclarationModuleInfo` | Returns the canonical view for a registered definition. Null throws `ArgumentNullException`; an unregistered or different snapshot with the same assembly identity throws `InvalidDataException`. |
-| `DeclarationModuleInfo.Name: string` | Complete, case-sensitive logical name; empty for the global module. |
-| `DeclarationModuleInfo.Assembly: AssemblyInfo` | Canonical owning assembly in the same context. |
-| `DeclarationModuleInfo.IsProjection: bool` | True when inferred from older native/CLI namespace metadata. |
-| `DeclarationModuleInfo.GetMembers(): IReadOnlyList<AssemblyMemberInfo>` | Direct types, free functions and constants, in existing assembly-member order. Excludes child-module members, nested types and type-owned members. Read-only; typed `Type`/`Function` views resolve lazily and retain their existing signature/dependency errors. |
-| `AssemblyMemberInfo.DeclaringModule: DeclarationModuleInfo` | Canonical logical owner; `Module` continues to identify the physical metadata image. |
+| `AssemblyInfo.GetModules(): IReadOnlyList<ModuleInfo>` | Logical modules in ordinal name order, including explicit empty modules. Read-only canonical context-owned views. |
+| `MetadataLoadContext.GetModules(): IReadOnlyList<ModuleInfo>` | All registered modules in assembly catalog order, then ordinal name order. No dependency loading. |
+| `MetadataLoadContext.Resolve(DeclarationModuleDefinition definition): ModuleInfo` | Canonical view for a registered definition. Null throws `ArgumentNullException`; an unregistered or different snapshot with the same assembly identity throws `InvalidDataException`. |
+| `ModuleInfo.Name: string` | Complete, case-sensitive logical name; empty for the global module. |
+| `ModuleInfo.Assembly: AssemblyInfo` | Canonical owning assembly. |
+| `ModuleInfo.IsProjection: bool` | True when inferred from older native/CLI namespace metadata. |
+| `ModuleInfo.GetMembers(): IReadOnlyList<AssemblyMemberInfo>` | Direct types, free functions and constants in assembly-member order. Excludes nested types, type-owned members and declarations in other modules, including dotted descendants. Typed views resolve lazily. |
+| `ModuleInfo.GetTypes(): IReadOnlyList<NominalTypeInfo>` | Nominal types belonging to this module, including nested types, in metadata order. |
+| `ModuleInfo.GetFunctions(): IReadOnlyList<MethodInfo>` | Direct free functions in metadata order, without visibility filtering. Unsupported callable signatures throw `InvalidDataException`; no invocation. |
+| `AssemblyMemberInfo.Module: ModuleInfo` | Canonical logical owner. |
+| `NominalTypeInfo.Module`, `MethodInfo.Module` | Canonical logical owner, inherited from the outermost declaring type for nested/type-owned declarations. |
+| `NominalTypeInfo.MetadataScopeName`, `MethodInfo.MetadataScopeName` | Physical metadata scope for interpreting `MetadataToken`. This is not a logical module identity; tokens may span multiple logical modules in one image. |
 
-Reference equality identifies a declaration module within one context. The same name
-in another assembly or context is a different view. Modules have no invented metadata
-token or separately loadable image. Existing `MetadataLoadContext.GetDeclarationModules()`
-keeps its reader-definition return type for compatibility; use `Resolve` to obtain
-views, or traverse `context.Assemblies` and `AssemblyInfo.GetDeclarationModules()`:
+All returned lists are read-only. Reference equality identifies a module within one
+context. The same name in another assembly or context is a different view. Signature
+and dependency resolution retains the existing typed-member errors. Assembly-wide
+`GetTypes()` continues to include all modules and nested types.
 
 ```csharp
-foreach (var assembly in context.Assemblies)
-    foreach (var module in assembly.GetDeclarationModules())
-        foreach (var member in module.GetMembers())
-            Console.WriteLine($"{module.Assembly.Name}: {member.FullName}");
+foreach (var module in context.GetModules())
+    foreach (var member in module.GetMembers())
+        Console.WriteLine($"{module.Assembly.Name}: {member.FullName}");
 ```
 
-Guest `RuntimeContext` traversal, guest declaration-module descriptors and AOT
-retention of these views remain unimplemented. This addition changes no compiler
-mapping, native format or existing physical `ModuleInfo` contract.
+**Development API migration:** remove `DeclarationModuleInfo`,
+`AssemblyInfo.GetDeclarationModules()`, `MetadataLoadContext.GetDeclarationModules()`
+and `AssemblyMemberInfo.DeclaringModule`. Use `ModuleInfo`, `GetModules()` and `Module`
+directly. Callers needing a physical scope name use `MetadataScopeName` on types or
+methods, or the reader's `ModuleDefinition`. Assembly-wide callable scans must visit
+all modules. Test discovery IDs now include the logical module name instead of the
+physical filename. Rebuild host tools and the Raven native importer together.
+
+Guest `RuntimeContext` and guest module descriptors still use the older physical
+model and await migration, including AOT retention. This host change adds no metadata
+format, hierarchy table, compiler target switch or module reference table.
 
 ## Unmanaged pointer signatures (development, 2026-10-07)
 
@@ -5328,7 +5341,7 @@ model, not runtime Reflection types or a complete replacement for that model.
 | --- | --- |
 | MetadataLoadContext | Constructor `(IEnumerable<AssemblyDefinition> snapshots)`; `IReadOnlyList<AssemblyInfo> Assemblies`; `Resolve(AssemblyIdentity)` and `Resolve(AssemblyReference)` returning AssemblyInfo; `Resolve(TypeReference)` returning NominalTypeInfo |
 | AssemblyInfo | `string Name`, `AssemblyIdentity Identity`, `IReadOnlyList<AssemblyInfo> ReferencedAssemblies`, `GetModules(): IReadOnlyList<ModuleInfo>`, `GetTypes(): IReadOnlyList<NominalTypeInfo>` |
-| ModuleInfo | `string Name`, `AssemblyInfo Assembly`, `GetTypes(): IReadOnlyList<NominalTypeInfo>` |
+| ModuleInfo | Logical `string Name`, `AssemblyInfo Assembly`, `bool IsProjection`, `GetMembers()`, `GetTypes()`, `GetFunctions()`; see the module reference above |
 | TypeInfo | Abstract read-only `string DisplayName`, `bool IsNominalType`; library-controlled construction |
 | NominalTypeInfo | TypeInfo plus `string Name`, `string Namespace`, `string FullName`, `uint MetadataToken`, `ModuleInfo Module`, nullable `NominalTypeInfo DeclaringType`, `int GenericArity`, `bool IsInterface`, `bool IsValueType` |
 

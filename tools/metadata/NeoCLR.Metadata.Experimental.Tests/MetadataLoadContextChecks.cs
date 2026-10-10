@@ -202,8 +202,7 @@ internal static class MetadataLoadContextChecks
         Reject<InvalidOperationException>(() => getView.MakeGenericMethod(intView));
         Reject<InvalidOperationException>(() => getView.GetGenericMethodDefinition());
         Reject<NotSupportedException>(() => ((IList<TypeInfo>)mixedClosed.GetGenericArguments()).Clear());
-        var moduleView = genericContext.Resolve(genericSnapshot.Identity).GetModules().Single();
-        var functionView = moduleView.GetFunctions().Single();
+        var functionView = genericContext.Resolve(genericSnapshot.Identity).GetModules().SelectMany(module => module.GetFunctions()).Single();
         Check(functionView.DeclaringType is null && functionView.ReturnType is ArrayTypeInfo functionArray &&
             ReferenceEquals(functionArray.ElementType, functionView.GetGenericArguments()[0]) &&
             ReferenceEquals(functionView.ReturnType, functionView.GetParameters()[0].ParameterType), "namespace generic vector signature");

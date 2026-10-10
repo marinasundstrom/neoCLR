@@ -8,17 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
-- Record the author's module-model correction: a module is a unit and namespace
-  of members within an assembly. Plan to consolidate public introspection around
-  that concept without preserving compatibility with the temporary facade split;
-  physical metadata scopes remain reader/backend facts. API migration is pending.
-
-- Add canonical host declaration-module introspection views, assembly traversal and
-  direct member ownership. Preserve physical ModuleInfo and existing definition
-  enumeration contracts. Validate empty/global/child modules, separate assemblies
-  and contexts, foreign snapshots, read-only member lists and shared type/function
-  identities across PE/NEOX round trips. Document the .NET scope comparison and
-  guest RuntimeContext/AOT work still outstanding; no guest API or format changes.
+- Consolidate host introspection around logical ModuleInfo: assemblies package flat
+  named modules, with dotted root/submodule names as convention and no hierarchy
+  metadata. Replace DeclarationModuleInfo/GetDeclarationModules with ModuleInfo/
+  GetModules and logical member ownership; expose physical token scopes separately.
+  Migrate Raven's native importer to traverse all modules and test discovery IDs to
+  use logical module names. Rebuild host tools and compiler together. Cover both
+  author-provided packaging examples, nested ownership, empty modules, context identity
+  and PE/NEOX round trips; the metadata suite passes 170/170 checks, and all three
+  Raven suites pass interpreter/macOS AOT with five discovery rejection cases. Pin
+  Windows builds to matching Raven 1a0c4e627; new Windows qualification is pending.
+  Guest RuntimeContext and AOT discovery remain pending; no native format or ordinary .NET policy changes.
 
 - Add source TestAttribute with constructor/named descriptions and host introspection
   discovery of parameterless Result-returning module tests. Generate typed Raven
@@ -28,7 +28,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and compiler source generators as future work. Add the manual framework API reference
   and Windows discovery gate; qualify its compiler's canonical namespace lookup fix.
   All three macOS ARM64 interpreter/AOT suites and five rejection cases pass, with
-  83 focused compiler checks; Windows qualification for this slice is pending.
+  83 focused compiler checks; Windows action 38049677871 succeeds at b903bc05.
+  Its artifact hashes have not been independently checked; the subsequent logical
+  module migration requires separate Windows qualification.
 
 - Add explicit fieldless external class-base authoring and protected base-constructor
   chaining. Preserve scoped CLI/native bases, reject missing/double initialization

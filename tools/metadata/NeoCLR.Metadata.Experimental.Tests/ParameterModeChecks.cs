@@ -42,7 +42,7 @@ internal static class ParameterModeChecks
             else
             {
                 var context = new MetadataLoadContext([snapshot]);
-                var parameter = context.Resolve(snapshot.Identity).GetModules().Single().GetFunctions().Single().GetParameters().Single();
+                var parameter = context.Resolve(snapshot.Identity).GetModules().SelectMany(module => module.GetFunctions()).Single().GetParameters().Single();
                 Check(parameter.PassingMode == (mode == System.Reflection.ParameterAttributes.Out ? ParameterPassingMode.Out : ParameterPassingMode.Ref), "CLI parameter flag parity");
             }
         }

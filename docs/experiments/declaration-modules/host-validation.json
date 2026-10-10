@@ -1,0 +1,193 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "suite": "collections",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS Any does not read Current\nPASS For break disposes its iterator\nPASS ArrayList copy has independent storage\nPASS Predicate Any stops at its first match\nPASS ArrayQueue preserves FIFO\nPASS HashSet applies its comparer\nPASS ArrayStack preserves LIFO\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS Any does not read Current\nPASS For break disposes its iterator\nPASS ArrayList copy has independent storage\nPASS Predicate Any stops at its first match\nPASS ArrayQueue preserves FIFO\nPASS HashSet applies its comparer\nPASS ArrayStack preserves LIFO\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "native",
+      "exitCode": 1,
+      "stdout": "PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "interpreter",
+      "exitCode": 1,
+      "stdout": "PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "native",
+      "exitCode": 1,
+      "stdout": "PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "interpreter",
+      "exitCode": 1,
+      "stdout": "PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "scripts/test-runtime-library.py": "db2f584ce715dcf19a7757a09ae939acd75f219c38429906667df324dcbb1cad",
+    "scripts/build-native-project.py": "782379cfbeaaa706c0921c0dea02061d23f9e31c735be004bd78031a7267359a",
+    "scripts/discover-runtime-tests.py": "0f7c22b1a3e46879654d29d4ad5cd292ed36adced2958f0d00a811a7342dd699",
+    "scripts/validate-test-discovery.py": "83f6cd15cc0a9fbaa4fd2a6a0fbca22d57da5d5edd1e2f248daacf3416088167",
+    "tools/testing/NeoCLR.TestDiscovery/Program.cs": "56f628771e941905d800f0793260558028bec25f4aeafe3eb310477511f63613",
+    "tools/testing/NeoCLR.TestDiscovery/NeoCLR.TestDiscovery.csproj": "87d0d17b301773d1a73666a6163a6049a06319ea651b9b9c9df34e199707f4ee",
+    "runtime/raven/tests/collections/Collections.rvn": "0fd2661cd5e234dd741602156c2162c011f0c0f4eeca4e94dd4e66cdd2e5bf17",
+    "runtime/raven/tests/collections/Main.rvn": "a5c13528e871311ba009e5a642337c4808333dfd6f6d43c0477b9d58d2eb3851",
+    "runtime/raven/tests/discovery-contract/OtherAttribute.rvn": "78d87fb89024c33a52dc817347bd983c9f389da46d135571f711618b744c880a",
+    "runtime/raven/tests/discovery-contract/Tests.rvn": "8ae844661f2ab1e3c502ef928e27634bb4b7553a88977a62b69d77ed5ef862b1",
+    "runtime/raven/tests/framework/Assertions.rvn": "75b24edb65dd3c9bc6af7a211966feda795c9834adea0f3d9d064e05049072eb",
+    "runtime/raven/tests/framework/TestAttribute.rvn": "a20f0d5f981985e52a384937a1dba70670a01507143a6949972978546c6204cd",
+    "runtime/raven/tests/framework/TestSuite.rvn": "85092ee02a75f0767bb073a44c349b143900ae8943e33280ed75ee386d159667",
+    "runtime/raven/tests/runner-contract/Main.rvn": "96902f9c17562d339025267fcbf61642f5e48555911e0169cbe6364770530614",
+    "runtime/raven/tests/collections/Tests.rvnproj": "9d52cee6c1a012f94a747ab5d8b0bcc98ab2fd209c7592da094b46ac4abf5641",
+    "runtime/raven/tests/discovery-contract/Tests.rvnproj": "138cbef1c75af0c870d1cf93998f95d0b2c6056c13c82800c7b12faf9d460cdc",
+    "runtime/raven/tests/runner-contract/Tests.rvnproj": "3061ec4816a7c6dc3025e6cd5775cd2b62fd7a230daabdf6de1709a9541e999e"
+  },
+  "bundleManifestSha256": "2b51da38ef6290947fa33068019a18a5c068fbaa364b9036828cc01d880b3736",
+  "aotSha256": "7888b1fb060c20124c9bb8ed223e94fd4ca1cbefe5bb74ff3d552d32865821e5",
+  "interpreterSha256": "156e707636147e34689700d24c8f4a5b1ef75a8ee6c06204bb75af3012c179d1",
+  "date": "2026-10-10",
+  "scope": "Host logical ModuleInfo and matching Raven native importer; guest module APIs unchanged.",
+  "compilerRevision": "1a0c4e62734b2d4f17dc9f8af1f5d02c566f8cf4",
+  "compilerBuild": "Built from the matching pre-commit working tree; existing source-built library bundle retained.",
+  "metadataContracts": "170/170 existing contract tests, plus expanded --declaration-modules and --check-module-consumer passed.",
+  "rejections": {
+    "passed": true,
+    "cases": [
+      {
+        "name": "parameters",
+        "rejected": "Test discovery failed: DiscoveryValidation.Invalid: tests require accessible parameterless, nongeneric module functions",
+        "sourceSha256": "af23847344f40a06af3aa3f63cad2e1157f83bc40efceae6963b2bab1c41c97d"
+      },
+      {
+        "name": "result",
+        "rejected": "Test discovery failed: DiscoveryValidation.Invalid: tests require Result<unit, TestFailure>",
+        "sourceSha256": "19006d977f55507be7a477e212aac282f9be0cd4ea11996ca8a3f967cf301d41"
+      },
+      {
+        "name": "instance",
+        "rejected": "Test discovery failed: DiscoveryValidation.Fixture.Invalid: tests require accessible parameterless, nongeneric module functions",
+        "sourceSha256": "8949d090ef4fcc8037370f41e00376801873ae72e7006aa44593e8a34e3efb64"
+      },
+      {
+        "name": "generic",
+        "rejected": "Test discovery failed: DiscoveryValidation.Invalid: tests require accessible parameterless, nongeneric module functions",
+        "sourceSha256": "2cef9da6a7ddba4d4fc8fbb99a956944717866f73fb53847b1b5d2aeec8655d8"
+      },
+      {
+        "name": "empty",
+        "rejected": "Test discovery failed: No tests discovered",
+        "sourceSha256": "8323e48a2fa5c4c4495137d047020d5c89b11f7b2a288bd151b711a44f7a84fc"
+      }
+    ]
+  },
+  "discovered": {
+    "collections": {
+      "assembly": "RuntimeLibraryTests",
+      "tests": [
+        {
+          "id": "19:RuntimeLibraryTests19:NeoClr.RuntimeTests37:NeoClr.RuntimeTests.AnyWithoutCurrent()",
+          "name": "NeoClr.RuntimeTests.AnyWithoutCurrent",
+          "description": "Any does not read Current"
+        },
+        {
+          "id": "19:RuntimeLibraryTests19:NeoClr.RuntimeTests28:NeoClr.RuntimeTests.ForBreak()",
+          "name": "NeoClr.RuntimeTests.ForBreak",
+          "description": "For break disposes its iterator"
+        },
+        {
+          "id": "19:RuntimeLibraryTests19:NeoClr.RuntimeTests28:NeoClr.RuntimeTests.ListCopy()",
+          "name": "NeoClr.RuntimeTests.ListCopy",
+          "description": "ArrayList copy has independent storage"
+        },
+        {
+          "id": "19:RuntimeLibraryTests19:NeoClr.RuntimeTests32:NeoClr.RuntimeTests.PredicateAny()",
+          "name": "NeoClr.RuntimeTests.PredicateAny",
+          "description": "Predicate Any stops at its first match"
+        },
+        {
+          "id": "19:RuntimeLibraryTests19:NeoClr.RuntimeTests30:NeoClr.RuntimeTests.QueueOrder()",
+          "name": "NeoClr.RuntimeTests.QueueOrder",
+          "description": "ArrayQueue preserves FIFO"
+        },
+        {
+          "id": "19:RuntimeLibraryTests19:NeoClr.RuntimeTests31:NeoClr.RuntimeTests.SetEquality()",
+          "name": "NeoClr.RuntimeTests.SetEquality",
+          "description": "HashSet applies its comparer"
+        },
+        {
+          "id": "19:RuntimeLibraryTests19:NeoClr.RuntimeTests30:NeoClr.RuntimeTests.StackOrder()",
+          "name": "NeoClr.RuntimeTests.StackOrder",
+          "description": "ArrayStack preserves LIFO"
+        }
+      ]
+    },
+    "discovery-contract": {
+      "assembly": "TestDiscoveryContract",
+      "tests": [
+        {
+          "id": "21:TestDiscoveryContract21:NeoClr.DiscoveryTests29:NeoClr.DiscoveryTests.ABefore()",
+          "name": "NeoClr.DiscoveryTests.ABefore",
+          "description": "first discovered test"
+        },
+        {
+          "id": "21:TestDiscoveryContract21:NeoClr.DiscoveryTests30:NeoClr.DiscoveryTests.BFailure()",
+          "name": "NeoClr.DiscoveryTests.BFailure",
+          "description": "discovered failure"
+        },
+        {
+          "id": "21:TestDiscoveryContract21:NeoClr.DiscoveryTests28:NeoClr.DiscoveryTests.CAfter()",
+          "name": "NeoClr.DiscoveryTests.CAfter",
+          "description": "after discovered failure"
+        },
+        {
+          "id": "21:TestDiscoveryContract21:NeoClr.DiscoveryTests41:NeoClr.DiscoveryTests.DWithoutDescription()",
+          "name": "NeoClr.DiscoveryTests.DWithoutDescription",
+          "description": "NeoClr.DiscoveryTests.DWithoutDescription"
+        }
+      ]
+    }
+  },
+  "developmentLibraries": {
+    "sourceRevision": "c63044924a9c700718b7d8bd8a03191cc033c4ee+attribute-usage-working-tree",
+    "compilerRevision": "0f09c350ab9d4dc6eeea021af91d31d6d6719560"
+  },
+  "testedCompilerFiles": {
+    "sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "26a3396af4c7092a171e5ae605c9d3cd7a1cfab391f45d0ee9858f06e3f45e98",
+    "sdk/tools/rvnc/rvnc.dll": "2a41a49ad0cdd238c706fe19094ac0aaf097cfb2177441c3b2611e8f38d6bccd",
+    "sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "1e7a07f50b127589eae4197a853f3c956b86883513ab3037e99d26bb387d0add",
+    "sdk/tools/rvnc/Raven.CodeAnalysis.dll": "987cd1ab48ec0a713ceb6ea24ebcf6550ca14e538c3ffecb9aca5e1a7c61bfe4"
+  },
+  "moduleConsumer": {
+    "assembly": "DifferentPackage",
+    "modules": [
+      "Example.App",
+      "Example.Numbers",
+      "Example.Reserved"
+    ],
+    "sha256": "e601e6ee3ffe4ef2af724ff05a60272fac0ad4564ad2675b95d1849466f4bb9e",
+    "result": "Compiled with matching importer; host module/member ownership checks passed."
+  },
+  "windows": "New logical-module slice not yet qualified. Prior TestAttribute gate 38049677871 succeeded at b903bc05; artifact hashes not independently checked."
+}

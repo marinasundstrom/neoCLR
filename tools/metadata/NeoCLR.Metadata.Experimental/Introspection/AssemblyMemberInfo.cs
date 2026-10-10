@@ -9,21 +9,18 @@ public sealed class AssemblyMemberInfo
 {
     private readonly MetadataLoadContext context;
     private readonly AssemblyMemberDefinition definition;
-    internal AssemblyMemberInfo(MetadataLoadContext context, AssemblyInfo assembly, ModuleInfo module, AssemblyMemberDefinition definition)
+    internal AssemblyMemberInfo(MetadataLoadContext context, AssemblyInfo assembly, AssemblyMemberDefinition definition)
     {
         this.context = context;
         this.definition = definition;
         Assembly = assembly;
-        Module = module;
     }
     /// <summary>Gets the member kind.</summary>
     public AssemblyMemberKind Kind => definition.Kind;
     /// <summary>Gets the declaring assembly facade.</summary>
     public AssemblyInfo Assembly { get; }
-    /// <summary>Gets the physical metadata module facade.</summary>
-    public ModuleInfo Module { get; }
-    /// <summary>Gets the canonical logical declaration module directly owning this member.</summary>
-    public DeclarationModuleInfo DeclaringModule => context.Resolve(definition.DeclaringModule);
+    /// <summary>Gets the canonical logical module directly owning this member.</summary>
+    public ModuleInfo Module => context.Resolve(definition.DeclaringModule);
     /// <summary>Gets the namespace portion of the member name.</summary>
     public string Namespace => definition.Namespace;
     /// <summary>Gets the simple metadata name.</summary>

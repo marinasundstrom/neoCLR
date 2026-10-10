@@ -10,12 +10,21 @@ This implements the first ownership/format slice of the
 artifact extensions, private-access rules and independent loading are not adopted.
 
 **Author clarification, 2026-10-10:** a module is a unit and namespace of members
-within an assembly. The intended public `ModuleInfo` models this concept directly;
-compatibility with the current physical-module API is not a constraint. The
-DeclarationModuleInfo/physical ModuleInfo split described below is an intermediate
-implementation to consolidate, not a permanent public design. Physical image and
-token-scope facts remain explicit metadata/backend details. See the
-[updated design direction](introspection-design.md#author-clarification-one-semantic-module-model-2026-10-10).
+within an assembly. A root namespace and dotted submodule names are a convention,
+not a hierarchy in metadata. One module per assembly is a common layout; several
+modules may be packaged together. Names need not match the assembly name:
+
+| Assembly | Modules |
+| --- | --- |
+| `System.Runtime` | `System`, `System.Networking` |
+| `Acme.CoffeeMaker` | `Acme.CoffeeMaker`, `Acme.CoffeeMaker.Factories` |
+
+Host `ModuleInfo` now models these logical modules directly. The temporary separate
+DeclarationModuleInfo facade has been removed; guest migration remains open.
+Namespace resolution and ownership should help authors design distributable modules
+for class libraries and APIs. No metadata hierarchy or new module-reference table is
+introduced. Existing assembly-qualified binding still distinguishes same-name modules
+in different assemblies; compiler ambiguity/access-policy changes are separate work.
 
 ## Format and identity
 
@@ -43,36 +52,35 @@ The Rust runtime validates these contracts before execution. Older readers rejec
 the unknown manifest field; rebuild tools together. Older input without the table
 remains readable as a marked projection, not an explicit module declaration.
 
-The existing manifest `modules` list and current `ModuleDefinition`/`ModuleInfo` describe
-physical metadata images. That is the current implementation, pending public API
-consolidation under the author's clarification above. Logical modules do not acquire
-separate files, token scopes, loading, scheduling or collection lifetimes. This
-distinction must remain expressible in metadata without dictating the public module API.
+The manifest `modules` list and reader `ModuleDefinition` still describe physical
+metadata images. Host `ModuleInfo` describes logical declaration modules. Physical
+image names and token scopes remain reader/backend facts, exposed as
+`MetadataScopeName` on host type/method descriptors when interpreting tokens.
+Logical modules do not acquire separate files, loading or scheduling lifetimes.
 
 ## API foundation
 
 `AssemblyBuilder.DefineModule(name)` returns a canonical
 `DeclarationModuleDefinition`. Its `AddClass`, `AddFunction` and `AddConstant`
-methods author members in that module. Existing namespace-argument APIs remain
-compatible and contribute module owners when writing native metadata.
-`AssemblyDefinition.GetModules()` enumerates logical modules; `GetMembers()` remains
-an assembly-wide aggregate. Each aggregate member exposes `DeclaringModule`.
-`MetadataLoadContext.GetDeclarationModules()` discovers registered module definitions
-without loading dependencies. Equal paths in different assemblies remain distinct.
+methods author members in that module. Existing namespace-argument APIs contribute
+module owners when writing native metadata. `AssemblyDefinition.GetModules()`
+enumerates reader definitions; each aggregate member exposes `DeclaringModule`.
 
-Development 2026-10-10 adds canonical host `DeclarationModuleInfo` views through
-`AssemblyInfo.GetDeclarationModules()` and `MetadataLoadContext.Resolve(definition)`.
-Their `Name`, `Assembly`, `IsProjection` and `GetMembers()` describe the existing
-logical owner. `AssemblyMemberInfo.DeclaringModule` returns that same view, while
-`Module` remains physical. Reference identity is context-scoped; even a second
-snapshot with the same exact assembly identity cannot be resolved through the first
-snapshot's context. The existing context enumeration still returns reader definitions
-for compatibility. See the [API reference](../api-docs/experimental-metadata.md#context-owned-declaration-views-development-2026-10-10).
+Host `AssemblyInfo.GetModules()` and `MetadataLoadContext.GetModules()` return
+canonical `ModuleInfo` views. `Resolve(DeclarationModuleDefinition)` returns the
+same view. `Name`, `Assembly`, `IsProjection`, `GetMembers()`, `GetTypes()` and
+`GetFunctions()` expose the module's declarations. Type, method and assembly-member
+`Module` properties share this owner; nested types retain their outer type's module.
+`GetMembers()` excludes nested/type-owned declarations; `GetTypes()` includes nested
+types. Dotted names are compared exactly, without recursive membership or synthesized
+parents. Identity is scoped to the owning assembly and context.
 
+This replaces the temporary DeclarationModuleInfo/physical ModuleInfo host split.
+Consumers must migrate and rebuild; no compatibility aliases remain. See the
+[API reference](../api-docs/experimental-metadata.md#context-owned-declaration-views-development-2026-10-10).
 Loaded modules reject mutation. `IsProjection` identifies inferred views of older
-native or CLI inputs. CLI output retains names through namespaces and existing
-free-function carriers but loses explicit module declarations, including empty ones.
-The guest `RuntimeContext` and physical `ModuleInfo` API have not yet migrated.
+native or CLI inputs; CLI output still loses explicit empty declarations. Guest
+RuntimeContext and its physical ModuleInfo API have not yet migrated.
 
 ## Comparison and tradeoffs
 

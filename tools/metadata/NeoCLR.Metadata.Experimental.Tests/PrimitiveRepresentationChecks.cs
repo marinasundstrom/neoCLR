@@ -39,7 +39,7 @@ internal static class PrimitiveRepresentationChecks
             echo.GetILGenerator().LoadArgument(0); echo.GetILGenerator().Return();
             var importedSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(consumer));
             var context = new MetadataLoadContext([snapshot, importedSnapshot]);
-            var importedEcho = context.Resolve(importedSnapshot.Identity).GetModules().Single().GetFunctions().Single();
+            var importedEcho = context.Resolve(importedSnapshot.Identity).GetModules().SelectMany(module => module.GetFunctions()).Single();
             if (!ReferenceEquals(importedEcho.ReturnType, context.Resolve(snapshot.Identity).GetTypes().Single()) ||
                 !ReferenceEquals(importedEcho.ReturnType, importedEcho.GetParameters().Single().ParameterType))
                 throw new Exception("external erased Value lost its selected owner");

@@ -65,7 +65,7 @@ internal static class EnumChecks
                 if (snapshot.IsNative)
                 {
                     var context = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([snapshot]);
-                    var view = context.Resolve(snapshot.Identity).GetModules()[0].GetTypes().Single(t => t.Name == "State");
+                    var view = context.Resolve(snapshot.Identity).GetTypes().Single(t => t.Name == "State");
                     if (view.IsFlagsEnum != flags || !view.IsEnum || view.GetFields().Single(f => f.Name == "Ready").Constant != 42)
                         throw new Exception("enum introspection facts were lost");
                 }
