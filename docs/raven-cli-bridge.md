@@ -7412,3 +7412,23 @@ See [attribute scope](custom-attributes.md#raven-source-annotation-emission-deve
 Compiler evidence: Raven `dfaa76145` on shared integration branch
 `codex/source-object-metadata-resolution`, using the explicit Core.dll bootstrap
 SHA-256 `132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f`.
+
+
+## Named guest attribute snapshots (2026-10-10)
+
+The source runtime adds CustomAttributeNamedArgument and GetNamedArguments; Raven
+source/API signatures remain ordinary classes, getters and sequence results. No
+Runtime Contract setting or compiler semantic change is required. The temporary
+CLI reference bridge describes those signatures and validates private snapshot
+layouts, now including the named-data array. Native interpreter/AOT materialization
+uses one shared metadata recipe and traces every descriptor/value; no attribute
+constructor or setter is a root. neoCLR owns this ABI and metadata validation; Raven
+owns ordinary emission. The source-native library replaces the legacy generated
+CLI helper snapshot for this new capability. Its standalone legacy regeneration
+currently stops at a missing ArrayReflection project input; it is not relabelled as
+updated. Old fixed-only libraries keep working and reject named metadata explicitly.
+
+Validation covers source-built libraries with bundled compiler 494dede84, paired
+macOS ARM64 interpreter/AOT execution, typed/null named values and immutable metadata
+under returned-array mutation. The reference bridge is built with Raven dfaa76145.
+This does not qualify source-annotation AOT integration or Windows named-data execution.

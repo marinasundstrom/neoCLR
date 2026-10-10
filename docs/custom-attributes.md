@@ -305,3 +305,26 @@ after that framework is completion of modules in Introspection and RuntimeContex
 Compiler evidence: Raven `dfaa76145` on shared integration branch
 `codex/source-object-metadata-resolution`, using the explicit Core.dll bootstrap
 SHA-256 `132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f`.
+
+
+## Named guest inspection (development 2026-10-10)
+
+The source runtime now exposes GetNamedArguments and immutable
+CustomAttributeNamedArgument descriptors (MemberName, IsField, TypedValue). The
+shared interpreter/AOT recipe preserves metadata order, String/null, Int32 and
+Boolean values, without executing constructors or assignments. The expanded native
+consumer tests both target kinds, empty sequences, exact types and copied sequence
+isolation; attribute accessors deliberately fault if invoked and are not native roots.
+
+This follows the host metadata and .NET data model. MemberInfo resolution on the
+named descriptor remains an explicit API gap, not a different semantic contract.
+Wider/type/array/named-enum constants remain unsupported. Match the updated source
+runtime library and runtime; older fixed-only libraries still inspect fixed values
+but reject named data explicitly. The metadata/retention format and Runtime Contract
+options are unchanged. The source-built macOS ARM64 consumer passes in both modes;
+Windows qualification of this expanded corpus is pending the shared action.
+
+The next bounded work is runtime AttributeUsage/AttributeTargets declarations. The
+separate-library Attribute base requires a coordinated external-base reference,
+constructor validation and compiler-emission slice; it has not been bypassed.
+Test discovery and the later module-model completion remain in the selected order.

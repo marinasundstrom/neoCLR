@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    "fixed-and-enum-arguments",
+    "named-field-property-arguments",
+    "named-null-and-snapshot-copy",
+    "null-string",
+    "repeated-attributes",
+    "property-method-parameter-targets",
+    "snapshot-copy",
+    "constructor-signature",
+    "no-user-constructor-roots",
+    "unannotated-type",
+    "unretained-type-rejection",
+    "standalone-dependencies"
+  ],
+  "inputs": {
+    "docs/experiments/native-attributes/Main.rvn": "c05d6493bbb1210d73ff6395fa0b45a3d2b5b99a2552346a6cb100751b99f728",
+    "docs/experiments/native-attributes/Native.rvnproj": "6fcc3173c04cc661cba9d53e6a49ce3f5869f327df91a1305bacf5a287a6c17c",
+    "docs/experiments/native-attributes/verify.py": "e6c23e3fe26a149dbf34ac18062476dfc591269bc3b3a00fd27b552ab31d343d",
+    "tools/aot-poc/target/debug/neoclr-aot-poc": "7888b1fb060c20124c9bb8ed223e94fd4ca1cbefe5bb74ff3d552d32865821e5",
+    "tools/aot-poc/target/debug/neoclr": "bc778348883aeb5f31b0b5faef0d976466e6acb6f53c0a24c4ccd3f89e7e10ba",
+    "target/named-attributes-library/bundle/lib/System.Runtime.dll": "0866326fcd891f90143efdadf18245c2f13dff4fe6251436cf654977a8760984",
+    "target/named-attributes-library/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "712ae51186407deda16357d34fe543b0f6161453cd7bfaea1f050c600ad4efda",
+    "target/named-attributes-library/bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/NativeAttributeAotFixture.cs": "70418dfd8573f0d9820a2fc467eb9b64622ad19d4d838f678f85502036a5c5c2",
+    "target/named-attributes-qualified/app.neox": "c68e773a708126c77979c746e0ad42ddbdd07f606fb43ddb1a440cec53c2163a",
+    "target/named-attributes-qualified/roots.json": "678eb7bc885f567e23c19513efed344324a6748f40e7f5de87ea15c760142fff"
+  },
+  "date": "2026-10-10",
+  "compilerRevision": "494dede84 (rebuilt source libraries; existing compiler)",
+  "annotationProducer": "NativeAttributeAotFixture; compiler-produced annotation AOT integration remains separate",
+  "windowsQualification": "Named corpus pending; fixed corpus verified at 6ae823c0",
+  "legacyFixedConsumer": "Passed with the existing library-scopes-final bundle and prior native-attributes-final application; interpreter live=0",
+  "apiSnapshot": "passed",
+  "legacyCliRegeneration": "Blocked: missing ArrayReflection project input; old fixed-only helper snapshot retained"
+}

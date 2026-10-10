@@ -7,7 +7,7 @@ attribute or invokes its constructor. This follows the existing
 [.NET CustomAttributeData comparison](../../attribute-introspection.md#comparison-and-tradeoffs-primary-sources-reviewed-2026-09-27).
 
 The checked consumer covers String/Int32/Boolean and Int32-backed enum fixed
-arguments, null strings, repeated annotations, constructor signatures, copied argument
+arguments, primitive named field/property values, null strings, repeated annotations, constructor signatures, copied argument
 sequences, and property/accessor/parameter targets. Enum `ArgumentType` retains its
 nominal identity; `Value` is the underlying boxed Int32. Empty results for a retained
 unannotated type differ from a fault for an unretained type. Both user constructors
@@ -27,8 +27,9 @@ python3 docs/experiments/native-attributes/verify.py \
 
 Choose a fresh output directory. Windows x64 uses the same script under an MSVC
 x64 environment, with `.exe` tool paths; the collections workflow now runs this
-gate. [Windows qualification](windows-validation.json) passes at 6ae823c0; available
+gate. [Windows qualification](windows-validation.json) passes for the earlier fixed-data corpus at 6ae823c0; available
 input hashes and archived output/dependency checks are verified.
+The expanded named-data corpus awaits its own Windows action result.
 Windows ARM64 is not qualified by this gate.
 
 ## Retention and representation
@@ -61,8 +62,9 @@ uses the existing metadata record profile, without claiming validated native
 Raven `51da30ea7` independently qualifies native import/usage binding, not this fixture's
 annotation emission. No Runtime Contract configuration or CLI bridge encoding changes.
 
-Named-argument inspection remains unsupported and fails explicitly when building a
-retained recipe. Type/array constants, wider primitives, general generic reflection,
+Named String/Int32/Boolean inspection now passes on macOS in both modes with the
+updated source runtime library. GetNamedArguments returns copied snapshots; MemberInfo
+resolution remains a gap. Older fixed-only libraries reject named metadata explicitly. Type/array constants, wider primitives, general generic reflection,
 assembly/module discovery, automatic test discovery and attribute instantiation are
 not added. Field, constructor and other member annotations reuse the same token lookup,
 but this gate does not add general native field/method/constructor enumeration.
@@ -70,5 +72,6 @@ Compiler source annotation round trips now pass independently on the shared Rave
 integration line; the bundled compiler is unchanged. Next qualify compiler-produced
 AOT annotations and the TestAttribute discovery adapter.
 
-See [validation.json](validation.json) for tested artifact hashes and cases. Detailed
+See [named-validation.json](named-validation.json) for the expanded macOS corpus,
+and [validation.json](validation.json) for the preceding fixed-data gate. Detailed
 command logs, native selection reports and binaries are generated in the output directory.

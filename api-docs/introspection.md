@@ -210,8 +210,8 @@ Development AOT now supports explicit custom-attribute data retention on macOS A
 using the same descriptor/argument contracts. Int32-backed enum arguments retain
 nominal ArgumentType and expose their underlying boxed Int32 Value. Private reflection
 roots select metadata independently from invocation; unretained owners fault, while
-retained unannotated targets return empty sequences. Named guest arguments remain
-unsupported. This is a metadata-authored native gate, not compiler source-annotation
+retained unannotated targets return empty sequences. Named String/Int32/Boolean field/property arguments are exposed by the matching
+development runtime library. This is a metadata-authored native gate, not compiler source-annotation
 integration or general discovery. Focused compiler-source emission checks pass independently.
 [Native validation and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-attributes/README.md).
 
@@ -237,3 +237,27 @@ not create attribute instances for metadata discovery. Use introspection to insp
 attribute data without executing constructors.
 
 [Attribute type reference](xref:System.Attribute)
+
+
+### Named attribute arguments (development 2026-10-10)
+
+`CustomAttributeData.GetNamedArguments() -> Sequence<CustomAttributeNamedArgument>`
+returns assignments in metadata order without executing constructors, setters or
+other annotated code. Each call returns a fresh sequence; replacing entries in an
+array obtained by casting it does not change later results. An attribute without
+named assignments returns an empty sequence.
+
+| Member | Contract |
+| --- | --- |
+| `CustomAttributeNamedArgument.MemberName: string` | Exact field/property name. |
+| `CustomAttributeNamedArgument.IsField: bool` | True for a field, false for a property. |
+| `CustomAttributeNamedArgument.TypedValue: CustomAttributeTypedArgument` | Declared primitive type and boxed constant; null String stays null. |
+
+String, Int32 and Boolean named values are supported in interpreted and retained
+native execution. The metadata reader validates the target member and value before
+inspection. The .NET names and typed-value model are preserved; its `MemberInfo`
+property is a remaining gap, as are named enums, type/array constants and wider
+primitives. There are no public constructors or mutation APIs on these descriptors.
+Use matching runtime/library artifacts: the descriptor layout now includes the
+named snapshot. Older libraries retain fixed-only inspection and explicitly reject
+named data. See the [tested consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-attributes/README.md).

@@ -743,19 +743,58 @@ fn attribute_data(
             }),
         limits,
     )?;
-    if !attribute.named_arguments.is_empty() {
+    // Preserve fixed-only snapshots for the independent legacy bootstrap profile.
+    // A library without the named-data descriptor must reject, never drop, named data.
+    let supports_named = module.types.iter().any(|definition| {
+        crate::reflection_source::name(module, &Type::Named(definition.name.clone()))
+            == Some("System.Introspection.CustomAttributeNamedArgument")
+    });
+    if !supports_named && !attribute.named_arguments.is_empty() {
         return Err(Fault::new(
-            "named attribute inspection is not yet supported by the guest CustomAttributeData contract",
+            "named attribute inspection requires the updated CustomAttributeNamedArgument library contract",
         ));
     }
-    Ok(record(
-        "System.Introspection.CustomAttributeData",
-        vec![
-            type_value(module, owner)?,
-            method(module, owner, &constructor, &[], limits)?,
-            arguments,
-        ],
-    ))
+    let mut fields = vec![
+        type_value(module, owner)?,
+        method(module, owner, &constructor, &[], limits)?,
+        arguments,
+    ];
+    if !supports_named {
+        return Ok(record("System.Introspection.CustomAttributeData", fields));
+    }
+    let named = array(
+        "System.Introspection.CustomAttributeNamedArgument",
+        attribute.named_arguments.iter().map(|argument| {
+            let (ty, value) = match &argument.value {
+                A::String(value) => (
+                    Type::String,
+                    match value {
+                        Some(value) => Value::Erased(Box::new(Value::String(value.clone().into()))),
+                        None => Value::NullObjectReference(Type::from_name("System.Object")),
+                    },
+                ),
+                A::Int32(value) => (Type::Int32, Value::Erased(Box::new(Value::Int32(*value)))),
+                A::Boolean(value) => (
+                    Type::Boolean,
+                    Value::Erased(Box::new(Value::Boolean(*value))),
+                ),
+            };
+            Ok(record(
+                "System.Introspection.CustomAttributeNamedArgument",
+                vec![
+                    Value::String(argument.name.clone().into()),
+                    Value::Boolean(argument.is_field),
+                    record(
+                        "System.Introspection.CustomAttributeTypedArgument",
+                        vec![type_value(module, &ty)?, value],
+                    ),
+                ],
+            ))
+        }),
+        limits,
+    )?;
+    fields.push(named);
+    Ok(record("System.Introspection.CustomAttributeData", fields))
 }
 
 fn member_record(
@@ -1627,6 +1666,52 @@ mod source_module_tests {
             .unwrap_err()
             .to_string()
             .contains("heap object limit")
+        );
+    }
+}
+
+#[cfg(test)]
+mod attribute_contract_tests {
+    use super::*;
+
+    #[test]
+    fn legacy_library_rejects_named_data_explicitly() {
+        let module = crate::assemble(
+            r#"
+.module AttributeContract
+.type Marker
+.field public Tag String
+.method instance .ctor() -> Void
+fault "attribute constructor must not execute"
+.end
+.end
+.type Subject
+.custom instance Marker::.ctor()
+.end
+.function Main() -> Void
+ldvoid
+ret
+.end
+"#,
+        )
+        .unwrap();
+        let context = QueryContext {
+            module: &module,
+            source: false,
+        };
+        let mut attribute = module.types[1].custom_attributes[0].clone();
+        attribute
+            .named_arguments
+            .push(crate::metadata::CustomAttributeNamedArgument {
+                name: "Tag".into(),
+                is_field: true,
+                value: crate::metadata::AttributeArgument::String(Some("named".into())),
+            });
+        assert!(
+            attribute_data(&context, &attribute, &Limits::default())
+                .unwrap_err()
+                .to_string()
+                .contains("requires the updated CustomAttributeNamedArgument library contract")
         );
     }
 }

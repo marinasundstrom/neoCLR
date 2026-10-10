@@ -138,6 +138,7 @@
   "System.Introspection.BindingFlags",
   "System.Introspection.ConstructorInfo",
   "System.Introspection.CustomAttributeData",
+  "System.Introspection.CustomAttributeNamedArgument",
   "System.Introspection.CustomAttributeTypedArgument",
   "System.Introspection.FieldInfo",
   "System.Introspection.FunctionTypeInfo",

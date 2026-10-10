@@ -4,7 +4,7 @@ using System.Text;
 // Current reflection API catalog. Placeholder metadata bodies never execute.
 static class ReflectionBindings
 {
-    public static readonly string[] ReferenceTypes = ["System.Introspection.CustomAttributeData", "System.Introspection.CustomAttributeTypedArgument", "System.Introspection.AssemblyInfo", "System.Introspection.ModuleInfo", "System.Runtime.RuntimeContext", "System.Introspection.TypeInfo", "System.Introspection.NominalTypeInfo", "System.Introspection.FunctionTypeInfo", "System.Introspection.ParameterInfo", "System.Introspection.MemberInfo", "System.Introspection.FieldInfo", "System.Introspection.MethodInfo", "System.Introspection.ConstructorInfo", "System.Introspection.PropertyInfo"];
+    public static readonly string[] ReferenceTypes = ["System.Introspection.CustomAttributeData", "System.Introspection.CustomAttributeTypedArgument", "System.Introspection.CustomAttributeNamedArgument", "System.Introspection.AssemblyInfo", "System.Introspection.ModuleInfo", "System.Runtime.RuntimeContext", "System.Introspection.TypeInfo", "System.Introspection.NominalTypeInfo", "System.Introspection.FunctionTypeInfo", "System.Introspection.ParameterInfo", "System.Introspection.MemberInfo", "System.Introspection.FieldInfo", "System.Introspection.MethodInfo", "System.Introspection.ConstructorInfo", "System.Introspection.PropertyInfo"];
     static readonly (string Owner, string Name, string[] Args, string Result, bool Static)[] Members = [
         ("System.Runtime.Reflection.ArrayReflection", "GetLength", ["System.Object"], "Int32", true),
         ("System.Runtime.Reflection.ArrayReflection", "GetValue", ["System.Object", "Int32"], "System.Object", true),
@@ -26,6 +26,10 @@ static class ReflectionBindings
         ("System.Introspection.CustomAttributeData", "get_AttributeType", [], "System.Introspection.TypeInfo", false),
         ("System.Introspection.CustomAttributeData", "get_Constructor", [], "System.Introspection.ConstructorInfo", false),
         ("System.Introspection.CustomAttributeData", "GetConstructorArguments", [], "System.Collections.Sequence<System.Introspection.CustomAttributeTypedArgument>", false),
+        ("System.Introspection.CustomAttributeData", "GetNamedArguments", [], "System.Collections.Sequence<System.Introspection.CustomAttributeNamedArgument>", false),
+        ("System.Introspection.CustomAttributeNamedArgument", "get_MemberName", [], "System.String", false),
+        ("System.Introspection.CustomAttributeNamedArgument", "get_IsField", [], "System.Boolean", false),
+        ("System.Introspection.CustomAttributeNamedArgument", "get_TypedValue", [], "System.Introspection.CustomAttributeTypedArgument", false),
         ("System.Introspection.CustomAttributeTypedArgument", "get_ArgumentType", [], "System.Introspection.TypeInfo", false),
         ("System.Introspection.CustomAttributeTypedArgument", "get_Value", [], "System.Object", false),
         ("System.Introspection.ParameterInfo", "get_MetadataToken", [], "System.Option<Int32>", false),
@@ -189,7 +193,8 @@ static class ReflectionBindings
         namespace Introspection { internal sealed class RuntimeConstructorInfo : RuntimeMemberInfo, ConstructorInfo { private RuntimeConstructorInfo() { } public System.Introspection.TypeInfo ReturnType => default; public bool IsStatic => default; public bool IsPublic => default; public bool IsPrivate => default; public bool IsAssembly => default; public bool IsReceiverByRef => default; public int DefinitionIndex => default; public bool IsReadOnly => default; public bool IsVirtual => default; public bool IsOverride => default; public bool IsAbstract => default; public System.Collections.Sequence<System.Introspection.ParameterInfo> GetParameters() => default; public override bool Equals(object? other) => default; public override int GetHashCode() => default; } }
         namespace Introspection { internal sealed class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo { private RuntimePropertyInfo() { } public System.Introspection.TypeInfo PropertyType => default; public bool IsStatic => default; public bool CanRead => default; public bool CanWrite => default; public int DefinitionIndex => default; public System.Collections.Sequence<System.Introspection.ParameterInfo> GetIndexParameters() => default; public System.Option<System.Introspection.MethodInfo> GetGetMethod() => default; public System.Option<System.Introspection.MethodInfo> GetGetMethod(bool arg0) => default; public System.Option<System.Introspection.MethodInfo> GetSetMethod() => default; public System.Option<System.Introspection.MethodInfo> GetSetMethod(bool arg0) => default; public override bool Equals(object? other) => default; public override int GetHashCode() => default; } }
         namespace Introspection {
-            public sealed class CustomAttributeData { private CustomAttributeData() {} public TypeInfo AttributeType => default; public ConstructorInfo Constructor => default; public System.Collections.Sequence<CustomAttributeTypedArgument> GetConstructorArguments() => default; }
+            public sealed class CustomAttributeData { private CustomAttributeData() {} public TypeInfo AttributeType => default; public ConstructorInfo Constructor => default; public System.Collections.Sequence<CustomAttributeTypedArgument> GetConstructorArguments() => default; public System.Collections.Sequence<CustomAttributeNamedArgument> GetNamedArguments() => default; }
+            public sealed class CustomAttributeNamedArgument { private CustomAttributeNamedArgument() {} public string MemberName => default; public bool IsField => default; public CustomAttributeTypedArgument TypedValue => default; }
             public sealed class CustomAttributeTypedArgument { private CustomAttributeTypedArgument() {} public TypeInfo ArgumentType => default; public object? Value => default; }
         }
         #nullable restore annotations
@@ -218,7 +223,7 @@ static class ReflectionBindings
         {
             var type = module.GetType(name) ?? throw new InvalidDataException("Missing reflection type: " + name);
             IntrospectionHierarchy.Validate(type);
-            var isInfo = name is not ("System.Runtime.RuntimeContext" or "System.Introspection.CustomAttributeData" or "System.Introspection.CustomAttributeTypedArgument");
+            var isInfo = name is not ("System.Runtime.RuntimeContext" or "System.Introspection.CustomAttributeData" or "System.Introspection.CustomAttributeTypedArgument" or "System.Introspection.CustomAttributeNamedArgument");
             var parents = name is "System.Introspection.FieldInfo" or "System.Introspection.MethodInfo" or "System.Introspection.ConstructorInfo" or "System.Introspection.PropertyInfo"
                 ? new[] { "System.Introspection.MemberInfo" } : name == "System.Introspection.TypeInfo" ? new[] { "System.EquatableTo`1<System.Introspection.TypeInfo>" } : name == "System.Introspection.FunctionTypeInfo" ? new[] { "System.Introspection.TypeInfo", "System.EquatableTo`1<System.Introspection.TypeInfo>" } : name == "System.Introspection.NominalTypeInfo" ? new[] { "System.Introspection.TypeInfo", "System.EquatableTo`1<System.Introspection.TypeInfo>", "System.Introspection.MemberInfo" } : Array.Empty<string>();
             if (!type.IsPublic || type.IsValueType || type.IsInterface != isInfo || type.HasGenericParameters
@@ -242,7 +247,7 @@ static class ReflectionBindings
         var name = "RuntimeReflection" + Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(key)))[..16];
         if (!Helpers.ContainsKey(key))
         {
-            var body = new StringBuilder($".function {name}({string.Join(',', inputs.Select((t,i) => t + " arg" + i))}) -> {result}\n");
+            var body = new StringBuilder($".function {name}({string.Join(',', inputs.Select((t, i) => t + " arg" + i))}) -> {result}\n");
             for (var i = 0; i < inputs.Length; i++)
             {
                 body.AppendLine("ldarg arg" + i);

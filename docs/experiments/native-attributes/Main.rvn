@@ -2,12 +2,23 @@ import System.*
 import System.Introspection.*
 import System.Option.*
 
-// Test metadata is attached by the fixture author until native source annotations emit.
+// Test metadata isolates AOT retention from compiler-source annotation integration.
 public enum NoteKind {
     Example = 7
 }
 
 public class NoteAttribute {
+    public field Tag: string?
+    public field Rank: int
+    var Enabled: bool {
+        get {
+            System.Fail("Attribute getter executed")
+        }
+        set {
+            System.Fail("Attribute setter executed")
+        }
+    }
+
     init(text: string?, number: int, enabled: bool, kind: NoteKind) {
         System.Fail("Attribute constructor executed")
     }
@@ -81,8 +92,42 @@ func Main() -> int {
     if !note.GetConstructorArguments()[0].ArgumentType.Equals(typeof(string)) {
         return 16
     }
+    let named = note.GetNamedArguments()
+    if named.Count != 3 || named[0].MemberName != "Tag" || !named[0].IsField || named[1].MemberName != "Enabled" || named[1].IsField {
+        return 20
+    }
+    if !named[0].TypedValue.ArgumentType.Equals(typeof(string)) || !named[1].TypedValue.ArgumentType.Equals(typeof(bool)) || !named[2].TypedValue.ArgumentType.Equals(typeof(int)) {
+        return 21
+    }
+    if named[0].TypedValue.Value is string tag {
+        if tag != "named ☃" {
+            return 22
+        }
+    } else {
+        return 23
+    }
+    if named[1].TypedValue.Value is bool enabled {
+        if enabled {
+            return 24
+        }
+    } else {
+        return 25
+    }
+    if named[2].TypedValue.Value is int rank {
+        if rank != -7 {
+            return 26
+        }
+    } else {
+        return 27
+    }
+    let namedErased: Object = named
+    let namedCopy = (CustomAttributeNamedArgument[])namedErased
+    namedCopy[0] = namedCopy[1]
+    if note.GetNamedArguments()[0].MemberName != "Tag" || attributes[1].GetNamedArguments()[0].TypedValue.Value != null {
+        return 28
+    }
     let property = subject.GetProperties()[0]
-    if property.GetCustomAttributesData().Count != 1 {
+    if property.GetCustomAttributesData().Count != 1 || property.GetCustomAttributesData()[0].GetNamedArguments().Count != 0 {
         return 17
     }
     if let Some(setter) = property.GetSetMethod() {

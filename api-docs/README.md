@@ -1501,3 +1501,16 @@ General host metadata attributes now include callables, fields, properties and
 parameters; see the [manual host reference](experimental-metadata.md#member-custom-attributes-development-2026-10-10).
 Guest reference signatures and snapshots are unchanged. AttributeUsage, Raven source
 emission and guest discovery remain tracked in the [attribute plan](../docs/custom-attributes.md).
+
+
+### Named attribute guest data (development 2026-10-10)
+
+CustomAttributeNamedArgument and CustomAttributeData.GetNamedArguments have matching
+XML, automatic RavenDoc type selection and a refreshed reference snapshot. The
+[introspection reference](introspection.md#named-attribute-arguments-development-2026-10-10)
+covers every new member and the MemberInfo/wider-value gaps. Source-built native
+libraries provide the same API under interpreter and AOT. Regenerating the separate
+legacy CLI Descriptors implementation slice currently fails because its project
+omits ArrayReflection; its old fixed-only snapshot remains unchanged. This is not
+an API reference refresh failure or evidence for named-data support in that legacy
+snapshot. The runtime rejects named data with that older library explicitly.

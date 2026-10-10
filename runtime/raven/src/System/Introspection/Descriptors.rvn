@@ -721,15 +721,33 @@ public class CustomAttributeTypedArgument {
     val Value: Object? => storedValue
 }
 
+public class CustomAttributeNamedArgument {
+    private var storedName: string
+    private var storedIsField: bool
+    private var storedValue: CustomAttributeTypedArgument
+
+    private init(name: string, isField: bool, value: CustomAttributeTypedArgument) {
+        storedName = name
+        storedIsField = isField
+        storedValue = value
+    }
+
+    val MemberName: string => storedName
+    val IsField: bool => storedIsField
+    val TypedValue: CustomAttributeTypedArgument => storedValue
+}
+
 public class CustomAttributeData {
     private var storedType: TypeInfo
     private var storedConstructor: ConstructorInfo
     private var storedArguments: CustomAttributeTypedArgument[]
+    private var storedNamedArguments: CustomAttributeNamedArgument[]
 
-    private init(type: TypeInfo, constructor: ConstructorInfo, arguments: CustomAttributeTypedArgument[]) {
+    private init(type: TypeInfo, constructor: ConstructorInfo, arguments: CustomAttributeTypedArgument[], namedArguments: CustomAttributeNamedArgument[]) {
         storedType = type
         storedConstructor = constructor
         storedArguments = arguments
+        storedNamedArguments = namedArguments
     }
 
     val AttributeType: TypeInfo => storedType
@@ -740,6 +758,16 @@ public class CustomAttributeData {
         var index = 0
         while index < storedArguments.Length {
             result[index] = storedArguments[index]
+            index += 1
+        }
+        return result
+    }
+
+    func GetNamedArguments() -> Sequence<CustomAttributeNamedArgument> {
+        let result = CheckedStorage.Reserve<CustomAttributeNamedArgument>(storedNamedArguments.Length)
+        var index = 0
+        while index < storedNamedArguments.Length {
+            result[index] = storedNamedArguments[index]
             index += 1
         }
         return result

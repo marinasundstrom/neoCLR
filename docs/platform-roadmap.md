@@ -14,8 +14,10 @@ native importer now exposes these attributes and applies existing usage target a
 multiplicity checks across assemblies. Native source annotation emission now passes
 focused compiler round trips on the shared Raven integration line; the packaged
 compiler remains unchanged. Next complete separate-library Attribute inheritance,
-runtime usage declarations and guest named-data inspection, then TestAttribute
-discovery without changing execution contracts. Explicit attribute-data retention now passes a standalone macOS ARM64
+runtime usage declarations, then TestAttribute
+discovery without changing execution contracts. Named field/property argument
+snapshots now pass the expanded macOS interpreter/AOT consumer with source-built
+libraries; the expanded Windows gate remains pending. Explicit attribute-data retention now passes a standalone macOS ARM64
 [public Raven consumer](experiments/native-attributes/README.md), using metadata-authored
 annotations and no user constructor roots. The matching [Windows x64 gate](experiments/native-attributes/windows-validation.json)
 passes at 6ae823c0, with available input hashes checked. Compiler-produced AOT

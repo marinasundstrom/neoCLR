@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using NeoCLR.Metadata.Experimental;
 
-// Isolate native retention/materialization from the still-incomplete Raven annotation emitter.
+// Isolate native retention/materialization from compiler-produced annotation integration.
 internal static class NativeAttributeAotFixture
 {
     internal static void Write(string input, string output, string roots)
@@ -32,6 +32,11 @@ internal static class NativeAttributeAotFixture
         }
         subject["custom_attributes"] = new JsonArray(Attribute("type ☃"), Attribute(null),
             Attribute("property", subject["origin"]!["property_tokens"]![0]!.GetValue<int>()));
+        foreach (var (attribute, value) in new[] { (subject["custom_attributes"]![0]!, "named ☃"), (subject["custom_attributes"]![1]!, (string?)null) })
+            attribute["named_arguments"] = new JsonArray(
+                new JsonObject { ["name"] = "Tag", ["is_field"] = true, ["value"] = new JsonObject { ["String"] = value } },
+                new JsonObject { ["name"] = "Enabled", ["is_field"] = false, ["value"] = new JsonObject { ["Boolean"] = false } },
+                new JsonObject { ["name"] = "Rank", ["is_field"] = true, ["value"] = new JsonObject { ["Int32"] = -7 } });
         var setter = module["functions"]!.AsArray().Single(f =>
             f!["origin"]!["name"]!.GetValue<string>() == "set_Name")!;
         setter["custom_attributes"] = new JsonArray(Attribute("method"),

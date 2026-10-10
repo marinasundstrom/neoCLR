@@ -1,7 +1,7 @@
 """Verify public attribute inspection with shared interpreter/AOT metadata recipes.
 
-The fixture attaches native annotations after Raven compilation until source emission
-is supported. This is deliberately an AOT gate, not compiler annotation evidence.
+The fixture attaches native annotations after Raven compilation to isolate retention.
+This is deliberately an AOT gate, not compiler annotation integration evidence.
 """
 import argparse
 import hashlib
@@ -99,6 +99,9 @@ for name in ('NoteAttribute', 'Subject'):
     declaration = next(t for t in source_types if (t.get('origin') or {}).get('name') == name)
     constructor = next(m for m in declaration['declaredMethods'] if m['name'].endswith('..ctor'))
     assert all(f['definition'] != constructor['definition'] for f in selection['functions']), name
+    if name == 'NoteAttribute':
+        for method in declaration['declaredMethods']:
+            assert all(f['definition'] != method['definition'] for f in selection['functions']), method['name']
 policy = json.loads(roots.read_text())
 policy['types'][1]['customAttributes'] = False
 missing = output / 'unretained.json'
@@ -106,7 +109,7 @@ missing.write_text(json.dumps(policy))
 exe, _ = native('unretained', missing)
 rejected = run([exe], expected=1)
 assert 'native custom attribute metadata was not retained' in rejected.stdout + rejected.stderr
-report = dict(passed=True, host=platform.platform(), cases=['fixed-and-enum-arguments', 'null-string',
+report = dict(passed=True, host=platform.platform(), cases=['fixed-and-enum-arguments', 'named-field-property-arguments', 'named-null-and-snapshot-copy', 'null-string',
     'repeated-attributes', 'property-method-parameter-targets', 'snapshot-copy', 'constructor-signature',
     'no-user-constructor-roots', 'unannotated-type', 'unretained-type-rejection', 'standalone-dependencies'],
     inputs={str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in

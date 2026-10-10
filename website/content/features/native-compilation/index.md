@@ -120,7 +120,8 @@ The routing workbench also parses a route, extracts an integer parameter and pri
   Explicit development reflection roots now support checked parameterless construction
   and property-access adapters. On macOS ARM64 and Windows x64, explicit attribute-data retention
   also supports fixed/enum arguments and member/parameter annotations without
-  executing attribute constructors. This metadata-authored gate still requires
+  executing attribute constructors. Named primitive field/property snapshots also pass
+  on macOS with the updated source library; their Windows gate is pending. This metadata-authored gate still requires
   compiler-produced source annotation integration;
   development JSON round trips cover nested objects, typed arrays, lists/sequences,
   string-keyed maps and explicitly declared JSON nodes on macOS and Windows x64.

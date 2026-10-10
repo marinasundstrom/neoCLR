@@ -245,6 +245,7 @@ impl Factory<'_> {
                     let owner = if matches!(
                         logical,
                         "System.Introspection.CustomAttributeData"
+                            | "System.Introspection.CustomAttributeNamedArgument"
                             | "System.Introspection.CustomAttributeTypedArgument"
                     ) {
                         expected.clone()
@@ -263,6 +264,7 @@ impl Factory<'_> {
                         "System.Introspection.PropertyInfo"
                         | "System.Introspection.ConstructorInfo" => (true, None),
                         "System.Introspection.CustomAttributeData"
+                        | "System.Introspection.CustomAttributeNamedArgument"
                         | "System.Introspection.CustomAttributeTypedArgument" => (false, None),
                         "System.Introspection.MethodInfo" => (true, Some("StoredIdentity")),
                         "System.Introspection.ParameterInfo" => {

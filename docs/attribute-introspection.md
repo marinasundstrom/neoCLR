@@ -86,3 +86,15 @@ now match the source runtime's layout instead of carrying a method-only identity
 field. No named-argument guest API, general native discovery or source annotation
 emission is implied. Windows qualification remains pending; the same gate is wired
 into its workflow. The fixture's metadata attachment is explicitly test-only.
+
+
+## Named data follow-up (2026-10-10)
+
+GetNamedArguments now returns fresh sequences of immutable descriptors with
+MemberName, IsField and TypedValue, preserving primitive fixed/named metadata without
+executing user code. See the [full API and limitations](../api-docs/introspection.md#named-attribute-arguments-development-2026-10-10).
+This closes the earlier named guest-data gap for source-built libraries on macOS
+interpreter/AOT; the separate legacy CLI bootstrap snapshot remains fixed-only.
+MemberInfo, wider values and inherited queries remain gaps relative to .NET. Windows
+x64 previously qualified the fixed-data corpus at 6ae823c0; the expanded named corpus
+requires a new action result. No new retention switch or constructor rooting is needed.

@@ -37,7 +37,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   source ConstructorInfo snapshot layout. Wire the same Windows x64 gate; Windows
   x64 qualification now passes at 6ae823c0, with nine available input hashes checked
   and archived native/interpreter output verified. Compiler-produced AOT annotations,
-  separate-library Attribute inheritance and guest named arguments remain open.
+  separate-library Attribute inheritance remain open. Guest GetNamedArguments and
+  CustomAttributeNamedArgument now expose primitive named field/property data, with
+  fresh sequences, exact types/nulls and no user-code execution. The expanded source
+  library consumer passes macOS interpreter/AOT; Windows named-data qualification
+  is pending. MemberInfo and broader constants remain gaps. Preserve old fixed-only
+  library inspection and explicitly reject named data without its new contract.
+  Refresh the API reference; the separate legacy CLI implementation generator still
+  stops at its missing ArrayReflection input.
   Record the author-selected sequence: finish attributes, continue the testing
   framework, then complete modules in Introspection and RuntimeContext.
 
