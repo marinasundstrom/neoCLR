@@ -296,13 +296,14 @@ Host metadata tooling now preserves and inspects annotations on types, callables
 fields, properties and parameters across native and CLI snapshots. Inspection runs
 no attribute constructors. Host enum constructor arguments and primitive named
 field/property data also survive native/CLI projection. Raven native import now
-applies usage policies across assemblies. Native source annotation emission and
-guest named-data inspection remain prerequisites for attributed test discovery; these are not yet released
+applies usage policies across assemblies. Source annotation emission now passes focused
+compiler checks; bundle integration and guest named-data inspection remain prerequisites
+for attributed test discovery. These are not yet released
 runtime capabilities. See the [API contract](../../docs/experimental-metadata.html#member-custom-attributes-development-2026-10-10)
 and [implementation plan](https://github.com/marinasundstrom/neoCLR/blob/main/docs/custom-attributes.md).
 
 Explicit development AOT retention now runs attribute-data inspection through the
-public Raven API on macOS ARM64 without executing attribute constructors. Fixed
+public Raven API on macOS ARM64 and Windows x64 without executing attribute constructors. Fixed
 arguments, Int32 enum values and member/parameter annotations are covered by a
 [metadata-authored consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-attributes/README.md).
-Native source annotation emission and Windows qualification remain open.
+Compiler-produced source annotations through AOT and automatic discovery remain open.

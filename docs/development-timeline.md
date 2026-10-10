@@ -13377,3 +13377,26 @@ host suite, 20 ordinary usage tests, native flags/runtime-library checks and foc
 native import cases pass. Source annotation emission, native Attribute inheritance
 validation, guest named data and AOT discovery remain open. The packaged toolchain
 has not yet been rebuilt for this compiler slice; see [evidence](custom-attributes.md).
+
+
+### 2026-10-10 — Attributes, test discovery, then the module model
+
+The author directs: “When this is ready we should continue with the testing framework.”
+The assistant commits to returning from general attribute support to TestAttribute
+discovery while preserving the runner's execution and reporting contracts. The author
+then adds: “One thing we need to complete after attributes support and the testing
+framework is making modules a part of the model in introspection and runtimecontext”.
+The assistant records that sequence in the roadmap and proposes auditing existing
+ModuleInfo/AssemblyInfo contracts and RuntimeContext traversal against .NET module
+ownership, with explicit Raven source-module semantics and interpreter/AOT validation.
+That review scope is a proposal; no new module API has been implemented or approved.
+
+During the attribute work, the assistant implements native source annotations in
+Raven's shared integration line and corrects ordinary property annotations leaking
+onto backing fields. Focused native round trips and 21 .NET AttributeUsage tests pass.
+The separate metadata-authored AOT consumer passes Windows x64 run 38043637200 at
+6ae823c0; available input hashes and archived execution results are checked, while
+unarchived compiler/runtime executables cannot be independently rehashed. Source
+annotation AOT integration, separate-library Attribute inheritance, runtime usage
+and guest named data remain open before discovery. See [attribute status](custom-attributes.md)
+and [Windows evidence](experiments/native-attributes/windows-validation.json).

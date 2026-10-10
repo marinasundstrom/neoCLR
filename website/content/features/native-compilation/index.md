@@ -118,10 +118,10 @@ The routing workbench also parses a route, extracts an integer parameter and pri
   as first steps toward native JSON. Retained vectors support checked creation,
   length, readback and semantic `GetType()` identity; other compound queries remain unsupported.
   Explicit development reflection roots now support checked parameterless construction
-  and property-access adapters. On macOS ARM64, explicit attribute-data retention
+  and property-access adapters. On macOS ARM64 and Windows x64, explicit attribute-data retention
   also supports fixed/enum arguments and member/parameter annotations without
   executing attribute constructors. This metadata-authored gate still requires
-  source annotation emission and Windows qualification;
+  compiler-produced source annotation integration;
   development JSON round trips cover nested objects, typed arrays, lists/sequences,
   string-keyed maps and explicitly declared JSON nodes on macOS and Windows x64.
   These bounded, explicitly rooted cases are not a published native JSON capability.

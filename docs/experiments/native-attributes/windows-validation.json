@@ -1,0 +1,156 @@
+{
+  "date": "2026-10-10",
+  "platform": "Windows x64",
+  "commit": "6ae823c0aba963a63e2ca7f6d508c13db44e6ff1",
+  "run": "https://github.com/marinasundstrom/neoCLR/actions/runs/38043637200",
+  "conclusion": "success",
+  "artifact": {
+    "id": 11667576110,
+    "name": "windows-native-collections-38043637200-1",
+    "sha256": "38369e3fe93a912747a002963f0e6b4747cdeaf49b597eba670155e59fee530d"
+  },
+  "validation": {
+    "passed": true,
+    "host": "Windows-2022Server-10.0.20348-SP0",
+    "cases": [
+      "fixed-and-enum-arguments",
+      "null-string",
+      "repeated-attributes",
+      "property-method-parameter-targets",
+      "snapshot-copy",
+      "constructor-signature",
+      "no-user-constructor-roots",
+      "unannotated-type",
+      "unretained-type-rejection",
+      "standalone-dependencies"
+    ],
+    "inputs": {
+      "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\native-attributes\\Main.rvn": "6492e43e2bb0b7be8bbac62fd53f902970cdc76725b563d569065206f424530a",
+      "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\native-attributes\\Native.rvnproj": "aacfc28079156d3046dcfaab220a6b81d17c96c2f9c175f629bea50fbf7ecb21",
+      "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\native-attributes\\verify.py": "55c895402fddd7c571423348c719e71eae1047f82966173c4dd76c0649e818e0",
+      "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\debug\\neoclr-aot-poc.exe": "32b4bf3eafc6f7672f95848c331332d6c7a1c6b7e749b3a3ae5b8d9c6556e962",
+      "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe": "099dfda56df5a7d320a4294d372346c1034a4e31769ecd26f46c3f2021d2f66a",
+      "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll": "1618e55241012ad6ee1810837cfa157c8b61b97f2aaf8d31ef297d0a11137d1d",
+      "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\sdk\\tools\\rvnc\\Raven.CodeAnalysis.NeoClr.dll": "2b6f87a9c297bad3ffd058dc290ba900273fb00ec29eb98c852afd68992650ae",
+      "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+      "D:\\a\\neoCLR\\neoCLR\\tools\\metadata\\NeoCLR.Metadata.Experimental.Tests\\NativeAttributeAotFixture.cs": "6b9d5258552aa46c6200faa80539e935f781df800d8cb7a6133dea550258afef",
+      "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\custom-attributes\\app.neox": "15198072e28ff8169163a02b5657428c4a03c880d7eeb1eedbd6dc8dd944fa3e",
+      "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\custom-attributes\\roots.json": "64263fbf4cfd973e5285ea5296a0d656392013abe53397f75764d038fd06d3ac"
+    }
+  },
+  "independentlyVerifiedInputs": [
+    {
+      "input": "commit:docs/experiments/native-attributes/Main.rvn",
+      "sha256": "6492e43e2bb0b7be8bbac62fd53f902970cdc76725b563d569065206f424530a",
+      "normalization": "Windows checkout CRLF"
+    },
+    {
+      "input": "commit:docs/experiments/native-attributes/Native.rvnproj",
+      "sha256": "aacfc28079156d3046dcfaab220a6b81d17c96c2f9c175f629bea50fbf7ecb21",
+      "normalization": "Windows checkout CRLF"
+    },
+    {
+      "input": "commit:docs/experiments/native-attributes/verify.py",
+      "sha256": "55c895402fddd7c571423348c719e71eae1047f82966173c4dd76c0649e818e0",
+      "normalization": "Windows checkout CRLF"
+    },
+    {
+      "input": "artifact:development toolchain/bundle/lib/System.Runtime.dll",
+      "sha256": "1618e55241012ad6ee1810837cfa157c8b61b97f2aaf8d31ef297d0a11137d1d",
+      "normalization": "none"
+    },
+    {
+      "input": "artifact:development toolchain/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll",
+      "sha256": "2b6f87a9c297bad3ffd058dc290ba900273fb00ec29eb98c852afd68992650ae",
+      "normalization": "none"
+    },
+    {
+      "input": "artifact:development toolchain/bundle/lib/System.runtime.neox",
+      "sha256": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+      "normalization": "none"
+    },
+    {
+      "input": "commit:tools/metadata/NeoCLR.Metadata.Experimental.Tests/NativeAttributeAotFixture.cs",
+      "sha256": "6b9d5258552aa46c6200faa80539e935f781df800d8cb7a6133dea550258afef",
+      "normalization": "Windows checkout CRLF"
+    },
+    {
+      "input": "artifact:custom-attributes/app.neox",
+      "sha256": "15198072e28ff8169163a02b5657428c4a03c880d7eeb1eedbd6dc8dd944fa3e",
+      "normalization": "none"
+    },
+    {
+      "input": "artifact:custom-attributes/roots.json",
+      "sha256": "64263fbf4cfd973e5285ea5296a0d656392013abe53397f75764d038fd06d3ac",
+      "normalization": "none"
+    }
+  ],
+  "inputsNotArchivedForIndependentVerification": [
+    "tools/aot-poc/target/debug/neoclr-aot-poc.exe",
+    "target/release/neoclr.exe"
+  ],
+  "bounds": "Metadata-authored annotations; bundled compiler 494dede84. Does not qualify source annotation emission, Windows ARM64, named guest data or automatic test discovery.",
+  "outputArtifactHashes": {
+    "attributes.exe": "fe6958b9a5740073769e76539bc838bc858e7b39817ec9473ccb61b1e8aa172a",
+    "unretained.exe": "5b2ef7071707f503430083a401c3034fa2a12a9bbf0d7ad98f97230738d51784",
+    "attributes-selection.json": "589a2d09e91c18109a5b4ff849119daf46746efd6ebbe3e31be46fd719621119",
+    "unretained-selection.json": "a2c21597dcb685bceba02e6f60dd3e0ab09ca56e94f0b7078d1ebdc592952036",
+    "commands.json": "a229d3fb4278618724a8e84ac88cfedfd5900e38f31a9cac6278a127fadb2d00",
+    "validation.json": "07e4c986c35ab86c1cee3977bfeee71efa845011a69825cb920e14a6c964cd40"
+  },
+  "executionEvidence": [
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\custom-attributes\\app.neox",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+        "--gc-stats"
+      ],
+      "exitCode": 0,
+      "stdout": "Native attribute inspection passed\n",
+      "stderr": "GC: allocated=223 live=0 peak=181 collections=3 reclaimed=223\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/dependents",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\custom-attributes\\attributes.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\custom-attributes\\attributes.exe\n\nFile Type: EXECUTABLE IMAGE\n\n  Image has the following dependencies:\n\n    KERNEL32.dll\n\n  Summary\n\n        2000 .data\n        1000 .fptable\n        2000 .pdata\n      12E000 .rdata\n        2000 .reloc\n      10A000 .text\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\custom-attributes\\attributes.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "Native attribute inspection passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/dependents",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\custom-attributes\\unretained.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\custom-attributes\\unretained.exe\n\nFile Type: EXECUTABLE IMAGE\n\n  Image has the following dependencies:\n\n    KERNEL32.dll\n\n  Summary\n\n        2000 .data\n        1000 .fptable\n        2000 .pdata\n       EF000 .rdata\n        2000 .reloc\n       DE000 .text\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\custom-attributes\\unretained.exe"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RuntimeError: native custom attribute metadata was not retained; configure --reflection-roots\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_496E74726F7370656374696F6E52756E74696D655365727669636573.M_4D656D626572437573746F6D41747472696275746573 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E496E74726F7370656374696F6E_52756E74696D654E6F6D696E616C54797065496E666F.M_476574437573746F6D4174747269627574657344617461 [instruction 5]\n   at NeoMetadata_5E8516736ED34BAD22E2E244B292B52307AAD304B7A9D6FDCF228A47F9BE208E.F_4D61696E [instruction 285]\n"
+    }
+  ]
+}

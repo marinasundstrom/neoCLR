@@ -782,3 +782,21 @@ and update the API reference and tested Raven examples with migration notes. Pre
 previous decisions in the development timeline. Keep research findings and proposed
 changes separate from implemented API behavior; continuing implementation is not
 approval of every proposed redesign.
+
+
+### Module model completion — author direction 2026-10-10
+
+After custom attributes and the testing framework, the author requests completion
+of modules in Introspection and RuntimeContext. Existing ModuleInfo/AssemblyInfo
+contracts and context-owned discovery are the starting point, not a new parallel
+model. The next review must establish which module semantics are already realized
+and which are still missing in interpreter and AOT consumers.
+
+Compare .NET Assembly/Module ownership and metadata scope with Raven's source
+`module` declarations and neoCLR's runtime module identities. Do not assume these
+are interchangeable. Proposed review scope: stable descriptor identity within a
+context, assembly/module/type ownership, module-level function discovery, attributes,
+and traversal from RuntimeContext, including retention and unsupported-query behavior
+under AOT. Loading and multiple contexts are not implicitly added to this task.
+Exact API additions and validation cases remain to be selected after the earlier
+milestones; this records direction, not implementation or a settled new contract.

@@ -7382,3 +7382,33 @@ are integrated and qualified together; compiler source support is not bundle sup
 
 Compiler evidence: Raven `51da30ea7`, shared integration branch
 `codex/source-object-metadata-resolution`; [bootstrap revision/hash and tests](custom-attributes.md#raven-import-and-usage-binding-2026-10-10).
+
+
+## Native source annotations (2026-10-10)
+
+Raven's native adapter now emits ordinary bound source attributes on supported
+type/member/parameter declarations. Native metadata owns constructor identity and
+typed fixed/named values; temporary CLI projection retains the equivalent constructor
+references and blobs. No new Runtime Contract switch is needed. The explicit native
+portable-planning capability admits annotated interfaces without changing other
+adapters' defaults. Raven owns binding, target diagnostics and emission; neoCLR owns
+metadata validation and introspection. A future native core removes the remaining
+explicit primitive CLI bootstrap, not the semantic identity of attributes.
+
+Supported payloads are String/Int32/Boolean, Int32 enum fixed values and primitive
+named fields/properties. Unhandled source targets, wider/type/array payloads, named
+enums and inherited named members reject rather than disappear. A co-owned source
+Attribute hierarchy passes; deriving from a concrete Attribute in another native
+assembly remains a type-planning gap. Synthesized markers retain their own encoders.
+The general property/backing-field correction is independently tested for ordinary
+.NET and does not represent a target-specific semantic divergence.
+
+Native source round trips, fail-without-output cases, flags regression and 21 ordinary
+AttributeUsage tests pass. The development bundle still uses Raven 494dede84; no
+bundle refresh or compiler-produced AOT qualification is claimed. The independent
+metadata-authored AOT gate at neoCLR 6ae823c0 now passes macOS ARM64 and Windows x64.
+See [attribute scope](custom-attributes.md#raven-source-annotation-emission-development-2026-10-10).
+
+Compiler evidence: Raven `dfaa76145` on shared integration branch
+`codex/source-object-metadata-resolution`, using the explicit Core.dll bootstrap
+SHA-256 `132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f`.

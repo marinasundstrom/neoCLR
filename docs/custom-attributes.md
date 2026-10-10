@@ -269,3 +269,39 @@ This is native runtime support, not native source annotation emission. The fixtu
 attaches annotations after compiling its Raven consumer; the bundled compiler
 remains unchanged. Guest named-data inspection and automatic discovery remain open.
 See the gate's retention design, tradeoffs, provenance and exact bounds.
+
+
+## Raven source annotation emission (development 2026-10-10)
+
+The shared Raven integration line now emits bound source annotations for supported
+types, interfaces/enums, functions, constructors, methods, fields, properties/accessors
+and parameters. String (including null), Int32, Boolean and Int32 enum fixed values
+and primitive named field/property values round-trip through native metadata. Local
+constructors in a co-owned Attribute hierarchy and imported constructor identities
+are both covered. Unsupported targets or payloads diagnose before publishing output.
+Ordinary property attributes no longer leak onto backing fields; explicit field
+attributes and field-only Raven storage retain their intended targets.
+
+Validation uses the native attribute probe and 21 ordinary .NET AttributeUsage tests;
+flags marker regression also passes. This is compiler-source support, not yet an
+updated toolchain bundle: the bundle remains at Raven 494dede84. No Runtime Contract
+configuration changes. See [bridge ownership and bounds](raven-cli-bridge.md#native-source-annotations-2026-10-10).
+
+The metadata-authored AOT gate now passes on macOS ARM64 and Windows x64. The
+[Windows evidence](experiments/native-attributes/windows-validation.json) records nine
+verified input hashes (with Windows CRLF checkout normalization where applicable),
+matching native/interpreter success, interpreter live=0, KERNEL32-only native
+imports and explicit failure without retention. Two build executables were not
+archived for independent rehashing. This gate still attaches attributes after source
+compilation; compiler-produced annotation AOT qualification is a separate next step.
+
+Before returning to TestAttribute discovery, complete separate-library Attribute
+inheritance, runtime usage declarations and guest named-data support. Arrays/type
+constants, wider primitives, inherited named members, named enum arguments and
+assembly/module/return/generic-parameter targets remain gaps. Test discovery needs
+retention and invocation adapters as well as data. The author-selected follow-up
+after that framework is completion of modules in Introspection and RuntimeContext.
+
+Compiler evidence: Raven `dfaa76145` on shared integration branch
+`codex/source-object-metadata-resolution`, using the explicit Core.dll bootstrap
+SHA-256 `132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f`.

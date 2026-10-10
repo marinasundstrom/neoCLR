@@ -1,7 +1,7 @@
 # Retained native custom attributes — development 2026-10-10
 
 The public Raven `GetCustomAttributesData()` API now executes in a standalone
-macOS ARM64 binary as well as the interpreter. It uses the same metadata-only
+macOS ARM64 or Windows x64 binary as well as the interpreter. It uses the same metadata-only
 recipes, allocating ordinary traced descriptors. Inspection never instantiates the
 attribute or invokes its constructor. This follows the existing
 [.NET CustomAttributeData comparison](../../attribute-introspection.md#comparison-and-tradeoffs-primary-sources-reviewed-2026-09-27).
@@ -27,7 +27,8 @@ python3 docs/experiments/native-attributes/verify.py \
 
 Choose a fresh output directory. Windows x64 uses the same script under an MSVC
 x64 environment, with `.exe` tool paths; the collections workflow now runs this
-gate. Windows execution remains unqualified until its run/artifacts are checked.
+gate. [Windows qualification](windows-validation.json) passes at 6ae823c0; available
+input hashes and archived output/dependency checks are verified.
 Windows ARM64 is not qualified by this gate.
 
 ## Retention and representation
@@ -65,7 +66,9 @@ retained recipe. Type/array constants, wider primitives, general generic reflect
 assembly/module discovery, automatic test discovery and attribute instantiation are
 not added. Field, constructor and other member annotations reuse the same token lookup,
 but this gate does not add general native field/method/constructor enumeration.
-Next qualify compiler-produced source annotations and the TestAttribute discovery adapter.
+Compiler source annotation round trips now pass independently on the shared Raven
+integration line; the bundled compiler is unchanged. Next qualify compiler-produced
+AOT annotations and the TestAttribute discovery adapter.
 
 See [validation.json](validation.json) for tested artifact hashes and cases. Detailed
 command logs, native selection reports and binaries are generated in the output directory.

@@ -11,13 +11,24 @@ Host metadata authoring/introspection now preserves callable, field, property an
 parameter annotations alongside types. Int32 enum fixed arguments and primitive named
 arguments now round-trip through host metadata and native/CLI projection. Raven's
 native importer now exposes these attributes and applies existing usage target and
-multiplicity checks across assemblies. Next implement native source annotation
-emission, runtime usage declarations and guest named-data inspection, then TestAttribute discovery without changing execution
-contracts. Explicit attribute-data retention now passes a standalone macOS ARM64
+multiplicity checks across assemblies. Native source annotation emission now passes
+focused compiler round trips on the shared Raven integration line; the packaged
+compiler remains unchanged. Next complete separate-library Attribute inheritance,
+runtime usage declarations and guest named-data inspection, then TestAttribute
+discovery without changing execution contracts. Explicit attribute-data retention now passes a standalone macOS ARM64
 [public Raven consumer](experiments/native-attributes/README.md), using metadata-authored
-annotations and no user constructor roots. Windows qualification and callable adapters
-remain open before claiming native automatic discovery. This supports the native/collection milestone; it does not
+annotations and no user constructor roots. The matching [Windows x64 gate](experiments/native-attributes/windows-validation.json)
+passes at 6ae823c0, with available input hashes checked. Compiler-produced AOT
+annotations and callable adapters remain open before claiming native automatic discovery. This supports the native/collection milestone; it does not
 permanently reprioritize the rest of the platform roadmap.
+
+**Author follow-up (2026-10-10):** after attributes support and the testing framework,
+complete modules as part of the Introspection and RuntimeContext model. Build on
+the existing ModuleInfo/AssemblyInfo contracts; audit module identity, ownership,
+module-level function discovery and context traversal across interpreter and AOT.
+Compare .NET metadata modules with Raven source modules explicitly before choosing
+any additional API. This is the next sequenced task, not a claim of completed support;
+see [the module follow-up](introspection-design.md#module-model-completion--author-direction-2026-10-10).
 
 ## Active direction: usable native compilation (2026-10-09)
 

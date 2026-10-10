@@ -28,13 +28,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   metadata-only bootstrap constructor validation. Raven's native importer now
   preserves attributes on supported declaration kinds and applies existing usage
   target/multiplicity policies across assemblies; malformed data produces RAVT003.
-  Native source attribute emission remains the next compiler gate. Add explicit
+  Native source annotation emission now passes focused shared-compiler round trips;
+  the development bundle has not yet been refreshed. Add explicit
   AOT custom-attribute retention (private reflection-roots schema 3), preserving
   source tokens and materializing shared metadata recipes without rooting user
   constructors. Fixed/enum arguments, nulls, repeats and member/parameter targets
   pass a standalone macOS ARM64 Raven consumer with interpreter parity; fix the
   source ConstructorInfo snapshot layout. Wire the same Windows x64 gate; Windows
-  qualification, source annotation emission and guest named arguments remain open.
+  x64 qualification now passes at 6ae823c0, with nine available input hashes checked
+  and archived native/interpreter output verified. Compiler-produced AOT annotations,
+  separate-library Attribute inheritance and guest named arguments remain open.
+  Record the author-selected sequence: finish attributes, continue the testing
+  framework, then complete modules in Introspection and RuntimeContext.
 
 - Add a Raven runtime-library test runner with module-level cases, Result-based
   Assert.Equal/True, stable IDs, structured pass/fail/skip reports and registration

@@ -206,13 +206,13 @@ still need normal bridge admission. Runtime null constants are supported; Raven'
 nullable-string attribute constructor emission remains a known source limitation.
 There is no `GetCustomAttributes` instantiation API or inheritance option yet.
 
-Development AOT now supports explicit custom-attribute data retention on macOS ARM64,
+Development AOT now supports explicit custom-attribute data retention on macOS ARM64 and Windows x64,
 using the same descriptor/argument contracts. Int32-backed enum arguments retain
 nominal ArgumentType and expose their underlying boxed Int32 Value. Private reflection
 roots select metadata independently from invocation; unretained owners fault, while
 retained unannotated targets return empty sequences. Named guest arguments remain
 unsupported. This is a metadata-authored native gate, not compiler source-annotation
-support or general discovery; Windows qualification is pending.
+integration or general discovery. Focused compiler-source emission checks pass independently.
 [Native validation and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-attributes/README.md).
 
 Cache validated descriptions during startup for repeated mappings. Dynamic union
