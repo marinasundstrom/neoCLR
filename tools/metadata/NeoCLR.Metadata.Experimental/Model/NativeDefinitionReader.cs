@@ -108,8 +108,11 @@ public sealed partial class NativeAssemblyDefinition
             .ToDictionary(pair => pair.Key, pair => pair.Value.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray());
         var parameterAttributes = methods.Select(method => method.ParameterAttributes.ToDictionary(p => p.Key,
             p => p.Value.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray())).ToArray();
+        var manifestAttributes = assemblyAttributes.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray();
         var explicitRows = methods.Select(m => m.ExplicitInterfaces.Select(e => (Owner: Copy(e.Owner), e.Name)).ToArray()).ToArray();
         var result = AssemblyDefinition.NativeDeclarations(Identity, typeRows, fieldRows.ToArray(), rows, propertyRows, references, externalRows.ToArray(), image, entryPointToken);
+        result.SetLoadedAttributes(manifestAttributes.Select(a =>
+            new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments.Select(argument => new CustomAttributeArgument(argument.Type.Materialize(result.MainModule), argument.Value)), a.Named)));
         for (int i = 0; i < types.Length; i++)
             result.MainModule.GetTypeDefinition(0x02000002u + (uint)i)!.SetLoadedAttributes(attributes[i].Select(a =>
                 new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments.Select(argument => new CustomAttributeArgument(argument.Type.Materialize(result.MainModule), argument.Value)), a.Named)));

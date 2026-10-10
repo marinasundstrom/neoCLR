@@ -136,6 +136,9 @@ pub(crate) fn validate_uses(linked: &Module, source: &Module) -> Result<(), Faul
     if source.references.is_none() {
         return Ok(());
     }
+    for assembly in &source.assemblies {
+        check_attributes(linked, source, &assembly.custom_attributes)?;
+    }
     if !source.entry.is_empty() {
         let entry = linked
             .functions

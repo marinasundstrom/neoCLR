@@ -1634,4 +1634,6 @@ The C# host-only `AssemblyDefinition.CustomAttributes` and
 [manual reference](experimental-metadata.md#assembly-custom-attributes-development-2026-10-10).
 They remain outside guest RavenDoc type selection under the existing host API exclusion;
 no guest API signature or runtime reference snapshot changes. The snapshot check passes.
-Native assembly retention and guest assembly attribute introspection remain pending.
+Native assembly retention and native-to-CLI reference projection now preserve these
+annotations. Guest assembly attribute introspection and native friend enforcement remain
+pending. No guest reference snapshot changes are required.

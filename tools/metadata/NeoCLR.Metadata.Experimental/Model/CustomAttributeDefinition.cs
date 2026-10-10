@@ -272,7 +272,7 @@ public sealed partial class AssemblyDefinition
     private IList<CustomAttributeDefinition>? customAttributes;
     /// <summary>Gets assembly-level custom attributes; physical-module attributes are separate.</summary>
     /// <remarks>Authored lists accept at most 256 output-module-owned attributes. Loaded snapshots
-    /// are read-only. Reading data never executes constructors. Native retention is not yet supported.</remarks>
+    /// are read-only. Reading data never executes constructors. CLI and native snapshots retain these annotations.</remarks>
     public IList<CustomAttributeDefinition> CustomAttributes => customAttributes ??= Producer is null
         ? Array.AsReadOnly(Array.Empty<CustomAttributeDefinition>())
         : new DefinitionCollection<CustomAttributeDefinition>([], attribute =>

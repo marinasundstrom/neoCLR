@@ -3,7 +3,7 @@ using NeoCLR.Metadata.Experimental.Model;
 
 static class AssemblyAttributeChecks
 {
-    public static void Run()
+    public static void Run(string? output = null)
     {
         var host = typeof(object).Assembly.GetName();
         var core = new AssemblyIdentity(host.Name!, host.Version!, "", Convert.ToHexString(host.GetPublicKeyToken()!));
@@ -19,7 +19,34 @@ static class AssemblyAttributeChecks
         Reject<NotSupportedException>(() => snapshot.CustomAttributes.Clear());
         var foreign = new AssemblyBuilder(new("Other", new(1, 0, 0, 0)), core);
         Reject<ArgumentException>(() => foreign.AddCustomAttribute(graph.Definition.CustomAttributes[0]));
-        Reject<NotSupportedException>(() => graph.WriteNativeAssembly());
+        var nativeCore = new AssemblyIdentity("Core", new(1, 0, 0, 0));
+        var nativeGraph = new AssemblyBuilder(new("NativeAnnotations", new(1, 0, 0, 0)), nativeCore);
+        var nativeMarker = nativeGraph.AddClass("System.Runtime.CompilerServices", "InternalsVisibleToAttribute");
+        var nativeConstructor = nativeMarker.AddConstructor(new MethodSignature(PrimitiveType.Void, [PrimitiveType.String]));
+        nativeConstructor.GetILGenerator().Fail("attribute constructor must not run during loading");
+        foreach (var friend in new[] { "FirstFriend", "SecondFriend" })
+            nativeGraph.AddCustomAttribute(new(nativeConstructor.Definition, [new(PrimitiveType.String, friend)]));
+        var main = nativeGraph.AddFunction("Main", new(PrimitiveType.Int32, []));
+        main.LoadConstant(42); main.Return(); nativeGraph.EntryPoint = main;
+        var native = nativeGraph.WriteNativeAssembly();
+        if (output is not null) File.WriteAllBytes(output, NeoCLR.Metadata.Experimental.NativeModuleContainer.WriteLibraryBinary(native));
+        foreach (var bytes in new[] { NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(native, nativeCore), NeoCLR.Metadata.Experimental.NativeModuleContainer.WriteLibraryBinary(native) })
+        {
+            var retained = AssemblyDefinition.ReadNativeAssembly(bytes);
+            Check(retained.CustomAttributes.Select(a => (string)a.GetArguments().Single().Value!).SequenceEqual(new[] { "FirstFriend", "SecondFriend" }), "native assembly grants lost");
+            Reject<NotSupportedException>(() => retained.CustomAttributes.Clear());
+            Check(retained.Write().SequenceEqual(bytes), "native loaded snapshot changed");
+        }
+        var projected = AssemblyDefinition.ReadAssembly(NativeAssemblyDefinition.ReadAssembly(native).CreateReferenceAssembly(nativeCore), false);
+        Check(projected.CustomAttributes.Where(a => a.AttributeType.Name == "InternalsVisibleToAttribute")
+            .Select(a => (string)a.GetArguments().Single().Value!).SequenceEqual(new[] { "FirstFriend", "SecondFriend" }), "native CLI projection lost assembly grants");
+        var malformed = System.Text.Json.Nodes.JsonNode.Parse(native)!;
+        malformed["assemblies"]![0]!["custom_attributes"]![0]!["target_token"] = 1;
+        Reject<InvalidDataException>(() => NativeAssemblyDefinition.ReadAssembly(System.Text.Encoding.UTF8.GetBytes(malformed.ToJsonString())));
+        malformed = System.Text.Json.Nodes.JsonNode.Parse(native)!;
+        var annotations = malformed["assemblies"]![0]!["custom_attributes"]!.AsArray();
+        while (annotations.Count <= 256) annotations.Add(annotations[0]!.DeepClone());
+        Reject<InvalidDataException>(() => NativeAssemblyDefinition.ReadAssembly(System.Text.Encoding.UTF8.GetBytes(malformed.ToJsonString())));
 
         var context = new AssemblyLoadContext("assembly-attribute-check", isCollectible: true);
         try
@@ -41,7 +68,7 @@ static class AssemblyAttributeChecks
             graph.AddCustomAttribute(new(reference, [new(PrimitiveType.String, "RepeatedFriend")]));
         Check(AssemblyDefinition.ReadAssembly(graph.Write(), false).CustomAttributes.Count == 256, "assembly attribute limit boundary failed");
         Reject<InvalidDataException>(() => graph.AddCustomAttribute(new(reference, [new(PrimitiveType.String, "Overflow")])));
-        Console.WriteLine("PASS assembly attribute CLI authoring/readback, repeated grants, CLR comparison, read-only snapshots, ownership, bounds and native rejection");
+        Console.WriteLine("PASS assembly attribute CLI authoring/readback, repeated grants, CLR comparison, read-only snapshots, ownership, bounds and native retention");
     }
 
     private static void Check(bool condition, string message)

@@ -286,8 +286,9 @@ are validated together, rather than committing a broken intermediate library.
 
 
 The metadata prerequisite now preserves CLI assembly attributes in the host model,
-including repeated friend grants. Native graphs carrying them fail explicitly until
-native manifest retention is implemented. This does not change Utf8 visibility yet.
+including repeated friend grants. The next slice adds native manifest retention,
+readback and CLI reference projection, with loader and dependency checks. This
+does not change Utf8 visibility or native friend access yet.
 The author's resolution-cost requirement is tracked separately: cache granted and
 refused friend access per immutable assembly pair, preserving public/same-assembly
 fast paths and avoiding repeated parsing or allocations during member lookup.

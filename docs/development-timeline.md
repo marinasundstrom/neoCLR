@@ -14051,3 +14051,11 @@ claim completion of in-process test discovery.
   CLR inspection, immutable loaded snapshots, ownership and count limits. Native
   emission rejects annotated graphs rather than dropping them. Native manifest
   retention, import/access enforcement and Utf8 internalization remain open.
+
+
+- **Subsequent retention outcome (2026-10-10):** native manifests now preserve assembly
+  annotations through native snapshots and CLI projection. Twelve runtime attribute
+  tests and host assembly/member probes pass. A host-emitted NEOX fixture runs and
+  returns 42 without invoking its deliberately faulting attribute constructor. The
+  remaining friend-access work is native compiler forwarding/exposure, import/runtime
+  enforcement and full-public-key identity; AOT friend access is not yet qualified.

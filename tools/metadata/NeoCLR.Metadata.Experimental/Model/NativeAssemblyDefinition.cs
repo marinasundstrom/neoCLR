@@ -37,6 +37,7 @@ public sealed partial class NativeAssemblyDefinition
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
     private AssemblyConstantDefinition[] assemblyConstants = [];
+    private AttributeRow[] assemblyAttributes = [];
     private string[]? declarationModuleNames;
     private readonly uint entryPointToken;
     private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, PropertyRow[] properties, AssemblyIdentity[] references, HashSet<string> valueTypeReferences, Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases, uint entryPointToken)
@@ -130,6 +131,7 @@ public sealed partial class NativeAssemblyDefinition
                     constants.Add(new(ns!, name, value, visibility));
                 }
             }
+            if (manifest.TryGetProperty("custom_attributes", out _)) manifestFields.Add("custom_attributes");
             Shape(manifest, manifestFields.ToArray());
             var identityText = Text(manifest, "full_name");
             var identity = ReadIdentity(identityText);
@@ -562,6 +564,12 @@ public sealed partial class NativeAssemblyDefinition
                     }
                 return new(owner, decoded) { Named = named.ToArray() };
             }
+            var assemblyAttributes = manifest.TryGetProperty("custom_attributes", out _)
+                ? Array(manifest, "custom_attributes", 256).Select(attribute =>
+                {
+                    Require(!attribute.TryGetProperty("target_token", out _), "assembly attribute cannot target a member token");
+                    return ReadAttribute(attribute);
+                }).ToArray() : [];
             foreach (var type in types)
                 foreach (var group in type.RawAttributes.GroupBy(a => a.TryGetProperty("target_token", out var token) ? token.GetUInt32() : 0u))
                 {
@@ -914,7 +922,7 @@ public sealed partial class NativeAssemblyDefinition
                     .Concat(constants.Select(constant => constant.Namespace));
                 Require(owners.All(name => declarationModuleNames.Contains(name, StringComparer.Ordinal)), "missing declaration module owner");
             }
-            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences, nativeTypeAliases, entryPointToken) { assemblyConstants = constants.ToArray(), declarationModuleNames = declarationModuleNames };
+            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences, nativeTypeAliases, entryPointToken) { assemblyConstants = constants.ToArray(), assemblyAttributes = assemblyAttributes, declarationModuleNames = declarationModuleNames };
         }
         catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException or OverflowException)
         { throw new InvalidDataException("invalid native metadata", error); }
@@ -1028,6 +1036,13 @@ public sealed partial class NativeAssemblyDefinition
         }
         foreach (var property in properties)
             owners[property.Owner].AddProperty(property.Name, Remap(property.Type), property.Getter < 0 ? null : projectedMethods[property.Getter], property.Setter < 0 ? null : projectedMethods[property.Setter], property.IsInitOnly);
+        foreach (var attribute in assemblyAttributes)
+        {
+            var owner = Remap(attribute.Owner);
+            var reference = owner.ClassType is { } local ? local.Definition.ToReference()
+                : graph.Definition.MainModule.ImportReference(owner.ImportedType!.AssemblyIdentity, owner.ImportedType.Namespace, owner.ImportedType.Name);
+            graph.AddCustomAttribute(new(reference, attribute.Arguments.Select(a => new CustomAttributeArgument(Remap(a.Type), a.Value)), attribute.Named));
+        }
         for (int i = 0; i < types.Length; i++)
             foreach (var attribute in types[i].Attributes)
             {

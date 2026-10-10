@@ -10,8 +10,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Retain assembly custom attributes in the host metadata model and CLI writer/reader,
   including ordered repeated InternalsVisibleTo grants, bounded ownership-checked
-  authoring and read-only snapshots. Native writing explicitly rejects assembly
-  annotations until manifest retention is implemented. Add CLR-comparison and
+  authoring and read-only snapshots. Extend retention to native manifests, PE/#Neo
+  and NEOX readback and CLI reference projection. Validate annotation constructor
+  scopes/dependencies, count limits and absence of member target tokens without
+  executing constructors. Native friend authorization remains pending. Add CLR-comparison and
   metadata-only regression checks. Guard imported base-constructor dispatch when
   its nominal declaring reference is absent, fixing a nullable build error.
 

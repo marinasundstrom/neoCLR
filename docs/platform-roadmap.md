@@ -386,11 +386,12 @@ controlled implementation sharing. The [follow-up design](design/encoding-api-re
 records the cross-assembly callers, .NET comparison and required compiler/runtime/AOT
 access checks; neither runtime API change is complete yet. The general Raven
 source/CLI friend-access fix is now on main at `52dc10011`, with 56 focused tests
-passing independently of the native integration branch. Native assembly grant
-retention, import admission and runtime/AOT enforcement remain the next dependency.
-The host metadata model now preserves CLI assembly annotations; native writing rejects
-annotated graphs explicitly until retention is supported. Friend lookup performance
-is an author requirement: retain existing fast paths and cache repeated pair decisions.
+passing independently of the native integration branch. Native compiler forwarding,
+import admission and runtime/AOT friend enforcement remain the next dependency.
+The host metadata model and native manifests now preserve assembly annotations through
+CLI/native snapshots and CLI reference projection. Loader checks validate constructor
+shape, member-target rejection, limits and declared dependencies without execution.
+Friend lookup performance is an author requirement: retain existing fast paths and cache repeated pair decisions.
 
 A separate native gap observed during implementation: String.GetScalars exposes an
 immutable UInt32 array that current native specialization rejects. This parser uses

@@ -224,3 +224,91 @@ ret
     bad["types"][0].as_object_mut().unwrap().remove("enum_info");
     assert!(load(&bad.to_string()).is_err());
 }
+
+#[test]
+fn assembly_attributes_roundtrip_without_execution() {
+    let mut module = assemble(include_str!("../examples/attributes.neoil")).unwrap();
+    let annotation = module.types[1].custom_attributes[0].clone();
+    let assembly = module
+        .assemblies
+        .iter_mut()
+        .find(|a| a.name == "Attributes")
+        .unwrap();
+    assembly.custom_attributes = vec![annotation.clone(), annotation];
+    let json = serde_json::to_string(&module).unwrap();
+    let loaded = load(&json).unwrap();
+    let retained = loaded
+        .assemblies
+        .iter()
+        .find(|a| a.name == "Attributes")
+        .unwrap();
+    assert_eq!(retained.custom_attributes.len(), 2);
+    assert_eq!(retained.custom_attributes[0], retained.custom_attributes[1]);
+    assert_eq!(
+        run(&loaded, Limits::default()).unwrap().output,
+        ["Attribute metadata passed"]
+    );
+}
+
+#[test]
+fn assembly_attributes_reject_bad_targets_constructors_and_excess_counts() {
+    let module = assemble(include_str!("../examples/attributes.neoil")).unwrap();
+    let annotation = module.types[1].custom_attributes[0].clone();
+    for mode in 0..3 {
+        let mut changed = module.clone();
+        let assembly = changed
+            .assemblies
+            .iter_mut()
+            .find(|a| a.name == "Attributes")
+            .unwrap();
+        assembly.custom_attributes = vec![annotation.clone()];
+        match mode {
+            0 => assembly.custom_attributes[0].target_token = Some(1),
+            1 => assembly.custom_attributes[0].constructor.instance = false,
+            _ => assembly.custom_attributes = vec![annotation.clone(); 257],
+        }
+        assert!(
+            load(&serde_json::to_string(&changed).unwrap()).is_err(),
+            "mode {mode}"
+        );
+    }
+    let mut boundary = module;
+    boundary
+        .assemblies
+        .iter_mut()
+        .find(|a| a.name == "Attributes")
+        .unwrap()
+        .custom_attributes = vec![annotation; 256];
+    assert!(load(&serde_json::to_string(&boundary).unwrap()).is_ok());
+}
+
+#[test]
+fn assembly_attribute_dependencies_are_checked_during_linking() {
+    let helpers = ".module Markers\n.references ()\n.type Marker\n.method instance .ctor() -> Void\nfault \"must not execute\"\n.end\n.end\n.type Annotated\n.custom instance Marker::.ctor()\n.end";
+    let app = ".module App\n.references (Markers)\n.entry Main\n.function Main() -> Int32\nldc.i4 42\nret\n.end";
+    let mut modules = neoclr::assembler::assemble_modules(&[app, helpers]).unwrap();
+    let annotation = modules[1].types[1].custom_attributes[0].clone();
+    modules[0]
+        .assemblies
+        .iter_mut()
+        .find(|a| a.name == "App")
+        .unwrap()
+        .custom_attributes
+        .push(annotation);
+    let helper_json = serde_json::to_string(&modules[1]).unwrap();
+    let app_json = serde_json::to_string(&modules[0]).unwrap();
+    let loaded = neoclr::load_modules(&[&app_json, &helper_json]).unwrap();
+    let program = neoclr::LoadedProgram::with_modules(
+        &loaded[0],
+        neoclr::library::system().unwrap(),
+        &loaded[1..],
+    )
+    .unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        neoclr::Value::Int32(42)
+    );
+    modules[0].references = Some(vec![]);
+    let undeclared = serde_json::to_string(&modules[0]).unwrap();
+    assert!(neoclr::load_modules(&[&undeclared, &helper_json]).is_err());
+}

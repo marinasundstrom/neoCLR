@@ -7963,3 +7963,23 @@ public/same-assembly fast paths are unchanged. All 58 focused main tests pass; t
 two new cases each measure zero allocations across 100,000 warmed checks. This is
 not a whole-compiler throughput claim. Native access checks should follow the same
 principle when implemented: resolve metadata once, not repeatedly per member access.
+
+
+### Native assembly annotation retention (2026-10-10)
+
+The host native writer now emits optional `assemblies[].custom_attributes`, using the
+existing bounded constructor/fixed/named argument schema. Missing fields mean an empty
+list, preserving existing artifacts. Assembly annotations cannot carry member target
+tokens and are limited to 256 per assembly. Native JSON, PE/#Neo and standalone NEOX
+readers retain order and immutable data; CLI reference projection recreates assembly
+attributes. This replaces the prior writer rejection with supported retention. Runtime
+normalization includes annotation constructor types, and explicit dependency checking
+includes their references. Constructors do not execute while inspecting/loading data.
+
+neoCLR owns these format/model/loader changes. Raven still needs source assembly
+attribute forwarding and native symbol exposure, while native import/runtime access
+policy still needs cached friend decisions. No Runtime Contract option is added. The
+existing CLI assembly-attribute representation remains a temporary compiler-reference
+transport; native manifest data is authoritative. Signed dependency import/full-public-key
+native identity remains a separate gap; strings containing keys do not authorize access.
+This slice adds no guest AssemblyInfo attribute API or AOT reflection roots.

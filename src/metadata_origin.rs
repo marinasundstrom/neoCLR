@@ -6,6 +6,9 @@ use std::collections::HashSet;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct AssemblyMetadata {
+    /// Assembly-level annotations; never executed by metadata loading.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub custom_attributes: Vec<crate::metadata::CustomAttribute>,
     /// Logical declaration containers; None denotes legacy namespace projection.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub declaration_modules: Option<DeclarationModules>,

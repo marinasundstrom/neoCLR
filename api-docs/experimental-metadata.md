@@ -8217,7 +8217,11 @@ assembly.AddCustomAttribute(new CustomAttributeDefinition(marker,
 ```
 
 This retains metadata; it does not add friend access enforcement to the native runtime
-or general AttributeUsage validation to the authoring library. Native writing of a graph
-with assembly attributes throws `NotSupportedException` until its manifest can retain
-them, instead of silently dropping annotations. Existing native member-attribute support
-is unchanged. CLI reference emission uses the same assembly-attribute writer.
+or general AttributeUsage validation to the authoring library. Native writing now records
+`assemblies[].custom_attributes` using the existing constructor/fixed/named argument
+schema. Native JSON, PE/#Neo and standalone NEOX readback, and native-to-CLI reference
+projection, preserve ordered assembly annotations. The native reader rejects member
+target tokens and more than 256 annotations per assembly. Existing native member
+attribute support is unchanged. CLI reference emission uses the same assembly writer.
+Native signed dependency import remains restricted; retaining a friend string containing
+a public key does not implement full-key native assembly identity or grant access.

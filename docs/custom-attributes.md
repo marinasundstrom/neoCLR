@@ -390,3 +390,30 @@ result descriptors. The native/interpreted consumer passes with rebuilt librarie
 including nominal member/parameter attributes, no-user-constructor retention and
 unretained-type rejection. [Evidence](experiments/native-attributes/shared-provider-validation.json).
 Windows rerun status must be checked separately.
+
+
+## Assembly annotations (2026-10-10 development)
+
+Host metadata now carries assembly annotations through CLI and native snapshots and
+native-to-CLI reference projection. This follows .NET's distinct assembly target; logical
+namespace modules and physical CLI modules do not acquire assembly annotations.
+The native manifest's optional `custom_attributes` list reuses existing attribute data
+and stores at most 256 ordered entries. Member target tokens are invalid there. Native
+loading normalizes constructor scopes, validates the same argument/constructor shapes
+as other attributes and checks explicit dependency admission, without executing code.
+
+This is retention, not friend access authorization. Raven native symbol/emission adapters,
+full-public-key identity, cached runtime/import enforcement, guest assembly attribute
+queries and AOT retention roots are follow-ups. Existing missing fields still mean no
+annotations; older readers reject the new field rather than silently dropping grants.
+See the [host API contract](../api-docs/experimental-metadata.md#assembly-custom-attributes-development-2026-10-10).
+
+
+Focused validation: `cargo test --test attributes` passes all 12 cases, including
+ordered assembly annotations, 256/257 boundaries, malformed constructors/target tokens
+and explicit cross-module dependency rejection. The host `--assembly-attributes` probe
+passes CLI/native round trips and read-only/ownership checks; `--member-attributes`
+continues to pass. Its optional output path emits a NEOX executable whose Main returns
+42 while its attribute constructor deliberately faults: running it through neoCLR returns
+`Int32(42)` without invoking the constructor. API reference snapshot checking passes.
+These checks qualify metadata and interpreted loading, not compiled AOT friend access.

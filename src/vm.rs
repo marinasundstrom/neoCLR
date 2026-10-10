@@ -1334,6 +1334,19 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             }
         }
     }
+    for assembly in &module.assemblies {
+        if assembly.custom_attributes.len() > 256 {
+            return Err(Fault::new("too many assembly attributes"));
+        }
+        for attribute in &assembly.custom_attributes {
+            if attribute.target_token.is_some() {
+                return Err(Fault::new(
+                    "assembly attribute cannot target a member token",
+                ));
+            }
+            validate_attribute(module, attribute)?;
+        }
+    }
     for (attributes, origin) in module
         .types
         .iter()

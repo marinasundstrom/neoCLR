@@ -25,8 +25,6 @@ public sealed partial class AssemblyBuilder
 
     private byte[] WriteNativeCore(int maxImageSize)
     {
-        if (Definition.CustomAttributes.Count != 0)
-            throw new NotSupportedException("native assembly-level custom attribute retention is not implemented");
         var methods = ValidateGraph();
         if (externalGrapheme is not null && types.Any(t => t.NativeGrapheme))
             throw new InvalidDataException("native Char cannot have both a local and external owner");
@@ -63,7 +61,8 @@ public sealed partial class AssemblyBuilder
             }
         var memberAttributes = methods.SelectMany(method => method.Definition.CustomAttributes.Concat(method.Definition.ParameterAttributes.SelectMany(p => p.Value)))
             .Concat(types.SelectMany(type => type.MetadataFields.SelectMany(field => field.Definition.CustomAttributes)))
-            .Concat(types.SelectMany(type => type.Properties.SelectMany(property => property.Definition.CustomAttributes)));
+            .Concat(types.SelectMany(type => type.Properties.SelectMany(property => property.Definition.CustomAttributes)))
+            .Concat(Definition.CustomAttributes);
         foreach (var attribute in memberAttributes)
         {
             attribute.ValidateContract(Definition.MainModule);
@@ -388,6 +387,8 @@ public sealed partial class AssemblyBuilder
             bits = c.Bits,
             visibility = c.Visibility.ToString().ToLowerInvariant()
         }).ToArray();
+        if (Definition.CustomAttributes.Count != 0)
+            manifest["custom_attributes"] = Definition.CustomAttributes.Select(a => Attribute(a)).ToArray();
         if (importedValues.Length != 0) manifest["value_type_references"] = importedValues;
         object[]? TypeAttributes(TypeBuilder type)
         {
