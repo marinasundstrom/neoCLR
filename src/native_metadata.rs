@@ -30,6 +30,17 @@ pub fn element_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
     )
 }
 
+/// Return a retained nominal type's logical module descriptor recipe.
+/// This unstable backend bridge adds no loading or callable execution capability.
+pub fn type_module(module: &Module, owner: &Type) -> Result<Value, Fault> {
+    crate::reflection::Query::Module.invoke_profile(
+        module,
+        &[Value::RuntimeTypeHandle(Box::new(crate::type_identity::describe_loaded(module, owner)?))],
+        &Limits::default(),
+        true,
+    )
+}
+
 /// Resolve a recipe handle to its source signature, without publishing native ordinals.
 pub fn handle_type(module: &Module, handle: &crate::TypeDescriptor) -> Result<Type, Fault> {
     crate::reflection::from_identity(module, &handle.identity)

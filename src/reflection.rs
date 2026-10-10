@@ -194,14 +194,7 @@ impl Query {
             Self::Module => {
                 let d = crate::metadata_tokens::definition(module, &handle.identity)
                     .ok_or_else(|| Fault::new("missing type module"))?;
-                crate::metadata_tokens::module_value(
-                    module,
-                    d.origin.as_ref(),
-                    &d.definition
-                        .as_ref()
-                        .ok_or_else(|| Fault::new("missing type identity"))?
-                        .module,
-                )
+                crate::assembly_info::type_module_value(module, d)
             }
             Self::Shape => Ok(Value::Boolean(match argument {
                 12 => matches!(handle.identity, TypeIdentity::Definition { .. }),
@@ -984,14 +977,7 @@ fn parameters(
                     if synthesized {
                         None
                     } else {
-                        Some(crate::metadata_tokens::module_value(
-                            module,
-                            f.origin.as_ref(),
-                            &f.definition
-                                .as_ref()
-                                .ok_or_else(|| Fault::new("missing method identity"))?
-                                .module,
-                        )?)
+                        Some(crate::assembly_info::function_module_value(module, f)?)
                     },
                 )?);
                 // Retain a compact owner key, not a member snapshot containing
@@ -1153,18 +1139,10 @@ pub(crate) fn bound_function(
         if type_contract(module) == "System.Introspection.TypeInfo"
             && has_method_metadata(module, target)
         {
-            let id = target
-                .definition
-                .as_ref()
-                .ok_or_else(|| Fault::new("missing target identity"))?;
             fields[3] = option(
                 module,
                 "System.Introspection.ModuleInfo",
-                Some(crate::metadata_tokens::module_value(
-                    module,
-                    target.origin.as_ref(),
-                    &id.module,
-                )?),
+                Some(crate::assembly_info::function_module_value(module, target)?),
             )?;
         }
     }

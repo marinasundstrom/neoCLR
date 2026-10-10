@@ -189,5 +189,5 @@
     "sha256": "e601e6ee3ffe4ef2af724ff05a60272fac0ad4564ad2675b95d1849466f4bb9e",
     "result": "Compiled with matching importer; host module/member ownership checks passed."
   },
-  "windows": "New logical-module slice not yet qualified. Prior TestAttribute gate 38049677871 succeeded at b903bc05; artifact hashes not independently checked."
+  "windows": "Action 38051487728 succeeded at 2e4d5b6d with Raven 1a0c4e627. Artifact hashes have not been independently checked. The subsequent guest module slice requires separate qualification."
 }

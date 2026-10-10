@@ -4,6 +4,26 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--module-retention", var moduleInput, var moduleRoots])
+{
+    var image = System.Text.Json.Nodes.JsonNode.Parse(NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.Read(File.ReadAllBytes(moduleInput)))!;
+    var types = image["types"]!.AsArray();
+    var selected = new System.Text.Json.Nodes.JsonArray();
+    foreach (var type in types)
+    {
+        if (type!["origin"]?["name"]?.GetValue<string>() is not ("Acme.CoffeeMaker.Machine" or "Acme.CoffeeMaker.Factories.Factory")) continue;
+        selected.Add(new System.Text.Json.Nodes.JsonObject {
+            ["definition"] = new System.Text.Json.Nodes.JsonObject {
+                ["module"] = image["name"]!.DeepClone(), ["revision"] = image["revision"]!.DeepClone(), ["index"] = types.IndexOf(type)
+            },
+            ["construct"] = false
+        });
+    }
+    if (selected.Count != 2) throw new Exception("Expected the two module-ownership fixture types");
+    File.WriteAllText(moduleRoots, new System.Text.Json.Nodes.JsonObject { ["schemaVersion"] = 1, ["types"] = selected }.ToJsonString());
+    return 0;
+}
+
 if (args is ["--aot-attribute-fixture", var attributeInput, var attributeImage, var attributeRoots])
 {
     NativeAttributeAotFixture.Write(attributeInput, attributeImage, attributeRoots); return 0;

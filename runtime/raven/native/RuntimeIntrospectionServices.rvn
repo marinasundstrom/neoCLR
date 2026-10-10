@@ -38,9 +38,6 @@ internal extension IntrospectionRuntimeServices for RuntimeServices {
         return neoCLR.Runtime.ModuleAssembly(arg0, arg1)
     }
 
-    static func ModuleMetadataToken(arg0: string, arg1: string) -> int {
-        return neoCLR.Runtime.ModuleMetadataToken(arg0, arg1)
-    }
 
     static func ModuleTypes(arg0: string, arg1: string) -> System.Introspection.TypeInfo[] {
         return neoCLR.Runtime.ModuleTypes(arg0, arg1)

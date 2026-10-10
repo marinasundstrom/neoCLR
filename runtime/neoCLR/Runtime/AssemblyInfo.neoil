@@ -19,9 +19,6 @@
 .function neoCLR.Runtime.ModuleAssembly(String arg0,String arg1) -> System.Introspection.AssemblyInfo
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.ModuleMetadataToken(String arg0,String arg1) -> Int32
-.methodimpl InternalCall
-.end
 .function neoCLR.Runtime.ModuleTypes(String arg0,String arg1) -> System.Introspection.TypeInfo[]
 .methodimpl InternalCall
 .end

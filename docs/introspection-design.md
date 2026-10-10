@@ -871,3 +871,23 @@ scope names remain explicit on type/method metadata descriptors. Raven's native
 importer now scans all logical modules in an assembly. Guest APIs still require
 migration; the host change and existing typed AOT registrations do not provide guest
 in-process module discovery.
+
+
+#### Guest logical ownership slice (2026-10-10)
+
+RuntimeContext.Current.ExecutingAssembly.GetModules now exposes the same flat logical
+names in the interpreter. Explicit empty modules survive; older images project only
+retained declarations. Type/member/parameter Module returns logical ownership, and
+nested types inherit the outermost owner's module. ModuleInfo.MetadataToken is
+removed; physical tokens remain separate definition metadata. Enumeration matches
+host ordinal ordering, without generating implicit parents.
+
+Native snapshot factories now support TypeModule for explicit retained nominal type
+roots, using the same recipe as the interpreter. Missing retention faults rather than
+inventing an empty module. No constructor or method execution is enabled by these
+roots. The [Raven consumer and recorded evidence](experiments/guest-modules/README.md)
+cover interpreter traversal and native ownership/negative retention. Native assembly
+traversal, Module.Assembly/GetTypes and module Object.Equals dispatch remain outside
+this slice. Module-level function enumeration and runtime test discovery remain next
+work. Legacy CLI bootstrap generation is separately blocked by its Map contract;
+source-built native libraries and the reference bridge are qualified.

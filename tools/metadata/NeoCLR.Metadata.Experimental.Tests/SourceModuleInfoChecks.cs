@@ -31,7 +31,7 @@ internal static class SourceModuleInfoChecks
         il.LoadTypeToken(local);
         il.Call(service);
         il.CallVirtual(name);
-        il.Emit(OpCode.Ldstr, "SourceModuleInfo.dll");
+        il.Emit(OpCode.Ldstr, "Example");
         il.Call(compare);
         il.LoadConstant(0); il.Emit(OpCode.Ceq);
         var failure = il.DefineLabel();

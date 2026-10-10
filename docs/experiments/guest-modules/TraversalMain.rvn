@@ -1,0 +1,51 @@
+module Acme.CoffeeMaker.Tests
+
+import System.*
+import System.Introspection.*
+import System.Runtime.*
+import System.Option.*
+import Acme.CoffeeMaker.*
+
+func Main() -> int {
+    let result = CheckOwnership()
+    if result != 0 {
+        return result
+    }
+    let assembly = RuntimeContext.Current.ExecutingAssembly
+    if assembly.Name != "CoffeePackage" {
+        return 10
+    }
+    let modules = assembly.GetModules()
+    if modules.Count != 4 {
+        return 11
+    }
+    if modules[0].Name != "Acme.CoffeeMaker" || modules[1].Name != "Acme.CoffeeMaker.Empty" || modules[2].Name != "Acme.CoffeeMaker.Factories" || modules[3].Name != "Acme.CoffeeMaker.Tests" {
+        return 12
+    }
+    for item in modules {
+        if !item.Assembly.Equals(assembly) {
+            return 13
+        }
+    }
+    if modules[0].GetTypes().Count != 1 || modules[1].GetTypes().Count != 0 || modules[2].GetTypes().Count != 1 || modules[3].GetTypes().Count != 0 {
+        return 14
+    }
+    let machine = (NominalTypeInfo)typeof(Machine)
+    let method = machine.GetMethods()[0]
+    if let Some(owner) = method.Module {
+        if !owner.Equals(modules[0]) {
+            return 15
+        }
+    } else {
+        return 16
+    }
+    if let Some(owner) = method.GetParameters()[0].Module {
+        if !owner.Equals(modules[0]) {
+            return 17
+        }
+    } else {
+        return 18
+    }
+    Console.WriteLine("Logical module traversal passed")
+    return 0
+}

@@ -137,7 +137,7 @@
     "runtime/raven/src/System/Closable.rvn": "934d043200f2e1284005444b53e3bbeeccfad9e1069c58b7c252e543e8d126a7",
     "runtime/raven/src/System/Clock.rvn": "1043b7bbabbd554ae9bfab607a9ca6ac16618c76d1cdcc3dc9c69d0175ef98d2",
     "runtime/raven/src/System/Introspection/AssemblyInfo.rvn": "137b4758422d334157bab90b8d2dadc99e47c7328c683df9a52d19d26ccff2c3",
-    "runtime/raven/src/System/Introspection/ModuleInfo.rvn": "3f5342a964cbe95317e56ca8f2856dc87c4abe12a4d730cb6278de577003ef6d",
+    "runtime/raven/src/System/Introspection/ModuleInfo.rvn": "12168767f50a8e61993c329008022a9109ca6660a7f9e2b886d6f29a4b89714e",
     "runtime/raven/src/System/Introspection/ParameterInfo.rvn": "e39c3449e71421de3bef2af93135a59e1336fc9936c82b4b2fa4981484e0f172",
     "runtime/raven/src/System/Duration.rvn": "c721be8cd945e3ca1dd94020d624880b3bd3240ee4844187db487577bf67d0bf",
     "runtime/raven/src/System/Instant.rvn": "321cff97417a63671689cbf22f8668ea2b5a1306012b6433293c2076fdf5e40f",
@@ -172,15 +172,15 @@
     "build/NeoCLR.Raven.props": "a2a9e721cc0d3c6b337fa4189191402f394657b578dd28fa59d4bb9558a5ca3e"
   },
   "outputs": {
-    "ModuleInfo.methods.neoil": "19a6f6a588a5e5126e1531beead7b59f975458648a282523123718689fb1bcf9",
-    "ModuleInfo.helpers.neoil": "50bc29f291b4d53b5ef91c287ed8e9e3484246cd5387562d28110769c5efc679"
+    "ModuleInfo.methods.neoil": "62d0f0b9cfd4393662f82cc940b0bcffda2a4394f2084aec8a1b30d7df851fa4",
+    "ModuleInfo.helpers.neoil": "de6693084d02e32ede307975713f264b806c311c079b4cb761e6492aead025f0"
   },
   "compilerSha256": "6ba4e92a38dc594d7c3da219dc63862262e215e0b28976ada52974b0e13e3d0c",
   "coreSha256": "a29679dbca2677df8e10f3e542059a579da3043e428d757e78e3c29233c8cfb3",
   "exports": [
     "get_Name() -> String",
     "get_Assembly() -> System.Introspection.AssemblyInfo",
-    "get_MetadataToken() -> Int32",
     "GetTypes() -> System.Collections.Sequence<System.Introspection.TypeInfo>"
-  ]
+  ],
+  "maintenance": "2026-10-10: mechanically removed the physical MetadataToken getter/property from both checked fragments. Full regeneration attempted but blocked by the pre-existing incompatible Map contract; remaining compiler/core provenance is unchanged."
 }

@@ -7510,3 +7510,22 @@ facade. Guest RuntimeContext and AOT module discovery remain separate implementa
 work. Validation: native importer/compiler builds and a real multi-module Raven
 consumer with host ownership inspection; runtime test adapters exercise native library
 imports across modules.
+
+
+### Guest logical module descriptors (2026-10-10)
+
+Guest ModuleInfo now denotes a logical namespace within an assembly, matching the
+host model. The flat declaration table and qualified names are unchanged; no new
+Runtime Contract switch or native format is required. Interpreter assembly traversal
+and type/member/parameter ownership use source names. Physical ModuleInfo.MetadataToken
+is removed from Raven source and the CLI reference projection. Remaining tokens still
+refer to physical definitions; the CLI projection still loses explicit empty modules.
+
+The VM owns logical ownership queries. AOT owns the explicit TypeModule retention
+adapter and builds trusted descriptor factories through native_metadata::type_module;
+no user constructors run. The [consumer](experiments/guest-modules/README.md) records
+interpreter traversal, retained native ownership and missing-retention failure. Native
+assembly traversal remains unsupported. Reference-only generation and source native
+class libraries succeed; the independent legacy implementation generator is blocked
+by its Map contract, with only mechanical getter removal applied to checked fragments.
+No Raven compiler change or ordinary .NET behavior change is needed for this slice.

@@ -1,0 +1,11 @@
+module Acme.CoffeeMaker {
+    public class Machine {
+        func Echo(value: int) -> int => value
+    }
+}
+
+module Acme.CoffeeMaker.Factories {
+    public class Factory { }
+}
+
+module Acme.CoffeeMaker.Empty { }

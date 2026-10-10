@@ -20,7 +20,7 @@ modules may be packaged together. Names need not match the assembly name:
 | `Acme.CoffeeMaker` | `Acme.CoffeeMaker`, `Acme.CoffeeMaker.Factories` |
 
 Host `ModuleInfo` now models these logical modules directly. The temporary separate
-DeclarationModuleInfo facade has been removed; guest migration remains open.
+DeclarationModuleInfo facade has been removed; guest interpreter traversal and explicitly retained native type ownership now follow the same model.
 Namespace resolution and ownership should help authors design distributable modules
 for class libraries and APIs. No metadata hierarchy or new module-reference table is
 introduced. Existing assembly-qualified binding still distinguishes same-name modules
@@ -79,8 +79,10 @@ This replaces the temporary DeclarationModuleInfo/physical ModuleInfo host split
 Consumers must migrate and rebuild; no compatibility aliases remain. See the
 [API reference](../api-docs/experimental-metadata.md#context-owned-declaration-views-development-2026-10-10).
 Loaded modules reject mutation. `IsProjection` identifies inferred views of older
-native or CLI inputs; CLI output still loses explicit empty declarations. Guest
-RuntimeContext and its physical ModuleInfo API have not yet migrated.
+native or CLI inputs; CLI output still loses explicit empty declarations. Guest traversal through RuntimeContext.Current.ExecutingAssembly now uses logical
+module names too. ModuleInfo.MetadataToken is removed. Interpreter queries include
+exact-name type enumeration; native support currently covers explicitly retained
+type-to-module descriptors. See [the guest consumer](experiments/guest-modules/README.md).
 
 ## Comparison and tradeoffs
 

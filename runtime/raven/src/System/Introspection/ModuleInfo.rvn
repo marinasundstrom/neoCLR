@@ -7,7 +7,6 @@ import System.Runtime.CompilerServices.*
 public sealed interface ModuleInfo {
     val Name: string { get }
     val Assembly: AssemblyInfo { get }
-    val MetadataToken: int { get }
     func GetTypes() -> Sequence<TypeInfo>
 }
 
@@ -23,8 +22,6 @@ internal class RuntimeModuleInfo : ModuleInfo {
     val Name: string => StoredName
 
     val Assembly: AssemblyInfo => RuntimeServices.ModuleAssembly(StoredIdentity, StoredName)
-
-    val MetadataToken: int => RuntimeServices.ModuleMetadataToken(StoredIdentity, StoredName)
 
     func GetTypes() -> Sequence<TypeInfo> {
         return RuntimeServices.ModuleTypes(StoredIdentity, StoredName)

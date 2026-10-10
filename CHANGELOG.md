@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Migrate guest module traversal and type/member/parameter ownership to flat logical
+  names, preserving explicit empty modules and nested-type ownership. Remove physical
+  ModuleInfo.MetadataToken and rebuild source libraries and the API reference. Add
+  explicitly retained AOT type-to-module snapshots with unretained metadata faults;
+  native assembly traversal and module Object.Equals dispatch remain unsupported.
+  Add a Raven interpreter/native consumer and Windows gate. Interpreter traversal,
+  native retained ownership and missing-retention failure pass locally, along with
+  focused runtime/reflection checks. Windows qualification is pending. The legacy
+  CLI bootstrap generator remains blocked by its incompatible Map contract; checked ModuleInfo
+  fragments receive only the documented getter/property deletion.
+
 - Consolidate host introspection around logical ModuleInfo: assemblies package flat
   named modules, with dotted root/submodule names as convention and no hierarchy
   metadata. Replace DeclarationModuleInfo/GetDeclarationModules with ModuleInfo/
@@ -17,7 +28,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   author-provided packaging examples, nested ownership, empty modules, context identity
   and PE/NEOX round trips; the metadata suite passes 170/170 checks, and all three
   Raven suites pass interpreter/macOS AOT with five discovery rejection cases. Pin
-  Windows builds to matching Raven 1a0c4e627; new Windows qualification is pending.
+  Windows builds to matching Raven 1a0c4e627; action 38051487728 passes at 2e4d5b6d,
+  with artifact hashes not independently checked.
   Guest RuntimeContext and AOT discovery remain pending; no native format or ordinary .NET policy changes.
 
 - Add source TestAttribute with constructor/named descriptions and host introspection

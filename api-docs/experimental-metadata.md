@@ -77,8 +77,9 @@ methods, or the reader's `ModuleDefinition`. Assembly-wide callable scans must v
 all modules. Test discovery IDs now include the logical module name instead of the
 physical filename. Rebuild host tools and the Raven native importer together.
 
-Guest `RuntimeContext` and guest module descriptors still use the older physical
-model and await migration, including AOT retention. This host change adds no metadata
+Guest traversal through `RuntimeContext.Current.ExecutingAssembly` now uses the same
+logical model in the interpreter. Native support is limited to explicitly retained
+type-to-module descriptors; see [guest contracts](introspection.md#logical-modules-development-2026-10-10). This host change adds no metadata
 format, hierarchy table, compiler target switch or module reference table.
 
 ## Unmanaged pointer signatures (development, 2026-10-07)

@@ -29,9 +29,6 @@ internal extern func MemberCustomAttributes(arg0: System.Introspection.TypeInfo,
 internal extern func ModuleAssembly(arg0: string, arg1: string) -> System.Introspection.AssemblyInfo;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func ModuleMetadataToken(arg0: string, arg1: string) -> int;
-
-[MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func ModuleTypes(arg0: string, arg1: string) -> System.Introspection.TypeInfo[];
 
 [MethodImpl(MethodImplOptions.InternalCall)]

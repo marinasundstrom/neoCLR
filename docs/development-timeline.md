@@ -13494,3 +13494,18 @@ consumer remain open at this entry. See the [attribute plan](custom-attributes.m
   reference graph, access policy or ambiguity rule is claimed.
 - **Remaining work:** guest RuntimeContext and module descriptors, callable discovery
   and AOT retention. Host consolidation is not completion of those capabilities.
+
+
+### 2026-10-10 — Guest follow-through on flat modules
+
+Following the author's flat-module and packaging clarifications, the assistant
+implements guest logical assembly traversal and consistent type/member/parameter
+ownership, removing physical ModuleInfo.MetadataToken. The existing table remains
+flat; dotted names do not acquire parent links. The interpreter consumer passes with
+empty modules and exact type membership. A retained native type-to-module probe and
+an explicit missing-retention failure pass; native assembly traversal and general
+module Object.Equals dispatch remain open. The assistant reports the separate legacy
+CLI regeneration failure (`Incompatible map contract: Map`) and distinguishes it from
+the successful source-native-library and reference-only builds. Evidence is linked
+from [the guest module consumer](experiments/guest-modules/README.md); this does not
+claim completion of in-process test discovery.

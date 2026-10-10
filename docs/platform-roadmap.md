@@ -43,8 +43,14 @@ assembly/context GetModules(), consolidating the temporary physical/declaration
 facade split. Members and nested types retain canonical logical ownership; physical
 token scopes remain explicit reader details. Raven's importer traverses every module. The [host migration evidence](experiments/declaration-modules/host-validation.json)
 covers metadata contracts, a real compiled consumer and all three interpreter/macOS
-AOT suites. Windows uses the coordinated Raven 1a0c4e627 pin; validation is pending.
-Guest RuntimeContext/module migration and AOT metadata retention remain open.
+AOT suites. The coordinated Windows action [38051487728](https://github.com/marinasundstrom/neoCLR/actions/runs/38051487728)
+passes at 2e4d5b6d with Raven 1a0c4e627; its artifact hashes are not independently checked.
+Guest traversal through RuntimeContext.Current.ExecutingAssembly now returns flat
+logical modules in the interpreter; type/member/parameter ownership agrees and the
+physical ModuleInfo.MetadataToken property is removed. AOT materializes type-to-module
+snapshots for explicitly retained nominal definitions. Assembly-wide AOT traversal,
+guest module-function enumeration and general callable invocation remain open. See
+[the guest consumer](experiments/guest-modules/README.md).
 
 **Author clarifications (2026-10-10):** a module is a unit and namespace of members
 within an assembly. Assemblies package one or more modules. Root namespaces and

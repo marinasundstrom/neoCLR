@@ -51,6 +51,40 @@ The executable integration fixture also checks constructed generic types, arrays
 wrong types, null at the Object boundary, HashMap callbacks and retention through GC.
 There is no general default comparer or cross-program descriptor identity contract.
 
+## Logical modules (development, 2026-10-10)
+
+`RuntimeContext.Current.ExecutingAssembly.GetModules()` now returns flat logical
+modules in ordinal name order, including explicitly declared empty modules. A module
+is a namespace of declarations within an assembly; dotted names do not introduce
+parent links or recursive membership. `ModuleInfo.GetTypes()` returns retained types
+owned by the exact name, including nested types, with their original declaring-type
+ownership. Older images without a declaration table project retained types, free
+functions and constants; they cannot recover undeclared empty modules.
+
+Type, member and parameter `Module` properties identify the same logical owner.
+Module identity remains full assembly identity plus logical name, within the loaded
+program. **Migration:** `ModuleInfo.MetadataToken` is removed. Physical image rows
+and their token scopes are separate metadata facts. Remaining type/member/parameter
+tokens describe physical definitions; pairing one with a logical module is not a
+replacement for physical scope information. No guest resolve-by-token API is provided.
+Rebuild the source libraries, reference assembly and runtime together.
+
+Interpreter traversal is qualified by the [Raven consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/guest-modules/README.md).
+AOT supports `NominalTypeInfo.Module` for explicitly retained nominal type definitions
+through the existing private reflection-roots policy, and reading the resulting Name.
+Unretained types fault with an explicit metadata-retention error. This does not grant
+constructor/method invocation. AOT assembly traversal, Module.Assembly/GetTypes and
+module Object.Equals dispatch are not qualified by this slice. Guest module function
+enumeration and context-wide assembly discovery remain open.
+
+The unstable Rust backend bridge
+`neoclr::native_metadata::type_module(&Module, &metadata::Type) -> Result<Value, Fault>`
+produces the same module descriptor recipe without allocating a guest wrapper or
+executing user code. Unknown types, absent/ambiguous catalog scope or invalid ownership
+return Fault. It is an in-repository compiler helper, outside the guest API and
+RavenDoc type selection; native snapshot factories materialize its result under
+explicit retention.
+
 ## Assembly and module identity
 
 [AssemblyInfo](xref:System.Introspection.AssemblyInfo) compares the full assembly

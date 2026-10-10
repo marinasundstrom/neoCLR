@@ -51,7 +51,7 @@ specialized TypeInfo interfaces remains planned.
 
 In the saved `Demo` project, the executing assembly references `System.Runtime`. That is the foundation’s logical identity; compiler bootstrap names are not additional platform dependencies. References are direct edges, not a recursive dependency listing.
 
-`AssemblyInfo` describes an assembly; `ModuleInfo` describes a module within it. Both expose `GetTypes()`. The current implementation lists retained, loaded definitions, including nonpublic types—not every type from an original source assembly that the importer may have discarded.
+`AssemblyInfo` describes an assembly; development `ModuleInfo` describes a logical namespace of members within it. `GetModules()` returns flat qualified names, including declared empty modules; dotted names do not add metadata hierarchy. Both expose `GetTypes()`, with modules selecting exact logical ownership, including nested types. The current implementation lists retained, loaded definitions, including nonpublic types—not every type from an original source assembly that the importer may have discarded.
 
 <a id="tokens"></a>
 
@@ -61,7 +61,7 @@ In the saved `Demo` project, the executing assembly references `System.Runtime`.
 {{TOUR_TOKENS}}
 ```
 
-The token agrees here because both descriptions refer to `Widget` in the same module. A token alone is not a global identifier. Type, member and parameter interfaces expose `Module` alongside `MetadataToken`; the assembly and module interfaces expose their own tokens too.
+The token agrees here because both descriptions refer to `Widget` in the same module. A token alone is not a global identifier. Type, member and parameter interfaces expose logical `Module` alongside physical definition tokens. Development ModuleInfo no longer exposes MetadataToken: a logical module is not a physical metadata row. Those tokens must not be resolved using a logical module name.
 
 Source definition tokens are preserved where the importer retains them. Merged runtime definitions receive module-scoped tokens. They are stable within an artifact, not a persistence key across rebuilds. Constructed generic types share their definition’s token. Arrays, pointer/by-reference wrappers and generic-parameter placeholders currently return zero; an absent parameter row also has token zero.
 
@@ -292,7 +292,7 @@ Development host tooling exposes logical modules directly through `ModuleInfo`,
 including empty modules and direct member ownership. Dotted names are a convention;
 module metadata is flat. Assemblies package one or several modules. Physical token
 scopes remain separate reader details. See the [host module API](/docs/experimental-metadata.html#context-owned-declaration-views-development-2026-10-10).
-Guest declaration-module traversal and its AOT retention remain future work.
+Guest traversal through the executing assembly is now qualified in the interpreter. AOT supports explicitly retained type-to-module name inspection; assembly-wide native traversal remains open. See the [module API and limits](/docs/introspection.html#logical-modules-development-2026-10-10).
 
 
 ## Development: general custom attributes

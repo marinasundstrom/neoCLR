@@ -1,0 +1,12 @@
+module Acme.CoffeeMaker.Tests
+
+import System.*
+
+func Main() -> int {
+    let result = CheckOwnership()
+    if result != 0 {
+        return result
+    }
+    Console.WriteLine("Logical module ownership passed")
+    return 0
+}

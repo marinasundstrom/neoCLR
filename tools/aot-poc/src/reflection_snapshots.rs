@@ -344,6 +344,7 @@ pub fn bind(
             matches!(
                 f.name.as_str(),
                 "neoCLR.Runtime.TypeProperties"
+                    | "neoCLR.Runtime.TypeModule"
                     | "neoCLR.Runtime.TypeElementType"
                     | "neoCLR.Runtime.MemberCustomAttributes"
             )
@@ -386,6 +387,7 @@ pub fn bind(
     let mut projections = vec![];
     for index in services {
         let f = &input.functions[index];
+        let modules = f.name.ends_with("TypeModule");
         let properties = f.name.ends_with("Properties");
         let attributes = f.name.ends_with("CustomAttributes");
         let attribute_parameters = attributes
@@ -432,6 +434,22 @@ pub fn bind(
         };
         if attributes {
             bind_attributes(&mut factory, index, definitions, retention, &expected)?;
+        } else if modules {
+            if name(source, &expected) != Some("System.Introspection.ModuleInfo") {
+                return Err("TypeModule requires scoped ModuleInfo".into());
+            }
+            for row in retention["types"].as_array().unwrap() {
+                let id: TypeDefId = serde_json::from_value(row["definition"].clone())?;
+                let ti = definitions.iter().position(|definition| *definition == id)
+                    .ok_or("missing module snapshot root")?;
+                let owner = Type::Named(source.types[ti].name.clone());
+                let skip = factory.body.len() + 3;
+                factory.body.extend([Op::Arg(0), Op::LoadTypeToken(owner.clone()), Op::Equal, Op::BranchFalse(0)]);
+                factory.emit(&neoclr::native_metadata::type_module(source, &owner).map_err(|e| e.to_string())?, &expected)?;
+                factory.body.push(Op::Return);
+                factory.body[skip] = Op::BranchFalse(factory.body.len());
+            }
+            factory.body.push(Op::Fault("native logical module metadata was not retained".into()));
         } else if properties {
             let Type::ArrayRef(element) = &expected else {
                 return Err("TypeProperties requires PropertyInfo vector".into());

@@ -1,6 +1,6 @@
 //! Definition tokens are scoped to their descriptive module, never provider objects.
 use crate::metadata::{Function, TypeDef};
-use crate::{Fault, Module, TypeIdentity, Value};
+use crate::{Fault, Module, TypeIdentity};
 
 fn token(table: u32, row: usize) -> Result<i32, Fault> {
     if row == 0 || row > 0x00ff_ffff {
@@ -120,25 +120,4 @@ pub(crate) fn parameter(module: &Module, function: &Function, index: usize) -> R
         .map(|f| f.parameters.len())
         .sum();
     token(8, prior + index + 1)
-}
-pub(crate) fn module_value(
-    module: &Module,
-    origin: Option<&crate::metadata_origin::MetadataOrigin>,
-    runtime_module: &str,
-) -> Result<Value, Fault> {
-    if let Some(origin) = origin {
-        return Ok(crate::assembly_info::module_value(
-            &origin.assembly,
-            &origin.module,
-        ));
-    }
-    let assembly = module
-        .assemblies
-        .iter()
-        .find(|a| a.modules.iter().any(|m| m == runtime_module))
-        .ok_or_else(|| Fault::new("missing module catalog entry"))?;
-    Ok(crate::assembly_info::module_value(
-        &assembly.full_name,
-        runtime_module,
-    ))
 }

@@ -42,4 +42,5 @@ and all three Raven suites passing in interpreter/macOS ARM64 AOT. Generated tes
 now use logical module names; invocation still uses typed adapters. The report records
 the matching compiler hashes and reused development-library provenance. This does not
 qualify guest ModuleInfo migration or guest AOT module scanning. The new Windows
-compiler pin is coordinated with this host API migration; its result is pending.
+compiler pin is coordinated with this host API migration; action 38051487728
+succeeds at 2e4d5b6d. Its artifact hashes are not independently checked.

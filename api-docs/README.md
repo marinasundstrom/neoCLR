@@ -1541,3 +1541,19 @@ discovery errors/limits, and the existing assembly-internal runner contract.
 No guest reference assembly/XML changed. Packaging the framework will require its
 own reference assembly/XML and generated navigation; this is an explicit coverage
 boundary rather than a silently excluded runtime API.
+
+
+### Guest logical module migration (2026-10-10)
+
+ModuleInfo remains selected in RavenDoc; its physical MetadataToken property is
+removed from source, bridge and XML, and the matching reference snapshot is refreshed.
+Assembly/module/member ownership now uses logical names. The [introspection guide](introspection.md#logical-modules-development-2026-10-10)
+documents interpreter traversal, bounded AOT retention and the unstable backend recipe
+helper. Website compilation is not required for this signature removal.
+
+The independent legacy CLI implementation regeneration was attempted with `--slice
+ModuleInfo` and stops at the existing `Incompatible map contract: Map` check. The
+checked ModuleInfo fragments received only a mechanical deletion of the removed getter
+and property; their manifest records that maintenance and preserves prior compiler/core
+provenance. This is not a successful clean legacy regeneration. Source-built native
+Runtime/Data/Networking/Web libraries and the reference-only bridge rebuilt successfully.
