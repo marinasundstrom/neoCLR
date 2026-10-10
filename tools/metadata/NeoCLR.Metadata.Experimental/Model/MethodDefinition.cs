@@ -107,7 +107,7 @@ public sealed partial class MethodDefinition
         static bool Value(SignatureType type) => type.PointerElement is not null || type.Primitive is not null || type.ArrayElement?.Primitive is not null;
         decoded = IsStatic && GenericArity == 0 && nativeSignature is { } native && Value(native.ReturnType) && native.ParameterTypes.All(Value) ? native : null;
         if (decoded is not null) return true;
-        return IsStatic && GenericArity == 0 && TryDecodeStaticValueSignature(signature, out decoded) && ApplyOutputs(ref decoded);
+        return IsStatic && GenericArity == 0 && TryDecodeValueSignature(signature, out decoded) && ApplyOutputs(ref decoded);
     }
 
     /// <summary>Recognizes unconstrained static generic primitive/vector signatures with scoped method parameters.</summary>
@@ -122,7 +122,7 @@ public sealed partial class MethodDefinition
             Value(native.ReturnType) && native.ParameterTypes.All(Value) ? native : null;
         if (decoded is not null) return true;
         return IsStatic && !unsupportedGenericParameters && GenericArity is > 0 and <= 32 &&
-            TryDecodeStaticValueSignature(signature, out decoded, GenericArity) && ApplyOutputs(ref decoded);
+            TryDecodeValueSignature(signature, out decoded, GenericArity) && ApplyOutputs(ref decoded);
     }
 
     private bool ApplyOutputs(ref MethodSignature? decoded)
@@ -153,16 +153,16 @@ public sealed partial class MethodDefinition
     internal static bool TryDecodeStaticPrimitiveSignature(ReadOnlySpan<byte> signature, out PrimitiveMethodSignature? decoded)
     {
         decoded = null;
-        if (!TryDecodeStaticValueSignature(signature, out var value) || value!.ReturnType.Primitive is not { } result ||
+        if (!TryDecodeValueSignature(signature, out var value) || value!.ReturnType.Primitive is not { } result ||
             value.ParameterTypes.Any(p => p.Primitive is null)) return false;
         decoded = new(result, value.ParameterTypes.Select(p => p.Primitive!.Value));
         return true;
     }
 
-    internal static bool TryDecodeStaticValueSignature(ReadOnlySpan<byte> signature, out MethodSignature? decoded, int genericArity = 0)
+    internal static bool TryDecodeValueSignature(ReadOnlySpan<byte> signature, out MethodSignature? decoded, int genericArity = 0, ModuleDefinition? nominalModule = null, bool instance = false)
     {
         decoded = null;
-        if (signature.Length < 3 || signature[0] != (genericArity == 0 ? 0 : 0x10)) return false;
+        if (signature.Length < 3 || signature[0] != ((genericArity == 0 ? 0 : 0x10) | (instance ? 0x20 : 0))) return false;
         int position = 1;
         if (genericArity > 0 && signature[position++] != genericArity) return false;
         int count = signature[position++];
@@ -172,11 +172,11 @@ public sealed partial class MethodDefinition
             count = ((count & 0x3f) << 8) | signature[position++];
             if (count < 128) return false;
         }
-        if (count > 256 || !ReadType(signature, ref position, true, out var result, genericArity)) return false;
+        if (count > 256 || !ReadType(signature, ref position, true, out var result, genericArity, nominalModule: nominalModule)) return false;
         var parameters = new SignatureType[count];
         for (int i = 0; i < count; i++)
         {
-            if (!ReadType(signature, ref position, false, out var parameter, genericArity, allowByReference: true)) return false;
+            if (!ReadType(signature, ref position, false, out var parameter, genericArity, allowByReference: true, nominalModule: nominalModule)) return false;
             parameters[i] = parameter!;
         }
         if (position != signature.Length) return false;
@@ -184,20 +184,20 @@ public sealed partial class MethodDefinition
         return true;
     }
 
-    private static bool ReadType(ReadOnlySpan<byte> signature, ref int position, bool allowVoid, out SignatureType? type, int genericArity, bool allowByReference = false, int depth = 0)
+    private static bool ReadType(ReadOnlySpan<byte> signature, ref int position, bool allowVoid, out SignatureType? type, int genericArity, bool allowByReference = false, int depth = 0, ModuleDefinition? nominalModule = null)
     {
         type = null;
         if (depth > 16 || position >= signature.Length) return false;
         var code = signature[position++];
         if (code == 0x0f)
         {
-            if (!ReadType(signature, ref position, true, out var target, genericArity, depth: depth + 1) || !SignatureType.IsPointerTarget(target!) || target!.NestingDepth >= 16) return false;
+            if (!ReadType(signature, ref position, true, out var target, genericArity, depth: depth + 1, nominalModule: nominalModule) || !SignatureType.IsPointerTarget(target!) || target!.NestingDepth >= 16) return false;
             type = SignatureType.PointerTo(target);
             return true;
         }
         if (code == 0x10 && allowByReference)
         {
-            if (!ReadType(signature, ref position, false, out var target, genericArity, depth: depth + 1)) return false;
+            if (!ReadType(signature, ref position, false, out var target, genericArity, depth: depth + 1, nominalModule: nominalModule)) return false;
             type = SignatureType.ByReference(target!);
             return true;
         }
@@ -206,6 +206,40 @@ public sealed partial class MethodDefinition
         {
             if (depth > 16 || position >= signature.Length) return false;
             code = signature[position++];
+        }
+        if (code is 0x11 or 0x12 && nominalModule is not null)
+        {
+            if (position >= signature.Length) return false;
+            uint token = signature[position++];
+            if ((token & 0x80) != 0)
+            {
+                if ((token & 0xc0) == 0x80 && position < signature.Length)
+                {
+                    token = ((token & 0x3f) << 8) | signature[position++];
+                    if (token < 128) return false;
+                }
+                else if ((token & 0xe0) == 0xc0 && position + 3 <= signature.Length)
+                {
+                    token = ((token & 0x1f) << 24) | (uint)signature[position++] << 16 |
+                        (uint)signature[position++] << 8 | signature[position++];
+                    if (token < 16384) return false;
+                }
+                else return false;
+            }
+            TypeReference? reference;
+            if ((token & 3) == 0)
+            {
+                var definition = nominalModule.GetTypeDefinition(0x02000000u | token >> 2);
+                if (definition is null || definition.GenericArity != 0 || definition.IsValueType != (code == 0x11)) return false;
+                reference = definition.ToReference();
+            }
+            else if ((token & 3) == 1)
+                reference = nominalModule.TypeReferences.SingleOrDefault(t => t.MetadataToken == (0x01000000u | token >> 2));
+            else return false;
+            if (reference is null || reference.Name.Contains('`')) return false;
+            var nominal = SignatureType.FromReference(reference);
+            type = vector ? SignatureType.ArrayOf(nominal) : nominal;
+            return true;
         }
         if (code == 0x1e)
         {

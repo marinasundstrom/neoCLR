@@ -4416,9 +4416,14 @@ MainModule.Mvid is Guid.Empty because the native manifest declares no MVID; cons
 must not use it alone as a snapshot identity. Profile is null for this execution profile.
 
 `MethodDefinition.TryGetSignature(out MethodSignature? decoded)` returns an immutable
-logical signature for native functions, authored methods and the existing bounded
-static CLI primitive/vector/generic profiles. It returns false for other loaded CLI
-signatures requiring contextual decoding. Void means no result, not an inhabited value.
+logical signature for native functions, authored methods, bounded nongeneric CLI
+instance/static methods (including nominal TypeDef/TypeRef parameters/results and
+single vectors), and the existing bounded static CLI generic value profile.
+Nongeneric nominal identities remain snapshot-owned references; dependencies are
+resolved only by an explicit introspection catalog. Generic constructions, unscoped
+owner parameters, custom modifiers and unsupported calling conventions still return
+false. Invalid local nominal token/category combinations also return false.
+The older static-only signature helpers retain their original narrower contract. Void means no result, not an inhabited value.
 Existing static primitive/value signature helpers also recognize these native functions.
 GetSignature throws NotSupportedException for native methods; there is no CLI blob.
 Body remains unsupported for loaded methods; no empty executable body is fabricated.

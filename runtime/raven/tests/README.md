@@ -55,7 +55,8 @@ fixtures, filtering and generic/collection assertions are not implemented yet.
 
 General [custom attributes and AttributeUsage](../../../docs/custom-attributes.md)
 are prerequisites. Host metadata support now spans callables, fields, properties
-and parameters alongside types; compiler/guest support still needs qualification.
+and parameters alongside types. Raven native import now preserves those annotations
+and usage policies; native source emission and guest discovery still need qualification.
 
 Author-selected direction: discover attributed test functions using introspection,
 then adapt them to the same case, invocation and report contracts. Explicit

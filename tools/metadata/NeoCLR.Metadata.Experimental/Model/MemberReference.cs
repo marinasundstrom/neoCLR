@@ -32,7 +32,7 @@ public sealed class MemberReference
     /// Host resolver failures propagate. No resolution result is cached.</remarks>
     public MethodDefinition ResolveMethod(IAssemblyResolver? resolver = null)
     {
-        if (!MethodDefinition.TryDecodeStaticValueSignature(signature, out var decoded,
+        if (!MethodDefinition.TryDecodeValueSignature(signature, out var decoded,
                 signature.Length > 1 && signature[0] == 0x10 && signature[1] is > 0 and <= 32 ? signature[1] : 0))
             throw new InvalidDataException("unsupported member method signature");
         TypeDefinition owner = (ParentToken >> 24) switch

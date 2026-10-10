@@ -32,6 +32,9 @@ internal static class MemberAttributeChecks
             Check((int)reflected.Invoke(null, null)! == 42, "attributed method behavior changed");
             var usage = typeof(UsageContractAttribute).GetCustomAttributesData().Single(a => a.AttributeType == typeof(AttributeUsageAttribute));
             var actual = AssemblyDefinition.ReadAssembly(File.ReadAllBytes(typeof(MemberAttributeChecks).Assembly.Location), false);
+            var metadataContext = new MetadataLoadContext([actual]);
+            var constructorView = metadataContext.Resolve(actual.Identity).GetTypes().Single(t => t.Name == nameof(EnumPayloadAttribute)).GetConstructors().Single();
+            Check(constructorView.GetParameters().Single().ParameterType is NominalTypeInfo { Name: nameof(LocalTargets), IsEnum: true }, "CLI instance enum signature lost identity");
             var storedUsage = actual.MainModule.Types.Single(t => t.Name == nameof(UsageContractAttribute)).CustomAttributes.Single(a => a.AttributeType.Name == "AttributeUsageAttribute");
             Check(storedUsage.GetArguments().Single().Type.ReferencedType?.Name == "AttributeTargets", "CLI enum identity lost");
             Check(Equals(storedUsage.GetArguments().Single().Value, usage.ConstructorArguments.Single().Value), "CLI enum value differs from CLR");
@@ -157,6 +160,12 @@ internal static class MemberAttributeChecks
         attributedType["custom_attributes"]!.AsArray().First(a => a!["target_token"] is not null)!["target_token"] = 0x0400ffff;
         Reject<InvalidDataException>(() => NativeAssemblyDefinition.ReadAssembly(Encoding.UTF8.GetBytes(wrongTarget.ToJsonString())));
         Console.WriteLine("PASS member attribute authoring, CLI/native snapshots, type/field/property/parameter inspection, metadata-only discovery, projection and invalid metadata");
+    }
+
+    private enum LocalTargets { Method = 64 }
+    private sealed class EnumPayloadAttribute : Attribute
+    {
+        public EnumPayloadAttribute(LocalTargets targets) { }
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true, Inherited = false)]

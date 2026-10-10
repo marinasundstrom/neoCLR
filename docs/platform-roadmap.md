@@ -9,8 +9,10 @@ The author clarifies that this requires [general custom attributes](custom-attri
 including AttributeUsage and applicable declaration kinds, not a test-only mechanism.
 Host metadata authoring/introspection now preserves callable, field, property and
 parameter annotations alongside types. Int32 enum fixed arguments and primitive named
-arguments now round-trip through host metadata and native/CLI projection. Next implement
-AttributeUsage/compiler support and guest named-data inspection, then TestAttribute discovery without changing execution
+arguments now round-trip through host metadata and native/CLI projection. Raven's
+native importer now exposes these attributes and applies existing usage target and
+multiplicity checks across assemblies. Next implement native source annotation
+emission, runtime usage declarations and guest named-data inspection, then TestAttribute discovery without changing execution
 contracts. Qualify metadata retention and callable adapters before claiming native
 automatic discovery. This supports the native/collection milestone; it does not
 permanently reprioritize the rest of the platform roadmap.

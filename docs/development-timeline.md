@@ -13351,3 +13351,14 @@ assignments. The generated image verifies and returns 42 without executing the
 faulting attribute constructors or accessors. Usage enforcement, broader argument
 categories, guest named-data inspection and Raven compiler integration remain open;
 this is not reported as complete AttributeUsage support.
+
+Follow-up implementation: Raven `51da30ea7` imports ordinary AttributeData across
+supported native declaration kinds. Separate consumer binding now applies the
+existing .NET-style usage target/multiplicity rules, inherited policies and replacement
+defaults. Invalid constructor/named data reports RAVT003. Validation exposed a host
+reader gap for CLI instance constructors; bounded instance/nominal signature
+inspection now handles the explicit bootstrap without executing code. The 168-group
+host suite, 20 ordinary usage tests, native flags/runtime-library checks and focused
+native import cases pass. Source annotation emission, native Attribute inheritance
+validation, guest named data and AOT discovery remain open. The packaged toolchain
+has not yet been rebuilt for this compiler slice; see [evidence](custom-attributes.md).

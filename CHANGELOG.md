@@ -23,7 +23,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   metadata and reject malformed native assignments without executing user code.
   CustomAttributeArgument.Type is now SignatureType; existing PrimitiveType inputs
   still convert implicitly. Named guest inspection and automatic Raven test
-  discovery are not yet implemented.
+  discovery are not yet implemented. Extend host logical CLI signature inspection
+  to bounded nongeneric instance/static methods with nominal types, allowing
+  metadata-only bootstrap constructor validation. Raven's native importer now
+  preserves attributes on supported declaration kinds and applies existing usage
+  target/multiplicity policies across assemblies; malformed data produces RAVT003.
+  Native source attribute emission remains the next compiler gate.
 
 - Add a Raven runtime-library test runner with module-level cases, Result-based
   Assert.Equal/True, stable IDs, structured pass/fail/skip reports and registration

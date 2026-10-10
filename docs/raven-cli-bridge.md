@@ -7353,3 +7353,32 @@ finally behavior. Ordinary .NET defaults are unchanged. Compiler execution and p
 cover ten cleanup/order and return-expression cases, alongside 50 existing tests. The native collections
 consumer now checks exhaustion, break, continue, return and labeled outward continue.
 The pinned compiler is integration-branch work, not Raven main availability.
+
+
+## Native attribute import and usage binding (2026-10-10)
+
+Raven's shared native importer now preserves AttributeData on supported types and
+members, including nominal enum arguments and primitive named values. The ordinary
+binder therefore enforces imported AttributeUsage targets and multiplicity without
+a testing-specific marker. Inherited usage and replacement defaults are preserved;
+this is not an inherited runtime attribute query. Invalid constructor/named-member
+contracts become RAVT003 before binding. Ordinary .NET behavior remains unchanged.
+
+Use the existing NeoCLR target/native metadata configuration and explicit matching
+primitive bootstrap; no Runtime Contract switch is added. The host metadata reader
+now handles bounded nongeneric CLI instance/nominal signatures for bootstrap
+constructor inspection. Native records own identity/data; temporary CLI projections
+encode equivalent constructor signatures and named blobs. Metadata readers own
+validation/decoding, Raven owns symbols/diagnostics, and neoCLR owns linked execution.
+The final native core/importer replaces this bootstrap dependency.
+
+Validation covers metadata-authored native inputs, separate Raven usage consumers,
+malformed import diagnostics, ordinary AttributeUsage tests, native flags and a
+System.Runtime async consumer. Native source annotation emission, strict Attribute
+base enforcement, broader payload/target categories, guest named-data descriptors
+and native discovery retention remain open. See [attribute status](custom-attributes.md).
+The development bundle remains pinned to its earlier compiler until these features
+are integrated and qualified together; compiler source support is not bundle support.
+
+Compiler evidence: Raven `51da30ea7`, shared integration branch
+`codex/source-object-metadata-resolution`; [bootstrap revision/hash and tests](custom-attributes.md#raven-import-and-usage-binding-2026-10-10).

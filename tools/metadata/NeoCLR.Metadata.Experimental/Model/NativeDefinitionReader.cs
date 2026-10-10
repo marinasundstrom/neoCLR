@@ -148,7 +148,7 @@ public sealed partial class MethodDefinition
 
     /// <summary>Reads the supported logical signature without serializing a CLI blob or resolving dependencies.</summary>
     /// <param name="decoded">The immutable signature on success; otherwise null.</param>
-    /// <returns>True for authored signatures, native bounded generic or nongeneric functions/methods, and the existing bounded static CLI value/generic profiles.</returns>
+    /// <returns>True for authored/native signatures, bounded nongeneric CLI instance/static signatures (including nominal types), and bounded static CLI generic value signatures.</returns>
     /// <remarks>False does not mean an absent signature: other loaded CLI signatures require contextual decoding.
     /// Native signatures retain native no-result semantics. This operation never materializes a method body.</remarks>
     public bool TryGetSignature(out MethodSignature? decoded)
@@ -156,6 +156,8 @@ public sealed partial class MethodDefinition
         if (unsupportedParameterModes) { decoded = null; return false; }
         decoded = nativeSignature ?? AuthoredSignature;
         if (decoded is not null) return true;
-        return GenericArity == 0 ? TryGetStaticValueSignature(out decoded) : TryGetStaticGenericValueSignature(out decoded);
+        return GenericArity == 0
+            ? TryDecodeValueSignature(signature, out decoded, nominalModule: Module, instance: !IsStatic) && ApplyOutputs(ref decoded)
+            : TryGetStaticGenericValueSignature(out decoded);
     }
 }

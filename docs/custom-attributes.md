@@ -222,3 +222,35 @@ enum value and named options. Native PE/NEOX and CLI projection retain the data;
 invalid member names/kinds/types and duplicates reject. The native executable with
 faulting attribute constructors/accessors verifies and returns 42. See the
 [host API details](../api-docs/experimental-metadata.md#enum-and-named-attribute-data-development-2026-10-10).
+
+
+### Raven import and usage binding (2026-10-10)
+
+The shared Raven compiler source now exposes imported attributes on types,
+constructors, methods/module functions, fields, properties and parameters using its
+ordinary AttributeData contract. Enum identity and named values survive mapping.
+Existing binder checks enforce imported AttributeUsage targets and repetition,
+including inherited policies and directly replaced policies with fresh defaults.
+Inherited is preserved as data, without adding runtime inherited-attribute queries.
+Malformed constructor/named-member metadata is rejected with RAVT003 before binding.
+A policy lookalike in another namespace is not treated as System.AttributeUsageAttribute.
+
+The host reader also inspects bounded nongeneric CLI instance/static nominal
+signatures, so the explicit primitive bootstrap's attribute constructors can be
+validated without executing them. Previously its logical signature API admitted
+only static CLI value signatures. Native signatures remain authoritative.
+
+Validation uses metadata-authored libraries and a separate Raven consumer: nine
+usage scenarios, three malformed payloads and supported member inspection; 20
+ordinary Raven AttributeUsage tests, native flags and runtime async-symbol regressions
+pass. The 168-group host metadata suite passes. Source attribute emission is still
+rejected by the native emitter. The bootstrap fixture does not establish strict
+native Attribute inheritance enforcement. These results do not qualify guest named
+data, discovery, AOT retention or a rebuilt development bundle.
+
+Tested compiler: Raven `51da30ea7` on the shared integration line
+`codex/source-object-metadata-resolution`, with this checkout's metadata project.
+The explicit CLI bootstrap is `target/library-scopes-final/bundle/lib/Core.dll`,
+SHA-256 `132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f`.
+That bundle's compiler remains `494dede84`; this source-import qualification is
+not a claim that the older bundled compiler implements it.
