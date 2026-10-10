@@ -401,3 +401,7 @@ coverage; do not infer a release performance result from that debug timeout.
 
 [JSON stream batch qualification](json-streams-batch-validation.json): all 12 tests
 pass native macOS ARM64 and release-interpreted execution. Windows remains pending.
+
+Batch `memory-stream`: MemoryStream seek, range, quota, overwrite and closed-state behavior; 5 tests pass native macOS ARM64 and
+release-interpreted execution ([evidence](memory-stream-validation.json)).
+Source: [docs/experiments/json-dom/Main.rvn](../../../docs/experiments/json-dom/Main.rvn). Windows remains pending.

@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Migrate MemoryStream seek, range, quota, overwrite and closed-state behavior into 5 attributed Raven tests in `memory-stream`.
+  Native macOS ARM64 and release-interpreted execution pass; default gates include
+  the suite. Original integration consumers remain; Windows qualification is pending.
+
 - Batch-port 12 public JSON DOM/document checks into attributed Raven tests: node
   access, null/missing fields, insertion order, duplicate preservation and escaped
   aliases, scalar/number behavior, malformed input, Unicode document round trips,

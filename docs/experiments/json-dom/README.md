@@ -88,3 +88,7 @@ zero-progress output, preflight cycles and quota checks. The original consumer s
 covers the acknowledgement sample and independent MemoryStream contracts; corpus
 validation also remains separate. Native/interpreted evidence is linked from the
 framework README.
+
+Development test migration (2026-10-10): MemoryStream seek, range, quota, overwrite and closed-state behavior now also run as 5
+attributed framework tests in `runtime/raven/tests/memory-stream`. The framework README
+links native/interpreted evidence. This original consumer retains its integration purpose.

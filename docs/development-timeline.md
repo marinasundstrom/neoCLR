@@ -13722,3 +13722,17 @@ claim completion of in-process test discovery.
   A rebuilt release interpreter passed the same source with the unchanged timeout
   ([evidence](../runtime/raven/tests/json-streams-batch-validation.json)). No runtime
   performance comparison is claimed. Windows remains pending for this batch.
+
+## 2026-10-10 — Ten further runtime-library migration batches
+
+- **Author:** “Continue with the 10 next important batches”.
+- **Assistant selection:** MemoryStream, string construction, Unicode casing, Int64
+  parsing, other primitive parsers, Path values, HTTP headers, route matching, IP
+  address values, and URI parsing/resolution. Prioritize foundational inputs to the
+  web showcase and deterministic behavior over network/service orchestration.
+- **Method:** retain observable scenarios and typed error checks, split into focused
+  attributed functions, validate native and release-interpreted execution, and commit
+  each batch with evidence. Keep original consumers for broader integration coverage.
+  No public APIs or .NET/neoCLR semantic contracts are changed by migration.
+- **Progress/evidence:** the framework README and roadmap record each completed batch;
+  remaining selections are plans until their corresponding evidence is recorded.

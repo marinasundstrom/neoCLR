@@ -57,6 +57,8 @@ A further 12 JSON stream tests cover partial I/O, borrowed ownership, errors and
 byte quotas; all pass native macOS ARM64 and release-interpreted execution
 ([evidence](../runtime/raven/tests/json-streams-batch-validation.json)). Independent
 MemoryStream and reflection-mapping migration remain follow-ups.
+Batch `memory-stream` adds 5 passing native/interpreted tests for MemoryStream seek, range, quota, overwrite and closed-state behavior
+([evidence](../runtime/raven/tests/memory-stream-validation.json)).
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 
