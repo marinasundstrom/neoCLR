@@ -515,3 +515,32 @@ array or scalar; public JsonSerializer signatures are unchanged.
 
 See [focused collection validation](experiments/json-object-mapping/collection-validation.json)
 for runtime adapter, typed mapper and independent HTTP peer results.
+
+## JsonObject as an indexable map — author follow-up, 2026-10-10
+
+The author asks to review `JsonObject` as an indexable `Map<string, JsonValue>`.
+This is planned API work, not implemented behavior. The current class exposes
+Count, Field, Item, Name and duplicate-rejecting Add; Map exposes Count, Keys,
+Find, ContainsKey and Iterable<KeyValuePair<K,V>>, but no indexer.
+
+The .NET baseline is [System.Text.Json.Nodes.JsonObject](https://learn.microsoft.com/dotnet/api/system.text.json.nodes.jsonobject),
+which implements dictionary/key-value enumeration contracts (reviewed 2026-10-10).
+neoCLR already represents JSON null explicitly as JsonNull and missing properties
+as typed lookup failures. Preserve that distinction in the proposed map view:
+Find of a present JsonNull should be Some(node); an absent key should be None.
+Iteration should retain insertion order and node identity, with a documented
+snapshot/mutation policy consistent with existing collection contracts.
+
+The first candidate is Map<string, JsonValue> conformance on JsonObject, preserving
+Field's detailed JsonError contract. Review the string indexer together with Map
+and HashMap, including absent-key behavior, before selecting its return type.
+Do not silently make JsonObject a MutableMap: the existing void Set contract cannot
+report JSON quota errors, and current Add deliberately rejects duplicate names.
+A setter/replacement API needs an explicit decision about error reporting and order.
+
+Validate ordinary map consumers, key/value deconstruction, empty objects, case-sensitive
+keys, absent keys versus JsonNull, identity preservation, mutation during iteration,
+and serialization/deserialization after map access in interpreted and native modes.
+Review serializer dispatch precedence so JsonObject remains a JSON node even when
+it also implements Map; generic collection handling must not reinterpret it.
+Public API reference and matching compiler/library snapshots must accompany implementation.

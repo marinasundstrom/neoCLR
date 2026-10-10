@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Record the author-requested JsonObject map/indexer review, including missing-key,
+  JSON-null, iteration and mutation contracts. This is planned API work.
+
 - Close the compiler gap exposed by MemoryStream/JSON migration: the matching Raven
   compiler now emits full-width long and null-safe String constant patterns.
   Restore direct union-payload literal assertions; five stream and twelve JSON DOM

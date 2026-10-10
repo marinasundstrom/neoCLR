@@ -13756,3 +13756,14 @@ claim completion of in-process test discovery.
   without a Windows execution claim. Raven's long/String constant-pattern gap is
   also fixed: six compiler checks and the restored five MemoryStream/twelve JSON DOM
   runtime cases pass. These replace the earlier literal-pattern workarounds.
+
+## 2026-10-10 — JsonObject map view
+
+- **Author:** “We also should look at JsonObject as an indexable map<string, JsonValue>”.
+- **Assistant review:** JsonObject is a natural candidate for the existing Map view,
+  including Find, ContainsKey, Keys and key/value iteration. The current Map has no
+  indexer, so review indexing across both JsonObject and HashMap. Keep absent fields
+  distinct from explicit JsonNull and retain JSON-node serialization precedence.
+- **Outcome:** record [the API review scope](json-dom-design.md#jsonobject-as-an-indexable-map--author-follow-up-2026-10-10)
+  and .NET baseline. No public API change is claimed. This joins the JSON follow-up
+  work; the active migration-gap fixes continue. Indexer and mutation contracts remain open.
