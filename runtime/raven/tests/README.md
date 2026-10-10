@@ -463,3 +463,18 @@ uses a nested String constant pattern. Both suites pass with Raven
 The compiler's six focused pattern checks include full-width mismatches, null and
 dynamically constructed strings. Libraries retain the previous compatible metadata
 snapshot; the bundle manifest records the compiler replacement and all file hashes.
+
+Batch `uri-resolution`: URI resolution, grammar errors, ordinal identity and byte
+quotas; 11 tests pass native macOS ARM64 and release-interpreted execution
+([evidence](uri-resolution-validation.json)). Source:
+[URI probe](../../../docs/experiments/uri/verify.py). The suite covers all 46 resolution
+pairs and 14 invalid inputs, typed/text Resolve parity, Object/interface equality,
+hash agreement, collection retention and the 4096-byte boundary. The original probe
+retains its forced-GC and independent .NET comparison roles.
+
+The ten author-requested migration batches add 69 library tests, bringing the library
+suite to 139 tests across 15 projects, plus discovery/runner contract checks. Every
+migrated suite has passing local native/interpreter evidence; no expected native
+admission failures remain. The gate requires both modes. Windows x64 object emission
+passes for the final Path/IPAddress/URI suites; this does not qualify Windows linking
+or execution. The Windows action runs the expanded suite with a 90-minute job budget.

@@ -40,3 +40,9 @@ This boundary-heavy interpreted test remains slow; it is not a throughput result
 Matching bootstrap regeneration, API snapshot validation, the combined 986-page
 website build and all 17 website tests pass. No remote CI matrix, release or website
 publication is claimed.
+
+Development migration (2026-10-10): eleven attributed framework tests now cover the
+46 resolution pairs, 14 invalid inputs, value dispatch and byte quotas in
+`runtime/raven/tests/uri-resolution`. Native macOS ARM64 and interpreted execution
+pass; Windows object emission passes but execution remains pending. The original
+probe retains its forced-GC and independent .NET-comparison purpose.

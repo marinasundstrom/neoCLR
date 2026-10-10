@@ -13775,3 +13775,24 @@ claim completion of in-process test discovery.
   MutableMap adds insert-or-replace assignment, while Find remains the preferred
   safe lookup. Apply this to JsonObject without confusing missing keys and JsonNull.
   This resolves the earlier open return-type question; implementation remains pending.
+
+## 2026-10-10 — Runtime test migration closes ten batches locally
+
+- **Author direction:** continue with ten important migration batches and fix gaps
+  exposed while writing tests. Later clarify Map's faulting getter indexer and
+  MutableMap's insert-or-replace setter; preserve Find as the safe lookup.
+- **Assistant actions:** migrate MemoryStream, String construction, Unicode casing,
+  Int64 parsing, primitive parsing, Path, HTTP headers, route matching, IPAddress
+  and URI checks into attributed Raven suites. Fix compiler literal patterns,
+  native parsing/scalar transport, Char/String construction, Object-slot dispatch
+  and integer shifts needed by those cases. Remove expected-admission exemptions.
+- **Assistant-reported outcome:** 69 migrated cases pass local native/interpreted
+  execution, bringing the library suites to 139 cases. The final combined gate
+  passes all 23 Path/IPAddress/URI cases in both modes. Focused Object/default-display,
+  inherited-display and 36 shift comparisons pass. Final Windows x64 object emission
+  passes; Windows runtime execution remains pending. Evidence is linked from the
+  [test README](../runtime/raven/tests/README.md).
+- **Open work:** implement the agreed map/indexer contract with JsonObject map
+  conformance and reference documentation. This milestone does not claim those API
+  changes, arbitrary native virtual dispatch or boxed/String Object equality/hash
+  adapters. Original integration and forced-GC consumers remain available.

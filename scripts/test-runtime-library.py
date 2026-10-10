@@ -177,6 +177,19 @@ IP_ADDRESS_VALUES_NAMES = [
     'IPv4 parsing and canonical formatting round trip',
     'IPv6 parsing and canonical formatting round trip',
 ]
+URI_RESOLUTION_NAMES = [
+    'URI resolution handles authority and path bases and rejects relative bases',
+    'URI classification and equality preserve literal identity',
+    'URI parsing rejects every invalid grammar corpus input',
+    'URI parsing and resolution enforce the byte quota',
+    'URI reference resolution corpus group 1',
+    'URI reference resolution corpus group 2',
+    'URI reference resolution corpus group 3',
+    'URI reference resolution corpus group 4',
+    'URI reference resolution corpus group 5',
+    'URI reference resolution corpus group 6',
+    'URI parsing reports unsupported bracketed authorities',
+]
 DISCOVERY_SPEC = importlib.util.spec_from_file_location('test_discovery', ROOT / 'scripts/discover-runtime-tests.py')
 DISCOVERY = importlib.util.module_from_spec(DISCOVERY_SPEC)
 DISCOVERY_SPEC.loader.exec_module(DISCOVERY)
@@ -192,7 +205,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-route-matching', 'ip-address-values', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -223,6 +236,7 @@ def main():
         ('http-header-values', 0, ''.join('PASS ' + n + '\n' for n in HTTP_HEADER_VALUES_NAMES) + f'Tests: {len(HTTP_HEADER_VALUES_NAMES)}, passed: {len(HTTP_HEADER_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-route-matching', 0, ''.join('PASS ' + n + '\n' for n in HTTP_ROUTE_MATCHING_NAMES) + f'Tests: {len(HTTP_ROUTE_MATCHING_NAMES)}, passed: {len(HTTP_ROUTE_MATCHING_NAMES)}, failed: 0, skipped: 0\n'),
         ('ip-address-values', 0, ''.join('PASS ' + n + '\n' for n in IP_ADDRESS_VALUES_NAMES) + f'Tests: {len(IP_ADDRESS_VALUES_NAMES)}, passed: {len(IP_ADDRESS_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
+        ('uri-resolution', 0, ''.join('PASS ' + n + '\n' for n in URI_RESOLUTION_NAMES) + f'Tests: {len(URI_RESOLUTION_NAMES)}, passed: {len(URI_RESOLUTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n'),
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]

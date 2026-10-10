@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Finish the ten-batch runtime test migration with eleven URI tests covering the
+  resolution corpus, grammar errors, equality/dispatch and byte quotas. All eleven
+  pass native macOS ARM64 and interpreted execution; Windows x64 object emission
+  passes, with Windows linking/execution still pending. Extend the Windows gate's
+  timeout for the expanded 139-test library suite.
+
 - Fix native Object equality/hash dispatch, inherited override admission and default
   type-name display exposed by Path/IPAddress tests. Preserve source metadata names,
   null-receiver faults and ordinary class identity semantics. Add native Int32/Int64

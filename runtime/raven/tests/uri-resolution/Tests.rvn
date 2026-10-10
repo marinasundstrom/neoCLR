@@ -1,0 +1,187 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import System.Option.*
+import NeoClr.Testing.*
+
+import System.Collections.*
+
+[Test("URI reference resolution corpus group 1")]
+func UriResolution1() -> Result<unit, TestFailure> {
+    let baseUri = RequiredUri("http://a/b/c/d;p?q")?
+    _ = CheckResolution(baseUri, "g:h", "g:h")?
+    _ = CheckResolution(baseUri, "g", "http://a/b/c/g")?
+    _ = CheckResolution(baseUri, "./g", "http://a/b/c/g")?
+    _ = CheckResolution(baseUri, "g/", "http://a/b/c/g/")?
+    _ = CheckResolution(baseUri, "/g", "http://a/g")?
+    _ = CheckResolution(baseUri, "//g", "http://g")?
+    _ = CheckResolution(baseUri, "?y", "http://a/b/c/d;p?y")?
+    _ = CheckResolution(baseUri, "g?y", "http://a/b/c/g?y")?
+    return Assert.True(true, "Resolution corpus group completed")
+}
+
+[Test("URI reference resolution corpus group 2")]
+func UriResolution2() -> Result<unit, TestFailure> {
+    let baseUri = RequiredUri("http://a/b/c/d;p?q")?
+    _ = CheckResolution(baseUri, "#s", "http://a/b/c/d;p?q#s")?
+    _ = CheckResolution(baseUri, "g#s", "http://a/b/c/g#s")?
+    _ = CheckResolution(baseUri, "g?y#s", "http://a/b/c/g?y#s")?
+    _ = CheckResolution(baseUri, ";x", "http://a/b/c/;x")?
+    _ = CheckResolution(baseUri, "g;x", "http://a/b/c/g;x")?
+    _ = CheckResolution(baseUri, "g;x?y#s", "http://a/b/c/g;x?y#s")?
+    _ = CheckResolution(baseUri, "", "http://a/b/c/d;p?q")?
+    _ = CheckResolution(baseUri, ".", "http://a/b/c/")?
+    return Assert.True(true, "Resolution corpus group completed")
+}
+
+[Test("URI reference resolution corpus group 3")]
+func UriResolution3() -> Result<unit, TestFailure> {
+    let baseUri = RequiredUri("http://a/b/c/d;p?q")?
+    _ = CheckResolution(baseUri, "./", "http://a/b/c/")?
+    _ = CheckResolution(baseUri, "..", "http://a/b/")?
+    _ = CheckResolution(baseUri, "../", "http://a/b/")?
+    _ = CheckResolution(baseUri, "../g", "http://a/b/g")?
+    _ = CheckResolution(baseUri, "../..", "http://a/")?
+    _ = CheckResolution(baseUri, "../../", "http://a/")?
+    _ = CheckResolution(baseUri, "../../g", "http://a/g")?
+    _ = CheckResolution(baseUri, "../../../g", "http://a/g")?
+    return Assert.True(true, "Resolution corpus group completed")
+}
+
+[Test("URI reference resolution corpus group 4")]
+func UriResolution4() -> Result<unit, TestFailure> {
+    let baseUri = RequiredUri("http://a/b/c/d;p?q")?
+    _ = CheckResolution(baseUri, "../../../../g", "http://a/g")?
+    _ = CheckResolution(baseUri, "/./g", "http://a/g")?
+    _ = CheckResolution(baseUri, "/../g", "http://a/g")?
+    _ = CheckResolution(baseUri, "g.", "http://a/b/c/g.")?
+    _ = CheckResolution(baseUri, ".g", "http://a/b/c/.g")?
+    _ = CheckResolution(baseUri, "g..", "http://a/b/c/g..")?
+    _ = CheckResolution(baseUri, "..g", "http://a/b/c/..g")?
+    _ = CheckResolution(baseUri, "./../g", "http://a/b/g")?
+    return Assert.True(true, "Resolution corpus group completed")
+}
+
+[Test("URI reference resolution corpus group 5")]
+func UriResolution5() -> Result<unit, TestFailure> {
+    let baseUri = RequiredUri("http://a/b/c/d;p?q")?
+    _ = CheckResolution(baseUri, "./g/.", "http://a/b/c/g/")?
+    _ = CheckResolution(baseUri, "g/./h", "http://a/b/c/g/h")?
+    _ = CheckResolution(baseUri, "g/../h", "http://a/b/c/h")?
+    _ = CheckResolution(baseUri, "g;x=1/./y", "http://a/b/c/g;x=1/y")?
+    _ = CheckResolution(baseUri, "g;x=1/../y", "http://a/b/c/y")?
+    _ = CheckResolution(baseUri, "g?y/./x", "http://a/b/c/g?y/./x")?
+    _ = CheckResolution(baseUri, "g?y/../x", "http://a/b/c/g?y/../x")?
+    _ = CheckResolution(baseUri, "g#s/./x", "http://a/b/c/g#s/./x")?
+    return Assert.True(true, "Resolution corpus group completed")
+}
+
+[Test("URI reference resolution corpus group 6")]
+func UriResolution6() -> Result<unit, TestFailure> {
+    let baseUri = RequiredUri("http://a/b/c/d;p?q")?
+    _ = CheckResolution(baseUri, "g#s/../x", "http://a/b/c/g#s/../x")?
+    _ = CheckResolution(baseUri, "http:g", "http:g")?
+    _ = CheckResolution(baseUri, "?", "http://a/b/c/d;p?")?
+    _ = CheckResolution(baseUri, "#", "http://a/b/c/d;p?q#")?
+    _ = CheckResolution(baseUri, "a%2Fb", "http://a/b/c/a%2Fb")?
+    _ = CheckResolution(baseUri, "%2e%2e/g", "http://a/b/c/%2e%2e/g")?
+    return Assert.True(true, "Resolution corpus group completed")
+}
+
+[Test("URI parsing rejects every invalid grammar corpus input")]
+func UriInvalid() -> Result<unit, TestFailure> {
+    for text in ["a b", "a\\b", "a\n", "%", "%0", "%zz", "1:a", ":a", "a#b#c", "http://a:xyz/", "http://a:1:2/", "http://a@b@c/", "é", "<x>"] {
+        if Uri.Parse(text) is Error(let error) {
+            _ = Assert.True(error is UriError.InvalidFormat, "Invalid grammar error kind")?
+        } else {
+            return Assert.True(false, "Invalid URI accepted: " + text)
+        }
+    }
+    return Assert.True(true, "Invalid grammar corpus rejected")
+}
+
+[Test("URI classification and equality preserve literal identity")]
+func UriClassification() -> Result<unit, TestFailure> {
+    let empty = RequiredUri("")?
+    let mail = RequiredUri("mailto:a@example.test")?
+    let authority = RequiredUri("//a/path")?
+    _ = Assert.True(empty.IsRelative && mail.IsAbsolute && authority.IsRelative, "URI reference classification")?
+    let upper = RequiredUri("http://A/")?
+    let lower = RequiredUri("http://a/")?
+    _ = Assert.True(!upper.Equals(lower), "Current URI value equality is ordinal")?
+    let value: Object = RequiredUri("a")?
+    return Assert.True(!value.Equals("a"), "URI does not equal plain text")
+}
+
+[Test("URI resolution handles authority and path bases and rejects relative bases")]
+func UriBaseRules() -> Result<unit, TestFailure> {
+    _ = CheckResolution(RequiredUri("http://a")?, "child", "http://a/child")?
+    _ = CheckResolution(RequiredUri("http://a/b/")?, "child", "http://a/b/child")?
+    _ = CheckResolution(RequiredUri("http://a/b")?, "child", "http://a/child")?
+    let relative = RequiredUri("relative")?
+    if relative.Resolve("http://a/") is Error(let error) {
+        return Assert.True(error is UriError.BaseNotAbsolute, "Resolution requires an absolute base")
+    }
+    return Assert.True(false, "Relative base must fail")
+}
+
+[Test("URI parsing reports unsupported bracketed authorities")]
+func UriUnsupportedAuthority() -> Result<unit, TestFailure> {
+    if Uri.Parse("http://[::1]/") is Error(let error) {
+        return Assert.True(error is UriError.UnsupportedAuthority, "IPv6 authority remains an explicit unsupported grammar shape")
+    }
+    return Assert.True(false, "Unsupported authority must fail")
+}
+
+[Test("URI parsing and resolution enforce the byte quota")]
+func UriLengthQuota() -> Result<unit, TestFailure> {
+    var text = "x"
+    var index = 0
+    while index < 12 {
+        text = text + text
+        index += 1
+    }
+    let maximum = RequiredUri(text)?
+    _ = Assert.Equal(text, maximum.Text)?
+    if Uri.Parse(text + "x") is Error(let error) {
+        _ = Assert.True(error is UriError.TooLong, "One extra byte exceeds URI quota")?
+    } else {
+        return Assert.True(false, "Oversized URI must fail")
+    }
+    let baseUri = RequiredUri("http://a/b/c/d;p?q")?
+    if baseUri.Resolve(maximum) is Error(let error) {
+        return Assert.True(error is UriError.TooLong, "Resolved URI must obey the same quota")
+    }
+    return Assert.True(false, "Oversized resolved URI must fail")
+}
+
+func RequiredUri(text: string) -> Result<Uri, TestFailure> {
+    if Uri.Parse(text) is Ok(let uri) {
+        return Ok(uri)
+    }
+    return Error(TestFailure("Expected valid URI", text, "parse failure"))
+}
+
+func CheckResolution(baseUri: Uri, reference: string, expected: string) -> Result<unit, TestFailure> {
+    let Ok(uri) = baseUri.Resolve(reference) else {
+        return Assert.True(false, "URI resolution failed: " + reference)
+    }
+    _ = Assert.Equal(expected, uri.Text)?
+    _ = Assert.True(uri.IsAbsolute && !uri.IsRelative, "Resolved URI is absolute")?
+    let same = RequiredUri(expected)?
+    _ = Assert.True(uri.Equals(same), "Resolved value equality")?
+    _ = Assert.Equal(same.GetHashCode(), uri.GetHashCode())?
+    let values = ArrayList<Uri>()
+    values.Add(uri)
+    _ = Assert.True(values[0].Equals(same), "Collection retains URI value")?
+    let comparable: EquatableTo<Uri> = uri
+    let boxed: Object = uri
+    _ = Assert.True(comparable.Equals(same) && boxed.Equals(same), "Interface and Object dispatch agree")?
+    _ = Assert.Equal(expected, boxed.ToString())?
+    let parsedReference = RequiredUri(reference)?
+    if baseUri.Resolve(parsedReference) is Ok(let typed) {
+        return Assert.True(typed.Equals(uri), "Typed and text resolution agree")
+    }
+    return Assert.True(false, "Typed resolution must succeed")
+}

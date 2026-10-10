@@ -75,6 +75,13 @@ Batch `http-route-matching` adds 8 tests for HTTP route parsing, captures, decod
 ([evidence](../runtime/raven/tests/http-route-matching-validation.json)).
 Batch `ip-address-values` adds 7 tests for public IPAddress parsing corpus, canonical formatting, equality and allocation churn qualified in native macOS ARM64 and release-interpreted execution
 ([evidence](../runtime/raven/tests/ip-address-values-validation.json)).
+Batch `uri-resolution` adds 11 passing native/interpreted tests for URI resolution,
+grammar, equality and byte quotas ([evidence](../runtime/raven/tests/uri-resolution-validation.json)).
+This completes local migration of the ten selected batches: 69 added cases, 139 total
+library tests. Gaps exposed by these tests were fixed rather than retained as native
+admission exceptions. Final Object-slot/shift checks and Windows object emission pass;
+Windows runtime qualification remains pending. Map/MutableMap indexers and JsonObject
+map conformance remain the agreed follow-up API work, not completed by this migration.
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 
