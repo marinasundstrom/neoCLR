@@ -66,8 +66,10 @@ Older neoCLR metadata exposes an identified namespace projection. Development ho
 and guest `ModuleInfo` now describe logical modules. Interpreter traversal through
 `RuntimeContext.Current.ExecutingAssembly.GetModules()` includes declared empty
 modules. Native compilation supports explicitly retained type-to-module ownership
-and `Module.Assembly` with assembly `Name`/`FullName`; assembly-wide native enumeration
-remains open. See the [API scope](/docs/introspection.html#logical-modules-development-2026-10-10).
+and `Module.Assembly` with assembly `Name`/`FullName`. Explicit module-catalog retention
+also enables native `AssemblyInfo.GetModules()`, preserving declared empty modules;
+a missing catalog faults instead of returning an incomplete list. Native RuntimeContext
+and type enumeration remain open. See the [API scope](/docs/introspection.html#logical-modules-development-2026-10-10).
 Module-private visibility, re-exports, guest module-function discovery and independently
 loadable modules remain outside this foundation. A module does not create its own heap,
 scheduler, native ABI or artifact file.

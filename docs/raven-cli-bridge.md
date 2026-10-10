@@ -7525,7 +7525,7 @@ The VM owns logical ownership queries. AOT owns the explicit TypeModule retentio
 adapter and builds trusted descriptor factories through native_metadata::type_module;
 no user constructors run. The [consumer](experiments/guest-modules/README.md) records
 interpreter traversal, retained native ownership and missing-retention failure. Native
-assembly-wide traversal remains unsupported. Retained modules now support
+assembly/type discovery remains incomplete. Retained modules now support
 Module.Assembly and AssemblyInfo.Name/FullName through the same validated catalog
 recipes; this is an AOT backend binding change with no compiler, CLI encoding or
 Runtime Contract change. It grants no additional declaration retention or invocation.
@@ -7533,3 +7533,17 @@ Reference-only generation and source native
 class libraries succeed; the independent legacy implementation generator is blocked
 by its Map contract, with only mechanical getter removal applied to checked fragments.
 No Raven compiler change or ordinary .NET behavior change is needed for this slice.
+
+### Native logical module catalogs (2026-10-10)
+
+The AOT backend accepts private reflection-roots schema 4 with explicit full assembly
+identities in moduleCatalogs. It materializes AssemblyInfo.GetModules through the same
+VM catalog query, preserving empty names/tables and exact ownership. Unknown identities,
+legacy namespace projections and omitted catalog retention are rejected rather than
+presented as complete discovery. This does not retain types or callable bodies.
+No Raven compiler capability, Runtime Contract configuration, CLI encoding or public
+guest signature changes. Native declaration tables are authoritative; ordinary CLI
+projection still cannot recover explicit empty modules. The backend owns the generated
+snapshot factories; a later native metadata backend replaces their generated branches.
+Validation and remaining native RuntimeContext/type-enumeration gaps are recorded in
+[the consumer](experiments/guest-modules/README.md).

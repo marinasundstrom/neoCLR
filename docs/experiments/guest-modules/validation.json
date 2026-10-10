@@ -8,17 +8,17 @@
         "/Users/robert/Projects/neoclr/target/guest-module-bundle/sdk/tools/rvnc/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/source/Traversal.rvnproj"
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/source/Traversal.rvnproj"
       ],
       "exitCode": 0,
-      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/source/bin/neoclr/CoffeePackage.dll\n",
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/source/bin/neoclr/CoffeePackage.dll\n",
       "stderr": "warning RAV0168: 'owner' shadows a previous declaration.\n"
     },
     {
       "command": [
         "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr",
         "run",
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/source/bin/neoclr/CoffeePackage.dll",
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/source/bin/neoclr/CoffeePackage.dll",
         "--system",
         "/Users/robert/Projects/neoclr/target/guest-module-bundle/lib/System.runtime.neox",
         "--module",
@@ -29,7 +29,7 @@
       ],
       "exitCode": 0,
       "stdout": "Logical module traversal passed\n",
-      "stderr": "GC: allocated=43 live=0 peak=43 collections=1 reclaimed=43\n"
+      "stderr": "GC: allocated=62 live=0 peak=62 collections=1 reclaimed=62\n"
     },
     {
       "command": [
@@ -37,10 +37,10 @@
         "/Users/robert/Projects/neoclr/target/guest-module-bundle/sdk/tools/rvnc/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/source/Native.rvnproj"
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/source/Native.rvnproj"
       ],
       "exitCode": 0,
-      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/source/bin/neoclr/CoffeePackage.dll\n",
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/source/bin/neoclr/CoffeePackage.dll\n",
       "stderr": ""
     },
     {
@@ -52,8 +52,8 @@
         "-p:WarningLevel=0",
         "--",
         "--module-retention",
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/source/bin/neoclr/CoffeePackage.dll",
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/roots.json"
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/source/bin/neoclr/CoffeePackage.dll",
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/roots.json"
       ],
       "exitCode": 0,
       "stdout": "",
@@ -66,23 +66,23 @@
         "--profile",
         "console",
         "--project",
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/source/Native.rvnproj",
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/source/Native.rvnproj",
         "--bundle",
         "/Users/robert/Projects/neoclr/target/guest-module-bundle",
         "--aot",
         "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
         "--reflection-roots",
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/roots.json",
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/roots.json",
         "--output",
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/retained"
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/retained"
       ],
       "exitCode": 0,
-      "stdout": "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/retained/app\n",
+      "stdout": "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/retained/app\n",
       "stderr": ""
     },
     {
       "command": [
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/isolated/app"
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/isolated/app"
       ],
       "exitCode": 0,
       "stdout": "Logical module ownership passed\n",
@@ -92,7 +92,7 @@
       "command": [
         "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr",
         "run",
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/retained/app.dll",
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/retained/app.dll",
         "--system",
         "/Users/robert/Projects/neoclr/target/guest-module-bundle/lib/System.runtime.neox",
         "--module",
@@ -103,7 +103,7 @@
       ],
       "exitCode": 0,
       "stdout": "Logical module ownership passed\n",
-      "stderr": "GC: allocated=11 live=0 peak=11 collections=1 reclaimed=11\n"
+      "stderr": "GC: allocated=30 live=0 peak=30 collections=1 reclaimed=30\n"
     },
     {
       "command": [
@@ -112,32 +112,61 @@
         "--profile",
         "console",
         "--project",
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/source/Native.rvnproj",
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/source/Native.rvnproj",
         "--bundle",
         "/Users/robert/Projects/neoclr/target/guest-module-bundle",
         "--aot",
         "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
         "--reflection-roots",
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/missing-root.json",
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/missing-root.json",
         "--output",
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/unretained"
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/unretained"
       ],
       "exitCode": 0,
-      "stdout": "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/unretained/app\n",
+      "stdout": "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/unretained/app\n",
       "stderr": ""
     },
     {
       "command": [
-        "/Users/robert/Projects/neoclr/target/guest-assembly-ownership-final/unretained/app"
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/unretained/app"
       ],
       "exitCode": 1,
       "stdout": "",
       "stderr": "UserFault: native logical module metadata was not retained\n   at neoCLR.Runtime.TypeModule [instruction 9]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_496E74726F7370656374696F6E52756E74696D655365727669636573.M_547970654D6F64756C65 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E496E74726F7370656374696F6E_52756E74696D654E6F6D696E616C54797065496E666F.M_6765745F4D6F64756C65 [instruction 2]\n   at NeoMetadata_36ECE47D0C7BEAE72C065D7D66B568A78B4C52D030B97153614A602CF15F8384.F_3C4E656F46756E6374696F6E3E34313633364436353245343336463636363636353635344436313642363537323245353436353733373437335F34333638363536333642344637373645363537323733363836393730 [instruction 75]\n   at NeoMetadata_36ECE47D0C7BEAE72C065D7D66B568A78B4C52D030B97153614A602CF15F8384.F_3C4E656F46756E6374696F6E3E34313633364436353245343336463636363636353635344436313642363537323245353436353733373437335F3444363136393645 [instruction 0]\n"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "console",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/source/Native.rvnproj",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/guest-module-bundle",
+        "--aot",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/missing-catalog.json",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/unretained-catalog"
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/unretained-catalog/app\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/guest-module-catalog-qualified/unretained-catalog/app"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: native assembly module catalog was not retained\n   at neoCLR.Runtime.AssemblyModules [instruction 0]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_496E74726F7370656374696F6E52756E74696D655365727669636573.M_417373656D626C794D6F64756C6573 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E496E74726F7370656374696F6E_52756E74696D65417373656D626C79496E666F.M_4765744D6F64756C6573 [instruction 2]\n   at NeoMetadata_36ECE47D0C7BEAE72C065D7D66B568A78B4C52D030B97153614A602CF15F8384.F_3C4E656F46756E6374696F6E3E34313633364436353245343336463636363636353635344436313642363537323245353436353733373437335F34333638363536333642344637373645363537323733363836393730 [instruction 127]\n   at NeoMetadata_36ECE47D0C7BEAE72C065D7D66B568A78B4C52D030B97153614A602CF15F8384.F_3C4E656F46756E6374696F6E3E34313633364436353245343336463636363636353635344436313642363537323245353436353733373437335F3444363136393645 [instruction 0]\n"
     }
   ],
   "inputs": {
-    "docs/experiments/guest-modules/verify.py": "a9d3a7327b8fd279e581128bff1ebd4993efcd220cf36c88c24c46ffc8c5c83d",
-    "docs/experiments/guest-modules/Ownership.rvn": "af8ed7ec783e9083279dce2e8959574afb4f4620eddf320c9d414f7fed679438",
+    "docs/experiments/guest-modules/verify.py": "0cc904a37f23e534ab744f92b9745a6628ed4fb63b815f3864f8a68eed9dc4e5",
+    "docs/experiments/guest-modules/Ownership.rvn": "fad1871bdcf678716b2b07113bdbb7027a017ea632b0aac7a548b7dcf6f6bb52",
     "docs/experiments/guest-modules/NativeMain.rvn": "ec7e9db53686459fea751b43dc2552f2fdf7bfd0f5ae965e3c87184ae4c0e79d",
     "docs/experiments/guest-modules/TraversalMain.rvn": "3d8bb197ba7588c8701fd26643a6afd39f11f906cddb7885153a871e744be6be",
     "docs/experiments/guest-modules/Models.rvn": "500f074e49fbf540a9db8760c6e1de929ac2ccaa92b046f98930a92f521f0932",
@@ -145,17 +174,18 @@
     "docs/experiments/guest-modules/Native.rvnproj": "bbe12f62c8ecdd0c9b22346a2b77dccecdac2a99f714cf3914ac7567aed39086"
   },
   "bundleManifestSha256": "7ee6a3e41645d7b7c63c0f976e24f70e91cce53bc500cd42821573111de12cca",
-  "aotSha256": "d827170e5d2efbc291f54e9ac9955c76cb9f9aff59fd2d3ab9401056f96692c6",
+  "aotSha256": "c8cb5373a2cc67dd892814d38c670f526217748733b13ad9abce98ebe9aab6a6",
   "runnerSha256": "0981655f58306a5c45cf9bb318f69259298dbb4a28e5a31290af2ceab23d1f89",
-  "scope": "Interpreter assembly/module/type/member/parameter traversal; AOT retained type-to-module ownership and Module.Assembly with AssemblyInfo.Name/FullName. AOT assembly-wide traversal and Object.Equals dispatch are not covered.",
+  "scope": "Interpreter assembly/module/type/member/parameter traversal; AOT retained type-to-module ownership and Module.Assembly with AssemblyInfo.Name/FullName. Explicit AOT Assembly.GetModules catalog including empty modules; missing-catalog faults. RuntimeContext.ExecutingAssembly, type enumeration and Object.Equals dispatch are not covered by AOT.",
   "date": "2026-10-10",
   "compilerRevision": "1a0c4e62734b2d4f17dc9f8af1f5d02c566f8cf4",
-  "aotBuild": "9ad543db plus retained module-to-assembly ownership working tree.",
+  "aotBuild": "ee978bda plus explicit native module-catalog retention working tree.",
   "runnerBuild": "2e4d5b6d plus guest logical-module working tree. A later ordinal-only UTF-16 ordering correction is covered by focused Rust checks; fixture names are ASCII.",
   "legacyBootstrap": "Clean ModuleInfo CLI regeneration attempted; blocked by Incompatible map contract: Map. Source-built native libraries and reference bridge rebuilt successfully.",
-  "windows": "Expanded ownership gate pending. Earlier guest gate 38053504768 was still in progress at the last check; preceding host-only gate 38051487728 succeeded, artifact hashes not independently checked.",
+  "windows": "Current catalog slice pending. Earlier ownership gate 38054078694 was still in progress at the last check; no Windows qualification is claimed.",
   "focusedChecks": [
-    "cargo test --target-dir tools/aot-poc/target --features native-metadata --lib assembly_info --quiet: 2 passed",
+    "cargo test --manifest-path tools/aot-poc/Cargo.toml --bin neoclr-aot-poc catalog --quiet: 2 passed (policy validation and unrelated retention regression)",
+    "SDKROOT from xcrun cargo test --manifest-path tools/aot-poc/Cargo.toml reflection_construction --quiet: 2 unit checks and 1 native constructor consumer passed",
     "python3 scripts/build-api-docs.py --check: passed"
   ]
 }

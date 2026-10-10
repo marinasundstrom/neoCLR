@@ -19,15 +19,32 @@ pub fn bind(
         .get("schemaVersion")
         .and_then(Value::as_u64)
         .unwrap_or(0);
-    if config.len() != 2 || !matches!(version, 1 | 2 | 3) {
-        return Err("reflection roots require schemaVersion 1, 2 or 3 and types".into());
+    if config.len() != if version == 4 { 3 } else { 2 } || !matches!(version, 1 | 2 | 3 | 4) {
+        return Err("reflection roots require schemaVersion 1–3 and types, or schemaVersion 4 with types and moduleCatalogs".into());
     }
     let roots = config
         .get("types")
         .and_then(Value::as_array)
         .ok_or("reflection roots require types array")?;
-    if roots.is_empty() || roots.len() > 64 {
-        return Err("reflection roots require one to 64 types".into());
+    let mut catalogs = vec![];
+    if version == 4 {
+        let requested = config.get("moduleCatalogs").and_then(Value::as_array)
+            .ok_or("moduleCatalogs must be an array of full assembly identities")?;
+        if requested.len() > 64 {
+            return Err("moduleCatalogs admits at most 64 assemblies".into());
+        }
+        for entry in requested {
+            let identity = entry.as_str().ok_or("moduleCatalogs requires String identities")?;
+            if catalogs.contains(&identity) {
+                return Err("duplicate module catalog identity".into());
+            }
+            neoclr::native_metadata::assembly_modules(source, identity)
+                .map_err(|error| error.to_string())?;
+            catalogs.push(identity);
+        }
+    }
+    if (roots.is_empty() && catalogs.is_empty()) || roots.len() > 64 {
+        return Err("reflection roots require one to 64 types or an explicit module catalog".into());
     }
     let mut selected = vec![];
     let mut rows = vec![];
@@ -50,10 +67,10 @@ pub fn bind(
         {
             return Err("reflection root fields do not match the requested schema".into());
         }
-        if version == 3 && !fields.contains_key("customAttributes") {
+        if version >= 3 && !fields.contains_key("customAttributes") {
             return Err("reflection root fields do not match the requested schema".into());
         }
-        let custom_attributes = if version == 3 {
+        let custom_attributes = if version >= 3 {
             root["customAttributes"]
                 .as_bool()
                 .ok_or("customAttributes must be Boolean")?
@@ -226,12 +243,47 @@ pub fn bind(
         ));
         f.body = body;
     }
-    Ok(json!({"schemaVersion":version,"types":rows}))
+    let mut result = json!({"schemaVersion":version,"types":rows});
+    if version == 4 {
+        result["moduleCatalogs"] = json!(catalogs);
+    }
+    Ok(result)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn module_catalogs_require_explicit_scoped_metadata_without_type_roots() {
+        let mut source = neoclr::assemble(".module Catalog\n").unwrap();
+        source.assemblies = serde_json::from_value(json!([
+            {"name":"One","full_name":"One, Version=1.0.0.0","modules":["One.dll"],"references":[],
+             "declaration_modules":{"version":1,"names":["Example","Example.Empty"]}},
+            {"name":"Two","full_name":"Two","modules":["Two.dll"],"references":[],
+             "declaration_modules":{"version":1,"names":[]}},
+            {"name":"Legacy","full_name":"Legacy","modules":["Legacy.dll"],"references":[]}
+        ])).unwrap();
+        let valid = json!({"schemaVersion":4,"types":[],"moduleCatalogs":["One, Version=1.0.0.0","Two"]});
+        let result = bind(&mut source.clone(), &source, &[], &[], &valid).unwrap();
+        assert_eq!(result["moduleCatalogs"], valid["moduleCatalogs"]);
+        assert_eq!(result["types"], json!([]));
+        for catalogs in [json!([]), json!(["One"]), json!(["Missing"]), json!(["Legacy"]),
+                         json!(["Two","Two"]), json!([7]), json!(true)] {
+            let mut config = valid.clone();
+            config["moduleCatalogs"] = catalogs;
+            assert!(bind(&mut source.clone(), &source, &[], &[], &config).is_err());
+        }
+        let mut config = valid.clone();
+        config["schemaVersion"] = json!(3);
+        assert!(bind(&mut source.clone(), &source, &[], &[], &config).is_err());
+        config = valid.clone();
+        config["unexpected"] = json!(true);
+        assert!(bind(&mut source.clone(), &source, &[], &[], &config).is_err());
+        config = valid;
+        config.as_object_mut().unwrap().remove("moduleCatalogs");
+        assert!(bind(&mut source.clone(), &source, &[], &[], &config).is_err());
+    }
 
     #[test]
     fn attributes_require_an_explicit_boolean_policy_without_constructor_roots() {

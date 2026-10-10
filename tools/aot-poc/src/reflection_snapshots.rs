@@ -348,6 +348,7 @@ pub fn bind(
                     | "neoCLR.Runtime.TypeModule"
                     | "neoCLR.Runtime.ModuleAssembly"
                     | "neoCLR.Runtime.AssemblyName"
+                    | "neoCLR.Runtime.AssemblyModules"
                     | "neoCLR.Runtime.TypeElementType"
                     | "neoCLR.Runtime.MemberCustomAttributes"
             )
@@ -387,12 +388,38 @@ pub fn bind(
         let ti = definitions.iter().position(|d| *d == id).ok_or("missing snapshot root")?;
         for property in &source.types[ti].properties { vectors(&property.ty, &mut tokens); }
     }
+    // Catalog retention is descriptive only: it roots all declared names, not their types.
+    let mut retained_modules = vec![];
+    let mut catalogs = vec![];
+    for identity in retention["moduleCatalogs"].as_array().into_iter().flatten() {
+        let identity = identity.as_str().ok_or("invalid module catalog identity")?;
+        let recipe = neoclr::native_metadata::assembly_modules(source, identity)
+            .map_err(|error| error.to_string())?;
+        let V::Array { elements, .. } = &recipe else {
+            return Err("invalid module catalog snapshot".into());
+        };
+        retained_modules.extend(elements.iter().cloned());
+        catalogs.push((identity, recipe));
+    }
+    if services.iter().any(|index| matches!(input.functions[*index].name.as_str(),
+        "neoCLR.Runtime.ModuleAssembly" | "neoCLR.Runtime.AssemblyName"))
+    {
+        for row in retention["types"].as_array().unwrap() {
+            let id: TypeDefId = serde_json::from_value(row["definition"].clone())?;
+            let ti = definitions.iter().position(|definition| *definition == id)
+                .ok_or("missing module snapshot root")?;
+            retained_modules.push(neoclr::native_metadata::type_module(
+                source, &Type::Named(source.types[ti].name.clone()),
+            ).map_err(|error| error.to_string())?);
+        }
+    }
     let mut projections = vec![];
     for index in services {
         let f = &input.functions[index];
         let modules = f.name.ends_with("TypeModule");
         let module_assembly = f.name.ends_with("ModuleAssembly");
         let assembly_name = f.name.ends_with("AssemblyName");
+        let assembly_modules = f.name.ends_with("AssemblyModules");
         let properties = f.name.ends_with("Properties");
         let attributes = f.name.ends_with("CustomAttributes");
         let attribute_parameters = attributes
@@ -406,7 +433,7 @@ pub fn bind(
                 && f.parameters
                     != if module_assembly {
                         vec![Type::String, Type::String]
-                    } else if assembly_name {
+                    } else if assembly_name || assembly_modules {
                         vec![Type::String]
                     } else if properties {
                         vec![Type::RuntimeTypeHandle, Type::Int32]
@@ -443,6 +470,23 @@ pub fn bind(
         };
         if attributes {
             bind_attributes(&mut factory, index, definitions, retention, &expected)?;
+        } else if assembly_modules {
+            let Type::ArrayRef(element) = &expected else {
+                return Err("AssemblyModules requires ModuleInfo vector".into());
+            };
+            if name(source, element) != Some("System.Introspection.ModuleInfo") {
+                return Err("AssemblyModules requires scoped ModuleInfo vector".into());
+            }
+            for (identity, recipe) in &catalogs {
+                let skip = factory.body.len() + 3;
+                factory.body.extend([
+                    Op::Arg(0), Op::String((*identity).into()), Op::Equal, Op::BranchFalse(0),
+                ]);
+                factory.emit(recipe, &expected)?;
+                factory.body.push(Op::Return);
+                factory.body[skip] = Op::BranchFalse(factory.body.len());
+            }
+            factory.body.push(Op::Fault("native assembly module catalog was not retained".into()));
         } else if module_assembly || assembly_name {
             if module_assembly && name(source, &expected) != Some("System.Introspection.AssemblyInfo")
                 || assembly_name && expected != Type::String
@@ -450,33 +494,29 @@ pub fn bind(
                 return Err("assembly snapshot query requires exact result contract".into());
             }
             let mut seen = std::collections::HashSet::new();
-            for row in retention["types"].as_array().unwrap() {
-                let id: TypeDefId = serde_json::from_value(row["definition"].clone())?;
-                let ti = definitions
-                    .iter()
-                    .position(|definition| *definition == id)
-                    .ok_or("missing assembly snapshot root")?;
-                let owner = Type::Named(source.types[ti].name.clone());
-                let V::Object { fields, .. } = neoclr::native_metadata::type_module(source, &owner)
-                    .map_err(|e| e.to_string())?
-                else {
+            let mut owners = vec![];
+            for recipe in &retained_modules {
+                let V::Object { fields, .. } = recipe else {
                     return Err("invalid logical module snapshot".into());
                 };
                 let [V::String(identity), V::String(module_name)] = fields.as_slice() else {
                     return Err("invalid logical module identity".into());
                 };
-                let key = (
-                    identity.to_string(),
-                    if module_assembly { module_name.to_string() } else { String::new() },
-                );
+                owners.push((identity.as_str(), Some(module_name.as_str())));
+            }
+            // An assembly can have an explicit empty catalog without a global module.
+            if assembly_name {
+                owners.extend(catalogs.iter().map(|(identity, _)| (*identity, None)));
+            }
+            for (identity, module_name) in owners {
+                let key = (identity, if module_assembly { module_name } else { None });
                 if !seen.insert(key) {
                     continue;
                 }
                 let mut skips = vec![];
-                for (argument, value) in [identity, module_name]
-                    .iter()
-                    .take(if module_assembly { 2 } else { 1 })
-                    .enumerate()
+                let arguments = std::iter::once(identity)
+                    .chain(module_name.filter(|_| module_assembly));
+                for (argument, value) in arguments.enumerate()
                 {
                     factory.body.extend([
                         Op::Arg(argument),
@@ -487,7 +527,9 @@ pub fn bind(
                     factory.body.push(Op::BranchFalse(0));
                 }
                 let value = if module_assembly {
-                    neoclr::native_metadata::module_assembly(source, identity, module_name)
+                    neoclr::native_metadata::module_assembly(
+                        source, identity, module_name.ok_or("missing retained module name")?,
+                    )
                 } else {
                     neoclr::native_metadata::assembly_name(source, identity)
                 }
@@ -844,4 +886,18 @@ fn bind_attributes(
         "native custom attribute metadata was not retained; configure --reflection-roots".into(),
     ));
     Ok(())
+}
+
+#[cfg(test)]
+mod catalog_tests {
+    use super::*;
+
+    #[test]
+    fn unrelated_type_retention_does_not_require_assembly_catalog_metadata() {
+        let source = neoclr::assemble(".module Legacy\n.type class Model\n.end\n").unwrap();
+        let definition = source.types[0].definition.clone().unwrap();
+        let mut retention = json!({"types":[{"definition":definition,"construct":false}]});
+        bind(&mut source.clone(), &source, &[definition], &mut retention).unwrap();
+        assert_eq!(retention["snapshotFactories"], json!([]));
+    }
 }

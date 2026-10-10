@@ -49,7 +49,9 @@ Guest traversal through RuntimeContext.Current.ExecutingAssembly now returns fla
 logical modules in the interpreter; type/member/parameter ownership agrees and the
 physical ModuleInfo.MetadataToken property is removed. AOT materializes type-to-module
 snapshots for explicitly retained nominal definitions, including Module.Assembly
-and AssemblyInfo.Name/FullName ownership inspection. Assembly-wide AOT traversal,
+and AssemblyInfo.Name/FullName ownership inspection. Explicit schema-4 catalog roots
+now support native AssemblyInfo.GetModules, including empty declarations, with a
+missing-catalog fault. Native RuntimeContext discovery and type enumeration,
 guest module-function enumeration and general callable invocation remain open. See
 [the guest consumer](experiments/guest-modules/README.md).
 

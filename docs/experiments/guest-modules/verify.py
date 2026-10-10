@@ -77,8 +77,14 @@ missing = output / 'missing-root.json'
 missing.write_text(json.dumps(policy) + '\n')
 negative = build('unretained', missing)
 run([negative / name], fault='native logical module metadata was not retained')
+policy = json.loads(roots.read_text())
+policy['moduleCatalogs'] = []
+missing_catalog = output / 'missing-catalog.json'
+missing_catalog.write_text(json.dumps(policy) + '\n')
+no_catalog = build('unretained-catalog', missing_catalog)
+run([no_catalog / name], fault='native assembly module catalog was not retained')
 assert all(sha(ROOT / path) == digest for path, digest in report['inputs'].items()), 'Fixture input changed'
 report['passed'] = True
-report['scope'] = 'Interpreter assembly/module/type/member/parameter traversal; AOT retained type-to-module ownership and Module.Assembly with AssemblyInfo.Name/FullName. AOT assembly-wide traversal and Object.Equals dispatch are not covered.'
+report['scope'] = 'Interpreter assembly/module/type/member/parameter traversal; AOT retained type-to-module ownership and Module.Assembly with AssemblyInfo.Name/FullName. Explicit AOT Assembly.GetModules catalog including empty modules; missing-catalog faults. RuntimeContext.ExecutingAssembly, type enumeration and Object.Equals dispatch are not covered by AOT.'
 (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
 print('Guest logical module checks: PASS')

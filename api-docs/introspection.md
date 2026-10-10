@@ -75,7 +75,10 @@ through the existing private reflection-roots policy, reading the resulting Name
 and following Module.Assembly to AssemblyInfo.Name/FullName. Assembly ownership
 is retained only for the exact module/assembly pairs reached from retained types.
 Unretained types fault with an explicit metadata-retention error. This does not grant
-constructor/method invocation. AOT assembly-wide traversal, Module.GetTypes and
+constructor/method invocation. Explicit schema-4 moduleCatalogs roots additionally
+enable AssemblyInfo.GetModules for the complete declared names, including empty
+modules. Without that policy the call faults, even when some type owners are retained.
+Native RuntimeContext.ExecutingAssembly, AssemblyInfo.GetTypes, Module.GetTypes and
 module Object.Equals dispatch are not qualified by this slice. Guest module function
 enumeration and context-wide assembly discovery remain open.
 
@@ -94,6 +97,13 @@ against the loaded catalog; missing assemblies or invalid module ownership retur
 Fault. The AOT adapter admits only retained ownership pairs/full assembly identities,
 otherwise faults with `native assembly ownership metadata was not retained`.
 These helpers do not enumerate assemblies, load dependencies, or grant invocation.
+`assembly_modules(&Module, identity: &str) -> Result<Value, Fault>` returns the
+complete declared logical-module recipe, rejecting absent assemblies and legacy
+metadata without an explicit declaration table. The AOT adapter requires a matching
+catalog root, otherwise faults with `native assembly module catalog was not retained`.
+See the [private retention policy](https://github.com/marinasundstrom/neoCLR/blob/main/docs/declaration-modules.md#native-module-catalog-retention--development-2026-10-10).
+Catalog retention admits module ownership/name queries, not the contained types or
+callable bodies. No guest signature or RavenDoc type-selection change is required.
 
 ## Assembly and module identity
 

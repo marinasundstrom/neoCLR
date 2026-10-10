@@ -292,7 +292,7 @@ Development host tooling exposes logical modules directly through `ModuleInfo`,
 including empty modules and direct member ownership. Dotted names are a convention;
 module metadata is flat. Assemblies package one or several modules. Physical token
 scopes remain separate reader details. See the [host module API](/docs/experimental-metadata.html#context-owned-declaration-views-development-2026-10-10).
-Guest traversal through the executing assembly is now qualified in the interpreter. AOT supports explicitly retained type-to-module name inspection and Module.Assembly with AssemblyInfo.Name/FullName; assembly-wide native traversal remains open. See the [module API and limits](/docs/introspection.html#logical-modules-development-2026-10-10).
+Guest traversal through the executing assembly is now qualified in the interpreter. AOT supports explicitly retained type-to-module name inspection and Module.Assembly with AssemblyInfo.Name/FullName. Explicit module-catalog roots now enable native AssemblyInfo.GetModules, including empty declarations, without retaining their types or methods. Native RuntimeContext discovery and type enumeration remain open. See the [module API and limits](/docs/introspection.html#logical-modules-development-2026-10-10).
 
 
 ## Development: general custom attributes

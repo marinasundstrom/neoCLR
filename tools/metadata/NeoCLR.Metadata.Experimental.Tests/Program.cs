@@ -9,18 +9,22 @@ if (args is ["--module-retention", var moduleInput, var moduleRoots])
     var image = System.Text.Json.Nodes.JsonNode.Parse(NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.Read(File.ReadAllBytes(moduleInput)))!;
     var types = image["types"]!.AsArray();
     var selected = new System.Text.Json.Nodes.JsonArray();
+    string? catalogIdentity = null;
     foreach (var type in types)
     {
         if (type!["origin"]?["name"]?.GetValue<string>() is not ("Acme.CoffeeMaker.Machine" or "Acme.CoffeeMaker.Factories.Factory")) continue;
+        catalogIdentity ??= type["origin"]!["assembly"]!.GetValue<string>();
         selected.Add(new System.Text.Json.Nodes.JsonObject {
             ["definition"] = new System.Text.Json.Nodes.JsonObject {
                 ["module"] = image["name"]!.DeepClone(), ["revision"] = image["revision"]!.DeepClone(), ["index"] = types.IndexOf(type)
             },
-            ["construct"] = false
+            ["construct"] = false, ["properties"] = false, ["getters"] = false,
+            ["setters"] = false, ["customAttributes"] = false
         });
     }
     if (selected.Count != 2) throw new Exception("Expected the two module-ownership fixture types");
-    File.WriteAllText(moduleRoots, new System.Text.Json.Nodes.JsonObject { ["schemaVersion"] = 1, ["types"] = selected }.ToJsonString());
+    File.WriteAllText(moduleRoots, new System.Text.Json.Nodes.JsonObject { ["schemaVersion"] = 4, ["types"] = selected,
+        ["moduleCatalogs"] = new System.Text.Json.Nodes.JsonArray(catalogIdentity!) }.ToJsonString());
     return 0;
 }
 

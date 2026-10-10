@@ -15,15 +15,20 @@ not change the platform's ordinary UTF-8 String comparison contract.
 The native consumer checks names from `NominalTypeInfo.Module` for two explicitly
 retained type definitions, plus repeated queries, Module.Assembly.Name and agreement
 of Assembly.FullName across two different modules in the same assembly. The private reflection-roots
-policy uses schema 1 with `construct: false`; obtaining module metadata grants no
+policy uses schema 4 with explicit `moduleCatalogs` and all type execution flags false; obtaining module metadata grants no
 construction or invocation capability. An otherwise identical executable retaining
 only one of the two types must fault with `native logical module metadata was not
 retained`. The factories use the interpreter's metadata recipe and GC-managed
 RuntimeModuleInfo/RuntimeAssemblyInfo providers. Module.Assembly validates the exact
 retained assembly/module pair; Assembly.Name validates the retained full identity.
-These descriptive ownership facts do not retain an assembly-wide declaration catalog.
+The native consumer also enumerates all four declared modules through Assembly.GetModules,
+including the explicit empty module and the module containing only functions, and
+checks each owning assembly. Dropping only moduleCatalogs must fault with
+`native assembly module catalog was not retained`. These catalog names do not retain
+contained types or executable bodies. Schema checks reject incomplete legacy
+projections and unknown/duplicate identities; an explicit empty table is valid.
 The native probe deliberately does not claim support for Module.GetTypes,
-assembly-wide traversal or Object.Equals dispatch.
+Assembly.GetTypes, RuntimeContext.ExecutingAssembly or Object.Equals dispatch.
 Guest module function enumeration and general reflective callable invocation remain
 open; this is not in-process test discovery yet.
 

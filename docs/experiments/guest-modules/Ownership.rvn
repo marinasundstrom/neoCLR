@@ -33,6 +33,18 @@ func CheckOwnership() -> int {
         } else {
             return 5
         }
+        let modules = owner.Assembly.GetModules()
+        if modules.Count != 4 {
+            return 9
+        }
+        if modules[0].Name != "Acme.CoffeeMaker" || modules[1].Name != "Acme.CoffeeMaker.Empty" || modules[2].Name != "Acme.CoffeeMaker.Factories" || modules[3].Name != "Acme.CoffeeMaker.Tests" {
+            return 19
+        }
+        for item in modules {
+            if item.Assembly.FullName != owner.Assembly.FullName || item.Assembly.Name != "CoffeePackage" {
+                return 20
+            }
+        }
     } else {
         return 6
     }

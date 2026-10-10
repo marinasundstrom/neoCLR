@@ -59,6 +59,19 @@ pub fn assembly_name(module: &Module, identity: &str) -> Result<Value, Fault> {
     )
 }
 
+/// Return a complete explicit logical module catalog, including empty declarations.
+/// Legacy namespace projections cannot establish completeness and are rejected.
+pub fn assembly_modules(module: &Module, identity: &str) -> Result<Value, Fault> {
+    if crate::assembly_info::lookup(module, identity)?.declaration_modules.is_none() {
+        return Err(Fault::new("native module catalog requires explicit declaration metadata"));
+    }
+    crate::assembly_info::Query::Modules.invoke(
+        module,
+        &[Value::String(identity.into())],
+        &Limits::default(),
+    )
+}
+
 /// Resolve a recipe handle to its source signature, without publishing native ordinals.
 pub fn handle_type(module: &Module, handle: &crate::TypeDescriptor) -> Result<Type, Fault> {
     crate::reflection::from_identity(module, &handle.identity)

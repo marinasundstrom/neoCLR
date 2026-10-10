@@ -83,7 +83,8 @@ native or CLI inputs; CLI output still loses explicit empty declarations. Guest 
 module names too. ModuleInfo.MetadataToken is removed. Interpreter queries include
 exact-name type enumeration; native support currently covers explicitly retained
 type-to-module descriptors and their owning AssemblyInfo.Name/FullName. This does
-not retain or enumerate the entire assembly. See [the guest consumer](experiments/guest-modules/README.md).
+not retain all assembly types. Explicit native module-catalog retention now enables
+AssemblyInfo.GetModules, including empty declarations. See [the guest consumer](experiments/guest-modules/README.md).
 
 ## Comparison and tradeoffs
 
@@ -141,6 +142,56 @@ There is no demonstrated execution-performance benefit. The assistant recommends
 keeping this bounded design and validating cross-assembly lookup before adding more
 module semantics. Existing host/interpreter and retained native ownership evidence
 supports feasibility; it does not establish completion of those open contracts.
+
+## Native module-catalog retention — development, 2026-10-10
+
+The bounded AOT backend now supports `AssemblyInfo.GetModules()` using an explicit
+catalog root. Existing type roots retain their owners, but do not imply a complete
+assembly module list. A missing catalog faults with
+`native assembly module catalog was not retained`; it never returns a filtered list
+of modules that happen to own retained types.
+
+The private `--reflection-roots` schema 4 adds `moduleCatalogs`, an array of exact full
+assembly identities. Its `types` entries use schema 3's six fields (`definition`,
+`construct`, `properties`, `getters`, `setters`, `customAttributes`). Existing schemas
+1–3 retain their behavior. For example, a catalog-only policy can use:
+
+```json
+{
+  "schemaVersion": 4,
+  "types": [],
+  "moduleCatalogs": ["Example, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"]
+}
+```
+
+The identity must match the loaded source catalog exactly; this example is illustrative.
+At most 64 unique assembly identities and 64 type roots are admitted. At least one
+catalog or type root is required. Unknown identities, duplicates, malformed policies
+and older metadata with only an inferred namespace projection are rejected. An explicit
+empty declaration table is valid and returns an empty module sequence.
+
+A catalog roots every declared module name, ordered ordinally by the shared VM query,
+including empty modules. Each descriptor supports Name and Assembly.Name/FullName.
+It does not root declaration types, functions, constructors or attributes. Assembly
+references, RuntimeContext.ExecutingAssembly and type enumeration within assemblies
+or modules in native code remain separate work. The catalog is an immutable build-time snapshot, not a
+runtime loader or a new assembly discovery API.
+
+Comparison: [.NET Assembly.GetModules](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assembly.getmodules?view=net-10.0)
+returns the assembly's physical modules (source checked 2026-10-10). neoCLR keeps the
+assembly-wide enumeration shape while applying the author's logical-module semantics.
+Reconstructing names from retained types would lose empty modules; retaining every
+assembly declaration would couple descriptive discovery to unrelated code and metadata.
+Explicit name-catalog retention preserves completeness with that narrower scope. Its
+cost is build configuration plus generated lookup branches, strings and runtime
+wrapper allocations; no performance benefit is claimed. A future native metadata
+backend can replace these factories without changing logical ownership. This private
+experimental policy is not a permanent user-facing retention API.
+
+The [consumer](experiments/guest-modules/README.md) exercises flat ordering, empty
+modules, owning assembly inspection and independent missing-type/missing-catalog
+faults. Unit checks cover scoped identities, empty catalogs, policy rejection and
+legacy projection rejection. Cross-platform evidence remains scoped to recorded runs.
 
 ## Next boundaries
 
