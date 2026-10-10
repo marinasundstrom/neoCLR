@@ -112,7 +112,7 @@ class Program {
         if !CheckSnapshots() || !CheckSets() {
             return 21
         }
-        if !CheckMaps() || !CheckMapConstruction() {
+        if !CheckMaps() || !CheckMapConstruction() || !CheckCollectionConstruction() {
             return 30
         }
         Console.WriteLine("collections passed")
@@ -222,6 +222,70 @@ class Program {
         return false
     }
 
+    static func CheckCollectionConstruction() -> bool {
+        let input = ObservedNumbers()
+        let list = ArrayList<int>(input)
+        let queue = ArrayQueue<int>(input)
+        let stack = ArrayStack<int>(input)
+        let set = HashSet<int>(input, ModuloTwo())
+        if input.Requests != 4 || input.Moves != 20 || input.Reads != 16 || input.Disposals != 4 {
+            return false
+        }
+        if list.Count != 4 || list[0] != 1 || list[3] != 4 || set.Count != 2 || !set.Contains(5) {
+            return false
+        }
+        let copy = ArrayList<int>(list)
+        list[0] = 99
+        if copy[0] != 1 {
+            return false
+        }
+        let query = ArrayList<int>(copy.Filter(value => value > 2))
+        if query.Count != 2 || query[0] != 3 || query[1] != 4 {
+            return false
+        }
+        let queueCopy = ArrayQueue<int>(queue)
+        queue.Clear()
+        let stackCopy = ArrayStack<int>(stack)
+        stack.Clear()
+        var expected = 1
+        while expected <= 4 {
+            if queueCopy.Dequeue() is Some(let queued) && stackCopy.Pop() is Some(let stacked) {
+                if queued != expected || stacked != expected {
+                    return false
+                }
+            } else {
+                return false
+            }
+            expected = expected + 1
+        }
+        let ordinaryStack = ArrayStack<int>(copy)
+        if ordinaryStack.Pop() is not Some(4) {
+            return false
+        }
+        let setCopy = HashSet<int>(set, ModuloTwo())
+        set.Clear()
+        if setCopy.Count != 2 || !setCopy.Contains(6) {
+            return false
+        }
+        let empty: int[] = []
+        if ArrayList<int>(empty).Count != 0 || ArrayQueue<int>(empty).Count != 0 || ArrayStack<int>(empty).Count != 0 || HashSet<int>(empty, ModuloTwo()).Count != 0 {
+            return false
+        }
+        let item = Item()
+        let items: Item[] = [item]
+        let copiedItems = ArrayList<Item>(items)
+        let queuedItems = ArrayQueue<Item>(items)
+        let stackedItems = ArrayStack<Item>(items)
+        item.Value = 64
+        if copiedItems[0].Value != 64 {
+            return false
+        }
+        if queuedItems.Peek() is Some(let queued) && stackedItems.Peek() is Some(let stacked) {
+            return queued.Value == 64 && stacked.Value == 64
+        }
+        return false
+    }
+
     static func CheckSets() -> bool {
         let concrete = HashSet<int>(CollidingIntegers())
         let set: MutableSet<int> = concrete
@@ -270,4 +334,47 @@ class Program {
 class CollidingIntegers : EqualityComparer<int> {
     func Equals(left: int, right: int) -> bool => left == right
     func GetHashCode(value: int) -> int => 1
+}
+
+class ModuloTwo : EqualityComparer<int> {
+    func Equals(left: int, right: int) -> bool => left % 2 == right % 2
+    func GetHashCode(value: int) -> int => value % 2
+}
+
+class ObservedNumbers : Iterable<int> {
+    var Requests: int { get; set; } = 0
+    var Moves: int { get; set; } = 0
+    var Reads: int { get; set; } = 0
+    var Disposals: int { get; set; } = 0
+
+    func GetIterator() -> Iterator<int> {
+        Requests = Requests + 1
+        return ObservedNumberIterator(self)
+    }
+}
+
+class ObservedNumberIterator : Iterator<int> {
+    private var owner: ObservedNumbers
+    private var index = 0
+
+    init(owner: ObservedNumbers) {
+        self.owner = owner
+    }
+
+    func MoveNext() -> bool {
+        owner.Moves = owner.Moves + 1
+        index = index + 1
+        return index <= 4
+    }
+
+    val Current: int {
+        get {
+            owner.Reads = owner.Reads + 1
+            return index
+        }
+    }
+
+    func Dispose() {
+        owner.Disposals = owner.Disposals + 1
+    }
 }

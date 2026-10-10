@@ -22,6 +22,7 @@ static class CollectionDeclarations
             public class ArrayQueue<T> : Queue<T> {
                 public ArrayQueue() { }
                 public ArrayQueue(int capacity) { }
+                public ArrayQueue(Iterable<T> items) { }
                 public int Count => default;
                 public int Capacity => default;
                 public void Enqueue(T value) { }
@@ -39,6 +40,7 @@ static class CollectionDeclarations
             public class ArrayStack<T> : Stack<T> {
                 public ArrayStack() { }
                 public ArrayStack(int capacity) { }
+                public ArrayStack(Iterable<T> items) { }
                 public int Count => default;
                 public int Capacity => default;
                 public void Push(T value) { }
@@ -57,6 +59,7 @@ static class CollectionDeclarations
             }
             public class HashSet<T> : MutableSet<T> {
                 public HashSet(EqualityComparer<T> comparer) { }
+                public HashSet(Iterable<T> items, EqualityComparer<T> comparer) { }
                 public int Count => default;
                 public bool Contains(T value) => default;
                 public bool Add(T value) => default;
@@ -113,6 +116,7 @@ static class CollectionDeclarations
             public class ArrayList<T> : List<T> {
                 public ArrayList() { }
                 public ArrayList(int capacity) { }
+                public ArrayList(Iterable<T> items) { }
                 public Option<int> FindIndex(Func<T, bool> match) => default;
                 public Option<int> FindLastIndex(Func<T, bool> match) => default;
                 public Option<T> FindLast(Func<T, bool> match) => default;

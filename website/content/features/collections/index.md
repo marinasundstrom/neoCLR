@@ -187,5 +187,17 @@ unsynchronized. These additions require rebuilt development libraries.
 
 [Executable collection checks](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-collections/Main.rvn)
 
-The new materialization checks pass on macOS ARM64 and the interpreter. Windows
-qualification of these overloads is pending in the collections action.
+The map materialization checks pass on macOS ARM64, Windows x64 and their matching
+interpreters.
+
+## Development: collection initialization
+
+`ArrayList<T>(items)`, `ArrayQueue<T>(items)`, `ArrayStack<T>(items)` and
+`HashSet<T>(items, comparer)` accept iterables, including sequences and lazy queries.
+Each consumes the input once and creates independent storage; referenced objects
+remain shared. Lists and queues preserve input order. Stacks push in input order,
+so the last input is popped first; constructing from another stack reverses its
+pop order. Sets discard duplicates under the explicit comparer.
+
+These overloads require rebuilt development libraries and retain the existing
+unsynchronized collection contracts.

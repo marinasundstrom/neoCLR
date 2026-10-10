@@ -131,9 +131,11 @@ pass ([verified Windows evidence](experiments/init-accessors/windows-validation.
 native record semantics remain open.
 The author-selected iterable/copy construction and LINQ ToMap slice now implements
 HashMap constructors and pair/selector materialization, with macOS native/interpreter
-positive and duplicate/disposal checks passing. The Windows action covers these cases;
-qualification of the new overloads is pending. Other collection constructors remain
-follow-ups; see [the contract](collection-contracts.md#iterable-construction-and-tomap--development-2026-10-10).
+positive and duplicate/disposal checks passing. [Verified Windows evidence](experiments/native-collections/windows-materialization-validation.json)
+now covers those map overloads. Iterable constructors now also cover
+ArrayList, ArrayQueue, ArrayStack and HashSet, with explicit ordering/copy contracts; see [the contract](collection-contracts.md#iterable-construction-and-tomap--development-2026-10-10).
+Next repair native for-loop iterator disposal so library loops can use ordinary for
+without losing cleanup; synchronous use already supports the constructor slice.
 Future concurrent variants retain implementation-specific atomicity/iteration contracts; see the [contracts and concurrency boundaries](collection-contracts.md#basic-library-slice-and-future-concurrency--2026-10-10).
 
 ### Follow-up review areas — author direction, 2026-10-10

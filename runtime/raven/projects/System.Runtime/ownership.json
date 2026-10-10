@@ -346,5 +346,10 @@
     "assemblyName": "System.Runtime",
     "namespaceName": "System",
     "functionName": "Fail"
+  },
+  "disposal": {
+    "assemblyName": "System.Runtime",
+    "interfaceTypeName": "System.Disposable",
+    "useExceptionHandling": false
   }
 }

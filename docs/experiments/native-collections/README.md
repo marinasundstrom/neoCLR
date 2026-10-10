@@ -82,4 +82,18 @@ pairs; record-array literals remain an explicit backend follow-up.
 
 [Materialization validation](materialization-validation.json) records the macOS checks.
 The root sample project explicitly includes Main.rvn so nested rejection fixtures
-remain separate programs. Windows qualification for these overloads is pending.
+remain separate programs. [Windows map qualification](windows-materialization-validation.json)
+passes; 1,686 downloaded files and 24 source inputs were hash-verified.
+
+## Basic collection constructor follow-up
+
+The consumer checks ArrayList/ArrayQueue/ArrayStack/HashSet construction from an
+observed iterable: four iterator requests, twenty MoveNext calls, sixteen Current
+reads and four disposals. It covers list/queue order, stack reversal (including
+stack-to-stack construction), set deduplication, empty arrays, lazy queries,
+independent copies and shared class values. The .NET baseline checks the same
+ordering/deduplication policy. Run the existing Windows action for that platform;
+local focused validation builds this consumer with the matching native bundle.
+
+[Scoped constructor evidence](copy-validation.json) records successful native macOS
+ARM64 and matching interpreter execution. Windows coverage is in the existing action.

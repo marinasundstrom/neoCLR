@@ -426,8 +426,8 @@ Map removal/clear and advanced operations remain subsequent API work.
 ## Iterable construction and ToMap — development, 2026-10-10
 
 Author direction: collection initialization/copy constructors are a general convention,
-following .NET. This slice implements HashMap; iterable constructors for the other
-concrete collection types remain follow-ups, not implied existing overloads.
+following .NET. The initial slice implements HashMap; the follow-up below extends the convention
+to the other basic concrete collections.
 `HashMap<K,V>(items, comparer)` and `(items, equal, hash)` accept
 `Iterable<KeyValuePair<K,V>>`. Sequence, arrays, queries and existing maps already
 satisfy that capability; separate overloads would add no behavior.
@@ -467,3 +467,39 @@ A focused .NET 10.0.0 console comparison confirms all three duplicate entry poin
 throw ArgumentException and that collection storage is independent while a List
 value stays shared. This confirms the selected .NET library baseline, not equivalence
 between .NET exception recovery and neoCLR terminal Faults.
+
+### List, queue, stack and set constructors
+
+The development follow-up adds `ArrayList<T>(items)`, `ArrayQueue<T>(items)`,
+`ArrayStack<T>(items)` and `HashSet<T>(items, comparer)`, all accepting Iterable<T>.
+Arrays, Sequence views, lazy queries and existing collections need no dedicated
+conversion overloads. Construction enumerates once and disposes normally; storage
+is independent and elements are copied shallowly. Provider/comparer Faults remain
+terminal without a general cleanup guarantee. Inputs must remain valid while read;
+this adds no concurrent snapshot or atomicity promise.
+
+Primary .NET 10 comparisons, checked 2026-10-10:
+[List](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.-ctor?view=net-10.0),
+[Queue](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.queue-1.-ctor?view=net-10.0),
+[Stack](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.stack-1.-ctor?view=net-10.0),
+and [HashSet](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.hashset-1.-ctor?view=net-10.0).
+The executable .NET 10.0.0 baseline confirms list/queue order, reversed stack order,
+stack-to-stack reversal and case-insensitive set deduplication. neoCLR follows those
+library semantics: queue removal starts with the first input, stack removal with
+the last. A stack iterator visits top first, so constructing from another stack
+reverses its pop order; there is no special case that changes behavior based on the
+source's concrete type. HashSet ignores equivalent duplicates, unlike HashMap's
+rejection of duplicate keys.
+
+This is a missing library convenience, not a claimed .NET improvement. The set
+keeps neoCLR's existing explicit comparer contract. Reusing insertion operations
+keeps one set of capacity/hash policies and avoids extra metadata/runtime support;
+it can grow storage several times instead of preallocating from Count. Capacity
+and allocation counts are not promised, and no speed claim is made. Optimized
+count-aware copying can be considered if measurement motivates it. A special
+stack-preserving clone would be a distinct API, not an implicit constructor rule.
+
+Implementation uses scoped `use` iterator resources. The native portable for
+lowering in compiler b939cd696 currently omits disposal; fixing that is the next
+compiler follow-up before replacing these loops with for. This is a compiler gap,
+not a different collection protocol. Terminal Faults do not unwind use scopes.

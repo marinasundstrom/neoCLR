@@ -1,0 +1,92 @@
+{
+  "passed": true,
+  "date": "2026-10-10",
+  "revision": "40a7689d2f39b58d8cb1c5bbfbb5deea76d1ef4c",
+  "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/38036345411",
+  "verifiedArtifactFiles": 1686,
+  "verifiedSourceInputs": 24,
+  "cases": [
+    {
+      "name": "collections",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "collections passed\n"
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "collections passed\n"
+        }
+      ]
+    },
+    {
+      "name": "init-accessors",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "Init accessors passed\n"
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "Init accessors passed\n"
+        }
+      ]
+    },
+    {
+      "name": "duplicate-constructor",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 1,
+          "stdout": "disposed\n"
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 1,
+          "stdout": "disposed\n"
+        }
+      ]
+    },
+    {
+      "name": "duplicate-pairs",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 1,
+          "stdout": "disposed\n"
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 1,
+          "stdout": "disposed\n"
+        }
+      ]
+    },
+    {
+      "name": "duplicate-selectors",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 1,
+          "stdout": "disposed\n"
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 1,
+          "stdout": "disposed\n"
+        }
+      ]
+    }
+  ],
+  "reportSha256": "d30fc2a41829b6a03e13b8411e170e86158126930ac03b6c85b81fcf0f0b753f",
+  "scope": "Windows x64 HashMap iterable constructors, pair/selector ToMap and duplicate/disposal checks; later basic collection constructors are not included."
+}

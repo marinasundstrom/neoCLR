@@ -17,6 +17,16 @@ public class ArrayStack<T> : Stack<T> {
         slots = ArrayList<Option<T>>(capacity)
     }
 
+    /// <summary>Pushes elements in enumeration order; the last input is removed first.</summary>
+    /// <param name="items">An iterable to consume once, including sequences and query results.</param>
+    /// <remarks>Native development API. Eager shallow copy with independent storage. Constructing from a stack reverses its removal order. Disposes the iterator on normal completion; provider Faults are terminal without guaranteed cleanup. No concurrent snapshot guarantee.</remarks>
+    init(items: Iterable<T>) {
+        use iterator = items.GetIterator()
+        while iterator.MoveNext() {
+            Push(iterator.Current)
+        }
+    }
+
     /// Number of allocated element slots.
     val Capacity: int => slots.Capacity
 

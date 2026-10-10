@@ -1482,3 +1482,7 @@ native type/member pages, XML parameter/result/error documentation and matching
 reference declarations. MapOperators is included in the public type inventory.
 These additions target the native metadata library; the historical bounded CLI
 application importer is not extended with these new pair-materialization calls.
+
+The follow-up iterable constructors for ArrayList, ArrayQueue, ArrayStack and HashSet
+are covered by their existing type selections, matching reference declarations,
+source XML parameter/ordering/error contracts and refreshed native member pages.

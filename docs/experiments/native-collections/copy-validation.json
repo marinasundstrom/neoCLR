@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "date": "2026-10-10",
+  "results": [
+    {
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "collections passed\n",
+      "stderr": ""
+    },
+    {
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "collections passed\n",
+      "stderr": ""
+    }
+  ],
+  "compilerRevision": "b939cd6964d57829fb00c4e058bf43309de39628",
+  "sourceInputs": {
+    "docs/experiments/native-collections/Main.rvn": "05865a01b47148967cdf61667d7834c236ba6a0405cdb367aba08e7e359c16fd",
+    "runtime/raven/projects/System.Runtime/ownership.json": "44985df3677b64fe24284399ea4796342878bc806f1f521e3a7ede21ce0ed6ec",
+    "runtime/raven/src/System/Collections/ArrayList.rvn": "d72aef23218d129f0f2fba8d3f9b2b4b871bc266693313067207bf5cae4ed57f",
+    "runtime/raven/src/System/Collections/ArrayQueue.rvn": "387c211d220cc2dd05b05c3b8427ed65338e10afc140eedecb815b82f14784f3",
+    "runtime/raven/src/System/Collections/ArrayStack.rvn": "666248abce46997ab8697191ecae9b340cd43bbe0853baf2259523c000e0315f",
+    "runtime/raven/src/System/Collections/HashSet.rvn": "2ce6edc122f85298313eb40e5741499938d62049647be0ecaf906c60c1d4a770"
+  },
+  "bundleManifestSha256": "53458ecda574ca2966de150cd587dc61e37682ac467b3368cd237743b9699b3c",
+  "executableSha256": "98789e8765ad59a1a04582ef078268f274a39a25dee1e1d19e140feba774a866",
+  "dotnetBaseline": "duplicate rejected\nduplicate rejected\nduplicate rejected\nshallow independent storage passed\n.NET 10.0.0\ncollection initialization order and set deduplication passed\n"
+}

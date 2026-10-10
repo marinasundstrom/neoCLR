@@ -7319,3 +7319,16 @@ artifacts/source hashes verified. AOT from `a2d7eda4` now preserves
 reached init associations through specialization/selection because they carry readonly
 write authority; unused accessors do not become roots. Source metadata catalogues also
 retain the flag. No runtime-freeze or full record-semantics claim is made.
+
+### Source-library disposal ownership (2026-10-10)
+
+The System.Runtime ownership manifest now explicitly selects disposal interface
+`System.Disposable` from assembly `System.Runtime`, with `UseExceptionHandling: false`.
+Without it, native source-library use declarations retain the bootstrap disposal
+owner and reject Iterator<T> conversions even though the source iterator implements
+its own Disposable. This is the existing RuntimeDisposalContract, not a new opcode
+or language spelling. Scoped constructor iterators lower to ordinary calls/branches;
+normal scope exits dispose, terminal Faults do not unwind. Native metadata consumes
+that same semantic plan. A library-native iterator remains a nominal interface;
+there is no structural Dispose-name inference. Native for lowering still omits
+cleanup in compiler b939cd696 and is the next compiler follow-up.

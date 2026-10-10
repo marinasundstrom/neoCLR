@@ -20,6 +20,16 @@ gap to fix, not a reason to make application examples callback-driven. Let
 `Task<()>`/`Task<unit>` functions complete by reaching the end; omit a redundant
 trailing `return ()`. Keep explicit unit returns where an early exit is intended.
 
+## Scoped iterator cleanup (2026-10-10)
+
+Prefer `use iterator = source.GetIterator()` when explicitly driving an iterator.
+The native target supports synchronous scope-exit cleanup; terminal Faults do not
+unwind resources. Do not replace explicit iteration with `for` when disposal is
+required until the native portable-enumeration lowering supplies that cleanup.
+The current compiler b939cd696 iterates correctly but omits Dispose for native for.
+Track that as a compiler gap, not a permanent language convention. Ordinary .NET
+iteration keeps its existing behavior.
+
 ## Native module declarations (2026-10-10)
 
 Use `module System.Collections` (or the appropriate qualified module name) in

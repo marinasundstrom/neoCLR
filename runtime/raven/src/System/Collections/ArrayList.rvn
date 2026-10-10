@@ -19,6 +19,18 @@ public open class ArrayList<T> : List<T> {
         count = 0
     }
 
+    /// <summary>Copies elements in enumeration order.</summary>
+    /// <param name="items">An iterable to consume once, including sequences and query results.</param>
+    /// <remarks>Native development API. Eager shallow copy with independent storage. Enumeration order is preserved. Disposes the iterator on normal completion; provider Faults are terminal without guaranteed cleanup. No concurrent snapshot guarantee.</remarks>
+    init(items: Iterable<T>) {
+        data = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+        count = 0
+        use iterator = items.GetIterator()
+        while iterator.MoveNext() {
+            Add(iterator.Current)
+        }
+    }
+
     val Count: int => count
     val Capacity: int => data.Length
 

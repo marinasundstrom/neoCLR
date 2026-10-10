@@ -8,14 +8,24 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Extend native development iterable construction to ArrayList, ArrayQueue,
+  ArrayStack and HashSet. Copy storage shallowly in one pass; preserve list/queue
+  order, push stack inputs in order, and discard set duplicates under the explicit
+  comparer. Stack-to-stack construction reverses pop order, matching .NET. Use
+  scoped iterators and select source-owned System.Disposable in the library
+  ownership manifest; native for-loop disposal remains the next compiler fix.
+  Refresh API references and qualify native macOS/interpreter construction,
+  single-pass consumption, normal disposal and shallow-copy behavior.
+
 - Add native development HashMap constructors from iterable KeyValuePair values
   with explicit comparer/callback policies, plus pair and selector LINQ ToMap
   operators. Materialization is eager, single-pass and shallow; duplicate keys
-  fault rather than overwrite. Other collection copy constructors remain follow-ups. Complete the module spelling
+  fault rather than overwrite. The basic collection follow-up is recorded above. Complete the module spelling
   migration for the second declaration block in Tasks.rvn. Native macOS/interpreter
   checks pass, including duplicate rejection/disposal; extend the Windows action
   coverage and refresh both API reference snapshots. Record the separate AOT
-  record-array-literal allocation limitation.
+  record-array-literal allocation limitation. Windows map materialization passes;
+  verify 1,686 downloaded files and 24 source inputs.
 
 - Use explicit module declarations throughout the native Raven runtime library and
   document that source convention. Qualified API names and assembly owners remain

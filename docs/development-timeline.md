@@ -13225,3 +13225,25 @@ claim follows from these focused checks.
   additions. An attempted record-pair array literal passes the interpreter but is
   rejected by AOT NewArray(record); the native iterable/sequence checks use pair lists.
   See [materialization evidence](experiments/native-collections/materialization-validation.json).
+
+### 2026-10-10 — Idiomatic collection iteration
+
+- Author asked whether for loops and the now-supported use statement should replace
+  explicit iterator management in the collection constructors.
+- Assistant checked the pinned Raven portable-enumeration lowering: it emits
+  GetIterator/MoveNext/Current but no Dispose. Synchronous use is already supported
+  through the selected runtime disposal contract, so the four new constructors use
+  scoped iterator resources. Native for disposal is recorded as a compiler follow-up;
+  the current omission is not adopted as a permanent language rule.
+- Validation follows in the collection constructor evidence; the observed iterable
+  checks one enumeration, one read per element and one disposal per construction.
+- The first use-based library build exposed a missing disposal-owner mapping in
+  the library manifest (RAV1503 converting source Iterator<T> to bootstrap Disposable).
+  Assistant selected the existing source-owned System.Runtime/System.Disposable
+  contract with exception handling disabled. The author explicitly requested focus
+  on the compiler fix after completing this constructor slice.
+- Outcome: scoped ArrayList/ArrayQueue/ArrayStack/HashSet constructors pass native
+  macOS and matching interpreter execution, including iterator-count/disposal checks.
+  The prior Windows map run passes with 1,686 artifact hashes and 24 source inputs
+  verified. Evidence: [constructors](experiments/native-collections/copy-validation.json)
+  and [Windows maps](experiments/native-collections/windows-materialization-validation.json).
