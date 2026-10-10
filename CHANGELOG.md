@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Restore AOT nominal-member attribute inspection with the rebuilt guest-function
+  libraries. A shared descriptor branch reached an unbound module-member service;
+  bind its exact contract to an explicit unsupported-retention fault while preserving
+  existing nominal retention. No empty-list fallback or implicit function retention.
+  Two focused binding checks and the native/interpreted attribute consumer pass,
+  including constructor non-retention and unretained-type rejection. Windows rerun
+  remains pending after the failure at 5e4cbd84.
+
 - Add test-runner selection through `--filter <text>` (literal ordinal ID/name
   substring) and `--id <id>` (exact stable ID), plus TestSuite.Run(filter)/RunId.
   Keep unfiltered runs and manual/discovered registration on the same path; validate

@@ -351,6 +351,7 @@ pub fn bind(
                     | "neoCLR.Runtime.AssemblyModules"
                     | "neoCLR.Runtime.TypeElementType"
                     | "neoCLR.Runtime.MemberCustomAttributes"
+                    | "neoCLR.Runtime.ModuleMemberCustomAttributes"
             )
         })
         .map(|(i, _)| i)
@@ -422,7 +423,8 @@ pub fn bind(
         let assembly_name = f.name.ends_with("AssemblyName");
         let assembly_modules = f.name.ends_with("AssemblyModules");
         let properties = f.name.ends_with("Properties");
-        let attributes = f.name.ends_with("CustomAttributes");
+        let attributes = f.name == "neoCLR.Runtime.MemberCustomAttributes";
+        let module_attributes = f.name == "neoCLR.Runtime.ModuleMemberCustomAttributes";
         let attribute_parameters = attributes
             && f.parameters.len() == 2
             && name(source, &f.parameters[0]) == Some("System.Introspection.TypeInfo")
@@ -432,7 +434,9 @@ pub fn bind(
             || (attributes && !attribute_parameters)
             || (!attributes
                 && f.parameters
-                    != if module_assembly {
+                    != if module_attributes {
+                        vec![Type::String, Type::String, Type::Int32]
+                    } else if module_assembly {
                         vec![Type::String, Type::String]
                     } else if assembly_name || assembly_modules {
                         vec![Type::String]
@@ -469,7 +473,20 @@ pub fn bind(
             locals: vec![],
             trusted: vec![],
         };
-        if attributes {
+        if module_attributes {
+            let Type::ArrayRef(element) = &expected else {
+                return Err("ModuleMemberCustomAttributes requires CustomAttributeData vector".into());
+            };
+            if name(source, element) != Some("System.Introspection.CustomAttributeData") {
+                return Err("ModuleMemberCustomAttributes requires scoped CustomAttributeData".into());
+            }
+            // RuntimeMemberInfo shares nominal and ownerless paths. The latter has
+            // no native retention policy yet; keep nominal consumers compilable
+            // without silently granting metadata or returning an empty snapshot.
+            factory.body.push(Op::Fault(
+                "native module-member custom attribute metadata was not retained; module-member retention is not yet supported".into(),
+            ));
+        } else if attributes {
             bind_attributes(&mut factory, index, definitions, retention, &expected)?;
         } else if assembly_modules {
             let Type::ArrayRef(element) = &expected else {
@@ -915,6 +932,23 @@ fn bind_attributes(
 #[cfg(test)]
 mod catalog_tests {
     use super::*;
+
+    #[test]
+    fn unretained_module_attributes_bind_an_explicit_fault_with_exact_contract() {
+        let source = neoclr::assemble(".module Attributes\n.type class System.Introspection.CustomAttributeData\n.end\n.function neoCLR.Runtime.ModuleMemberCustomAttributes(String,String,Int32) -> arrayref<System.Introspection.CustomAttributeData>\n.methodimpl InternalCall\n.end\n").unwrap();
+        let mut retention = json!({"types":[]});
+        let mut input = source.clone();
+        bind(&mut input, &source, &[], &mut retention).unwrap();
+        assert_eq!(input.functions[0].impl_flags, 0);
+        assert!(matches!(&input.functions[0].body[..], [Op::Fault(message)] if message.contains("module-member retention is not yet supported")));
+        assert_eq!(retention["snapshotFactories"], json!([]));
+        let mut invalid = source.clone();
+        invalid.functions[0].parameters[2] = Type::String;
+        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("exact reserved InternalCall contract"));
+        let mut invalid = source.clone();
+        invalid.functions[0].returns = Type::ArrayRef(Box::new(Type::Int32));
+        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("scoped CustomAttributeData"));
+    }
 
     #[test]
     fn unrelated_type_retention_does_not_require_assembly_catalog_metadata() {

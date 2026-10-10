@@ -371,3 +371,22 @@ metadata does not indiscriminately retain unrelated code. Future grouping should
 enable selective execution; compiler source generators may later replace adapter
 production while preserving case identity and execution contracts. The requested
 module Introspection/RuntimeContext completion remains follow-up work.
+
+### Native shared-provider regression — 2026-10-10
+
+Windows run [38058523529](https://github.com/marinasundstrom/neoCLR/actions/runs/38058523529)
+exposed a reachability regression after guest ownerless method metadata was added:
+RuntimeMemberInfo.GetCustomAttributesData contains both nominal and module-member
+paths, so compiling supported nominal inspection also reached the unbound
+ModuleMemberCustomAttributes service. The current fix validates its exact internal
+signature and binds the unsupported module-member branch to an explicit missing
+retention fault. It does not return an empty attribute list or silently retain
+functions. Existing explicit type/member retention and its no-user-constructor rule
+remain the supported AOT contract. Module-member native retention is still a gap;
+this change restores nominal inspection with rebuilt libraries.
+
+Focused binding checks cover the diagnostic and rejection of wrong parameters and
+result descriptors. The native/interpreted consumer passes with rebuilt libraries,
+including nominal member/parameter attributes, no-user-constructor retention and
+unretained-type rejection. [Evidence](experiments/native-attributes/shared-provider-validation.json).
+Windows rerun status must be checked separately.

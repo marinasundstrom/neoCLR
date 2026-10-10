@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    "fixed-and-enum-arguments",
+    "named-field-property-arguments",
+    "named-null-and-snapshot-copy",
+    "null-string",
+    "repeated-attributes",
+    "property-method-parameter-targets",
+    "snapshot-copy",
+    "constructor-signature",
+    "no-user-constructor-roots",
+    "unannotated-type",
+    "unretained-type-rejection",
+    "standalone-dependencies"
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/native-attributes/Main.rvn": "c05d6493bbb1210d73ff6395fa0b45a3d2b5b99a2552346a6cb100751b99f728",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-attributes/Native.rvnproj": "6fcc3173c04cc661cba9d53e6a49ce3f5869f327df91a1305bacf5a287a6c17c",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-attributes/verify.py": "e6c23e3fe26a149dbf34ac18062476dfc591269bc3b3a00fd27b552ab31d343d",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "efaa7b7b5908b681c297eda8e56482d76e0f279f9405e57f76434e5d0ad689f1",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr": "d403d020488209b1afae459b63b4d4f60edb4c7d7cf92f9b6cdcb0eb9e692e1b",
+    "/Users/robert/Projects/neoclr/target/entry-attribute-bundle/lib/System.Runtime.dll": "5b79d28e8a6552a43d3b164aba00e8a96ea970cd57a2ee08ff9366b8b735d861",
+    "/Users/robert/Projects/neoclr/target/entry-attribute-bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "1e7a07f50b127589eae4197a853f3c956b86883513ab3037e99d26bb387d0add",
+    "/Users/robert/Projects/neoclr/target/entry-attribute-bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/NativeAttributeAotFixture.cs": "70418dfd8573f0d9820a2fc467eb9b64622ad19d4d838f678f85502036a5c5c2",
+    "/Users/robert/Projects/neoclr/target/attribute-shared-provider-fix/app.neox": "c68e773a708126c77979c746e0ad42ddbdd07f606fb43ddb1a440cec53c2163a",
+    "/Users/robert/Projects/neoclr/target/attribute-shared-provider-fix/roots.json": "678eb7bc885f567e23c19513efed344324a6748f40e7f5de87ea15c760142fff",
+    "tools/aot-poc/src/reflection_snapshots.rs": "3c5173d0506005006f9eaab00d2fa8016b4d803a6190fe63f6eac86fa04f6f82"
+  },
+  "date": "2026-10-10",
+  "codeBaseline": "8d18a91b plus shared-provider binding fix",
+  "windowsStatus": "Pending rerun; fixes failure observed at 5e4cbd84 in run 38058523529",
+  "focusedChecks": [
+    "unretained_module_attributes_bind_an_explicit_fault_with_exact_contract",
+    "unrelated_type_retention_does_not_require_assembly_catalog_metadata"
+  ]
+}

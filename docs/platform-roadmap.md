@@ -21,7 +21,10 @@ checks, including absent DeclaringType, fixed/named descriptions and excluded pa
 targets. Guest ModuleInfo.GetFunctions and method-level attribute queries now pass an
 interpreted Raven consumer using the real TestAttribute, without invoking bodies.
 Open generic signature snapshots remain explicitly unsupported. Native enumeration,
-retention and in-process callable registration are still open.
+retention and in-process callable registration are still open. The guest-function
+Windows run at 5e4cbd84 exposed an AOT shared-provider binding regression in nominal
+attribute inspection; [the fix passes locally](experiments/native-attributes/shared-provider-validation.json)
+with rebuilt libraries. Windows requalification remains pending.
 
 **Author priority correction (2026-10-10):** after making guest discovery work, focus
 on making the test framework useful through runner filtering before grouping.

@@ -7619,3 +7619,12 @@ The neoCLR backend/native-host layers own the private process-arguments-v1 adapt
 a future native hosting ABI replaces it. Environment.GetCommandLineArgs AOT support
 is still separate. Tests use explicit Main arguments, not that fallback. Compiler
 pin 1a0c4e62734b2d4f17dc9f8af1f5d02c566f8cf4 requires no compiler rebuild for this fix.
+
+The rebuilt RuntimeMemberInfo shared nominal/module-member attribute path also needs
+an AOT binding for the dormant module-member service. The exact reserved contract
+now lowers to an explicit unsupported-retention fault; nominal-member retention
+remains executable. This restores the supported native consumer without granting
+ownerless function retention. No Raven configuration/emission or metadata schema
+changes are involved. The [qualified regression fix](custom-attributes.md#native-shared-provider-regression--2026-10-10)
+is owned by neoCLR's native snapshot projection; real module-member retention must
+replace this bounded rejection when that capability is implemented.
