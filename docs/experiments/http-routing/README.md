@@ -33,3 +33,7 @@ automatic handler invocation or new hosting lifecycle.
 See [the contract and .NET comparison](../../route-parsing.md) and the
 [validation record](validation.json). Existing target union/pattern limitations
 are recorded in the design; no compiler fix is claimed by this case.
+
+Development test migration (2026-10-10): HTTP route parsing, captures, decoding, numeric conversion and quotas now also run as 8
+attributed framework tests in `runtime/raven/tests/http-route-matching`. The framework README
+links native/interpreted evidence. This original consumer retains its integration purpose.

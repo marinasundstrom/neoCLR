@@ -71,6 +71,8 @@ Batch `path-values` adds 5 tests for Path equality, hashing, display and collidi
 ([evidence](../runtime/raven/tests/path-values-validation.json)).
 Batch `http-header-values` adds 5 tests for HTTP header repetition, lookup validation, snapshots and request metadata qualified in native macOS ARM64 and release-interpreted execution
 ([evidence](../runtime/raven/tests/http-header-values-validation.json)).
+Batch `http-route-matching` adds 8 tests for HTTP route parsing, captures, decoding, numeric conversion and quotas qualified in native macOS ARM64 and release-interpreted execution
+([evidence](../runtime/raven/tests/http-route-matching-validation.json)).
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

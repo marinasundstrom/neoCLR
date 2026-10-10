@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Migrate HTTP route parsing, captures, decoding, numeric conversion and quotas into 8 attributed Raven tests in `http-route-matching`.
+  Native macOS ARM64 and release-interpreted execution pass; default gates include
+  the suite. Original integration consumers remain; Windows qualification is pending.
+
 - Migrate HTTP header repetition, lookup validation, snapshots and request metadata into 5 attributed Raven tests in `http-header-values`.
   Native macOS ARM64 and release-interpreted execution pass; default gates include
   the suite. Original integration consumers remain; Windows qualification is pending.

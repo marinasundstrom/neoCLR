@@ -1,0 +1,125 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import System.Option.*
+import NeoClr.Testing.*
+
+import System.Web.Http.*
+
+[Test("Route matching separates query text and converts captured integers")]
+func RouteCaptures() -> Result<unit, TestFailure> {
+    let pattern = RequiredPattern("/stations/{stationId}/reports")?
+    let values = RequiredMatch(pattern, "/stations/42/reports?limit=2")?
+    if values.Get("stationId") is Ok(let text) {
+        _ = Assert.Equal("42", text)?
+    } else {
+        return Assert.True(false, "Named capture must exist")
+    }
+    _ = Assert.True(values.GetInt32("stationId") is Ok(42), "Typed capture")?
+    return Assert.True(values.Get("missing") is Error(_), "Missing capture reports failure")
+}
+
+[Test("Route matching preserves case segment and trailing-slash distinctions")]
+func RouteAbsence() -> Result<unit, TestFailure> {
+    let pattern = RequiredPattern("/stations/{stationId}/reports")?
+    for target in ["/missing", "/stations/42/reports/", "/Stations/42/reports", "/stations//reports", "/stations/42", "/stations/42/reports/extra"] {
+        _ = Assert.True(pattern.Match(target) is Ok(None), "Valid nonmatching route must return absence: " + target)?
+    }
+    let root = RequiredPattern("/")?
+    _ = Assert.True(root.Match("/?x=1") is Ok(Some(_)), "Root matches with query")?
+    return Assert.True(root.Match("//") is Ok(None), "Repeated slash does not match root")
+}
+
+[Test("Route matching validates malformed targets even when literals mismatch")]
+func RouteInvalidTargets() -> Result<unit, TestFailure> {
+    let pattern = RequiredPattern("/stations/{stationId}/reports")?
+    for target in ["/elsewhere/%ZZ", "stations/42/reports", "/stations/%2f/reports", "/stations/%5C/reports", "/stations/%00/reports", "/stations/%ff/reports", "/stations/%/reports", "/stations/%GG/reports", "/stations/42/reports#fragment"] {
+        _ = Assert.True(pattern.Match(target) is Error(_), "Invalid target must report failure: " + target)?
+    }
+    return Assert.True(true, "Malformed targets rejected")
+}
+
+[Test("Route parsing rejects malformed and unsupported pattern syntax")]
+func RouteInvalidPatterns() -> Result<unit, TestFailure> {
+    for text in ["relative", "/{id}/{id}", "/{id", "/{}", "/{1id}", "/{id?}", "/{id:int}", "/x{id}", "/a?b", "/a#b", "/%ZZ"] {
+        _ = Assert.True(RoutePattern.Parse(text) is Error(_), "Invalid pattern must report failure: " + text)?
+    }
+    return Assert.True(true, "Malformed patterns rejected")
+}
+
+[Test("Route captures decode UTF-8 once and preserve literal plus")]
+func RouteDecoding() -> Result<unit, TestFailure> {
+    let pattern = RequiredPattern("/names/{name}")?
+    _ = CapturedName(pattern, "/names/Caf%C3%A9", "Café")?
+    _ = CapturedName(pattern, "/names/a+b", "a+b")?
+    _ = CapturedName(pattern, "/names/%252F", "%2F")?
+    let literal = RequiredPattern("/Caf%C3%A9")?
+    return Assert.True(literal.Match("/Café") is Ok(Some(_)), "Decoded literal matches Unicode target")
+}
+
+[Test("Route integer conversion distinguishes path matching from conversion failure")]
+func RouteIntegerBounds() -> Result<unit, TestFailure> {
+    let pattern = RequiredPattern("/stations/{stationId}/reports")?
+    for text in ["-2147483648", "2147483647"] {
+        let values = RequiredMatch(pattern, "/stations/" + text + "/reports")?
+        _ = Assert.True(values.GetInt32("stationId") is Ok(_), "Signed integer boundary converts")?
+    }
+    for text in ["abc", "2147483648", "1.5"] {
+        let values = RequiredMatch(pattern, "/stations/" + text + "/reports")?
+        _ = Assert.True(values.GetInt32("stationId") is Error(_), "Matched text with invalid integer fails conversion")?
+    }
+    return Assert.True(true, "Integer conversions checked")
+}
+
+[Test("Route segment quotas admit the boundary and reject one extra segment")]
+func RouteSegmentLimit() -> Result<unit, TestFailure> {
+    var text = ""
+    var index = 0
+    while index < 16 {
+        text += "/a"
+        index += 1
+    }
+    let pattern = RequiredPattern(text)?
+    _ = Assert.True(pattern.Match(text) is Ok(Some(_)), "Exact segment quota matches")?
+    _ = Assert.True(RoutePattern.Parse(text + "/a") is Error(_), "Pattern segment overflow")?
+    return Assert.True(pattern.Match(text + "/a") is Error(_), "Target segment overflow")
+}
+
+[Test("Route byte quotas admit the boundary and reject one extra byte")]
+func RouteByteLimit() -> Result<unit, TestFailure> {
+    var part = "a"
+    var text = "/"
+    var index = 0
+    while index < 10 {
+        text += part
+        part += part
+        index += 1
+    }
+    let pattern = RequiredPattern(text)?
+    _ = Assert.True(pattern.Match(text) is Ok(Some(_)), "Exact UTF-8 byte quota matches")?
+    _ = Assert.True(RoutePattern.Parse(text + "a") is Error(_), "Pattern byte overflow")?
+    return Assert.True(pattern.Match(text + "a") is Error(_), "Target byte overflow")
+}
+
+func RequiredPattern(text: string) -> Result<RoutePattern, TestFailure> {
+    if RoutePattern.Parse(text) is Ok(let pattern) {
+        return Ok(pattern)
+    }
+    return Error(TestFailure("Expected valid route pattern", text, "parse failure"))
+}
+
+func RequiredMatch(pattern: RoutePattern, target: string) -> Result<RouteMatch, TestFailure> {
+    if pattern.Match(target) is Ok(Some(let values)) {
+        return Ok(values)
+    }
+    return Error(TestFailure("Expected route match", target, "absent or invalid"))
+}
+
+func CapturedName(pattern: RoutePattern, target: string, expected: string) -> Result<unit, TestFailure> {
+    let values = RequiredMatch(pattern, target)?
+    if values.Get("name") is Ok(let text) {
+        return Assert.Equal(expected, text)
+    }
+    return Assert.True(false, "Expected name capture")
+}

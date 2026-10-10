@@ -444,3 +444,9 @@ recorded as an admission gap, while all five tests execute interpreted.
 
 Batch `http-header-values`: HTTP header repetition, lookup validation, snapshots and request metadata; 5 tests pass native macOS ARM64 and release-interpreted execution ([evidence](http-header-values-validation.json)).
 Source: [docs/experiments/http-headers/Main.rvn](../../../docs/experiments/http-headers/Main.rvn). Windows remains pending.
+
+Batch `http-route-matching`: HTTP route parsing, captures, decoding, numeric conversion and quotas; 8 tests pass native macOS ARM64 and release-interpreted execution ([evidence](http-route-matching-validation.json)).
+Source: [docs/experiments/http-routing/Main.rvn](../../../docs/experiments/http-routing/Main.rvn). Windows remains pending.
+
+The route suite ports RoutePattern/RouteMatch behavior; application-specific helper
+and route-to-union mapping checks remain in the original routing consumer.
