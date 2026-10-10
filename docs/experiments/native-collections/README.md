@@ -50,3 +50,12 @@ BoundNodeGenerator executable path 262 characters long. Compiler staging now use
 a short repository-level temporary checkout; evidence remains at the requested
 output path. A focused regression covers path length, failure diagnostics and
 checkout cleanup. Pair execution was not reached in that failed run.
+
+The short-checkout rerun [38032202226](https://github.com/marinasundstrom/neoCLR/actions/runs/38032202226)
+passes Windows x64 native/interpreter collection and pair checks plus all four
+rejection fixtures. [Verified evidence](windows-map-validation.json) records 1,560
+downloaded file hashes, 11 source-input hashes, matching isolated executable/build
+hashes, and a standalone dependency list containing only KERNEL32.dll. The sibling
+[reflection/JSON run](windows-json-map-validation.json) also passes; 1,571 downloaded
+file hashes and 11 source-input hashes were checked. Interpreter/AOT executables
+outside the uploaded artifacts were stability-checked in CI, not rehashed locally.

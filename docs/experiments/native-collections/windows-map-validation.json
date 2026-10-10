@@ -1,0 +1,83 @@
+{
+  "workflowRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/38032202226",
+  "revision": "bb262359eb0fb06cd62ece2bb6b7a9d55dd9e279",
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "reportSha256": "4636fc0cf82b1a33d59fd8ea1a02f34c06b12373643ca79f39c4a88cbe68c0f0",
+  "verifiedDownloadedFiles": 1560,
+  "verifiedSourceInputs": 11,
+  "cases": [
+    {
+      "name": "collections",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\collections executable only\\app.exe"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\collections native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "rejections": [
+    {
+      "name": "generated-equality",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support unregistered dependency: NativeCollections for struct Pair.func Equals(other: Pair) -> bool.\n"
+    },
+    {
+      "name": "imported-update",
+      "exitCode": 1,
+      "diagnostic": "error RAV0200: 'Key' is read-only and cannot be assigned to.\n"
+    },
+    {
+      "name": "mutable-component",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support constructor-initialized positional val components.\n"
+    },
+    {
+      "name": "record-class",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support positional record structs without additional members.\n"
+    }
+  ],
+  "buildArtifacts": {
+    "app.dll": "70d86f494eb4aced136ab8c14da6a18bc012d8eda4192cbfb8a39f4831341c46",
+    "app.obj": "cb16b8296d1e540f04c4a73331ab2c401a82573e0f3cc7f5a87b6b776132db18",
+    "app.exe": "d94829c64e23ba48efcda92510922336fc0492dd5069ff3726413da948a7e062"
+  },
+  "dependencies": [
+    "KERNEL32.dll"
+  ],
+  "isolatedExecutableMatchesBuild": true,
+  "scope": "Windows x64 Queue/Stack/Set/iterable Map with pinned Raven d5fadf968 compiler. Interpreter/AOT binaries outside artifact were stability-checked in CI, not locally rehashed."
+}

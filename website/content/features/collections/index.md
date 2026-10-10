@@ -164,7 +164,7 @@ Queue, Stack and Set pass native macOS, Windows x64 and interpreted checks.
 Development `Map<K,V>` also implements `Iterable<KeyValuePair<K,V>>`. Each pair has
 read-only `Key` and `Value` properties and supports `let (key, value) = pair`.
 HashMap iteration captures a shallow snapshot in unspecified order. Pair iteration
-passes native macOS and interpreted checks; Windows pair qualification is separate.
+passes native macOS, Windows x64 and interpreted checks.
 The native pair supports construction, copying and deconstruction; full record
 equality, hashing, formatting and init-only updates remain unsupported.
 Future concurrent implementations remain separate work.

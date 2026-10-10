@@ -23,7 +23,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and native API snapshot. Native macOS/interpreter consumer and interpreter queue
   element-release checks pass; add a dedicated Windows action. Current implementations
   are unsynchronized; future concurrency guarantees remain implementation-specific.
-  Windows x64 Queue/Stack/Set action also passes; retain verified downloaded evidence.
+  Windows x64 Queue/Stack/Set, iterable Map and reflection/JSON actions pass; retain
+  verified source-input, downloaded-artifact and isolated-executable evidence.
   Add Map pair iteration and deconstructable KeyValuePair value storage with shallow
   HashMap snapshots. Custom Map implementations must now supply GetIterator. Native
   positional records require the matching development compiler and omit equality,

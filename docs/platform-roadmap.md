@@ -110,8 +110,8 @@ general-purpose collection consumers, existing collection contracts and .NET
 ergonomics/behavior before selecting additions. The author clarifies that TaskQueue
 is not necessarily connected; collection additions do not require scheduler changes.
 See the [Queue/Stack review](experiments/queue-stack/README.md): application-local
-Option-slot storage probes pass native macOS and interpreter execution; public
-contracts, GC reclamation and Windows Queue/Stack qualification remain open. The
+Option-slot storage probes preceded the public library and Windows qualification
+recorded below; native element-reclamation instrumentation remains open. The
 bounded basic JSON correctness/platform gate now passes on macOS ARM64 and Windows
 x64; collection API work can proceed. The earlier interpreter/native JSON benchmark
 and later framework-comparison direction remains recorded in the native JSON plan;
@@ -122,7 +122,9 @@ author subsequently adds sets; see the [set review and prototype](experiments/se
 Set/MutableSet/HashSet now pass the [public native/interpreter consumer](experiments/native-collections/).
 Queue/Stack/Set also pass the [Windows x64 action](experiments/native-collections/windows-validation.json).
 Map now supports iterable, deconstructable KeyValuePair values through a bounded native
-positional-record storage contract; full native record semantics remain open.
+positional-record storage contract. The [Windows x64 Map run](experiments/native-collections/windows-map-validation.json)
+and [JSON regression](experiments/native-collections/windows-json-map-validation.json) now pass,
+with source and artifact hashes checked. Full native record semantics remain open.
 Future concurrent variants retain implementation-specific atomicity/iteration contracts; see the [contracts and concurrency boundaries](collection-contracts.md#basic-library-slice-and-future-concurrency--2026-10-10).
 
 ### Follow-up review areas — author direction, 2026-10-10

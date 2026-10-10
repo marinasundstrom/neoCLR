@@ -1,0 +1,118 @@
+{
+  "workflowRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/38032202180",
+  "revision": "bb262359eb0fb06cd62ece2bb6b7a9d55dd9e279",
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "reportSha256": "c1ccea2e2e782e21452e709d1657617e6411af5ee2f5dcf925de3595c6d7ca94",
+  "verifiedDownloadedFiles": 1571,
+  "verifiedSourceInputs": 11,
+  "cases": [
+    {
+      "name": "introspection",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\introspection executable only\\app.exe"
+          ],
+          "exitCode": 0,
+          "stdout": "Report\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\introspection native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "Report\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "name": "json",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\json executable only\\app.exe"
+          ],
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\json native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-json-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "builds": [
+    {
+      "case": "json native output",
+      "artifacts": {
+        "app.dll": "327b3445f40db54a3518d1430766b98e3feb2b3e6b01b6095ab745600909f6a6",
+        "app.obj": "3e74bcd380c6c39ac7a9c2ff77ad650fdcf4b43407f7b1f2a88d7c19478128c5",
+        "app.exe": "ea588896847ef3dc5766f38e2da04358fc111e274189fee5731b404d3424829f"
+      },
+      "dependencies": [
+        "KERNEL32.dll"
+      ],
+      "isolatedExecutableMatchesBuild": true
+    },
+    {
+      "case": "introspection native output",
+      "artifacts": {
+        "app.dll": "bda9aeca02defc07ce8083d60bc80ca7fae55d322f50f975bc0c273888d80e91",
+        "app.obj": "703d6704edddd1f484984d875a2dca052f675f10914717713fca48a61b567490",
+        "app.exe": "777a3ea24b9e718aedc4cc070891f2306210d62e68599247317b1616e46d2269"
+      },
+      "dependencies": [
+        "KERNEL32.dll"
+      ],
+      "isolatedExecutableMatchesBuild": true
+    }
+  ],
+  "scope": "Windows x64 reflection/JSON with iterable Map and pinned Raven d5fadf968 compiler. Interpreter/AOT binaries outside artifact were stability-checked in CI, not locally rehashed."
+}
