@@ -155,3 +155,9 @@ Keep this larger executable as an integration smoke test until the migrated case
 have Windows equivalence evidence. New behavior tests should be added to the Raven
 suite rather than duplicated here. Terminal duplicate-key fault/disposal programs
 and compiler rejection cases still require their specialized harnesses.
+
+The queue/stack entry checks and `CheckSnapshots` are also ported into six
+[QueueStack.rvn tests](../../../runtime/raven/tests/collections/QueueStack.rvn).
+They retain FIFO/LIFO growth, wrapped contents, shared reference identity, clear/reuse
+and mutation-after-snapshot cases. Explicit small capacities guarantee that growth
+is exercised; the tests do not pin an internal growth factor.

@@ -316,3 +316,14 @@ compiler rejection cases remain separate process/compiler tests.
 [First migration qualification](map-migration-validation.json): all 12 collection
 cases pass natively on macOS ARM64 and in the interpreter, and `--filter Map`
 selects exactly the five ported tests. Windows execution is pending its action.
+
+The next port splits queue/stack entry checks and `CheckSnapshots` into six tests in
+[QueueStack.rvn](collections/QueueStack.rvn): wrapped queue growth, stack growth,
+reference identity and clear/reuse for each, and FIFO/LIFO captured iterators. Small
+explicit capacities force growth; assertions do not require a particular growth
+factor. Captured iterators use `use` with explicit advances, preserving the original
+snapshot timing rather than opening a fresh traversal after mutation.
+
+[Queue/stack migration qualification](queue-stack-migration-validation.json): all 18
+collection tests and the existing ArrayQueue/Map selectors pass native macOS ARM64
+and interpreted execution. Windows qualification remains pending.

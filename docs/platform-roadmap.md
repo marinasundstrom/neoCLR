@@ -41,7 +41,10 @@ Author follow-up explicitly starts migration of existing program-form checks. Th
 [first five map ports](../runtime/raven/tests/collections/MapMaterialization.rvn) pass
 within the 12-case native/interpreted collection suite and through `--filter Map`.
 [Migration evidence](../runtime/raven/tests/map-migration-validation.json); retain the
-old integration smoke consumer until Windows equivalence is qualified.
+old integration smoke consumer until Windows equivalence is qualified. Six subsequent
+[queue/stack ports](../runtime/raven/tests/collections/QueueStack.rvn) cover growth,
+reference identity, clear/reuse and snapshots; the expanded 18-test suite and existing
+selectors pass both modes ([evidence](../runtime/raven/tests/queue-stack-migration-validation.json)).
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

@@ -26,9 +26,15 @@ COLLECTION_NAMES = [
     'ArrayList copy has independent storage',
     *MAP_NAMES,
     'Predicate Any stops at its first match',
+    'Queue growth preserves wrapped FIFO contents',
     'ArrayQueue preserves FIFO',
+    'Queue preserves references through clear and reuse',
+    'Queue iterator captures FIFO contents before mutation',
     'HashSet applies its comparer',
+    'Stack growth preserves LIFO contents',
     'ArrayStack preserves LIFO',
+    'Stack preserves references through clear and reuse',
+    'Stack iterator captures LIFO contents before mutation',
 ]
 DISCOVERY_SPEC = importlib.util.spec_from_file_location('test_discovery', ROOT / 'scripts/discover-runtime-tests.py')
 DISCOVERY = importlib.util.module_from_spec(DISCOVERY_SPEC)

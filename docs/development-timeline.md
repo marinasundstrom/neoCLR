@@ -13693,3 +13693,8 @@ claim completion of in-process test discovery.
   execution, along with Map-only and ArrayQueue-only selection.
   [Evidence](../runtime/raven/tests/map-migration-validation.json) records hashes and
   exact results. Windows equivalence is pending its action.
+- **Follow-up implementation:** six queue/stack tests now preserve growth, reference
+  identity, clear/reuse and captured snapshot scenarios from the standalone program.
+  All 18 collection tests and existing selectors pass native macOS ARM64 and the
+  interpreter ([evidence](../runtime/raven/tests/queue-stack-migration-validation.json));
+  Windows qualification remains pending.

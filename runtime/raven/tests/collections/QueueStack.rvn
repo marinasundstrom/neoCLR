@@ -1,0 +1,153 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Option.*
+import System.Result.*
+import NeoClr.Testing.*
+
+// Ported from native-collections/Main.rvn: entry checks and CheckSnapshots.
+[Test("Queue growth preserves wrapped FIFO contents")]
+func QueueGrowth() -> Result<unit, TestFailure> {
+    let queue = ArrayQueue<int>(4)
+    _ = Assert.True(queue.Dequeue() is None, "New queue must be empty")?
+    var index = 0
+    while index < 4 {
+        queue.Enqueue(index)
+        index = index + 1
+    }
+    _ = Assert.True(queue.Dequeue() is Some(0), "First item must leave first")?
+    _ = Assert.True(queue.Dequeue() is Some(1), "Second item must follow")?
+    while index < 12 {
+        queue.Enqueue(index)
+        index = index + 1
+    }
+    _ = Assert.True(queue.Capacity >= 10, "Wrapped queue must grow to hold its contents")?
+    _ = Assert.Equal(10, queue.Count)?
+    _ = Assert.True(queue.Peek() is Some(2), "Growth must preserve the head")?
+    index = 2
+    while index < 12 {
+        if queue.Dequeue() is Some(let value) {
+            _ = Assert.Equal(index, value)?
+        } else {
+            return Assert.True(false, "Queue lost an item during growth")
+        }
+        index = index + 1
+    }
+    _ = Assert.Equal(0, queue.Count)?
+    _ = Assert.True(queue.Peek() is None, "Drained queue must have no head")?
+    return Assert.True(queue.Dequeue() is None, "Drained queue must remain empty")
+}
+
+[Test("Queue preserves references through clear and reuse")]
+func QueueReferences() -> Result<unit, TestFailure> {
+    let queue = ArrayQueue<QueueStackItem>()
+    let item = QueueStackItem()
+    queue.Enqueue(item)
+    if queue.Dequeue() is Some(let alias) {
+        alias.Value = 8
+    } else {
+        return Assert.True(false, "Queued reference must be returned")
+    }
+    _ = Assert.Equal(8, item.Value)?
+    _ = Assert.Equal(0, queue.Count)?
+    queue.Enqueue(item)
+    queue.Clear()
+    _ = Assert.Equal(0, queue.Count)?
+    _ = Assert.True(queue.Peek() is None, "Clear must remove the head")?
+    queue.Enqueue(item)
+    if queue.Peek() is Some(let current) {
+        _ = Assert.Equal(8, current.Value)?
+    } else {
+        return Assert.True(false, "Cleared queue must support reuse")
+    }
+    return Assert.Equal(1, queue.Count)
+}
+
+[Test("Queue iterator captures FIFO contents before mutation")]
+func QueueSnapshots() -> Result<unit, TestFailure> {
+    let queue: Queue<int> = ArrayQueue<int>(3)
+    queue.Enqueue(1)
+    queue.Enqueue(2)
+    use snapshot = queue.GetIterator()
+    queue.Clear()
+    queue.Enqueue(3)
+    // Advance the captured iterator, not a fresh traversal of the mutated queue.
+    _ = Assert.True(snapshot.MoveNext(), "Snapshot must retain the first item")?
+    _ = Assert.Equal(1, snapshot.Current)?
+    _ = Assert.True(snapshot.MoveNext(), "Snapshot must retain the second item")?
+    _ = Assert.Equal(2, snapshot.Current)?
+    _ = Assert.True(!snapshot.MoveNext(), "Snapshot must exclude later insertions")?
+    _ = Assert.Equal(1, queue.Count)?
+    return Assert.True(queue.Peek() is Some(3), "Current queue must expose the new item")
+}
+
+[Test("Stack growth preserves LIFO contents")]
+func StackGrowth() -> Result<unit, TestFailure> {
+    let stack = ArrayStack<int>(3)
+    _ = Assert.True(stack.Pop() is None, "New stack must be empty")?
+    _ = Assert.True(stack.Peek() is None, "New stack must have no top")?
+    var index = 0
+    while index < 12 {
+        stack.Push(index)
+        index = index + 1
+    }
+    _ = Assert.True(stack.Capacity >= 12, "Stack must grow to hold its contents")?
+    _ = Assert.Equal(12, stack.Count)?
+    _ = Assert.True(stack.Peek() is Some(11), "Growth must preserve the top")?
+    while index > 0 {
+        index = index - 1
+        if stack.Pop() is Some(let value) {
+            _ = Assert.Equal(index, value)?
+        } else {
+            return Assert.True(false, "Stack lost an item during growth")
+        }
+    }
+    _ = Assert.Equal(0, stack.Count)?
+    _ = Assert.True(stack.Peek() is None, "Drained stack must have no top")?
+    return Assert.True(stack.Pop() is None, "Drained stack must remain empty")
+}
+
+[Test("Stack preserves references through clear and reuse")]
+func StackReferences() -> Result<unit, TestFailure> {
+    let stack = ArrayStack<QueueStackItem>()
+    let item = QueueStackItem()
+    stack.Push(item)
+    if stack.Pop() is Some(let alias) {
+        alias.Value = 9
+    } else {
+        return Assert.True(false, "Pushed reference must be returned")
+    }
+    _ = Assert.Equal(9, item.Value)?
+    _ = Assert.Equal(0, stack.Count)?
+    stack.Push(item)
+    stack.Clear()
+    _ = Assert.Equal(0, stack.Count)?
+    _ = Assert.True(stack.Peek() is None, "Clear must remove the top")?
+    stack.Push(item)
+    if stack.Peek() is Some(let current) {
+        _ = Assert.Equal(9, current.Value)?
+    } else {
+        return Assert.True(false, "Cleared stack must support reuse")
+    }
+    return Assert.Equal(1, stack.Count)
+}
+
+[Test("Stack iterator captures LIFO contents before mutation")]
+func StackSnapshots() -> Result<unit, TestFailure> {
+    let stack: Stack<int> = ArrayStack<int>(3)
+    stack.Push(1)
+    stack.Push(2)
+    use snapshot = stack.GetIterator()
+    stack.Clear()
+    _ = Assert.True(snapshot.MoveNext(), "Snapshot must retain the top item")?
+    _ = Assert.Equal(2, snapshot.Current)?
+    _ = Assert.True(snapshot.MoveNext(), "Snapshot must retain the bottom item")?
+    _ = Assert.Equal(1, snapshot.Current)?
+    _ = Assert.True(!snapshot.MoveNext(), "Snapshot must end after its captured items")?
+    return Assert.Equal(0, stack.Count)
+}
+
+class QueueStackItem {
+    var Value: int { get; set; } = 7
+}

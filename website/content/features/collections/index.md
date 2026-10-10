@@ -215,7 +215,8 @@ separate discovery from execution. Host TestAttribute discovery generates typed
 registration adapters; interpreted module metadata can also inspect descriptions.
 Development runners accept `--filter <text>` for literal case-sensitive ID/name
 substring selection and `--id <id>` for exact IDs, including manual registrations.
-The framework now includes migrated map snapshot, copy and materialization checks;
+The framework now includes migrated map snapshot, copy and materialization checks,
+plus queue/stack growth, snapshot and reference-identity cases;
 `--filter Map` runs that group of cases without requiring a grouping attribute.
 No matches or invalid arguments are configuration errors. Grouping attributes and
 .NET-style filter expressions remain future work.
