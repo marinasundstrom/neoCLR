@@ -59,6 +59,8 @@ byte quotas; all pass native macOS ARM64 and release-interpreted execution
 MemoryStream and reflection-mapping migration remain follow-ups.
 Batch `memory-stream` adds 5 passing native/interpreted tests for MemoryStream seek, range, quota, overwrite and closed-state behavior
 ([evidence](../runtime/raven/tests/memory-stream-validation.json)).
+Batch `string-construction` adds 5 tests for String character-sequence copying, graphemes and named arguments qualified in release-interpreted execution; native admission remains unsupported
+([evidence](../runtime/raven/tests/string-construction-validation.json)).
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

@@ -13,6 +13,10 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / 'runtime/raven/tests'
+# Explicit admission gaps: these suites still run interpreted; no native pass is claimed.
+NATIVE_ADMISSION_GAPS = {
+    'string-construction': 'value member requires a local record owner (Char)',
+}
 MAP_NAMES = [
     'Map materialization handles collisions and empty input',
     'HashMap copies sequences and maps independently',
@@ -108,6 +112,13 @@ MEMORY_STREAM_NAMES = [
     'MemoryStream rejects invalid buffer and seek ranges without moving',
     'MemoryStream overwrites preserve length and untouched bytes',
 ]
+STRING_CONSTRUCTION_NAMES = [
+    'String construction copies character storage',
+    'String construction accepts an empty character sequence',
+    'String construction preserves and merges grapheme boundaries',
+    'String named arguments preserve public parameter contracts',
+    'String exposes a readonly character sequence',
+]
 DISCOVERY_SPEC = importlib.util.spec_from_file_location('test_discovery', ROOT / 'scripts/discover-runtime-tests.py')
 DISCOVERY = importlib.util.module_from_spec(DISCOVERY_SPEC)
 DISCOVERY_SPEC.loader.exec_module(DISCOVERY)
@@ -123,7 +134,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -146,6 +157,7 @@ def main():
         ('json-dom', 0, ''.join('PASS ' + n + '\n' for n in JSON_NAMES) + f'Tests: {len(JSON_NAMES)}, passed: {len(JSON_NAMES)}, failed: 0, skipped: 0\n'),
         ('json-streams', 0, ''.join('PASS ' + n + '\n' for n in JSON_STREAM_NAMES) + f'Tests: {len(JSON_STREAM_NAMES)}, passed: {len(JSON_STREAM_NAMES)}, failed: 0, skipped: 0\n'),
         ('memory-stream', 0, ''.join('PASS ' + n + '\n' for n in MEMORY_STREAM_NAMES) + f'Tests: {len(MEMORY_STREAM_NAMES)}, passed: {len(MEMORY_STREAM_NAMES)}, failed: 0, skipped: 0\n'),
+        ('string-construction', 0, ''.join('PASS ' + n + '\n' for n in STRING_CONSTRUCTION_NAMES) + f'Tests: {len(STRING_CONSTRUCTION_NAMES)}, passed: {len(STRING_CONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n'),
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]
@@ -166,21 +178,32 @@ def main():
             result = subprocess.run(list(map(str, command)), cwd=ROOT, env=environment, capture_output=True, timeout=600)
             (out / (name + '-build.stdout.log')).write_bytes(result.stdout)
             (out / (name + '-build.stderr.log')).write_bytes(result.stderr)
-            if result.returncode:
+            admission_gap = NATIVE_ADMISSION_GAPS.get(name)
+            if admission_gap:
+                diagnostic = result.stderr.decode('utf-8')
+                if not result.returncode or admission_gap not in diagnostic or not (build / 'app.dll').is_file():
+                    raise RuntimeError(name + ' native admission changed; qualify support or inspect retained logs')
+                report.setdefault('nativeAdmissionGaps', []).append(dict(suite=name, diagnostic=admission_gap))
+                print(name + ': native execution unavailable: ' + admission_gap, flush=True)
+            elif result.returncode:
                 raise RuntimeError(name + ' build failed; see retained logs')
             if name != 'runner-contract':
                 DISCOVERY.verify_registration(build / 'app.dll', bundle, out / (name + '-discovery'))
             isolated = out / (name + '-isolated')
             isolated.mkdir()
             exe = isolated / ('app.exe' if os.name == 'nt' else 'app')
-            shutil.copy2(build / exe.name, exe)
+            if not admission_gap:
+                shutil.copy2(build / exe.name, exe)
             lib = bundle / 'lib'
             catalog = json.loads((lib / 'bundle.json').read_text())
             interpreter = [args.runtime.resolve(), 'run', build / 'app.dll', '--system', lib / catalog['runtimeSeed'],
                            *[arg for a in catalog['assemblyNames'] for arg in ('--module', lib / (a + '.dll'))],
                            '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']
             env = {k: v for k, v in os.environ.items() if k.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
-            for mode, command, cwd, environment in [('native', [exe], isolated, env), ('interpreter', interpreter, ROOT, None)]:
+            executions = [('interpreter', interpreter, ROOT, None)]
+            if not admission_gap:
+                executions.insert(0, ('native', [exe], isolated, env))
+            for mode, command, cwd, environment in executions:
                 result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=180)
                 record = dict(suite=name, mode=mode, exitCode=result.returncode,
                               stdout=result.stdout.decode('utf-8').replace('\r\n', '\n'),

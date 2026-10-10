@@ -1,0 +1,59 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import System.Option.*
+import NeoClr.Testing.*
+
+import System.Collections.*
+
+[Test("String construction copies character storage")]
+func StringCopy() -> Result<unit, TestFailure> {
+    let characters: char[] = ['F', 'o', 'o']
+    let copied = String(characters)
+    characters[0] = 'B'
+    _ = Assert.Equal("Foo", copied)?
+    return Assert.Equal("Boo", String(characters))
+}
+
+[Test("String exposes a readonly character sequence")]
+func StringSequence() -> Result<unit, TestFailure> {
+    let text = String(['F', 'o', 'o'])
+    let sequence: Sequence<char> = text
+    _ = Assert.Equal(text.Length, sequence.Count)?
+    _ = Assert.True(sequence[1] == 'o', "Sequence index preserves character")?
+    return Assert.Equal(text, String(sequence))
+}
+
+[Test("String construction accepts an empty character sequence")]
+func StringEmpty() -> Result<unit, TestFailure> {
+    let empty: char[] = []
+    return Assert.Equal("", String(empty))
+}
+
+[Test("String construction preserves and merges grapheme boundaries")]
+func StringGraphemes() -> Result<unit, TestFailure> {
+    let emoji = Char.FromString("👩‍💻")
+    let graphemes: char[] = [Char.FromString("é"), emoji]
+    let text = String(graphemes)
+    _ = Assert.Equal("é👩‍💻", text)?
+    _ = Assert.Equal(2, text.Length)?
+    _ = Assert.True(text[1] == emoji, "Index returns whole grapheme")?
+    let merging: char[] = ['e', Char.FromString("́")]
+    return Assert.Equal(1, String(merging).Length)
+}
+
+[Test("String named arguments preserve public parameter contracts")]
+func StringNamedArguments() -> Result<unit, TestFailure> {
+    let text = String.Concat(right: "o", left: "Fo")
+    _ = Assert.Equal(String(characters: ['F', 'o', 'o']), text)?
+    _ = Assert.True(text.Equals(other: "Foo"), "Named equality operand")?
+    _ = Assert.True(String.CompareOrdinal(right: "Food", left: text) < 0, "Named comparison order")?
+    _ = Assert.True(text.ContainsOrdinal(substring: "oo"), "Named substring")?
+    _ = Assert.True(text.StartsWithOrdinal(prefix: "Fo"), "Named prefix")?
+    _ = Assert.True(text.EndsWithOrdinal(suffix: "oo"), "Named suffix")?
+    if text.SliceUtf8(byteLength: 1, byteStart: 1) is Ok(let piece) {
+        return Assert.Equal("o", piece)
+    }
+    return Assert.True(false, "Named UTF-8 slice must succeed")
+}

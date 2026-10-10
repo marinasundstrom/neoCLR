@@ -405,3 +405,13 @@ pass native macOS ARM64 and release-interpreted execution. Windows remains pendi
 Batch `memory-stream`: MemoryStream seek, range, quota, overwrite and closed-state behavior; 5 tests pass native macOS ARM64 and
 release-interpreted execution ([evidence](memory-stream-validation.json)).
 Source: [docs/experiments/json-dom/Main.rvn](../../../docs/experiments/json-dom/Main.rvn). Windows remains pending.
+
+Batch `string-construction`: String character-sequence copying, graphemes and named arguments; 5 tests pass release-interpreted execution; native admission remains unsupported ([evidence](string-construction-validation.json)).
+Source: [docs/experiments/string-sequence/Main.rvn](../../../docs/experiments/string-sequence/Main.rvn). Windows remains pending.
+
+Explicit native admission gaps are recorded separately from test passes. The
+`string-construction` suite currently requires the exact `value member requires a
+local record owner (Char)` rejection and then executes its compiled artifact in the
+interpreter. Unexpected build errors or unexpected native admission fail the gate;
+remove the gap only after qualifying native execution. A passing migration gate is
+not a native execution claim for suites listed in `nativeAdmissionGaps`.

@@ -54,3 +54,7 @@ The sample reorders named arguments for Concat, CompareOrdinal and SliceUtf8. Th
 verifier rejects the old value0/value1 Concat names. Positional calls and member
 signatures remain compatible; named callers must migrate to these names. Reference
 metadata, authored bodies, runtime parameter introspection and API docs now agree.
+
+Development test migration (2026-10-10): String character-sequence copying, graphemes and named arguments now also run as 5
+attributed framework tests in `runtime/raven/tests/string-construction`. The framework README
+links native/interpreted evidence. This original consumer retains its integration purpose.
