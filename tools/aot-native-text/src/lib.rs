@@ -256,3 +256,60 @@ mod numeric_adapter_tests {
         assert_eq!(output, [99, 98]);
     }
 }
+
+
+// The private native kernel archive also hosts pure temporal rules. It links no
+// OS timezone service; both execution modes compile the same pinned rule kernel.
+#[cfg(feature = "time-zone-rules")]
+#[path = "../../../src/time_zone_rules.rs"]
+#[allow(dead_code)]
+mod time_zone_rules;
+
+/// # Safety
+/// Input must be readable for length bytes. No input pointer is retained.
+#[cfg(feature = "time-zone-rules")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_tz_exists_v1(bytes: *const u8, length: usize) -> i32 {
+    let Some(id) = (unsafe { input(bytes, length) }) else { return 0 };
+    i32::from(time_zone_rules::exists(id))
+}
+
+/// # Safety
+/// Input must be readable for length bytes. No input pointer is retained.
+#[cfg(feature = "time-zone-rules")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_tz_offset_v1(bytes: *const u8, length: usize, ticks: i64) -> i32 {
+    let Some(id) = (unsafe { input(bytes, length) }) else { return i32::MIN };
+    time_zone_rules::offset(id, ticks)
+}
+
+/// # Safety
+/// Output must be writable and aligned. The returned bytes have static lifetime.
+#[cfg(feature = "time-zone-rules")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_tz_version_v1(length: *mut usize) -> *const u8 {
+    if length.is_null() { return core::ptr::null(); }
+    unsafe { *length = chrono_tz::IANA_TZDB_VERSION.len(); }
+    chrono_tz::IANA_TZDB_VERSION.as_ptr()
+}
+
+
+#[cfg(all(test, feature = "time-zone-rules"))]
+mod time_zone_tests {
+    use super::*;
+    #[test]
+    fn pinned_rules_validate_utf8_names_and_signed_tick_bounds() {
+        unsafe {
+            assert_eq!(neoclr_tz_exists_v1(b"UTC".as_ptr(), 3), 1);
+            assert_eq!(neoclr_tz_exists_v1(b"utc".as_ptr(), 3), 0);
+            assert_eq!(neoclr_tz_exists_v1(b"\xff".as_ptr(), 1), 0);
+            assert_eq!(neoclr_tz_offset_v1(b"UTC".as_ptr(), 3, -1), 0);
+            assert_eq!(neoclr_tz_offset_v1(b"UTC".as_ptr(), 3, i64::MIN), i32::MIN);
+            assert_eq!(neoclr_tz_offset_v1(b"UTC".as_ptr(), 3, i64::MAX), i32::MIN);
+            assert_eq!(neoclr_tz_offset_v1(b"\xff".as_ptr(), 1, 0), i32::MIN);
+            let mut len = 0;
+            let version = neoclr_tz_version_v1(&mut len);
+            assert_eq!(core::slice::from_raw_parts(version, len), b"2025b");
+        }
+    }
+}

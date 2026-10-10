@@ -6,4 +6,6 @@ public union DateTimeParseError {
     case InvalidFormat
     /// Numeric fields match the grammar but do not form a valid temporal value.
     case OutOfRange
+    /// The stated offset does not match the supplied named zone at the parsed instant.
+    case OffsetMismatch
 }

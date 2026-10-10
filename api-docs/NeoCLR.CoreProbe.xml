@@ -3013,5 +3013,15 @@
     <returns>Result&lt;Instant, DateTimeParseError&gt; containing the UTC instant or InvalidFormat/OutOfRange.</returns>
     <remarks>Local years are 1–9999 and offsets have whole-second precision within ±18 hours. UTC may cross a civil boundary within Instant's wider signed tick domain. No ambient culture or local zone, whitespace, named zones, leap seconds or rounding. General patterns and wider-year text are unsupported. The parser validates local fields before offset fields and reports the first error.</remarks>
   </member>
+  <member name="M:System.Time.ZonedDateTime.Parse(System.String,System.Time.TimeZone)">
+    <summary>Parses a complete invariant explicit-offset timestamp and validates its offset against the supplied named zone.</summary>
+    <param name="value">The same timestamp grammar as Instant.Parse, with Z or a signed HH:mm[:ss] offset.</param>
+    <param name="zone">Explicit zone resolved separately through TimeZone.Find or TimeZone.Utc.</param>
+    <returns>Result&lt;ZonedDateTime, DateTimeParseError&gt; containing a resolved value or InvalidFormat, OutOfRange or OffsetMismatch.</returns>
+    <remarks>Both UTC and local years must be 1900–2099. Stated offsets select overlap candidates; gaps and mismatches are rejected without shifting. No inline zone identifier or machine-zone inference is supported.</remarks>
+  </member>
+  <member name="T:System.Time.DateTimeParseError.OffsetMismatch">
+    <summary>The timestamp's stated offset does not match the supplied named zone at its parsed instant.</summary>
+  </member>
 </members>
 </doc>

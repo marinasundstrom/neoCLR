@@ -37,7 +37,7 @@ The full signed 64-bit tick range is accepted; overflow returns OutOfRange.
 `TimeOffset.Parse(value)` returns `Result<TimeOffset, DateTimeParseError>` for `Z`
 or `±HH:mm[:ss]`, using the existing inclusive ±18-hour range and whole seconds.
 Negative zero means zero. Both reject whitespace and incomplete/non-ASCII fields.
-Unsupported syntax returns InvalidFormat. General parsing patterns and named-zone parsing remain development gaps; see [the contract](/docs/api/System/Time/Duration/method_Parse.html)
+Unsupported syntax returns InvalidFormat. General parsing patterns and inline zone identifiers remain development gaps; see [the contract](/docs/api/System/Time/Duration/method_Parse.html)
 and [offset reference](/docs/api/System/Time/TimeOffset/method_Parse.html).
 
 
@@ -51,3 +51,14 @@ Local years are 1–9999. Offset conversion may place UTC outside those civil bo
 within Instant's wider signed tick domain. The source offset is not retained.
 Unsupported syntax returns InvalidFormat; invalid fields/ranges return OutOfRange.
 [Instant.Parse reference](/docs/api/System/Time/Instant/method_Parse.html).
+
+
+## Development: zoned parsing with an explicit zone
+
+`ZonedDateTime.Parse(value, zone)` returns `Result<ZonedDateTime, DateTimeParseError>`.
+The input uses Instant.Parse's explicit-offset grammar; resolve a named zone with
+TimeZone.Find and supply it separately. The stated offset must match its rule at
+the parsed instant. `OffsetMismatch` rejects skipped local times and incorrect offsets;
+matching offsets select either overlap candidate. UTC and local years must be
+1900–2099. No inline zone identifier or host-zone inference is performed.
+[ZonedDateTime.Parse reference](/docs/api/System/Time/ZonedDateTime/method_Parse.html).

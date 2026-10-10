@@ -149,3 +149,29 @@ The calendar group now compiles into a separate native library, and an artifact-
 consumer executes named-zone offsets, gaps/overlaps and the optional local-or-zoned
 union. The internal mapping service returns managed Int64 arrays. See the
 [gate and remaining full-System blockers](experiments/extended-cli-metadata/source-calendar-2026-10-06.md).
+
+
+## Development parsing and native rule queries (2026-10-10)
+
+ZonedDateTime.Parse(value, zone) parses an explicit-offset invariant timestamp and
+checks that the supplied named zone agrees. It rejects skipped local times and
+incorrect offsets with DateTimeParseError.OffsetMismatch; overlap candidates are
+selected by the input offset. The existing 1900–2099 UTC/local bounds apply.
+[Parsing contract and comparisons](date-time.md#zoned-parsing-with-explicit-zone-context-development-2026-10-10).
+
+Native project builds now explicitly bind TimeZoneExists, TimeZoneOffset and
+TimeZoneDatabaseVersion under --bind-time-zone-rules. The allocation-free Rust rule
+kernel is shared with the interpreter and uses the same chrono/chrono-tz pins and
+IANA 2025b data. The C boundary borrows UTF-8 names only for the call; version text
+uses the existing bounded text arena. It neither collects nor calls guest code.
+Pure rules add no OS locale/timezone dependency. The private aot-native-text archive
+also houses these temporal kernels to share its no_std/abort boundary; its historical
+name is an internal packaging detail. An optional Cargo feature and separate archive
+variants keep the database out of text-only consumers, including packaged build kits.
+Reachability selects the rule adapter and archive; source-kit hashing includes the
+shared kernel. This adds pinned data/code when used;
+no size or performance improvement is claimed.
+
+Native MapLocal array results and host-system-zone discovery remain separate gaps.
+The new parser uses explicit offset-to-instant conversion plus rule validation and
+does not require those services. Pinned-zone rule updates still require a rebuild.

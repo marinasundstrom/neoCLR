@@ -433,6 +433,36 @@ pub fn system_culture(input: &mut neoclr::Module, selection: &Value) -> Result<V
     Ok(bindings)
 }
 
+/// Explicit pure pinned-rule bindings; no machine timezone or clock is consulted.
+pub fn time_zone_rules(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        let (name, parameters, returns, symbol, implementation, placeholder) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.TimeZoneExists") => ("neoCLR.Runtime.TimeZoneExists", vec![Type::String], Type::Boolean, "neoclr_time_zone_exists_v1", "time-zone-exists-v1", Op::Bool(false)),
+            Some("neoCLR.Runtime.TimeZoneOffset") => ("neoCLR.Runtime.TimeZoneOffset", vec![Type::String, Type::Int64], Type::Int32, "neoclr_time_zone_offset_v1", "time-zone-offset-v1", Op::Int(i32::MIN)),
+            Some("neoCLR.Runtime.TimeZoneDatabaseVersion") => ("neoCLR.Runtime.TimeZoneDatabaseVersion", vec![], Type::String, "neoclr_time_zone_version_v1", "time-zone-version-v1", Op::String(String::new())),
+            _ => continue,
+        };
+        let index = row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize;
+        let f = &mut input.functions[index];
+        if f.name != name || f.owner.is_some() || f.instance
+            || f.parameters != parameters || f.returns != returns || f.no_result
+            || f.impl_flags != 0x1000 || !f.body.is_empty() || !f.locals.is_empty()
+            || f.pinvoke.is_some() || f.receiver_byref || f.receiver_readonly
+            || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+            return Err("native time-zone binding requires exact TimeZoneExists/TimeZoneOffset/TimeZoneDatabaseVersion InternalCall contracts".into());
+        }
+        f.impl_flags = 0;
+        f.body = vec![placeholder, Op::Return];
+        bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,
+            "implementation":implementation,"symbol":symbol}));
+    }
+    Ok(bindings)
+}
+
 pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
@@ -924,6 +954,35 @@ mod type_identity_tests {
         let bindings = system_culture(&mut input, &inventory).unwrap();
         assert_eq!(bindings[0]["symbol"], "neoclr_system_culture_name_v1");
         assert_eq!(input.functions[0].impl_flags, 0);
+    }
+
+    #[test]
+    fn time_zone_rules_require_exact_internal_call_contracts() {
+        for (name, signature, result, symbol) in [
+            ("TimeZoneExists", "String id", "Boolean", "neoclr_time_zone_exists_v1"),
+            ("TimeZoneOffset", "String id, Int64 ticks", "Int32", "neoclr_time_zone_offset_v1"),
+            ("TimeZoneDatabaseVersion", "", "String", "neoclr_time_zone_version_v1"),
+        ] {
+            let source = neoclr::assemble(&format!(".module ZoneBinding\n.function neoCLR.Runtime.{name}({signature}) -> {result}\n.methodimpl InternalCall\n.end\n")).unwrap();
+            let inventory = json!({"functions":[{"compiledIndex":0,"name":format!("neoCLR.Runtime.{name}")}]});
+            for variant in 0..6 {
+                let mut input = source.clone();
+                let f = &mut input.functions[0];
+                match variant {
+                    0 => f.parameters.push(Type::Int32),
+                    1 => f.returns = Type::Void,
+                    2 => f.impl_flags = 0,
+                    3 => f.body.push(Op::Int(0)),
+                    4 => f.no_result = true,
+                    _ => f.locals.push(Type::String),
+                }
+                assert!(time_zone_rules(&mut input, &inventory).is_err());
+            }
+            let mut input = source;
+            let bindings = time_zone_rules(&mut input, &inventory).unwrap();
+            assert_eq!(bindings[0]["symbol"], symbol);
+            assert_eq!(input.functions[0].impl_flags, 0);
+        }
     }
 
 }

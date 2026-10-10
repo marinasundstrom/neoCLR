@@ -1,32 +1,10 @@
 //! Pinned IANA rules. Civil policy and public errors remain in the Raven library.
 use crate::{Value, metadata::Type};
-use chrono::{DateTime, Datelike, LocalResult, Offset, TimeZone, Utc};
+use chrono::{LocalResult, TimeZone};
 use chrono_tz::Tz;
 
-const TICKS_PER_SECOND: i64 = 10_000_000;
-fn timestamp(ticks: i64) -> Option<DateTime<Utc>> {
-    let value = DateTime::from_timestamp(
-        ticks.div_euclid(TICKS_PER_SECOND),
-        (ticks.rem_euclid(TICKS_PER_SECOND) * 100) as u32,
-    )?;
-    (1900..=2099).contains(&value.year()).then_some(value)
-}
-fn ticks(value: DateTime<Tz>) -> i64 {
-    value.timestamp() * TICKS_PER_SECOND + i64::from(value.timestamp_subsec_nanos() / 100)
-}
-pub(crate) fn exists(id: &str) -> bool {
-    id.parse::<Tz>().is_ok()
-}
-pub(crate) fn offset(id: &str, instant: i64) -> i32 {
-    let Some((zone, instant)) = id.parse::<Tz>().ok().zip(timestamp(instant)) else {
-        return i32::MIN;
-    };
-    let local = instant.with_timezone(&zone);
-    if !(1900..=2099).contains(&local.year()) {
-        return i32::MIN;
-    }
-    local.offset().fix().local_minus_utc()
-}
+use crate::time_zone_rules::{timestamp, ticks};
+pub(crate) use crate::time_zone_rules::{exists, offset};
 pub(crate) fn map_local(id: &str, local_ticks: i64) -> Value {
     // Status: -1 out of range/unknown; 0 gap; 1 unique; 2 ordered overlap.
     let values = match id.parse::<Tz>().ok().zip(timestamp(local_ticks)) {
@@ -60,6 +38,8 @@ pub(crate) fn map_local(id: &str, local_ticks: i64) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chrono::Utc;
+    const TICKS_PER_SECOND: i64 = 10_000_000;
     fn at(year: i32, month: u32, day: u32, hour: u32, minute: u32) -> i64 {
         Utc.with_ymd_and_hms(year, month, day, hour, minute, 0)
             .single()

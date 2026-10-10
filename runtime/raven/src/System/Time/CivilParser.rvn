@@ -245,13 +245,7 @@ internal class CivilParser {
             return Error(DateTimeParseError.InvalidFormat)
         }
         let text = Utf8.Encode(value)
-        var offsetStart = -1
-        for index in 19..<length {
-            if text[index] == 90 || text[index] == 43 || text[index] == 45 {
-                offsetStart = index
-                break
-            }
-        }
+        let offsetStart = TimestampOffsetStart(text)
         if offsetStart < 0 {
             return Error(DateTimeParseError.InvalidFormat)
         }
@@ -266,5 +260,31 @@ internal class CivilParser {
         // Four-digit civil years and ±18 hours fit safely in signed Unix ticks.
         // UTC may cross a civil-year boundary; Instant has a wider tick domain.
         return Ok(offset.ToInstant(local))
+    }
+
+    private static func TimestampOffsetStart(text: Sequence<byte>) -> int {
+        for index in 19..<text.Count {
+            if text[index] == 90 || text[index] == 43 || text[index] == 45 {
+                return index
+            }
+        }
+        return -1
+    }
+
+    static func ParseZoned(value: string, zone: TimeZone) -> Result<ZonedDateTime, DateTimeParseError> {
+        let instant = ParseInstant(value)?
+        let text = Utf8.Encode(value)
+        let start = TimestampOffsetStart(text)
+        let Ok(offsetText) = value.SliceUtf8(start, text.Count - start) else {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let expectedOffset = ParseOffset(offsetText)?
+        let Ok(zoned) = ZonedDateTime.Create(instant, zone) else {
+            return Error(DateTimeParseError.OutOfRange)
+        }
+        if !zoned.Offset.Equals(expectedOffset) {
+            return Error(DateTimeParseError.OffsetMismatch)
+        }
+        return Ok(zoned)
     }
 }

@@ -152,7 +152,7 @@ introduce platform-dependent accepted forms; implementing the bounded grammar in
 Raven provides the same explicit-culture behavior on all targets. These preview
 choices may evolve before a stable release.
 
-ZonedDateTime parsing remains a separate gap. Timezone conversion remains an explicit
+ZonedDateTime parsing with an explicitly supplied zone is described below. Timezone conversion remains an explicit
 operation after civil parsing; Instant parsing below requires an explicit offset.
 
 
@@ -216,4 +216,29 @@ implementation requires an offset to avoid environment-dependent interpretation;
 whole-second/±18-hour offsets and Instant's wider UTC range deliberately preserve
 neoCLR's established type domains, unlike DateTimeOffset's minute/±14-hour and
 civil UTC bounds. Interop must validate those constraints. Wider-year textual forms,
-general patterns and named-zone parsing remain unimplemented.
+general patterns and inline zone-identifier syntax remain unimplemented.
+
+
+### Zoned parsing with explicit zone context (development, 2026-10-10)
+
+`ZonedDateTime.Parse(value, zone)` accepts Instant.Parse's timestamp grammar and an
+explicitly resolved TimeZone. It preserves the supplied zone, derives the instant,
+and validates the stated offset against that zone's pinned rule at the instant.
+Mismatch returns the new DateTimeParseError.OffsetMismatch case; callers matching
+all error cases should handle it. InvalidFormat and OutOfRange retain their existing
+meaning. Both UTC and local years must be within the named-rule range 1900–2099.
+
+An explicit matching offset selects either candidate in a DST overlap. A skipped
+local time cannot have a matching offset and is rejected, without selecting a
+resolver or shifting the clock. TimeZone.Find handles unknown identifiers separately.
+There is no one-string zone-ID syntax, implicit host zone, or offset-free overload.
+This bounded API composes existing explicit contexts, rather than adopting a new
+wire format for zone identifiers.
+
+.NET DateTimeOffset does not retain a TimeZoneInfo; validating a parsed offset
+against supplied zone rules is additional application policy there. This API keeps
+that policy explicit and returns a typed mismatch. The comparison with Noda Time's
+[ZonedDateTime patterns](https://nodatime.org/3.2.x/userguide/zoneddatetime-patterns)
+is useful: offset-bearing zoned input can disambiguate overlaps, while an offset
+inconsistent with the named zone must fail. More general patterns, zone-name
+providers and offset-free resolver choices remain future work.

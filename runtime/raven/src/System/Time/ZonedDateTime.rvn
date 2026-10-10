@@ -18,6 +18,17 @@ public class ZonedDateTime {
         self.offset = offset
     }
 
+    /// <summary>Parses an explicit-offset invariant timestamp and validates it against the supplied named zone.</summary>
+    /// <param name="value">The same complete numeric timestamp accepted by Instant.Parse.</param>
+    /// <param name="zone">An explicitly resolved zone; the host zone is never inferred.</param>
+    /// <returns>A zoned value, InvalidFormat, OutOfRange, or OffsetMismatch.</returns>
+    /// <remarks>Both UTC and local years must lie in the zone's supported range.
+    /// An overlap is selected by its stated offset. Gaps and incorrect offsets return OffsetMismatch.
+    /// No zone identifier is embedded in the text; resolve names separately with TimeZone.Find.</remarks>
+    static func Parse(value: string, zone: TimeZone) -> Result<ZonedDateTime, DateTimeParseError> {
+        return CivilParser.ParseZoned(value, zone)
+    }
+
     static func Create(instant: Instant, zone: TimeZone) -> Result<ZonedDateTime, TimeZoneError> {
         let offset = zone.GetUtcOffset(instant)?
         let Ok(local) = offset.AtInstant(instant) else {

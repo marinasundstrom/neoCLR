@@ -71,6 +71,9 @@ pub struct Options {
     pub string_graphemes: Vec<usize>,
     pub string_scalars: Vec<usize>,
     pub system_culture: Vec<usize>,
+    pub time_zone_exists: Vec<usize>,
+    pub time_zone_offset: Vec<usize>,
+    pub time_zone_version: Vec<usize>,
     pub string_from_chars: Vec<usize>,
     pub string_upper: Vec<usize>,
     pub string_lower: Vec<usize>,
@@ -328,6 +331,15 @@ impl Options {
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             system_culture: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "system-culture-name-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            time_zone_exists: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "time-zone-exists-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            time_zone_offset: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "time-zone-offset-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            time_zone_version: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "time-zone-version-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             string_scalars: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "string-scalars-v1")

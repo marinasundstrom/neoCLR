@@ -22,6 +22,7 @@ static class GlobalizationBindings
         public struct LocalTimeMapping { public struct Unique { } public struct Ambiguous { } public struct Skipped { } }
         public sealed class ZonedDateTime {
             private ZonedDateTime() { }
+            public static Result<ZonedDateTime,DateTimeParseError> Parse(string value, TimeZone zone) => default;
             public static Result<ZonedDateTime,TimeZoneError> Create(Instant instant, TimeZone zone) => default;
             public Instant Instant => default;
             public TimeZone Zone => default;
@@ -127,6 +128,7 @@ static class GlobalizationBindings
             (SystemProvider, "FromPreference") => ("String", SystemProvider, true),
             (SystemProvider, "get_PreferredCultureName") => ("", "String", false),
             (SystemProvider, "get_IsFallback") => ("", "Boolean", false),
+            (Zoned, "Parse") => ("String,System.Time.TimeZone", "System.Result<System.Time.ZonedDateTime,System.Time.DateTimeParseError>", true),
             (Zoned, "Create") => ("System.Time.Instant,System.Time.TimeZone", "System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>", true),
             (Zoned, "get_Instant") => ("", "System.Time.Instant", false),
             (Zoned, "get_Zone") => ("", Zone, false),

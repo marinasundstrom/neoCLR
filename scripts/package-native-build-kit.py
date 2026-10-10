@@ -3,6 +3,7 @@
 import argparse
 import importlib.util
 import json
+import os
 from pathlib import Path
 import platform
 import shutil
@@ -22,6 +23,8 @@ def main():
     args = parser.parse_args()
     if (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
         parser.error('This kit requires macOS ARM64')
+    build_env = {**os.environ, "SDKROOT": subprocess.check_output(
+        ["xcrun", "--sdk", "macosx", "--show-sdk-path"], text=True).strip()}
     bundle, output = args.bundle.resolve(), args.output.resolve()
     manifest = json.loads((bundle / 'manifest.json').read_text())
     if manifest.get('format') != 'neoclr-native-poc-v1':
@@ -37,7 +40,7 @@ def main():
                Path(__file__).resolve(), *builder.support_files(), *builder.native_text_sources()]
     inputs = {str(p.relative_to(ROOT)): builder.sha(p) for p in sources}
     command = ['cargo', 'build', '--locked', '--manifest-path', str(cargo_manifest), '--message-format=json']
-    result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=True)
+    result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=True, env=build_env)
     artifacts = [json.loads(line) for line in result.stdout.splitlines() if line.startswith('{')]
     binaries = [Path(a['executable']) for a in artifacts if a.get('reason') == 'compiler-artifact'
                 and a.get('target', {}).get('name') == 'neoclr-aot-poc' and a.get('executable')]
@@ -64,11 +67,12 @@ def main():
     copy(bundle / 'manifest.json', 'bundle/manifest.json')
     builder.verify_files(staged / 'bundle', manifest['files'])
     copy(aot, 'bin/neoclr-aot-poc')
-    text_manifest = ROOT / 'tools/aot-native-text/Cargo.toml'
-    subprocess.run(['cargo', 'build', '--locked', '--release', '--target', 'aarch64-apple-darwin',
-                    '--manifest-path', str(text_manifest)], cwd=ROOT, check=True)
-    copy(text_manifest.parent / 'target/aarch64-apple-darwin/release/libneoclr_aot_native_text.a',
-         'lib/libneoclr_aot_native_text.a')
+    # Keep pure text and pinned-rule kernels separate so text-only consumers do
+    # not inherit the timezone data merely because they need Unicode operations.
+    for time_zone_rules in (False, True):
+        kernel_command, archive = builder.native_kernel_build('aarch64-apple-darwin', time_zone_rules)
+        subprocess.run(kernel_command, cwd=ROOT, check=True, env=build_env)
+        copy(archive, 'lib/' + builder.native_kernel_archive_name(False, time_zone_rules))
     for source in builder.support_files():
         copy(source, source.relative_to(ROOT))
     for source in (ROOT / 'tools/native/samples/hello').iterdir():

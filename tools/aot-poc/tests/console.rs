@@ -6331,3 +6331,17 @@ fn native_unary_negation_matches_interpreter_boundaries() {
     let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate()").unwrap()).unwrap();
     assert_eq!(method.invoke(vec![], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
 }
+
+#[test]
+fn time_zone_binding_requires_explicit_context() {
+    for (flags, message) in [
+        (vec!["--bind-time-zone-rules"], "requires --compile-system"),
+        (vec!["--compile-system", "--bind-time-zone-rules"], "requires --reference-arena"),
+        (vec!["--bind-time-zone-rules", "--bind-time-zone-rules"], "duplicate --bind-time-zone-rules"),
+    ] {
+        let result = std::process::Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+            .args(flags).output().unwrap();
+        assert!(!result.status.success());
+        assert!(String::from_utf8_lossy(&result.stderr).contains(message));
+    }
+}

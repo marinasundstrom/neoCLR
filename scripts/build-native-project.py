@@ -19,7 +19,23 @@ def native_text_sources():
     return [ROOT / 'tools/aot-native-text/Cargo.toml', ROOT / 'tools/aot-native-text/Cargo.lock',
             ROOT / 'tools/aot-native-text/src/lib.rs',
             *[ROOT / 'src' / name for name in
-              ('string_comparison.rs', 'string_case_folding.rs', 'string_casing_data.rs', 'string_casing_kernel.rs', 'numeric_parse_core.rs')]]
+              ('string_comparison.rs', 'string_case_folding.rs', 'string_casing_data.rs', 'string_casing_kernel.rs', 'numeric_parse_core.rs', 'time_zone_rules.rs')]]
+
+
+def native_kernel_archive_name(windows, time_zone_rules=False):
+    stem = 'neoclr_aot_native_text' + ('_time_zone' if time_zone_rules else '')
+    return stem + '.lib' if windows else 'lib' + stem + '.a'
+
+
+def native_kernel_build(target, time_zone_rules=False):
+    manifest = ROOT / 'tools/aot-native-text/Cargo.toml'
+    directory = manifest.parent / 'target' / ('time-zone-rules' if time_zone_rules else 'text-only')
+    command = ['cargo', 'build', '--locked', '--release', '--target', target,
+               '--target-dir', directory, '--manifest-path', manifest]
+    if time_zone_rules:
+        command += ['--features', 'time-zone-rules']
+    archive = directory / target / 'release' / native_kernel_archive_name('windows' in target)
+    return command, archive
 
 
 def support_files():
@@ -32,7 +48,7 @@ def support_files():
               ('windows-console-host.c', 'windows-gc-host.c', 'windows-host-memory.c', 'windows-native-stack.c')],
             *[base / 'aot-console' / name for name in
               ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c',
-               'native-stack.c', 'task-queue.c', 'socket-listener.c', 'string-unicode.c', 'system-culture.c')],
+               'native-stack.c', 'task-queue.c', 'socket-listener.c', 'string-unicode.c', 'system-culture.c', 'time-zone.c')],
             base / 'aot-scalar/console.c', base / 'aot-fault-details/render.c',
             *sorted((base / 'aot-console').glob('*.h')),
             *sorted((base / 'aot-scalar').glob('*.h')),
@@ -76,10 +92,12 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
     def save():
         (output / 'build.json').write_text(json.dumps(report, indent=2) + '\n')
 
+    build_env = {**os.environ, "NeoClrBundleRoot": str(bundle)}
+
     def run(command):
         command = list(map(str, command))
         result = subprocess.run(command, cwd=project.parent, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180,
-                                env={**os.environ, "NeoClrBundleRoot": str(bundle)})
+                                env=build_env)
         report['commands'].append(dict(command=command, exitCode=result.returncode,
                                        stdout=result.stdout, stderr=result.stderr))
         save()
@@ -113,6 +131,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         else:
             clang = run(['xcrun', '--sdk', 'macosx', '--find', 'clang']).strip()
             sdk = run(['xcrun', '--sdk', 'macosx', '--show-sdk-path']).strip()
+            build_env['SDKROOT'] = sdk
             report['toolchain'] = dict(clang=clang, sdk=sdk, version=run([clang, '--version']))
         lib = bundle / 'lib'
         catalog_path = lib / 'bundle.json'
@@ -170,7 +189,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                    '--object-root', libraries[0]]
         flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
                  '--bind-console-read-byte', '--bind-console-write-line', '--bind-console-stream-output',
-                 '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text', '--bind-character-text', '--bind-system-culture']
+                 '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text', '--bind-character-text', '--bind-system-culture', '--bind-time-zone-rules']
         if http:
             flags += ['--bind-task-queue',
                       '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-socket-client']
@@ -198,16 +217,20 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                              for binding in selection.get('nativeBindings', []))
         if system_culture:
             adapters.append(base / 'system-culture.c')
+        time_zone_rules = any(binding.get('implementation', '').startswith('time-zone-')
+                              for binding in selection.get('nativeBindings', []))
+        if time_zone_rules:
+            adapters.append(base / 'time-zone.c')
         text_services = {'neoclr_string_compare_ignore_case_v1', 'neoclr_string_hash_ordinal_v1',
                          'neoclr_string_hash_ignore_case_v1', 'neoclr_string_upper_v1',
                          'neoclr_string_lower_v1', 'neoclr_string_grapheme_count_v1',
                          'neoclr_string_grapheme_at_v1', 'neoclr_string_graphemes_v1',
                          'neoclr_string_scalars_v1', 'neoclr_string_from_chars_v1'}
         native_text = []
-        if any(binding.get('nativePrimitiveParser') or binding.get('symbol') in text_services or binding.get('validationSymbol') == 'neoclr_is_single_grapheme_v1'
+        if time_zone_rules or any(binding.get('nativePrimitiveParser') or binding.get('symbol') in text_services or binding.get('validationSymbol') == 'neoclr_is_single_grapheme_v1'
                for binding in selection.get('nativeBindings', [])):
             adapters.append(base / 'string-unicode.c')
-            archive_name = 'neoclr_aot_native_text.lib' if windows else 'libneoclr_aot_native_text.a'
+            archive_name = native_kernel_archive_name(windows, time_zone_rules)
             if kit_path.exists():
                 archive = ROOT / 'lib' / archive_name
                 if kit['files'].get(archive.relative_to(ROOT).as_posix()) != sha(archive):
@@ -215,10 +238,9 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             else:
                 for path in native_text_sources():
                     report['inputs'][str(path)] = sha(path)
-                manifest = ROOT / 'tools/aot-native-text/Cargo.toml'
                 target = 'x86_64-pc-windows-msvc' if windows else 'aarch64-apple-darwin'
-                run(['cargo', 'build', '--locked', '--release', '--target', target, '--manifest-path', manifest])
-                archive = manifest.parent / 'target' / target / 'release' / archive_name
+                command, archive = native_kernel_build(target, time_zone_rules)
+                run(command)
             report['inputs'][str(archive)] = sha(archive)
             native_text.append(archive)
         # Publish the executable only after link and dependency checks succeed.

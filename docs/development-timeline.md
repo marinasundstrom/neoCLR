@@ -13911,3 +13911,20 @@ claim completion of in-process test discovery.
   behavior and Runtime Contract configuration are unchanged. Windows is pending.
 - **Remaining:** broader patterns, named-zone text and zone/offset consistency rules;
   the follow-up does not infer a new author decision about those policies.
+
+## 2026-10-10 — Explicit-zone parsing and the next API review
+
+- **Author direction:** continue the current slice, then “After this we should
+  review the encoding API.”
+- **Assistant implementation:** add ZonedDateTime.Parse(value, zone), requiring an
+  explicit offset consistent with the supplied zone. Correct offsets select overlap
+  candidates; mismatches and gaps return OffsetMismatch. Reuse pinned IANA rules
+  across interpreter and native lookup/offset/version services. Separate native
+  archive variants keep timezone data out of ordinary text consumers.
+- **Outcome:** eight new cases pass native macOS ARM64 and interpreted execution.
+  API references and bridge documentation are updated. Native MapLocal, system-zone
+  discovery and Windows qualification remain open. The SDK selection problem found
+  during kernel compilation is fixed in project and kit build tooling.
+- **Next:** review Encoding/Encoder/Decoder and stream completion against .NET and
+  the established UTF-8/strict-ASCII decisions. Additional codecs or a permanent
+  roadmap reprioritization are not inferred from this request.

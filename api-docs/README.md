@@ -1615,3 +1615,13 @@ explicit-offset grammar, Result errors, precision, boundary and interop limitati
 The reference projection adds only a declaration; native library source owns the
 implementation. General patterns and ZonedDateTime text remain gaps. Native XML
 summaries, parameter/result notes and remarks are rendered from the matching bundle.
+
+
+## Zoned parsing development snapshot (2026-10-10)
+
+ZonedDateTime.Parse(String, TimeZone) and DateTimeParseError.OffsetMismatch are now
+selected and rendered in both API references, with parameter/result documentation
+and explicit offset, overlap, gap and range rules. The new case is additive but
+exhaustive error consumers must handle it. TimeZone lookup, offset and database
+version have native bindings; MapLocal and system-zone discovery remain native gaps.
+No inline zone-ID syntax or offset-free resolver is introduced.

@@ -541,3 +541,13 @@ is used. The existing civil and Duration/offset evidence is reused because their
 executable implementation is unchanged in this slice. XML documentation corrections
 followed the Instant gate; its report records that distinction. Windows qualification
 remains pending; all three parsing suites run in the default Windows library gate.
+
+### Explicit-zone parsing
+
+`--suite zoned-time-parsing` adds eight attributed cases for pinned rule lookup,
+offset validation, both overlap candidates, gaps, half-hour transitions, historical
+second offsets and UTC/local rule bounds. They pass native macOS ARM64 and
+interpreted execution, alongside all six Instant cases
+([qualification](zoned-time-parsing-validation.json)). The library now contains
+174 cases across 19 projects. Windows runs this suite by default; qualification
+is pending. Native local-time mapping and machine-zone discovery remain separate.

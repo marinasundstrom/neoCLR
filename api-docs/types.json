@@ -328,6 +328,7 @@
   "System.Time.DateTime",
   "System.Time.DateTimeParseError",
   "System.Time.DateTimeParseError.InvalidFormat",
+  "System.Time.DateTimeParseError.OffsetMismatch",
   "System.Time.DateTimeParseError.OutOfRange",
   "System.Time.Duration",
   "System.Time.Instant",

@@ -21,7 +21,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   timestamps with an explicit offset or Z, preserving fractional ticks and the wider
   Instant domain across civil boundaries. Six more framework cases pass both modes;
   improve native parameter/result rendering for the three new parsers. General
-  patterns, non-Gregorian and named-zone parsing remain gaps.
+  patterns, non-Gregorian and inline zone-name parsing remain gaps. Add
+  ZonedDateTime.Parse(value, zone) with explicit offset validation, overlap selection
+  and OffsetMismatch errors. Eight new cases pass both local modes. Share pinned
+  IANA lookup/offset/version rules with native builds through optional kernel archives;
+  keep text-only consumers independent of timezone data. Propagate the selected
+  macOS SDK into kernel builds and package both archive variants. Native MapLocal
+  and machine-zone discovery remain gaps; Windows qualification remains pending.
 - Add the explicit native SystemCultureName host adapter, matching the interpreter's
   preferred-language APIs on macOS and Windows. Project builds enable the binding;
   only consumers that retain it link CoreFoundation on macOS. Local host-preference
