@@ -388,8 +388,11 @@ access checks; neither runtime API change is complete yet. The general Raven
 source/CLI friend-access fix is now on main at `52dc10011`, with 56 focused tests
 passing independently of the native integration branch. Native compiler forwarding
 and assembly-symbol exposure now pass the focused native attribute probe, including
-friend/non-friend binding. Native import admission and runtime/AOT friend enforcement
-remain the next dependency.
+friend/non-friend binding. Direct metadata and Raven-emitted consumers now execute
+friend-only internal type/constructor/field/method access under the unsigned simple-ASCII
+profile, returning 42. Compiler imports reuse cached semantic grants; resolved runtime
+checks use a linked-snapshot index. Full identity semantics, platform/AOT qualification
+and the runtime-library attribute/Utf8 visibility migration remain open.
 The host metadata model and native manifests now preserve assembly annotations through
 CLI/native snapshots and CLI reference projection. Loader checks validate constructor
 shape, member-target rejection, limits and declared dependencies without execution.

@@ -111,6 +111,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
 fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
     let mut module = Module {
         object_root: None,
+        friend_access: Default::default(),
         assemblies: vec![],
         format: 5,
         name: String::new(),

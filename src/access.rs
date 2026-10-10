@@ -35,7 +35,8 @@ pub(crate) fn check_call(
             });
         }
         if !same_module {
-            return false;
+            return callee.visibility == Visibility::Internal
+                && crate::friend_access::permits(module, scope(caller), scope(callee));
         }
         match callee.visibility {
             Visibility::Public | Visibility::Internal => true,
@@ -121,7 +122,17 @@ pub(crate) fn check_field(
         .is_some_and(|(ty, method)| ty.module == method.module && ty.revision == method.revision);
     let allowed = match field.visibility {
         Visibility::Public => true,
-        Visibility::Internal => same_module,
+        Visibility::Internal => {
+            same_module
+                || crate::friend_access::permits(
+                    module,
+                    scope(caller),
+                    definition
+                        .definition
+                        .as_ref()
+                        .map(|id| (id.module.as_str(), id.revision.as_deref())),
+                )
+        }
         Visibility::Protected => false,
         Visibility::Private => {
             same_module
@@ -243,6 +254,14 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
                     .definition
                     .as_ref()
                     .is_none_or(|id| source != Some((id.module.as_str(), id.revision.as_deref())))
+                && !(def.visibility == Visibility::Internal
+                    && crate::friend_access::permits(
+                        module,
+                        source,
+                        def.definition
+                            .as_ref()
+                            .map(|id| (id.module.as_str(), id.revision.as_deref())),
+                    ))
             {
                 return Err(Fault::new(format!(
                     "type access denied: {} is {:?}",

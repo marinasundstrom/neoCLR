@@ -10,6 +10,7 @@ mod runtime_lookup;
 mod self_types;
 pub use assembler::assemble;
 mod access;
+mod friend_access;
 mod clock;
 mod console;
 pub mod debugger;

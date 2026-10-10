@@ -210,6 +210,8 @@ impl Type {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Module {
+    #[serde(skip)]
+    pub(crate) friend_access: crate::friend_access::Cache,
     // Host-selected load context, never authored or trusted from serialized metadata.
     #[serde(skip)]
     pub(crate) object_root: Option<TypeDefId>,
@@ -1352,6 +1354,7 @@ pub struct TypeDefId {
 
 impl Module {
     pub(crate) fn normalize_definition_ids(&mut self) -> Result<(), crate::Fault> {
+        self.friend_access = Default::default();
         if self.assemblies.is_empty() {
             let identity = if self.name == "System" {
                 "System.Runtime"

@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Enforce directed native runtime friend grants for internal types, methods and fields
+  using a lazy per-linked-snapshot index; preserve public/same-module fast paths and
+  private/protected restrictions. The current profile admits unsigned assemblies and
+  simple ASCII names only; qualified, escaped and non-ASCII grants fail closed pending
+  full identity support. Raven native imports now admit cached friend-approved types,
+  constructors, fields and methods; an emitted consumer returns 42 under interpreted
+  execution. AOT/platform qualification and making Utf8 internal remain pending.
+
 - Retain assembly custom attributes in the host metadata model and CLI writer/reader,
   including ordered repeated InternalsVisibleTo grants, bounded ownership-checked
   authoring and read-only snapshots. Extend retention to native manifests, PE/#Neo
@@ -16,7 +24,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   executing constructors. Add cached host AssemblyInfo annotation views for Raven
   native symbol import. Decode bounded non-indexed nominal CLI properties, preserving
   AttributeUsage.ValidOn enum identity. Raven native annotation forwarding and
-  friend/non-friend binding are qualified; import/runtime friend authorization remains pending. Add CLR-comparison and
+  friend/non-friend binding are qualified. Add CLR-comparison and
   metadata-only regression checks. Guard imported base-constructor dispatch when
   its nominal declaring reference is absent, fixing a nullable build error.
 

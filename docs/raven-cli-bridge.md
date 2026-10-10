@@ -8006,3 +8006,50 @@ properties were rejected, including AttributeUsage.ValidOn. Reusing the existing
 signature decoder preserves its enum identity. Host assembly view/read-only/cache tests,
 the native attribute probe against a freshly generated unstripped primitive Core, and
 existing member-attribute checks pass. No constructor executes during this inspection.
+
+
+### Resolved runtime friend checks (2026-10-10)
+
+neoCLR now admits an internal type, method or field from a named friend at the
+resolved runtime access layer. Public and same-module fast paths remain unchanged;
+private/protected rules are not broadened. A lazy index belongs to the linked Module
+snapshot and maps resolved definition scopes to unambiguous assembly identities,
+then stores directed granting/requesting assembly pairs. Repeated checks use lookups,
+not attribute scans or identity parsing. Cloning mutable input discards the cache;
+normalizing definition IDs resets it. No serialized input can supply the cached index.
+
+The current executable profile is unsigned assemblies and unqualified ASCII friend
+names, compared ignoring ASCII case. Legacy IL identities, native five-part identities
+and unsigned CLI display identities are recognized. Key/token/version/culture-qualified,
+quoted/escaped and non-ASCII grants fail closed; full .NET identity grammar and ordinal
+Unicode case behavior remain implementation gaps, not a different permanent contract.
+Ambiguous assembly ownership of a resolved module scope also grants no access. Friend
+grant constructors never run. The policy uses the exact nominal attribute metadata name
+and a single String constructor parameter, preserving the existing CLI/native transport.
+
+A direct metadata consumer exercises an internal type, field and method and returns 42.
+A Raven-emitted consumer additionally exercises an internal constructor and local type,
+writes/reads the field and calls the method, also returning 42. Unrelated consumers
+produce RAV0500 and no image. Full identity support and platform/AOT executable
+qualification remain pending. Runtime
+Contract configuration is unchanged. The shared compiler already caches semantic pair
+checks; this separate runtime index protects loaded metadata consumers as well.
+
+Raven's native adapter now admits internal external symbol shapes through an explicit,
+default-off portable capability. Semantic binding and the native symbol importer still
+require the shared cached friend grant; admitting a shape is not authorization. The
+portable layer exists on the integration branch, not current Raven main. The general
+source/CLI friend checker is already on main; this change is native integration work.
+Runtime Contract settings and ordinary .NET emission are unchanged. Temporary CLI
+references still carry nominal definitions; reference visibility is not a permission
+and runtime checks use resolved native definition visibility. Native metadata/backend
+replacement must retain assembly identity and resolved access checks. Compiler adapter
+ownership stays in Raven; loaded snapshot policy stays in neoCLR. The runtime bundle
+pin is unchanged, and Utf8 remains public until the library migration is qualified.
+
+Tested compiler revision: Raven `codex/source-object-metadata-resolution` at
+`a3be45460`. Focused validation passes 23 runtime access tests (`friend_assemblies`,
+`accessibility`, `field_access`, `type_visibility`) and two cache tests, including
+100,000 positive/negative warmed checks and clone invalidation. The API reference
+snapshot check passes. This demonstrates cache reuse, not a whole-program performance
+comparison; native compiled/AOT and Windows qualification remain separate work.

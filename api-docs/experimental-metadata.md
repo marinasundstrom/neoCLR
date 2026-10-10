@@ -8216,8 +8216,10 @@ assembly.AddCustomAttribute(new CustomAttributeDefinition(marker,
     [new CustomAttributeArgument(PrimitiveType.String, "Library.Tests")]));
 ```
 
-This retains metadata; it does not add friend access enforcement to the native runtime
-or general AttributeUsage validation to the authoring library. Native writing now records
+This API retains metadata; the authoring library does not perform general AttributeUsage
+validation. neoCLR resolved runtime access now recognizes unsigned simple-ASCII friend
+grants, and Raven imports friend-approved internal symbols. Complete identity support
+and AOT/platform qualification remain pending. Native writing now records
 `assemblies[].custom_attributes` using the existing constructor/fixed/named argument
 schema. Native JSON, PE/#Neo and standalone NEOX readback, and native-to-CLI reference
 projection, preserve ordered assembly annotations. The native reader rejects member

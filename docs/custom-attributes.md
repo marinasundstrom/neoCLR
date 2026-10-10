@@ -417,3 +417,19 @@ continues to pass. Its optional output path emits a NEOX executable whose Main r
 42 while its attribute constructor deliberately faults: running it through neoCLR returns
 `Int32(42)` without invoking the constructor. API reference snapshot checking passes.
 These checks qualify metadata and interpreted loading, not compiled AOT friend access.
+
+
+### Runtime friend-access development profile
+
+Retained InternalsVisibleTo annotations now authorize internal type/method/field access
+for a named friend during resolved loading/execution. The first profile supports unsigned
+assemblies and simple ASCII names with case-insensitive matching; unsupported identity
+forms fail closed. Private members remain inaccessible, grants are directional and are
+not followed transitively. The per-linked-snapshot index parses grants once; positive
+and negative pair checks reuse it. Public/same-module access keeps its existing fast path.
+
+See the [runtime bridge boundary](raven-cli-bridge.md#resolved-runtime-friend-checks-2026-10-10)
+for cache lifetime, identity restrictions and pending AOT/platform qualification.
+A Raven-emitted consumer now uses an internal constructor, local type, field and method
+and returns 42; unrelated consumers fail before emission.
+This does not yet make Utf8 internal or introduce a guest assembly-reflection API.
