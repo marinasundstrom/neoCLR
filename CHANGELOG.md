@@ -18,7 +18,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and private access producing no object file. Clear assembly annotations from the
   private AOT verification projection after original access validation, matching
   existing type/member pruning and preventing dangling attribute-type references.
-  Windows qualification and making Utf8 internal remain pending.
+  Add the source-runtime InternalsVisibleToAttribute with assembly-only repeatable,
+  non-inherited usage, a string constructor and read-only AssemblyName. Rebuild all
+  four libraries and qualify real source grants, property behavior and access/usage
+  rejection in interpreted and native macOS ARM64 consumers. Refresh both API
+  references. Windows qualification and making Utf8 internal remain pending.
 
 - Retain assembly custom attributes in the host metadata model and CLI writer/reader,
   including ordered repeated InternalsVisibleTo grants, bounded ownership-checked

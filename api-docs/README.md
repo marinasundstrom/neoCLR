@@ -1643,3 +1643,13 @@ Host `AssemblyInfo.GetCustomAttributes()` and the expanded bounded CLI property-
 reader are documented in the [host manual](experimental-metadata.md#host-assembly-annotation-views-and-cli-property-decoding).
 These C# APIs use the existing host-only exclusion from guest RavenDoc selection. No guest
 reference artifact changes; the existing snapshot check passes.
+
+
+### Runtime friend attribute (2026-10-10)
+
+InternalsVisibleToAttribute is selected automatically in both API references, including
+its String constructor and read-only AssemblyName. Matching XML documents directional,
+non-transitive access and the current unsigned/simple-ASCII native identity limits.
+The native reference was rendered from rebuilt Runtime/Data/Networking/Web libraries;
+the aggregate bridge adds a reference-only declaration. No public helper is removed
+in this slice: Utf8 remains public pending migration of public conversion consumers.

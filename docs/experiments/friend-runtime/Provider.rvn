@@ -1,0 +1,10 @@
+import System.Runtime.CompilerServices.*
+
+[assembly: InternalsVisibleTo("RuntimeFriendConsumer")]
+[assembly: InternalsVisibleTo("SecondRuntimeFriend")]
+
+module FriendExample
+
+internal static class Hidden {
+    internal static func Answer() -> int => 42
+}

@@ -23,6 +23,7 @@ static class CoreDeclarations
         if (libraryBootstrap) declarations += RuntimeFailureBindings.Declarations + NativeAllocationBindings.Declarations + ParameterSnapshotBindings.Declarations + CheckedStorageBindings.Declarations + RuntimeServiceBindings.Declarations + ValueStorageBindings.Declarations;
         var source = Source.Replace("public struct Double { }", unionProbe ? DoubleBindings.Declarations : "public struct Double { }").Replace("public struct Int32 { }", unionProbe ? Int32Bindings.Declarations : "public struct Int32 { }").Replace("public sealed class String { }", StringBindings.Declarations(unionProbe, collectionProbe))
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
+            .Replace("// Friend assembly attribute", collectionProbe ? "[System.AttributeUsage(System.AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)] public sealed class InternalsVisibleToAttribute : System.Attribute { public InternalsVisibleToAttribute(string assemblyName) { } public string AssemblyName => default; }" : "")
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
         if (comparerStorage)
             source = source.Replace("public struct Int32 { }", "public struct Int32 { public int CompareTo(int other) => 0; public bool Equals(int other) => false; public new string ToString() => default; }")
@@ -206,6 +207,7 @@ static class CoreDeclarations
         }
         namespace System.Runtime.CompilerServices {
             public static class IsExternalInit { }
+            // Friend assembly attribute
             // Union probe attribute
             public sealed class ReferenceAssemblyAttribute : System.Attribute { }
             // Raven namespace-member metadata marker; not an executable runtime API.

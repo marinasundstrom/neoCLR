@@ -1,0 +1,9 @@
+import System.Runtime.CompilerServices.*
+
+func Main() -> int {
+    let grant = InternalsVisibleToAttribute("RuntimeFriendConsumer")
+    if grant.AssemblyName != "RuntimeFriendConsumer" {
+        return 1
+    }
+    return FriendExample.Hidden.Answer()
+}

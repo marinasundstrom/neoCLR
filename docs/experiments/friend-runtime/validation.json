@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-10",
+  "platform": "macOS ARM64",
+  "passed": true,
+  "compilerRevision": "215435573",
+  "runtimeBaseRevision": "35fa5232",
+  "sourceFiles": {
+    "runtime/raven/src/System/Runtime/CompilerServices/InternalsVisibleToAttribute.rvn": "662d2fefe08de66c28842076ba0ebbf2fdb9dd9d10f67491d9decc3d6b26303d",
+    "docs/experiments/friend-runtime/Provider.rvn": "0f60b95288e4925e26d6845772d7bd914e71924567d4d9c5f186bdb08c6a13f2",
+    "docs/experiments/friend-runtime/Main.rvn": "fb2e5bafca62d903796a3996722f8d3401db5529532700711f402251e38d1cf5"
+  },
+  "libraryArtifacts": {
+    "System.Runtime.dll": "bbb601762a185ae2ca93cfe677ddeeba1b5bdcb379f25f11fafbcd2c84736622",
+    "System.Data.dll": "c2b18848dd5489d59b9bf42b4ee1b6bddeaecae3a09d881f707d18fcdb266e6c",
+    "System.Networking.dll": "ec5b8520a6484c7e242c82c9e0186d32c98552bae69e14399ac549d0517c3db8",
+    "System.Web.dll": "b31b4d75fef3f22d9088937e39b8a3117f4a2755c612aaec20b8397a3715e425",
+    "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
+  },
+  "checks": [
+    "Runtime/Data/Networking/Web native library rebuild",
+    "Two source-authored assembly grants accepted",
+    "Attribute constructor preserves AssemblyName",
+    "Interpreted consumer returns 42",
+    "Unrelated consumer RAV0500 with no assembly",
+    "Class application RAV0502 with no assembly",
+    "AOT compilation and C host return expected 42",
+    "Aggregate API snapshot and native renderer"
+  ],
+  "remaining": [
+    "Windows execution",
+    "Complete native identity semantics",
+    "Utf8 internalization"
+  ]
+}

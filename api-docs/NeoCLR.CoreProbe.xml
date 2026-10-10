@@ -3023,5 +3023,8 @@
   <member name="T:System.Time.DateTimeParseError.OffsetMismatch">
     <summary>The timestamp's stated offset does not match the supplied named zone at its parsed instant.</summary>
   </member>
+    <member name="T:System.Runtime.CompilerServices.InternalsVisibleToAttribute"><summary>Grants a named assembly access to internal types and members.</summary><remarks>Assembly-only and repeatable; not inherited. Grants are directional and non-transitive and do not expose private members. Native execution currently accepts unsigned, unqualified ASCII assembly names, ignoring ASCII case. Signed, qualified, quoted/escaped and non-ASCII identities remain unsupported. A namespace or module name is not an assembly identity.</remarks></member>
+    <member name="M:System.Runtime.CompilerServices.InternalsVisibleToAttribute.#ctor(System.String)"><summary>Records the supplied friend assembly identity.</summary><param name="assemblyName">The assembly identity to retain. Native access currently requires an unsigned, unqualified ASCII name.</param><remarks>Construction does not load an assembly or validate a grant. Compiler and runtime metadata access checks consume the annotation without executing its constructor.</remarks></member>
+    <member name="P:System.Runtime.CompilerServices.InternalsVisibleToAttribute.AssemblyName"><summary>Gets the assembly identity supplied to the constructor, unchanged.</summary></member>
 </members>
 </doc>

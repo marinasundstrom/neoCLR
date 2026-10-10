@@ -394,8 +394,12 @@ profile, returning 42. Compiler imports reuse cached semantic grants; resolved r
 checks use a linked-snapshot index. The same Raven consumer now compiles, links and
 returns 42 as native macOS ARM64 code; denied grants/private access produce no object
 ([regression fixtures](../tools/aot-poc/tests/fixtures/friend-assemblies/README.md)).
-Full identity semantics, Windows qualification and the runtime-library attribute/Utf8
-visibility migration remain open.
+The source-runtime attribute now has its constructor, AssemblyName and repeatable
+assembly usage policy; [real source-grant consumers](experiments/friend-runtime/README.md)
+pass interpreted and native macOS ARM64 execution after all four libraries rebuild.
+Full identity semantics, Windows qualification and Utf8 internalization remain open.
+Public conversion migration also requires paired one-shot decoding; Encoding currently
+exposes only incremental decoding.
 The host metadata model and native manifests now preserve assembly annotations through
 CLI/native snapshots and CLI reference projection. Loader checks validate constructor
 shape, member-target rejection, limits and declared dependencies without execution.

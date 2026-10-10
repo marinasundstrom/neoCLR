@@ -1,0 +1,19 @@
+module System.Runtime.CompilerServices
+
+import System.*
+
+/// Grants a named assembly access to this assembly's internal types and members.
+/// Grants are directional and non-transitive; private access is unchanged.
+[AttributeUsage(AttributeTargets.Assembly, AllowMultiple: true, Inherited: false)]
+public class InternalsVisibleToAttribute : System.Attribute {
+    private val assemblyName: string
+
+    /// Records the friend assembly identity without loading an assembly or executing access checks.
+    /// Native execution currently accepts unsigned, unqualified ASCII names only.
+    init(assemblyName: string) {
+        self.assemblyName = assemblyName
+    }
+
+    /// Gets the supplied assembly identity. A module or namespace name does not grant access.
+    val AssemblyName: string => assemblyName
+}

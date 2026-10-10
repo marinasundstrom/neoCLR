@@ -8073,3 +8073,18 @@ qualified grants and private-member access to fail without producing an object f
 The [fixture record](../tools/aot-poc/tests/fixtures/friend-assemblies/README.md) includes
 compiler/runtime revisions and regeneration instructions. No bundle pin changes;
 Windows execution, full-key/Unicode identities and the Utf8 migration remain pending.
+
+
+### Runtime attribute API and source grants (2026-10-10)
+
+The source library now supplies InternalsVisibleToAttribute; its usage is assembly-only,
+repeatable and non-inherited, with a String constructor and read-only AssemblyName.
+The qualified System.Attribute base selects the source-owned declaration during the
+bootstrap build, matching UnionAttribute. The aggregate CLI reference carries a
+matching non-executable declaration; native Runtime metadata is authoritative.
+Raven `215435573` rebuilds all four libraries and emits a provider with two grants
+using the real attribute. Its consumer checks the property and calls an internal method,
+returning 42 in the interpreter and macOS ARM64 AOT. Invalid class usage and unrelated
+consumers fail with no output. See the [fixture and evidence](experiments/friend-runtime/README.md).
+Runtime Contract settings and compiler semantics are unchanged. Native identity gaps,
+Windows execution and Utf8 migration remain explicit; no runtime bundle pin changes.

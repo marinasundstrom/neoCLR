@@ -447,3 +447,21 @@ and executing attribute constructors, without implying CLR-style dynamic loading
 unrestricted AOT reflection. Missing/wrong/qualified grants and private access must
 fail before object emission. See the [reproducible fixtures](../tools/aot-poc/tests/fixtures/friend-assemblies/README.md).
 Windows execution, full identity semantics and runtime-library integration remain open.
+
+
+### Source-runtime friend attribute (2026-10-10)
+
+`System.Runtime.CompilerServices.InternalsVisibleToAttribute` now follows the .NET
+shape described in the [encoding API review](design/encoding-api-review.md#author-follow-up-internal-helpers-and-friend-assemblies-2026-10-10):
+assembly-only, AllowMultiple=true, Inherited=false; a string constructor and read-only
+AssemblyName preserving its argument. Constructor execution only stores the value;
+authorization reads metadata without instantiating it. The native unsigned/simple-ASCII
+identity restrictions still apply. Private access and non-transitive grants are unchanged.
+Place assembly annotations before the module declaration, as the
+[compiled fixture](experiments/friend-runtime/Provider.rvn) demonstrates.
+
+All four libraries rebuild; the real runtime attribute passes source grant and property
+checks in interpreted and macOS ARM64 AOT execution. Class application and unrelated
+access produce diagnostics and no output. The aggregate and native API snapshots now
+include the type and both members. Windows, full identity behavior and Utf8 migration
+remain open; this does not advance the production runtime bundle pin.
