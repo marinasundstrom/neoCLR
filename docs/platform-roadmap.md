@@ -418,8 +418,10 @@ ten functional cases and eight guard cases interpreted and on macOS ARM64 AOT;
 Windows CI is configured but unexecuted. Configurable timeout is next: the transport still has a
 fixed 15-second exchange deadline, an incomplete contract rather than a deliberate
 .NET divergence. A private interpreter timer source now has cancellation, bounded
-monotonic deadlines and traced callback handoff; native timer binding and the HTTP
-adapter remain next before exposing Timeout.
+monotonic deadlines and traced callback handoff. Native one-shot binding and macOS
+qualification are now in place. Author clarification (2026-10-11): build sensible
+Raven Timer and timed-cancellation APIs rather than copying .NET mechanically;
+these library layers precede the HTTP adapter. Public Timer/Timeout remain pending.
 The subsequent string API direction keeps encoding explicit: public string operations
 should describe text, not byte storage. GetUtf8ByteCount/SliceUtf8 remain migration
 debt; replace their uses with appropriate encoding contracts before removing them,

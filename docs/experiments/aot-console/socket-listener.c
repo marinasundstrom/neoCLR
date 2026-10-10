@@ -92,6 +92,8 @@ int32_t neoclr_socket_scope_leave_v1(neoclr_socket_scope *scope) {
         scope->slots[i].id = 0;
     }
 #ifdef NEOCLR_NATIVE_GC
+    if (scope->timer_delivery && neoclr_gc_host_root_release_v1(scope->context, scope->timer_delivery)) status = 3;
+    scope->timer_delivery = 0;
     for (unsigned i = 0; i < 64; i++) {
         if (scope->operations[i].callback && neoclr_gc_host_root_release_v1(scope->context, scope->operations[i].callback)) status = 3;
         release_client(scope, i);
@@ -189,6 +191,44 @@ static uint64_t new_operation_id(void) {
     return id;
 }
 #include "socket-client-internal.h"
+/* One-shot timer roots remain valid until the next owner-thread poll. The host
+ * must install/invoke each returned callback before polling again. */
+int32_t neoclr_timer_start_v1(int32_t milliseconds, void *callback,
+    neoclr_aot_context *context, int64_t *output) {
+    neoclr_socket_scope *scope = find_scope(context);
+    if (!scope || !callback || !output || milliseconds < 0) return 3;
+    unsigned slot = 0;
+    while (slot < 64 && scope->operations[slot].state) slot++;
+    if (slot == 64) return 3;
+    uint64_t now = monotonic_ns(), delay = (uint64_t)milliseconds * UINT64_C(1000000);
+    if (!now || now > UINT64_MAX - delay) return 3;
+    uint64_t id = new_operation_id(), root = 0;
+    if (!id) return 3;
+    int32_t status = neoclr_gc_host_root_create_v1(context, callback, &root);
+    if (status) return status;
+    scope->operations[slot].id = id;
+    scope->operations[slot].callback = root;
+    scope->operations[slot].deadline = now + delay;
+    scope->operations[slot].kind = 6;
+    scope->operations[slot].state = 1;
+    *output = (int64_t)id;
+    return 0;
+}
+int32_t neoclr_timer_cancel_v1(uint64_t id, neoclr_aot_context *context, int32_t *output) {
+    neoclr_socket_scope *scope = find_scope(context);
+    if (!scope || !output) return 3;
+    for (unsigned i = 0; i < 64; i++) {
+        if (!id || scope->operations[i].id != id || scope->operations[i].kind != 6) continue;
+        if (scope->operations[i].state == 1 || scope->operations[i].state == 2) {
+            if (neoclr_gc_host_root_release_v1(context, scope->operations[i].callback)) return 3;
+            memset(&scope->operations[i], 0, sizeof(scope->operations[i]));
+            *output = 1;
+            return 0;
+        }
+    }
+    *output = 0;
+    return 0;
+}
 int32_t neoclr_socket_accept_v1(uint64_t listener, void *callback,
                                neoclr_aot_context *context, void *output) {
     neoclr_socket_scope *scope = find_scope(context);
@@ -220,7 +260,7 @@ int32_t neoclr_socket_cancel_v1(uint64_t operation, neoclr_aot_context *context,
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !output) return 3;
     for (unsigned i = 0; i < 64; i++) if (operation && scope->operations[i].id == operation) {
-        if (scope->operations[i].kind == 5) return 3;
+        if (scope->operations[i].kind >= 5) return 3;
         *output = scope->operations[i].state == 1;
         if (*output) {
             scope->operations[i].state = 2;
@@ -236,7 +276,7 @@ static int32_t take_result(uint64_t operation, neoclr_aot_context *context, void
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !output) return 3;
     for (unsigned i = 0; i < 64; i++) if (operation && scope->operations[i].id == operation) {
-        if (scope->operations[i].state != 3 || ((scope->operations[i].kind == 1 || scope->operations[i].kind == 4) != accept_result) || scope->operations[i].kind == 5) return 3;
+        if (scope->operations[i].state != 3 || ((scope->operations[i].kind == 1 || scope->operations[i].kind == 4) != accept_result) || scope->operations[i].kind >= 5) return 3;
         if (neoclr_gc_host_root_release_v1(context, scope->operations[i].callback)) return 3;
         publish(output, scope->operations[i].tag, scope->operations[i].value);
         release_client(scope, i);
@@ -329,9 +369,26 @@ int32_t neoclr_socket_poll_suspended_v1(neoclr_aot_context *context, uint64_t *c
 static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !callback || context->fault.code) return -3;
+    if (scope->timer_delivery) {
+        if (neoclr_gc_host_root_release_v1(context, scope->timer_delivery)) return -3;
+        scope->timer_delivery = 0;
+    }
+    unsigned first_timer = 64;
+    uint64_t now = monotonic_ns();
+    if (!now) return -3;
+    for (unsigned i = 0; i < 64; i++) {
+        if (scope->operations[i].kind != 6) continue;
+        if (scope->operations[i].state && scope->operations[i].deadline <= now &&
+            (first_timer == 64 || scope->operations[i].deadline < scope->operations[first_timer].deadline ||
+             (scope->operations[i].deadline == scope->operations[first_timer].deadline &&
+              scope->operations[i].id < scope->operations[first_timer].id))) {
+            first_timer = i;
+        }
+    }
     for (unsigned n = 0; n < 64; n++) {
         unsigned i = (scope->poll_cursor + n) % 64;
-        if (scope->operations[i].state == 1 && scope->operations[i].kind >= 4) {
+        if (i == first_timer) scope->operations[i].state = 2;
+        if (scope->operations[i].state == 1 && (scope->operations[i].kind == 4 || scope->operations[i].kind == 5)) {
             if (poll_client(scope, i)) return -3;
         }
         if (scope->operations[i].state == 1 && (scope->operations[i].kind == 2 || scope->operations[i].kind == 3)) {
@@ -390,6 +447,10 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
             scope->operations[i].state = 3;
             scope->poll_cursor = (i + 1) % 64;
             *callback = scope->operations[i].callback;
+            if (scope->operations[i].kind == 6) {
+                scope->timer_delivery = *callback;
+                memset(&scope->operations[i], 0, sizeof(scope->operations[i]));
+            }
             return 1;
         }
     }

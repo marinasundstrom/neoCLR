@@ -14200,3 +14200,18 @@ claim completion of in-process test discovery.
 - **Remaining:** configurable timeout, followed by Index/Range. Protected disposal
   hooks and other full .NET HTTP parity gaps remain recorded in the
   [lifetime design](design/http-client-lifetime.md); these results do not claim them.
+
+### 2026-10-11 — Timer API layering
+
+- **Author:** asked whether there should be a Timer type, directed continued
+  implementation of the layers, and clarified that a sensible design need not
+  necessarily use the same APIs as .NET.
+- **Assistant proposal:** private scheduling beneath a public Timer and timed
+  cancellation, with HttpClient.Timeout using cancellation. After the clarification,
+  proposed captured callbacks, durations and explicit start/stop/disposal rather
+  than copying object-state arguments or numeric infinite-delay sentinels.
+- **Actions:** interpreter groundwork is committed in `7221531d`; native one-shot
+  delivery and AOT binding now pass focused macOS qualification. Public Timer,
+  timed cancellation and HttpClient integration are not yet implemented. See
+  [the timer/lifetime design](design/http-client-lifetime.md) for the API proposal
+  and the invocation scheduler's remaining concurrency limitations.

@@ -15,7 +15,7 @@ typedef struct neoclr_socket_scope {
     struct neoclr_socket_scope *previous;
     struct { uint64_t id; neoclr_socket_descriptor descriptor; int listener; } slots[64];
     /* Private operations: state 1 pending, 2 ready, 3 delivered; kind 1 accept,
-     * 2 receive, 3 send, 4 connect, 5 DNS. Transfer snapshots have a separate bounded native budget. */
+     * 2 receive, 3 send, 4 connect, 5 DNS, 6 one-shot timer. Transfer snapshots have a separate bounded native budget. */
     struct { uint64_t id, listener, callback, tag, value, buffer_root, deadline;
         uint32_t state, kind, offset, count; unsigned char *buffer;
         neoclr_dns_work *dns;
@@ -24,6 +24,7 @@ typedef struct neoclr_socket_scope {
         uint16_t port;
         uint64_t attempt_deadline;
     } operations[64];
+    uint64_t timer_delivery; /* Root handed to host, retained until next poll/leave. */
     uint64_t transfer_bytes;
     unsigned poll_cursor;
 } neoclr_socket_scope;
@@ -40,6 +41,12 @@ int32_t neoclr_socket_local_port_v1(uint64_t handle, neoclr_aot_context *context
 int32_t neoclr_socket_close_v1(uint64_t handle, neoclr_aot_context *context, void *output);
 #ifdef NEOCLR_NATIVE_GC
 #include "native-gc.h"
+/* Private one-shot timers share the bounded host operation table. Delay is 0 to
+ * INT32_MAX milliseconds; cancellation returns false for stale/delivered handles.
+ * Timer poll roots survive until the NEXT poll (or scope leave). Install/invoke
+ * the returned callback before polling again. No public Timer API is implied. */
+int32_t neoclr_timer_start_v1(int32_t, void *, neoclr_aot_context *, int64_t *);
+int32_t neoclr_timer_cancel_v1(uint64_t, neoclr_aot_context *, int32_t *);
 /* Callback must be a verified fn<Void> descriptor from this image/context. */
 int32_t neoclr_socket_accept_v1(uint64_t listener, void *callback, neoclr_aot_context *context, void *output);
 int32_t neoclr_socket_connect_result_v1(uint64_t operation, neoclr_aot_context *context, void *output);

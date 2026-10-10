@@ -6439,3 +6439,54 @@ fn class_virtual_dispatch_preserves_base_calls_fields_inheritance_and_null_fault
     let source = include_str!("../../../docs/experiments/aot-console/class-virtual-calls.neoil");
     check_reference_execution(source, 5, b"", &[0, 1, 2]);
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_timers_retain_callback_receivers_and_release_completed_or_cancelled_roots() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(SOCKET_SEED).unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/timer-callback.neoil");
+    let flags = ["--compile-system", "--reference-arena", "--native-gc", "--bind-timers"];
+    let r = compile_source(&dir, &seed, source, &flags, false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "socket-listener.h"
+#include "native-gc.h"
+#define CHECK(x) do { if (!(x)) return __LINE__; } while (0)
+int main(void) {
+    uint64_t buffer[513] = {0}; buffer[512] = 1234567;
+    neoclr_aot_context c = {.text = {(unsigned char *)buffer, 4096, 0}};
+    for (int cancel = 0; cancel < 2; cancel++) {
+        neoclr_socket_scope scope;
+        CHECK(!neoclr_socket_scope_enter_v1(&scope, &c));
+        int32_t result = -1;
+        CHECK(!neoclr_entry_v4(cancel, &result, &c) && result == 42);
+        CHECK(!neoclr_gc_collect_v1(&c, NULL));
+        uint64_t root = 999;
+        int32_t ready = neoclr_socket_poll_v1(&c, &root);
+        CHECK(ready == !cancel);
+        if (ready) {
+            CHECK(!neoclr_gc_collect_v1(&c, NULL));
+            CHECK(!neoclr_invoke_void_callback_v1(root, &c) && !c.fault.code);
+            CHECK(!neoclr_socket_poll_v1(&c, &root));
+        }
+        CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+        CHECK(!neoclr_socket_scope_leave_v1(&scope));
+        CHECK(!neoclr_root_probe_depth_v1());
+    }
+    CHECK(buffer[512] == 1234567);
+    return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(dir.0.join("host.c"))
+        .arg(base.join("socket-listener.c")).arg(base.join("root-probe.c"))
+        .arg(base.join("native-gc.c")).arg(base.join("text-arena.c"))
+        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host"))
+        .output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
+    assert!(r.status.success(), "{r:?}");
+}

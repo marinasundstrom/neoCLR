@@ -145,3 +145,30 @@ cargo test --test timers
 
 Website review: existing pages continue to label configurable timeout as pending;
 this private interpreter mechanism adds no public API reference entry or API snapshot.
+
+## Native timer delivery and public layering (2026-10-11)
+
+The AOT prototype now has an explicit `--bind-timers` contract for the same private
+TimerStart/TimerCancel signatures. It requires managed system compilation and native
+GC. The existing polled host scope admits one-shot timers alongside network operations,
+with a shared 64-operation limit. This shared native capacity differs from the
+interpreter's separate 64-timer bound; neither is a public Timer capacity guarantee.
+The poller uses monotonic deadlines, preserves timer deadline/registration order, and
+never runs guest code inline. Cancellation releases pending roots and returns false
+for stale or delivered handles. A delivered timer's root remains valid until the next
+owner-thread poll or scope teardown; the host must install/invoke the returned callback
+before polling again. AOT entry pumping recognizes timers as host completion work.
+
+Five sanitized native host cases (timer plus existing socket/DNS paths) pass on macOS,
+and a compiled AOT consumer retains its callback receiver across collection, invokes
+it once, and releases roots after delivery or cancellation. Windows runs the same
+kernel validator in CI but has not been executed locally. Public Timer and HTTP
+adapters remain pending; these are private mechanisms with explicit host contracts.
+
+The author clarified that the public API should make sense for Raven rather than
+necessarily copy .NET. The comparison remains [.NET Timer](https://learn.microsoft.com/en-us/dotnet/api/system.threading.timer?view=net-10.0)
+(checked 2026-10-11): its callbacks use thread-pool scheduling. Proposed Raven layering
+uses a duration-based Timer with captured callback state and explicit start/stop/dispose,
+then timed cancellation, then HttpClient.Timeout. Exact periodic cadence, rescheduling
+and disposal behavior must be qualified before exposing those APIs. Invocation-local
+callbacks are not a claim of .NET timer thread-pool or concurrent callback support.

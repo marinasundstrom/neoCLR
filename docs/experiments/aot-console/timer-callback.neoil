@@ -1,0 +1,44 @@
+.module NativeTimer
+.type class Completion
+.field Number Int32
+.method instance .ctor() -> noresult
+ldarg 0
+ldc.i4 42
+stfld Completion::Number
+ret
+.end
+.method instance Complete() -> Void
+ldarg 0
+ldfld Completion::Number
+ldc.i4 42
+ceq
+brtrue Good
+fault "timer lost its receiver"
+Good:
+ldvoid
+ret
+.end
+.end
+.function Calculate(Int32 cancel) -> Int32
+.local Int64 handle
+ldc.i4 0
+newobj instance Completion::.ctor()
+function.bind fn<Void> = instance Completion::Complete()
+call neoCLR.Runtime.TimerStart(Int32, fn<Void>)
+stloc handle
+ldarg 0
+brfalse Good
+ldloc handle
+call neoCLR.Runtime.TimerCancel(Int64)
+brtrue Good
+fault "timer cancellation failed"
+Good:
+ldc.i4 42
+ret
+.end
+.function neoCLR.Runtime.TimerStart(Int32 delay, fn<Void> callback) -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TimerCancel(Int64 handle) -> Boolean
+.methodimpl InternalCall
+.end

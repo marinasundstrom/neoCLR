@@ -15,7 +15,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   after sending. Custom handlers now override Send; stateless handlers inherit Dispose.
   Rebuild against matching libraries. Add a private interpreter timer source with
   cancellable monotonic deadlines, bounded capacity and traced scheduler handoff.
-  Configurable timeout still requires native timer binding and the HTTP adapter;
+  Add explicit AOT timer binding and rooted native one-shot delivery through the
+  macOS/Windows host kernel; focused macOS kernel and compiled consumer checks pass.
+  Windows execution remains pending. Configurable timeout still requires the library adapter;
   no public Timeout/Timer/CancelAfter API is introduced by this foundation.
 
 - Add bounded AOT virtual dispatch for nongeneric reference classes. Resolve targets
