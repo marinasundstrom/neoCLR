@@ -646,9 +646,10 @@ impl<'a> Profile<'a> {
         }
         if f.instance
             || !matches!(self.results[i], None | Some(Ty::Int | Ty::Unit))
-            || !(self.args[i].is_empty() || self.args[i] == [Ty::Int])
+            || !(self.args[i].is_empty() || self.args[i] == [Ty::Int] || self.args[i] == [Ty::StringArray])
+            || !f.out_parameters.is_empty()
         {
-            return Err("value root must be static with zero arguments or one Int32 argument and Int32, Void or no result".into());
+            return Err("value root must be static with zero arguments, one Int32 or one String[] argument and Int32, Void or no result".into());
         }
         Ok(i)
     }

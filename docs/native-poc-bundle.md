@@ -134,7 +134,9 @@ The explicit `macos-arm64-console-v1` profile supports synchronous console entry
 selected UTF-8 text operations and Int32 formatting, using the existing private
 ABI v4, native root reporting and a bounded 1 MiB nonmoving managed heap. It
 renders guest faults, checks that guest root frames have unwound and collects at
-quiescent shutdown. It supplies no guest command-line arguments, task pump, socket
+quiescent shutdown. Development Main(string[]) roots now receive
+[managed command-line arguments](native-entry-arguments.md) through a matching
+private process-entry ABI. It supplies no task pump, socket
 services, file services, guarded recursion or general native reflection. Unsupported
 reachable services/instructions fail through the backend's existing diagnostics.
 This is a bounded deployment policy, not a permanent platform restriction or a

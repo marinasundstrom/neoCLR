@@ -7605,3 +7605,17 @@ and retention should replace the runtime snapshot bridge. Runtime/bridge layers 
 this change. The guest-functions consumer passes interpreted metadata/description
 checks; the rebuilt reference snapshot passes validation. Legacy CLI implementation
 generation retains its documented Map blocker, without a claimed regeneration.
+
+### Native String[] entry arguments — 2026-10-10
+
+Raven's existing Main(string[]) signature now has a native process-host path; see
+[the entry contract, ABI, tradeoffs and validation](native-entry-arguments.md).
+No Runtime Contract option, metadata encoding or compiler emission changes are
+needed: canonical arrayref<String> is exposed as CLI String[] by the reference
+bridge. AOT admits that root with native GC and copies process arguments excluding
+the executable into managed storage after entry admission/reset. Windows uses wide
+CRT arguments with strict UTF-8 conversion. Parameterless roots keep their ABI.
+The neoCLR backend/native-host layers own the private process-arguments-v1 adapter;
+a future native hosting ABI replaces it. Environment.GetCommandLineArgs AOT support
+is still separate. Tests use explicit Main arguments, not that fallback. Compiler
+pin 1a0c4e62734b2d4f17dc9f8af1f5d02c566f8cf4 requires no compiler rebuild for this fix.

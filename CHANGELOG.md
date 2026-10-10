@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Admit native Main(String[]) roots and copy process arguments excluding the executable
+  into managed storage after entry admission. Console/HTTP hosts share this path;
+  Windows uses wide CRT arguments and strict UTF-8 conversion, avoiding ANSI code-page
+  dependence. Preserve empty/Unicode arguments, existing parameterless ABI, startup
+  fault/result behavior and GC ownership. The private argument ABI requires native GC;
+  Environment.GetCommandLineArgs AOT binding remains a separate gap. Two focused
+  backend checks pass, including macOS execution of Int32/unit/no-result roots,
+  startup failure/reclamation probes and Windows x64 object emission. Windows
+  execution remains pending its action.
+
 - Add runtime module-function definition selection as groundwork for guest test
   discovery. Preserve exact assembly/namespace scope, metadata order, all visibility
   levels and generic definitions; exclude type members, child namespaces and generic

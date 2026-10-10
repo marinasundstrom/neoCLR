@@ -596,6 +596,7 @@ pub(super) fn select_inventory_with_host_roots(
         .and_then(|source| type_rows.binary_search(&source).ok().map(|compiled| json!({"sourceIndex":source,"compiledIndex":compiled,
             "policy":"verified nominal byte-array backing; identity-preserving views and intrinsic storage field"})));
     let report = json!({"schema":"neoclr-aot-selection-v1", "module":input.name, "root":root,
+        "entryArguments": matches!(input.functions[*root_index].parameters.as_slice(), [Type::ArrayRef(t)] if **t == Type::String),
         "hostRoots": host_roots.iter().map(|i| json!({"sourceIndex":i,"compiledIndex":rows.binary_search(i).unwrap(),"name":input.functions[*i].name,"reason":"explicit runtime adapter"})).collect::<Vec<_>>(),
         "policy":"explicit closed world with constructed-class implicit interface dispatch; ordinary selected bodies retained; verified Object.ToString override dispatch replaces its private slot body; no reflection, dynamic loading or general class virtual dispatch",
         "stringInterfaceDispatch":string_dispatch, "interfaceDispatch":dispatch, "objectDisplayDispatch":object_dispatch, "arrayBackingProjection":array_backing,

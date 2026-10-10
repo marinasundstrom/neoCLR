@@ -463,7 +463,9 @@ pub fn prepare(
         let rows = super::bindings::object_reference_equals(&mut selected, &report)?;
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
     }
-    report["nativeAbi"] = if reference_arena || report["nativeBindings"].as_array().unwrap().iter()
+    report["nativeAbi"] = if report["entryArguments"] == true {
+        json!("process-arguments-v1")
+    } else if reference_arena || report["nativeBindings"].as_array().unwrap().iter()
         .any(|r| matches!(r["implementation"].as_str(), Some("int32-to-string-v1" | "int64-to-string-v1" | "uint64-to-string-v1"))) {
         json!("caller-owned-text-arena-v4")
     } else { json!("no-text-arena") };

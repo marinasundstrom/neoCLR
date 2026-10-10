@@ -12,6 +12,12 @@ Native Raven sources use logical module declarations such as `module System.Coll
 Modules organize declarations; assemblies remain packaging and binding identities.
 Legacy `namespace` spelling remains accepted by the development compiler.
 
+Development entry points also accept `Main(arguments: string[])`, with arguments
+excluding the executable name. Empty strings, spaces and valid Unicode are preserved;
+Windows hosts use wide command-line arguments rather than the active ANSI code page.
+This requires the matching development AOT tool and native host adapters.
+[Entry contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-entry-arguments.md)
+
 ## From Raven to an executable
 
 Raven source is compiled to neoCLR metadata and instructions, then lowered to native

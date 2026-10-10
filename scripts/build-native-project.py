@@ -24,7 +24,7 @@ def native_text_sources():
 
 def support_files():
     base = ROOT / 'docs/experiments'
-    return [ROOT / 'scripts/build-native-project.py', ROOT / 'tools/native/console-host.c',
+    return [ROOT / 'scripts/build-native-project.py', ROOT / 'tools/native/console-host.c', ROOT / 'tools/native/entry-arguments.c',
             ROOT / 'benchmarks/native-web/http-host.c', ROOT / 'benchmarks/native-web/http-session-host.c',
             base / 'aot-console/native-session.c',
             *sorted((ROOT / 'tools/native').glob('windows-*.h')),
@@ -149,6 +149,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         if bootstrap_root:
             adapters = [ROOT / 'benchmarks/native-web/http-session-host.c' if p == ROOT / 'benchmarks/native-web/http-host.c' else p for p in adapters]
             adapters += [base / 'native-session.c']
+        adapters.append(ROOT / 'tools/native/entry-arguments.c')
         inputs = [Path(__file__).resolve(), project, catalog_path, aot, *required, *adapters,
                   *base.glob('*.h'), *base.parent.joinpath('aot-scalar').glob('*.h'),
                   *base.parent.joinpath('aot-fault-details').glob('*.h'),
@@ -219,7 +220,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         pending = output / ('app.pending.exe' if windows else 'app.pending')
         if windows:
             run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
-                 '/DNEOCLR_NATIVE_GC', *(['/DNEOCLR_HTTP_HOST'] if http else []), '/I' + str(base), '/Fo' + str(output) + '/',
+                 '/DNEOCLR_NATIVE_GC', *(['/DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), *(['/DNEOCLR_HTTP_HOST'] if http else []), '/I' + str(base), '/Fo' + str(output) + '/',
                  '/Fe:' + str(pending), *adapters, obj, *native_text, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http else [])])
             import re
             dependencies = re.findall(r'^\s+([A-Za-z0-9_.-]+\.dll)\s*$', run(['dumpbin', '/dependents', pending]), re.MULTILINE | re.IGNORECASE)
@@ -228,7 +229,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:
             run([clang, '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
-                 '-DNEOCLR_NATIVE_GC', '-I', base, *adapters, obj, *native_text, '-o', pending])
+                 '-DNEOCLR_NATIVE_GC', *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, '-o', pending])
             dependencies = [line.split()[0] for line in run(['xcrun', 'otool', '-L', pending]).splitlines()[1:]]
             if dependencies != ['/usr/lib/libSystem.B.dylib']:
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))

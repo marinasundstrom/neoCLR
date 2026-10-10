@@ -1,3 +1,4 @@
+#include "entry-arguments.h"
 /* One-request HTTP correctness host, not a production scheduler or load benchmark. */
 #include "native-gc.h"
 #include "task-queue.h"
@@ -36,7 +37,7 @@ static int32_t poll_entry(neoclr_aot_context *context, uint64_t *callback,
     return 2;
 }
 /* Serial reuse proof; not persistent guest state or a public hosting ABI. */
-static int invoke(neoclr_aot_context *context, int *failed) {
+static int invoke(neoclr_aot_context *context, int *failed, int argc, neoclr_process_char **argv) {
     neoclr_socket_scope sockets;
     neoclr_task_scope tasks;
     int host_error = 0, status = 0, result = 0;
@@ -47,7 +48,7 @@ static int invoke(neoclr_aot_context *context, int *failed) {
     entry_io io = {&sockets, milliseconds()};
     tasks.poll = poll_entry;
     tasks.poll_state = &io;
-    status = neoclr_entry_v4(0, &result, context);
+    status = neoclr_process_entry(argc, argv, &result, context);
     uint64_t started = milliseconds();
     while (!status && !host_error) {
         status = neoclr_drain_default_queue_v1(context);
@@ -79,7 +80,7 @@ static int invoke(neoclr_aot_context *context, int *failed) {
     return status ? 1 : result;
 }
 
-int main(void) {
+int NEOCLR_PROCESS_MAIN(int argc, neoclr_process_char **argv) {
 #ifdef _WIN32
     if (_setmode(_fileno(stdin), _O_BINARY) == -1 ||
         _setmode(_fileno(stdout), _O_BINARY) == -1 ||
@@ -97,7 +98,7 @@ int main(void) {
 #endif
     int host_error = 0, result = 0;
     for (unsigned invocation = 0; invocation < NEOCLR_HTTP_INVOCATIONS; invocation++) {
-        int code = invoke(context, &host_error);
+        int code = invoke(context, &host_error, argc, argv);
         if (!result && code) result = code;
 #ifndef _WIN32
         if (buffer[words] != UINT64_C(0x1122334455667788)) host_error = 1;

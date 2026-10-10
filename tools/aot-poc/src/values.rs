@@ -257,6 +257,10 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         return Err("native host bootstrap requires native GC".into());
     }
     let root = p.root(root, bootstrap)?;
+    let entry_arguments = p.args[root] == [Ty::StringArray];
+    if entry_arguments && !details.is_some_and(|d| d.native_gc) {
+        return Err("String[] entry requires native GC and a process argument host".into());
+    }
     // Identity is scoped to this linked image. No pointer or persistent numeric
     // value is exposed by the guest RuntimeTypeHandle contract.
     let mut type_tokens = Vec::new();
@@ -1987,6 +1991,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         signature.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_gc_entry_check_v1", Linkage::Import, &signature)?)
     } else { None };
+    let argument_service = if entry_arguments {
+        let mut signature = module.make_signature();
+        signature.params = [types::I32, types::I64, types::I64, types::I64].map(AbiParam::new).to_vec();
+        signature.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_process_arguments_v1", Linkage::Import, &signature)?)
+    } else { None };
     let export_root = if bootstrap {
         let mut signature = module.make_signature();
         signature.params = vec![AbiParam::new(types::I64); 3];
@@ -1998,13 +2008,14 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     let mut context = module.make_context();
     context.func.signature.params = vec![AbiParam::new(types::I32), AbiParam::new(types::I64)];
     if details.is_some() { context.func.signature.params.push(AbiParam::new(types::I64)); }
+    if entry_arguments { context.func.signature.params.push(AbiParam::new(types::I64)); }
     context
         .func
         .signature
         .returns
         .push(AbiParam::new(types::I32));
     let export =
-        module.declare_function(if bootstrap { "neoclr_bootstrap_callback_v1" } else if text_arena { "neoclr_entry_v4" } else if details.is_some() { "neoclr_entry_v3" } else { "neoclr_entry_v2" }, Linkage::Export, &context.func.signature)?;
+        module.declare_function(if entry_arguments { "neoclr_entry_args_v1" } else if bootstrap { "neoclr_bootstrap_callback_v1" } else if text_arena { "neoclr_entry_v4" } else if details.is_some() { "neoclr_entry_v3" } else { "neoclr_entry_v2" }, Linkage::Export, &context.func.signature)?;
     let target = module.declare_func_in_func(ids[root], &mut context.func);
     let mut fb = FunctionBuilderContext::new();
     {
@@ -2050,7 +2061,24 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             b.ins().store(MemFlags::new(), zero, params[2], 1064);
         }
         let mut call_args = vec![];
-        if !p.args[root].is_empty() { call_args.push(params[0]); }
+        if let Some(service) = argument_service {
+            // ABI: argc, result, context, argv. Construct after the admitted heap
+            // reset. Allocation cannot collect; the callee publishes argument roots.
+            let storage = slot(&mut b, 8);
+            let output = b.ins().stack_addr(types::I64, storage, 0);
+            let service = module.declare_func_in_func(service, b.func);
+            let call = b.ins().call(service, &[params[0], params[3], params[2], output]);
+            let status = b.inst_results(call)[0];
+            let ready = b.create_block();
+            let failed = b.create_block();
+            let ok = b.ins().icmp_imm(IntCC::Equal, status, 0);
+            b.ins().brif(ok, ready, &[], failed, &[]);
+            b.switch_to_block(failed);
+            b.ins().store(MemFlags::new(), status, params[2], 0);
+            b.ins().return_(&[status]);
+            b.switch_to_block(ready);
+            call_args.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
+        } else if !p.args[root].is_empty() { call_args.push(params[0]); }
         let unit_result = p.results[root] != Some(Ty::Int);
         let result = if unit_result {
             let storage = slot(&mut b, 8);

@@ -1,3 +1,4 @@
+#include "entry-arguments.h"
 /* Experimental synchronous Windows console host; private collector ABI. */
 #include "windows-gc-host.h"
 #include "../../docs/experiments/aot-scalar/console.h"
@@ -20,7 +21,7 @@ int32_t neoclr_console_write_line_utf8_v1(const uint8_t *bytes, size_t length) {
     return failed;
 }
 #ifndef NEOCLR_HTTP_HOST
-int main(void) {
+int NEOCLR_PROCESS_MAIN(int argc, neoclr_process_char **argv) {
     /* Byte contracts include embedded NUL and LF; console display policy remains
      * the terminal's responsibility. No CRT CRLF or Ctrl-Z translation. */
     if (_setmode(_fileno(stdin), _O_BINARY) == -1 ||
@@ -29,7 +30,7 @@ int main(void) {
     neoclr_windows_gc_host host = {0};
     if (neoclr_windows_gc_host_open(&host, 1024 * 1024)) return 2;
     int32_t result = 0;
-    int32_t status = neoclr_entry_v4(0, &result, &host.context);
+    int32_t status = neoclr_process_entry(argc, argv, &result, &host.context);
     int host_error = neoclr_root_probe_head_v1() != NULL;
     if (status && neoclr_aot_render_fault(stderr, &host.context.fault)) host_error = 1;
     if (!host_error && neoclr_gc_collect_v1(&host.context, NULL)) host_error = 1;
