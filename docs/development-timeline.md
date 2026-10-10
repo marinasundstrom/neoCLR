@@ -13716,3 +13716,9 @@ claim completion of in-process test discovery.
   tests extract union payloads and compare through Assert.Equal instead. This does
   not fix or redefine the compiler gap. Stream and reflection-mapping checks remain
   in their specialized consumers; Windows qualification is pending.
+- **Stream batch outcome:** 12 tests now cover partial UTF-8 I/O, borrowed ownership,
+  memory round trips, nested errors, zero progress, cycle preflight and byte quotas.
+  Native execution passed; the debug interpreter exceeded the 180-second timeout.
+  A rebuilt release interpreter passed the same source with the unchanged timeout
+  ([evidence](../runtime/raven/tests/json-streams-batch-validation.json)). No runtime
+  performance comparison is claimed. Windows remains pending for this batch.

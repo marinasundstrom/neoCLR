@@ -14,7 +14,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   root kinds and cycles. Include the suite in the default native/interpreted gate.
   Stream and reflection-mapping consumers retain their separate coverage. Extract
   string error payloads for assertions around the current native constant-pattern gap.
-  All 12 pass native macOS ARM64 and interpreted execution; Windows remains pending.
+  All 12 pass native macOS ARM64 and interpreted execution; Windows remains pending. Follow
+  with a 12-test JSON stream batch for partial UTF-8 I/O, memory round trips, borrowed
+  ownership, nested error causes, zero progress, preflight validation and byte quotas.
+  Preserve separate memory-stream, sample, reflection and corpus consumers. All 12
+  stream tests pass natively and with the release interpreter under the existing
+  timeout; a debug-interpreter run timed out. Windows qualification remains pending.
 
 - Begin porting program-form library checks into the Raven test framework: split
   map iteration/materialization checks into five discoverable tests with descriptive

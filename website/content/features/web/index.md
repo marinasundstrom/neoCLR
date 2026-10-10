@@ -479,7 +479,9 @@ The tested example adds an acknowledgement to an object and propagates failures.
 `JsonSerializer.DeserializeNode` and `SerializeNode` read and write the DOM. Development
 [framework tests](https://github.com/marinasundstrom/neoCLR/tree/main/runtime/raven/tests/json-dom)
 cover node access, duplicate fields, document round trips and error handling in both
-native and interpreted execution.
+native and interpreted execution. The
+[stream suite](https://github.com/marinasundstrom/neoCLR/tree/main/runtime/raven/tests/json-streams)
+also checks partial I/O, borrowed ownership, errors and UTF-8 document quotas.
 Object mapping uses `Deserialize<T>` and `Serialize`. The stream overloads use
 StreamReader/StreamWriter and leave supplied streams open;
 the caller controls flushing and closing. The sample also runs through

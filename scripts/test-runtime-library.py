@@ -87,6 +87,20 @@ JSON_NAMES = [
     'JSON documents support every root node kind',
     'JSON scalar nodes expose their typed values',
 ]
+JSON_STREAM_NAMES = [
+    'JSON stream serialization detects cycles before writing',
+    'JSON stream output quota includes escaping and validates before writes',
+    'JSON stream reads reject split invalid UTF-8',
+    'JSON memory stream round trip preserves document content',
+    'JSON number document quota preserves long number spelling',
+    'JSON streams retry single-byte reads and writes without taking ownership',
+    'JSON stream reads preserve the underlying I/O failure',
+    'JSON stream input quota counts bytes and preserves ownership',
+    'JSON stream reads reject a truncated document',
+    'JSON stream boundary counts UTF-8 bytes rather than characters',
+    'JSON stream writes preserve partial output and failure cause',
+    'JSON stream writes reject zero progress without looping',
+]
 DISCOVERY_SPEC = importlib.util.spec_from_file_location('test_discovery', ROOT / 'scripts/discover-runtime-tests.py')
 DISCOVERY = importlib.util.module_from_spec(DISCOVERY_SPEC)
 DISCOVERY_SPEC.loader.exec_module(DISCOVERY)
@@ -102,7 +116,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -123,6 +137,7 @@ def main():
         ('collection-construction', 0, ''.join('PASS ' + n + '\n' for n in CONSTRUCTION_NAMES) + f'Tests: {len(CONSTRUCTION_NAMES)}, passed: {len(CONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('collection-iteration', 0, ''.join('PASS ' + n + '\n' for n in ITERATION_NAMES) + f'Tests: {len(ITERATION_NAMES)}, passed: {len(ITERATION_NAMES)}, failed: 0, skipped: 0\n'),
         ('json-dom', 0, ''.join('PASS ' + n + '\n' for n in JSON_NAMES) + f'Tests: {len(JSON_NAMES)}, passed: {len(JSON_NAMES)}, failed: 0, skipped: 0\n'),
+        ('json-streams', 0, ''.join('PASS ' + n + '\n' for n in JSON_STREAM_NAMES) + f'Tests: {len(JSON_STREAM_NAMES)}, passed: {len(JSON_STREAM_NAMES)}, failed: 0, skipped: 0\n'),
         ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n'),
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]

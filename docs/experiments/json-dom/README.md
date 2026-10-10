@@ -81,3 +81,10 @@ alongside document round trips from the native JSON consumer. The framework repo
 individual assertion failures and runs the same source in native and interpreted
 modes. Stream failures, ownership, memory stream behavior and quota boundaries remain
 in this consumer; this migration does not replace its broader integration coverage.
+
+The subsequent [JSON stream batch](../../../runtime/raven/tests/json-streams/JsonStreams.rvn)
+ports partial UTF-8 I/O, memory round trips, borrowed ownership, nested error causes,
+zero-progress output, preflight cycles and quota checks. The original consumer still
+covers the acknowledgement sample and independent MemoryStream contracts; corpus
+validation also remains separate. Native/interpreted evidence is linked from the
+framework README.

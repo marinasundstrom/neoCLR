@@ -1,0 +1,215 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Data.Json.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Text.*
+import NeoClr.Testing.*
+
+[Test("JSON streams retry single-byte reads and writes without taking ownership")]
+func StreamPartialRoundTrip() -> Result<unit, TestFailure> {
+    let text = "{\"station\":\"Café 😀\",\"readings\":[21,22.5],\"ready\":true,\"note\":null}"
+    let Ok(original) = JsonSerializer.DeserializeNode(text) else {
+        return Assert.True(false, "Parse round-trip document")
+    }
+    let output = ShortOutput(-1, false)
+    _ = Assert.True(JsonSerializer.SerializeNode(output, original) is Ok(_), "Partial writes must complete")?
+    _ = Assert.True(!output.Closed, "Serializer borrows output")?
+    _ = Assert.Equal(0, output.Flushes)?
+    let input = ShortInput(output.Bytes, -1)
+    let restored = JsonSerializer.DeserializeNode(input)
+    _ = Assert.True(!input.Closed, "Deserializer borrows input")?
+    _ = Assert.Equal(output.Count, input.Position)?
+    input.Close()
+    output.Close()
+    if restored is Ok(let value) {
+        if JsonSerializer.SerializeNode(value) is Ok(let actual) {
+            return Assert.Equal(text, actual)
+        }
+    }
+    return Assert.True(false, "Single-byte chunks must preserve multibyte UTF-8 and node values")
+}
+
+[Test("JSON memory stream round trip preserves document content")]
+func StreamMemoryRoundTrip() -> Result<unit, TestFailure> {
+    let text = "{\"values\":[1,null,\"雪\"]}"
+    let Ok(value) = JsonSerializer.DeserializeNode(text) else {
+        return Assert.True(false, "Parse source document")
+    }
+    let memory = MemoryStream()
+    _ = Assert.True(JsonSerializer.SerializeNode(memory, value) is Ok(_), "Write document")?
+    _ = Assert.True(memory.Seek(0) is Ok(_), "Serializer must leave memory stream open")?
+    let result = JsonSerializer.DeserializeNode(memory)
+    _ = Assert.True(memory.GetPosition() is Ok(_), "Deserializer must leave memory stream open")?
+    memory.Close()
+    if result is Ok(let restored) {
+        if JsonSerializer.SerializeNode(restored) is Ok(let actual) {
+            return Assert.Equal(text, actual)
+        }
+    }
+    return Assert.True(false, "Memory document round trip must succeed")
+}
+
+[Test("JSON stream reads preserve the underlying I/O failure")]
+func StreamReadFailure() -> Result<unit, TestFailure> {
+    let input = ShortInput(Utf8.Encode("{}"), 1)
+    let result = JsonSerializer.DeserializeNode(input)
+    _ = Assert.True(!input.Closed, "Failure must not close borrowed input")?
+    input.Close()
+    return Assert.True(result is Error(JsonError.Read(TextReadError.IoFailure)), "JSON stream reads preserve the underlying I/O failure")
+}
+
+[Test("JSON stream reads reject split invalid UTF-8")]
+func StreamInvalidUtf8() -> Result<unit, TestFailure> {
+    let bytes: byte[] = [(byte)34, (byte)195, (byte)34]
+    let input = ShortInput(bytes, -1)
+    let result = JsonSerializer.DeserializeNode(input)
+    _ = Assert.True(!input.Closed, "Failure must not close borrowed input")?
+    input.Close()
+    return Assert.True(result is Error(JsonError.Read(TextReadError.InvalidUtf8)), "JSON stream reads reject split invalid UTF-8")
+}
+
+[Test("JSON stream reads reject a truncated document")]
+func StreamTruncated() -> Result<unit, TestFailure> {
+    let input = ShortInput(Utf8.Encode("[1,"), -1)
+    let result = JsonSerializer.DeserializeNode(input)
+    _ = Assert.True(!input.Closed, "Failure must not close borrowed input")?
+    input.Close()
+    return Assert.True(result is Error(JsonError.Syntax(_)), "JSON stream reads reject a truncated document")
+}
+
+[Test("JSON stream input quota counts bytes and preserves ownership")]
+func StreamReadQuota() -> Result<unit, TestFailure> {
+    let bytes = ArrayList<byte>()
+    var index = 0
+    while index < 1025 {
+        bytes.Add((byte)32)
+        index = index + 1
+    }
+    let input = ShortInput(bytes, -1)
+    let result = JsonSerializer.DeserializeNode(input)
+    _ = Assert.Equal(1025, input.Position)?
+    _ = Assert.True(!input.Closed, "Quota failure must not close input")?
+    input.Close()
+    return Assert.True(result is Error(JsonError.Read(TextReadError.LimitExceeded)), "Oversized stream must return read quota failure")
+}
+
+[Test("JSON stream writes preserve partial output and failure cause")]
+func StreamWriteFailure() -> Result<unit, TestFailure> {
+    let Ok(value) = JsonSerializer.DeserializeNode("[1,2]") else {
+        return Assert.True(false, "Parse source document")
+    }
+    let output = ShortOutput(2, false)
+    let result = JsonSerializer.SerializeNode(output, value)
+    _ = Assert.Equal(2, output.Count)?
+    _ = Assert.Equal(0, output.Flushes)?
+    _ = Assert.True(!output.Closed, "Write failure must not close output")?
+    output.Close()
+    return Assert.True(result is Error(JsonError.Write(StreamError.AccessDenied)), "Underlying write error must survive")
+}
+
+[Test("JSON stream writes reject zero progress without looping")]
+func StreamZeroProgress() -> Result<unit, TestFailure> {
+    let output = ShortOutput(-1, true)
+    let result = JsonSerializer.SerializeNode(output, JsonNull())
+    _ = Assert.Equal(0, output.Count)?
+    _ = Assert.Equal(0, output.Flushes)?
+    _ = Assert.True(!output.Closed, "Zero-progress failure must not close output")?
+    output.Close()
+    return Assert.True(result is Error(JsonError.Write(StreamError.IoFailure)), "Zero progress must return I/O failure")
+}
+
+[Test("JSON stream serialization detects cycles before writing")]
+func StreamCyclePreflight() -> Result<unit, TestFailure> {
+    let cycle = JsonArray()
+    _ = Assert.True(cycle.Add(cycle) is Ok(_), "Create cyclic input")?
+    let output = ShortOutput(-1, false)
+    let result = JsonSerializer.SerializeNode(output, cycle)
+    _ = Assert.Equal(0, output.Count)?
+    _ = Assert.Equal(0, output.Flushes)?
+    _ = Assert.True(!output.Closed, "Validation failure must not close output")?
+    output.Close()
+    return Assert.True(result is Error(JsonError.LimitExceeded(_)), "Cycle must fail before output begins")
+}
+
+[Test("JSON stream boundary counts UTF-8 bytes rather than characters")]
+func StreamUnicodeBoundary() -> Result<unit, TestFailure> {
+    let content = Repeat511("é")
+    let text = "\"" + content + "\""
+    _ = Assert.Equal(1024, text.GetUtf8ByteCount())?
+    let input = ShortInput(Utf8.Encode(text), -1)
+    let result = JsonSerializer.DeserializeNode(input)
+    _ = Assert.True(!input.Closed, "Boundary success must preserve ownership")?
+    input.Close()
+    if result is Ok(let node) {
+        if node is JsonString value {
+            _ = Assert.Equal(content, value.Value)?
+        } else {
+            return Assert.True(false, "Boundary document must be a string")
+        }
+    } else {
+        return Assert.True(false, "Exact UTF-8 quota must parse")
+    }
+    return Assert.True(JsonSerializer.DeserializeNode(text + " ") is Error(JsonError.LimitExceeded(_)), "One extra byte must exceed document quota")
+}
+
+[Test("JSON stream output quota includes escaping and validates before writes")]
+func StreamEscapedOutputQuota() -> Result<unit, TestFailure> {
+    let content = Repeat511("\\")
+    let value = JsonString(content)
+    let Ok(text) = JsonSerializer.SerializeNode(value) else {
+        return Assert.True(false, "Exact escaped quota must serialize")
+    }
+    _ = Assert.Equal(1024, text.GetUtf8ByteCount())?
+    let output = ShortOutput(-1, false)
+    _ = Assert.True(JsonSerializer.SerializeNode(output, value) is Ok(_), "Write exact escaped quota")?
+    _ = Assert.Equal(1024, output.Count)?
+    _ = Assert.True(!output.Closed, "Successful write borrows output")?
+    output.Close()
+    let untouched = ShortOutput(-1, false)
+    let rejected = JsonSerializer.SerializeNode(untouched, JsonString(content + "a"))
+    _ = Assert.Equal(0, untouched.Count)?
+    _ = Assert.Equal(0, untouched.Flushes)?
+    _ = Assert.True(!untouched.Closed, "Quota rejection borrows output")?
+    untouched.Close()
+    return Assert.True(rejected is Error(JsonError.LimitExceeded(_)), "Escaped output exceeding quota must fail before writing")
+}
+
+[Test("JSON number document quota preserves long number spelling")]
+func StreamNumberBoundary() -> Result<unit, TestFailure> {
+    var digits = "1"
+    var index = 0
+    while index < 10 {
+        digits = digits + digits
+        index = index + 1
+    }
+    let input = ShortInput(Utf8.Encode(digits), -1)
+    let result = JsonSerializer.DeserializeNode(input)
+    input.Close()
+    if result is Ok(let value) {
+        if JsonSerializer.SerializeNode(value) is Ok(let text) {
+            _ = Assert.Equal(digits, text)?
+        } else {
+            return Assert.True(false, "Exact number quota must serialize")
+        }
+    } else {
+        return Assert.True(false, "Exact number quota must parse")
+    }
+    return Assert.True(JsonNumber.Parse(digits + "0") is Error(JsonError.InvalidNumber), "Oversized number token must fail")
+}
+
+// Produce 511 copies in nine steps without making boundary tests depend on a
+// thousand temporary concatenations.
+func Repeat511(value: string) -> string {
+    var result = ""
+    var part = value
+    var index = 0
+    while index < 9 {
+        result = result + part
+        part = part + part
+        index = index + 1
+    }
+    return result
+}

@@ -373,3 +373,31 @@ gap, not a restriction on JSON field names or on the testing contract.
 
 [JSON batch qualification](json-dom-batch-validation.json): all 12 tests pass native
 macOS ARM64 and interpreted execution. Windows qualification remains pending.
+
+## JSON stream migration batch
+
+`--suite json-streams` runs 12 tests ported from the public JSON DOM/stream consumer.
+They cover one-byte reads/writes splitting UTF-8 scalars, borrowed stream ownership,
+memory-stream round trips, read/encoding/syntax failures, partial write errors,
+zero progress, cycle preflight, and input/output quotas. Exact-boundary cases include
+multibyte strings, escaped strings and long number tokens. Error assertions inspect
+union causes rather than relying on formatted error text.
+
+The stream interfaces expose Close rather than Disposable, so the fixtures retain
+explicit Close calls. Boundary strings are built by doubling chunks to avoid making
+these contract tests depend on thousands of temporary concatenations. No serializer
+or I/O semantics change: existing bounded UTF-8 and ownership contracts remain the
+subjects of the tests. Stream contracts and quota behavior deliberately differ from
+unbounded .NET JSON convenience calls; see the existing [DOM design](../../../docs/json-dom-design.md).
+
+The default harness includes this suite. MemoryStream's independent seek/range/closed
+state tests, the acknowledgement sample, reflection mapping and broader corpus checks
+remain in their existing consumers. These tests do not replace those validations.
+
+The stream quota cases should use the release interpreter (the harness default,
+`target/release/neoclr`). A debug-interpreter attempt passed the native phase but
+exceeded the unchanged 180-second interpreter timeout. Keep byte-at-a-time boundary
+coverage; do not infer a release performance result from that debug timeout.
+
+[JSON stream batch qualification](json-streams-batch-validation.json): all 12 tests
+pass native macOS ARM64 and release-interpreted execution. Windows remains pending.

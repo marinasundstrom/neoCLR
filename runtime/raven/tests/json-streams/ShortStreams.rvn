@@ -1,0 +1,86 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Data.Json.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Text.*
+import NeoClr.Testing.*
+
+// Streams expose Close, not Disposable; these ownership tests close explicitly.
+// One byte at a time deliberately splits multibyte UTF-8 characters.
+class ShortInput : InputStream {
+    private val bytes: Sequence<byte>
+    private var position = 0
+    private val failAt: int
+    private var closed = false
+
+    init(bytes: Sequence<byte>, failAt: int) {
+        self.bytes = bytes
+        self.failAt = failAt
+    }
+
+    val Closed: bool => closed
+    val Position: int => position
+
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if position == failAt {
+            return Error(StreamError.IoFailure)
+        }
+        if count == 0 || position == bytes.Count {
+            return Ok(0)
+        }
+        buffer[offset] = bytes[position]
+        position += 1
+        return Ok(1)
+    }
+
+    func Close() {
+        closed = true
+    }
+}
+
+class ShortOutput : OutputStream {
+    private val bytes: List<byte> = ArrayList<byte>()
+    private val failAt: int
+    private val zeroProgress: bool
+    private var closed = false
+    private var flushes = 0
+
+    init(failAt: int, zeroProgress: bool) {
+        self.failAt = failAt
+        self.zeroProgress = zeroProgress
+    }
+
+    val Closed: bool => closed
+    val Count: int => bytes.Count
+    val Flushes: int => flushes
+    val Bytes: Sequence<byte> => bytes
+
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if bytes.Count == failAt {
+            return Error(StreamError.AccessDenied)
+        }
+        if count == 0 || zeroProgress {
+            return Ok(0)
+        }
+        bytes.Add(buffer[offset])
+        return Ok(1)
+    }
+
+    func Flush() -> Result<unit, StreamError> {
+        flushes += 1
+        return Ok(())
+    }
+
+    func Close() {
+        closed = true
+    }
+}

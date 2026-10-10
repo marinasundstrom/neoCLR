@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>JsonStreamTests</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../framework/Assertions.rvn" />
+    <Compile Include="../framework/TestSuite.rvn" />
+    <Compile Include="../framework/TestAttribute.rvn" />
+    <Compile Include="$(NeoClrTestRegistry)" />
+    <Compile Include="../collections/Main.rvn" />
+    <Compile Include="JsonStreams.rvn" />
+    <Compile Include="ShortStreams.rvn" />
+  </ItemGroup>
+</Project>
