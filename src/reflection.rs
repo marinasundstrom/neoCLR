@@ -710,6 +710,8 @@ fn attribute_data(
                         Value::Erased(Box::new(Value::String(value.clone().into())))
                     }
                     A::String(None) => Value::NullObjectReference(Type::from_name("System.Object")),
+                    // Like CLR CustomAttributeTypedArgument, enum identity is in ArgumentType;
+                    // Value is its underlying integral value, not a boxed enum instance.
                     A::Int32(value) => Value::Erased(Box::new(Value::Int32(*value))),
                     A::Boolean(value) => Value::Erased(Box::new(Value::Boolean(*value))),
                 };
@@ -720,6 +722,11 @@ fn attribute_data(
             }),
         limits,
     )?;
+    if !attribute.named_arguments.is_empty() {
+        return Err(Fault::new(
+            "named attribute inspection is not yet supported by the guest CustomAttributeData contract",
+        ));
+    }
     Ok(record(
         "System.Introspection.CustomAttributeData",
         vec![

@@ -20,4 +20,6 @@ public sealed class CustomAttributeInfo
     /// <exception cref="NotSupportedException">A fixed/named argument category is unsupported.</exception>
     /// <exception cref="InvalidDataException">Supported metadata is malformed.</exception>
     public IReadOnlyList<CustomAttributeArgument> GetArguments() => definition.GetArguments();
+    /// <summary>Gets named primitive field/property data without executing assignments.</summary>
+    public IReadOnlyList<CustomAttributeNamedArgument> GetNamedArguments() => definition.GetNamedArguments();
 }

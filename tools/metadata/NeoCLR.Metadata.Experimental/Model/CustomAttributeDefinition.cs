@@ -3,14 +3,20 @@ using System.Text;
 
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>A typed fixed constructor argument. The initial profile supports String, Int32 and Boolean.</summary>
+/// <summary>A typed immutable attribute value: String, Int32, Boolean or a nominal Int32-backed enum.</summary>
 public sealed class CustomAttributeArgument
 {
-    /// <summary>Creates an immutable argument; only String permits a null value.</summary>
+    /// <summary>Creates a supported primitive or nominal enum argument; only String permits null.</summary>
+    /// <remarks>External enum identities are validated against the explicit catalog when linking.</remarks>
     /// <exception cref="ArgumentException">The type/value combination is unsupported.</exception>
-    public CustomAttributeArgument(PrimitiveType type, object? value)
+    public CustomAttributeArgument(SignatureType type, object? value)
     {
-        if (!(type == PrimitiveType.String && value is null or string || type == PrimitiveType.Int32 && value is int || type == PrimitiveType.Boolean && value is bool))
+        ArgumentNullException.ThrowIfNull(type);
+        bool nominal = type.ClassType is { IsEnum: true } ||
+            type.ImportedType is { IsValueType: true, GenericArity: 0 } || type.ReferencedType is not null;
+        if (!(type.Primitive == PrimitiveType.String && value is null or string ||
+              type.Primitive == PrimitiveType.Int32 && value is int ||
+              type.Primitive == PrimitiveType.Boolean && value is bool || nominal && value is int))
             throw new ArgumentException("unsupported custom attribute argument");
         if (value is string text)
         {
@@ -19,13 +25,33 @@ public sealed class CustomAttributeArgument
         }
         Type = type; Value = value;
     }
-    /// <summary>Gets the constructor parameter's primitive type.</summary>
-    public PrimitiveType Type { get; }
-    /// <summary>Gets the immutable String, Int32, Boolean or null String value.</summary>
+    /// <summary>Gets the declared argument type, preserving nominal enum identity.</summary>
+    public SignatureType Type { get; }
+    /// <summary>Gets the immutable value. Enum values carry their Int32 storage value.</summary>
     public object? Value { get; }
 }
 
-/// <summary>Metadata-only custom attribute data. Reading never invokes a constructor.</summary>
+/// <summary>A named field or property assignment retained as metadata, never executed during inspection.</summary>
+public sealed class CustomAttributeNamedArgument
+{
+    /// <summary>Creates a named primitive field/property value.</summary>
+    /// <exception cref="ArgumentException">The name is invalid or the value has an unsupported named-argument type.</exception>
+    public CustomAttributeNamedArgument(string name, bool isField, CustomAttributeArgument value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) || value.Type.Primitive is null)
+            throw new ArgumentException("unsupported named attribute argument");
+        MemberName = name; IsField = isField; TypedValue = value;
+    }
+    /// <summary>Gets the exact metadata member name.</summary>
+    public string MemberName { get; }
+    /// <summary>Gets true for a field assignment, false for a property assignment.</summary>
+    public bool IsField { get; }
+    /// <summary>Gets the immutable typed value.</summary>
+    public CustomAttributeArgument TypedValue { get; }
+}
+
+/// <summary>Metadata-only custom attribute data. Reading never invokes constructors or named assignments.</summary>
 public sealed class CustomAttributeDefinition
 {
     private readonly byte[] signature;
@@ -33,45 +59,53 @@ public sealed class CustomAttributeDefinition
     private readonly TypeReference? authoredType;
     private readonly ModuleDefinition? module;
     private readonly uint constructor;
-    /// <summary>Authors a .ctor reference with an explicit nominal owner and fixed argument types.</summary>
-    /// <remarks>Only top-level nongeneric attribute owners and String/Int32/Boolean fixed arguments are supported.
-    /// No dependency is loaded; the host must supply the actual constructor when linking/executing.
-    /// Named arguments, arrays, enum arguments and System.Type arguments remain unsupported for authoring.</remarks>
-    /// <exception cref="ArgumentException">Unsupported owner, arguments or count.</exception>
-    public CustomAttributeDefinition(TypeReference attributeType, IEnumerable<CustomAttributeArgument> arguments)
+    private readonly IReadOnlyList<CustomAttributeArgument>? authoredArguments;
+    private readonly IReadOnlyList<CustomAttributeNamedArgument>? authoredNamedArguments;
+
+    /// <summary>Authors an explicit nominal constructor and fixed/named data.</summary>
+    /// <remarks>Fixed values support String, Int32, Boolean and Int32-backed enums. Named values currently support
+    /// String, Int32 and Boolean. Owners must be top-level nongeneric nominal types. Arrays and Type values remain unsupported.</remarks>
+    /// <exception cref="ArgumentException">Unsupported owner, data or bounds.</exception>
+    public CustomAttributeDefinition(TypeReference attributeType, IEnumerable<CustomAttributeArgument> arguments,
+        IEnumerable<CustomAttributeNamedArgument>? namedArguments = null)
     {
         ArgumentNullException.ThrowIfNull(attributeType); ArgumentNullException.ThrowIfNull(arguments);
         var copied = arguments.Take(257).ToArray();
-        if (copied.Length > 256 || copied.Any(a => a is null) || attributeType.Name.Contains('`') || attributeType.ResolutionScopeToken >> 24 == 1)
+        var named = (namedArguments ?? []).Take(257).ToArray();
+        if (copied.Length > 256 || copied.Any(a => a is null) || named.Length > 256 || named.Any(a => a is null) ||
+            named.Select(a => a.MemberName).Distinct(StringComparer.Ordinal).Count() != named.Length ||
+            attributeType.Name.Contains('`') || attributeType.ResolutionScopeToken >> 24 == 1)
             throw new ArgumentException("unsupported custom attribute contract");
-        if (copied.Sum(a => a.Value is string text ? (long)Encoding.UTF8.GetByteCount(text) + 4 : 4) > 1048576)
+        if (copied.Concat(named.Select(n => n.TypedValue)).Sum(a => a.Value is string text ? (long)Encoding.UTF8.GetByteCount(text) + 4 : 4) > 1048576)
             throw new ArgumentException("attribute data exceeds limit");
         authoredType = attributeType;
+        authoredArguments = Array.AsReadOnly(copied); authoredNamedArguments = Array.AsReadOnly(named);
         var sig = new BlobBuilder(); sig.WriteByte(0x20); sig.WriteCompressedInteger(copied.Length); sig.WriteByte(1);
         var blob = new BlobBuilder(); blob.WriteUInt16(1);
         foreach (var argument in copied)
         {
-            sig.WriteByte(argument.Type == PrimitiveType.String ? (byte)0x0e : argument.Type == PrimitiveType.Int32 ? (byte)8 : (byte)2);
-            if (argument.Type == PrimitiveType.String) blob.WriteSerializedString((string?)argument.Value);
-            else if (argument.Type == PrimitiveType.Int32) blob.WriteInt32((int)argument.Value!);
-            else blob.WriteByte((bool)argument.Value! ? (byte)1 : (byte)0);
+            if (argument.Type.Primitive is { } primitive) sig.WriteByte(TypeCode(primitive));
+            WriteValue(blob, argument);
         }
-        blob.WriteUInt16(0); signature = sig.ToArray(); value = blob.ToArray();
+        blob.WriteUInt16((ushort)named.Length);
+        foreach (var argument in named)
+        {
+            blob.WriteByte(argument.IsField ? (byte)0x53 : (byte)0x54);
+            blob.WriteByte(TypeCode(argument.TypedValue.Type.Primitive!.Value));
+            blob.WriteSerializedString(argument.MemberName);
+            WriteValue(blob, argument.TypedValue);
+        }
+        signature = copied.All(a => a.Type.Primitive is not null) ? sig.ToArray() : [];
+        value = blob.ToArray();
     }
-    /// <summary>Authors an attribute from an owned constructor definition and matching fixed arguments.</summary>
-    /// <exception cref="ArgumentException">The method is not an owned supported constructor or arguments do not match.</exception>
-    public CustomAttributeDefinition(MethodDefinition constructor, IEnumerable<CustomAttributeArgument> arguments)
-        : this(OwnedConstructorType(constructor), arguments)
-    {
-        ValidateSignature(constructor.Producer!.Signature);
-    }
-    /// <summary>Authors an attribute from an output-owned imported constructor and matching fixed arguments.</summary>
-    /// <exception cref="ArgumentException">The method is not a supported constructor or arguments do not match.</exception>
-    public CustomAttributeDefinition(ImportedMethodReference constructor, IEnumerable<CustomAttributeArgument> arguments)
-        : this(ImportedConstructorType(constructor), arguments)
-    {
-        ValidateSignature(constructor.Signature);
-    }
+    /// <summary>Authors data for an output-owned constructor, checking its full signature.</summary>
+    public CustomAttributeDefinition(MethodDefinition constructor, IEnumerable<CustomAttributeArgument> arguments,
+        IEnumerable<CustomAttributeNamedArgument>? namedArguments = null) : this(OwnedConstructorType(constructor), arguments, namedArguments)
+    { ValidateSignature(constructor.Producer!.Signature); }
+    /// <summary>Authors data for an imported constructor, checking its full signature.</summary>
+    public CustomAttributeDefinition(ImportedMethodReference constructor, IEnumerable<CustomAttributeArgument> arguments,
+        IEnumerable<CustomAttributeNamedArgument>? namedArguments = null) : this(ImportedConstructorType(constructor), arguments, namedArguments)
+    { ValidateSignature(constructor.Signature); }
     private static TypeReference OwnedConstructorType(MethodDefinition constructor)
     {
         ArgumentNullException.ThrowIfNull(constructor);
@@ -87,9 +121,10 @@ public sealed class CustomAttributeDefinition
         var owner = constructor.Target.DeclaringType;
         return constructor.Owner.Definition.MainModule.ImportReference(owner.Assembly.Identity, owner.Namespace, owner.Name);
     }
+
     private void ValidateSignature(MethodSignature constructor)
     {
-        if (!constructor.Matches(new MethodSignature(PrimitiveType.Void, GetArguments().Select(a => (SignatureType)a.Type))))
+        if (!constructor.Matches(new MethodSignature(PrimitiveType.Void, GetArguments().Select(a => a.Type))))
             throw new ArgumentException("attribute arguments do not match constructor signature");
     }
     internal CustomAttributeDefinition(ModuleDefinition module, uint constructor, byte[] signature, byte[] value)
@@ -110,14 +145,19 @@ public sealed class CustomAttributeDefinition
                 ?? throw new InvalidDataException("unsupported attribute owner");
         }
     }
-    /// <summary>Copies the CLI instance constructor signature, preserving unsupported signatures on loaded data.</summary>
-    public byte[] GetConstructorSignature() => (byte[])signature.Clone();
-    /// <summary>Copies the CLI custom attribute blob, preserving unsupported named/fixed arguments on loaded data.</summary>
+
+    /// <summary>Copies the stored CLI signature for loaded or primitive-only authored attributes.</summary>
+    /// <exception cref="NotSupportedException">Authored nominal parameters need output token assignment; inspect GetArguments instead.</exception>
+    public byte[] GetConstructorSignature() => signature.Length != 0 ? (byte[])signature.Clone()
+        : throw new NotSupportedException("nominal attribute signatures require output token assignment");
+    /// <summary>Copies the CLI attribute payload, including named data.</summary>
     public byte[] GetValue() => (byte[])value.Clone();
-    /// <summary>Decodes the supported fixed arguments without reflection or dependency loading.</summary>
-    /// <exception cref="NotSupportedException">The constructor or argument category is outside the bounded profile.</exception>
-    /// <exception cref="InvalidDataException">Malformed supported data.</exception>
-    public IReadOnlyList<CustomAttributeArgument> GetArguments()
+    /// <summary>Gets typed fixed data without invoking the constructor.</summary>
+    public IReadOnlyList<CustomAttributeArgument> GetArguments() => authoredArguments ?? Decode().Arguments;
+    /// <summary>Gets typed named data without invoking setters or writing fields.</summary>
+    public IReadOnlyList<CustomAttributeNamedArgument> GetNamedArguments() => authoredNamedArguments ?? Decode().Named;
+
+    private (IReadOnlyList<CustomAttributeArgument> Arguments, IReadOnlyList<CustomAttributeNamedArgument> Named) Decode()
     {
         var s = new AttributeBlobReader(signature); var v = new AttributeBlobReader(value);
         if (s.Byte() != 0x20) throw new NotSupportedException("attribute constructor calling convention");
@@ -127,37 +167,79 @@ public sealed class CustomAttributeDefinition
         var result = new List<CustomAttributeArgument>();
         for (int i = 0; i < count; i++)
         {
-            switch (s.Byte())
+            int code = s.Byte();
+            SignatureType type;
+            if (code == 0x11)
             {
-                case 0x0e: result.Add(new(PrimitiveType.String, v.String())); break;
-                case 8: result.Add(new(PrimitiveType.Int32, v.Int32())); break;
-                case 2:
-                    int boolean = v.Byte(); if (boolean > 1) throw new InvalidDataException("attribute Boolean");
-                    result.Add(new(PrimitiveType.Boolean, boolean == 1)); break;
-                default: throw new NotSupportedException("attribute fixed argument category");
+                uint coded = (uint)s.Compressed();
+                var reference = (coded & 3) switch
+                {
+                    0 => module!.GetTypeDefinition(0x02000000u | coded >> 2)?.ToReference(),
+                    1 => module!.TypeReferences.SingleOrDefault(t => t.MetadataToken == (0x01000000u | coded >> 2)),
+                    _ => null
+                } ?? throw new InvalidDataException("invalid enum attribute parameter");
+                type = SignatureType.FromReference(reference);
             }
+            else type = Primitive(code);
+            result.Add(new(type, ReadValue(v, type.Primitive)));
         }
         if (!s.End) throw new InvalidDataException("trailing constructor signature data");
-        if (v.UInt16() != 0) throw new NotSupportedException("named attribute arguments");
+        int namedCount = v.UInt16();
+        if (namedCount > 256) throw new InvalidDataException("too many named attribute arguments");
+        var named = new List<CustomAttributeNamedArgument>();
+        var names = new HashSet<string>(StringComparer.Ordinal);
+        for (int i = 0; i < namedCount; i++)
+        {
+            int kind = v.Byte();
+            if (kind is not (0x53 or 0x54)) throw new InvalidDataException("invalid named attribute kind");
+            var type = Primitive(v.Byte());
+            string name = v.String() ?? throw new InvalidDataException("null named attribute name");
+            if (!names.Add(name)) throw new InvalidDataException("duplicate named attribute argument");
+            named.Add(new(name, kind == 0x53, new(type, ReadValue(v, type))));
+        }
         if (!v.End) throw new InvalidDataException("trailing custom attribute data");
-        return result.AsReadOnly();
+        return (result.AsReadOnly(), named.AsReadOnly());
+    }
+    private static PrimitiveType Primitive(int code) => code switch
+    { 0x0e => PrimitiveType.String, 8 => PrimitiveType.Int32, 2 => PrimitiveType.Boolean, _ => throw new NotSupportedException("attribute argument category") };
+    private static byte TypeCode(PrimitiveType type) => type switch
+    { PrimitiveType.String => 0x0e, PrimitiveType.Int32 => 8, PrimitiveType.Boolean => 2, _ => throw new NotSupportedException("attribute argument category") };
+    private static object? ReadValue(AttributeBlobReader reader, PrimitiveType? type) => type switch
+    {
+        PrimitiveType.String => reader.String(),
+        PrimitiveType.Boolean => reader.Byte() switch { 0 => false, 1 => true, _ => throw new InvalidDataException("attribute Boolean") },
+        _ => reader.Int32()
+    };
+    private static void WriteValue(BlobBuilder blob, CustomAttributeArgument argument)
+    {
+        if (argument.Type.Primitive == PrimitiveType.String) blob.WriteSerializedString((string?)argument.Value);
+        else if (argument.Type.Primitive == PrimitiveType.Boolean) blob.WriteByte((bool)argument.Value! ? (byte)1 : (byte)0);
+        else blob.WriteInt32((int)argument.Value!);
     }
     internal void ValidateOwner(TypeDefinition owner) => ValidateOwner(owner.Module);
     internal void ValidateOwner(ModuleDefinition owner)
     {
         if (authoredType is null || !ReferenceEquals(authoredType.Module, owner)) throw new ArgumentException("attribute reference must be authored in the owning module");
         if (authoredType.ExplicitScope is null && authoredType.Resolve().DeclaringType is not null) throw new ArgumentException("nested attribute owner unsupported");
+        foreach (var argument in GetArguments()) argument.Type.ValidateOwner(owner.Assembly.Producer ?? throw new InvalidOperationException("loaded attribute owner"));
     }
     internal void ValidateContract(TypeDefinition owner) => ValidateContract(owner.Module);
     internal void ValidateContract(ModuleDefinition owner)
     {
         ValidateOwner(owner);
-        if (AttributeType.ExplicitScope is not null) return; // Linked against the explicit external catalog/runtime.
+        if (AttributeType.ExplicitScope is not null) return;
         var type = AttributeType.Resolve();
-        var expected = new MethodSignature(PrimitiveType.Void, GetArguments().Select(a => (SignatureType)a.Type));
+        var expected = new MethodSignature(PrimitiveType.Void, GetArguments().Select(a => a.Type));
         if (type.Producer is not { IsStatic: false, IsValueType: false } producer || type.GenericArity != 0 ||
             !producer.Methods.Any(m => m.IsConstructor && m.Visibility == MethodVisibility.Public && m.Signature.Matches(expected)))
             throw new InvalidDataException("missing or incompatible local attribute constructor");
+        foreach (var argument in GetNamedArguments())
+        {
+            bool valid = argument.IsField
+                ? producer.MetadataFields.Any(f => f.Name == argument.MemberName && f.Visibility == FieldVisibility.Public && !f.Definition.IsLiteral && (f.Definition.Attributes & 0x30) == 0 && f.FieldType.Equals(argument.TypedValue.Type))
+                : producer.Properties.Any(p => p.Name == argument.MemberName && p.SetMethod is { IsStatic: false, Visibility: MethodVisibility.Public } setter && p.GetMethod is { IsStatic: false, Visibility: MethodVisibility.Public } && p.ParameterTypes.Count == 0 && p.PropertyType.Equals(argument.TypedValue.Type));
+            if (!valid) throw new InvalidDataException("invalid named attribute member: " + argument.MemberName);
+        }
     }
     private sealed class AttributeBlobReader(byte[] data)
     {

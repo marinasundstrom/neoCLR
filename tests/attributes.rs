@@ -161,3 +161,66 @@ ret
         assert!(load(&altered.to_string()).is_err(), "{token}");
     }
 }
+
+#[test]
+fn enum_and_named_attribute_data_validate_without_executing_assignments() {
+    let source = r#".module Usage
+.entry Main
+.type Targets
+.enum Int32
+.field private Bits Int32
+.literal Method 64
+.end
+.type UsageAttribute
+.field public Tag String
+.property instance Inherited() -> Boolean
+.get instance UsageAttribute::get_Inherited()
+.set instance UsageAttribute::set_Inherited(Boolean)
+.end
+.method instance get_Inherited() -> Boolean
+fault "attribute getter must not execute"
+.end
+.method instance set_Inherited(Boolean value) -> Void
+fault "attribute setter must not execute"
+.end
+.method instance .ctor(Targets targets) -> Void
+fault "attribute constructor must not execute"
+.end
+.end
+.type Candidate
+.custom instance UsageAttribute::.ctor(Targets) = {"arguments":[{"Int32":64}],"named_arguments":[{"name":"Inherited","is_field":false,"value":{"Boolean":false}},{"name":"Tag","is_field":true,"value":{"String":"test"}}]}
+.end
+.function Main() -> Int32
+ldc.i4 42
+ret
+.end
+"#;
+    let module = assemble(source).unwrap();
+    let json = serde_json::to_value(&module).unwrap();
+    let loaded = load(&json.to_string()).unwrap();
+    assert_eq!(serde_json::to_value(&loaded).unwrap(), json);
+    assert_eq!(
+        run(&loaded, Limits::default()).unwrap().value,
+        neoclr::Value::Int32(42)
+    );
+    for (field, value) in [
+        ("name", serde_json::json!("Missing")),
+        ("name", serde_json::json!("")),
+        ("is_field", serde_json::json!(true)),
+        ("value", serde_json::json!({"Int32":0})),
+    ] {
+        let mut bad = json.clone();
+        bad["types"][2]["custom_attributes"][0]["named_arguments"][0][field] = value;
+        assert!(load(&bad.to_string()).is_err(), "{field}");
+    }
+    let mut bad = json.clone();
+    let values = bad["types"][2]["custom_attributes"][0]["named_arguments"]
+        .as_array_mut()
+        .unwrap();
+    values.push(values[0].clone());
+    assert!(load(&bad.to_string()).is_err());
+    // Identical Int32 storage does not make an ordinary record an enum parameter.
+    let mut bad = json;
+    bad["types"][0].as_object_mut().unwrap().remove("enum_info");
+    assert!(load(&bad.to_string()).is_err());
+}

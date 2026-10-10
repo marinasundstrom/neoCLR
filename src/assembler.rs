@@ -1606,17 +1606,36 @@ fn parse_custom_attribute(text: &str) -> Result<crate::metadata::CustomAttribute
     } else {
         (None, text)
     };
-    let (constructor, arguments) = match text.split_once(" = ") {
-        Some((constructor, arguments)) => (
-            constructor,
-            serde_json::from_str(arguments)
-                .map_err(|e| Fault::new(format!("invalid attribute arguments: {e}")))?,
-        ),
-        None => (text, vec![]),
+    #[derive(serde::Deserialize, Default)]
+    #[serde(deny_unknown_fields)]
+    struct Data {
+        #[serde(default)]
+        arguments: Vec<crate::metadata::AttributeArgument>,
+        #[serde(default)]
+        named_arguments: Vec<crate::metadata::CustomAttributeNamedArgument>,
+    }
+    let (constructor, data) = match text.split_once(" = ") {
+        Some((constructor, payload)) => {
+            let value: serde_json::Value = serde_json::from_str(payload)
+                .map_err(|e| Fault::new(format!("invalid attribute arguments: {e}")))?;
+            let data = if value.is_array() {
+                Data {
+                    arguments: serde_json::from_value(value)
+                        .map_err(|e| Fault::new(format!("invalid attribute arguments: {e}")))?,
+                    ..Data::default()
+                }
+            } else {
+                serde_json::from_value(value)
+                    .map_err(|e| Fault::new(format!("invalid attribute arguments: {e}")))?
+            };
+            (constructor, data)
+        }
+        None => (text, Data::default()),
     };
     Ok(crate::metadata::CustomAttribute {
         constructor: parse_function_ref(constructor)?,
-        arguments,
+        arguments: data.arguments,
+        named_arguments: data.named_arguments,
         target_token,
     })
 }

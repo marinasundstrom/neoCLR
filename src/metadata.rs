@@ -1307,9 +1307,20 @@ pub struct CustomAttribute {
     pub constructor: FunctionRef,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub arguments: Vec<AttributeArgument>,
+    /// Named assignments are descriptive metadata and never execute during inspection.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub named_arguments: Vec<CustomAttributeNamedArgument>,
     /// None annotates the enclosing definition; otherwise a source metadata token.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub target_token: Option<u32>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CustomAttributeNamedArgument {
+    pub name: String,
+    pub is_field: bool,
+    pub value: AttributeArgument,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

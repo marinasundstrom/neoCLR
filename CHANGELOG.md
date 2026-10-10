@@ -8,13 +8,22 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Clarify the design default: retain .NET API structure and semantics unless a
+  concrete benefit justifies a documented divergence. Incomplete support remains
+  a gap; this does not require copying CLR internals.
+
 - Extend host custom-attribute metadata beyond types to callables (including
   constructors and assembly-level functions), fields, properties and parameters.
   Preserve native/CLI snapshots and reference projection, reject foreign targets,
   keep loaded lists read-only and avoid duplicate parameter-array markers. The
   168-group metadata suite and focused inspection/round-trip checks pass. Document
-  general AttributeUsage, enum/named payloads and compiler/guest support as next
-  work; automatic Raven test discovery is not yet implemented.
+  general AttributeUsage and compiler/guest support as next work. Add Int32-backed
+  enum constructor arguments and primitive named field/property data, preserving
+  enum identity and CLI/native projection. Compare decoding with CLR AttributeUsage
+  metadata and reject malformed native assignments without executing user code.
+  CustomAttributeArgument.Type is now SignatureType; existing PrimitiveType inputs
+  still convert implicitly. Named guest inspection and automatic Raven test
+  discovery are not yet implemented.
 
 - Add a Raven runtime-library test runner with module-level cases, Result-based
   Assert.Equal/True, stable IDs, structured pass/fail/skip reports and registration

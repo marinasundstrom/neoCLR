@@ -676,6 +676,17 @@ public sealed partial class AssemblyBuilder
         int nextMethod = 1;
         int nextParameter = 1;
         var genericRows = new List<(EntityHandle Owner, int Sort, IReadOnlyList<string> Names)>();
+        BlobHandle AttributeSignature(CustomAttributeDefinition attribute)
+        {
+            var blob = new BlobBuilder();
+            var arguments = attribute.GetArguments();
+            new BlobEncoder(blob).MethodSignature(isInstanceMethod: true).Parameters(arguments.Count,
+                result => result.Void(), parameters =>
+                {
+                    foreach (var argument in arguments) EncodeType(parameters.AddParameter().Type(), argument.Type);
+                });
+            return metadata.GetOrAddBlob(blob);
+        }
         void WriteAttributes(EntityHandle target, IEnumerable<CustomAttributeDefinition> attributes)
         {
             foreach (var attribute in attributes)
@@ -685,7 +696,7 @@ public sealed partial class AssemblyBuilder
                 EntityHandle attributeOwner = reference.ExplicitScope is { } scope
                     ? metadata.AddTypeReference(ImportAssembly(scope), metadata.GetOrAddString(reference.Namespace), metadata.GetOrAddString(reference.Name))
                     : typeHandles[reference.Resolve().Producer ?? throw new InvalidDataException("detached attribute owner")];
-                var constructor = metadata.AddMemberReference(attributeOwner, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(attribute.GetConstructorSignature()));
+                var constructor = metadata.AddMemberReference(attributeOwner, metadata.GetOrAddString(".ctor"), AttributeSignature(attribute));
                 metadata.AddCustomAttribute(target, constructor, metadata.GetOrAddBlob(attribute.GetValue()));
             }
         }
@@ -894,7 +905,7 @@ public sealed partial class AssemblyBuilder
                 EntityHandle attributeOwner = reference.ExplicitScope is { } scope
                     ? metadata.AddTypeReference(ImportAssembly(scope), metadata.GetOrAddString(reference.Namespace), metadata.GetOrAddString(reference.Name))
                     : typeHandles[reference.Resolve().Producer ?? throw new InvalidDataException("detached attribute owner")];
-                var constructor = metadata.AddMemberReference(attributeOwner, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(attribute.GetConstructorSignature()));
+                var constructor = metadata.AddMemberReference(attributeOwner, metadata.GetOrAddString(".ctor"), AttributeSignature(attribute));
                 metadata.AddCustomAttribute(typeHandle, constructor, metadata.GetOrAddBlob(attribute.GetValue()));
             }
             foreach (var field in type.MetadataFields)

@@ -323,9 +323,15 @@ public sealed partial class AssemblyBuilder
             var arguments = attribute.GetArguments();
             var data = new Dictionary<string, object>
             {
-                ["constructor"] = new { name = name + "..ctor", owner = SignatureValue(owner), instance = true, parameters = arguments.Select(a => a.Type.ToString()).ToArray() },
-                ["arguments"] = arguments.Select(a => (object)new Dictionary<string, object?> { [a.Type.ToString()] = a.Value }).ToArray()
+                ["constructor"] = new { name = name + "..ctor", owner = SignatureValue(owner), instance = true, parameters = arguments.Select(a => SignatureValue(a.Type)).ToArray() },
+                ["arguments"] = arguments.Select(a => (object)new Dictionary<string, object?> { [a.Type.Primitive?.ToString() ?? "Int32"] = a.Value }).ToArray()
             };
+            var named = attribute.GetNamedArguments();
+            if (named.Count != 0) data["named_arguments"] = named.Select(a => new
+            {
+                name = a.MemberName, is_field = a.IsField,
+                value = new Dictionary<string, object?> { [a.TypedValue.Type.Primitive!.Value.ToString()] = a.TypedValue.Value }
+            }).ToArray();
             if (targetToken is { } token) data["target_token"] = token;
             return data;
         }

@@ -5218,15 +5218,71 @@ fn validate_attribute(
             "attribute requires an instance constructor and matching arguments",
         ));
     }
-    for (ty, argument) in target.parameters.iter().zip(&attribute.arguments) {
-        use crate::metadata::AttributeArgument as A;
-        if !matches!(
+    use crate::metadata::AttributeArgument as A;
+    fn matches_value(module: &Module, ty: &Type, argument: &A) -> bool {
+        matches!(
             (ty, argument),
             (Type::String, A::String(_))
                 | (Type::Int32, A::Int32(_))
                 | (Type::Boolean, A::Boolean(_))
-        ) {
+        ) || matches!(argument, A::Int32(_))
+            && module
+                .type_definition(ty)
+                .and_then(|d| d.enum_info.as_ref())
+                .is_some_and(|e| e.underlying == Type::Int32)
+    }
+    if attribute.arguments.len() > 256 || attribute.named_arguments.len() > 256 {
+        return Err(Fault::new("attribute argument count exceeds limit"));
+    }
+    for (ty, argument) in target.parameters.iter().zip(&attribute.arguments) {
+        if !matches_value(module, ty, argument) {
             return Err(Fault::new("unsupported or mismatched attribute argument"));
+        }
+    }
+    let definition = module
+        .type_definition(owner)
+        .ok_or_else(|| Fault::new("missing attribute owner"))?;
+    let mut names = std::collections::HashSet::new();
+    for argument in &attribute.named_arguments {
+        if argument.name.trim().is_empty()
+            || argument.name.len() > 4096
+            || argument.name.chars().any(char::is_control)
+            || !names.insert(&argument.name)
+        {
+            return Err(Fault::new("invalid or duplicate named attribute argument"));
+        }
+        let valid = if argument.is_field {
+            definition.fields.iter().enumerate().any(|(index, field)| {
+                field.name == argument.name
+                    && field.visibility == crate::metadata::Visibility::Public
+                    && !definition
+                        .origin
+                        .as_ref()
+                        .and_then(|o| o.field_readonly.get(index))
+                        .copied()
+                        .unwrap_or(false)
+                    && matches_value(module, &field.ty, &argument.value)
+            })
+        } else {
+            definition.properties.iter().any(|property| {
+                property.name == argument.name
+                    && property.instance
+                    && property.parameters.is_empty()
+                    && matches_value(module, &property.ty, &argument.value)
+                    && property
+                        .getter
+                        .as_ref()
+                        .and_then(|r| resolve(module, r).ok())
+                        .is_some_and(|f| f.visibility == crate::metadata::Visibility::Public)
+                    && property
+                        .setter
+                        .as_ref()
+                        .and_then(|r| resolve(module, r).ok())
+                        .is_some_and(|f| f.visibility == crate::metadata::Visibility::Public)
+            })
+        };
+        if !valid {
+            return Err(Fault::new("invalid named attribute member"));
         }
     }
     let constructor = resolve(module, target)?;

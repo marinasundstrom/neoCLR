@@ -190,3 +190,35 @@ suite passes. The parameter-array gate separately combines ordinary parameter
 annotations with ParamArrayAttribute and checks projection does not duplicate it.
 The generated native image also passes neoCLR verification and returns 42 from its
 unannotated entry point. This does not qualify native guest automatic discovery.
+
+
+### Enum and named payload foundation (2026-10-10)
+
+Implemented in the host metadata layer: fixed arguments preserve the nominal type
+of Int32-backed enums; named String/Int32/Boolean field or property values preserve
+member name, kind, type and value. Native records have an optional `named_arguments`
+array. CLI projection writes the standard named count and field/property entries;
+constructor signatures encode enum identity instead of erasing it to Int32.
+Omitting the native array preserves old marker/scalar records. Readers must be
+updated for records that contain it; no published format compatibility is claimed.
+
+Owned named members are checked for an exact type and a public writable instance
+field or public instance read/write non-indexed property. The linked runtime checks
+resolved declarations without executing constructors, getters or setters. External
+references require matching dependency metadata at link time. Inherited named
+members, broader primitive types, named enum values, arrays and System.Type values
+remain implementation gaps relative to .NET. AttributeUsage target/multiplicity
+policy is not yet enforced by this payload layer. Existing record-shaped native
+attributes do not yet require a System.Attribute base class.
+
+The host APIs expose both argument groups. Guest CustomAttributeData still has its
+previous constructor-argument-only layout and explicitly rejects named-data queries
+rather than returning incomplete data. Extending that descriptor, the library
+reference, compiler emission/import and AOT retention are subsequent slices.
+
+Validation: the 168-group host suite and nine Rust attribute tests pass. A C#-compiled
+AttributeUsage annotation is decoded identically to CLR CustomAttributeData for its
+enum value and named options. Native PE/NEOX and CLI projection retain the data;
+invalid member names/kinds/types and duplicates reject. The native executable with
+faulting attribute constructors/accessors verifies and returns 42. See the
+[host API details](../api-docs/experimental-metadata.md#enum-and-named-attribute-data-development-2026-10-10).

@@ -30,6 +30,16 @@ internal static class MemberAttributeChecks
             var reflected = context.LoadFromStream(new MemoryStream(image)).GetType("Tests.Operations")!.GetMethod("Read")!;
             Check((string)reflected.GetCustomAttributesData().Single().ConstructorArguments[0].Value! == "test ☃", "CLR method attribute mismatch");
             Check((int)reflected.Invoke(null, null)! == 42, "attributed method behavior changed");
+            var usage = typeof(UsageContractAttribute).GetCustomAttributesData().Single(a => a.AttributeType == typeof(AttributeUsageAttribute));
+            var actual = AssemblyDefinition.ReadAssembly(File.ReadAllBytes(typeof(MemberAttributeChecks).Assembly.Location), false);
+            var storedUsage = actual.MainModule.Types.Single(t => t.Name == nameof(UsageContractAttribute)).CustomAttributes.Single(a => a.AttributeType.Name == "AttributeUsageAttribute");
+            Check(storedUsage.GetArguments().Single().Type.ReferencedType?.Name == "AttributeTargets", "CLI enum identity lost");
+            Check(Equals(storedUsage.GetArguments().Single().Value, usage.ConstructorArguments.Single().Value), "CLI enum value differs from CLR");
+            foreach (var named in usage.NamedArguments)
+            {
+                var stored = storedUsage.GetNamedArguments().Single(a => a.MemberName == named.MemberName);
+                Check(stored.IsField == named.IsField && Equals(stored.TypedValue.Value, named.TypedValue.Value), "CLI named argument differs from CLR");
+            }
         }
         finally { context.Unload(); }
 
@@ -37,6 +47,25 @@ internal static class MemberAttributeChecks
         var attributeType = graph.AddClass("NeoClr.Testing", "TestAttribute");
         var ctor = attributeType.AddConstructor(new MethodSignature(PrimitiveType.Void, []));
         ctor.GetILGenerator().Fail("Discovery must never execute attribute constructors");
+        var nativeTargets = graph.AddEnum("System", "AttributeTargets");
+        nativeTargets.AddEnumMember("Method", 64);
+        var usageType = graph.AddClass("System", "AttributeUsageAttribute");
+        var usageCtor = usageType.AddConstructor(new MethodSignature(PrimitiveType.Void, [(SignatureType)nativeTargets]));
+        usageCtor.GetILGenerator().Fail("Metadata inspection must never execute usage constructors");
+        foreach (var name in new[] { "AllowMultiple", "Inherited" })
+        {
+            var read = usageType.AddInstanceMethod("get_" + name, new(PrimitiveType.Boolean, []));
+            read.GetILGenerator().Fail("Metadata inspection must never execute usage getters");
+            var write = usageType.AddInstanceMethod("set_" + name, new(PrimitiveType.Void, [PrimitiveType.Boolean]));
+            write.GetILGenerator().Fail("Metadata inspection must never execute usage setters");
+            usageType.AddProperty(name, PrimitiveType.Boolean, read, write);
+        }
+        var usageData = new CustomAttributeDefinition(usageCtor.Definition, [new(nativeTargets, 64)],
+            [new("AllowMultiple", false, new(PrimitiveType.Boolean, true)), new("Inherited", false, new(PrimitiveType.Boolean, false))]);
+        attributeType.AddCustomAttribute(usageData);
+        Reject<ArgumentException>(() => new CustomAttributeDefinition(usageCtor.Definition, [new(PrimitiveType.Int32, 64)]));
+        Reject<ArgumentException>(() => new CustomAttributeDefinition(usageCtor.Definition, [new(nativeTargets, 64)],
+            [new("Inherited", false, new(PrimitiveType.Boolean, true)), new("Inherited", false, new(PrimitiveType.Boolean, false))]));
         var declared = new CustomAttributeDefinition(ctor.Definition, []);
         ctor.AddCustomAttribute(declared);
         var first = graph.DefineModule("Tests.Collections").AddFunction("First", new(PrimitiveType.Int32, []));
@@ -68,6 +97,11 @@ internal static class MemberAttributeChecks
             var catalog = new MetadataLoadContext([snapshot]);
             var assembly = catalog.Resolve(snapshot.Identity);
             var expectedType = assembly.GetTypes().Single(t => t.Name == "TestAttribute");
+            var usageView = expectedType.GetCustomAttributes().Single();
+            Check(usageView.GetArguments().Single().Type.ReferencedType?.Name == "AttributeTargets" &&
+                usageView.GetArguments().Single().Value is 64, "native enum argument identity/value lost");
+            Check(usageView.GetNamedArguments().Count == 2 && usageView.GetNamedArguments()[0].TypedValue.Value is true &&
+                usageView.GetNamedArguments()[1].TypedValue.Value is false && !usageView.GetNamedArguments()[0].IsField, "native named data lost");
             Check(expectedType.GetConstructors().Single().GetCustomAttributes().Single().GetAttributeType() == expectedType, "constructor attribute lost");
             var discovered = assembly.GetModules().Single().GetFunctions()
                 .Where(f => f.GetCustomAttributes().Any(a => ReferenceEquals(a.GetAttributeType(), expectedType)))
@@ -88,6 +122,9 @@ internal static class MemberAttributeChecks
         var projected = RuntimeAssemblyContainer.ReadCliProjection(binary);
         Check(projected.MainModule.Functions.Count(f => f.CustomAttributes.Count == 1) == 2, "CLI projection lost function attributes");
         Check(projected.MainModule.Types.Single(t => t.Name == "OptionalFixture").Methods.Single(m => m.Name == "Example").CustomAttributes.Count == 1, "CLI projection lost method attribute");
+        var projectedUsage = projected.MainModule.Types.Single(t => t.Name == "TestAttribute").CustomAttributes.Single();
+        Check(projectedUsage.GetArguments().Single().Type.ReferencedType?.Name == "AttributeTargets" &&
+            projectedUsage.GetNamedArguments().Count == 2, "usage projection lost typed/named data");
         var projectedFixture = projected.MainModule.Types.Single(t => t.Name == "OptionalFixture");
         Check(projectedFixture.Fields.Single().CustomAttributes.Count == 1, "CLI field projection lost attribute");
         Check(projectedFixture.Properties.Single().CustomAttributes.Count == 1, "CLI property projection lost attribute");
@@ -103,12 +140,27 @@ internal static class MemberAttributeChecks
             if (corruption == "count") for (int i = 0; i < 256; i++) attributes.Add(attribute.DeepClone());
             Reject<InvalidDataException>(() => NativeAssemblyDefinition.ReadAssembly(Encoding.UTF8.GetBytes(bad.ToJsonString())));
         }
+        foreach (var corruption in new[] { "missing", "kind", "type", "duplicate" })
+        {
+            var bad = JsonNode.Parse(json)!;
+            var usage = bad["types"]!.AsArray().SelectMany(t => t!["custom_attributes"]?.AsArray() ?? [])
+                .Single(a => a!["named_arguments"] is not null)!;
+            var named = usage["named_arguments"]!.AsArray();
+            if (corruption == "missing") named[0]!["name"] = "Missing";
+            if (corruption == "kind") named[0]!["is_field"] = true;
+            if (corruption == "type") named[0]!["value"] = new JsonObject { ["Int32"] = 1 };
+            if (corruption == "duplicate") named.Add(named[0]!.DeepClone());
+            Reject<InvalidDataException>(() => NativeAssemblyDefinition.ReadAssembly(Encoding.UTF8.GetBytes(bad.ToJsonString())).CreateReferenceAssembly(graph.CoreLibrary));
+        }
         var wrongTarget = JsonNode.Parse(json)!;
         var attributedType = wrongTarget["types"]!.AsArray().Single(t => t!["custom_attributes"] is JsonArray a && a.Any(value => value!["target_token"] is not null))!;
         attributedType["custom_attributes"]!.AsArray().First(a => a!["target_token"] is not null)!["target_token"] = 0x0400ffff;
         Reject<InvalidDataException>(() => NativeAssemblyDefinition.ReadAssembly(Encoding.UTF8.GetBytes(wrongTarget.ToJsonString())));
         Console.WriteLine("PASS member attribute authoring, CLI/native snapshots, type/field/property/parameter inspection, metadata-only discovery, projection and invalid metadata");
     }
+
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
+    private sealed class UsageContractAttribute : Attribute { }
 
     private static void Check(bool condition, string message)
     {

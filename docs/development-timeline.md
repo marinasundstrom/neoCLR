@@ -13337,3 +13337,17 @@ lists, and coexists with parameter-array markers. The 168-group metadata suite p
 The [general attribute plan](custom-attributes.md) records .NET usage defaults and
 scope. Enum/named payloads, AttributeUsage enforcement, compiler emission/import and
 guest discovery remain open; no completion of those is inferred from this foundation.
+
+
+The author adds: “We should stick to .NET structure and semantics unless we have
+good reason to diverge”. The assistant records this as the platform-wide default
+in AGENTS.md and the design-research policy, preserving the prior position. For
+attribute contracts this means: nominal enum types, positional and named arguments, usage targets,
+multiplicity and inheritance. The payload slice preserves Int32 enum identity and
+named field/property data. Its host descriptor uses MemberName, IsField and
+TypedValue, matching .NET terminology. Tests compare AttributeUsage payload decoding
+with CLR inspection, check native/projection round trips, and reject invalid named
+assignments. The generated image verifies and returns 42 without executing the
+faulting attribute constructors or accessors. Usage enforcement, broader argument
+categories, guest named-data inspection and Raven compiler integration remain open;
+this is not reported as complete AttributeUsage support.

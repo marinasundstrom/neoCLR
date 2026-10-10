@@ -5970,8 +5970,9 @@ get_Value null literal. Full native union/case metadata and execution remain pen
 
 Host-only namespace `NeoCLR.Metadata.Experimental.Model`:
 
-- `CustomAttributeArgument(PrimitiveType type, object? value)` stores immutable `Type`
-  and `Value`. Supported fixed arguments are String (including null), Int32 and Boolean.
+- `CustomAttributeArgument(SignatureType type, object? value)` stores immutable `Type`
+  and `Value`. Supported fixed arguments are String (including null), Int32, Boolean
+  and nominal Int32-backed enums; see the development extension below.
   Other type/value combinations throw ArgumentException. Strings are strict UTF-8 and
   bounded to 65,536 UTF-16 code units.
 - `CustomAttributeDefinition(TypeReference attributeType, IEnumerable<CustomAttributeArgument> arguments)`
@@ -6002,9 +6003,10 @@ Host-only namespace `NeoCLR.Metadata.Experimental.Introspection`:
   dependencies throw InvalidDataException. No runtime reflection or constructor execution
   is involved.
 
-Authoring is limited to top-level nongeneric nominal owners and type-level attributes.
-Named arguments, enum/array/System.Type arguments and other parent categories are not
-newly supported. Loaded CLI blobs remain available as raw copies even when typed decoding
+Authoring uses top-level nongeneric nominal attribute owners. See the later
+[member](#member-custom-attributes-development-2026-10-10) and
+[payload](#enum-and-named-attribute-data-development-2026-10-10) extensions for current
+development scope. Array and System.Type arguments remain unsupported. Loaded CLI blobs remain available as raw copies even when typed decoding
 is unsupported. This does not add mutable loaded-assembly rewriting.
 
 CLI output uses the existing CustomAttribute table, constructor MemberRef and standard
@@ -8049,3 +8051,40 @@ Earlier bounded host readers may reject newly admitted data; use matching tools.
 [Design, scope and validation](../docs/custom-attributes.md). No guest reference
 assembly or RavenDoc type selection changes are required for this host-only API;
 this manual reference supplies the signatures and limitations.
+
+
+## Enum and named attribute data (development 2026-10-10)
+
+Host-only, `NeoCLR.Metadata.Experimental.Model`; this does not extend the guest
+System.Introspection descriptor yet.
+
+| API | Contract |
+| --- | --- |
+| `CustomAttributeArgument(SignatureType type, object? value)` | Immutable `Type : SignatureType` and `Value : object?`. Supports String/null, Int32, Boolean and nominal Int32-backed enum identities with an Int32 storage value. Invalid combinations throw ArgumentException. Owned enum identity is retained; external identities require validation against linked dependencies. |
+| `CustomAttributeNamedArgument(string name, bool isField, CustomAttributeArgument value)` | Immutable `MemberName : string`, `IsField : bool`, `TypedValue : CustomAttributeArgument`. String/Int32/Boolean values only in this slice. Invalid/empty/control-containing names, names over 1,024 characters or unsupported types throw ArgumentException. |
+| `CustomAttributeDefinition(..., IEnumerable<CustomAttributeNamedArgument>? namedArguments = null)` | All three constructor overloads accept optional named arguments, copied into read-only storage. At most 256 per group; duplicate named members reject. Local member access/kind/type checks run on output; explicit external references are checked when linked. No assignments execute. |
+| `CustomAttributeDefinition.GetNamedArguments()` | Returns `IReadOnlyList<CustomAttributeNamedArgument>`, declared order, without invoking user code. Malformed data throws InvalidDataException; unsupported categories throw NotSupportedException. |
+| `Introspection.CustomAttributeInfo.GetNamedArguments()` | Same immutable metadata-only named data through the host inspection view. |
+| `CustomAttributeDefinition.GetConstructorSignature()` | Copies a loaded signature or a primitive-only authored signature. Authored enum signatures require output token assignment and throw NotSupportedException here; use GetArguments for logical types. CLI writing assigns tokens and emits the complete signature. |
+
+Migration: Type was PrimitiveType and is now SignatureType. Existing PrimitiveType
+constructor arguments convert implicitly; consumers inspecting Type should inspect
+its Primitive property or nominal identity. Enum values retain their Int32 storage
+value; the associated Type carries their semantic identity. GetValue includes the
+CLI named entries. Previously supported marker/scalar call sites remain valid.
+
+```csharp
+var data = new CustomAttributeDefinition(usageConstructor.Definition,
+    [new(attributeTargetsEnum, 64)],
+    [new("AllowMultiple", false, new(PrimitiveType.Boolean, true)),
+     new("Inherited", false, new(PrimitiveType.Boolean, false))]);
+attributeType.AddCustomAttribute(data);
+```
+
+This assumes output-owned declarations for the enum, constructor and public writable
+Boolean properties. It records data; it does not establish AttributeUsage enforcement.
+Named inherited members, named enums, arrays, System.Type and wider primitives are
+not supported. The CLI decoder currently handles the Int32 enum storage profile;
+it is not a general-purpose decoder for arbitrary external enum backing types.
+Native named-data records require matching metadata/runtime readers. Guest inspection
+currently rejects named data explicitly; it never silently drops it.

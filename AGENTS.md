@@ -75,9 +75,11 @@ See [the changelog workflow](docs/changelog.md) for consolidation and release ha
 
 ## Research-backed platform design
 
-- Treat .NET as the ergonomic target, not an exact API or implementation template.
-  Learn from other frameworks and account for neoCLR’s UTF-8 platform contracts;
-  justify claimed improvements with concrete benefits and costs.
+- Default to .NET API structure and semantics unless there is a concrete reason
+  to diverge (author clarification, 2026-10-10). Internal implementation need not
+  copy the CLR. Learn from other frameworks and account for neoCLR’s UTF-8 platform
+  contracts; document each deliberate divergence, its benefit, costs and validation.
+  Treat incomplete support as a gap, not a new semantic contract.
 - Frame every roadmap capability and substantive improvement to existing features
   as a comparison with .NET/CLR APIs, behavior and implementation layers.
 - Follow [design research](docs/design-research.md): use primary sources, distinguish

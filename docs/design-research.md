@@ -6,6 +6,15 @@ and which solution best serves the platform. Familiar APIs and observable behavi
 are the starting point. The author reaffirmed on 2026-09-27 that .NET is the ergonomic
 target, not an exact API-shape requirement. Learn from other frameworks and let
 neoCLR’s UTF-8 and text model inform fundamental API contracts.
+
+On 2026-10-10, the author sharpened the default: “We should stick to .NET structure
+and semantics unless we have good reason to diverge”. Adopt familiar .NET API
+organization, naming, defaults and observable behavior when they fit. A deliberate
+variation needs a concrete platform or user benefit, explicit costs and validation;
+an unimplemented feature is a gap rather than a reason to invent different semantics.
+This updates the default without requiring identical CLR internals or undoing justified
+UTF-8 platform choices. Preserve earlier decisions and reassess them when affected.
+
 Different syntax or internals are permitted, but difference
 alone is not an improvement. More runtime machinery is an option to evaluate, not
 an automatic preference. Historical .NET/CLR compatibility accommodations are

@@ -102,17 +102,17 @@ public sealed partial class NativeAssemblyDefinition
             property.Getter < 0 ? 0 : 0x06000001u + (uint)property.Getter,
             property.Setter < 0 ? 0 : 0x06000001u + (uint)property.Setter, [], Copy(property.Type), property.Parameters.Select(Copy).ToArray(), property.IsInitOnly)).ToArray();
         var references = References.Select((identity, index) => new AssemblyDefinition.ReferenceRow(0x23000001u + (uint)index, identity)).ToArray();
-        var attributes = types.Select(type => type.Attributes.Select(a => (Owner: Copy(a.Owner), a.Arguments)).ToArray()).ToArray();
-        var methodAttributes = methods.Select(method => method.Attributes.Select(a => (Owner: Copy(a.Owner), a.Arguments)).ToArray()).ToArray();
+        var attributes = types.Select(type => type.Attributes.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray()).ToArray();
+        var methodAttributes = methods.Select(method => method.Attributes.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray()).ToArray();
         var memberAttributes = types.SelectMany(type => type.MemberAttributes)
-            .ToDictionary(pair => pair.Key, pair => pair.Value.Select(a => (Owner: Copy(a.Owner), a.Arguments)).ToArray());
+            .ToDictionary(pair => pair.Key, pair => pair.Value.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray());
         var parameterAttributes = methods.Select(method => method.ParameterAttributes.ToDictionary(p => p.Key,
-            p => p.Value.Select(a => (Owner: Copy(a.Owner), a.Arguments)).ToArray())).ToArray();
+            p => p.Value.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray())).ToArray();
         var explicitRows = methods.Select(m => m.ExplicitInterfaces.Select(e => (Owner: Copy(e.Owner), e.Name)).ToArray()).ToArray();
         var result = AssemblyDefinition.NativeDeclarations(Identity, typeRows, fieldRows.ToArray(), rows, propertyRows, references, externalRows.ToArray(), image, entryPointToken);
         for (int i = 0; i < types.Length; i++)
             result.MainModule.GetTypeDefinition(0x02000002u + (uint)i)!.SetLoadedAttributes(attributes[i].Select(a =>
-                new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments)));
+                new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments.Select(argument => new CustomAttributeArgument(argument.Type.Materialize(result.MainModule), argument.Value)), a.Named)));
         for (int i = 0; i < methods.Length; i++)
             result.MainModule.GetMethodDefinition(0x06000001u + (uint)i)!.SetLoadedExplicitInterfaces(explicitRows[i].Select(mapping =>
             {
@@ -124,17 +124,17 @@ public sealed partial class NativeAssemblyDefinition
             }));
         for (int i = 0; i < methods.Length; i++)
             result.MainModule.GetMethodDefinition(0x06000001u + (uint)i)!.SetLoadedAttributes(methodAttributes[i].Select(a =>
-                new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments)));
+                new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments.Select(argument => new CustomAttributeArgument(argument.Type.Materialize(result.MainModule), argument.Value)), a.Named)));
         foreach (var (token, attributesForMember) in memberAttributes)
         {
-            var values = attributesForMember.Select(a => new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments));
+            var values = attributesForMember.Select(a => new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments.Select(argument => new CustomAttributeArgument(argument.Type.Materialize(result.MainModule), argument.Value)), a.Named));
             if (token >> 24 == 4) result.MainModule.GetFieldDefinition(token)!.SetLoadedAttributes(values);
             else result.MainModule.GetPropertyDefinition(token)!.SetLoadedAttributes(values);
         }
         for (int i = 0; i < methods.Length; i++)
             foreach (var (position, attributesForParameter) in parameterAttributes[i])
                 result.MainModule.GetMethodDefinition(0x06000001u + (uint)i)!.SetLoadedParameterAttributes(position,
-                    attributesForParameter.Select(a => new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments)));
+                    attributesForParameter.Select(a => new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments.Select(argument => new CustomAttributeArgument(argument.Type.Materialize(result.MainModule), argument.Value)), a.Named)));
         result.MainModule.SetConstants(assemblyConstants);
         result.DeclaredModuleNames = declarationModuleNames;
         return result;

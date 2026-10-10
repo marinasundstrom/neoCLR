@@ -8,8 +8,9 @@ macOS ARM64 native/interpreter checks. The Windows runner action at 9db8eb4c suc
 The author clarifies that this requires [general custom attributes](custom-attributes.md),
 including AttributeUsage and applicable declaration kinds, not a test-only mechanism.
 Host metadata authoring/introspection now preserves callable, field, property and
-parameter annotations alongside types. Next implement enum/named payloads and
-AttributeUsage/compiler support, then TestAttribute discovery without changing execution
+parameter annotations alongside types. Int32 enum fixed arguments and primitive named
+arguments now round-trip through host metadata and native/CLI projection. Next implement
+AttributeUsage/compiler support and guest named-data inspection, then TestAttribute discovery without changing execution
 contracts. Qualify metadata retention and callable adapters before claiming native
 automatic discovery. This supports the native/collection milestone; it does not
 permanently reprioritize the rest of the platform roadmap.

@@ -25,7 +25,7 @@ public sealed partial class NativeAssemblyDefinition
         internal Dictionary<uint, AttributeRow[]> MemberAttributes { get; } = []; internal uint[] AttributeTargets { get; init; } = [];
         internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = [];
     }
-    private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
+    private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments) { internal CustomAttributeNamedArgument[] Named { get; init; } = []; }
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, AttributeRow[]> ParameterAttributes { get; init; } = []; internal AttributeRow[] Attributes { get; init; } = []; internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters, bool IsInitOnly);
@@ -509,8 +509,10 @@ public sealed partial class NativeAssemblyDefinition
             }
             AttributeRow ReadAttribute(JsonElement attribute)
             {
-                if (attribute.TryGetProperty("target_token", out _)) Shape(attribute, "constructor", "arguments", "target_token");
-                else Shape(attribute, "constructor", "arguments");
+                var fields = new List<string> { "constructor", "arguments" };
+                if (attribute.TryGetProperty("target_token", out _)) fields.Add("target_token");
+                if (attribute.TryGetProperty("named_arguments", out _)) fields.Add("named_arguments");
+                Shape(attribute, fields.ToArray());
                 var constructor = attribute.GetProperty("constructor"); Shape(constructor, "name", "owner", "instance", "parameters");
                 var ownerValue = constructor.GetProperty("owner"); Shape(ownerValue, "Named");
                 Require(constructor.GetProperty("instance").GetBoolean() && Text(constructor, "name") == Text(ownerValue, "Named") + "..ctor", "invalid attribute constructor");
@@ -519,21 +521,36 @@ public sealed partial class NativeAssemblyDefinition
                 var parameters = Array(constructor, "parameters", 256);
                 var arguments = Array(attribute, "arguments", 256);
                 Require(parameters.Length == arguments.Length, "attribute argument count mismatch");
-                var decoded = new List<CustomAttributeArgument>();
-                for (int i = 0; i < arguments.Length; i++)
+                CustomAttributeArgument DecodeValue(SignatureType type, JsonElement argument)
                 {
-                    var parameter = parameters[i].GetString();
-                    Require(parameter is "String" or "Int32" or "Boolean", "unsupported attribute parameter");
-                    Shape(arguments[i], parameter!);
-                    var value = arguments[i].GetProperty(parameter!);
-                    decoded.Add(parameter switch
+                    string key = type.Primitive?.ToString() ?? "Int32";
+                    Require(key is "String" or "Int32" or "Boolean", "unsupported attribute parameter");
+                    Require(type.Primitive is not null || type.ClassType is { IsEnum: true } || type.ImportedType is { IsValueType: true, GenericArity: 0 }, "attribute nominal parameter must be an Int32 enum");
+                    Shape(argument, key);
+                    var value = argument.GetProperty(key);
+                    return new(type, key switch
                     {
-                        "String" => new(PrimitiveType.String, value.ValueKind == JsonValueKind.Null ? null : value.GetString()),
-                        "Int32" => new(PrimitiveType.Int32, value.GetInt32()),
-                        _ => new(PrimitiveType.Boolean, value.GetBoolean())
+                        "String" => value.ValueKind == JsonValueKind.Null ? null : value.GetString(),
+                        "Int32" => value.GetInt32(),
+                        _ => value.GetBoolean()
                     });
                 }
-                return new(owner, decoded.ToArray());
+                var decoded = parameters.Select((parameter, i) => DecodeValue(ReadType(parameter, false), arguments[i])).ToArray();
+                var named = new List<CustomAttributeNamedArgument>();
+                var names = new HashSet<string>(StringComparer.Ordinal);
+                if (attribute.TryGetProperty("named_arguments", out _))
+                    foreach (var argument in Array(attribute, "named_arguments", 256))
+                    {
+                        Shape(argument, "name", "is_field", "value");
+                        string name = Text(argument, "name");
+                        Require(names.Add(name), "duplicate named attribute argument");
+                        var value = argument.GetProperty("value");
+                        Require(value.ValueKind == JsonValueKind.Object && value.EnumerateObject().Count() == 1, "invalid named attribute value");
+                        var key = value.EnumerateObject().Single().Name;
+                        var type = key switch { "String" => PrimitiveType.String, "Int32" => PrimitiveType.Int32, "Boolean" => PrimitiveType.Boolean, _ => throw new InvalidDataException("unsupported named attribute type") };
+                        named.Add(new(name, argument.GetProperty("is_field").GetBoolean(), DecodeValue(type, value)));
+                    }
+                return new(owner, decoded) { Named = named.ToArray() };
             }
             foreach (var type in types)
                 foreach (var group in type.RawAttributes.GroupBy(a => a.TryGetProperty("target_token", out var token) ? token.GetUInt32() : 0u))
@@ -985,7 +1002,7 @@ public sealed partial class NativeAssemblyDefinition
                     var attributeOwner = Remap(attribute.Owner);
                     var reference = attributeOwner.ClassType is { } local ? local.Definition.ToReference()
                         : graph.Definition.MainModule.ImportReference(attributeOwner.ImportedType!.AssemblyIdentity, attributeOwner.ImportedType.Namespace, attributeOwner.ImportedType.Name);
-                    output.Definition.GetParameterCustomAttributes(position).Add(new(reference, attribute.Arguments));
+                    output.Definition.GetParameterCustomAttributes(position).Add(new(reference, attribute.Arguments.Select(a => new CustomAttributeArgument(Remap(a.Type), a.Value)), attribute.Named));
                 }
             if (method.ImplementationAttributes == 0x1000) output.SetInternalCall();
             foreach (var pair in method.NullableAnnotations) output.SetNullableAnnotation(pair.Key, pair.Value);
@@ -1007,7 +1024,7 @@ public sealed partial class NativeAssemblyDefinition
                 var owner = Remap(attribute.Owner);
                 var reference = owner.ClassType is { } local ? local.Definition.ToReference()
                     : graph.Definition.MainModule.ImportReference(owner.ImportedType!.AssemblyIdentity, owner.ImportedType.Namespace, owner.ImportedType.Name);
-                owners[i].AddCustomAttribute(new(reference, attribute.Arguments));
+                owners[i].AddCustomAttribute(new(reference, attribute.Arguments.Select(a => new CustomAttributeArgument(Remap(a.Type), a.Value)), attribute.Named));
             }
         for (int i = 0; i < methods.Length; i++)
             foreach (var attribute in methods[i].Attributes)
@@ -1015,7 +1032,7 @@ public sealed partial class NativeAssemblyDefinition
                 var owner = Remap(attribute.Owner);
                 var reference = owner.ClassType is { } local ? local.Definition.ToReference()
                     : graph.Definition.MainModule.ImportReference(owner.ImportedType!.AssemblyIdentity, owner.ImportedType.Namespace, owner.ImportedType.Name);
-                projectedMethods[i].AddCustomAttribute(new(reference, attribute.Arguments));
+                projectedMethods[i].AddCustomAttribute(new(reference, attribute.Arguments.Select(a => new CustomAttributeArgument(Remap(a.Type), a.Value)), attribute.Named));
             }
         var projectedFields = owners.SelectMany(owner => owner.MetadataFields).ToArray();
         var projectedProperties = owners.SelectMany(owner => owner.Properties).ToArray();
@@ -1028,7 +1045,7 @@ public sealed partial class NativeAssemblyDefinition
                         : graph.Definition.MainModule.ImportReference(owner.ImportedType!.AssemblyIdentity, owner.ImportedType.Namespace, owner.ImportedType.Name);
                     var destination = token >> 24 == 4 ? projectedFields[(int)(token & 0xffffff) - 1].Definition.CustomAttributes
                         : projectedProperties[(int)(token & 0xffffff) - 1].Definition.CustomAttributes;
-                    destination.Add(new(reference, attribute.Arguments));
+                    destination.Add(new(reference, attribute.Arguments.Select(a => new CustomAttributeArgument(Remap(a.Type), a.Value)), attribute.Named));
                 }
         return graph.WriteReferenceImage();
     }
