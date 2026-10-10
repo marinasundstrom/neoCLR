@@ -13822,3 +13822,26 @@ claim completion of in-process test discovery.
   or ZonedDateTime currently declares Parse/TryParse. Date and TimeOfDay do expose
   culture-aware formatting. Record these concrete gaps in the roadmap; parser code,
   accepted formats, culture/zone behavior and validation remain to be implemented.
+
+
+### JsonObject map implementation follow-up (2026-10-10)
+
+- **Author direction carried forward:** make JsonObject usable as an indexable map;
+  use faulting getter indexers and prefer recoverable lookup methods for absence.
+- **Assistant action:** implement read-only Map<string, JsonValue> conformance,
+  ordinal Find/ContainsKey, a string getter indexer and shallow insertion-order
+  snapshots. Preserve existing Add duplicate/quota errors and positional Item(int).
+  MutableMap/setter semantics remain a separate design question, as recorded in the
+  prior review; no new author decision about JSON mutation is inferred.
+- **Gap discovered and fixed:** Serialize(Object)'s JSON-node fast path still caused
+  native compilation to traverse the generic reflection fallback. Lower unretained
+  property services to the existing fault without granting nominal reflection rights;
+  retain reached interface implementations for signature/storage-only concrete types
+  so the private projection verifies. This can retain additional accessor bodies.
+- **Outcome:** 16 JSON DOM cases pass native macOS ARM64 and interpreted execution;
+  four separate missing-field reads fault as expected. Backend regression and API
+  snapshot checks pass. Evidence: [JSON map qualification](../runtime/raven/tests/json-map-validation.json)
+  and [fault probe](experiments/json-map/README.md). Reference docs and website API
+  content now describe the implemented view; Windows runtime qualification is pending.
+- **Next:** the author's Date/TimeOfDay/LocalDateTime parsing request remains open;
+  this slice implements no time parser and does not settle accepted formats/cultures.

@@ -284,8 +284,9 @@ fn string_dispatch_target(input: &neoclr::Module, contract: usize) -> Result<Opt
 }
 
 /// Exact implicit implementations for classes constructed by the reachable program.
+/// Optional conformance types add verification-only roots; omit them for dispatch tables.
 /// Original conformance is verified before private projection; this is not a binder.
-pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>, array_backing: Option<usize>, reference_backings: &[usize]) -> Result<Vec<(usize, usize)>, Error> {
+pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>, array_backing: Option<usize>, reference_backings: &[usize], conformance_types: Option<&BTreeSet<usize>>) -> Result<Vec<(usize, usize)>, Error> {
     let f = &input.functions[contract];
     let display = object_dispatch_contract(f);
     if !interface_contract(input, f) && !display { return Ok(vec![]); }
@@ -293,6 +294,14 @@ pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usiz
         return Err("interface dispatch requires a bodyless nongeneric instance contract".into());
     }
     let mut constructed = BTreeSet::new();
+    if !display {
+        for &index in conformance_types.into_iter().flatten() {
+            let ty = &input.types[index];
+            if ty.is_reference_type && ty.representation == neoclr::metadata::Representation::Record && !ty.is_abstract {
+                constructed.insert(ty.name.as_str());
+            }
+        }
+    }
     let array_owner = array_backing.map(|i| Type::Named(input.types[i].name.clone())).or_else(|| byte_array_owner(input));
     for &i in reached {
         for &index in reference_backings {
@@ -383,75 +392,12 @@ pub(super) fn validate_source(input: &neoclr::Module, single_assembly: bool) -> 
     Ok(())
 }
 
-pub fn select(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Value), Error> {
-    select_inventory(input, root, true)
-}
-
-pub(super) fn select_inventory(
-    input: &neoclr::Module,
-    root: &str,
-    single_assembly: bool,
-) -> Result<(neoclr::Module, Value), Error> {
-    select_inventory_with_host_roots(input, root, single_assembly, &[], &[])
-}
-pub(super) fn select_inventory_with_host_roots(
-    input: &neoclr::Module, root: &str, single_assembly: bool, host_roots: &[usize], reference_backings: &[usize],
-) -> Result<(neoclr::Module, Value), Error> {
-    validate_source(input, single_assembly)?;
-    if host_roots.iter().any(|i| *i >= input.functions.len()) { return Err("host root index out of range".into()); }
-    let roots: Vec<_> = input
-        .functions
-        .iter()
-        .enumerate()
-        .filter(|(_, f)| f.name == root)
-        .map(|(i, _)| i)
-        .collect();
-    let [root_index] = roots.as_slice() else {
-        return Err("closed-world root must have one exact name match".into());
-    };
-    let mut functions = BTreeSet::new();
-    let mut pending = vec![*root_index];
-    pending.extend_from_slice(host_roots);
-    loop {
-        while let Some(i) = pending.pop() {
-            if !functions.insert(i) {
-                continue;
-            }
-            if functions.len() > crate::limits::FUNCTIONS {
-                return Err("selected functions exceed the value profile limit".into());
-            }
-            if object_dispatch_contract(&input.functions[i]) { continue; }
-            for op in &input.functions[i].body {
-                match op {
-                    Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) | Op::BindFunction { target, .. } => {
-                        if callable_invoke(target).is_some() { continue; }
-                        let callee = resolve(input, target)?;
-                        let f = &input.functions[callee];
-                        if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && !object_dispatch_contract(f) && !sealed_member(input, f) && !inherited_object_member(input, f) && (f.is_virtual || f.is_abstract || f.is_override) {
-                            return Err("virtual calls requiring dispatch need a later selection profile".into());
-                        }
-                        if matches!(op, Op::Call(_)) && object_dispatch_contract(f) {
-                            return Err("direct Object.ToString/Equals/GetHashCode calls require base-call lowering".into());
-                        }
-                        pending.push(callee);
-                    }
-                    _ => (), // Unsupported selected opcodes still fail ordinary AOT admission.
-                }
-            }
-        }
-        for &contract in &functions {
-            if let Some(target) = string_dispatch_target(input, contract)? {
-                if !functions.contains(&target) { pending.push(target); }
-            }
-            for (_, target) in dispatch_targets_with_array(input, contract, &functions, None, reference_backings)? {
-                if !functions.contains(&target) { pending.push(target); }
-            }
-        }
-        if pending.is_empty() { break; }
-    }
+// Signature/storage-only classes still need implementations of retained interface
+// contracts in the private verification projection, even without a constructor.
+fn retained_types(input: &neoclr::Module, functions: &BTreeSet<usize>, reference_backings: &[usize]) -> Result<BTreeSet<usize>, Error> {
     let mut types = BTreeSet::new();
     let mut pending_types = reference_backings.iter().map(|i| Type::Named(input.types[*i].name.clone())).collect::<Vec<_>>();
-    for &i in &functions {
+    for &i in functions {
         let f = &input.functions[i];
         pending_types.extend(f.owner.iter().cloned());
         pending_types.extend(f.parameters.iter().chain(&f.locals).cloned());
@@ -527,6 +473,77 @@ pub(super) fn select_inventory_with_host_roots(
             }
         }
     }
+    Ok(types)
+}
+
+pub fn select(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Value), Error> {
+    select_inventory(input, root, true)
+}
+
+pub(super) fn select_inventory(
+    input: &neoclr::Module,
+    root: &str,
+    single_assembly: bool,
+) -> Result<(neoclr::Module, Value), Error> {
+    select_inventory_with_host_roots(input, root, single_assembly, &[], &[])
+}
+pub(super) fn select_inventory_with_host_roots(
+    input: &neoclr::Module, root: &str, single_assembly: bool, host_roots: &[usize], reference_backings: &[usize],
+) -> Result<(neoclr::Module, Value), Error> {
+    validate_source(input, single_assembly)?;
+    if host_roots.iter().any(|i| *i >= input.functions.len()) { return Err("host root index out of range".into()); }
+    let roots: Vec<_> = input
+        .functions
+        .iter()
+        .enumerate()
+        .filter(|(_, f)| f.name == root)
+        .map(|(i, _)| i)
+        .collect();
+    let [root_index] = roots.as_slice() else {
+        return Err("closed-world root must have one exact name match".into());
+    };
+    let mut functions = BTreeSet::new();
+    let mut pending = vec![*root_index];
+    pending.extend_from_slice(host_roots);
+    loop {
+        while let Some(i) = pending.pop() {
+            if !functions.insert(i) {
+                continue;
+            }
+            if functions.len() > crate::limits::FUNCTIONS {
+                return Err("selected functions exceed the value profile limit".into());
+            }
+            if object_dispatch_contract(&input.functions[i]) { continue; }
+            for op in &input.functions[i].body {
+                match op {
+                    Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) | Op::BindFunction { target, .. } => {
+                        if callable_invoke(target).is_some() { continue; }
+                        let callee = resolve(input, target)?;
+                        let f = &input.functions[callee];
+                        if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && !object_dispatch_contract(f) && !sealed_member(input, f) && !inherited_object_member(input, f) && (f.is_virtual || f.is_abstract || f.is_override) {
+                            return Err("virtual calls requiring dispatch need a later selection profile".into());
+                        }
+                        if matches!(op, Op::Call(_)) && object_dispatch_contract(f) {
+                            return Err("direct Object.ToString/Equals/GetHashCode calls require base-call lowering".into());
+                        }
+                        pending.push(callee);
+                    }
+                    _ => (), // Unsupported selected opcodes still fail ordinary AOT admission.
+                }
+            }
+        }
+        let conformance_types = retained_types(input, &functions, reference_backings)?;
+        for &contract in &functions {
+            if let Some(target) = string_dispatch_target(input, contract)? {
+                if !functions.contains(&target) { pending.push(target); }
+            }
+            for (_, target) in dispatch_targets_with_array(input, contract, &functions, None, reference_backings, Some(&conformance_types))? {
+                if !functions.contains(&target) { pending.push(target); }
+            }
+        }
+        if pending.is_empty() { break; }
+    }
+    let types = retained_types(input, &functions, reference_backings)?;
     let rows: Vec<_> = functions.iter().copied().collect();
     let type_rows: Vec<_> = types.iter().copied().collect();
     let mut projected = input.clone();
@@ -612,7 +629,7 @@ pub(super) fn select_inventory_with_host_roots(
         }
         let display = object_dispatch_contract(&input.functions[*source]);
         if interface_contract(input, &input.functions[*source]) || display {
-            let targets = dispatch_targets_with_array(input, *source, &functions, None, reference_backings)?;
+            let targets = dispatch_targets_with_array(input, *source, &functions, None, reference_backings, None)?;
             let inventory = if display { &mut object_dispatch } else { &mut dispatch };
             inventory.push(json!({"contractCompiledIndex":compiled,"contractSourceIndex":source, "kind":input.functions[*source].name.rsplit('.').next(),
                 "targets":targets.iter().map(|(ty, method)| json!({"typeCompiledIndex":type_rows.binary_search(ty).unwrap(),"functionCompiledIndex":rows.binary_search(method).unwrap()})).collect::<Vec<_>>() }));

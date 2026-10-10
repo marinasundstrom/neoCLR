@@ -78,11 +78,17 @@ Batch `ip-address-values` adds 7 tests for public IPAddress parsing corpus, cano
 Batch `uri-resolution` adds 11 passing native/interpreted tests for URI resolution,
 grammar, equality and byte quotas ([evidence](../runtime/raven/tests/uri-resolution-validation.json)).
 This completes local migration of the ten selected batches: 69 added cases, 139 total
-library tests. Gaps exposed by these tests were fixed rather than retained as native
+library tests. The Windows action at 898fc8a4 subsequently completed successfully
+([run](https://github.com/marinasundstrom/neoCLR/actions/runs/38067140698));
+its artifacts have not yet been independently audited. Gaps exposed by these tests were fixed rather than retained as native
 admission exceptions. Final Object-slot/shift checks and Windows object emission pass;
 Windows runtime qualification remains pending. A subsequent slice adds Map getter
-indexers and MutableMap/HashMap setters, preserving safe Find lookup. JsonObject map
-conformance remains the agreed follow-up API work.
+indexers and MutableMap/HashMap setters, preserving safe Find lookup. JsonObject now also implements a read-only Map view with safe lookup, a faulting
+string indexer and ordered snapshots. Its expanded 16-case JSON suite passes both
+local modes ([evidence](../runtime/raven/tests/json-map-validation.json)), with four
+isolated missing-field checks. Native serializer fallback admission and retained-type
+conformance gaps exposed by the new tests are fixed; nominal reflection still needs
+explicit retention. Time Parse APIs remain the next author-directed library review.
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

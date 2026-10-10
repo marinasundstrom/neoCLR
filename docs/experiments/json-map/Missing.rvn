@@ -1,0 +1,15 @@
+module JsonMapFaults
+
+import System.Collections.*
+import System.Data.Json.*
+
+func Main(args: string[]) -> int {
+    let document = JsonObject()
+    if args.Length == 0 {
+        _ = document["missing"]
+    } else {
+        let map: Map<string, JsonValue> = document
+        _ = map["missing"]
+    }
+    return 99
+}

@@ -519,7 +519,8 @@ for runtime adapter, typed mapper and independent HTTP peer results.
 ## JsonObject as an indexable map — author follow-up, 2026-10-10
 
 The author asks to review `JsonObject` as an indexable `Map<string, JsonValue>`.
-This is planned API work, not implemented behavior. The current class exposes
+At the initial review this was planned API work; implementation is recorded below.
+The class then exposed
 Count, Field, Item, Name and duplicate-rejecting Add; Map exposes Count, Keys,
 Find, ContainsKey and Iterable<KeyValuePair<K,V>>, but no indexer.
 
@@ -554,5 +555,31 @@ indexing returning V, with a missing-key fault, and a MutableMap setter using th
 existing insert-or-replace semantics. Find remains the safe Option-returning path.
 Apply the same missing-key distinction to JsonObject: JsonNull is an existing node,
 not an absent entry. This resolves the indexer return-type question above. General
-map indexers and JsonObject conformance are still implementation work; JSON setter
+map indexers and JsonObject conformance were implementation work at this point; JSON setter
 quota failures must remain explicit in its documentation and tests.
+
+### Implemented read-only map view (2026-10-10)
+
+JsonObject now implements `Map<string, JsonValue>`. Its string indexer returns the
+original node and faults on a missing field. Find returns Some(node), including a
+present JsonNull, or None for absence. ContainsKey compares exact ordinal names,
+matching Field and Add. Field retains its typed MissingField error, and positional
+Item/Name remain available. These additions do not change the JSON document format.
+
+Keys and GetIterator return shallow snapshots in insertion order. Iterators retain
+node references; subsequent Add calls do not extend an existing snapshot. Nested
+nodes remain shared and mutable. Snapshot construction allocates proportional to
+the field count (currently bounded at 31); no concurrency or deep-copy guarantee is
+introduced. Ordinary map consumers and KeyValuePair deconstruction are supported.
+
+This adopts the dictionary view used by System.Text.Json.JsonObject while preserving
+neoCLR's explicit JsonNull representation and duplicate-rejecting, Result-returning
+Add. JsonObject deliberately does not implement MutableMap in this slice. A setter
+requires a separate decision about quota errors, replacement and insertion order;
+the original author clarification about MutableMap setters remains applicable to
+that interface. Find or Field should be preferred when a missing field is expected.
+
+JsonSerializer's existing JsonValue branch precedes generic object mapping, so
+adding Map conformance must not reinterpret JSON nodes as ordinary objects. The
+framework tests exercise that boundary through an Object holding the map view.
+See [map tests and terminal-fault probe](experiments/json-map/README.md) for evidence.

@@ -191,12 +191,21 @@ pub fn prepare(
         reflection_roots.extend(super::reflection_properties::bind(&mut joined, &source_metadata, &types, &methods, retention)?);
         super::reflection_collections::bind(&mut joined, &source_metadata, &types, retention)?;
         super::reflection_snapshots::bind(&mut joined, &source_metadata, &types, retention)?;
-    } else if super::runtime_context::has_queries(&joined, &source_metadata) {
-        // A direct executing-assembly query itself retains its descriptive identity.
+    } else if super::runtime_context::has_queries(&joined, &source_metadata)
+        || joined.functions.iter().any(|f| matches!(f.name.as_str(),
+            "neoCLR.Runtime.ReflectionPropertyGet" | "neoCLR.Runtime.ReflectionPropertyGetCheck"
+            | "neoCLR.Runtime.ReflectionPropertySet" | "neoCLR.Runtime.ReflectionPropertySetCheck")) {
+        // APIs may contain reflection fallbacks without retaining any properties.
         // This internal plan is not admission of an empty user roots policy, and
-        // grants neither a module catalog nor type/member execution rights.
+        // grants neither a module catalog nor nominal type/member execution rights.
+        // Direct executing-assembly queries still retain their descriptive identity.
         let mut retention = json!({"types":[],"moduleCatalogs":[],"propertyBindings":[],
-            "policy":"source executing-assembly queries; no general reflection roots"});
+            "policy":"source queries and guarded reflection fallbacks; no general reflection roots"});
+        // Generic APIs may contain a reflection fallback even when their runtime
+        // input is an intrinsic JSON node. Lower unretained property operations to
+        // the existing explicit fault instead of leaving raw InternalCalls behind.
+        reflection_roots.extend(super::reflection_properties::bind(&mut joined, &source_metadata, &types, &methods, &mut retention)?);
+        super::reflection_collections::bind(&mut joined, &source_metadata, &types, &mut retention)?;
         super::reflection_snapshots::bind(&mut joined, &source_metadata, &types, &mut retention)?;
         reflection_retention = Some(retention);
     }

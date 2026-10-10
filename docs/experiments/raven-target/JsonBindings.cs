@@ -19,11 +19,16 @@ public struct JsonError { public struct Syntax { } public struct LimitExceeded {
 public abstract class JsonValue {
     protected JsonValue() { }
 }
-public sealed class JsonObject : JsonValue {
+public sealed class JsonObject : JsonValue, Collections.Map<string, JsonValue> {
     public JsonObject() { }
     public int Count => default;
+    public Collections.Sequence<string> Keys => default;
+    public JsonValue this[string name] => default;
+    public Option<JsonValue> Find(string name) => default;
+    public bool ContainsKey(string name) => default;
+    public Collections.Iterator<Collections.KeyValuePair<string, JsonValue>> GetIterator() => default;
     public Result<JsonValue, JsonError> Field(string name) => default;
-    public Result<JsonValue, JsonError> Item(int index) => default;
+    public Result<JsonValue, JsonError> PositionalItem(int index) => default;
     public Result<string, JsonError> Name(int index) => default;
     public Result<PropagationUnit, JsonError> Add(string name, JsonValue value) => default;
 }
@@ -117,6 +122,9 @@ internal sealed class JsonClientRead {
 }
 """;
     public static void Project(ModuleDefinition module) {
+        // C# cannot declare a method named Item beside its default indexer.
+        // Restore the actual Raven/CLI contract in this declaration-only bridge.
+        module.GetType(Prefix + "JsonObject").Methods.Single(m => m.Name == "PositionalItem").Name = "Item";
         var constructor = module.GetType(Marker).Methods.Single(m => m.IsConstructor);
         var attribute = new CustomAttribute(constructor);
         attribute.ConstructorArguments.Add(new CustomAttributeArgument(constructor.Parameters[0].ParameterType,

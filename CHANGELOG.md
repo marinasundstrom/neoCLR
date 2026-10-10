@@ -8,6 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add a read-only Map<string, JsonValue> view to JsonObject: faulting string indexer,
+  safe Find/ContainsKey and insertion-order key/pair snapshots with shared nodes.
+  Preserve explicit JsonNull, duplicate/quota Add results and positional Item(int).
+  Add four framework cases and four isolated missing-field executions; refresh
+  aggregate/native API references and document the declaration-only C# Item rename.
+- Fix native Serialize(Object) admission without reflection roots for intrinsic JSON
+  nodes: unretained property services still fault and grant no nominal member rights.
+  Retain interface implementations for signature/storage-only concrete types in the
+  private verification projection, with constructed-receiver dispatch unchanged.
+  Add regression tests; this conservative retention can include additional bodies.
+  All 16 JSON DOM cases pass native macOS ARM64 and interpreted execution; Windows
+  qualification of this slice remains pending.
+
 - Record the author's time-parsing follow-up: Date, TimeOfDay and LocalDateTime,
   with a related-type audit. Existing source has no Parse/TryParse on the reviewed
   time values; formats, culture behavior and parser implementation remain planned.
@@ -17,7 +30,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Setters insert or replace using the existing comparer and preserve stored keys.
   Existing custom map implementations must add the accessors. Add positive framework
   and six isolated missing-key executions; refresh aggregate/native API references. This does
-  not yet add JsonObject map conformance or a concurrency guarantee.
+  not add a concurrency guarantee; JsonObject conformance follows in this date’s slice.
 
 - Finish the ten-batch runtime test migration with eleven URI tests covering the
   resolution corpus, grammar errors, equality/dispatch and byte quotas. All eleven
@@ -36,7 +49,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   JSON-null, iteration and mutation contracts. The author specifies faulting getter
   indexers on Map and insert-or-replace setters on MutableMap; Find remains the
   preferred safe lookup. Map indexers are now implemented; JsonObject conformance
-  remains planned API work.
+  is implemented in the subsequent slice recorded above.
 
 - Close the compiler gap exposed by MemoryStream/JSON migration: the matching Raven
   compiler now emits full-width long and null-safe String constant patterns.

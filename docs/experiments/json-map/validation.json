@@ -1,0 +1,82 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "date": "2026-10-10",
+  "cases": [
+    {
+      "mode": "native",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/json-map-missing/app"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: JsonObject field not found\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.T_53797374656D2E446174612E4A736F6E_4A736F6E4F626A656374.M_6765745F4974656D [instruction 45]\n   at NeoMetadata_5B2FBE3CF00D0D0B64F9B2C0BCCEAAA4AED05BBA9BC9A46305A7F4848070F89C.F_3C4E656F46756E6374696F6E3E34413733364636453444363137303436363137353643373437335F3444363136393645 [instruction 10]\n"
+    },
+    {
+      "mode": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/json-map-missing/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/json-map-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/json-map-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/json-map-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/json-map-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/json-map-bundle/bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/json-map-bundle/bundle/lib/System.Runtime.dll",
+        "--"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: JsonObject field not found\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.T_53797374656D2E446174612E4A736F6E_4A736F6E4F626A656374.M_6765745F4974656D [instruction 45]\n   at NeoMetadata_5B2FBE3CF00D0D0B64F9B2C0BCCEAAA4AED05BBA9BC9A46305A7F4848070F89C.F_3C4E656F46756E6374696F6E3E34413733364636453444363137303436363137353643373437335F3444363136393645 [instruction 10]\n"
+    },
+    {
+      "mode": "native",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/json-map-missing/app",
+        "map"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: JsonObject field not found\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.T_53797374656D2E446174612E4A736F6E_4A736F6E4F626A656374.M_6765745F4974656D [instruction 45]\n   at NeoMetadata_5B2FBE3CF00D0D0B64F9B2C0BCCEAAA4AED05BBA9BC9A46305A7F4848070F89C.F_3C4E656F46756E6374696F6E3E34413733364636453444363137303436363137353643373437335F3444363136393645 [instruction 18]\n"
+    },
+    {
+      "mode": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/json-map-missing/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/json-map-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/json-map-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/json-map-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/json-map-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/json-map-bundle/bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/json-map-bundle/bundle/lib/System.Runtime.dll",
+        "--",
+        "map"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: JsonObject field not found\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.T_53797374656D2E446174612E4A736F6E_4A736F6E4F626A656374.M_6765745F4974656D [instruction 45]\n   at NeoMetadata_5B2FBE3CF00D0D0B64F9B2C0BCCEAAA4AED05BBA9BC9A46305A7F4848070F89C.F_3C4E656F46756E6374696F6E3E34413733364636453444363137303436363137353643373437335F3444363136393645 [instruction 18]\n"
+    }
+  ],
+  "passed": true,
+  "sha256": {
+    "target/json-map-missing/app": "428ec8746d3f6de208bf673e6e69179f5c78e7cd6b39492dc413c20a94604892",
+    "target/json-map-missing/app.dll": "63f58d29c9e0fb3095c388602f6c83c0d4e14c36e2f3cf24502681283f5acf73",
+    "docs/experiments/json-map/Missing.rvn": "90df8a7d4233abcd285ce750a73c9aed559033d9f4111e5c0acfec6ad825e5cc",
+    "target/json-map-bundle/bundle/manifest.json": "3a951541fcb5bacfccd160c560d9abfa612aafb221d1994fc92aede1ad4bbf77",
+    "target/release/neoclr": "12516b4780dbc636bb0fe5b717826e046d931422153e823239e6ddadf5769fc6"
+  }
+}

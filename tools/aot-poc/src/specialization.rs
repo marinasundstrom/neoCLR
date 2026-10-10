@@ -561,7 +561,19 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
                 let instance = context.resolve(&reference)?;
                 if !visited.contains(&instance.row) { pending.push(instance); }
             }
-            for owner in &constructed {
+            // Keep conformance for descriptor/signature-only classes as well as
+            // executable receivers. Their getters can themselves need closed shapes.
+            let mut receivers = constructed.clone();
+            if !super::selection::object_dispatch_contract(&contract) {
+                for shape in &context.shapes {
+                    let ty = &input.types[shape.source];
+                    if !ty.is_reference_type || ty.is_abstract || ty.representation != neoclr::metadata::Representation::Record { continue; }
+                    let owner = if shape.arguments.is_empty() { Type::Named(ty.name.clone()) }
+                        else { Type::Constructed { definition: ty.name.clone(), arguments: shape.arguments.clone() } };
+                    if !receivers.contains(&owner) { receivers.push(owner); }
+                }
+            }
+            for owner in &receivers {
                 if *owner == Type::String { continue; }
                 if !super::selection::object_dispatch_contract(&contract) && !super::selection::implements_interface(input, owner, contract.owner.as_ref().unwrap()) { continue; }
                 let definition = input.type_definition(owner).ok_or("constructed interface implementor requires local definition")?;
@@ -728,6 +740,51 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn signature_only_classes_retain_closed_interface_conformance() {
+        let input = neoclr::assemble(".module SignatureConformance
+.entry Main
+.interface Readable<T>
+.method instance Read() -> T
+.end
+.end
+.type class Descriptor<T>
+.implements Readable<T>
+.field Value T
+.method instance Read() -> T
+ldarg 0
+ldfld Descriptor<T>::Value
+ret
+.end
+.method instance Unused() -> Int32
+ldc.i4 99
+ret
+.end
+.end
+.function Main() -> Int32
+.local Descriptor<Int32> descriptor
+ldloca descriptor
+initobj Descriptor<Int32>
+ldc.bool false
+brfalse Done
+ldloc descriptor
+castclass Readable<Int32>
+callvirt instance Readable<Int32>::Read()
+ret
+Done:
+ldc.i4 42
+ret
+.end").unwrap();
+        neoclr::verify(&input).unwrap();
+        let (expanded, _) = expand(&input, "Main").unwrap();
+        let (selected, report) = super::super::selection::select(&expanded, "Main").unwrap();
+        neoclr::verify(&selected).unwrap();
+        assert!(selected.functions.iter().any(|f| f.name == "Descriptor.Read"));
+        assert!(!selected.functions.iter().any(|f| f.name.ends_with(".Unused")));
+        assert!(report["interfaceDispatch"].as_array().unwrap().iter().all(|r| r["targets"].as_array().unwrap().is_empty()));
+        assert_eq!(neoclr::LoadedProgram::new(&selected).unwrap().run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    }
 
     #[test]
     fn deeply_nested_type_dependencies_fail_without_overflowing_the_host_stack() {

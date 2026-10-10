@@ -128,3 +128,82 @@ func CheckJsonDocument(input: string, canonical: string) -> Result<unit, TestFai
     }
     return Assert.Equal(canonical, copiedText)
 }
+
+[Test("JSON map lookup distinguishes null absence and ordinal keys")]
+func JsonMapLookup() -> Result<unit, TestFailure> {
+    let document = JsonObject()
+    let nullNode = JsonNull()
+    let textNode = JsonString("text")
+    _ = Assert.True(document.Add("name", nullNode) is Ok(_), "Insert explicit null")?
+    _ = Assert.True(document.Add("Name", textNode) is Ok(_), "Case-distinct key")?
+    let map: System.Collections.Map<string, JsonValue> = document
+    _ = Assert.Equal(2, map.Count)?
+    _ = Assert.True(Object.ReferenceEquals(nullNode, map["name"]), "Indexer retains JsonNull identity")?
+    _ = Assert.True(Object.ReferenceEquals(textNode, document["Name"]), "Concrete indexer retains node identity")?
+    if map.Find("name") is System.Option<JsonValue>.Some(let node) {
+        _ = Assert.True(Object.ReferenceEquals(node, nullNode), "Find distinguishes present null")?
+    } else {
+        return Assert.True(false, "Present JsonNull must be Some")
+    }
+    _ = Assert.True(map.Find("absent") is System.Option<JsonValue>.None, "Absent key is None")?
+    return Assert.True(map.ContainsKey("name") && !map.ContainsKey("NAME"), "Keys use ordinal equality")
+}
+
+[Test("JSON map snapshots preserve insertion order and node identity")]
+func JsonMapSnapshot() -> Result<unit, TestFailure> {
+    let document = JsonObject()
+    let first = JsonString("first")
+    let second = JsonArray()
+    _ = Assert.True(document.Add("雪", first) is Ok(_), "Insert first field")?
+    _ = Assert.True(document.Add("second", second) is Ok(_), "Insert second field")?
+    let map: System.Collections.Map<string, JsonValue> = document
+    let keys = map.Keys
+    use pairs = map.GetIterator()
+    _ = Assert.True(document.Add("later", JsonBoolean(true)) is Ok(_), "Mutate after snapshots")?
+    _ = Assert.Equal(2, keys.Count)?
+    _ = Assert.Equal("雪", keys[0])?
+    _ = Assert.Equal("second", keys[1])?
+    // Deliberately drive the snapshot captured before mutation.
+    _ = Assert.True(pairs.MoveNext(), "First pair exists")?
+    let (key, value) = pairs.Current
+    _ = Assert.Equal("雪", key)?
+    _ = Assert.True(Object.ReferenceEquals(first, value), "First node identity retained")?
+    _ = Assert.True(pairs.MoveNext(), "Second pair exists")?
+    let pair = pairs.Current
+    _ = Assert.Equal("second", pair.Key)?
+    _ = Assert.True(Object.ReferenceEquals(second, pair.Value), "Second node identity retained")?
+    _ = Assert.True(!pairs.MoveNext(), "Snapshot excludes later addition")?
+    var count = 0
+    for entry in map {
+        count += 1
+    }
+    return Assert.Equal(3, count)
+}
+
+[Test("JSON map views keep JSON node serialization precedence")]
+func JsonMapSerialization() -> Result<unit, TestFailure> {
+    let Ok(node) = JsonSerializer.DeserializeNode("{\"name\":null,\"nested\":[true,{\"x\":1}]}") else {
+        return Assert.True(false, "Parse nested object")
+    }
+    if node is JsonObject document {
+        let map: System.Collections.Map<string, JsonValue> = document
+        let boxed: Object = map
+        _ = Assert.True(map["nested"] is JsonArray, "Parsed object supports map access")?
+        let Ok(text) = JsonSerializer.Serialize(boxed) else {
+            return Assert.True(false, "Serialize node through Object")
+        }
+        return Assert.Equal("{\"name\":null,\"nested\":[true,{\"x\":1}]}", text)
+    }
+    return Assert.True(false, "Parsed root must be JsonObject")
+}
+
+[Test("Empty JSON objects support empty map snapshots and safe lookup")]
+func JsonMapEmpty() -> Result<unit, TestFailure> {
+    let map: System.Collections.Map<string, JsonValue> = JsonObject()
+    _ = Assert.Equal(0, map.Count)?
+    _ = Assert.Equal(0, map.Keys.Count)?
+    use pairs = map.GetIterator()
+    _ = Assert.True(!pairs.MoveNext(), "Empty pair iterator")?
+    _ = Assert.True(!map.ContainsKey("missing"), "Empty membership")?
+    return Assert.True(map.Find("missing") is System.Option<JsonValue>.None, "Empty safe lookup")
+}

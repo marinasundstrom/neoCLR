@@ -7754,3 +7754,36 @@ compiler/documentation reference mirrors these signatures with declaration-only
 bodies; it is not an executable library. Use matching rebuilt runtime/reference
 artifacts. Native source property metadata is the replacement for that aggregate
 CLI reference; neoCLR owns the projection. Safe Find lookup remains unchanged.
+
+### JsonObject map view and rootless JSON-node serialization (2026-10-10)
+
+JsonObject implements Map<string, JsonValue> with an ordinary Raven getter indexer.
+Its existing positional Item(int) method coexists with the CLI Item property.
+C# declaration authoring rejects that name combination: the aggregate reference
+bridge temporarily names the positional method PositionalItem, then restores Item
+with Cecil before emission. This declaration-only bridge loses executable behavior;
+Raven/native metadata retain both real members without renaming. neoCLR owns this
+workaround, to be removed with the aggregate reference bridge. Runtime Contract
+configuration and Raven binding/emission are unchanged; matching runtime/reference
+artifacts and compiler b2f3ba0f8b8e92f0c516155f563b332b0a6fad54 are required.
+
+Serialize(Object) must preserve the existing JSON-node-first path even without
+explicit reflection roots. The native linker now lowers property services under an
+internal empty retention plan to the existing unretained-metadata fault. This grants
+no nominal property/constructor rights; user root files still require their existing
+nonempty policy. Closed intrinsic collection adapters and descriptive snapshots use
+the existing binders. No module catalog is implicitly authorized.
+
+Private specialization/selection also retains implementations of reached interface
+contracts for concrete classes reachable only through signatures or storage. This
+keeps the verification projection well formed, while dispatch tables still enumerate
+constructed receivers. Original source verification remains mandatory; no source
+conformance/access rules are relaxed. The cost is retaining some additional accessor
+bodies; finer trimming would need a separate proof-preserving representation. This
+is a backend correction, not a new .NET/Raven semantic rule or reflection permission.
+Native metadata/codegen remains the replacement for private projected identities.
+
+Validation: the signature-only closed-generic conformance regression and all four
+unretained-property service cases pass in the focused backend tests. The JSON DOM
+framework and missing-field probe provide executable integration evidence linked
+from runtime/raven/tests/README.md; Windows execution remains separately qualified.

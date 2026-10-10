@@ -1575,3 +1575,15 @@ implementations must add the accessors. All three existing selected public types
 have Item property XML summaries, parameter/value descriptions and native source
 comments. Refresh both the aggregate reference and native snapshot with this API.
 No public type exclusion or renderer workaround is needed.
+
+### JsonObject map view (development, 2026-10-10)
+
+JsonObject now implements Map<string, JsonValue> with a string indexer, Keys, Find,
+ContainsKey and GetIterator. Existing positional Item(int), Field and Add retain
+their contracts. Source XML and authored member XML describe absence versus JsonNull,
+terminal missing-key faults, shallow insertion-order snapshots and owned iterators.
+The existing JsonObject type remains selected; both reference snapshots include the
+new members, with no exclusions. The C# aggregate declaration bridge temporarily
+names Item(int) PositionalItem, then restores its real CLI name after compilation:
+C# rejects a method named Item alongside its default indexer, while the native Raven
+metadata carries both. Neither temporary names nor declaration bodies are public APIs.

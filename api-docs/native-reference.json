@@ -1,21 +1,21 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "0f10605c7c92e8b85a465cd7336e63b1b2a0d15e504041bd4b2bbe1ecae5887f",
-  "librarySourceRevision": "898fc8a4d8b676ed3751d8cbf1d494de05836ccb",
+  "sha256": "fd6cb7ce2bf6ebd3bc8d1d517ce0f93f2e3cc69d03adafe047e91ab4ea78c189",
+  "librarySourceRevision": "ee21653d3d0f2582932eff3fe8b3d3e17b2d791d",
   "compilerRevision": "b2f3ba0f8b8e92f0c516155f563b332b0a6fad54",
-  "rendererRevision": "cf45f8691eba0d05c1ed462d2c497cf14b3753e8",
+  "rendererRevision": "dc82607e2b0aeaf649086f103ef67967c0c0ae62",
   "libraryArtifacts": {
-    "System.Runtime.dll": "e3b6c6a999ac44794479b74cee9872cc8f0ca1a45bf781fc9dcbe5d69a62d945",
-    "System.Data.dll": "0e2af4f9dbafaf7490238880d5edbc344eea7b31175fc496ad572d13b893841a",
-    "System.Networking.dll": "a971f39162db81e18179addd8ed7a701e3ec80b4fb04bb9adf6f3f587335aa89",
-    "System.Web.dll": "1b875fceb861a9b7127a4a76cdb634e995c94b8f67fcf71863d297a78a0ea7d4",
+    "System.Runtime.dll": "7c475fa67ab1d51c90b2d79da46d2f960b12ca34f481d19dc5864201399071a4",
+    "System.Data.dll": "ff4c1a3ac10c0770178e5f07138a1772eed344f93d3135be682c46648924482e",
+    "System.Networking.dll": "5d65c09be8193298b4d386c165fc69943fae9b6b676a85e9a6292a219b95e992",
+    "System.Web.dll": "c36ff486b71c4117bd2f2ee255e1db17717093e7c2c94034cbc4544d9579fb0c",
     "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
     "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
   },
   "renderingEvidence": {
-    "normalized-sidecars.json": "4282e7d7e02ed479d45b8082c63ec0e6fe4fc4b687b75b6093da56d259ef9952",
-    "restored-xml-comments.json": "96f68f8f47b573d23a003059f4b22b2ff4981f5e55061f5953bd7fa314cccb5c"
+    "normalized-sidecars.json": "08d582dce224233119b0dc84959822ddfc67f17d02bef5351db89984ac27b55f",
+    "restored-xml-comments.json": "dc12492f8b95973c2db9f89a095f3d8049f06da86d870b6a0923a9537b04effe"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

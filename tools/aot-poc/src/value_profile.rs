@@ -210,7 +210,7 @@ impl<'a> Profile<'a> {
             let interface = references && crate::selection::interface_contract(input, f);
             if interface {
                 let reached = (0..input.functions.len()).collect();
-                p.dispatch.insert(i, crate::selection::dispatch_targets_with_array(input, i, &reached, array_backing, reference_backings)?);
+                p.dispatch.insert(i, crate::selection::dispatch_targets_with_array(input, i, &reached, array_backing, reference_backings, None)?);
             }
             if ((f.is_virtual || f.is_abstract) && !interface)
                 || f.is_override

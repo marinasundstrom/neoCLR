@@ -485,3 +485,18 @@ preserved keys, Set interoperability and colliding growth pass both local modes
 ([evidence](map-indexers-validation.json)). Six isolated missing-key executions
 also pass ([terminal-fault probe](../../../docs/experiments/map-indexers/README.md));
 these cannot run inside the continuation-oriented runner because Fault is terminal.
+
+### JsonObject map view
+
+The JSON DOM suite now contains 16 tests, with 144 library tests overall. Four new
+cases cover safe lookup and explicit JsonNull, ordinal names, concrete/interface
+indexers, empty maps, ordered snapshots and node identity. Serialize(Object) keeps
+a JsonObject's JSON-node behavior even when the object was viewed as Map; native
+execution of this case requires no nominal reflection roots.
+
+[JSON map qualification](json-map-validation.json): all 16 pass native macOS ARM64
+and interpreted execution. [Four isolated faults](../../../docs/experiments/json-map/validation.json)
+cover missing-field reads through concrete and Map views in both modes. All 32
+backend unit checks and the API snapshot checks pass. Native selection conservatively
+retains reached interface implementations on signature/storage-only concrete types;
+dispatch receivers remain constructed objects. Windows execution is pending.

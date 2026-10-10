@@ -325,3 +325,36 @@ pub fn bind(
     retention["accessorRoots"] = json!(roots.iter().map(|i| &methods[*i]).collect::<Vec<_>>());
     Ok(roots)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_internal_retention_faults_instead_of_granting_property_access() {
+        for (name, setter, check) in [
+            ("ReflectionPropertyGet", false, false),
+            ("ReflectionPropertyGetCheck", false, true),
+            ("ReflectionPropertySet", true, false),
+            ("ReflectionPropertySetCheck", true, true),
+        ] {
+            let parameters = if setter {
+                "RuntimeTypeHandle,Int32,System.Object,System.Object"
+            } else {
+                "RuntimeTypeHandle,Int32,System.Object"
+            };
+            let result = if check { "Int32" } else if setter { "Void" } else { "System.Object" };
+            let extra = if setter { "ldloc receiver\n" } else { "" };
+            let text = format!(".module DeniedProperties\n.type class System.Object\n.end\n.function neoCLR.Runtime.{name}({parameters}) -> {result}\n.methodimpl InternalCall\n.end\n.entry Main\n.function Main() -> Int32\n.local System.Object receiver\nldloca receiver\ninitobj System.Object\nldtoken System.Object\nldc.i4 0\nldloc receiver\n{extra}call neoCLR.Runtime.{name}({parameters})\npop\nldc.i4 0\nret\n.end");
+            let source = neoclr::assemble(&text).unwrap();
+            let mut projected = source.clone();
+            let methods = source.functions.iter().map(|f| f.definition.clone().unwrap()).collect::<Vec<_>>();
+            let mut retention = json!({"types":[]});
+            assert!(bind(&mut projected, &source, &[], &methods, &mut retention).unwrap().is_empty());
+            let program = neoclr::LoadedProgram::new(&projected).unwrap();
+            let fault = program.run(neoclr::Limits::default()).unwrap_err();
+            assert!(fault.to_string().contains("metadata was not retained"), "{name}: {fault}");
+            assert_eq!(retention["accessorRoots"], json!([]));
+        }
+    }
+}

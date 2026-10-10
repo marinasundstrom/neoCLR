@@ -9,13 +9,57 @@ public sealed class JsonValue {
     protected init() { }
 }
 
-public class JsonObject : JsonValue {
+/// <summary>A JSON object with ordinal field names and a read-only map view.</summary>
+/// <remarks>Field and Find provide safe lookup. The indexer faults when a field is absent. Keys and pair iteration are shallow snapshots in insertion order; JsonNull remains an explicit present value. Mutation uses duplicate-rejecting, quota-aware Add.</remarks>
+public class JsonObject : JsonValue, Map<string, JsonValue> {
     private var names: ArrayList<string> = ArrayList<string>()
     private var values: ArrayList<JsonValue> = ArrayList<JsonValue>()
 
     init(): base() { }
 
     val Count: int => values.Count
+
+    /// <summary>Gets a shallow snapshot of field names in insertion order.</summary>
+    val Keys: Sequence<string> => names.Copy()
+
+    /// <summary>Gets an existing JSON field value.</summary>
+    /// <param name="name">The exact ordinal field name.</param>
+    /// <remarks>Missing fields cause a terminal Fault. Prefer Field or Find when absence is expected. A present JsonNull is returned unchanged.</remarks>
+    val self[name: string]: JsonValue {
+        get {
+            for index in 0..<names.Count {
+                if names[index].Equals(name) {
+                    return values[index]
+                }
+            }
+            System.Fail("JsonObject field not found")
+        }
+    }
+
+    /// <summary>Finds a field, returning None when absent and Some for every present node, including JsonNull.</summary>
+    /// <param name="name">The exact ordinal field name.</param>
+    func Find(name: string) -> Option<JsonValue> {
+        if Field(name) is Ok(let value) {
+            return Option<JsonValue>.Some(value)
+        }
+        return Option<JsonValue>.None
+    }
+
+    /// <summary>Tests whether an exact ordinal field name is present.</summary>
+    /// <param name="name">The field name to test.</param>
+    func ContainsKey(name: string) -> bool {
+        return Find(name) is Option<JsonValue>.Some(_)
+    }
+
+    /// <summary>Returns a shallow snapshot of field pairs in insertion order.</summary>
+    /// <returns>An owned iterator retaining the original node references. Later additions do not alter its pairs.</returns>
+    func GetIterator() -> Iterator<KeyValuePair<string, JsonValue>> {
+        let pairs = ArrayList<KeyValuePair<string, JsonValue>>(names.Count)
+        for index in 0..<names.Count {
+            pairs.Add(KeyValuePair<string, JsonValue>(names[index], values[index]))
+        }
+        return pairs.GetIterator()
+    }
 
     func Field(name: string) -> Result<JsonValue, JsonError> {
         for index in 0..<names.Count {
