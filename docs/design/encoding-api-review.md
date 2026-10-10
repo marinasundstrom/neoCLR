@@ -183,3 +183,20 @@ custom decoded expansion, zero-progress output, input-error propagation and
 maximum writer/input quotas. All eight pass native macOS ARM64 and interpreted execution
 ([qualification](../../runtime/raven/tests/encoding-boundaries-validation.json)). Existing unaffected MemoryStream/JSON
 evidence is reused; no blanket platform parity or complete encoding matrix is claimed.
+
+## Why Utf8 is public — author question, 2026-10-10
+
+The author asked why the Utf8 class exists. Its current implementation is a thin
+library boundary over RuntimeServices.Utf8Encode/Utf8Decode. Encode returns a byte
+sequence directly for an already-valid UTF-8 String; Decode snapshots its input and
+returns InvalidUtf8Error on malformed bytes. It has no encoding-session quota.
+Encodings.Utf8 implements the generic provider/session policy on top of that
+primitive, with EncodingError and bounded requests.
+
+That implementation layering does not by itself justify two public conversion
+surfaces. Assistant recommendation: make Encoding the ordinary public entry point
+for paired one-shot and streaming conversion; retain low-level UTF-8 primitives
+internally unless a distinct public use case is demonstrated. This would require
+migration of Utf8 consumers and error/limit contracts, not merely a class rename.
+The author has asked the question, not yet selected this API change. No removal or
+renaming is implemented here.

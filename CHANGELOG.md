@@ -20,6 +20,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add eight further passing reader/stream boundary cases for Unicode lines and EOF,
   custom decoded expansion, zero-progress output, input/flush failures and maximum
   input/write quotas. The three batches total 24 tests; library behavior is unchanged.
+  Explain the Utf8 primitive/provider split and record the proposal to consolidate
+  ordinary public conversion through Encoding; no API removal is implemented.
 
 - Add Date, TimeOfDay and LocalDateTime Parse overloads using current or explicit
   Culture and Result<T, DateTimeParseError>. Support the existing invariant, Swedish

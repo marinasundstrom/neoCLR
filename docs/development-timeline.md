@@ -13961,3 +13961,16 @@ claim completion of in-process test discovery.
   interpreter; the three encoding batches total 24 cases. Existing MemoryStream
   and JSON stream evidence is reused. Windows qualification and direct decoder/drain
   maximum-buffer fixtures remain open. No library implementation changes were needed.
+
+## 2026-10-10 — Why expose Utf8 separately?
+
+- **Author question:** “Why do we have the Utf8 class?”
+- **Assistant explanation:** distinguish the direct valid-UTF-8 String/byte
+  primitives from Encoding provider/session policy, noting their different errors
+  and limits.
+- **Assistant recommendation:** prefer Encoding as the ordinary public conversion
+  entry point, with low-level primitives internal unless a concrete public use case
+  warrants them. Record migration considerations in the
+  [encoding review](design/encoding-api-review.md).
+- **Status:** explanation and proposal only; no author selection, API removal or
+  compatibility change is inferred. Encoding buffer qualification continues.
