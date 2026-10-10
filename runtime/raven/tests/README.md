@@ -434,3 +434,10 @@ The primitive parser suite currently rejects native closed generic `Single` resu
 at selection. Its twelve cases pass interpreted; this records the first admission
 gap rather than claiming all later parser bindings are implemented. Generic numeric
 operator and JSON conversion checks remain in the original numeric consumer.
+
+Batch `path-values`: Path equality, hashing, display and colliding map behavior; 5 tests pass release-interpreted execution; native admission remains unsupported ([evidence](path-values-validation.json)).
+Source: [docs/experiments/path-object/Main.rvn](../../../docs/experiments/path-object/Main.rvn). Windows remains pending.
+
+The Path suite preserves Object/interface dispatch assertions. Native selection
+currently rejects `System.Object.Equals` virtual dispatch; its exact diagnostic is
+recorded as an admission gap, while all five tests execute interpreted.

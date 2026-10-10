@@ -67,6 +67,8 @@ Batch `int64-parsing` adds 5 tests for Int64 boundary parsing, lexical errors, o
 ([evidence](../runtime/raven/tests/int64-parsing-validation.json)).
 Batch `primitive-parsing` adds 12 tests for primitive numeric and Boolean parsing values, format errors and overflow qualified in release-interpreted execution; native admission remains unsupported
 ([evidence](../runtime/raven/tests/primitive-parsing-validation.json)).
+Batch `path-values` adds 5 tests for Path equality, hashing, display and colliding map behavior qualified in release-interpreted execution; native admission remains unsupported
+([evidence](../runtime/raven/tests/path-values-validation.json)).
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

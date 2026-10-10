@@ -1,0 +1,111 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import System.Option.*
+import NeoClr.Testing.*
+
+import System.Storage.Path
+import System.Collections.*
+
+[Test("Path equality agrees across typed interface and Object dispatch")]
+func PathValueEquality() -> Result<unit, TestFailure> {
+    let Ok(first) = Path.Parse("notes/naïve.txt") else {
+        return Assert.True(false, "Parse first fixture path")
+    }
+    let Ok(second) = Path.Parse("notes/naïve.txt") else {
+        return Assert.True(false, "Parse equal fixture path")
+    }
+    let Ok(third) = Path.Parse("notes/naïve.txt") else {
+        return Assert.True(false, "Parse third fixture path")
+    }
+    let typed: EquatableTo<Path> = first
+    let boxed: Object = first
+    _ = Assert.True(!Object.ReferenceEquals(first, second), "Equal parses are distinct references")?
+    _ = Assert.True(first.Equals(second) && second.Equals(third) && first.Equals(third), "Typed equality is transitive")?
+    _ = Assert.True(typed.Equals(second) && boxed.Equals(second), "Interface and Object equality agree")?
+    return Assert.True(!boxed.Equals(null) && !boxed.Equals(42), "Wrong type and null are unequal")
+}
+
+[Test("Equal paths share hashes and virtual display")]
+func PathHashDisplay() -> Result<unit, TestFailure> {
+    let Ok(first) = Path.Parse("notes/naïve.txt") else {
+        return Assert.True(false, "Parse first fixture path")
+    }
+    let Ok(second) = Path.Parse("notes/naïve.txt") else {
+        return Assert.True(false, "Parse equal fixture path")
+    }
+    let boxed: Object = first
+    _ = Assert.Equal(second.GetHashCode(), boxed.GetHashCode())?
+    _ = Assert.Equal(first.Text, boxed.ToString())?
+    return Assert.Equal(first.Text, first.ToString())
+}
+
+[Test("Path equality distinguishes case roots and normalization")]
+func PathOrdinal() -> Result<unit, TestFailure> {
+    let Ok(first) = Path.Parse("notes/naïve.txt") else {
+        return Assert.True(false, "Parse first fixture path")
+    }
+    let Ok(second) = Path.Parse("notes/naïve.txt") else {
+        return Assert.True(false, "Parse equal fixture path")
+    }
+    let Ok(cased) = Path.Parse("notes/NAÏVE.txt") else {
+        return Assert.True(false, "Parse different case")
+    }
+    let Ok(rooted) = Path.Parse("/notes/naïve.txt") else {
+        return Assert.True(false, "Parse rooted path")
+    }
+    let Ok(composed) = Path.Parse("café") else {
+        return Assert.True(false, "Parse composed text")
+    }
+    let Ok(decomposed) = Path.Parse("cafe\u0301") else {
+        return Assert.True(false, "Parse decomposed text")
+    }
+    return Assert.True(!first.Equals(cased) && !first.Equals(rooted) && !composed.Equals(decomposed), "Path values retain ordinal text and root distinctions")
+}
+
+[Test("Path maps replace equal keys and retain lookup through growth")]
+func PathMap() -> Result<unit, TestFailure> {
+    let Ok(first) = Path.Parse("notes/naïve.txt") else {
+        return Assert.True(false, "Parse first fixture path")
+    }
+    let Ok(second) = Path.Parse("notes/naïve.txt") else {
+        return Assert.True(false, "Parse equal fixture path")
+    }
+    let map = HashMap<Path, int>((left, right) => left.Equals(right), key => key.GetHashCode())
+    _ = Assert.True(map.TryAdd(first, 1), "Insert original key")?
+    _ = Assert.True(!map.TryAdd(second, 2), "Equal parsed key is duplicate")?
+    map.Set(second, 3)
+    _ = Assert.True(map.Find(first) is Some(3), "Equal key replaces value")?
+    _ = Assert.Equal(1, map.Count)?
+    var index = 0
+    while index < 12 {
+        let Ok(path) = Path.Parse("entry-" + index.ToString()) else {
+            return Assert.True(false, "Parse growth key")
+        }
+        map.Set(path, index)
+        index += 1
+    }
+    _ = Assert.Equal(13, map.Count)?
+    return Assert.True(map.ContainsKey(second) && map.Find(second) is Some(3), "Growth preserves equal-key lookup")
+}
+
+[Test("Path Object equality distinguishes colliding map keys")]
+func PathCollisions() -> Result<unit, TestFailure> {
+    let Ok(first) = Path.Parse("notes/naïve.txt") else {
+        return Assert.True(false, "Parse first fixture path")
+    }
+    let Ok(second) = Path.Parse("notes/naïve.txt") else {
+        return Assert.True(false, "Parse equal fixture path")
+    }
+    let map = HashMap<Path, int>((left, right) => PathObjectEquals(left, right), key => 0)
+    _ = Assert.True(map.TryAdd(first, 7), "Insert first collision")?
+    _ = Assert.True(!map.TryAdd(second, 8), "Equal collision is duplicate")?
+    let Ok(other) = Path.Parse("other") else {
+        return Assert.True(false, "Parse distinct key")
+    }
+    _ = Assert.True(map.TryAdd(other, 9), "Unequal collision is retained")?
+    return Assert.True(map.Find(first) is Some(7) && map.Find(other) is Some(9), "Both collision lookups retain values")
+}
+
+func PathObjectEquals(left: Object, right: Object?) -> bool => left.Equals(right)

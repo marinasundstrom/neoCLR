@@ -20,6 +20,7 @@ NATIVE_ADMISSION_GAPS = {
     # A changed linked index deliberately requires fresh inspection/qualification.
     'int64-parsing': '$aot_linked_114: unsupported value member contract',
     'primitive-parsing': 'unsupported closed generic argument: Single',
+    'path-values': 'virtual calls requiring dispatch need a later specialization profile: System.Object.Equals',
 }
 MAP_NAMES = [
     'Map materialization handles collisions and empty input',
@@ -152,6 +153,13 @@ PRIMITIVE_PARSING_NAMES = [
     'UInt32 parsing preserves values and reports overflow',
     'UInt64 parsing preserves values and reports overflow',
 ]
+PATH_VALUES_NAMES = [
+    'Path Object equality distinguishes colliding map keys',
+    'Equal paths share hashes and virtual display',
+    'Path maps replace equal keys and retain lookup through growth',
+    'Path equality distinguishes case roots and normalization',
+    'Path equality agrees across typed interface and Object dispatch',
+]
 DISCOVERY_SPEC = importlib.util.spec_from_file_location('test_discovery', ROOT / 'scripts/discover-runtime-tests.py')
 DISCOVERY = importlib.util.module_from_spec(DISCOVERY_SPEC)
 DISCOVERY_SPEC.loader.exec_module(DISCOVERY)
@@ -167,7 +175,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'int64-parsing', 'primitive-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'int64-parsing', 'primitive-parsing', 'path-values', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -194,6 +202,7 @@ def main():
         ('unicode-casing', 0, ''.join('PASS ' + n + '\n' for n in UNICODE_CASING_NAMES) + f'Tests: {len(UNICODE_CASING_NAMES)}, passed: {len(UNICODE_CASING_NAMES)}, failed: 0, skipped: 0\n'),
         ('int64-parsing', 0, ''.join('PASS ' + n + '\n' for n in INT64_PARSING_NAMES) + f'Tests: {len(INT64_PARSING_NAMES)}, passed: {len(INT64_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('primitive-parsing', 0, ''.join('PASS ' + n + '\n' for n in PRIMITIVE_PARSING_NAMES) + f'Tests: {len(PRIMITIVE_PARSING_NAMES)}, passed: {len(PRIMITIVE_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
+        ('path-values', 0, ''.join('PASS ' + n + '\n' for n in PATH_VALUES_NAMES) + f'Tests: {len(PATH_VALUES_NAMES)}, passed: {len(PATH_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n'),
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]
