@@ -35,7 +35,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   descriptors represent contributions; shared-view API reconciliation remains open.
   Clarify that modules mean namespaces: retain existing namespace projection and
   resolution as the baseline, with flexible naming/packaging and no separate resolver
-  or loading model implied by this direction.
+  or loading model implied by this direction. Clarify that metadata modules represent
+  those same namespaces; assembly-local scope does not introduce a second module
+  concept or require a separate aggregate descriptor.
   Replace DeclarationModuleInfo/GetDeclarationModules with ModuleInfo/
   GetModules and logical member ownership; expose physical token scopes separately.
   Migrate Raven's native importer to traverse all modules and test discovery IDs to

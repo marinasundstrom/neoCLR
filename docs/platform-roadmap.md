@@ -75,9 +75,10 @@ Assembly identity belongs to each declaration and to assembly-local contribution
 it does not make the namespace exclusive. The author further clarifies that modules
 simply mean namespaces: keep .NET's naming/packaging flexibility and the existing
 namespace projection and resolution baseline. Do not introduce a separate resolver
-or module-loading model. Validate existing split-module compiler lookup and
-reconcile context-wide introspection with today's assembly-scoped ModuleInfo and its
-singular Assembly property. This clarifies the current module milestone rather than
+or module-loading model. The metadata module represents that same namespace;
+assembly-scoped ModuleInfo records the assembly's contribution, not another module
+concept. Validate existing split-module lookup and the introspection scoping needed
+for discovery; a separate aggregate descriptor is not a requirement. This clarifies the current module milestone rather than
 reprioritizing unrelated capabilities. See the [current contract and implementation gap](declaration-modules.md).
 
 ## Active direction: usable native compilation (2026-10-09)

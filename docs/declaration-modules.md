@@ -15,12 +15,14 @@ referenced contributions and fix demonstrated gaps rather than redesigning resol
 Introspection should describe this model with the smallest useful API; the shared-view
 question below is not a commitment to introduce another module abstraction.
 
-The implementation described below currently exposes assembly-scoped contributions
-through ModuleInfo. Those descriptors are not yet a context-wide shared namespace
-view. In particular, singular ModuleInfo.Assembly describes a contribution; the final
-shared-view API and its relationship to these descriptors require follow-through.
-Assembly-local declaration tables remain useful for recording each contribution,
-including empty declarations. They do not claim exclusive ownership of a module name.
+**Metadata clarification, 2026-10-10:** a module in the metadata model also means
+that namespace. It is not a second, physical-module concept. Within an assembly's
+metadata, ModuleInfo describes the declarations that assembly contributes to the
+namespace; its Assembly property records that scope, not exclusive ownership of the
+namespace name. Assembly-local declaration tables can retain empty declarations.
+Across references, ordinary namespace resolution combines matching contributions.
+A separate aggregate descriptor is not required by this clarification; any additional
+context-wide introspection API should be justified by an actual discovery need.
 
 Author direction, 2026-10-09: modules replace namespaces as the named containers
 for declarations. Assemblies remain packaging and binding identities and remain

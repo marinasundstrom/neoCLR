@@ -13561,3 +13561,16 @@ claim completion of in-process test discovery.
   documentation clarification, not a compiler or runtime behavior change. The
   current contribution-scoped ModuleInfo and shared introspection question remain
   explicit; the simplest useful API remains to be determined.
+
+
+## 2026-10-10 — Metadata modules represent namespaces too
+
+- **Author:** “The metadata context of a module corresponds to our concept of a
+  module, which is a namespace.”
+- **Assistant response:** the metadata model describes the same namespace concept.
+  An assembly-local descriptor records the scope of its contribution; this does not
+  imply a second semantic module kind or exclusive namespace ownership.
+- **Action:** clarifies the module design and roadmap, removing wording that made a
+  separate shared-view API sound mandatory. Existing resolution and metadata scope
+  remain the baseline. No API or runtime behavior changes in this documentation slice;
+  additional discovery APIs still require a concrete use case.
