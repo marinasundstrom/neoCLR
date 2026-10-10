@@ -19,7 +19,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   without rooting unused accessors. Automatic/implemented properties, local records
   and imported KeyValuePair initializers pass macOS native/interpreter validation;
   a separate-library consumer rejects later writes. Refresh API snapshots and extend
-  the Windows collections action with the same coverage (Windows run pending).
+  the Windows collections action with the same coverage (Windows run pending). Keep
+  generated fixture outputs in ignored build/evidence directories.
 
 - Build and hash-check the current release interpreter for native HTTP server,
   client and retained-session comparisons. Development libraries require services
