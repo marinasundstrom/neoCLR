@@ -13606,3 +13606,23 @@ claim completion of in-process test discovery.
   compiler or resolver changes were needed. Exact commands, pinned inputs and limits
   are in [the validation record](experiments/guest-modules/validation.json).
   Windows qualification and duplicate-name/reference-order cases remain open.
+
+
+## 2026-10-10 — Close the module authoring and metadata story
+
+- **Author:** “OK. Let's finish and close this story so we can move on”.
+- **Assistant action:** reviews the implemented model, removes stale wording implying
+  a mandatory aggregate module API, and records the story's closure boundary in the
+  design and roadmap. Namespace remains the name; Module navigates to the defining
+  assembly's descriptor. No compiler or runtime changes are needed for this closure.
+- **Evidence:** shared application/library namespace lookup and executing ownership
+  pass interpreter/macOS ARM64 at 61e687bd. Windows run 38056974148 is still in progress
+  at this review; its module step has not completed. Earlier catalog run 38054570720
+  succeeded at c898003d, with artifact hashes not independently checked.
+- **Open work:** final Windows qualification, additional ambiguity/reference-order
+  coverage, native type enumeration, guest module-function discovery/invocation,
+  broader context queries and the imported function-reference emitter gap remain
+  explicit follow-ups. Assistant selects guest module-function metadata enumeration
+  as the next bounded step toward in-process TestAttribute discovery, consistent with
+  the earlier author-directed testing-framework work. Closure does not claim those
+  capabilities have shipped or that pending CI has passed.

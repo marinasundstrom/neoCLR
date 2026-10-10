@@ -126,8 +126,9 @@ Source metadata and guest signatures remain unchanged.
 
 The author's shared-namespace direction allows a module name to span referenced
 assemblies. Current ModuleInfo identity and its singular Assembly property describe
-an assembly-local contribution. A context-wide shared namespace view is still open;
-these APIs must not be interpreted as exclusive ownership of a namespace name.
+an assembly-local contribution to that namespace. This does not require a separate
+aggregate descriptor. These APIs must not be interpreted as exclusive ownership of
+a namespace name; Namespace supplies the name and Module supplies scoped navigation.
 
 ## Assembly and module identity
 

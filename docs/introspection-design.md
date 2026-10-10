@@ -786,6 +786,12 @@ approval of every proposed redesign.
 
 ### Module model completion — author direction 2026-10-10
 
+**Closure update:** the author closes the module authoring/metadata story after
+settling shared namespace semantics and the Namespace/Module distinction. The
+historical review below includes broader discovery capabilities that remain separate
+follow-ups, not completed features. See the [closure scope](declaration-modules.md)
+for implemented behavior, evidence and pending Windows qualification.
+
 After custom attributes and the testing framework, the author requests completion
 of modules in Introspection and RuntimeContext. Existing ModuleInfo/AssemblyInfo
 contracts and context-owned discovery are the starting point, not a new parallel
@@ -832,8 +838,9 @@ retention remain the next implementation boundaries; host views do not complete 
 **Subsequent clarification:** a module namespace may span multiple assemblies,
 with .NET-style namespace lookup across referenced contributions. The assembly-scoped
 ModuleInfo described here is the current contribution view, not exclusive ownership
-of a namespace. Its singular Assembly property and the context-wide shared view
-still need API reconciliation. Dotted names introduce no metadata hierarchy. See
+of a namespace. The final clarification retains Namespace as a string and Module
+as the assembly-scoped descriptor, without requiring an aggregate API. Dotted names
+introduce no metadata hierarchy. See
 [the current direction](declaration-modules.md).
 
 The author corrects the compatibility premise of the first ownership slice:

@@ -1,5 +1,27 @@
 # Declaration modules — development foundation
 
+**Story status, 2026-10-10: implementation and design closed.** The author requests
+closure of the module story. The accepted contract and implemented boundary are
+listed below; this is not completion of all native introspection or test discovery.
+
+- Modules mean namespaces in source and metadata. Assemblies contribute one or more;
+  names may span assemblies. Naming an assembly after its main/root module is recommended.
+- Keep Namespace as a string and Module as the defining assembly's namespace descriptor.
+  Existing namespace lookup and ambiguity rules remain the baseline.
+- Host/guest logical ownership, flat native tables, retained native module catalogs
+  and native executing-assembly queries are implemented. The shared-namespace consumer
+  passes interpreter and macOS ARM64 AOT without compiler/resolver changes.
+- Windows qualification for the final consumer is pending in
+  [run 38056974148](https://github.com/marinasundstrom/neoCLR/actions/runs/38056974148)
+  at 61e687bd. Earlier catalog/ownership Windows gates passed; they do not qualify
+  the newer executing-assembly or shared-namespace cases.
+
+Follow-up capabilities: native type enumeration, guest module-function discovery
+and invocation for in-process test registration, and broader runtime-context queries.
+Duplicate-name/reference-order coverage and the imported function-reference emitter
+gap remain tracked validation/compiler work. None requires reopening the namespace
+model or introducing an aggregate ModuleInfo API. See the [roadmap](platform-roadmap.md).
+
 **Latest author clarification, 2026-10-10:** a module name is a namespace and may
 span multiple assemblies. Referencing/importing that name combines matching declarations
 from the referenced assemblies, using .NET-style namespace lookup and ambiguity rules.
@@ -139,7 +161,7 @@ repurposing physical module rows would conflate organization with loading identi
 This assessment predates the author’s shared-namespace clarification above. Its
 assembly-qualified identity discussion now applies to contributions, not exclusive
 logical namespace ownership. The author selects .NET-style namespace combination;
-exact public introspection changes remain open.
+the final name/descriptor distinction and closure scope are recorded above.
 
 The author asks whether the diverging module semantics are sound. The assistant's
 assessment is yes for the implemented scope: an assembly packages declarations,

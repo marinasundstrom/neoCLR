@@ -1,5 +1,21 @@
 # neoCLR platform roadmap
 
+**Module story closure (2026-10-10):** the author requests closing the namespace/module
+authoring and metadata story so work can move on. The accepted model and implemented
+boundary are [recorded here](declaration-modules.md). Keep Namespace as the string and
+Module as the assembly-scoped descriptor; no aggregate module API or resolver redesign
+is required. Interpreter/macOS ARM64 shared-namespace qualification passes at 61e687bd.
+The final [Windows gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38056974148)
+is pending; closure does not claim its success or completion of native introspection.
+
+**Next bounded work:** resume the testing-framework discovery follow-up: establish
+the guest module-function metadata enumeration contract needed to discover TestAttribute
+methods, reusing host discovery behavior and retaining manual registration. Native type
+enumeration, general callable invocation, grouping/filtering, broader context discovery
+and the imported function-reference emitter gap remain separately scoped follow-ups.
+Keep Windows qualification and duplicate-name/reference-order coverage visible as
+validation work; do not redesign module semantics to address those checks.
+
 **Author-directed testing slice (2026-10-10):** establish a Raven-written runtime-library
 [test framework and runner](../runtime/raven/tests/README.md), with module-level
 functions and an intended stable core contract. Explicit registration, assertions,

@@ -43,7 +43,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   namespace through a single import, preserving their distinct executing assemblies;
   interpreter/macOS ARM64 AOT pass without compiler or resolver changes. Clarify the
   existing Namespace string versus assembly-scoped Module descriptor. Windows and
-  duplicate-name/reference-order qualification remain open.
+  duplicate-name/reference-order qualification remain open. Close the module
+  authoring/metadata story at this implemented boundary; remove the implied aggregate
+  API requirement and retain guest discovery/native enumeration as follow-up work.
   Replace DeclarationModuleInfo/GetDeclarationModules with ModuleInfo/
   GetModules and logical member ownership; expose physical token scopes separately.
   Migrate Raven's native importer to traverse all modules and test discovery IDs to
