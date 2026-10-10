@@ -17,8 +17,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   whole-second form, preserving full Int64 tick bounds and the existing ±18-hour
   offset domain. Eight additional framework cases pass both local execution modes.
   Fix native value-profile unary negation exposed by the parsers, with integer-limit
-  and Double native/interpreter comparison coverage. General patterns, non-Gregorian
-  and Instant/named-zone parsing remain gaps.
+  and Double native/interpreter comparison coverage. Add Instant.Parse for invariant
+  timestamps with an explicit offset or Z, preserving fractional ticks and the wider
+  Instant domain across civil boundaries. Six more framework cases pass both modes;
+  improve native parameter/result rendering for the three new parsers. General
+  patterns, non-Gregorian and named-zone parsing remain gaps.
 - Add the explicit native SystemCultureName host adapter, matching the interpreter's
   preferred-language APIs on macOS and Windows. Project builds enable the binding;
   only consumers that retain it link CoreFoundation on macOS. Local host-preference

@@ -13,8 +13,10 @@ public struct Duration : ComparableTo<Duration>, EquatableTo<Duration> {
         return Duration(ticks)
     }
 
-    /// Parses invariant [-][d.]hh:mm:ss[.fffffff], with 1–8 day digits and 1–7 fraction digits.
-    /// Returns InvalidFormat for unsupported syntax or OutOfRange for invalid fields or tick overflow.
+    /// <summary>Parses invariant [-][d.]hh:mm:ss[.fraction], with 1–8 day digits and 1–7 fraction digits.</summary>
+    /// <param name="value">Complete ASCII text without whitespace or a leading plus sign.</param>
+    /// <returns>The duration, or InvalidFormat for unsupported syntax or OutOfRange for invalid fields or tick overflow.</returns>
+    /// <remarks>Leading day zeros are accepted within the eight-digit bound. Full signed Int64 ticks are supported.</remarks>
     static func Parse(value: string) -> Result<Duration, DateTimeParseError> {
         return CivilParser.ParseDuration(value)
     }

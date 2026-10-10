@@ -35,6 +35,16 @@ public struct Instant : ComparableTo<Instant>, EquatableTo<Instant> {
         return Ok(Instant(StoredTicks + amount))
     }
 
+    /// <summary>Parses invariant yyyy-MM-ddTHH:mm:ss[.fraction] followed by Z or ±HH:mm[:ss].</summary>
+    /// <param name="value">Complete ASCII text with an explicit offset; fractions have 1–7 digits.</param>
+    /// <returns>The instant, or InvalidFormat/OutOfRange for unsupported syntax or invalid fields.</returns>
+    /// <remarks>Local years are 1–9999. Existing ±18-hour, whole-second offsets apply.
+    /// UTC can cross those civil boundaries within Instant's wider signed tick domain.
+    /// No ambient culture, host zone, whitespace, leap seconds or named zones are accepted.</remarks>
+    static func Parse(value: string) -> Result<Instant, DateTimeParseError> {
+        return CivilParser.ParseInstant(value)
+    }
+
     val UnixTimeTicks: long => StoredTicks
 
     func Equals(other: Instant) -> bool {

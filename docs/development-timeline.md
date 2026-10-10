@@ -13893,3 +13893,21 @@ claim completion of in-process test discovery.
 - **Next:** the author asked to continue after this slice. Implement Instant parsing
   with an explicit offset or Z; named-zone identifiers and ambiguity policies need
   a separate bounded review. The current slice does not implement that parser.
+
+
+## 2026-10-10 — Explicit-offset Instant parsing follow-up
+
+- **Author direction:** continue after the Duration/offset slice.
+- **Assistant action:** implement Instant.Parse by composing the invariant civil
+  parser and explicit TimeOffset parsing, with no ambient zone/culture inference.
+  Preserve Instant's existing wider tick domain when an offset crosses civil year
+  boundaries; document the interop costs relative to DateTimeOffset rather than
+  calling the difference an improvement. Named-zone text remains separate work.
+- **Outcome:** six discoverable tests pass native macOS ARM64 and interpreter
+  execution, covering offset equivalence, fractions, boundaries, malformed/range
+  errors and projection. [Evidence](../runtime/raven/tests/instant-parsing-validation.json).
+  Refresh aggregate/native API references and fix source XML wrappers so parameters
+  and return descriptions appear in their intended reference sections. Compiler
+  behavior and Runtime Contract configuration are unchanged. Windows is pending.
+- **Remaining:** broader patterns, named-zone text and zone/offset consistency rules;
+  the follow-up does not infer a new author decision about those policies.

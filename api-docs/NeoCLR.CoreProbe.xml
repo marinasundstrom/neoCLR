@@ -3007,5 +3007,11 @@
     <returns>A whole-second offset, or DateTimeParseError.InvalidFormat for unsupported syntax or OutOfRange for invalid minute, second or total offset values.</returns>
     <remarks>No whitespace, fractional seconds, culture-dependent patterns or named zones are accepted.</remarks>
   </member>
+  <member name="M:System.Time.Instant.Parse(System.String)">
+    <summary>Parses an invariant Gregorian timestamp yyyy-MM-ddTHH:mm:ss[.fraction] followed by Z or a signed HH:mm[:ss] offset.</summary>
+    <param name="value">Complete ASCII timestamp with 1–7 optional fractional digits and an explicit offset.</param>
+    <returns>Result&lt;Instant, DateTimeParseError&gt; containing the UTC instant or InvalidFormat/OutOfRange.</returns>
+    <remarks>Local years are 1–9999 and offsets have whole-second precision within ±18 hours. UTC may cross a civil boundary within Instant's wider signed tick domain. No ambient culture or local zone, whitespace, named zones, leap seconds or rounding. General patterns and wider-year text are unsupported. The parser validates local fields before offset fields and reports the first error.</remarks>
+  </member>
 </members>
 </doc>

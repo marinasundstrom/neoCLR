@@ -235,4 +235,36 @@ internal class CivilParser {
         }
         return Ok(offset)
     }
+
+    static func ParseInstant(value: string) -> Result<Instant, DateTimeParseError> {
+        let length = value.GetUtf8ByteCount()
+        if length < 20 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        if length > 36 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let text = Utf8.Encode(value)
+        var offsetStart = -1
+        for index in 19..<length {
+            if text[index] == 90 || text[index] == 43 || text[index] == 45 {
+                offsetStart = index
+                break
+            }
+        }
+        if offsetStart < 0 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let Ok(localText) = value.SliceUtf8(0, offsetStart) else {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let Ok(offsetText) = value.SliceUtf8(offsetStart, length - offsetStart) else {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let local = ParseLocal(localText, Culture.Invariant)?
+        let offset = ParseOffset(offsetText)?
+        // Four-digit civil years and ±18 hours fit safely in signed Unix ticks.
+        // UTC may cross a civil-year boundary; Instant has a wider tick domain.
+        return Ok(offset.ToInstant(local))
+    }
 }

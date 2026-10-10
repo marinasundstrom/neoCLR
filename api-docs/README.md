@@ -1606,3 +1606,12 @@ DateTimeParseError cases are reused. The aggregate bridge remains declaration-on
 no new Runtime Contract option is required. The native snapshot uses the matching
 Duration/offset bundle and the same renderer code revision as the civil slice.
 General duration patterns and named-zone parsing remain tracked gaps.
+
+
+## Instant parsing development snapshot (2026-10-10)
+
+Instant.Parse(String) is included in aggregate and native member references, with
+explicit-offset grammar, Result errors, precision, boundary and interop limitations.
+The reference projection adds only a declaration; native library source owns the
+implementation. General patterns and ZonedDateTime text remain gaps. Native XML
+summaries, parameter/result notes and remarks are rendered from the matching bundle.

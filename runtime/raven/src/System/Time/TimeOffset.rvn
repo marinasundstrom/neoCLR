@@ -24,8 +24,10 @@ public struct TimeOffset : EquatableTo<TimeOffset>, ComparableTo<TimeOffset> {
         return Ok(TimeOffset(seconds))
     }
 
-    /// Parses Z or signed HH:mm[:ss], within the existing inclusive ±18-hour range.
-    /// Negative zero denotes zero; malformed text and invalid ranges return DateTimeParseError.
+    /// <summary>Parses Z or signed HH:mm[:ss], within the existing inclusive ±18-hour range.</summary>
+    /// <param name="value">Complete ASCII text without whitespace, fractional seconds or named zones.</param>
+    /// <returns>The offset, or InvalidFormat for unsupported syntax or OutOfRange for invalid fields.</returns>
+    /// <remarks>Negative zero denotes zero, not an unknown offset. Offset precision is whole seconds.</remarks>
     static func Parse(value: string) -> Result<TimeOffset, DateTimeParseError> {
         return CivilParser.ParseOffset(value)
     }

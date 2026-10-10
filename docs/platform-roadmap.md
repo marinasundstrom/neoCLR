@@ -343,7 +343,7 @@ continue to co-evolve with native foundations.
 | Runtime scheduling | Review runnable work, I/O wakeups, cancellation and host ownership against the existing [scheduler design](runtime-scheduling-design.md). | Compare .NET Task/ThreadPool responsibilities with runtime-owned execution; preserve interpreter/native lifecycle consistency. |
 | Queue, Stack and sets | Review FIFO/LIFO and set interfaces and concrete implementations against [current collection contracts](collection-contracts.md) and actual consumers. | Compare .NET Queue/Stack/HashSet ergonomics, equality, duplicates, removal, empty results, iteration, growth and reference release; select useful additions without treating the broader [collection proposal](proposals/collections-api.md) as implemented. |
 | Database-backed web sample | Select a provider and a small parameterized query/update scenario with a Dapper-like typed object mapper. | Evaluate Dapper/ADO.NET responsibilities, UTF-8 conversion, null/type mapping, connection/transaction lifetime and native macOS/Windows dependencies. Provider choice, mapping strategy and public contracts remain open. |
-| Time Parse methods | Civil Date/TimeOfDay/LocalDateTime numeric parsers now pass eight local native/interpreted tests. Duration/TimeOffset add bounded invariant forms; next scope Instant/ZonedDateTime inputs separately. | Current/explicit culture and typed Result errors are implemented; general patterns, non-Gregorian parsing and offset/zone policies remain gaps. |
+| Time Parse methods | Civil Date/TimeOfDay/LocalDateTime numeric parsers now pass eight local native/interpreted tests. Duration/TimeOffset add bounded invariant forms; Instant requires an explicit offset or Z. Named-zone parsing remains separate. | Current/explicit culture and typed Result errors are implemented; general patterns, non-Gregorian parsing and named-zone text remain gaps. |
 | Runtime suspension | Review safe suspension/resumption boundaries, retained roots and host-resource lifetime alongside scheduling. | Compare CLR suspension/GC coordination and cooperative execution approaches; distinguish runtime suspension from awaiting I/O and leave the stack/preemption model open. |
 
 **Author clarification (2026-10-10):** explicitly include Parse methods for Date,
@@ -352,10 +352,14 @@ leaving time parsing implicit. The initial audit found no Parse/TryParse methods
 The [civil parsing slice](date-time.md#development-parsing-2026-10-10) now implements
 Parse(value) and Parse(value, culture), with a shared standard error union. Eight
 framework cases pass both local modes, and native/interpreted host-preference output
-matches. General formatting patterns, non-Gregorian parsing and parsers for Instant,
-ZonedDateTime remain open. Duration and TimeOffset now add invariant parsing with
-full tick-boundary checks and the existing offset domain. No TryParse alias is added.
-Windows validation includes the new suite and host-culture parity probe.
+matches. General formatting patterns, non-Gregorian parsing and ZonedDateTime parsing
+remain open. Duration and TimeOffset add invariant parsing with full tick-boundary
+checks and the existing offset domain. Instant now composes invariant civil text
+with an explicit offset or Z; it never guesses the host zone. Eight Duration/offset
+cases and six Instant cases pass both local modes
+([duration/offset evidence](../runtime/raven/tests/duration-offset-parsing-validation.json),
+[instant evidence](../runtime/raven/tests/instant-parsing-validation.json)). No TryParse alias is added.
+Windows validation includes the new parsing suites and host-culture parity probe.
 
 A separate native gap observed during implementation: String.GetScalars exposes an
 immutable UInt32 array that current native specialization rejects. This parser uses

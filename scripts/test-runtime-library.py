@@ -13,6 +13,15 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / 'runtime/raven/tests'
+INSTANT_PARSING_NAMES = [
+    'Instant parsing normalizes explicit offsets to the same epoch',
+    'Instant parsing preserves fractional ticks before and after the epoch',
+    'Instant parsing preserves the wider tick domain at civil boundaries',
+    'Instant parsing requires a complete invariant timestamp and explicit offset',
+    'Instant parsing rejects invalid civil fields and offset ranges',
+    'Parsed instants project back through their explicit fixed offset',
+]
+
 DURATION_OFFSET_PARSING_NAMES = [
     'Duration parsing preserves signed tick boundaries',
     'Duration parsing rejects overflow and invalid clock fields',
@@ -232,7 +241,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -264,6 +273,7 @@ def main():
         ('http-route-matching', 0, ''.join('PASS ' + n + '\n' for n in HTTP_ROUTE_MATCHING_NAMES) + f'Tests: {len(HTTP_ROUTE_MATCHING_NAMES)}, passed: {len(HTTP_ROUTE_MATCHING_NAMES)}, failed: 0, skipped: 0\n'),
         ('ip-address-values', 0, ''.join('PASS ' + n + '\n' for n in IP_ADDRESS_VALUES_NAMES) + f'Tests: {len(IP_ADDRESS_VALUES_NAMES)}, passed: {len(IP_ADDRESS_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('uri-resolution', 0, ''.join('PASS ' + n + '\n' for n in URI_RESOLUTION_NAMES) + f'Tests: {len(URI_RESOLUTION_NAMES)}, passed: {len(URI_RESOLUTION_NAMES)}, failed: 0, skipped: 0\n'),
+        ('instant-parsing', 0, ''.join('PASS ' + n + '\n' for n in INSTANT_PARSING_NAMES) + f'Tests: {len(INSTANT_PARSING_NAMES)}, passed: {len(INSTANT_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('duration-offset-parsing', 0, ''.join('PASS ' + n + '\n' for n in DURATION_OFFSET_PARSING_NAMES) + f'Tests: {len(DURATION_OFFSET_PARSING_NAMES)}, passed: {len(DURATION_OFFSET_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('time-parsing', 0, ''.join('PASS ' + n + '\n' for n in TIME_PARSING_NAMES) + f'Tests: {len(TIME_PARSING_NAMES)}, passed: {len(TIME_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n'),

@@ -1,0 +1,80 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import System.Time.*
+import NeoClr.Testing.*
+
+[Test("Instant parsing normalizes explicit offsets to the same epoch")]
+func AEpoch() -> Result<unit, TestFailure> {
+    for text in ["1970-01-01T00:00:00Z", "1970-01-01T00:00:00+00:00", "1970-01-01T00:00:00-00:00", "1970-01-01T01:00:00+01:00", "1969-12-31T23:00:00-01:00", "1970-01-01T00:00:01+00:00:01", "1969-12-31T23:59:59-00:00:01", "1970-01-01T18:00:00+18:00", "1969-12-31T06:00:00-18:00"] {
+        let Ok(value) = Instant.Parse(text) else {
+            return Error(TestFailure("Expected instant", "Ok", text))
+        }
+        _ = Assert.True(value.UnixTimeTicks == 0L, "Equivalent epoch: " + text)?
+    }
+    return Assert.True(true, "Explicit offsets normalize consistently")
+}
+
+[Test("Instant parsing preserves fractional ticks before and after the epoch")]
+func BPrecision() -> Result<unit, TestFailure> {
+    let inputs = ["1970-01-01T00:00:00.1Z", "1970-01-01T00:00:00.12Z", "1970-01-01T00:00:00.123Z", "1970-01-01T00:00:00.1234Z", "1970-01-01T00:00:00.12345Z", "1970-01-01T00:00:00.123456Z", "1970-01-01T00:00:00.1234567Z", "1969-12-31T23:59:59.9999999Z", "1970-01-01T01:02:03.0000001+01:02:03"]
+    let ticks = [1000000L, 1200000L, 1230000L, 1234000L, 1234500L, 1234560L, 1234567L, -1L, 1L]
+    for index in 0..<inputs.Length {
+        let Ok(value) = Instant.Parse(inputs[index]) else {
+            return Error(TestFailure("Expected precise instant", "Ok", inputs[index]))
+        }
+        _ = Assert.True(value.UnixTimeTicks == ticks[index], "Exact fractional ticks")?
+    }
+    return Assert.True(true, "Fractions preserve 100 ns resolution")
+}
+
+[Test("Instant parsing preserves the wider tick domain at civil boundaries")]
+func CBounds() -> Result<unit, TestFailure> {
+    let inputs = ["0001-01-01T00:00:00Z", "9999-12-31T23:59:59.9999999Z", "0001-01-01T00:00:00+18:00", "9999-12-31T23:59:59.9999999-18:00:00"]
+    let ticks = [-621355968000000000L, 2534023007999999999L, -621356616000000000L, 2534023655999999999L]
+    for index in 0..<inputs.Length {
+        let Ok(value) = Instant.Parse(inputs[index]) else {
+            return Error(TestFailure("Expected boundary instant", "Ok", inputs[index]))
+        }
+        _ = Assert.True(value.UnixTimeTicks == ticks[index], "Boundary arithmetic must not clamp")?
+    }
+    return Assert.True(true, "Civil boundaries convert exactly")
+}
+
+[Test("Instant parsing requires a complete invariant timestamp and explicit offset")]
+func DGrammar() -> Result<unit, TestFailure> {
+    for text in ["", "1970-01-01", "1970-01-01T00:00:00", "1970-01-01 00:00:00Z", "1970-01-01t00:00:00Z", "1970-01-01T00:00:00z", "1970-01-01T00:00:00+0000", "1970-01-01T00:00:00+00", "1970-01-01T00:00:00Z+00:00", "1970-01-01T00:00:00+00:00Z", "1970-01-01T00:00:00.12345678Z", "1970-01-01T00:00:00.Z", "1970-01-01T00:00:00,1Z", "1970-01-01T00:00:00Z ", " 1970-01-01T00:00:00Z", "1970-01-01T00:00:00UTC", "1970-01-01T00:00:00+00:00[UTC]", "10000-01-01T00:00:00Z", "１９７０-01-01T00:00:00Z"] {
+        _ = Assert.True(Instant.Parse(text) is Error(DateTimeParseError.InvalidFormat), "Expected malformed timestamp: " + text)?
+    }
+    return Assert.True(true, "No implicit zone or partial parsing")
+}
+
+[Test("Instant parsing rejects invalid civil fields and offset ranges")]
+func ERanges() -> Result<unit, TestFailure> {
+    for text in ["0000-01-01T00:00:00Z", "1900-02-29T00:00:00Z", "2024-04-31T00:00:00Z", "1970-13-01T00:00:00Z", "1970-01-01T24:00:00Z", "1970-01-01T00:60:00Z", "1970-01-01T23:59:60Z", "1970-01-01T00:00:00+18:00:01", "1970-01-01T00:00:00-18:01", "1970-01-01T00:00:00+00:60"] {
+        _ = Assert.True(Instant.Parse(text) is Error(DateTimeParseError.OutOfRange), "Expected invalid timestamp range: " + text)?
+    }
+    return Assert.True(true, "Invalid timestamps rejected")
+}
+
+[Test("Parsed instants project back through their explicit fixed offset")]
+func FProjection() -> Result<unit, TestFailure> {
+    let Ok(instant) = Instant.Parse("2024-02-29T23:59:58.1234567-05:30:15") else {
+        return Error(TestFailure("Instant fixture", "Ok", "Error"))
+    }
+    let Ok(offset) = TimeOffset.Parse("-05:30:15") else {
+        return Error(TestFailure("Offset fixture", "Ok", "Error"))
+    }
+    let Ok(local) = offset.AtInstant(instant) else {
+        return Error(TestFailure("Local projection", "Ok", "Error"))
+    }
+    _ = Assert.Equal(2024, local.Date.Year)?
+    _ = Assert.Equal(2, local.Date.Month)?
+    _ = Assert.Equal(29, local.Date.Day)?
+    _ = Assert.Equal(23, local.Time.Hour)?
+    _ = Assert.Equal(59, local.Time.Minute)?
+    _ = Assert.Equal(58, local.Time.Second)?
+    _ = Assert.Equal(1234567, local.Time.FractionTicks)?
+    return Assert.True(offset.ToInstant(local).Equals(instant), "Fixed-offset round trip")
+}

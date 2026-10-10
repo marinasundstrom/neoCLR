@@ -522,9 +522,22 @@ enable that capability and link its adapter only when reached.
 `--suite duration-offset-parsing` adds eight attributed tests for signed Duration
 bounds, tick overflow, all fraction widths, strict grammar, fixed-offset bounds,
 negative zero and arithmetic/conversion consumers. All eight pass native macOS ARM64
-and interpreted execution. The library now contains 160 cases across 17 projects.
+and interpreted execution. That slice brings the library to 160 cases across 17 projects.
 The parser exposed missing native unary negation: its value-profile admission and
 lowering are fixed, with an additional Int32/Int64/Double comparison probe. The
 [qualification](duration-offset-parsing-validation.json) also reruns civil parsing.
 Windows execution of this slice remains pending; the Windows action selects this
 suite by default. Prior suite evidence remains applicable to unaffected behavior.
+
+
+### Explicit-offset instant parsing
+
+`--suite instant-parsing` adds six attributed tests for equivalent offsets, all
+fraction widths, civil-boundary conversion into Instant's wider domain, invalid
+syntax/ranges and fixed-offset projection. All six pass native macOS ARM64 and
+interpreted execution ([qualification](instant-parsing-validation.json)). This brings
+the library to 166 cases across 18 projects. No ambient culture or local timezone
+is used. The existing civil and Duration/offset evidence is reused because their
+executable implementation is unchanged in this slice. XML documentation corrections
+followed the Instant gate; its report records that distinction. Windows qualification
+remains pending; all three parsing suites run in the default Windows library gate.

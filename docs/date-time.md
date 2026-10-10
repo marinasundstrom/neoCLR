@@ -152,8 +152,8 @@ introduce platform-dependent accepted forms; implementing the bounded grammar in
 Raven provides the same explicit-culture behavior on all targets. These preview
 choices may evolve before a stable release.
 
-Instant and ZonedDateTime parsing remain separate gaps. Timezone conversion remains
-an explicit operation after civil parsing.
+ZonedDateTime parsing remains a separate gap. Timezone conversion remains an explicit
+operation after civil parsing; Instant parsing below requires an explicit offset.
 
 
 ### Duration and offset parsing (development, 2026-10-10)
@@ -185,8 +185,35 @@ second precision and ±18-hour range exceed DateTimeOffset's whole-minute ±14-h
 constraint. Preserving that domain supports existing zone data, at the cost of
 requiring range/precision checks when exchanging values with DateTimeOffset.
 
-Next, scope Instant parsing around an explicit numeric offset or Z, with checked
-conversion and civil/tick bounds; do not silently use the machine zone. A future
+The next Instant slice implements an explicit numeric offset or Z, as described below. A future
 ZonedDateTime parser must additionally define zone identifiers, offset consistency,
 gaps and repeated-local-time resolution. These are review directions, not implemented
 APIs. A parser must not lose a zone identifier by treating it as a fixed offset.
+
+
+### Explicit-offset Instant parsing (development, 2026-10-10)
+
+`Instant.Parse(value)` returns `Result<Instant, DateTimeParseError>` for
+`yyyy-MM-ddTHH:mm:ss[.fraction]` followed by `Z` or `±HH:mm[:ss]`. It composes the
+invariant local parser with TimeOffset.Parse, preserving all 1–7 fractional digits
+and the existing offset range/precision. It requires uppercase T/Z, seconds and
+complete ASCII input; no culture or host-zone default is read. Local fields are
+validated before offset fields and the first failure is returned. Length is bounded
+to 20–36 UTF-8 bytes before snapshots/slices are created. This is not allocation-free.
+
+The local year must be 1–9999. Conversion uses existing TimeOffset.ToInstant;
+that bounded civil domain plus ±18 hours provably fits signed Unix ticks. An offset
+can place UTC just outside civil years 1–9999. This preserves Instant's existing
+wider timeline, rather than clamping it to the civil projection domain. Projecting
+such an instant at a different offset may return InvalidDateError. The original
+text/offset is not retained in Instant, which stores only UnixTimeTicks.
+
+Compare [.NET round-trip timestamp formats](https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings)
+and [DateTimeOffset.Parse](https://learn.microsoft.com/en-us/dotnet/api/system.datetimeoffset.parse?view=net-10.0):
+the numeric timestamp shape and 100 ns resolution are familiar. This bounded
+implementation requires an offset to avoid environment-dependent interpretation;
+.NET's general culture/style surface remains an implementation gap. Existing
+whole-second/±18-hour offsets and Instant's wider UTC range deliberately preserve
+neoCLR's established type domains, unlike DateTimeOffset's minute/±14-hour and
+civil UTC bounds. Interop must validate those constraints. Wider-year textual forms,
+general patterns and named-zone parsing remain unimplemented.

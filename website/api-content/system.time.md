@@ -37,6 +37,17 @@ The full signed 64-bit tick range is accepted; overflow returns OutOfRange.
 `TimeOffset.Parse(value)` returns `Result<TimeOffset, DateTimeParseError>` for `Z`
 or `±HH:mm[:ss]`, using the existing inclusive ±18-hour range and whole seconds.
 Negative zero means zero. Both reject whitespace and incomplete/non-ASCII fields.
-Unsupported syntax returns InvalidFormat. General parsing patterns, Instant parsing
-and named-zone parsing remain development gaps; see [the contract](/docs/api/System/Time/Duration/method_Parse.html)
+Unsupported syntax returns InvalidFormat. General parsing patterns and named-zone parsing remain development gaps; see [the contract](/docs/api/System/Time/Duration/method_Parse.html)
 and [offset reference](/docs/api/System/Time/TimeOffset/method_Parse.html).
+
+
+## Development: explicit-offset instant parsing
+
+`Instant.Parse(value)` returns `Result<Instant, DateTimeParseError>` for
+`yyyy-MM-ddTHH:mm:ss[.fraction]` followed by `Z` or `±HH:mm[:ss]`. It preserves
+1–7 fractional digits and uses whole-second offsets within ±18 hours. Input must
+be complete ASCII with uppercase T/Z; omitted offsets never select the host zone.
+Local years are 1–9999. Offset conversion may place UTC outside those civil bounds,
+within Instant's wider signed tick domain. The source offset is not retained.
+Unsupported syntax returns InvalidFormat; invalid fields/ranges return OutOfRange.
+[Instant.Parse reference](/docs/api/System/Time/Instant/method_Parse.html).
