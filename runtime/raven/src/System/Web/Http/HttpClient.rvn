@@ -11,6 +11,7 @@ import System.Collections.*
 import System.Result.*
 import System.Text.*
 import System.IO.*
+import System.Time.*
 
 // Provisional bounded HTTP response contracts.
 public class HttpHeader {
@@ -1045,6 +1046,44 @@ public class HttpRequest {
 }
 
 public class HttpClient : Disposable {
+    private var started = false
+    private var timeout: Option<Duration> = Some(Duration.FromTicks(1000000000L))
+
+    /// The total cooperative request budget, including custom handlers and response buffering.
+    /// Defaults to Some(100 seconds); None disables the client countdown.
+    /// Positive durations through Int32.MaxValue milliseconds are accepted; fractions round upward.
+    /// Invalid values, changes after sending starts, and changes after disposal fault.
+    /// Expiry requests cancellation and waits for handler cleanup before HttpError.TimedOut.
+    /// Caller/disposal cancellation takes precedence. Normal handler results are preserved.
+    /// Requires scheduler progress and cooperating handlers; transport phase limits still apply.
+    var Timeout: Option<Duration> {
+        get {
+            if let Some(duration) = timeout {
+                return Some(duration)
+            }
+            return None()
+        }
+        set {
+            if let Some(duration) = value {
+                if duration.Ticks <= 0L {
+                    System.Fail("HTTP timeout is out of range")
+                }
+                if duration.Ticks > 21474836470000L {
+                    System.Fail("HTTP timeout is out of range")
+                }
+            } else if let System.Option.None = value {
+                // Explicitly disabled, without a negative-duration sentinel.
+            } else {
+                System.Fail("Timeout requires Some or None")
+            }
+            EnsureUsable()
+            if started {
+                System.Fail("HTTP timeout cannot change after sending starts")
+            }
+            timeout = value
+        }
+    }
+
     private val lifetime = CancellationTokenSource()
     private var disposed = false
     private var ownsHandler = true
@@ -1132,7 +1171,9 @@ public class HttpClient : Disposable {
     /// Sends a prepared request, forwarding the token through the handler pipeline.
     func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
+        started = true
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let prepared = request.WithDefaults(defaultHeaders)
@@ -1143,6 +1184,9 @@ public class HttpClient : Disposable {
             System.Fail("Request preparation returned no outcome")
         }
         let operation = HttpSendScope(outgoing, cancellationToken, lifetime.Token)
+        if let Some(delay) = timeout {
+            operation.StartTimeout(delay)
+        }
         return operation.Attach(handler.Send(outgoing, operation.Token))
     }
 
@@ -1155,6 +1199,7 @@ public class HttpClient : Disposable {
     func Get(url: string, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let parsed = Uri.Parse(url)
@@ -1176,6 +1221,7 @@ public class HttpClient : Disposable {
     func Get(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let parsed = CreateRequest(uri)
@@ -1197,6 +1243,7 @@ public class HttpClient : Disposable {
     func Post(url: string, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let parsed = Uri.Parse(url)
@@ -1218,6 +1265,7 @@ public class HttpClient : Disposable {
     func Post(uri: Uri, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let parsed = CreatePost(uri, content)
@@ -1243,6 +1291,7 @@ public class HttpClient : Disposable {
     func Put(url: string, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let parsed = Uri.Parse(url)
@@ -1264,6 +1313,7 @@ public class HttpClient : Disposable {
     func Put(uri: Uri, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let parsed = CreatePut(uri, content)
@@ -1289,6 +1339,7 @@ public class HttpClient : Disposable {
     func Patch(url: string, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let parsed = Uri.Parse(url)
@@ -1310,6 +1361,7 @@ public class HttpClient : Disposable {
     func Patch(uri: Uri, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let parsed = CreatePatch(uri, content)
@@ -1335,6 +1387,7 @@ public class HttpClient : Disposable {
     func Delete(url: string, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let parsed = Uri.Parse(url)
@@ -1356,6 +1409,7 @@ public class HttpClient : Disposable {
     func Delete(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let parsed = CreateDelete(uri)
@@ -1381,6 +1435,7 @@ public class HttpClient : Disposable {
     func Head(url: string, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let parsed = Uri.Parse(url)
@@ -1402,6 +1457,7 @@ public class HttpClient : Disposable {
     func Head(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             return Cancelled()
         }
         let parsed = CreateHead(uri)
@@ -1427,6 +1483,7 @@ public class HttpClient : Disposable {
     func GetString(url: string, cancellationToken: CancellationToken) -> Task<Result<string, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             let source = Promise<Result<string, HttpError>>()
             _ = source.Cancel()
             return source.Task
@@ -1443,6 +1500,7 @@ public class HttpClient : Disposable {
     func GetString(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<string, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
+            started = true
             let source = Promise<Result<string, HttpError>>()
             _ = source.Cancel()
             return source.Task
@@ -1549,7 +1607,6 @@ public class HttpSocketHandler : HttpHandler {
 internal class HttpExchange {
     private var uploadRemaining: int = 0
     private var ownsUpload: bool = false
-    private var deadline = NetworkDeadline.Expired
     private var token: CancellationToken
     private var request: HttpRequest
     private var source: Promise<Result<HttpResponse, HttpError>>
@@ -1593,8 +1650,7 @@ internal class HttpExchange {
             ownsUpload = true
             uploadRemaining = request.Content.Length
         }
-        deadline = NetworkDeadline.AfterMilliseconds(15000)
-        let pending = Dns.GetHostAddressesUntil(request.Host, deadline, token)
+        let pending = Dns.GetHostAddresses(request.Host, token)
         lookup = Some(pending)
         pending.OnCompleted(self.OnLookup)
         return source.Task
@@ -1621,11 +1677,7 @@ internal class HttpExchange {
 
     private func Finish(result: Result<HttpResponse, HttpError>) {
         Cleanup()
-        if deadline.IsExpired {
-            _ = source.Complete(Error(HttpError.TimedOut))
-        } else {
-            _ = source.Complete(result)
-        }
+        _ = source.Complete(result)
     }
 
     private func OnLookup() {
@@ -1636,12 +1688,8 @@ internal class HttpExchange {
             }
             let result = pending.GetResult()
             lookup = None()
-            if deadline.IsExpired {
-                Finish(Error(HttpError.TimedOut))
-                return
-            }
             if let Ok(addresses) = result {
-                let next = Socket.ConnectUntil(addresses, request.Port, deadline, token)
+                let next = Socket.Connect(addresses, request.Port, token)
                 connecting = Some(next)
                 next.OnCompleted(self.OnConnected)
             } else if let Error(reason) = result {
@@ -1672,10 +1720,6 @@ internal class HttpExchange {
             Cancel()
             return
         }
-        if deadline.IsExpired {
-            Finish(Error(HttpError.TimedOut))
-            return
-        }
         if let Some(connection) = socket {
             if sent == outgoing.Count {
                 if uploadRemaining == 0 {
@@ -1687,10 +1731,6 @@ internal class HttpExchange {
                 // A synchronous source may request cancellation during Read.
                 if token.IsCancellationRequested {
                     Cancel()
-                    return
-                }
-                if deadline.IsExpired {
-                    Finish(Error(HttpError.TimedOut))
                     return
                 }
                 if let Error(reason) = reading {
@@ -1714,7 +1754,7 @@ internal class HttpExchange {
                 buffer[count] = outgoing[sent + count]
                 count += 1
             }
-            let pending = connection.SendUntil(buffer, 0, count, deadline, token)
+            let pending = connection.Send(buffer, 0, count, token)
             transfer = Some(pending)
             pending.OnCompleted(self.OnSent)
         }
@@ -1728,10 +1768,6 @@ internal class HttpExchange {
             }
             let result = pending.GetResult()
             transfer = None()
-            if deadline.IsExpired {
-                Finish(Error(HttpError.TimedOut))
-                return
-            }
             if let Ok(count) = result {
                 if count > 0 {
                     sent += count
@@ -1746,12 +1782,8 @@ internal class HttpExchange {
     }
 
     private func ReceiveNext() {
-        if deadline.IsExpired {
-            Finish(Error(HttpError.TimedOut))
-            return
-        }
         if let Some(connection) = socket {
-            let pending = connection.ReceiveUntil(buffer, 0, 256, deadline, token)
+            let pending = connection.Receive(buffer, 0, 256, token)
             transfer = Some(pending)
             pending.OnCompleted(self.OnReceived)
         }
@@ -1765,10 +1797,6 @@ internal class HttpExchange {
             }
             let result = pending.GetResult()
             transfer = None()
-            if deadline.IsExpired {
-                Finish(Error(HttpError.TimedOut))
-                return
-            }
             if let Ok(count) = result {
                 if count == 0 {
                     Finish(decoder.EndOfInput())
@@ -1799,6 +1827,11 @@ internal class HttpExchange {
 // Cancellation-outcome adapter: await cannot currently observe a cancelled task.
 // Cancellation requests are cooperative; completion waits for provider cleanup.
 internal class HttpSendScope {
+    private val caller: CancellationToken
+    private val owner: CancellationToken
+    private var timeoutSource: CancellationTokenSource? = null
+    private var timeoutRegistration: CancellationRegistration? = null
+    private var timedOut = false
     private val request: HttpRequest
     private val cancellation = CancellationTokenSource()
     private val source = Promise<Result<HttpResponse, HttpError>>()
@@ -1808,12 +1841,34 @@ internal class HttpSendScope {
     private var closed = false
 
     internal init(request: HttpRequest, caller: CancellationToken, owner: CancellationToken) {
+        self.caller = caller
+        self.owner = owner
         self.request = request
         callerRegistration = caller.Register(self.Cancel)
         ownerRegistration = owner.Register(self.Cancel)
     }
 
     internal val Token: CancellationToken => cancellation.Token
+
+    internal func StartTimeout(delay: Duration) {
+        let timer = CancellationTokenSource()
+        timeoutSource = timer
+        timeoutRegistration = timer.Token.Register(self.TimeoutElapsed)
+        timer.CancelAfter(delay)
+    }
+
+    private func TimeoutElapsed() {
+        if closed {
+            return
+        }
+        if let Some(task) = pending {
+            if task.IsCompleted {
+                return
+            }
+        }
+        timedOut = true
+        cancellation.Cancel()
+    }
 
     private func Cancel() {
         if !closed {
@@ -1848,9 +1903,27 @@ internal class HttpSendScope {
         }
         callerRegistration = null
         ownerRegistration = null
+        if timeoutRegistration is CancellationRegistration registration {
+            registration.Dispose()
+        }
+        if timeoutSource is CancellationTokenSource timer {
+            timer.Dispose()
+        }
+        timeoutRegistration = null
+        timeoutSource = null
         cancellation.Dispose()
         if task.IsCancelled {
-            _ = source.Cancel()
+            // Like HttpClient's .NET cancellation classification, an explicit caller
+            // or client-lifetime request takes precedence over timeout at acknowledgement.
+            // Copy readonly struct fields before invoking their getters: the current
+            // native compiler does not emit defensive copies for field receivers.
+            let callerToken = self.caller
+            let ownerToken = self.owner
+            if timedOut && !callerToken.IsCancellationRequested && !ownerToken.IsCancellationRequested {
+                _ = source.Complete(Error(HttpError.TimedOut))
+            } else {
+                _ = source.Cancel()
+            }
         } else {
             let result = task.GetResult()
             if let Ok(response) = result {

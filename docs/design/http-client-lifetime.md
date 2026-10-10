@@ -1,9 +1,10 @@
 # HttpClient lifetime and timeouts — development, 2026-10-10
 
 The author requested configurable request timeouts and Disposable support immediately
-after the encoding migration. Lifetime support is implemented in this slice; configurable timeout remains next.
+after the encoding migration. Lifetime, Timer, timed cancellation and configurable client timeout are now implemented;
+qualification and remaining transport limits are recorded below.
 
-## Current gaps
+## Initial gaps (historical baseline)
 
 HttpClient has no Timeout member. HttpExchange creates a single 15000 ms
 NetworkDeadline covering DNS, connection and transfers. Request cancellation is
@@ -225,3 +226,65 @@ No linked-source public factory is added in this slice. Scheduling remains invoc
 behavior scenarios and five fault guards pass in the interpreter and macOS ARM64
 native executable. Matching API snapshots pass their checks. Windows CI is configured,
 not executed. The source remains cooperative; no timeout preemption is claimed.
+
+
+## HttpClient.Timeout (2026-10-11)
+
+`Timeout: Option<Duration>` defaults to Some(100 seconds). None disables the client
+countdown; Some must be positive and no greater than Int32.MaxValue milliseconds.
+Fractional milliseconds round upward. The setting freezes on the first send, including
+pre-cancelled sends, and cannot be changed after disposal. Each request owns a separate
+CancellationTokenSource.CancelAfter countdown, started before calling the handler.
+It covers middleware and the buffered response; progress never renews the countdown.
+
+Expiry requests cancellation through the existing linked scope. Completion waits for
+provider acknowledgement and cleanup. A cancelled handler task maps to HttpError.TimedOut
+only if neither caller nor client-lifetime cancellation has been requested when
+acknowledgement is observed; otherwise it stays task cancellation. A handler's normal
+result is preserved, even if it chose to finish after a cancellation request. Custom
+handlers must cooperate; this API cannot preempt synchronous code or complete a
+permanently uncooperative handler. Completed requests remove all countdown registrations.
+
+The [.NET implementation](https://github.com/dotnet/runtime/blob/main/src/libraries/System.Net.Http/src/System/Net/Http/HttpClient.cs)
+(checked 2026-10-11) provides the comparison: per-send linked cancellation, 100-second
+default, frozen configuration, cancellation classification and cleanup. neoCLR keeps
+its typed HttpError outcome instead of exception-based timeout reporting. Option<Duration>
+instead of an infinite TimeSpan sentinel makes disabling explicit; the cost is a different
+property type and Some/None syntax. This follows the author's permission to choose
+sensible Raven APIs while preserving useful .NET behavior.
+
+HttpExchange no longer imposes an independent 15-second whole-request deadline, and
+the standalone native project host no longer aborts an invocation after 15 seconds.
+External test subprocess timeouts remain safety guards. NetworkDeadline remains a
+separate bounded socket API; it does not constrain the client countdown. DNS, connect
+and transfers still have provisional five-second phase bounds, including when Timeout
+is None. Those bounds are **remaining transport parity gaps**, not new timeout semantics
+or a promise that disabling the client countdown prevents transport failures. Server
+read/send budgets and the separate session-host test guard are unchanged.
+
+Focused qualification uses controlled handlers for acknowledgement, caller/disposal
+races, disabled deadlines, completion winning, independent requests and timer-capacity
+recovery. A native 16-second response guards against the former host abort. A real local
+peer verifies request delivery, socket closure on acknowledged timeout, and a delayed
+successful response with no client countdown. Windows uses the same CI consumers;
+local results do not claim Windows execution.
+
+Compiler integration notes: copy readonly CancellationToken fields to local values
+before invoking getters; the native portable emitter currently rejects direct readonly
+struct-field addresses instead of emitting a defensive copy. A pattern-bound request
+used across an async loop also exposed native local-before-store admission; the test
+constructs that request in a synchronous helper. These remain compiler candidates,
+not changes to Raven or .NET semantics. Async test helpers avoid retaining a large
+Result union across unrelated awaits under the current bounded native object profile.
+The AOT size diagnostic now identifies the offending type and flattened width.
+
+[Handler/guard qualification](../experiments/http-timeout/validation.json) passes nine
+scenarios and six guards in both modes, plus the native 16-second host regression.
+[Real network qualification](../experiments/http-timeout/network-validation.json) passes
+acknowledged timeout/peer closure and disabled-timeout response in both modes. The
+interpreter fixture uses the existing HTTP-test instruction budget of 100 million;
+the 96-send capacity check reuses a prepared request. The documentation-only rebuild
+refreshes both API references with the same compiler and implementation source; runtime
+evidence names the exact tested bundle hash. Windows CI is configured but unexecuted.
+The existing ten HTTP lifetime/delegating-handler tests also pass with the new default
+countdown in both modes ([regression evidence](../experiments/http-timeout/lifetime-validation.json)).

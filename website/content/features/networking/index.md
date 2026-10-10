@@ -31,8 +31,8 @@ String socket overloads also accept numeric addresses.
 
 Networking and Web share an opaque
 [NetworkDeadline](xref:System.Networking.NetworkDeadline). DNS, connection attempts and
-partial transfers can use the same deadline without restarting it. HTTP retains its
-15-second exchange budget; existing shorter phase limits and cancellation behavior remain.
+partial transfers can use the same deadline without restarting it. HttpClient owns its configurable total request countdown; shorter transport phase limits
+and cooperative cancellation behavior remain.
 The default deadline is expired. See the [API contract](/docs/sockets.html) for limits.
 
 ## Resolve, connect, exchange
@@ -164,5 +164,5 @@ with `use` or dispose it explicitly. The default constructor and handler constru
 own the handler; `HttpClient(handler, false)` borrows it. Disposal requests cancellation
 of pending sends and rejects new ones. The host must keep processing completions so
 handlers can finish cleanup. Completed responses remain caller-owned. Derive middleware from DelegatingHandler, which owns InnerHandler and freezes its
-configuration on the first send. A configurable client timeout is
-still pending; the current transport deadline is described above.
+configuration on the first send. HttpClient.Timeout configures the total cooperative request budget, defaulting to
+100 seconds; None disables it. Transport phase limits remain independent.

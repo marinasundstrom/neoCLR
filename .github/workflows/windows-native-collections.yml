@@ -26,6 +26,9 @@ on:
       - 'scripts/validate-timers.py'
       - 'docs/experiments/timers/**'
       - 'docs/experiments/cancel-after/**'
+      - 'docs/experiments/http-timeout/**'
+      - 'scripts/validate-http-timeout-network.py'
+      - 'benchmarks/native-web/http-host.c'
       - 'docs/experiments/http-lifetime/**'
       - 'docs/experiments/obsolete-runtime/**'
       - 'docs/experiments/raven-target/samples/library-utf8*'
@@ -67,6 +70,9 @@ on:
       - 'scripts/validate-timers.py'
       - 'docs/experiments/timers/**'
       - 'docs/experiments/cancel-after/**'
+      - 'docs/experiments/http-timeout/**'
+      - 'scripts/validate-http-timeout-network.py'
+      - 'benchmarks/native-web/http-host.c'
       - 'docs/experiments/http-lifetime/**'
       - 'docs/experiments/obsolete-runtime/**'
       - 'docs/experiments/raven-target/samples/library-utf8*'
@@ -135,6 +141,15 @@ jobs:
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-timers.py --suite cancel-after --bundle `"target/windows-native-collections-validation/development toolchain/bundle`" --output target/windows-native-collections-validation/cancel-after"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify HTTP timeout and real socket cleanup
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-timers.py --suite http-timeout --bundle `"target/windows-native-collections-validation/development toolchain/bundle`" --output target/windows-native-collections-validation/http-timeout"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-http-timeout-network.py --bundle `"target/windows-native-collections-validation/development toolchain/bundle`" --output target/windows-native-collections-validation/http-timeout-network"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Verify public encoding sample and internal helper boundary

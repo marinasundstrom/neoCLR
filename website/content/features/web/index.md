@@ -245,15 +245,21 @@ It rejects ambiguous framing, chunk extensions/trailers, other transfer codings
 and content encodings. It does not implement TLS, redirects, pooling,
 streaming responses, unknown-length uploads or informational response handling. Text always means strict UTF-8.
 
-The socket handler has a provisional 15-second exchange budget, starting before
-DNS lookup and ending with the buffered response. DNS, connection and transfers keep
-their shorter five-second bounds. Short progress does not renew the shared budget;
-expiry closes the connection and returns an error. This requires scheduler progress
-and does not preempt guest code. The limit is not configurable yet.
+Development `HttpClient.Timeout` configures one cooperative budget across the handler
+pipeline, DNS, connection and buffered response completion. It defaults to
+`Some(Duration.FromTicks(1000000000L))` (100 seconds); `Option<Duration>.None()` disables
+the client countdown. Configure it before sending. Positive durations through
+Int32.MaxValue milliseconds are supported, rounding fractional milliseconds upward.
 
-Request construction, custom pipeline work outside the socket handler, server accept
-and server application-handler waiting are not covered by this exchange budget.
-The verifier's watchdog is only a test guard.
+Expiry requests cancellation and waits for handler cleanup acknowledgement, then returns
+`HttpError.TimedOut`. Caller cancellation and disposal remain cancelled task outcomes.
+A completed response is preserved; a custom handler that ignores cancellation may keep
+running. Timer delivery requires scheduler progress and cannot preempt synchronous code.
+DNS, connection and transfers retain their independent five-second bounds and may fail
+earlier. Direct socket-handler use has only those phase bounds. Server budgets are separate.
+
+The native request host no longer aborts after fifteen seconds; test subprocesses retain
+external watchdogs. See the [Timeout API](/docs/api/System/Web/Http/HttpClient/index.html).
 The transport uses a 256-byte reusable buffer and handles short transfers. This
 is a correctness POC, not a performance benchmark. Generated async states still perform suspension.
 

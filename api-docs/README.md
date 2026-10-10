@@ -1707,3 +1707,8 @@ cancel callback work. See the timer section in docs/design/http-client-lifetime.
 Both CancelAfter overloads are included in the aggregate/native development reference.
 Duration schedules a cooperative request; Option.None disables scheduling without
 resetting cancellation state. Durations follow Timer's range and rounding rules.
+
+HttpClient.Timeout is included in both development snapshots as Option<Duration>,
+defaulting to Some(100 seconds), with None disabling the per-request countdown.
+Configuration freezes on send; cancellation acknowledgement precedes typed timeout
+completion. Five-second transport phase bounds remain independent limitations.

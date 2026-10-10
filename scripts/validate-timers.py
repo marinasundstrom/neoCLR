@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--suite', choices=('timers', 'cancel-after'), default='timers')
+    parser.add_argument('--suite', choices=('timers', 'cancel-after', 'http-timeout'), default='timers')
     parser.add_argument('--bundle', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
@@ -23,7 +23,7 @@ def main():
     bundle, out = args.bundle.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     fixture = ROOT / 'docs/experiments' / args.suite
-    report = dict(passed=False, platform=platform.platform(), cases=[],
+    report = dict(passed=False, platform=platform.platform(), instructionBudget=100000000, cases=[],
                   bundleManifestSha256=hashlib.sha256((bundle / 'manifest.json').read_bytes()).hexdigest(),
                   sources={p.name: hashlib.sha256(p.read_bytes()).hexdigest()
                            for p in fixture.iterdir() if p.suffix in ('.rvn', '.rvnproj')})
@@ -38,10 +38,10 @@ def main():
             (out / (project + '.stdout.log')).write_text(result.stdout)
             (out / (project + '.stderr.log')).write_text(result.stderr)
             if result.returncode:
-                raise RuntimeError('Timer fixture build failed; see retained logs')
+                raise RuntimeError('Runtime fixture build failed; see retained logs')
             lib = bundle / 'lib'
             interpreter = [str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--system', str(lib / 'System.runtime.neox'),
-                           '--object-root', str(lib / 'System.Runtime.dll')]
+                           '--object-root', str(lib / 'System.Runtime.dll'), '--instructions', '100000000']
             for name in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web'):
                 interpreter += ['--module', str(lib / (name + '.dll'))]
             native = [str(build / ('app.exe' if os.name == 'nt' else 'app'))]
@@ -53,7 +53,12 @@ def main():
                 cases = {'negative': 'Timer duration is out of range', 'excessive': 'Timer duration is out of range',
                          'cancelled-negative': 'Timer duration is out of range', 'disposed': 'Cancellation source is disposed',
                          'disposed-disable': 'Cancellation source is disposed'}
-            expected = 10 if args.suite == 'timers' else 4
+            if args.suite == 'http-timeout' and project == 'Faults':
+                cases = {'zero': 'HTTP timeout is out of range', 'negative': 'HTTP timeout is out of range',
+                         'excessive': 'HTTP timeout is out of range', 'disposed': 'HTTP client is disposed',
+                         'started': 'HTTP timeout cannot change after sending starts',
+                         'cancelled-send': 'HTTP timeout cannot change after sending starts'}
+            expected = {'timers': 10, 'cancel-after': 4, 'http-timeout': 9}[args.suite]
             for case, message in cases.items():
                 for mode, command in (('interpreter', interpreter), ('native', native)):
                     command = [*command, *(['--'] if mode == 'interpreter' and message else []), *([case] if message else [])]
@@ -64,6 +69,13 @@ def main():
                         result.returncode == 0 and result.stdout.count('PASS ') == expected and 'ERROR' not in result.stdout)
                     if not valid:
                         raise RuntimeError(f'{case} {mode} failed: {record}')
+            if args.suite == 'http-timeout' and project == 'Timers':
+                # This specifically guards the former native host's 15-second abort.
+                result = subprocess.run([*native, 'long'], cwd=ROOT, capture_output=True, text=True, timeout=30)
+                report['cases'].append(dict(case='long-request', mode='native', exitCode=result.returncode,
+                                            stdout=result.stdout, stderr=result.stderr))
+                if result.returncode or 'PASS default timeout permits requests beyond fifteen seconds' not in result.stdout:
+                    raise RuntimeError('Long request was cut short by the native host')
         report['passed'] = True
     finally:
         (out / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')

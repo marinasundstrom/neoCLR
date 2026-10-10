@@ -34,3 +34,6 @@
 
 /docs/experiments/cancel-after/bin/
 /docs/experiments/cancel-after/obj/
+
+/docs/experiments/http-timeout/bin/
+/docs/experiments/http-timeout/obj/

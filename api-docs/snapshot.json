@@ -1,7 +1,7 @@
 {
-  "assemblySha256": "d55e793c37813b8fa8ec96883d8d7c62b443cd3451f8a9dfcfef3c8c6a1d51b8",
+  "assemblySha256": "4d9f29ca97570d93e57361a2cec01dd581acca83a87aa371ba6e4a81dfdb3209",
   "inputs": {
-    "api-docs/NeoCLR.CoreProbe.xml": "072b6c077b07035bd74eb6f981418f0568dd49a64aee383f67c821536703635c",
+    "api-docs/NeoCLR.CoreProbe.xml": "827fc4360405a60f6991d818664cbb049625b5dd426bf519986fad86c4068648",
     "api-docs/exclusions.json": "dfbbab53935ec02fec642d8b5281a5bb01f12ff30d27d2fe47900430c26e642a",
     "api-docs/manual-members.json": "0e873d90c2e2b1a78b111265459ff9998aa0b8a6ef1eb8aca2b393d6fc277ecf",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
@@ -56,7 +56,7 @@
     "docs/experiments/raven-target/GlobalizationBindings.cs": "bae1a4cbf06d98c76d68727a14a0f67594dbf78db1f10954244246f35dde8b03",
     "docs/experiments/raven-target/GlobalizationChecks.cs": "20e0ebd0a12f3ea247c72a181e18f98f33717d03425222d0af4b5a724a0f7757",
     "docs/experiments/raven-target/HashCodeBindings.cs": "f5f42c4cb5402f3df6d99f6f6f5734106538a417a223fa72fdddd92f4bdc8e6b",
-    "docs/experiments/raven-target/HttpBindings.cs": "e69fef272b3dfc7c4bd32c6ab14d81fd4780e8e692f68a544b73a1ec91bcc15a",
+    "docs/experiments/raven-target/HttpBindings.cs": "fd954ae4e799488ad98aec649e9e39acd8613e77fabbfb7e4bf7a89d846848c7",
     "docs/experiments/raven-target/HttpJsonBindings.cs": "52515cadf6ad04ece1995e7a698118ca136451630212aa2f695a40a5d49698eb",
     "docs/experiments/raven-target/IPAddressBindings.cs": "fbb8f46466c5464ab54c3188fa826f47ff15f0dfb73f486a947a78eb46aee976",
     "docs/experiments/raven-target/InstanceLibraryChecks.cs": "172a54a1ac036d4b5c9433100a4e035a8678d661cfc8aa39d0b6f759ca7cdfb6",
@@ -320,7 +320,7 @@
     "runtime/raven/src/System/UriError.rvn": "7827af304d1df8c476dab87f7dfd6e4f41e5f434f2e5bd26fcf340147052a1ba",
     "runtime/raven/src/System/Value.rvn": "29178eeeb815a738293b3c5e675ba67fed7cfe906d19876bd4f501908625632b",
     "runtime/raven/src/System/Void.rvn": "260060b042e17bb4d8ebcd7bfd8e4fd05cebfaa3621335b6ea9920212d8ca5f7",
-    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "7ed93fa3f920c384f8bba06aead51bcc34e398d78d4bc588407b651243e4255a",
+    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "aa3b01c7c7c982961cdade262b15e7a4362e88ef10ef28e7a3c54967a824c582",
     "runtime/raven/src/System/Web/Http/HttpError.rvn": "58341b8593bd2a23bf4b25f68ac8c0f0fee9b39e584f3fb9efa2609033db0848",
     "runtime/raven/src/System/Web/Http/HttpServer.rvn": "260d78965926c3071eae700c03d8e2ebfbb18d28f555d3383ce227c345caf6e2",
     "runtime/raven/src/System/Web/Http/HttpStatusCode.rvn": "793a7145655e008ed29d1245205504e5e0333964320e4a036e5a857c111201dd",

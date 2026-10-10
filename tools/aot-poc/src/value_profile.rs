@@ -195,7 +195,10 @@ impl<'a> Profile<'a> {
                 }
             }
             if p.input.types[i].is_reference_type && width > 32 {
-                return Err("reference hierarchy exceeds the 264-byte native object bound".into());
+                return Err(format!(
+                    "{}: reference hierarchy exceeds the 264-byte native object bound ({width} flattened lanes)",
+                    p.input.types[i].name
+                ).into());
             }
             p.widths[i] = width.max(1);
             states[i] = 2;

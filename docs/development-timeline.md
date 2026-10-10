@@ -14229,3 +14229,13 @@ claim completion of in-process test discovery.
 - **Next layer outcome:** CancelAfter now implements replace/disable/lifetime cleanup;
   four behavior scenarios and five guards pass interpreted and macOS native execution.
   [Evidence](experiments/cancel-after/validation.json). HTTP timeout remains in progress.
+
+- **HTTP layer outcome:** HttpClient.Timeout now composes CancelAfter with the existing
+  cancellation/ownership pipeline. Local checks pass for nine handler scenarios, six
+  guards, real socket cleanup and a native request exceeding fifteen seconds. The old
+  project-host watchdog and whole-exchange client budget are removed. Five-second
+  transport phase bounds remain explicit gaps. Windows CI is configured, unexecuted.
+- **Author follow-up:** requested HttpMethod, predefined method properties and Parse,
+  while retaining custom values through its constructor. **Assistant plan:** implement
+  this as the next slice, integrate request authoring and compare .NET validation and
+  equality. This follow-up is not claimed implemented by the timeout slice.

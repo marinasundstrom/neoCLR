@@ -44,6 +44,7 @@ static class HttpBindings
                 public HttpClient(HttpHandler handler, bool disposeHandler) { }
                 public void Dispose() { }
                 public Option<string> BaseUri { get; set; }
+                public Option<Time.Duration> Timeout { get; set; }
                 public Collections.Sequence<HttpHeader> DefaultRequestHeaders { get; set; }
                 public Tasks.Task<Result<HttpResponse, HttpError>> Get(string url) => default;
                 public Tasks.Task<Result<HttpResponse, HttpError>> Get(string url, Concurrency.CancellationToken cancellationToken) => default;
@@ -284,6 +285,8 @@ static class HttpBindings
             ("HttpRequest", "WithDefaults") when library => ("System.Collections.Sequence<System.Web.Http.HttpHeader>", $"System.Result<{request},System.Web.Http.HttpError>", false),
             ("HttpClient", "get_DefaultRequestHeaders") => ("", "System.Collections.Sequence<System.Web.Http.HttpHeader>", false),
             ("HttpClient", "set_DefaultRequestHeaders") => ("System.Collections.Sequence<System.Web.Http.HttpHeader>", "noresult", false),
+            ("HttpClient", "get_Timeout") => ("", "System.Option<System.Time.Duration>", false),
+            ("HttpClient", "set_Timeout") => ("System.Option<System.Time.Duration>", "noresult", false),
             ("HttpClient", "get_BaseUri") => ("", "System.Option<String>", false),
             ("HttpClient", "set_BaseUri") => ("System.Option<String>", "noresult", false),
             ("HttpHandler" or "DelegatingHandler", "Send") => (request + ",System.Concurrency.CancellationToken", task, false),

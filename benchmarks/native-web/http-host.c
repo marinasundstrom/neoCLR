@@ -18,16 +18,10 @@
 #include <io.h>
 #endif
 
-static uint64_t milliseconds(void) {
-    uint64_t now = neoclr_os_monotonic_ns();
-    return now ? now / UINT64_C(1000000) : UINT64_MAX;
-}
-typedef struct entry_io { neoclr_socket_scope *sockets; uint64_t started; } entry_io;
+typedef struct entry_io { neoclr_socket_scope *sockets; } entry_io;
 static int32_t poll_entry(neoclr_aot_context *context, uint64_t *callback,
     const neoclr_probe_frame *boundary, void *state) {
     entry_io *io = state;
-    uint64_t now = milliseconds();
-    if (now == UINT64_MAX || io->started == UINT64_MAX || now - io->started > 15000) return -3;
     unsigned active = 0;
     for (unsigned i = 0; i < 64; i++) active += io->sockets->operations[i].state != 0;
     if (!active) return 0;
@@ -45,11 +39,10 @@ static int invoke(neoclr_aot_context *context, int *failed, int argc, neoclr_pro
     if (neoclr_task_scope_enter_v1(&tasks, context)) {
         neoclr_socket_scope_leave_v1(&sockets); *failed = 1; return 2;
     }
-    entry_io io = {&sockets, milliseconds()};
+    entry_io io = {&sockets};
     tasks.poll = poll_entry;
     tasks.poll_state = &io;
     status = neoclr_process_entry(argc, argv, &result, context);
-    uint64_t started = milliseconds();
     while (!status && !host_error) {
         status = neoclr_drain_default_queue_v1(context);
         if (status) break;
@@ -61,8 +54,6 @@ static int invoke(neoclr_aot_context *context, int *failed, int argc, neoclr_pro
         if (ready == 1) status = neoclr_invoke_void_callback_v1(callback, context);
         else if (ready < 0) host_error = 1;
         else neoclr_os_pause();
-        uint64_t now = milliseconds();
-        if (now == UINT64_MAX || started == UINT64_MAX || now - started > 15000) host_error = 1;
     }
     if (neoclr_root_probe_head_v1()) host_error = 1;
     if (neoclr_socket_scope_leave_v1(&sockets)) host_error = 1;
@@ -110,6 +101,6 @@ int NEOCLR_PROCESS_MAIN(int argc, neoclr_process_char **argv) {
 #else
     free(buffer);
 #endif
-    if (host_error) fputs("Native HTTP host failed or exceeded its completion timeout\n", stderr);
+    if (host_error) fputs("Native HTTP host failed\n", stderr);
     return host_error ? 2 : result;
 }

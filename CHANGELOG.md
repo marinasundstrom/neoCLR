@@ -23,7 +23,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Refresh both API references and add shared interpreter/native Windows CI fixtures.
   Add CancellationTokenSource.CancelAfter with replaceable Duration countdowns and
   explicit None disabling; cancellation/disposal releases pending timers.
-  Windows execution remains pending. HttpClient.Timeout is the next layer.
+  Add per-request HttpClient.Timeout with a 100-second default, explicit None disabling,
+  frozen configuration and cancellation acknowledgement before typed timeout completion.
+  Remove the old independent 15-second client budget and native project host abort;
+  socket/DNS phase bounds remain provisional limits. AOT size diagnostics now identify
+  the oversized type and flattened width. Windows execution remains pending.
 
 - Add bounded AOT virtual dispatch for nongeneric reference classes. Resolve targets
   with interpreter ancestry rules, retain required base slots, and generate separate

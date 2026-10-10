@@ -3683,3 +3683,13 @@ before returning to Index/Range.
 lifetime, replacing countdowns and allowing explicit None disabling. HttpClient.Timeout
 is next; the native host watchdog and old transport exchange budget must be removed
 from that request-timeout path before claiming its configured semantics.
+
+**HTTP timeout layer (2026-10-11):** HttpClient.Timeout now composes per-request timed
+cancellation with handler cleanup, a 100-second default, explicit disabled state,
+frozen configuration and typed timeout outcomes. Nine handler scenarios, six guards,
+a native 16-second request and two real-network cases pass locally in the applicable
+interpreter/macOS modes ([evidence](experiments/http-timeout/validation.json),
+[network](experiments/http-timeout/network-validation.json)). Windows remains pending.
+The independent 15-second client/host limits are removed; shorter transport phase
+bounds remain tracked gaps. Author follow-up is HttpMethod with predefined values,
+parsing and custom construction before returning to Index/Range.

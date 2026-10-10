@@ -1,0 +1,26 @@
+import System.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Time.*
+import System.Web.Http.*
+
+async func Main(arguments: string[]) -> Task<()> {
+    let client = HttpClient()
+    let mode = arguments[1]
+    if mode == "timeout" {
+        client.Timeout = Some(Duration.FromTicks(20000000L))
+    } else {
+        client.Timeout = Option<Duration>.None()
+    }
+    let result = await client.Get(arguments[0])
+    client.Dispose()
+    if mode == "timeout" {
+        let Error(HttpError.TimedOut) = result else { System.Fail("Expected network timeout") }
+        Console.WriteLine("PASS socket cleanup before timeout acknowledgement")
+    } else {
+        let Ok(response) = result else { System.Fail("Expected network response") }
+        if (int)response.StatusCode != 200 { System.Fail("Unexpected status") }
+        Console.WriteLine("PASS delayed response with disabled client timeout")
+    }
+}

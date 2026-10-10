@@ -1,0 +1,38 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Time.*
+import System.Web.Http.*
+
+class ImmediateHandler : HttpHandler {
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(HttpResponse(200, ArrayList<HttpHeader>(), ArrayList<byte>())))
+    }
+}
+
+func Main(arguments: string[]) {
+    use client = HttpClient(ImmediateHandler())
+    let mode = arguments[0]
+    if mode == "zero" {
+        client.Timeout = Some(Duration.FromTicks(0L))
+    } else if mode == "negative" {
+        client.Timeout = Some(Duration.FromTicks(-1L))
+    } else if mode == "excessive" {
+        client.Timeout = Some(Duration.FromTicks(21474836470001L))
+    } else if mode == "started" {
+        _ = client.Get("http://example.test/")
+        client.Timeout = Option<Duration>.None()
+    } else if mode == "disposed" {
+        client.Dispose()
+        client.Timeout = Option<Duration>.None()
+    } else if mode == "cancelled-send" {
+        use source = CancellationTokenSource()
+        source.Cancel()
+        _ = client.Get("http://example.test/", source.Token)
+        client.Timeout = Option<Duration>.None()
+    }
+    Console.WriteLine("ERROR invalid HTTP timeout change returned")
+}

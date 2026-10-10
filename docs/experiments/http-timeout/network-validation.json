@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "case": "timeout",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS socket cleanup before timeout acknowledgement\n",
+      "stderr": "",
+      "peer": {
+        "requestBytes": 60,
+        "closed": true
+      }
+    },
+    {
+      "case": "success",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS delayed response with disabled client timeout\n",
+      "stderr": "",
+      "peer": {
+        "requestBytes": 60,
+        "closed": true
+      }
+    },
+    {
+      "case": "timeout",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS socket cleanup before timeout acknowledgement\n",
+      "stderr": "",
+      "peer": {
+        "requestBytes": 60,
+        "closed": true
+      }
+    },
+    {
+      "case": "success",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS delayed response with disabled client timeout\n",
+      "stderr": "",
+      "peer": {
+        "requestBytes": 60,
+        "closed": true
+      }
+    }
+  ],
+  "sourceSha256": "ec50f83e41581928e08bc8e0812c786043defcb385121a18949d5008a259214d",
+  "bundleManifestSha256": "bba491df2be980b67955f6fae839dddd0c45795094db4a66634dca6b4e50fe02"
+}
