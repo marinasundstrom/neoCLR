@@ -1,0 +1,11 @@
+module NeoClr.RuntimeTests
+
+import NeoClr.Testing.*
+
+func Main() -> int {
+    let suite = TestSuite()
+    RegisterCollectionTests(suite)
+    let report = suite.Run()
+    ConsoleReporter.Write(report)
+    return report.ExitCode
+}

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add a Raven runtime-library test runner with module-level cases, Result-based
+  Assert.Equal/True, stable IDs, structured pass/fail/skip reports and registration
+  preflight. Seven collection tests and deliberate failure/continuation checks pass
+  macOS native/interpreter execution. Wire matching Windows CI; qualification is
+  pending. Document the intended stable source contract and next TestAttribute
+  introspection adapter; automatic discovery is not implemented yet.
+
 - Admit immutable native-produced Char[] snapshots in AOT, matching the existing
   interpreter StringGraphemes contract instead of the incorrect mutable-array
   binding. Preserve read-only access, fixed-extent replacement and tracing of

@@ -13302,3 +13302,22 @@ Before that work, the assistant verifies Windows compiler-cleanup artifacts and
 implements bounded immutable Char[] native admission. Focused snapshot tests pass,
 but the full String(sequence) consumer remains blocked by constructor call admission;
 the library's existing character-copy loop remains unchanged.
+
+
+The author clarified that classes need not group tests, requested modern .NET-like
+ergonomics with room to evolve, and emphasized “a more or less stable contract”.
+The assistant implemented module-level tests, Assert.Equal/True, separate stable
+IDs/display names, structured pass/fail/skip outcomes, registration preflight and
+an independent console reporter. Assertions currently return Result and require
+explicit propagation; ignored failures and terminal Faults remain limitations.
+Both native and interpreted macOS execution pass seven collection cases and the
+runner's deliberate failure/continuation, skip and invalid-registration checks.
+See the [core contract and evidence](../runtime/raven/tests/README.md).
+
+The author then selected TestAttribute discovery, clarifying introspection rather
+than reflection for finding tests. The assistant separates attribute inspection
+from invocation and records this as the next adapter over the existing runner.
+Attribute emission, discovery/rooting and native invocation are not implemented
+by the initial runner slice. The author did not require classes or approve specific
+attribute options; those remain open. Windows framework execution is added to the
+existing collections action and awaits qualification.

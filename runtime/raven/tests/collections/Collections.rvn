@@ -1,0 +1,112 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Linq.*
+import System.Option.*
+import System.Result.*
+import NeoClr.Testing.*
+
+func RegisterCollectionTests(suite: TestSuite) {
+    suite.Add("NeoClr.RuntimeTests.ListCopy", "ArrayList copy has independent storage", ListCopy)
+    suite.Add("NeoClr.RuntimeTests.QueueOrder", "ArrayQueue preserves FIFO", QueueOrder)
+    suite.Add("NeoClr.RuntimeTests.StackOrder", "ArrayStack preserves LIFO", StackOrder)
+    suite.Add("NeoClr.RuntimeTests.SetEquality", "HashSet applies its comparer", SetEquality)
+    suite.Add("NeoClr.RuntimeTests.AnyWithoutCurrent", "Any does not read Current", AnyWithoutCurrent)
+    suite.Add("NeoClr.RuntimeTests.PredicateAny", "Predicate Any stops at its first match", PredicateAny)
+    suite.Add("NeoClr.RuntimeTests.ForBreak", "For break disposes its iterator", ForBreak)
+}
+
+func ListCopy() -> Result<unit, TestFailure> {
+    let source = ArrayList<int>()
+    source.Add(4)
+    let copy = ArrayList<int>(source)
+    source[0] = 9
+    _ = Assert.Equal(1, copy.Count)?
+    return Assert.Equal(4, copy[0])
+}
+
+func QueueOrder() -> Result<unit, TestFailure> {
+    let queue = ArrayQueue<int>()
+    queue.Enqueue(4)
+    queue.Enqueue(9)
+    _ = Assert.True(queue.Dequeue() is Some(4), "First input must be removed first")?
+    _ = Assert.True(queue.Dequeue() is Some(9), "Second input must follow")?
+    return Assert.True(queue.Dequeue() is None, "Drained queue must be empty")
+}
+
+func StackOrder() -> Result<unit, TestFailure> {
+    let stack = ArrayStack<int>()
+    stack.Push(4)
+    stack.Push(9)
+    _ = Assert.True(stack.Pop() is Some(9), "Last input must be removed first")?
+    _ = Assert.True(stack.Pop() is Some(4), "First input must follow")?
+    return Assert.True(stack.Pop() is None, "Drained stack must be empty")
+}
+
+func SetEquality() -> Result<unit, TestFailure> {
+    let set = HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    _ = Assert.True(set.Add("Raven"), "First item must be added")?
+    _ = Assert.True(!set.Add("RAVEN"), "Equivalent item must be ignored")?
+    return Assert.Equal(1, set.Count)
+}
+
+func AnyWithoutCurrent() -> Result<unit, TestFailure> {
+    let input = ObservedNumbers()
+    _ = Assert.True(input.Any(), "Input is nonempty")?
+    _ = Assert.Equal(1, input.Moves)?
+    _ = Assert.Equal(0, input.Reads)?
+    return Assert.Equal(1, input.Disposals)
+}
+
+func PredicateAny() -> Result<unit, TestFailure> {
+    let input = ObservedNumbers()
+    _ = Assert.True(input.Any(value => value == 2), "Second element matches")?
+    _ = Assert.Equal(2, input.Moves)?
+    _ = Assert.Equal(2, input.Reads)?
+    return Assert.Equal(1, input.Disposals)
+}
+
+func ForBreak() -> Result<unit, TestFailure> {
+    let input = ObservedNumbers()
+    for value in input {
+        break
+    }
+    _ = Assert.Equal(1, input.Moves)?
+    return Assert.Equal(1, input.Disposals)
+}
+
+// A fixture has state; the test functions above do not require a fixture class.
+class ObservedNumbers : Iterable<int> {
+    var Moves: int { get; set; } = 0
+    var Reads: int { get; set; } = 0
+    var Disposals: int { get; set; } = 0
+
+    func GetIterator() -> Iterator<int> => ObservedIterator(self)
+}
+
+class ObservedIterator : Iterator<int> {
+    private val owner: ObservedNumbers
+    private var index = 0
+
+    init(owner: ObservedNumbers) {
+        self.owner = owner
+    }
+
+    func MoveNext() -> bool {
+        owner.Moves = owner.Moves + 1
+        index = index + 1
+        return index <= 4
+    }
+
+    val Current: int {
+        get {
+            owner.Reads = owner.Reads + 1
+            return index
+        }
+    }
+
+    func Dispose() {
+        owner.Disposals = owner.Disposals + 1
+    }
+}

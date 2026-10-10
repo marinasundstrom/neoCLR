@@ -206,3 +206,10 @@ The development compiler also disposes reference iterators on structured exits
 from `for`, including early return and break, in lifetime order with `use`. Terminal
 Faults do not unwind these scopes. Prefer for where consuming elements expresses
 the operation; use retains explicit control for advance-only or stateful iteration.
+
+Development runtime-library tests now use ordinary Raven module functions and a
+Raven runner, with native/interpreter checks for collection ordering, copying,
+comparers and iterator ownership. The
+[test contract and executable suites](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/README.md)
+separate discovery from execution; TestAttribute introspection discovery is the next
+planned layer.

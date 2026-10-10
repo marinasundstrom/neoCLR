@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+**Author-directed testing slice (2026-10-10):** establish a Raven-written runtime-library
+[test framework and runner](../runtime/raven/tests/README.md), with module-level
+functions and an intended stable core contract. Explicit registration, assertions,
+structured pass/fail/skip reports and continuation after assertion failure now pass
+macOS ARM64 native/interpreter checks. Windows CI is wired; qualification is pending.
+Next add TestAttribute discovery through introspection without changing execution
+contracts. Qualify metadata retention and callable adapters before claiming native
+automatic discovery. This supports the native/collection milestone; it does not
+permanently reprioritize the rest of the platform roadmap.
+
 ## Active direction: usable native compilation (2026-10-09)
 
 After Preview 13, the author selects native compilation as the next priority and

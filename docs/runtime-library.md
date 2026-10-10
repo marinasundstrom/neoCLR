@@ -4,6 +4,10 @@ The planned [System.Runtime assembly](system-runtime-assembly.md) will own the
 minimum managed foundation now being authored through the System project.
 This is a project/assembly boundary, not a move of every type into one namespace.
 
+The [Raven test framework](../runtime/raven/tests/README.md) provides module-level
+runtime-library tests with a stable execution contract and a planned TestAttribute
+introspection adapter. Native and interpreted execution share the same suites.
+
 Try the latest local collection APIs with the [Raven .12 installation](raven-collections-local-build.md).
 
 The [API design policy and contract inventory](api-design.md) defines when System

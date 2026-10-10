@@ -1,0 +1,150 @@
+module NeoClr.Testing
+
+import System.*
+import System.Collections.*
+import System.Option.*
+import System.Result.*
+
+union TestOutcome {
+    case Passed
+    case Failed(failure: TestFailure)
+    case Skipped(reason: string)
+}
+
+class TestCase {
+    val Id: string
+    val Name: string
+    val SkipReason: Option<string>
+    private val body: () -> Result<unit, TestFailure>
+
+    init(id: string, name: string, body: () -> Result<unit, TestFailure>, skipReason: Option<string>) {
+        Id = id
+        Name = name
+        self.body = body
+        SkipReason = skipReason
+    }
+
+    func Invoke() -> Result<unit, TestFailure> => body()
+}
+
+class TestExecution {
+    val Id: string
+    val Name: string
+    val Outcome: TestOutcome
+
+    init(id: string, name: string, outcome: TestOutcome) {
+        Id = id
+        Name = name
+        Outcome = outcome
+    }
+}
+
+class TestRunReport {
+    val Results: Sequence<TestExecution>
+    val Passed: int
+    val Failed: int
+    val Skipped: int
+    val Error: string
+
+    init(results: Sequence<TestExecution>, passed: int, failed: int, skipped: int, error: string) {
+        Results = results
+        Passed = passed
+        Failed = failed
+        Skipped = skipped
+        Error = error
+    }
+
+    val ExitCode: int {
+        get {
+            if Error != "" {
+                return 2
+            }
+            if Failed != 0 {
+                return 1
+            }
+            return 0
+        }
+    }
+}
+
+class TestSuite {
+    private val cases = ArrayList<TestCase>()
+    private var registrationError = ""
+
+    private func Register(test: TestCase) {
+        if registrationError != "" {
+            return
+        }
+        if test.Id == "" || test.Name == "" {
+            registrationError = "Test IDs and names must be nonempty"
+            return
+        }
+        for existing in cases {
+            if existing.Id == test.Id {
+                registrationError = "Duplicate test ID: " + test.Id
+                return
+            }
+        }
+        cases.Add(test)
+    }
+
+    func Add(id: string, name: string, body: () -> Result<unit, TestFailure>) {
+        Register(TestCase(id, name, body, None))
+    }
+
+    func Skip(id: string, name: string, reason: string) {
+        if reason == "" {
+            registrationError = "Skipped tests require a reason"
+            return
+        }
+        Register(TestCase(id, name, () => Ok(()), Some(reason)))
+    }
+
+    func Run() -> TestRunReport {
+        let results = ArrayList<TestExecution>()
+        if registrationError != "" {
+            return TestRunReport(results, 0, 0, 0, registrationError)
+        }
+        if cases.Count == 0 {
+            return TestRunReport(results, 0, 0, 0, "No tests registered")
+        }
+        var passed = 0
+        var failed = 0
+        var skipped = 0
+        for test in cases {
+            if let Some(reason) = test.SkipReason {
+                results.Add(TestExecution(test.Id, test.Name, TestOutcome.Skipped(reason)))
+                skipped = skipped + 1
+            } else {
+                match test.Invoke() {
+                    Ok(_) => {
+                        results.Add(TestExecution(test.Id, test.Name, TestOutcome.Passed()))
+                        passed = passed + 1
+                    }
+                    Error(let failure) => {
+                        results.Add(TestExecution(test.Id, test.Name, TestOutcome.Failed(failure)))
+                        failed = failed + 1
+                    }
+                }
+            }
+        }
+        return TestRunReport(results, passed, failed, skipped, "")
+    }
+}
+
+static class ConsoleReporter {
+    static func Write(report: TestRunReport) {
+        if report.Error != "" {
+            Console.WriteLine("ERROR " + report.Error)
+            return
+        }
+        for test in report.Results {
+            match test.Outcome {
+                TestOutcome.Passed => Console.WriteLine("PASS " + test.Name)
+                TestOutcome.Failed(let failure) => Console.WriteLine("FAIL " + test.Name + ": " + failure.Message)
+                TestOutcome.Skipped(let reason) => Console.WriteLine("SKIP " + test.Name + ": " + reason)
+            }
+        }
+        Console.WriteLine("Tests: " + report.Results.Count.ToString() + ", passed: " + report.Passed.ToString() + ", failed: " + report.Failed.ToString() + ", skipped: " + report.Skipped.ToString())
+    }
+}

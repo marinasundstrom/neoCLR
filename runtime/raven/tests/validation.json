@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "suite": "collections",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS ArrayList copy has independent storage\nPASS ArrayQueue preserves FIFO\nPASS ArrayStack preserves LIFO\nPASS HashSet applies its comparer\nPASS Any does not read Current\nPASS Predicate Any stops at its first match\nPASS For break disposes its iterator\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS ArrayList copy has independent storage\nPASS ArrayQueue preserves FIFO\nPASS ArrayStack preserves LIFO\nPASS HashSet applies its comparer\nPASS Any does not read Current\nPASS Predicate Any stops at its first match\nPASS For break disposes its iterator\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "native",
+      "exitCode": 1,
+      "stdout": "PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "interpreter",
+      "exitCode": 1,
+      "stdout": "PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "scripts/test-runtime-library.py": "1b672ba03b8110e4b9b77e16c12ecd9391b7e6cfd6eb9f27995a40bdc534e2e9",
+    "scripts/build-native-project.py": "782379cfbeaaa706c0921c0dea02061d23f9e31c735be004bd78031a7267359a",
+    "runtime/raven/tests/collections/Collections.rvn": "72f2ff824e6275fdc288f1ab6e07463b932b2b3d941d52ed4eb90a0e82a299a8",
+    "runtime/raven/tests/collections/Main.rvn": "267f280456a2469dee286a278ec0b2e9bc9fe294cc21a98f236337fbdb45c1bd",
+    "runtime/raven/tests/framework/Assertions.rvn": "75b24edb65dd3c9bc6af7a211966feda795c9834adea0f3d9d064e05049072eb",
+    "runtime/raven/tests/framework/TestSuite.rvn": "85092ee02a75f0767bb073a44c349b143900ae8943e33280ed75ee386d159667",
+    "runtime/raven/tests/runner-contract/Main.rvn": "96902f9c17562d339025267fcbf61642f5e48555911e0169cbe6364770530614",
+    "runtime/raven/tests/collections/Tests.rvnproj": "95e41e789145c5ad074c427074eed03bd0b232ede5cf6ebef17477085a24fa70",
+    "runtime/raven/tests/runner-contract/Tests.rvnproj": "3061ec4816a7c6dc3025e6cd5775cd2b62fd7a230daabdf6de1709a9541e999e"
+  },
+  "bundleManifestSha256": "9c9170477e001076f4e82b38b17bc8119e5201255047c607f9d50a7897028979",
+  "aotSha256": "695f39bc534eb1283eb591bee72335de13865c28ca7d21c85ccb742243fb3240",
+  "interpreterSha256": "b9848dad02ccba0fc333b7c4070d27c2c2873a380c9438f42a4d82a24a844ad8"
+}

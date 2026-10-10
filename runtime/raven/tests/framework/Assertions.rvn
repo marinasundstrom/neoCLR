@@ -1,0 +1,42 @@
+module NeoClr.Testing
+
+import System.*
+import System.Result.*
+
+// Returned failures keep ordinary assertions recoverable without runtime unwinding.
+class TestFailure {
+    val Message: string
+    val Expected: string
+    val Actual: string
+
+    init(message: string, expected: string, actual: string) {
+        Message = message
+        Expected = expected
+        Actual = actual
+    }
+}
+
+static class Assert {
+    static func True(condition: bool, message: string) -> Result<unit, TestFailure> {
+        if condition {
+            return Ok(())
+        }
+        return Error(TestFailure(message, "true", "false"))
+    }
+
+    static func Equal(expected: int, actual: int) -> Result<unit, TestFailure> {
+        if expected == actual {
+            return Ok(())
+        }
+        let expectedText = expected.ToString()
+        let actualText = actual.ToString()
+        return Error(TestFailure("Expected " + expectedText + ", actual " + actualText, expectedText, actualText))
+    }
+
+    static func Equal(expected: string, actual: string) -> Result<unit, TestFailure> {
+        if expected == actual {
+            return Ok(())
+        }
+        return Error(TestFailure("Expected '" + expected + "', actual '" + actual + "'", expected, actual))
+    }
+}

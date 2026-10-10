@@ -1,0 +1,47 @@
+module NeoClr.RunnerTests
+
+import System.*
+import System.Result.*
+import NeoClr.Testing.*
+
+func Before() -> Result<unit, TestFailure> => Assert.Equal("same", "same")
+
+func Failure() -> Result<unit, TestFailure> {
+    _ = Assert.Equal(1, 2)?
+    // A broken assertion or propagation path would turn this case into a pass.
+    return Ok(())
+}
+
+func After() -> Result<unit, TestFailure> => Assert.True(true, "Runner continued")
+
+func Main() -> int {
+    let suite = TestSuite()
+    suite.Add("runner.before", "before failure", Before)
+    suite.Add("runner.failure", "intentional assertion failure", Failure)
+    suite.Add("runner.after", "after failure", After)
+    suite.Skip("runner.skipped", "intentional skip", "contract probe")
+    let report = suite.Run()
+    ConsoleReporter.Write(report)
+    if report.ExitCode != 1 || report.Passed != 2 || report.Failed != 1 || report.Skipped != 1 {
+        return 2
+    }
+    if report.Results.Count != 4 || report.Results[0].Id != "runner.before" {
+        return 2
+    }
+    match report.Results[1].Outcome {
+        TestOutcome.Failed(let failure) => {
+            if failure.Expected != "1" || failure.Actual != "2" {
+                return 2
+            }
+        }
+        _ => return 2
+    }
+    let duplicate = TestSuite()
+    duplicate.Add("same", "first", Before)
+    duplicate.Add("same", "second", After)
+    let invalid = duplicate.Run()
+    if invalid.ExitCode != 2 || invalid.Results.Count != 0 || TestSuite().Run().ExitCode != 2 {
+        return 2
+    }
+    return report.ExitCode
+}
