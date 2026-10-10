@@ -1,0 +1,232 @@
+{
+  "passed": true,
+  "date": "2026-10-10",
+  "revision": "0361085dbd4b8ef8724be0b37204c89f24e3f2bc",
+  "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/38038254729",
+  "verifiedArtifactFiles": 1694,
+  "verifiedSourceInputs": 24,
+  "cases": [
+    {
+      "name": "collections",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\collections executable only\\app.exe"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\collections native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "name": "init-accessors",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\init-accessors executable only\\app.exe"
+          ],
+          "exitCode": 0,
+          "stdout": "Init accessors passed\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\init-accessors native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "Init accessors passed\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "name": "duplicate-constructor",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\duplicate-constructor executable only\\app.exe"
+          ],
+          "exitCode": 1,
+          "stdout": "disposed\n",
+          "stderr": "UserFault: HashMap input contains a duplicate key\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_436F70794974656D73 [instruction 19]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032..ctor [instruction 70]\n   at NeoMetadata_F8151B18AAC8274562154E6F3303CFCA9F109C255292FCA8930068D024FDFF83.T__50726F6772616D.M_4D61696E [instruction 6]\n"
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\duplicate-constructor native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 1,
+          "stdout": "disposed\n",
+          "stderr": "UserFault: HashMap input contains a duplicate key\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_436F70794974656D73 [instruction 19]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032..ctor [instruction 70]\n   at NeoMetadata_F8151B18AAC8274562154E6F3303CFCA9F109C255292FCA8930068D024FDFF83.T__50726F6772616D.M_4D61696E [instruction 6]\n"
+        }
+      ]
+    },
+    {
+      "name": "duplicate-pairs",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\duplicate-pairs executable only\\app.exe"
+          ],
+          "exitCode": 1,
+          "stdout": "disposed\n",
+          "stderr": "UserFault: HashMap input contains a duplicate key\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_436F70794974656D73 [instruction 19]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032..ctor [instruction 70]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E4C696E71_4D61704F70657261746F7273.M_546F4D6170 [instruction 2]\n   at NeoMetadata_F8151B18AAC8274562154E6F3303CFCA9F109C255292FCA8930068D024FDFF83.T__50726F6772616D.M_4D61696E [instruction 6]\n"
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\duplicate-pairs native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 1,
+          "stdout": "disposed\n",
+          "stderr": "UserFault: HashMap input contains a duplicate key\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032.M_436F70794974656D73 [instruction 19]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_486173684D61706032..ctor [instruction 70]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E4C696E71_4D61704F70657261746F7273.M_546F4D6170 [instruction 2]\n   at NeoMetadata_F8151B18AAC8274562154E6F3303CFCA9F109C255292FCA8930068D024FDFF83.T__50726F6772616D.M_4D61696E [instruction 6]\n"
+        }
+      ]
+    },
+    {
+      "name": "duplicate-selectors",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\duplicate-selectors executable only\\app.exe"
+          ],
+          "exitCode": 1,
+          "stdout": "disposed\n",
+          "stderr": "UserFault: HashMap input contains a duplicate key\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E4C696E71_4F70657261746F7273.M_546F4D6170 [instruction 28]\n   at NeoMetadata_F8151B18AAC8274562154E6F3303CFCA9F109C255292FCA8930068D024FDFF83.T__50726F6772616D.M_4D61696E [instruction 8]\n"
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\duplicate-selectors native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 1,
+          "stdout": "disposed\n",
+          "stderr": "UserFault: HashMap input contains a duplicate key\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E4C696E71_4F70657261746F7273.M_546F4D6170 [instruction 28]\n   at NeoMetadata_F8151B18AAC8274562154E6F3303CFCA9F109C255292FCA8930068D024FDFF83.T__50726F6772616D.M_4D61696E [instruction 8]\n"
+        }
+      ]
+    }
+  ],
+  "rejections": [
+    {
+      "name": "generated-equality",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support unregistered dependency: NativeCollections for struct Pair.func Equals(other: Pair) -> bool.\n"
+    },
+    {
+      "name": "imported-update",
+      "exitCode": 1,
+      "diagnostic": "error RAV0200: 'Key' is read-only and cannot be assigned to.\n"
+    },
+    {
+      "name": "mutable-component",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support constructor-initialized positional val components.\n"
+    },
+    {
+      "name": "record-class",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support positional record structs without additional members.\n"
+    }
+  ]
+}

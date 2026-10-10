@@ -150,7 +150,8 @@ for/use conversions while preserving explicit long-lived ownership, advance-only
 iteration and disposal before terminal faults; see the [audit](raven-conventions.md#runtime-source-audit).
 [Verified Windows for-cleanup evidence](experiments/native-collections/windows-for-cleanup-validation.json)
 now covers compiler 494dede84 and the iterable constructors at 4d34f35b; the later
-source simplification run is separate. A bounded AOT follow-up admits immutable
+[source simplification run](experiments/native-collections/windows-scoped-library-validation.json)
+also passes at 0361085d with artifact and source hashes verified. A bounded AOT follow-up admits immutable
 StringGraphemes Char[] snapshots; String(sequence) remains blocked by constructor
 call admission, so its cleanup refactor remains deferred.
 Future concurrent variants retain implementation-specific atomicity/iteration contracts; see the [contracts and concurrency boundaries](collection-contracts.md#basic-library-slice-and-future-concurrency--2026-10-10).

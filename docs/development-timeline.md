@@ -13286,7 +13286,8 @@ into character-array backend work or claiming native validation for that convers
 The final selective refactor passes macOS native and matching interpreter execution,
 including exact query traversal/disposal counts and the new constructor paths
 ([evidence](experiments/native-collections/scoped-library-validation.json)). API
-fingerprint and native snapshot checks pass; Windows CI qualification is pending.
+fingerprint and native snapshot checks pass. The later Windows run at 0361085d
+also passes; [downloaded artifact and source hashes are verified](experiments/native-collections/windows-scoped-library-validation.json).
 
 
 ### 2026-10-10 — Raven runtime-library testing infrastructure
