@@ -165,3 +165,21 @@ preflight, final trailers, ownership, partial failures and selected readers
 pin current Flush/Close behavior for review; they do not endorse it as the final API.
 The author emphasized coverage of encoding, streams, StreamReader and StreamWriter.
 Unicode reader boundaries, custom decoded output and maximum quotas remain next.
+
+## Coverage across layers
+
+The author explicitly emphasized encoding, streams, StreamReader and StreamWriter.
+Track the layers separately so codec tests do not stand in for adapter behavior:
+
+| Layer | Attributed coverage | Remaining work |
+| --- | --- | --- |
+| Byte stream storage | MemoryStream overwrite/gap writes, range/quota state, interface closure | File/socket-specific lifecycle and host errors retain separate qualification. |
+| Codec provider and sessions | Strict UTF-8/ASCII, scalar split points, malformed input, copied carry, independence, bounded drain progress | Decoder/drain maximum-buffer quota fixtures, configurable limits, future codecs. |
+| Text adapters | Selected encoding, short writes, line preflight, custom final output, ownership and failure after partial output | Completion contract redesign remains provisional. |
+| Composed document I/O | Existing JSON stream tests cover short transfers, UTF-8, input/output quotas, cycles and ownership | Keep serializer/schema expansion separate from text conversion. |
+
+The new boundary batch targets Unicode line endings and EOF, one-byte input,
+custom decoded expansion, zero-progress output, input-error propagation and
+maximum writer/input quotas. All eight pass native macOS ARM64 and interpreted execution
+([qualification](../../runtime/raven/tests/encoding-boundaries-validation.json)). Existing unaffected MemoryStream/JSON
+evidence is reused; no blanket platform parity or complete encoding matrix is claimed.

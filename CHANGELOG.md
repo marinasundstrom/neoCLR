@@ -17,6 +17,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   native macOS ARM64 and interpreted execution; Windows qualification is pending.
   Add eight passing stream-adapter cases for short writes, custom final trailers,
   strict line preflight, ownership, partial-output failures and selected readers.
+  Add eight further passing reader/stream boundary cases for Unicode lines and EOF,
+  custom decoded expansion, zero-progress output, input/flush failures and maximum
+  input/write quotas. The three batches total 24 tests; library behavior is unchanged.
 
 - Add Date, TimeOfDay and LocalDateTime Parse overloads using current or explicit
   Culture and Result<T, DateTimeParseError>. Support the existing invariant, Swedish

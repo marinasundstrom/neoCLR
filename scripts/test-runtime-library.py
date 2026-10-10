@@ -13,6 +13,17 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / 'runtime/raven/tests'
+ENCODING_BOUNDARY_NAMES = [
+    'StreamReader decodes Unicode lines across single-byte reads',
+    'StreamReader distinguishes empty lines EOF and lone carriage returns',
+    'StreamReader delimits custom decoded output and bounds expansion',
+    'StreamWriter reports zero progress and preserves flush failures',
+    'StreamReader rejects invalid limits before consuming its input',
+    'Encoding input quotas reject oversized chunks without poisoning sessions',
+    'StreamWriter accepts its maximum byte count and preflights oversized lines',
+    'StreamReader preserves input failures and rejects truncated UTF-8 at EOF',
+]
+
 ENCODING_STREAM_NAMES = [
     'StreamWriter completes short writes and preserves cross-input graphemes',
     'ASCII StreamWriter rejects complete lines before output and remains reusable',
@@ -274,7 +285,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'encoding-boundaries', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -298,6 +309,7 @@ def main():
         ('json-streams', 0, ''.join('PASS ' + n + '\n' for n in JSON_STREAM_NAMES) + f'Tests: {len(JSON_STREAM_NAMES)}, passed: {len(JSON_STREAM_NAMES)}, failed: 0, skipped: 0\n'),
         ('memory-stream', 0, ''.join('PASS ' + n + '\n' for n in MEMORY_STREAM_NAMES) + f'Tests: {len(MEMORY_STREAM_NAMES)}, passed: {len(MEMORY_STREAM_NAMES)}, failed: 0, skipped: 0\n'),
         ('string-construction', 0, ''.join('PASS ' + n + '\n' for n in STRING_CONSTRUCTION_NAMES) + f'Tests: {len(STRING_CONSTRUCTION_NAMES)}, passed: {len(STRING_CONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
+        ('encoding-boundaries', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_BOUNDARY_NAMES) + f'Tests: {len(ENCODING_BOUNDARY_NAMES)}, passed: {len(ENCODING_BOUNDARY_NAMES)}, failed: 0, skipped: 0\n'),
         ('encoding-streams', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_STREAM_NAMES) + f'Tests: {len(ENCODING_STREAM_NAMES)}, passed: {len(ENCODING_STREAM_NAMES)}, failed: 0, skipped: 0\n'),
         ('encoding', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_NAMES) + f'Tests: {len(ENCODING_NAMES)}, passed: {len(ENCODING_NAMES)}, failed: 0, skipped: 0\n'),
         ('unicode-casing', 0, ''.join('PASS ' + n + '\n' for n in UNICODE_CASING_NAMES) + f'Tests: {len(UNICODE_CASING_NAMES)}, passed: {len(UNICODE_CASING_NAMES)}, failed: 0, skipped: 0\n'),

@@ -570,3 +570,17 @@ incremental final drains and selected reader conversion. All pass native macOS
 ARM64 and interpreted execution ([qualification](encoding-streams-validation.json)),
 bringing the library to 190 cases across 21 projects. Windows remains pending.
 Unicode reader boundaries, custom decoded output and maximum quotas remain next.
+
+### Encoding and text stream boundaries
+
+`--suite encoding-boundaries` adds eight cases spanning single-byte Unicode input,
+CRLF/empty lines/lone CR/EOF, custom decoder expansion and encoded output counts,
+zero-progress writes, flush/read failures, preflight recovery and maximum input/write
+quotas. All pass native macOS ARM64 and interpreted execution
+([qualification](encoding-boundaries-validation.json)). The three encoding batches
+total 24 cases; the library reaches 198 cases across 22 projects. Windows remains
+pending and runs all three suites by default. Existing MemoryStream and JSON stream
+suites retain their own storage, seek, document and ownership coverage.
+
+Direct decoder/drain maximum-buffer fixtures and broader file/socket host scenarios
+remain separate; these cases do not claim every codec, stream or platform is covered.

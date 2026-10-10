@@ -1,0 +1,87 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Text.*
+
+// A deliberately expanding test codec proves that adapters consume decoded text.
+class ExpandedEncoding : Encoding {
+    func CreateEncoder() -> Encoder {
+        return ExpandedEncoder()
+    }
+    func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {
+        let bytes: Sequence<byte> = [(byte)90]
+        return Ok(bytes)
+    }
+    func CreateDecoder() -> Decoder {
+        return ExpandedDecoder()
+    }
+}
+
+class ExpandedEncoder : Encoder {
+    private val inner: Encoder = Encodings.Ascii.CreateEncoder()
+    func Accept(text: string, final: bool) -> Result<unit, EncodingError> {
+        if final && text.IsEmpty {
+            return inner.Accept("", true)
+        }
+        return inner.Accept("Z", final)
+    }
+    func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError> {
+        return inner.Drain(output, offset, count)
+    }
+}
+
+class ExpandedDecoder : Decoder {
+    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, EncodingError> {
+        if count == 0 {
+            return Ok("")
+        }
+        return Ok("A\nB")
+    }
+}
+
+class FailedSink : OutputStream {
+    private var zero: bool = false
+    private var calls: int = 0
+    init(zero: bool) {
+        self.zero = zero
+    }
+    val Calls: int => calls
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        calls += 1
+        if zero {
+            return Ok(0)
+        }
+        if calls == 1 {
+            return Ok(1)
+        }
+        return Error(StreamError.AccessDenied)
+    }
+    func Flush() -> Result<unit, StreamError> {
+        return Error(StreamError.IoFailure)
+    }
+    func Close() { }
+}
+
+class CountingSink : OutputStream {
+    private var total = 0
+    private var allX = true
+    val Total: int => total
+    val AllX: bool => allX
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        for index in offset..<(offset + count) {
+            if buffer[index] != 120 {
+                allX = false
+            }
+        }
+        total += count
+        return Ok(count)
+    }
+    func Flush() -> Result<unit, StreamError> {
+        return Ok(())
+    }
+    func Close() {
+    }
+}

@@ -1,0 +1,137 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.IO.*
+import System.Option.*
+import System.Result.*
+import System.Text.*
+import NeoClr.Testing.*
+
+func ReadText(result: Result<string, TextReadError>, expected: string) -> Result<unit, TestFailure> {
+    let Ok(text) = result else {
+        return Error(TestFailure("Read text", expected, "Error"))
+    }
+    return Assert.Equal(expected, text)
+}
+
+func ReadLineText(reader: StreamReader, limit: int, expected: string) -> Result<unit, TestFailure> {
+    let Ok(Some(text)) = reader.ReadLine(limit) else {
+        return Error(TestFailure("Read line", expected, "Error or None"))
+    }
+    return Assert.Equal(expected, text)
+}
+
+func MaximumText() -> string {
+    var text = "x"
+    for index in 0..<16 {
+        text = text + text
+    }
+    return text
+}
+
+[Test("StreamReader decodes Unicode lines across single-byte reads")]
+func AUnicodeLines() -> Result<unit, TestFailure> {
+    for text in ["", "a", "é", "😀", "é", "a\rb", "\u0000"] {
+        let source = ShortInput(Utf8.Encode(text + "\r\n"), -1)
+        let reader = StreamReader(source)
+        _ = ReadLineText(reader, text.GetUtf8ByteCount(), text)?
+        _ = Assert.True(reader.ReadLine(0) is Ok(None), "Line EOF")?
+        reader.Close()
+        _ = Assert.True(source.Closed, "Owned input closes")?
+    }
+    return Assert.True(true, "All Unicode lines")
+}
+
+[Test("StreamReader distinguishes empty lines EOF and lone carriage returns")]
+func BLineEndings() -> Result<unit, TestFailure> {
+    let source = ShortInput(Utf8.Encode("A\n\nB\r"), -1)
+    let reader = StreamReader(source)
+    _ = ReadLineText(reader, 1, "A")?
+    _ = ReadLineText(reader, 0, "")?
+    _ = ReadLineText(reader, 2, "B\r")?
+    _ = Assert.True(reader.ReadLine(0) is Ok(None), "EOF is not an empty line")?
+    _ = ReadText(reader.ReadToEnd(0), "")?
+    let lone = StreamReader(ShortInput(Utf8.Encode("\r"), -1))
+    return Assert.True(lone.ReadLine(0) is Error(TextReadError.LimitExceeded), "Lone CR consumes quota")
+}
+
+[Test("StreamReader delimits custom decoded output and bounds expansion")]
+func CCustomDecode() -> Result<unit, TestFailure> {
+    let source = ShortInput(Utf8.Encode("x"), -1)
+    let reader = StreamReader(source, ExpandedEncoding())
+    _ = ReadLineText(reader, 1, "A")?
+    _ = ReadText(reader.ReadToEnd(1), "B")?
+    let limited = StreamReader(ShortInput(Utf8.Encode("x"), -1), ExpandedEncoding())
+    _ = Assert.True(limited.ReadToEnd(1) is Error(TextReadError.LimitExceeded), "Decoded expansion counts toward limit")?
+    let sink = ShortOutput(-1, false)
+    let writer = StreamWriter(sink, ExpandedEncoding())
+    let Ok(count) = writer.Write("several input bytes") else {
+        return Error(TestFailure("Custom write", "Ok", "Error"))
+    }
+    return Assert.True(count == 1 && sink.Count == 1 && sink.Bytes[0] == 90, "Count encoded output bytes")
+}
+
+[Test("StreamWriter reports zero progress and preserves flush failures")]
+func DZeroProgress() -> Result<unit, TestFailure> {
+    let sink = FailedSink(true)
+    let writer = StreamWriter(sink, Encodings.Ascii)
+    _ = Assert.True(writer.Write("ok") is Error(StreamError.IoFailure), "Zero output progress is an error")?
+    _ = Assert.Equal(1, sink.Calls)?
+    _ = Assert.True(writer.Write("retry") is Error(StreamError.InvalidEncoding), "Cannot replay consumed conversion")?
+    _ = Assert.Equal(1, sink.Calls)?
+    return Assert.True(writer.Flush() is Error(StreamError.IoFailure), "Flush error remains observable")
+}
+
+[Test("StreamReader rejects invalid limits before consuming its input")]
+func EReaderPreflight() -> Result<unit, TestFailure> {
+    let source = ShortInput(Utf8.Encode("é"), -1)
+    let reader = StreamReader(source, Encodings.Utf8, true)
+    _ = Assert.True(reader.ReadToEnd(-1) is Error(TextReadError.InvalidRange), "Negative limit")?
+    _ = Assert.True(reader.ReadLine(65537) is Error(TextReadError.LimitExceeded), "Oversized limit")?
+    _ = Assert.Equal(0, source.Position)?
+    _ = ReadText(reader.ReadToEnd(2), "é")?
+    reader.Close()
+    _ = Assert.True(!source.Closed, "Borrowed input remains open")?
+    return Assert.True(reader.ReadLine(2) is Error(TextReadError.Closed), "Closed reader")
+}
+
+[Test("Encoding input quotas reject oversized chunks without poisoning sessions")]
+func FEncodingQuota() -> Result<unit, TestFailure> {
+    let excessive = MaximumText() + "x"
+    _ = Assert.True(Encodings.Utf8.Encode(excessive) is Error(EncodingError.LimitExceeded), "UTF-8 input quota")?
+    _ = Assert.True(Encodings.Ascii.Encode(excessive) is Error(EncodingError.LimitExceeded), "ASCII input quota")?
+    let encoder = Encodings.Utf8.CreateEncoder()
+    _ = Assert.True(encoder.Accept(excessive, true) is Error(EncodingError.LimitExceeded), "Encoder input quota")?
+    _ = Assert.True(encoder.Accept("ok", true) is Ok(_), "Quota rejection is retryable")?
+    let buffer: byte[] = [(byte)0, (byte)0]
+    let Ok(step) = encoder.Drain(buffer, 0, 2) else {
+        return Error(TestFailure("Quota retry", "Ok", "Error"))
+    }
+    return Assert.True(step.BytesWritten == 2 && step.State is EncoderState.Finished && buffer[0] == 111 && buffer[1] == 107, "Retry output")
+}
+
+[Test("StreamWriter accepts its maximum byte count and preflights oversized lines")]
+func GMaximumWrite() -> Result<unit, TestFailure> {
+    let text = MaximumText()
+    let sink = CountingSink()
+    let writer = StreamWriter(sink)
+    _ = Assert.True(writer.WriteLine(text) is Error(StreamError.LimitExceeded), "LF counts toward line limit")?
+    _ = Assert.True(writer.Write(text + "x") is Error(StreamError.LimitExceeded), "Oversized write")?
+    _ = Assert.Equal(0, sink.Total)?
+    let Ok(count) = writer.Write(text) else {
+        return Error(TestFailure("Maximum write", "Ok", "Error"))
+    }
+    _ = Assert.Equal(65536, count)?
+    _ = Assert.Equal(65536, sink.Total)?
+    _ = Assert.True(sink.AllX, "Maximum write content")?
+    return Assert.True(writer.Finish() is Ok(0), "Maximum write completion")
+}
+
+[Test("StreamReader preserves input failures and rejects truncated UTF-8 at EOF")]
+func HInputFailures() -> Result<unit, TestFailure> {
+    let failed = StreamReader(ShortInput(Utf8.Encode("AB"), 1))
+    _ = Assert.True(failed.ReadToEnd(2) is Error(TextReadError.IoFailure), "Input error after prefix")?
+    let bytes: byte[] = [(byte)65, (byte)240, (byte)159]
+    let truncated = StreamReader(ShortInput(bytes, -1))
+    return Assert.True(truncated.ReadToEnd(8) is Error(TextReadError.InvalidUtf8), "Final incomplete scalar")
+}

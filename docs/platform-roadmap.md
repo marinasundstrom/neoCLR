@@ -372,8 +372,10 @@ retains the established UTF-8/strict-ASCII baseline and compares role, completio
 error, quota and buffer contracts with System.Text. Eight provider/session checks have migrated into attributed tests; all pass
 both local modes ([evidence](../runtime/raven/tests/encoding-validation.json)).
 Eight further [stream adapter cases](../runtime/raven/tests/encoding-streams-validation.json)
-cover writer completion/failure and selected readers in both local modes. Unicode
-reader boundaries, custom decoded output and maximum quotas remain. Paired one-shot
+cover writer completion/failure and selected readers in both local modes. Eight [boundary cases](../runtime/raven/tests/encoding-boundaries-validation.json)
+also pass both local modes: Unicode reader boundaries, custom decoded output,
+zero-progress transfers, failures and maximum input/write quotas. Direct decoder/drain
+buffer-limit fixtures and Windows qualification remain. Paired one-shot
 decoding and general writer completion follow as proposals. This review does not
 approve additional codecs or permanently reprioritize the roadmap.
 

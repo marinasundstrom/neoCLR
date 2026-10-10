@@ -13954,3 +13954,10 @@ claim completion of in-process test discovery.
 - **Next:** extend reader Unicode/custom-decoder boundaries and quota coverage;
   keep .NET completion semantics under review rather than inferring endorsement
   of the current explicit Finish contract.
+
+- **Follow-up outcome:** eight more attributed scenarios cover Unicode line/EOF
+  behavior, custom decoded expansion, zero-progress output, input/flush failures
+  and maximum accepted input/write quotas. All pass native macOS ARM64 and the
+  interpreter; the three encoding batches total 24 cases. Existing MemoryStream
+  and JSON stream evidence is reused. Windows qualification and direct decoder/drain
+  maximum-buffer fixtures remain open. No library implementation changes were needed.

@@ -251,3 +251,9 @@ PublicEncoderMain.rvn now have an attributed counterpart in the
 also exercises every byte split of a mixed-width UTF-8 string. Retain these
 historical programs: writer completion, quotas and reader integration have not
 all migrated. See the [API review](../../design/encoding-api-review.md).
+
+Follow-up [stream adapter](../../../runtime/raven/tests/encoding-streams/Tests.rvn)
+and [boundary](../../../runtime/raven/tests/encoding-boundaries/Tests.rvn) batches add
+16 passing native/interpreted cases. These migrate custom finalization, short/failed
+transfers, reader line/EOF/custom-codec behavior and maximum writer/input quotas.
+Keep the historical probes for remaining cases and original comparison evidence.
