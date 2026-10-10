@@ -156,3 +156,13 @@ may continue in the host after its guest Task is cancelled, retaining its bounde
 host-capacity permit until it returns. Tokens are currently invocation-local.
 [The API guide](/docs/sockets.html#per-operation-cancellation-development) explains
 ownership and limits. The development HTTP client forwards these tokens across lookup, connect and transfers.
+
+### Client lifetime (development)
+
+`HttpClient` and `HttpHandler` implement `Disposable`. Reuse a client, then scope it
+with `use` or dispose it explicitly. The default constructor and handler constructor
+own the handler; `HttpClient(handler, false)` borrows it. Disposal requests cancellation
+of pending sends and rejects new ones. The host must keep processing completions so
+handlers can finish cleanup. Completed responses remain caller-owned. Derive middleware from DelegatingHandler, which owns InnerHandler and freezes its
+configuration on the first send. A configurable client timeout is
+still pending; the current transport deadline is described above.

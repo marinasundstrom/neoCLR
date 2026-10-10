@@ -411,8 +411,13 @@ address HttpClient's configurable request timeout and Disposable/client-handler
 ownership gaps, including use support and macOS/Windows cancellation/cleanup parity.
 The [lifetime and timeout design note](design/http-client-lifetime.md) records the
 .NET baseline, current timer/deadline constraints and required qualification.
-The current transport has a fixed 15-second exchange deadline; the client has no
-Dispose method. These are incomplete contracts, not deliberate .NET divergences.
+The client and handler now implement Disposable with explicit ownership and cooperative
+pending-request cancellation. The abstract handler and DelegatingHandler pipeline pass
+ten functional cases and eight guard cases interpreted and on macOS ARM64 AOT;
+[dispatch evidence](design/native-class-dispatch.md) records the bounded support.
+Windows CI is configured but unexecuted. Configurable timeout is next: the transport still has a
+fixed 15-second exchange deadline, an incomplete contract rather than a deliberate
+.NET divergence.
 The subsequent string API direction keeps encoding explicit: public string operations
 should describe text, not byte storage. GetUtf8ByteCount/SliceUtf8 remain migration
 debt; replace their uses with appropriate encoding contracts before removing them,

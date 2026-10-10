@@ -15,6 +15,7 @@ func Check(condition: bool) {
 }
 
 class ReplyHandler : HttpHandler {
+
     var Calls: int = 0
     var SawToken: bool = false
     private var status: int
@@ -25,7 +26,7 @@ class ReplyHandler : HttpHandler {
         self.bytes = bytes
     }
 
-    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Calls += 1
         SawToken = cancellationToken.CanBeCancelled
         let source = Promise<Result<HttpResponse, HttpError>>()
@@ -34,22 +35,20 @@ class ReplyHandler : HttpHandler {
     }
 }
 
-class Forwarder : HttpHandler {
-    private var inner: HttpHandler
-    init(inner: HttpHandler) {
-        self.inner = inner
-    }
-    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
-        return inner.Send(request, cancellationToken)
-    }
+class Forwarder : DelegatingHandler {
+    init(inner: HttpHandler) : base(inner) { }
 }
 
 class PendingHandler : HttpHandler {
+    override func Dispose() {
+        Cancel()
+    }
+
     val Completion: Promise<Result<HttpResponse, HttpError>> = Promise<Result<HttpResponse, HttpError>>()
     var Cleaned: bool = false
     private var registration: CancellationRegistration? = null
 
-    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         registration = cancellationToken.Register(self.Cancel)
         return Completion.Task
     }
@@ -103,7 +102,7 @@ func CheckContracts() {
     let plain = client.GetString("child")
     let plainUri = client.GetString(uri)
     TaskQueue.Default.Drain()
-    Check(!fake.SawToken && fake.Calls == 3)
+    Check(fake.SawToken && fake.Calls == 3)
     if let Ok(first) = plain.GetResult() {
         Check(first == "Café 🌍")
     } else {

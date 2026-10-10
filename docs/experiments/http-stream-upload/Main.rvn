@@ -58,11 +58,11 @@ class GeneratedInput : InputStream {
     }
 }
 
-class ForwardUpload : HttpHandler {
-    private var transport: HttpSocketHandler = HttpSocketHandler()
-    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+class ForwardUpload : DelegatingHandler {
+    init() : base(HttpSocketHandler()) { }
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Check(!request.Content.IsBuffered)
-        return transport.Send(request, cancellationToken)
+        return base.Send(request, cancellationToken)
     }
 }
 

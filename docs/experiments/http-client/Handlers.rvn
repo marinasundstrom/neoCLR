@@ -9,26 +9,25 @@ import System.Networking.*
 import System.Networking.Sockets.*
 
 // A forwarding handler can observe both sides of the exchange without owning sockets.
-class RecordingHandler : HttpHandler {
+class RecordingHandler : DelegatingHandler {
     private var name: string
-    private var inner: HttpHandler
     private var events: ArrayList<string>
 
-    init(name: string, inner: HttpHandler, events: ArrayList<string>) {
+    init(name: string, inner: HttpHandler, events: ArrayList<string>) : base(inner) {
         self.name = name
-        self.inner = inner
         self.events = events
     }
 
-    async func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    async override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         events.Add(String.Concat(name, " before"))
-        let outcome = await inner.Send(request, cancellationToken)
+        let outcome = await base.Send(request, cancellationToken)
         events.Add(String.Concat(name, " after"))
         return outcome
     }
 }
 
 class FakeHandler : HttpHandler {
+
     private var fail: bool
     var Calls: int = 0
 
@@ -36,7 +35,7 @@ class FakeHandler : HttpHandler {
         self.fail = fail
     }
 
-    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Calls += 1
         Check(request.Method == "GET")
         Check(request.Host == "example.test")

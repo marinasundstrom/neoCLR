@@ -25,3 +25,6 @@
 
 /docs/experiments/native-introspection/bin/
 /docs/experiments/native-introspection/obj/
+
+/docs/experiments/http-lifetime/bin/
+/docs/experiments/http-lifetime/obj/

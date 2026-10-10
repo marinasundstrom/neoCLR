@@ -13,13 +13,14 @@ func Check(value: bool) {
 }
 
 class InspectHandler : HttpHandler {
+
     var Calls: int = 0
     var CancellableCalls: int = 0
     var PutCalls: int = 0
     var PatchCalls: int = 0
     var DeleteCalls: int = 0
     var HeadCalls: int = 0
-    func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Check(request.Target == "/base/item")
         Check(request.Method == "PUT" || request.Method == "PATCH" || request.Method == "DELETE" || request.Method == "HEAD")
         Check(request.Content.Bytes.Count == (if request.Method == "DELETE" || request.Method == "HEAD" { 0 } else { 5 }))

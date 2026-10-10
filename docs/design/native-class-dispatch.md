@@ -51,7 +51,7 @@ added. Existing specialized Object and interface dispatch remain separately qual
   prior paths and rejection behavior.
 - `target/http-delegating-validation-v8/report.json`: ten HTTP lifetime/pipeline cases
   pass in both interpreted and macOS ARM64 AOT execution.
-- `target/http-delegating-faults-v3/report.json`: eight HTTP guard/fault cases pass in
+- `target/http-delegating-faults-v3/validation.json`: eight HTTP guard/fault cases pass in
   both modes. Windows execution remains pending; CI exercises the same HTTP suite.
 
 The retained local reports describe the tested binaries and inputs. Later changes to

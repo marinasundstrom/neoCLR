@@ -14,6 +14,8 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / 'runtime/raven/tests'
+HTTP_LIFETIME_NAMES = ['HTTP client use disposes its owned handler exactly once', 'HTTP borrowed handler survives one client and serves another', 'HTTP disposal requests cancellation and waits for handler acknowledgement', 'HTTP caller cancellation propagates without disposing the handler', 'HTTP completed responses survive disposal and retain request association', 'HTTP pre-cancellation skips custom handlers', 'HTTP socket handler disposal is idempotent through Disposable', 'HTTP delegating handlers run outward and unwind inward', 'HTTP borrowed delegating pipeline remains reusable', 'HTTP borrowed clients cancel only their own pending sends']
+
 HTTP_TEXT_NAMES = [
     'HTTP buffered text preserves scalars beyond the one-shot codec quota',
     'HTTP buffered text rejects malformed and truncated large bodies',
@@ -302,7 +304,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-text', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-text', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -319,6 +321,7 @@ def main():
     validation = importlib.util.module_from_spec(validation_spec)
     validation_spec.loader.exec_module(validation)
     expected = [
+        ('http-lifetime', 0, ''.join('PASS ' + n + '\n' for n in HTTP_LIFETIME_NAMES) + f'Tests: {len(HTTP_LIFETIME_NAMES)}, passed: {len(HTTP_LIFETIME_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-text', 0, ''.join('PASS ' + n + '\n' for n in HTTP_TEXT_NAMES) + f'Tests: {len(HTTP_TEXT_NAMES)}, passed: {len(HTTP_TEXT_NAMES)}, failed: 0, skipped: 0\n'),
         ('collections', 0, ''.join('PASS ' + n + '\n' for n in COLLECTION_NAMES) + f'Tests: {len(COLLECTION_NAMES)}, passed: {len(COLLECTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('collection-construction', 0, ''.join('PASS ' + n + '\n' for n in CONSTRUCTION_NAMES) + f'Tests: {len(CONSTRUCTION_NAMES)}, passed: {len(CONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
@@ -357,7 +360,7 @@ def main():
             if name != 'runner-contract':
                 registry = DISCOVERY.discover(TESTS / name / 'Tests.rvnproj', bundle, out / (name + '-discovery'))
                 environment['NeoClrTestRegistry'] = str(registry)
-            profile = 'http' if name == 'http-text' else 'console'
+            profile = 'http' if name in ('http-text', 'http-lifetime') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
             command = [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile',

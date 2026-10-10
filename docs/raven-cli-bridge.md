@@ -8144,3 +8144,50 @@ Windows/source-development helper pins that revision. Publishing the compiler
 revision is a prerequisite to running CI on another machine; local validation does
 not imply Windows execution or a published toolchain. Nullable attribute signature
 matching is a native adapter fix; source signatures keep nullable information.
+
+### HttpHandler inheritance and middleware (2026-10-10)
+
+The experimental HTTP handler contract is now an abstract class implementing
+Disposable, with virtual Send/Dispose slots. DelegatingHandler is its abstract
+middleware base, carrying an owned InnerHandler and forwarding through base.Send.
+Native production metadata uses ordinary class inheritance and virtual dispatch;
+no Runtime Contract switch or special handler metadata is introduced. The temporary
+aggregate CLI reference now mirrors those classes and constructors for documentation
+and legacy translation. It no longer projects HttpHandler as an interface. Source
+consumers must use override Send and rebuild with matching reference/library inputs.
+
+This consumer exposed shared Raven unqualified override lookup: the derived override
+and base declaration must not be competing overloads. The general fix belongs on
+Raven main; native source integration consumes the same binder behavior. This does
+not alter .NET's default target contracts. Native snapshots and ordinary method tables
+remain the replacement for aggregate CLI projection, which is not the production
+HTTP implementation. Focused handler tests and the native documentation audit qualify
+the bridge; platform execution results are retained with the lifetime fixture.
+
+### Shared async base-call receiver (2026-10-10)
+
+Raven shared main `9b6688fa3` fixes async base dispatch for ordinary .NET as well as
+shared lowering (integration `fda107a6c`). The bound base marker now retains an
+explicit hoisted instance receiver after async rewriting. CLI emission still uses
+direct call; the native portable backend must likewise load the original receiver
+and preserve direct dispatch. No Runtime Contract option, temporary CLI encoding,
+or metadata version changes. Native metadata supplies actual base definitions and
+slot validation rather than replacing this compiler fix. Four normal .NET cases
+cover local/imported bases, completed/suspending awaits, inherited IDisposable
+conversion and nullable property assignment. Native HTTP consumers now pass interpreted and macOS ARM64 AOT validation.
+
+### Native external handler inheritance (2026-10-10)
+
+Raven integration `83b5ee210` admits public nongeneric external class bases through
+an explicit target capability (off by default). It supplies resolved declared field
+counts, base/interface edges and public instance method contracts to neoCLR metadata
+`52cd8e8c`. Private ancestor storage contributes to field ordinals but remains in its
+defining dependency. Native slot identity and direct calls preserve inherited virtual
+behavior; generic/nested bases and protected ordinary methods remain gaps. The CLI
+projection retains extends/member-reference identities; no field-copy bridge is used.
+Four normal .NET async/import cases and the portable capability gate pass; all ten
+HTTP lifetime/pipeline cases and eight guard cases pass interpreted and macOS ARM64
+AOT execution; see [dispatch qualification](design/native-class-dispatch.md).
+Windows execution remains pending. Native feature support remains
+on `codex/source-object-metadata-resolution`; shared main contains the general async
+receiver and override lookup fixes.

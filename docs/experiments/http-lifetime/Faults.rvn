@@ -1,0 +1,47 @@
+import System.*
+import System.Result.*
+import System.Concurrency.*
+import System.Web.Http.*
+
+class Forwarder : DelegatingHandler {
+    init() { }
+    init(inner: HttpHandler) : base(inner) { }
+}
+
+func Main(arguments: string[]) {
+    let mode = arguments[0]
+    let Ok(request) = HttpRequest.Get("http://example.test/") else {
+        System.Fail("Fixture request failed")
+    }
+    use stopped = CancellationTokenSource()
+    stopped.Cancel()
+    if mode == "unassigned" {
+        _ = Forwarder().Send(request, stopped.Token)
+    } else if mode == "frozen" {
+        let handler = Forwarder(HttpSocketHandler())
+        _ = handler.Send(request, stopped.Token)
+        handler.InnerHandler = HttpSocketHandler()
+    } else if mode == "disposed-chain" {
+        let handler = Forwarder(HttpSocketHandler())
+        handler.Dispose()
+        _ = handler.Send(request, stopped.Token)
+    } else if mode == "null-inner" {
+        let handler = Forwarder()
+        handler.InnerHandler = null
+    } else if mode == "handler" {
+        let handler = HttpSocketHandler()
+        handler.Dispose()
+        _ = handler.Send(request, stopped.Token)
+    } else {
+        let client = HttpClient()
+        client.Dispose()
+        if mode == "send" {
+            _ = client.Send(request)
+        } else if mode == "cancelled" {
+            _ = client.Get("invalid", stopped.Token)
+        } else {
+            _ = client.GetString("http://example.test/")
+        }
+    }
+    Console.WriteLine("ERROR disposed send returned")
+}

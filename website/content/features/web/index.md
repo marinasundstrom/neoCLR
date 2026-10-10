@@ -124,8 +124,9 @@ accepts optional text and can change after a request has been sent.
 ## Attach behavior with handlers
 
 HttpClient delegates `Send(HttpRequest, CancellationToken)` to an `HttpHandler`. Its contract returns
-`Task<Result<HttpResponse, HttpError>>`. A forwarding handler receives an inner handler:
-it can act before sending and after the result arrives. Several handlers can form
+`Task<Result<HttpResponse, HttpError>>`. Derive middleware from `DelegatingHandler`
+and await `base.Send(request, cancellationToken)` to act before and after the exchange.
+Its `InnerHandler` property owns the next stage and freezes after sending begins. Several handlers can form
 a pipeline, with socket transport at the end. Forwarding handlers pass the token to
 their inner handler. A fake handler can return a response
 without a network connection.
@@ -314,7 +315,14 @@ can survive a later request; cancellation between phases prevents the next opera
 Separate requests retain separate connections and cancellation state. DNS host work
 may continue after guest cancellation, with its bounded capacity still charged.
 
-Custom HttpHandler implementations require Send(request, cancellationToken).
+Custom handlers derive from HttpHandler and override Send(request, cancellationToken).
+DelegatingHandler supplies middleware forwarding and owned inner-handler disposal;
+overrides can await base.Send(request, cancellationToken).
+HttpClient owns its handler by default; the (handler, false) constructor borrows it.
+Use a reusable client with use or explicit Dispose. Disposal requests cancellation
+of pending sends and rejects new sends, while completed responses remain caller-owned.
+Handlers must acknowledge cancellation after cleanup; a handler ignoring cancellation
+may remain pending. Forwarding handlers dispose owned inner handlers.
 They must forward or honor the token and finish owned cleanup before reporting
 cancellation. The client does not force completion of an uncooperative handler or
 dispose injected handlers.

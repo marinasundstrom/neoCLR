@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add Disposable HttpClient lifetime and an abstract HttpHandler base, owned and borrowed handler
+  constructors, idempotent disposal and linked pending-request cancellation. Preserve
+  completed responses and wait for handler acknowledgement before completing cancelled
+  sends. Add DelegatingHandler for owned middleware chains and freeze InnerHandler
+  after sending. Custom handlers now override Send; stateless handlers inherit Dispose.
+  Rebuild against matching libraries. Configurable timeout remains the next slice.
+
 - Add bounded AOT virtual dispatch for nongeneric reference classes. Resolve targets
   with interpreter ancestry rules, retain required base slots, and generate separate
   dispatch methods so direct base calls keep their original bodies. Preserve null

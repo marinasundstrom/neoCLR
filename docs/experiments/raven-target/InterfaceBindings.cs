@@ -12,14 +12,14 @@ static class InterfaceBindings
         public interface Closable<E> { Result<PropagationUnit,E> Close(); }
         """;
     static readonly HashSet<string> Contracts = new() { "System.Number", "System.EquatableTo", "System.ComparableTo", "System.Closable", "System.ConvertibleInto" };
-    public static bool IsInterface(string type) => type is "System.Number" or "System.Clonable" || type == GlobalizationBindings.Provider || ComparerBindings.IsInterface(type) || type == StandardUnionLibrary.ProtocolName || (HttpBindings.IsContract(type) || ReaderBindings.IsContract(type) || type == "System.Time.Clock" || StorageItemBindings.IsName(type) || StreamBindings.IsCapability(type) || StorageProviderBindings.IsName(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
+    public static bool IsInterface(string type) => type is "System.Number" or "System.Clonable" || type == GlobalizationBindings.Provider || ComparerBindings.IsInterface(type) || type == StandardUnionLibrary.ProtocolName || (ReaderBindings.IsContract(type) || type == "System.Time.Clock" || StorageItemBindings.IsName(type) || StreamBindings.IsCapability(type) || StorageProviderBindings.IsName(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
     public static string? Type(TypeReference type, Func<TypeReference, string>? parameterMap = null)
     {
         if (!RuntimeSignatures.IsCore(type.Scope)) return null;
         if (type.FullName == "System.Runtime.CompilerServices.Self") return "Self";
         if (type.FullName is "System.Number" or "System.Clonable") return type.FullName;
         if (StandardUnionLibrary.ProtocolType(type) is { } protocol) return protocol;
-        if ((HttpBindings.IsContract(type.FullName) || ReaderBindings.IsContract(type.FullName) || type.FullName == "System.Time.Clock" || StorageItemBindings.IsName(type.FullName) || StreamBindings.IsCapability(type.FullName) || StorageProviderBindings.IsName(type.FullName)) && !type.IsValueType) return type.FullName;
+        if ((ReaderBindings.IsContract(type.FullName) || type.FullName == "System.Time.Clock" || StorageItemBindings.IsName(type.FullName) || StreamBindings.IsCapability(type.FullName) || StorageProviderBindings.IsName(type.FullName)) && !type.IsValueType) return type.FullName;
         if (type.FullName == "System.Object") return "System.Object";
         if (type is not GenericInstanceType g || g.IsValueType || g.GenericArguments.Count != 1) return null;
         var name = g.ElementType.FullName.Split('`')[0];
@@ -34,7 +34,6 @@ static class InterfaceBindings
     {
         if (GlobalizationBindings.Bind(reference, definition) is { } culture) return culture;
         if (ComparerBindings.Bind(reference, definition) is { } comparer) return comparer;
-        if (HttpBindings.IsContract(reference.DeclaringType.FullName)) return HttpBindings.BindContract(reference, definition);
         if (ReaderBindings.IsContract(reference.DeclaringType.FullName)) return ReaderBindings.BindContract(reference, definition);
         if (StorageItemBindings.IsName(reference.DeclaringType.FullName)) return StorageItemBindings.BindContract(reference, definition);
         if (reference.DeclaringType.FullName == "System.Time.Clock") return CalendarBindings.Bind(reference, definition);

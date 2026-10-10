@@ -1687,3 +1687,10 @@ options and cross-assembly DeclareClassBase behavior are documented in the manua
 They are not guest APIs and do not require RavenDoc type selection. CLR execution
 and negative authoring tests cover external storage, slot reuse and abstract-member
 requirements. Native HTTP consumers use the matching integration compiler.
+
+Development (2026-10-11): HttpClient implements Disposable with owned/borrowed handler
+constructors. HttpHandler is now an abstract class with virtual Send/Dispose, and
+DelegatingHandler supplies a nullable InnerHandler property and protected constructors.
+The selected type list, aggregate reference and native reference include this surface;
+existing protected-constructor manual coverage rules still apply. Timeout remains a gap.
+The host-only native class slot resolver is documented in [introspection](introspection.md).

@@ -24,8 +24,9 @@ func ContentFor(index: int) -> HttpContent {
 }
 
 class InspectHandler : HttpHandler {
+
     var Calls: int = 0
-    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Calls += 1
         Check(request.Method == "POST")
         Check(request.Target == "/base/echo")

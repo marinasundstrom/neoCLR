@@ -1,0 +1,209 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+import NeoClr.Testing.*
+
+class LifetimeHandler : HttpHandler {
+    var DisposeCount: int = 0
+    var Calls: int = 0
+    var Token: CancellationToken = CancellationToken.None
+    val Completion = Promise<Result<HttpResponse, HttpError>>()
+
+    override func Dispose() {
+        DisposeCount += 1
+    }
+
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        Calls += 1
+        Token = cancellationToken
+        return Completion.Task
+    }
+}
+
+func UseOwned(handler: LifetimeHandler) {
+    use client = HttpClient(handler)
+    client.Dispose()
+    client.Dispose()
+}
+
+// These tests intentionally inspect cancellation outcomes and scheduling boundaries;
+// awaiting a cancelled task cannot express those assertions.
+[Test("HTTP client use disposes its owned handler exactly once")]
+func AOwned() -> Result<unit, TestFailure> {
+    let handler = LifetimeHandler()
+    UseOwned(handler)
+    return Assert.Equal(1, handler.DisposeCount)
+}
+
+[Test("HTTP borrowed handler survives one client and serves another")]
+func BBorrowed() -> Result<unit, TestFailure> {
+    let handler = LifetimeHandler()
+    let first = HttpClient(handler, false)
+    first.Dispose()
+    _ = Assert.Equal(0, handler.DisposeCount)?
+    use second = HttpClient(handler, false)
+    _ = handler.Completion.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), ArrayList<byte>())))
+    let result = second.Get("http://example.test/")
+    _ = Assert.True(result.IsCompleted && !result.IsCancelled, "Borrowed handler remains usable")?
+    return Assert.Equal(1, handler.Calls)
+}
+
+[Test("HTTP disposal requests cancellation and waits for handler acknowledgement")]
+func CCancellation() -> Result<unit, TestFailure> {
+    let handler = LifetimeHandler()
+    let client = HttpClient(handler)
+    let result = client.Get("http://example.test/")
+    client.Dispose()
+    _ = Assert.True(handler.Token.IsCancellationRequested, "Disposal requests cancellation")?
+    _ = Assert.True(!result.IsCompleted, "Provider still owns cleanup")?
+    _ = handler.Completion.Cancel()
+    TaskQueue.Default.Drain()
+    _ = Assert.True(result.IsCancelled, "Acknowledged cancellation is preserved")?
+    return Assert.Equal(1, handler.DisposeCount)
+}
+
+[Test("HTTP caller cancellation propagates without disposing the handler")]
+func DCaller() -> Result<unit, TestFailure> {
+    let handler = LifetimeHandler()
+    use client = HttpClient(handler, false)
+    use caller = CancellationTokenSource()
+    let result = client.Get("http://example.test/", caller.Token)
+    caller.Cancel()
+    _ = Assert.True(handler.Token.IsCancellationRequested, "Caller token reaches handler")?
+    _ = handler.Completion.Cancel()
+    TaskQueue.Default.Drain()
+    _ = Assert.True(result.IsCancelled, "Cancelled task preserved")?
+    return Assert.Equal(0, handler.DisposeCount)
+}
+
+[Test("HTTP completed responses survive disposal and retain request association")]
+func ECompleted() -> Result<unit, TestFailure> {
+    let handler = LifetimeHandler()
+    let response = HttpResponse(200, ArrayList<HttpHeader>(), ArrayList<byte>())
+    _ = handler.Completion.Complete(Ok(response))
+    let client = HttpClient(handler)
+    let result = client.Get("http://example.test/answer")
+    client.Dispose()
+    _ = Assert.True(!handler.Token.IsCancellationRequested, "Completed request registrations released")?
+    _ = Assert.True(result.IsCompleted && !result.IsCancelled, "Completed response preserved")?
+    let Some(request) = response.Request else {
+        return Error(TestFailure("Request association", "Some", "None"))
+    }
+    return Assert.Equal("/answer", request.Target)
+}
+
+[Test("HTTP pre-cancellation skips custom handlers")]
+func FPreCancelled() -> Result<unit, TestFailure> {
+    let handler = LifetimeHandler()
+    use client = HttpClient(handler)
+    use caller = CancellationTokenSource()
+    caller.Cancel()
+    _ = Assert.True(client.Get("bad\r\n", caller.Token).IsCancelled, "Cancellation precedes URI parsing")?
+    return Assert.Equal(0, handler.Calls)
+}
+
+[Test("HTTP socket handler disposal is idempotent through Disposable")]
+func GSocket() -> Result<unit, TestFailure> {
+    let handler = HttpSocketHandler()
+    let resource: Disposable = handler
+    resource.Dispose()
+    handler.Dispose()
+    return Assert.True(true, "Repeated handler disposal is harmless")
+}
+
+class RecordingMiddleware : DelegatingHandler {
+    private val name: string
+    private val events: ArrayList<string>
+
+    init(name: string, events: ArrayList<string>) {
+        self.name = name
+        self.events = events
+    }
+
+    init(name: string, events: ArrayList<string>, inner: HttpHandler) : base(inner) {
+        self.name = name
+        self.events = events
+    }
+
+    async override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        events.Add(String.Concat(name, " before"))
+        let response = await base.Send(request, cancellationToken)
+        events.Add(String.Concat(name, " after"))
+        return response
+    }
+}
+
+[Test("HTTP delegating handlers run outward and unwind inward")]
+func HDelegation() -> Result<unit, TestFailure> {
+    let events = ArrayList<string>()
+    let terminal = LifetimeHandler()
+    let inner = RecordingMiddleware("inner", events, terminal)
+    let outer = RecordingMiddleware("outer", events)
+    outer.InnerHandler = inner
+    let client = HttpClient(outer)
+    let response = client.Get("http://example.test/")
+    _ = Assert.Equal(2, events.Count)?
+    _ = terminal.Completion.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), ArrayList<byte>())))
+    TaskQueue.Default.Drain()
+    _ = Assert.True(response.IsCompleted && !response.IsCancelled, "Pipeline completes")?
+    _ = Assert.Equal("outer before", events[0])?
+    _ = Assert.Equal("inner before", events[1])?
+    _ = Assert.Equal("inner after", events[2])?
+    _ = Assert.Equal("outer after", events[3])?
+    client.Dispose()
+    outer.Dispose()
+    inner.Dispose()
+    return Assert.Equal(1, terminal.DisposeCount)
+}
+
+[Test("HTTP borrowed delegating pipeline remains reusable")]
+func IBorrowedPipeline() -> Result<unit, TestFailure> {
+    let events = ArrayList<string>()
+    let terminal = LifetimeHandler()
+    let outer = RecordingMiddleware("outer", events, terminal)
+    let first = HttpClient(outer, false)
+    first.Dispose()
+    _ = Assert.Equal(0, terminal.DisposeCount)?
+    let second = HttpClient(outer)
+    _ = terminal.Completion.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), ArrayList<byte>())))
+    let response = second.Get("http://example.test/")
+    TaskQueue.Default.Drain()
+    _ = Assert.True(response.IsCompleted && !response.IsCancelled, "Borrowed pipeline remains usable")?
+    second.Dispose()
+    return Assert.Equal(1, terminal.DisposeCount)
+}
+
+class SharedHandler : HttpHandler {
+    val Tokens = ArrayList<CancellationToken>()
+    val Completions = ArrayList<Promise<Result<HttpResponse, HttpError>>>()
+
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        let completion = Promise<Result<HttpResponse, HttpError>>()
+        Tokens.Add(cancellationToken)
+        Completions.Add(completion)
+        return completion.Task
+    }
+}
+
+[Test("HTTP borrowed clients cancel only their own pending sends")]
+func JIndependentOwners() -> Result<unit, TestFailure> {
+    let shared = SharedHandler()
+    let first = HttpClient(shared, false)
+    use second = HttpClient(shared, false)
+    let cancelled = first.Get("http://example.test/first")
+    let survivor = second.Get("http://example.test/second")
+    first.Dispose()
+    _ = Assert.True(shared.Tokens[0].IsCancellationRequested, "First owner requests cancellation")?
+    _ = Assert.True(!shared.Tokens[1].IsCancellationRequested, "Other owner is independent")?
+    _ = shared.Completions[0].Cancel()
+    _ = shared.Completions[1].Complete(Error(HttpError.Handler("expected")))
+    TaskQueue.Default.Drain()
+    _ = Assert.True(cancelled.IsCancelled, "First send acknowledges cancellation")?
+    return Assert.True(survivor.GetResult() is Error(HttpError.Handler("expected")), "Independent failure preserved")
+}

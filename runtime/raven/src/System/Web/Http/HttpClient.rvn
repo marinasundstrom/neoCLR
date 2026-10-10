@@ -464,8 +464,66 @@ internal class HttpResponseDecoder {
 
 
 // Request and handler contracts are independent of socket transport.
-public interface HttpHandler {
-    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>>
+/// Base contract for a reusable request pipeline or terminal transport.
+public abstract class HttpHandler : Disposable {
+    protected init() { }
+
+    abstract func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>>
+
+    /// Releases resources owned by the handler. Stateless handlers need no override.
+    virtual func Dispose() { }
+}
+
+/// Base for middleware which forwards to an owned inner handler.
+public abstract class DelegatingHandler : HttpHandler {
+    private var inner: HttpHandler? = null
+    private var started = false
+    private var disposed = false
+
+    protected init() { }
+
+    protected init(innerHandler: HttpHandler) {
+        inner = innerHandler
+    }
+
+    /// The owned next handler. Assign before the first send or disposal.
+    var InnerHandler: HttpHandler? {
+        get => inner
+        set {
+            if disposed || started {
+                System.Fail("Handler pipeline is already started or disposed")
+            }
+            if value is not HttpHandler {
+                System.Fail("Inner handler cannot be null")
+            }
+            inner = value
+        }
+    }
+
+    /// Forwards to the inner handler, freezing pipeline configuration.
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if disposed {
+            System.Fail("HTTP handler is disposed")
+        }
+        let target = inner
+        if target is HttpHandler handler {
+            started = true
+            return handler.Send(request, cancellationToken)
+        }
+        System.Fail("Inner handler has not been assigned")
+    }
+
+    /// Disposes the owned inner handler once. Overrides must call base.Dispose().
+    override func Dispose() {
+        if disposed {
+            return
+        }
+        disposed = true
+        let target = inner
+        if target is HttpHandler handler {
+            handler.Dispose()
+        }
+    }
 }
 
 public class HttpContent : Disposable {
@@ -986,7 +1044,10 @@ public class HttpRequest {
     }
 }
 
-public class HttpClient {
+public class HttpClient : Disposable {
+    private val lifetime = CancellationTokenSource()
+    private var disposed = false
+    private var ownsHandler = true
     private var defaultHeaders: Sequence<HttpHeader> = ArrayList<HttpHeader>()
 
     /// Client-wide application headers, copied on get/set and validated at Send.
@@ -1033,8 +1094,35 @@ public class HttpClient {
         handler = HttpSocketHandler()
     }
 
+    /// Creates a client which owns the supplied handler.
     init(handler: HttpHandler) {
         self.handler = handler
+    }
+
+    /// Creates a client with explicit handler ownership.
+    init(handler: HttpHandler, disposeHandler: bool) {
+        self.handler = handler
+        ownsHandler = disposeHandler
+    }
+
+    /// Cancels pending requests and disposes the handler when this client owns it.
+    /// Repeated disposal is harmless; completed responses remain caller-owned.
+    func Dispose() {
+        if disposed {
+            return
+        }
+        disposed = true
+        lifetime.Cancel()
+        lifetime.Dispose()
+        if ownsHandler {
+            handler.Dispose()
+        }
+    }
+
+    private func EnsureUsable() {
+        if disposed {
+            System.Fail("HTTP client is disposed")
+        }
     }
 
     func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
@@ -1043,6 +1131,7 @@ public class HttpClient {
 
     /// Sends a prepared request, forwarding the token through the handler pipeline.
     func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1053,16 +1142,8 @@ public class HttpClient {
         let Ok(outgoing) = prepared else {
             System.Fail("Request preparation returned no outcome")
         }
-        let sent = handler.Send(outgoing, cancellationToken)
-        if sent.IsCompleted {
-            if !sent.IsCancelled {
-                if let Ok(response) = sent.GetResult() {
-                    response.Associate(outgoing)
-                }
-            }
-            return sent
-        }
-        return sent.Map(HttpResponseAssociation(outgoing).Attach)
+        let operation = HttpSendScope(outgoing, cancellationToken, lifetime.Token)
+        return operation.Attach(handler.Send(outgoing, operation.Token))
     }
 
     /// Sends an absolute URL without a base, or a relative URL when BaseUri is set.
@@ -1072,6 +1153,7 @@ public class HttpClient {
 
     /// Uses the same address rules, with cooperative cancellation.
     func Get(url: string, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1092,6 +1174,7 @@ public class HttpClient {
 
     /// Uses the same address rules, with cooperative cancellation.
     func Get(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1112,6 +1195,7 @@ public class HttpClient {
 
     /// Posts content with cooperative exchange cancellation.
     func Post(url: string, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1132,6 +1216,7 @@ public class HttpClient {
 
     /// Posts content through Send, forwarding the cancellation token unchanged.
     func Post(uri: Uri, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1156,6 +1241,7 @@ public class HttpClient {
 
     /// Sends PUT content with cooperative exchange cancellation.
     func Put(url: string, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1176,6 +1262,7 @@ public class HttpClient {
 
     /// Sends PUT content through Send, forwarding the cancellation token unchanged.
     func Put(uri: Uri, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1200,6 +1287,7 @@ public class HttpClient {
 
     /// Sends PATCH content with cooperative exchange cancellation.
     func Patch(url: string, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1220,6 +1308,7 @@ public class HttpClient {
 
     /// Sends PATCH content through Send, forwarding the cancellation token unchanged.
     func Patch(uri: Uri, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1244,6 +1333,7 @@ public class HttpClient {
 
     /// Uses the same address rules, with cooperative cancellation.
     func Delete(url: string, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1264,6 +1354,7 @@ public class HttpClient {
 
     /// Uses the same address rules, with cooperative cancellation.
     func Delete(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1288,6 +1379,7 @@ public class HttpClient {
 
     /// Uses the same address rules, with cooperative cancellation.
     func Head(url: string, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1308,6 +1400,7 @@ public class HttpClient {
 
     /// Uses the same address rules, with cooperative cancellation.
     func Head(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
@@ -1332,6 +1425,7 @@ public class HttpClient {
 
     /// Fetches UTF-8 text, preserving HTTP failures and acknowledged task cancellation.
     func GetString(url: string, cancellationToken: CancellationToken) -> Task<Result<string, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             let source = Promise<Result<string, HttpError>>()
             _ = source.Cancel()
@@ -1347,6 +1441,7 @@ public class HttpClient {
 
     /// Fetches UTF-8 text, preserving HTTP failures and acknowledged task cancellation.
     func GetString(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<string, HttpError>> {
+        EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             let source = Promise<Result<string, HttpError>>()
             _ = source.Cancel()
@@ -1414,21 +1509,38 @@ public class HttpClient {
 }
 
 public class HttpSocketHandler : HttpHandler {
+    private val lifetime = CancellationTokenSource()
+    private var disposed = false
+
     init() { }
+
+    /// Requests cancellation of this handler's pending exchanges, once.
+    override func Dispose() {
+        if disposed {
+            return
+        }
+        disposed = true
+        lifetime.Cancel()
+        lifetime.Dispose()
+    }
 
     func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         return Send(request, CancellationToken.None)
     }
 
     /// Uses one token across lookup, connect and transfers, closing before cancellation completes.
-    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if disposed {
+            System.Fail("HTTP handler is disposed")
+        }
         if cancellationToken.IsCancellationRequested {
             let source = Promise<Result<HttpResponse, HttpError>>()
             _ = source.Cancel()
             return source.Task
         }
-        let exchange = HttpExchange(request, cancellationToken)
-        return exchange.Execute()
+        let operation = HttpSendScope(request, cancellationToken, lifetime.Token)
+        let exchange = HttpExchange(request, operation.Token)
+        return operation.Attach(exchange.Execute())
     }
 }
 
@@ -1684,17 +1796,67 @@ internal class HttpExchange {
 }
 
 
-// Per-send state retains the originating request until completion, including custom handlers.
-internal class HttpResponseAssociation {
-    private var request: HttpRequest
-    internal init(request: HttpRequest) {
+// Cancellation-outcome adapter: await cannot currently observe a cancelled task.
+// Cancellation requests are cooperative; completion waits for provider cleanup.
+internal class HttpSendScope {
+    private val request: HttpRequest
+    private val cancellation = CancellationTokenSource()
+    private val source = Promise<Result<HttpResponse, HttpError>>()
+    private var callerRegistration: CancellationRegistration? = null
+    private var ownerRegistration: CancellationRegistration? = null
+    private var pending: Option<Task<Result<HttpResponse, HttpError>>> = None()
+    private var closed = false
+
+    internal init(request: HttpRequest, caller: CancellationToken, owner: CancellationToken) {
         self.request = request
+        callerRegistration = caller.Register(self.Cancel)
+        ownerRegistration = owner.Register(self.Cancel)
     }
 
-    internal func Attach(result: Result<HttpResponse, HttpError>) -> Result<HttpResponse, HttpError> {
-        if let Ok(response) = result {
-            response.Associate(request)
+    internal val Token: CancellationToken => cancellation.Token
+
+    private func Cancel() {
+        if !closed {
+            cancellation.Cancel()
         }
-        return result
+    }
+
+    internal func Attach(task: Task<Result<HttpResponse, HttpError>>) -> Task<Result<HttpResponse, HttpError>> {
+        pending = Some(task)
+        if task.IsCompleted {
+            Complete()
+        } else {
+            task.OnCompleted(self.Complete)
+        }
+        return source.Task
+    }
+
+    private func Complete() {
+        if closed {
+            return
+        }
+        let Some(task) = pending else {
+            System.Fail("HTTP operation has no pending task")
+        }
+        closed = true
+        pending = None()
+        if callerRegistration is CancellationRegistration caller {
+            caller.Dispose()
+        }
+        if ownerRegistration is CancellationRegistration owner {
+            owner.Dispose()
+        }
+        callerRegistration = null
+        ownerRegistration = null
+        cancellation.Dispose()
+        if task.IsCancelled {
+            _ = source.Cancel()
+        } else {
+            let result = task.GetResult()
+            if let Ok(response) = result {
+                response.Associate(request)
+            }
+            _ = source.Complete(result)
+        }
     }
 }

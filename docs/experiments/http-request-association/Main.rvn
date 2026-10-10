@@ -14,6 +14,7 @@ func Check(condition: bool) {
 }
 
 class ReplyHandler : HttpHandler {
+
     val Completion: Promise<Result<HttpResponse, HttpError>> = Promise<Result<HttpResponse, HttpError>>()
     val Response: HttpResponse
     var Calls: int = 0
@@ -25,7 +26,7 @@ class ReplyHandler : HttpHandler {
         self.pending = pending
     }
 
-    func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Calls += 1
         SawToken = token.CanBeCancelled
         if !pending {

@@ -14,12 +14,13 @@ func Check(condition: bool) {
 }
 
 class CaptureHandler : HttpHandler {
+
     var Calls: int = 0
     var Host: string = ""
     var Target: string = ""
     var Port: int = 0
 
-    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Calls += 1
         Host = request.Host
         Port = request.Port
@@ -30,18 +31,8 @@ class CaptureHandler : HttpHandler {
     }
 }
 
-class Forwarder : HttpHandler {
-    private var inner: HttpHandler
-    var Calls: int = 0
-
-    init(inner: HttpHandler) {
-        self.inner = inner
-    }
-
-    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
-        Calls += 1
-        return inner.Send(request, cancellationToken)
-    }
+class Forwarder : DelegatingHandler {
+    init(inner: HttpHandler) : base(inner) { }
 }
 
 func Resolved(baseText: string, reference: string, expected: string) {

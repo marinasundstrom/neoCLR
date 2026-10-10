@@ -369,6 +369,7 @@
   "System.Value",
   "System.ValueType",
   "System.Void",
+  "System.Web.Http.DelegatingHandler",
   "System.Web.Http.HttpClient",
   "System.Web.Http.HttpContent",
   "System.Web.Http.HttpContext",

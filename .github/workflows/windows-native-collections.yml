@@ -22,6 +22,8 @@ on:
       - 'scripts/test-runtime-library.py'
       - 'scripts/validate-public-encoding.py'
       - 'scripts/validate-runtime-obsolete.py'
+      - 'scripts/validate-http-lifetime.py'
+      - 'docs/experiments/http-lifetime/**'
       - 'docs/experiments/obsolete-runtime/**'
       - 'docs/experiments/raven-target/samples/library-utf8*'
       - 'scripts/discover-runtime-tests.py'
@@ -58,6 +60,8 @@ on:
       - 'scripts/test-runtime-library.py'
       - 'scripts/validate-public-encoding.py'
       - 'scripts/validate-runtime-obsolete.py'
+      - 'scripts/validate-http-lifetime.py'
+      - 'docs/experiments/http-lifetime/**'
       - 'docs/experiments/obsolete-runtime/**'
       - 'docs/experiments/raven-target/samples/library-utf8*'
       - 'scripts/discover-runtime-tests.py'
@@ -106,6 +110,13 @@ jobs:
           if (-not $vs) { throw 'MSVC x64 tools not found' }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/test-runtime-library.py --bundle `"target/windows-native-collections-validation/development toolchain/bundle`" --output target/windows-native-collections-validation/runtime-library-tests"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify HTTP lifetime and delegating pipeline guards
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-http-lifetime.py --bundle `"target/windows-native-collections-validation/development toolchain/bundle`" --output target/windows-native-collections-validation/http-lifetime"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Verify public encoding sample and internal helper boundary
         shell: pwsh
         run: |

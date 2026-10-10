@@ -54,7 +54,11 @@ Handlers return `Task<Result<HttpResponse, HttpError>>`. A forwarding handler ca
 before/after the inner handler's result; the socket handler owns connection cleanup.
 Each socket-backed Send has separate buffers, pending tasks and a connection.
 Custom mutable handlers must define their own concurrent-use policy; there is no
-handler disposal or automatic retry. Handlers now forward or honor invocation-local cancellation tokens.
+automatic retry. Clients own their handler by default; HttpClient(handler, false)
+borrows it. DelegatingHandler owns its inner handler and freezes InnerHandler on
+first send. Custom terminal handlers derive HttpHandler and override Send.
+Disposal requests cancellation, with task completion after provider acknowledgement.
+Handlers forward or honor the linked invocation-local cancellation token.
 
 Only plain HTTP/1.1 GET with a 200 response and exactly one Content-Length is admitted.
 Limits: 1,024 URL bytes, 2,048 header bytes, 16 fields, 1,024 body bytes. Header names

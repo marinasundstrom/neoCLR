@@ -4,10 +4,9 @@ using Mono.Cecil;
 static class HttpBindings
 {
     public const string Prefix = "System.Web.Http.";
-    public static readonly string[] Names = ["RoutePattern", "RouteMatch", "HttpClient", "HttpHandler", "HttpRequest", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation", "HttpResponseAssociation"];
+    public static readonly string[] Names = ["RoutePattern", "RouteMatch", "HttpClient", "HttpHandler", "DelegatingHandler", "HttpRequest", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation"];
     public static bool IsName(string name) => Names.Any(n => name == Prefix + n);
-    public static bool IsContract(string name) => name == Prefix + "HttpHandler";
-    public static bool IsProvider(TypeDefinition type) => type.FullName is Prefix + "HttpResponseDecoder" or Prefix + "HttpExchange" or Prefix + "HttpRequestDecoder" or Prefix + "HttpServerExchange" or Prefix + "HttpServeOperation" or Prefix + "HttpResponseAssociation";
+    public static bool IsProvider(TypeDefinition type) => type.FullName is Prefix + "HttpResponseDecoder" or Prefix + "HttpExchange" or Prefix + "HttpRequestDecoder" or Prefix + "HttpServerExchange" or Prefix + "HttpServeOperation";
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
@@ -15,8 +14,17 @@ static class HttpBindings
         namespace Web.Http {
             public enum HttpStatusCode { Continue = 100, SwitchingProtocols = 101, OK = 200, Created = 201, Accepted = 202, NoContent = 204, ResetContent = 205, PartialContent = 206, MultipleChoices = 300, MovedPermanently = 301, Found = 302, SeeOther = 303, NotModified = 304, TemporaryRedirect = 307, PermanentRedirect = 308, BadRequest = 400, Unauthorized = 401, Forbidden = 403, NotFound = 404, MethodNotAllowed = 405, RequestTimeout = 408, Conflict = 409, Gone = 410, LengthRequired = 411, PreconditionFailed = 412, RequestEntityTooLarge = 413, RequestUriTooLong = 414, UnsupportedMediaType = 415, RequestedRangeNotSatisfiable = 416, ExpectationFailed = 417, UnprocessableContent = 422, TooManyRequests = 429, InternalServerError = 500, NotImplemented = 501, BadGateway = 502, ServiceUnavailable = 503, GatewayTimeout = 504, HttpVersionNotSupported = 505 }
             public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct Content { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Handler { } public struct UnsuccessfulStatus { } }
-            public interface HttpHandler {
-                Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken);
+            public abstract class HttpHandler : Disposable {
+                protected HttpHandler() { }
+                public abstract Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken);
+                public virtual void Dispose() { }
+            }
+            public abstract class DelegatingHandler : HttpHandler {
+                protected DelegatingHandler() { }
+                protected DelegatingHandler(HttpHandler innerHandler) { }
+                public HttpHandler InnerHandler { get; set; }
+                public override Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
+                public override void Dispose() { }
             }
             public sealed class RoutePattern {
                 private RoutePattern() { }
@@ -30,9 +38,11 @@ static class HttpBindings
                 public Result<string, string> Get(string name) => default;
                 public Result<int, string> GetInt32(string name) => default;
             }
-            public sealed class HttpClient {
+            public sealed class HttpClient : Disposable {
                 public HttpClient() { }
                 public HttpClient(HttpHandler handler) { }
+                public HttpClient(HttpHandler handler, bool disposeHandler) { }
+                public void Dispose() { }
                 public Option<string> BaseUri { get; set; }
                 public Collections.Sequence<HttpHeader> DefaultRequestHeaders { get; set; }
                 public Tasks.Task<Result<HttpResponse, HttpError>> Get(string url) => default;
@@ -68,8 +78,9 @@ static class HttpBindings
             }
             public sealed class HttpSocketHandler : HttpHandler {
                 public HttpSocketHandler() { }
+                public override void Dispose() { }
                 public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
+                public override Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
             }
             public sealed class HttpHeader {
                 public HttpHeader(string name, string value) { }
@@ -179,10 +190,6 @@ static class HttpBindings
                 public Result<HttpResponse, HttpError> Finish() => default;
                 public Result<HttpResponse, HttpError> EndOfInput() => default;
             }
-            public sealed class HttpResponseAssociation {
-                public HttpResponseAssociation(HttpRequest request) { }
-                public Result<HttpResponse, HttpError> Attach(Result<HttpResponse, HttpError> result) => default;
-            }
             public sealed class HttpExchange {
                 public HttpExchange(HttpRequest request, Concurrency.CancellationToken token) { }
                 public Tasks.Task<Result<HttpResponse, HttpError>> Execute() => default;
@@ -248,7 +255,13 @@ static class HttpBindings
             ("HttpContext", "get_Request") => ("", request, false),
             ("HttpContext", "Close" or "Dispose") => ("", "noresult", false),
             ("HttpContext", "Send") when library => (response + (args.Length == 2 ? "," + CancellationBindings.Token : ""), "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
+            ("HttpHandler", ".ctor") => ("", "noresult", false),
+            ("DelegatingHandler", ".ctor") => (args.Length == 0 ? "" : Prefix + "HttpHandler", "noresult", false),
+            ("DelegatingHandler", "get_InnerHandler") => ("", Prefix + "HttpHandler", false),
+            ("DelegatingHandler", "set_InnerHandler") => (Prefix + "HttpHandler", "noresult", false),
             ("HttpClient", ".ctor") when args.Length == 0 => ("", "noresult", false),
+            ("HttpClient", ".ctor") when args.Length == 2 => (Prefix + "HttpHandler,Boolean", "noresult", false),
+            ("HttpClient" or "HttpSocketHandler" or "HttpHandler" or "DelegatingHandler", "Dispose") => ("", "noresult", false),
             ("HttpClient", ".ctor") => (Prefix + "HttpHandler", "noresult", false),
             ("HttpClient", "Get" or "GetString" or "Delete" or "Head") => (args.Length > 0 && args[0] == "String" ? "String" : "System.Uri",
                 definition.Name != "GetString" ? task : "System.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>", false),
@@ -259,8 +272,6 @@ static class HttpBindings
             ("HttpRequest", "Encode") when library => ("", "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", false),
             ("HttpResponse", "get_Request") => ("", "System.Option<System.Web.Http.HttpRequest>", false),
             ("HttpResponse", "Associate") when library => (request, "noresult", false),
-            ("HttpResponseAssociation", ".ctor") when library => (request, "noresult", false),
-            ("HttpResponseAssociation", "Attach") when library => ($"System.Result<{response},System.Web.Http.HttpError>", $"System.Result<{response},System.Web.Http.HttpError>", false),
             ("HttpContent", "get_MediaType") when library => ("", "System.Option<String>", false),
             ("HttpContent", "FromStream") => ("System.IO.InputStream,Int32,Boolean", "System.Result<System.Web.Http.HttpContent,System.Web.Http.HttpError>", true),
             ("HttpContent", "get_IsBuffered") => ("", "Boolean", false),
@@ -275,7 +286,7 @@ static class HttpBindings
             ("HttpClient", "set_DefaultRequestHeaders") => ("System.Collections.Sequence<System.Web.Http.HttpHeader>", "noresult", false),
             ("HttpClient", "get_BaseUri") => ("", "System.Option<String>", false),
             ("HttpClient", "set_BaseUri") => ("System.Option<String>", "noresult", false),
-            ("HttpHandler", "Send") => (request + ",System.Concurrency.CancellationToken", task, false),
+            ("HttpHandler" or "DelegatingHandler", "Send") => (request + ",System.Concurrency.CancellationToken", task, false),
             ("HttpClient" or "HttpSocketHandler", "Send") => (request, task, false),
             ("HttpResponseDecoder", ".ctor") when library => ("Boolean", "noresult", false),
             ("HttpSocketHandler", ".ctor") => ("", "noresult", false),
@@ -303,22 +314,17 @@ static class HttpBindings
             && definition.Name is "Get" or "GetString" or "Send" or "Post" or "Put" or "Patch" or "Delete" or "Head"
             && args.LastOrDefault() == CancellationBindings.Token)
             expected.Item1 += "," + CancellationBindings.Token;
-        var virtualMember = (owner == Prefix + "HttpContext" || owner == Prefix + "HttpContent") && definition.Name == "Dispose" || IsContract(owner) || owner == Prefix + "HttpSocketHandler"
+        var virtualMember = (owner == Prefix + "HttpHandler" || owner == Prefix + "DelegatingHandler") && definition.Name is "Send" or "Dispose" || (owner == Prefix + "HttpContext" || owner == Prefix + "HttpContent" || owner == Prefix + "HttpClient" || owner == Prefix + "HttpSocketHandler") && definition.Name == "Dispose" || owner == Prefix + "HttpSocketHandler"
             && definition.Name == "Send" && args.Length == 2;
         if (definition.IsConstructor != construct || definition.IsStatic != expected.Item3
-            || !(definition.IsPublic || library && definition.IsAssembly)
+            || !(definition.IsPublic || construct && definition.IsFamily || library && definition.IsAssembly)
             || definition.IsVirtual != virtualMember || definition.HasGenericParameters
             || definition.DeclaringType.HasGenericParameters
-            || (IsContract(owner) ? !definition.IsAbstract || !definition.DeclaringType.IsInterface : !definition.DeclaringType.IsSealed)
+            || (owner is Prefix + "HttpHandler" or Prefix + "DelegatingHandler" ? !definition.DeclaringType.IsAbstract || definition.DeclaringType.IsInterface : !definition.DeclaringType.IsSealed)
             || string.Join(',', args) != expected.Item1 || result != expected.Item2)
             throw new InvalidDataException("Unsupported HTTP signature: " + reference.FullName);
         return construct ? new(args, owner, $"newobj instance {owner}::.ctor({string.Join(',', args)})")
             : new(definition.IsStatic ? args : new[] { owner }.Concat(args).ToArray(), result,
-                $"{(IsContract(owner) ? "callvirt" : "call")} {(definition.IsStatic ? "" : "instance ")}{owner}::{definition.Name}({string.Join(',', args)})");
-    }
-    public static ResultBindings.Binding? BindContract(MethodReference reference, MethodDefinition definition)
-    {
-        var call = Bind(reference, definition, false, false)!;
-        return new(reference.DeclaringType.FullName + "::" + reference.Name, call.Arguments, call.Result, Instruction: call.Instruction);
+                $"{(virtualMember ? "callvirt" : "call")} {(definition.IsStatic ? "" : "instance ")}{owner}::{definition.Name}({string.Join(',', args)})");
     }
 }

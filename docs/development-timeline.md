@@ -25,6 +25,25 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-10 — Experimental API compatibility and Index/Range continuation
+
+- **Author:** “Continue towards and through the Index and Range feature”, retaining
+  HttpClient work as its predecessor. Subsequently clarified: “We are experimental
+  and backwards compatibility is not important right now”.
+- **Assistant:** will prioritize coherent contracts and update callers, tests and
+  documentation together, without compatibility layers solely to preserve old APIs.
+- **Actions:** the prior encoding/obsolete slice is committed as `fbd0d93d`.
+  HttpClient/handler disposal and ownership are implemented and undergoing focused
+  interpreted/native validation; timeout and Index/Range remain subsequent work.
+- **Author follow-up:** requested an architecture similar to .NET HttpClient with
+  a delegating handler. **Action:** replaced the handler interface with an abstract
+  base and added DelegatingHandler, migrating middleware to base.Send and shared
+  inner-handler ownership. Compiler overload lookup validation is ongoing.
+- **Scope:** this clarification removes compatibility preservation as a constraint
+  on current experimental APIs. It does not alter frozen published release notes or
+  assert that queued features have shipped. See the [HttpClient design](design/http-client-lifetime.md)
+  and [roadmap](platform-roadmap.md).
+
 ## 2026-10-10 — Custom attributes must work with AOT
 
 - **Author:** “Custom attributes should also work with AOT”. This follows the
@@ -14140,3 +14159,44 @@ claim completion of in-process test discovery.
   indexing contract retained. No implementation is claimed; obsolete annotations
   and encoding qualification remain the current slice. Exact signatures and
   allocation/view behavior need design and target-compiler validation.
+
+### 2026-10-10 — .NET handler inheritance and shared compiler qualification
+
+- **Author:** selected an architecture like .NET HttpClient with DelegatingHandler,
+  directed “Fix whatever you need to make behavior consistent with .net here”,
+  and then requested checking whether the same issues exist on Raven main despite
+  the neoCLR integration branch having diverged.
+- **Assistant actions:** implemented a draft owned/borrowed handler pipeline and
+  cancellation tests. Those consumers exposed imported override lookup, nullable
+  property/interface projection, external class inheritance and async base-receiver
+  gaps. The overload fix is on Raven shared main (`19c0fca69`); native projection
+  fixes are on the integration branch (`8a1419177`). External inheritance and the
+  HTTP pipeline are still under qualification, not completed platform claims.
+- **Next validation:** reproduce async base dispatch using ordinary .NET on Raven
+  shared main; land general fixes there before integrating them into neoCLR. Keep
+  native metadata/capability changes on the native integration branch. The author
+  explicitly allows experimental API changes; compatibility does not justify
+  preserving an incorrect contract. Timeout and Index/Range remain pending.
+
+- **Shared-main outcome:** the ordinary .NET async-base regression reproduced the
+  defect (1 instead of 42). Raven main commit `9b6688fa3` preserves the original
+  receiver and direct dispatch; integration commit `fda107a6c` carries the same fix.
+  Sixteen focused initial tests passed, followed by four expanded cases covering
+  local/imported bases, completed/suspending awaits, inherited IDisposable conversion
+  and nullable property assignment. The native-specific imported-interface/property
+  bugs did not reproduce on the CLI path in those cases. No blanket claim about all
+  compiler behavior is made. Native HTTP qualification continues.
+
+### 2026-10-11 — Handler pipeline qualification
+
+- **Assistant outcome:** completed the shared-main check requested above: normal .NET
+  receiver/override fixes are on Raven main; nullable imported properties and inherited
+  interfaces pass its four async/import regressions. Native external contracts remain
+  behind the native capability on the integration branch (`83b5ee210`).
+- **Implementation:** neoCLR metadata commits `1273c5f7` and `52cd8e8c` preserve
+  external base contracts and storage; `993d82d3` adds bounded AOT class dispatch.
+  Ten HTTP ownership/cancellation/middleware cases and eight guard cases pass in the
+  interpreter and macOS ARM64 AOT. Windows CI is configured, not executed.
+- **Remaining:** configurable timeout, followed by Index/Range. Protected disposal
+  hooks and other full .NET HTTP parity gaps remain recorded in the
+  [lifetime design](design/http-client-lifetime.md); these results do not claim them.

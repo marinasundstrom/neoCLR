@@ -7,11 +7,12 @@ import System.Tasks.*
 import System.Web.Http.*
 
 class SampleHandler : HttpHandler {
+
     private val mode: int
     init(mode: int) {
         self.mode = mode
     }
-    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         let source = Promise<Result<HttpResponse, HttpError>>()
         if mode == 1 {
             _ = source.Complete(Error(HttpError.Protocol("peer")))
