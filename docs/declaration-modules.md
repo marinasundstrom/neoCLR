@@ -11,10 +11,10 @@ listed below; this is not completion of all native introspection or test discove
 - Host/guest logical ownership, flat native tables, retained native module catalogs
   and native executing-assembly queries are implemented. The shared-namespace consumer
   passes interpreter and macOS ARM64 AOT without compiler/resolver changes.
-- Windows qualification for the final consumer is pending in
-  [run 38056974148](https://github.com/marinasundstrom/neoCLR/actions/runs/38056974148)
-  at 61e687bd. Earlier catalog/ownership Windows gates passed; they do not qualify
-  the newer executing-assembly or shared-namespace cases.
+- Windows [run 38056974148](https://github.com/marinasundstrom/neoCLR/actions/runs/38056974148)
+  passes at 61e687bd, including executing-assembly/shared-namespace checks. Artifact
+  hashes have not been independently checked. This does not qualify later guest
+  function discovery changes.
 
 Follow-up capabilities: native type enumeration, guest module-function discovery
 and invocation for in-process test registration, and broader runtime-context queries.

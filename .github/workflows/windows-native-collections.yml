@@ -29,6 +29,7 @@ on:
       - 'docs/experiments/native-attributes/**'
       - 'docs/experiments/attribute-usage/**'
       - 'docs/experiments/guest-modules/**'
+      - 'docs/experiments/guest-functions/**'
       - 'tools/metadata/**'
       - 'docs/experiments/map-pairs/**'
       - 'scripts/validate-native-http-project.py'
@@ -60,6 +61,7 @@ on:
       - 'docs/experiments/native-attributes/**'
       - 'docs/experiments/attribute-usage/**'
       - 'docs/experiments/guest-modules/**'
+      - 'docs/experiments/guest-functions/**'
       - 'tools/metadata/**'
       - 'docs/experiments/map-pairs/**'
       - 'scripts/validate-native-http-project.py'
@@ -116,6 +118,11 @@ jobs:
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python docs/experiments/guest-modules/verify.py --bundle `"target/windows-native-collections-validation/development toolchain/bundle`" --aot tools/aot-poc/target/debug/neoclr-aot-poc.exe --runner target/release/neoclr.exe --output target/windows-native-collections-validation/guest-modules"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Discover guest module functions and test descriptions
+        shell: pwsh
+        run: |
+          python docs/experiments/guest-functions/verify.py --bundle "target/windows-native-collections-validation/development toolchain/bundle" --compiler "target/windows-native-collections-validation/development toolchain/bundle/sdk/tools/rvnc/rvnc.dll" --runner target/release/neoclr.exe --output target/windows-native-collections-validation/guest-functions
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()

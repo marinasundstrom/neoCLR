@@ -1117,15 +1117,15 @@ fn method(
 }
 
 /// Source recipes for ownerless function discovery, without creating a live binding.
-#[cfg(feature = "native-metadata")]
 pub(crate) fn module_function_snapshot(
     module: &Module,
     target: &Function,
+    source: bool,
 ) -> Result<Value, Fault> {
     if target.owner.is_some() || target.instance {
         return Err(Fault::new("module function snapshot requires a static ownerless definition"));
     }
-    let context = QueryContext { module, source: true };
+    let context = QueryContext { module, source };
     // Reuse the bound-function signature key privately. It is not a declaring type.
     let shape = Type::Function(Box::new(crate::metadata::FunctionType {
         parameters: target.argument_types(),
@@ -1144,9 +1144,8 @@ pub(crate) fn module_function_snapshot(
 }
 
 /// Method-level annotations only; parameter/return annotations are separate targets.
-#[cfg(feature = "native-metadata")]
-pub(crate) fn module_function_attributes(module: &Module, target: &Function) -> Result<Value, Fault> {
-    let context = QueryContext { module, source: true };
+pub(crate) fn module_function_attributes(module: &Module, target: &Function, source: bool) -> Result<Value, Fault> {
+    let context = QueryContext { module, source };
     let token = crate::metadata_tokens::method(target)? as u32;
     array("System.Introspection.CustomAttributeData",
         target.custom_attributes.iter()

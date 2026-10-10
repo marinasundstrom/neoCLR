@@ -12,6 +12,8 @@ pub(crate) enum Query {
     Types,
     ModuleAssembly,
     ModuleTypes,
+    ModuleFunctions,
+    ModuleMemberAttributes,
 }
 impl Query {
     pub(crate) fn binding(name: &str) -> Option<(Self, usize, &'static str)> {
@@ -31,6 +33,8 @@ impl Query {
             "neoCLR.Runtime.ModuleTypes" => {
                 (Self::ModuleTypes, 2, "System.Introspection.TypeInfo[]")
             }
+            "neoCLR.Runtime.ModuleFunctions" => (Self::ModuleFunctions, 2, "System.Introspection.MethodInfo[]"),
+            "neoCLR.Runtime.ModuleMemberCustomAttributes" => (Self::ModuleMemberAttributes, 3, "System.Introspection.CustomAttributeData[]"),
             _ => return None,
         })
     }
@@ -39,6 +43,15 @@ impl Query {
         module: &Module,
         args: &[Value],
         limits: &Limits,
+    ) -> Result<Value, Fault> {
+        self.invoke_profile(module, args, limits, false)
+    }
+    pub(crate) fn invoke_profile(
+        self,
+        module: &Module,
+        args: &[Value],
+        limits: &Limits,
+        source: bool,
     ) -> Result<Value, Fault> {
         let Some(Value::String(identity)) = args.first() else {
             return Err(Fault::new("assembly identity requires String"));
@@ -74,6 +87,22 @@ impl Query {
                     .map(|name| Ok(module_value(identity, name))),
                 limits,
             ),
+            Self::ModuleFunctions => crate::reflection::array(
+                "System.Introspection.MethodInfo",
+                module_functions(module, identity, selected_module.ok_or_else(|| Fault::new("module name required"))?)?
+                    .into_iter().map(|function| crate::reflection::module_function_snapshot(module, function, source)),
+                limits,
+            ),
+            Self::ModuleMemberAttributes => {
+                let Some(Value::Int32(token)) = args.get(2) else { return Err(Fault::new("module member token requires Int32")); };
+                let functions = module_functions(module, identity, selected_module.ok_or_else(|| Fault::new("module name required"))?)?;
+                let mut matches = Vec::new();
+                for function in functions {
+                    if crate::metadata_tokens::method(function)? == *token { matches.push(function); }
+                }
+                if matches.len() != 1 { return Err(Fault::new("missing or ambiguous module member token")); }
+                crate::reflection::module_function_attributes(module, matches[0], source)
+            }
             Self::Types | Self::ModuleTypes => {
                 let mut types = Vec::new();
                 for definition in &module.types {
@@ -230,7 +259,6 @@ pub(crate) fn module_names(
 /// Select source free-function definitions in an exact assembly-local namespace.
 /// This is descriptive discovery: all access levels and generic definitions survive;
 /// type-owned methods and instantiated generic bodies do not become module members.
-#[cfg(any(feature = "native-metadata", test))]
 pub(crate) fn module_functions<'a>(
     module: &'a Module,
     identity: &str,

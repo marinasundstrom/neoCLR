@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>GuestFunctions</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../../runtime/raven/tests/framework/TestAttribute.rvn" />
+    <Compile Include="Main.rvn" />
+  </ItemGroup>
+</Project>

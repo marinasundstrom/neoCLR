@@ -212,3 +212,15 @@ native executable discovery qualification.
 Next: connect these recipes to guest GetFunctions and ownerless attribute queries,
 then qualify explicit native retention and callable registration. Current host-generated registrations remain the
 working discovery path throughout that work.
+
+
+Guest enumeration now passes the [interpreted consumer](../../../docs/experiments/guest-functions/README.md)
+with the framework's real TestAttribute. ModuleInfo.GetFunctions exposes ownerless
+method/parameter metadata and method-level attribute data, including descriptions.
+This does not yet register callable test bodies or enable native runtime discovery;
+host-generated typed registration remains the supported execution path.
+
+Author priority (2026-10-10): runner filtering comes before grouping attributes after
+this discovery slice. Keep stable IDs and display names separate, preserve manual
+registration, and make selection available through the runner. Grouping remains a
+later extension, not a prerequisite for selecting tests.

@@ -76,6 +76,9 @@ internal sealed class RuntimeMemberInfo {
         if StoredDeclaringType is NominalTypeInfo nominal {
             return RuntimeServices.MemberCustomAttributes(nominal, StoredMetadataToken)
         }
+        if let Some(owner) = StoredModule {
+            return RuntimeServices.ModuleMemberCustomAttributes(owner.Assembly.FullName, owner.Name, StoredMetadataToken)
+        }
         return CheckedStorage.Reserve<CustomAttributeData>(0)
     }
 

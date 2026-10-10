@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/guest-module-bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/guest-functions-final/source/docs/experiments/guest-functions/GuestFunctions.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/guest-functions-final/source/docs/experiments/guest-functions/bin/neoclr/GuestFunctions.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/guest-functions-final/source/docs/experiments/guest-functions/bin/neoclr/GuestFunctions.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/guest-function-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/guest-function-bundle/lib/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/guest-function-bundle/lib/System.Runtime.dll",
+        "--gc-stats"
+      ],
+      "exitCode": 0,
+      "stdout": "Guest module function discovery passed\n",
+      "stderr": "GC: allocated=70 live=0 peak=67 collections=2 reclaimed=70\n"
+    }
+  ],
+  "inputs": {
+    "docs/experiments/guest-functions/verify.py": "3cbe844b1e1e04038e051e8b216c01923d03b5cbd2ef761b46ba4e00a7b7f0eb",
+    "docs/experiments/guest-functions/Main.rvn": "51e64956771434d0027704a7855fc5938529e83146f293001a93737698043a24",
+    "docs/experiments/guest-functions/GuestFunctions.rvnproj": "864260c44ed3538b98492e209e15437748c281f35415ae259ca2510bc36786f5",
+    "runtime/raven/tests/framework/TestAttribute.rvn": "a20f0d5f981985e52a384937a1dba70670a01507143a6949972978546c6204cd"
+  },
+  "compilerSha256": "2a41a49ad0cdd238c706fe19094ac0aaf097cfb2177441c3b2611e8f38d6bccd",
+  "runnerSha256": "d403d020488209b1afae459b63b4d4f60edb4c7d7cf92f9b6cdcb0eb9e692e1b",
+  "runtimeSha256": "5b79d28e8a6552a43d3b164aba00e8a96ea970cd57a2ee08ff9366b8b735d861",
+  "imageSha256": "e087716b569e6894fe38c7a6b0512d764fbfeea323b8216095ab772596a753b6",
+  "scope": "Interpreter module function enumeration, absent declaring type, module/parameter metadata, exact TestAttribute identity and fixed/named descriptions. No test invocation, AOT retention or registration is claimed.",
+  "date": "2026-10-10",
+  "compilerRevision": "1a0c4e62734b2d4f17dc9f8af1f5d02c566f8cf4",
+  "runtimeBuild": "60fd1ebb plus guest function discovery working tree",
+  "focusedChecks": "Four assembly_info tests passed; prior four module-function selection/recipe checks pass with the new service wiring.",
+  "windows": "New interpreter gate added; this revision is not yet qualified on Windows."
+}

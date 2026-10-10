@@ -234,7 +234,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         return Ok(Binding::Math(operation));
     }
     if let Some((query, count, result)) = crate::assembly_info::Query::binding(&function.name) {
-        if function.parameters != vec![Type::String; count]
+        let mut parameters = vec![Type::String; count];
+        if matches!(query, crate::assembly_info::Query::ModuleMemberAttributes) { parameters[2] = Type::Int32; }
+        if function.parameters != parameters
             || function.returns != crate::assembler::parse_type(result)?
         {
             return Err(Fault::new("assembly service signature mismatch"));

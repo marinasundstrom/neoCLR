@@ -39,6 +39,14 @@ internal extension IntrospectionRuntimeServices for RuntimeServices {
     }
 
 
+    static func ModuleFunctions(arg0: string, arg1: string) -> System.Introspection.MethodInfo[] {
+        return neoCLR.Runtime.ModuleFunctions(arg0, arg1)
+    }
+
+    static func ModuleMemberCustomAttributes(arg0: string, arg1: string, arg2: int) -> System.Introspection.CustomAttributeData[] {
+        return neoCLR.Runtime.ModuleMemberCustomAttributes(arg0, arg1, arg2)
+    }
+
     static func ModuleTypes(arg0: string, arg1: string) -> System.Introspection.TypeInfo[] {
         return neoCLR.Runtime.ModuleTypes(arg0, arg1)
     }

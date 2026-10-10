@@ -273,6 +273,8 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
                     | crate::assembly_info::Query::Modules
                     | crate::assembly_info::Query::Types
                     | crate::assembly_info::Query::ModuleTypes
+                    | crate::assembly_info::Query::ModuleFunctions
+                    | crate::assembly_info::Query::ModuleMemberAttributes
             )
         ) {
             uses.push(ServiceUse {

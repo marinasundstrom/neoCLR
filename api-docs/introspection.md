@@ -356,8 +356,8 @@ an explicit declaration-module table; inferred legacy namespace catalogs are rej
 
 Selection executes no bodies, loads no dependencies and grants no AOT retention or
 invocation rights. It supplies the definition keys needed for later signature and
-attribute descriptors. Guest ModuleInfo.GetFunctions and in-process TestAttribute
-registration are not implemented by this helper. This backend API is documented here
+attribute descriptors. The helper alone does not provide in-process TestAttribute registration; the guest
+enumeration API is described below. This backend API is documented here
 manually; it is outside RavenDoc's guest class-library assembly.
 
 
@@ -378,4 +378,23 @@ fault for foreign definitions. Open generic method signature snapshots currently
 fault explicitly; their attribute data can still be inspected. Unsupported attribute
 payloads or provider contracts retain the existing snapshot diagnostics. Recipes
 must pass the existing provider/materialization checks before becoming guest values;
-these helpers alone do not expose guest GetFunctions or change native retention.
+these helpers alone do not change native retention. Guest enumeration is described below.
+
+
+### Guest module functions (development)
+
+`ModuleInfo.GetFunctions() -> Sequence<MethodInfo>` enumerates directly declared
+free functions in the module's assembly and exact namespace, in loaded metadata
+order and without visibility filtering. It excludes type-owned methods, child
+namespaces and instantiated generic bodies. Empty modules return an empty sequence.
+Each descriptor has an absent DeclaringType and this module as its Module owner;
+GetParameters supplies parameter names, positions, types and ownership.
+
+`MethodInfo.GetCustomAttributesData()` now reads method-level annotations for these
+ownerless descriptors, including supported fixed and named arguments, without
+executing attribute constructors or method bodies. Missing or ambiguous module/token
+matches fault. Open generic method signature snapshots remain unsupported and cause
+GetFunctions to fault; ownerless parameter/return attribute queries remain a gap.
+The [compiled consumer](../docs/experiments/guest-functions/README.md) demonstrates
+TestAttribute inspection. Interpreter support is qualified; AOT enumeration/retention
+and dynamic invocation are not added. The inherited attribute API signature is unchanged.

@@ -13626,3 +13626,20 @@ claim completion of in-process test discovery.
   as the next bounded step toward in-process TestAttribute discovery, consistent with
   the earlier author-directed testing-framework work. Closure does not claim those
   capabilities have shipped or that pending CI has passed.
+
+
+## 2026-10-10 — Prioritize runner filtering after guest discovery
+
+- **Author:** requests that discovery work, then that the test framework become good
+  enough; suggests filtering tests through the runner as the first priority ahead
+  of the previously discussed grouping.
+- **Assistant response:** accepts that order, proposing existing stable IDs and names
+  as selection inputs while preserving manual registration. Exact filter syntax and
+  matching behavior are not yet selected.
+- **Action/outcome:** guest GetFunctions and method-level attribute queries now pass
+  the interpreted Raven consumer with the real TestAttribute and constructor/named
+  descriptions. Bodies are not invoked. Source-library snapshot selection was fixed
+  for assembly services, and the reference snapshot rebuilt. The Windows interpreter
+  gate is added but not yet qualified; AOT discovery/retention and in-process callable
+  registration remain open. Runner filtering is the next bounded task; grouping is
+  deferred. [Evidence](experiments/guest-functions/validation.json).

@@ -1557,3 +1557,11 @@ checked ModuleInfo fragments received only a mechanical deletion of the removed 
 and property; their manifest records that maintenance and preserves prior compiler/core
 provenance. This is not a successful clean legacy regeneration. Source-built native
 Runtime/Data/Networking/Web libraries and the reference-only bridge rebuilt successfully.
+
+
+Development (2026-10-10) adds ModuleInfo.GetFunctions, already within RavenDoc's
+selected type set, and method-level attribute inspection for ownerless functions.
+Matching XML, reference signatures and source snapshot are refreshed. The manual
+introspection guide documents interpreter-only support, open generic and parameter
+attribute gaps, and absence of native retention/invocation. Legacy CLI implementation
+regeneration remains separately blocked by the existing Map contract issue.

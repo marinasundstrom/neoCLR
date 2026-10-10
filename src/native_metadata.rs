@@ -113,7 +113,7 @@ pub fn module_function_snapshot(
     name: &str,
     definition: &crate::metadata::MemberId,
 ) -> Result<Value, Fault> {
-    crate::reflection::module_function_snapshot(module, module_function(module, identity, name, definition)?)
+    crate::reflection::module_function_snapshot(module, module_function(module, identity, name, definition)?, true)
 }
 
 /// Read method-level attribute data, without invoking constructors or test bodies.
@@ -123,7 +123,7 @@ pub fn module_function_attributes(
     name: &str,
     definition: &crate::metadata::MemberId,
 ) -> Result<Value, Fault> {
-    crate::reflection::module_function_attributes(module, module_function(module, identity, name, definition)?)
+    crate::reflection::module_function_attributes(module, module_function(module, identity, name, definition)?, true)
 }
 
 /// Describe the assembly of a verified lexical caller, using the VM facade rules.

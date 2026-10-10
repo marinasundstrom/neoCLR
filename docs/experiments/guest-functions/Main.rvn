@@ -1,0 +1,107 @@
+module Example.Tests {
+    import System.*
+    import NeoClr.Testing.*
+
+    [Test("discovered description")]
+    func Discovered(value: int) -> int {
+        Fail("Discovery must not invoke test bodies")
+    }
+
+    [Test(Description: "named description")]
+    func Named() -> int {
+        Fail("Discovery must not invoke test bodies")
+    }
+
+    class Container {
+        func NotAModuleFunction() -> int => 1
+    }
+}
+
+module Example.Tests.Child {
+    func Excluded() -> int => 2
+}
+
+module Example.Empty { }
+
+module Example.Runner {
+    import System.*
+    import System.Runtime.*
+    import System.Introspection.*
+    import System.Option.*
+    import NeoClr.Testing.*
+
+    func Main() -> int {
+        var found = 0
+        for ownerModule in RuntimeContext.Current.ExecutingAssembly.GetModules() {
+            if ownerModule.Name == "Example.Empty" && ownerModule.GetFunctions().Count != 0 {
+                return 1
+            }
+            if ownerModule.Name != "Example.Tests" {
+                continue
+            }
+            let functions = ownerModule.GetFunctions()
+            if functions.Count != 2 {
+                return 2
+            }
+            for method in functions {
+                if method.DeclaringType is Some(_) || !method.IsStatic {
+                    return 3
+                }
+                if let Some(owner) = method.Module {
+                    if !owner.Equals(ownerModule) {
+                        return 4
+                    }
+                } else {
+                    return 5
+                }
+                let attributes = method.GetCustomAttributesData()
+                if attributes.Count != 1 || !attributes[0].AttributeType.Equals(typeof(TestAttribute)) {
+                    return 6
+                }
+                if method.Name == "Discovered" {
+                    let parameters = method.GetParameters()
+                    if parameters.Count != 1 || parameters[0].Name != "value" || !parameters[0].ParameterType.Equals(typeof(int)) {
+                        return 7
+                    }
+                    if let Some(parameterModule) = parameters[0].Module {
+                        if !parameterModule.Equals(ownerModule) {
+                            return 15
+                        }
+                    } else {
+                        return 16
+                    }
+                    if !method.ReturnType.Equals(typeof(int)) {
+                        return 17
+                    }
+                    if attributes[0].GetConstructorArguments()[0].Value is string description {
+                        if description != "discovered description" {
+                            return 8
+                        }
+                    } else {
+                        return 9
+                    }
+                } else if method.Name == "Named" {
+                    let named = attributes[0].GetNamedArguments()
+                    if named.Count != 1 || named[0].MemberName != "Description" {
+                        return 10
+                    }
+                    if named[0].TypedValue.Value is string description {
+                        if description != "named description" {
+                            return 11
+                        }
+                    } else {
+                        return 12
+                    }
+                } else {
+                    return 13
+                }
+                found += 1
+            }
+        }
+        if found != 2 {
+            return 14
+        }
+        Console.WriteLine("Guest module function discovery passed")
+        return 0
+    }
+}

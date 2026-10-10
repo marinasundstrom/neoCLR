@@ -324,3 +324,10 @@ Imported target validation is covered by the
 [usage consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/attribute-usage/README.md).
 Inherited guest queries and guest in-process discovery remain future work. See the
 [AttributeUsageAttribute reference](/docs/api/System.AttributeUsageAttribute.html).
+
+
+Development interpreter builds also expose `ModuleInfo.GetFunctions()` for directly
+owned free functions. Their descriptors have no declaring type and preserve module,
+parameter and method-level attribute metadata. A compiled Raven consumer reads
+`TestAttribute` descriptions without executing tests. Native enumeration and dynamic
+registration remain follow-up work; the current runner uses generated typed adapters.

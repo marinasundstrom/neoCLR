@@ -7585,3 +7585,23 @@ an imported module function (`let read = ReadLibraryAssembly`) fails NEOMETA001 
 Raven 1a0c4e627. A lambda calling it compiles and exercises the callback path. This is
 an emission coverage gap to investigate independently, not a new language restriction
 or a permanent namespace/module policy.
+
+
+### Guest module-function enumeration (2026-10-10)
+
+The reference bridge exposes ModuleInfo.GetFunctions returning Sequence<MethodInfo>.
+The source-native library uses ModuleFunctions(String,String) and
+ModuleMemberCustomAttributes(String,String,Int32) InternalCalls. Names identify the
+exact assembly-local namespace contribution; the member token is checked for a unique
+ownerless function in that scope. No Runtime Contract option or ordinary .NET compiler
+behavior changes. The VM selects source-library snapshot recipes from the service's
+scoped result signature, then validates/materializes providers normally.
+
+Source metadata keeps ownerless functions; CLI reference signatures are a temporary
+surface, not a synthetic declaring type. Guest DeclaringType is absent. Native AOT
+retention and enumeration are not implemented; generic signature and ownerless
+parameter-attribute limitations remain explicit. Future native module-member tables
+and retention should replace the runtime snapshot bridge. Runtime/bridge layers own
+this change. The guest-functions consumer passes interpreted metadata/description
+checks; the rebuilt reference snapshot passes validation. Legacy CLI implementation
+generation retains its documented Map blocker, without a claimed regeneration.

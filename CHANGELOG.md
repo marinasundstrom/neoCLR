@@ -19,7 +19,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   module ownership, preserving fixed/named arguments without constructor execution.
   Reject foreign definition keys and open generic signature snapshots; attribute-only
   queries still work for generic definitions. Four focused selection/recipe checks
-  pass; guest enumeration/attribute services and native retention are not added.
+  pass. Expose guest ModuleInfo.GetFunctions and method-level attribute data through
+  source-profile-aware assembly services. A Raven interpreter consumer checks absent
+  declaring types, module/parameter ownership and real TestAttribute fixed/named
+  descriptions without executing tests. Rebuild source libraries/reference snapshot
+  and add the Windows interpreter gate; its result is pending. Native enumeration,
+  retention, ownerless parameter attributes and in-process registration remain open.
+  Prioritize runner filtering before grouping per author direction.
 
 - Migrate guest module traversal and type/member/parameter ownership to flat logical
   names, preserving explicit empty modules and nested-type ownership. Remove physical

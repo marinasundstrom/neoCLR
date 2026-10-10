@@ -4049,6 +4049,11 @@ fn interpret_instructions_with_dispatch(
                                 heap,
                                 &limits,
                             )?
+                        } else if let crate::native::Binding::AssemblyInfo(query) = binding {
+                            query.invoke_profile(
+                                module, &args, &limits,
+                                crate::reflection_source::uses_source(module, &callee.returns),
+                            )?
                         } else if let crate::native::Binding::Reflection(query) = binding {
                             query.invoke_profile(
                                 module,

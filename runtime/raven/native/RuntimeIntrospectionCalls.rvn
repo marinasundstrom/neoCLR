@@ -123,3 +123,8 @@ internal extern func TypeModule(arg0: System.RuntimeTypeHandle) -> System.Intros
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func TypeProperties(arg0: System.RuntimeTypeHandle, arg1: int) -> System.Introspection.PropertyInfo[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ModuleFunctions(arg0: string, arg1: string) -> System.Introspection.MethodInfo[];
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ModuleMemberCustomAttributes(arg0: string, arg1: string, arg2: int) -> System.Introspection.CustomAttributeData[];

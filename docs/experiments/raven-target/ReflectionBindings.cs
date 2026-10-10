@@ -45,6 +45,7 @@ static class ReflectionBindings
         ("System.Introspection.AssemblyInfo", "GetTypes", [], "System.Collections.Sequence<System.Introspection.TypeInfo>", false),
         ("System.Introspection.ModuleInfo", "get_Name", [], "String", false),
         ("System.Introspection.ModuleInfo", "get_Assembly", [], "System.Introspection.AssemblyInfo", false),
+        ("System.Introspection.ModuleInfo", "GetFunctions", [], "System.Collections.Sequence<System.Introspection.MethodInfo>", false),
         ("System.Introspection.ModuleInfo", "GetTypes", [], "System.Collections.Sequence<System.Introspection.TypeInfo>", false),
         ("System.Object", "GetType", [], "System.Introspection.TypeInfo", false),
         ("System.Object", "ToString", [], "String", false),

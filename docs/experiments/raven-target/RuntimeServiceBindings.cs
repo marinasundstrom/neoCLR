@@ -161,6 +161,8 @@ static partial class RuntimeServiceBindings
             ("AssemblyModules", ["String"], "arrayref<System.Introspection.ModuleInfo>"),
             ("AssemblyTypes", ["String"], "arrayref<System.Introspection.TypeInfo>"),
             ("ModuleAssembly", ["String", "String"], "System.Introspection.AssemblyInfo"),
+            ("ModuleFunctions", ["String", "String"], "arrayref<System.Introspection.MethodInfo>"),
+            ("ModuleMemberCustomAttributes", ["String", "String", "Int32"], "arrayref<System.Introspection.CustomAttributeData>"),
             ("ModuleTypes", ["String", "String"], "arrayref<System.Introspection.TypeInfo>"),
             ("TypeMetadataToken", ["System.RuntimeTypeHandle"], "Int32"),
             ("TypeDeclaringType", ["System.RuntimeTypeHandle"], "System.Option<System.Introspection.TypeInfo>"),

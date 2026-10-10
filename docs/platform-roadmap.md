@@ -6,20 +6,27 @@ boundary are [recorded here](declaration-modules.md). Keep Namespace as the stri
 Module as the assembly-scoped descriptor; no aggregate module API or resolver redesign
 is required. Interpreter/macOS ARM64 shared-namespace qualification passes at 61e687bd.
 The final [Windows gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38056974148)
-is pending; closure does not claim its success or completion of native introspection.
+passes at 61e687bd; artifact hashes have not been independently checked. This does
+not qualify the later guest-function discovery changes or complete native introspection.
 
-**Next bounded work:** resume the testing-framework discovery follow-up: establish
+**Discovery progress:** the testing-framework follow-up establishes
 the guest module-function metadata enumeration contract needed to discover TestAttribute
 methods, reusing host discovery behavior and retaining manual registration. Native type
 enumeration, general callable invocation, grouping/filtering, broader context discovery
 and the imported function-reference emitter gap remain separately scoped follow-ups.
 The runtime definition selector now validates exact assembly/module ownership and
 preserves source function order without execution; its native bridge requires an
-explicit module catalog. Four focused checks pass. This is backend groundwork only:
-ownerless method/parameter and method-attribute recipes now pass focused backend
+explicit module catalog. Four focused checks pass. Ownerless method/parameter and method-attribute recipes now pass focused backend
 checks, including absent DeclaringType, fixed/named descriptions and excluded parameter
-targets. Guest enumeration/attribute services and public GetFunctions remain next;
-open generic signature snapshots are still explicitly unsupported.
+targets. Guest ModuleInfo.GetFunctions and method-level attribute queries now pass an
+interpreted Raven consumer using the real TestAttribute, without invoking bodies.
+Open generic signature snapshots remain explicitly unsupported. Native enumeration,
+retention and in-process callable registration are still open.
+
+**Author priority correction (2026-10-10):** after making guest discovery work, focus
+on making the test framework useful through runner filtering before grouping.
+The next bounded slice is runner selection using existing test IDs/names, keeping
+manual registration. Grouping attributes remain later work.
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 
@@ -77,7 +84,8 @@ now support native AssemblyInfo.GetModules, including empty declarations, with a
 missing-catalog fault. Native RuntimeContext.ExecutingAssembly now retains the lexical
 caller assembly through direct query calls, including separate-library helpers and
 callbacks, without requiring reflection roots. Context-wide discovery and type enumeration,
-guest module-function enumeration and general callable invocation remain open. See
+guest module-function enumeration now works in the interpreter, while native enumeration
+and general callable invocation remain open. See
 [the guest consumer](experiments/guest-modules/README.md).
 
 **Author clarifications (2026-10-10):** a module is a unit and namespace of members

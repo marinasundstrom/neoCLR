@@ -31,3 +31,10 @@
 .function neoCLR.Runtime.TypeDeclaringType(System.RuntimeTypeHandle handle) -> System.Option<System.Introspection.TypeInfo>
 .methodimpl InternalCall
 .end
+
+.function neoCLR.Runtime.ModuleFunctions(String arg0,String arg1) -> System.Introspection.MethodInfo[]
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ModuleMemberCustomAttributes(String arg0,String arg1,Int32 arg2) -> System.Introspection.CustomAttributeData[]
+.methodimpl InternalCall
+.end
