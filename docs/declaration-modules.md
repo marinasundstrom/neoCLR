@@ -1,5 +1,18 @@
 # Declaration modules — development foundation
 
+**Latest author clarification, 2026-10-10:** a module name is a namespace and may
+span multiple assemblies. Referencing/importing that name combines matching declarations
+from the referenced assemblies, using .NET-style namespace lookup and ambiguity rules.
+Dotted names have ordinary namespace meaning; there is no separate module hierarchy
+in native metadata. Each declaration retains its defining assembly identity.
+
+The implementation described below currently exposes assembly-scoped contributions
+through ModuleInfo. Those descriptors are not yet a context-wide shared namespace
+view. In particular, singular ModuleInfo.Assembly describes a contribution; the final
+shared-view API and its relationship to these descriptors require follow-through.
+Assembly-local declaration tables remain useful for recording each contribution,
+including empty declarations. They do not claim exclusive ownership of a module name.
+
 Author direction, 2026-10-09: modules replace namespaces as the named containers
 for declarations. Assemblies remain packaging and binding identities and remain
 visible in RavenDoc. One module per assembly is a common layout, not a constraint:
@@ -37,8 +50,9 @@ Native format-5 assembly manifests now include:
 }
 ```
 
-Module identity is exact assembly identity plus an ordinal, case-sensitive qualified
-name. Names use the existing UTF-8 qualified-name contract: at most 1024 characters,
+The current assembly-contribution descriptor identity is exact assembly identity
+plus an ordinal, case-sensitive qualified name. The shared module namespace is its
+name across the referenced assembly set. Names use the existing UTF-8 qualified-name contract: at most 1024 characters,
 no control characters or empty/whitespace-only dotted segments; the empty name denotes
 the global module. There are at most 4096 distinct modules. Writers order names
 ordinally. A module can be empty. Dotted names express organization; a parent need
@@ -97,6 +111,11 @@ Compiler-only syntax would be cheaper but could not preserve empty native contai
 repurposing physical module rows would conflate organization with loading identity.
 
 ## Soundness review — 2026-10-10
+
+This assessment predates the author’s shared-namespace clarification above. Its
+assembly-qualified identity discussion now applies to contributions, not exclusive
+logical namespace ownership. The author selects .NET-style namespace combination;
+exact public introspection changes remain open.
 
 The author asks whether the diverging module semantics are sound. The assistant's
 assessment is yes for the implemented scope: an assembly packages declarations,
@@ -173,8 +192,9 @@ empty declaration table is valid and returns an empty module sequence.
 A catalog roots every declared module name, ordered ordinally by the shared VM query,
 including empty modules. Each descriptor supports Name and Assembly.Name/FullName.
 It does not root declaration types, functions, constructors or attributes. Assembly
-references, RuntimeContext.ExecutingAssembly and type enumeration within assemblies
-or modules in native code remain separate work. The catalog is an immutable build-time snapshot, not a
+references and type enumeration within assemblies or modules in native code remain
+separate work. Native RuntimeContext.ExecutingAssembly now identifies the lexical
+caller independently of module-catalog retention. The catalog is an immutable build-time snapshot, not a
 runtime loader or a new assembly discovery API.
 
 Comparison: [.NET Assembly.GetModules](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assembly.getmodules?view=net-10.0)
@@ -192,6 +212,44 @@ The [consumer](experiments/guest-modules/README.md) exercises flat ordering, emp
 modules, owning assembly inspection and independent missing-type/missing-catalog
 faults. Unit checks cover scoped identities, empty catalogs, policy rejection and
 legacy projection rejection. Cross-platform evidence remains scoped to recorded runs.
+
+## Native executing assembly — development, 2026-10-10
+
+`RuntimeContext.Current.ExecutingAssembly` now follows the calling code's assembly
+in the bounded AOT profile. An application sees its own assembly; a helper executing
+inside a dependency sees the dependency, including when reached through an ordinary
+function callback. The runtime's exact query facades are transparent, as in the
+interpreter; arbitrary user wrappers are not. A direct query retains the assembly's
+identity/name without requiring `--reflection-roots`. It does not retain modules,
+types, methods, referenced assemblies or load anything dynamically.
+
+The baseline is [.NET Assembly.GetExecutingAssembly](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assembly.getexecutingassembly?view=net-10.0),
+which reports the assembly containing the executing code (checked 2026-10-10).
+neoCLR exposes that operation through RuntimeContext rather than the .NET static
+Assembly API. This is not GetEntryAssembly or GetCallingAssembly: a library helper
+must not report the application's assembly merely because the app invoked it.
+
+The backend validates the scoped getter/service forwarding chain after source
+verification, then carries caller identity through a synthetic String argument on
+the private getter projection. Call versus callvirt is preserved; branch targets and
+sequence points are relocated. The synthetic parameter has no source metadata token,
+and private nullable annotations are cleared; original signatures/annotations remain
+in the descriptive source catalog. An inlined caller retains its original identity
+because the literal is attached before specialization. Exact module and assembly
+scopes prevent similarly named foreign methods from becoming transparent wrappers.
+
+This avoids introducing stack walking solely for this query. The cost is generated
+identity branches and descriptor allocation; no performance improvement is claimed.
+Changed facade bodies are rejected, not discarded. Binding the getter itself as a
+function is not supported; direct queries inside ordinary bound functions are supported.
+Dynamic loading, general reflective getter invocation and new runtime-context APIs
+are not established by this slice. A future native intrinsic can replace the private
+argument without changing the guest contract or native assembly format.
+
+See the [executable consumer](experiments/guest-modules/README.md) and its recorded
+.NET comparison. Unit checks cover distinct caller assemblies, branch relocation,
+preserved virtual call kind, foreign same-name scopes and unsupported facade/binding
+shapes. Native type enumeration and in-process test-function discovery remain open.
 
 ## Next boundaries
 

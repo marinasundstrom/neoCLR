@@ -52,6 +52,11 @@ path need not be an explicitly declared module. Imports retain existing ambiguit
 rules. Identical module paths in two assemblies do not merge their declaration
 identities.
 
+A module namespace may span several referenced assemblies. Imports should combine
+matching declarations using .NET-style namespace lookup, while each declaration keeps
+its defining assembly identity. Current introspection exposes assembly-local
+contributions; the shared context-wide module view is still being reconciled.
+
 ## What the foundation provides
 
 Native metadata has a versioned module table, preserving empty modules and their
@@ -68,8 +73,8 @@ and guest `ModuleInfo` now describe logical modules. Interpreter traversal throu
 modules. Native compilation supports explicitly retained type-to-module ownership
 and `Module.Assembly` with assembly `Name`/`FullName`. Explicit module-catalog retention
 also enables native `AssemblyInfo.GetModules()`, preserving declared empty modules;
-a missing catalog faults instead of returning an incomplete list. Native RuntimeContext
-and type enumeration remain open. See the [API scope](/docs/introspection.html#logical-modules-development-2026-10-10).
+a missing catalog faults instead of returning an incomplete list. Native RuntimeContext.ExecutingAssembly now preserves the calling assembly, including
+library helpers and callbacks; type enumeration remains open. See the [API scope](/docs/introspection.html#logical-modules-development-2026-10-10).
 Module-private visibility, re-exports, guest module-function discovery and independently
 loadable modules remain outside this foundation. A module does not create its own heap,
 scheduler, native ABI or artifact file.

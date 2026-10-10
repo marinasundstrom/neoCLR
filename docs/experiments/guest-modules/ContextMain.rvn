@@ -1,0 +1,20 @@
+module Acme.CoffeeMaker.Tests
+
+import System.*
+import System.Runtime.*
+import Acme.Diagnostics.*
+
+func Main() -> int {
+    if ReadLibraryAssembly() != "Coffee.Context" {
+        return 30
+    }
+    let read = () => ReadLibraryAssembly()
+    if read() != "Coffee.Context" {
+        return 31
+    }
+    if RuntimeContext.Current.ExecutingAssembly.Name != "CoffeePackage" {
+        return 32
+    }
+    Console.WriteLine("Executing assembly context passed")
+    return 0
+}

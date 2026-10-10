@@ -13527,3 +13527,22 @@ claim completion of in-process test discovery.
   No implementation or roadmap reprioritization is part of this assessment; the
   native traversal and guest discovery work remains open. No subsequent author
   decision on these recommendations is recorded.
+
+## 2026-10-10 — Shared module namespaces across assemblies
+
+- **Author:** “We should accept that a module (meaning the same namespace) might be
+  split across multiple assemblies.” Referencing a module name may resolve types
+  from multiple assemblies contributing the same namespace. “The dotted name is
+  just a convention that is treated like .NET namespaces”.
+- **Assistant response:** accepts shared namespace lookup across referenced assemblies,
+  with normal namespace ambiguity rules and defining-assembly identity on individual
+  declarations. The preceding discussion of distinct ownership applies to assembly-local
+  contributions, not exclusive ownership of the logical namespace.
+- **Action:** updates the module design and authoritative roadmap while completing
+  native executing-assembly validation. That query still identifies the defining
+  assembly of the executing code and is compatible with shared module names.
+- **Open work:** validate split-module compiler lookup and reconcile the current
+  assembly-scoped ModuleInfo/singular Assembly property with a shared context-wide
+  namespace view. No exact replacement introspection signature is decided here.
+  This supersedes any exclusive-namespace inference from the earlier assessment;
+  prior positions remain recorded above.

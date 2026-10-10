@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-10",
+  "passed": true,
+  "sdk": "11.0.100-rc.1.26425.128",
+  "targetFramework": "net10.0",
+  "command": [
+    "dotnet",
+    "run",
+    "--no-build",
+    "--project",
+    "target/runtime-context-dotnet-baseline/App/App.csproj"
+  ],
+  "exitCode": 0,
+  "stdout": "CLR executing assembly baseline passed\n",
+  "stderr": "",
+  "scope": "Assembly.GetExecutingAssembly in application and separate dependency, including a Func callback. No CLR implementation/inlining-performance claim.",
+  "sources": {
+    "Library/Library.csproj": "<Project Sdk=\"Microsoft.NET.Sdk\"><PropertyGroup><TargetFramework>net10.0</TargetFramework><AssemblyName>ContextDependency</AssemblyName></PropertyGroup></Project>\n",
+    "Library/Query.cs": "public static class Query {\n    public static string Name() => System.Reflection.Assembly.GetExecutingAssembly().GetName().Name!;\n}\n",
+    "App/App.csproj": "<Project Sdk=\"Microsoft.NET.Sdk\"><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>ContextApplication</AssemblyName></PropertyGroup><ItemGroup><ProjectReference Include=\"../Library/Library.csproj\" /></ItemGroup></Project>\n",
+    "App/Program.cs": "if (Query.Name() != \"ContextDependency\") return 1;\nSystem.Func<string> read = Query.Name;\nif (read() != \"ContextDependency\") return 2;\nif (System.Reflection.Assembly.GetExecutingAssembly().GetName().Name != \"ContextApplication\") return 3;\nSystem.Console.WriteLine(\"CLR executing assembly baseline passed\");\nreturn 0;\n"
+  }
+}

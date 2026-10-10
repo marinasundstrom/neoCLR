@@ -15,8 +15,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   extend retained ownership to Module.Assembly and AssemblyInfo.Name/FullName.
   Add explicit schema-4 module catalogs for native AssemblyInfo.GetModules, preserving
   empty declarations and rejecting missing catalog retention or legacy projections.
-  Native RuntimeContext discovery, type enumeration and module Object.Equals dispatch
-  remain unsupported.
+  Add native RuntimeContext.ExecutingAssembly with lexical caller identity through
+  verified direct query calls; library helpers and ordinary callbacks keep their own
+  assembly. Query identity/name retention needs no reflection-roots flags and does not
+  retain a module catalog. Context-wide discovery, type enumeration and module
+  Object.Equals dispatch remain unsupported. Bound getter calls are diagnosed.
   Add a Raven interpreter/native consumer and Windows gate. Interpreter traversal,
   native retained ownership and missing-retention failure pass locally, along with
   focused runtime/reflection checks. Windows qualification is pending. The legacy
@@ -27,7 +30,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   named modules, with dotted root/submodule names as convention and no hierarchy
   metadata. Record a .NET comparison and soundness assessment, distinguishing owned
   module identity from unresolved cross-dependency lookup, visibility and lifetime
-  policies. Replace DeclarationModuleInfo/GetDeclarationModules with ModuleInfo/
+  policies. Record the subsequent author correction: module namespaces may span
+  assemblies and combine through .NET-style namespace lookup. Current assembly-scoped
+  descriptors represent contributions; shared-view API reconciliation remains open.
+  Replace DeclarationModuleInfo/GetDeclarationModules with ModuleInfo/
   GetModules and logical member ownership; expose physical token scopes separately.
   Migrate Raven's native importer to traverse all modules and test discovery IDs to
   use logical module names. Rebuild host tools and compiler together. Cover both

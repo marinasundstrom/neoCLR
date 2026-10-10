@@ -2,11 +2,15 @@ module Acme.CoffeeMaker.Tests
 
 import System.*
 import System.Introspection.*
+import System.Runtime.*
 import System.Option.*
 import Acme.CoffeeMaker.*
 import Acme.CoffeeMaker.Factories.*
 
 func CheckOwnership() -> int {
+    if RuntimeContext.Current.ExecutingAssembly.Name != "CoffeePackage" {
+        return 21
+    }
     let machine = (NominalTypeInfo)typeof(Machine)
     let factory = (NominalTypeInfo)typeof(Factory)
     if let Some(owner) = machine.Module {

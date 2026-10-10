@@ -51,7 +51,9 @@ physical ModuleInfo.MetadataToken property is removed. AOT materializes type-to-
 snapshots for explicitly retained nominal definitions, including Module.Assembly
 and AssemblyInfo.Name/FullName ownership inspection. Explicit schema-4 catalog roots
 now support native AssemblyInfo.GetModules, including empty declarations, with a
-missing-catalog fault. Native RuntimeContext discovery and type enumeration,
+missing-catalog fault. Native RuntimeContext.ExecutingAssembly now retains the lexical
+caller assembly through direct query calls, including separate-library helpers and
+callbacks, without requiring reflection roots. Context-wide discovery and type enumeration,
 guest module-function enumeration and general callable invocation remain open. See
 [the guest consumer](experiments/guest-modules/README.md).
 
@@ -64,6 +66,16 @@ Acme.CoffeeMaker/Acme.CoffeeMaker.Factories as examples. Compatibility with deve
 APIs is not a constraint. Namespace/module ownership should guide understandable
 library distribution; new reference/ambiguity policies remain separate work.
 See [the corrected direction](introspection-design.md#author-clarification-one-semantic-module-model-2026-10-10).
+
+**Latest author clarification (2026-10-10):** the same module namespace may span
+multiple assemblies. Imports/references to a module name combine matching declarations
+across referenced assemblies, with .NET-style namespace and ambiguity semantics.
+Dotted names follow namespace convention, without a native metadata hierarchy.
+Assembly identity belongs to each declaration and to assembly-local contributions;
+it does not make the namespace exclusive. Validate split-module compiler lookup and
+reconcile context-wide introspection with today's assembly-scoped ModuleInfo and its
+singular Assembly property. This clarifies the current module milestone rather than
+reprioritizing unrelated capabilities. See the [current contract and implementation gap](declaration-modules.md).
 
 ## Active direction: usable native compilation (2026-10-09)
 

@@ -1,0 +1,12 @@
+module Acme.Diagnostics
+
+import System.*
+import System.Runtime.*
+
+func ReadContext() -> string {
+    return RuntimeContext.Current.ExecutingAssembly.Name
+}
+
+public func ReadLibraryAssembly() -> string {
+    return ReadContext()
+}

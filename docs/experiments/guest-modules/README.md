@@ -28,9 +28,24 @@ checks each owning assembly. Dropping only moduleCatalogs must fault with
 contained types or executable bodies. Schema checks reject incomplete legacy
 projections and unknown/duplicate identities; an explicit empty table is valid.
 The native probe deliberately does not claim support for Module.GetTypes,
-Assembly.GetTypes, RuntimeContext.ExecutingAssembly or Object.Equals dispatch.
+Assembly.GetTypes or Object.Equals dispatch.
 Guest module function enumeration and general reflective callable invocation remain
 open; this is not in-process test discovery yet.
+
+The application now checks RuntimeContext.Current.ExecutingAssembly. A separate
+Coffee.Context library queries its own assembly through a helper; the application
+calls that helper directly and through a lambda callback, then checks its own
+identity again. This second executable uses no reflection-roots policy. The harness
+uses the backend's explicit dependency load set and the first build's platform linker
+commands: the project driver itself still admits bundle libraries only. It does not
+claim new arbitrary-project-dependency support in that driver.
+
+A native query retains only its caller's assembly identity/name. A module catalog
+remains a separate requirement. The private lowering preserves callvirt, relocates
+branches/source positions, and rejects changed runtime facades or binding the getter
+itself as a function. Unit checks also cover foreign same-name caller scopes.
+The .NET baseline uses a separate library and a Func callback to Assembly.GetExecutingAssembly;
+see [the recorded comparison](dotnet-context-validation.json).
 
 Run with a matching source-built Runtime/Data/Networking/Web bundle and rebuilt
 interpreter/AOT tools:

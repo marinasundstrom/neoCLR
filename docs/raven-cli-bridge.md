@@ -7547,3 +7547,41 @@ projection still cannot recover explicit empty modules. The backend owns the gen
 snapshot factories; a later native metadata backend replaces their generated branches.
 Validation and remaining native RuntimeContext/type-enumeration gaps are recorded in
 [the consumer](experiments/guest-modules/README.md).
+
+### Native executing-assembly caller identity (2026-10-10)
+
+Native semantic intent matches the interpreter: RuntimeContext.ExecutingAssembly
+identifies the actual caller assembly through the exact runtime query facades. Library
+helpers retain their own identity. The AOT backend verifies the scoped forwarding
+chain after original-scope verification, then adds a private String caller argument
+and snapshot factory. It preserves call/callvirt and relocates branches/source points.
+The synthetic parameter receives token zero; private nullable annotations are cleared.
+Original descriptive metadata, Raven signatures and CLI bridge encoding remain intact.
+No Runtime Contract configuration or ordinary .NET compiler behavior changes.
+
+The backend owns this temporary lowering; a native context intrinsic can replace it.
+A direct query retains assembly identity/name without reflection-roots configuration,
+but grants no module catalog, type/member discovery or invocation roots. Bound getter
+calls and changed forwarding bodies are rejected; ordinary callbacks containing direct
+queries are supported. General reflective context-getter invocation is not qualified.
+The [consumer](experiments/guest-modules/README.md) covers application and separate-library
+calls in interpreter/native modes, with the same platform adapters used by the Windows
+gate. The separate-library harness uses the backend load-set interface, not new project
+driver dependency support. Native type enumeration remains follow-up work.
+
+### Shared module namespaces — author clarification (2026-10-10)
+
+A module name may be contributed by multiple referenced assemblies. Importing that
+name should combine declarations with .NET-style namespace/ambiguity behavior; dots
+add no native metadata hierarchy. Keep defining-assembly identity on declarations
+and assembly-local contribution tables. Current ModuleInfo is still a contribution
+view; context-wide aggregation and its singular Assembly property need API review.
+This direction does not require merging physical metadata/token scopes or loading
+arbitrary files by namespace name. Split-module lookup validation is the next module
+follow-through, not a claim that all introspection views already merge contributions.
+
+Deferred compiler candidate from the executing-assembly consumer: directly binding
+an imported module function (`let read = ReadLibraryAssembly`) fails NEOMETA001 with
+Raven 1a0c4e627. A lambda calling it compiles and exercises the callback path. This is
+an emission coverage gap to investigate independently, not a new language restriction
+or a permanent namespace/module policy.

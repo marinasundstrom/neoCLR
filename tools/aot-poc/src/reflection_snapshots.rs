@@ -388,6 +388,7 @@ pub fn bind(
         let ti = definitions.iter().position(|d| *d == id).ok_or("missing snapshot root")?;
         for property in &source.types[ti].properties { vectors(&property.ty, &mut tokens); }
     }
+    let context_queries = super::runtime_context::prepare(input, source)?;
     // Catalog retention is descriptive only: it roots all declared names, not their types.
     let mut retained_modules = vec![];
     let mut catalogs = vec![];
@@ -507,6 +508,8 @@ pub fn bind(
             // An assembly can have an explicit empty catalog without a global module.
             if assembly_name {
                 owners.extend(catalogs.iter().map(|(identity, _)| (*identity, None)));
+                owners.extend(context_queries.iter().flat_map(|query| query.assemblies.iter())
+                    .map(|(identity, _)| (identity.as_str(), None)));
             }
             for (identity, module_name) in owners {
                 let key = (identity, if module_assembly { module_name } else { None });
@@ -728,6 +731,27 @@ pub fn bind(
         f.locals = factory.locals;
         f.local_names.clear();
     }
+    let mut caller_rows = vec![];
+    for query in context_queries {
+        let expected = input.functions[query.getter].returns.clone();
+        let mut factory = Factory { input, source, body: vec![], locals: vec![], trusted: vec![] };
+        for (identity, recipe) in &query.assemblies {
+            let skip = factory.body.len() + 3;
+            factory.body.extend([Op::Arg(1), Op::String(identity.clone()), Op::Equal, Op::BranchFalse(0)]);
+            factory.emit(recipe, &expected)?;
+            factory.body.push(Op::Return);
+            factory.body[skip] = Op::BranchFalse(factory.body.len());
+        }
+        factory.body.push(Op::Fault("native executing assembly caller was not admitted".into()));
+        projections.extend(factory.trusted);
+        let getter = &mut factory.input.functions[query.getter];
+        getter.body = factory.body;
+        getter.locals = factory.locals;
+        getter.local_names.clear();
+        getter.sequence_points.clear();
+        caller_rows.push(json!({"getter":getter.definition,"assemblies":query.assemblies.iter().map(|(identity, _)| identity).collect::<Vec<_>>()}));
+    }
+    retention["executingAssemblyQueries"] = json!(caller_rows);
     retention["snapshotFactories"] = json!(projections);
     Ok(())
 }

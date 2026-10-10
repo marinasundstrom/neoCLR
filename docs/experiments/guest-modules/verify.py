@@ -83,8 +83,34 @@ missing_catalog = output / 'missing-catalog.json'
 missing_catalog.write_text(json.dumps(policy) + '\n')
 no_catalog = build('unretained-catalog', missing_catalog)
 run([no_catalog / name], fault='native assembly module catalog was not retained')
+# The project driver currently admits bundle dependencies only. Exercise a separately
+# compiled library through the backend's explicit load set, reusing the qualified
+# platform adapter/link commands from the positive build.
+run(['dotnet', compiler, 'neoclr', '--project', source / 'ContextLibrary.rvnproj'])
+library = source / 'bin/neoclr/Coffee.Context.dll'
+run(['dotnet', compiler, 'neoclr', '--project', source / 'Context.rvnproj'])
+cross = output / 'cross-assembly'
+cross.mkdir()
+shutil.copyfile(image, cross / 'app.dll')
+build_report = json.loads((native / 'build.json').read_text())
+for entry in build_report['commands']:
+    command = entry['command']
+    is_aot = '--closed-world' in command
+    is_link = any('app.pending' in part for part in command) and Path(command[0]).name not in ('xcrun', 'dumpbin')
+    if not (is_aot or is_link):
+        continue
+    command = [part.replace(str(native), str(cross)) for part in command]
+    if is_aot:
+        at = command.index('--reflection-roots')
+        del command[at:at + 2]
+        command += ['--module', str(library)]
+    run(command)
+executable = cross / ('app.pending.exe' if os.name == 'nt' else 'app.pending')
+assert run([executable]).stdout == 'Executing assembly context passed\n'
+assert run([runner, 'run', cross / 'app.dll', *context, '--module', library, '--gc-stats']).stdout == 'Executing assembly context passed\n'
+report['crossAssemblyLibrarySha256'] = sha(library)
 assert all(sha(ROOT / path) == digest for path, digest in report['inputs'].items()), 'Fixture input changed'
 report['passed'] = True
-report['scope'] = 'Interpreter assembly/module/type/member/parameter traversal; AOT retained type-to-module ownership and Module.Assembly with AssemblyInfo.Name/FullName. Explicit AOT Assembly.GetModules catalog including empty modules; missing-catalog faults. RuntimeContext.ExecutingAssembly, type enumeration and Object.Equals dispatch are not covered by AOT.'
+report['scope'] = 'Interpreter assembly/module/type/member/parameter traversal; AOT retained type-to-module ownership and Module.Assembly with AssemblyInfo.Name/FullName. Explicit AOT Assembly.GetModules catalog including empty modules; missing-catalog faults. Native RuntimeContext.ExecutingAssembly preserves application and separate library callers, including a function callback. Type enumeration and Object.Equals dispatch are not covered by AOT.'
 (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
 print('Guest logical module checks: PASS')

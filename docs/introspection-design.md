@@ -829,6 +829,13 @@ retention remain the next implementation boundaries; host views do not complete 
 
 #### Author clarification: one semantic module model (2026-10-10)
 
+**Subsequent clarification:** a module namespace may span multiple assemblies,
+with .NET-style namespace lookup across referenced contributions. The assembly-scoped
+ModuleInfo described here is the current contribution view, not exclusive ownership
+of a namespace. Its singular Assembly property and the context-wide shared view
+still need API reconciliation. Dotted names introduce no metadata hierarchy. See
+[the current direction](declaration-modules.md).
+
 The author corrects the compatibility premise of the first ownership slice:
 “We shouldn’t worry about breaking compatibility. Our concept of a module is
 different from .NET. It’s a unit and namespace of members within an assembly.”

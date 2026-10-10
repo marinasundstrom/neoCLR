@@ -191,6 +191,14 @@ pub fn prepare(
         reflection_roots.extend(super::reflection_properties::bind(&mut joined, &source_metadata, &types, &methods, retention)?);
         super::reflection_collections::bind(&mut joined, &source_metadata, &types, retention)?;
         super::reflection_snapshots::bind(&mut joined, &source_metadata, &types, retention)?;
+    } else if super::runtime_context::has_queries(&joined, &source_metadata) {
+        // A direct executing-assembly query itself retains its descriptive identity.
+        // This internal plan is not admission of an empty user roots policy, and
+        // grants neither a module catalog nor type/member execution rights.
+        let mut retention = json!({"types":[],"moduleCatalogs":[],"propertyBindings":[],
+            "policy":"source executing-assembly queries; no general reflection roots"});
+        super::reflection_snapshots::bind(&mut joined, &source_metadata, &types, &mut retention)?;
+        reflection_retention = Some(retention);
     }
     let source_conformance = joined.clone();
     let relationships: Vec<_> = joined

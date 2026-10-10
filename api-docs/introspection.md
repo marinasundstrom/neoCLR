@@ -78,7 +78,9 @@ Unretained types fault with an explicit metadata-retention error. This does not 
 constructor/method invocation. Explicit schema-4 moduleCatalogs roots additionally
 enable AssemblyInfo.GetModules for the complete declared names, including empty
 modules. Without that policy the call faults, even when some type owners are retained.
-Native RuntimeContext.ExecutingAssembly, AssemblyInfo.GetTypes, Module.GetTypes and
+Native RuntimeContext.ExecutingAssembly now preserves the calling code’s assembly,
+including library calls, and supports Name/FullName without reflection-roots flags.
+It does not implicitly retain module catalogs. AssemblyInfo.GetTypes, Module.GetTypes and
 module Object.Equals dispatch are not qualified by this slice. Guest module function
 enumeration and context-wide assembly discovery remain open.
 
@@ -104,6 +106,21 @@ catalog root, otherwise faults with `native assembly module catalog was not reta
 See the [private retention policy](https://github.com/marinasundstrom/neoCLR/blob/main/docs/declaration-modules.md#native-module-catalog-retention--development-2026-10-10).
 Catalog retention admits module ownership/name queries, not the contained types or
 callable bodies. No guest signature or RavenDoc type-selection change is required.
+
+`executing_assembly(&Module, facade: &metadata::Function, caller: &metadata::Function)
+-> Result<Value, Fault>` is an unstable backend recipe helper. It uses the interpreter's
+scoped facade-skip rules and loaded catalog; missing caller/catalog metadata returns
+Fault. It neither executes the supplied functions nor loads assemblies. The native
+backend admits direct calls to the verified RuntimeContext getter. Binding the getter
+itself as a function is unsupported and diagnosed; ordinary function callbacks whose
+bodies query RuntimeContext retain their own assembly identity. The temporary lowering
+adds a private caller-identity argument, preserving call/callvirt and receiver checks.
+Source metadata and guest signatures remain unchanged.
+
+The author's shared-namespace direction allows a module name to span referenced
+assemblies. Current ModuleInfo identity and its singular Assembly property describe
+an assembly-local contribution. A context-wide shared namespace view is still open;
+these APIs must not be interpreted as exclusive ownership of a namespace name.
 
 ## Assembly and module identity
 

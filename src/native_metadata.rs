@@ -72,6 +72,17 @@ pub fn assembly_modules(module: &Module, identity: &str) -> Result<Value, Fault>
     )
 }
 
+/// Describe the assembly of a verified lexical caller, using the VM facade rules.
+pub fn executing_assembly(
+    module: &Module,
+    facade: &crate::metadata::Function,
+    caller: &crate::metadata::Function,
+) -> Result<Value, Fault> {
+    let identity = crate::assembly_info::executing_assembly(module, [facade, caller].into_iter())
+        .ok_or_else(|| Fault::new("ExecutingAssembly requires source caller metadata"))?;
+    crate::assembly_info::assembly_value(module, &identity)
+}
+
 /// Resolve a recipe handle to its source signature, without publishing native ordinals.
 pub fn handle_type(module: &Module, handle: &crate::TypeDescriptor) -> Result<Type, Fault> {
     crate::reflection::from_identity(module, &handle.identity)
