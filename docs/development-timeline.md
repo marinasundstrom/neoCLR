@@ -14225,3 +14225,7 @@ claim completion of in-process test discovery.
   after Stop/Dispose. A cancelled callback stops its schedule.
 - **Outcome:** ten callback scenarios pass interpreter and macOS ARM64 AOT. Five guards also pass in both modes; Windows CI is configured but unexecuted. Timed cancellation and HTTP timeout
   remain the next layers, not claimed complete by the Timer implementation.
+
+- **Next layer outcome:** CancelAfter now implements replace/disable/lifetime cleanup;
+  four behavior scenarios and five guards pass interpreted and macOS native execution.
+  [Evidence](experiments/cancel-after/validation.json). HTTP timeout remains in progress.

@@ -43,6 +43,8 @@ static class CancellationBindings
                 public bool IsCancellationRequested => default;
                 public bool IsDisposed => default;
                 public void Cancel() { }
+                public void CancelAfter(Time.Duration delay) { }
+                public void CancelAfter(Option<Time.Duration> delay) { }
                 public void Dispose() { }
                 public CancellationRegistration Register(Func<PropagationUnit> callback) => default;
                 public void Remove(CancellationRegistration registration) { }
@@ -101,6 +103,7 @@ static class CancellationBindings
             (Source, "get_IsDisposed") when library => ("", "Boolean", false),
             (Source, "Register") when library => ("fn<Void>", Registration, false),
             (Source, "Remove") when library => (Registration, "noresult", false),
+            (Source, "CancelAfter") => (args.Length == 1 && args[0] == "System.Option<System.Time.Duration>" ? "System.Option<System.Time.Duration>" : "System.Time.Duration", "noresult", false),
             (Source, "Cancel" or "Dispose") => ("", "noresult", false),
             (Registration, ".ctor") when library => ($"{Source},System.Option<fn<Void>>,{Registration}", "noresult", false),
             (Registration, "get_Next" or "TakeNext") when library => ("", Registration, false),

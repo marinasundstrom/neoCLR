@@ -2,6 +2,7 @@ module System.Concurrency
 
 import System.*
 import System.Option.*
+import System.Time.*
 
 /// A copyable request-observation capability, independent of any task or scheduler.
 public struct CancellationToken {
@@ -48,6 +49,7 @@ public struct CancellationToken {
 public class CancellationTokenSource : Disposable {
     private var requested: bool
     private var disposed: bool
+    private var timer: Timer? = null
     private var head: CancellationRegistration?
 
     /// Creates an active source with no cancellation request.
@@ -72,6 +74,48 @@ public class CancellationTokenSource : Disposable {
 
     internal val IsDisposed: bool => disposed
 
+    /// Requests cancellation after delay; another call replaces the pending countdown.
+    /// Zero is deferred. Negative or excessive durations fault, even after cancellation.
+    func CancelAfter(delay: Duration) {
+        if disposed {
+            System.Fail("Cancellation source is disposed")
+        }
+        _ = Timer.Milliseconds(delay, false)
+        if requested {
+            return
+        }
+        let current = timer
+        if current is Timer active {
+            active.Start(delay)
+        } else {
+            let created = Timer(self.Cancel)
+            timer = created
+            created.Start(delay)
+        }
+    }
+
+    /// Some schedules cancellation; None disables the pending countdown without cancelling.
+    func CancelAfter(delay: Option<Duration>) {
+        if disposed {
+            System.Fail("Cancellation source is disposed")
+        }
+        if let Some(duration) = delay {
+            CancelAfter(duration)
+        } else if let System.Option.None = delay {
+            ClearTimer()
+        } else {
+            System.Fail("CancelAfter requires Some or None")
+        }
+    }
+
+    private func ClearTimer() {
+        let current = timer
+        timer = null
+        if current is Timer active {
+            active.Dispose()
+        }
+    }
+
     /// Sets the request flag and invokes active callbacks synchronously in reverse registration order.
     func Cancel() {
         if disposed {
@@ -81,6 +125,7 @@ public class CancellationTokenSource : Disposable {
             return
         }
         requested = true
+        ClearTimer()
         var pending = head
         head = null
         while pending is CancellationRegistration current {
@@ -95,6 +140,7 @@ public class CancellationTokenSource : Disposable {
             return
         }
         disposed = true
+        ClearTimer()
         var pending = head
         head = null
         while pending is CancellationRegistration current {

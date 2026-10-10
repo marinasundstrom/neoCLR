@@ -1,0 +1,85 @@
+import System.*
+import System.Concurrency.*
+import System.Option.*
+import System.Tasks.*
+import System.Time.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fail("CancelAfter check failed")
+    }
+}
+
+async func Pause() -> Task<()> {
+    let done = Promise<()>()
+    let timer = Timer(() => { done.Complete(()) })
+    timer.Start(Duration.FromTicks(10000L))
+    await done.Task
+    timer.Dispose()
+}
+
+async func Reset() -> Task<()> {
+    let source = CancellationTokenSource()
+    let done = Promise<()>()
+    let registration = source.Token.Register(() => { done.Complete(()) })
+    source.CancelAfter(Duration.FromTicks(21474836470000L))
+    source.CancelAfter(Duration.FromTicks(0L))
+    Check(!source.IsCancellationRequested)
+    await done.Task
+    Check(source.IsCancellationRequested)
+    source.CancelAfter(Duration.FromTicks(0L))
+    source.CancelAfter(Option<Duration>.None())
+    Check(source.IsCancellationRequested)
+    registration.Dispose()
+    source.Dispose()
+    Console.WriteLine("PASS reset countdown and deferred zero")
+}
+
+async func Disable() -> Task<()> {
+    let source = CancellationTokenSource()
+    source.CancelAfter(Duration.FromTicks(0L))
+    source.CancelAfter(Option<Duration>.None())
+    await Pause()
+    Check(!source.IsCancellationRequested)
+    source.CancelAfter(Option<Duration>.Some(Duration.FromTicks(0L)))
+    await Pause()
+    Check(source.IsCancellationRequested)
+    source.Dispose()
+    Console.WriteLine("PASS disable and reenable countdown")
+}
+
+async func DisposePending() -> Task<()> {
+    let source = CancellationTokenSource()
+    let token = source.Token
+    source.CancelAfter(Duration.FromTicks(0L))
+    source.Dispose()
+    source.Dispose()
+    await Pause()
+    Check(!token.IsCancellationRequested)
+    Console.WriteLine("PASS disposal suppresses timed cancellation")
+}
+
+class Counter {
+    var Count = 0
+    func Tick() { Count += 1 }
+}
+
+async func CancelEarly() -> Task<()> {
+    let source = CancellationTokenSource()
+    let counter = Counter()
+    let registration = source.Token.Register(counter.Tick)
+    source.CancelAfter(Duration.FromTicks(0L))
+    source.Cancel()
+    await Pause()
+    Check(counter.Count == 1 && source.IsCancellationRequested)
+    registration.Dispose()
+    source.Dispose()
+    Console.WriteLine("PASS manual cancellation removes countdown")
+}
+
+async func Main() -> Task<()> {
+    await Reset()
+    await Disable()
+    await DisposePending()
+    await CancelEarly()
+}

@@ -3678,3 +3678,8 @@ interpreter/macOS ARM64 scenarios pass; Windows CI is configured, execution pend
 See [the contract](design/http-client-lifetime.md#public-timer-and-asynchronous-callbacks-2026-10-11).
 Author direction is to continue through timed cancellation and HttpClient.Timeout
 before returning to Index/Range.
+
+**Timed cancellation layer (2026-10-11):** CancelAfter now composes Timer with source
+lifetime, replacing countdowns and allowing explicit None disabling. HttpClient.Timeout
+is next; the native host watchdog and old transport exchange budget must be removed
+from that request-timeout path before claiming its configured semantics.

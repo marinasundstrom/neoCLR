@@ -21,7 +21,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   non-overlapping fixed-delay repetition, safe restart and idempotent stop/disposal.
   Callback cancellation stops its schedule; disposal permits in-flight work to finish.
   Refresh both API references and add shared interpreter/native Windows CI fixtures.
-  Windows execution remains pending. Timeout/CancelAfter are the next layers.
+  Add CancellationTokenSource.CancelAfter with replaceable Duration countdowns and
+  explicit None disabling; cancellation/disposal releases pending timers.
+  Windows execution remains pending. HttpClient.Timeout is the next layer.
 
 - Add bounded AOT virtual dispatch for nongeneric reference classes. Resolve targets
   with interpreter ancestry rules, retain required base slots, and generate separate

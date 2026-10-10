@@ -1,0 +1,24 @@
+import System.*
+import System.Concurrency.*
+import System.Option.*
+import System.Time.*
+
+func Main(arguments: string[]) {
+    use source = CancellationTokenSource()
+    let mode = arguments[0]
+    if mode == "negative" {
+        source.CancelAfter(Duration.FromTicks(-1L))
+    } else if mode == "excessive" {
+        source.CancelAfter(Duration.FromTicks(21474836470001L))
+    } else if mode == "cancelled-negative" {
+        source.Cancel()
+        source.CancelAfter(Duration.FromTicks(-1L))
+    } else if mode == "disposed" {
+        source.Dispose()
+        source.CancelAfter(Duration.FromTicks(0L))
+    } else if mode == "disposed-disable" {
+        source.Dispose()
+        source.CancelAfter(Option<Duration>.None())
+    }
+    Console.WriteLine("ERROR invalid CancelAfter operation returned")
+}

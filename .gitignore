@@ -31,3 +31,6 @@
 
 /docs/experiments/timers/bin/
 /docs/experiments/timers/obj/
+
+/docs/experiments/cancel-after/bin/
+/docs/experiments/cancel-after/obj/

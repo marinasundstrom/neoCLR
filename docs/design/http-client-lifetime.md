@@ -208,3 +208,20 @@ remains deferred rather than defining a native language restriction.
 
 [Local qualification](../experiments/timers/validation.json): all ten callback scenarios
 and five guards pass in interpreter and macOS ARM64 AOT. Windows remains unexecuted.
+
+## Timed cancellation (2026-10-11)
+
+`CancellationTokenSource.CancelAfter(Duration)` schedules or replaces its countdown.
+`CancelAfter(Option<Duration>)` accepts Some with identical behavior or None to disable
+scheduling. Zero is deferred; positive fractions round upward; bounds match Timer.
+Cancel and Dispose remove scheduling. An already requested source never resets its
+request flag; invalid durations and disposed use still fault. This matches .NET's
+reset-before-cancellation and cooperative request model. The deliberate API difference
+is explicit Option disabling instead of a negative infinite sentinel: clearer duration
+validation at the cost of an additional overload and Some/None at optional call sites.
+No linked-source public factory is added in this slice. Scheduling remains invocation-local.
+
+[Timed-cancellation qualification](../experiments/cancel-after/validation.json): four
+behavior scenarios and five fault guards pass in the interpreter and macOS ARM64
+native executable. Matching API snapshots pass their checks. Windows CI is configured,
+not executed. The source remains cooperative; no timeout preemption is claimed.

@@ -1703,3 +1703,7 @@ Stop and Dispose. Native RavenDoc currently spells the nested unit result `Task<
 the authored constructor summary specifies the source spelling `Task<()>`. No API is
 excluded. Fixed-delay repetition includes async completion; Stop/Dispose do not join or
 cancel callback work. See the timer section in docs/design/http-client-lifetime.md.
+
+Both CancelAfter overloads are included in the aggregate/native development reference.
+Duration schedules a cooperative request; Option.None disables scheduling without
+resetting cancellation state. Durations follow Timer's range and rounding rules.
