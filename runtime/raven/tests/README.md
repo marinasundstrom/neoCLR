@@ -419,13 +419,13 @@ not a native execution claim for suites listed in `nativeAdmissionGaps`.
 Batch `unicode-casing`: Unicode casing expansions, contextual sigma and text preservation; 6 tests pass native macOS ARM64 and release-interpreted execution ([evidence](unicode-casing-validation.json)).
 Source: [docs/experiments/casing-integer/Main.rvn](../../../docs/experiments/casing-integer/Main.rvn). Windows remains pending.
 
-Batch `int64-parsing`: Int64 boundary parsing, lexical errors, overflow and formatting; 5 tests pass release-interpreted execution; native admission remains unsupported ([evidence](int64-parsing-validation.json)).
+Batch `int64-parsing`: Int64 boundary parsing, lexical errors, overflow and formatting; 5 tests pass native macOS ARM64 and release-interpreted execution ([evidence](int64-parsing-validation.json)).
 Source: [docs/experiments/casing-integer/Main.rvn](../../../docs/experiments/casing-integer/Main.rvn). Windows remains pending.
 
-The Int64 suite admission gap is the unbound `neoCLR.Runtime.ParseInt64` service.
-Evidence includes the inspected source member behind the private linked index.
-That exact rejection is pinned deliberately: a changed index requires inspection
-rather than accepting an arbitrary unsupported-member failure.
+The missing native `neoCLR.Runtime.ParseInt64` binding is now implemented. The
+suite requires both modes to pass; its earlier admission exception is removed.
+Focused backend checks additionally compare lexical/error/null behavior with the
+interpreter. Windows requalification remains pending.
 
 Batch `primitive-parsing`: primitive numeric and Boolean parsing values, format errors and overflow; 12 tests pass release-interpreted execution; native admission remains unsupported ([evidence](primitive-parsing-validation.json)).
 Source: [docs/experiments/numeric-contracts/Main.rvn](../../../docs/experiments/numeric-contracts/Main.rvn). Windows remains pending.

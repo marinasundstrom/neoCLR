@@ -337,6 +337,39 @@ publish:;
 }
 
 
+int32_t neoclr_parse_int64_v1(const neoclr_aot_text *text, void *output) {
+    if (!text || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t start = 0;
+    int negative = text->length && text->bytes[0] == '-';
+    if (text->length && (negative || text->bytes[0] == '+')) start = 1;
+    uint64_t tag = 2, payload = 1; /* malformed, including empty/sign-only */
+    if (start < text->length) {
+        uint64_t magnitude = 0;
+        uint64_t limit = negative ? UINT64_C(9223372036854775808) : UINT64_C(9223372036854775807);
+        int overflow = 0;
+        for (uint64_t i = start; i < text->length; ++i) {
+            unsigned char ch = text->bytes[i];
+            if (ch < '0' || ch > '9') goto publish;
+            uint64_t digit = ch - '0';
+            if (!overflow) {
+                if (magnitude > (limit - digit) / 10) overflow = 1;
+                else magnitude = magnitude * 10 + digit;
+            }
+        }
+        if (overflow) payload = 2;
+        else {
+            tag = 5;
+            /* Unsigned arithmetic preserves INT64_MIN without signed overflow. */
+            payload = negative ? UINT64_C(0) - magnitude : magnitude;
+        }
+    }
+publish:;
+    uint64_t lanes[2] = {tag, payload};
+    memcpy(output, lanes, sizeof(lanes));
+    return NEOCLR_AOT_FAULT_NONE;
+}
+
+
 int32_t neoclr_string_starts_with_ordinal_v1(const neoclr_aot_text *text,
         const neoclr_aot_text *pattern, int32_t *output) {
     if (!text || !pattern || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;

@@ -16,9 +16,6 @@ TESTS = ROOT / 'runtime/raven/tests'
 # Explicit admission gaps: these suites still run interpreted; no native pass is claimed.
 NATIVE_ADMISSION_GAPS = {
     'string-construction': 'value member requires a local record owner (Char)',
-    # Inspection resolves this private index to neoCLR.Runtime.ParseInt64.
-    # A changed linked index deliberately requires fresh inspection/qualification.
-    'int64-parsing': '$aot_linked_114: unsupported value member contract',
     'primitive-parsing': 'unsupported closed generic argument: Single',
     'path-values': 'virtual calls requiring dispatch need a later specialization profile: System.Object.Equals',
 }

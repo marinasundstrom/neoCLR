@@ -242,11 +242,12 @@ pub fn character_text(input: &mut neoclr::Module, selection: &Value) -> Result<V
     Ok(bindings)
 }
 
-/// Explicit wide integer formatting and ARM64 native-width conversion.
+/// Explicit signed integer parsing, wide formatting and native-width conversion.
 pub fn integer_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
         let (parameter, result, implementation) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.ParseInt64") => (Type::String, Type::Value, "parse-int64-v1"),
             Some("neoCLR.Runtime.ParseInt32") => (Type::String, Type::Value, "parse-int32-v1"),
             Some("neoCLR.Runtime.Int64ToString") => (Type::Int64, Type::String, "int64-to-string-v1"),
             Some("neoCLR.Runtime.UInt64ToString") => (Type::UInt64, Type::String, "uint64-to-string-v1"),
@@ -263,7 +264,7 @@ pub fn integer_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
             || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
             || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
             || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("native integer text binding requires exact reserved Int32 parsing, Int64/UInt64 formatting or native-integer conversion InternalCall contract".into()); }
+        { return Err("native integer text binding requires exact reserved Int32/Int64 parsing, Int64/UInt64 formatting or native-integer conversion InternalCall contract".into()); }
         f.impl_flags = 0;
         f.body = if result == Type::String {
             vec![Op::String(String::new()), Op::Return]
@@ -275,11 +276,12 @@ pub fn integer_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
             "compiledIndex": row["compiledIndex"], "implementation": implementation,
             "symbol": match implementation {
+                "parse-int64-v1" => Some("neoclr_parse_int64_v1"),
                 "parse-int32-v1" => Some("neoclr_parse_int32_v1"),
                 "int64-to-string-v1" => Some("neoclr_int64_to_string_v1"),
                 "uint64-to-string-v1" => Some("neoclr_uint64_to_string_v1"),
                 _ => None,
-            }, "storage": if result == Type::String { "caller-owned-text-arena-v4" } else if result == Type::Value { "allocation-free erased Int32 or Byte parse error" } else { "64-bit target bit-preserving conversion" }}));
+            }, "storage": if result == Type::String { "caller-owned-text-arena-v4" } else if result == Type::Value { "allocation-free erased signed integer or Byte parse error" } else { "64-bit target bit-preserving conversion" }}));
     }
     Ok(bindings)
 }

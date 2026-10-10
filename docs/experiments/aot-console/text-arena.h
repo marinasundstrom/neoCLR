@@ -75,6 +75,7 @@ int32_t neoclr_string_join_parts_v1(const void *parts, int32_t count, const neoc
 /* Exact ASCII [+-]?[0-9]+; complete grammar validation precedes range.
  * Publishes erased Int32 or Byte(1=InvalidFormat, 2=Overflow), no allocation.
  * Null arguments fault without publishing output. */
+int32_t neoclr_parse_int64_v1(const neoclr_aot_text *text, void *output);
 int32_t neoclr_parse_int32_v1(const neoclr_aot_text *text, void *output);
 /* Exact, case-sensitive UTF-8 bytes; empty patterns match. Null inputs fault.
  * Predicates allocate nothing and publish a normalized Boolean only on success. */

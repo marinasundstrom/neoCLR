@@ -4,6 +4,13 @@
   "cases": [
     {
       "suite": "int64-parsing",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS Int64 parsing accepts both signed boundaries\nPASS Int64 decimal formatting round trips signed boundaries\nPASS Int64 parsing rejects noncanonical lexical inputs\nPASS Int64 parsing distinguishes overflow from invalid trailing text\nPASS Int64 parsing accepts signs leading zeros and values beyond Int32\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "int64-parsing",
       "mode": "interpreter",
       "exitCode": 0,
       "stdout": "PASS Int64 parsing accepts both signed boundaries\nPASS Int64 decimal formatting round trips signed boundaries\nPASS Int64 parsing rejects noncanonical lexical inputs\nPASS Int64 parsing distinguishes overflow from invalid trailing text\nPASS Int64 parsing accepts signs leading zeros and values beyond Int32\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
@@ -11,7 +18,7 @@
     }
   ],
   "inputs": {
-    "scripts/test-runtime-library.py": "92c02f7426229a7f0ef28d46ea0e97679664fcc4d202d70fa5ab539245667ef6",
+    "scripts/test-runtime-library.py": "d439613b4d0f1eb5018b0c6f54f6f2b20b56dd7cd94b80f4fa8f593273da360f",
     "scripts/build-native-project.py": "2f60d4e65f913495167054edd435a34ef0c70897a752b3b56152010b04c89188",
     "scripts/discover-runtime-tests.py": "0f7c22b1a3e46879654d29d4ad5cd292ed36adced2958f0d00a811a7342dd699",
     "scripts/validate-test-discovery.py": "83f6cd15cc0a9fbaa4fd2a6a0fbca22d57da5d5edd1e2f248daacf3416088167",
@@ -31,11 +38,16 @@
     "runtime/raven/tests/framework/Assertions.rvn": "75b24edb65dd3c9bc6af7a211966feda795c9834adea0f3d9d064e05049072eb",
     "runtime/raven/tests/framework/TestAttribute.rvn": "a20f0d5f981985e52a384937a1dba70670a01507143a6949972978546c6204cd",
     "runtime/raven/tests/framework/TestSuite.rvn": "de0c1c8e5491ba22d6c3964142c81e12f210b567c61b02a3ebf58fc4acad3f07",
+    "runtime/raven/tests/http-header-values/Tests.rvn": "fc0bc92f4bbd80b90550f3e734b15e681c76bf9eb6d675cf9c24114f620ef012",
+    "runtime/raven/tests/http-route-matching/Tests.rvn": "e597b64fb4297491af075579dd8984568e5718df4b3e79f5a6ed031a0361f86d",
     "runtime/raven/tests/int64-parsing/Tests.rvn": "03ecbfd540200cfe0e17bdda5a542b658dd01541e63228dfe090ed652d96c270",
+    "runtime/raven/tests/ip-address-values/Tests.rvn": "f5c8fd7e24132e984991cabe2b28f65afab00b938c2b0ee37c084c2834a9d3e6",
     "runtime/raven/tests/json-dom/JsonDom.rvn": "4f2753887ec133e481c06feea11be80e9fceed55e033a504df796b553f8b9900",
     "runtime/raven/tests/json-streams/JsonStreams.rvn": "fcb32a105f03541534dcff01022838d82bcc3d561cb1216247126057cd3cdafe",
     "runtime/raven/tests/json-streams/ShortStreams.rvn": "1fbda3bbe9b9aa4cc1cc7f57988b15ff7b9a2ba9ef15a55b4a78fc8daa1cfe86",
     "runtime/raven/tests/memory-stream/Tests.rvn": "d1cc16c3774b7bb4074a03d49d92bb70a89f8c97981405a67e2336291ef56a4a",
+    "runtime/raven/tests/path-values/Tests.rvn": "8bffa5ed04a581f21864b68d9231c0587d9c6a518c507d9a533bd900d9a8b85b",
+    "runtime/raven/tests/primitive-parsing/Tests.rvn": "d67dd84ca10671406338e67ad9e3aa4d9b9748da18710d33fc987c9b56edaa47",
     "runtime/raven/tests/runner-contract/Main.rvn": "6aa7515a6b2bd4eaccbd296e80348c869fab9f8f74e89e067f72530f3ce55d0f",
     "runtime/raven/tests/string-construction/Tests.rvn": "8861a8e01ee38bb33be583b7e5b614de8882ead5f77ecbc25a957bd5d57ce716",
     "runtime/raven/tests/unicode-casing/Tests.rvn": "b19bebaf414ca5a722e9c2cabf7c7e26b3fed611b54532f4a244e30b051ebd24",
@@ -43,46 +55,27 @@
     "runtime/raven/tests/collection-iteration/Tests.rvnproj": "9c5fcf509fcc91b3ad3f696a189135f2df1d895709a4b5a8accc27028a42e1b4",
     "runtime/raven/tests/collections/Tests.rvnproj": "c1374380a7d0c8a586f6a99a98e2530d17ffdc3f0a82cf8cea33f121ba6fffb1",
     "runtime/raven/tests/discovery-contract/Tests.rvnproj": "138cbef1c75af0c870d1cf93998f95d0b2c6056c13c82800c7b12faf9d460cdc",
+    "runtime/raven/tests/http-header-values/Tests.rvnproj": "f0d2c1f9c5370068f37ef551d5eab40712a6742e6b4681e897f563209f2367ac",
+    "runtime/raven/tests/http-route-matching/Tests.rvnproj": "e02e34b150ad6458e35678ec26d5cdf93e363562bfcfbb2a8e39806c1f9da199",
     "runtime/raven/tests/int64-parsing/Tests.rvnproj": "338266a559ffe4d67c1775fc2e4b5b91330e95d4c0c7336e6c5a8fa2202c1b34",
+    "runtime/raven/tests/ip-address-values/Tests.rvnproj": "b5d6d6b969706cf1b74c408ad27060d26946ee766f04e04ebbf440d25e85765e",
     "runtime/raven/tests/json-dom/Tests.rvnproj": "2a384379580867b0886ac4eedda4c0f269db9eefca2ad251531c9b88030d062f",
     "runtime/raven/tests/json-streams/Tests.rvnproj": "e430d27261d4f3c26d7c8f638ad4e54c983872e0a1e774de56887c86db7da1c5",
     "runtime/raven/tests/memory-stream/Tests.rvnproj": "163fe46d9dc76c149bf6d757f0bfaab1d0d4950017bdcd6be9a8033def9ebf4f",
+    "runtime/raven/tests/path-values/Tests.rvnproj": "109e8179b5c1f498bb73c87a62ade1bab4d943621d4c2f1e038a255cee32bf58",
+    "runtime/raven/tests/primitive-parsing/Tests.rvnproj": "cf259491b67421b4b906f8a47c62995f2428bec98bcdd64e7f9a0efbfade950a",
     "runtime/raven/tests/runner-contract/Tests.rvnproj": "3061ec4816a7c6dc3025e6cd5775cd2b62fd7a230daabdf6de1709a9541e999e",
     "runtime/raven/tests/string-construction/Tests.rvnproj": "91e2574c582f0f70a2a1ed811d4645c1cc161783af26b848b3c7df8c9b3a9409",
     "runtime/raven/tests/unicode-casing/Tests.rvnproj": "4bb50d2937be0265c0cec5af3fd658c1b6f745569d33ae403f0a275383916596"
   },
   "bundleManifestSha256": "febe0d6b510ca36c19a82ec21305097467a3185611328c701b5ef158251d59d2",
-  "aotSha256": "efaa7b7b5908b681c297eda8e56482d76e0f279f9405e57f76434e5d0ad689f1",
+  "aotSha256": "6e99ee56df65f413cdcaaa18785c3824a8185daaf10505bdbb20230e33e36d09",
   "interpreterSha256": "12516b4780dbc636bb0fe5b717826e046d931422153e823239e6ddadf5769fc6",
   "suites": [
     "int64-parsing"
   ],
-  "nativeAdmissionGaps": [
-    {
-      "suite": "int64-parsing",
-      "diagnostic": "$aot_linked_114: unsupported value member contract"
-    }
-  ],
-  "date": "2026-10-10",
-  "codeBaseline": "7d387b664435a1521de5c136352ee94e38a0b842 plus int64-parsing migration",
-  "scope": "Int64 boundary parsing, lexical errors, overflow and formatting",
-  "sourceConsumer": "docs/experiments/casing-integer/Main.rvn",
-  "windowsStatus": "Pending GitHub action",
-  "nativeAdmissionInspection": {
-    "admission": {
-      "accepted": false,
-      "firstError": "$aot_linked_114: unsupported value member contract",
-      "phase": "compilation"
-    },
-    "member": {
-      "compiledIndex": 114,
-      "compiledName": "$aot_linked_114",
-      "definition": {
-        "index": 112,
-        "module": "System"
-      },
-      "name": "neoCLR.Runtime.ParseInt64",
-      "sourceIndex": 2959
-    }
+  "focusedBackendChecks": {
+    "command": "cargo test --manifest-path tools/aot-poc/Cargo.toml --test console parsing_ --quiet",
+    "passed": 3
   }
 }

@@ -22,6 +22,7 @@ pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fau
                 &d.console_write_bytes,
                 &d.console_flush,
                 &d.parse_int32,
+                &d.parse_int64,
                 &d.entry_task_drain,
                 &d.task_queue_register,
                 &d.task_queue_default,

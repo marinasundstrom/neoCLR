@@ -13736,3 +13736,16 @@ claim completion of in-process test discovery.
   No public APIs or .NET/neoCLR semantic contracts are changed by migration.
 - **Progress/evidence:** the framework README and roadmap record each completed batch;
   remaining selections are plans until their corresponding evidence is recorded.
+
+## 2026-10-10 — Fix gaps exposed during test migration
+
+- **Author:** “We should fix any gaps while we write tests”.
+- **Assistant response:** stop treating explicit native admission exclusions as
+  completed migrations; fix the exposed compiler/backend gaps and require execution.
+- **First outcome:** implement the missing ParseInt64 native binding. All five
+  public parser tests now pass native macOS ARM64 and interpreted execution, with
+  three focused backend checks covering signed parsing and reserved binding admission.
+  [Evidence](../runtime/raven/tests/int64-parsing-validation.json).
+- **Open work:** Char wrappers, primitive parser transport, virtual equality/hash
+  dispatch and native literal-pattern emission; finish the IP-address and URI batches.
+  Windows qualification is pending. These are implementation gaps, not new contracts.

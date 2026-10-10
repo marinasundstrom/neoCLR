@@ -439,6 +439,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             (&d.string_contains_ordinal, "neoclr_string_contains_ordinal_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_starts_with_ordinal, "neoclr_string_starts_with_ordinal_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_ends_with_ordinal, "neoclr_string_ends_with_ordinal_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.parse_int64, "neoclr_parse_int64_v1", vec![types::I64, types::I64]),
             (&d.parse_int32, "neoclr_parse_int32_v1", vec![types::I64, types::I64]),
             (&d.utf8_encode, "neoclr_utf8_encode_v1", vec![types::I64, types::I64, types::I64]),
             (&d.utf8_decode, "neoclr_utf8_decode_v1", vec![types::I64, types::I64, types::I64]),

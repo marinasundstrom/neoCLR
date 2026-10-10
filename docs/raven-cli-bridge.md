@@ -7628,3 +7628,22 @@ ownerless function retention. No Raven configuration/emission or metadata schema
 changes are involved. The [qualified regression fix](custom-attributes.md#native-shared-provider-regression--2026-10-10)
 is owned by neoCLR's native snapshot projection; real module-member retention must
 replace this bounded rejection when that capability is implemented.
+
+### Native Int64 parsing gap closure — 2026-10-10
+
+The migrated parser tests exposed an absent native binding for the existing exact
+`neoCLR.Runtime.ParseInt64(String) -> Value` InternalCall. The AOT integer-text
+profile now supplies `neoclr_parse_int64_v1`, keeping the public managed Result
+wrapper and the interpreter's grammar, boundary and error precedence. This restores
+the existing [integer contract](design/text-casing-integer.md), without changing
+its documented .NET comparison or creating an AOT-specific parsing policy.
+
+No Runtime Contract configuration, compiler emission or reference metadata changes
+are needed; compiler pin 1a0c4e62734b2d4f17dc9f8af1f5d02c566f8cf4 remains valid.
+The temporary adapter writes private erased lanes (Int64 tag 5 or Byte tag 2);
+these are not metadata type ordinals or a public ABI. It allocates no text and
+uses unsigned arithmetic to preserve Int64.MinValue without signed overflow.
+The native backend owns this bridge until native service lowering replaces it.
+Five [public tests](../runtime/raven/tests/int64-parsing-validation.json) pass
+both local modes; backend checks cover all ASCII trailing characters after a long
+digit sequence, format-before-overflow and null faults. Windows remains pending.
