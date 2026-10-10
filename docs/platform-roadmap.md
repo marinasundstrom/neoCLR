@@ -4,8 +4,12 @@
 [test framework and runner](../runtime/raven/tests/README.md), with module-level
 functions and an intended stable core contract. Explicit registration, assertions,
 structured pass/fail/skip reports and continuation after assertion failure now pass
-macOS ARM64 native/interpreter checks. Windows CI is wired; qualification is pending.
-Next add TestAttribute discovery through introspection without changing execution
+macOS ARM64 native/interpreter checks. The Windows runner action at 9db8eb4c succeeds; its artifacts have not yet been independently verified.
+The author clarifies that this requires [general custom attributes](custom-attributes.md),
+including AttributeUsage and applicable declaration kinds, not a test-only mechanism.
+Host metadata authoring/introspection now preserves callable, field, property and
+parameter annotations alongside types. Next implement enum/named payloads and
+AttributeUsage/compiler support, then TestAttribute discovery without changing execution
 contracts. Qualify metadata retention and callable adapters before claiming native
 automatic discovery. This supports the native/collection milestone; it does not
 permanently reprioritize the rest of the platform roadmap.

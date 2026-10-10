@@ -33,6 +33,11 @@ public sealed class MethodInfo
             type.ByReferenceElement is null ? ParameterPassingMode.Value : signature.OutParameters.Contains(i) ? ParameterPassingMode.Out : ParameterPassingMode.Ref,
             definition.ParameterNames.GetValueOrDefault(i))).ToArray()));
     }
+    /// <summary>Gets declared method attributes as metadata-only snapshots; parameter attributes are excluded.</summary>
+    /// <remarks>No attribute constructor or test body is executed. Resolving an attribute type requires an explicit catalog.</remarks>
+    public IReadOnlyList<CustomAttributeInfo> GetCustomAttributes() => Array.AsReadOnly(Definition.CustomAttributes
+        .Select(attribute => new CustomAttributeInfo(Context, attribute)).ToArray());
+
     /// <summary>Gets the declaration name.</summary>
     public string Name { get; }
     /// <summary>Gets the namespace recorded for a namespace function; empty when absent.</summary>
@@ -94,6 +99,10 @@ public enum ParameterPassingMode
 /// <summary>A metadata parameter with position and type; absent native parameter names are not invented.</summary>
 public sealed class ParameterInfo
 {
+    /// <summary>Gets attributes declared on this parameter without executing constructors.</summary>
+    public IReadOnlyList<CustomAttributeInfo> GetCustomAttributes() => Array.AsReadOnly(DeclaringMethod.Definition
+        .GetParameterCustomAttributes(Position).Select(a => new CustomAttributeInfo(DeclaringMethod.Context, a)).ToArray());
+
     internal ParameterInfo(MethodInfo method, int position, TypeInfo type, ParameterPassingMode passingMode, string? name) { DeclaringMethod = method; Position = position; ParameterType = type; PassingMode = passingMode; Name = name; }
     /// <summary>Gets the declared parameter name, or null when metadata omits it.</summary>
     public string? Name { get; }

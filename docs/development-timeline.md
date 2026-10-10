@@ -13322,3 +13322,18 @@ Attribute emission, discovery/rooting and native invocation are not implemented
 by the initial runner slice. The author did not require classes or approve specific
 attribute options; those remain open. Windows framework execution is added to the
 existing collections action and awaits qualification.
+
+
+### 2026-10-10 — General attributes before test discovery
+
+The author confirms the discovery direction and specifies “custom attribute support
+with attribute usage attribute”, then corrects the scope: “wherever it fits and not
+just methods”. The assistant broadens the work to shared metadata infrastructure;
+TestAttribute is a consumer, not a special compiler marker. The first slice adds
+host authoring/inspection and CLI/native round trips for callables, fields,
+properties and parameters alongside types. Tests prove metadata inspection runs no
+attribute constructors or annotated bodies, preserves targets and immutable loaded
+lists, and coexists with parameter-array markers. The 168-group metadata suite passes.
+The [general attribute plan](custom-attributes.md) records .NET usage defaults and
+scope. Enum/named payloads, AttributeUsage enforcement, compiler emission/import and
+guest discovery remain open; no completion of those is inferred from this foundation.

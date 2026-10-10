@@ -53,6 +53,10 @@ fixtures, filtering and generic/collection assertions are not implemented yet.
 
 ## TestAttribute and introspection: next layer
 
+General [custom attributes and AttributeUsage](../../../docs/custom-attributes.md)
+are prerequisites. Host metadata support now spans callables, fields, properties
+and parameters alongside types; compiler/guest support still needs qualification.
+
 Author-selected direction: discover attributed test functions using introspection,
 then adapt them to the same case, invocation and report contracts. Explicit
 registration remains useful and supported. Classes may eventually provide fixtures,
@@ -125,7 +129,8 @@ subsequent pass, skip, structured expected/actual values, and rejection of empty
 suites and duplicate IDs. Both suites run natively and with the same assemblies
 in the interpreter. A successful harness ends with `Runtime library tests: PASS`.
 [Initial macOS ARM64 evidence](validation.json) records source and tool hashes.
-Windows framework qualification remains pending until its action passes.
+Windows action [38039487454](https://github.com/marinasundstrom/neoCLR/actions/runs/38039487454)
+succeeds at 9db8eb4c; artifact hashes have not yet been independently checked.
 
 This source-included test helper is not part of System.Runtime or its public API
 reference assembly. This document covers its complete initial contract. Packaging

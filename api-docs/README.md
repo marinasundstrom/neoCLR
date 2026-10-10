@@ -1495,3 +1495,9 @@ and XML contracts are unchanged, so the existing compiler reference assembly is
 reused with refreshed source fingerprints. The native documentation snapshot is
 rendered from the matching source libraries and compiler/renderer 494dede84.
 No website build or publication is implied.
+
+
+General host metadata attributes now include callables, fields, properties and
+parameters; see the [manual host reference](experimental-metadata.md#member-custom-attributes-development-2026-10-10).
+Guest reference signatures and snapshots are unchanged. AttributeUsage, Raven source
+emission and guest discovery remain tracked in the [attribute plan](../docs/custom-attributes.md).

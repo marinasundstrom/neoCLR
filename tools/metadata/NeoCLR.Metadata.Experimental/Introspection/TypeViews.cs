@@ -106,8 +106,17 @@ public sealed class ConstructedTypeInfo : TypeInfo
 /// <summary>A declared field viewed through an open or constructed metadata owner; no object access is available.</summary>
 public sealed class FieldInfo
 {
+    private readonly Lazy<IReadOnlyList<CustomAttributeInfo>> attributes;
+    /// <summary>Gets declared attributes without invoking constructors or accessors.</summary>
+    public IReadOnlyList<CustomAttributeInfo> GetCustomAttributes() => attributes.Value;
+
     internal FieldInfo(FieldDefinition definition, TypeInfo declaringType, TypeInfo fieldType)
-    { IsLiteral = definition.IsLiteral; Constant = definition.Constant; Accessibility = MetadataAccess.Member(definition.Attributes); Name = definition.Name; MetadataToken = definition.MetadataToken; DeclaringType = declaringType; FieldType = fieldType; IsStatic = (definition.Attributes & 0x10) != 0; IsReadOnly = (definition.Attributes & 0x20) != 0; }
+    {
+        attributes = new(() => Array.AsReadOnly(definition.CustomAttributes.Select(a => new CustomAttributeInfo(declaringType.Context, a)).ToArray()));
+        IsLiteral = definition.IsLiteral; Constant = definition.Constant; Accessibility = MetadataAccess.Member(definition.Attributes);
+        Name = definition.Name; MetadataToken = definition.MetadataToken; DeclaringType = declaringType; FieldType = fieldType;
+        IsStatic = (definition.Attributes & 0x10) != 0; IsReadOnly = (definition.Attributes & 0x20) != 0;
+    }
     /// <summary>Gets the metadata name.</summary>
     public string Name { get; }
     /// <summary>Gets the original declaration's module-local field token.</summary>

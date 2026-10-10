@@ -34,18 +34,29 @@ internal static class ParameterArrayChecks
         var core = AssemblyDefinition.ReadAssembly(File.ReadAllBytes(corePath), expectedExtended: false);
         var graph = Create(core.Identity);
         graph.BindNativeLibrary(core, NativeLibraryDefinition.ReadAssembly(File.ReadAllBytes(seedPath)), core.Identity);
+        var attributeType = graph.AddClass("Tests", "TestAttribute");
+        var ctor = attributeType.AddConstructor(new MethodSignature(PrimitiveType.Void, []));
+        ctor.GetILGenerator().Fail("metadata inspection must not invoke attributes");
+        foreach (var method in graph.Definition.MainModule.Types.Single(t => t.Name == "Operations").Methods)
+        {
+            method.CustomAttributes.Add(new CustomAttributeDefinition(ctor.Definition, []));
+            method.GetParameterCustomAttributes(0).Add(new CustomAttributeDefinition(ctor.Definition, []));
+        }
         var json = graph.WriteNativeAssembly();
         var binary = RuntimeAssemblyContainer.WriteBinary(json, core.Identity);
         var snapshot = AssemblyDefinition.ReadNativeAssembly(binary);
         var context = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([snapshot]);
         var methods = context.Resolve(snapshot.Identity).GetTypes().Single(t => t.Name == "Operations").GetMethods();
         Check(methods.Count() == 2 && methods.All(m => m.GetParameters().Single().IsParameterArray), "native introspection lost parameter arrays");
+        Check(methods.All(m => m.GetCustomAttributes().Single().Name == "TestAttribute"), "method and parameter attributes mixed");
+        Check(methods.All(m => m.GetParameters().Single().GetCustomAttributes().Select(a => a.Name).Order().SequenceEqual(new[] { "ParamArrayAttribute", "TestAttribute" })), "parameter marker or custom attribute lost");
         var projected = RuntimeAssemblyContainer.ReadCliProjection(binary);
+        Check(projected.MainModule.Types.Single(t => t.Name == "Operations").Methods.All(m => m.GetParameterCustomAttributes(0).Count == 2), "projection duplicated the parameter marker");
         Check(projected.MainModule.Types.Single(t => t.Name == "Operations").Methods.All(m => m.ParameterArrayIndex == 0), "projection lost marker");
         var root = System.Text.Json.Nodes.JsonNode.Parse(json)!;
         var functions = root["functions"]!.AsArray();
         var marked = functions.First(f => f!["custom_attributes"] is not null)!;
-        marked["custom_attributes"]![0]!["target_token"] = 0;
+        marked["custom_attributes"]!.AsArray().Single(a => a!["constructor"]!["name"]!.GetValue<string>() == "System.ParamArrayAttribute..ctor")!["target_token"] = 0;
         Reject(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(System.Text.Encoding.UTF8.GetBytes(root.ToJsonString()), core.Identity)));
     }
 

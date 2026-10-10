@@ -374,12 +374,12 @@ public sealed partial class AssemblyDefinition
             if (reader.CustomAttributes.Count > 4096) throw new InvalidDataException("too many custom attributes");
             var result = new AssemblyDefinition(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, fields, properties, methods, memberReferences, references, typeReferences, artifact?.Profile, owned, entryPointToken);
             int attributeBytes = 0;
-            foreach (var handle in reader.TypeDefinitions)
+            List<CustomAttributeDefinition> ReadAttributes(CustomAttributeHandleCollection handles)
             {
                 var attributes = new List<CustomAttributeDefinition>();
-                foreach (var attributeHandle in reader.GetTypeDefinition(handle).GetCustomAttributes())
+                foreach (var attributeHandle in handles)
                 {
-                    if (attributes.Count >= 256) throw new InvalidDataException("too many type attributes");
+                    if (attributes.Count >= 256) throw new InvalidDataException("too many member attributes");
                     var attribute = reader.GetCustomAttribute(attributeHandle);
                     uint token = (uint)MetadataTokens.GetToken(attribute.Constructor);
                     var signature = attribute.Constructor.Kind switch
@@ -393,8 +393,24 @@ public sealed partial class AssemblyDefinition
                     attributeBytes += length;
                     attributes.Add(new(result.MainModule, token, reader.GetBlobBytes(signature), reader.GetBlobBytes(attribute.Value)));
                 }
-                result.MainModule.GetTypeDefinition((uint)MetadataTokens.GetToken(handle))!.SetLoadedAttributes(attributes);
+                return attributes;
             }
+            foreach (var handle in reader.TypeDefinitions)
+                result.MainModule.GetTypeDefinition((uint)MetadataTokens.GetToken(handle))!.SetLoadedAttributes(ReadAttributes(reader.GetTypeDefinition(handle).GetCustomAttributes()));
+            foreach (var handle in reader.MethodDefinitions)
+                result.MainModule.GetMethodDefinition((uint)MetadataTokens.GetToken(handle))!.SetLoadedAttributes(ReadAttributes(reader.GetMethodDefinition(handle).GetCustomAttributes()));
+            foreach (var handle in reader.MethodDefinitions)
+                foreach (var parameterHandle in reader.GetMethodDefinition(handle).GetParameters())
+                {
+                    var parameter = reader.GetParameter(parameterHandle);
+                    if (parameter.SequenceNumber != 0)
+                        result.MainModule.GetMethodDefinition((uint)MetadataTokens.GetToken(handle))!
+                            .SetLoadedParameterAttributes(parameter.SequenceNumber - 1, ReadAttributes(parameter.GetCustomAttributes()));
+                }
+            foreach (var handle in reader.FieldDefinitions)
+                result.MainModule.GetFieldDefinition((uint)MetadataTokens.GetToken(handle))!.SetLoadedAttributes(ReadAttributes(reader.GetFieldDefinition(handle).GetCustomAttributes()));
+            foreach (var handle in reader.PropertyDefinitions)
+                result.MainModule.GetPropertyDefinition((uint)MetadataTokens.GetToken(handle))!.SetLoadedAttributes(ReadAttributes(reader.GetPropertyDefinition(handle).GetCustomAttributes()));
             return result;
         }
         catch (BadImageFormatException error)

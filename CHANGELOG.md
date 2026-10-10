@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Extend host custom-attribute metadata beyond types to callables (including
+  constructors and assembly-level functions), fields, properties and parameters.
+  Preserve native/CLI snapshots and reference projection, reject foreign targets,
+  keep loaded lists read-only and avoid duplicate parameter-array markers. The
+  168-group metadata suite and focused inspection/round-trip checks pass. Document
+  general AttributeUsage, enum/named payloads and compiler/guest support as next
+  work; automatic Raven test discovery is not yet implemented.
+
 - Add a Raven runtime-library test runner with module-level cases, Result-based
   Assert.Equal/True, stable IDs, structured pass/fail/skip reports and registration
   preflight. Seven collection tests and deliberate failure/continuation checks pass

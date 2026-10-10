@@ -142,12 +142,14 @@ public sealed class CustomAttributeDefinition
         if (!v.End) throw new InvalidDataException("trailing custom attribute data");
         return result.AsReadOnly();
     }
-    internal void ValidateOwner(TypeDefinition owner)
+    internal void ValidateOwner(TypeDefinition owner) => ValidateOwner(owner.Module);
+    internal void ValidateOwner(ModuleDefinition owner)
     {
-        if (authoredType is null || !ReferenceEquals(authoredType.Module, owner.Module)) throw new ArgumentException("attribute reference must be authored in the owning module");
+        if (authoredType is null || !ReferenceEquals(authoredType.Module, owner)) throw new ArgumentException("attribute reference must be authored in the owning module");
         if (authoredType.ExplicitScope is null && authoredType.Resolve().DeclaringType is not null) throw new ArgumentException("nested attribute owner unsupported");
     }
-    internal void ValidateContract(TypeDefinition owner)
+    internal void ValidateContract(TypeDefinition owner) => ValidateContract(owner.Module);
+    internal void ValidateContract(ModuleDefinition owner)
     {
         ValidateOwner(owner);
         if (AttributeType.ExplicitScope is not null) return; // Linked against the explicit external catalog/runtime.
@@ -197,4 +199,89 @@ public sealed partial class TypeBuilder
 {
     /// <summary>Appends an attribute through the definition's ownership validation.</summary>
     public void AddCustomAttribute(CustomAttributeDefinition attribute) => Definition.CustomAttributes.Add(attribute);
+}
+
+public sealed partial class MethodDefinition
+{
+    private IList<CustomAttributeDefinition>? customAttributes;
+    /// <summary>Gets declared method or assembly-function attributes, excluding parameter attributes.</summary>
+    /// <remarks>Authored definitions accept output-owned attributes. Loaded snapshots are read-only.
+    /// Reading data never invokes an attribute constructor.</remarks>
+    public IList<CustomAttributeDefinition> CustomAttributes => customAttributes ??= AuthoredSignature is null
+        ? Array.AsReadOnly(Array.Empty<CustomAttributeDefinition>())
+        : new DefinitionCollection<CustomAttributeDefinition>([], attribute =>
+        {
+            if (customAttributes!.Count >= 256) throw new InvalidDataException("too many method attributes");
+            attribute.ValidateOwner(Module);
+        });
+    internal void SetLoadedAttributes(IEnumerable<CustomAttributeDefinition> attributes) => customAttributes = Array.AsReadOnly(attributes.ToArray());
+}
+
+public sealed partial class MethodBuilder
+{
+    /// <summary>Adds a declared attribute using the callable's output-module ownership.</summary>
+    /// <exception cref="ArgumentException">The attribute belongs to another module.</exception>
+    public void AddCustomAttribute(CustomAttributeDefinition attribute) => Definition.CustomAttributes.Add(attribute);
+}
+
+public sealed partial class FieldDefinition
+{
+    private IList<CustomAttributeDefinition>? customAttributes;
+    /// <summary>Gets declared field attributes. Loaded snapshots are read-only; inspection never invokes constructors.</summary>
+    public IList<CustomAttributeDefinition> CustomAttributes => customAttributes ??= FieldType is null
+        ? Array.AsReadOnly(Array.Empty<CustomAttributeDefinition>())
+        : new DefinitionCollection<CustomAttributeDefinition>([], attribute =>
+        {
+            if (customAttributes!.Count >= 256) throw new InvalidDataException("too many field attributes");
+            attribute.ValidateOwner(Module);
+        });
+    internal void SetLoadedAttributes(IEnumerable<CustomAttributeDefinition> attributes) => customAttributes = Array.AsReadOnly(attributes.ToArray());
+}
+
+public sealed partial class PropertyDefinition
+{
+    private IList<CustomAttributeDefinition>? customAttributes;
+    /// <summary>Gets declared property attributes. Loaded snapshots are read-only; inspection never invokes constructors.</summary>
+    public IList<CustomAttributeDefinition> CustomAttributes => customAttributes ??= PropertyType is null
+        ? Array.AsReadOnly(Array.Empty<CustomAttributeDefinition>())
+        : new DefinitionCollection<CustomAttributeDefinition>([], attribute =>
+        {
+            if (customAttributes!.Count >= 256) throw new InvalidDataException("too many property attributes");
+            attribute.ValidateOwner(Module);
+        });
+    internal void SetLoadedAttributes(IEnumerable<CustomAttributeDefinition> attributes) => customAttributes = Array.AsReadOnly(attributes.ToArray());
+}
+
+public sealed partial class MethodDefinition
+{
+    private readonly Dictionary<int, IList<CustomAttributeDefinition>> parameterAttributes = [];
+    internal IEnumerable<KeyValuePair<int, IList<CustomAttributeDefinition>>> ParameterAttributes => parameterAttributes;
+    /// <summary>Gets attributes declared on a zero-based parameter, excluding a receiver. Loaded lists are read-only.</summary>
+    /// <exception cref="ArgumentOutOfRangeException">The position is outside the supported method signature.</exception>
+    /// <exception cref="NotSupportedException">The method signature cannot be decoded.</exception>
+    public IList<CustomAttributeDefinition> GetParameterCustomAttributes(int position)
+    {
+        if (!TryGetSignature(out var method)) throw new NotSupportedException("unsupported parameter signature");
+        if (position < 0 || position >= method!.ParameterTypes.Count) throw new ArgumentOutOfRangeException(nameof(position));
+        if (!parameterAttributes.TryGetValue(position, out var attributes))
+        {
+            attributes = AuthoredSignature is null ? Array.AsReadOnly(Array.Empty<CustomAttributeDefinition>())
+                : new DefinitionCollection<CustomAttributeDefinition>([], attribute =>
+                {
+                    if (parameterAttributes[position].Count >= 256) throw new InvalidDataException("too many parameter attributes");
+                    attribute.ValidateOwner(Module);
+                });
+            parameterAttributes.Add(position, attributes);
+        }
+        return attributes;
+    }
+    internal void SetLoadedParameterAttributes(int position, IEnumerable<CustomAttributeDefinition> attributes)
+        => parameterAttributes[position] = Array.AsReadOnly(attributes.ToArray());
+}
+
+public sealed partial class AssemblyBuilder
+{
+    private bool HasParameterArrayAttribute(MethodBuilder method, int position) => method.Definition.GetParameterCustomAttributes(position)
+        .Any(attribute => attribute.AttributeType.Namespace == "System" && attribute.AttributeType.Name == "ParamArrayAttribute" &&
+            (attribute.AttributeType.ExplicitScope ?? attribute.AttributeType.Module.Assembly.Identity).Equals(CoreLibrary));
 }

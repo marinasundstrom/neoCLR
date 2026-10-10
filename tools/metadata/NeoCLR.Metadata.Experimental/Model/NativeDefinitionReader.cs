@@ -103,6 +103,11 @@ public sealed partial class NativeAssemblyDefinition
             property.Setter < 0 ? 0 : 0x06000001u + (uint)property.Setter, [], Copy(property.Type), property.Parameters.Select(Copy).ToArray(), property.IsInitOnly)).ToArray();
         var references = References.Select((identity, index) => new AssemblyDefinition.ReferenceRow(0x23000001u + (uint)index, identity)).ToArray();
         var attributes = types.Select(type => type.Attributes.Select(a => (Owner: Copy(a.Owner), a.Arguments)).ToArray()).ToArray();
+        var methodAttributes = methods.Select(method => method.Attributes.Select(a => (Owner: Copy(a.Owner), a.Arguments)).ToArray()).ToArray();
+        var memberAttributes = types.SelectMany(type => type.MemberAttributes)
+            .ToDictionary(pair => pair.Key, pair => pair.Value.Select(a => (Owner: Copy(a.Owner), a.Arguments)).ToArray());
+        var parameterAttributes = methods.Select(method => method.ParameterAttributes.ToDictionary(p => p.Key,
+            p => p.Value.Select(a => (Owner: Copy(a.Owner), a.Arguments)).ToArray())).ToArray();
         var explicitRows = methods.Select(m => m.ExplicitInterfaces.Select(e => (Owner: Copy(e.Owner), e.Name)).ToArray()).ToArray();
         var result = AssemblyDefinition.NativeDeclarations(Identity, typeRows, fieldRows.ToArray(), rows, propertyRows, references, externalRows.ToArray(), image, entryPointToken);
         for (int i = 0; i < types.Length; i++)
@@ -117,6 +122,19 @@ public sealed partial class NativeAssemblyDefinition
                     : new InterfaceImplementation(owner.ReferencedType!);
                 return new ExplicitInterfaceImplementation(relationship, mapping.Name);
             }));
+        for (int i = 0; i < methods.Length; i++)
+            result.MainModule.GetMethodDefinition(0x06000001u + (uint)i)!.SetLoadedAttributes(methodAttributes[i].Select(a =>
+                new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments)));
+        foreach (var (token, attributesForMember) in memberAttributes)
+        {
+            var values = attributesForMember.Select(a => new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments));
+            if (token >> 24 == 4) result.MainModule.GetFieldDefinition(token)!.SetLoadedAttributes(values);
+            else result.MainModule.GetPropertyDefinition(token)!.SetLoadedAttributes(values);
+        }
+        for (int i = 0; i < methods.Length; i++)
+            foreach (var (position, attributesForParameter) in parameterAttributes[i])
+                result.MainModule.GetMethodDefinition(0x06000001u + (uint)i)!.SetLoadedParameterAttributes(position,
+                    attributesForParameter.Select(a => new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments)));
         result.MainModule.SetConstants(assemblyConstants);
         result.DeclaredModuleNames = declarationModuleNames;
         return result;

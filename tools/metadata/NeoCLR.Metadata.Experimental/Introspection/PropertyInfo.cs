@@ -5,8 +5,13 @@ namespace NeoCLR.Metadata.Experimental.Introspection;
 /// <summary>A declared metadata property with projected signatures and canonical accessors; no value access is available.</summary>
 public sealed class PropertyInfo
 {
+    private readonly Lazy<IReadOnlyList<CustomAttributeInfo>> attributes;
+    /// <summary>Gets declared attributes without invoking constructors or accessors.</summary>
+    public IReadOnlyList<CustomAttributeInfo> GetCustomAttributes() => attributes.Value;
+
     internal PropertyInfo(MetadataLoadContext context, PropertyDefinition definition, TypeInfo owner, IReadOnlyList<TypeInfo> arguments)
     {
+        attributes = new(() => Array.AsReadOnly(definition.CustomAttributes.Select(a => new CustomAttributeInfo(context, a)).ToArray()));
         if (!definition.TryGetSignature(out var type, out var indices, out var isStatic))
             throw new InvalidDataException("unsupported property metadata signature: " + definition.Name);
         Name = definition.Name;

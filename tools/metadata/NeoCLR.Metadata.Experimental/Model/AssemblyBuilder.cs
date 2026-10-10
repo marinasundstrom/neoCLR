@@ -676,8 +676,22 @@ public sealed partial class AssemblyBuilder
         int nextMethod = 1;
         int nextParameter = 1;
         var genericRows = new List<(EntityHandle Owner, int Sort, IReadOnlyList<string> Names)>();
+        void WriteAttributes(EntityHandle target, IEnumerable<CustomAttributeDefinition> attributes)
+        {
+            foreach (var attribute in attributes)
+            {
+                attribute.ValidateContract(Definition.MainModule);
+                var reference = attribute.AttributeType;
+                EntityHandle attributeOwner = reference.ExplicitScope is { } scope
+                    ? metadata.AddTypeReference(ImportAssembly(scope), metadata.GetOrAddString(reference.Namespace), metadata.GetOrAddString(reference.Name))
+                    : typeHandles[reference.Resolve().Producer ?? throw new InvalidDataException("detached attribute owner")];
+                var constructor = metadata.AddMemberReference(attributeOwner, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(attribute.GetConstructorSignature()));
+                metadata.AddCustomAttribute(target, constructor, metadata.GetOrAddBlob(attribute.GetValue()));
+            }
+        }
         void EmitMethod(MethodBuilder method)
         {
+            WriteAttributes(MetadataTokens.MethodDefinitionHandle(nextMethod), method.Definition.CustomAttributes);
             var firstParameter = MetadataTokens.ParameterHandle(nextParameter);
             void AnnotateNullable(ParameterHandle parameter, NullableAnnotation annotation)
             {
@@ -694,12 +708,13 @@ public sealed partial class AssemblyBuilder
                 AnnotateNullable(metadata.AddParameter(ParameterAttributes.None, default, 0), returnFlags);
                 nextParameter++;
             }
-            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.NullableAnnotations.Keys.Any(i => i >= 0))
+            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.NullableAnnotations.Keys.Any(i => i >= 0) || method.Definition.ParameterAttributes.Any(p => p.Value.Count != 0))
                 for (int i = 0; i < method.ParameterCount; i++)
                 {
                     var parameter = metadata.AddParameter(method.Signature.OutParameters.Contains(i) ? ParameterAttributes.Out : ParameterAttributes.None, method.Definition.ParameterNames.TryGetValue(i, out var parameterName) ? metadata.GetOrAddString(parameterName) : default, i + 1);
+                    WriteAttributes(parameter, method.Definition.GetParameterCustomAttributes(i));
                     if (method.Definition.NullableAnnotations.TryGetValue(i, out var flags)) AnnotateNullable(parameter, flags);
-                    if (method.Definition.ParameterArrayIndex == i)
+                    if (method.Definition.ParameterArrayIndex == i && !HasParameterArrayAttribute(method, i))
                     {
                         var marker = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("ParamArrayAttribute"));
                         var constructor = metadata.AddMemberReference(marker, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 }));
@@ -889,6 +904,7 @@ public sealed partial class AssemblyBuilder
                 EncodeType(encoder, field.FieldType);
                 var fieldHandle = metadata.AddFieldDefinition((FieldAttributes)field.Definition.Attributes,
                     metadata.GetOrAddString(field.Name), metadata.GetOrAddBlob(signature));
+                WriteAttributes(fieldHandle, field.Definition.CustomAttributes);
                 if (field.Definition.Constant is { } constant) metadata.AddConstant(fieldHandle, constant);
                 nextField++;
             }
@@ -917,6 +933,7 @@ public sealed partial class AssemblyBuilder
                         foreach (var type in property.ParameterTypes) EncodeType(parameters.AddParameter().Type(), type);
                     });
                 var handle = metadata.AddProperty(PropertyAttributes.None, metadata.GetOrAddString(property.Name), metadata.GetOrAddBlob(signature));
+                WriteAttributes(handle, property.Definition.CustomAttributes);
                 if (firstProperty) { metadata.AddPropertyMap(typeHandle, handle); firstProperty = false; }
                 if (property.GetMethod is { } getter) metadata.AddMethodSemantics(handle, MethodSemanticsAttributes.Getter, handles[getter]);
                 if (property.SetMethod is { } setter) metadata.AddMethodSemantics(handle, MethodSemanticsAttributes.Setter, handles[setter]);

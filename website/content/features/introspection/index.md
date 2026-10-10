@@ -288,3 +288,13 @@ and the transitional bound-target Function property.
 
 The separate [C# metadata API](/docs/experimental-metadata.html) reads and authors native
 assemblies on the host. It is distinct from the guest introspection APIs described here.
+
+
+## Development: general custom attributes
+
+Host metadata tooling now preserves and inspects annotations on types, callables,
+fields, properties and parameters across native and CLI snapshots. Inspection runs
+no attribute constructors. General AttributeUsage and native Raven source support
+are the next prerequisites for attributed test discovery; these are not yet released
+runtime capabilities. See the [API contract](../../docs/experimental-metadata.html#member-custom-attributes-development-2026-10-10)
+and [implementation plan](https://github.com/marinasundstrom/neoCLR/blob/main/docs/custom-attributes.md).

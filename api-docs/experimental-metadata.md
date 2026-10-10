@@ -8013,3 +8013,39 @@ remain executable. The flag is a compiler usage contract, not a runtime freeze.
 This metadata-tooling API is distinct from the Raven runtime PropertyInfo surface;
 no new query or invocation restriction is added there. See the
 [design and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/init-accessors.md).
+
+## Member custom attributes (development 2026-10-10)
+
+The host .NET metadata library extends existing type attributes to methods (including
+constructors and assembly-level functions), fields, properties and parameters.
+These are host authoring/introspection APIs, not guest System.Introspection changes.
+
+| API | Contract |
+|---|---|
+| `MethodDefinition.CustomAttributes`, `FieldDefinition.CustomAttributes`, `PropertyDefinition.CustomAttributes` | `IList<CustomAttributeDefinition>` of declared annotations. Authored lists accept output-module-owned attributes; loaded lists are read-only. Maximum 256 per declaration. |
+| `MethodBuilder.AddCustomAttribute(CustomAttributeDefinition attribute)` | Convenience method using the definition's ownership checks. Foreign-module attributes throw ArgumentException. |
+| `MethodDefinition.GetParameterCustomAttributes(int position)` | Attribute list for a zero-based declared parameter, excluding a receiver. Invalid positions throw ArgumentOutOfRangeException; unsupported signatures throw NotSupportedException. Same ownership, count and read-only rules. |
+| `Introspection.MethodInfo.GetCustomAttributes()`, `FieldInfo.GetCustomAttributes()`, `PropertyInfo.GetCustomAttributes()`, `ParameterInfo.GetCustomAttributes()` | `IReadOnlyList<CustomAttributeInfo>` of declared data. No constructors, getters, test bodies or runtime code execute. Attribute type resolution requires an explicit metadata catalog. No inherited search. |
+
+Example: `method.AddCustomAttribute(new CustomAttributeDefinition(markerConstructor.Definition, []))`;
+`field.Definition.CustomAttributes.Add(attribute)` and
+`method.Definition.GetParameterCustomAttributes(0).Add(attribute)` use the same data
+contract. Attribute constructors need not be executable to inspect stored data.
+
+CLI, native PE/#Neo and NEOX snapshots and native-to-CLI reference projection preserve
+supported attributes. Fields/properties use validated enclosing-type target tokens;
+parameters use enclosing-function parameter tokens. An absent target annotates the
+enclosing declaration. Malformed or foreign targets fail with InvalidDataException.
+ParamArrayAttribute remains inspectable alongside ordinary parameter attributes and
+its IsParameterArray policy; projection avoids synthesizing it twice.
+
+Payload authoring remains bounded to String, Int32 and Boolean fixed arguments on
+supported nongeneric nominal constructors. Enum/named arguments and AttributeUsage
+policy are pending. Native literal-field annotations are explicitly rejected pending
+literal metadata-token support. Assembly/module, return-value and generic-parameter
+annotations are not added by this slice. Rewriting loaded snapshots remains unsupported.
+Earlier bounded host readers may reject newly admitted data; use matching tools.
+
+[Design, scope and validation](../docs/custom-attributes.md). No guest reference
+assembly or RavenDoc type selection changes are required for this host-only API;
+this manual reference supplies the signatures and limitations.

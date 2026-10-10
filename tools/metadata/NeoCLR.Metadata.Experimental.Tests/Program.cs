@@ -4,6 +4,9 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--member-attributes"]) { MemberAttributeChecks.Run(); return 0; }
+if (args is ["--member-attributes", var attributeOutput]) { MemberAttributeChecks.Run(attributeOutput); return 0; }
+
 if (args is ["--init-accessors"]) { NativeInitAccessorChecks.Run(); return 0; }
 
 if (args is ["--check-module-consumer", var moduleConsumer])
@@ -479,6 +482,7 @@ var tests = new (string Name, Action Body)[]
     ("Mutable owned field addresses", FieldAddressChecks.Run),
     ("Typed boxing and core Object", BoxingChecks.Run),
     ("Type custom attributes and explicit metadata introspection", CustomAttributeChecks.Run),
+    ("Member custom attributes and classless discovery", () => MemberAttributeChecks.Run()),
     ("Parameter names survive native and CLI metadata", ParameterNameChecks.Run),
     ("Native callback signatures project canonical generic views", FunctionViewChecks.Run),
     ("Symbol-authored nested value constructors execute on CLR", () => ValueConstructorChecks.Run(nested: true, native: true, authored: true)),

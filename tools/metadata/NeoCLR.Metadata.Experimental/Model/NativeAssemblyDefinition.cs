@@ -22,11 +22,12 @@ public sealed partial class NativeAssemblyDefinition
         internal PrimitiveType? NativePrimitive { get; init; }
         internal bool PrimitiveReference { get; init; }
         internal bool NativeGrapheme { get; init; }
+        internal Dictionary<uint, AttributeRow[]> MemberAttributes { get; } = []; internal uint[] AttributeTargets { get; init; } = [];
         internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = [];
     }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, AttributeRow[]> ParameterAttributes { get; init; } = []; internal AttributeRow[] Attributes { get; init; } = []; internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters, bool IsInitOnly);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -357,7 +358,7 @@ public sealed partial class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
             }
             for (int i = 0; i < types.Count; i++)
             {
@@ -506,33 +507,48 @@ public sealed partial class NativeAssemblyDefinition
                 return index >= 0 ? (SignatureType)signatureOwners[index]
                     : ImportExternalType(signatureGraph, Text(element, "Named"), 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
             }
-            foreach (var type in types)
-                foreach (var attribute in type.RawAttributes)
+            AttributeRow ReadAttribute(JsonElement attribute)
+            {
+                if (attribute.TryGetProperty("target_token", out _)) Shape(attribute, "constructor", "arguments", "target_token");
+                else Shape(attribute, "constructor", "arguments");
+                var constructor = attribute.GetProperty("constructor"); Shape(constructor, "name", "owner", "instance", "parameters");
+                var ownerValue = constructor.GetProperty("owner"); Shape(ownerValue, "Named");
+                Require(constructor.GetProperty("instance").GetBoolean() && Text(constructor, "name") == Text(ownerValue, "Named") + "..ctor", "invalid attribute constructor");
+                var owner = ReadType(ownerValue, false);
+                Require(owner.ClassType is { IsValueType: false, IsStatic: false, GenericParameterNames.Count: 0 } || owner.ImportedType is { IsValueType: false, GenericArity: 0 }, "invalid attribute type");
+                var parameters = Array(constructor, "parameters", 256);
+                var arguments = Array(attribute, "arguments", 256);
+                Require(parameters.Length == arguments.Length, "attribute argument count mismatch");
+                var decoded = new List<CustomAttributeArgument>();
+                for (int i = 0; i < arguments.Length; i++)
                 {
-                    Shape(attribute, "constructor", "arguments");
-                    var constructor = attribute.GetProperty("constructor"); Shape(constructor, "name", "owner", "instance", "parameters");
-                    var ownerValue = constructor.GetProperty("owner"); Shape(ownerValue, "Named");
-                    Require(constructor.GetProperty("instance").GetBoolean() && Text(constructor, "name") == Text(ownerValue, "Named") + "..ctor", "invalid attribute constructor");
-                    var owner = ReadType(ownerValue, false);
-                    Require(owner.ClassType is { IsValueType: false, IsStatic: false, GenericParameterNames.Count: 0 } || owner.ImportedType is { IsValueType: false, GenericArity: 0 }, "invalid attribute type");
-                    var parameters = Array(constructor, "parameters", 256);
-                    var arguments = Array(attribute, "arguments", 256);
-                    Require(parameters.Length == arguments.Length, "attribute argument count mismatch");
-                    var decoded = new List<CustomAttributeArgument>();
-                    for (int i = 0; i < arguments.Length; i++)
+                    var parameter = parameters[i].GetString();
+                    Require(parameter is "String" or "Int32" or "Boolean", "unsupported attribute parameter");
+                    Shape(arguments[i], parameter!);
+                    var value = arguments[i].GetProperty(parameter!);
+                    decoded.Add(parameter switch
                     {
-                        var parameter = parameters[i].GetString();
-                        Require(parameter is "String" or "Int32" or "Boolean", "unsupported attribute parameter");
-                        Shape(arguments[i], parameter!);
-                        var value = arguments[i].GetProperty(parameter!);
-                        decoded.Add(parameter switch
-                        {
-                            "String" => new(PrimitiveType.String, value.ValueKind == JsonValueKind.Null ? null : value.GetString()),
-                            "Int32" => new(PrimitiveType.Int32, value.GetInt32()),
-                            _ => new(PrimitiveType.Boolean, value.GetBoolean())
-                        });
+                        "String" => new(PrimitiveType.String, value.ValueKind == JsonValueKind.Null ? null : value.GetString()),
+                        "Int32" => new(PrimitiveType.Int32, value.GetInt32()),
+                        _ => new(PrimitiveType.Boolean, value.GetBoolean())
+                    });
+                }
+                return new(owner, decoded.ToArray());
+            }
+            foreach (var type in types)
+                foreach (var group in type.RawAttributes.GroupBy(a => a.TryGetProperty("target_token", out var token) ? token.GetUInt32() : 0u))
+                {
+                    Require(group.Count() <= 256, "too many attributes on a declaration");
+                    if (group.Key == 0)
+                    {
+                        Require(group.All(a => !a.TryGetProperty("target_token", out _)), "invalid attribute target");
+                        type.Attributes.AddRange(group.Select(ReadAttribute));
                     }
-                    type.Attributes.Add(new(owner, decoded.ToArray()));
+                    else
+                    {
+                        Require(type.AttributeTargets.Contains(group.Key), "attribute target does not belong to declaring type");
+                        type.MemberAttributes.Add(group.Key, group.Select(ReadAttribute).ToArray());
+                    }
                 }
             for (int typeIndex = 0; typeIndex < types.Count; typeIndex++)
             {
@@ -694,21 +710,45 @@ public sealed partial class NativeAssemblyDefinition
                         Require(nullableAnnotations.TryAdd(position, new NullableAnnotation(flags.Select(f => (byte)f), uniform)), "duplicate native nullable annotation");
                     }
                 int? parameterArray = null;
+                var methodAttributes = new List<AttributeRow>();
+                var parameterAttributes = new Dictionary<int, List<AttributeRow>>();
                 if (method.TryGetProperty("custom_attributes", out _))
                 {
-                    var attributes = Array(method, "custom_attributes", 1);
-                    Require(attributes.Length == 1, "only the parameter-array method attribute is supported");
-                    var attribute = attributes[0]; Shape(attribute, "constructor", "arguments", "target_token");
-                    var markerConstructor = attribute.GetProperty("constructor"); Shape(markerConstructor, "name", "owner", "instance", "parameters");
-                    var marker = markerConstructor.GetProperty("owner"); Shape(marker, "Named");
-                    Require(Text(markerConstructor, "name") == "System.ParamArrayAttribute..ctor" && Text(marker, "Named") == "System.ParamArrayAttribute" &&
-                        markerConstructor.GetProperty("instance").GetBoolean() && Array(markerConstructor, "parameters", 0).Length == 0 && Array(attribute, "arguments", 0).Length == 0 &&
-                        nativeTypeAliases.TryGetValue(("System.ParamArrayAttribute", 0), out var markerAlias) && markerAlias.Namespace == "System" && markerAlias.Name == "ParamArrayAttribute" && !markerAlias.ValueType &&
-                        nativeModuleAliases[markerAlias.Assembly].Module == "System", "unsupported parameter-array marker identity");
-                    int position = System.Array.FindIndex(tokens, t => t.GetInt32() == attribute.GetProperty("target_token").GetInt32());
-                    Require(position >= 0 && position == parameterTypes.Length - 1 && tokens[position].GetInt32() != 0 && parameterTypes[position].ArrayElement is not null,
-                        "parameter-array marker requires the final by-value vector parameter token");
-                    parameterArray = position;
+                    var attributes = Array(method, "custom_attributes", 4096);
+                    foreach (var attribute in attributes)
+                    {
+                        if (!attribute.TryGetProperty("target_token", out _))
+                        {
+                            Require(methodAttributes.Count < 256, "too many method attributes");
+                            methodAttributes.Add(ReadAttribute(attribute));
+                            continue;
+                        }
+                        var markerName = Text(attribute.GetProperty("constructor"), "name");
+                        if (markerName != "System.ParamArrayAttribute..ctor")
+                        {
+                            int parameter = System.Array.FindIndex(tokens, t => t.GetUInt32() == attribute.GetProperty("target_token").GetUInt32());
+                            Require(parameter >= 0 && tokens[parameter].GetUInt32() != 0, "attribute target does not belong to parameter");
+                            if (!parameterAttributes.TryGetValue(parameter, out var values)) parameterAttributes.Add(parameter, values = []);
+                            Require(values.Count < 256, "too many parameter attributes");
+                            values.Add(ReadAttribute(attribute));
+                            continue;
+                        }
+                        Require(parameterArray is null, "duplicate parameter-array marker");
+                        Shape(attribute, "constructor", "arguments", "target_token");
+                        var markerConstructor = attribute.GetProperty("constructor"); Shape(markerConstructor, "name", "owner", "instance", "parameters");
+                        var marker = markerConstructor.GetProperty("owner"); Shape(marker, "Named");
+                        Require(Text(markerConstructor, "name") == "System.ParamArrayAttribute..ctor" && Text(marker, "Named") == "System.ParamArrayAttribute" &&
+                            markerConstructor.GetProperty("instance").GetBoolean() && Array(markerConstructor, "parameters", 0).Length == 0 && Array(attribute, "arguments", 0).Length == 0 &&
+                            nativeTypeAliases.TryGetValue(("System.ParamArrayAttribute", 0), out var markerAlias) && markerAlias.Namespace == "System" && markerAlias.Name == "ParamArrayAttribute" && !markerAlias.ValueType &&
+                            nativeModuleAliases[markerAlias.Assembly].Module == "System", "unsupported parameter-array marker identity");
+                        int position = System.Array.FindIndex(tokens, t => t.GetInt32() == attribute.GetProperty("target_token").GetInt32());
+                        Require(position >= 0 && position == parameterTypes.Length - 1 && tokens[position].GetInt32() != 0 && parameterTypes[position].ArrayElement is not null,
+                            "parameter-array marker requires the final by-value vector parameter token");
+                        parameterArray = position;
+                        if (!parameterAttributes.TryGetValue(position, out var parameterValues)) parameterAttributes.Add(position, parameterValues = []);
+                        Require(parameterValues.Count < 256, "too many parameter attributes");
+                        parameterValues.Add(ReadAttribute(attribute));
+                    }
                 }
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
                 Require(seenMethods.Add((ownerIndex, ns, name, genericArity + ":" + string.Join(",", parameterTypes.Select(TypeKey)))), "duplicate native signature");
@@ -755,7 +795,7 @@ public sealed partial class NativeAssemblyDefinition
                     Require(ownerIndex < 0 && !instance && !isAbstract && !isVirtual && !isOverride && genericNames.Length == 0 &&
                         method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var internalLocals) || internalLocals.GetArrayLength() == 0),
                         "internal calls require bodyless nongeneric assembly functions");
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterAttributes = parameterAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), Attributes = methodAttributes.ToArray(), Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
             nativeTypeAliases.TryGetValue(("System.Object", 0), out var externalRootAlias);
             if (externalRootAlias is not null)
@@ -939,6 +979,14 @@ public sealed partial class NativeAssemblyDefinition
                 : method.Virtual ? owners[method.Owner].AddVirtualMethod(method.Name, signature)
                 : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(signature, method.Visibility)
                 : owners[method.Owner].AddInstanceMethod(method.Name, signature, method.Visibility);
+            foreach (var (position, attributes) in method.ParameterAttributes)
+                foreach (var attribute in attributes)
+                {
+                    var attributeOwner = Remap(attribute.Owner);
+                    var reference = attributeOwner.ClassType is { } local ? local.Definition.ToReference()
+                        : graph.Definition.MainModule.ImportReference(attributeOwner.ImportedType!.AssemblyIdentity, attributeOwner.ImportedType.Namespace, attributeOwner.ImportedType.Name);
+                    output.Definition.GetParameterCustomAttributes(position).Add(new(reference, attribute.Arguments));
+                }
             if (method.ImplementationAttributes == 0x1000) output.SetInternalCall();
             foreach (var pair in method.NullableAnnotations) output.SetNullableAnnotation(pair.Key, pair.Value);
             foreach (var pair in method.ParameterNames) output.SetParameterName(pair.Key, pair.Value);
@@ -961,6 +1009,27 @@ public sealed partial class NativeAssemblyDefinition
                     : graph.Definition.MainModule.ImportReference(owner.ImportedType!.AssemblyIdentity, owner.ImportedType.Namespace, owner.ImportedType.Name);
                 owners[i].AddCustomAttribute(new(reference, attribute.Arguments));
             }
+        for (int i = 0; i < methods.Length; i++)
+            foreach (var attribute in methods[i].Attributes)
+            {
+                var owner = Remap(attribute.Owner);
+                var reference = owner.ClassType is { } local ? local.Definition.ToReference()
+                    : graph.Definition.MainModule.ImportReference(owner.ImportedType!.AssemblyIdentity, owner.ImportedType.Namespace, owner.ImportedType.Name);
+                projectedMethods[i].AddCustomAttribute(new(reference, attribute.Arguments));
+            }
+        var projectedFields = owners.SelectMany(owner => owner.MetadataFields).ToArray();
+        var projectedProperties = owners.SelectMany(owner => owner.Properties).ToArray();
+        foreach (var type in types)
+            foreach (var (token, attributes) in type.MemberAttributes)
+                foreach (var attribute in attributes)
+                {
+                    var owner = Remap(attribute.Owner);
+                    var reference = owner.ClassType is { } local ? local.Definition.ToReference()
+                        : graph.Definition.MainModule.ImportReference(owner.ImportedType!.AssemblyIdentity, owner.ImportedType.Namespace, owner.ImportedType.Name);
+                    var destination = token >> 24 == 4 ? projectedFields[(int)(token & 0xffffff) - 1].Definition.CustomAttributes
+                        : projectedProperties[(int)(token & 0xffffff) - 1].Definition.CustomAttributes;
+                    destination.Add(new(reference, attribute.Arguments));
+                }
         return graph.WriteReferenceImage();
     }
     private static TypeBuilder[] DefineTypes(AssemblyBuilder graph, IReadOnlyList<TypeRow> rows)
