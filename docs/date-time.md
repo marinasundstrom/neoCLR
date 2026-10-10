@@ -3,8 +3,9 @@
 The core was implemented 2026-09-08; the 2026-10-09 development migration names
 the separate values `System.Time.Date` and `System.Time.TimeOfDay`,
 with validated factories, readonly components and value equality/ordering. This
-core establishes representation and construction; parsing, formatting,
-arithmetic, durations and timezone mapping remain planned. The
+core established representation and construction. Subsequent development adds
+[formatting and calendars](calendar-globalization.md), civil arithmetic,
+[timezone mapping](time-zones.md), and the bounded parsing described below. The
 [local clock](local-clock.md) now provides actual system date/time.
 
 ## Representation and API
@@ -101,3 +102,56 @@ source/artifact execution, zero defaults and unchecked attempts to access privat
 storage. The [local clock](local-clock.md) now supplies actual system date/time.
 Parsing, formatting and globalization are deferred; arithmetic and time carry
 remain later work as described in the plan.
+
+## Development parsing (2026-10-10)
+
+Date, TimeOfDay and LocalDateTime expose `Parse(value: string)` and
+`Parse(value: string, culture: Culture)`, returning `Result<T, DateTimeParseError>`.
+The first overload snapshots Culture.Current; explicit Culture.Invariant is the
+portable choice for stored data. Neither overload changes host culture or infers a
+zone/offset. The default calendar is Gregorian for all currently supported cultures.
+
+| Culture | Date | Time | Local date/time separator |
+| --- | --- | --- | --- |
+| Invariant | yyyy-MM-dd | HH:mm:ss[.fffffff] | T |
+| SwedishSweden | yyyy-MM-dd | HH:mm:ss[,fffffff] | one space |
+| HebrewIsrael | dd.MM.yyyy | HH:mm:ss[.fffffff] | one space |
+
+Brackets indicate an optional fraction, with **one through seven** ASCII digits.
+A single fractional digit means tenths of a second; seven preserve 100 ns ticks.
+The parser accepts complete ASCII numeric text only, without trimming. It rejects
+extra precision rather than rounding, Unicode digits, omitted seconds, date/time
+suffixes, leap seconds and 24:00. Factories remain the authority for Gregorian leap
+years, years 1–9999 and clock ranges. InvalidFormat identifies grammar failure;
+OutOfRange identifies invalid numeric fields. LocalDateTime validates the date
+component before the clock component and reports its first failure. Default errors have no active union
+case; use the returned case, not default construction.
+
+The UTF-8 implementation bounds input to 10/16/27 bytes before encoding a byte snapshot,
+then checks ASCII digits and fixed positions. This avoids culture-dependent host parsing
+and keeps interpreted/native rules in the Raven library. It allocates a small byte
+snapshot, so this is not an allocation-free parsing claim.
+
+### .NET comparison and provisional scope
+
+Reviewed 2026-10-10: [.NET date/time parsing](https://learn.microsoft.com/en-us/dotnet/standard/base-types/parsing-datetime),
+[DateOnly.Parse](https://learn.microsoft.com/en-us/dotnet/api/system.dateonly.parse?view=net-10.0)
+and [DateTime.Parse](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.parse?view=net-10.0).
+Adopt the familiar Parse overload structure and current/explicit culture distinction.
+Reuse neoCLR's established typed Result convention instead of .NET's throwing Parse
+or Boolean/out TryParse. The benefit is recoverable, composable errors; the cost is
+a different caller signature and a separate error taxonomy. This does not add a
+second TryParse spelling for the same Result operation.
+
+.NET accepts a much broader language and offers ParseExact/TryParseExact and style
+options. This first implementation mirrors neoCLR's existing numeric formatting
+profiles; it is an incomplete parsing implementation, not a claim that strict numeric
+forms replace .NET's general contract. Adding general patterns/providers, whitespace
+styles or calendar parsing remains future work. Delegating to host parsers would
+introduce platform-dependent accepted forms; implementing the bounded grammar in
+Raven provides the same explicit-culture behavior on all targets. These preview
+choices may evolve before a stable release.
+
+Instant, Duration, TimeOffset and ZonedDateTime parsing remain separate gaps: their
+wire formats, offset precision and named-zone ambiguity policies are not settled by
+this civil slice. Timezone conversion remains an explicit operation after parsing.

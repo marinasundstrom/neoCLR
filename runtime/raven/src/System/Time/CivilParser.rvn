@@ -1,0 +1,142 @@
+module System.Time
+
+import System.*
+import System.Collections.*
+import System.Globalization.*
+import System.Result.*
+import System.Text.*
+
+// Parse only bounded ASCII numeric forms. Byte-count checks precede UTF-8
+// materialization; numeric fields accept only ASCII bytes.
+internal class CivilParser {
+    private static func Digits(text: Sequence<byte>, start: int, count: int) -> int {
+        var value = 0
+        for index in start..<start + count {
+            let digit = (int)text[index] - 48
+            if digit < 0 {
+                return -1
+            }
+            if digit > 9 {
+                return -1
+            }
+            value = value * 10 + digit
+        }
+        return value
+    }
+
+    private static func DatePart(text: Sequence<byte>, culture: Culture) -> Result<Date, DateTimeParseError> {
+        var yearStart = 0
+        var monthStart = 5
+        var dayStart = 8
+        if culture.Name.Equals("he-IL") {
+            if text[2] != 46 || text[5] != 46 {
+                return Error(DateTimeParseError.InvalidFormat)
+            }
+            yearStart = 6
+            monthStart = 3
+            dayStart = 0
+        } else if text[4] != 45 || text[7] != 45 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let year = Digits(text, yearStart, 4)
+        let month = Digits(text, monthStart, 2)
+        let day = Digits(text, dayStart, 2)
+        if year < 0 || month < 0 || day < 0 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let Ok(value) = Date.Create(year, month, day) else {
+            return Error(DateTimeParseError.OutOfRange)
+        }
+        return Ok(value)
+    }
+
+    private static func TimePart(text: Sequence<byte>, start: int, culture: Culture) -> Result<TimeOfDay, DateTimeParseError> {
+        let length = text.Count - start
+        if length < 8 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        if length > 16 || length == 9 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        if text[start + 2] != 58 || text[start + 5] != 58 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let hour = Digits(text, start, 2)
+        let minute = Digits(text, start + 3, 2)
+        let second = Digits(text, start + 6, 2)
+        var fraction = 0
+        if length > 8 {
+            var separator = 46
+            if culture.Name.Equals("sv-SE") {
+                separator = 44
+            }
+            if (int)text[start + 8] != separator {
+                return Error(DateTimeParseError.InvalidFormat)
+            }
+            fraction = Digits(text, start + 9, length - 9)
+            if fraction < 0 {
+                return Error(DateTimeParseError.InvalidFormat)
+            }
+            for index in length - 9..<7 {
+                fraction *= 10
+            }
+        }
+        if hour < 0 || minute < 0 || second < 0 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let Ok(value) = TimeOfDay.Create(hour, minute, second, fraction) else {
+            return Error(DateTimeParseError.OutOfRange)
+        }
+        return Ok(value)
+    }
+
+    static func ParseDate(value: string, culture: Culture) -> Result<Date, DateTimeParseError> {
+        if value.GetUtf8ByteCount() != 10 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let text = Utf8.Encode(value)
+        if text.Count != 10 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        return DatePart(text, culture)
+    }
+
+    static func ParseTime(value: string, culture: Culture) -> Result<TimeOfDay, DateTimeParseError> {
+        let length = value.GetUtf8ByteCount()
+        if length < 8 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        if length > 16 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let text = Utf8.Encode(value)
+        if text.Count != length {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        return TimePart(text, 0, culture)
+    }
+
+    static func ParseLocal(value: string, culture: Culture) -> Result<LocalDateTime, DateTimeParseError> {
+        let length = value.GetUtf8ByteCount()
+        if length < 19 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        if length > 27 {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let text = Utf8.Encode(value)
+        if text.Count != length {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        var separator = 32
+        if culture.Name.IsEmpty {
+            separator = 84
+        }
+        if (int)text[10] != separator {
+            return Error(DateTimeParseError.InvalidFormat)
+        }
+        let date = DatePart(text, culture)?
+        let time = TimePart(text, 11, culture)?
+        return Ok(LocalDateTime.Create(date, time))
+    }
+}

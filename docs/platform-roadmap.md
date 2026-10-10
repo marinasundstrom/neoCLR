@@ -88,7 +88,10 @@ string indexer and ordered snapshots. Its expanded 16-case JSON suite passes bot
 local modes ([evidence](../runtime/raven/tests/json-map-validation.json)), with four
 isolated missing-field checks. Native serializer fallback admission and retained-type
 conformance gaps exposed by the new tests are fixed; nominal reflection still needs
-explicit retention. Time Parse APIs remain the next author-directed library review.
+explicit retention. The subsequent civil parsing slice adds current/explicit-culture Parse on Date,
+TimeOfDay and LocalDateTime; all eight cases pass both local execution modes
+([evidence](../runtime/raven/tests/time-parsing-validation.json)). Native host-culture
+lookup now has the same preference source as the interpreter and a parity gate.
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 
@@ -337,21 +340,26 @@ continue to co-evolve with native foundations.
 | Runtime scheduling | Review runnable work, I/O wakeups, cancellation and host ownership against the existing [scheduler design](runtime-scheduling-design.md). | Compare .NET Task/ThreadPool responsibilities with runtime-owned execution; preserve interpreter/native lifecycle consistency. |
 | Queue, Stack and sets | Review FIFO/LIFO and set interfaces and concrete implementations against [current collection contracts](collection-contracts.md) and actual consumers. | Compare .NET Queue/Stack/HashSet ergonomics, equality, duplicates, removal, empty results, iteration, growth and reference release; select useful additions without treating the broader [collection proposal](proposals/collections-api.md) as implemented. |
 | Database-backed web sample | Select a provider and a small parameterized query/update scenario with a Dapper-like typed object mapper. | Evaluate Dapper/ADO.NET responsibilities, UTF-8 conversion, null/type mapping, connection/transaction lifetime and native macOS/Windows dependencies. Provider choice, mapping strategy and public contracts remain open. |
-| Missing Time Parse methods | Audit existing time types and parsers, then select missing methods needed by real inputs. | Compare .NET parsing and existing neoCLR Result/error conventions; decide invariant round trips, culture, offset/zone ambiguity and invalid-input behavior before extending APIs. |
+| Time Parse methods | Civil Date/TimeOfDay/LocalDateTime numeric parsers now pass eight local native/interpreted tests. Next scope Instant/Duration/TimeOffset/ZonedDateTime inputs separately. | Current/explicit culture and typed Result errors are implemented; general patterns, non-Gregorian parsing and offset/zone policies remain gaps. |
 | Runtime suspension | Review safe suspension/resumption boundaries, retained roots and host-resource lifetime alongside scheduling. | Compare CLR suspension/GC coordination and cooperative execution approaches; distinguish runtime suspension from awaiting I/O and leave the stack/preemption model open. |
 
 **Author clarification (2026-10-10):** explicitly include Parse methods for Date,
 TimeOfDay and LocalDateTime, then audit Instant, Duration and TimeOffset rather than
-leaving time parsing implicit. Source inspection finds no Parse/TryParse methods on
-these six value types; ZonedDateTime also has none. Date/TimeOfDay formatting already
-uses culture, so define invariant round trips and culture behavior explicitly. Compare
-.NET Parse/TryParse with neoCLR's existing Result-based parsing before selecting
-signatures; TryParse was an assistant review suggestion, not an author requirement.
-This is the next time-API review after the current collection/indexer work; it does
-not commit to a zone grammar or resolving ambiguous local times.
+leaving time parsing implicit. The initial audit found no Parse/TryParse methods.
+The [civil parsing slice](date-time.md#development-parsing-2026-10-10) now implements
+Parse(value) and Parse(value, culture), with a shared standard error union. Eight
+framework cases pass both local modes, and native/interpreted host-preference output
+matches. General formatting patterns, non-Gregorian parsing and parsers for Instant,
+Duration, TimeOffset and ZonedDateTime remain open. No TryParse alias is added.
+Windows validation includes the new suite and host-culture parity probe.
 
-No database provider, converter extension, green-thread implementation or new Time
-parsing contract is claimed by this list. The JSON benchmark/publication follow-up
+A separate native gap observed during implementation: String.GetScalars exposes an
+immutable UInt32 array that current native specialization rejects. This parser uses
+UTF-8 byte input directly because its grammar is ASCII numeric. Broader immutable
+scalar-array support still needs its own conformance and allocation tests.
+
+No database provider, converter extension or green-thread implementation is claimed
+by this list; time parsing is limited to the civil slice described above. The JSON benchmark/publication follow-up
 remains recorded separately.
 
 **Author clarification (2026-10-09):** once the native compilation foundations are

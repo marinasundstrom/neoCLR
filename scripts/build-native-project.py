@@ -32,7 +32,7 @@ def support_files():
               ('windows-console-host.c', 'windows-gc-host.c', 'windows-host-memory.c', 'windows-native-stack.c')],
             *[base / 'aot-console' / name for name in
               ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c',
-               'native-stack.c', 'task-queue.c', 'socket-listener.c', 'string-unicode.c')],
+               'native-stack.c', 'task-queue.c', 'socket-listener.c', 'string-unicode.c', 'system-culture.c')],
             base / 'aot-scalar/console.c', base / 'aot-fault-details/render.c',
             *sorted((base / 'aot-console').glob('*.h')),
             *sorted((base / 'aot-scalar').glob('*.h')),
@@ -170,7 +170,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                    '--object-root', libraries[0]]
         flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
                  '--bind-console-read-byte', '--bind-console-write-line', '--bind-console-stream-output',
-                 '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text', '--bind-character-text']
+                 '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text', '--bind-character-text', '--bind-system-culture']
         if http:
             flags += ['--bind-task-queue',
                       '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-socket-client']
@@ -194,6 +194,10 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             report['inputs'][str(reflection_roots)] = sha(reflection_roots)
             flags += ['--reflection-roots', reflection_roots]
         selection = json.loads(run([aot, '--closed-world', assembly, selected_root, obj, *context, *flags]))
+        system_culture = any(binding.get('implementation') == 'system-culture-name-v1'
+                             for binding in selection.get('nativeBindings', []))
+        if system_culture:
+            adapters.append(base / 'system-culture.c')
         text_services = {'neoclr_string_compare_ignore_case_v1', 'neoclr_string_hash_ordinal_v1',
                          'neoclr_string_hash_ignore_case_v1', 'neoclr_string_upper_v1',
                          'neoclr_string_lower_v1', 'neoclr_string_grapheme_count_v1',
@@ -230,9 +234,12 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:
             run([clang, '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
-                 '-DNEOCLR_NATIVE_GC', *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, '-o', pending])
+                 '-DNEOCLR_NATIVE_GC', *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending])
             dependencies = [line.split()[0] for line in run(['xcrun', 'otool', '-L', pending]).splitlines()[1:]]
-            if dependencies != ['/usr/lib/libSystem.B.dylib']:
+            allowed = {'/usr/lib/libSystem.B.dylib'}
+            if system_culture:
+                allowed.add('/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation')
+            if set(dependencies) != allowed:
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         if any(sha(Path(path)) != digest for path, digest in report['inputs'].items()):
             raise RuntimeError('Build inputs changed during compilation')

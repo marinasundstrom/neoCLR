@@ -8,6 +8,12 @@ static class CalendarBindings
     public const string TimeResult = "System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>";
     sealed record Member(string Owner, string Name, string[] Args, string Result, bool Instance = false);
     static readonly Member[] Members = [
+        new("Date", "Parse", ["String"], "System.Result<System.Time.Date,System.Time.DateTimeParseError>"),
+        new("Date", "Parse", ["String", "System.Globalization.Culture"], "System.Result<System.Time.Date,System.Time.DateTimeParseError>"),
+        new("TimeOfDay", "Parse", ["String"], "System.Result<System.Time.TimeOfDay,System.Time.DateTimeParseError>"),
+        new("TimeOfDay", "Parse", ["String", "System.Globalization.Culture"], "System.Result<System.Time.TimeOfDay,System.Time.DateTimeParseError>"),
+        new("LocalDateTime", "Parse", ["String"], "System.Result<System.Time.LocalDateTime,System.Time.DateTimeParseError>"),
+        new("LocalDateTime", "Parse", ["String", "System.Globalization.Culture"], "System.Result<System.Time.LocalDateTime,System.Time.DateTimeParseError>"),
         new("TimeOffset", "get_Zero", [], "System.Time.TimeOffset"),
         new("TimeOffset", "get_Seconds", [], "Int32", true),
         new("TimeOffset", "FromSeconds", ["Int32"], "System.Result<System.Time.TimeOffset,System.Time.InvalidTimeError>"),
@@ -65,6 +71,7 @@ static class CalendarBindings
         "Create" when member.Owner == "TimeOfDay" => new[] { "hour", "minute", "second", "fractionTicks" }[index],
         "Create" when member.Owner == "LocalDateTime" => new[] { "date", "time" }[index],
         "ToString" => "culture",
+        "Parse" => index == 0 ? "value" : "culture",
         "AddDays" => "days",
         "AddMonths" => "months",
         "AddYears" => "years",

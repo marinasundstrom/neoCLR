@@ -6,6 +6,21 @@ import System.Runtime.CompilerServices.RuntimeServices
 import System.Result.*
 
 public struct LocalDateTime {
+    /// <summary>Parses a supported numeric civil value using Culture.Current.</summary>
+    /// <param name="value">The complete text; whitespace, offsets and zone names are not accepted.</param>
+    /// <returns>A value or InvalidFormat/OutOfRange. Use the explicit culture overload for deterministic input.</returns>
+    static func Parse(value: string) -> Result<LocalDateTime, DateTimeParseError> {
+        return Parse(value, System.Globalization.Culture.Current)
+    }
+
+    /// <summary>Parses a supported numeric Gregorian value with an explicit culture.</summary>
+    /// <param name="value">The complete culture-specific numeric representation.</param>
+    /// <param name="culture">Invariant, SwedishSweden or HebrewIsrael conventions; no ambient culture is read.</param>
+    /// <returns>A value or InvalidFormat/OutOfRange; no partial parse or rounding occurs.</returns>
+    static func Parse(value: string, culture: System.Globalization.Culture) -> Result<LocalDateTime, DateTimeParseError> {
+        return CivilParser.ParseLocal(value, culture)
+    }
+
     private field StoredDate: Date
     private field StoredTime: TimeOfDay
 

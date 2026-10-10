@@ -144,6 +144,11 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if bind_utf8_text && !compile_system {
         return Err("--bind-utf8-text requires --compile-system".into());
     }
+    let culture_count = args.iter().filter(|a| *a == "--bind-system-culture").count();
+    if culture_count > 1 { return Err("duplicate --bind-system-culture option".into()); }
+    let bind_system_culture = culture_count == 1;
+    args.retain(|a| a != "--bind-system-culture");
+    if bind_system_culture && !compile_system { return Err("--bind-system-culture requires --compile-system".into()); }
     let character_count = args.iter().filter(|a| *a == "--bind-character-text").count();
     if character_count > 1 { return Err("duplicate --bind-character-text option".into()); }
     let bind_character_text = character_count == 1;
@@ -228,10 +233,11 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if bind_file_input && !reference_arena { return Err("--bind-file-input requires --reference-arena".into()); }
     if bind_file_output && !reference_arena { return Err("--bind-file-output requires --reference-arena".into()); }
     if bind_paths && !reference_arena { return Err("--bind-paths requires --reference-arena".into()); }
+    if bind_system_culture && !reference_arena { return Err("--bind-system-culture requires --reference-arena".into()); }
     if bind_utf8_text && !reference_arena { return Err("--bind-utf8-text requires --reference-arena".into()); }
     let fault_details_count = args.iter().filter(|a| *a == "--fault-details").count();
     if fault_details_count > 1 { return Err("duplicate --fault-details option".into()); }
-    let fault_details = fault_details_count == 1 || bind_user_fault || bind_console_read_byte || bind_console_write_line || bind_console_stream_output || bind_int32_to_string || bind_character_text || bind_integer_text || reference_arena;
+    let fault_details = fault_details_count == 1 || bind_user_fault || bind_console_read_byte || bind_console_write_line || bind_console_stream_output || bind_int32_to_string || bind_system_culture || bind_character_text || bind_integer_text || reference_arena;
     args.retain(|a| a != "--fault-details");
     if probe_stack_roots && !fault_details {
         return Err("--probe-stack-roots requires --fault-details or an existing context-enabled binding".into());
@@ -282,7 +288,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
     {
         return Err(
-            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --reflection-roots <file.json> admits explicit source-identity parameterless constructor retention with --compile-system and --reference-arena; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-paths binds exact lexical Unix path services; --bind-file-output binds bounded blocking UTF-8 file output; --bind-file-input binds bounded strict UTF-8 file input; --bind-utf8-text binds UTF-8 encoding/decoding, concatenation, ordinal predicates, byte counts and scalar-boundary slices with --reference-arena; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds primitive numeric/Boolean parsing, signed/unsigned 64-bit formatting and native-width conversion services; --bind-socket-transfer binds Receive/Send/TransferResult and request-deadline services with --native-gc; --bind-socket-client binds bounded DNS/outbound connect with --native-gc and --bind-socket-accept; --bind-task-queue binds exact closed TaskQueue services with --native-gc; --bind-socket-accept binds Accept/ConnectResult/Cancel with --native-gc; --bind-socket-listener binds Listen/LocalPort/Close to an explicit host socket scope (requires --reference-arena); --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics; --probe-stack-roots adds a read-only pre-operation spill callback (requires a context-enabled profile, not a collector); --native-host-bootstrap exports an owned fn<Void> root handle instead of an ordinary entry (requires --native-gc); --native-gc enables experimental nonmoving collection with --reference-arena and a matching statically linked GC adapter; --native-stack-budget opts into guarded recursion with --native-gc and the matching macOS ARM64 stack adapter"
+            "usage: neoclr-aot-poc <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --reflection-roots <file.json> admits explicit source-identity parameterless constructor retention with --compile-system and --reference-arena; --compile-system opts supplied System managed bodies into closed-world selection; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-paths binds exact lexical Unix path services; --bind-file-output binds bounded blocking UTF-8 file output; --bind-file-input binds bounded strict UTF-8 file input; --bind-utf8-text binds UTF-8 encoding/decoding, concatenation, ordinal predicates, byte counts and scalar-boundary slices with --reference-arena; --bind-system-culture binds a host preference snapshot with --reference-arena; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds primitive numeric/Boolean parsing, signed/unsigned 64-bit formatting and native-width conversion services; --bind-socket-transfer binds Receive/Send/TransferResult and request-deadline services with --native-gc; --bind-socket-client binds bounded DNS/outbound connect with --native-gc and --bind-socket-accept; --bind-task-queue binds exact closed TaskQueue services with --native-gc; --bind-socket-accept binds Accept/ConnectResult/Cancel with --native-gc; --bind-socket-listener binds Listen/LocalPort/Close to an explicit host socket scope (requires --reference-arena); --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics; --probe-stack-roots adds a read-only pre-operation spill callback (requires a context-enabled profile, not a collector); --native-host-bootstrap exports an owned fn<Void> root handle instead of an ordinary entry (requires --native-gc); --native-gc enables experimental nonmoving collection with --reference-arena and a matching statically linked GC adapter; --native-stack-budget opts into guarded recursion with --native-gc and the matching macOS ARM64 stack adapter"
                 .into(),
         );
     }
@@ -356,6 +362,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 bind_file_output,
                 bind_file_input,
                 bind_character_text,
+                bind_system_culture,
                 bind_integer_text,
                 bind_socket_listener,
                 bind_socket_accept,

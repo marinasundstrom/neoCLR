@@ -6281,3 +6281,17 @@ int main(int argc, char **argv) {
         }
     }
 }
+
+#[test]
+fn system_culture_binding_requires_explicit_host_context() {
+    for (flags, message) in [
+        (vec!["--bind-system-culture"], "requires --compile-system"),
+        (vec!["--compile-system", "--bind-system-culture"], "requires --reference-arena"),
+        (vec!["--bind-system-culture", "--bind-system-culture"], "duplicate --bind-system-culture"),
+    ] {
+        let result = std::process::Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+            .args(flags).output().unwrap();
+        assert!(!result.status.success());
+        assert!(String::from_utf8_lossy(&result.stderr).contains(message));
+    }
+}

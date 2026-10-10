@@ -13845,3 +13845,30 @@ claim completion of in-process test discovery.
   content now describe the implemented view; Windows runtime qualification is pending.
 - **Next:** the author's Date/TimeOfDay/LocalDateTime parsing request remains open;
   this slice implements no time parser and does not settle accepted formats/cultures.
+
+
+## 2026-10-10 — Civil parsing implementation and native host culture
+
+- **Author direction:** continue after the JsonObject slice, carrying forward the
+  request for Parse on Date, TimeOfDay and LocalDateTime and review related time types.
+- **Assistant choice:** follow .NET's current/explicit culture overload structure and
+  neoCLR's established Result error convention. Implement only existing numeric
+  culture formats, using a standard DateTimeParseError union. General patterns,
+  non-Gregorian parsing and instant/duration/offset/zone formats remain gaps rather
+  than newly settled contracts. The [design comparison](date-time.md) records costs.
+- **Implementation:** add pure Raven parsers over bounded UTF-8 byte snapshots, with
+  factory validation, complete input consumption and 100 ns precision. Add eight
+  framework cases and reference docs. An initial UInt32 scalar approach exposed an
+  existing immutable-array native gap; byte input better fits this ASCII grammar,
+  and scalar-array support remains separately tracked. Split mixed relational
+  guards that the pinned compiler parsed ambiguously; no compiler change is claimed.
+- **Native prerequisite:** implement SystemCultureName under an explicit binding,
+  using the interpreter's macOS/Windows preference APIs. macOS programs using it now
+  link CoreFoundation; other programs retain their existing dependencies. Retain the
+  same Raven culture resolution and invariant fallback, with no mutable locale state.
+- **Outcome:** eight cases pass native macOS ARM64 and interpreted execution. A
+  separate probe reports en-US and invariant selection identically in both modes.
+  Signature/context admission checks and API snapshot checks pass. The Windows action
+  now runs the parser suite and parity probe; Windows execution is still pending.
+  Evidence: [framework](../runtime/raven/tests/time-parsing-validation.json) and
+  [host parity](experiments/time-parsing/validation.json).

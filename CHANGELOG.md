@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add Date, TimeOfDay and LocalDateTime Parse overloads using current or explicit
+  Culture and Result<T, DateTimeParseError>. Support the existing invariant, Swedish
+  and Hebrew-Israel numeric Gregorian formats, with optional 1–7 fractional digits.
+  Reject malformed input and invalid civil ranges without throwing. Eight framework
+  tests pass native macOS ARM64 and interpreted execution; refresh both API snapshots.
+  General patterns, non-Gregorian and Instant/Duration/offset/zone parsing remain gaps.
+- Add the explicit native SystemCultureName host adapter, matching the interpreter's
+  preferred-language APIs on macOS and Windows. Project builds enable the binding;
+  only consumers that retain it link CoreFoundation on macOS. Local host-preference
+  parity passes. Add exact-signature/context checks and a Windows parity gate;
+  Windows runtime qualification remains pending.
+
 - Add a read-only Map<string, JsonValue> view to JsonObject: faulting string indexer,
   safe Find/ContainsKey and insertion-order key/pair snapshots with shared nodes.
   Preserve explicit JsonNull, duplicate/quota Add results and positional Item(int).
@@ -20,10 +32,6 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add regression tests; this conservative retention can include additional bodies.
   All 16 JSON DOM cases pass native macOS ARM64 and interpreted execution; Windows
   qualification of this slice remains pending.
-
-- Record the author's time-parsing follow-up: Date, TimeOfDay and LocalDateTime,
-  with a related-type audit. Existing source has no Parse/TryParse on the reviewed
-  time values; formats, culture behavior and parser implementation remain planned.
 
 - Add getter indexers to Map and read/write indexers to MutableMap and HashMap.
   Missing keys cause a terminal Fault on read; Find remains the safe lookup.

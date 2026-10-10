@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/time-parse-culture/app"
+      ],
+      "exitCode": 0,
+      "stdout": "en-US\n\n\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/time-parse-culture/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/time-parse-utf8-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/time-parse-utf8-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/time-parse-utf8-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/time-parse-utf8-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/time-parse-utf8-bundle/bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/time-parse-utf8-bundle/bundle/lib/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "en-US\n\n\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/time-parse-utf8-bundle/bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/time-parse-utf8-bundle/bundle/lib/bundle.json": "e780617a43e259c6abe46a06a46a50d67f8739160f118caf91111ab7191ca7db",
+    "/Users/robert/Projects/neoclr/target/time-parse-utf8-bundle/bundle/lib/System.Runtime.dll": "a7e65ef7654bd0420e1e456175cc724ac8d2f8361c6d4617772ecdb7734685cd",
+    "/Users/robert/Projects/neoclr/target/time-parse-utf8-bundle/bundle/lib/System.Data.dll": "122fb71d54e295e073752a647e7cf7df173fcdaddae8add14cfc3aba6655c7ac",
+    "/Users/robert/Projects/neoclr/target/time-parse-utf8-bundle/bundle/lib/System.Networking.dll": "65b5ef67745267bc98960a38fa4f5ea5b7c7308e89910ceb821f0aa649f136bc",
+    "/Users/robert/Projects/neoclr/target/time-parse-utf8-bundle/bundle/lib/System.Web.dll": "74b13b13fac3cedbc067a8bdb2c09b0f147731e126d61084ae58339f375d71e9",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "12516b4780dbc636bb0fe5b717826e046d931422153e823239e6ddadf5769fc6",
+    "/Users/robert/Projects/neoclr/target/time-parse-culture/build.json": "86afc28f0028fc4d04b5c1857047460c302f113d446aa677bc0f203683a46348",
+    "/Users/robert/Projects/neoclr/docs/experiments/time-parsing/Culture.rvn": "3ffdcef6e1f6425d8f303bc5c0c80821caee19f0ae382c66cdcb17b755889a39",
+    "/Users/robert/Projects/neoclr/docs/experiments/time-parsing/verify.py": "bc771f3c478639fc88224874c8e493596325dc3e3ceb586aa61125efca23507a"
+  },
+  "preferredCulture": "en-US",
+  "selectedCulture": "",
+  "recordedDate": "2026-10-10",
+  "codeBaseline": "a96611cb plus the civil parsing and native host-culture slice",
+  "windowsStatus": "Local macOS ARM64 evidence; Windows runtime qualification pending"
+}

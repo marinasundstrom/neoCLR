@@ -32,6 +32,7 @@
     <None Update="samples/*.rvn" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/NumberParseError.rvn" LogicalName="NeoCLR.NumberParseError.rvn" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Time/DateTimeParseError.rvn" LogicalName="NeoCLR.DateTimeParseError.rvn" /></ItemGroup>
   <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/BooleanParseError.rvn" LogicalName="NeoCLR.BooleanParseError.rvn" /></ItemGroup>
   <Target Name="RequireRaven" BeforeTargets="Restore;PrepareForBuild" Condition="'$(RavenRoot)' == ''">
     <Error Text="Pass -p:RavenRoot=/absolute/path/to/Raven at the documented revision." />

@@ -1,0 +1,12 @@
+module CultureParity
+
+import System.*
+import System.Globalization.*
+
+func Main() -> int {
+    let provider = SystemCultureProvider()
+    Console.WriteLine(provider.PreferredCultureName)
+    Console.WriteLine(provider.Current.Name)
+    Console.WriteLine(Culture.Current.Name)
+    return 0
+}

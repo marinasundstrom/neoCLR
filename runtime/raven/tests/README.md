@@ -500,3 +500,18 @@ cover missing-field reads through concrete and Map views in both modes. All 32
 backend unit checks and the API snapshot checks pass. Native selection conservatively
 retains reached interface implementations on signature/storage-only concrete types;
 dispatch receivers remain constructed objects. Windows execution is pending.
+
+### Civil parsing
+
+`--suite time-parsing` adds eight attributed cases: Gregorian bounds/leap years,
+malformed versus range errors, all seven fractional widths, invalid clock fields,
+three explicit numeric cultures, culture mismatches, local civil boundaries and
+current-culture defaults. [Qualification](time-parsing-validation.json) passes native
+macOS ARM64 and interpreted execution. This brings the library suite to 152 cases
+across 16 projects. General patterns and offset/zone parsing are not covered APIs.
+
+The separate [culture parity probe](../../../docs/experiments/time-parsing/README.md)
+compares the reported host preference and bounded culture resolution in both modes.
+It passes locally; the Windows workflow runs it after the attributed suite. Native
+host-culture lookup is explicit through --bind-system-culture; native project builds
+enable that capability and link its adapter only when reached.

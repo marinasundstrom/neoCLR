@@ -408,6 +408,31 @@ pub fn file_input(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<V
     Ok(bindings)
 }
 
+/// Explicit host-preference binding; separate from pure UTF-8 operations.
+pub fn system_culture(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        if row["name"] != "neoCLR.Runtime.SystemCultureName" { continue; }
+        let index = row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize;
+        let f = &mut input.functions[index];
+        if f.name != "neoCLR.Runtime.SystemCultureName" || f.owner.is_some() || f.instance
+            || !f.parameters.is_empty() || f.returns != Type::String || f.no_result
+            || f.impl_flags != 0x1000 || !f.body.is_empty() || !f.locals.is_empty()
+            || f.pinvoke.is_some() || f.receiver_byref || f.receiver_readonly
+            || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+            return Err("native culture binding requires exact SystemCultureName() -> String InternalCall contract".into());
+        }
+        f.impl_flags = 0;
+        f.body = vec![Op::String(String::new()), Op::Return];
+        bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,
+            "implementation":"system-culture-name-v1","symbol":"neoclr_system_culture_name_v1"}));
+    }
+    Ok(bindings)
+}
+
 pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
@@ -878,4 +903,27 @@ mod type_identity_tests {
         assert_eq!(input.functions[0].impl_flags, 0);
         assert!(matches!(input.functions[0].body[2], Op::Equal));
     }
+    #[test]
+    fn system_culture_requires_the_exact_internal_call_contract() {
+        let source = neoclr::assemble(".module CultureBinding\n.function neoCLR.Runtime.SystemCultureName() -> String\n.methodimpl InternalCall\n.end\n").unwrap();
+        let inventory = json!({"functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.SystemCultureName"}]});
+        for variant in 0..6 {
+            let mut input = source.clone();
+            let f = &mut input.functions[0];
+            match variant {
+                0 => f.parameters.push(Type::Int32),
+                1 => f.returns = Type::Int32,
+                2 => f.impl_flags = 0,
+                3 => f.body.push(Op::String(String::new())),
+                4 => f.no_result = true,
+                _ => f.locals.push(Type::String),
+            }
+            assert!(system_culture(&mut input, &inventory).is_err());
+        }
+        let mut input = source;
+        let bindings = system_culture(&mut input, &inventory).unwrap();
+        assert_eq!(bindings[0]["symbol"], "neoclr_system_culture_name_v1");
+        assert_eq!(input.functions[0].impl_flags, 0);
+    }
+
 }

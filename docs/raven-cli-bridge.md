@@ -7787,3 +7787,36 @@ Validation: the signature-only closed-generic conformance regression and all fou
 unretained-property service cases pass in the focused backend tests. The JSON DOM
 framework and missing-field probe provide executable integration evidence linked
 from runtime/raven/tests/README.md; Windows execution remains separately qualified.
+
+### Civil Parse and native host culture (2026-10-10)
+
+Date/TimeOfDay/LocalDateTime Parse use ordinary static methods returning the standard
+Result<T, DateTimeParseError> union. The aggregate reference mirrors both overloads,
+compiles DateTimeParseError from its Raven source and projects the usual union bridge.
+It remains declaration-only, with no executable parser bodies. Native metadata owns
+the real definitions and implementations. No Runtime Contract configuration, Raven
+binding or compiler emission change is needed; matching runtime/reference artifacts
+use compiler b2f3ba0f8b8e92f0c516155f563b332b0a6fad54.
+
+The native project backend adds --bind-system-culture, requiring --compile-system
+and --reference-arena, for the exact SystemCultureName() -> String InternalCall.
+The current/explicit culture distinction matches the interpreter's existing library
+semantics. The adapter snapshots the first host preferred language using
+CFLocaleCopyPreferredLanguages or GetUserPreferredUILanguages, the same APIs used
+by interpreter sys-locale 0.3.2. No preference returns empty text; existing Raven
+resolution provides invariant fallback. This does not read host parsing patterns or
+modify process/thread culture. Allocation uses the private text-arena ABI and the
+host service never collects/reenters guest code; normal native fault handling applies.
+
+neoCLR owns this adapter and the eventual native host-service ABI replacement.
+Project builds select it explicitly, linking its C implementation only when reached.
+macOS culture consumers add CoreFoundation to the checked dependency list; other
+programs retain their prior dependencies. Windows uses KERNEL32 preference APIs.
+Public Parse currently supports bounded numeric Gregorian formats; general parsing
+remains a library gap. The native immutable UInt32 array path exposed by GetScalars
+also remains a separate gap; civil parsing directly consumes bounded UTF-8 bytes.
+
+Eight framework cases and a standalone host-preference parity probe pass native
+macOS ARM64 and interpreted execution. Exact-signature and missing-context checks
+pass. The Windows action includes both consumers; Windows execution remains pending.
+See runtime/raven/tests/time-parsing-validation.json and the time-parsing probe.

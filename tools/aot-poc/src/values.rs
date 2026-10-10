@@ -472,6 +472,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             (&d.string_grapheme_count, "neoclr_string_grapheme_count_v1", vec![types::I64, types::I64]),
             (&d.string_grapheme_at, "neoclr_string_grapheme_at_v1", vec![types::I64, types::I32, types::I64, types::I64]),
             (&d.string_graphemes, "neoclr_string_graphemes_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.system_culture, "neoclr_system_culture_name_v1", vec![types::I64, types::I64]),
             (&d.string_scalars, "neoclr_string_scalars_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_from_chars, "neoclr_string_from_chars_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_upper, "neoclr_string_upper_v1", vec![types::I64, types::I64, types::I64]),
@@ -1170,6 +1171,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 } else if details.unwrap().string_slice_utf8.contains(&i) || details.unwrap().string_replace_ordinal.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], parameters[2], arena, output]
+                } else if details.unwrap().system_culture.contains(&i) {
+                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                    vec![arena, output]
                 } else if details.unwrap().string_grapheme_at.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], arena, output]

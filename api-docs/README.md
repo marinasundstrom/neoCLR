@@ -1587,3 +1587,12 @@ new members, with no exclusions. The C# aggregate declaration bridge temporarily
 names Item(int) PositionalItem, then restores its real CLI name after compilation:
 C# rejects a method named Item alongside its default indexer, while the native Raven
 metadata carries both. Neither temporary names nor declaration bodies are public APIs.
+
+## Civil parsing development snapshot (2026-10-10)
+
+Date, TimeOfDay and LocalDateTime include both Parse overloads, parameters, typed
+results and grammar limitations. DateTimeParseError and its InvalidFormat/OutOfRange
+cases are selected in RavenDoc. The aggregate reference compiles the error from its
+ordinary Raven union source; no new manual carrier or renderer exclusion is added.
+The native library snapshot exposes the same members. This is bounded numeric
+culture parsing, not a full .NET parsing API or a time-zone parser.

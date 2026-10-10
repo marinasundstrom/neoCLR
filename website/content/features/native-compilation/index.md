@@ -23,7 +23,8 @@ This requires the matching development AOT tool and native host adapters.
 Raven source is compiled to neoCLR metadata and instructions, then lowered to native
 object code and linked with the required library and runtime support. The resulting
 program needs no separately installed neoCLR or .NET runtime. Tested macOS binaries
-use libSystem. Windows console EXEs import KERNEL32; the HTTP EXEs also use WS2_32
+use libSystem; development programs that query Culture.Current also link the system
+CoreFoundation framework. Windows console EXEs import KERNEL32; the HTTP EXEs also use WS2_32
 for networking. Windows builds link the CRT statically.
 
 AOT moves compilation work to build time and produces an architecture-specific binary.
@@ -34,7 +35,9 @@ The development project workflow builds an ordinary Raven project with a matchin
 compiler/library bundle, links its executable and records diagnostics and dependencies.
 The development runtime tests also exercise primitive numeric and Boolean parsing
 in native macOS ARM64 and interpreted modes, using the same culture-independent
-parser. Path and IP-address tests also cover class equality/hash overrides and
+parser. Development civil date/time parsing also passes local native/interpreted
+tests for three numeric culture profiles, with a host-preference parity probe.
+Windows validation is configured; its result remains pending. Path and IP-address tests also cover class equality/hash overrides and
 display through Object. General virtual dispatch and intrinsic boxed/String
 Object equality/hash adapters remain incomplete. Windows execution of these newly
 migrated suites remains pending.

@@ -58,7 +58,10 @@ digits for Hebrew fields and is **not a Gregorian ISO serialization format**.
 
 System discovery was tested on macOS; Windows/Linux adapters have not been exercised.
 Preferred language discovery does not promise OS regional pattern overrides.
-Arbitrary format strings, parsing, timezone rules and bidirectional layout are not supported. The UI controls text direction when embedding Hebrew output.
+Development Date, TimeOfDay and LocalDateTime Parse overloads now accept the three
+numeric Gregorian culture formats, with current or explicit culture and typed errors.
+They preserve up to seven fractional-second digits. General format strings,
+non-Gregorian parsing, timezone rules and bidirectional layout remain unsupported. The UI controls text direction when embedding Hebrew output.
 
 ## Localization is independent
 
