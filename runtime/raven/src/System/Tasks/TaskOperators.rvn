@@ -1,4 +1,4 @@
-namespace System.Tasks
+module System.Tasks
 
 import System.*
 import System.Option.*

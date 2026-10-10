@@ -1,4 +1,4 @@
-namespace System.Linq
+module System.Linq
 
 public union SingleError {
     case Empty

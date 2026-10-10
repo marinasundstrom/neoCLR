@@ -1,4 +1,4 @@
-namespace System.Text
+module System.Text
 
 import System.*
 import System.Collections.*

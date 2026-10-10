@@ -1,4 +1,4 @@
-namespace System.Environment
+module System.Environment
 
 import System.EnvironmentError
 import System.Result.*

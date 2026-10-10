@@ -1,4 +1,4 @@
-namespace System.Concurrency
+module System.Concurrency
 
 import System.*
 import System.Tasks.*

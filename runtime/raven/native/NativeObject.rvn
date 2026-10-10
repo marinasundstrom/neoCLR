@@ -1,4 +1,4 @@
-namespace System.Runtime.CompilerServices
+module System.Runtime.CompilerServices
 
 // Use a distinct facade: the bootstrap RuntimeServices.ObjectTypeHandle member
 // takes precedence over extensions and carries the bootstrap Object identity.

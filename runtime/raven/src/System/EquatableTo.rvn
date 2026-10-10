@@ -1,4 +1,4 @@
-namespace System
+module System
 
 public interface EquatableTo<T> {
     func Equals(other: T) -> bool

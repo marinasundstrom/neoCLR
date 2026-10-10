@@ -1,4 +1,4 @@
-namespace System.Storage
+module System.Storage
 
 public union FileReadError {
     case InvalidLimit

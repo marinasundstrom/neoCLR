@@ -1,6 +1,6 @@
 import System.Runtime.CompilerServices.*
 
-namespace neoCLR.Runtime
+module neoCLR.Runtime
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func IntPtrToInt64(value: nint) -> long;

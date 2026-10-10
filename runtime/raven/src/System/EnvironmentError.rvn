@@ -1,4 +1,4 @@
-namespace System
+module System
 
 public struct EnvironmentError {
     func ToString() -> string {

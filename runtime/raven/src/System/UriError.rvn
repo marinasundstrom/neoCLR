@@ -1,4 +1,4 @@
-namespace System
+module System
 
 public union UriError {
     case InvalidFormat

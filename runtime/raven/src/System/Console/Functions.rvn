@@ -1,4 +1,4 @@
-namespace System
+module System
 
 import System.*
 import System.IO.*

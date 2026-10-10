@@ -1,4 +1,4 @@
-namespace System
+module System
 
 public interface ComparableTo<T> {
     func CompareTo(other: T) -> int

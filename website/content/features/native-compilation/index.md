@@ -8,6 +8,10 @@ on macOS ARM64 and Windows x64 for a supported subset of Raven applications,
 including console programs and the HttpClient/HttpServer showcases. The interpreter
 remains available; interpreter API support does not automatically imply native support.
 
+Native Raven sources use logical module declarations such as `module System.Collections`.
+Modules organize declarations; assemblies remain packaging and binding identities.
+Legacy `namespace` spelling remains accepted by the development compiler.
+
 ## From Raven to an executable
 
 Raven source is compiled to neoCLR metadata and instructions, then lowered to native

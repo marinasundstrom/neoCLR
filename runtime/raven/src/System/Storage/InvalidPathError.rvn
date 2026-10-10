@@ -1,4 +1,4 @@
-namespace System.Storage
+module System.Storage
 
 public struct InvalidPathError {
     func ToString() -> string => "InvalidPath"

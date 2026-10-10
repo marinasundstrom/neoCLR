@@ -1,4 +1,4 @@
-namespace System.Web.Http
+module System.Web.Http
 
 import System.*
 import System.Collections.*

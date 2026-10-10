@@ -1,4 +1,4 @@
-namespace System
+module System
 
 /// Explicit, locale-independent string comparison policies.
 public enum StringComparison {

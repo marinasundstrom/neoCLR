@@ -1,4 +1,4 @@
-namespace System.Web.Http.Json
+module System.Web.Http.Json
 
 import System.*
 import System.Data.Json.*

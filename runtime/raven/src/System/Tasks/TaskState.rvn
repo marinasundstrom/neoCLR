@@ -1,4 +1,4 @@
-namespace System.Tasks
+module System.Tasks
 
 public enum TaskState {
     Pending = 0

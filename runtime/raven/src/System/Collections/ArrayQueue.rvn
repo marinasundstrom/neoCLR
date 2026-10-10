@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 import System.*
 import System.Option.*

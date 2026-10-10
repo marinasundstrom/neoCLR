@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 /// A mutable LIFO collection. Thread safety is an implementation contract.
 public interface Stack<T> : Collection<T> {

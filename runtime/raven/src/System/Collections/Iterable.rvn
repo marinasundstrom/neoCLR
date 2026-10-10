@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 public interface Iterable<T> {
     func GetIterator() -> Iterator<T>

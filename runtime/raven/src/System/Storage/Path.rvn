@@ -1,4 +1,4 @@
-namespace System.Storage
+module System.Storage
 
 import System.*
 import System.Result.*

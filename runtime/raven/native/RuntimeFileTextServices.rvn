@@ -1,4 +1,4 @@
-namespace System.Storage.FileText
+module System.Storage.FileText
 
 import System.Runtime.CompilerServices.RuntimeServices
 

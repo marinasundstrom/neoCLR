@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 /// Adapts equality and hash callbacks into one reusable policy.
 public class FunctionEqualityComparer<T> : EqualityComparer<T> {

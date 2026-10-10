@@ -1,4 +1,4 @@
-namespace System.Introspection
+module System.Introspection
 
 [System.Flags]
 public enum BindingFlags {

@@ -1,6 +1,6 @@
 import System.Runtime.CompilerServices.*
 
-namespace neoCLR.Runtime
+module neoCLR.Runtime
 
 // Native library declarations. The runtime binds these exact signatures;
 // the enclosing source-built library owns them and their managed callers.

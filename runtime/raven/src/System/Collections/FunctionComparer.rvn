@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 /// Adapts an ordering callback into a reusable policy.
 public class FunctionComparer<T> : Comparer<T> {

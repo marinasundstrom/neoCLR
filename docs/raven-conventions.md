@@ -20,6 +20,15 @@ gap to fix, not a reason to make application examples callback-driven. Let
 `Task<()>`/`Task<unit>` functions complete by reaching the end; omit a redundant
 trailing `return ()`. Keep explicit unit returns where an early exit is intended.
 
+## Native module declarations (2026-10-10)
+
+Use `module System.Collections` (or the appropriate qualified module name) in
+neoCLR-native Raven sources. The compiler accepts legacy `namespace` spelling,
+but new and maintained native examples should express their logical module owner.
+This is source organization, not an assembly rename or a new physical image.
+Ordinary .NET sources and C# reference declarations retain namespace syntax.
+See [declaration modules](declaration-modules.md) for metadata and compatibility.
+
 ## Assembly-level members and qualified names (2026-10-08)
 
 Author clarification: types, functions and constants can be assembly-level members.

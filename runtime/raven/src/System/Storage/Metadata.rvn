@@ -1,4 +1,4 @@
-namespace System.Storage.Metadata
+module System.Storage.Metadata
 
 import System.*
 import System.Storage.*

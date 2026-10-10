@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 public interface Map<K, V> : Iterable<KeyValuePair<K, V>> {
     val Count: int { get }

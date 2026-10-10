@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 /// Orders values by the sign of Compare's result.
 public interface Comparer<T> {

@@ -1,4 +1,4 @@
-namespace neoCLR.Runtime
+module neoCLR.Runtime
 
 import System.Runtime.CompilerServices.*
 

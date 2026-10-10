@@ -1,4 +1,4 @@
-namespace System.Time
+module System.Time
 
 import System.*
 

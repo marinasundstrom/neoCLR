@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 public interface Iterator<T> : System.Disposable {
     func MoveNext() -> bool

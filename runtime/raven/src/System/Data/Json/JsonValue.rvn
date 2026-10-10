@@ -1,4 +1,4 @@
-namespace System.Data.Json
+module System.Data.Json
 
 import System.*
 import System.Collections.*

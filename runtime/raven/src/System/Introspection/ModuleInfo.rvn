@@ -1,4 +1,4 @@
-namespace System.Introspection
+module System.Introspection
 
 import System.*
 import System.Collections.*

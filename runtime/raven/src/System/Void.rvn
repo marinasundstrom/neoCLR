@@ -1,4 +1,4 @@
-namespace System
+module System
 
 // Nominal unit storage is supplied by the runtime.
 public struct Void { }

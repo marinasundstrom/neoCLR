@@ -1,4 +1,4 @@
-namespace System.Runtime
+module System.Runtime
 
 import System.*
 import System.Introspection.*

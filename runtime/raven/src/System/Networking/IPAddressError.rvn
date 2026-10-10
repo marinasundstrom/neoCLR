@@ -1,4 +1,4 @@
-namespace System.Networking
+module System.Networking
 
 /// Expected failures when parsing an IP address literal.
 public union IPAddressError {

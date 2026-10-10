@@ -1,4 +1,4 @@
-namespace System
+module System
 
 public class Array<T> : Collections.MutableSequence<T> {
     #pragma warning disable-next-line RAV9032

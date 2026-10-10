@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 /// A mutable FIFO collection. Thread safety is an implementation contract.
 public interface Queue<T> : Collection<T> {

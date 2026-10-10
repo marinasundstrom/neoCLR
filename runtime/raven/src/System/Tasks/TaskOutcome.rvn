@@ -1,4 +1,4 @@
-namespace System.Tasks
+module System.Tasks
 
 /// Describes completion or cancellation of a task.
 public union TaskOutcome<T> {

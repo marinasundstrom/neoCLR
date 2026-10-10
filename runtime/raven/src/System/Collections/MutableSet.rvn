@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 /// A set supporting insertion, removal and clearing.
 public interface MutableSet<T> : Set<T> {

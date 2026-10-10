@@ -1,4 +1,4 @@
-namespace System.Runtime.Reflection
+module System.Runtime.Reflection
 
 public union ReflectionError {
     case UnboundMetadata

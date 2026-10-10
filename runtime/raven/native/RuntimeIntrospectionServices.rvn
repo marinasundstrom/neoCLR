@@ -2,7 +2,7 @@ import System.*
 import System.Introspection.*
 import System.Runtime.CompilerServices.*
 
-namespace System.Runtime.CompilerServices
+module System.Runtime.CompilerServices
 
 // Native adapter additions; seed-owned primitives remain on the selected bootstrap.
 internal extension IntrospectionRuntimeServices for RuntimeServices {

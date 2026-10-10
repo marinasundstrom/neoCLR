@@ -1,4 +1,4 @@
-namespace System.Runtime.CompilerServices
+module System.Runtime.CompilerServices
 
 internal extension NetworkRuntimeServices for RuntimeServices {
     static func DnsLookup(hostName: string, callback: () -> System.Void) -> System.Value {

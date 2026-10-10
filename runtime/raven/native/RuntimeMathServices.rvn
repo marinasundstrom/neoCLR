@@ -1,4 +1,4 @@
-namespace System.Math
+module System.Math
 
 import System.Runtime.CompilerServices.RuntimeServices
 

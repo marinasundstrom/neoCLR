@@ -1,4 +1,4 @@
-namespace System.Globalization
+module System.Globalization
 
 import System.Runtime.CompilerServices.RuntimeServices
 

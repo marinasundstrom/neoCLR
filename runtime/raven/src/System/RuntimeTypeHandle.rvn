@@ -1,4 +1,4 @@
-namespace System
+module System
 
 // Runtime representation remains intrinsic; this is the public declaration.
 public struct RuntimeTypeHandle { }

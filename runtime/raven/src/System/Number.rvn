@@ -1,4 +1,4 @@
-namespace System
+module System
 
 /// Basic arithmetic and ordering for numeric values. Parsing is a separate capability.
 public interface Number : ComparableTo<Self> {

@@ -1,4 +1,4 @@
-namespace System.Networking
+module System.Networking
 
 public union DnsError {
     case InvalidName

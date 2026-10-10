@@ -1,4 +1,4 @@
-namespace System.Runtime.CompilerServices
+module System.Runtime.CompilerServices
 
 internal static class RuntimeFailure {
     static func Terminate(message: string) {

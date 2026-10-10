@@ -1,4 +1,4 @@
-namespace System
+module System
 
 public interface Disposable {
     func Dispose()

@@ -1,4 +1,4 @@
-namespace System
+module System
 
 /// Base class for nominal metadata attributes.
 public abstract class Attribute {

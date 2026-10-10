@@ -1,4 +1,4 @@
-namespace System.Runtime.InteropServices.NativeMemory
+module System.Runtime.InteropServices.NativeMemory
 
 import System.Runtime.CompilerServices.NativeAllocation
 

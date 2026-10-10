@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 /// Defines a stable equality relation and matching hash codes.
 public interface EqualityComparer<T> {

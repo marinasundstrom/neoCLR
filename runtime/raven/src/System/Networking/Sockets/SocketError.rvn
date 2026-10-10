@@ -1,4 +1,4 @@
-namespace System.Networking.Sockets
+module System.Networking.Sockets
 
 public union SocketError {
     case Closed

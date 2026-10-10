@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Use explicit module declarations throughout the native Raven runtime library and
+  document that source convention. Qualified API names and assembly owners remain
+  unchanged; legacy namespace spelling remains accepted. All four native library
+  projects compile with the pinned development compiler; API fingerprint checks pass.
+
 - Add development native init-accessor metadata, authoring/introspection flags,
   CLI IsExternalInit projection and declaring-type readonly-write privileges.
   Keep raw/reflection calls executable and reject malformed static/missing-setter

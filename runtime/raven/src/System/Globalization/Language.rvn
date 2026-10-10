@@ -1,4 +1,4 @@
-namespace System.Globalization
+module System.Globalization
 
 /// Provisional strongly typed language identity for the supported formatting profiles.
 public class Language {

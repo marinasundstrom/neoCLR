@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 public interface Collection<T> : Iterable<T> {
     val Count: int { get }

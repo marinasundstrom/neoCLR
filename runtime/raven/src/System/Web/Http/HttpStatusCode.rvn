@@ -1,4 +1,4 @@
-namespace System.Web.Http
+module System.Web.Http
 
 /// Named HTTP status codes; unnamed numeric values remain representable.
 public enum HttpStatusCode {

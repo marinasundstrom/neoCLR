@@ -1,4 +1,4 @@
-namespace System.Globalization
+module System.Globalization
 
 public class FixedCultureProvider : CultureProvider {
     private var culture: Culture

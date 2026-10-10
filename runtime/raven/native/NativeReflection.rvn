@@ -1,4 +1,4 @@
-namespace System.Runtime.CompilerServices
+module System.Runtime.CompilerServices
 
 // Distinct facade preserves source Object ownership instead of selecting the
 // bootstrap RuntimeServices construction signature.

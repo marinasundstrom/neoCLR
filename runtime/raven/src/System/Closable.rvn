@@ -1,4 +1,4 @@
-namespace System
+module System
 
 public interface Closable<E> {
     func Close() -> Result<Void, E>

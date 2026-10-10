@@ -1,4 +1,4 @@
-namespace System
+module System
 
 /// A 1-component value tuple. Assignment copies its fields.
 public struct Tuple<T1> {

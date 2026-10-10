@@ -13203,3 +13203,16 @@ claim follows from these focused checks.
   separate-library initialization and rejected later writes all pass. API references,
   source samples and the Windows action are updated. Reflection/raw calls remain
   intentionally possible; full record semantics and runtime freezing are not added.
+
+### 2026-10-10 — Collection construction and native source spelling
+
+- Author requested HashMap construction from iterable/sequence KeyValuePair values
+  and a LINQ ToMap operator, then clarified that initialization/copy constructors
+  are a general collection convention, following .NET.
+- Assistant selected shallow independent storage, an explicit comparer and duplicate
+  key rejection for the map slice; implementation and validation follow below.
+- Author observed native sources still use `namespace System.Collections` instead
+  of `module System.Collections`. Assistant migrated runtime source declarations
+  and recorded the native-source convention; existing .NET spelling remains valid.
+- Module spelling validation: all four native library projects compile with Raven
+  b939cd696; API reference fingerprints pass. No public signature changed.

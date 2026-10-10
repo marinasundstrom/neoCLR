@@ -1,4 +1,4 @@
-namespace System.Collections
+module System.Collections
 
 /// A collection of distinct elements under its implementation's equality policy.
 public interface Set<T> : Collection<T> {
