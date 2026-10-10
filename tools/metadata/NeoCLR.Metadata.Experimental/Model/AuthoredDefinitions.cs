@@ -187,7 +187,8 @@ public sealed partial class AssemblyBuilder
             {
                 if (definition.BaseType is not null) throw new ArgumentException("interfaces have no class base");
             }
-            else if (!definition.IsNativeObjectRoot && !(category is 0 or 0x80 or 0x100 && definition.DeclaringType is null && definition.BaseType is { ExplicitScope: null } localBase && ReferenceEquals(localBase.Module, Definition.MainModule) && localBase.Resolve().Producer is { } parent && IsOrdinaryBase(parent) && (definition.GenericArity == 0 || parent.IsNativeObjectRoot)) && (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
+            else if (!definition.IsNativeObjectRoot && !(definition.AuthoredExternalBase is { } externalBase &&
+                fieldlessClassBases.Contains(externalBase) && definition.GenericArity == 0 && definition.DeclaringType is null && category is 0 or 0x80 or 0x100) && !(category is 0 or 0x80 or 0x100 && definition.DeclaringType is null && definition.BaseType is { ExplicitScope: null } localBase && ReferenceEquals(localBase.Module, Definition.MainModule) && localBase.Resolve().Producer is { } parent && IsOrdinaryBase(parent) && (definition.GenericArity == 0 || parent.IsNativeObjectRoot)) && (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
                 baseType.Name != (definition.IsEnum ? "Enum" : definition.IsValueType ? "ValueType" : "Object") || definition.IsValueType != (category == 0x108 || category == 0x100 && definition.IsEnum)))
                 throw new ArgumentException("type base/category does not match the explicit core contract");
             // Validate pending fields before attaching any ownership or writer handles.

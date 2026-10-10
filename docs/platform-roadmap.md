@@ -15,11 +15,10 @@ multiplicity checks across assemblies. Native source annotation emission now pas
 focused compiler round trips on the shared Raven integration line; the development Windows compiler pin now advances to Raven 0f09c350a. Runtime usage
 declarations pass the [usage consumer](experiments/attribute-usage/README.md) on
 macOS interpreter/AOT, including imported target rejection; Windows is pending.
-External base identity now survives scoped native reader snapshots; authoring and
-constructor chaining remain open. Continue through working TestAttribute discovery
+External base identity, bounded fieldless authoring and constructor chaining now
+pass host metadata and Raven interpreter/macOS AOT checks. Continue through working TestAttribute discovery
 and registration, as explicitly requested, including the separate-library inheritance
-prerequisite. Then complete
-discovery without changing execution contracts. Named field/property argument
+prerequisite, without changing execution contracts. Named field/property argument
 snapshots now pass the expanded macOS interpreter/AOT consumer with source-built
 libraries; the expanded [Windows action](https://github.com/marinasundstrom/neoCLR/actions/runs/38045805683) succeeds at 96ad94e2; its artifact hashes have not yet been independently checked. Explicit attribute-data retention now passes a standalone macOS ARM64
 [public Raven consumer](experiments/native-attributes/README.md), using metadata-authored

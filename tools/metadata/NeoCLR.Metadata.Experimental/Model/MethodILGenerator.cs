@@ -515,10 +515,12 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     public void Emit(OpCode opCode, ImportedMethodReference operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
-        if (opCode != (operand.IsConstructor ? OpCode.Newobj : operand.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("wrong dispatch opcode", nameof(opCode));
+        var baseConstructor = operand.IsConstructor && opCode == OpCode.Call && bodyBuilder.IsConstructor &&
+            DeclaringType?.IsDirectBaseConstructor(operand.Target, operand.DeclaringReference) == true;
+        if (!baseConstructor && opCode != (operand.IsConstructor ? OpCode.Newobj : operand.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("wrong dispatch opcode", nameof(opCode));
         if (!ReferenceEquals(operand.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(operand));
         if (operand.Signature.GenericParameterNames.Count != 0 || operand.Target.DeclaringType?.GenericParameterNames.Count > 0) throw new ArgumentException("generic import must be instantiated", nameof(operand));
-        Append(new(operand.IsConstructor ? "new.object" : operand.RequiresVirtualDispatch ? "call.virtual" : "call", Target: operand.Target, Type: operand.IsStatic ? null : operand.Target.NativeImportPrimitiveOwner is { } primitive ? (SignatureType)primitive : (SignatureType)operand.DeclaringReference!));
+        Append(new(baseConstructor ? "call" : operand.IsConstructor ? "new.object" : operand.RequiresVirtualDispatch ? "call.virtual" : "call", Target: operand.Target, Type: operand.IsStatic ? null : operand.Target.NativeImportPrimitiveOwner is { } primitive ? (SignatureType)primitive : (SignatureType)operand.DeclaringReference!));
     }
 
     public void Emit(OpCode opCode, NativeFunctionDefinition operand)

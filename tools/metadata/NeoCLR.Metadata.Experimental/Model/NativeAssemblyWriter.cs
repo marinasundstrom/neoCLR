@@ -329,7 +329,8 @@ public sealed partial class AssemblyBuilder
             var named = attribute.GetNamedArguments();
             if (named.Count != 0) data["named_arguments"] = named.Select(a => new
             {
-                name = a.MemberName, is_field = a.IsField,
+                name = a.MemberName,
+                is_field = a.IsField,
                 value = new Dictionary<string, object?> { [a.TypedValue.Type.Primitive!.Value.ToString()] = a.TypedValue.Value }
             }).ToArray();
             if (targetToken is { } token) data["target_token"] = token;
@@ -358,14 +359,14 @@ public sealed partial class AssemblyBuilder
             ValidateArrayBacking(arrayBacking);
             manifest["array_backing"] = new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(arrayBacking) };
         }
-        var moduleBindings = dependencies.Values.Where(d => ExternalObjectRoot?.AssemblyIdentity.Equals(d.Identity) == true || d.NativeBinding is not null || externalGrapheme?.AssemblyIdentity.Equals(d.Identity) == true || ExternalPrimitive(PrimitiveType.Void)?.AssemblyIdentity.Equals(d.Identity) == true || ExternalPrimitive(PrimitiveType.Value)?.AssemblyIdentity.Equals(d.Identity) == true).Select(d => new
+        var moduleBindings = dependencies.Values.Where(d => ExternalObjectRoot?.AssemblyIdentity.Equals(d.Identity) == true || d.NativeBinding is not null || types.Any(t => t.ExternalBase?.AssemblyIdentity.Equals(d.Identity) == true) || externalGrapheme?.AssemblyIdentity.Equals(d.Identity) == true || ExternalPrimitive(PrimitiveType.Void)?.AssemblyIdentity.Equals(d.Identity) == true || ExternalPrimitive(PrimitiveType.Value)?.AssemblyIdentity.Equals(d.Identity) == true).Select(d => new
         {
             assembly = IdentityText(d.Identity),
             module = ModuleName(d),
             revision = d.NativeBinding is null ? d.Identity.Version.ToString() : d.NativeBinding.Revision
         }).ToArray();
         if (moduleBindings.Length != 0) manifest["native_module_bindings"] = moduleBindings;
-        var typeBindings = importedNominalTypes.Values.Where(t => Equals(ExternalObjectRoot, t) || NativeBindingFor(t.AssemblyIdentity) is not null || IsNativeGrapheme(t) || AuthoredPrimitiveOwner(t) is PrimitiveType.Void or PrimitiveType.Value).Select(t => new
+        var typeBindings = importedNominalTypes.Values.Where(t => Equals(ExternalObjectRoot, t) || NativeBindingFor(t.AssemblyIdentity) is not null || types.Any(owner => Equals(owner.ExternalBase, t)) || IsNativeGrapheme(t) || AuthoredPrimitiveOwner(t) is PrimitiveType.Void or PrimitiveType.Value).Select(t => new
         {
             native_name = ExternalName(t),
             assembly = IdentityText(t.AssemblyIdentity),
@@ -416,7 +417,7 @@ public sealed partial class AssemblyBuilder
             assemblies = new[] { manifest },
             types = types.Select((type, index) => new NativeTypeRow(
                 TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = type.IsEnum ? "private" : f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface && !type.IsValueType && type.NativePrimitive is null, !type.IsInterface && type.IsAbstract, (type.Definition.Attributes & 0x100) != 0, type.IsClosedHierarchy,
-                TypeOrigin(type, index), type.Definition.IsNativePrimitiveReference, type.LocalBase is { } baseType ? SignatureValue(baseType.OpenSignature) : null, type.IsInterface ? "Interface" : (type.NativePrimitive is not null || type.NativeGrapheme) ? "Runtime" : null,
+                TypeOrigin(type, index), type.Definition.IsNativePrimitiveReference, type.ExternalBase is { } externalBase ? SignatureValue(externalBase) : type.LocalBase is { } baseType ? SignatureValue(baseType.OpenSignature) : null, type.IsInterface ? "Interface" : (type.NativePrimitive is not null || type.NativeGrapheme) ? "Runtime" : null,
                 !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
                 type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new NativeProperty(p.Name, !p.IsStatic, p.ParameterTypes.Select(SignatureValue).ToArray(), SignatureValue(p.PropertyType), Accessor(p.GetMethod), Accessor(p.SetMethod), p.Definition.IsInitOnly)).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, TypeAttributes(type), type.IsEnum ? new { underlying = "Int32", flags = type.IsFlagsEnum, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null)).ToArray(),

@@ -100,7 +100,7 @@ public sealed partial class AssemblyBuilder
         if (type is { GenericArity: > 0, CanImportReference: false })
             throw new InvalidDataException("unsupported imported method owner");
         if (!definition.IsStatic && (type is null || definition.GenericArity != 0 ||
-            definition.Name == ".cctor" || (definition.Attributes & 7) != 6 ||
+            definition.Name == ".cctor" || (definition.Attributes & 7) != 6 && !(definition.Name == ".ctor" && (definition.Attributes & 7) == 4 && definition.Module.Assembly.IsNative) ||
             (isInterface ? !isAbstract || !isVirtual : isAbstract || isVirtual && !isFinal && !type.IsValueType && !isObjectToString && !isObjectHash && !isObjectEquals && !nativeOverride)))
             throw new InvalidDataException("unsupported imported instance method contract");
         if (definition.Name == ".ctor" && (definition.IsStatic || isInterface || isVirtual || isAbstract || (definition.Attributes & 0x1800) != 0x1800))
@@ -141,7 +141,7 @@ public sealed partial class AssemblyBuilder
             return result;
         }
         var owner = MakeOwner(type);
-        var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, function.Name, signature!, @namespace: function.Namespace, isStatic: definition.IsStatic)) { DeclaringReference = declaringReference, RequiresVirtualDispatch = !definition.IsStatic && !type!.IsValueType && isVirtual };
+        var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, function.Name, signature!, visibility: (definition.Attributes & 7) == 4 ? MethodVisibility.Protected : MethodVisibility.Public, @namespace: function.Namespace, isStatic: definition.IsStatic)) { DeclaringReference = declaringReference, RequiresVirtualDispatch = !definition.IsStatic && !type!.IsValueType && isVirtual };
         if (type is null && definition.ImplementationAttributes == 0x1000)
         {
             if (definition.GenericArity != 0) throw new InvalidDataException("generic internal-call imports are unsupported");

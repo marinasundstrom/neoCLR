@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add explicit fieldless external class-base authoring and protected base-constructor
+  chaining. Preserve scoped CLI/native bases, reject missing/double initialization
+  and protected allocation outside a derived constructor. Raven's native adapter
+  validates the fieldless public hierarchy behind a target capability; a real Raven
+  attribute derived from the separate System.Runtime library runs in interpreter
+  and macOS ARM64 AOT. General external storage/virtual inheritance remains a gap.
+
 - Clarify the design default: retain .NET API structure and semantics unless a
   concrete benefit justifies a documented divergence. Incomplete support remains
   a gap; this does not require copying CLR internals.

@@ -140,7 +140,8 @@ public sealed partial class AssemblyBuilder
                         throw new InvalidDataException("abstract classes cannot be constructed");
                     if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition) is { Visibility: MethodVisibility.Protected } familyTarget &&
                         (method.DeclaringType is not { } callerType ||
-                         !ReferenceEquals(callerType, familyTarget.DeclaringType) && !callerType.DerivesFrom(familyTarget.DeclaringType!)))
+                         !ReferenceEquals(callerType, familyTarget.DeclaringType) && !callerType.DerivesFrom(familyTarget.DeclaringType!) &&
+                         !(instruction.Op == "call" && method.IsConstructor && callerType.IsDirectBaseConstructor(familyTarget, instruction.Type))))
                         throw new InvalidDataException("protected constructor requires a declaring-family caller");
                     if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true && instruction.Op is not ("call.virtual" or "call.virtual.constructed" or "call.constrained" or "function.bind"))
                         throw new InvalidDataException("interface dispatch requires a supported virtual-call contract");
@@ -742,7 +743,7 @@ public sealed partial class AssemblyBuilder
             }
             var code = new BlobBuilder();
             var offsets = new int[method.Instructions.Count + 1];
-            offsets[0] = method.IsConstructor && !method.DeclaringType!.IsValueType && method.DeclaringType.LocalBase is null ? 6 : 0;
+            offsets[0] = method.IsConstructor && !method.DeclaringType!.IsValueType && !method.DeclaringType.HasExplicitClassBase ? 6 : 0;
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch
                 {
@@ -763,7 +764,7 @@ public sealed partial class AssemblyBuilder
                 });
             var labels = method.LabelPositions();
             if (referenceOnly) { code.WriteByte(0x14); code.WriteByte(0x7a); } // ldnull; throw: never substitute native behavior.
-            else if (method.IsConstructor && !method.DeclaringType!.IsValueType && method.DeclaringType.LocalBase is null)
+            else if (method.IsConstructor && !method.DeclaringType!.IsValueType && !method.DeclaringType.HasExplicitClassBase)
             {
                 code.WriteByte(0x02); // ldarg.0: initialize the sole supported CLI root base.
                 code.WriteByte(0x28); code.WriteInt32(MetadataTokens.GetToken(objectConstructor));
@@ -893,7 +894,7 @@ public sealed partial class AssemblyBuilder
         foreach (var type in types)
         {
             var typeHandle = metadata.AddTypeDefinition((TypeAttributes)type.Definition.Attributes,
-                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface || type.Definition.IsNativeObjectRoot ? default(EntityHandle) : type.IsEnum ? enumBase : type.IsValueType ? valueBase : type.LocalBase is { } parentType ? typeHandles[parentType] : objectType,
+                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface || type.Definition.IsNativeObjectRoot ? default(EntityHandle) : type.IsEnum ? enumBase : type.IsValueType ? valueBase : type.ExternalBase is { } externalBase ? ImportedTypeHandle(externalBase) : type.LocalBase is { } parentType ? typeHandles[parentType] : objectType,
                 MetadataTokens.FieldDefinitionHandle(nextField), MetadataTokens.MethodDefinitionHandle(nextMethod));
             if (type.Definition.DeclaringType is { } parent)
                 metadata.AddNestedType(typeHandle, MetadataTokens.TypeDefinitionHandle(types.IndexOf(parent.Producer!) + 2));

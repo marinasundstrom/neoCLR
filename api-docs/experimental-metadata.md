@@ -8114,3 +8114,31 @@ Output-side external inheritance and constructor chaining remain unsupported. CL
 reference projection continues to reject inheritance instead of dropping the base.
 The focused local/external reader gate covers identity, missing/wrong-version resolution,
 canonical views, copies and malformed bindings across schema-2/3 NEOX snapshots.
+
+## Fieldless external class-base authoring (development 2026-10-10)
+
+`AssemblyBuilder.DeclareFieldlessClassBase(ImportedTypeReference type)` records an
+explicit compiler-host contract: a public, nonsealed, nongeneric, top-level class
+hierarchy without instance storage, interfaces or additional virtual slots. The
+host must validate dependency facts; this API checks reference ownership/shape,
+not dependency layout. It does not load files. Foreign, value, interface, nested or
+generic references throw `ArgumentException`.
+
+`AssemblyBuilder.AddClass(string namespace, string name, ImportedTypeReference
+baseType, TypeVisibility visibility = Public)` requires that contract and creates
+an owned derived class. Undeclared bases/invalid visibility throw `ArgumentException`.
+The existing local-base overload is unchanged. CLI extends and native base bindings
+retain the exact dependency identity. Linking still validates actual declarations.
+
+`CreateMethodReference` gains optional `MethodVisibility visibility = Public`.
+Only a nonstatic `.ctor` may additionally use `Protected`; other nonpublic imports
+remain unsupported. Imported protected constructors can be called by the direct
+derived constructor with its uninitialized receiver. Allocation through `newobj`,
+missing initialization and double initialization fail validation. This follows CLR
+constructor access/initialization semantics within a narrower supported hierarchy.
+No general external field-layout or inherited virtual-dispatch support is claimed.
+
+Validation: `NeoCLR.Metadata.Experimental.Tests --external-class-base <output>`
+checks metadata, actual CLR execution and negative constructor cases. Its native
+artifact returns 42 in the interpreter. A Raven `TestAttribute : Attribute` sample
+also returns 42 in interpreter and macOS ARM64 AOT with the matched compiler.

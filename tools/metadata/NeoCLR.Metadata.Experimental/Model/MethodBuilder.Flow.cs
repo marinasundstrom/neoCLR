@@ -74,7 +74,7 @@ public sealed partial class MethodBuilder
         var work = new Queue<int>();
         var initiallyAssigned = new bool[locals.Count + ParameterCount + (IsConstructor && DeclaringType!.IsValueType ? DeclaringType.Fields.Count : 0)];
         for (int i = 0; i < ParameterCount; i++) initiallyAssigned[locals.Count + i] = !Signature.OutParameters.Contains(i);
-        states[0] = new([], initiallyAssigned, !(IsConstructor && DeclaringType!.LocalBase is not null)); work.Enqueue(0);
+        states[0] = new([], initiallyAssigned, !(IsConstructor && DeclaringType!.HasExplicitClassBase)); work.Enqueue(0);
         while (work.TryDequeue(out var index))
         {
             var state = states[index]!;
@@ -109,7 +109,7 @@ public sealed partial class MethodBuilder
                      stack[^1].GenericInstance is { Definition.IsValueType: false, Definition.IsStatic: false } ||
                      stack[^1].ImportedType is { IsValueType: false });
                 var localExternalConformance = stack.Count > 0 && stack[^1].Class is { } localClass && type.ImportedType is { } externalTarget &&
-                    localClass.InheritedContracts().Any(c => Equals(c.ImportedType, externalTarget));
+                    (localClass.HasExternalBase(externalTarget) || localClass.InheritedContracts().Any(c => Equals(c.ImportedType, externalTarget)));
                 if (stack.Count > 0 && (stack[^1].Class?.IsValueType == true || stack[^1].GenericInstance?.Definition.IsValueType == true || stack[^1].ImportedType?.IsValueType == true) &&
                     (type.Class?.IsInterface == true || type.GenericInstance?.Definition.IsInterface == true || type.ImportedType is { IsValueType: false }))
                     throw new InvalidDataException("value-to-interface conversion requires explicit boxing or constrained dispatch");
@@ -372,7 +372,7 @@ public sealed partial class MethodBuilder
                     }
                     if (instruction.Target.IsConstructor)
                     {
-                        if (baseInitialized || !IsConstructor || !ReferenceEquals(DeclaringType!.LocalBase, instruction.Target.DeclaringType) ||
+                        if (baseInitialized || !IsConstructor || !DeclaringType!.IsDirectBaseConstructor(instruction.Target, instruction.Type) ||
                             stack.Count != 1 || !stack[0].ConstructionReceiver || !(stack[0] with { ConstructionReceiver = false }).Equals((BodyValueType)DeclaringType.OpenSignature))
                             throw new InvalidDataException("base constructor must initialize the current receiver exactly once");
                         stack.Clear(); baseInitialized = true;
