@@ -13974,3 +13974,22 @@ claim completion of in-process test discovery.
   [encoding review](design/encoding-api-review.md).
 - **Status:** explanation and proposal only; no author selection, API removal or
   compatibility change is inferred. Encoding buffer qualification continues.
+
+## 2026-10-10 — Keep helpers internal; consider friend assemblies
+
+- **Author decision:** “Utf8 class should be internal then.” The author cautioned
+  that internal helpers may not be ready, or ever suitable, for public release.
+  This explicitly advances the earlier proposal-only discussion.
+- **Assistant response:** accepted internal visibility and proposed paired Encoding
+  decoding, consumer migration and removal from the public reference as a separate
+  implementation slice after the ongoing buffer/compiler qualification.
+- **Author proposal:** “Another thing we should consider is to add support for a
+  InternalsVisibleToAttribute.”
+- **Assistant assessment:** use .NET assembly-level, one-way friend access; logical
+  modules/namespaces are not friend identities. Inspection found same-assembly-only
+  Raven internal accessibility and an explicit friend-access gap in the CLI import
+  contract. Runtime Data/Web consumers currently use the Runtime Utf8 helper, so
+  changing visibility also requires resolving cross-assembly implementation sharing.
+- **Action/status:** record scope, costs, identity questions and interpreter/AOT
+  acceptance in the [encoding review](design/encoding-api-review.md#author-follow-up-internal-helpers-and-friend-assemblies-2026-10-10).
+  Neither Utf8 internalization nor friend access is claimed implemented by this note.

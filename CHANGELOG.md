@@ -22,6 +22,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   input/write quotas. The three batches total 24 tests; library behavior is unchanged.
   Explain the Utf8 primitive/provider split and record the proposal to consolidate
   ordinary public conversion through Encoding; no API removal is implemented.
+  Record the subsequent author decision to internalize Utf8 and the proposed .NET-style
+  InternalsVisibleTo capability, including cross-assembly consumers and validation gaps.
 
 - Add Date, TimeOfDay and LocalDateTime Parse overloads using current or explicit
   Culture and Result<T, DateTimeParseError>. Support the existing invariant, Swedish

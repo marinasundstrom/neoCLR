@@ -200,3 +200,42 @@ internally unless a distinct public use case is demonstrated. This would require
 migration of Utf8 consumers and error/limit contracts, not merely a class rename.
 The author has asked the question, not yet selected this API change. No removal or
 renaming is implemented here.
+
+## Author follow-up: internal helpers and friend assemblies (2026-10-10)
+
+The author explicitly selected making `Utf8` internal and cautioned that helpers
+used by the implementation may never be suitable public APIs. This supersedes the
+proposal-only status above. Public conversion should be consolidated through the
+supported Encoding surface, including paired one-shot decoding, with matching
+consumer migration and API snapshots. That implementation remains pending.
+
+The author also proposed `InternalsVisibleToAttribute`. Treat this as a separate
+cross-assembly accessibility capability, not an excuse to publish runtime helpers.
+`System.Data` and `System.Web` currently call the Runtime-owned Utf8 primitive.
+Replacing those calls blindly with the bounded Encoding provider can change limits
+and error contracts; preserve those contracts when internalizing the helper.
+
+Follow [the .NET attribute contract](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.internalsvisibletoattribute?view=net-10.0)
+(primary source, reviewed 2026-10-10): an assembly-level, repeatable attribute grants
+a named assembly access to internals. The grant is one-way and non-transitive;
+private access does not change. It targets assembly identity, never a namespace or
+neoCLR logical module. The benefit is implementation sharing and focused tests
+without public API commitments; the cost is deliberate coupling between friend
+assemblies and additional identity/access validation. It is not a security sandbox.
+
+Current inspection: Raven's `AccessibilityUtilities.IsAccessibleFromInternalScope`
+only compares containing assemblies. The CLI library import contract also excludes
+friend access. Declaring the attribute alone is insufficient. A future slice must
+cover attribute declaration/usage, source and imported assembly attributes, Raven
+access checks, CLI bridge/import validation and native metadata retention. AOT must
+apply the same access decision before code generation; no runtime reflection or
+attribute-constructor execution should be required to authorize a static call.
+
+Acceptance: a named friend can use internal types and members; an unrelated
+assembly cannot; friendship is neither reciprocal nor inherited by a friend's
+consumers; private members remain inaccessible; same-assembly behavior is unchanged.
+Include separate-library interpreted and AOT consumers, and ordinary Raven/.NET
+regressions. Specify identity parsing and signed-assembly behavior explicitly;
+.NET's full-public-key rule must not silently degrade to simple-name matching.
+Unsupported identity forms must be diagnosed until implemented. No new permanent
+identity semantics or feature-completion claim is made here.
