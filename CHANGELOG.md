@@ -13,7 +13,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   completed responses and wait for handler acknowledgement before completing cancelled
   sends. Add DelegatingHandler for owned middleware chains and freeze InnerHandler
   after sending. Custom handlers now override Send; stateless handlers inherit Dispose.
-  Rebuild against matching libraries. Configurable timeout remains the next slice.
+  Rebuild against matching libraries. Add a private interpreter timer source with
+  cancellable monotonic deadlines, bounded capacity and traced scheduler handoff.
+  Configurable timeout still requires native timer binding and the HTTP adapter;
+  no public Timeout/Timer/CancelAfter API is introduced by this foundation.
 
 - Add bounded AOT virtual dispatch for nongeneric reference classes. Resolve targets
   with interpreter ancestry rules, retain required base slots, and generate separate

@@ -94,3 +94,54 @@ macOS ARM64 AOT (`target/http-delegating-validation-v8/report.json` and
 async-base and overload-lookup fixes are on Raven main, with native-specific metadata
 and emission on the integration branch. Windows CI is configured but unexecuted.
 Timeout remains unimplemented; these results do not qualify a Timeout property.
+
+## Private timer foundation (2026-10-11)
+
+The interpreter now supplies exact InternalCall services `TimerStart(Int32, fn<Void>)
+-> Int64` and `TimerCancel(Int64) -> Boolean`, classified as TaskDispatch. These are
+private runtime mechanisms, not public Raven APIs. Native AOT binding and the HTTP
+library adapter are still required before Timeout can be exposed consistently.
+
+The .NET baseline is scheduled cancellation: [CancelAfter](https://learn.microsoft.com/en-us/dotnet/api/system.threading.cancellationtokensource.cancelafter?view=net-10.0)
+starts its countdown at registration and allows later reset (checked 2026-10-11).
+This slice implements only the one-shot mechanism underneath such library policy.
+It does not add CancelAfter, reset policy, infinite-delay semantics or Timeout itself.
+
+Each invocation owns at most 64 pending timers with monotonic deadlines and
+process-unique positive handles. Start accepts 0 through Int32.MaxValue milliseconds;
+zero queues work for a later poll rather than invoking inline. Negative delays, invalid
+callbacks, exhausted handles and capacity overflow fault before retaining work.
+Cancellation removes pending work and releases its managed roots; unknown, foreign,
+cancelled or already-delivered handles return false. A callback already transferred
+to the scheduler ready slot cannot be retracted. The future request adapter must
+check its terminal state, as cancellation cannot undo a callback already dispatched.
+
+Timers share existing fair completion arbitration and the traced ready-slot handoff.
+The interpreter parks between polls; it does not allocate a worker thread or post
+a self-repeating callback per timer. Due callbacks are ordered by deadline, with
+registration order breaking ties. Pending callbacks remain rooted, failed ready-slot
+installation preserves roots, and successful installation transfers ownership to
+the active frame. Invocation teardown drops remaining timers.
+
+A bounded linear scan reuses the current scheduler and keeps this foundation small;
+it costs O(n) polling for up to 64 timers and inherits the current approximately 10 ms
+park interval. This is not a throughput or latency claim. A heap/timer wheel and
+nearest-deadline parking may be evaluated if measurements justify them. As with the
+existing invocation scheduler, callbacks run at safe owner-thread boundaries, not
+as preemptive thread-pool callbacks. Full .NET timer concurrency is still a gap.
+
+Focused tests cover deadline boundaries without sleeping, maximum delay, capacity
+recovery, stale/foreign handles, GC handoff, exact metadata contracts and executable
+guest entry-pump delivery/cancellation. Windows and native AOT qualification remain
+required before the HTTP timeout milestone is complete.
+
+Reproduce the interpreter foundation checks with:
+
+```sh
+cargo test --lib timer
+cargo test --lib scheduler::tests
+cargo test --test timers
+```
+
+Website review: existing pages continue to label configurable timeout as pending;
+this private interpreter mechanism adds no public API reference entry or API snapshot.

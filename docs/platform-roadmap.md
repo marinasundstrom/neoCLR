@@ -417,7 +417,9 @@ ten functional cases and eight guard cases interpreted and on macOS ARM64 AOT;
 [dispatch evidence](design/native-class-dispatch.md) records the bounded support.
 Windows CI is configured but unexecuted. Configurable timeout is next: the transport still has a
 fixed 15-second exchange deadline, an incomplete contract rather than a deliberate
-.NET divergence.
+.NET divergence. A private interpreter timer source now has cancellation, bounded
+monotonic deadlines and traced callback handoff; native timer binding and the HTTP
+adapter remain next before exposing Timeout.
 The subsequent string API direction keeps encoding explicit: public string operations
 should describe text, not byte storage. GetUtf8ByteCount/SliceUtf8 remain migration
 debt; replace their uses with appropriate encoding contracts before removing them,

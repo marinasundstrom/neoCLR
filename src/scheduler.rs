@@ -68,6 +68,18 @@ impl Source for crate::name_resolution::Resolver {
     }
 }
 
+impl Source for crate::timers::Timers {
+    fn poll(&mut self, _: &ManagedHeap) -> Result<Option<Value>, Fault> {
+        Ok(self.poll(std::time::Instant::now()))
+    }
+    fn pending(&self) -> bool {
+        self.pending()
+    }
+    fn trace_roots(&self, roots: &mut Vec<usize>) {
+        self.trace_roots(roots);
+    }
+}
+
 // Keep ready values inline; boxing would add an allocation to each completion.
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, PartialEq)]
@@ -120,6 +132,7 @@ pub(crate) struct Scheduler {
     pub(crate) workers: crate::workers::Workers,
     pub(crate) sockets: crate::socket_io::Sockets,
     pub(crate) resolver: crate::name_resolution::Resolver,
+    pub(crate) timers: crate::timers::Timers,
     ready: Option<Ready>,
     arbitration: Arbitration,
     wake: Arc<Wake>,
@@ -131,6 +144,7 @@ impl Default for Scheduler {
             workers: crate::workers::Workers::with_wake(wake.clone()),
             sockets: Default::default(),
             resolver: crate::name_resolution::Resolver::with_wake(wake.clone()),
+            timers: Default::default(),
             ready: None,
             arbitration: Default::default(),
             wake,
@@ -143,8 +157,12 @@ impl Scheduler {
     }
 
     fn progress(&mut self, heap: &ManagedHeap) -> Result<Progress, Fault> {
-        let sources: &mut [&mut dyn Source] =
-            &mut [&mut self.workers, &mut self.sockets, &mut self.resolver];
+        let sources: &mut [&mut dyn Source] = &mut [
+            &mut self.workers,
+            &mut self.sockets,
+            &mut self.resolver,
+            &mut self.timers,
+        ];
         self.arbitration.poll(sources, heap)
     }
 
@@ -156,6 +174,7 @@ impl Scheduler {
         Source::trace_roots(&self.workers, roots);
         Source::trace_roots(&self.sockets, roots);
         Source::trace_roots(&self.resolver, roots);
+        Source::trace_roots(&self.timers, roots);
     }
 
     fn stage(&mut self, callback: Value, destination: &Value) {
@@ -263,6 +282,46 @@ mod tests {
             ready: values.iter().map(|n| Value::Int32(*n)).collect(),
             pending: false,
         }
+    }
+
+    #[test]
+    fn timer_callback_roots_transfer_once_and_cancelled_timers_release_them() {
+        let mut heap = ManagedHeap::default();
+        let mut scheduler = Scheduler::default();
+        let (callback, destination) = ready_graphs(&mut heap);
+        let id = scheduler
+            .timers
+            .start(0, callback, std::time::Instant::now())
+            .unwrap();
+        collect(&mut heap, &scheduler, std::slice::from_ref(&destination));
+        assert_eq!(heap.len(), 4);
+        assert!(scheduler.poll(&heap, &destination).unwrap());
+        assert!(
+            !scheduler.timers.cancel(id),
+            "delivery already belongs to ready slot"
+        );
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.len(), 4);
+        assert!(scheduler
+            .install_ready(|_, _| Err(Fault::new("rejected")))
+            .is_err());
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.len(), 4);
+        scheduler.install_ready(|_, _| Ok(())).unwrap();
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.len(), 0);
+        assert!(!scheduler.poll(&heap, &Value::Void).unwrap());
+
+        let (callback, _) = ready_graphs(&mut heap);
+        let id = scheduler
+            .timers
+            .start(i32::MAX, callback, std::time::Instant::now())
+            .unwrap();
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.len(), 2);
+        assert!(scheduler.timers.cancel(id));
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.len(), 0);
     }
 
     #[test]

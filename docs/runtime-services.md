@@ -156,3 +156,9 @@ existing tracing collector and budgets; these services do not imply byte account
 generations, finalization, native memory release or a new host permission. Private
 control calls return inhabited Void; the public Raven class has no-result methods.
 See [the contract](runtime-gc.md).
+
+Development (2026-10-11): private one-shot `neoCLR.Runtime.TimerStart` and
+`TimerCancel` require TaskDispatch. Submission requires a registered default queue;
+callbacks are rooted until cancellation or completion handoff. These interpreter
+services do not yet expose a public Timer, CancelAfter or HttpClient.Timeout API.
+See [lifetime/timer constraints](design/http-client-lifetime.md).

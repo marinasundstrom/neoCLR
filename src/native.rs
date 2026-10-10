@@ -11,6 +11,7 @@ pub(crate) enum Binding {
     GcKeepAlive,
     Socket(crate::socket_io::Operation),
     Resolve(crate::name_resolution::Operation),
+    Timer(crate::timers::Operation),
     #[cfg(test)]
     TestSocketReceive,
     SystemCultureName,
@@ -626,6 +627,15 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.StringSliceUtf8", [Type::String, Type::Int32, Type::Int32]) => {
             (Binding::StringSliceUtf8, Type::Value)
         }
+        ("neoCLR.Runtime.TimerStart", [Type::Int32, callback])
+            if *callback == crate::assembler::parse_type("fn<Void>")? =>
+        {
+            (Binding::Timer(crate::timers::Operation::Start), Type::Int64)
+        }
+        ("neoCLR.Runtime.TimerCancel", [Type::Int64]) => (
+            Binding::Timer(crate::timers::Operation::Cancel),
+            Type::Boolean,
+        ),
         ("neoCLR.Runtime.SocketDeadlineAfter", [Type::Int32]) => (
             Binding::Socket(crate::socket_io::Operation::DeadlineAfter),
             Type::Int64,
@@ -1564,6 +1574,21 @@ mod character_tests {
 
 #[cfg(test)]
 mod task_callback_tests {
+    #[test]
+    fn timer_services_require_exact_internal_call_signatures() {
+        for (signature, accepted) in [
+            ("TimerStart(Int32 milliseconds, fn<Void> callback) -> Int64", true),
+            ("TimerCancel(Int64 handle) -> Boolean", true),
+            ("TimerStart(Int64 milliseconds, fn<Void> callback) -> Int64", false),
+            ("TimerStart(Int32 milliseconds, fn<Int32> callback) -> Int64", false),
+            ("TimerStart(Int32 milliseconds, fn<Void> callback) -> Int32", false),
+            ("TimerCancel(Int32 handle) -> Boolean", false),
+        ] {
+            let source = format!(".module Test\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n");
+            assert_eq!(crate::assemble(&source).is_ok(), accepted, "{signature}");
+        }
+    }
+
     #[test]
     fn typed_queue_services_require_exact_generic_signatures() {
         for (signature, accepted) in [

@@ -4024,6 +4024,15 @@ fn interpret_instructions_with_dispatch(
                                     .intern(text.clone())
                                     .map_err(|e| e.fault())?,
                             )
+                        } else if let crate::native::Binding::Timer(operation) = binding {
+                            if matches!(operation, crate::timers::Operation::Start)
+                                && default_task_queue.is_none()
+                            {
+                                return Err(Fault::new(
+                                    "Timer completion requires the default TaskQueue",
+                                ));
+                            }
+                            scheduler.timers.invoke(operation, &args)?
                         } else if let crate::native::Binding::Resolve(operation) = binding {
                             if matches!(
                                 operation,
