@@ -6,6 +6,15 @@ from the referenced assemblies, using .NET-style namespace lookup and ambiguity 
 Dotted names have ordinary namespace meaning; there is no separate module hierarchy
 in native metadata. Each declaration retains its defining assembly identity.
 
+**Simplicity clarification, 2026-10-10:** “module” means namespace in this model.
+An assembly may contribute multiple namespaces, and namespace names and packaging
+remain conventions with the same flexibility as .NET. Existing namespace projection
+and resolution are the baseline; shared names do not require a new module resolver,
+loading mechanism or reference graph. Validate that existing lookup combines the
+referenced contributions and fix demonstrated gaps rather than redesigning resolution.
+Introspection should describe this model with the smallest useful API; the shared-view
+question below is not a commitment to introduce another module abstraction.
+
 The implementation described below currently exposes assembly-scoped contributions
 through ModuleInfo. Those descriptors are not yet a context-wide shared namespace
 view. In particular, singular ModuleInfo.Assembly describes a contribution; the final

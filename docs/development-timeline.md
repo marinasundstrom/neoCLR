@@ -13546,3 +13546,18 @@ claim completion of in-process test discovery.
   namespace view. No exact replacement introspection signature is decided here.
   This supersedes any exclusive-namespace inference from the earlier assessment;
   prior positions remain recorded above.
+
+
+## 2026-10-10 — Keep modules as namespaces without extra machinery
+
+- **Author:** clarifies that “we use modules as meaning a namespace”; an assembly
+  may contribute multiple modules, naming is convention, and the platform should
+  remain as flexible as .NET. Existing resolution need not change drastically
+  because namespaces are still projected.
+- **Assistant response:** treats existing namespace projection and resolution as
+  the baseline. Validate split-assembly lookup and address demonstrated gaps;
+  do not infer a new module resolver, loading model or mandatory aggregate API.
+- **Action:** records this constraint in the module design and roadmap. This is a
+  documentation clarification, not a compiler or runtime behavior change. The
+  current contribution-scoped ModuleInfo and shared introspection question remain
+  explicit; the simplest useful API remains to be determined.

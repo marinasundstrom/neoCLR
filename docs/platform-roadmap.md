@@ -72,7 +72,10 @@ multiple assemblies. Imports/references to a module name combine matching declar
 across referenced assemblies, with .NET-style namespace and ambiguity semantics.
 Dotted names follow namespace convention, without a native metadata hierarchy.
 Assembly identity belongs to each declaration and to assembly-local contributions;
-it does not make the namespace exclusive. Validate split-module compiler lookup and
+it does not make the namespace exclusive. The author further clarifies that modules
+simply mean namespaces: keep .NET's naming/packaging flexibility and the existing
+namespace projection and resolution baseline. Do not introduce a separate resolver
+or module-loading model. Validate existing split-module compiler lookup and
 reconcile context-wide introspection with today's assembly-scoped ModuleInfo and its
 singular Assembly property. This clarifies the current module milestone rather than
 reprioritizing unrelated capabilities. See the [current contract and implementation gap](declaration-modules.md).

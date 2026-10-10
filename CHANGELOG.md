@@ -33,6 +33,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   policies. Record the subsequent author correction: module namespaces may span
   assemblies and combine through .NET-style namespace lookup. Current assembly-scoped
   descriptors represent contributions; shared-view API reconciliation remains open.
+  Clarify that modules mean namespaces: retain existing namespace projection and
+  resolution as the baseline, with flexible naming/packaging and no separate resolver
+  or loading model implied by this direction.
   Replace DeclarationModuleInfo/GetDeclarationModules with ModuleInfo/
   GetModules and logical member ownership; expose physical token scopes separately.
   Migrate Raven's native importer to traverse all modules and test discovery IDs to
