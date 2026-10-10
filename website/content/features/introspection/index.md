@@ -307,6 +307,13 @@ public Raven API on macOS ARM64 and Windows x64 without executing attribute cons
 arguments, Int32 enum values and member/parameter annotations are covered by a
 [metadata-authored consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-attributes/README.md).
 Named field/property argument snapshots also pass on macOS in both modes with the
-updated source library; Windows qualification of that expanded corpus remains open.
+updated source library. The [Windows action](https://github.com/marinasundstrom/neoCLR/actions/runs/38045805683) also succeeds at 96ad94e2; independent artifact-hash verification remains open.
 See the [named argument API](/docs/introspection.html#named-attribute-arguments-development-2026-10-10).
 Compiler-produced source annotations through AOT and automatic discovery remain open.
+
+Development source libraries also expose AttributeTargets and AttributeUsageAttribute
+with .NET flag values and policy defaults (AllowMultiple=false, Inherited=true).
+Imported target validation is covered by the
+[usage consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/attribute-usage/README.md).
+Inherited guest queries and automatic discovery remain future work. See the
+[AttributeUsageAttribute reference](/docs/api/System.AttributeUsageAttribute.html).

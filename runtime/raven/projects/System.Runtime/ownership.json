@@ -6,6 +6,8 @@
       "sources": [
         "runtime/raven/src/System/Array.rvn",
         "runtime/raven/src/System/Attribute.rvn",
+        "runtime/raven/src/System/AttributeTargets.rvn",
+        "runtime/raven/src/System/AttributeUsageAttribute.rvn",
         "runtime/raven/src/System/Boolean.rvn",
         "runtime/raven/src/System/BooleanParseError.rvn",
         "runtime/raven/src/System/Byte.rvn",
@@ -31,7 +33,7 @@
         "runtime/raven/src/System/ComparableTo.rvn",
         "runtime/raven/src/System/Concurrency/Cancellation.rvn",
         "runtime/raven/src/System/Concurrency/Workers.rvn",
-        "runtime/raven/src/System/Console/Functions.rvn",
+        "runtime/raven/src/System/Console/Console.rvn",
         "runtime/raven/src/System/Console/Streams.rvn",
         "runtime/raven/src/System/ConsoleReadError.rvn",
         "runtime/raven/src/System/ConvertibleInto.rvn",
@@ -181,6 +183,8 @@
         "runtime/raven/native/RuntimeTimeZoneServices.rvn"
       ],
       "types": [
+        "System.AttributeTargets",
+        "System.AttributeUsageAttribute",
         "System.ArrayIterator`1",
         "System.Array`1",
         "System.Boolean",

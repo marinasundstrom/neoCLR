@@ -295,7 +295,7 @@ SOURCES = {
     'UnicodeScalar': 'runtime/raven/src/System/Text/UnicodeScalar.rvn',
     'InvalidUtf8Error': 'runtime/raven/src/System/Text/InvalidUtf8Error.rvn',
     'Environment': 'runtime/raven/src/System/Environment/Functions.rvn',
-    'Console': 'runtime/raven/src/System/Console/Functions.rvn',
+    'Console': 'runtime/raven/src/System/Console/Console.rvn',
     'IntPtr': 'runtime/raven/src/System/IntPtr.rvn',
     'UIntPtr': 'runtime/raven/src/System/UIntPtr.rvn',
     'Iterable': 'runtime/raven/src/System/Collections/Iterable.rvn',

@@ -7432,3 +7432,23 @@ Validation covers source-built libraries with bundled compiler 494dede84, paired
 macOS ARM64 interpreter/AOT execution, typed/null named values and immutable metadata
 under returned-array mutation. The reference bridge is built with Raven dfaa76145.
 This does not qualify source-annotation AOT integration or Windows named-data execution.
+
+
+## Source attribute usage ownership (2026-10-10)
+
+The native runtime owns AttributeTargets and AttributeUsageAttribute; the .NET
+values and defaults are preserved. No Runtime Contract configuration changes.
+The temporary CLI primitive scaffold previously duplicated them: bootstrap preparation
+now explicitly removes those two metadata declarations and type-level usage
+annotations, rejecting retained signatures using removed types. The full API
+reference keeps them. neoCLR owns this preparation and ownership manifest; Raven
+owns binding, usage diagnostics and emission. Native source libraries carry the
+actual policies. Removing the primitive CLI bootstrap eventually removes this step.
+
+Raven 0f09c350a separates bound data from policy validation, preventing recursion for
+self-described AttributeUsage. Its 24 focused ordinary .NET tests pass. The
+[runtime usage gate](experiments/attribute-usage/README.md) validates defaults,
+flag values, options and imported rejection with interpreter/macOS AOT parity.
+The Windows workflow uses the updated compiler and same consumer; qualification is
+pending. Inherited guest queries, unsupported targets and external Attribute bases
+remain gaps, not alternate semantics.

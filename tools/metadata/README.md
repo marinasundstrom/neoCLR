@@ -280,3 +280,18 @@ retain it; CLI projection writes the setter-return `IsExternalInit` modreq, whic
 the CLI property reader recognizes. Native imports retain it in CLI member references.
 The ordinary-call API remains usable: this is a source restriction, not a runtime
 freeze. See [the contract and validation](../../docs/init-accessors.md).
+
+
+## Temporary source-runtime bootstrap preparation
+
+The Translate executable also accepts
+`--prepare-source-attribute-core INPUT.dll OUTPUT.dll`. This explicit development
+mode uses Mono.Cecil to remove the temporary System.AttributeTargets and
+System.AttributeUsageAttribute declarations and their type-level policy annotations
+from a selected primitive CLI core. It rejects retained signatures using either
+removed type, refuses input/output identity and existing outputs, and never loads
+or executes the assembly. It is intended only for the primitive core used by
+`prepare-native-bootstrap.py`; it is not a general assembly trimmer. The reusable
+metadata library remains independent of Mono.Cecil. Native source libraries replace
+these declarations; the complete API reference remains separate and unchanged by
+this preparation. See the [consumer and limits](../../docs/experiments/attribute-usage/README.md).

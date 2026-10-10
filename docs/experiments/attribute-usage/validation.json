@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    "all-target-flag-values",
+    "flags-composition",
+    "usage-construction-defaults",
+    "mutable-options",
+    "independent-instances",
+    "native-interpreter-parity",
+    "interpreter-cleanup",
+    "imported-usage-target-rejection"
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/attribute-usage/verify.py": "391130d1fbfbc9c5f5da9dc733fd5fad74230c01192e7e1047ac155699bcba34",
+    "/Users/robert/Projects/neoclr/docs/experiments/attribute-usage/Main.rvn": "13e8303b759da479c5558048fb586cec3cda5e30f19c0acea30960e261667ea5",
+    "/Users/robert/Projects/neoclr/docs/experiments/attribute-usage/Native.rvnproj": "f1d8610e14aa9b13b8b5f75dea4ac3e812ce1c40884ebe47e8052792ad93294a",
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/AttributeTargets.rvn": "5a921efd1775faf4d2431d19ac824569b34ad560a6047c6f0c09203b3bce8b1b",
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/AttributeUsageAttribute.rvn": "bc98c636ee2aded70179789b34c0c5e1fa677c88b322c4ddbb20d0281f13009e",
+    "/Users/robert/Projects/neoclr/target/attribute-usage-qualified-bundle/lib/System.Runtime.dll": "82cc7ce28e51f8ef245beb0dcad013b617dedfabd0237881c850d49511dc6152",
+    "/Users/robert/Projects/neoclr/target/attribute-usage-qualified-bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/attribute-usage-qualified-bundle/lib/Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+    "/Users/robert/Projects/neoclr/target/attribute-usage-qualified-bundle/lib/ownership.json": "b6776991106e1682db4b9ddd2e16b938b965433f59f6f39d98ef0e2d93fc6527",
+    "/Users/robert/Projects/neoclr/target/attribute-usage-qualified-bundle/lib/build-evidence.json": "257d02fbbceb4458cba0832984ada0f7500cc965878469dfd85c03325f5eb97d",
+    "/Users/robert/Projects/neoclr/target/attribute-usage-qualified-bundle/manifest.json": "009e7c1c554d0d2e2314fece3a747326c0ff090db7e9c3566993471ba8b7531b",
+    "/Users/robert/Projects/neoclr/target/attribute-usage-qualified/native/app.dll": "816719ca32b01da6a307c68ba96b6d2da245c01ebe02284db29def9270432726",
+    "/Users/robert/Projects/neoclr/target/attribute-usage-qualified/isolated/app": "8d9b8b2c701ef1be4ef7046c67e3906ebec475d3d1d72460244d0b5c5e530ba5",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "7888b1fb060c20124c9bb8ed223e94fd4ca1cbefe5bb74ff3d552d32865821e5",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr": "156e707636147e34689700d24c8f4a5b1ef75a8ee6c06204bb75af3012c179d1",
+    "/Users/robert/Projects/neoclr/target/attribute-usage-qualified-bundle/sdk/tools/rvnc/rvnc.dll": "ae164b8ffc8451d3763a55fa4e9aba0ea97f1de215a042d487b3ce3de587aa41",
+    "/Users/robert/Projects/neoclr/target/attribute-usage-qualified-bundle/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "6d5cf52c6a15cb32093b164497efd7d0cea9540c1bcc90ca500de5a2a4a75cf7",
+    "/Users/robert/Projects/neoclr/target/attribute-usage-qualified-bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "1f566ffbdd23e085d7c0fe669e011f1d3494edc5325d32a2d1c0809d1e60f20a"
+  }
+}

@@ -40,11 +40,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   separate-library Attribute inheritance remain open. Guest GetNamedArguments and
   CustomAttributeNamedArgument now expose primitive named field/property data, with
   fresh sequences, exact types/nulls and no user-code execution. The expanded source
-  library consumer passes macOS interpreter/AOT; Windows named-data qualification
-  is pending. MemberInfo and broader constants remain gaps. Preserve old fixed-only
+  library consumer passes macOS interpreter/AOT; the Windows action at 96ad94e2
+  succeeds, with independent artifact-hash verification pending. MemberInfo and
+  broader constants remain gaps. Preserve old fixed-only
   library inspection and explicitly reject named data without its new contract.
   Refresh the API reference; the separate legacy CLI implementation generator still
   stops at its missing ArrayReflection input.
+  Add source-runtime AttributeTargets and sealed AttributeUsageAttribute, matching
+  .NET values/defaults with read-only ValidOn and mutable policy options. The macOS
+  interpreter/AOT consumer checks flags, defaults, mutation and cleanup; imported
+  misuse rejects with RAV0502. Prepare old primitive cores by removing duplicate
+  usage scaffolds; ownership now requires the runtime declarations. Pin Windows CI
+  to Raven 0f09c350a, which fixes recursive source usage validation (24 focused tests).
+  Add the matching Windows gate; qualification remains pending. Follow the author's
+  Console source rename in live build inputs and refresh the public API reference.
   Record the author-selected sequence: finish attributes, continue the testing
   framework, then complete modules in Introspection and RuntimeContext.
 

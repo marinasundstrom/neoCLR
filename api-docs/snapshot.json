@@ -1,7 +1,7 @@
 {
-  "assemblySha256": "60dbdf650b3bdbbf30fc074f65a37d0a9856bf4351581978a656aec6c8674324",
+  "assemblySha256": "ca4dc4f113ad0477fbcc3d1e1853ce42b672f4aae314a4d8ba0d5a931dc8da76",
   "inputs": {
-    "api-docs/NeoCLR.CoreProbe.xml": "68de47a1885ba2edfef35fa189dc0f0500829bf3ac75145539ef75a4fb8bc3ba",
+    "api-docs/NeoCLR.CoreProbe.xml": "036e27917cc0a6998da8ffa9419bf4b5b98a88010d2512cfcc30d306d64592ff",
     "api-docs/exclusions.json": "dfbbab53935ec02fec642d8b5281a5bb01f12ff30d27d2fe47900430c26e642a",
     "api-docs/manual-members.json": "0e873d90c2e2b1a78b111265459ff9998aa0b8a6ef1eb8aca2b393d6fc277ecf",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
@@ -31,7 +31,7 @@
     "docs/experiments/raven-target/ComparerChecks.cs": "a3717753f277a5ec4a11b7593a49d425ddfa86a00c98e74a943ee1ea2e1a8cda",
     "docs/experiments/raven-target/ConditionalOutputChecks.cs": "e6fc8f4369348cb9bf1c7980350aa0ddf653a8a1e7f88229b93cbac772144959",
     "docs/experiments/raven-target/ConstructionBindingChecks.cs": "785616703f5226f6de6fa4cdab43475af536cbf56e95d5d4c2fcd2f088464f82",
-    "docs/experiments/raven-target/CoreDeclarations.cs": "661e111f5b84672359ee7d12875381b9184ec130bd43de47df65d252c2ae8b56",
+    "docs/experiments/raven-target/CoreDeclarations.cs": "0c1cfaf0686b91c887ba7264d6d8ad8d908d08834945262e2f93ddcd7a55e501",
     "docs/experiments/raven-target/DescriptorLibrary.cs": "7cb2ba8d1523fbdbde438aa4b04838754a2468f58bb194cd0b7c60752ef2869d",
     "docs/experiments/raven-target/DoubleBindings.cs": "ca3ac375b5ad59ef3eac75a11f5592691333c95b79c10c46e3dd0e2059010240",
     "docs/experiments/raven-target/EmptyLibrary.cs": "94063d95f47320072221ad3f2564018544e20f063b6849e31f0003dd68757fc0",
@@ -142,6 +142,8 @@
     "docs/experiments/raven-target/WorkerBindings.cs": "af58f0f39807c4f7bee9832f13767b1369df8c05f1bd32614ceac9dfafdb05f5",
     "runtime/raven/src/System/Array.rvn": "0719768111e5e5a6b058c5cb8bd8b1f3d11c6e29e62d327fa1d70cea6d7db36a",
     "runtime/raven/src/System/Attribute.rvn": "cc1251acf3d1cff070b980be7847611ebdaed261fabbe756d4a85fac39de0fb8",
+    "runtime/raven/src/System/AttributeTargets.rvn": "5a921efd1775faf4d2431d19ac824569b34ad560a6047c6f0c09203b3bce8b1b",
+    "runtime/raven/src/System/AttributeUsageAttribute.rvn": "bc98c636ee2aded70179789b34c0c5e1fa677c88b322c4ddbb20d0281f13009e",
     "runtime/raven/src/System/Boolean.rvn": "79439bf8ec8a7822c48da00c16c31db53efaa1c11672855224bccc463a058fad",
     "runtime/raven/src/System/BooleanParseError.rvn": "d73021f4a603a98b337aa6b3479aa1cc19a775e24501449a701e2924791b135c",
     "runtime/raven/src/System/Byte.rvn": "d482136c8cb60e4c4d37efaea2679e4488346cd6b664c1e8ce939b8d1622b899",

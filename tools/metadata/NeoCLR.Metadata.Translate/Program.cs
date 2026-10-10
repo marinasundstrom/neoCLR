@@ -2,6 +2,43 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using NeoCLR.Metadata.Experimental;
 
+// Explicit temporary CLI bootstrap preparation; ordinary translation stays unchanged.
+if (args.Length == 3 && args[0] == "--prepare-source-attribute-core")
+{
+    try
+    {
+        if (Path.GetFullPath(args[1]) == Path.GetFullPath(args[2]))
+            throw new InvalidDataException("input and output paths must differ");
+        using var image = Mono.Cecil.AssemblyDefinition.ReadAssembly(args[1]);
+        var module = image.MainModule;
+        var removedNames = new HashSet<string> { "System.AttributeTargets", "System.AttributeUsageAttribute" };
+        foreach (var type in module.GetTypes())
+            foreach (var attribute in type.CustomAttributes.ToArray())
+                if (removedNames.Contains(attribute.AttributeType.FullName))
+                    type.CustomAttributes.Remove(attribute);
+        foreach (var type in module.Types.Where(t => removedNames.Contains(t.FullName)).ToArray())
+            module.Types.Remove(type);
+        // Retained declarations may not keep signatures referencing removed definitions.
+        foreach (var type in module.GetTypes())
+        {
+            var signatures = type.Fields.Select(f => f.FieldType)
+                .Concat(type.Properties.Select(p => p.PropertyType))
+                .Concat(type.Methods.SelectMany(m => m.Parameters.Select(p => p.ParameterType).Append(m.ReturnType)));
+            if (signatures.Any(t => removedNames.Contains(t.GetElementType().FullName)))
+                throw new InvalidDataException("Retained bootstrap signature uses a source-owned attribute declaration.");
+        }
+        using var output = new FileStream(args[2], FileMode.CreateNew, FileAccess.Write);
+        image.Write(output);
+        Console.WriteLine("Prepared source-owned attribute bootstrap.");
+        return 0;
+    }
+    catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException)
+    {
+        Console.Error.WriteLine(error.Message);
+        return 1;
+    }
+}
+
 if (args.Length < 2 || (args.Length - 2) % 2 != 0 ||
     Enumerable.Range(0, (args.Length - 2) / 2).Any(i => args[2 + i * 2] != "--reference"))
 {

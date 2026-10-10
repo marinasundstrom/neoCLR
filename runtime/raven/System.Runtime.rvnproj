@@ -221,7 +221,7 @@
     <Compile Include="src/System/Environment/Functions.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Console'">
-    <Compile Include="src/System/Console/Functions.rvn" />
+    <Compile Include="src/System/Console/Console.rvn" />
     <Compile Include="src/System/Console/Streams.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StringBuilder'">

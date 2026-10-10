@@ -1,0 +1,32 @@
+import System.*
+
+func Main() -> int {
+    let selected = AttributeTargets.Method | AttributeTargets.Constructor
+    let usage = AttributeUsageAttribute(selected)
+    if usage.ValidOn != selected || usage.AllowMultiple || !usage.Inherited {
+        return 1
+    }
+    usage.AllowMultiple = true
+    usage.Inherited = false
+    if !usage.AllowMultiple || usage.Inherited || usage.ValidOn != selected {
+        return 2
+    }
+    let defaults = AttributeUsageAttribute(AttributeTargets.All)
+    if defaults.AllowMultiple || !defaults.Inherited || (int)defaults.ValidOn != 32767 {
+        return 3
+    }
+    if (int)AttributeTargets.Assembly != 1 || (int)AttributeTargets.Module != 2 || (int)AttributeTargets.Class != 4 || (int)AttributeTargets.Struct != 8 {
+        return 4
+    }
+    if (int)AttributeTargets.Enum != 16 || (int)AttributeTargets.Constructor != 32 || (int)AttributeTargets.Method != 64 || (int)AttributeTargets.Property != 128 {
+        return 5
+    }
+    if (int)AttributeTargets.Field != 256 || (int)AttributeTargets.Event != 512 || (int)AttributeTargets.Interface != 1024 || (int)AttributeTargets.Parameter != 2048 {
+        return 6
+    }
+    if (int)AttributeTargets.Delegate != 4096 || (int)AttributeTargets.ReturnValue != 8192 || (int)AttributeTargets.GenericParameter != 16384 {
+        return 7
+    }
+    Console.WriteLine("Runtime attribute usage passed")
+    return 0
+}

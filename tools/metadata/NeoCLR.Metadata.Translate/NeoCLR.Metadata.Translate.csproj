@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Mono.Cecil" Version="0.11.6" />
     <ProjectReference Include="../NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj" />
   </ItemGroup>
 </Project>

@@ -1514,3 +1514,12 @@ legacy CLI Descriptors implementation slice currently fails because its project
 omits ArrayReflection; its old fixed-only snapshot remains unchanged. This is not
 an API reference refresh failure or evidence for named-data support in that legacy
 snapshot. The runtime rejects named data with that older library explicitly.
+
+
+### Runtime usage policies (development 2026-10-10)
+
+AttributeTargets now documents every .NET flag value; AttributeUsageAttribute includes
+ValidOn, constructor defaults and mutable options in the matching reference snapshot.
+These declarations now have executable source-runtime implementations. Inherited
+queries and some annotation targets remain gaps; enum membership is not a support
+claim. Primitive bootstrap pruning is separate from this complete API reference.

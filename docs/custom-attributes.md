@@ -322,9 +322,27 @@ Wider/type/array/named-enum constants remain unsupported. Match the updated sour
 runtime library and runtime; older fixed-only libraries still inspect fixed values
 but reject named data explicitly. The metadata/retention format and Runtime Contract
 options are unchanged. The source-built macOS ARM64 consumer passes in both modes;
-Windows qualification of this expanded corpus is pending the shared action.
+The [Windows action](https://github.com/marinasundstrom/neoCLR/actions/runs/38045805683) succeeds at 96ad94e2; archived input hashes have not yet been independently checked.
 
 The next bounded work is runtime AttributeUsage/AttributeTargets declarations. The
 separate-library Attribute base requires a coordinated external-base reference,
 constructor validation and compiler-emission slice; it has not been bypassed.
 Test discovery and the later module-model completion remain in the selected order.
+
+
+## Runtime usage declarations (development 2026-10-10)
+
+Source-owned AttributeTargets and sealed AttributeUsageAttribute now provide .NET
+flag values, read-only ValidOn, AllowMultiple=false and Inherited=true defaults.
+Both options are writable; inherited guest queries remain a gap. The
+[runtime consumer](experiments/attribute-usage/README.md) checks these contracts in
+interpreter/AOT and requires RAV0502 for an invalid imported target. Windows CI runs
+the same gate; its qualification remains pending.
+
+The prepared primitive bootstrap removes duplicate usage declarations and their
+type-level usage annotations; ordinary .NET lookup is unchanged. Source ownership
+rejects duplicates. Raven 0f09c350a fixes recursive validation of self-described
+AttributeUsage by binding immutable data before enforcing policy; 24 focused .NET
+tests pass. The development CI compiler pin advances to that revision. Full
+compiler-produced annotation AOT inspection and external Attribute bases remain
+open before test discovery, followed by the requested module model work.

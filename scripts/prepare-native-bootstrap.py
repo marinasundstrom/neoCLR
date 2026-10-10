@@ -73,12 +73,14 @@ def main():
             raise RuntimeError(result.stdout + result.stderr)
 
     core = output / 'Core.dll'
+    original_core = output / 'Core.bootstrap.dll'
     # This narrow CLI bootstrap excludes Fail and Math: the native source library owns them.
     if args.probe:
-        run(['dotnet', args.probe.resolve(), '--reference-source-runtime-core', core])
+        run(['dotnet', args.probe.resolve(), '--reference-source-runtime-core', original_core])
     else:
-        shutil.copyfile(args.core_reference.resolve(), core)
+        shutil.copyfile(args.core_reference.resolve(), original_core)
         report['reusedPrimitiveCore'] = str(args.core_reference.resolve())
+    run(['dotnet', args.translator.resolve(), '--prepare-source-attribute-core', original_core, core])
     seed_source = output / 'System.neoil'
     seed_source.write_text(seed_text)
     bootstrap_json = output / 'System.bootstrap.json'
@@ -92,7 +94,7 @@ def main():
         inputs += list((ROOT / 'docs/experiments/raven-target').glob('*.cs'))
         inputs += list(args.probe.parent.glob('*.dll'))
     inputs += list(args.translator.parent.glob('*.dll'))
-    outputs = [core, seed_source, bootstrap_json, retained, seed]
+    outputs = [core, original_core, seed_source, bootstrap_json, retained, seed]
     report['hashes'] = {str(path.resolve()): sha(path) for path in inputs + outputs}
     (output / 'preparation-evidence.json').write_text(json.dumps(report, indent=2) + '\n')
     # Publish only after every generator succeeds. The native seed is finalized

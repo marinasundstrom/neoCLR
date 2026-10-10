@@ -1296,13 +1296,29 @@
     <member name="T:System.FlagsAttribute"><summary>Compiler-reference marker for flag enum declarations.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
     <member name="M:System.FlagsAttribute.#ctor"><summary>Creates FlagsAttribute.</summary></member>
 
-    <member name="T:System.AttributeTargets"><summary>Compiler-reference targets used by attribute declarations; this bounded scaffold provides All.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
-    <member name="F:System.AttributeTargets.All"><summary>The All metadata constant.</summary></member>
-    <member name="T:System.AttributeUsageAttribute"><summary>Compiler-reference metadata describing where attributes may be used.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
-    <member name="M:System.AttributeUsageAttribute.#ctor(System.AttributeTargets)"><summary>Constructs AttributeUsageAttribute with the supplied arguments.</summary></member>
+    <member name="T:System.AttributeTargets"><summary>Identifies declaration categories to which an attribute may be applied. Development source-runtime API with .NET-compatible flag values.</summary><remarks>Presence of a target flag does not mean every compiler target can emit annotations on that declaration category. Unsupported native targets still diagnose.</remarks></member>
+    <member name="F:System.AttributeTargets.Assembly"><summary>Identifies the Assembly declaration target (1).</summary></member>
+    <member name="F:System.AttributeTargets.Module"><summary>Identifies the Module declaration target (2).</summary></member>
+    <member name="F:System.AttributeTargets.Class"><summary>Identifies the Class declaration target (4).</summary></member>
+    <member name="F:System.AttributeTargets.Struct"><summary>Identifies the Struct declaration target (8).</summary></member>
+    <member name="F:System.AttributeTargets.Enum"><summary>Identifies the Enum declaration target (16).</summary></member>
+    <member name="F:System.AttributeTargets.Constructor"><summary>Identifies the Constructor declaration target (32).</summary></member>
+    <member name="F:System.AttributeTargets.Method"><summary>Identifies the Method declaration target (64).</summary></member>
+    <member name="F:System.AttributeTargets.Property"><summary>Identifies the Property declaration target (128).</summary></member>
+    <member name="F:System.AttributeTargets.Field"><summary>Identifies the Field declaration target (256).</summary></member>
+    <member name="F:System.AttributeTargets.Event"><summary>Identifies the Event declaration target (512).</summary></member>
+    <member name="F:System.AttributeTargets.Interface"><summary>Identifies the Interface declaration target (1024).</summary></member>
+    <member name="F:System.AttributeTargets.Parameter"><summary>Identifies the Parameter declaration target (2048).</summary></member>
+    <member name="F:System.AttributeTargets.Delegate"><summary>Identifies the Delegate declaration target (4096).</summary></member>
+    <member name="F:System.AttributeTargets.ReturnValue"><summary>Identifies the ReturnValue declaration target (8192).</summary></member>
+    <member name="F:System.AttributeTargets.GenericParameter"><summary>Identifies the GenericParameter declaration target (16384).</summary></member>
+    <member name="F:System.AttributeTargets.All"><summary>All declaration categories (32767).</summary></member>
+    <member name="T:System.AttributeUsageAttribute"><summary>Describes where an attribute class may be used, whether repeated applications are allowed, and whether inherited queries should consider it.</summary><remarks>Development source-runtime API. Inherited is a policy value; guest inherited-attribute queries are not implemented.</remarks></member>
+    <member name="M:System.AttributeUsageAttribute.#ctor(System.AttributeTargets)"><summary>Initializes a usage policy with repetition disabled and inheritance enabled.</summary><param name="validOn">Declaration target flags, preserved exactly in ValidOn.</param></member>
+    <member name="P:System.AttributeUsageAttribute.ValidOn"><summary>Gets the declaration target flags supplied to the constructor.</summary></member>
 
     <member name="P:System.AttributeUsageAttribute.AllowMultiple"><summary>Gets or sets whether the attribute permits repeated applications.</summary></member>
-    <member name="P:System.AttributeUsageAttribute.Inherited"><summary>Gets or sets whether attribute metadata is inherited.</summary></member>
+    <member name="P:System.AttributeUsageAttribute.Inherited"><summary>Gets or sets the inheritance policy, initially true. Guest inherited-attribute queries remain unsupported.</summary></member>
     <member name="T:System.Math.NamespaceMembers"><summary>Assembly-level functions and constants for integer and floating-point mathematics.</summary></member>
     <member name="F:System.Math.NamespaceMembers.Pi"><summary>The circle circumference-to-diameter ratio, rounded to Double precision.</summary><remarks>Development API. Equivalent to .NET Math.PI; named Pi using neoCLR casing. Compile-time constant: consumers inline its value.</remarks></member>
     <member name="F:System.Math.NamespaceMembers.E"><summary>Euler's number, the base of natural logarithms, rounded to Double precision.</summary><remarks>Development compile-time constant equivalent to .NET Math.E.</remarks></member>

@@ -1,0 +1,22 @@
+module System
+
+/// Describes the declaration targets, repetition and inheritance policy of an attribute class.
+[AttributeUsage(AttributeTargets.Class)]
+public class AttributeUsageAttribute : Attribute {
+    private var targets: AttributeTargets
+
+    /// Initializes a usage policy with repetition disabled and inheritance enabled.
+    init(validOn: AttributeTargets) {
+        targets = validOn
+        Inherited = true
+    }
+
+    /// Gets the declaration categories to which the attribute may be applied.
+    val ValidOn: AttributeTargets => targets
+
+    /// Gets or sets whether the attribute may occur more than once on a declaration.
+    var AllowMultiple: bool { get; set; }
+
+    /// Gets or sets whether inherited queries should consider the attribute.
+    var Inherited: bool { get; set; }
+}
