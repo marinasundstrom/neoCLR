@@ -19,6 +19,7 @@ public sealed partial class NativeAssemblyDefinition
         internal bool IsFlagsEnum { get; init; }
         internal string? BaseName { get; init; }
         internal int BaseIndex { get; set; } = -1;
+        internal ImportedTypeReference? ExternalBase { get; set; }
         internal PrimitiveType? NativePrimitive { get; init; }
         internal bool PrimitiveReference { get; init; }
         internal bool NativeGrapheme { get; init; }
@@ -365,7 +366,14 @@ public sealed partial class NativeAssemblyDefinition
                 var type = types[i];
                 if (type.BaseName is null) continue;
                 type.BaseIndex = types.FindIndex(candidate => candidate.NativeName == type.BaseName);
-                Require(type.BaseIndex >= 0, "base class must be a local declaration");
+                if (type.BaseIndex < 0)
+                {
+                    Require(IsOrdinaryClass(type) && !type.IsClosedHierarchy &&
+                        nativeTypeAliases.TryGetValue((type.BaseName, 0), out var alias) &&
+                        !alias.ValueType && alias.Declaring is null,
+                        "external base requires an explicit nongeneric top-level reference binding and ordinary class owner");
+                    continue;
+                }
                 var parent = types[type.BaseIndex];
                 Require((IsOrdinaryClass(type) || parent.IsObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType && type.DeclaringType < 0 && type.NativePrimitive is null or PrimitiveType.String && !type.NativeGrapheme) && IsOrdinaryClass(parent) && !parent.IsSealedClass, $"unsupported base class category: {type.Namespace}.{type.Name} -> {parent.Namespace}.{parent.Name}");
                 var seen = new HashSet<int>();
@@ -386,6 +394,8 @@ public sealed partial class NativeAssemblyDefinition
             }
             foreach (var alias in nativeTypeAliases.Values)
                 _ = ImportExternalType(signatureGraph, alias.NativeName, alias.Arity, referenceIdentities, valueTypeReferences, nativeTypeAliases);
+            foreach (var type in types.Where(t => t.BaseName is not null && t.BaseIndex < 0))
+                type.ExternalBase = ImportExternalType(signatureGraph, type.BaseName!, 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
             int genericArity = 0; int typeArity = 0;
             var signatureOwners = DefineTypes(signatureGraph, types);
             for (int i = 0; i < types.Count; i++)

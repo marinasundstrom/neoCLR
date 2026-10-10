@@ -346,3 +346,11 @@ AttributeUsage by binding immutable data before enforcing policy; 24 focused .NE
 tests pass. The development CI compiler pin advances to that revision. Full
 compiler-produced annotation AOT inspection and external Attribute bases remain
 open before test discovery, followed by the requested module model work.
+
+
+The next prerequisite now preserves explicitly scoped external class bases in native
+metadata reader snapshots and host introspection. Focused local/external reader tests
+pass; this does not yet enable authoring or invoking a constructor across an assembly
+boundary. See the [reader contract](../api-docs/experimental-metadata.md#scoped-external-class-base-readers-development-2026-10-10).
+The author now explicitly requests continuing through working TestAttribute discovery
+and registration; metadata work is a prerequisite, not the completion criterion.

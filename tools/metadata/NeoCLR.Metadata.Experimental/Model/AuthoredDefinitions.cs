@@ -120,9 +120,10 @@ public sealed partial class TypeDefinition
         ? throw new NotSupportedException("CLI closed-family attributes are not materialized") : closedHierarchy;
     private TypeReference? authoredBaseType;
     /// <summary>Gets the authored or materialized nominal base reference without resolving dependencies.</summary>
-    /// <remarks>Native snapshots support local nongeneric class bases, including the native Object base of a generic class. Null means no recorded base.</remarks>
+    /// <remarks>Native snapshots support local bases and explicitly scoped external nongeneric top-level class bases. External references require an explicit resolver; dependency legality is verified separately. Null means no recorded base.</remarks>
     public TypeReference? BaseType => authoredBaseType ?? (loadedBaseTypeToken == 0 ? null :
         Module!.GetTypeDefinition(loadedBaseTypeToken)?.ToReference()
+            ?? Module.TypeReferences.SingleOrDefault(reference => reference.MetadataToken == loadedBaseTypeToken)
             ?? throw new InvalidDataException("missing base class definition"));
 }
 

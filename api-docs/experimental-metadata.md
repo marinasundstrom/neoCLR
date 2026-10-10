@@ -3465,7 +3465,7 @@ It implements only the assembly/type/field part of the definition-first plan abo
 | `AssemblyBuilder.Definition` / `AssemblyBuilder.ForDefinition(AssemblyDefinition)` | Returns the same assembly/facade without copying declarations. Null input throws `ArgumentNullException`; loaded input throws `InvalidOperationException`. |
 | `ModuleDefinition.ImportReference(AssemblyIdentity scope, string namespace, string name)` | Creates an explicitly scoped reference; does not load a dependency or consult host reflection. Invalid/null arguments reject. Explicit resolution requires matching assembly identity. |
 | `TypeDefinition(string namespace, string name, uint attributes, TypeReference? baseType)` | Creates a detached declaration. Attachment admits nongeneric root classes, static classes or sealed sequential value types with the same module's explicitly imported core Object/ValueType base. Unsupported shape, foreign ownership or duplicate name throws `ArgumentException`. |
-| `TypeDefinition.BaseType` | Authored base reference or a loaded local native base; CLI base decoding remains pending. |
+| `TypeDefinition.BaseType` | Authored base reference or a loaded local/scoped external native base; CLI base decoding remains pending. |
 | `FieldDefinition(string name, ushort attributes, SignatureType fieldType)` | Creates a detached instance field. Supports Private, Assembly or Public access and optional InitOnly; nonvoid signature required. Value-type storage retains existing primitive/generic-payload restrictions. |
 | `FieldDefinition.FieldType` | Authored signature; null for opaque loaded signatures. `GetSignature()` rejects authored fields until encoded/read; use FieldType instead. |
 | `FieldDefinition.Name` | Authored fields can be renamed with Unicode/name and duplicate checks. Loaded edits throw `InvalidOperationException`. |
@@ -8093,3 +8093,24 @@ not supported. The CLI decoder currently handles the Int32 enum storage profile;
 it is not a general-purpose decoder for arbitrary external enum backing types.
 Native named-data records require matching metadata/runtime readers. Guest inspection
 currently rejects named data explicitly; it never silently drops it.
+
+
+## Scoped external class-base readers (development 2026-10-10)
+
+`TypeDefinition.BaseType` now retains a nongeneric top-level external base as an
+assembly-scoped TypeReference when the native manifest supplies an explicit matching
+native type/module binding. `NominalTypeInfo.BaseType` resolves that reference through
+the existing fixed MetadataLoadContext catalog, returning its canonical parent view.
+Missing dependencies and wrong versions throw InvalidDataException; no file probing,
+name-only fallback or code execution occurs. Snapshot Write preserves the original
+container and relationship.
+
+This follows .NET's scoped base-type identity, while keeping metadata loading separate
+from execution. The reader admits ordinary top-level nongeneric class owners and
+rejects unbound, value, nested or generic base bindings. The dependency's actual class
+category, visibility, sealed state and cross-assembly cycle/constructor/layout legality
+still require semantic/link verification; descriptive loading does not establish them.
+Output-side external inheritance and constructor chaining remain unsupported. CLI
+reference projection continues to reject inheritance instead of dropping the base.
+The focused local/external reader gate covers identity, missing/wrong-version resolution,
+canonical views, copies and malformed bindings across schema-2/3 NEOX snapshots.

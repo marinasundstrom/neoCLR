@@ -95,7 +95,7 @@ public sealed class NominalTypeInfo : TypeInfo
     private readonly Lazy<IReadOnlyList<CustomAttributeInfo>> attributes;
     internal TypeDefinition Definition => definition;
     /// <summary>Gets the recorded nominal base through this explicit metadata context, or null when absent.</summary>
-    /// <remarks>Native local nongeneric class bases are supported. This does not perform inherited member lookup.</remarks>
+    /// <remarks>Native local and explicitly scoped external nongeneric class bases are supported. External bases require their exact dependency in this context. This does not perform inherited member lookup.</remarks>
     /// <exception cref="NotSupportedException">Base relationships have not been materialized for a CLI snapshot.</exception>
     public TypeInfo? BaseType => !definition.Module.Assembly.IsNative
         ? throw new NotSupportedException("CLI base relationships are not materialized")

@@ -54,6 +54,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   to Raven 0f09c350a, which fixes recursive source usage validation (24 focused tests).
   Add the matching Windows gate; qualification remains pending. Follow the author's
   Console source rename in live build inputs and refresh the public API reference.
+  Preserve explicitly scoped external class bases in native metadata reader snapshots
+  and host introspection, with exact dependency resolution and canonical views. The
+  local/external reader gate passes; output-side inheritance and constructor chaining
+  remain open, and CLI reference projection still rejects rather than losing bases.
   Record the author-selected sequence: finish attributes, continue the testing
   framework, then complete modules in Introspection and RuntimeContext.
 

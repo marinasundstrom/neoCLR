@@ -13400,3 +13400,17 @@ unarchived compiler/runtime executables cannot be independently rehashed. Source
 annotation AOT integration, separate-library Attribute inheritance, runtime usage
 and guest named data remain open before discovery. See [attribute status](custom-attributes.md)
 and [Windows evidence](experiments/native-attributes/windows-validation.json).
+
+
+## 2026-10-10 — Continue through test discovery
+
+**Author:** “Continue work until you have a working TestAttribute for dynamically
+ discovering and registering test methods.”
+
+**Assistant:** Committed runtime usage policies and their macOS interpreter/AOT gate
+as `4455880d`; Windows validation was queued. Began the external-base prerequisite
+and explicitly committed to carrying annotation discovery through registration with
+the existing runner. Scoped external-base metadata reading now passes focused tests;
+that is an intermediate result, not completion of the requested discovery workflow.
+Constructor chaining, callable retention/invocation and the executable discovery
+consumer remain open at this entry. See the [attribute plan](custom-attributes.md).

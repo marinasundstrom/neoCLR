@@ -12,6 +12,8 @@ if (args is ["--aot-attribute-fixture", var attributeInput, var attributeImage, 
 if (args is ["--member-attributes"]) { MemberAttributeChecks.Run(); return 0; }
 if (args is ["--member-attributes", var attributeOutput]) { MemberAttributeChecks.Run(attributeOutput); return 0; }
 
+if (args is ["--class-base-readers"]) { ClassBaseReaderChecks.Run(); ExternalClassBaseReaderChecks.Run(); return 0; }
+
 if (args is ["--init-accessors"]) { NativeInitAccessorChecks.Run(); return 0; }
 
 if (args is ["--check-module-consumer", var moduleConsumer])
@@ -582,6 +584,7 @@ var tests = new (string Name, Action Body)[]
     ("Class base authoring and constructor initialization", ClassBaseAuthoringChecks.Run),
     ("Class virtual and abstract slot authoring", ClassVirtualChecks.Run),
     ("Native local class base snapshots and facade identity", ClassBaseReaderChecks.Run),
+    ("Native scoped external class base snapshots", ExternalClassBaseReaderChecks.Run),
     ("Read-only callable imports and emission", ImportedReferenceChecks.Run),
     ("CLI and native Int32 enum definitions and builders", EnumChecks.Run),
     ("Bounded library PE profile and native declaration round trip", LibraryPeProfileChecks.Run),
