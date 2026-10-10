@@ -32,6 +32,10 @@ linked into that binary. See [architecture](../../architecture/) for those layer
 
 The development project workflow builds an ordinary Raven project with a matching
 compiler/library bundle, links its executable and records diagnostics and dependencies.
+The development runtime tests also exercise primitive numeric and Boolean parsing
+in native macOS ARM64 and interpreted modes, using the same culture-independent
+parser. Windows execution of this newly migrated suite remains pending.
+
 Choose the profile for the host and workload:
 
 | Host | Console profile | HTTP profile | Build tools |

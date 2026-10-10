@@ -424,13 +424,13 @@ suite requires both modes to pass; its earlier admission exception is removed.
 Focused backend checks additionally compare lexical/error/null behavior with the
 interpreter. Windows requalification remains pending.
 
-Batch `primitive-parsing`: primitive numeric and Boolean parsing values, format errors and overflow; 12 tests pass release-interpreted execution; native admission remains unsupported ([evidence](primitive-parsing-validation.json)).
+Batch `primitive-parsing`: primitive numeric and Boolean parsing values, format errors and overflow; 12 tests pass native macOS ARM64 and release-interpreted execution ([evidence](primitive-parsing-validation.json)).
 Source: [docs/experiments/numeric-contracts/Main.rvn](../../../docs/experiments/numeric-contracts/Main.rvn). Windows remains pending.
 
-The primitive parser suite currently rejects native closed generic `Single` results
-at selection. Its twelve cases pass interpreted; this records the first admission
-gap rather than claiming all later parser bindings are implemented. Generic numeric
-operator and JSON conversion checks remain in the original numeric consumer.
+The primitive parser suite now requires native execution. Single/Double generic
+values and primitive erased payloads are supported, and exact parser bindings share
+the interpreter kernel. Scalar/tag, NaN, negative-zero and conversion checks pass.
+Generic numeric operator and JSON conversion checks remain in the original consumer.
 
 Batch `path-values`: Path equality, hashing, display and colliding map behavior; 5 tests pass release-interpreted execution; native admission remains unsupported ([evidence](path-values-validation.json)).
 Source: [docs/experiments/path-object/Main.rvn](../../../docs/experiments/path-object/Main.rvn). Windows remains pending.

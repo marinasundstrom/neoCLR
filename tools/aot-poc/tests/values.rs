@@ -2112,3 +2112,57 @@ fn double_profile_rejects_unsupported_operations_before_codegen() {
         assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
     }
 }
+
+#[test]
+fn erased_primitive_scalars_preserve_tags_and_values_through_generics() {
+    for (kind, value) in [
+        ("SByte", "ldc.i4 -128\nconv.i1"),
+        ("Byte", "ldc.i4 255\nconv.u1"),
+        ("Int16", "ldc.i4 -32768\nconv.i2"),
+        ("UInt16", "ldc.i4 65535\nconv.u2"),
+        ("UInt32", "ldc.i4 -1\nconv.u4"),
+        ("Single", "ldc.r4 1.25"),
+        ("Double", "ldc.r8 1.0000000000000002"),
+    ] {
+        let mut source = format!(".module ScalarTransport\n.entry Main\n.type Box<T>\n.field Item T\n.end\n.function Copy<T>(!!0 value) -> !!0\nldarg value\nret\n.end\n.function Main() -> Int32\n.local Value erased\n{value}\ncall Copy<{kind}>({kind})\nnewobj Box<{kind}>\nldfld 0\nvalue.pack {kind}\nstloc erased\n");
+        for target in ["SByte", "Byte", "Int16", "UInt16", "Int32", "UInt32", "Single", "Double", "Boolean"] {
+            source += &format!("ldloc erased\nvalue.is {target}\n{} fail\n", if target == kind { "brfalse" } else { "brtrue" });
+        }
+        source += &format!("ldloc erased\nvalue.unpack {kind}\n{value}\nceq\nbrfalse fail\nldc.i4 42\nret\nfail:\nldc.i4 -1\nret\n.end");
+        let m = neoclr::assemble(&source).unwrap();
+        assert_eq!(neoclr::LoadedProgram::new(&m).unwrap().run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+        let temp = Temp::new();
+        let compiled = compile_mode(&bytes, &temp, "@entry", true);
+        assert!(compiled.status.success(), "{kind}: {}", String::from_utf8_lossy(&compiled.stderr));
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        native_mode(&bytes, 0, 0, 42, "@entry", true);
+    }
+}
+
+#[test]
+fn erased_floating_transport_preserves_nan_and_signed_zero() {
+    for (kind, load) in [("Single", "ldc.r4"), ("Double", "ldc.r8")] {
+        let source = format!(".module FloatingTransport\n.entry Main\n.function Main() -> Int32\n{load} nan\nvalue.pack {kind}\nvalue.unpack {kind}\ndup\nceq\nbrtrue fail\n{load} 1\n{load} -0.0\nvalue.pack {kind}\nvalue.unpack {kind}\ndiv\n{load} -inf\nceq\nbrfalse fail\nldc.i4 42\nret\nfail:\nldc.i4 -1\nret\n.end");
+        let m = neoclr::assemble(&source).unwrap();
+        assert_eq!(neoclr::LoadedProgram::new(&m).unwrap().run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+        let temp = Temp::new();
+        let compiled = compile_mode(&bytes, &temp, "@entry", true);
+        assert!(compiled.status.success(), "{kind}: {}", String::from_utf8_lossy(&compiled.stderr));
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        native_mode(&bytes, 0, 0, 42, "@entry", true);
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn floating_conversions_preserve_rounding_and_unsigned_range() {
+    for body in [
+        "ldc.i4 16777217\nconv.r4\nldc.r4 16777216\nceq",
+        "ldc.r8 1.0000000000000002\nconv.r4\nldc.r4 1\nceq",
+        "ldc.r4 1.25\nconv.r8\nldc.r8 1.25\nceq",
+        "ldc.i4 -1\nconv.r.un\nldc.r8 4294967295\nceq",
+        "ldc.i8 -1\nconv.r.un\nldc.r8 18446744073709551616\nceq",
+    ] { double_check(body, true); }
+}

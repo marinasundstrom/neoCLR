@@ -15,7 +15,6 @@ ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / 'runtime/raven/tests'
 # Explicit admission gaps: these suites still run interpreted; no native pass is claimed.
 NATIVE_ADMISSION_GAPS = {
-    'primitive-parsing': 'unsupported closed generic argument: Single',
     'path-values': 'virtual calls requiring dispatch need a later specialization profile: System.Object.Equals',
 }
 MAP_NAMES = [

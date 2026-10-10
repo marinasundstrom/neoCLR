@@ -19,7 +19,7 @@ def native_text_sources():
     return [ROOT / 'tools/aot-native-text/Cargo.toml', ROOT / 'tools/aot-native-text/Cargo.lock',
             ROOT / 'tools/aot-native-text/src/lib.rs',
             *[ROOT / 'src' / name for name in
-              ('string_comparison.rs', 'string_case_folding.rs', 'string_casing_data.rs', 'string_casing_kernel.rs')]]
+              ('string_comparison.rs', 'string_case_folding.rs', 'string_casing_data.rs', 'string_casing_kernel.rs', 'numeric_parse_core.rs')]]
 
 
 def support_files():
@@ -200,7 +200,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                          'neoclr_string_grapheme_at_v1', 'neoclr_string_graphemes_v1',
                          'neoclr_string_scalars_v1', 'neoclr_string_from_chars_v1'}
         native_text = []
-        if any(binding.get('symbol') in text_services or binding.get('validationSymbol') == 'neoclr_is_single_grapheme_v1'
+        if any(binding.get('nativePrimitiveParser') or binding.get('symbol') in text_services or binding.get('validationSymbol') == 'neoclr_is_single_grapheme_v1'
                for binding in selection.get('nativeBindings', [])):
             adapters.append(base / 'string-unicode.c')
             archive_name = 'neoclr_aot_native_text.lib' if windows else 'libneoclr_aot_native_text.a'

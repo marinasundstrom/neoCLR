@@ -492,7 +492,7 @@ pub(super) fn select_inventory_with_host_roots(
             Type::ArrayRef(t) if *t == Type::Byte => {
                 if let Some(owner) = byte_array_owner(input) { pending_types.push(owner); }
             },
-            Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::RuntimeTypeHandle => (),
+            Type::Single | Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::RuntimeTypeHandle => (),
             _ => {
                 return Err(
                     "closed-world selection requires reference-free nongeneric value signatures"

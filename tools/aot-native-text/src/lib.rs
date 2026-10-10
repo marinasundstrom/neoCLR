@@ -164,3 +164,95 @@ mod hash_tests {
         assert_eq!(output, 123);
     }
 }
+
+// The interpreter and native adapters share grammar and rounding, not transport.
+#[path = "../../../src/numeric_parse_core.rs"]
+mod numeric_parse;
+
+unsafe fn parse_number(text: *const u8, output: *mut u64, kind: numeric_parse::Kind) -> i32 {
+    if text.is_null() || output.is_null() { return 3; }
+    let length = unsafe { text.cast::<u64>().read() };
+    if length > isize::MAX as u64 { return 3; }
+    let bytes = unsafe { core::slice::from_raw_parts(text.add(8), length as usize) };
+    let Ok(text) = core::str::from_utf8(bytes) else { return 3; };
+    use numeric_parse::ParsedNumber as Parsed;
+    // Private AOT erased tags, synchronized with value_profile::erased_tag.
+    let (tag, payload) = match numeric_parse::parse(text, kind) {
+        Parsed::Int32(n) => (1, n as u32 as u64),
+        Parsed::Byte(n) => (2, n as u64),
+        Parsed::Boolean(n) => (3, u64::from(n)),
+        Parsed::UInt64(n) => (6, n),
+        Parsed::SByte(n) => (7, n as u8 as u64),
+        Parsed::Int16(n) => (8, n as u16 as u64),
+        Parsed::UInt16(n) => (9, n as u64),
+        Parsed::UInt32(n) => (10, n as u64),
+        Parsed::Single(n) => (11, n.to_bits() as u64),
+        Parsed::Double(n) => (12, n.to_bits()),
+    };
+    unsafe { output.write(tag); output.add(1).write(payload); }
+    0
+}
+
+macro_rules! parser_adapter {
+    ($symbol:ident, $kind:ident) => {
+        /// Parse a native immutable UTF-8 string into private erased result lanes.
+        /// # Safety
+        /// `text` addresses its readable length header and bytes; `output` addresses
+        /// two writable u64 lanes. Both pointers are aligned and live for this call.
+        #[unsafe(no_mangle)]
+        pub unsafe extern "C" fn $symbol(text: *const u8, output: *mut u64) -> i32 {
+            unsafe { parse_number(text, output, numeric_parse::Kind::$kind) }
+        }
+    };
+}
+parser_adapter!(neoclr_parse_sbyte_v1, SByte);
+parser_adapter!(neoclr_parse_byte_v1, Byte);
+parser_adapter!(neoclr_parse_int16_v1, Int16);
+parser_adapter!(neoclr_parse_uint16_v1, UInt16);
+parser_adapter!(neoclr_parse_uint32_v1, UInt32);
+parser_adapter!(neoclr_parse_uint64_v1, UInt64);
+parser_adapter!(neoclr_parse_single_v1, Single);
+parser_adapter!(neoclr_parse_double_v1, Double);
+parser_adapter!(neoclr_parse_boolean_v1, Boolean);
+
+#[cfg(test)]
+mod numeric_adapter_tests {
+    use super::*;
+    type Parser = unsafe extern "C" fn(*const u8, *mut u64) -> i32;
+
+    #[test]
+    fn publishes_exact_erased_kinds_and_float_bits() {
+        let cases: [(Parser, &str, [u64; 2]); 12] = [
+            (neoclr_parse_sbyte_v1, "-128", [7, 128]),
+            (neoclr_parse_byte_v1, "1", [2, 1]),
+            (neoclr_parse_byte_v1, "-1", [1, 2]),
+            (neoclr_parse_int16_v1, "-32768", [8, 32768]),
+            (neoclr_parse_uint16_v1, "65535", [9, 65535]),
+            (neoclr_parse_uint32_v1, "4294967295", [10, u32::MAX as u64]),
+            (neoclr_parse_uint64_v1, "18446744073709551615", [6, u64::MAX]),
+            (neoclr_parse_single_v1, "-0", [11, (-0.0f32).to_bits() as u64]),
+            (neoclr_parse_single_v1, "1e39x", [1, 1]),
+            (neoclr_parse_double_v1, "-Infinity", [12, f64::NEG_INFINITY.to_bits()]),
+            (neoclr_parse_double_v1, "1e999", [1, 2]),
+            (neoclr_parse_boolean_v1, "TrUe", [3, 1]),
+        ];
+        for (parse, text, expected) in cases {
+            let mut storage = vec![0u64; 1 + text.len().div_ceil(8)];
+            storage[0] = text.len() as u64;
+            unsafe { core::ptr::copy_nonoverlapping(text.as_ptr(), storage.as_mut_ptr().add(1).cast(), text.len()); }
+            let mut output = [u64::MAX; 2];
+            assert_eq!(unsafe { parse(storage.as_ptr().cast(), output.as_mut_ptr()) }, 0);
+            assert_eq!(output, expected, "{text}");
+        }
+    }
+
+    #[test]
+    fn null_and_invalid_utf8_fault_without_publishing() {
+        let mut output = [99, 98];
+        assert_eq!(unsafe { neoclr_parse_single_v1(core::ptr::null(), output.as_mut_ptr()) }, 3);
+        assert_eq!(output, [99, 98]);
+        let invalid = [1u64, 255];
+        assert_eq!(unsafe { neoclr_parse_double_v1(invalid.as_ptr().cast(), output.as_mut_ptr()) }, 3);
+        assert_eq!(output, [99, 98]);
+    }
+}

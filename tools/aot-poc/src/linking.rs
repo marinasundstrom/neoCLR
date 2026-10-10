@@ -476,7 +476,7 @@ pub fn prepare(
     // source identity in the report, then use private free-function bodies: the
     // backend's bundled primitive declarations belong to a different verification module.
     let primitive_static: std::collections::BTreeSet<_> = selected.functions.iter().enumerate()
-        .filter(|(_, f)| matches!(f.owner, Some(neoclr::metadata::Type::Char | neoclr::metadata::Type::String | neoclr::metadata::Type::Int32 | neoclr::metadata::Type::Boolean | neoclr::metadata::Type::Int64 | neoclr::metadata::Type::UInt64)) && !f.instance && !f.receiver_byref)
+        .filter(|(_, f)| matches!(f.owner, Some(neoclr::metadata::Type::Single | neoclr::metadata::Type::Double | neoclr::metadata::Type::SByte | neoclr::metadata::Type::Byte | neoclr::metadata::Type::Int16 | neoclr::metadata::Type::UInt16 | neoclr::metadata::Type::UInt32 | neoclr::metadata::Type::Char | neoclr::metadata::Type::String | neoclr::metadata::Type::Int32 | neoclr::metadata::Type::Boolean | neoclr::metadata::Type::Int64 | neoclr::metadata::Type::UInt64)) && !f.instance && !f.receiver_byref)
         .map(|(i, _)| i).collect();
     report["staticPrimitiveOwners"] = json!(primitive_static.iter().map(|i| json!({
         "compiledIndex": i, "owner": selected.functions[*i].owner, "lowering": "verified static wrapper to private free function"

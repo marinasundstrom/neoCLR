@@ -32,7 +32,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the suite. Original integration consumers remain; Windows qualification is pending.
 
 - Migrate primitive numeric and Boolean parsing values, format errors and overflow into 12 attributed Raven tests in `primitive-parsing`.
-  Release-interpreted execution passes; native admission remains unsupported. Default gates include
+  Share the allocation-free parser between native and interpreted services; add native
+  Single/generic floating storage, primitive erased transport and exact parser bindings.
+  All twelve cases pass native macOS ARM64 and interpreted execution; remove the
+  admission exception. Windows x64 object emission passes. Default gates include
   the suite. Original integration consumers remain; Windows qualification is pending.
 
 - Migrate Int64 boundary parsing, lexical errors, overflow and formatting into 5 attributed Raven tests in `int64-parsing`.

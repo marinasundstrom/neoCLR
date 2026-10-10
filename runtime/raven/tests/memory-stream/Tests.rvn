@@ -88,4 +88,3 @@ func MemoryClosed() -> Result<unit, TestFailure> {
     _ = Assert.True(output.Flush() is Error(StreamError.Closed), "Closed flush")?
     return Assert.True(seek.Seek(0) is Error(StreamError.Closed), "Closed seek")
 }
-

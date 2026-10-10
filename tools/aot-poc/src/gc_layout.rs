@@ -73,6 +73,7 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
         | Ty::Unit
         | Ty::Size
         | Ty::Wide
+        | Ty::Single
         | Ty::Double
         | Ty::TypeToken => return vec![],
     };

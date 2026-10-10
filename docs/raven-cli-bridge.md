@@ -7685,3 +7685,30 @@ Both suites pass native macOS ARM64 and interpreted execution with a hashed bund
 containing the rebuilt compiler and unchanged compatible source-library metadata.
 Windows development qualification now selects the same compiler revision; execution
 is pending. Broader constant-pattern types remain separate compiler work.
+
+### Native primitive parsing and scalar transport — 2026-10-10
+
+The primitive-parsing migration exposed absent Single specialization and native
+services for SByte, Byte, Int16, UInt16, UInt32, UInt64, Single, Double and Boolean.
+The native integer-text profile now binds those exact InternalCalls. Their grammar
+and range handling use the same allocation-free kernel as the interpreter, linked
+through the native text archive. This preserves the existing [numeric contracts](design/numeric-contracts.md),
+including strict culture-independent syntax and typed errors; no new .NET divergence
+is introduced. Locale-sensitive C parsing is intentionally avoided.
+
+Private native layouts now admit Single scalar storage and Single/Double generic
+arguments, primitive erased payloads, and numeric-to-float width conversions. Signed
+narrow values normalize on unpack; floating payloads preserve their IEEE bits,
+including negative zero and NaN. Private erased tags are not metadata ordinals or
+public ABI. GC traces only the existing String tag, not numeric payload bits.
+Original metadata validation still precedes private primitive wrapper projection.
+These backend-owned adapters will be replaced by native service lowering; general
+Single arrays, float-to-integer conversions and the complete numeric operation set
+are not claimed by this slice.
+
+Raven configuration, semantic binding, CLI signatures and public APIs are unchanged.
+The matching compiler remains b2f3ba0f8b8e92f0c516155f563b332b0a6fad54. All twelve
+[public parser tests](../runtime/raven/tests/primitive-parsing-validation.json) pass
+both local modes. Three interpreter parser tests, six adapter tests, eight erased
+transport tests and one five-case conversion check pass; no-std release linking
+and Windows x64 object emission succeed. Windows execution remains pending.

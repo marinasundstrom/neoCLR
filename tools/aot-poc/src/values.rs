@@ -31,13 +31,14 @@ use profile::{Profile, Ty};
 fn lanes(p: &Profile<'_>, t: &Ty) -> Vec<ir::Type> {
     match t {
         Ty::Double => vec![types::F64],
+        Ty::Single => vec![types::F32],
         Ty::Record(i) if !p.input.types[*i].fields.is_empty() => p.input.types[*i].fields.iter()
             .flat_map(|f| lanes(p, &p.ty(&f.ty).expect("admitted field"))).collect(),
         _ => p.pointer_lanes(t).into_iter().map(|pointer| if pointer { types::I64 } else { types::I32 }).collect(),
     }
 }
 fn zero(b: &mut FunctionBuilder<'_>, ty: ir::Type) -> ir::Value {
-    if ty == types::F64 { b.ins().f64const(0.0) } else { b.ins().iconst(ty, 0) }
+    if ty == types::F64 { b.ins().f64const(0.0) } else if ty == types::F32 { b.ins().f32const(0.0) } else { b.ins().iconst(ty, 0) }
 }
 
 // Cranelift 0.121's ARM64 lowering lacks unordered relational FloatCCs.
@@ -429,6 +430,16 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         }
     }
     let mut utf8_services = std::collections::HashMap::new();
+    if let Some(d) = details {
+        let mut parsers: Vec<_> = d.primitive_parsers.iter().collect();
+        parsers.sort_by_key(|(index, _)| **index);
+        for (index, symbol) in parsers {
+            let mut sig = module.make_signature();
+            sig.params.extend([AbiParam::new(types::I64), AbiParam::new(types::I64)]);
+            sig.returns.push(AbiParam::new(types::I32));
+            utf8_services.insert(*index, module.declare_function(symbol, Linkage::Import, &sig)?);
+        }
+    }
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
             (&d.file_input, "neoclr_file_read_utf8_v1", vec![types::I64, types::I32, types::I64, types::I64]),
@@ -1275,6 +1286,19 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 match op {
                     Op::Int(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
                     Op::Int64(v) => stack.push(b.ins().iconst(types::I64, *v)),
+                    Op::Float32 { bits } => stack.push(b.ins().f32const(ir::immediates::Ieee32::with_bits(*bits))),
+                    Op::ConvertFloat32 | Op::ConvertFloat64 | Op::ConvertFloatUnsigned => {
+                        let value = pop(&mut stack);
+                        let target = if matches!(op, Op::ConvertFloat32) { types::F32 } else { types::F64 };
+                        let converted = match top() {
+                            Ty::Single if target == types::F64 => b.ins().fpromote(target, value),
+                            Ty::Double if target == types::F32 => b.ins().fdemote(target, value),
+                            Ty::Single | Ty::Double => value,
+                            _ if matches!(op, Op::ConvertFloatUnsigned) => b.ins().fcvt_from_uint(target, value),
+                            _ => b.ins().fcvt_from_sint(target, value),
+                        };
+                        stack.push(converted);
+                    }
                     Op::Float64 { bits } => stack.push(b.ins().f64const(ir::immediates::Ieee64::with_bits(*bits))),
                     Op::String(_) => {
                         let data = module.declare_data_in_func(literals[&(i, pc)], b.func);
@@ -1376,7 +1400,15 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     Op::PackValue(t) => {
                         let payload = pop(&mut stack);
                         let payload = normalize(&mut b, &p, &p.ty(t)?, &[payload])[0];
-                        let payload = if matches!(p.ty(t)?, Ty::Literal | Ty::Wide) { payload } else { b.ins().uextend(types::I64, payload) };
+                        let payload = match p.ty(t)? {
+                            Ty::Literal | Ty::Wide => payload,
+                            Ty::Double => b.ins().bitcast(types::I64, MemFlags::new(), payload),
+                            Ty::Single => {
+                                let bits = b.ins().bitcast(types::I32, MemFlags::new(), payload);
+                                b.ins().uextend(types::I64, bits)
+                            }
+                            _ => b.ins().uextend(types::I64, payload),
+                        };
                         stack.push(b.ins().iconst(types::I32, profile::erased_tag(t)?));
                         stack.push(payload);
                     }
@@ -1390,7 +1422,16 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             let wrong = b.ins().icmp_imm(IntCC::Equal, matches, 0);
                             let status = b.ins().iconst(types::I32, 3); // RuntimeError
                             return_if_detailed(&mut b, wrong, status, site.as_ref());
-                            stack.push(if matches!(p.ty(t)?, Ty::Literal | Ty::Wide) { payload } else { b.ins().ireduce(types::I32, payload) });
+                            let value = match p.ty(t)? {
+                                Ty::Literal | Ty::Wide => payload,
+                                Ty::Double => b.ins().bitcast(types::F64, MemFlags::new(), payload),
+                                Ty::Single => {
+                                    let bits = b.ins().ireduce(types::I32, payload);
+                                    b.ins().bitcast(types::F32, MemFlags::new(), bits)
+                                }
+                                _ => b.ins().ireduce(types::I32, payload),
+                            };
+                            stack.push(normalize(&mut b, &p, &p.ty(t)?, &[value])[0]);
                         }
                     }
                     Op::Arg(n) | Op::Load(n) => {
@@ -1898,7 +1939,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             _ => b.ins().bxor(left, right),
                         });
                     }
-                    Op::Add | Op::Sub | Op::Mul | Op::Divide if *top() == Ty::Double => {
+                    Op::Add | Op::Sub | Op::Mul | Op::Divide if matches!(top(), Ty::Single | Ty::Double) => {
                         let r = pop(&mut stack);
                         let l = pop(&mut stack);
                         stack.push(match op {
@@ -1932,7 +1973,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             Op::Less => IntCC::SignedLessThan,
                             _ => IntCC::UnsignedLessThan,
                         };
-                        let bool8 = if *top() == Ty::Double { float_compare(&mut b, cc, l, r) } else { b.ins().icmp(cc, l, r) };
+                        let bool8 = if matches!(top(), Ty::Single | Ty::Double) { float_compare(&mut b, cc, l, r) } else { b.ins().icmp(cc, l, r) };
                         stack.push(b.ins().uextend(types::I32, bool8));
                     }
                     Op::Branch(n) => {
@@ -1960,7 +2001,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let (n, cc) = flow::comparison(op).unwrap();
                         let r = pop(&mut stack);
                         let l = pop(&mut stack);
-                        let condition = if *top() == Ty::Double { float_compare(&mut b, cc, l, r) } else { b.ins().icmp(cc, l, r) };
+                        let condition = if matches!(top(), Ty::Single | Ty::Double) { float_compare(&mut b, cc, l, r) } else { b.ins().icmp(cc, l, r) };
                         b.ins().brif(
                             condition,
                             blocks[n],

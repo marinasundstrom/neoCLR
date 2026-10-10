@@ -65,7 +65,7 @@ Batch `unicode-casing` adds 6 tests for Unicode casing expansions, contextual si
 ([evidence](../runtime/raven/tests/unicode-casing-validation.json)).
 Batch `int64-parsing` adds 5 tests for Int64 boundary parsing, lexical errors, overflow and formatting qualified in native macOS ARM64 and release-interpreted execution after implementing the missing native binding
 ([evidence](../runtime/raven/tests/int64-parsing-validation.json)).
-Batch `primitive-parsing` adds 12 tests for primitive numeric and Boolean parsing values, format errors and overflow qualified in release-interpreted execution; native admission remains unsupported
+Batch `primitive-parsing` adds 12 tests for primitive numeric and Boolean parsing values, format errors and overflow qualified in native macOS ARM64 and release-interpreted execution after fixing floating generic storage and parser bindings
 ([evidence](../runtime/raven/tests/primitive-parsing-validation.json)).
 Batch `path-values` adds 5 tests for Path equality, hashing, display and colliding map behavior qualified in release-interpreted execution; native admission remains unsupported
 ([evidence](../runtime/raven/tests/path-values-validation.json)).
@@ -3549,6 +3549,6 @@ arrays remain open. Windows project qualification passes at `91911ce9`
 **Migration gap closure (2026-10-10):** missing Int64 native parsing and Char/String
 factory projection are fixed and their native exclusions removed. Raven long/String
 constant-pattern emission is also fixed; restored payload patterns pass the five
-MemoryStream and twelve JSON DOM cases in both local modes. Primitive parsing and
-Object equality/hash dispatch remain implementation work before the ten-batch
+MemoryStream and twelve JSON DOM cases in both local modes. Primitive parsing is also fixed;
+Object equality/hash dispatch remains implementation work before the ten-batch
 migration can be called complete. Windows execution of these fixes remains pending.
