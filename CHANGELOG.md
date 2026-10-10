@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Admit immutable native-produced Char[] snapshots in AOT, matching the existing
+  interpreter StringGraphemes contract instead of the incorrect mutable-array
+  binding. Preserve read-only access, fixed-extent replacement and tracing of
+  grapheme text owners. Focused macOS native/interpreter cases cover copying,
+  bounds, nulls and replacement; mutation/borrows/defaults remain rejected. Full
+  Raven String(sequence) AOT still reaches a separate constructor-lowering limit.
+- Verify Windows native/interpreter for-cleanup and iterable-constructor evidence
+  at 4d34f35b: 1,694 artifact hashes and 24 source inputs match the successful run.
+
 - Review runtime Raven iterator ownership after the compiler cleanup fix. Use `for`
   for collection copying and element-consuming queries; use scoped explicit iterators for advance-only/stateful queries. Keep
   manual disposal before terminal faults and for long-lived asynchronous/lazy

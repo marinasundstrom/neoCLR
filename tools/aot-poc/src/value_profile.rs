@@ -21,6 +21,7 @@ pub(super) enum Ty {
     ByteArray,
     CharacterArray, // Same pointer-slot layout, distinct element identity.
     StringArray, // Invocation-owned pointer slots; verified nominal backing enables views.
+    CharacterValues, // Immutable grapheme snapshot; distinct from mutable character arrays.
     ByteValues, // Immutable native-produced value-array snapshot; no element addresses.
     Size,
     TypeToken, // Image-local opaque type identity, never a native address.
@@ -447,6 +448,7 @@ impl<'a> Profile<'a> {
             Type::Int64 | Type::UInt64 => Ty::Wide,
             Type::Double => Ty::Double,
             Type::Array(t) if **t == Type::Byte && self.references => Ty::ByteValues,
+            Type::Array(t) if **t == Type::Char && self.references => Ty::CharacterValues,
             Type::ArrayRef(t) if **t == Type::Byte && self.references => Ty::ByteArray,
             Type::ArrayRef(t) if **t == Type::String && self.references => Ty::StringArray,
             Type::ArrayRef(t) if **t == Type::Char && self.references => Ty::CharacterArray,
@@ -496,7 +498,7 @@ impl<'a> Profile<'a> {
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
             Ty::Erased => vec![false, true],
-            Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::Callable(_) | Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray | Ty::ByteValues | Ty::Size | Ty::Wide | Ty::TypeToken => vec![true],
+            Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::Callable(_) | Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray | Ty::CharacterValues | Ty::ByteValues | Ty::Size | Ty::Wide | Ty::TypeToken => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
             _ => vec![false; self.lanes(t)],
@@ -1079,7 +1081,11 @@ impl<'a> Profile<'a> {
                 }
                 Op::ArrayElement(t @ (Type::String | Type::Char)) => {
                     take(&mut stack, &Ty::Int)?;
-                    take(&mut stack, &self.ty(&Type::ArrayRef(Box::new(t.clone())))?)?;
+                    let array = pop(&mut stack)?;
+                    if array != self.ty(&Type::ArrayRef(Box::new(t.clone())))? &&
+                        !(t == &Type::Char && array == Ty::CharacterValues) {
+                        return Err(fail(pc, "character value arrays permit indexed reads only"));
+                    }
                     stack.push(self.ty(t)?);
                 }
                 Op::StoreArrayElement(t @ (Type::String | Type::Char)) => {
@@ -1092,7 +1098,7 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::ByteArray);
                 }
                 Op::ArrayLength => {
-                    if !matches!(pop(&mut stack)?, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray | Ty::ByteValues) {
+                    if !matches!(pop(&mut stack)?, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray | Ty::CharacterValues | Ty::ByteValues) {
                         return Err(fail(pc, "array length requires a byte array or immutable byte values"));
                     }
                     stack.push(Ty::Size);

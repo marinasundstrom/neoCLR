@@ -13287,3 +13287,18 @@ The final selective refactor passes macOS native and matching interpreter execut
 including exact query traversal/disposal counts and the new constructor paths
 ([evidence](experiments/native-collections/scoped-library-validation.json)). API
 fingerprint and native snapshot checks pass; Windows CI qualification is pending.
+
+
+### 2026-10-10 — Raven runtime-library testing infrastructure
+
+The author asks to start “a make-shift testing framework with a runner for neoCLR
+in Raven” to test the runtime library. The assistant proposes explicit named test
+registration, basic assertions, pass/fail output and an exit code. Assertion failures
+should allow subsequent tests to run; terminal runtime Faults require separate
+process isolation. Reflection discovery is not required for the first slice. These
+are implementation choices proposed by the assistant, not a user-selected stable API.
+
+Before that work, the assistant verifies Windows compiler-cleanup artifacts and
+implements bounded immutable Char[] native admission. Focused snapshot tests pass,
+but the full String(sequence) consumer remains blocked by constructor call admission;
+the library's existing character-copy loop remains unchanged.

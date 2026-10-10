@@ -486,7 +486,7 @@ pub(super) fn select_inventory_with_host_roots(
             }
             Type::Function(shape) => { pending_types.extend(shape.parameters); pending_types.push(shape.returns); }
             Type::ByRef(t) => pending_types.push(*t),
-            Type::Array(t) if *t == Type::Byte => (),
+            Type::Array(t) if matches!(*t, Type::Byte | Type::Char) => (),
             Type::ArrayRef(t) if matches!(*t, Type::String | Type::Char) || scalar_array_element(&t) => (),
             Type::ArrayRef(t) if matches!(*t, Type::Function(_) | Type::Named(_)) => pending_types.push(*t),
             Type::ArrayRef(t) if *t == Type::Byte => {

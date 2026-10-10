@@ -1,0 +1,148 @@
+.module StringGraphemes
+.function Snapshot(Char[] source) -> Char[]
+ldarg source
+ret
+.end
+.function Replace(Char[] original, Char[] replacement) -> Char[]
+ldarg replacement
+starg original
+ldarg original
+ret
+.end
+.function CopyInto(Char[] source, out Char[]& target) -> noresult
+ldarg target
+ldarg source
+stobj Char[]
+ret
+.end
+.function Copy(String text) -> arrayref<Char>
+.local Char[] source
+.local arrayref<Char> destination
+.local Int32 index
+ldarg text
+call neoCLR.Runtime.StringGraphemes(String)
+call Snapshot(Char[])
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr Char
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem Char
+stelem Char
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Char[] original
+.local Char[] snapshot
+.local String text
+.local arrayref<Char> copy
+ldarg mode
+ldc.i4 -3
+ceq
+brtrue Null
+ldarg mode
+ldc.i4 -2
+ceq
+brtrue Empty
+ldstr "aé😀\u0000z"
+call neoCLR.Runtime.StringGraphemes(String)
+stloc original
+ldarg mode
+ldc.i4 -5
+ceq
+brtrue ResizeArgument
+ldarg mode
+ldc.i4 -6
+ceq
+brtrue ResizeOutput
+ldloc original
+call Snapshot(Char[])
+ldloca snapshot
+call CopyInto(Char[], Char[]&)
+ldarg mode
+ldc.i4 -4
+ceq
+brtrue Resize
+ldstr "12345"
+br Replace
+Resize:
+ldstr "replacement"
+Replace:
+call neoCLR.Runtime.StringGraphemes(String)
+stloc original
+ldstr "aé😀\u0000z"
+call Copy(String)
+stloc copy
+ldloc copy
+ldc.i4 0
+ldstr "!"
+call neoCLR.Runtime.CharFromString(String)
+stelem Char
+ldarg mode
+ldc.i4 -1
+ceq
+brtrue Length
+ldloc snapshot
+ldarg mode
+ldelem Char
+call neoCLR.Runtime.CharText(Char)
+call neoCLR.Runtime.StringByteCount(String)
+ret
+Length:
+ldloc snapshot
+ldlen
+conv.i4
+ret
+Empty:
+ldstr ""
+call neoCLR.Runtime.StringGraphemes(String)
+ldlen
+conv.i4
+ret
+ResizeArgument:
+ldloc original
+ldstr ""
+call neoCLR.Runtime.StringGraphemes(String)
+call Replace(Char[], Char[])
+pop
+ldc.i4 0
+ret
+ResizeOutput:
+ldstr ""
+call neoCLR.Runtime.StringGraphemes(String)
+ldloca original
+call CopyInto(Char[], Char[]&)
+ldc.i4 0
+ret
+Null:
+ldloca text
+initobj String
+ldloc text
+call neoCLR.Runtime.StringGraphemes(String)
+pop
+ldc.i4 0
+ret
+.end
+.function neoCLR.Runtime.StringGraphemes(String) -> Char[]
+.methodimpl InternalCall
+.end

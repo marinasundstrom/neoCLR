@@ -6045,3 +6045,67 @@ ret
 "#;
     check_reflection_arrays(source, 1, b"");
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn character_value_snapshots_and_managed_copy_match_interpreter() {
+    let dir=Temp::new();
+    let seed=neoclr::assemble(&format!("{UTF8_SEED}\n{CHARACTER_SEED}")).unwrap();
+    let source=include_str!("../../../docs/experiments/aot-console/character-values.neoil");
+    let r=compile_source(&dir,&seed,source,&["--compile-system","--reference-arena","--bind-user-fault","--bind-utf8-text","--bind-character-text"],false);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <stdlib.h>
+int main(int argc, char **argv) {
+    uint64_t storage[1024];
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    int32_t result=-99;
+    int status=neoclr_entry_v4(argc>1 ? atoi(argv[1]) : 0,&result,&ctx);
+    if (status) {
+        if (result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
+        neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
+    }
+    printf("%d\n",result);return 0;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-console/string-unicode.c")).arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o")).arg(base.join("../../tools/aot-native-text/target/release/libneoclr_aot_native_text.a")).arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let app=neoclr::assemble(source).unwrap();
+    let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
+    let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for mode in -6..11 {
+        let reference=method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default());
+        let r=Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
+        match reference {
+            Ok(result)=>{
+                assert_eq!(r.status.code(),Some(0),"{mode}: {r:?}");
+                let neoclr::Value::Int32(value)=result.value else {panic!("expected Int32")};
+                assert_eq!(r.stdout,format!("{value}\n").as_bytes());
+                assert!(r.stderr.is_empty());
+            }
+            Err(fault)=>{
+                assert_eq!(r.status.code(),Some(1),"{mode}: {r:?}; interpreter: {}",fault.diagnostic());
+                assert_eq!(String::from_utf8_lossy(&r.stderr),fault.diagnostic().to_string(),"{mode}");
+            }
+        }
+    }
+}
+
+#[test]
+fn character_value_snapshots_reject_mutation_and_borrows() {
+    let seed = neoclr::assemble(&format!("{UTF8_SEED}\n{CHARACTER_SEED}")).unwrap();
+    let original = include_str!("../../../docs/experiments/aot-console/character-values.neoil");
+    for operations in ["ldloca original\nldc.i4 0\nldstr \"x\"\ncall neoCLR.Runtime.CharFromString(String)\nstelem Char",
+        "ldloca original\nldc.i4 0\nldelema Char\npop", "ldloca original\ninitobj Char[]"] {
+        let source = original.replacen("stloc original", &format!("stloc original\n{operations}"), 1);
+        let dir = Temp::new();
+        let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena", "--bind-utf8-text", "--bind-character-text"], false);
+        assert!(!r.status.success() && !dir.0.join("app.o").exists(), "{operations}: {r:?}");
+        if !operations.contains("initobj") { assert!(!String::from_utf8_lossy(&r.stderr).contains("Fault:"), "source must verify before native rejection: {r:?}"); }
+    }
+}

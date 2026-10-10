@@ -40,7 +40,7 @@ The 2026-10-10 review applies the author's semantic/performance constraint:
 | Source/operation | Decision | Reason |
 | --- | --- | --- |
 | ArrayList/ArrayQueue/ArrayStack/HashSet iterable construction | for | Each visited element is copied once, in the same order. |
-| String character snapshot | Deferred; existing explicit iterator retained | It is a natural for candidate, but the added executable check hit the native `Array(Char)` specialization limit. Qualify the character path before changing it. |
+| String character snapshot | Deferred; existing explicit iterator retained | It is a natural for candidate. Immutable Char[] admission is now fixed, but full String(sequence) AOT still hits reference-constructor call admission. Qualify that path before changing it. |
 | Any(predicate), All, Fold, First(predicate) | for | Element consumption and early exit express the query directly. |
 | Any(), First(), Last(), Single(), predicate Last/Single | use with explicit iterator | Preserve advance-only probes or the existing stateful first-match/remainder algorithm. |
 | Count overloads, HashMap.CopyItems, selector ToMap | Explicit disposal retained | Deliberate overflow/duplicate Faults must occur after disposal; terminal Faults do not unwind. Count() also avoids Current reads. |

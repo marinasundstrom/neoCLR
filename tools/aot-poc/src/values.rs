@@ -222,7 +222,7 @@ fn null_reference(b: &mut FunctionBuilder<'_>, pointer: ir::Value, site: Option<
 
 // Value-array slots have fixed extent after their first assignment, matching the
 // interpreter even though immutable snapshots can share their backing bytes.
-fn check_byte_value_replacement(b: &mut FunctionBuilder<'_>, address: ir::Value, value: ir::Value, site: Option<&crate::fault_details::Site>) {
+fn check_value_array_replacement(b: &mut FunctionBuilder<'_>, address: ir::Value, value: ir::Value, site: Option<&crate::fault_details::Site>) {
     let old = b.ins().load(types::I64, MemFlags::new(), address, 0);
     let assigned = b.ins().icmp_imm(IntCC::NotEqual, old, 0);
     let check = b.create_block();
@@ -1418,7 +1418,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         } else {
                             &p.locals[i][*n]
                         };
-                        if *ty == Ty::ByteValues { check_byte_value_replacement(&mut b, address, value[0], site.as_ref()); }
+                        if matches!(ty, Ty::ByteValues | Ty::CharacterValues) { check_value_array_replacement(&mut b, address, value[0], site.as_ref()); }
                         write_typed(&mut b, &p, ty, address, &value);
                     }
                     Op::Dup => {
@@ -1446,7 +1446,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     Op::StoreObject(t) => {
                         let value = stack.split_off(stack.len() - p.lanes(&p.ty(t)?));
                         let address = pop(&mut stack);
-                        if p.ty(t)? == Ty::ByteValues { check_byte_value_replacement(&mut b, address, value[0], site.as_ref()); }
+                        if matches!(p.ty(t)?, Ty::ByteValues | Ty::CharacterValues) { check_value_array_replacement(&mut b, address, value[0], site.as_ref()); }
                         write_typed(&mut b, &p, &p.ty(t)?, address, &value);
                     }
                     Op::New(t) => {

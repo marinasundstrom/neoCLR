@@ -2031,3 +2031,31 @@ It passes with UBSan and warnings-as-errors on macOS ARM64. The diagnostic
 optimized run on 2026-10-09 measured last-entry hits at 7.4 / 87.7 / 1,611.8 /
 23,408.8 ns for 1 / 16 / 256 / 4,096 entries (10,000 hits each). These single-run
 numbers characterize scaling, not a platform comparison or release performance claim.
+
+
+## Immutable grapheme snapshots (2026-10-10)
+
+StringGraphemes(String) returns Char[] value storage, as the interpreter and retained
+Raven bridge already require. The native UTF-8 binding previously declared a mutable
+arrayref<Char> return; that did not match the actual service contract. AOT now admits
+the immutable form as a distinct type with the existing pointer-vector/text tracing
+recipe. Copy/pass/return and indexed reads are supported. Replacing a local, argument
+or output slot must preserve its first-assigned length. Defaults, element mutation,
+borrows, array-valued fields and general value-array producers remain unsupported.
+The managed bridge can copy the snapshot into a mutable arrayref; it does not expose
+aliasing mutation of the immutable backing. No public API or Raven contract changes.
+
+This reuses the Byte[] snapshot design above. Unlike .NET's UTF-16 char enumeration,
+neoCLR chars are UTF-8 extended graphemes; segmentation/text allocation and the bridge
+copy have a cost, with no performance improvement claimed. This temporary raw value
+array is an internal bridge representation, not a new collection API. Native library
+metadata/backends should eventually remove unnecessary bridge copying without
+weakening value semantics. AOT specialization, admission and GC layout own this fix.
+
+character-values.neoil covers 17 macOS native/interpreter comparisons, including
+empty/null inputs, multibyte graphemes, snapshots, mutable copying, bounds and extent
+changes through locals, arguments and output slots. Separate tests reject mutation,
+borrows and defaults. String(sequence) project qualification remains incomplete:
+character literals additionally need the character-text binding, and the sequence-only
+consumer reaches the separate reference-constructor call admission limit. Keep the
+String.rvn cleanup candidate unchanged until that consumer passes both modes.

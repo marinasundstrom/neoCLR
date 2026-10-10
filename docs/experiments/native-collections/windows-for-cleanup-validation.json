@@ -1,0 +1,112 @@
+{
+  "passed": true,
+  "date": "2026-10-10",
+  "revision": "4d34f35b74e7015c5be8f0a72d406016aeccb160",
+  "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/38037907353",
+  "verifiedArtifactFiles": 1694,
+  "verifiedSourceInputs": 24,
+  "cases": [
+    {
+      "name": "collections",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "collections passed\n"
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "collections passed\n"
+        }
+      ]
+    },
+    {
+      "name": "init-accessors",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "Init accessors passed\n"
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "Init accessors passed\n"
+        }
+      ]
+    },
+    {
+      "name": "duplicate-constructor",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 1,
+          "stdout": "disposed\n"
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 1,
+          "stdout": "disposed\n"
+        }
+      ]
+    },
+    {
+      "name": "duplicate-pairs",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 1,
+          "stdout": "disposed\n"
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 1,
+          "stdout": "disposed\n"
+        }
+      ]
+    },
+    {
+      "name": "duplicate-selectors",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "exitCode": 1,
+          "stdout": "disposed\n"
+        },
+        {
+          "mode": "interpreter",
+          "exitCode": 1,
+          "stdout": "disposed\n"
+        }
+      ]
+    }
+  ],
+  "rejections": [
+    {
+      "name": "generated-equality",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support unregistered dependency: NativeCollections for struct Pair.func Equals(other: Pair) -> bool.\n"
+    },
+    {
+      "name": "imported-update",
+      "exitCode": 1,
+      "diagnostic": "error RAV0200: 'Key' is read-only and cannot be assigned to.\n"
+    },
+    {
+      "name": "mutable-component",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support constructor-initialized positional val components.\n"
+    },
+    {
+      "name": "record-class",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support positional record structs without additional members.\n"
+    }
+  ]
+}

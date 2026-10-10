@@ -67,7 +67,7 @@ impl Specializer<'_> {
                 return Ok(Type::Function(Box::new(shape)));
             }
             Type::ByRef(t) => return Ok(Type::ByRef(Box::new(self.lower(t)?))),
-            Type::Array(t) if **t == Type::Byte => return Ok(ty.clone()),
+            Type::Array(t) if matches!(**t, Type::Byte | Type::Char) => return Ok(ty.clone()),
             Type::ArrayRef(t) if matches!(**t, Type::String | Type::Char) || super::selection::scalar_array_element(t) => {
                 if let Some(owner) = super::selection::array_owner(self.source, t) { self.lower(&owner)?; }
                 return Ok(ty.clone());

@@ -134,3 +134,8 @@ execution with the corrected compiler before these library-body simplifications.
 [Refactored-library evidence](scoped-library-validation.json) records macOS ARM64
 native/interpreter success against the final source hashes. Reference fingerprints
 and the native API snapshot are refreshed; public signatures remain unchanged.
+
+[Verified Windows compiler-cleanup evidence](windows-for-cleanup-validation.json)
+passes all five native/interpreter cases at 4d34f35b, with 1,694 artifact files and
+24 source inputs checked. This qualifies the compiler fix and iterable constructors;
+it predates the final runtime source simplification commit.
