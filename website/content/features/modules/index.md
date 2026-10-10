@@ -55,7 +55,12 @@ identities.
 A module namespace may span several referenced assemblies. Imports should combine
 matching declarations using .NET-style namespace lookup, while each declaration keeps
 its defining assembly identity. Current introspection exposes assembly-local
-contributions; the shared context-wide module view is still being reconciled.
+contributions to those same namespaces. A separate aggregate descriptor is not
+required by this model.
+
+Prefer naming an assembly after its main or root module namespace. This convention
+helps readers recognize the package; it is not enforced. The `DifferentPackage`
+example above deliberately demonstrates that the names can differ.
 
 ## What the foundation provides
 

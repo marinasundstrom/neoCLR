@@ -77,8 +77,13 @@ simply mean namespaces: keep .NET's naming/packaging flexibility and the existin
 namespace projection and resolution baseline. Do not introduce a separate resolver
 or module-loading model. The metadata module represents that same namespace;
 assembly-scoped ModuleInfo records the assembly's contribution, not another module
-concept. Validate existing split-module lookup and the introspection scoping needed
-for discovery; a separate aggregate descriptor is not a requirement. This clarifies the current module milestone rather than
+concept. Prefer naming the assembly after its main/root module namespace, as a
+convention rather than a compiler or metadata constraint. Keep NominalTypeInfo.Namespace
+as the string name and Module as the assembly-scoped descriptor. Existing Raven
+namespace lookup now passes the shared application/library types-and-functions
+consumer on interpreter/macOS AOT with one import and no resolver changes. Duplicate
+name/reference-order coverage and the introspection scoping needed for discovery
+remain follow-up work; a separate aggregate descriptor is not a requirement. This clarifies the current module milestone rather than
 reprioritizing unrelated capabilities. See the [current contract and implementation gap](declaration-modules.md).
 
 ## Active direction: usable native compilation (2026-10-09)

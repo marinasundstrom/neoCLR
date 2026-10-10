@@ -60,6 +60,9 @@ Use `module System.Collections` (or the appropriate qualified module name) in
 neoCLR-native Raven sources. The compiler accepts legacy `namespace` spelling,
 but new and maintained native examples should express their logical module owner.
 This is source organization, not an assembly rename or a new physical image.
+Prefer naming an assembly after its main/root module namespace. The name is a
+packaging convention, not a required match; several assemblies can contribute to
+one namespace and an assembly can contribute several modules.
 Ordinary .NET sources and C# reference declarations retain namespace syntax.
 See [declaration modules](declaration-modules.md) for metadata and compatibility.
 

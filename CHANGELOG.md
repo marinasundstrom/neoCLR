@@ -37,7 +37,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   resolution as the baseline, with flexible naming/packaging and no separate resolver
   or loading model implied by this direction. Clarify that metadata modules represent
   those same namespaces; assembly-local scope does not introduce a second module
-  concept or require a separate aggregate descriptor.
+  concept or require a separate aggregate descriptor. Recommend matching assembly
+  names to their main/root module as an unenforced authoring convention. Extend the
+  guest consumer to resolve application/library types and functions in one shared
+  namespace through a single import, preserving their distinct executing assemblies;
+  interpreter/macOS ARM64 AOT pass without compiler or resolver changes. Clarify the
+  existing Namespace string versus assembly-scoped Module descriptor. Windows and
+  duplicate-name/reference-order qualification remain open.
   Replace DeclarationModuleInfo/GetDeclarationModules with ModuleInfo/
   GetModules and logical member ownership; expose physical token scopes separately.
   Migrate Raven's native importer to traverse all modules and test discovery IDs to

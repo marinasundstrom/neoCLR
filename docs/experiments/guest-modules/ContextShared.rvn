@@ -1,0 +1,9 @@
+module Acme.Diagnostics
+
+public class ApplicationMarker {
+    val Value: int => 22
+}
+
+func ReadApplicationAssembly() -> string {
+    return System.Runtime.RuntimeContext.Current.ExecutingAssembly.Name
+}

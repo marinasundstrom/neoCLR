@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ContextMain.rvn" />
+    <Compile Include="ContextShared.rvn" />
     <Reference Include="Coffee.Context">
       <HintPath>bin/neoclr/Coffee.Context.dll</HintPath>
     </Reference>

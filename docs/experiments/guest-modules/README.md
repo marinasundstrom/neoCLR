@@ -35,7 +35,13 @@ open; this is not in-process test discovery yet.
 The application now checks RuntimeContext.Current.ExecutingAssembly. A separate
 Coffee.Context library queries its own assembly through a helper; the application
 calls that helper directly and through a lambda callback, then checks its own
-identity again. This second executable uses no reflection-roots policy. The harness
+identity again. The application and library both contribute to `Acme.Diagnostics`:
+`ApplicationMarker` and `ReadApplicationAssembly` come from the application;
+`LibraryMarker` and `ReadLibraryAssembly` come from the library. One namespace import
+resolves all four, and both types are instantiated and their properties read.
+This exercises existing namespace resolution without requiring assembly names to
+match module names. Duplicate-name ambiguity and additional reference orders are
+not covered by this consumer. This second executable uses no reflection-roots policy. The harness
 uses the backend's explicit dependency load set and the first build's platform linker
 commands: the project driver itself still admits bundle libraries only. It does not
 claim new arbitrary-project-dependency support in that driver.

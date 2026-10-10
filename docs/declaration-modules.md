@@ -24,10 +24,23 @@ Across references, ordinary namespace resolution combines matching contributions
 A separate aggregate descriptor is not required by this clarification; any additional
 context-wide introspection API should be justified by an actual discovery need.
 
+`NominalTypeInfo.Namespace` remains the namespace name as a string. Its existing
+`Module` property (through MemberInfo in the guest API) navigates to the defining
+assembly's ModuleInfo for that namespace. These are a name and a scoped metadata
+descriptor, respectively. Keeping both preserves Raven's existing namespace-based
+resolution for the neoCLR target; no string-to-descriptor rename is needed.
+
+The [shared-namespace consumer](experiments/guest-modules/README.md) qualifies
+application and library types/functions in Acme.Diagnostics through one import on
+the interpreter and macOS ARM64 AOT. The compiler and resolver are unchanged.
+Duplicate-name ambiguity and reference-order permutations remain outside that check.
+
 Author direction, 2026-10-09: modules replace namespaces as the named containers
 for declarations. Assemblies remain packaging and binding identities and remain
 visible in RavenDoc. One module per assembly is a common layout, not a constraint:
-`System.Runtime` contains many modules. An assembly name need not match a module.
+`System.Runtime` contains many modules. By convention, name an assembly after its
+main or root module namespace. This is a recommendation, not a compiler or metadata
+requirement: assembly names may differ, and assemblies may contribute to other namespaces.
 
 This implements the first ownership/format slice of the
 [module assessment](design/module-system-assessment.md). The original proposal's

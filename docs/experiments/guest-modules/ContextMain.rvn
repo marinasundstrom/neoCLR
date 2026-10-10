@@ -15,6 +15,14 @@ func Main() -> int {
     if RuntimeContext.Current.ExecutingAssembly.Name != "CoffeePackage" {
         return 32
     }
+    let library = LibraryMarker()
+    let application = ApplicationMarker()
+    if library.Value + application.Value != 42 {
+        return 33
+    }
+    if ReadApplicationAssembly() != "CoffeePackage" {
+        return 34
+    }
     Console.WriteLine("Executing assembly context passed")
     return 0
 }

@@ -13574,3 +13574,35 @@ claim completion of in-process test discovery.
   separate shared-view API sound mandatory. Existing resolution and metadata scope
   remain the baseline. No API or runtime behavior changes in this documentation slice;
   additional discovery APIs still require a concrete use case.
+
+
+## 2026-10-10 — Assembly naming convention and shared namespace qualification
+
+- **Author:** assembly names need not match, but recommends matching the name or
+  namespace of the main/root module. Then directs continued work.
+- **Assistant response:** adopts this as an authoring convention, with no enforced
+  assembly/module name match. Proposes validating existing shared namespace lookup
+  before introducing additional resolution machinery.
+- **Action:** records the naming convention in authoring guidance, the roadmap and
+  website. Extends the guest-module consumer with application and library types and
+  functions in the same Acme.Diagnostics namespace, consumed through one import.
+  Both assemblies deliberately have different packaging names. Validation results
+  are recorded with the consumer; this does not change compiler resolution rules.
+
+
+## 2026-10-10 — Namespace names and module metadata descriptors
+
+- **Author:** considers renaming NominalTypeInfo's string Namespace property to
+  Module, or keeping namespace and module distinct, with type information referring
+  back to assembly-level ModuleInfo. Adds: “This will keep the .NET style resolution
+  for the neoCLR target in Raven”.
+- **Assistant response:** recommends retaining Namespace as a string and the existing
+  Module property as a scoped metadata descriptor. Inspection confirms that the guest
+  API already exposes both via NominalTypeInfo and MemberInfo; no rename is necessary.
+  This separates a name from metadata navigation, not two namespace-resolution models.
+- **Outcome:** the extended shared-namespace consumer passes interpreter and macOS
+  ARM64 AOT: one import resolves types/functions contributed by both the application
+  and its library, and each contribution reports its own executing assembly. No
+  compiler or resolver changes were needed. Exact commands, pinned inputs and limits
+  are in [the validation record](experiments/guest-modules/validation.json).
+  Windows qualification and duplicate-name/reference-order cases remain open.

@@ -10,3 +10,7 @@ func ReadContext() -> string {
 public func ReadLibraryAssembly() -> string {
     return ReadContext()
 }
+
+public class LibraryMarker {
+    val Value: int => 20
+}

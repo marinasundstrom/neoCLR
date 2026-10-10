@@ -19,6 +19,13 @@ shapes do not implement NominalTypeInfo or MemberInfo. Named declarations, inclu
 constructed generic types, do. General shape and member queries remain on TypeInfo.
 Use NominalTypeInfo for declaration metadata and DisplayName for diagnostic text.
 
+`NominalTypeInfo.Namespace` is the namespace name as a string. The inherited
+`MemberInfo.Module: Option<ModuleInfo>` navigates to the assembly-scoped metadata
+module for that namespace; nominal runtime descriptors supply that owner. A matching
+namespace name in another assembly does not change this declaration's owner.
+The string name and module descriptor serve different queries; keeping both supports
+existing namespace-based compiler resolution without introducing another module kind.
+
 ## Type identity
 
 Repeated queries can allocate different descriptors of the same type. Both runtime descriptor providers
