@@ -287,6 +287,10 @@ UTF-8 slicing and interned identity. The native binary links the text services
 statically; it needs no shared managed runtime. Interpreter and native fault output
 are checked together.
 
+The development project workflow also runs five attributed string-construction tests
+in native macOS ARM64 and interpreted modes, including copied character storage and
+combining graphemes. Windows execution of this migrated suite remains pending.
+
 This is a work-in-progress bootstrap milestone, not full core-library qualification.
 The native intern pool is bounded and currently uses linear lookup. Native Object
 display still requires explicit overrides for reachable constructed types; the

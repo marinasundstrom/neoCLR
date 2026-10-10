@@ -406,15 +406,12 @@ Batch `memory-stream`: MemoryStream seek, range, quota, overwrite and closed-sta
 release-interpreted execution ([evidence](memory-stream-validation.json)).
 Source: [docs/experiments/json-dom/Main.rvn](../../../docs/experiments/json-dom/Main.rvn). Windows remains pending.
 
-Batch `string-construction`: String character-sequence copying, graphemes and named arguments; 5 tests pass release-interpreted execution; native admission remains unsupported ([evidence](string-construction-validation.json)).
+Batch `string-construction`: String character-sequence copying, graphemes and named arguments; 5 tests pass native macOS ARM64 and release-interpreted execution ([evidence](string-construction-validation.json)).
 Source: [docs/experiments/string-sequence/Main.rvn](../../../docs/experiments/string-sequence/Main.rvn). Windows remains pending.
 
-Explicit native admission gaps are recorded separately from test passes. The
-`string-construction` suite currently requires the exact `value member requires a
-local record owner (Char)` rejection and then executes its compiled artifact in the
-interpreter. Unexpected build errors or unexpected native admission fail the gate;
-remove the gap only after qualifying native execution. A passing migration gate is
-not a native execution claim for suites listed in `nativeAdmissionGaps`.
+The String suite now requires both native and interpreted execution: Char receiver
+projection and empty Object initialization in native String factories are fixed.
+Remaining `nativeAdmissionGaps` are unresolved work, not native test passes.
 
 Batch `unicode-casing`: Unicode casing expansions, contextual sigma and text preservation; 6 tests pass native macOS ARM64 and release-interpreted execution ([evidence](unicode-casing-validation.json)).
 Source: [docs/experiments/casing-integer/Main.rvn](../../../docs/experiments/casing-integer/Main.rvn). Windows remains pending.

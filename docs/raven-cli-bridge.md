@@ -7647,3 +7647,23 @@ The native backend owns this bridge until native service lowering replaces it.
 Five [public tests](../runtime/raven/tests/int64-parsing-validation.json) pass
 both local modes; backend checks cover all ASCII trailing characters after a long
 digit sequence, format-before-overflow and null faults. Windows remains pending.
+
+### Native Char wrappers and String factories — 2026-10-10
+
+The string-construction migration now executes all five tests in both local modes.
+The AOT linker projects verified ordinary Char instance wrappers to private functions
+with a borrowed Char receiver, as for other primitive wrappers. String constructor
+factories elide only the exact leading, empty Object initializer; nonempty base
+constructors still reject. Branch destinations are relocated after that elision.
+This restores the existing grapheme/String contract rather than changing its
+documented UTF-8 divergence from .NET Char. Original load-set verification remains
+mandatory before these private transformations.
+
+Project console/HTTP profiles now bind the existing CharFromString/CharText services
+and link the pinned Unicode adapter when a selected validation service needs it.
+Windows profiles admit the same services; actual Windows execution remains pending.
+No Raven Runtime Contract option, semantic rule, CLI encoding or emission changes
+are required. Compiler pin 1a0c4e62734b2d4f17dc9f8af1f5d02c566f8cf4 remains valid.
+neoCLR's native linker owns these private receiver/factory transformations; eventual
+intrinsic native String construction will replace them. General chained String
+constructors remain unsupported. See [test evidence](../runtime/raven/tests/string-construction-validation.json).

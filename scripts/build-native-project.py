@@ -170,7 +170,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                    '--object-root', libraries[0]]
         flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
                  '--bind-console-read-byte', '--bind-console-write-line', '--bind-console-stream-output',
-                 '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text']
+                 '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text', '--bind-character-text']
         if http:
             flags += ['--bind-task-queue',
                       '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-socket-client']
@@ -200,7 +200,8 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                          'neoclr_string_grapheme_at_v1', 'neoclr_string_graphemes_v1',
                          'neoclr_string_scalars_v1', 'neoclr_string_from_chars_v1'}
         native_text = []
-        if any(binding.get('symbol') in text_services for binding in selection.get('nativeBindings', [])):
+        if any(binding.get('symbol') in text_services or binding.get('validationSymbol') == 'neoclr_is_single_grapheme_v1'
+               for binding in selection.get('nativeBindings', [])):
             adapters.append(base / 'string-unicode.c')
             archive_name = 'neoclr_aot_native_text.lib' if windows else 'libneoclr_aot_native_text.a'
             if kit_path.exists():

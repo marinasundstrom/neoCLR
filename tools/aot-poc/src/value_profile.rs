@@ -255,7 +255,7 @@ impl<'a> Profile<'a> {
             }
             for (index, t) in f.parameters.iter().enumerate() {
                 if let Type::ByRef(target) = t {
-                    let projected_receiver = index == 0 && matches!(**target, Type::Int32 | Type::Boolean | Type::Int64 | Type::UInt64)
+                    let projected_receiver = index == 0 && matches!(**target, Type::Int32 | Type::Boolean | Type::Int64 | Type::UInt64 | Type::Char)
                         && primitive_receivers.is_some_and(|indices| indices.contains(&i));
                     if !f.out_parameters.contains(&index) && !projected_receiver {
                         return Err(
@@ -335,7 +335,7 @@ impl<'a> Profile<'a> {
                         && c.owner.as_ref().and_then(|t| input.type_definition(t)).is_some_and(|t| t.is_reference_type)
                         && !(matches!(op, Op::Call(_)) && reference_constructor && Some(pc) == base_initializer
                             && matches!(f.body.first(), Some(Op::Arg(0))) && owner.unwrap().base == c.owner) {
-                        return Err("reference constructor calls require newobj.ctor or the single leading base initializer".into());
+                        return Err(format!("reference constructor calls require newobj.ctor or the single leading base initializer: {} at {pc} calls {}", f.name, c.name).into());
                     }
                     if p.dispatch.contains_key(&callee) && !matches!(op, Op::CallVirtual(_)) {
                         return Err("interface contracts require callvirt".into());

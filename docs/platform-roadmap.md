@@ -59,7 +59,7 @@ byte quotas; all pass native macOS ARM64 and release-interpreted execution
 MemoryStream and reflection-mapping migration remain follow-ups.
 Batch `memory-stream` adds 5 passing native/interpreted tests for MemoryStream seek, range, quota, overwrite and closed-state behavior
 ([evidence](../runtime/raven/tests/memory-stream-validation.json)).
-Batch `string-construction` adds 5 tests for String character-sequence copying, graphemes and named arguments qualified in release-interpreted execution; native admission remains unsupported
+Batch `string-construction` adds 5 tests for String character-sequence copying, graphemes and named arguments qualified in native macOS ARM64 and release-interpreted execution after fixing Char projection and String factory initialization
 ([evidence](../runtime/raven/tests/string-construction-validation.json)).
 Batch `unicode-casing` adds 6 tests for Unicode casing expansions, contextual sigma and text preservation qualified in native macOS ARM64 and release-interpreted execution
 ([evidence](../runtime/raven/tests/unicode-casing-validation.json)).

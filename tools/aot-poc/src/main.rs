@@ -204,16 +204,16 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         return Err("Windows console experiment requires Windows x64, --compile-system, --reference-arena, --native-gc and --native-stack-budget".into());
     }
     if windows_console && (bind_paths || bind_file_input || bind_file_output || bind_task_queue
-        || bind_socket_listener || bind_socket_accept || bind_socket_transfer || bind_socket_client || bind_character_text) {
-        return Err("Windows console experiment does not support file, path, task, socket or character services".into());
+        || bind_socket_listener || bind_socket_accept || bind_socket_transfer || bind_socket_client) {
+        return Err("Windows console experiment does not support file, path, task or socket services".into());
     }
     if windows_http && (target != compiler::Target::WindowsX64 || !compile_system
         || !native_gc || !native_stack_budget || !reference_arena
         || !bind_task_queue || !bind_socket_listener || !bind_socket_accept || !bind_socket_transfer) {
         return Err("Windows HTTP experiment requires Windows x64, --compile-system, --reference-arena, --native-gc, --native-stack-budget and task/listener/accept/transfer bindings".into());
     }
-    if windows_http && (bind_paths || bind_file_input || bind_file_output || bind_character_text) {
-        return Err("Windows HTTP experiment does not support file, path or character services".into());
+    if windows_http && (bind_paths || bind_file_input || bind_file_output) {
+        return Err("Windows HTTP experiment does not support file or path services".into());
     }
     if (windows_stack || windows_heap) && (target != compiler::Target::WindowsX64 || !native_gc
         || !native_stack_budget || !reference_arena || compile_system) {

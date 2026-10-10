@@ -35,7 +35,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the suite. Original integration consumers remain; Windows qualification is pending.
 
 - Migrate String character-sequence copying, graphemes and named arguments into 5 attributed Raven tests in `string-construction`.
-  Release-interpreted execution passes; native admission remains unsupported. Default gates include
+  Fix native Char receiver projection and String factory base initialization;
+  project builds bind grapheme services and link their text adapter when needed.
+  Native macOS ARM64 and release-interpreted execution pass; remove the native
+  admission exception. Default gates include
   the suite. Original integration consumers remain; Windows qualification is pending.
 
 - Migrate MemoryStream seek, range, quota, overwrite and closed-state behavior into 5 attributed Raven tests in `memory-stream`.

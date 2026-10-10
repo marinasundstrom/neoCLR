@@ -498,7 +498,7 @@ pub fn prepare(
     // to private free functions. No receiver copy or replacement CIL body.
     let primitive_members: std::collections::BTreeMap<_, _> = selected.functions.iter().enumerate()
         .filter(|(_, f)| matches!(f.owner, Some(neoclr::metadata::Type::Int32 | neoclr::metadata::Type::Boolean
-            | neoclr::metadata::Type::Int64 | neoclr::metadata::Type::UInt64)) && f.instance)
+            | neoclr::metadata::Type::Int64 | neoclr::metadata::Type::UInt64 | neoclr::metadata::Type::Char)) && f.instance)
         .map(|(i, f)| (i, f.owner.clone().unwrap())).collect();
     for &i in primitive_members.keys() {
         let f = &selected.functions[i];
