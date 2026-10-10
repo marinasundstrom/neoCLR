@@ -56,7 +56,7 @@ explicit `JsonNull` node; CLR null references remain unsupported. `Object`-typed
 properties do not infer JSON node mapping. The complete mixed document shares the
 existing depth, occurrence and byte limits, including cycles inside embedded nodes.
 
-The [tested NodeEnvelope sample](../docs/experiments/native-json/Main.rvn) combines
+The [tested NodeEnvelope sample](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-json/Main.rvn) combines
 `JsonValue`, `JsonObject` and `JsonValue[]` properties. Supported lists and maps
 can also contain explicitly declared JSON nodes.
 

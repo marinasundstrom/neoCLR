@@ -152,7 +152,11 @@ pub(crate) fn bind_in(module: &crate::Module, function: &Function) -> Result<Bin
             function.name.as_str(),
             "neoCLR.Runtime.ExecutingAssembly" | "neoCLR.Runtime.ReflectionArrayCreate"
         );
-    if relevant || function.name.starts_with("neoCLR.Runtime.ReflectionCollection") {
+    if relevant
+        || function
+            .name
+            .starts_with("neoCLR.Runtime.ReflectionCollection")
+    {
         let mut contract = function.clone();
         contract.parameters = function
             .parameters
@@ -274,16 +278,25 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         return Ok(Binding::Reflection(query));
     }
     for (kind, name) in ["Kind", "Count", "Get", "Key", "Create"].iter().enumerate() {
-        if function.name != format!("neoCLR.Runtime.ReflectionCollection{name}") { continue; }
+        if function.name != format!("neoCLR.Runtime.ReflectionCollection{name}") {
+            continue;
+        }
         let object = Type::from_name("System.Object");
         let mut expected = vec![Type::from_name("System.Introspection.TypeInfo")];
         match kind {
-            0 => {},
+            0 => {}
             1 => expected.push(object.clone()),
             2 | 3 => expected.extend([object.clone(), Type::Int32]),
-            _ => expected.extend([Type::ArrayRef(Box::new(object.clone())), Type::ArrayRef(Box::new(Type::String))]),
+            _ => expected.extend([
+                Type::ArrayRef(Box::new(object.clone())),
+                Type::ArrayRef(Box::new(Type::String)),
+            ]),
         }
-        let returns = match kind { 0 | 1 => Type::Int32, 3 => Type::String, _ => object };
+        let returns = match kind {
+            0 | 1 => Type::Int32,
+            3 => Type::String,
+            _ => object,
+        };
         if function.parameters != expected || function.returns != returns || function.no_result {
             return Err(Fault::new("reflection collection signature mismatch"));
         }
@@ -1456,9 +1469,9 @@ impl Binding {
                     },
                 ))
             }
-            (Self::StringHashOrdinal, [Value::String(value)]) => Ok(Value::Int32(
-                crate::string_comparison::hash_ordinal(value),
-            )),
+            (Self::StringHashOrdinal, [Value::String(value)]) => {
+                Ok(Value::Int32(crate::string_comparison::hash_ordinal(value)))
+            }
             (Self::StringHashOrdinalIgnoreCase, [Value::String(value)]) => Ok(Value::Int32(
                 crate::string_comparison::hash_ignore_case(value),
             )),

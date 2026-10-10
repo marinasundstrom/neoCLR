@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Repair the JSON guide/sample website links and apply Rust formatting to existing
+  reflection/collection adapters so website and source-format validation can proceed.
+  The website build checks 3,543 pages; these repairs do not change runtime behavior.
+
 - Add development Queue/ArrayQueue, Stack/ArrayStack and Set/MutableSet/HashSet
   library APIs with Option removal/peek, explicit set equality, bucket-chain removal,
   freed-slot reuse and shallow snapshot iteration. Refresh type/member references

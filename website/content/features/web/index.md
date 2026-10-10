@@ -525,5 +525,5 @@ typed objects. JsonObject, JsonArray and scalar node declarations require their
 matching kind. Nodes serialize as JSON content; JsonNull is explicit data, and
 Object-typed properties do not infer nodes. Whole-document limits still apply.
 The [tested NodeEnvelope consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-json/Main.rvn)
-uses JsonValue, JsonObject and JsonValue[]; see the [API rules](/docs/json/).
+uses JsonValue, JsonObject and JsonValue[]; see the [API rules](/docs/json.html).
 List/map mapping remains under development.

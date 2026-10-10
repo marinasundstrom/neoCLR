@@ -3889,8 +3889,12 @@ fn interpret_instructions_with_dispatch(
                                     binding
                                 {
                                     crate::reflection_arrays::adapter(module, &callee, &args, kind)?
-                                } else if let crate::native::Binding::ReflectionCollection(kind) = binding {
-                                    crate::reflection_collections::adapter(module, &callee, &args, kind)?
+                                } else if let crate::native::Binding::ReflectionCollection(kind) =
+                                    binding
+                                {
+                                    crate::reflection_collections::adapter(
+                                        module, &callee, &args, kind,
+                                    )?
                                 } else if let crate::native::Binding::ReflectionMember(kind) =
                                     binding
                                 {

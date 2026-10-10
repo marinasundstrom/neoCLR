@@ -210,7 +210,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             &binding,
             crate::native::Binding::ReflectionConstruct
                 | crate::native::Binding::ReflectionCollection(_)
-            | crate::native::Binding::ReflectionMember(_)
+                | crate::native::Binding::ReflectionMember(_)
                 | crate::native::Binding::ReflectionProperty(_)
         ) {
             uses.extend(
@@ -252,7 +252,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             &binding,
             crate::native::Binding::UnixTimeToLocal
                 | crate::native::Binding::ReflectionCollection(_)
-            | crate::native::Binding::ReflectionMember(_)
+                | crate::native::Binding::ReflectionMember(_)
                 | crate::native::Binding::ReflectionMemberCheck(_)
                 | crate::native::Binding::TimeZoneMapLocal
                 | crate::native::Binding::EnvironmentArguments
