@@ -168,6 +168,6 @@ passes native macOS, Windows x64 and interpreted checks.
 The native pair supports construction, copying and deconstruction; full record
 equality, hashing and formatting remain unsupported. Development object initializers
 can set pair components; ordinary later assignments are rejected. This is a compiler
-restriction, not runtime object freezing.
+restriction, not runtime object freezing. Init checks pass on macOS and Windows x64.
 Future concurrent implementations remain separate work.
 See the type and member contracts in the [API reference](/docs/).

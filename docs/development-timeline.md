@@ -13195,3 +13195,11 @@ claim follows from these focused checks.
   decision to add runtime freezing or full native record semantics.
 - Evidence and remaining limits: [init contract](init-accessors.md); native execution
   and compiler qualification are recorded as they complete in the linked experiment.
+
+- Outcome: Raven `b939cd696` adds native init emission/import and prevents direct
+  accessor-name calls through normal member lookup. neoCLR `84df378d` adds metadata
+  and readonly-write permissions; `a2d7eda4` retains those permissions through AOT
+  specialization/trimming. The macOS and Windows x64 native/interpreter consumers,
+  separate-library initialization and rejected later writes all pass. API references,
+  source samples and the Windows action are updated. Reflection/raw calls remain
+  intentionally possible; full record semantics and runtime freezing are not added.

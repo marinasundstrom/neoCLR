@@ -1,0 +1,155 @@
+{
+  "workflowRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/38034560853",
+  "revision": "a2d7eda43d677684e3f8a58a3dc13ff96c683b35",
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "reportSha256": "2d1d95b8d191fd7ff053958a92e9046dc8cfd2f23634fed2f00a3c70a6eefaf5",
+  "verifiedDownloadedFiles": 1610,
+  "verifiedSourceInputs": 18,
+  "builds": [
+    {
+      "name": "init-accessors native output",
+      "artifacts": {
+        "app.dll": "7f199db70ffe63d2002245948b27def2a2e7a4c1899a1540d44d3cdbb30cb046",
+        "app.obj": "9338e86895d7adae460ece7982f0882a80598b06789fd9445150363d9dd94f66",
+        "app.exe": "b8ea4a46bcd590f365e3f97b4a0be44327a3853cf7a7b1791768be85b1c57173"
+      },
+      "dependencies": [
+        "KERNEL32.dll"
+      ]
+    },
+    {
+      "name": "collections native output",
+      "artifacts": {
+        "app.dll": "2716860fe5b48674c24acd771083190b1caa095443bc03bdbf8ed3284f06bb9d",
+        "app.obj": "bcb72b5af6077455eb91db2e0c6ade88a8f48ebea9fbb286aa189d9a7b5fab2b",
+        "app.exe": "506b0e1780c8054afbf67996fd52230bfece71dc45ff3585d21975e4706fe31d"
+      },
+      "dependencies": [
+        "KERNEL32.dll"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "collections",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\collections executable only\\app.exe"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\collections native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "collections passed\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "name": "init-accessors",
+      "passed": true,
+      "results": [
+        {
+          "mode": "native",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\init-accessors executable only\\app.exe"
+          ],
+          "exitCode": 0,
+          "stdout": "Init accessors passed\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+            "run",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\init-accessors native output\\app.dll",
+            "--system",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.runtime.neox",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Data.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Networking.dll",
+            "--module",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Web.dll",
+            "--object-root",
+            "D:\\a\\neoCLR\\neoCLR\\target\\windows-native-collections-validation\\development toolchain\\bundle\\lib\\System.Runtime.dll",
+            "--instructions",
+            "100000000"
+          ],
+          "exitCode": 0,
+          "stdout": "Init accessors passed\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "rejections": [
+    {
+      "name": "generated-equality",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support unregistered dependency: NativeCollections for struct Pair.func Equals(other: Pair) -> bool.\n"
+    },
+    {
+      "name": "imported-update",
+      "exitCode": 1,
+      "diagnostic": "error RAV0200: 'Key' is read-only and cannot be assigned to.\n"
+    },
+    {
+      "name": "mutable-component",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support constructor-initialized positional val components.\n"
+    },
+    {
+      "name": "record-class",
+      "exitCode": 1,
+      "diagnostic": "error NEOMETA001: Native emission does not support positional record structs without additional members.\n"
+    }
+  ],
+  "separateLibrary": {
+    "passed": true,
+    "rejections": [
+      {
+        "name": "class-update",
+        "diagnostic": "error RAV0200: 'Port' is read-only and cannot be assigned to.\n"
+      },
+      {
+        "name": "pair-update",
+        "diagnostic": "error RAV0200: 'Value' is read-only and cannot be assigned to.\n"
+      },
+      {
+        "name": "direct-accessor",
+        "diagnostic": "error RAV0117: 'Settings' has no member 'set_Port'.\n"
+      }
+    ]
+  },
+  "note": "Downloaded file, native build, isolated executable and source input hashes verified locally, allowing Windows checkout line endings. Outside-artifact tools were stability-checked in CI, not rehashed locally. A second successful run at 1ff056bb (38034575616) includes only generated-fixture cleanup changes."
+}

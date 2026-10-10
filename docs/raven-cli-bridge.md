@@ -7314,7 +7314,8 @@ record components. Imported accessor methods are hidden from ordinary named-memb
 lookup, matching PE import. 62 focused Raven tests pass; separate-library consumers
 initialize successfully and reject ordinary writes (RAV0200) and named setter calls
 (RAV0117). macOS native/interpreter qualification is in the
-[init experiment](experiments/init-accessors/); Windows is pending. AOT now preserves
+[init experiment](experiments/init-accessors/); Windows x64 also passes with downloaded
+artifacts/source hashes verified. AOT from `a2d7eda4` now preserves
 reached init associations through specialization/selection because they carry readonly
 write authority; unused accessors do not become roots. Source metadata catalogues also
 retain the flag. No runtime-freeze or full record-semantics claim is made.

@@ -8,6 +8,7 @@ Metadata/runtime slice (2026-10-10):
 - `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --init-accessors`
   checks authoring, native JSON/binary containers, introspection, CLI modreq,
   imported CLI calls, reflection invocation and malformed/readonly rejection.
+- Full C# metadata regression: 167/167 groups passed after the init changes.
 - `cargo test --locked --test properties`: 9 passed.
 - `cargo test --locked --test readonly_fields`: 5 passed, including an init setter
   writing its own readonly field and ordinary-method rejection.
@@ -28,7 +29,10 @@ SDKROOT=$(xcrun --sdk macosx --show-sdk-path) python3 scripts/validate-native-co
 ```
 
 The Windows native collections GitHub action runs the same native/interpreter and
-separate-library/rejection cases. Windows init qualification is pending.
+separate-library/rejection cases. The [verified Windows report](windows-validation.json)
+passes both native projects and the separate-library/rejection cases at `a2d7eda4`.
+All 1,610 downloaded file hashes, 18 tracked source inputs, both build outputs and
+isolated executables were verified. The follow-up run at `1ff056bb` also passes.
 
 AOT specialization and selection retain only init setter associations whose bodies
 are already reached by calls. They do not retain unused setters/getters merely to

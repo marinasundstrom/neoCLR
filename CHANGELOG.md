@@ -19,7 +19,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   without rooting unused accessors. Automatic/implemented properties, local records
   and imported KeyValuePair initializers pass macOS native/interpreter validation;
   a separate-library consumer rejects later writes. Refresh API snapshots and extend
-  the Windows collections action with the same coverage (Windows run pending). Keep
+  the Windows collections action with the same coverage. Windows x64 passes; verify
+  1,610 downloaded files, 18 source inputs and both isolated executables. All 167 C#
+  metadata contract groups pass. Direct native getter/setter metadata names are no
+  longer source-callable; use property syntax, matching Raven's .NET importer. Keep
   generated fixture outputs in ignored build/evidence directories.
 
 - Build and hash-check the current release interpreter for native HTTP server,

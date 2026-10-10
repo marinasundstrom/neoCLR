@@ -31,7 +31,10 @@ instance automatic and implemented init accessors, including positional record
 components, behind an explicit portable emission capability. Syntax, editor grammar
 and ordinary .NET compilation remain unchanged. This slice reuses Raven's existing
 language rules; it does not promise every C# construction-phase context or full
-native `with`/record support.
+native `with`/record support. Native accessor metadata names such as `set_Port`
+are no longer directly callable through source member lookup; use property syntax.
+This also applies to ordinary native getters/setters and aligns native import with
+Raven's .NET importer. Reflective method invocation remains available.
 
 The verifier permits an associated init setter to write readonly fields declared
 by its own type, just as the declaring constructor can. Ordinary methods retain
