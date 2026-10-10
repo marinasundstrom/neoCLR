@@ -157,3 +157,11 @@ API proposals are unchanged.
 All eight cases pass native macOS ARM64 and interpreter execution
 ([qualification](../../runtime/raven/tests/encoding-validation.json)); no library
 implementation changes were needed. Windows qualification remains pending.
+
+The second [framework batch](../../runtime/raven/tests/encoding-streams/Tests.rvn)
+adds eight passing native/interpreted cases for writer short transfers, whole-line
+preflight, final trailers, ownership, partial failures and selected readers
+([evidence](../../runtime/raven/tests/encoding-streams-validation.json)). These
+pin current Flush/Close behavior for review; they do not endorse it as the final API.
+The author emphasized coverage of encoding, streams, StreamReader and StreamWriter.
+Unicode reader boundaries, custom decoded output and maximum quotas remain next.

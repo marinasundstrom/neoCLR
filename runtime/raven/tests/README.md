@@ -561,3 +561,12 @@ macOS ARM64 and interpreted execution
 ([qualification](encoding-validation.json)). The library reaches 182 cases across
 20 projects. Windows qualification is pending; the default gate includes this suite.
 Custom writer, reader and quota probe migration remains separate.
+
+### Encoding stream adapters
+
+`--suite encoding-streams` adds eight cases for short writes, strict line preflight,
+custom final trailers, explicit completion/ownership, partial-output errors,
+incremental final drains and selected reader conversion. All pass native macOS
+ARM64 and interpreted execution ([qualification](encoding-streams-validation.json)),
+bringing the library to 190 cases across 21 projects. Windows remains pending.
+Unicode reader boundaries, custom decoded output and maximum quotas remain next.

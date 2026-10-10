@@ -13942,3 +13942,15 @@ claim completion of in-process test discovery.
   then validate paired conversion and general completion with custom providers.
   These are assistant proposals; no subsequent author selection or implementation
   is claimed. Additional codecs and a new runtime mechanism are not inferred.
+
+## 2026-10-10 — Encoding and stream conformance coverage
+
+- **Author direction:** continue the encoding work, then emphasize: “It's important
+  to cover the encoding, streams, and streamreader, streamwriter scenarios”.
+- **Assistant action:** migrate provider/session probes, then writer completion,
+  short transfers, failure and reader scenarios into discoverable framework tests.
+- **Outcome:** the first two batches total 16 passing native macOS ARM64 and
+  interpreted cases. No public API changes or new codecs are introduced.
+- **Next:** extend reader Unicode/custom-decoder boundaries and quota coverage;
+  keep .NET completion semantics under review rather than inferring endorsement
+  of the current explicit Finish contract.

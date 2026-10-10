@@ -15,6 +15,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   checks into attributed framework tests, including every mixed-width UTF-8 split,
   strict errors, copied carry, independent sessions and bounded drains. All pass
   native macOS ARM64 and interpreted execution; Windows qualification is pending.
+  Add eight passing stream-adapter cases for short writes, custom final trailers,
+  strict line preflight, ownership, partial-output failures and selected readers.
 
 - Add Date, TimeOfDay and LocalDateTime Parse overloads using current or explicit
   Culture and Result<T, DateTimeParseError>. Support the existing invariant, Swedish

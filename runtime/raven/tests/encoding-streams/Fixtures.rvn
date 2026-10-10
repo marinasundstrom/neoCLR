@@ -1,0 +1,65 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Text.*
+
+class TrailerEncoding : Encoding {
+    func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {
+        return Ok(Utf8.Encode(text + "<end>"))
+    }
+    func CreateDecoder() -> Decoder {
+        return Encodings.Utf8.CreateDecoder()
+    }
+    func CreateEncoder() -> Encoder {
+        return TrailerEncoder()
+    }
+}
+
+class TrailerEncoder : Encoder {
+    private val inner: Encoder = Encodings.Utf8.CreateEncoder()
+    func Accept(text: string, final: bool) -> Result<unit, EncodingError> {
+        if final {
+            return inner.Accept(text + "<end>", true)
+        }
+        return inner.Accept(text, false)
+    }
+    func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError> {
+        return inner.Drain(output, offset, count)
+    }
+}
+
+class ProbeSink : OutputStream {
+    private val bytes: ArrayList<byte> = ArrayList<byte>()
+    private var closed: bool = false
+    private var failAfter: int = -1
+    private var flushes: int = 0
+    init(failAfter: int) {
+        self.failAfter = failAfter
+    }
+    val Bytes: Sequence<byte> => bytes
+    val Closed: bool => closed
+    val Flushes: int => flushes
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if failAfter >= 0 && bytes.Count >= failAfter {
+            return Error(StreamError.AccessDenied)
+        }
+        if count == 0 {
+            return Ok(0)
+        }
+        bytes.Add(buffer[offset])
+        return Ok(1)
+    }
+    func Flush() -> Result<unit, StreamError> {
+        flushes += 1
+        return Ok(())
+    }
+    func Close() {
+        closed = true
+    }
+}
