@@ -93,6 +93,20 @@ impl Factory<'_> {
                         .map_err(|e| e.to_string())?,
                 ))
             }
+            V::Erased(value) => {
+                if !self.source.is_object_reference_type(expected) {
+                    return Err("snapshot boxed value requires object reference".into());
+                }
+                let ty = match value.as_ref() {
+                    V::Int32(_) => Type::Int32,
+                    V::Boolean(_) => Type::Boolean,
+                    V::String(_) => Type::String,
+                    _ => return Err("unsupported boxed snapshot value".into()),
+                };
+                self.emit(value, &ty)?;
+                self.body.push(Op::BoxValue(ty));
+                self.body.push(Op::CastClass(expected.clone()));
+            }
             V::NullObjectReference(_) => {
                 if !self.source.is_object_reference_type(expected) {
                     return Err("snapshot null signature mismatch".into());
@@ -228,8 +242,16 @@ impl Factory<'_> {
                         Op::Call(call),
                     ]);
                 } else {
-                    let owner = neoclr::native_metadata::provider(self.source, expected, fields)
-                        .map_err(|e| e.to_string())?;
+                    let owner = if matches!(
+                        logical,
+                        "System.Introspection.CustomAttributeData"
+                            | "System.Introspection.CustomAttributeTypedArgument"
+                    ) {
+                        expected.clone()
+                    } else {
+                        neoclr::native_metadata::provider(self.source, expected, fields)
+                            .map_err(|e| e.to_string())?
+                    };
                     let layout = self
                         .source
                         .instantiated_fields(&owner)
@@ -238,7 +260,10 @@ impl Factory<'_> {
                         return Err(format!("snapshot field count mismatch {owner:?}").into());
                     }
                     let (skip_module, identity) = match logical {
-                        "System.Introspection.PropertyInfo" => (true, None),
+                        "System.Introspection.PropertyInfo"
+                        | "System.Introspection.ConstructorInfo" => (true, None),
+                        "System.Introspection.CustomAttributeData"
+                        | "System.Introspection.CustomAttributeTypedArgument" => (false, None),
                         "System.Introspection.MethodInfo" => (true, Some("StoredIdentity")),
                         "System.Introspection.ParameterInfo" => {
                             (false, Some("StoredMemberIdentity"))
@@ -316,7 +341,9 @@ pub fn bind(
         .filter(|(_, f)| {
             matches!(
                 f.name.as_str(),
-                "neoCLR.Runtime.TypeProperties" | "neoCLR.Runtime.TypeElementType"
+                "neoCLR.Runtime.TypeProperties"
+                    | "neoCLR.Runtime.TypeElementType"
+                    | "neoCLR.Runtime.MemberCustomAttributes"
             )
         })
         .map(|(i, _)| i)
@@ -358,14 +385,21 @@ pub fn bind(
     for index in services {
         let f = &input.functions[index];
         let properties = f.name.ends_with("Properties");
+        let attributes = f.name.ends_with("CustomAttributes");
+        let attribute_parameters = attributes
+            && f.parameters.len() == 2
+            && name(source, &f.parameters[0]) == Some("System.Introspection.TypeInfo")
+            && f.parameters[1] == Type::Int32;
         if f.instance
             || f.owner.is_some()
-            || f.parameters
-                != if properties {
-                    vec![Type::RuntimeTypeHandle, Type::Int32]
-                } else {
-                    vec![Type::RuntimeTypeHandle]
-                }
+            || (attributes && !attribute_parameters)
+            || (!attributes
+                && f.parameters
+                    != if properties {
+                        vec![Type::RuntimeTypeHandle, Type::Int32]
+                    } else {
+                        vec![Type::RuntimeTypeHandle]
+                    })
             || f.impl_flags != 0x1000
             || !f.body.is_empty()
             || !f.locals.is_empty()
@@ -394,7 +428,9 @@ pub fn bind(
             locals: vec![],
             trusted: vec![],
         };
-        if properties {
+        if attributes {
+            bind_attributes(&mut factory, index, definitions, retention, &expected)?;
+        } else if properties {
             let Type::ArrayRef(element) = &expected else {
                 return Err("TypeProperties requires PropertyInfo vector".into());
             };
@@ -574,4 +610,151 @@ fn predicate(body: &mut Vec<Op>, scope: i32, access: i32) {
         Op::Int(scope | access),
         Op::Equal,
     ]);
+}
+
+// The source catalogue supplies recipes; only descriptor factories become executable.
+// Keeping an attribute never grants invocation rights to its constructor or target.
+fn bind_attributes(
+    factory: &mut Factory<'_>,
+    service: usize,
+    definitions: &[TypeDefId],
+    retention: &Value,
+    expected: &Type,
+) -> Result<(), Error> {
+    let Type::ArrayRef(element) = expected else {
+        return Err("MemberCustomAttributes requires CustomAttributeData vector".into());
+    };
+    if name(factory.source, element) != Some("System.Introspection.CustomAttributeData") {
+        return Err("MemberCustomAttributes requires scoped CustomAttributeData".into());
+    }
+    let contract = factory.input.functions[service].parameters[0].clone();
+    let origin = factory
+        .source
+        .type_definition(&contract)
+        .and_then(|d| d.origin.as_ref())
+        .ok_or("missing TypeInfo source identity")?;
+    let providers: Vec<_> = factory
+        .source
+        .types
+        .iter()
+        .filter(|d| {
+            d.origin.as_ref().is_some_and(|o| {
+                o.assembly == origin.assembly
+                    && o.module == origin.module
+                    && o.name == "System.Introspection.RuntimeNominalTypeInfo"
+            })
+        })
+        .collect();
+    let [provider] = providers.as_slice() else {
+        return Err("missing unique RuntimeNominalTypeInfo provider".into());
+    };
+    let owner = Type::Named(provider.name.clone());
+    let getters: Vec<_> = factory
+        .input
+        .functions
+        .iter()
+        .filter(|f| {
+            f.owner.as_ref() == Some(&owner)
+                && f.instance
+                && f.parameters.is_empty()
+                && f.returns == Type::RuntimeTypeHandle
+                && f.origin
+                    .as_ref()
+                    .is_some_and(|o| o.name == "get_ExecutionHandle")
+        })
+        .collect();
+    let [getter] = getters.as_slice() else {
+        return Err("missing unique nominal type handle accessor".into());
+    };
+    let call = FunctionRef {
+        definition: getter.definition.clone(),
+        name: getter.name.clone(),
+        owner: Some(owner.clone()),
+        instance: true,
+        parameters: vec![],
+        generic_arguments: vec![],
+    };
+    let handle = factory.local(Type::RuntimeTypeHandle);
+    factory.body.extend([
+        Op::Arg(0),
+        Op::CastClass(owner),
+        Op::Call(call),
+        Op::Store(handle),
+        Op::Arg(1),
+        Op::Int(0),
+        Op::Less,
+        Op::BranchFalse(9),
+        Op::Fault("invalid attribute target".into()),
+    ]);
+    for row in retention["types"]
+        .as_array()
+        .ok_or("missing reflection root types")?
+    {
+        if row["customAttributes"] != true {
+            continue;
+        }
+        let id: TypeDefId = serde_json::from_value(row["definition"].clone())?;
+        let ti = definitions
+            .iter()
+            .position(|d| *d == id)
+            .ok_or("missing attribute root")?;
+        let declaration = &factory.source.types[ti];
+        let origin = declaration
+            .origin
+            .as_ref()
+            .ok_or("attribute root requires source metadata")?;
+        let owner = Type::Named(declaration.name.clone());
+        let branch = factory.body.len() + 3;
+        factory.body.extend([
+            Op::Load(handle),
+            Op::LoadTypeToken(owner.clone()),
+            Op::Equal,
+            Op::BranchFalse(0),
+        ]);
+        let mut tokens: Vec<u32> = declaration
+            .custom_attributes
+            .iter()
+            .map(|a| a.target_token.unwrap_or(origin.token))
+            .collect();
+        // Match interpreter lookup, including callable and parameter tokens in this module.
+        for f in &factory.source.functions {
+            if let Some(o) = &f.origin {
+                if o.assembly == origin.assembly && o.module == origin.module {
+                    tokens.extend(
+                        f.custom_attributes
+                            .iter()
+                            .map(|a| a.target_token.unwrap_or(o.token)),
+                    );
+                }
+            }
+        }
+        tokens.sort_unstable();
+        tokens.dedup();
+        for token in tokens {
+            let token: i32 = token.try_into()?;
+            if token == 0 {
+                continue;
+            }
+            let skip = factory.body.len() + 3;
+            factory
+                .body
+                .extend([Op::Arg(1), Op::Int(token), Op::Equal, Op::BranchFalse(0)]);
+            let recipe = neoclr::native_metadata::custom_attributes(factory.source, &owner, token)
+                .map_err(|e| e.to_string())?;
+            factory.emit(&recipe, expected)?;
+            factory.body.push(Op::Return);
+            factory.body[skip] = Op::BranchFalse(factory.body.len());
+        }
+        // Valid retained owner, no annotation for this target (including token zero).
+        factory.body.extend([
+            Op::Int(0),
+            Op::ReserveArray((**element).clone()),
+            Op::Return,
+        ]);
+        factory.body[branch] = Op::BranchFalse(factory.body.len());
+    }
+    factory.body.push(Op::Fault(
+        "native custom attribute metadata was not retained; configure --reflection-roots".into(),
+    ));
+    Ok(())
 }

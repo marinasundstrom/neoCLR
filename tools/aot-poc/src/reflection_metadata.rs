@@ -110,7 +110,7 @@ pub fn catalogue(
                 "noResult":f.no_result,"receiverByRef":f.receiver_byref,"receiverReadonly":f.receiver_readonly,
                 "parameters":f.parameters.iter().map(|t| close(t, &arguments)).collect::<Result<Vec<_>, _>>()?,
                 "returns":close(&f.returns, &arguments)?,
-                "genericParameters":f.generic_parameters,"origin":f.origin}));
+                "genericParameters":f.generic_parameters,"origin":f.origin,"customAttributes":f.custom_attributes}));
         }
         let properties = declaration
             .properties
@@ -246,6 +246,7 @@ pub fn bind_queries(
                 Some(
                     "neoCLR.Runtime.TypeName"
                         | "neoCLR.Runtime.TypeArgumentCount"
+                        | "neoCLR.Runtime.TypeMetadataToken"
                         | "neoCLR.Runtime.TypeArgument"
                         | "neoCLR.Runtime.TypeShape"
                 )
@@ -348,12 +349,16 @@ pub fn bind_queries(
         } else {
             [false; 14]
         };
-        descriptors.push((token.clone(), name, count, shapes));
+        let metadata_token = if queries.iter().any(|r| r["name"] == "neoCLR.Runtime.TypeMetadataToken") {
+            neoclr::native_metadata::type_token(source, &semantic_type).map_err(|e| e.to_string())?
+        } else { 0 };
+        descriptors.push((token.clone(), name, count, shapes, metadata_token));
     }
     let mut bindings = vec![];
     for row in queries {
         let index = row["compiledIndex"].as_u64().ok_or("missing query index")? as usize;
         let f = &mut input.functions[index];
+        let metadata_tokens = row["name"] == "neoCLR.Runtime.TypeMetadataToken";
         let names = row["name"] == "neoCLR.Runtime.TypeName";
         let shapes = row["name"] == "neoCLR.Runtime.TypeShape";
         let arguments = row["name"] == "neoCLR.Runtime.TypeArgument";
@@ -394,10 +399,10 @@ pub fn bind_queries(
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
         {
-            return Err("native descriptor query requires exact reserved TypeName/TypeArgumentCount/TypeArgument/TypeShape InternalCall contract".into());
+            return Err("native descriptor query requires exact reserved TypeName/TypeArgumentCount/TypeArgument/TypeShape/TypeMetadataToken InternalCall contract".into());
         }
         let mut body = vec![];
-        for (descriptor, (token, name, count, flags)) in descriptors.iter().enumerate() {
+        for (descriptor, (token, name, count, flags, metadata_token)) in descriptors.iter().enumerate() {
             let branch = body.len() + 3;
             body.extend([
                 Op::Arg(0),
@@ -429,6 +434,8 @@ pub fn bind_queries(
                 body.extend([
                     if names {
                         Op::String(name.clone())
+                    } else if metadata_tokens {
+                        Op::Int(*metadata_token)
                     } else {
                         Op::Int(*count as i32)
                     },
@@ -443,7 +450,7 @@ pub fn bind_queries(
         f.impl_flags = 0;
         f.body = body;
         bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,
-            "implementation":if names { "type-name-closed-v1" } else if shapes { "type-shape-closed-v1" } else if arguments { "type-argument-closed-v1" } else { "type-argument-count-closed-v1" },
+            "implementation":if metadata_tokens { "type-metadata-token-closed-v1" } else if names { "type-name-closed-v1" } else if shapes { "type-shape-closed-v1" } else if arguments { "type-argument-closed-v1" } else { "type-argument-count-closed-v1" },
             "descriptorCount":descriptors.len(),"policy":"closed token producers; semantic source names; no accessor reachability"}));
     }
     Ok(bindings)
@@ -459,6 +466,25 @@ mod tests {
         let report = json!({"functions":[{"name":"neoCLR.Runtime.TypeName","compiledIndex":0}],
             "sourceMetadata":{"types":[{"compiledTypeIndex":0,"name":"Original","origin":{"name":"Café"},"typeArguments":[]}]}});
         (module, report)
+    }
+
+    #[test]
+    fn metadata_tokens_preserve_source_rows_instead_of_native_type_indices() {
+        let (mut source, mut report) = query();
+        source.types[0].name = "Original".into();
+        source.types[0].origin = Some(serde_json::from_value(json!({
+            "assembly":"OriginalAssembly","module":"Original.dll","name":"Original","token":0x0200002a
+        })).unwrap());
+        source.functions[0].name = "neoCLR.Runtime.TypeMetadataToken".into();
+        source.functions[0].returns = Type::Int32;
+        source.functions[1].body[0] = Op::LoadTypeToken(Type::Named("Original".into()));
+        report["functions"][0]["name"] = json!("neoCLR.Runtime.TypeMetadataToken");
+        let mut input = source.clone();
+        bind_queries(&mut input, &source, &report).unwrap();
+        assert!(input.functions[0].body.iter().any(|op| matches!(op, Op::Int(0x0200002a))));
+        input = source.clone();
+        input.functions[0].returns = Type::RuntimeTypeHandle;
+        assert!(bind_queries(&mut input, &source, &report).is_err());
     }
 
     #[test]

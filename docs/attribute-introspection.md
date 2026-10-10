@@ -70,3 +70,19 @@ available MemberInfo categories and parameters, exact argument types, snapshots 
 non-execution. Native tests cover artifact round trips, null constants, malformed
 arguments, invalid target tokens and isolation of member/type annotations. The
 [retained constructor case](experiments/union-construction/README.md) now binds and invokes value-case and carrier constructors. The general route mapper remains the next layer.
+
+## AOT retention — development 2026-10-10
+
+[The native consumer](experiments/native-attributes/README.md) now executes public
+attribute inspection on macOS ARM64 with interpreter parity. Explicit schema-3
+roots retain custom-attribute data separately from construction rights. String,
+Int32, Boolean and Int32-enum constructor arguments, repeats, null strings and
+property/accessor/parameter annotations are covered. Enum Value is the underlying
+boxed integer; ArgumentType remains nominal. Attribute constructors are not roots.
+
+Source tokens remain module scoped after lowering. An unretained owner faults;
+a retained unannotated target returns an empty sequence. Constructor descriptors
+now match the source runtime's layout instead of carrying a method-only identity
+field. No named-argument guest API, general native discovery or source annotation
+emission is implied. Windows qualification remains pending; the same gate is wired
+into its workflow. The fixture's metadata attachment is explicitly test-only.

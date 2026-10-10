@@ -25,6 +25,21 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-10 — Custom attributes must work with AOT
+
+- **Author:** “Custom attributes should also work with AOT”. This follows the
+  general attribute/AttributeUsage direction and the .NET semantic default.
+- **Assistant:** makes a standalone native executable part of acceptance, with
+  deliberately faulting constructors proving metadata inspection is side-effect free.
+- **Action/outcome:** adds explicit native attribute-data retention and shared
+  interpreter/AOT snapshot recipes. A public Raven consumer passes on macOS ARM64,
+  including enum/fixed arguments and member/parameter annotations; executable
+  selection excludes both the attribute and annotated target constructors.
+- **Remaining:** source annotations are attached by a test fixture until compiler
+  emission is implemented. Named guest arguments and automatic test discovery remain
+  open. The Windows x64 gate is wired but its outcome is not yet qualified.
+  [Design and evidence](experiments/native-attributes/README.md).
+
 ## 2026-10-09 — Completed task factories and native HTTP follow-through
 
 - **Author:** notices `Promise<()>().Task` in failure paths and asks for

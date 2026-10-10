@@ -1,0 +1,100 @@
+import System.*
+import System.Introspection.*
+import System.Option.*
+
+// Test metadata is attached by the fixture author until native source annotations emit.
+public enum NoteKind {
+    Example = 7
+}
+
+public class NoteAttribute {
+    init(text: string?, number: int, enabled: bool, kind: NoteKind) {
+        System.Fail("Attribute constructor executed")
+    }
+}
+
+public class Subject {
+    var Name: string { get; set; }
+    init() {
+        System.Fail("Annotated target constructor executed")
+    }
+}
+
+public class Plain { }
+
+func Main() -> int {
+    let subject = (NominalTypeInfo)typeof(Subject)
+    let attributes = subject.GetCustomAttributesData()
+    if attributes.Count != 2 {
+        return 1
+    }
+    let note = attributes[0]
+    if !note.AttributeType.Equals(typeof(NoteAttribute)) || note.Constructor.Name != ".ctor" {
+        return 2
+    }
+    let parameters = note.Constructor.GetParameters()
+    if parameters.Count != 4 || !parameters[0].ParameterType.Equals(typeof(string)) {
+        return 3
+    }
+    let arguments = note.GetConstructorArguments()
+    if arguments.Count != 4 || !arguments[1].ArgumentType.Equals(typeof(int)) {
+        return 4
+    }
+    if arguments[0].Value is string text {
+        if text != "type ☃" {
+            return 5
+        }
+    } else {
+        return 6
+    }
+    if arguments[1].Value is int number {
+        if number != 42 {
+            return 7
+        }
+    } else {
+        return 8
+    }
+    if arguments[2].Value is bool enabled {
+        if !enabled {
+            return 9
+        }
+    } else {
+        return 10
+    }
+    if !arguments[3].ArgumentType.Equals(typeof(NoteKind)) {
+        return 12
+    }
+    if arguments[3].Value is int kind {
+        if kind != 7 {
+            return 13
+        }
+    } else {
+        return 14
+    }
+    let repeated = attributes[1].GetConstructorArguments()
+    if repeated[0].Value != null {
+        return 15
+    }
+    let erased: Object = arguments
+    let copied = (CustomAttributeTypedArgument[])erased
+    copied[0] = copied[1]
+    if !note.GetConstructorArguments()[0].ArgumentType.Equals(typeof(string)) {
+        return 16
+    }
+    let property = subject.GetProperties()[0]
+    if property.GetCustomAttributesData().Count != 1 {
+        return 17
+    }
+    if let Some(setter) = property.GetSetMethod() {
+        if setter.GetCustomAttributesData().Count != 1 || setter.GetParameters()[0].GetCustomAttributesData().Count != 1 {
+            return 18
+        }
+    } else {
+        return 19
+    }
+    if ((NominalTypeInfo)typeof(Plain)).GetCustomAttributesData().Count != 0 {
+        return 11
+    }
+    Console.WriteLine("Native attribute inspection passed")
+    return 0
+}

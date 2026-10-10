@@ -300,3 +300,9 @@ applies usage policies across assemblies. Native source annotation emission and
 guest named-data inspection remain prerequisites for attributed test discovery; these are not yet released
 runtime capabilities. See the [API contract](../../docs/experimental-metadata.html#member-custom-attributes-development-2026-10-10)
 and [implementation plan](https://github.com/marinasundstrom/neoCLR/blob/main/docs/custom-attributes.md).
+
+Explicit development AOT retention now runs attribute-data inspection through the
+public Raven API on macOS ARM64 without executing attribute constructors. Fixed
+arguments, Int32 enum values and member/parameter annotations are covered by a
+[metadata-authored consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-attributes/README.md).
+Native source annotation emission and Windows qualification remain open.

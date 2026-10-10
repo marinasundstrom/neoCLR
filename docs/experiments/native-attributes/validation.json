@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    "fixed-and-enum-arguments",
+    "null-string",
+    "repeated-attributes",
+    "property-method-parameter-targets",
+    "snapshot-copy",
+    "constructor-signature",
+    "no-user-constructor-roots",
+    "unannotated-type",
+    "unretained-type-rejection",
+    "standalone-dependencies"
+  ],
+  "inputs": {
+    "docs/experiments/native-attributes/Main.rvn": "4edbbb37f8fc52a5cddafb311eb6f07a584f27c6948520e1ca243e7a746f0ad5",
+    "docs/experiments/native-attributes/Native.rvnproj": "6fcc3173c04cc661cba9d53e6a49ce3f5869f327df91a1305bacf5a287a6c17c",
+    "docs/experiments/native-attributes/verify.py": "962f8f8bdbdde9c4ee5a8d4c52aa9275eb63b923bc76e6b205e274ceb4d86eb5",
+    "tools/aot-poc/target/debug/neoclr-aot-poc": "b3a81f6e0edefd09d689aa60f7cf651da39a5f80fbbee4b392e0a9ad08c702a9",
+    "target/debug/neoclr": "ebd4653992b240f18f8edd006674a980a2979abcb5598dd4aac2e1e9016eecd5",
+    "target/library-scopes-final/bundle/lib/System.Runtime.dll": "75d881c3170dd4ca1be32fdd266075e9cd1c9649903888743e0e3e214d5bd069",
+    "target/library-scopes-final/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "712ae51186407deda16357d34fe543b0f6161453cd7bfaea1f050c600ad4efda",
+    "target/library-scopes-final/bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/NativeAttributeAotFixture.cs": "457aae616fc62f861bef36e5bf7cb8695a2ec1518ec0dd3f1ba08d5a3382c01f",
+    "target/native-attributes-final/app.neox": "15198072e28ff8169163a02b5657428c4a03c880d7eeb1eedbd6dc8dd944fa3e",
+    "target/native-attributes-final/roots.json": "678eb7bc885f567e23c19513efed344324a6748f40e7f5de87ea15c760142fff"
+  },
+  "date": "2026-10-10",
+  "compilerRevision": "494dede84 (existing development bundle)",
+  "annotationProducer": "NativeAttributeAotFixture; Raven source annotation emission remains unsupported",
+  "focusedChecks": {
+    "aotReflectionTests": 10,
+    "interpreterAttributeAndHierarchyTests": 15,
+    "apiSnapshot": "passed"
+  },
+  "windowsQualification": "pending; shared verifier wired into windows-native-collections workflow"
+}

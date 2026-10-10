@@ -159,40 +159,7 @@ impl Query {
         let definition = module.type_definition(&ty);
         let arguments = type_arguments(&ty);
         match self {
-            Self::CustomAttributes => {
-                let mut attributes = Vec::new();
-                if let Some(d) = definition {
-                    let token = u32::try_from(argument)
-                        .map_err(|_| Fault::new("invalid attribute target"))?;
-                    if token != 0 {
-                        let own =
-                            crate::metadata_tokens::type_token(module, &handle.identity)? as u32;
-                        attributes.extend(d.custom_attributes.iter().filter(|a| {
-                            a.target_token == Some(token)
-                                || a.target_token.is_none() && token == own
-                        }));
-                        for f in &module.functions {
-                            if let (Some(origin), Some(owner)) = (&f.origin, &d.origin) {
-                                if origin.assembly == owner.assembly
-                                    && origin.module == owner.module
-                                {
-                                    attributes.extend(f.custom_attributes.iter().filter(|a| {
-                                        a.target_token == Some(token)
-                                            || a.target_token.is_none() && token == origin.token
-                                    }));
-                                }
-                            }
-                        }
-                    }
-                }
-                array(
-                    "System.Introspection.CustomAttributeData",
-                    attributes
-                        .into_iter()
-                        .map(|a| attribute_data(module, a, limits)),
-                    limits,
-                )
-            }
+            Self::CustomAttributes => custom_attributes(module, &ty, argument, limits),
             Self::DeclaringType => {
                 let parent = match &handle.identity {
                     TypeIdentity::Definition { .. } => {
@@ -686,6 +653,60 @@ fn record(name: &str, fields: Vec<Value>) -> Value {
         fields,
     }
 }
+/// Shared metadata-only recipe used by interpreted and retained native queries.
+#[cfg(feature = "native-metadata")]
+pub(crate) fn custom_attribute_snapshot(
+    module: &Module,
+    owner: &Type,
+    token: i32,
+) -> Result<Value, Fault> {
+    custom_attributes(
+        &QueryContext {
+            module,
+            source: true,
+        },
+        owner,
+        token,
+        &Limits::default(),
+    )
+}
+
+fn custom_attributes(
+    module: &QueryContext,
+    owner: &Type,
+    argument: i32,
+    limits: &Limits,
+) -> Result<Value, Fault> {
+    let mut attributes = Vec::new();
+    if let Some(d) = module.type_definition(owner) {
+        let token = u32::try_from(argument).map_err(|_| Fault::new("invalid attribute target"))?;
+        if token != 0 {
+            let handle = crate::type_identity::describe_loaded(module, owner)?;
+            let own = crate::metadata_tokens::type_token(module, &handle.identity)? as u32;
+            attributes.extend(d.custom_attributes.iter().filter(|a| {
+                a.target_token == Some(token) || a.target_token.is_none() && token == own
+            }));
+            for f in &module.functions {
+                if let (Some(origin), Some(owner)) = (&f.origin, &d.origin) {
+                    if origin.assembly == owner.assembly && origin.module == owner.module {
+                        attributes.extend(f.custom_attributes.iter().filter(|a| {
+                            a.target_token == Some(token)
+                                || a.target_token.is_none() && token == origin.token
+                        }));
+                    }
+                }
+            }
+        }
+    }
+    array(
+        "System.Introspection.CustomAttributeData",
+        attributes
+            .into_iter()
+            .map(|a| attribute_data(module, a, limits)),
+        limits,
+    )
+}
+
 fn attribute_data(
     module: &QueryContext,
     attribute: &crate::metadata::CustomAttribute,
@@ -1056,7 +1077,7 @@ fn method(
             Value::Boolean(crate::interfaces::is_bodyless(module, f)),
         ],
     )?;
-    if type_contract(module) == "System.Introspection.TypeInfo" {
+    if type_contract(module) == "System.Introspection.TypeInfo" && !f.name.ends_with("..ctor") {
         if let Value::Object { fields, .. } = &mut result {
             fields.push(Value::String(
                 format!(

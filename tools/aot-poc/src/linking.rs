@@ -432,7 +432,7 @@ pub fn prepare(
             .map(|r| json!({"compiledIndex":r["compiledIndex"],"name":r["name"],"implementation":"reflection-construction-retained-v1"})).collect();
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
         let rows: Vec<_> = report["functions"].as_array().unwrap().iter()
-            .filter(|r| matches!(r["name"].as_str(),Some("neoCLR.Runtime.TypeProperties" | "neoCLR.Runtime.TypeElementType")))
+            .filter(|r| matches!(r["name"].as_str(),Some("neoCLR.Runtime.TypeProperties" | "neoCLR.Runtime.TypeElementType" | "neoCLR.Runtime.MemberCustomAttributes")))
             .map(|r| json!({"compiledIndex":r["compiledIndex"],"name":r["name"],"implementation":"reflection-snapshot-retained-v1"})).collect();
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
         let collection_rows: Vec<_> = report["functions"].as_array().unwrap().iter()

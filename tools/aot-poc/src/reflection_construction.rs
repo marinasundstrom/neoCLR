@@ -19,8 +19,8 @@ pub fn bind(
         .get("schemaVersion")
         .and_then(Value::as_u64)
         .unwrap_or(0);
-    if config.len() != 2 || !matches!(version, 1 | 2) {
-        return Err("reflection roots require schemaVersion 1 or 2 and types".into());
+    if config.len() != 2 || !matches!(version, 1 | 2 | 3) {
+        return Err("reflection roots require schemaVersion 1, 2 or 3 and types".into());
     }
     let roots = config
         .get("types")
@@ -35,22 +35,37 @@ pub fn bind(
         let fields = root
             .as_object()
             .ok_or("reflection root must be an object")?;
-        if fields.len() != if version == 1 { 2 } else { 5 }
+        let field_count = match version {
+            1 => 2,
+            2 => 5,
+            _ => 6,
+        };
+        if fields.len() != field_count
             || !fields.contains_key("definition")
             || !fields.contains_key("construct")
-            || (version == 2
+            || (version >= 2
                 && ["properties", "getters", "setters"]
                     .iter()
                     .any(|k| !fields.contains_key(*k)))
         {
             return Err("reflection root fields do not match the requested schema".into());
         }
+        if version == 3 && !fields.contains_key("customAttributes") {
+            return Err("reflection root fields do not match the requested schema".into());
+        }
+        let custom_attributes = if version == 3 {
+            root["customAttributes"]
+                .as_bool()
+                .ok_or("customAttributes must be Boolean")?
+        } else {
+            false
+        };
         let definition: TypeDefId = serde_json::from_value(root["definition"].clone())?;
         let construct = root["construct"]
             .as_bool()
             .ok_or("construct must be Boolean")?;
         let mut property_policy = [false; 3];
-        if version == 2 {
+        if version >= 2 {
             for (i, key) in ["properties", "getters", "setters"].iter().enumerate() {
                 property_policy[i] = root[*key]
                     .as_bool()
@@ -131,7 +146,7 @@ pub fn bind(
             }
         }
         rows.push(json!({"definition":definition,"sourceName":ty.name,"construct":construct,
-            "properties":property_policy[0],"getters":property_policy[1],"setters":property_policy[2],
+            "customAttributes":custom_attributes,"properties":property_policy[0],"getters":property_policy[1],"setters":property_policy[2],
             "checkStatus":status,"constructor":target.as_ref().and_then(|_| candidates.first()).map(|i| &methods[*i]),
             "policy":"explicit source identity; metadata check does not retain constructor body unless invocation is requested"}));
         selected.push((index, construct, status, target));
@@ -212,4 +227,36 @@ pub fn bind(
         f.body = body;
     }
     Ok(json!({"schemaVersion":version,"types":rows}))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn attributes_require_an_explicit_boolean_policy_without_constructor_roots() {
+        let source = neoclr::assemble(".module Retention\n.type class Model\n.end\n").unwrap();
+        let definitions = vec![source.types[0].definition.clone().unwrap()];
+        let mut config = json!({"schemaVersion":3,"types":[{"definition":definitions[0],
+            "construct":false,"properties":false,"getters":false,"setters":false,"customAttributes":true}]});
+        let result = bind(&mut source.clone(), &source, &definitions, &[], &config).unwrap();
+        assert_eq!(result["types"][0]["customAttributes"], true);
+        assert_eq!(result["types"][0]["construct"], false);
+        assert!(result["types"][0]["constructor"].is_null());
+        config["types"][0]["customAttributes"] = json!(1);
+        assert!(
+            bind(&mut source.clone(), &source, &definitions, &[], &config)
+                .unwrap_err()
+                .to_string()
+                .contains("must be Boolean")
+        );
+        config["types"][0]
+            .as_object_mut()
+            .unwrap()
+            .remove("customAttributes");
+        assert!(bind(&mut source.clone(), &source, &definitions, &[], &config).is_err());
+        config["schemaVersion"] = json!(2);
+        let result = bind(&mut source.clone(), &source, &definitions, &[], &config).unwrap();
+        assert_eq!(result["types"][0]["customAttributes"], false);
+    }
 }

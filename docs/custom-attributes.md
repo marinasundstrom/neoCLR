@@ -254,3 +254,18 @@ The explicit CLI bootstrap is `target/library-scopes-final/bundle/lib/Core.dll`,
 SHA-256 `132bbb0932d5903cdca1c66a18cba68ac79299973cec13591bc4af885eee6e6f`.
 That bundle's compiler remains `494dede84`; this source-import qualification is
 not a claim that the older bundled compiler implements it.
+
+## Native AOT inspection — development 2026-10-10
+
+The author explicitly requires custom attributes with AOT. The first
+[retained native gate](experiments/native-attributes/README.md) now passes on macOS
+ARM64 with interpreter parity. Private reflection-roots schema 3 separates
+`customAttributes` retention from constructor/accessor invocation. Fixed arguments,
+including Int32 enums, are materialized using the VM's metadata recipe; source
+member tokens survive executable lowering. User constructors are neither called
+nor rooted. Windows x64 has a matching workflow gate; qualification is pending.
+
+This is native runtime support, not native source annotation emission. The fixture
+attaches annotations after compiling its Raven consumer; the bundled compiler
+remains unchanged. Guest named-data inspection and automatic discovery remain open.
+See the gate's retention design, tradeoffs, provenance and exact bounds.

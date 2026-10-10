@@ -89,3 +89,14 @@ pub fn validate_collection_service(
 ) -> Result<(), crate::Fault> {
     crate::reflection_collections::validate_service(module, service, operation)
 }
+
+/// Return declared custom-attribute data without constructing attribute instances.
+pub fn custom_attributes(module: &Module, owner: &Type, token: i32) -> Result<Value, Fault> {
+    crate::reflection::custom_attribute_snapshot(module, owner, token)
+}
+
+/// Return the original module-scoped metadata token, not a native layout ordinal.
+pub fn type_token(module: &Module, owner: &Type) -> Result<i32, Fault> {
+    let handle = crate::type_identity::describe_loaded(module, owner)?;
+    crate::metadata_tokens::type_token(module, &handle.identity)
+}

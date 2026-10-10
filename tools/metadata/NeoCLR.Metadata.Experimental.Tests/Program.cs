@@ -4,6 +4,11 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--aot-attribute-fixture", var attributeInput, var attributeImage, var attributeRoots])
+{
+    NativeAttributeAotFixture.Write(attributeInput, attributeImage, attributeRoots); return 0;
+}
+
 if (args is ["--member-attributes"]) { MemberAttributeChecks.Run(); return 0; }
 if (args is ["--member-attributes", var attributeOutput]) { MemberAttributeChecks.Run(attributeOutput); return 0; }
 
