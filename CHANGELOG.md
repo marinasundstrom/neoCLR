@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Add canonical host declaration-module introspection views, assembly traversal and
+  direct member ownership. Preserve physical ModuleInfo and existing definition
+  enumeration contracts. Validate empty/global/child modules, separate assemblies
+  and contexts, foreign snapshots, read-only member lists and shared type/function
+  identities across PE/NEOX round trips. Document the .NET scope comparison and
+  guest RuntimeContext/AOT work still outstanding; no guest API or format changes.
+
 - Add source TestAttribute with constructor/named descriptions and host introspection
   discovery of parameterless Result-returning module tests. Generate typed Raven
   registrations for interpreter/AOT, keep manual Add/Skip, stable IDs and deterministic

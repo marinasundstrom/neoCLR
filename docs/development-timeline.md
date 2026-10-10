@@ -13391,6 +13391,16 @@ ModuleInfo/AssemblyInfo contracts and RuntimeContext traversal against .NET modu
 ownership, with explicit Raven source-module semantics and interpreter/AOT validation.
 That review scope is a proposal; no new module API has been implemented or approved.
 
+**Later assistant action (2026-10-10):** after the host TestAttribute milestone,
+implemented canonical host declaration-module views, assembly traversal and direct
+member ownership over the existing native table. Preserved physical ModuleInfo and
+the existing context reader-definition enumeration. Focused PE/NEOX checks cover
+empty/global/child modules, separate contexts/assemblies and foreign-snapshot
+rejection. Recorded the .NET physical-module comparison and API contract in
+[the module design](introspection-design.md#first-ownership-slice-2026-10-10).
+Guest RuntimeContext traversal, callable discovery/invocation and AOT retention
+remain open; this is a foundation slice, not completion of the author's module goal.
+
 During the attribute work, the assistant implements native source annotations in
 Raven's shared integration line and corrects ordinary property annotations leaking
 onto backing fields. Focused native round trips and 21 .NET AttributeUsage tests pass.

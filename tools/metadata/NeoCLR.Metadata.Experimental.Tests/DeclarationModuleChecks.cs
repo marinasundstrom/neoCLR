@@ -13,7 +13,13 @@ internal static class DeclarationModuleChecks
         builder.DefineModule("Example.Empty");
         var math = builder.DefineModule("Example.Math");
         if (!ReferenceEquals(math, builder.DefineModule("Example.Math"))) throw new Exception("unstable module");
-        builder.DefineModule("Example.Data").AddClass("Item").AddNestedValueType("Nested");
+        var item = builder.DefineModule("Example.Data").AddClass("Item");
+        item.AddNestedValueType("Nested");
+        item.AddField("Value", PrimitiveType.Int32);
+        var owned = item.AddMethod("Owned", new MethodSignature(PrimitiveType.Int32, []));
+        owned.LoadConstant(7); owned.Return();
+        builder.DefineModule("Example.Math.Advanced").AddClass("Child");
+        builder.DefineModule("").AddClass("Global");
         math.AddConstant("Pi", Math.PI);
         var f = math.AddFunction("Read", new MethodSignature(PrimitiveType.Int32, []));
         f.LoadConstant(42); f.Return(); builder.EntryPoint = f;
@@ -21,14 +27,22 @@ internal static class DeclarationModuleChecks
         {
             var read = AssemblyDefinition.ReadNativeAssembly(image);
             var modules = read.GetModules();
-            if (!modules.Select(m => m.Name).SequenceEqual(new[] { "Example.Data", "Example.Empty", "Example.Math" }) || modules.Any(m => m.IsProjection)) throw new Exception("module table round trip");
-            if (modules[1].GetMembers().Count != 0 || modules[2].GetMembers().Count != 2 || modules[0].GetMembers().Count != 1) throw new Exception("module membership");
+            if (!modules.Select(m => m.Name).SequenceEqual(new[] { "", "Example.Data", "Example.Empty", "Example.Math", "Example.Math.Advanced" }) || modules.Any(m => m.IsProjection)) throw new Exception("module table round trip");
+            if (modules[2].GetMembers().Count != 0 || modules[3].GetMembers().Count != 2 || modules[1].GetMembers().Count != 1) throw new Exception("module membership");
             foreach (var m in modules)
                 if (m.GetMembers().Any(member => !ReferenceEquals(member.DeclaringModule, m))) throw new Exception("module owner");
             var other = new AssemblyBuilder(new AssemblyIdentity("DifferentPackage", new Version(1, 0, 0, 0)), core);
             other.DefineModule("Example.Math");
             var catalog = new MetadataLoadContext([read, AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteLibraryBinary(other.WriteNativeAssembly()))]);
             if (catalog.GetDeclarationModules().Count(m => m.Name == "Example.Math") != 2) throw new Exception("same path across assemblies merged");
+            CheckViews(catalog, read);
+            var sameSnapshotContext = new MetadataLoadContext([read]);
+            if (ReferenceEquals(catalog.Resolve(modules[3]), sameSnapshotContext.Resolve(modules[3]))) throw new Exception("module view leaked across contexts");
+            var foreign = AssemblyDefinition.ReadNativeAssembly(image);
+            try { catalog.Resolve(foreign.GetModules()[0]); throw new Exception("foreign snapshot admitted"); }
+            catch (InvalidDataException) { }
+            try { catalog.Resolve((DeclarationModuleDefinition)null!); throw new Exception("null module admitted"); }
+            catch (ArgumentNullException) { }
         }
         var json = JsonNode.Parse(builder.WriteNativeAssembly())!;
         void Bad(Action<JsonNode> mutate)
@@ -44,8 +58,42 @@ internal static class DeclarationModuleChecks
         Bad(table => table["names"]!.AsArray().Add("Bad..Path"));
         json["assemblies"]![0]!.AsObject().Remove("declaration_modules");
         var legacy = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteLibraryBinary(Encoding.UTF8.GetBytes(json.ToJsonString())));
-        if (legacy.GetModules().Any(m => !m.IsProjection) || legacy.GetModules().Count != 2) throw new Exception("legacy projection");
+        if (legacy.GetModules().Any(m => !m.IsProjection) || legacy.GetModules().Count != 4) throw new Exception("legacy projection");
+        var legacyContext = new MetadataLoadContext([legacy]);
+        CheckViews(legacyContext, legacy);
         if (output is not null) File.WriteAllBytes(output, builder.WriteNativeAssembly());
-        Console.WriteLine("PASS logical module ownership, empty modules, same-path assemblies, legacy projection and invalid manifests");
+        Console.WriteLine("PASS logical module ownership, canonical context views, empty/global/child modules, foreign snapshots, legacy projection and invalid manifests");
+    }
+
+    private static void CheckViews(MetadataLoadContext catalog, AssemblyDefinition snapshot)
+    {
+        var assembly = catalog.Resolve(snapshot.Identity);
+        var views = assembly.GetDeclarationModules();
+        if (!views.Select(m => m.Name).SequenceEqual(snapshot.GetModules().Select(m => m.Name))) throw new Exception("view ordering");
+        foreach (var definition in snapshot.GetModules())
+        {
+            var view = views.Single(m => m.Name == definition.Name);
+            if (!ReferenceEquals(view, catalog.Resolve(definition)) || !ReferenceEquals(view.Assembly, assembly) || view.IsProjection != definition.IsProjection)
+                throw new Exception("canonical module identity");
+            if (!view.GetMembers().Select(m => m.FullName).SequenceEqual(definition.GetMembers().Select(m => m.FullName))) throw new Exception("direct member projection");
+            foreach (var member in view.GetMembers())
+            {
+                if (!ReferenceEquals(member.DeclaringModule, view) || !ReferenceEquals(member.Assembly, assembly) || !ReferenceEquals(member.Module, assembly.GetModules()[0]))
+                    throw new Exception("member ownership");
+                if (member.Function is { } function && !ReferenceEquals(function, assembly.GetModules()[0].GetFunctions().Single(f => f.Name == member.Name)))
+                    throw new Exception("function view identity");
+                if (member.Type is { } type && !ReferenceEquals(type, assembly.GetTypes().Single(t => t.FullName == member.FullName)))
+                    throw new Exception("type view identity");
+            }
+            try { ((IList<AssemblyMemberInfo>)view.GetMembers()).Clear(); throw new Exception("mutable module members"); }
+            catch (NotSupportedException) { }
+        }
+        foreach (var member in assembly.GetMembers())
+            if (!ReferenceEquals(member.DeclaringModule, views.Single(m => m.Name == member.Namespace))) throw new Exception("aggregate owner identity");
+        var mathViews = catalog.GetDeclarationModules().Where(m => m.Name == "Example.Math").Select(catalog.Resolve).ToArray();
+        if (mathViews.Distinct().Count() != mathViews.Length) throw new Exception("same-name assembly views merged");
+        if (!ReferenceEquals(views[0], assembly.GetDeclarationModules()[0])) throw new Exception("unstable module view");
+        try { ((IList<DeclarationModuleInfo>)views).Clear(); throw new Exception("mutable module list"); }
+        catch (NotSupportedException) { }
     }
 }

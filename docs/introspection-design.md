@@ -800,3 +800,29 @@ and traversal from RuntimeContext, including retention and unsupported-query beh
 under AOT. Loading and multiple contexts are not implicitly added to this task.
 Exact API additions and validation cases remain to be selected after the earlier
 milestones; this records direction, not implementation or a settled new contract.
+
+#### First ownership slice (2026-10-10)
+
+The host now exposes canonical `DeclarationModuleInfo` views over the existing
+declaration table: assembly traversal, explicit context resolution and direct member
+ownership. Physical `ModuleInfo` remains unchanged. Existing context enumeration
+returns reader definitions for compatibility; callers can resolve those definitions
+or traverse the assembly views. No new compiler contract or native encoding is needed.
+
+The [.NET Module contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.module?view=net-10.0)
+separates physical metadata scopes from namespaces, which may cross those scopes.
+Its [GetMethods](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.module.getmethods?view=net-10.0)
+enumerates global methods. Raven's explicit declaration modules additionally preserve
+empty named containers and direct source ownership. Keeping a separate declaration
+view preserves both facts; the cost is two module concepts and explicit traversal.
+Repurposing ModuleInfo would erase the existing token/physical ownership distinction;
+leaving everything as namespace strings would lose explicit empty declarations.
+Sources reviewed 2026-10-10. These are semantic comparisons, not performance claims.
+
+Focused host validation covers empty/global/child modules, native container round
+trips, same-name modules in different assemblies, context-scoped identity, foreign
+snapshots, direct-member exclusions and legacy projections. See
+[declaration modules](declaration-modules.md). Guest RuntimeContext still exposes
+assembly traversal and physical modules only. Guest declaration descriptors,
+module-function metadata/attributes, checked callable invocation and explicit AOT
+retention remain the next implementation boundaries; host views do not complete them.

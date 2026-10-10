@@ -8,11 +8,13 @@ namespace NeoCLR.Metadata.Experimental.Introspection;
 public sealed partial class MetadataLoadContext
 {
     /// <summary>Discovers logical declaration modules in explicitly registered assemblies without loading dependencies.</summary>
-    /// <remarks>Equal paths in different assemblies remain distinct; callers can filter by exact assembly identity.</remarks>
+    /// <remarks>Equal paths in different assemblies remain distinct; callers can filter by exact assembly identity.
+    /// This existing API returns reader definitions. Resolve each definition for its context-owned introspection view.</remarks>
     public IReadOnlyList<DeclarationModuleDefinition> GetDeclarationModules() => Array.AsReadOnly(
         Assemblies.SelectMany(assembly => assembly.Definition.GetModules()).ToArray());
 
     private readonly Dictionary<AssemblyIdentity, AssemblyInfo> assemblies = [];
+    private readonly Dictionary<DeclarationModuleDefinition, DeclarationModuleInfo> declarationModules = [];
     private readonly Dictionary<TypeDefinition, NominalTypeInfo> types = [];
     private readonly Dictionary<TypeReference, NominalTypeInfo> references = [];
     private readonly object gate = new();
@@ -46,6 +48,21 @@ public sealed partial class MetadataLoadContext
 
     /// <summary>Gets registered assembly views in input order, without expanding dependencies.</summary>
     public IReadOnlyList<AssemblyInfo> Assemblies { get; }
+
+    /// <summary>Resolves a registered logical declaration module to its canonical context-owned view.</summary>
+    /// <exception cref="ArgumentNullException">Definition is null.</exception>
+    /// <exception cref="InvalidDataException">The exact owning snapshot is not registered in this context.</exception>
+    public DeclarationModuleInfo Resolve(DeclarationModuleDefinition definition)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        var assembly = RequireSnapshot(definition.Assembly);
+        lock (gate)
+        {
+            if (!declarationModules.TryGetValue(definition, out var module))
+                declarationModules.Add(definition, module = new(this, assembly, definition));
+            return module;
+        }
+    }
 
     /// <summary>Finds a registered assembly by full identity.</summary>
     /// <exception cref="ArgumentNullException">Identity is null.</exception>

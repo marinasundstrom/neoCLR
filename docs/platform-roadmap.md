@@ -38,6 +38,11 @@ module-level function discovery and context traversal across interpreter and AOT
 Compare .NET metadata modules with Raven source modules explicitly before choosing
 any additional API. This is the next sequenced task, not a claim of completed support;
 see [the module follow-up](introspection-design.md#module-model-completion--author-direction-2026-10-10).
+The first ownership slice now provides canonical host declaration-module views,
+assembly traversal and direct member ownership, with physical modules unchanged.
+Focused PE/NEOX and context-identity checks pass. Guest declaration-module traversal,
+function discovery/invocation and AOT retention remain open; see
+[the implemented host contract](declaration-modules.md#api-foundation).
 
 ## Active direction: usable native compilation (2026-10-09)
 

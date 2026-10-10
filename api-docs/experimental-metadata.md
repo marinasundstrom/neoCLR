@@ -36,6 +36,38 @@ collide. Existing `AssemblyInfo.GetModules()` and `ModuleDefinition` still descr
 physical images. Empty logical modules survive native emission but not CLI projection.
 See [format, limits and migration](https://github.com/marinasundstrom/neoclr/blob/main/docs/declaration-modules.md).
 
+### Context-owned declaration views (development, 2026-10-10)
+
+Namespace `NeoCLR.Metadata.Experimental.Introspection`. These host APIs inspect
+immutable snapshots; they do not load dependencies or invoke guest code.
+
+| API | Contract |
+| --- | --- |
+| `AssemblyInfo.GetDeclarationModules(): IReadOnlyList<DeclarationModuleInfo>` | All logical modules in ordinal name order, including explicit empty modules. Returns a read-only list of canonical context-owned views. |
+| `MetadataLoadContext.Resolve(DeclarationModuleDefinition definition): DeclarationModuleInfo` | Returns the canonical view for a registered definition. Null throws `ArgumentNullException`; an unregistered or different snapshot with the same assembly identity throws `InvalidDataException`. |
+| `DeclarationModuleInfo.Name: string` | Complete, case-sensitive logical name; empty for the global module. |
+| `DeclarationModuleInfo.Assembly: AssemblyInfo` | Canonical owning assembly in the same context. |
+| `DeclarationModuleInfo.IsProjection: bool` | True when inferred from older native/CLI namespace metadata. |
+| `DeclarationModuleInfo.GetMembers(): IReadOnlyList<AssemblyMemberInfo>` | Direct types, free functions and constants, in existing assembly-member order. Excludes child-module members, nested types and type-owned members. Read-only; typed `Type`/`Function` views resolve lazily and retain their existing signature/dependency errors. |
+| `AssemblyMemberInfo.DeclaringModule: DeclarationModuleInfo` | Canonical logical owner; `Module` continues to identify the physical metadata image. |
+
+Reference equality identifies a declaration module within one context. The same name
+in another assembly or context is a different view. Modules have no invented metadata
+token or separately loadable image. Existing `MetadataLoadContext.GetDeclarationModules()`
+keeps its reader-definition return type for compatibility; use `Resolve` to obtain
+views, or traverse `context.Assemblies` and `AssemblyInfo.GetDeclarationModules()`:
+
+```csharp
+foreach (var assembly in context.Assemblies)
+    foreach (var module in assembly.GetDeclarationModules())
+        foreach (var member in module.GetMembers())
+            Console.WriteLine($"{module.Assembly.Name}: {member.FullName}");
+```
+
+Guest `RuntimeContext` traversal, guest declaration-module descriptors and AOT
+retention of these views remain unimplemented. This addition changes no compiler
+mapping, native format or existing physical `ModuleInfo` contract.
+
 ## Unmanaged pointer signatures (development, 2026-10-07)
 
 `SignatureType.PointerTo(elementType)` creates an immutable unmanaged pointer signature.

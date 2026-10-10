@@ -20,8 +20,10 @@ public sealed class AssemblyMemberInfo
     public AssemblyMemberKind Kind => definition.Kind;
     /// <summary>Gets the declaring assembly facade.</summary>
     public AssemblyInfo Assembly { get; }
-    /// <summary>Gets the declaring module facade.</summary>
+    /// <summary>Gets the physical metadata module facade.</summary>
     public ModuleInfo Module { get; }
+    /// <summary>Gets the canonical logical declaration module directly owning this member.</summary>
+    public DeclarationModuleInfo DeclaringModule => context.Resolve(definition.DeclaringModule);
     /// <summary>Gets the namespace portion of the member name.</summary>
     public string Namespace => definition.Namespace;
     /// <summary>Gets the simple metadata name.</summary>

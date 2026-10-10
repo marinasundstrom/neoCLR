@@ -51,6 +51,15 @@ an assembly-wide aggregate. Each aggregate member exposes `DeclaringModule`.
 `MetadataLoadContext.GetDeclarationModules()` discovers registered module definitions
 without loading dependencies. Equal paths in different assemblies remain distinct.
 
+Development 2026-10-10 adds canonical host `DeclarationModuleInfo` views through
+`AssemblyInfo.GetDeclarationModules()` and `MetadataLoadContext.Resolve(definition)`.
+Their `Name`, `Assembly`, `IsProjection` and `GetMembers()` describe the existing
+logical owner. `AssemblyMemberInfo.DeclaringModule` returns that same view, while
+`Module` remains physical. Reference identity is context-scoped; even a second
+snapshot with the same exact assembly identity cannot be resolved through the first
+snapshot's context. The existing context enumeration still returns reader definitions
+for compatibility. See the [API reference](../api-docs/experimental-metadata.md#context-owned-declaration-views-development-2026-10-10).
+
 Loaded modules reject mutation. `IsProjection` identifies inferred views of older
 native or CLI inputs. CLI output retains names through namespaces and existing
 free-function carriers but loses explicit module declarations, including empty ones.
@@ -84,3 +93,7 @@ Raven ced9e1a686b3946de517b06e6817b324a5847819 supplies the module syntax, nativ
 ownership emission/import and target-aware language-server presentation. The compiler
 retains namespace-shaped syntax/symbol scopes in this foundation; guest RuntimeContext
 migration and independent module loading are not implied.
+
+The expanded host checks also cover canonical identity across traversal paths,
+separate contexts, foreign-snapshot rejection, global and child modules, read-only
+collections and shared type/function views in both PE/NEOX native containers.

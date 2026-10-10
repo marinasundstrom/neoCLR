@@ -30,6 +30,10 @@ public sealed class AssemblyInfo
     public IReadOnlyList<AssemblyInfo> ReferencedAssemblies => references.Value;
     /// <summary>Gets modules. The current reader supports one main module only.</summary>
     public IReadOnlyList<ModuleInfo> GetModules() => modules;
+    /// <summary>Gets logical declaration modules in ordinal name order, including explicit empty modules.</summary>
+    /// <remarks>Views are canonical within this metadata context. Physical metadata modules remain available through GetModules.</remarks>
+    public IReadOnlyList<DeclarationModuleInfo> GetDeclarationModules() => Array.AsReadOnly(
+        Definition.GetModules().Select(context.Resolve).ToArray());
     /// <summary>Gets nominal definitions including nested types, excluding the CLI module pseudo-type.</summary>
     public IReadOnlyList<NominalTypeInfo> GetTypes() => modules[0].GetTypes();
 }
