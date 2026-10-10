@@ -7332,3 +7332,24 @@ normal scope exits dispose, terminal Faults do not unwind. Native metadata consu
 that same semantic plan. A library-native iterator remains a nominal interface;
 there is no structural Dispose-name inference. Native for lowering still omits
 cleanup in compiler b939cd696 and is the next compiler follow-up.
+
+
+## Native for scope-exit cleanup (2026-10-10)
+
+Raven 494dede841bc09c9e4876ab51f8ba91c74d64ab7 on
+`codex/source-object-metadata-resolution` lowers configured disposable reference
+iteration before scope-exit cleanup. RuntimeIterationContract selects Iterable and
+Iterator; RuntimeDisposalContract selects source System.Runtime's System.Disposable
+with UseExceptionHandling=false. Exhaustion, break, return and outward transfers
+dispose in lifetime order with use; an inner-loop continue does not dispose its
+own iterator. This matches .NET's structured-exit ownership, while terminal Faults
+still do not unwind. Arrays/ranges keep their existing lowering.
+
+The temporary CLI representation is ordinary calls/locals/branches without
+exception regions; native metadata/codegen preserves the same calls. Raven owns
+lowering, neoCLR owns the protocol and runtime fault contract. Future unwind
+support needs an explicit runtime contract change, not an assumption based on CLR
+finally behavior. Ordinary .NET defaults are unchanged. Compiler execution and portable-admission tests
+cover ten cleanup/order and return-expression cases, alongside 50 existing tests. The native collections
+consumer now checks exhaustion, break, continue, return and labeled outward continue.
+The pinned compiler is integration-branch work, not Raven main availability.

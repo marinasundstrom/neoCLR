@@ -134,8 +134,9 @@ HashMap constructors and pair/selector materialization, with macOS native/interp
 positive and duplicate/disposal checks passing. [Verified Windows evidence](experiments/native-collections/windows-materialization-validation.json)
 now covers those map overloads. Iterable constructors now also cover
 ArrayList, ArrayQueue, ArrayStack and HashSet, with explicit ordering/copy contracts; see [the contract](collection-contracts.md#iterable-construction-and-tomap--development-2026-10-10).
-Next repair native for-loop iterator disposal so library loops can use ordinary for
-without losing cleanup; synchronous use already supports the constructor slice.
+Native for-loop iterator disposal is repaired in Raven 494dede84, using the same
+scope-exit cleanup as use. Next audit runtime .rvn sources for for/use conversions,
+preserving explicit long-lived ownership and disposal before terminal faults.
 Future concurrent variants retain implementation-specific atomicity/iteration contracts; see the [contracts and concurrency boundaries](collection-contracts.md#basic-library-slice-and-future-concurrency--2026-10-10).
 
 ### Follow-up review areas — author direction, 2026-10-10

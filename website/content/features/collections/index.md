@@ -201,3 +201,8 @@ pop order. Sets discard duplicates under the explicit comparer.
 
 These overloads require rebuilt development libraries and retain the existing
 unsynchronized collection contracts.
+
+The development compiler also disposes reference iterators on structured exits
+from `for`, including early return and break, in lifetime order with `use`. Terminal
+Faults do not unwind these scopes. Prefer for where consuming elements expresses
+the operation; use retains explicit control for advance-only or stateful iteration.

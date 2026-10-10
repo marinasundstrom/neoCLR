@@ -112,7 +112,7 @@ class Program {
         if !CheckSnapshots() || !CheckSets() {
             return 21
         }
-        if !CheckMaps() || !CheckMapConstruction() || !CheckCollectionConstruction() {
+        if !CheckMaps() || !CheckMapConstruction() || !CheckCollectionConstruction() || !CheckForCleanup() || !CheckQueryCleanup() {
             return 30
         }
         Console.WriteLine("collections passed")
@@ -220,6 +220,110 @@ class Program {
             return value.Value == 42
         }
         return false
+    }
+
+    static func Counts(input: ObservedNumbers, moves: int, reads: int) -> bool {
+        return input.Requests == 1 && input.Moves == moves && input.Reads == reads && input.Disposals == 1
+    }
+
+    static func CheckQueryCleanup() -> bool {
+        let any = ObservedNumbers()
+        if !any.Any() || !Counts(any, 1, 0) {
+            return false
+        }
+        let predicateAny = ObservedNumbers()
+        if !predicateAny.Any(value => value == 2) || !Counts(predicateAny, 2, 2) {
+            return false
+        }
+        let all = ObservedNumbers()
+        if all.All(value => value < 3) || !Counts(all, 3, 3) {
+            return false
+        }
+        let fold = ObservedNumbers()
+        if fold.Fold(0, (sum, value) => sum + value) != 10 || !Counts(fold, 5, 4) {
+            return false
+        }
+        let first = ObservedNumbers()
+        if first.First() is not Some(1) || !Counts(first, 1, 1) {
+            return false
+        }
+        let last = ObservedNumbers()
+        if last.Last() is not Some(4) || !Counts(last, 5, 4) {
+            return false
+        }
+        let single = ObservedNumbers()
+        _ = single.Single()
+        if !Counts(single, 2, 1) {
+            return false
+        }
+        let selectedFirst = ObservedNumbers()
+        if selectedFirst.First(value => value == 2) is not Some(2) || !Counts(selectedFirst, 2, 2) {
+            return false
+        }
+        let selectedLast = ObservedNumbers()
+        if selectedLast.Last(value => value < 3) is not Some(2) || !Counts(selectedLast, 5, 4) {
+            return false
+        }
+        let selectedSingle = ObservedNumbers()
+        _ = selectedSingle.Single(value => value == 2)
+        if !Counts(selectedSingle, 5, 4) {
+            return false
+        }
+        let count = ObservedNumbers()
+        if count.Count() != 4 || !Counts(count, 5, 0) {
+            return false
+        }
+        let selectedCount = ObservedNumbers()
+        if selectedCount.Count(value => value < 3) != 2 || !Counts(selectedCount, 5, 4) {
+            return false
+        }
+        let list = ObservedNumbers()
+        if list.ToList().Count != 4 || !Counts(list, 5, 4) {
+            return false
+        }
+        let empty = ObservedNumbers()
+        empty.Limit = 0
+        return !empty.Any() && Counts(empty, 1, 0)
+    }
+
+    static func FirstFromLoop(input: Iterable<int>) -> int {
+        for value in input {
+            return value
+        }
+        return 0
+    }
+
+    static func CheckForCleanup() -> bool {
+        let input = ObservedNumbers()
+        var sum = 0
+        for value in input {
+            sum = sum + value
+        }
+        for value in input {
+            break
+        }
+        for value in input {
+            continue
+        }
+        if FirstFromLoop(input) != 1 || sum != 10 {
+            return false
+        }
+        if input.Requests != 4 || input.Disposals != 4 {
+            return false
+        }
+        outer: for value in input {
+            for other in input {
+                continue outer
+            }
+        }
+        if input.Requests != 9 || input.Disposals != 9 {
+            return false
+        }
+        input.Limit = 0
+        for value in input {
+            return false
+        }
+        return input.Requests == 10 && input.Disposals == 10
     }
 
     static func CheckCollectionConstruction() -> bool {
@@ -342,6 +446,7 @@ class ModuloTwo : EqualityComparer<int> {
 }
 
 class ObservedNumbers : Iterable<int> {
+    var Limit: int { get; set; } = 4
     var Requests: int { get; set; } = 0
     var Moves: int { get; set; } = 0
     var Reads: int { get; set; } = 0
@@ -364,7 +469,7 @@ class ObservedNumberIterator : Iterator<int> {
     func MoveNext() -> bool {
         owner.Moves = owner.Moves + 1
         index = index + 1
-        return index <= 4
+        return index <= owner.Limit
     }
 
     val Current: int {

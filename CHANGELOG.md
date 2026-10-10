@@ -13,7 +13,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   order, push stack inputs in order, and discard set duplicates under the explicit
   comparer. Stack-to-stack construction reverses pop order, matching .NET. Use
   scoped iterators and select source-owned System.Disposable in the library
-  ownership manifest; native for-loop disposal remains the next compiler fix.
+  ownership manifest. Pin Raven 494dede84 to repair native for-loop disposal on
+  exhaustion and structured exits, with focused compiler and native consumer tests.
   Refresh API references and qualify native macOS/interpreter construction,
   single-pass consumption, normal disposal and shallow-copy behavior.
 

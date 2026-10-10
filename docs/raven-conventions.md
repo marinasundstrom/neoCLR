@@ -23,12 +23,15 @@ trailing `return ()`. Keep explicit unit returns where an early exit is intended
 ## Scoped iterator cleanup (2026-10-10)
 
 Prefer `use iterator = source.GetIterator()` when explicitly driving an iterator.
-The native target supports synchronous scope-exit cleanup; terminal Faults do not
-unwind resources. Do not replace explicit iteration with `for` when disposal is
-required until the native portable-enumeration lowering supplies that cleanup.
-The current compiler b939cd696 iterates correctly but omits Dispose for native for.
-Track that as a compiler gap, not a permanent language convention. Ordinary .NET
-iteration keeps its existing behavior.
+Prefer `for` when consuming each element expresses the operation naturally. Keep
+explicit iterator control when it avoids unnecessary Current reads, preserves
+short-circuit behavior or makes the state machine clearer; use is the cleanup
+convention in that case. Concision alone is not a reason to change iteration. Compiler 494dede84 supplies
+synchronous native iterator cleanup on exhaustion, break, return and outward
+transfers, in lifetime order with `use`. Terminal Faults do not unwind resources;
+leave a loop/scope before raising a deliberate fault when disposal is required.
+Compiler b939cd696 omitted native for cleanup; that historical gap is fixed in
+the pinned integration compiler. Ordinary .NET iteration retains its behavior.
 
 ## Native module declarations (2026-10-10)
 

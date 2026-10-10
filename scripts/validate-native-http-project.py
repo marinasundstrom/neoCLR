@@ -38,7 +38,7 @@ def rebuild_libraries(run, bundle, output):
     # Preview 13 supplies the primitive bootstrap. Build the exact development
     # compiler required by positional map pairs, then this checkout’s libraries.
     run([sys.executable, ROOT / 'scripts/prepare-native-development-bundle.py', '--bundle', bundle,
-         '--output', output, '--build-compiler', '--compiler-revision', 'b939cd6964d57829fb00c4e058bf43309de39628'], 'development-libraries')
+         '--output', output, '--build-compiler', '--compiler-revision', '494dede841bc09c9e4876ab51f8ba91c74d64ab7'], 'development-libraries')
     return output / 'bundle'
 
 def serve(command, request, fragmented, cwd, env=None):

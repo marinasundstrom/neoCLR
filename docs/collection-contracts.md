@@ -499,7 +499,6 @@ and allocation counts are not promised, and no speed claim is made. Optimized
 count-aware copying can be considered if measurement motivates it. A special
 stack-preserving clone would be a distinct API, not an implicit constructor rule.
 
-Implementation uses scoped `use` iterator resources. The native portable for
-lowering in compiler b939cd696 currently omits disposal; fixing that is the next
-compiler follow-up before replacing these loops with for. This is a compiler gap,
-not a different collection protocol. Terminal Faults do not unwind use scopes.
+Implementation uses scoped `use` iterator resources. Compiler 494dede84 repairs
+the native portable for cleanup omitted by b939cd696. Library loop simplification
+is the next slice. Terminal Faults do not unwind use scopes.

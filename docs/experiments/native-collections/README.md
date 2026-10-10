@@ -97,3 +97,23 @@ local focused validation builds this consumer with the matching native bundle.
 
 [Scoped constructor evidence](copy-validation.json) records successful native macOS
 ARM64 and matching interpreter execution. Windows coverage is in the existing action.
+
+
+## Native iterator scope exits (2026-10-10)
+
+Compiler 494dede841bc09c9e4876ab51f8ba91c74d64ab7 repairs native for cleanup
+and preserves unrelated return expressions when a method owns an iterator. The
+consumer checks exhaustion (including empty input), break, continue, early return
+and labeled outward continue with exactly one disposal per acquired iterator.
+Compiler tests additionally cover nested use disposal order, outward goto and match
+returns. The integration compiler remains on codex/source-object-metadata-resolution.
+Windows qualification uses the shared compiler pin; prior Windows evidence above
+does not qualify this new compiler.
+
+The same consumer checks query acquisition/disposal counts and exact MoveNext/Current
+counts before library simplification: advance-only Any and Count do not read Current;
+predicate queries stop at the required element; Single probes a second element
+without reading it. These are behavioral checks, not a throughput benchmark.
+
+[Scope-exit evidence](for-cleanup-validation.json) records passing macOS ARM64
+native and matching interpreter execution against the exact compiler revision.

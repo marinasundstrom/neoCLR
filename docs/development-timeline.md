@@ -13247,3 +13247,27 @@ claim follows from these focused checks.
   The prior Windows map run passes with 1,686 artifact hashes and 24 source inputs
   verified. Evidence: [constructors](experiments/native-collections/copy-validation.json)
   and [Windows maps](experiments/native-collections/windows-materialization-validation.json).
+
+
+### 2026-10-10 — Compiler cleanup before library simplification
+
+The author directed compiler repair first, then a review of runtime `.rvn` source
+for `use` replacing explicit Dispose and `for` replacing manual iterator loops.
+The assistant identified missing native for cleanup and repaired lowering before
+the method-wide scope-exit pass (Raven 6ad5ddcbf); eight new execution regressions
+and 50 existing focused tests pass. The author’s concise-source direction does
+not change ownership: long-lived lazy iterators and cleanup before terminal Faults
+need deliberate treatment. Native integration and the library audit follow this
+compiler change; see [bridge contract](raven-cli-bridge.md#native-for-scope-exit-cleanup-2026-10-10).
+
+The author clarified: “We shouldn't introduce for statements in places where it
+might hurt performance or it does not express what's really happening in code.”
+The assistant agreed to use for only for natural element consumption, retaining
+explicit iterator control for advance-only operations, short-circuit state machines
+and lazy lifetimes. This is a semantic review, not a blanket syntax conversion;
+no performance improvement is claimed.
+
+The follow-up compiler revision 494dede84 also preserves return expressions outside
+active scopes; native Runtime/Data/Networking/Web builds pass. The collection
+consumer passes macOS ARM64 AOT and interpreter cleanup and query read-count checks
+([evidence](experiments/native-collections/for-cleanup-validation.json)).
