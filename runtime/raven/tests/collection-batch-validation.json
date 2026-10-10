@@ -1,0 +1,138 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "suite": "collections",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS Any does not read Current\nPASS For break disposes its iterator\nPASS ArrayList copy has independent storage\nPASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nPASS Predicate Any stops at its first match\nPASS Queue growth preserves wrapped FIFO contents\nPASS ArrayQueue preserves FIFO\nPASS Queue preserves references through clear and reuse\nPASS Queue iterator captures FIFO contents before mutation\nPASS HashSet applies its comparer\nPASS Stack growth preserves LIFO contents\nPASS ArrayStack preserves LIFO\nPASS Stack preserves references through clear and reuse\nPASS Stack iterator captures LIFO contents before mutation\nTests: 18, passed: 18, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS Any does not read Current\nPASS For break disposes its iterator\nPASS ArrayList copy has independent storage\nPASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nPASS Predicate Any stops at its first match\nPASS Queue growth preserves wrapped FIFO contents\nPASS ArrayQueue preserves FIFO\nPASS Queue preserves references through clear and reuse\nPASS Queue iterator captures FIFO contents before mutation\nPASS HashSet applies its comparer\nPASS Stack growth preserves LIFO contents\nPASS ArrayStack preserves LIFO\nPASS Stack preserves references through clear and reuse\nPASS Stack iterator captures LIFO contents before mutation\nTests: 18, passed: 18, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "native",
+      "arguments": [
+        "--filter",
+        "ArrayQueue"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "arguments": [
+        "--filter",
+        "ArrayQueue"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "native",
+      "arguments": [
+        "--filter",
+        "Map"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "arguments": [
+        "--filter",
+        "Map"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collection-construction",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS Collection constructors consume and dispose each input once\nPASS Collection constructors accept empty arrays\nPASS Queue and stack copies follow source iteration order\nPASS List construction materializes filtered input independently\nPASS Collection copies preserve element reference identity\nPASS Set copy retains values and explicit comparer after source clear\nPASS Set collision chains survive removal growth and slot reuse\nPASS Set snapshot retains values across clear and reuse\nPASS Set ordinal string equality preserves case and Unicode\nTests: 9, passed: 9, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collection-construction",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS Collection constructors consume and dispose each input once\nPASS Collection constructors accept empty arrays\nPASS Queue and stack copies follow source iteration order\nPASS List construction materializes filtered input independently\nPASS Collection copies preserve element reference identity\nPASS Set copy retains values and explicit comparer after source clear\nPASS Set collision chains survive removal growth and slot reuse\nPASS Set snapshot retains values across clear and reuse\nPASS Set ordinal string equality preserves case and Unicode\nTests: 9, passed: 9, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collection-iteration",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS For completion disposes its iterator\nPASS For continue preserves traversal and disposal\nPASS For disposes an empty iterator\nPASS Labeled continue disposes each inner iterator\nPASS For return disposes before returning to its caller\nPASS All stops at the first failed predicate\nPASS Count advances without reading Current\nPASS Any disposes empty input\nPASS First stops after one value\nPASS Fold visits every value\nPASS Last visits the complete input\nPASS Predicate Single stops at the second match\nPASS Predicate First disposes input with no match\nPASS Predicate Count reads every value\nPASS Predicate First stops at its match\nPASS Predicate Last retains the final match\nPASS Predicate Single scans for a unique match\nPASS Single rejects multiple values without reading the second\nPASS ToList materializes and disposes its input\nTests: 19, passed: 19, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collection-iteration",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS For completion disposes its iterator\nPASS For continue preserves traversal and disposal\nPASS For disposes an empty iterator\nPASS Labeled continue disposes each inner iterator\nPASS For return disposes before returning to its caller\nPASS All stops at the first failed predicate\nPASS Count advances without reading Current\nPASS Any disposes empty input\nPASS First stops after one value\nPASS Fold visits every value\nPASS Last visits the complete input\nPASS Predicate Single stops at the second match\nPASS Predicate First disposes input with no match\nPASS Predicate Count reads every value\nPASS Predicate First stops at its match\nPASS Predicate Last retains the final match\nPASS Predicate Single scans for a unique match\nPASS Single rejects multiple values without reading the second\nPASS ToList materializes and disposes its input\nTests: 19, passed: 19, failed: 0, skipped: 0\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "scripts/test-runtime-library.py": "23cfcaca978dc9d856e332207c2bf66862a4cbc0b57ad52999bac4e8f160b81a",
+    "scripts/build-native-project.py": "2f60d4e65f913495167054edd435a34ef0c70897a752b3b56152010b04c89188",
+    "scripts/discover-runtime-tests.py": "0f7c22b1a3e46879654d29d4ad5cd292ed36adced2958f0d00a811a7342dd699",
+    "scripts/validate-test-discovery.py": "83f6cd15cc0a9fbaa4fd2a6a0fbca22d57da5d5edd1e2f248daacf3416088167",
+    "tools/testing/NeoCLR.TestDiscovery/Program.cs": "56f628771e941905d800f0793260558028bec25f4aeafe3eb310477511f63613",
+    "tools/testing/NeoCLR.TestDiscovery/NeoCLR.TestDiscovery.csproj": "87d0d17b301773d1a73666a6163a6049a06319ea651b9b9c9df34e199707f4ee",
+    "runtime/raven/tests/collection-construction/Construction.rvn": "ddd2af5dcce0720e86c43ca20ee6fdb4f4e0ac4b89d49211fe70b8d0082cb1ca",
+    "runtime/raven/tests/collection-construction/Sets.rvn": "67968e7a90b91e93b54681f8507a07815abd13f5e0f4a93525708e616bc49558",
+    "runtime/raven/tests/collection-iteration/ForCleanup.rvn": "49d938e6b0886ddef91d0eee932f98170f597d676c2e90a1de93e434d9c719c4",
+    "runtime/raven/tests/collection-iteration/QueryCleanup.rvn": "a96312300e924756692f40c8be8ff8f43011abec7b738e7ac98c22a4f264b43a",
+    "runtime/raven/tests/collections/Collections.rvn": "616327862d3556f5e768a19650591e663213226154148dd2f37901597b594af2",
+    "runtime/raven/tests/collections/Main.rvn": "e0d4d6b296788027744cc6f4e5db76e85d99381c5cbd7f14c64727bc48ff0c8d",
+    "runtime/raven/tests/collections/MapMaterialization.rvn": "363ee1bc09ec13e638cd7abbad69b2f96c15597fea44d9a2b137ce110124cc8e",
+    "runtime/raven/tests/collections/ObservedNumbers.rvn": "c42f57095c9d357cec05baaa3a17f127a7b6fff23385b95f5a4a9157b32729b4",
+    "runtime/raven/tests/collections/QueueStack.rvn": "36f9b8623731832ef8599273bb9307d03ccce62f1cd1e912c5edb7fca7612f75",
+    "runtime/raven/tests/discovery-contract/OtherAttribute.rvn": "78d87fb89024c33a52dc817347bd983c9f389da46d135571f711618b744c880a",
+    "runtime/raven/tests/discovery-contract/Tests.rvn": "72e0dcdb877c6100bf8cb9ab2073df92a7d3c087f44e7c9d024d738c9a4a9f28",
+    "runtime/raven/tests/framework/Assertions.rvn": "75b24edb65dd3c9bc6af7a211966feda795c9834adea0f3d9d064e05049072eb",
+    "runtime/raven/tests/framework/TestAttribute.rvn": "a20f0d5f981985e52a384937a1dba70670a01507143a6949972978546c6204cd",
+    "runtime/raven/tests/framework/TestSuite.rvn": "de0c1c8e5491ba22d6c3964142c81e12f210b567c61b02a3ebf58fc4acad3f07",
+    "runtime/raven/tests/runner-contract/Main.rvn": "6aa7515a6b2bd4eaccbd296e80348c869fab9f8f74e89e067f72530f3ce55d0f",
+    "runtime/raven/tests/collection-construction/Tests.rvnproj": "dbe02c58a39270c421dfdf790fd98b9fdea554b32824ff221d5f69a613c98e3e",
+    "runtime/raven/tests/collection-iteration/Tests.rvnproj": "9c5fcf509fcc91b3ad3f696a189135f2df1d895709a4b5a8accc27028a42e1b4",
+    "runtime/raven/tests/collections/Tests.rvnproj": "c1374380a7d0c8a586f6a99a98e2530d17ffdc3f0a82cf8cea33f121ba6fffb1",
+    "runtime/raven/tests/discovery-contract/Tests.rvnproj": "138cbef1c75af0c870d1cf93998f95d0b2c6056c13c82800c7b12faf9d460cdc",
+    "runtime/raven/tests/runner-contract/Tests.rvnproj": "3061ec4816a7c6dc3025e6cd5775cd2b62fd7a230daabdf6de1709a9541e999e"
+  },
+  "bundleManifestSha256": "febe0d6b510ca36c19a82ec21305097467a3185611328c701b5ef158251d59d2",
+  "aotSha256": "efaa7b7b5908b681c297eda8e56482d76e0f279f9405e57f76434e5d0ad689f1",
+  "interpreterSha256": "d403d020488209b1afae459b63b4d4f60edb4c7d7cf92f9b6cdcb0eb9e692e1b",
+  "suites": [
+    "collections",
+    "collection-construction",
+    "collection-iteration"
+  ],
+  "date": "2026-10-10",
+  "codeBaseline": "991d088e plus collection batch migration",
+  "scope": "46 tests across three suites, native and interpreted; existing Map/ArrayQueue selectors; unchanged runner and discovery rejection checks reused",
+  "windowsStatus": "Pending GitHub action",
+  "notes": [
+    "Initial combined executable failed NEOMETA003: binary payload exceeds envelope limit; three suite projects passed.",
+    "After validation, extra blank lines at EOF were removed from collections/Collections.rvn and collection-iteration/QueryCleanup.rvn; no executable source changed."
+  ],
+  "finalCollectionsSourceSha256": "2793973c50d8501998f3de17ac6d1be149e6f1a3b34229372c90c0897d280c2b",
+  "finalQuerySourceSha256": "7e6d9e27d73af1448ad79019c69ac46541c092490972d36c93f3648cbd9414d7"
+}

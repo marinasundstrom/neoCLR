@@ -327,3 +327,30 @@ snapshot timing rather than opening a fresh traversal after mutation.
 [Queue/stack migration qualification](queue-stack-migration-validation.json): all 18
 collection tests and the existing ArrayQueue/Map selectors pass native macOS ARM64
 and interpreted execution. Windows qualification remains pending.
+
+## Collection migration batch
+
+The remaining observable checks from `native-collections/Main.rvn` are migrated as
+one batch: 3 set tests, 6 construction tests, 5 additional loop cleanup tests and
+14 additional query cleanup tests. The existing Any, predicate Any and break tests
+remain in the original suite. This makes 46 collection tests across three projects:
+
+- `collections`: 18 ordering, copy, map and snapshot tests.
+- `collection-construction`: 9 constructor, comparer, collision and set snapshot tests.
+- `collection-iteration`: 19 query and loop ownership tests.
+
+Run all three with repeated `--suite` arguments, or omit `--suite` to run them with
+the runner/discovery contracts. The default Windows action includes all projects.
+The shared observable iterator records acquisition, advances, Current reads and
+disposals. Query assertions preserve short-circuit and advance-only behavior;
+labeled continue and return verify cleanup at their actual control-flow boundaries.
+
+A single 46-test executable exceeded the current native metadata encoder envelope
+(`NEOMETA003`). Splitting projects is a temporary packaging workaround, not a maximum
+test count contract; raising or removing the metadata limit needs separate validation.
+No .NET/CLR collection semantics change in this migration. Existing comparer,
+snapshot, Option/Result and UTF-8 contracts remain the subjects of the tests.
+
+[Collection batch qualification](collection-batch-validation.json): all 46 tests pass native macOS ARM64
+and interpreted execution; the existing Map/ArrayQueue filters also pass. Windows
+qualification remains pending.

@@ -1,0 +1,103 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Linq.*
+import System.Option.*
+import System.Result.*
+import NeoClr.Testing.*
+
+[Test("Collection constructors consume and dispose each input once")]
+func ConstructionConsumption() -> Result<unit, TestFailure> {
+    let input = ObservedNumbers()
+    let list = ArrayList<int>(input)
+    let queue = ArrayQueue<int>(input)
+    let stack = ArrayStack<int>(input)
+    let set = HashSet<int>(input, ModuloTwo())
+    _ = CheckObservation(input, 4, 20, 16, 4)?
+    _ = Assert.Equal(4, list.Count)?
+    _ = Assert.Equal(1, list[0])?
+    _ = Assert.Equal(4, list[3])?
+    _ = Assert.Equal(4, queue.Count)?
+    _ = Assert.Equal(4, stack.Count)?
+    _ = Assert.Equal(2, set.Count)?
+    return Assert.True(set.Contains(5), "Construction must use the supplied comparer")
+}
+
+[Test("List construction materializes filtered input independently")]
+func ConstructionQuery() -> Result<unit, TestFailure> {
+    let input = ObservedNumbers()
+    let list = ArrayList<int>(input)
+    let copy = ArrayList<int>(list)
+    list[0] = 99
+    _ = Assert.Equal(1, copy[0])?
+    let query = ArrayList<int>(copy.Filter(value => value > 2))
+    _ = Assert.Equal(2, query.Count)?
+    _ = Assert.Equal(3, query[0])?
+    return Assert.Equal(4, query[1])
+}
+
+[Test("Queue and stack copies follow source iteration order")]
+func ConstructionOrdering() -> Result<unit, TestFailure> {
+    let input = ObservedNumbers()
+    let queue = ArrayQueue<int>(input)
+    let stack = ArrayStack<int>(input)
+    let queueCopy = ArrayQueue<int>(queue)
+    queue.Clear()
+    let stackCopy = ArrayStack<int>(stack)
+    stack.Clear()
+    var expected = 1
+    while expected <= 4 {
+        if queueCopy.Dequeue() is Some(let queued) && stackCopy.Pop() is Some(let stacked) {
+            _ = Assert.Equal(expected, queued)?
+            _ = Assert.Equal(expected, stacked)?
+        } else {
+            return Assert.True(false, "Copies must retain all source values after clear")
+        }
+        expected = expected + 1
+    }
+    _ = Assert.True(queueCopy.Dequeue() is None && stackCopy.Pop() is None, "Copies must contain exactly four values")?
+    let ordinaryStack = ArrayStack<int>(input)
+    return Assert.True(ordinaryStack.Pop() is Some(4), "Ordinary input is pushed in iteration order")
+}
+
+[Test("Set copy retains values and explicit comparer after source clear")]
+func ConstructionSetCopy() -> Result<unit, TestFailure> {
+    let input = ObservedNumbers()
+    let set = HashSet<int>(input, ModuloTwo())
+    let copy = HashSet<int>(set, ModuloTwo())
+    set.Clear()
+    _ = Assert.Equal(0, set.Count)?
+    _ = Assert.Equal(2, copy.Count)?
+    return Assert.True(copy.Contains(5) && copy.Contains(6), "Copy must preserve both comparer equivalence classes")
+}
+
+[Test("Collection constructors accept empty arrays")]
+func ConstructionEmpty() -> Result<unit, TestFailure> {
+    let empty: int[] = []
+    _ = Assert.Equal(0, ArrayList<int>(empty).Count)?
+    _ = Assert.Equal(0, ArrayQueue<int>(empty).Count)?
+    _ = Assert.Equal(0, ArrayStack<int>(empty).Count)?
+    return Assert.Equal(0, HashSet<int>(empty, ModuloTwo()).Count)
+}
+
+[Test("Collection copies preserve element reference identity")]
+func ConstructionReferences() -> Result<unit, TestFailure> {
+    let item = ConstructionItem()
+    let items: ConstructionItem[] = [item]
+    let copied = ArrayList<ConstructionItem>(items)
+    let queued = ArrayQueue<ConstructionItem>(items)
+    let stacked = ArrayStack<ConstructionItem>(items)
+    item.Value = 64
+    _ = Assert.Equal(64, copied[0].Value)?
+    if queued.Peek() is Some(let queueItem) && stacked.Peek() is Some(let stackItem) {
+        _ = Assert.Equal(64, queueItem.Value)?
+        return Assert.Equal(64, stackItem.Value)
+    }
+    return Assert.True(false, "Constructed collections must retain the reference")
+}
+
+
+class ConstructionItem {
+    var Value: int { get; set; } = 7
+}

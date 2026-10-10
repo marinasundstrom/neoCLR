@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <AssemblyName>RuntimeLibraryTests</AssemblyName>
+    <AssemblyName>CollectionConstructionTests</AssemblyName>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
@@ -11,10 +11,9 @@
     <Compile Include="../framework/TestSuite.rvn" />
     <Compile Include="../framework/TestAttribute.rvn" />
     <Compile Include="$(NeoClrTestRegistry)" />
-    <Compile Include="Main.rvn" />
-    <Compile Include="Collections.rvn" />
-    <Compile Include="ObservedNumbers.rvn" />
-    <Compile Include="MapMaterialization.rvn" />
-    <Compile Include="QueueStack.rvn" />
+    <Compile Include="../collections/Main.rvn" />
+    <Compile Include="../collections/ObservedNumbers.rvn" />
+    <Compile Include="Construction.rvn" />
+    <Compile Include="Sets.rvn" />
   </ItemGroup>
 </Project>

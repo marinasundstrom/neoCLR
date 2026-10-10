@@ -72,38 +72,3 @@ func ForBreak() -> Result<unit, TestFailure> {
     _ = Assert.Equal(1, input.Moves)?
     return Assert.Equal(1, input.Disposals)
 }
-
-// A fixture has state; the test functions above do not require a fixture class.
-class ObservedNumbers : Iterable<int> {
-    var Moves: int { get; set; } = 0
-    var Reads: int { get; set; } = 0
-    var Disposals: int { get; set; } = 0
-
-    func GetIterator() -> Iterator<int> => ObservedIterator(self)
-}
-
-class ObservedIterator : Iterator<int> {
-    private val owner: ObservedNumbers
-    private var index = 0
-
-    init(owner: ObservedNumbers) {
-        self.owner = owner
-    }
-
-    func MoveNext() -> bool {
-        owner.Moves = owner.Moves + 1
-        index = index + 1
-        return index <= 4
-    }
-
-    val Current: int {
-        get {
-            owner.Reads = owner.Reads + 1
-            return index
-        }
-    }
-
-    func Dispose() {
-        owner.Disposals = owner.Disposals + 1
-    }
-}

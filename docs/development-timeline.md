@@ -13698,3 +13698,15 @@ claim completion of in-process test discovery.
   All 18 collection tests and existing selectors pass native macOS ARM64 and the
   interpreter ([evidence](../runtime/raven/tests/queue-stack-migration-validation.json));
   Windows qualification remains pending.
+
+- **Author correction:** “You should pick out a group of tests and batch migrate”,
+  followed by a direction to continue with the next batch afterward.
+- **Assistant action:** selects the remaining collection behavior group together:
+  sets, construction and query/loop cleanup (28 additional tests). The initial single
+  executable exceeds the native metadata envelope before execution; partitions the
+  same batch into three runnable collection suites rather than changing the format
+  limit during a test migration. Validation outcome is recorded with the batch.
+- **Batch outcome:** all 46 collection tests pass in native macOS ARM64 and interpreted
+  execution, plus existing selectors ([evidence](../runtime/raven/tests/collection-batch-validation.json)).
+  Windows equivalence remains pending. The next selected batch is public JSON DOM
+  behavior from the existing JSON programs.

@@ -24,7 +24,11 @@ COLLECTION_NAMES = [
     'Any does not read Current',
     'For break disposes its iterator',
     'ArrayList copy has independent storage',
-    *MAP_NAMES,
+    'Map materialization handles collisions and empty input',
+    'HashMap copies sequences and maps independently',
+    'Map iteration snapshots pairs before mutation',
+    'ToMap materializes pair queries and selectors',
+    'HashMap copies preserve reference values and comparer',
     'Predicate Any stops at its first match',
     'Queue growth preserves wrapped FIFO contents',
     'ArrayQueue preserves FIFO',
@@ -36,6 +40,39 @@ COLLECTION_NAMES = [
     'Stack preserves references through clear and reuse',
     'Stack iterator captures LIFO contents before mutation',
 ]
+CONSTRUCTION_NAMES = [
+    'Collection constructors consume and dispose each input once',
+    'Collection constructors accept empty arrays',
+    'Queue and stack copies follow source iteration order',
+    'List construction materializes filtered input independently',
+    'Collection copies preserve element reference identity',
+    'Set copy retains values and explicit comparer after source clear',
+    'Set collision chains survive removal growth and slot reuse',
+    'Set snapshot retains values across clear and reuse',
+    'Set ordinal string equality preserves case and Unicode',
+]
+ITERATION_NAMES = [
+    'For completion disposes its iterator',
+    'For continue preserves traversal and disposal',
+    'For disposes an empty iterator',
+    'Labeled continue disposes each inner iterator',
+    'For return disposes before returning to its caller',
+    'All stops at the first failed predicate',
+    'Count advances without reading Current',
+    'Any disposes empty input',
+    'First stops after one value',
+    'Fold visits every value',
+    'Last visits the complete input',
+    'Predicate Single stops at the second match',
+    'Predicate First disposes input with no match',
+    'Predicate Count reads every value',
+    'Predicate First stops at its match',
+    'Predicate Last retains the final match',
+    'Predicate Single scans for a unique match',
+    'Single rejects multiple values without reading the second',
+    'ToList materializes and disposes its input',
+]
+
 DISCOVERY_SPEC = importlib.util.spec_from_file_location('test_discovery', ROOT / 'scripts/discover-runtime-tests.py')
 DISCOVERY = importlib.util.module_from_spec(DISCOVERY_SPEC)
 DISCOVERY_SPEC.loader.exec_module(DISCOVERY)
@@ -51,7 +88,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -69,6 +106,8 @@ def main():
     validation_spec.loader.exec_module(validation)
     expected = [
         ('collections', 0, ''.join('PASS ' + n + '\n' for n in COLLECTION_NAMES) + f'Tests: {len(COLLECTION_NAMES)}, passed: {len(COLLECTION_NAMES)}, failed: 0, skipped: 0\n'),
+        ('collection-construction', 0, ''.join('PASS ' + n + '\n' for n in CONSTRUCTION_NAMES) + f'Tests: {len(CONSTRUCTION_NAMES)}, passed: {len(CONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
+        ('collection-iteration', 0, ''.join('PASS ' + n + '\n' for n in ITERATION_NAMES) + f'Tests: {len(ITERATION_NAMES)}, passed: {len(ITERATION_NAMES)}, failed: 0, skipped: 0\n'),
         ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n'),
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]
@@ -80,7 +119,7 @@ def main():
         for name, exit_code, stdout in selected:
             build = out / (name + '-build')
             environment = dict(os.environ)
-            if name in ('collections', 'discovery-contract'):
+            if name != 'runner-contract':
                 registry = DISCOVERY.discover(TESTS / name / 'Tests.rvnproj', bundle, out / (name + '-discovery'))
                 environment['NeoClrTestRegistry'] = str(registry)
             command = [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile',
@@ -91,7 +130,7 @@ def main():
             (out / (name + '-build.stderr.log')).write_bytes(result.stderr)
             if result.returncode:
                 raise RuntimeError(name + ' build failed; see retained logs')
-            if name in ('collections', 'discovery-contract'):
+            if name != 'runner-contract':
                 DISCOVERY.verify_registration(build / 'app.dll', bundle, out / (name + '-discovery'))
             isolated = out / (name + '-isolated')
             isolated.mkdir()
@@ -129,7 +168,7 @@ def main():
                     (['--unknown', 'after'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
                     (['--id', 'runner.after', '--filter', 'after'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
                 ],
-            }[name]
+            }.get(name, [])
             for arguments, selected_exit, selected_stdout in selections:
                 for mode, command, cwd, environment in [('native', [exe, *arguments], isolated, env),
                                                         ('interpreter', [*interpreter, '--', *arguments], ROOT, None)]:

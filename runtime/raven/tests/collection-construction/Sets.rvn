@@ -1,0 +1,87 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Linq.*
+import System.Option.*
+import System.Result.*
+import NeoClr.Testing.*
+
+[Test("Set collision chains survive removal growth and slot reuse")]
+func SetCollisionReuse() -> Result<unit, TestFailure> {
+    let concrete = HashSet<int>(CollidingIntegers())
+    let set: MutableSet<int> = concrete
+    let view: Set<int> = concrete
+    var index = 0
+    while index < 24 {
+        _ = Assert.True(set.Add(index), "Distinct colliding value must be inserted")?
+        _ = Assert.True(!set.Add(index), "Duplicate value must be rejected")?
+        index = index + 1
+    }
+    _ = Assert.True(set.Remove(23), "Remove chain head")?
+    _ = Assert.True(set.Remove(12), "Remove chain middle")?
+    _ = Assert.True(set.Remove(0), "Remove chain tail")?
+    _ = Assert.True(!set.Remove(12), "Repeated removal must report absence")?
+    _ = Assert.Equal(21, view.Count)?
+    _ = Assert.True(!view.Contains(23) && !view.Contains(12) && !view.Contains(0), "Removed values must be absent")?
+    index = 24
+    while index < 28 {
+        _ = Assert.True(set.Add(index), "Freed slots and growth must accept new values")?
+        index = index + 1
+    }
+    index = 1
+    while index < 28 {
+        if index != 12 && index != 23 {
+            _ = Assert.True(view.Contains(index), "Surviving collision chain value must remain reachable")?
+        }
+        index = index + 1
+    }
+    return Assert.Equal(25, view.Count)
+}
+
+[Test("Set snapshot retains values across clear and reuse")]
+func SetSnapshotClear() -> Result<unit, TestFailure> {
+    let set = HashSet<int>(CollidingIntegers())
+    var index = 0
+    while index < 25 {
+        _ = Assert.True(set.Add(index), "Insert snapshot source value")?
+        index = index + 1
+    }
+    use snapshot = set.GetIterator()
+    set.Clear()
+    _ = Assert.Equal(0, set.Count)?
+    _ = Assert.True(set.Add(42), "Cleared set must support reuse")?
+    let captured = HashSet<int>(CollidingIntegers())
+    while snapshot.MoveNext() {
+        _ = Assert.True(captured.Add(snapshot.Current), "Snapshot must not repeat values")?
+    }
+    _ = Assert.Equal(25, captured.Count)?
+    index = 0
+    while index < 25 {
+        _ = Assert.True(captured.Contains(index), "Snapshot must preserve each original value")?
+        index = index + 1
+    }
+    return Assert.True(!captured.Contains(42), "Snapshot must exclude later insertions")
+}
+
+[Test("Set ordinal string equality preserves case and Unicode")]
+func SetUnicodeOrdinal() -> Result<unit, TestFailure> {
+    let words = HashSet<string>(StringComparer.Ordinal)
+    _ = Assert.True(words.Add("Café"), "Insert accented text")?
+    _ = Assert.True(!words.Add("Café"), "Reject identical text")?
+    _ = Assert.True(words.Add("café"), "Ordinal equality distinguishes case")?
+    _ = Assert.True(words.Add("雪"), "Insert non-Latin text")?
+    _ = Assert.True(words.Remove("Café"), "Remove exact text")?
+    _ = Assert.True(words.Contains("café") && words.Contains("雪"), "Other strings must remain")?
+    return Assert.Equal(2, words.Count)
+}
+
+class CollidingIntegers : EqualityComparer<int> {
+    func Equals(left: int, right: int) -> bool => left == right
+    func GetHashCode(value: int) -> int => 1
+}
+
+class ModuloTwo : EqualityComparer<int> {
+    func Equals(left: int, right: int) -> bool => left % 2 == right % 2
+    func GetHashCode(value: int) -> int => value % 2
+}

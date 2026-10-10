@@ -14,7 +14,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   reference/comparer behavior. Add six queue/stack ports covering wrapped FIFO growth,
   LIFO growth, reference identity, clear/reuse and captured iterator snapshots. All
   18 collection cases and focused Map/ArrayQueue selections pass native macOS ARM64
-  and interpreter execution with rebuilt libraries.
+  and interpreter execution with rebuilt libraries. Batch-port the remaining set,
+  constructor, query and loop cleanup scenarios as 28 additional tests. Split the
+  46 tests across three projects because one executable exceeds the current native
+  metadata encoder envelope; the default gate discovers and runs all three. All 46
+  pass native macOS ARM64 and interpreted execution, with existing selectors passing.
   Keep the original integration consumer pending Windows equivalence, and keep
   terminal-fault/compiler rejection checks in their specialized harnesses. Focused
   host --suite runs verify actual registration without repeating fixed discovery

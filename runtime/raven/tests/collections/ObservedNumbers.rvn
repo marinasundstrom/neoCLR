@@ -1,0 +1,55 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Linq.*
+import System.Option.*
+import System.Result.*
+import NeoClr.Testing.*
+
+// A fixture has state; the test functions above do not require a fixture class.
+class ObservedNumbers : Iterable<int> {
+    var Limit: int { get; set; } = 4
+    var Requests: int { get; set; } = 0
+    var Moves: int { get; set; } = 0
+    var Reads: int { get; set; } = 0
+    var Disposals: int { get; set; } = 0
+
+    func GetIterator() -> Iterator<int> {
+        Requests = Requests + 1
+        return ObservedIterator(self)
+    }
+}
+
+class ObservedIterator : Iterator<int> {
+    private val owner: ObservedNumbers
+    private var index = 0
+
+    init(owner: ObservedNumbers) {
+        self.owner = owner
+    }
+
+    func MoveNext() -> bool {
+        owner.Moves = owner.Moves + 1
+        index = index + 1
+        return index <= owner.Limit
+    }
+
+    val Current: int {
+        get {
+            owner.Reads = owner.Reads + 1
+            return index
+        }
+    }
+
+    func Dispose() {
+        owner.Disposals = owner.Disposals + 1
+    }
+}
+
+func CheckObservation(input: ObservedNumbers, requests: int, moves: int, reads: int, disposals: int) -> Result<unit, TestFailure> {
+    _ = Assert.Equal(requests, input.Requests)?
+    _ = Assert.Equal(moves, input.Moves)?
+    _ = Assert.Equal(reads, input.Reads)?
+    return Assert.Equal(disposals, input.Disposals)
+}

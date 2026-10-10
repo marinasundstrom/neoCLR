@@ -1,0 +1,63 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Linq.*
+import System.Option.*
+import System.Result.*
+import NeoClr.Testing.*
+
+[Test("For completion disposes its iterator")]
+func ForCompletion() -> Result<unit, TestFailure> {
+    let input = ObservedNumbers()
+    var sum = 0
+    for value in input {
+        sum = sum + value
+    }
+    _ = Assert.Equal(10, sum)?
+    return CheckObservation(input, 1, 5, 4, 1)
+}
+
+[Test("For continue preserves traversal and disposal")]
+func ForContinue() -> Result<unit, TestFailure> {
+    let input = ObservedNumbers()
+    for value in input {
+        continue
+    }
+    return CheckObservation(input, 1, 5, 4, 1)
+}
+
+[Test("For return disposes before returning to its caller")]
+func ForReturn() -> Result<unit, TestFailure> {
+    let input = ObservedNumbers()
+    _ = Assert.Equal(1, FirstFromLoop(input))?
+    return CheckObservation(input, 1, 1, 1, 1)
+}
+
+[Test("Labeled continue disposes each inner iterator")]
+func ForOuterContinue() -> Result<unit, TestFailure> {
+    let input = ObservedNumbers()
+    outer: for value in input {
+        for other in input {
+            continue outer
+        }
+    }
+    return CheckObservation(input, 5, 9, 8, 5)
+}
+
+[Test("For disposes an empty iterator")]
+func ForEmpty() -> Result<unit, TestFailure> {
+    let input = ObservedNumbers()
+    input.Limit = 0
+    for value in input {
+        return Assert.True(false, "Empty input must not enter the loop")
+    }
+    return CheckObservation(input, 1, 1, 0, 1)
+}
+
+func FirstFromLoop(input: Iterable<int>) -> int {
+    for value in input {
+        return value
+    }
+    return 0
+}

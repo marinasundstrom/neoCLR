@@ -45,6 +45,12 @@ old integration smoke consumer until Windows equivalence is qualified. Six subse
 [queue/stack ports](../runtime/raven/tests/collections/QueueStack.rvn) cover growth,
 reference identity, clear/reuse and snapshots; the expanded 18-test suite and existing
 selectors pass both modes ([evidence](../runtime/raven/tests/queue-stack-migration-validation.json)).
+Author-directed batch migration adds the remaining collection scenarios together,
+with 46 tests split across three projects to stay within the current native metadata
+encoder envelope. This packaging limit remains a separate gap, not a test API rule.
+[Batch qualification](../runtime/raven/tests/collection-batch-validation.json): all 46
+tests and existing selectors pass native macOS ARM64 and interpreted execution.
+Windows qualification remains pending.
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

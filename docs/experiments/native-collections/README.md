@@ -161,3 +161,11 @@ The queue/stack entry checks and `CheckSnapshots` are also ported into six
 They retain FIFO/LIFO growth, wrapped contents, shared reference identity, clear/reuse
 and mutation-after-snapshot cases. Explicit small capacities guarantee that growth
 is exercised; the tests do not pin an internal growth factor.
+
+The remaining `CheckSets`, `CheckCollectionConstruction`, `CheckForCleanup` and
+`CheckQueryCleanup` scenarios now have focused assertion-based counterparts in the
+[construction/set](../../../runtime/raven/tests/collection-construction/) and
+[query/iterator](../../../runtime/raven/tests/collection-iteration/) suites. Together
+with the earlier ports they cover this program's observable checks. Keep this smoke
+consumer until Windows equivalence is established; fault and compiler rejection
+fixtures retain their separate purpose.
