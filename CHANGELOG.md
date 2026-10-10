@@ -22,7 +22,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Native macOS/interpreter pair checks, four compiler rejection cases and the
   focused JSON collection regression pass. Pin the shared Windows development-library
   workflow to the exact Raven integration compiler revision and build it reproducibly
-  before rebuilding source libraries.
+  before rebuilding source libraries. Stage the compiler in a short repository-level
+  temporary directory so Windows generator launch paths stay below the platform
+  limit; preserve build diagnostics and clean the checkout on failure as well as success.
 
 - Add sets to the author-selected collection work and implement an application-local
   set prototype with read/mutation interfaces, explicit equality comparers, duplicate

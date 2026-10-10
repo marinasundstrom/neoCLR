@@ -9,6 +9,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -43,28 +44,34 @@ def main():
     if args.build_compiler:
         if len(args.compiler_revision) != 40 or any(c not in '0123456789abcdef' for c in args.compiler_revision):
             raise ValueError('--build-compiler requires an exact full Raven commit')
-        source = out / '.raven-source'
-        run(['git', 'init', source])
-        run(['git', '-C', source, 'remote', 'add', 'origin', 'https://github.com/marinasundstrom/raven.git'])
-        run(['git', '-C', source, 'fetch', '--depth', '1', 'origin', args.compiler_revision])
-        run(['git', '-C', source, 'checkout', '--detach', args.compiler_revision])
-        actual = subprocess.check_output(['git', '-C', str(source), 'rev-parse', 'HEAD'], text=True).strip()
-        if actual != args.compiler_revision:
-            raise ValueError('Raven checkout revision mismatch')
-        metadata = ROOT / 'tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj'
-        run(['dotnet', 'build', source / 'src/Raven.Compiler/Raven.Compiler.csproj', '-f', 'net10.0',
-             '-p:WarningLevel=0', '-p:UseRavenCoreReference=false', '-p:Platform=AnyCPU',
-             '-p:NeoClrMetadataProject=' + str(metadata)])
-        compiler_directory = out / 'compiler'
-        shutil.copytree(source / 'src/Raven.Compiler/bin/Debug/net10.0', compiler_directory)
-        compiler = compiler_directory / 'rvnc.dll'
-        report['compilerRevision'] = actual
-        report['compilerFiles'] = {p.relative_to(compiler_directory).as_posix(): sha(p)
-                                   for p in sorted(compiler_directory.rglob('*')) if p.is_file()}
-        def remove_readonly(function, path, error):
-            os.chmod(path, stat.S_IWRITE)
-            function(path)
-        shutil.rmtree(source, onerror=remove_readonly)
+        # Raven generators launch executables beneath this checkout. Keeping it
+        # below a deeply nested evidence directory exceeds Windows launch limits.
+        scratch = ROOT / 'target'
+        scratch.mkdir(exist_ok=True)
+        source = Path(tempfile.mkdtemp(prefix='rvnc-', dir=scratch))
+        try:
+            run(['git', 'init', source])
+            run(['git', '-C', source, 'remote', 'add', 'origin', 'https://github.com/marinasundstrom/raven.git'])
+            run(['git', '-C', source, 'fetch', '--depth', '1', 'origin', args.compiler_revision])
+            run(['git', '-C', source, 'checkout', '--detach', args.compiler_revision])
+            actual = subprocess.check_output(['git', '-C', str(source), 'rev-parse', 'HEAD'], text=True).strip()
+            if actual != args.compiler_revision:
+                raise ValueError('Raven checkout revision mismatch')
+            metadata = ROOT / 'tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj'
+            run(['dotnet', 'build', source / 'src/Raven.Compiler/Raven.Compiler.csproj', '-f', 'net10.0',
+                 '-p:WarningLevel=0', '-p:UseRavenCoreReference=false', '-p:Platform=AnyCPU',
+                 '-p:NeoClrMetadataProject=' + str(metadata)])
+            compiler_directory = out / 'compiler'
+            shutil.copytree(source / 'src/Raven.Compiler/bin/Debug/net10.0', compiler_directory)
+            compiler = compiler_directory / 'rvnc.dll'
+            report['compilerRevision'] = actual
+            report['compilerFiles'] = {p.relative_to(compiler_directory).as_posix(): sha(p)
+                                       for p in sorted(compiler_directory.rglob('*')) if p.is_file()}
+        finally:
+            def remove_readonly(function, path, error):
+                os.chmod(path, stat.S_IWRITE)
+                function(path)
+            shutil.rmtree(source, onerror=remove_readonly)
     translator_project = ROOT / 'tools/metadata/NeoCLR.Metadata.Translate/NeoCLR.Metadata.Translate.csproj'
     translator = translator_project.parent / 'bin/Release/net10.0/NeoCLR.Metadata.Translate.dll'
     run(['dotnet', 'build', translator_project, '-c', 'Release', '-p:WarningLevel=0', '-p:Platform=AnyCPU'])

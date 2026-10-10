@@ -43,3 +43,10 @@ The [focused JSON regression](json-map-regression.json) also passes native macOS
 and interpreted execution with this bundle, preserving nested object/list/map JSON
 behavior after Map gains Iterable. [Map validation](map-validation.json) records
 the positive consumer and four explicit rejection cases.
+
+Windows pair run [38002073187](https://github.com/marinasundstrom/neoCLR/actions/runs/38002073187)
+failed during compiler preparation: the nested evidence path made a generated
+BoundNodeGenerator executable path 262 characters long. Compiler staging now uses
+a short repository-level temporary checkout; evidence remains at the requested
+output path. A focused regression covers path length, failure diagnostics and
+checkout cleanup. Pair execution was not reached in that failed run.
