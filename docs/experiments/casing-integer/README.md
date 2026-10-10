@@ -38,3 +38,7 @@ Int64 union API from the archived bootstrap. A check of the separate historical
 source checklist remains blocked by its pre-existing caller-discovery drift
 (`UInt64ToString`); see [tooling tracking](../../tracking/toolchain-release.md).
 The current public metadata inventory and API snapshot are independently checked.
+
+Development test migration (2026-10-10): Unicode casing expansions, contextual sigma and text preservation now also run as 6
+attributed framework tests in `runtime/raven/tests/unicode-casing`. The framework README
+links native/interpreted evidence. This original consumer retains its integration purpose.

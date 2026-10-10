@@ -61,6 +61,8 @@ Batch `memory-stream` adds 5 passing native/interpreted tests for MemoryStream s
 ([evidence](../runtime/raven/tests/memory-stream-validation.json)).
 Batch `string-construction` adds 5 tests for String character-sequence copying, graphemes and named arguments qualified in release-interpreted execution; native admission remains unsupported
 ([evidence](../runtime/raven/tests/string-construction-validation.json)).
+Batch `unicode-casing` adds 6 tests for Unicode casing expansions, contextual sigma and text preservation qualified in native macOS ARM64 and release-interpreted execution
+([evidence](../runtime/raven/tests/unicode-casing-validation.json)).
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
 

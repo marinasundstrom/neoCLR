@@ -1,0 +1,42 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import System.Option.*
+import NeoClr.Testing.*
+
+[Test("Invariant casing supports full Unicode expansions")]
+func CasingExpansion() -> Result<unit, TestFailure> {
+    _ = Assert.Equal("STRASSE FFI", "Straße ﬃ".ToUpperInvariant())?
+    return Assert.Equal("i̇ıi", "İıI".ToLowerInvariant())
+}
+
+[Test("Invariant lowercase respects contextual Greek sigma")]
+func CasingSigma() -> Result<unit, TestFailure> {
+    _ = Assert.Equal("ος", "ΟΣ".ToLowerInvariant())?
+    _ = Assert.Equal("οσα", "ΟΣΑ".ToLowerInvariant())?
+    _ = Assert.Equal("aς́", "AΣ́".ToLowerInvariant())?
+    _ = Assert.Equal("aσ́b", "AΣ́B".ToLowerInvariant())?
+    return Assert.Equal("σ", "Σ".ToLowerInvariant())
+}
+
+[Test("Invariant uppercase preserves emoji and supplementary letters")]
+func CasingSupplementary() -> Result<unit, TestFailure> {
+    return Assert.Equal("𐐀𐐀👩‍💻", "𐐀𐐨👩‍💻".ToUpperInvariant())
+}
+
+[Test("Invariant casing preserves normalization form")]
+func CasingNoNormalization() -> Result<unit, TestFailure> {
+    return Assert.Equal("É É", "é é".ToUpperInvariant())
+}
+
+[Test("Invariant casing preserves embedded NUL and empty strings")]
+func CasingBoundaries() -> Result<unit, TestFailure> {
+    _ = Assert.Equal("A\u0000B", "a\u0000b".ToUpperInvariant())?
+    return Assert.Equal("", "".ToLowerInvariant())
+}
+
+[Test("Full casing expansion does not redefine ordinal ignore-case comparison")]
+func CasingNotOrdinalFolding() -> Result<unit, TestFailure> {
+    return Assert.True(String.CompareOrdinalIgnoreCase("ß", "ss") != 0, "Ordinal comparison must not apply full casing expansion")
+}

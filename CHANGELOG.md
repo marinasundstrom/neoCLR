@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-10
 
+- Migrate Unicode casing expansions, contextual sigma and text preservation into 6 attributed Raven tests in `unicode-casing`.
+  Native macOS ARM64 and release-interpreted execution pass; default gates include
+  the suite. Original integration consumers remain; Windows qualification is pending.
+
 - Migrate String character-sequence copying, graphemes and named arguments into 5 attributed Raven tests in `string-construction`.
   Release-interpreted execution passes; native admission remains unsupported. Default gates include
   the suite. Original integration consumers remain; Windows qualification is pending.
