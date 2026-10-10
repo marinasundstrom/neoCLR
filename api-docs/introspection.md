@@ -71,9 +71,11 @@ Rebuild the source libraries, reference assembly and runtime together.
 
 Interpreter traversal is qualified by the [Raven consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/guest-modules/README.md).
 AOT supports `NominalTypeInfo.Module` for explicitly retained nominal type definitions
-through the existing private reflection-roots policy, and reading the resulting Name.
+through the existing private reflection-roots policy, reading the resulting Name,
+and following Module.Assembly to AssemblyInfo.Name/FullName. Assembly ownership
+is retained only for the exact module/assembly pairs reached from retained types.
 Unretained types fault with an explicit metadata-retention error. This does not grant
-constructor/method invocation. AOT assembly traversal, Module.Assembly/GetTypes and
+constructor/method invocation. AOT assembly-wide traversal, Module.GetTypes and
 module Object.Equals dispatch are not qualified by this slice. Guest module function
 enumeration and context-wide assembly discovery remain open.
 
@@ -84,6 +86,14 @@ executing user code. Unknown types, absent/ambiguous catalog scope or invalid ow
 return Fault. It is an in-repository compiler helper, outside the guest API and
 RavenDoc type selection; native snapshot factories materialize its result under
 explicit retention.
+
+The same unstable backend bridge provides
+`module_assembly(&Module, identity: &str, name: &str) -> Result<Value, Fault>` and
+`assembly_name(&Module, identity: &str) -> Result<Value, Fault>`. These validate
+against the loaded catalog; missing assemblies or invalid module ownership return
+Fault. The AOT adapter admits only retained ownership pairs/full assembly identities,
+otherwise faults with `native assembly ownership metadata was not retained`.
+These helpers do not enumerate assemblies, load dependencies, or grant invocation.
 
 ## Assembly and module identity
 

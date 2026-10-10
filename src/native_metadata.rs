@@ -41,6 +41,24 @@ pub fn type_module(module: &Module, owner: &Type) -> Result<Value, Fault> {
     )
 }
 
+/// Return the owning assembly recipe after validating exact logical module ownership.
+pub fn module_assembly(module: &Module, identity: &str, name: &str) -> Result<Value, Fault> {
+    crate::assembly_info::Query::ModuleAssembly.invoke(
+        module,
+        &[Value::String(identity.into()), Value::String(name.into())],
+        &Limits::default(),
+    )
+}
+
+/// Return the simple name of an assembly in the loaded descriptive catalog.
+pub fn assembly_name(module: &Module, identity: &str) -> Result<Value, Fault> {
+    crate::assembly_info::Query::Name.invoke(
+        module,
+        &[Value::String(identity.into())],
+        &Limits::default(),
+    )
+}
+
 /// Resolve a recipe handle to its source signature, without publishing native ordinals.
 pub fn handle_type(module: &Module, handle: &crate::TypeDescriptor) -> Result<Type, Fault> {
     crate::reflection::from_identity(module, &handle.identity)

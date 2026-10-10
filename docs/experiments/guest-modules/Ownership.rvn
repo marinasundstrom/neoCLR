@@ -10,6 +10,9 @@ func CheckOwnership() -> int {
     let machine = (NominalTypeInfo)typeof(Machine)
     let factory = (NominalTypeInfo)typeof(Factory)
     if let Some(owner) = machine.Module {
+        if owner.Assembly.Name != "CoffeePackage" {
+            return 7
+        }
         if owner.Name != "Acme.CoffeeMaker" {
             return 1
         }
@@ -21,6 +24,9 @@ func CheckOwnership() -> int {
             return 3
         }
         if let Some(other) = factory.Module {
+            if other.Assembly.FullName != owner.Assembly.FullName || other.Assembly.Name != "CoffeePackage" {
+                return 8
+            }
             if other.Name != "Acme.CoffeeMaker.Factories" || owner.Name == other.Name {
                 return 4
             }

@@ -270,7 +270,8 @@ impl Factory<'_> {
                         "System.Introspection.ParameterInfo" => {
                             (false, Some("StoredMemberIdentity"))
                         }
-                        "System.Introspection.ModuleInfo" => (false, None),
+                        "System.Introspection.ModuleInfo"
+                        | "System.Introspection.AssemblyInfo" => (false, None),
                         _ => {
                             return Err(
                                 format!("unsupported native snapshot provider {logical}").into()
@@ -345,6 +346,8 @@ pub fn bind(
                 f.name.as_str(),
                 "neoCLR.Runtime.TypeProperties"
                     | "neoCLR.Runtime.TypeModule"
+                    | "neoCLR.Runtime.ModuleAssembly"
+                    | "neoCLR.Runtime.AssemblyName"
                     | "neoCLR.Runtime.TypeElementType"
                     | "neoCLR.Runtime.MemberCustomAttributes"
             )
@@ -388,6 +391,8 @@ pub fn bind(
     for index in services {
         let f = &input.functions[index];
         let modules = f.name.ends_with("TypeModule");
+        let module_assembly = f.name.ends_with("ModuleAssembly");
+        let assembly_name = f.name.ends_with("AssemblyName");
         let properties = f.name.ends_with("Properties");
         let attributes = f.name.ends_with("CustomAttributes");
         let attribute_parameters = attributes
@@ -399,7 +404,11 @@ pub fn bind(
             || (attributes && !attribute_parameters)
             || (!attributes
                 && f.parameters
-                    != if properties {
+                    != if module_assembly {
+                        vec![Type::String, Type::String]
+                    } else if assembly_name {
+                        vec![Type::String]
+                    } else if properties {
                         vec![Type::RuntimeTypeHandle, Type::Int32]
                     } else {
                         vec![Type::RuntimeTypeHandle]
@@ -434,6 +443,64 @@ pub fn bind(
         };
         if attributes {
             bind_attributes(&mut factory, index, definitions, retention, &expected)?;
+        } else if module_assembly || assembly_name {
+            if module_assembly && name(source, &expected) != Some("System.Introspection.AssemblyInfo")
+                || assembly_name && expected != Type::String
+            {
+                return Err("assembly snapshot query requires exact result contract".into());
+            }
+            let mut seen = std::collections::HashSet::new();
+            for row in retention["types"].as_array().unwrap() {
+                let id: TypeDefId = serde_json::from_value(row["definition"].clone())?;
+                let ti = definitions
+                    .iter()
+                    .position(|definition| *definition == id)
+                    .ok_or("missing assembly snapshot root")?;
+                let owner = Type::Named(source.types[ti].name.clone());
+                let V::Object { fields, .. } = neoclr::native_metadata::type_module(source, &owner)
+                    .map_err(|e| e.to_string())?
+                else {
+                    return Err("invalid logical module snapshot".into());
+                };
+                let [V::String(identity), V::String(module_name)] = fields.as_slice() else {
+                    return Err("invalid logical module identity".into());
+                };
+                let key = (
+                    identity.to_string(),
+                    if module_assembly { module_name.to_string() } else { String::new() },
+                );
+                if !seen.insert(key) {
+                    continue;
+                }
+                let mut skips = vec![];
+                for (argument, value) in [identity, module_name]
+                    .iter()
+                    .take(if module_assembly { 2 } else { 1 })
+                    .enumerate()
+                {
+                    factory.body.extend([
+                        Op::Arg(argument),
+                        Op::String(value.to_string()),
+                        Op::Equal,
+                    ]);
+                    skips.push(factory.body.len());
+                    factory.body.push(Op::BranchFalse(0));
+                }
+                let value = if module_assembly {
+                    neoclr::native_metadata::module_assembly(source, identity, module_name)
+                } else {
+                    neoclr::native_metadata::assembly_name(source, identity)
+                }
+                .map_err(|e| e.to_string())?;
+                factory.emit(&value, &expected)?;
+                factory.body.push(Op::Return);
+                for skip in skips {
+                    factory.body[skip] = Op::BranchFalse(factory.body.len());
+                }
+            }
+            factory.body.push(Op::Fault(
+                "native assembly ownership metadata was not retained".into(),
+            ));
         } else if modules {
             if name(source, &expected) != Some("System.Introspection.ModuleInfo") {
                 return Err("TypeModule requires scoped ModuleInfo".into());

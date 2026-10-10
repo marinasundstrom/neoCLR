@@ -7525,7 +7525,11 @@ The VM owns logical ownership queries. AOT owns the explicit TypeModule retentio
 adapter and builds trusted descriptor factories through native_metadata::type_module;
 no user constructors run. The [consumer](experiments/guest-modules/README.md) records
 interpreter traversal, retained native ownership and missing-retention failure. Native
-assembly traversal remains unsupported. Reference-only generation and source native
+assembly-wide traversal remains unsupported. Retained modules now support
+Module.Assembly and AssemblyInfo.Name/FullName through the same validated catalog
+recipes; this is an AOT backend binding change with no compiler, CLI encoding or
+Runtime Contract change. It grants no additional declaration retention or invocation.
+Reference-only generation and source native
 class libraries succeed; the independent legacy implementation generator is blocked
 by its Map contract, with only mechanical getter removal applied to checked fragments.
 No Raven compiler change or ordinary .NET behavior change is needed for this slice.

@@ -388,6 +388,22 @@ mod tests {
             module_value("Package", &names[0]),
             module_value("Other", &names[0])
         );
+        #[cfg(feature = "native-metadata")]
+        {
+            for identity in ["Package", "Other"] {
+                assert_eq!(
+                    crate::native_metadata::module_assembly(&module, identity, &names[0]).unwrap(),
+                    assembly_value(&module, identity).unwrap()
+                );
+                assert_eq!(
+                    crate::native_metadata::assembly_name(&module, identity).unwrap(),
+                    Value::String(identity.into())
+                );
+            }
+            assert!(crate::native_metadata::module_assembly(&module, "Package", "Acme").is_err());
+            assert!(crate::native_metadata::module_assembly(&module, "Missing", &names[0]).is_err());
+            assert!(crate::native_metadata::assembly_name(&module, "Missing").is_err());
+        }
         let root_args = [
             Value::String("Package".into()),
             Value::String("Acme.CoffeeMaker".into()),

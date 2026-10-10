@@ -79,6 +79,6 @@ negative = build('unretained', missing)
 run([negative / name], fault='native logical module metadata was not retained')
 assert all(sha(ROOT / path) == digest for path, digest in report['inputs'].items()), 'Fixture input changed'
 report['passed'] = True
-report['scope'] = 'Interpreter assembly/module/type/member/parameter traversal; AOT retained type-to-module ownership. AOT assembly traversal and Object.Equals dispatch are not covered.'
+report['scope'] = 'Interpreter assembly/module/type/member/parameter traversal; AOT retained type-to-module ownership and Module.Assembly with AssemblyInfo.Name/FullName. AOT assembly-wide traversal and Object.Equals dispatch are not covered.'
 (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
 print('Guest logical module checks: PASS')

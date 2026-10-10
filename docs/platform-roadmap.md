@@ -48,7 +48,8 @@ passes at 2e4d5b6d with Raven 1a0c4e627; its artifact hashes are not independent
 Guest traversal through RuntimeContext.Current.ExecutingAssembly now returns flat
 logical modules in the interpreter; type/member/parameter ownership agrees and the
 physical ModuleInfo.MetadataToken property is removed. AOT materializes type-to-module
-snapshots for explicitly retained nominal definitions. Assembly-wide AOT traversal,
+snapshots for explicitly retained nominal definitions, including Module.Assembly
+and AssemblyInfo.Name/FullName ownership inspection. Assembly-wide AOT traversal,
 guest module-function enumeration and general callable invocation remain open. See
 [the guest consumer](experiments/guest-modules/README.md).
 

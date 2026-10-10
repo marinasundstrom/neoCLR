@@ -12,7 +12,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   names, preserving explicit empty modules and nested-type ownership. Remove physical
   ModuleInfo.MetadataToken and rebuild source libraries and the API reference. Add
   explicitly retained AOT type-to-module snapshots with unretained metadata faults;
-  native assembly traversal and module Object.Equals dispatch remain unsupported.
+  extend retained ownership to Module.Assembly and AssemblyInfo.Name/FullName.
+  Assembly-wide traversal and module Object.Equals dispatch remain unsupported.
   Add a Raven interpreter/native consumer and Windows gate. Interpreter traversal,
   native retained ownership and missing-retention failure pass locally, along with
   focused runtime/reflection checks. Windows qualification is pending. The legacy

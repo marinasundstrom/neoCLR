@@ -62,10 +62,14 @@ document/workspace symbols. For .NET
 output, Raven projects modules onto namespaces; explicit module identity and empty
 module declarations do not survive that projection.
 
-Older neoCLR metadata exposes an identified namespace projection. The current
-physical-image `ModuleInfo` and guest `RuntimeContext` APIs have not yet migrated.
-Module-private visibility, re-exports, runtime discovery and independently loadable
-modules are not part of this first slice. A module does not create its own heap,
+Older neoCLR metadata exposes an identified namespace projection. Development host
+and guest `ModuleInfo` now describe logical modules. Interpreter traversal through
+`RuntimeContext.Current.ExecutingAssembly.GetModules()` includes declared empty
+modules. Native compilation supports explicitly retained type-to-module ownership
+and `Module.Assembly` with assembly `Name`/`FullName`; assembly-wide native enumeration
+remains open. See the [API scope](/docs/introspection.html#logical-modules-development-2026-10-10).
+Module-private visibility, re-exports, guest module-function discovery and independently
+loadable modules remain outside this foundation. A module does not create its own heap,
 scheduler, native ABI or artifact file.
 
 [Browse library modules](../../docs/namespaces.html) ·

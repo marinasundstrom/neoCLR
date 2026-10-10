@@ -82,7 +82,8 @@ Loaded modules reject mutation. `IsProjection` identifies inferred views of olde
 native or CLI inputs; CLI output still loses explicit empty declarations. Guest traversal through RuntimeContext.Current.ExecutingAssembly now uses logical
 module names too. ModuleInfo.MetadataToken is removed. Interpreter queries include
 exact-name type enumeration; native support currently covers explicitly retained
-type-to-module descriptors. See [the guest consumer](experiments/guest-modules/README.md).
+type-to-module descriptors and their owning AssemblyInfo.Name/FullName. This does
+not retain or enumerate the entire assembly. See [the guest consumer](experiments/guest-modules/README.md).
 
 ## Comparison and tradeoffs
 
