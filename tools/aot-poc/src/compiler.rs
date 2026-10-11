@@ -10,7 +10,7 @@ use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext, Variable};
 #[path = "flow.rs"]
 mod flow;
 #[path = "values.rs"]
-mod values;
+pub(super) mod values;
 use cranelift_module::{DataDescription, Linkage, Module};
 use cranelift_object::{ObjectBuilder, ObjectModule};
 use neoclr::metadata::{Function, FunctionRef, Instruction as Op, Type};
@@ -107,7 +107,7 @@ pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bo
         "neoclr_scalar",
         cranelift_module::default_libcall_names(),
     )?);
-    compile_scalar(input, root, console, &mut module)?;
+    compile_scalar(input, root, console, &mut module, false)?;
     finish(module)
 }
 
@@ -117,6 +117,7 @@ pub(super) fn compile_scalar<M: Module>(
     root: &str,
     console: bool,
     module: &mut M,
+    long_range_calls: bool,
 ) -> Result<(), Error> {
     if !input.types.is_empty() {
         return Err("scalar profile does not support type definitions".into());
@@ -470,6 +471,7 @@ pub(super) fn compile_scalar<M: Module>(
             builder.seal_all_blocks();
             builder.finalize();
         }
+        prepare_calls(&mut context, long_range_calls);
         module.define_function(ids[index], &mut context)?;
     }
     if parameterless_root {
@@ -498,6 +500,7 @@ pub(super) fn compile_scalar<M: Module>(
             builder.seal_all_blocks();
             builder.finalize();
         }
+        prepare_calls(&mut context, long_range_calls);
         module.define_function(export, &mut context)?;
     }
     Ok(())
@@ -679,4 +682,14 @@ fn check_console_wrapper() -> Result<(), Error> {
         return Err("bundled console wrapper changed; review native console lowering".into());
     }
     Ok(())
+}
+
+// Independently allocated JIT functions and host helpers need not fit ARM64's
+// direct branch range. AOT retains its existing linker-managed relocation policy.
+pub(super) fn prepare_calls(context: &mut cranelift_codegen::Context, long_range: bool) {
+    if long_range {
+        for function in context.func.dfg.ext_funcs.values_mut() {
+            function.colocated = false;
+        }
+    }
 }

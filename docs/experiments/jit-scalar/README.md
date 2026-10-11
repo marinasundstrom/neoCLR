@@ -83,3 +83,10 @@ three-test JIT run adds NEOX container/corruption coverage and repeats two check
 (22 distinct scalar tests covered). Three Windows object-emission tests pass on
 macOS; four Windows execution tests are explicitly ignored here. No Windows JIT
 claim follows from those object checks. The managed lowering path was not changed.
+
+## Managed follow-up
+
+The separate [managed JIT profile](../jit-managed/README.md) now runs the real
+Index/Range framework assembly. It retains the scalar profile's narrow contract and
+uses explicit long-range calls for independently allocated ARM64 JIT code and helpers;
+AOT keeps its existing linker relocation policy.

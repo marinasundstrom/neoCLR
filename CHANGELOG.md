@@ -11,8 +11,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Add a private macOS ARM64 scalar JIT probe to the native compiler tool, sharing
   verified scalar lowering with AOT and owning generated code through each call.
   Report loading, compilation/finalization and invocation timings plus native fault
-  status. Managed/test-framework assemblies, HTTP and Windows JIT remain unsupported.
-  Extend scalar parity checks to JIT and remove a stale AOT shift-rejection expectation.
+  status. Extend this with a synchronous managed probe using existing GC/stack/fault
+  helpers: the real 20-test Index/Range assembly now runs with filtering and fault parity.
+  Bind required helpers before invocation and use long-range ARM64 JIT calls while
+  preserving AOT object output. Async/HTTP and Windows JIT remain unsupported.
+  Extend scalar parity checks to JIT and correct stale shift/negation rejection and
+  selection-limit expectations. Add a reproducible three-mode test-run benchmark.
+  Record eventual JIT defaults, preferred AOT deployment and full interpreter support;
+  current CLI defaults remain unchanged and hybrid execution/hot reload remain plans.
 
 - Add phase timings to runtime test discovery/native builds and optional repeated
   suite execution via `--execution-repetitions`, retaining correctness checks for

@@ -585,6 +585,7 @@ dependencies = [
  "cranelift-jit",
  "cranelift-module",
  "cranelift-object",
+ "libloading",
  "neoclr",
  "object",
  "serde_json",

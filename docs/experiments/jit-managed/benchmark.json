@@ -1,0 +1,350 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "machine": "arm64",
+  "qualificationSha256": "d93bd1f3bdebe274105e46db31fb86243f706337ea546dc3c4867e494c838483",
+  "appSha256": "1aa4e1efb81bbbb843836a05f822f949c6ea831ec1707420759864d36af485a9",
+  "aotSha256": "42e2ad5ff4ce5b77166a88a51a39596634b0d7526fe1d17763aada69f314df84",
+  "jitSha256": "f29f9944f999d8bbc989f9a9deb6518902400bb7db8e51ecc4ea9959d8297613",
+  "interpreterSha256": "f9234ad8c7c5d26adf0003ac0b0d4193bdb2f69c32203f0cf5544929af4c1163",
+  "hostSha256": "3c1295f7a4a9b4105412b31f9e4a56e94d544f362272a2499553832aa39746f8",
+  "commands": {
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/jit-iteration-release-baseline/index-range-build/app"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/release/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/jit-iteration-release-baseline/index-range-build/app.dll",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.runtime.neox",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Web.dll",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Runtime.dll",
+      "--instructions",
+      "100000000"
+    ],
+    "jit": [
+      "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+      "--jit-managed",
+      "--closed-world",
+      "/Users/robert/Projects/neoclr/target/jit-iteration-release-baseline/index-range-build/app.dll",
+      "@entry",
+      "/Users/robert/Projects/neoclr/target/jit-managed-validation-final/host.dylib",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.runtime.neox",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Web.dll",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Runtime.dll",
+      "--compile-system",
+      "--bind-user-fault",
+      "--reference-arena",
+      "--native-gc",
+      "--bind-console-read-byte",
+      "--bind-console-write-line",
+      "--bind-console-stream-output",
+      "--bind-int32-to-string",
+      "--bind-utf8-text",
+      "--native-stack-budget",
+      "--bind-integer-text",
+      "--bind-character-text",
+      "--bind-system-culture",
+      "--bind-time-zone-rules"
+    ]
+  },
+  "warmups": [
+    {
+      "mode": "aot",
+      "round": -1,
+      "processSeconds": 0.010625499999999982,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "interpreter",
+      "round": -1,
+      "processSeconds": 2.9866321250000003,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "jit",
+      "round": -1,
+      "processSeconds": 2.3569115419999997,
+      "jit": {
+        "compileAndFinalizeSeconds": 0.442789917,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.005833584,
+        "profile": "macos-arm64-jit-managed-v1"
+      },
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    }
+  ],
+  "samples": [
+    {
+      "mode": "aot",
+      "round": 0,
+      "processSeconds": 0.008923041000000076,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "interpreter",
+      "round": 0,
+      "processSeconds": 3.1576523750000005,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "jit",
+      "round": 0,
+      "processSeconds": 2.558263416000001,
+      "jit": {
+        "compileAndFinalizeSeconds": 0.474159458,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.005704958,
+        "profile": "macos-arm64-jit-managed-v1"
+      },
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "interpreter",
+      "round": 1,
+      "processSeconds": 3.0020567919999994,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "jit",
+      "round": 1,
+      "processSeconds": 2.345655916,
+      "jit": {
+        "compileAndFinalizeSeconds": 0.430693833,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.005528875,
+        "profile": "macos-arm64-jit-managed-v1"
+      },
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "aot",
+      "round": 1,
+      "processSeconds": 0.009650333999999816,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "jit",
+      "round": 2,
+      "processSeconds": 2.3211270000000006,
+      "jit": {
+        "compileAndFinalizeSeconds": 0.43212725,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.0056725,
+        "profile": "macos-arm64-jit-managed-v1"
+      },
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "aot",
+      "round": 2,
+      "processSeconds": 0.009020833000001005,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "interpreter",
+      "round": 2,
+      "processSeconds": 2.9461932080000004,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "aot",
+      "round": 3,
+      "processSeconds": 0.008995750000000413,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "interpreter",
+      "round": 3,
+      "processSeconds": 2.9249769999999984,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "jit",
+      "round": 3,
+      "processSeconds": 2.322395792000002,
+      "jit": {
+        "compileAndFinalizeSeconds": 0.423611125,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.005554584,
+        "profile": "macos-arm64-jit-managed-v1"
+      },
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "interpreter",
+      "round": 4,
+      "processSeconds": 2.9358320419999977,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "jit",
+      "round": 4,
+      "processSeconds": 2.311211292000003,
+      "jit": {
+        "compileAndFinalizeSeconds": 0.421274583,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.005546417,
+        "profile": "macos-arm64-jit-managed-v1"
+      },
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "aot",
+      "round": 4,
+      "processSeconds": 0.008378832999994756,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "jit",
+      "round": 5,
+      "processSeconds": 2.3302643749999987,
+      "jit": {
+        "compileAndFinalizeSeconds": 0.423958667,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.005639,
+        "profile": "macos-arm64-jit-managed-v1"
+      },
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "aot",
+      "round": 5,
+      "processSeconds": 0.009291707999999232,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "interpreter",
+      "round": 5,
+      "processSeconds": 2.936951791999995,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "aot",
+      "round": 6,
+      "processSeconds": 0.008514791999999716,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "interpreter",
+      "round": 6,
+      "processSeconds": 2.9632422910000003,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "jit",
+      "round": 6,
+      "processSeconds": 2.4028208340000035,
+      "jit": {
+        "compileAndFinalizeSeconds": 0.488139417,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.00642975,
+        "profile": "macos-arm64-jit-managed-v1"
+      },
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "interpreter",
+      "round": 7,
+      "processSeconds": 3.3739933749999977,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "jit",
+      "round": 7,
+      "processSeconds": 2.4149978340000047,
+      "jit": {
+        "compileAndFinalizeSeconds": 0.432511208,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.005754541,
+        "profile": "macos-arm64-jit-managed-v1"
+      },
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "aot",
+      "round": 7,
+      "processSeconds": 0.015009749999997268,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "jit",
+      "round": 8,
+      "processSeconds": 2.4435550829999997,
+      "jit": {
+        "compileAndFinalizeSeconds": 0.428166041,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.005631083,
+        "profile": "macos-arm64-jit-managed-v1"
+      },
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "aot",
+      "round": 8,
+      "processSeconds": 0.008593791000002682,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    },
+    {
+      "mode": "interpreter",
+      "round": 8,
+      "processSeconds": 2.961542625000007,
+      "stdoutSha256": "ba9b3f28f763b00a35dc6ec48d239a372ef9e70c689a27616b4c9902db4b421f"
+    }
+  ],
+  "summary": {
+    "aot": {
+      "medianSeconds": 0.008995750000000413,
+      "minSeconds": 0.008378832999994756,
+      "maxSeconds": 0.015009749999997268
+    },
+    "interpreter": {
+      "medianSeconds": 2.961542625000007,
+      "minSeconds": 2.9249769999999984,
+      "maxSeconds": 3.3739933749999977
+    },
+    "jit": {
+      "medianSeconds": 2.345655916,
+      "minSeconds": 2.311211292000003,
+      "maxSeconds": 2.558263416000001
+    },
+    "compileAndFinalizeSeconds": {
+      "medianSeconds": 0.430693833,
+      "minSeconds": 0.421274583,
+      "maxSeconds": 0.488139417
+    },
+    "invocationSeconds": {
+      "medianSeconds": 0.005639,
+      "minSeconds": 0.005528875,
+      "maxSeconds": 0.00642975
+    }
+  },
+  "date": "2026-10-11",
+  "hostCpu": "Apple M1",
+  "sourceBaseRevision": "a8f41979",
+  "sourceState": "Managed JIT slice; executable artifacts identified by SHA-256",
+  "compilerRevision": "163050da2a79444878169f1d011abff644d37b2b",
+  "sourceSha256": {
+    "docs/experiments/jit-managed/host.c": "6ea1368cbc086938b1cee26ace3ec25b920a07c8db46403cbd32877bd35cce7e",
+    "docs/experiments/jit-managed/verify.py": "92eeea7cd97e1547efd8c3f2b894ffd627e2aa00d1bc98bf40cdde152f0f4b29",
+    "docs/experiments/jit-managed/benchmark.py": "2e3c0f3da87eba4f8fa713285058a7d9d55e14b82d0c9fd5c8f507f2292ffd29"
+  }
+}

@@ -3,8 +3,10 @@
 **Product and execution review (2026-10-11):** target simple, productive, fast native
 web/backend development with familiar C#/.NET ergonomics, future language support,
 and concurrency as a core capability. Evaluate suspension and green threads with
-scheduling and memory ownership. Reopen whether to start a bounded JIT experiment
-for development/test iteration; retain interpreter support and AOT deployment.
+scheduling and memory ownership. The author selects JIT as the eventual default on
+supported platforms, AOT as the preferred deployment target, and a fully supported
+interpreter for constrained devices and explicitly supported dynamic-code scenarios.
+Current execution defaults remain unchanged pending qualification.
 Prior JIT deferral below is historical context, not a prohibition on this evaluation.
 With the Index/Range slice complete locally, assess memory views and shared execution
 requirements without treating any proposed API or backend as selected. See
@@ -17,7 +19,12 @@ compares existing debug-built and release-built AOT tools while checking HTTP ha
 lifetime and Index/Range behavior. It recommends a bounded JIT shared-lowering probe,
 followed by real test-framework execution. The [scalar JIT probe](experiments/jit-scalar/README.md)
 now implements in-memory native invocation on macOS ARM64 with shared AOT lowering;
-managed test-framework assemblies and socket workload qualification remain open. Memory views and suspension remain related design work.
+the [managed JIT probe](experiments/jit-managed/README.md) now runs the real 20-test
+Index/Range framework assembly with filtering/fault parity. Socket workloads, async
+execution, Windows JIT and production integration remain open. A nine-run local
+benchmark records median process times of 2.346s JIT, 2.962s interpreted and 9.00ms
+prebuilt AOT for that same assembly; JIT includes compilation, AOT excludes its build.
+This is test-run evidence, not HTTP throughput. Memory views and suspension remain related design work.
 
 **Module story closure (2026-10-10):** the author requests closing the namespace/module
 authoring and metadata story so work can move on. The accepted model and implemented

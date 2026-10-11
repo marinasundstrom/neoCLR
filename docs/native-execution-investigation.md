@@ -873,3 +873,12 @@ The [real Raven routing consumer](experiments/aot-console/route-native-gc-valida
 completes 1,024 requests within a fixed 64 KiB buffer, with retained captures and exact
 fault/output parity; the arena-only predecessor failed that budget at 128 requests.
 Precise maps, measured pressure scheduling and full HTTP service integration remain next.
+
+### Managed JIT follow-up — 2026-10-11
+
+The [managed JIT probe](experiments/jit-managed/README.md) shares AOT value/GC/fault
+lowering and executes an existing framework assembly in memory with explicit native
+helpers. It qualifies synchronous roots and cleanup, filtering, bounds faults and
+missing-helper rejection. The paired benchmark compares all three execution modes.
+The author now selects [eventual JIT defaults and preferred AOT deployment](platform-direction.md#execution-direction-clarified-2026-10-11);
+this supersedes the earlier investment deferral, without changing current defaults.

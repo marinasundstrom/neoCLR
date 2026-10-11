@@ -7,7 +7,6 @@ use cranelift_codegen::cursor::{Cursor, FuncCursor};
 use cranelift_codegen::ir::{self, AbiParam, InstBuilder, StackSlot, types};
 use cranelift_frontend::FunctionBuilder;
 use cranelift_module::{DataDescription, DataId, FuncId, Linkage, Module};
-use cranelift_object::ObjectModule;
 use std::collections::HashMap;
 
 struct Storage {
@@ -37,7 +36,7 @@ pub(super) struct Probes {
 }
 impl Probes {
     pub fn prepare(
-        module: &mut ObjectModule,
+        module: &mut impl Module,
         p: &Profile<'_>,
         flows: &[Stacks],
         details: Option<&crate::fault_details::Options>,
@@ -237,7 +236,7 @@ impl Probes {
     }
     pub fn enter(
         &self,
-        module: &mut ObjectModule,
+        module: &mut impl Module,
         b: &mut FunctionBuilder<'_>,
         frame: StackSlot,
         context: ir::Value,
@@ -275,7 +274,7 @@ impl Probes {
     }
     // Lowering emits returns in many fault branches. Instrument the completed IR
     // so all returns, including arithmetic/null faults, share the same cleanup.
-    pub fn finish(&self, module: &mut ObjectModule, func: &mut ir::Function, frame: StackSlot) {
+    pub fn finish(&self, module: &mut impl Module, func: &mut ir::Function, frame: StackSlot) {
         let returns: Vec<_> = func
             .layout
             .blocks()
@@ -298,7 +297,7 @@ impl Probes {
     }
     pub fn publish(
         &self,
-        module: &mut ObjectModule,
+        module: &mut impl Module,
         b: &mut FunctionBuilder<'_>,
         function: usize,
         pc: usize,
@@ -339,7 +338,7 @@ impl Probes {
     }
     pub fn emit(
         &self,
-        module: &mut ObjectModule,
+        module: &mut impl Module,
         b: &mut FunctionBuilder<'_>,
         function: usize,
         pc: usize,

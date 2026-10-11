@@ -38,6 +38,31 @@ cancellation under load, and consistent macOS/Windows behavior. Separate compile
 discovery and build costs from execution. An improvement over .NET requires evidence
 about correctness and developer effort as well as speed.
 
+## Execution direction clarified 2026-10-11
+
+The author selects **JIT as the eventual default execution mode where supported**,
+with **native AOT as the preferred deployment target**. The interpreter remains a
+fully supported backend for constrained devices and other environments where its
+tradeoffs fit. Microcontrollers are a target to investigate, including AOT where
+feasible; no current microcontroller port is implied.
+
+On targets that prohibit executable code generation, an explicitly enabled interpreter
+could execute dynamically generated code alongside AOT, subject to platform policy.
+This is a future hybrid capability, not silent fallback or a requirement to bundle an
+interpreter into every native application. An AOT-only deployment must remain possible.
+Cross-target hot reload is future work with shared metadata, state compatibility and
+code-lifetime contracts, independent of execution mode. Neither hybrid execution nor
+hot reload is implemented by the current JIT probe.
+
+Compared with the .NET JIT/Native AOT layers discussed in the
+[execution investigation](native-execution-investigation.md), the intended benefit is
+familiar native-speed development plus self-contained deployment, retaining a portable
+execution option. The costs are compiler startup, executable-memory/platform policy,
+and maintaining semantic and lifecycle parity across three backends. No speed advantage
+over .NET is established. Switching the default requires useful workload coverage,
+macOS/Windows qualification, diagnostics, ownership and reproducible iteration evidence.
+The private synchronous macOS ARM64 probe is an implementation step, not that switch.
+
 ## Foundations to retain
 
 Keep value and reference type categories, ordinary class and array references,

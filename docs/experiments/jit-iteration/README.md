@@ -84,7 +84,9 @@ needed before predicting server throughput or the achievable edit–test improve
 ## Concrete JIT scope
 
 The subsequent [scalar JIT slice](../jit-scalar/README.md) implements the first step
-below. Managed test-framework execution remains the next meaningful milestone.
+below. The subsequent [managed probe and benchmark](../jit-managed/README.md)
+now exercise a real synchronous test assembly. The recommendations below record the
+original experiment sequence.
 
 Recommendation: begin a bounded JIT feasibility slice, while also using a release
 compiler for realistic native iteration measurements. Reuse verified native lowering

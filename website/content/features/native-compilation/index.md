@@ -169,7 +169,7 @@ The routing workbench also parses a route, extracts an integer parameter and pri
 - **Deployment:** OS dependencies remain. Trimming, a stable public native ABI and a
   fully independent production-core bootstrap are unfinished.
 
-JIT and native hot reload remain future work. See [project direction](../../proposals/#runtime)
+Production JIT integration and native hot reload remain future work. See [project direction](../../proposals/#runtime)
 and [garbage collection](../gc/) for related topics.
 
 <a id="measurements-and-comparisons"></a>
@@ -189,8 +189,12 @@ remain under development; no comparative benchmark results are published yet.
 
 ## JIT investigation
 
-A development-only macOS ARM64 scalar JIT probe now shares verified integer lowering
-with AOT and executes generated code in memory. It covers integer control flow, local
-calls and fault statuses. It does not yet run managed test assemblies, HTTP applications
-or Windows JIT code. The interpreter and AOT workflows above remain the application
-execution options. [Probe contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-scalar/README.md).
+Development-only macOS ARM64 JIT probes share verified lowering with AOT and execute
+generated code in memory. The managed probe runs the real 20-test Index/Range assembly,
+including filtering and bounds faults, with interpreter/AOT parity. Async/HTTP applications,
+Windows JIT and normal runtime integration remain open.
+[Contracts, validation and local benchmark](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-managed/README.md).
+
+The intended direction is JIT by default where supported, AOT for deployment, and a fully
+supported interpreter for constrained environments. Current execution defaults are unchanged.
+Cross-target hot reload and explicit AOT/interpreter hybrid execution remain future work.

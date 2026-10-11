@@ -47,6 +47,16 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         println!("{result}");
         return Ok(());
     }
+    let managed_jit = args.iter().filter(|a| *a == "--jit-managed").count();
+    if managed_jit > 1 { return Err("duplicate --jit-managed".into()); }
+    args.retain(|a| a != "--jit-managed");
+    let mut jit_arguments = vec![std::ffi::CString::new("neoclr-jit")?];
+    while let Some(index) = args.iter().position(|a| a == "--jit-entry-argument") {
+        let value = args.get(index + 1).and_then(|v| v.to_str()).ok_or("--jit-entry-argument requires UTF-8 text")?;
+        jit_arguments.push(std::ffi::CString::new(value)?);
+        args.drain(index..=index + 1);
+    }
+    if managed_jit == 0 && jit_arguments.len() != 1 { return Err("entry arguments require --jit-managed".into()); }
     let mut target = compiler::Target::MacosArm64;
     if args.iter().filter(|a| *a == "--target").count() > 1 {
         return Err("duplicate --target option".into());
@@ -310,6 +320,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let inspect = args.first().is_some_and(|a| a == "--inspect");
     let inspect_closed = inspect && args.get(3).is_some_and(|a| a == "--closed-world");
     let closed = args.first().is_some_and(|a| a == "--closed-world");
+    if managed_jit == 1 && !closed { return Err("--jit-managed requires --closed-world".into()); }
     if target == compiler::Target::WindowsX64 && (inspect || closed && !windows_console && !windows_http) {
         return Err("Windows x64 currently supports only scalar/literal-console emission; inspection and closed-world profiles remain macOS ARM64-only".into());
     }
@@ -449,6 +460,15 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         d.native_stack_budget = native_stack_budget;
         d
     });
+    if managed_jit == 1 {
+        if !closed || target != compiler::Target::MacosArm64 || bind_task_queue || bind_timers || bind_socket_listener || bind_socket_accept || bind_socket_client || bind_socket_transfer || native_host_bootstrap {
+            return Err("--jit-managed requires closed-world macOS synchronous console compilation".into());
+        }
+        let details = details.as_ref().ok_or("--jit-managed requires explicit GC/context bindings")?;
+        let result = jit::execute_managed(compile_input, root, details, Path::new(&args[3]), &jit_arguments)?;
+        eprintln!("JIT_RESULT {result}");
+        return Ok(());
+    }
     let object = compiler::compile_for_target(compile_input, root, !closed && args.len() == 4, details.as_ref(), target)?;
     // Do not clobber an existing artifact, including on failed compilation.
     let mut output = fs::OpenOptions::new()

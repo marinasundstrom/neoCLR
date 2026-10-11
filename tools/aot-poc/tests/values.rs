@@ -1618,7 +1618,7 @@ fn raven_generic_methods_compile_from_pe_and_neox_with_original_tokens_reported(
 
 #[test]
 fn generic_method_clones_are_bounded_and_keep_plain_callees_at_the_limit() {
-    for count in [256, 257] {
+    for count in [1022, 1023] {
         let mut source =
             String::from(".module MethodLimit\n.entry Main\n.function Main() -> Int32\n");
         for i in 0..count {
@@ -1638,12 +1638,12 @@ fn generic_method_clones_are_bounded_and_keep_plain_callees_at_the_limit() {
         );
         assert_eq!(
             result.status.success(),
-            count == 256,
+            count == 1022,
             "{}",
             String::from_utf8_lossy(&result.stderr)
         );
-        if count == 257 {
-            assert!(String::from_utf8_lossy(&result.stderr).contains("256 clones"));
+        if count == 1023 {
+            assert!(String::from_utf8_lossy(&result.stderr).contains("1024 selected functions"));
             assert!(!temp.0.join("value.o").exists());
         }
     }
@@ -1872,7 +1872,7 @@ ret
 
 #[test]
 fn multiple_value_shape_discovery_stays_bounded() {
-    for count in [128,129] {
+    for count in [256,257] {
     let mut source = String::from(".module ManyShapes\n.type Box<T>\n.field Value T\n.end\n");
     for n in 0..count { source.push_str(&format!(".type Leaf{n}\n.end\n")); }
     source.push_str(".function Main() -> Int32\n");
@@ -1881,10 +1881,10 @@ fn multiple_value_shape_discovery_stays_bounded() {
     let m = neoclr::assemble(&source).unwrap();
     let temp = Temp::new();
     let r = compile_mode(&neoclr::metadata_container::write_module(&m).unwrap(),&temp,"Main",true);
-    assert_eq!(r.status.success(),count==128,"{}",String::from_utf8_lossy(&r.stderr));
-    if count==129 {
+    assert_eq!(r.status.success(),count==256,"{}",String::from_utf8_lossy(&r.stderr));
+    if count==257 {
     assert!(!temp.0.join("value.o").exists());
-    assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 256"));
+    assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 512"));
     }
     }
 }
@@ -2017,8 +2017,8 @@ fn erased_wide_integer_mismatch_faults_without_publishing_result() {
 }
 
 #[test]
-fn selected_value_type_budget_accepts_256_and_rejects_257() {
-    for count in [256, 257] {
+fn selected_value_type_budget_accepts_512_and_rejects_513() {
+    for count in [512, 513] {
         let mut source = String::from(".module TypeBudget\n.function Main() -> Int32\n");
         for index in 0..count {
             source += &format!("call Make{index}()\npop\n");
@@ -2030,8 +2030,8 @@ fn selected_value_type_budget_accepts_256_and_rejects_257() {
         let module = neoclr::assemble(&source).unwrap();
         let temp = Temp::new();
         let result = compile_mode(&neoclr::metadata_container::write_module(&module).unwrap(), &temp, "Main", true);
-        assert_eq!(result.status.success(), count == 256, "{}", String::from_utf8_lossy(&result.stderr));
-        if count == 257 {
+        assert_eq!(result.status.success(), count == 512, "{}", String::from_utf8_lossy(&result.stderr));
+        if count == 513 {
             assert!(!temp.0.join("value.o").exists());
             assert!(String::from_utf8_lossy(&result.stderr).contains("selected types exceed"));
         }
@@ -2053,6 +2053,7 @@ fn ordinary_int32_borrow_is_not_authorized_by_a_primitive_like_name() {
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn double_arithmetic_comparisons_and_storage_match_interpreter() {
     let cases = [
+        ("ldc.r8 1\nneg\nldc.r8 -1\nceq", true),
         ("ldc.r8 7.5\nldc.r8 2\nadd\nldc.r8 9.5\nceq", true),
         ("ldc.r8 7.5\nldc.r8 2\nsub\nldc.r8 5.5\nceq", true),
         ("ldc.r8 3.141592653589793\nldc.r8 2\nmul\nldc.r8 6.283185307179586\nceq", true),
@@ -2101,7 +2102,7 @@ fn double_program(source: &str, expected: i32) {
 
 #[test]
 fn double_profile_rejects_unsupported_operations_before_codegen() {
-    for body in ["ldc.r8 1\nldc.r8 2\nrem", "ldc.r8 1\nneg", "ldc.r8 1\nconv.i4"] {
+    for body in ["ldc.r8 1\nldc.r8 2\nrem", "ldc.r8 1\nconv.i4"] {
         let result_type = if body.ends_with("conv.i4") { "Int32" } else { "Double" };
         let source = format!(".module RejectedDouble\n.entry Main\n.function Work() -> {result_type}\n{body}\nret\n.end\n.function Main() -> Int32\ncall Work()\npop\nldc.i4 0\nret\n.end");
         let m = neoclr::assemble(&source).unwrap();

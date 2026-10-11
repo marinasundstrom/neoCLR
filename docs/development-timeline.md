@@ -14337,3 +14337,26 @@ claim completion of in-process test discovery.
   dispatch and the sequence fallback have separate executable checks. The shared
   Raven implementation is committed; native/API completion is recorded with the
   slice's final changelog and [Index/Range evidence](design/index-range.md).
+
+## 2026-10-11 — execution defaults and managed JIT evidence
+
+**Author:** “JIT will be the default instead of the interpreter,” while the interpreter
+will remain “fully supported.” Native AOT is the preferred deployment target. The author
+identifies constrained devices, possible microcontroller AOT, future cross-target hot
+reload, and interpreted dynamic-code execution on platforms prohibiting JIT as directions.
+A subsequent instruction requests a benchmark comparing JIT, AOT and interpretation.
+
+**Assistant:** records the destination without changing current execution defaults;
+explicit hybrid capabilities must respect platform policy and preserve AOT-only deployment.
+Implements shared managed lowering, trusted synchronous helper binding and owned JIT code
+lifetime. The real 20-test Index/Range framework assembly passes JIT/AOT/interpreter parity,
+including no-match filtering and a bounds fault. Missing helpers fail before invocation;
+AOT object bytes remain identical. Long-range ARM64 calls resolve a JIT relocation failure.
+
+**Evidence and open work:** [managed probe and benchmark](experiments/jit-managed/README.md).
+Nine measured runs per mode check identical results: median process times are 2.346s
+JIT, 2.962s interpreted and 9.00ms prebuilt AOT. JIT includes compilation; AOT excludes
+its build. The benchmark does not establish HTTP
+throughput, cross-platform performance or a .NET comparison. Async/HTTP JIT, Windows JIT,
+production integration, default switching, microcontrollers, hybrid execution and hot reload
+remain open. This updates earlier JIT deferral; it does not select a green-thread design.

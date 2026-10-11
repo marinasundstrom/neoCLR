@@ -2,7 +2,6 @@
 use cranelift_codegen::ir::{self, InstBuilder, MemFlags, condcodes::IntCC, types};
 use cranelift_frontend::FunctionBuilder;
 use cranelift_module::{DataDescription, DataId, Linkage, Module};
-use cranelift_object::ObjectModule;
 use neoclr::metadata::Instruction as Op;
 use std::collections::{HashMap, HashSet};
 type Error = Box<dyn std::error::Error>;
@@ -459,7 +458,7 @@ pub struct Data {
     messages: HashMap<(usize, usize), DataId>,
     defaults: [DataId; 9],
 }
-fn literal(module: &mut ObjectModule, name: &str, text: &str) -> Result<DataId, Error> {
+fn literal(module: &mut impl Module, name: &str, text: &str) -> Result<DataId, Error> {
     let id = module.declare_data(name, Linkage::Local, false, false)?;
     let mut bytes = (text.len() as u64).to_le_bytes().to_vec();
     bytes.extend_from_slice(text.as_bytes());
@@ -471,7 +470,7 @@ fn literal(module: &mut ObjectModule, name: &str, text: &str) -> Result<DataId, 
 }
 impl Data {
     pub fn new(
-        module: &mut ObjectModule,
+        module: &mut impl Module,
         input: &neoclr::Module,
         options: &Options,
     ) -> Result<Self, Error> {
@@ -527,7 +526,7 @@ impl Data {
     }
     pub fn site(
         &self,
-        module: &mut ObjectModule,
+        module: &mut impl Module,
         b: &mut FunctionBuilder<'_>,
         context: ir::Value,
         i: usize,

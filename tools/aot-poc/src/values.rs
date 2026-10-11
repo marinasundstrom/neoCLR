@@ -151,7 +151,7 @@ fn text_object_view(b: &mut FunctionBuilder<'_>, value: ir::Value) -> ir::Value 
 }
 
 // Copy immutable bytes into a fresh String owner when identity is observable.
-fn copy_text(module: &mut ObjectModule, b: &mut FunctionBuilder<'_>,
+fn copy_text(module: &mut impl Module, b: &mut FunctionBuilder<'_>,
     binding: (cranelift_module::FuncId, cranelift_module::DataId), pointer: ir::Value,
     context: ir::Value, site: Option<&crate::fault_details::Site>) -> ir::Value {
     let service = module.declare_func_in_func(binding.0, b.func);
@@ -240,6 +240,30 @@ fn check_value_array_replacement(b: &mut FunctionBuilder<'_>, address: ir::Value
 }
 
 pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>, platform_target: super::Target) -> Result<Vec<u8>, Error> {
+    let mut flags = settings::builder();
+    flags.set("is_pic", "true")?;
+    if platform_target == super::Target::WindowsX64 {
+        // Windows grows the committed stack a guard page at a time. The pinned
+        // x64 backend probes each 4 KiB page before installing a large frame.
+        flags.set("enable_probestack", "true")?;
+        flags.set("probestack_strategy", "inline")?;
+        flags.set("probestack_size_log2", "12")?;
+    }
+    let isa = isa::lookup(platform_target.triple().parse().unwrap())?
+        .finish(settings::Flags::new(flags))?;
+    let mut module = ObjectModule::new(ObjectBuilder::new(
+        isa,
+        "neoclr_values",
+        cranelift_module::default_libcall_names(),
+    )?);
+    compile_into(input, root, details, platform_target, &mut module, false)?;
+    super::finish(module)
+}
+
+pub(crate) fn compile_into(
+    input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>,
+    platform_target: super::Target, module: &mut impl Module, long_range_calls: bool,
+) -> Result<(), Error> {
     if details.is_some_and(|d| !d.native_gc && !d.string_intern.is_empty()) {
         return Err("native String.Intern requires --native-gc for invocation-scoped strong ownership".into());
     }
@@ -298,22 +322,6 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
     // The backend's narrow shape analysis is additional admission, not a replacement
     // for type/member identity, accessibility, initialization or byref lifetime checks.
     neoclr::LoadedProgram::new(input).and_then(|v| v.verify()).map_err(|e| e.to_string())?;
-    let mut flags = settings::builder();
-    flags.set("is_pic", "true")?;
-    if platform_target == super::Target::WindowsX64 {
-        // Windows grows the committed stack a guard page at a time. The pinned
-        // x64 backend probes each 4 KiB page before installing a large frame.
-        flags.set("enable_probestack", "true")?;
-        flags.set("probestack_strategy", "inline")?;
-        flags.set("probestack_size_log2", "12")?;
-    }
-    let isa = isa::lookup(platform_target.triple().parse().unwrap())?
-        .finish(settings::Flags::new(flags))?;
-    let mut module = ObjectModule::new(ObjectBuilder::new(
-        isa,
-        "neoclr_values",
-        cranelift_module::default_libcall_names(),
-    )?);
     // Immutable length-prefixed UTF-8. Strings originate from these image literals
     // or explicit, bounded invocation-arena producers. When identity is observable,
     // literal evaluations receive fresh arena storage; image data remains a template.
@@ -363,7 +371,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         sig.returns.push(AbiParam::new(types::I32));
         Some((module.declare_function("neoclr_string_concat_v1", Linkage::Import, &sig)?, id))
     } else { None };
-    let diagnostic_data = details.map(|options| crate::fault_details::Data::new(&mut module, input, options)).transpose()?;
+    let diagnostic_data = details.map(|options| crate::fault_details::Data::new(module, input, options)).transpose()?;
     let input_service = if details.is_some_and(|d| !d.console_read_byte.is_empty()) {
         let mut sig = module.make_signature();
         sig.returns.push(AbiParam::new(types::I32));
@@ -592,7 +600,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         Some(module.declare_function("neoclr_native_stack_check_v1", Linkage::Import, &sig)?)
     } else { None };
     let root_probes = if details.is_some_and(|d| d.probe_stack_roots) {
-        Some(gc_probe::Probes::prepare(&mut module, &p, &flows, details)?)
+        Some(gc_probe::Probes::prepare(module, &p, &flows, details)?)
     } else { None };
     for (i, f) in input.functions.iter().enumerate() {
         let mut context = module.make_context();
@@ -632,15 +640,15 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     }
                     let frame = slot(&mut b, 104);
                     let table = slot(&mut b, table_bytes);
-                    probes.enter(&mut module, &mut b, frame, fault_context.unwrap(), i, table, &arguments, &[]);
+                    probes.enter(module, &mut b, frame, fault_context.unwrap(), i, table, &arguments, &[]);
                     probe_frame = Some(frame);
-                    emit_stack_check(&mut module, &mut b, stack_check, diagnostic_data.as_ref(), fault_context.unwrap(), i, false);
+                    emit_stack_check(module, &mut b, stack_check, diagnostic_data.as_ref(), fault_context.unwrap(), i, false);
                 }
             }
             if let Some(targets) = details.and_then(|d| d.object_type_queries.get(&i)) {
                 let receiver = parameters[0];
                 let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
-                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
                 site.capture_frame = false;
                 let status = b.ins().iconst(types::I32, 6);
                 return_if_detailed(&mut b, null, status, Some(&site));
@@ -670,23 +678,23 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     b.ins().return_(&[zero]);
                     b.switch_to_block(next);
                 }
-                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 1);
+                let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 1);
                 site.capture_frame = false;
                 let status = b.ins().iconst(types::I32, 3);
                 site.record(&mut b, status);
                 b.ins().return_(&[status]);
                 b.seal_all_blocks(); b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             if let Some(&(tag_index, unbox)) = details.and_then(|d| d.scalar_box_queries.get(&i)) {
                 let receiver = parameters[0];
                 let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
                 if unbox {
-                    let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
                     site.capture_frame = false;
                     let status = b.ins().iconst(types::I32, 6);
                     return_if_detailed(&mut b, null, status, Some(&site));
@@ -710,7 +718,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[zero]);
                 b.switch_to_block(absent);
                 if unbox {
-                    let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 1);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 1);
                     site.capture_frame = false;
                     let status = b.ins().iconst(types::I32, 11);
                     site.record(&mut b, status);
@@ -723,9 +731,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 }
                 b.seal_all_blocks(); b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             if let Some(&record) = details.and_then(|d| d.empty_record_boxes.get(&i).or_else(|| d.int32_boxes.get(&i)).or_else(|| d.boolean_boxes.get(&i))) {
@@ -741,7 +749,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let runtime = b.ins().iconst(types::I32, 3);
                 let status = b.ins().select(exhausted, memory, runtime);
                 let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
                 if primitive {
@@ -752,9 +760,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks(); b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             if let Some(targets) = p.dispatch.get(&i) {
@@ -784,7 +792,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     } else {
                         let status = b.ins().iconst(types::I32, 3);
                         if let Some(d) = &diagnostic_data {
-                            let mut site = d.site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                            let mut site = d.site(module, &mut b, fault_context.unwrap(), i, 0);
                             site.capture_frame = false;
                             site.record(&mut b, status);
                         }
@@ -810,7 +818,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let runtime = b.ins().iconst(types::I32, 3);
                         let status = b.ins().select(exhausted, memory, runtime);
                         let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                        let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                        let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
                         site.capture_frame = false;
                         return_if_detailed(&mut b, failed, status, Some(&site));
                         let zero = b.ins().iconst(types::I32, 0);
@@ -855,7 +863,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     for index in boxes {
                         let boxed = matches_type(&mut b, &p, tag, index);
                         let status = b.ins().iconst(types::I32, 3);
-                        let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                        let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
                         site.capture_frame = false;
                         return_if_detailed(&mut b, boxed, status, Some(&site));
                     }
@@ -875,7 +883,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 } else {
                     let status = b.ins().iconst(types::I32, 3);
                     if let Some(d) = &diagnostic_data {
-                        let mut site = d.site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                        let mut site = d.site(module, &mut b, fault_context.unwrap(), i, 0);
                         site.capture_frame = false;
                         site.record(&mut b, status);
                     }
@@ -884,9 +892,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.seal_all_blocks();
                 b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             if details.is_some_and(|d| d.entry_task_drain.contains(&i)) {
@@ -903,7 +911,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let call = b.ins().call(begin, &[ctx, entry, run, drain, queue_output]);
                 let status = b.inst_results(call)[0];
                 let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, ctx, i, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, ctx, i, 0);
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
                 let done = b.create_block();
@@ -973,9 +981,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks(); b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             if let Some(service) = socket_services.get(&i) {
@@ -996,7 +1004,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let memory = b.ins().iconst(types::I32, 5);
                 let runtime = b.ins().iconst(types::I32, 3);
                 let status = b.ins().select(exhausted, memory, runtime);
-                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
                 if let Some(ty @ Ty::StringArray) = &p.results[i] {
@@ -1007,9 +1015,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks(); b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             if let Some(service) = stream_services.get(&i) {
@@ -1019,7 +1027,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     let array = parameters[1];
                     let null = b.ins().icmp_imm(IntCC::Equal, array, 0);
                     let status = b.ins().iconst(types::I32, 3);
-                    let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
                     site.capture_frame = false;
                     return_if_detailed(&mut b, null, status, Some(&site));
                     if let Some(check) = initialized_service {
@@ -1059,9 +1067,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.seal_all_blocks();
                 b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             if details.is_some_and(|d| d.console_read_byte.contains(&i)) {
@@ -1086,9 +1094,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.seal_all_blocks();
                 b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             if details.is_some_and(|d| d.console_write_line.contains(&i)) {
@@ -1097,7 +1105,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 // for default/null String instead of dereferencing address zero.
                 let null = b.ins().icmp_imm(IntCC::Equal, parameters[0], 0);
                 let null_status = b.ins().iconst(types::I32, 3);
-                let mut null_site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                let mut null_site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
                 null_site.capture_frame = false;
                 return_if_detailed(&mut b, null, null_status, Some(&null_site));
                 let length = b.ins().load(types::I64, MemFlags::new(), parameters[0], 0);
@@ -1106,7 +1114,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let result = b.inst_results(call)[0];
                 let failed = b.ins().icmp_imm(IntCC::NotEqual, result, 0);
                 let status = b.ins().iconst(types::I32, 3); // RuntimeError, same as interpreter
-                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
                 site.capture_frame = false; // InternalCall has no managed frame
                 return_if_detailed(&mut b, failed, status, Some(&site));
                 let zero = b.ins().iconst(types::I32, 0);
@@ -1115,14 +1123,14 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.seal_all_blocks();
                 b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             if details.is_some_and(|d| d.char_from_string.contains(&i) || d.char_text.contains(&i)) {
                 let pointer = parameters[0];
-                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
                 site.capture_frame = false;
                 let status = b.ins().iconst(types::I32, 3);
                 let null = b.ins().icmp_imm(IntCC::Equal, pointer, 0);
@@ -1138,7 +1146,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 }
                 let pointer = if details.unwrap().char_text.contains(&i) {
                     if let Some(binding) = text_copy {
-                        copy_text(&mut module, &mut b, binding, pointer, fault_context.unwrap(), Some(&site))
+                        copy_text(module, &mut b, binding, pointer, fault_context.unwrap(), Some(&site))
                     } else { pointer }
                 } else { pointer };
                 write(&mut b, output, &[pointer]);
@@ -1147,9 +1155,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.seal_all_blocks();
                 b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             if details.is_some_and(|d| d.native_integer_to64.contains(&i)) {
@@ -1159,9 +1167,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.seal_all_blocks();
                 b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             if let Some(service) = utf8_services.get(&i) {
@@ -1216,7 +1224,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     b.ins().select(limited, intern, status)
                 } else { status };
                 let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
                 if let Some(ty) = &p.results[i] {
@@ -1229,9 +1237,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks(); b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             if details.is_some_and(|d| d.int32_to_string.contains(&i)) || wide_format_services.contains_key(&i) {
@@ -1246,7 +1254,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let runtime = b.ins().iconst(types::I32, 3);
                 let status = b.ins().select(exhausted, memory, runtime);
                 let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                let mut site = diagnostic_data.as_ref().unwrap().site(&mut module, &mut b, fault_context.unwrap(), i, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
                 let zero = b.ins().iconst(types::I32, 0);
@@ -1254,9 +1262,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 b.seal_all_blocks();
                 b.finalize();
                 if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(&mut module, &mut context.func, frame);
+                    probes.finish(module, &mut context.func, frame);
                 }
-                define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
             let call_result_bytes = p.call_result_bytes();
@@ -1316,8 +1324,8 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 return Err("value profile frame storage exceeds 64 KiB".into());
             }
             if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                probes.enter(&mut module, &mut b, frame, fault_context.unwrap(), i, storage_table.unwrap(), &arguments, &locals);
-                emit_stack_check(&mut module, &mut b, stack_check, diagnostic_data.as_ref(), fault_context.unwrap(), i, true);
+                probes.enter(module, &mut b, frame, fault_context.unwrap(), i, storage_table.unwrap(), &arguments, &locals);
+                emit_stack_check(module, &mut b, stack_check, diagnostic_data.as_ref(), fault_context.unwrap(), i, true);
             }
             let blocks: Vec<_> = f.body.iter().map(|_| b.create_block()).collect();
             for (pc, stack) in flows[i].iter().enumerate() {
@@ -1338,7 +1346,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 let mut stack = b.block_params(blocks[pc]).to_vec();
                 let top = || shape.last().unwrap();
                 let pop = |s: &mut Vec<ir::Value>| s.pop().expect("checked stack");
-                let mut site = diagnostic_data.as_ref().map(|d| d.site(&mut module, &mut b, fault_context.unwrap(), i, pc));
+                let mut site = diagnostic_data.as_ref().map(|d| d.site(module, &mut b, fault_context.unwrap(), i, pc));
                 if let Some(&adapter_pc) = details.and_then(|d| d.reflection_array_sites.get(&(i, pc))) {
                     if let Some(site) = site.as_mut() { site.remap_instruction(adapter_pc); }
                 }
@@ -1348,7 +1356,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 }
 
                 if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
-                    probes.emit(&mut module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
+                    probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
                 }
                 match op {
                     Op::Int(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
@@ -1371,7 +1379,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         let data = module.declare_data_in_func(literals[&(i, pc)], b.func);
                         let pointer = b.ins().global_value(types::I64, data);
                         if let Some(binding) = text_copy {
-                            let owned = copy_text(&mut module, &mut b, binding, pointer, fault_context.unwrap(), site.as_ref());
+                            let owned = copy_text(module, &mut b, binding, pointer, fault_context.unwrap(), site.as_ref());
                             stack.push(owned);
                         } else { stack.push(pointer); }
                     }
@@ -1849,7 +1857,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                             for lane in gc_layout::seed_lanes(&p, t) {
                                 b.ins().store(MemFlags::new(), zero, result, (lane * 8) as i32);
                             }
-                            probes.publish(&mut module, &mut b, i, pc, 3, probe_frame.unwrap(), transient_table.unwrap(), result);
+                            probes.publish(module, &mut b, i, pc, 3, probe_frame.unwrap(), transient_table.unwrap(), result);
                         }
                         let join = b.create_block();
                         b.append_block_param(join, types::I32);
@@ -1880,7 +1888,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         return_if_detailed(&mut b, failed, status, site.as_ref());
                         if let Some(t) = &result_type {
                             if let Some(probes) = &root_probes {
-                                probes.publish(&mut module, &mut b, i, pc, 2, probe_frame.unwrap(), transient_table.unwrap(), result);
+                                probes.publish(module, &mut b, i, pc, 2, probe_frame.unwrap(), transient_table.unwrap(), result);
                             }
                             stack.extend(read(&mut b, &p, t, result));
                         }
@@ -1917,7 +1925,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                                 address
                             };
                             if let Some(probes) = &root_probes {
-                                probes.publish(&mut module, &mut b, i, pc, 1, probe_frame.unwrap(), transient_table.unwrap(), address);
+                                probes.publish(module, &mut b, i, pc, 1, probe_frame.unwrap(), transient_table.unwrap(), address);
                             }
                             call_args.insert(0, receiver);
                             Some((t, address))
@@ -1939,7 +1947,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                                 for lane in gc_layout::seed_lanes(&p, t) {
                                     b.ins().store(MemFlags::new(), zero, result, (lane * 8) as i32);
                                 }
-                                probes.publish(&mut module, &mut b, i, pc, 3, probe_frame.unwrap(), transient_table.unwrap(), result);
+                                probes.publish(module, &mut b, i, pc, 3, probe_frame.unwrap(), transient_table.unwrap(), result);
                             }
                         }
                         call_args.push(result);
@@ -1951,12 +1959,12 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                         return_if_detailed(&mut b, failed, status, site.as_ref());
                         if let Some((t, address)) = constructed {
                             if let Some(probes) = &root_probes {
-                                probes.publish(&mut module, &mut b, i, pc, 2, probe_frame.unwrap(), transient_table.unwrap(), address);
+                                probes.publish(module, &mut b, i, pc, 2, probe_frame.unwrap(), transient_table.unwrap(), address);
                             }
                             stack.extend(read(&mut b, &p, &t, address));
                         } else if let Some(t) = &p.results[c] {
                             if let Some(probes) = &root_probes {
-                                probes.publish(&mut module, &mut b, i, pc, 2, probe_frame.unwrap(), transient_table.unwrap(), result);
+                                probes.publish(module, &mut b, i, pc, 2, probe_frame.unwrap(), transient_table.unwrap(), result);
                             }
                             stack.extend(read(&mut b, &p, t, result));
                         }
@@ -2109,9 +2117,9 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             b.finalize();
         }
         if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-            probes.finish(&mut module, &mut context.func, frame);
+            probes.finish(module, &mut context.func, frame);
         }
-        define_checked(&mut module, ids[i], &mut context, stack_budget)?;
+        define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
     }
     let entry_check = if details.is_some_and(|d| d.native_gc) {
         let mut signature = module.make_signature();
@@ -2180,7 +2188,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         }
         if bootstrap { crate::fault_details::reset(&mut b, params[2]); }
         if stack_budget {
-            emit_stack_check(&mut module, &mut b, stack_check, diagnostic_data.as_ref(), params[2], root, false);
+            emit_stack_check(module, &mut b, stack_check, diagnostic_data.as_ref(), params[2], root, false);
         }
         if text_arena {
             // Reset only the cursor; capacity/data belong to the host. Previous
@@ -2256,27 +2264,27 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
         b.seal_all_blocks();
         b.finalize();
     }
-    define_checked(&mut module, export, &mut context, stack_budget)?;
+    define_checked(module, export, &mut context, stack_budget, long_range_calls)?;
     // Entry's prologue runs before its first budget check; keep it below one
     // page. Hosts still owe a usable stack to call the ABI at all.
     if platform_target == super::Target::WindowsX64 && frame_charge(&context, true)? > 4096 {
         return Err("Windows stack experiment entry frame exceeds one page".into());
     }
     if details.is_some_and(|d| d.native_gc) {
-        compile_host_callbacks(&mut module, &p, &ids, stack_check, diagnostic_data.as_ref(), false)?;
+        compile_host_callbacks(module, &p, &ids, stack_check, diagnostic_data.as_ref(), false, long_range_calls)?;
         if details.is_some_and(|d| !d.entry_task_drain.is_empty()) {
-            compile_host_callbacks(&mut module, &p, &ids, stack_check, diagnostic_data.as_ref(), true)?;
+            compile_host_callbacks(module, &p, &ids, stack_check, diagnostic_data.as_ref(), true, long_range_calls)?;
         }
         if let Some(drain) = details.and_then(|d| d.task_queue_drain) {
-            compile_host_queue(&mut module, ids[drain], drain, stack_check, diagnostic_data.as_ref().unwrap())?;
+            compile_host_queue(module, ids[drain], drain, stack_check, diagnostic_data.as_ref().unwrap(), long_range_calls)?;
         }
     }
-    super::finish(module)
+    Ok(())
 }
 
 // Quiescent host entry for the existing inhabited-Void callback shape. The strong
 // handle keeps the descriptor/receiver alive across the callee's collection points.
-fn compile_host_callbacks(module: &mut ObjectModule, p: &Profile<'_>, ids: &[cranelift_module::FuncId], stack_check: Option<cranelift_module::FuncId>, diagnostic_data: Option<&crate::fault_details::Data>, entry_pump: bool) -> Result<(), Error> {
+fn compile_host_callbacks(module: &mut impl Module, p: &Profile<'_>, ids: &[cranelift_module::FuncId], stack_check: Option<cranelift_module::FuncId>, diagnostic_data: Option<&crate::fault_details::Data>, entry_pump: bool, long_range_calls: bool) -> Result<(), Error> {
     use neoclr::metadata::{FunctionType, Type};
     let shape = Type::Function(Box::new(FunctionType {
         parameters: vec![], returns: Type::Void, no_result: false,
@@ -2340,13 +2348,13 @@ fn compile_host_callbacks(module: &mut ObjectModule, p: &Profile<'_>, ids: &[cra
         b.seal_all_blocks();
         b.finalize();
     }
-    define_checked(module, export, &mut context, stack_check.is_some())?;
+    define_checked(module, export, &mut context, stack_check.is_some(), long_range_calls)?;
     Ok(())
 }
 
 // Guard after publishing the current frame, before executing guest operations.
 // All returns use the existing frame unlink instrumentation, including this fault.
-fn emit_stack_check(module: &mut ObjectModule, b: &mut FunctionBuilder<'_>,
+fn emit_stack_check(module: &mut impl Module, b: &mut FunctionBuilder<'_>,
     check: Option<cranelift_module::FuncId>, data: Option<&crate::fault_details::Data>,
     context: ir::Value, function: usize, capture_frame: bool) {
     let Some(check) = check else { return; };
@@ -2359,8 +2367,9 @@ fn emit_stack_check(module: &mut ObjectModule, b: &mut FunctionBuilder<'_>,
     site.capture_frame = capture_frame;
     return_if_detailed(b, failed, status, Some(&site));
 }
-fn define_checked(module: &mut ObjectModule, id: cranelift_module::FuncId,
-    context: &mut cranelift_codegen::Context, stack_budget: bool) -> Result<(), Error> {
+fn define_checked(module: &mut impl Module, id: cranelift_module::FuncId,
+    context: &mut cranelift_codegen::Context, stack_budget: bool, long_range_calls: bool) -> Result<(), Error> {
+    super::prepare_calls(context, long_range_calls);
     module.define_function(id, context)?;
     if stack_budget {
         let windows = module.isa().default_call_conv() == cranelift_codegen::isa::CallConv::WindowsFastcall;
@@ -2382,8 +2391,8 @@ fn frame_charge(context: &cranelift_codegen::Context, windows: bool) -> Result<u
         + 16 + ((outgoing + 15) & !15) + if windows { 32 } else { 0 })
 }
 
-fn compile_host_queue(module: &mut ObjectModule, target: cranelift_module::FuncId,
-    drain: usize, stack_check: Option<cranelift_module::FuncId>, data: &crate::fault_details::Data) -> Result<(), Error> {
+fn compile_host_queue(module: &mut impl Module, target: cranelift_module::FuncId,
+    drain: usize, stack_check: Option<cranelift_module::FuncId>, data: &crate::fault_details::Data, long_range_calls: bool) -> Result<(), Error> {
     let mut sig = module.make_signature();
     sig.params.extend([types::I64, types::I64].map(AbiParam::new));
     sig.returns.push(AbiParam::new(types::I32));
@@ -2423,7 +2432,7 @@ fn compile_host_queue(module: &mut ObjectModule, target: cranelift_module::FuncI
         b.ins().return_(&[status]);
         b.seal_all_blocks(); b.finalize();
     }
-    define_checked(module, export, &mut context, stack_check.is_some())
+    define_checked(module, export, &mut context, stack_check.is_some(), long_range_calls)
 }
 
 #[cfg(test)]
@@ -2455,7 +2464,7 @@ mod windows_frame_tests {
                 b.seal_all_blocks();
                 b.finalize();
             }
-            let result = define_checked(&mut module, id, &mut context, true);
+            let result = define_checked(&mut module, id, &mut context, true, false);
             if accepted { result.unwrap(); }
             else { assert!(result.unwrap_err().to_string().contains("final machine frames")); }
         }

@@ -4,11 +4,17 @@ For a current implementation overview and service-layer diagrams, start with
 [neoCLR architecture](architecture.md). This document retains the architectural
 requirements and the sequence of native experiments.
 
-Status: architectural requirements and proposed implementation sequence. Interpretation
-is implemented; a separate [ARM64 scalar AOT experiment](experiments/aot-scalar/README.md)
-now emits a small native subset. General native AOT, JIT compilation and a general
-embedding API remain unimplemented. This document does not introduce executable backend flags or
-commit to a native code generator, binary schema, or public hosting ABI.
+Status (2026-10-11): interpretation and bounded native AOT profiles are implemented;
+see the [roadmap](platform-roadmap.md) for platform/workload qualification. Private
+[scalar and managed JIT probes](experiments/jit-managed/README.md) now share native
+lowering on macOS ARM64. General embedding and hot reload remain design work. Earlier
+experiment descriptions below preserve their historical scope.
+
+The [latest author direction](platform-direction.md#execution-direction-clarified-2026-10-11)
+selects JIT as the eventual supported-platform default and AOT as the preferred deployment
+target, retaining full interpreter support. Explicit future AOT/interpreter hybrids may
+serve dynamic-code use where platform policy permits; constrained-device targets and
+cross-target hot reload require separate qualification. Current CLI defaults are unchanged.
 
 Interpretation, JIT, and native AOT are platform-wide architectural concerns. They
 influence the type system, metadata, instructions, linking, verification, library,
