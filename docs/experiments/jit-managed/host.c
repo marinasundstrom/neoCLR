@@ -15,6 +15,11 @@ typedef wchar_t entry_char;
 typedef char entry_char;
 #endif
 
+#ifndef NEOCLR_HTTP_HEAP_BYTES
+#define NEOCLR_HTTP_HEAP_BYTES (1024 * 1024)
+#endif
+_Static_assert(NEOCLR_HTTP_HEAP_BYTES > 0, "positive JIT heap budget");
+
 typedef int32_t (*entry_v4)(int32_t, int32_t *, neoclr_aot_context *);
 typedef int32_t (*entry_args)(int32_t, int32_t *, neoclr_aot_context *, const entry_char **);
 
@@ -30,7 +35,7 @@ static int32_t poll_entry(neoclr_aot_context *context, uint64_t *callback,
 
 static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, const entry_char **argv) {
     if (!entry || argc < 1 || !argv || (with_args != 0 && with_args != 1)) return 2;
-    const size_t heap_bytes = 1024 * 1024;
+    const size_t heap_bytes = NEOCLR_HTTP_HEAP_BYTES;
     unsigned char *heap = calloc(1, heap_bytes);
     if (!heap) return 2;
     neoclr_aot_context context = {.text = {heap, heap_bytes, 0}};

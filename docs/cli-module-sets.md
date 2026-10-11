@@ -7,7 +7,7 @@ containers (feature-branch metadata support). The root of `assemble` is always t
 source, preserving the existing command's behavior.
 
 ```sh
-cargo run -- run examples/modules/app.neoil \
+cargo run -- run examples/modules/app.neoil --execution interpreter \
   --module examples/modules/operations.neoil \
   --module examples/modules/models.neoil
 
@@ -29,7 +29,7 @@ set, not each assembly separately. It counts interpreter instructions, not elaps
 time, and does not interrupt native code. This exposes the existing bounded execution
 control; it does not change CLI metadata or guest semantics.
 
-    neoclr run App.dll --module NeoCLR.Collections.dll --system System.neox --instructions 1000000
+    neoclr run App.dll --execution interpreter --module NeoCLR.Collections.dll --system System.neox --instructions 1000000
 
 The option is accepted once, before `--`, by `run` only. A positive decimal count
 must fit the host's unsigned pointer-sized integer. Missing, zero, negative,
@@ -50,7 +50,7 @@ cargo run -- assemble examples/modules/operations.neoil out/operations.neo.json 
   --module out/models.neo.json
 cargo run -- assemble examples/modules/app.neoil out/app.neo.json \
   --module out/operations.neo.json --module out/models.neo.json
-cargo run -- run out/app.neo.json \
+cargo run -- run out/app.neo.json --execution interpreter \
   --module out/operations.neo.json --module examples/modules/models.neoil
 ```
 
@@ -94,7 +94,7 @@ cargo run -- assemble examples/modules/operations.neoil out/operations.neox \
   --format neox --module out/models.neox
 cargo run -- assemble examples/modules/app.neoil out/app.neox --format neox \
   --module out/operations.neox --module out/models.neox
-cargo run -- run out/app.neox --module out/operations.neox --module out/models.neox
+cargo run -- run out/app.neox --execution interpreter --module out/operations.neox --module out/models.neox
 ```
 
 `--format neox` serializes the root native Module directly to required execution schema 3.

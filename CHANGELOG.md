@@ -18,6 +18,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Windows ARM64 JIT remain unsupported. Canonicalize dependency identity when
   merging installed libraries with explicit modules, avoiding duplicate loads
   through equivalent paths; keep native-package interpreter controls explicit.
+  Honor the configured JIT helper heap size and update the Windows compiler pin
+  for current async-iteration metadata; the prior pin failed before execution.
+  Update source-checkout interpreter examples to select their mode explicitly.
 
 - Reduce native collector traversal work: validate spans while building the index,
   combine mark reset with intern-root seeding, and trace each activated owned parked

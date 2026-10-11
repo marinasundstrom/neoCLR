@@ -130,7 +130,7 @@ need a separate build for normal sample execution.
 ### Quick start
 
 ```sh
-cargo run --locked -- run examples/hello.neoil
+cargo run --locked -- run examples/hello.neoil --execution interpreter
 ```
 
 Cargo builds the executable if needed, then neoCLR assembles and runs the source.
@@ -146,14 +146,14 @@ Hello, world!
 cargo build --locked
 ./target/debug/neoclr assemble examples/hello.neoil hello.neo.json
 ./target/debug/neoclr verify hello.neo.json
-./target/debug/neoclr run hello.neo.json
+./target/debug/neoclr run hello.neo.json --execution interpreter
 ```
 
 Feature-branch development also supports direct native binary assemblies:
 
 ```sh
 ./target/debug/neoclr assemble examples/hello.neoil hello.neox --format neox
-./target/debug/neoclr run hello.neox
+./target/debug/neoclr run hello.neox --execution interpreter
 ```
 
 `--format neox` verifies the load set and writes a standalone schema-3 assembly,
@@ -193,7 +193,7 @@ its included files assemble into one System module. Cargo bundles those same fil
 
 ```sh
 cargo run --locked -- assemble runtime/System.neoil System.neo.json
-cargo run --locked -- run hello.neo.json --system System.neo.json
+cargo run --locked -- run hello.neo.json --execution interpreter --system System.neo.json
 ```
 
 The second command uses the HelloWorld artifact assembled above. These commands
@@ -203,21 +203,21 @@ output-file overwrite rule applies to `System.neo.json`.
 ### Test representative programs
 
 ```sh
-cargo run --locked -- run examples/strings.neoil
-cargo run --locked -- run examples/errors.neoil
-cargo run --locked -- run examples/file_input.neoil
-cargo run --locked -- run examples/console_input.neoil
-printf 'A' | cargo run --locked -- run examples/console_typed.neoil
-cargo run --locked -- run examples/properties.neoil
-cargo run --locked -- run examples/constructors.neoil
-cargo run --locked -- run examples/ordinary_carrier.neoil
-cargo run --locked -- run examples/ordinary_unions.neoil
-cargo run --locked -- run examples/accessibility.neoil
-cargo run --locked -- run examples/field_access.neoil
-cargo run --locked -- run examples/type_visibility.neoil
-cargo run --locked -- run examples/type_arities.neoil
-cargo run --locked -- run examples/arrays.neoil
-cargo run --locked -- run examples/array_bounds.neoil
+cargo run --locked -- run examples/strings.neoil --execution interpreter
+cargo run --locked -- run examples/errors.neoil --execution interpreter
+cargo run --locked -- run examples/file_input.neoil --execution interpreter
+cargo run --locked -- run examples/console_input.neoil --execution interpreter
+printf 'A' | cargo run --locked -- run examples/console_typed.neoil --execution interpreter
+cargo run --locked -- run examples/properties.neoil --execution interpreter
+cargo run --locked -- run examples/constructors.neoil --execution interpreter
+cargo run --locked -- run examples/ordinary_carrier.neoil --execution interpreter
+cargo run --locked -- run examples/ordinary_unions.neoil --execution interpreter
+cargo run --locked -- run examples/accessibility.neoil --execution interpreter
+cargo run --locked -- run examples/field_access.neoil --execution interpreter
+cargo run --locked -- run examples/type_visibility.neoil --execution interpreter
+cargo run --locked -- run examples/type_arities.neoil --execution interpreter
+cargo run --locked -- run examples/arrays.neoil --execution interpreter
+cargo run --locked -- run examples/array_bounds.neoil --execution interpreter
 ```
 
 The [accessibility sample](docs/accessibility.md) demonstrates public methods and restricted helpers.
@@ -248,7 +248,7 @@ cargo test --locked
 ### Multiple modules
 
 ```sh
-cargo run --locked -- run examples/modules/app.neoil \
+cargo run --locked -- run examples/modules/app.neoil --execution interpreter \
   --module examples/modules/operations.neoil --module examples/modules/models.neoil
 ```
 
@@ -262,31 +262,31 @@ loops, arithmetic, Option<Void>, and Result<Void,String>. The additional samples
 cover the implemented instruction set:
 
 ```sh
-cargo run -- run examples/features.neoil
-cargo run -- run examples/overloads.neoil
-cargo run -- run examples/types.neoil
-cargo run -- run examples/names.neoil
-cargo run -- run examples/pointers.neoil
-cargo run -- run examples/memory.neoil
-cargo run -- run examples/stack.neoil
-cargo run -- run examples/control-flow.neoil
-cargo run -- run examples/arguments.neoil
-cargo run -- run examples/comparison-branches.neoil
-cargo run -- run examples/compact.neoil
-cargo run -- run examples/layout.neoil
-cargo run -- run examples/generic-metadata.neoil
-cargo run -- run examples/generic-values.neoil
-cargo run -- run examples/generic-methods.neoil
-cargo run -- run examples/generic-memory.neoil
-cargo run -- run examples/attributes.neoil
-cargo run -- run examples/member-identities.neoil
+cargo run -- run examples/features.neoil --execution interpreter
+cargo run -- run examples/overloads.neoil --execution interpreter
+cargo run -- run examples/types.neoil --execution interpreter
+cargo run -- run examples/names.neoil --execution interpreter
+cargo run -- run examples/pointers.neoil --execution interpreter
+cargo run -- run examples/memory.neoil --execution interpreter
+cargo run -- run examples/stack.neoil --execution interpreter
+cargo run -- run examples/control-flow.neoil --execution interpreter
+cargo run -- run examples/arguments.neoil --execution interpreter
+cargo run -- run examples/comparison-branches.neoil --execution interpreter
+cargo run -- run examples/compact.neoil --execution interpreter
+cargo run -- run examples/layout.neoil --execution interpreter
+cargo run -- run examples/generic-metadata.neoil --execution interpreter
+cargo run -- run examples/generic-values.neoil --execution interpreter
+cargo run -- run examples/generic-methods.neoil --execution interpreter
+cargo run -- run examples/generic-memory.neoil --execution interpreter
+cargo run -- run examples/attributes.neoil --execution interpreter
+cargo run -- run examples/member-identities.neoil --execution interpreter
 cargo run -- verify examples/generic-methods.neoil
-cargo run -- run examples/native-integers.neoil
-cargo run -- run examples/integers.neoil
-cargo run -- run examples/bits.neoil
-cargo run -- run examples/floating.neoil
-cargo run -- run examples/checked-conversions.neoil
-cargo run -- run examples/fault.neoil
+cargo run -- run examples/native-integers.neoil --execution interpreter
+cargo run -- run examples/integers.neoil --execution interpreter
+cargo run -- run examples/bits.neoil --execution interpreter
+cargo run -- run examples/floating.neoil --execution interpreter
+cargo run -- run examples/checked-conversions.neoil --execution interpreter
+cargo run -- run examples/fault.neoil --execution interpreter
 ```
 
 `examples/fault.neoil` deliberately produces a terminal Fault and nonzero exit code.
@@ -305,7 +305,7 @@ See [the assembly reference](docs/neoil.md) for primitive aliases and syntax.
 
 ```sh
 cargo run --locked --example build_native
-cargo run --locked -- run examples/pinvoke.neoil
+cargo run --locked -- run examples/pinvoke.neoil --execution interpreter
 ```
 
 This builds a native C-ABI library, then demonstrates a native function modifying
@@ -325,7 +325,7 @@ It can also use an explicitly compiled System artifact:
 
 ```sh
 cargo run -- assemble runtime/System.neoil System.neo.json
-cargo run -- run examples/hello.neoil System.neo.json
+cargo run -- run examples/hello.neoil --execution interpreter System.neo.json
 ```
 
 Explicit module sets can link additional libraries, with optional direct dependency
@@ -504,11 +504,11 @@ Debug-source resolution and guest StackTrace/StackFrame types remain pending.
 [Explicit target layouts](docs/target-layout.md) support storage planning independently of the host.
 `cargo run --example target_layout` compares two pointer-width/alignment choices.
 [Initial String methods](docs/text-model.md) provide concatenation, equality, and checked UTF-8 slicing.
-`cargo run -- run examples/strings.neoil` demonstrates Unicode text and recoverable slice errors.
+`cargo run -- run examples/strings.neoil --execution interpreter` demonstrates Unicode text and recoverable slice errors.
 [System.Array<T> buffer descriptors](docs/arrays-and-pointers.md) provide explicit allocation/free
-and checked access for native-layout elements. `cargo run -- run examples/arrays.neoil`
+and checked access for native-layout elements. `cargo run -- run examples/arrays.neoil --execution interpreter`
 demonstrates descriptor aliasing and mutation; `examples/array_bounds.neoil` produces a bounds Fault.
-`cargo run -- run examples/arrays_stack.neoil` demonstrates a frame-local array backed by `localloc`.
+`cargo run -- run examples/arrays_stack.neoil --execution interpreter` demonstrates a frame-local array backed by `localloc`.
 
 [Explicit module sets](docs/module-sets.md) support additional libraries, cross-module
 generic calls, and field-name aliases. Run `cargo run --example modules` for a three-module
@@ -519,11 +519,11 @@ support exact dependency pins and definition identities. Duplicate type names an
 side-by-side module versions remain pending.
 
 [Ordinary nested types](docs/nested-types.md) support generic cases under non-generic
-companions. Run `cargo run -- run examples/nested_types.neoil` for a minimal example.
-Non-generic unions can nest cases directly; `cargo run -- run examples/non_generic_union.neoil`
+companions. Run `cargo run -- run examples/nested_types.neoil --execution interpreter` for a minimal example.
+Non-generic unions can nest cases directly; `cargo run -- run examples/non_generic_union.neoil --execution interpreter`
 demonstrates that form.
-`cargo run -- run examples/system_companions.neoil` constructs a nested System result case.
-`cargo run -- run examples/union_extract.neoil` demonstrates discriminator-then-accessor extraction.
+`cargo run -- run examples/system_companions.neoil --execution interpreter` constructs a nested System result case.
+`cargo run -- run examples/union_extract.neoil --execution interpreter` demonstrates discriminator-then-accessor extraction.
 
 neoCLR is licensed under the [MIT License](LICENSE). [Third-party notices](THIRD_PARTY_NOTICES.md)
 record the locked dependency licenses, including native libffi and its build-tool notices.
