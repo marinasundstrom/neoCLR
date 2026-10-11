@@ -4,16 +4,17 @@ import argparse
 import hashlib
 import json
 import math
-import os
 from pathlib import Path
 import platform
-import queue
-import signal
 import socket
 import statistics
 import subprocess
 import threading
 import time
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "framework"))
+from process import Guest
 
 ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
@@ -24,44 +25,6 @@ RESPONSE = b'HTTP/1.1 200 OK\r\nContent-Length: 10\r\nContent-Type: text/plain; 
 
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
-
-
-class Guest:
-    def __init__(self, command):
-        self.started = time.perf_counter()
-        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                        start_new_session=True)
-        self.lines = queue.Queue()
-        self.output = []
-        def read():
-            for line in self.process.stdout:
-                self.output.append(line)
-                self.lines.put((line.rstrip(b'\r\n'), time.perf_counter()))
-            self.lines.put((None, time.perf_counter()))
-        self.reader = threading.Thread(target=read, daemon=True)
-        self.reader.start()
-
-    def line(self, expected=None):
-        line, at = self.lines.get(timeout=120)
-        if line is None or expected is not None and line != expected:
-            detail = self.process.stderr.read().decode(errors='replace') if line is None else ''
-            raise RuntimeError(f'Unexpected guest output: {line!r}; expected {expected!r}; {detail}')
-        return line, at
-
-    def finish(self):
-        code = self.process.wait(timeout=30)
-        self.reader.join(timeout=5)
-        error = self.process.stderr.read()
-        if code or error or self.reader.is_alive():
-            raise RuntimeError(f'Guest failed: {code}, {error!r}, {self.output!r}')
-
-    def close(self):
-        if self.process.poll() is None:
-            os.killpg(self.process.pid, signal.SIGKILL)
-            self.process.wait(timeout=10)
-        self.reader.join(timeout=5)
-        self.process.stdout.close()
-        self.process.stderr.close()
 
 
 def response(peer):
@@ -197,6 +160,8 @@ def main():
                     command[1] = str(a.compiler.resolve())
                 build(command)
             commands[name] = {mode: replace(command) for mode,command in recipe['artifacts'][name]['commands'].items()}
+            if '--execution' not in commands[name]['interpreter']:
+                commands[name]['interpreter'] += ['--execution', 'interpreter']
             for command in commands[name].values():
                 for part in command:
                     if Path(part).is_absolute() and Path(part).is_file():
@@ -205,6 +170,8 @@ def main():
                 assemblySha256=sha(folder/'app.dll'), objectSha256=sha(folder/'app.o'), executableSha256=sha(folder/'app'))
         report['hostSha256'] = sha(host)
         report['inputs'][str(Path(__file__).resolve())] = sha(__file__)
+        transport = ROOT/'benchmarks/framework/process.py'
+        report['inputs'][str(transport)] = sha(transport)
         modes = ['interpreter', 'jit', 'aot']
         for round_index in range(-1, a.rounds):
             order = modes[max(0,round_index)%3:] + modes[:max(0,round_index)%3]

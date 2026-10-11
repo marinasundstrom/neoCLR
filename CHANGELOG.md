@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add an initial development benchmark runner with manually registered Raven
+  callbacks, exact case filtering, warmup/operation counts, isolated mode jobs,
+  raw samples and input-hash checks. JSON node serialization/deserialization use
+  a nested Unicode document; external batch latency includes transport and
+  correctness checks and is not internal operation timing. Share process transport
+  with HTTP and test failure/protocol/timeout handling. Async callbacks, typed JSON
+  benchmarks, attributes and a monotonic operation clock remain pending.
+
 - Qualify the Raven fix for `let … else` bindings across await using persistent
   HTTP client/server samples. Shared lifetime analysis is fixed on Raven main
   (`2059d5e5f`); native portable emission also initializes hoisted pattern fields

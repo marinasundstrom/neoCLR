@@ -206,7 +206,11 @@ Those gates establish functional behavior. A separate development
 checks 32-request client/server samples in interpreter, JIT and AOT, with startup
 separated from request timing. Its initial macOS ARM64 timing run had background
 CPU contention and is exploratory; it does not establish Windows performance or
-comparisons with other frameworks. JSON serialization benchmarks remain next.
+comparisons with other frameworks. An initial
+[JSON node workbench](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/json/README.md)
+uses manually registered Raven workers and separate serialization/deserialization
+batches. It measures external batch latency including validation and protocol
+costs; typed-object/collection benchmarks and internal operation timing remain open.
 [Contracts, validation and local benchmark](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-managed/README.md).
 
 A subsequent shared metadata lookup optimization reduces startup work in both the JIT

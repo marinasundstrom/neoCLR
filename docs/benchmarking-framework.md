@@ -61,5 +61,16 @@ The [HTTP workbench](../benchmarks/jit-http/README.md) implements external proce
 orchestration, fresh builds, warmup, repeated launches, correctness checks, mode
 rotation and raw timing/provenance output. It is development tooling, not yet a
 Raven benchmarking library. Its first run observed background CPU contention.
-JSON workloads and the reusable worker/framework are still pending. This work stays
-within the benchmark gate before schedulers and runtime-managed suspension.
+The [initial worker and runner](../benchmarks/framework/README.md) now provide manual
+synchronous registration, exact-name filtering, bounded counts, isolated jobs,
+protocol/checksum validation, input hashes and raw JSON reports. HTTP shares the
+process transport. The [JSON node workload](../benchmarks/json/README.md) separates
+serialization and deserialization of a nested Unicode document with arrays/nulls.
+This first version measures external batch latency, including transport and
+correctness checks; it does not implement internal operation timing.
+
+Typed JSON objects and collection mapping remain next, followed by a qualified
+monotonic clock and internal measurement, async callbacks, setup/cleanup and
+attribute discovery. These are still gaps relative to BenchmarkDotNet, not new
+permanent semantics. This work stays within the benchmark gate before schedulers
+and runtime-managed suspension.

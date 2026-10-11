@@ -26,7 +26,9 @@ suspension points instead of requiring Raven-generated async state machines. Thi
 is a direction, not implemented behavior or a selected stack representation.
 The [HTTP workbench](../benchmarks/jit-http/README.md) now passes 1,152 requests
 across all three modes; initial timing is provisional due to background contention.
-JSON benchmarking remains open.
+The [first benchmark runner](../benchmarks/framework/README.md) adds manually
+registered Raven workers and JSON node serialization/deserialization batches.
+Typed-object/collection JSON and internal operation timing remain open.
 The author also requests a [BenchmarkDotNet-like framework](benchmarking-framework.md),
 combining external process orchestration with Raven workload measurement.
 Experimental API/compiler compatibility may be broken where justified. Compare the

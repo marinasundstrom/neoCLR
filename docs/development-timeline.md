@@ -14529,3 +14529,23 @@ unchanged. Raw timings are retained but explicitly provisional because backgroun
 compilation/indexing competed for CPU. Median server throughput is 1.38/53.49/54.31
 requests/s and client throughput 0.96/34.83/35.66 for interpreter/JIT/AOT respectively.
 This is validation plus exploratory measurement, not a published performance claim.
+
+
+### 2026-10-11 — First reusable benchmark worker
+
+**Author direction:** continues the BenchmarkDotNet-like framework work after the
+HTTP compiler fixes. **Assistant implementation:** extracts shared subprocess
+transport from the HTTP controller and adds a manually registered synchronous
+Raven worker with bounded counts and an external controller. The worker separates
+warmup from measured batches and validates operation results; the controller checks
+protocol, exit status, filtering and input hashes.
+
+**Outcome:** JSON node serialization/deserialization pass all three modes in 18
+processes (144 measured operations and 36 warmups). Four controller tests and five
+native-worker rejection cases pass, along with 64 HTTP requests after transport
+extraction. Results are explicitly external batch timings, including validation
+and transport. They do not establish internal serializer-only performance. The
+public wall-clock API is unsuitable for internal monotonic measurement; a clock
+contract, typed-object/collection workloads and discovery remain open. See
+[worker contract](../benchmarks/framework/README.md) and
+[JSON evidence](../benchmarks/json/README.md).
