@@ -1493,7 +1493,17 @@ from result retrieval, projecting runtime cancellation through Raven's current
 IsCancelled protocol into a cancelled managed Task. Pending, completed and
 registration-time cancellation are covered; independent work continues. This aligns
 notification/outcome separation with .NET awaiters while retaining the experimental
-neoCLR cancellation projection. Faulted outcomes, automatic lifetime, compiler-native
+neoCLR cancellation projection. Typed result projection, automatic lifetime, compiler-native
 await, JIT/AOT and comparative performance qualification remain open. See
 [cancellation evidence](experiments/runtime-async/cancellation-validation.json) and
 [bridge ownership/limits](raven-cli-bridge.md#runtime-operation-cancellation-delivery-2026-10-11).
+
+
+### Fault boundary reaffirmed — 2026-10-11
+
+The author explicitly states that Fault is non-recoverable and must remain so.
+Runtime async must not convert runtime faults into recoverable Task outcomes.
+The pending-self-await diagnostic follows that boundary: it terminates the invocation
+instead of indefinitely parking a body on its own pending operation. Independent
+callback waits and terminal cancellation observation remain valid; general cycle
+detection remains open. See [validation and costs](experiments/runtime-async/README.md#pending-self-await-diagnostic-2026-10-11).

@@ -34,6 +34,9 @@ intrinsic binder fix is now qualified on the separate native compiler line
 (`f51d0561f`); [evidence](experiments/runtime-async/single-source-validation.json).
 The adapter now propagates cancellation to managed Tasks without cancelling the
 invocation ([evidence](experiments/runtime-async/cancellation-validation.json)).
+Pending self-await now faults promptly; independent callback waits remain valid
+([qualification](experiments/runtime-async/README.md#pending-self-await-diagnostic-2026-10-11)).
+The author reaffirms that Fault remains non-recoverable and invocation-terminal.
 Next are compiler-native
 await/managed Task integration and equivalent state-machine
 comparisons before switching supported defaults. Native stack representation, preemption and

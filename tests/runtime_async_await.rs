@@ -665,3 +665,87 @@ fn completion_observation_rejects_unknown_and_released_handles() {
         }
     }
 }
+
+fn self_wait_program(service: &str, cancel_before_resume: bool) -> LoadedProgram {
+    let extra = BODY.replace(".field Phase Int32", ".field Phase Int32\n.field OwnOperation Int64")
+        .replace("ldc.i4 42\nret", "ldarg 0\ncall instance AsyncBody::ObserveSelf()\npop\nldc.i4 42\nret")
+        .replace(".end\n.end\n", &format!(".end\n.method instance ObserveSelf() -> Boolean\nldarg 0\nldfld AsyncBody::OwnOperation\ncall neoCLR.Runtime.{service}(Int64)\n{}ret\n.end\n.end\n", if service == "RuntimeAsyncAwait" { "pop\nldc.bool true\n" } else { "" }));
+    let setup = format!(
+        "stloc operation\nldloc body\nldloc operation\nstfld AsyncBody::OwnOperation\n{}",
+        if cancel_before_resume {
+            "ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncCancel(Int64)\npop\n"
+        } else {
+            ""
+        }
+    );
+    let main = START_BODY.replace("stloc operation", &setup)
+        .replace("ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret", "ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncWaitCompletion(Int64)\npop\nldc.i4 0\nret");
+    program(&main, &extra)
+}
+
+#[test]
+fn pending_body_self_wait_fails_instead_of_hanging() {
+    for service in ["RuntimeAsyncAwait", "RuntimeAsyncWaitCompletion"] {
+        let p = self_wait_program(service, false);
+        let token = CancellationToken::new();
+        let (stop, stopped) = std::sync::mpsc::channel();
+        let fault = std::thread::scope(|scope| {
+            let cancel = token.clone();
+            scope.spawn(move || {
+                if stopped
+                    .recv_timeout(std::time::Duration::from_secs(2))
+                    .is_err()
+                {
+                    cancel.cancel();
+                }
+            });
+            let result = p.run(ExecutionOptions {
+                cancellation: Some(token),
+                ..Default::default()
+            });
+            let _ = stop.send(());
+            result.unwrap_err()
+        });
+        assert_eq!(fault.code, FaultCode::RuntimeError);
+        assert!(fault
+            .message
+            .contains("cannot await its own pending operation"));
+        assert!(fault.function.unwrap().contains("ObserveSelf"));
+    }
+}
+
+#[test]
+fn body_can_observe_its_own_terminal_cancellation() {
+    assert_eq!(
+        bounded_run(self_wait_program("RuntimeAsyncWaitCompletion", true)).value,
+        Value::Int32(0)
+    );
+}
+
+#[test]
+fn independently_dispatched_callback_can_await_the_submitting_body() {
+    let extra = BODY.replace(".field Phase Int32", ".field Phase Int32\n.field OwnOperation Int64")
+        .replace("ldc.i4 42\nret", "ldarg 0\nfunction.bind fn<Void> = instance AsyncBody::Observe()\ncall neoCLR.Runtime.SchedulerSubmit(fn<Void>)\npop\ncall neoCLR.Runtime.RuntimeAsyncYield()\npop\nldc.i4 42\nret")
+        .replace(".end\n.end\n", r#".end
+.method instance Observe() -> Void
+ldarg 0
+ldfld AsyncBody::OwnOperation
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+ldc.i4 42
+ceq
+brfalse Bad
+call neoCLR.Runtime.GCCollect()
+ldvoid
+ret
+Bad:
+fault "independent observer lost body result"
+.end
+.end
+"#);
+    let main = START_BODY.replace(
+        "stloc operation",
+        "stloc operation\nldloc body\nldloc operation\nstfld AsyncBody::OwnOperation",
+    );
+    let extra = format!(".function neoCLR.Runtime.RuntimeAsyncYield() -> Void\n.methodimpl InternalCall\n.end\n{extra}");
+    assert_eq!(bounded_run(program(&main, &extra)).value, Value::Int32(42));
+}

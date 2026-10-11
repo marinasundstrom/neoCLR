@@ -14985,3 +14985,16 @@ On continuation, the bounded binder fix was carried to the separate native line 
 The author requested returning to POC work after this slice; cancellation projection
 is the next bounded adapter gap identified by the assistant. No full branch merge
 or runtime-await default switch was performed.
+
+
+## 2026-10-11 — Non-recoverable Fault boundary
+
+- **Assistant:** while continuing runtime-async work, identified that storing runtime
+  faults as Task outcomes would change the terminal-failure contract. Selected the
+  bounded pending-self-await diagnostic instead; no fault-capture behavior was added.
+- **Author:** “Fault are non-recoverable and should stay so”.
+- **Assistant outcome:** retained invocation-terminal Fault behavior. The self-await
+  regression previously hung until watchdog cancellation; 24 focused executable
+  async tests now pass, including independent callback waits and terminal cancellation
+  observation. Indirect cycles and compiler-native await remain open. See the
+  [experiment](experiments/runtime-async/README.md#pending-self-await-diagnostic-2026-10-11).

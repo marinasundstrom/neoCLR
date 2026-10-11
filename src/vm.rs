@@ -4160,6 +4160,17 @@ fn interpret_instructions_with_dispatch(
                                 }
                                 (wait @ (crate::native::Binding::RuntimeAsyncAwait | crate::native::Binding::RuntimeAsyncWaitCompletion), [Value::Int64(id)]) => {
                                     async_operations.validate(*id)?;
+                                    // Ordinary calls inherit their runtime body's operation;
+                                    // independently dispatched callbacks do not. A pending
+                                    // body cannot finish while waiting for its own return.
+                                    let owner = frames.iter().rev()
+                                        .find(|frame| frame.runtime_callback)
+                                        .and_then(|frame| frame.async_result);
+                                    if owner == Some(*id) && !async_operations.is_ready(*id) {
+                                        return Err(Fault::new(
+                                            "Runtime async body cannot await its own pending operation",
+                                        ));
+                                    }
                                     yield_boundaries.push(RuntimeAsyncBoundary {
                                         depth: frames.len(),
                                         dispatched: false,

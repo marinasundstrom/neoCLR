@@ -8,11 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Reject a runtime-async POC body's wait on its own pending operation with a terminal
+  Fault instead of hanging, including through helper calls. Independent callbacks
+  may still await the body, and terminal cancellation remains observable. General
+  cycle detection remains unsupported; Fault stays non-recoverable.
+
 - Extend the interpreter runtime-async POC with private cancellation observation and
   terminal-completion waiting. The ordinary-await adapter now propagates pending,
   pre-existing and registration-time cancellation into managed Tasks while other
   work continues; direct cancelled-result reads and host cancellation still fault.
-  Generated state machines remain; native-await lowering, faulted outcomes, managed
+  Generated state machines remain; native-await lowering, typed results, managed
   lifetime and JIT/AOT suspension remain open.
 
 - Add private runtime operation readiness and an ordinary Raven await compatibility

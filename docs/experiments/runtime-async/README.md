@@ -214,8 +214,8 @@ New private `RuntimeAsyncRelease(Int64) -> Boolean` explicitly releases a termin
 handle. It returns false for pending, foreign, unknown or already released handles,
 and when an active/parked waiter or a running/parked body still uses the operation.
 Release is serialized with dispatcher transitions; it cannot retract an admitted
-waiter's outcome. Reads after successful release fault. No deadlock detection is
-promised for cycles or an operation waiting for itself.
+waiter's outcome. Reads after successful release fault. The later pending-self-await
+slice below rejects direct self-waits; general cycle detection remains unsupported.
 
 This is experimental handle bookkeeping, **not a Task.Dispose requirement**. The
 future managed projection needs lifetime ownership tied to managed reachability;
@@ -315,3 +315,29 @@ native compiler line `f51d0561f`; generated state machines remain. No public lib
 API, faulted-Task projection, managed lifetime, cross-thread race qualification or
 JIT/AOT suspension support is introduced. Native activation/outcome metadata and
 backend support must eventually replace these private integer-handle signatures.
+
+
+## Pending self-await diagnostic (2026-10-11)
+
+The private interpreter runtime-async POC now rejects a body's attempt to await its
+own pending operation, including from ordinary helper calls. This applies to both
+RuntimeAsyncAwait and RuntimeAsyncWaitCompletion. It raises a terminal RuntimeError
+Fault at the offending call instead of parking forever. An independently dispatched
+callback has its own activation boundary and may still await the submitting body.
+A body may observe its own already-terminal cancellation through completion waiting.
+
+This is a deliberate private POC diagnostic beyond .NET Task's general await
+contract: it catches a provably unsatisfiable self-dependency before parking, at the
+cost of a scan to the current activation boundary when establishing a runtime wait.
+It is not general deadlock detection; indirect cycles and external missing producers
+remain possible. No public Task guarantee, compiler lowering, Runtime Contract option,
+metadata encoding or native/JIT capability changes. The author explicitly reaffirms
+that Fault is non-recoverable: faults still end the invocation and are not stored as
+recoverable task outcomes. Host cancellation and resource-limit faults remain terminal.
+
+Validation: the regression previously required watchdog cancellation; 24 focused
+runtime_async_await executable tests now pass, covering both wait forms, ordinary
+helper attribution, terminal cancellation and independent callback waits. Existing
+eager/nested body, repeated/shared result, GC, release and host cancellation checks
+pass in that same suite. Compiler-native await/default switching and comparative
+performance qualification remain open.
