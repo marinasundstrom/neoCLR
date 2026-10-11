@@ -193,7 +193,58 @@ static int destination_contract(void) {
     return 0;
 }
 
+static int registration_contract(void) {
+    uint64_t buffer[128] = {0}, delivery = 0;
+    neoclr_aot_context c = {.text = {(unsigned char *)buffer, sizeof(buffer), 0}};
+    neoclr_socket_scope scope;
+    CHECK(!neoclr_socket_scope_enter_v1(&scope, &c));
+    int64_t destination = 0, registrations[64], rejected = -9;
+    CHECK(!neoclr_scheduler_capture_v1(&c, &destination, NULL));
+    void *callback = NULL;
+    CHECK(!neoclr_allocate_object_v1(&c.text, UINT32_MAX, 24, &callback));
+    ((uint64_t *)callback)[1] = 1;
+    CHECK(neoclr_scheduler_register_managed_v1(destination, callback, &c, &rejected) == 3 && rejected == -9);
+    neoclr_probe_frame entry;
+    neoclr_probe_storage empty = {0};
+    neoclr_probe_enter_v3(&entry, &c, 7, &empty, 0, "", 0);
+    CHECK(neoclr_scheduler_register_managed_v1(0, callback, &c, &rejected) == 3 && rejected == -9);
+    CHECK(neoclr_scheduler_register_managed_v1(destination, callback, &c, NULL) == 3);
+    for (unsigned i = 0; i < 64; i++)
+        CHECK(!neoclr_scheduler_register_managed_v1(destination, callback, &c, &registrations[i]));
+    CHECK(neoclr_scheduler_register_managed_v1(destination, callback, &c, &rejected) == NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT && rejected == -9);
+    int32_t changed = -9;
+    CHECK(neoclr_scheduler_submit_managed_v1(callback, &c, &changed) == NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT && changed == -9);
+    CHECK(!neoclr_gc_collect_v1(&c, &entry) && c.text.used);
+    CHECK(neoclr_scheduler_step_v1(&c, &delivery, &entry) == NEOCLR_SCHEDULER_IDLE);
+    CHECK(!neoclr_scheduler_activate_managed_v1(registrations[0], &c, &changed) && changed);
+    CHECK(!neoclr_scheduler_activate_managed_v1(registrations[0], &c, &changed) && !changed);
+    CHECK(!neoclr_scheduler_cancel_managed_v1(registrations[0], &c, &changed) && !changed);
+    CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, &entry) == NEOCLR_SCHEDULER_READY);
+    CHECK(!neoclr_scheduler_complete_v1(&c, delivery, &entry));
+    for (unsigned i = 1; i < 64; i++) {
+        CHECK(!neoclr_scheduler_cancel_managed_v1(registrations[i], &c, &changed) && changed);
+        CHECK(!neoclr_scheduler_cancel_managed_v1(registrations[i], &c, &changed) && !changed);
+        CHECK(!neoclr_scheduler_activate_managed_v1(registrations[i], &c, &changed) && !changed);
+    }
+    CHECK(neoclr_scheduler_step_v1(&c, &delivery, &entry) == NEOCLR_SCHEDULER_IDLE);
+    CHECK(!neoclr_gc_collect_v1(&c, &entry) && !c.text.used);
+    CHECK(!neoclr_allocate_object_v1(&c.text, UINT32_MAX, 24, &callback));
+    ((uint64_t *)callback)[1] = 1;
+    CHECK(!neoclr_scheduler_register_managed_v1(destination, callback, &c, &rejected));
+    neoclr_probe_leave_v1(&entry);
+    CHECK(!neoclr_socket_scope_leave_v1(&scope));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    CHECK(!neoclr_socket_scope_enter_v1(&scope, &c));
+    neoclr_probe_enter_v3(&entry, &c, 7, &empty, 0, "", 0);
+    CHECK(!neoclr_scheduler_activate_managed_v1(rejected, &c, &changed) && !changed);
+    CHECK(!neoclr_scheduler_cancel_managed_v1(rejected, &c, &changed) && !changed);
+    neoclr_probe_leave_v1(&entry);
+    CHECK(!neoclr_socket_scope_leave_v1(&scope));
+    return 0;
+}
+
 int main(void) {
+    CHECK(!registration_contract());
     CHECK(!destination_contract());
     CHECK(!submitted_work_contract());
     CHECK(!entry_delivery_contract());

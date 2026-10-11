@@ -379,7 +379,7 @@ int32_t neoclr_scheduler_step_v1(neoclr_aot_context *context, uint64_t *callback
      * delivery remains rooted until this owner advances or tears down the scope. */
     neoclr_socket_scope *scope = find_scope(context);
     for (unsigned i = 0; i < 64; i++)
-        if (scope->operations[i].state) return NEOCLR_SCHEDULER_PENDING;
+        if (scope->operations[i].state && scope->operations[i].kind != 8) return NEOCLR_SCHEDULER_PENDING;
     return NEOCLR_SCHEDULER_IDLE;
 }
 
@@ -421,6 +421,58 @@ int32_t neoclr_scheduler_submit_to_managed_v1(int64_t destination, void *callbac
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || destination <= 0 || scope->scheduler_destination != (uint64_t)destination) return 3;
     return neoclr_scheduler_submit_managed_v1(callback, context, output);
+}
+
+int32_t neoclr_scheduler_register_managed_v1(int64_t destination, void *callback,
+    neoclr_aot_context *context, int64_t *output) {
+    neoclr_socket_scope *scope = find_scope(context);
+    const neoclr_probe_frame *boundary = neoclr_root_probe_head_v1();
+    if (!scope || !output || !boundary || !scheduler_boundary_valid(context, boundary) ||
+        destination <= 0 || scope->scheduler_destination != (uint64_t)destination) return 3;
+    unsigned slot = 0;
+    while (slot < 64 && scope->operations[slot].state) slot++;
+    if (slot == 64) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    uint64_t id = new_operation_id(), root = 0;
+    if (!id) return 3;
+    int32_t status = neoclr_gc_host_root_create_v1(context, callback, &root);
+    if (status) return status;
+    void *verified = NULL;
+    status = neoclr_gc_callback_read_suspended_v1(context, root, &verified, boundary);
+    if (status) { neoclr_gc_host_root_release_v1(context, root); return status; }
+    scope->operations[slot].id = id;
+    scope->operations[slot].callback = root;
+    scope->operations[slot].kind = 8;
+    scope->operations[slot].state = 1;
+    *output = (int64_t)id;
+    return 0;
+}
+static int32_t scheduler_registration_transition(int64_t registration, neoclr_aot_context *context,
+    int32_t *output, int activate) {
+    neoclr_socket_scope *scope = find_scope(context);
+    const neoclr_probe_frame *boundary = neoclr_root_probe_head_v1();
+    if (!scope || !output || !boundary || !scheduler_boundary_valid(context, boundary)) return 3;
+    for (unsigned i = 0; i < 64; i++) {
+        if (registration <= 0 || scope->operations[i].id != (uint64_t)registration ||
+            scope->operations[i].kind != 8 || scope->operations[i].state != 1) continue;
+        if (activate) {
+            scope->operations[i].kind = 7;
+            scope->operations[i].state = 2;
+        } else {
+            int32_t status = neoclr_gc_host_root_release_v1(context, scope->operations[i].callback);
+            if (status) return status;
+            memset(&scope->operations[i], 0, sizeof(scope->operations[i]));
+        }
+        *output = 1;
+        return 0;
+    }
+    *output = 0;
+    return 0;
+}
+int32_t neoclr_scheduler_activate_managed_v1(int64_t registration, neoclr_aot_context *context, int32_t *output) {
+    return scheduler_registration_transition(registration, context, output, 1);
+}
+int32_t neoclr_scheduler_cancel_managed_v1(int64_t registration, neoclr_aot_context *context, int32_t *output) {
+    return scheduler_registration_transition(registration, context, output, 0);
 }
 
 int32_t neoclr_scheduler_submit_v1(neoclr_aot_context *context, uint64_t callback,

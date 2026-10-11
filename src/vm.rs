@@ -3859,6 +3859,19 @@ fn interpret_instructions_with_dispatch(
                             return Ok(None);
                         }
 
+                        if matches!(binding, crate::native::Binding::SchedulerRegister
+                            | crate::native::Binding::SchedulerActivate | crate::native::Binding::SchedulerCancel) {
+                            let Value::Int64(id) = args.remove(0) else {
+                                return Err(Fault::new("Invalid scheduler registration argument"));
+                            };
+                            let result = match binding {
+                                crate::native::Binding::SchedulerRegister => Value::Int64(scheduler.register(id, args.remove(0))?),
+                                crate::native::Binding::SchedulerActivate => Value::Boolean(scheduler.activate(id)),
+                                _ => Value::Boolean(scheduler.cancel_registration(id)),
+                            };
+                            frames.last_mut().unwrap().stack.push(result);
+                            return Ok(None);
+                        }
                         if matches!(binding, crate::native::Binding::SchedulerCapture) {
                             let destination = scheduler.capture_destination()?;
                             frames.last_mut().unwrap().stack.push(Value::Int64(destination));

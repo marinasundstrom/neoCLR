@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add private runtime-owned dormant continuation registrations with reserved capacity,
+  one-shot activation/cancellation and callback-root release on cancellation/teardown.
+  Dormant registrations do not keep an invocation alive. The internal awaitable uses
+  this lifecycle; public Task routing is unchanged. Task represents the operation and
+  its state, while Promise remains its TaskCompletionSource-like producer; cancelling
+  a registration does not cancel the Task. Abandonment cleanup and cross-invocation
+  rules remain production-migration work. Focused lifecycle contracts and six
+  interpreter/JIT/AOT consumer runs pass on macOS ARM64.
+
 - Add a matched pending-await benchmark for direct callbacks versus captured
   invocation registrations in interpreter/JIT/AOT. Retain raw startup/batch samples,
   build inputs and measurement limits; the original state-machine baseline remains

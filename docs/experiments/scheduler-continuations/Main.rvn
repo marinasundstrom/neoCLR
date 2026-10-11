@@ -82,6 +82,35 @@ module SchedulerContinuations {
         }
     }
 
+    func CancelledRegistrationRan() -> System.Void {
+        System.Fail("Cancelled registration was dispatched")
+        return ()
+    }
+
+    async func RegistrationLifecycle() -> Task<int> {
+        let operation = Completion(UnpumpedProducer())
+        let withdrawn = Continuation(operation.Publish)
+        if !withdrawn.Cancel() || withdrawn.Cancel() {
+            System.Fail("Registration cancellation was not one-shot")
+        }
+        if operation.IsCompleted {
+            System.Fail("Registration cancellation changed operation state")
+        }
+        let delivery = Continuation(operation.Publish)
+        delivery.Submit()
+        if delivery.Cancel() {
+            System.Fail("Cancellation retracted admitted work")
+        }
+        if operation.IsCompleted {
+            System.Fail("Activation completed operation inline")
+        }
+        let value = await operation
+        if value != 42 {
+            System.Fail("Activated continuation lost result")
+        }
+        return 0
+    }
+
     async func Main() -> Task<int> {
         _ = await Pending()
         Console.WriteLine("PASS multiple pending awaits without producer pump")
@@ -89,6 +118,10 @@ module SchedulerContinuations {
         Console.WriteLine("PASS completed await and deferred observer")
         _ = await Cancelled()
         Console.WriteLine("PASS cancellation without producer pump")
+        _ = await RegistrationLifecycle()
+        Console.WriteLine("PASS registration lifecycle is separate from task state")
+        let abandoned = Continuation(CancelledRegistrationRan)
+        Console.WriteLine("PASS dormant registration does not keep invocation alive")
         return 0
     }
 

@@ -1000,3 +1000,50 @@ The eighteen-run registration comparison passes correctness/protocol checks but 
 substantial round-to-round timing variation across both adapters. Its overhead estimate
 is inconclusive; a quieter counterbalanced run is required before a performance-based
 representation decision. Destination checks remain a correctness requirement.
+
+
+## Operation state and registration lifetime — 2026-10-11
+
+**Author clarification:** Task represents an asynchronous operation, including its
+observable state. Promise is the producer-side completion source, analogous to .NET
+TaskCompletionSource, used to adapt work into a Task. Their managed implementation may
+share backing storage; this does not move the operation abstraction or completion
+authority into the scheduler. Runtime registration cancellation is not Task cancellation.
+
+The next private runtime layer retains dormant continuation registrations. Registration
+validates the captured invocation destination, roots the callback and reserves dispatch
+capacity. Activate transfers that ownership to runnable dispatch once; Cancel releases a
+still-dormant callback once. Repeated, foreign, expired or already-activated handles
+return false. Registration with an invalid destination faults before retaining work.
+Neither transition changes the associated Task outcome: the producer still owns that.
+
+Dormant registrations do not count as pending completion sources or runnable work, so
+an otherwise idle invocation can end. Teardown abandons their roots. This matches the
+existing behavior that an unresolved Task alone does not keep an invocation running.
+Activation signals interpreter readiness; native owner-thread hosts discover activated
+work through their existing pump. Failed frame installation retains activated roots.
+Registration reserves capacity up front, so later activation needs no additional slot.
+
+The prototype has a 64-entry interpreter registration/submission budget; native hosts
+share 64 operation slots with I/O/timers. These are implementation limits, not a portable
+quota. Strong dormant roots may retain an abandoned managed operation until explicit
+unregistration or invocation teardown. Production migration must define how operation
+abandonment/disposal releases registrations in long-running invocations. Cross-thread
+completion, cross-invocation routing, scheduler customization and races remain unsupported
+portable contracts. This is not a .NET CancellationTokenRegistration clone: that API
+registers cancellation notifications; these handles own continuation dispatch lifetime.
+
+Private services are SchedulerRegister(Int64 destination, fn<Void>) -> Int64,
+SchedulerActivate(Int64) -> Boolean and SchedulerCancel(Int64) -> Boolean. Callback,
+handle and fixed-capacity encodings remain temporary bridges. The internal awaitable now
+keeps runtime registration handles instead of retaining its own callable until completion;
+public Task/Promise routing remains unchanged. Existing captured-registration benchmarks
+remain historical baselines and do not measure this new ownership path. No performance
+or allocation improvement is asserted.
+
+Validation: 16 scheduler checks, five reserved-signature checks, five existing
+submission/timer consumers, one native binding contract, six instrumented C contracts
+and six interpreter/JIT/AOT success/fault executions pass on macOS ARM64. Windows
+has not been requalified. The lifecycle consumer checks cancellation of a registration
+for an operation-completion callback while the Task remains pending, then completes
+that operation through a different activated registration.

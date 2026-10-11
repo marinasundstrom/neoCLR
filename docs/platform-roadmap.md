@@ -54,7 +54,10 @@ now qualifies pending/completed awaits, multiple awaiters, cancellation and term
 faults without pumping an explicit producer queue in interpreter/JIT/AOT. It uses an
 internal awaitable; it now captures an invocation destination per registration and
 rejects foreign/expired destinations before retaining callbacks. Production Task
-registration, cross-invocation routing and race/lifetime rules remain open. The interpreter readiness query now includes
+registration and cross-invocation routing remain open. The internal awaitable now
+uses runtime-owned dormant registrations with one-shot activation/cancellation;
+Task remains the operation/state abstraction and Promise its producer-side completion
+source. Abandonment cleanup and race/lifetime rules remain production-migration gates. The interpreter readiness query now includes
 submitted work and keeps source/submission arbitration private;
 [quiescence contract and validation](runtime-scheduling-design.md#unified-interpreter-readiness--2026-10-11).
 

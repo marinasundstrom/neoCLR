@@ -72,17 +72,20 @@ module SchedulerContinuations {
     }
 
     class Continuation {
-        private val destination: long
-        private val callback: () -> System.Void
+        private val registration: long
 
         init(callback: () -> System.Void) {
-            destination = neoCLR.Runtime.SchedulerCapture()
-            self.callback = callback
+            let destination = neoCLR.Runtime.SchedulerCapture()
+            registration = neoCLR.Runtime.SchedulerRegister(destination, callback)
         }
 
         func Submit() {
-            _ = neoCLR.Runtime.SchedulerSubmitTo(destination, callback)
+            if !neoCLR.Runtime.SchedulerActivate(registration) {
+                System.Fail("Continuation registration already consumed")
+            }
         }
+
+        func Cancel() -> bool => neoCLR.Runtime.SchedulerCancel(registration)
     }
 
     func UnpumpedProducer() -> TaskQueue {
@@ -108,4 +111,13 @@ module neoCLR.Runtime {
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal extern func SchedulerSubmitTo(destination: long, callback: () -> System.Void) -> int;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerRegister(destination: long, callback: () -> System.Void) -> long;
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerActivate(registration: long) -> bool;
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerCancel(registration: long) -> bool;
+
 }

@@ -8334,3 +8334,29 @@ inferred execution support from an arbitrary Raven-main build.
 
 Companion Raven shared-main documentation: `b9cf3487b` (documentation only; no
 compiler binary change).
+
+
+### Runtime-owned registration lifecycle (2026-10-11)
+
+The internal awaitable now uses SchedulerRegister(Int64 destination, fn<Void>) -> Int64,
+SchedulerActivate(Int64 registration) -> Boolean and SchedulerCancel(Int64 registration)
+-> Boolean, all exact reserved InternalCall declarations under the existing scheduler
+binding opt-in. Runtime Contract options, Raven semantic/emission rules and .NET behavior
+are unchanged. neoCLR owns callback rooting, capacity reservation and one-shot transitions;
+Raven emits the existing callable/Int64/Boolean forms. No compiler binary change is needed.
+
+Registration retains the callback in the current invocation; activation transfers it
+to runnable dispatch, while cancellation releases only a dormant registration. Handles
+are nonpersistent and invocation-owned. A dormant registration does not keep execution
+alive and teardown abandons it. Cancellation of this handle does not alter Task state:
+Task remains the operation abstraction and Promise its producer completion source.
+The temporary 64-slot bound, integer token and unit callback do not define permanent
+language semantics. Native metadata/codegen should eventually project registration
+ownership for callbacks or saved activations without fixing these encodings.
+
+Cross-invocation dispatch, concurrent transition semantics and automatic cleanup of
+abandoned managed operations are still unqualified. The
+[consumer](experiments/scheduler-continuations/README.md) retains all-mode execution
+and native/interpreter lifecycle evidence; public Task/Promise registration is unchanged.
+
+Companion Raven shared-main documentation: `d0fdf808e` (documentation only).

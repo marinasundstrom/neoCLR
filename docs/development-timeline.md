@@ -14765,3 +14765,19 @@ outside benchmark measurement. Implementation follows the configuration slice.
 - **Open:** instrument allocation/retained memory and extend representative workloads;
   runtime suspension is not yet available for a paired comparison. These baseline
   samples do not establish an improvement from a scheduler or suspension change.
+
+
+### 2026-10-11 — Task and Promise remain operation abstractions
+
+- **Author:** clarifies that Task represents an ongoing operation and holds its state;
+  Promise serves the role of .NET TaskCompletionSource, the producer-side promise used
+  when adapting something into a task/asynchronous operation.
+- **Assistant response:** agrees and distinguishes the managed operation/outcome model
+  from the runtime registration's scheduling and callback lifetime. Activating or
+  cancelling a continuation registration must not complete or cancel its Task.
+- **Action:** records this boundary in the scheduler design and adds an executable
+  lifecycle check to the internal continuation experiment. Its existing Promise-backed
+  storage is an implementation detail, not a change to the consumer/producer contract.
+- **Open:** public Task routing migration, registration cleanup for abandoned managed
+  operations, and cross-invocation/race semantics remain work. No Task state or producer
+  completion authority is moved into the runtime registration service.

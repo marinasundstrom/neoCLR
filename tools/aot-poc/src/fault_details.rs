@@ -45,6 +45,9 @@ pub struct Options {
     pub socket_receive: Vec<usize>,
     pub socket_send: Vec<usize>,
     pub scheduler_submit: Vec<usize>,
+    pub scheduler_register: Vec<usize>,
+    pub scheduler_activate: Vec<usize>,
+    pub scheduler_cancel: Vec<usize>,
     pub scheduler_capture: Vec<usize>,
     pub scheduler_submit_to: Vec<usize>,
     pub timer_start: Vec<usize>,
@@ -215,6 +218,15 @@ impl Options {
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             socket_cancel: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "socket-cancel-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            scheduler_register: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "scheduler-register-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            scheduler_activate: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "scheduler-activate-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            scheduler_cancel: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "scheduler-cancel-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             scheduler_capture: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "scheduler-capture-v1")

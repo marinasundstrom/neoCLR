@@ -655,6 +655,9 @@ fn completion_services(input: &mut neoclr::Module, selection: &Value, submission
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
         if row["name"].as_str().is_some_and(|name| name.starts_with("neoCLR.Runtime.Scheduler")) != submission { continue; }
         let (parameters, result, implementation, symbol) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.SchedulerRegister") => (vec![Type::Int64, neoclr::assembler::parse_type("fn<Void>").expect("fixed scheduler callback signature")], Type::Int64, "scheduler-register-v1", "neoclr_scheduler_register_managed_v1"),
+            Some("neoCLR.Runtime.SchedulerActivate") => (vec![Type::Int64], Type::Boolean, "scheduler-activate-v1", "neoclr_scheduler_activate_managed_v1"),
+            Some("neoCLR.Runtime.SchedulerCancel") => (vec![Type::Int64], Type::Boolean, "scheduler-cancel-v1", "neoclr_scheduler_cancel_managed_v1"),
             Some("neoCLR.Runtime.SchedulerCapture") => (vec![], Type::Int64, "scheduler-capture-v1", "neoclr_scheduler_capture_managed_v1"),
             Some("neoCLR.Runtime.SchedulerSubmitTo") => (vec![Type::Int64, neoclr::assembler::parse_type("fn<Void>").expect("fixed scheduler callback signature")], Type::Int32, "scheduler-submit-to-v1", "neoclr_scheduler_submit_to_managed_v1"),
             Some("neoCLR.Runtime.SchedulerSubmit") => (vec![neoclr::assembler::parse_type("fn<Void>").expect("fixed scheduler callback signature")], Type::Int32, "scheduler-submit-v1", "neoclr_scheduler_submit_managed_v1"),
@@ -768,6 +771,9 @@ mod deadline_tests {
         for (name, signature) in [
             ("SchedulerSubmit", "fn<Void> callback) -> Int32"),
             ("SchedulerCapture", ") -> Int64"),
+            ("SchedulerRegister", "Int64 destination, fn<Void> callback) -> Int64"),
+            ("SchedulerActivate", "Int64 registration) -> Boolean"),
+            ("SchedulerCancel", "Int64 registration) -> Boolean"),
             ("SchedulerSubmitTo", "Int64 destination, fn<Void> callback) -> Int32"),
             ("TimerStart", "Int32 milliseconds, fn<Void> callback) -> Int64"),
             ("TimerCancel", "Int64 handle) -> Boolean"),

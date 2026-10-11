@@ -32,11 +32,22 @@ ordinary asynchronous flow uses await. Every producer queue contains the pump se
 
 ## Ownership and remaining design work
 
-Each `Continuation` captures `SchedulerCapture()` at registration and holds that
-opaque destination plus its callback. The managed list retains these registrations
-until completion; `SchedulerSubmitTo` verifies the destination before transferring
-callback ownership into runtime admission. Completed explicit registration follows
-the same capture/submit path. The token retains no runtime or managed root itself.
+Each `Continuation` captures `SchedulerCapture()` and immediately registers its
+callback with `SchedulerRegister`. The runtime retains the callable and reserves a
+slot; the managed list holds only registration wrappers/handles. Completion calls
+`SchedulerActivate`, transferring ownership into runnable dispatch exactly once.
+`SchedulerCancel` releases a dormant callback and returns true once; after activation,
+repeat cancellation or an unknown/foreign/expired handle returns false. It does not
+retract already-runnable work. Completed explicit registration uses the same
+register/activate path. A registration handle is private to its invocation.
+
+Dormant registrations retain roots but do not keep an invocation pending. Teardown
+abandons remaining dormant roots. The destination token itself remains non-owning;
+the runtime registration is what retains the callback. This may retain abandoned
+managed operations until explicit cancellation or teardown, so automatic abandonment
+cleanup remains a production migration gate. Task still represents operation state;
+Promise is its TaskCompletionSource-like producer. Registration transitions do not
+complete/cancel Tasks; the lifecycle consumer checks this explicitly.
 
 Interpreter and native scopes keep one lazy identity across dispatch turns. A foreign
 or expired identity faults before admission; reopening a native scope at the same
@@ -50,9 +61,9 @@ rather than silently rerouted. A real library migration still needs completion
 ownership, registration lifetime, race rules and deliberate cross-invocation handling.
 It cannot simply replace every queue.Post with SchedulerSubmitTo.
 
-Admission is bounded, per callback and may fault. More than available capacity is not
-an atomic fan-out operation; rollback, overload/backpressure, unlinking cancellation
-and cross-thread completion remain open. No new fairness, FIFO or stable ABI guarantee
+Admission is bounded, per registration and may fault. It reserves capacity so later
+activation needs no additional slot. Registering multiple waiters is not atomic;
+rollback, overload/backpressure and cross-thread completion remain open. No new fairness, FIFO or stable ABI guarantee
 is inferred. Runtime saved activations will require a different execution adapter;
 callback/state-machine layout must not define their public contract.
 
@@ -75,7 +86,8 @@ python3 docs/experiments/jit-async/verify.py \
 
 Use matching rebuilt runtime/backend binaries and the Xcode SDK environment described
 in the scheduler-projection experiment. [Original invocation-only evidence](validation.json) predates destination capture.
-[Captured-destination evidence](destinations-validation.json) records compiler,
+[Captured-destination evidence](destinations-validation.json) predates runtime-owned
+registrations. [Registration lifecycle evidence](registrations-validation.json) records compiler,
 bundle, shared source, runtime/backend and output hashes plus exact commands. Success
 and terminal-fault cases pass in interpreter, JIT and AOT on macOS ARM64 (six executions).
 Windows was not run. Runtime Contract configuration, compiler emission and class-library
@@ -85,3 +97,8 @@ binaries are unchanged; no new reference assembly/API snapshot is required.
 expired/reused scopes, boundary/output rejection and rooted delivery/cleanup. Rust
 scheduler tests cover equivalent destination identity and rejection-before-retention.
 Exact reserved signature tests run in both interpreter and native binding layers.
+
+[Native registration contracts](registration-contracts.json) check full-capacity
+activation, cancellation and root release, dormant quiescence and scope teardown.
+The real awaitable consumer additionally checks registration cancellation independently
+of Task state and exits with an intentionally abandoned dormant registration.

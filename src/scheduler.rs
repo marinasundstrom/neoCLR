@@ -139,6 +139,7 @@ pub(crate) struct Scheduler {
     destination: Option<i64>,
     ready: Option<Ready>,
     submitted: std::collections::VecDeque<Value>,
+    registrations: std::collections::BTreeMap<i64, Value>,
     prefer_submission: bool,
     arbitration: Arbitration,
     wake: Arc<Wake>,
@@ -154,6 +155,7 @@ impl Default for Scheduler {
             destination: None,
             ready: None,
             submitted: Default::default(),
+            registrations: Default::default(),
             prefer_submission: true,
             arbitration: Default::default(),
             wake,
@@ -220,7 +222,7 @@ impl Scheduler {
         {
             return Err(Fault::new("Scheduler submission requires a unit callback"));
         }
-        if self.submitted.len() >= 64 {
+        if self.submitted.len() + self.registrations.len() >= 64 {
             return Err(Fault::coded(
                 crate::FaultCode::NativeMemoryLimitExceeded,
                 "Scheduler submission capacity exceeded",
@@ -229,6 +231,48 @@ impl Scheduler {
         self.submitted.push_back(callback);
         self.wake.signal();
         Ok(())
+    }
+
+    pub(crate) fn register(&mut self, destination: i64, callback: Value) -> Result<i64, Fault> {
+        use std::sync::atomic::{AtomicI64, Ordering};
+        static NEXT: AtomicI64 = AtomicI64::new(1);
+        if destination <= 0 || self.destination != Some(destination) {
+            return Err(Fault::new("Scheduler destination is not current"));
+        }
+        if !matches!(callback, Value::Function(_))
+            || callback.ty() != crate::assembler::parse_type("fn<Void>")?
+        {
+            return Err(Fault::new(
+                "Scheduler registration requires a unit callback",
+            ));
+        }
+        if self.submitted.len() + self.registrations.len() >= 64 {
+            return Err(Fault::coded(
+                crate::FaultCode::NativeMemoryLimitExceeded,
+                "Scheduler registration capacity exceeded",
+            ));
+        }
+        let id = NEXT
+            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+                value.checked_add(1)
+            })
+            .map_err(|_| Fault::new("Scheduler registration identity exhausted"))?;
+        self.registrations.insert(id, callback);
+        Ok(id)
+    }
+
+    pub(crate) fn activate(&mut self, id: i64) -> bool {
+        let Some(callback) = self.registrations.remove(&id) else {
+            return false;
+        };
+        // Registration already reserved capacity. Transfer ownership, never clone.
+        self.submitted.push_back(callback);
+        self.wake.signal();
+        true
+    }
+
+    pub(crate) fn cancel_registration(&mut self, id: i64) -> bool {
+        self.registrations.remove(&id).is_some()
     }
 
     pub(crate) fn install_submission(
@@ -248,6 +292,9 @@ impl Scheduler {
     }
 
     pub(crate) fn trace_roots(&self, roots: &mut Vec<usize>) {
+        for callback in self.registrations.values() {
+            crate::gc::trace(callback, roots);
+        }
         for callback in &self.submitted {
             crate::gc::trace(callback, roots);
         }
@@ -752,6 +799,62 @@ mod tests {
         );
         collect(&mut heap, &scheduler, &[]);
         assert!(heap.is_empty());
+    }
+
+    #[test]
+    fn dormant_registrations_reserve_capacity_transfer_once_and_release_roots() {
+        let mut heap = ManagedHeap::default();
+        let mut scheduler = Scheduler::default();
+        let destination = scheduler.capture_destination().unwrap();
+        let (callback, _) = ready_graphs(&mut heap);
+        let registrations: Vec<_> = (0..64)
+            .map(|_| scheduler.register(destination, callback.clone()).unwrap())
+            .collect();
+        assert!(scheduler.register(destination, callback.clone()).is_err());
+        assert!(scheduler.submit(callback).is_err());
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.len(), 2);
+        assert_eq!(
+            scheduler
+                .completion_state(&heap, &Default::default())
+                .unwrap(),
+            CompletionState::Idle
+        );
+        assert_eq!(scheduler.wait_timeout(Instant::now(), true), POLL_INTERVAL);
+        let mut foreign = Scheduler::default();
+        assert!(!foreign.activate(registrations[0]));
+        assert!(!foreign.cancel_registration(registrations[0]));
+        assert!(
+            scheduler.activate(registrations[0]),
+            "activation needs no extra capacity"
+        );
+        assert!(!scheduler.activate(registrations[0]));
+        assert!(!scheduler.cancel_registration(registrations[0]));
+        assert_eq!(
+            scheduler
+                .completion_state(&heap, &Default::default())
+                .unwrap(),
+            CompletionState::Ready
+        );
+        assert!(
+            scheduler
+                .install_submission(|_| Err(Fault::new("frame rejected")))
+                .is_err()
+        );
+        assert!(scheduler.install_submission(|_| Ok(())).unwrap());
+        for registration in &registrations[1..] {
+            assert!(scheduler.cancel_registration(*registration));
+            assert!(!scheduler.cancel_registration(*registration));
+            assert!(!scheduler.activate(*registration));
+        }
+        collect(&mut heap, &scheduler, &[]);
+        assert!(heap.is_empty());
+        let (callback, _) = ready_graphs(&mut heap);
+        let abandoned = scheduler.register(destination, callback).unwrap();
+        drop(scheduler);
+        assert!(!foreign.activate(abandoned));
+        collect(&mut heap, &foreign, &[]);
+        assert!(heap.is_empty(), "teardown abandons dormant registrations");
     }
 
     #[test]

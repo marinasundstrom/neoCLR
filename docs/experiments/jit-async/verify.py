@@ -91,7 +91,9 @@ def main():
         cases = [('continuations', ROOT/'docs/experiments/scheduler-continuations/Main.rvn', [], 0,
                   'PASS multiple pending awaits without producer pump\n'
                   'PASS completed await and deferred observer\n'
-                  'PASS cancellation without producer pump\n', None),
+                  'PASS cancellation without producer pump\n'
+                  'PASS registration lifecycle is separate from task state\n'
+                  'PASS dormant registration does not keep invocation alive\n', None),
                  ('continuation-fault', ROOT/'docs/experiments/scheduler-continuations/Fault.rvn', [], 1,
                   '', 'fault after continuation submission')]
     if args.case:

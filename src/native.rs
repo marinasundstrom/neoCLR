@@ -54,6 +54,9 @@ pub(crate) enum Binding {
     SchedulerSubmit,
     SchedulerCapture,
     SchedulerSubmitTo,
+    SchedulerRegister,
+    SchedulerActivate,
+    SchedulerCancel,
     StartWorker(bool),
     JoinWorker,
     JoinWorkerResult,
@@ -911,6 +914,13 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         {
             (Binding::NotifyWorker, Type::Void)
         }
+        ("neoCLR.Runtime.SchedulerRegister", [Type::Int64, callback])
+            if *callback == crate::assembler::parse_type("fn<Void>")? =>
+        {
+            (Binding::SchedulerRegister, Type::Int64)
+        }
+        ("neoCLR.Runtime.SchedulerActivate", [Type::Int64]) => (Binding::SchedulerActivate, Type::Boolean),
+        ("neoCLR.Runtime.SchedulerCancel", [Type::Int64]) => (Binding::SchedulerCancel, Type::Boolean),
         ("neoCLR.Runtime.SchedulerCapture", []) => (Binding::SchedulerCapture, Type::Int64),
         ("neoCLR.Runtime.SchedulerSubmitTo", [Type::Int64, callback])
             if *callback == crate::assembler::parse_type("fn<Void>")? =>
@@ -1666,6 +1676,13 @@ mod task_callback_tests {
     fn scheduler_destinations_require_exact_contracts() {
         for (signature, accepted) in [
             ("SchedulerCapture() -> Int64", true),
+            ("SchedulerRegister(Int64 destination, fn<Void> callback) -> Int64", true),
+            ("SchedulerRegister(Int64 destination, fn<Int32> callback) -> Int64", false),
+            ("SchedulerRegister(Int64 destination, fn<Void> callback) -> Int32", false),
+            ("SchedulerActivate(Int64 registration) -> Boolean", true),
+            ("SchedulerCancel(Int64 registration) -> Boolean", true),
+            ("SchedulerActivate(Int32 registration) -> Boolean", false),
+            ("SchedulerCancel(Int64 registration) -> Int32", false),
             ("SchedulerCapture() -> Int32", false),
             ("SchedulerCapture(Int64 value) -> Int64", false),
             ("SchedulerSubmitTo(Int64 destination, fn<Void> callback) -> Int32", true),
