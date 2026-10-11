@@ -2,6 +2,7 @@ mod class_dispatch;
 mod bindings;
 mod boxing;
 mod compiler;
+mod jit;
 mod fault_details;
 mod inspection;
 mod linking;
@@ -32,6 +33,20 @@ fn main() {
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut args: Vec<_> = env::args_os().skip(1).collect();
+    if args.first().is_some_and(|arg| arg == "--jit-scalar") {
+        if args.len() != 4 {
+            return Err("usage: neoclr-aot-poc --jit-scalar <input.neoil|input.neox|input.dll> <root-name> <Int32 argument>".into());
+        }
+        let started = std::time::Instant::now();
+        let input = read_module(Path::new(&args[1]))?;
+        let load_seconds = started.elapsed().as_secs_f64();
+        let root = args[2].to_str().ok_or("root must be UTF-8")?;
+        let argument: i32 = args[3].to_str().ok_or("argument must be Int32")?.parse()?;
+        let mut result = jit::execute(&input, root, argument)?;
+        result["loadSeconds"] = serde_json::json!(load_seconds);
+        println!("{result}");
+        return Ok(());
+    }
     let mut target = compiler::Target::MacosArm64;
     if args.iter().filter(|a| *a == "--target").count() > 1 {
         return Err("duplicate --target option".into());

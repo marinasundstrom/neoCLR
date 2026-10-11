@@ -15,8 +15,9 @@ and the [JIT evaluation brief](native-execution-investigation.md#jit-for-develop
 records discovery/build phases and repeatable process timings. The [local evaluation](experiments/jit-iteration/README.md)
 compares existing debug-built and release-built AOT tools while checking HTTP handler
 lifetime and Index/Range behavior. It recommends a bounded JIT shared-lowering probe,
-followed by real test-framework execution; implementation and socket workload
-qualification remain open. Memory views and suspension remain related design work.
+followed by real test-framework execution. The [scalar JIT probe](experiments/jit-scalar/README.md)
+now implements in-memory native invocation on macOS ARM64 with shared AOT lowering;
+managed test-framework assemblies and socket workload qualification remain open. Memory views and suspension remain related design work.
 
 **Module story closure (2026-10-10):** the author requests closing the namespace/module
 authoring and metadata story so work can move on. The accepted model and implemented

@@ -186,3 +186,11 @@ The development JSON corpus additionally exercises two nested documents through
 JsonValue and typed objects, plus typed scalar/object vectors, with macOS
 interpreter/native parity. The same corpus now passes Windows x64 project execution. Lists/sequences and maps
 remain under development; no comparative benchmark results are published yet.
+
+## JIT investigation
+
+A development-only macOS ARM64 scalar JIT probe now shares verified integer lowering
+with AOT and executes generated code in memory. It covers integer control flow, local
+calls and fault statuses. It does not yet run managed test assemblies, HTTP applications
+or Windows JIT code. The interpreter and AOT workflows above remain the application
+execution options. [Probe contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-scalar/README.md).

@@ -83,6 +83,9 @@ needed before predicting server throughput or the achievable edit–test improve
 
 ## Concrete JIT scope
 
+The subsequent [scalar JIT slice](../jit-scalar/README.md) implements the first step
+below. Managed test-framework execution remains the next meaningful milestone.
+
 Recommendation: begin a bounded JIT feasibility slice, while also using a release
 compiler for realistic native iteration measurements. Reuse verified native lowering
 rather than introduce another IL-to-machine-code implementation. The current scalar

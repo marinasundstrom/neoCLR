@@ -52,7 +52,9 @@ but cannot predict JIT speed or explain the full edit–test delay.
 records repeated local test-process timings and compiler build-profile costs. The
 assistant recommends beginning a bounded shared-lowering JIT probe, with real test
 framework execution as the subsequent milestone. These preliminary measurements
-do not establish JIT performance or a production JIT commitment.
+do not establish JIT performance or a production JIT commitment. The subsequent
+[scalar probe](experiments/jit-scalar/README.md) now implements the first bounded
+shared-lowering path; it does not yet execute managed test-framework assemblies.
 
 ## Historical starting point
 

@@ -96,6 +96,31 @@ pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bo
         }
         return values::compile(input, root, details, target);
     }
+    let target = target.triple()
+        .parse()
+        .expect("fixed valid target triple");
+    let mut settings = settings::builder();
+    settings.set("is_pic", "true")?;
+    let isa = isa::lookup(target)?.finish(settings::Flags::new(settings))?;
+    let mut module = ObjectModule::new(ObjectBuilder::new(
+        isa,
+        "neoclr_scalar",
+        cranelift_module::default_libcall_names(),
+    )?);
+    compile_scalar(input, root, console, &mut module)?;
+    finish(module)
+}
+
+/// Shared verified scalar lowering for object and in-memory module implementations.
+pub(super) fn compile_scalar<M: Module>(
+    input: &neoclr::Module,
+    root: &str,
+    console: bool,
+    module: &mut M,
+) -> Result<(), Error> {
+    if !input.types.is_empty() {
+        return Err("scalar profile does not support type definitions".into());
+    }
     if input.name == "System" || input.functions.len() > 128 {
         return Err(
             "scalar profile requires an application with no types and at most 128 functions".into(),
@@ -200,17 +225,6 @@ pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bo
         .and_then(|program| program.verify())
         .map_err(|error| error.to_string())?;
 
-    let target = target.triple()
-        .parse()
-        .expect("fixed valid target triple");
-    let mut settings = settings::builder();
-    settings.set("is_pic", "true")?;
-    let isa = isa::lookup(target)?.finish(settings::Flags::new(settings))?;
-    let mut module = ObjectModule::new(ObjectBuilder::new(
-        isa,
-        "neoclr_scalar",
-        cranelift_module::default_libcall_names(),
-    )?);
     let console_id = if uses_console {
         let mut signature = module.make_signature();
         signature.params = vec![AbiParam::new(types::I64), AbiParam::new(types::I64)];
@@ -486,7 +500,7 @@ pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bo
         }
         module.define_function(export, &mut context)?;
     }
-    finish(module)
+    Ok(())
 }
 
 fn finish(module: ObjectModule) -> Result<Vec<u8>, Error> {

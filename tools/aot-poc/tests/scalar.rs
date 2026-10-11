@@ -46,10 +46,6 @@ fn unsupported_or_invalid_programs_never_emit_an_object() {
             "unsupported instruction",
         ),
         (
-            SOURCE.replace("    mul", "    shl"),
-            "unsupported instruction",
-        ),
-        (
             SOURCE.replace("    ldarg value\n    ldc.i4 2", "    ldc.i4 2"),
             "stack underflow",
         ),
@@ -93,13 +89,21 @@ fn unsupported_or_invalid_programs_never_emit_an_object() {
         let temp = Temp::new();
         let path = temp.0.join("rejected.o");
         let result = compile(&source, &path);
-        assert!(!result.status.success());
+        assert!(!result.status.success(), "unexpected success for {source}");
         let error = String::from_utf8_lossy(&result.stderr);
         assert!(
             error.contains(expected),
             "expected {expected:?}, got {error}"
         );
         assert!(!path.exists());
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        {
+            let jit = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+                .arg("--jit-scalar").arg(path.with_extension("neoil"))
+                .args(["Calculate", "0"]).output().unwrap();
+            assert!(!jit.status.success(), "invalid input must not execute through JIT");
+            assert!(jit.stdout.is_empty());
+        }
     }
 }
 
@@ -201,11 +205,21 @@ fn assert_native_outcomes(source: &str, inputs: &[i32], oracle: Option<&dyn Fn(i
             .arg(input.to_string())
             .output()
             .unwrap();
+        let jit = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+            .arg("--jit-scalar").arg(object.with_extension("neoil"))
+            .arg("Calculate").arg(input.to_string()).output().unwrap();
+        assert!(jit.status.success(), "{}", String::from_utf8_lossy(&jit.stderr));
+        assert!(jit.stderr.is_empty());
+        let jit: serde_json::Value = serde_json::from_slice(&jit.stdout).unwrap();
+        assert!(jit["compileAndFinalizeSeconds"].as_f64().unwrap() >= 0.0);
+        assert!(jit["invocationSeconds"].as_f64().unwrap() >= 0.0);
         match interpreted {
             Ok(execution) => {
                 let neoclr::Value::Int32(expected) = execution.value else {
                     panic!("unexpected interpreter result")
                 };
+                assert_eq!(jit["status"], 0);
+                assert_eq!(jit["value"], expected);
                 if let Some(oracle) = oracle {
                     assert_eq!(expected, oracle(input));
                 }
@@ -224,6 +238,14 @@ fn assert_native_outcomes(source: &str, inputs: &[i32], oracle: Option<&dyn Fn(i
             }
             Err(fault) => {
                 assert!(oracle.is_none(), "unexpected interpreter fault {fault}");
+                let expected_status = match fault.code {
+                    neoclr::FaultCode::DivideByZero => 1,
+                    neoclr::FaultCode::ArithmeticOverflow => 2,
+                    neoclr::FaultCode::UserFault => 4,
+                    ref other => panic!("unexpected scalar fault {other:?}"),
+                };
+                assert_eq!(jit["status"], expected_status);
+                assert!(jit["value"].is_null());
                 assert!(matches!(
                     fault.code,
                     neoclr::FaultCode::DivideByZero | neoclr::FaultCode::ArithmeticOverflow | neoclr::FaultCode::UserFault
@@ -849,4 +871,63 @@ fn scalar_boolean_values_do_not_become_int32_operands() {
         assert!(!compile(&source, &object).status.success());
         assert!(!object.exists());
     }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn jit_parameterless_entry_and_argument_validation() {
+    let temp = Temp::new();
+    let input = temp.0.join("main.neoil");
+    fs::write(&input, ".module Main\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n").unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        .arg("--jit-scalar").arg(&input).args(["Main", "99"]).output().unwrap();
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    let result: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert_eq!(result["status"], 0);
+    assert_eq!(result["value"], 42);
+    for argument in ["2147483648", "no", ""] {
+        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+            .arg("--jit-scalar").arg(&input).args(["Main", argument]).output().unwrap();
+        assert!(!result.status.success());
+        assert!(result.stdout.is_empty());
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn jit_rejects_expanded_aot_features_and_external_services() {
+    let temp = Temp::new();
+    let input = temp.0.join("unsupported.neoil");
+    for source in [
+        SOURCE.replace("    mul", "    shl"),
+        include_str!("../../../docs/experiments/aot-scalar/console.neoil").to_owned(),
+        ".module Unsupported\n.function Calculate() -> Int64\nldc.i8 1\nret\n.end\n".to_owned(),
+    ] {
+        fs::write(&input, source).unwrap();
+        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+            .arg("--jit-scalar").arg(&input).args(["Calculate", "0"]).output().unwrap();
+        assert!(!result.status.success());
+        assert!(result.stdout.is_empty());
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn jit_native_container_matches_source_and_rejects_corruption() {
+    let temp = Temp::new();
+    let input = temp.0.join("scalar.neox");
+    let module = neoclr::assemble(SOURCE).unwrap();
+    let bytes = neoclr::metadata_container::write_module(&module).unwrap();
+    fs::write(&input, &bytes).unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        .arg("--jit-scalar").arg(&input).args(["Calculate", "20"]).output().unwrap();
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    let result: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert_eq!(result["status"], 0);
+    assert_eq!(result["value"], 42);
+    fs::write(&input, &bytes[..bytes.len() - 1]).unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        .arg("--jit-scalar").arg(&input).args(["Calculate", "20"]).output().unwrap();
+    assert!(!result.status.success());
+    assert!(result.stdout.is_empty());
 }

@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-11",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "sourceBaseRevision": "e6332565",
+  "toolProfile": "release",
+  "toolSha256": "a76ebf84e67cf63f963e3cb132b7461dd8446a6abf9310ea5cbc6ae627250edc",
+  "inputs": {
+    "tools/aot-poc/Cargo.toml": "e5cd82f85901a79e6c9d9d62a6c4fd5fbc519d1ec49fd0a9147ae0f39a1e4f7e",
+    "tools/aot-poc/Cargo.lock": "a9467cc5288d907fbac53117730512e4d45f6408ead1aaa38217de992ab99b49",
+    "tools/aot-poc/src/compiler.rs": "99229ffb3e6dca79d63c313ef219c2dc553232b9a624b52a82b277d30c5d8bf0",
+    "tools/aot-poc/src/jit.rs": "3668730754625f174cf4788ad71f658502c7792c617d7684f920caca0deae9bf",
+    "tools/aot-poc/src/main.rs": "27a1b179159ce22a9ce11939cdb8e110b7f4368549e38ac6847711683a4050a8",
+    "tools/aot-poc/tests/scalar.rs": "61bc00770ff71b0a9ccb1df841c873abcf4ce22ea3208f914f48b605d09bffe6"
+  },
+  "samples": [
+    {
+      "input": "docs/experiments/aot-scalar/scalar.neoil",
+      "inputSha256": "33df2ac6c3d2e1d7cd70f1094de476fa3d58e348af705dcfba07dceead789db7",
+      "argument": 20,
+      "result": {
+        "compileAndFinalizeSeconds": 0.040830167,
+        "invocationSeconds": 6.041e-06,
+        "loadSeconds": 0.045557375,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": 42
+      }
+    },
+    {
+      "input": "docs/experiments/aot-scalar/control-flow.neoil",
+      "inputSha256": "ca325b2b5454a3d66486681b563a78fccd2a9da3fe3caf5b730882a9c674b330",
+      "argument": 5,
+      "result": {
+        "compileAndFinalizeSeconds": 0.031198083,
+        "invocationSeconds": 5.083e-06,
+        "loadSeconds": 0.03252975,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": 20
+      }
+    },
+    {
+      "input": "docs/experiments/aot-scalar/faults.neoil",
+      "inputSha256": "71fffdc8cde0285dc4cde54a6a6c8d79d2aead01c78cf4988cf0ba431229d81e",
+      "argument": -1,
+      "result": {
+        "compileAndFinalizeSeconds": 0.031288583,
+        "invocationSeconds": 8.083e-06,
+        "loadSeconds": 0.03435775,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 1,
+        "value": null
+      }
+    },
+    {
+      "input": "docs/experiments/aot-scalar/faults.neoil",
+      "inputSha256": "71fffdc8cde0285dc4cde54a6a6c8d79d2aead01c78cf4988cf0ba431229d81e",
+      "argument": 2147483647,
+      "result": {
+        "compileAndFinalizeSeconds": 0.030994458,
+        "invocationSeconds": 8.958e-06,
+        "loadSeconds": 0.032694125,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 2,
+        "value": null
+      }
+    },
+    {
+      "input": "docs/experiments/aot-scalar/user-fault.neoil",
+      "inputSha256": "a1a9a8a433730eff2cf4d13e6d6d10ffec78a76c7a796fa8f4710a7dcc82c36e",
+      "argument": 1,
+      "result": {
+        "compileAndFinalizeSeconds": 0.032000166,
+        "invocationSeconds": 6.125e-06,
+        "loadSeconds": 0.033252667,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 4,
+        "value": null
+      }
+    }
+  ],
+  "tests": [
+    {
+      "target": "scalar",
+      "passed": 21,
+      "logSha256": "cdf595fe15ea2ff901402d28bef6626814ec84513bb6e2658ac3cf71177df7ac"
+    },
+    {
+      "target": "scalar jit_ (adds native-container coverage, repeats two tests)",
+      "passed": 3,
+      "logSha256": "3f43e434324bb485371c3d4abf5d4aaeb6dbb5221ba0c8e70b69e37a18e0fd68"
+    },
+    {
+      "target": "windows_scalar object emission on macOS",
+      "passed": 3,
+      "ignoredWindowsExecution": 4
+    }
+  ],
+  "limitations": [
+    "No managed test-framework or HTTP execution",
+    "No Windows JIT execution",
+    "Single invocation samples include no process launch and are not throughput benchmarks",
+    "Scalar shared lowering; managed lowering remains object-module-specific"
+  ]
+}

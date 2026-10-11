@@ -53,6 +53,11 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   these samples, while whole-harness times are similar because other phases vary.
   **Assistant recommendation:** start a bounded shared-lowering JIT probe, then run
   the actual test framework; no JIT implementation or performance prediction is claimed.
+- **Subsequent implementation:** the [scalar JIT probe](experiments/jit-scalar/README.md)
+  now uses shared AOT lowering and invocation-scoped executable-code ownership.
+  Interpreter/AOT/JIT scalar parity and native-container rejection checks pass on
+  macOS ARM64. Managed test assemblies, HTTP and Windows JIT remain open; the scalar
+  timings do not establish the requested developer-experience improvement.
 
 ## 2026-10-10 — Experimental API compatibility and Index/Range continuation
 
